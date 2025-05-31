@@ -85,7 +85,7 @@ public class LoadMojo extends AbstractMojo {
         getLog().info("[MAVEN-CORE-IT-LOG] Creating output file: " + file);
 
         try {
-            mkDirForParentFile();
+            mkDirForParentFile(file);
             file.createNewFile();
         } catch (IOException e) {
             throw new MojoExecutionException("Output file could not be created: " + file, e);

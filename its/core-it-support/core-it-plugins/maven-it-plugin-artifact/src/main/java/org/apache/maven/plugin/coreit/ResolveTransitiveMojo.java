@@ -120,7 +120,7 @@ public class ResolveTransitiveMojo extends AbstractMojo {
             getLog().info("[MAVEN-CORE-IT-LOG] Creating properties file " + propertiesFile);
 
             try {
-                propertiesFilemkDirForParentFile();
+                propertiesFilemkDirForParentFile(file);
 
                 try (FileOutputStream fos = new FileOutputStream(propertiesFile)) {
                     thread.props.store(fos, "MAVEN-CORE-IT");

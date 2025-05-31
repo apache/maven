@@ -51,7 +51,7 @@ public class PackagingMojo extends AbstractMojo {
         getLog().info("[MAVEN-CORE-IT-LOG] Creating artifact file: " + jarFile);
 
         try {
-            jarFilemkDirForParentFile();
+            jarFilemkDirForParentFile(file);
             jarFile.createNewFile();
         } catch (IOException e) {
             throw new MojoExecutionException("Error assembling JAR", e);

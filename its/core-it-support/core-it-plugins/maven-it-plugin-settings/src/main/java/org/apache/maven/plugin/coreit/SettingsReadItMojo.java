@@ -46,7 +46,7 @@ public class SettingsReadItMojo extends AbstractMojo {
         if (dumpFile.exists()) {
             dumpFile.delete();
         }
-        dumpFilemkDirForParentFile();
+        dumpFilemkDirForParentFile(file);
         try (FileWriter fw = new FileWriter(dumpFile)) {
             SettingsXpp3Writer writer = new SettingsXpp3Writer();
             writer.write(fw, settings);

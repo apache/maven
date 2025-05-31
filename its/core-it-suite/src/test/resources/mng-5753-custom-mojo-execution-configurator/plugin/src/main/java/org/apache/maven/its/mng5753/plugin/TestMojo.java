@@ -60,7 +60,7 @@ public class TestMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException {
         try {
             File file = new File(project.getBasedir(), "configuration.txt");
-            mkDirForParentFile();
+            mkDirForParentFile(file);
             Writer w = new OutputStreamWriter(new FileOutputStream(file, true), "UTF-8");
             try {
                 w.write(name);

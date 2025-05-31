@@ -49,7 +49,7 @@ public class SerializeMojo extends AbstractMojo {
         Writer writer = null;
         XmlSerializer s = new MXSerializer();
         try {
-            mkDirForParentFile();
+            mkDirForParentFile(file);
             writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
             s.setOutput(writer);
 

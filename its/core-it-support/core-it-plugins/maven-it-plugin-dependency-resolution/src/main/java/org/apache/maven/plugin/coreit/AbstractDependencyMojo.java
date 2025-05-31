@@ -79,7 +79,7 @@ public abstract class AbstractDependencyMojo extends AbstractMojo {
 
         BufferedWriter writer = null;
         try {
-            mkDirForParentFile();
+            mkDirForParentFile(file);
 
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
 
@@ -134,7 +134,7 @@ public abstract class AbstractDependencyMojo extends AbstractMojo {
 
         BufferedWriter writer = null;
         try {
-            mkDirForParentFile();
+            mkDirForParentFile(file);
 
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
 
@@ -200,7 +200,7 @@ public abstract class AbstractDependencyMojo extends AbstractMojo {
 
         FileOutputStream os = null;
         try {
-            mkDirForParentFile();
+            mkDirForParentFile(file);
 
             os = new FileOutputStream(file);
 

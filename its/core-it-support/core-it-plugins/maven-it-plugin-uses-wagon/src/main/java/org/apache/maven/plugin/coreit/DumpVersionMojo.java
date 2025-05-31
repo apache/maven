@@ -107,7 +107,7 @@ public class DumpVersionMojo extends AbstractMojo {
 
         OutputStream out = null;
         try {
-            propertiesFilemkDirForParentFile();
+            propertiesFilemkDirForParentFile(file);
             out = new FileOutputStream(propertiesFile);
             wagonProperties.store(out, "MAVEN-CORE-IT-LOG");
         } catch (IOException e) {
