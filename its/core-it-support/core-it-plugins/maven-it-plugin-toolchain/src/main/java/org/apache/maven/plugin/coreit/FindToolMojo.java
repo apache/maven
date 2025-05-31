@@ -88,8 +88,8 @@ public class FindToolMojo extends AbstractMojo {
         }
 
         OutputStream out = null;
+        outputFile.getParentFile().mkdirs();
         try {
-            outputFile.getParentFile().mkdirs();
             out = new FileOutputStream(outputFile);
             properties.store(out, "MAVEN-CORE-IT-LOG");
         } catch (IOException e) {

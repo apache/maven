@@ -70,10 +70,9 @@ public class TestCompileMojo extends AbstractMojo {
             outputFile = new File(project.getBasedir(), pathname).getAbsoluteFile();
         }
 
-        getLog().info("[MAVEN-CORE-IT-LOG] Creating output file: " + outputFile);
 
+        outputFile.getParentFile().mkdirs();
         try {
-            outputFile.getParentFile().mkdirs();
             outputFile.createNewFile();
         } catch (IOException e) {
             throw new MojoExecutionException("Output file could not be created: " + pathname, e);

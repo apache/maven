@@ -118,8 +118,8 @@ public class CheckMojo extends AbstractMojo {
         getLog().info("[MAVEN-CORE-IT-LOG] Creating output file " + outputFile);
 
         OutputStream out = null;
+        outputFile.getParentFile().mkdirs();
         try {
-            outputFile.getParentFile().mkdirs();
             out = new FileOutputStream(outputFile);
             componentProperties.store(out, "MAVEN-CORE-IT-LOG");
         } catch (IOException e) {

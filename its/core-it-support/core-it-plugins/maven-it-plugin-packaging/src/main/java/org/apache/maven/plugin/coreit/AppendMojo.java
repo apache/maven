@@ -49,8 +49,8 @@ public class AppendMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException {
         getLog().info("[MAVEN-CORE-IT-LOG] Creating output file: " + outputFile);
 
+        outputFile.getParentFile().mkdirs();
         try {
-            outputFile.getParentFile().mkdirs();
 
             getLog().info("[MAVEN-CORE-IT-LOG]   " + message);
 

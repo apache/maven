@@ -65,8 +65,8 @@ public class ItMojo extends AbstractMojo {
 
         getLog().info("[MAVEN-CORE-IT-LOG] Creating output file: " + outputFile);
 
+        outputFile.getParentFile().mkdirs();
         try {
-            outputFile.getParentFile().mkdirs();
             try (FileOutputStream os = new FileOutputStream(outputFile)) {
                 props.store(os, "MAVEN-CORE-IT-LOG");
             }

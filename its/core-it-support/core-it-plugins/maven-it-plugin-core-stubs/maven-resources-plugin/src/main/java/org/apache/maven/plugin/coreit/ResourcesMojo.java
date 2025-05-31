@@ -81,8 +81,8 @@ public class ResourcesMojo extends AbstractMojo {
 
         getLog().info("[MAVEN-CORE-IT-LOG] Creating output file: " + outputFile);
 
+        outputFile.getParentFile().mkdirs();
         try {
-            outputFile.getParentFile().mkdirs();
 
             if (message != null && message.length() > 0) {
                 getLog().info("[MAVEN-CORE-IT-LOG]   " + message);
