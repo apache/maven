@@ -57,7 +57,7 @@ public abstract class AbstractPomMojo extends AbstractMojo {
 
     protected void store(Properties props, File file) throws MojoExecutionException {
         try {
-            filemkDirForParentFile();
+            mkDirForParentFile();
 
             try (FileOutputStream os = new FileOutputStream(file)) {
                 props.store(os, "[MAVEN-CORE-IT-LOG]");

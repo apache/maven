@@ -57,7 +57,6 @@ public class MyMojo extends AbstractMojo {
         File pomFile = project.getFile();
 
         File movedPomFile = new File(project.getBuild().getDirectory(), "pom.xml");
-        movedPomFilemkDirForParentFile();
         mkDirForParentFile();
 
         try {
