@@ -50,14 +50,14 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
 
     @Override
     public void transferInitiated(TransferEvent event) {
-        overridePreviousTransfer(event);
+        overridePreviousTransfer();
 
         super.transferInitiated(event);
     }
 
     @Override
     public void transferCorrupted(TransferEvent event) throws TransferCancelledException {
-        overridePreviousTransfer(event);
+        overridePreviousTransfer();
 
         super.transferCorrupted(event);
     }
@@ -123,7 +123,7 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
     @Override
     public void transferSucceeded(TransferEvent event) {
         transfers.remove(new TransferResourceIdentifier(event.getResource()));
-        overridePreviousTransfer(event);
+        overridePreviousTransfer();
 
         super.transferSucceeded(event);
     }
@@ -131,12 +131,12 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
     @Override
     public void transferFailed(TransferEvent event) {
         transfers.remove(new TransferResourceIdentifier(event.getResource()));
-        overridePreviousTransfer(event);
+        overridePreviousTransfer();
 
         super.transferFailed(event);
     }
 
-    private void overridePreviousTransfer(TransferEvent event) {
+    private void overridePreviousTransfer() {
         if (lastLength > 0) {
             pad(buffer, lastLength);
             buffer.append('\r');

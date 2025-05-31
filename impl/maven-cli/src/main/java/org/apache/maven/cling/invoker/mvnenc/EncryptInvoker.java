@@ -26,6 +26,8 @@ import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.mvnenc.EncryptOptions;
 import org.apache.maven.api.services.Lookup;
+import org.apache.maven.api.services.SettingsBuilderRequest;
+import org.apache.maven.api.services.SettingsBuilderResult;
 import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.LookupInvoker;
 import org.apache.maven.cling.utils.CLIReportingUtils;
@@ -109,6 +111,14 @@ public class EncryptInvoker extends LookupInvoker<EncryptContext> {
             return ERROR;
         }
     }
+
+    @Override
+    protected void customizeSettingsRequest(EncryptContext context, SettingsBuilderRequest settingsBuilderRequest)
+            throws Exception {}
+
+    @Override
+    protected void customizeSettingsResult(EncryptContext context, SettingsBuilderResult settingsBuilderResult)
+            throws Exception {}
 
     protected int badGoalsErrorMessage(String message, EncryptContext context) {
         context.logger.error(message);
