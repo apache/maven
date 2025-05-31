@@ -26,7 +26,7 @@ import java.nio.file.StandardCopyOption;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Class that sets up Mimir for maven-cli tests IF outer build uses Mimir as well (CI setup).
+ * Class that sets up Mimir for maven-executor tests IF outer build uses Mimir as well (CI setup).
  */
 public final class MimirInfuser {
     public static void infuse(Path userHome) throws IOException {
