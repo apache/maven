@@ -31,6 +31,7 @@ import org.apache.maven.api.Toolchain;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
@@ -124,6 +125,7 @@ public class DefaultJavaToolchainFactory implements ToolchainFactory {
         }
 
         @Override
+        @Nullable
         public String findTool(String toolName) {
             Path toRet = findTool(toolName, Paths.get(getJavaHome()).normalize());
             if (toRet != null) {

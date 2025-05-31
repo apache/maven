@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.services.LifecycleRegistry;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.LookupException;
@@ -85,6 +86,7 @@ public class DefaultLifecycles {
      * @param phase
      * @return
      */
+    @Nullable
     public Lifecycle get(String phase) {
         return getPhaseToLifecycleMap().get(phase);
     }

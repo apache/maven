@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.project.DependencyResolutionResult;
 import org.apache.maven.project.MavenProject;
 
@@ -86,6 +87,7 @@ public class DefaultMavenExecutionResult implements MavenExecutionResult {
         return !getExceptions().isEmpty();
     }
 
+    @Nullable
     public BuildSummary getBuildSummary(MavenProject project) {
         return buildSummaries.get(project);
     }

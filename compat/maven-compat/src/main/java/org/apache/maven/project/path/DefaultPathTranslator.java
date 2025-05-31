@@ -25,6 +25,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Reporting;
@@ -81,6 +82,7 @@ public class DefaultPathTranslator implements PathTranslator {
         }
     }
 
+    @Nullable
     public String alignToBaseDirectory(String path, File basedir) {
         if (basedir == null) {
             return path;
@@ -188,6 +190,7 @@ public class DefaultPathTranslator implements PathTranslator {
         }
     }
 
+    @Nullable
     public String unalignFromBaseDirectory(String path, File basedir) {
         if (basedir == null) {
             return path;

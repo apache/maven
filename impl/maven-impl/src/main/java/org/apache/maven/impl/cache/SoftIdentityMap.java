@@ -28,6 +28,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
+import org.apache.maven.api.annotations.Nullable;
+
 /**
  * A Map implementation that uses soft references for both keys and values,
  * and compares keys using identity (==) rather than equals().
@@ -87,6 +89,7 @@ public class SoftIdentityMap<K, V> implements Map<K, V> {
     }
 
     @Override
+    @Nullable
     public V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction) {
         Objects.requireNonNull(key);
         Objects.requireNonNull(mappingFunction);

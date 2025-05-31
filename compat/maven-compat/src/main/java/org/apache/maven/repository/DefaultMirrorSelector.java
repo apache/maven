@@ -26,6 +26,7 @@ import java.net.URL;
 import java.util.List;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.settings.Mirror;
 
@@ -43,6 +44,7 @@ public class DefaultMirrorSelector implements MirrorSelector {
 
     private static final String EXTERNAL_HTTP_WILDCARD = "external:http:*";
 
+    @Nullable
     public Mirror getMirror(ArtifactRepository repository, List<Mirror> mirrors) {
         String repoId = repository.getId();
 

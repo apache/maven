@@ -21,6 +21,7 @@ package org.apache.maven.repository.legacy;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.repository.ArtifactTransferEvent;
 import org.apache.maven.repository.ArtifactTransferListener;
 import org.apache.maven.repository.ArtifactTransferResource;
@@ -41,6 +42,7 @@ public class TransferListenerAdapter implements TransferListener {
 
     private final Map<Resource, Long> transfers;
 
+    @Nullable
     public static TransferListener newAdapter(ArtifactTransferListener listener) {
         if (listener == null) {
             return null;

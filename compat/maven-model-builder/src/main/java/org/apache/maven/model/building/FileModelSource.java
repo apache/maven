@@ -23,6 +23,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.building.FileSource;
 
 /**
@@ -58,6 +59,7 @@ public class FileModelSource extends FileSource implements ModelSource2 {
     }
 
     @Override
+    @Nullable
     public ModelSource2 getRelatedSource(String relPath) {
         relPath = relPath.replace('\\', File.separatorChar).replace('/', File.separatorChar);
 

@@ -18,6 +18,7 @@
  */
 package org.apache.maven.repository.metadata;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.ArtifactScopeEnum;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -62,7 +63,9 @@ public class MetadataResolutionResult {
     public MetadataGraph getGraph() throws MetadataResolutionException {
         return treeRoot == null ? null : new MetadataGraph(treeRoot);
     }
+
     // ----------------------------------------------------------------------------
+    @Nullable
     public MetadataGraph getGraph(ArtifactScopeEnum scope)
             throws MetadataResolutionException, GraphConflictResolutionException {
         if (treeRoot == null) {
@@ -75,7 +78,9 @@ public class MetadataResolutionResult {
 
         return conflictResolver.resolveConflicts(getGraph(), scope);
     }
+
     // ----------------------------------------------------------------------------
+    @Nullable
     public MetadataGraph getGraph(MetadataResolutionRequestTypeEnum requestType)
             throws MetadataResolutionException, GraphConflictResolutionException {
         if (requestType == null) {
@@ -105,7 +110,9 @@ public class MetadataResolutionResult {
         }
         return null;
     }
+
     // ----------------------------------------------------------------------------
+    @Nullable
     public ClasspathContainer getClasspath(ArtifactScopeEnum scope)
             throws MetadataGraphTransformationException, MetadataResolutionException {
         if (classpathTransformation == null) {
@@ -121,6 +128,7 @@ public class MetadataResolutionResult {
     }
 
     // ----------------------------------------------------------------------------
+    @Nullable
     public MetadataTreeNode getClasspathTree(ArtifactScopeEnum scope)
             throws MetadataGraphTransformationException, MetadataResolutionException {
         ClasspathContainer cpc = getClasspath(scope);

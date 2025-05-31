@@ -22,6 +22,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.Properties;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.impl.model.reflection.ReflectionValueExtractor;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -127,6 +128,7 @@ public class PluginParameterExpressionEvaluator implements TypeAwareExpressionEv
 
     @Override
     @SuppressWarnings("checkstyle:methodlength")
+    @Nullable
     public Object evaluate(String expr, Class<?> type) throws ExpressionEvaluationException {
         Object value = null;
 

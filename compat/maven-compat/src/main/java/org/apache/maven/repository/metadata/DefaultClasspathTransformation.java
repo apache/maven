@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.ArtifactScopeEnum;
 
 /**
@@ -41,6 +42,7 @@ public class DefaultClasspathTransformation implements ClasspathTransformation {
     GraphConflictResolver conflictResolver;
 
     // ----------------------------------------------------------------------------------------------------
+    @Nullable
     public ClasspathContainer transform(MetadataGraph dirtyGraph, ArtifactScopeEnum scope, boolean resolve)
             throws MetadataGraphTransformationException {
         try {

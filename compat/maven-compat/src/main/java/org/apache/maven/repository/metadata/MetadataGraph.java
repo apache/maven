@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.ArtifactScopeEnum;
 
 /**
@@ -150,7 +151,9 @@ public class MetadataGraph {
             processTreeNodes(vertex, n, depth + 1, i);
         }
     }
+
     // ------------------------------------------------------------------------
+    @Nullable
     public MetadataGraphVertex findVertex(ArtifactMetadata md) {
         if (md == null || vertices == null || vertices.size() < 1) {
             return null;
@@ -168,7 +171,9 @@ public class MetadataGraph {
 
         return null;
     }
+
     // ------------------------------------------------------------------------
+    @Nullable
     public MetadataGraphVertex addVertex(ArtifactMetadata md) {
         if (md == null) {
             return null;
@@ -252,7 +257,9 @@ public class MetadataGraph {
             throw new MetadataResolutionException("badly formed edge");
         }
     }
+
     // ------------------------------------------------------------------------
+    @Nullable
     public List<MetadataGraphEdge> getEdgesBetween(MetadataGraphVertex vFrom, MetadataGraphVertex vTo) {
         List<MetadataGraphEdge> edges = getIncidentEdges(vTo);
         if (edges == null || edges.isEmpty()) {
@@ -347,11 +354,13 @@ public class MetadataGraph {
         return vertices;
     }
 
+    @Nullable
     public List<MetadataGraphEdge> getIncidentEdges(MetadataGraphVertex vertex) {
         checkEdges();
         return incidentEdges.get(vertex);
     }
 
+    @Nullable
     public List<MetadataGraphEdge> getExcidentEdges(MetadataGraphVertex vertex) {
         checkEdges();
         return excidentEdges.get(vertex);

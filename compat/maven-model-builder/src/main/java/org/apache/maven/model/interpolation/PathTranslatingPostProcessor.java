@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.model.path.PathTranslator;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 import org.codehaus.plexus.interpolation.util.ValueSourceUtils;
@@ -50,6 +51,7 @@ class PathTranslatingPostProcessor implements InterpolationPostProcessor {
     }
 
     @Override
+    @Nullable
     public Object execute(String expression, Object value) {
         if (value != null) {
             expression = ValueSourceUtils.trimPrefix(expression, expressionPrefixes, true);

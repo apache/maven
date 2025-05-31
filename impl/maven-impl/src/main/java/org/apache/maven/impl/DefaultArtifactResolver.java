@@ -255,6 +255,7 @@ public class DefaultArtifactResolver implements ArtifactResolver {
         }
 
         @Override
+        @Nullable
         public ResultItem getResult(ArtifactCoordinates coordinates) {
             return results.get(coordinates);
         }

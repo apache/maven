@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -130,6 +131,7 @@ public class LegacyRepositorySystem implements RepositorySystem {
         return artifactFactory.createProjectArtifact(groupId, artifactId, metaVersionId);
     }
 
+    @Nullable
     public Artifact createDependencyArtifact(Dependency d) {
         VersionRange versionRange;
         try {
@@ -169,6 +171,7 @@ public class LegacyRepositorySystem implements RepositorySystem {
         return artifact;
     }
 
+    @Nullable
     public Artifact createExtensionArtifact(String groupId, String artifactId, String version) {
         VersionRange versionRange;
         try {
@@ -191,6 +194,7 @@ public class LegacyRepositorySystem implements RepositorySystem {
         return artifactFactory.createParentArtifact(groupId, artifactId, version);
     }
 
+    @Nullable
     public Artifact createPluginArtifact(Plugin plugin) {
         String version = plugin.getVersion();
         if (version == null || version.isEmpty()) {
@@ -331,6 +335,7 @@ public class LegacyRepositorySystem implements RepositorySystem {
         return artifactResolver.resolve(request);
     }
 
+    @Nullable
     public List<ArtifactRepository> getEffectiveRepositories(List<ArtifactRepository> repositories) {
         if (repositories == null) {
             return null;
@@ -663,6 +668,7 @@ public class LegacyRepositorySystem implements RepositorySystem {
     //
     // Artifact Repository Creation
     //
+    @Nullable
     public ArtifactRepository buildArtifactRepository(Repository repo) throws InvalidRepositoryException {
         if (repo != null) {
             String id = repo.getId();

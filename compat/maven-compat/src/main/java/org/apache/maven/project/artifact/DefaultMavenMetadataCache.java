@@ -32,6 +32,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
@@ -262,6 +263,7 @@ public class DefaultMavenMetadataCache implements MavenMetadataCache {
         }
     }
 
+    @Nullable
     public ResolutionGroup get(
             Artifact artifact,
             boolean resolveManagedVersions,

@@ -25,6 +25,7 @@ import java.util.Objects;
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.JXPathNotFoundException;
 import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.project.MavenProject;
 
 public class PomTestWrapper {
@@ -70,6 +71,7 @@ public class PomTestWrapper {
         return context.getValue(expression) != null;
     }
 
+    @Nullable
     public Object getValue(String expression) {
         try {
             return context.getValue(expression);
