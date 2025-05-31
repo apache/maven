@@ -109,7 +109,7 @@ public class DumpAuthMojo extends AbstractMojo {
 
         OutputStream out = null;
         try {
-            propertiesFilemkDirForParentFile(file);
+            mkDirForParentFile(propertiesFile);
             out = new FileOutputStream(propertiesFile);
             authProperties.store(out, "MAVEN-CORE-IT-LOG");
         } catch (IOException e) {
