@@ -16,6 +16,8 @@ github:
     - MNG
   pull_requests:
     del_branch_on_merge: true
+  features:
+    issues: true
 notifications:
   commits: commits@maven.apache.org
   issues: issues@maven.apache.org
