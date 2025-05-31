@@ -33,13 +33,16 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.metadata.v4.MetadataStaxReader;
 import org.apache.maven.metadata.v4.MetadataStaxWriter;
 
+import static java.lang.System.lineSeparator;
+import static org.apache.maven.artifact.Artifact.LATEST_VERSION;
+import static org.apache.maven.artifact.Artifact.RELEASE_VERSION;
+
 /**
  * Shared methods of the repository metadata handling.
  *
  */
 @Deprecated
 public abstract class AbstractRepositoryMetadata implements RepositoryMetadata {
-    private static final String LS = System.lineSeparator();
 
     private Metadata metadata;
 
@@ -66,51 +69,37 @@ public abstract class AbstractRepositoryMetadata implements RepositoryMetadata {
 
     protected void updateRepositoryMetadata(ArtifactRepository localRepository, ArtifactRepository remoteRepository)
             throws IOException, XMLStreamException {
-        Metadata metadata = null;
-
         File metadataFile = new File(
                 localRepository.getBasedir(), localRepository.pathOfLocalRepositoryMetadata(this, remoteRepository));
-
-        if (metadataFile.length() == 0) {
+        Metadata metadata = this.metadata;
+        if (metadataFile.exists()) {
+            try (InputStream input = Files.newInputStream(metadataFile.toPath())) {
+                metadata = new Metadata(new MetadataStaxReader().read(input, false));
+            }
+        } else if (metadataFile.length() == 0) {
             if (!metadataFile.delete()) {
                 // sleep for 10ms just in case this is windows holding a file lock
                 try {
                     Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    // ignore
+                } catch (InterruptedException ignore) {
                 }
                 metadataFile.delete(); // if this fails, forget about it, we'll try to overwrite it anyway so no need
                 // to delete on exit
             }
-        } else if (metadataFile.exists()) {
-            try (InputStream input = Files.newInputStream(metadataFile.toPath())) {
-                metadata = new Metadata(new MetadataStaxReader().read(input, false));
-            }
         }
+        writeMetadata(metadata, metadataFile);
+    }
 
-        boolean changed;
-
-        // If file could not be found or was not valid, start from scratch
-        if (metadata == null) {
-            metadata = this.metadata;
-
-            changed = true;
-        } else {
-            changed = metadata.merge(this.metadata);
-        }
-
+    private void writeMetadata(Metadata metadata, File metadataFile) throws IOException, XMLStreamException {
         // beware meta-versions!
-        String version = metadata.getVersion();
-        if (Artifact.LATEST_VERSION.equals(version) || Artifact.RELEASE_VERSION.equals(version)) {
+        if (LATEST_VERSION.equals(metadata.getVersion()) || RELEASE_VERSION.equals(metadata.getVersion())) {
             // meta-versions are not valid <version/> values...don't write them.
             metadata.setVersion(null);
         }
-
-        if (changed || !metadataFile.exists()) {
+        if (metadata.merge(this.metadata) || !metadataFile.exists()) {
             metadataFile.getParentFile().mkdirs();
             try (OutputStream output = Files.newOutputStream(metadataFile.toPath())) {
-                MetadataStaxWriter mappingWriter = new MetadataStaxWriter();
-                mappingWriter.write(output, metadata.getDelegate());
+                new MetadataStaxWriter().write(output, metadata.getDelegate());
             }
         } else {
             metadataFile.setLastModified(System.currentTimeMillis());
@@ -147,26 +136,21 @@ public abstract class AbstractRepositoryMetadata implements RepositoryMetadata {
     public void merge(org.apache.maven.repository.legacy.metadata.ArtifactMetadata metadata) {
         // TODO not sure that it should assume this, maybe the calls to addMetadata should pre-merge, then artifact
         // replaces?
-        AbstractRepositoryMetadata repoMetadata = (AbstractRepositoryMetadata) metadata;
-        this.metadata.merge(repoMetadata.getMetadata());
+        this.metadata.merge(((AbstractRepositoryMetadata) metadata).getMetadata());
     }
 
     public void merge(ArtifactMetadata metadata) {
         // TODO not sure that it should assume this, maybe the calls to addMetadata should pre-merge, then artifact
         // replaces?
-        AbstractRepositoryMetadata repoMetadata = (AbstractRepositoryMetadata) metadata;
-        this.metadata.merge(repoMetadata.getMetadata());
+        this.metadata.merge(((AbstractRepositoryMetadata) metadata).getMetadata());
     }
 
     public String extendedToString() {
-        StringBuilder buffer = new StringBuilder(256);
-
-        buffer.append(LS).append("Repository Metadata").append(LS).append("--------------------------");
-        buffer.append(LS).append("GroupId: ").append(getGroupId());
-        buffer.append(LS).append("ArtifactId: ").append(getArtifactId());
-        buffer.append(LS).append("Metadata Type: ").append(getClass().getName());
-
-        return buffer.toString();
+        return lineSeparator() + "Repository Metadata" + lineSeparator() + "--------------------------"
+                + lineSeparator()
+                + "GroupId: " + getGroupId() + lineSeparator()
+                + "ArtifactId: " + getArtifactId() + lineSeparator()
+                + "Metadata Type: " + getClass().getName();
     }
 
     public int getNature() {
@@ -176,9 +160,7 @@ public abstract class AbstractRepositoryMetadata implements RepositoryMetadata {
     public ArtifactRepositoryPolicy getPolicy(ArtifactRepository repository) {
         int nature = getNature();
         if ((nature & RepositoryMetadata.RELEASE_OR_SNAPSHOT) == RepositoryMetadata.RELEASE_OR_SNAPSHOT) {
-            ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy(repository.getReleases());
-            policy.merge(repository.getSnapshots());
-            return policy;
+            return new ArtifactRepositoryPolicy(repository.getReleases()).merge(repository.getSnapshots());
         } else if ((nature & RepositoryMetadata.SNAPSHOT) != 0) {
             return repository.getSnapshots();
         } else {

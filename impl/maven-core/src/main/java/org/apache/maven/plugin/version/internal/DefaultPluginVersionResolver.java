@@ -209,8 +209,7 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
                     } else {
                         releases.add(v);
                     }
-                } catch (InvalidVersionSpecificationException e) {
-                    // ignore
+                } catch (InvalidVersionSpecificationException ignored) {
                 }
             }
 

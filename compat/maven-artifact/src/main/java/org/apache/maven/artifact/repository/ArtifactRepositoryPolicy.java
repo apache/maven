@@ -132,18 +132,10 @@ public class ArtifactRepositoryPolicy {
 
     @Override
     public String toString() {
-        StringBuilder buffer = new StringBuilder(64);
-        buffer.append("{enabled=");
-        buffer.append(enabled);
-        buffer.append(", checksums=");
-        buffer.append(checksumPolicy);
-        buffer.append(", updates=");
-        buffer.append(updatePolicy);
-        buffer.append('}');
-        return buffer.toString();
+        return "{enabled=" + enabled + ", checksums=" + checksumPolicy + ", updates=" + updatePolicy + '}';
     }
 
-    public void merge(ArtifactRepositoryPolicy policy) {
+    public ArtifactRepositoryPolicy merge(ArtifactRepositoryPolicy policy) {
         if (policy != null && policy.isEnabled()) {
             setEnabled(true);
 
@@ -155,6 +147,7 @@ public class ArtifactRepositoryPolicy {
                 setUpdatePolicy(policy.getUpdatePolicy());
             }
         }
+        return policy;
     }
 
     private int ordinalOfCksumPolicy(String policy) {

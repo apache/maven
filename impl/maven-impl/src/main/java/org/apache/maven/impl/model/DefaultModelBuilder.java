@@ -341,8 +341,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 if (str != null) {
                     parallelism = Integer.parseInt(str);
                 }
-            } catch (Exception e) {
-                // ignore
+            } catch (Exception ignored) {
             }
             return Math.max(1, Math.min(parallelism, Runtime.getRuntime().availableProcessors()));
         }

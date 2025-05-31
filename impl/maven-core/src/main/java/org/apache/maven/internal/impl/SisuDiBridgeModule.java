@@ -268,8 +268,7 @@ public class SisuDiBridgeModule extends AbstractModule {
                     return !(b instanceof ProviderInstanceBinding<?> pib)
                             || !(pib.getUserSuppliedProvider() instanceof BridgeProvider<?>);
                 }
-            } catch (Exception e) {
-                // ignore
+            } catch (Exception ignored) {
             }
             return true;
         }

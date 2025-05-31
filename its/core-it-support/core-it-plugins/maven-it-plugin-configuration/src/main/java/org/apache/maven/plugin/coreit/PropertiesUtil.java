@@ -70,8 +70,8 @@ class PropertiesUtil {
 
     public static void write(File outputFile, Properties props) throws MojoExecutionException {
         OutputStream os = null;
+        createOutputFile(outputFile);
         try {
-            outputFile.getParentFile().mkdirs();
             os = new FileOutputStream(outputFile);
             props.store(os, "MAVEN-CORE-IT-LOG");
         } catch (IOException e) {
