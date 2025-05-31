@@ -22,20 +22,21 @@ import javax.xml.stream.XMLStreamException;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.internal.transformation.PomArtifactTransformer;
 import org.apache.maven.internal.transformation.TransformationFailedException;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.internal.impl.checksum.Sha1ChecksumAlgorithmFactory;
+import org.eclipse.aether.spi.connector.checksum.ChecksumAlgorithmHelper;
 
 /**
  * Transformed artifact is derived with some transformation from source artifact.
@@ -45,7 +46,7 @@ import org.eclipse.aether.RepositorySystemSession;
 class TransformedArtifact extends DefaultArtifact {
 
     private static final int SHA1_BUFFER_SIZE = 8192;
-    private final DefaultConsumerPomArtifactTransformer defaultConsumerPomArtifactTransformer;
+    private final PomArtifactTransformer pomArtifactTransformer;
     private final MavenProject project;
     private final Supplier<Path> sourcePathProvider;
     private final Path target;
@@ -54,7 +55,7 @@ class TransformedArtifact extends DefaultArtifact {
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     TransformedArtifact(
-            DefaultConsumerPomArtifactTransformer defaultConsumerPomArtifactTransformer,
+            PomArtifactTransformer pomArtifactTransformer,
             MavenProject project,
             Path target,
             RepositorySystemSession session,
@@ -71,7 +72,7 @@ class TransformedArtifact extends DefaultArtifact {
                 classifier,
                 new TransformedArtifactHandler(
                         classifier, extension, source.getArtifactHandler().getPackaging()));
-        this.defaultConsumerPomArtifactTransformer = defaultConsumerPomArtifactTransformer;
+        this.pomArtifactTransformer = pomArtifactTransformer;
         this.project = project;
         this.target = target;
         this.session = session;
@@ -97,12 +98,12 @@ class TransformedArtifact extends DefaultArtifact {
                 return null;
             }
             return target.toFile();
-        } catch (IOException | NoSuchAlgorithmException | XMLStreamException | ModelBuilderException e) {
+        } catch (IOException | XMLStreamException | ModelBuilderException e) {
             throw new TransformationFailedException(e);
         }
     }
 
-    private String mayUpdate() throws IOException, NoSuchAlgorithmException, XMLStreamException, ModelBuilderException {
+    private String mayUpdate() throws IOException, XMLStreamException, ModelBuilderException {
         String result;
         Path src = sourcePathProvider.get();
         if (src == null) {
@@ -112,31 +113,16 @@ class TransformedArtifact extends DefaultArtifact {
             Files.deleteIfExists(target);
             result = "";
         } else {
-            String current = sha1(src);
+            String current = ChecksumAlgorithmHelper.calculate(src, List.of(new Sha1ChecksumAlgorithmFactory()))
+                    .get(Sha1ChecksumAlgorithmFactory.NAME);
             String existing = sourceState.get();
             if (!Files.exists(target) || !Objects.equals(current, existing)) {
-                defaultConsumerPomArtifactTransformer.transform(project, session, src, target);
+                pomArtifactTransformer.transform(project, session, src, target);
                 Files.setLastModifiedTime(target, Files.getLastModifiedTime(src));
             }
             result = current;
         }
         sourceState.set(result);
         return result;
-    }
-
-    static String sha1(Path path) throws NoSuchAlgorithmException, IOException {
-        MessageDigest md = MessageDigest.getInstance("SHA-1");
-        try (InputStream fis = Files.newInputStream(path)) {
-            byte[] buffer = new byte[SHA1_BUFFER_SIZE];
-            int read;
-            while ((read = fis.read(buffer)) != -1) {
-                md.update(buffer, 0, read);
-            }
-        }
-        StringBuilder result = new StringBuilder();
-        for (byte b : md.digest()) {
-            result.append(String.format("%02x", b));
-        }
-        return result.toString();
     }
 }
