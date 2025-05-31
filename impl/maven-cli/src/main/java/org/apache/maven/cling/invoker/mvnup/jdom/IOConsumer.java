@@ -16,30 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.cli;
+package org.apache.maven.cling.invoker.mvnup.jdom;
 
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Immutable;
+import java.io.IOException;
 
-/**
- * Represents most common tools supported by CLIng.
- *
- * @since 4.0.0
- */
-@Immutable
-@Experimental
-public final class Tools {
-    private Tools() {}
+public interface IOConsumer<T> {
 
-    public static final String MVN_CMD = "mvn";
-    public static final String MVN_NAME = "Maven";
-
-    public static final String MVNENC_CMD = "mvnenc";
-    public static final String MVNENC_NAME = "Maven Password Encrypting Tool";
-
-    public static final String MVNSHELL_CMD = "mvnsh";
-    public static final String MVNSHELL_NAME = "Maven Shell Tool";
-
-    public static final String MVNUP_CMD = "mvnup";
-    public static final String MVNUP_NAME = "Maven Upgrade Tool";
+    void accept(T t) throws IOException;
 }

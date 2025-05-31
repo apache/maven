@@ -16,30 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.cli;
-
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Immutable;
+package org.apache.maven.cling.invoker.mvnup;
 
 /**
- * Represents most common tools supported by CLIng.
- *
- * @since 4.0.0
+ * The mvnup tool goal.
  */
-@Immutable
-@Experimental
-public final class Tools {
-    private Tools() {}
-
-    public static final String MVN_CMD = "mvn";
-    public static final String MVN_NAME = "Maven";
-
-    public static final String MVNENC_CMD = "mvnenc";
-    public static final String MVNENC_NAME = "Maven Password Encrypting Tool";
-
-    public static final String MVNSHELL_CMD = "mvnsh";
-    public static final String MVNSHELL_NAME = "Maven Shell Tool";
-
-    public static final String MVNUP_CMD = "mvnup";
-    public static final String MVNUP_NAME = "Maven Upgrade Tool";
+public interface Goal {
+    int execute(UpgradeContext context) throws Exception;
 }

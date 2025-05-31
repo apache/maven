@@ -52,7 +52,7 @@ public class ReactorGraph {
         CLUSTER_PATTERNS.put("Commons", Pattern.compile("^commons-cli:.*"));
         CLUSTER_PATTERNS.put("Testing", Pattern.compile("^.*:(mockito-core|junit-jupiter-api):.*"));
     }
-    private static final Pattern HIDDEN_NODES = Pattern.compile(".*:(maven-docgen|roaster-api|roaster-jdt|velocity-engine-core|commons-lang3|asm|logback-classic|slf4j-simple):.*");
+    private static final Pattern HIDDEN_NODES = Pattern.compile(".*:(maven-docgen|roaster-api|roaster-jdt|velocity-engine-core|commons-lang3|asm|logback-classic|slf4j-simple|jdom2):.*");
 
     public static void main(String[] args) {
         try {

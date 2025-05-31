@@ -16,30 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.cli;
+package org.apache.maven.cling.invoker.mvnup.jdom;
 
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Immutable;
+import java.io.IOException;
+import java.util.stream.Stream;
 
 /**
- * Represents most common tools supported by CLIng.
+ * Construction to supply collection of things.
  *
- * @since 4.0.0
+ * @param <T> the type of objects produced by this Source
  */
-@Immutable
-@Experimental
-public final class Tools {
-    private Tools() {}
+@FunctionalInterface
+public interface Source<T> extends AutoCloseable {
+    Stream<T> get() throws IOException;
 
-    public static final String MVN_CMD = "mvn";
-    public static final String MVN_NAME = "Maven";
-
-    public static final String MVNENC_CMD = "mvnenc";
-    public static final String MVNENC_NAME = "Maven Password Encrypting Tool";
-
-    public static final String MVNSHELL_CMD = "mvnsh";
-    public static final String MVNSHELL_NAME = "Maven Shell Tool";
-
-    public static final String MVNUP_CMD = "mvnup";
-    public static final String MVNUP_NAME = "Maven Upgrade Tool";
+    @Override
+    default void close() throws Exception {}
 }
