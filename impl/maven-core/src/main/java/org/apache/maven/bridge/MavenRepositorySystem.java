@@ -27,7 +27,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -61,6 +60,8 @@ import org.eclipse.aether.repository.AuthenticationContext;
 import org.eclipse.aether.repository.AuthenticationSelector;
 import org.eclipse.aether.repository.ProxySelector;
 import org.eclipse.aether.repository.RemoteRepository;
+
+import static org.apache.maven.artifact.repository.ArtifactRepositoryPolicy.getEffectivePolicy;
 
 /**
  * @since 3.2.3
@@ -627,20 +628,20 @@ public class MavenRepositorySystem {
                 mirroredRepos.addAll(aliasedRepo.getMirroredRepositories());
             }
 
-            ArtifactRepositoryPolicy releasePolicy = getEffectivePolicy(releasePolicies);
-
             List<ArtifactRepositoryPolicy> snapshotPolicies = new ArrayList<>(aliasedRepos.size());
 
             for (ArtifactRepository aliasedRepo : aliasedRepos) {
                 snapshotPolicies.add(aliasedRepo.getSnapshots());
             }
 
-            ArtifactRepositoryPolicy snapshotPolicy = getEffectivePolicy(snapshotPolicies);
-
             ArtifactRepository aliasedRepo = aliasedRepos.get(0);
 
             ArtifactRepository effectiveRepository = createArtifactRepository(
-                    aliasedRepo.getId(), aliasedRepo.getUrl(), aliasedRepo.getLayout(), snapshotPolicy, releasePolicy);
+                    aliasedRepo.getId(),
+                    aliasedRepo.getUrl(),
+                    aliasedRepo.getLayout(),
+                    getEffectivePolicy(snapshotPolicies),
+                    getEffectivePolicy(releasePolicies));
 
             effectiveRepository.setAuthentication(aliasedRepo.getAuthentication());
 
@@ -654,20 +655,6 @@ public class MavenRepositorySystem {
         }
 
         return effectiveRepositories;
-    }
-
-    private ArtifactRepositoryPolicy getEffectivePolicy(Collection<ArtifactRepositoryPolicy> policies) {
-        ArtifactRepositoryPolicy effectivePolicy = null;
-
-        for (ArtifactRepositoryPolicy policy : policies) {
-            if (effectivePolicy == null) {
-                effectivePolicy = new ArtifactRepositoryPolicy(policy);
-            } else {
-                effectivePolicy.merge(policy);
-            }
-        }
-
-        return effectivePolicy;
     }
 
     public ArtifactRepository createLocalRepository(MavenExecutionRequest request, File localRepository)

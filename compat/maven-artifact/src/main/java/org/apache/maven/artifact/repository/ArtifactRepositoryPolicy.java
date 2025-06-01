@@ -19,6 +19,7 @@
 package org.apache.maven.artifact.repository;
 
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 
 /**
@@ -143,7 +144,7 @@ public class ArtifactRepositoryPolicy {
         return buffer.toString();
     }
 
-    public void merge(ArtifactRepositoryPolicy policy) {
+    public ArtifactRepositoryPolicy merge(ArtifactRepositoryPolicy policy) {
         if (policy != null && policy.isEnabled()) {
             setEnabled(true);
 
@@ -155,6 +156,14 @@ public class ArtifactRepositoryPolicy {
                 setUpdatePolicy(policy.getUpdatePolicy());
             }
         }
+        return policy;
+    }
+
+    public static ArtifactRepositoryPolicy getEffectivePolicy(Collection<ArtifactRepositoryPolicy> policies) {
+        return policies.stream()
+                .map(ArtifactRepositoryPolicy::new)
+                .reduce(ArtifactRepositoryPolicy::merge)
+                .orElse(null);
     }
 
     private int ordinalOfCksumPolicy(String policy) {

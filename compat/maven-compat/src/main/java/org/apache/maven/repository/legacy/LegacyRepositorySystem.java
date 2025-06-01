@@ -25,7 +25,6 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -78,6 +77,8 @@ import org.eclipse.aether.repository.AuthenticationContext;
 import org.eclipse.aether.repository.AuthenticationSelector;
 import org.eclipse.aether.repository.ProxySelector;
 import org.eclipse.aether.repository.RemoteRepository;
+
+import static org.apache.maven.artifact.repository.ArtifactRepositoryPolicy.getEffectivePolicy;
 
 /**
  */
@@ -358,20 +359,20 @@ public class LegacyRepositorySystem implements RepositorySystem {
                 mirroredRepos.addAll(aliasedRepo.getMirroredRepositories());
             }
 
-            ArtifactRepositoryPolicy releasePolicy = getEffectivePolicy(releasePolicies);
-
             List<ArtifactRepositoryPolicy> snapshotPolicies = new ArrayList<>(aliasedRepos.size());
 
             for (ArtifactRepository aliasedRepo : aliasedRepos) {
                 snapshotPolicies.add(aliasedRepo.getSnapshots());
             }
 
-            ArtifactRepositoryPolicy snapshotPolicy = getEffectivePolicy(snapshotPolicies);
-
             ArtifactRepository aliasedRepo = aliasedRepos.get(0);
 
             ArtifactRepository effectiveRepository = createArtifactRepository(
-                    aliasedRepo.getId(), aliasedRepo.getUrl(), aliasedRepo.getLayout(), snapshotPolicy, releasePolicy);
+                    aliasedRepo.getId(),
+                    aliasedRepo.getUrl(),
+                    aliasedRepo.getLayout(),
+                    getEffectivePolicy(snapshotPolicies),
+                    getEffectivePolicy(releasePolicies));
 
             effectiveRepository.setAuthentication(aliasedRepo.getAuthentication());
 
@@ -385,20 +386,6 @@ public class LegacyRepositorySystem implements RepositorySystem {
         }
 
         return effectiveRepositories;
-    }
-
-    private ArtifactRepositoryPolicy getEffectivePolicy(Collection<ArtifactRepositoryPolicy> policies) {
-        ArtifactRepositoryPolicy effectivePolicy = null;
-
-        for (ArtifactRepositoryPolicy policy : policies) {
-            if (effectivePolicy == null) {
-                effectivePolicy = new ArtifactRepositoryPolicy(policy);
-            } else {
-                effectivePolicy.merge(policy);
-            }
-        }
-
-        return effectivePolicy;
     }
 
     public Mirror getMirror(ArtifactRepository repository, List<Mirror> mirrors) {

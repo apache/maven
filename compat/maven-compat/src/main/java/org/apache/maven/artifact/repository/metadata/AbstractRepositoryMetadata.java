@@ -176,9 +176,7 @@ public abstract class AbstractRepositoryMetadata implements RepositoryMetadata {
     public ArtifactRepositoryPolicy getPolicy(ArtifactRepository repository) {
         int nature = getNature();
         if ((nature & RepositoryMetadata.RELEASE_OR_SNAPSHOT) == RepositoryMetadata.RELEASE_OR_SNAPSHOT) {
-            ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy(repository.getReleases());
-            policy.merge(repository.getSnapshots());
-            return policy;
+            return new ArtifactRepositoryPolicy(repository.getReleases()).merge(repository.getSnapshots());
         } else if ((nature & RepositoryMetadata.SNAPSHOT) != 0) {
             return repository.getSnapshots();
         } else {
