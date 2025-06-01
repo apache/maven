@@ -716,11 +716,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         };
     }
 
-    protected void customizeSettingsRequest(C context, SettingsBuilderRequest settingsBuilderRequest)
-            throws Exception {}
-
-    protected void customizeSettingsResult(C context, SettingsBuilderResult settingsBuilderResult) throws Exception {}
-
     protected boolean mayDisableInteractiveMode(C context, boolean proposedInteractive) {
         if (!context.invokerRequest.options().forceInteractive().orElse(false)) {
             if (context.invokerRequest.options().nonInteractive().orElse(false)) {
@@ -936,4 +931,10 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected abstract int execute(C context) throws Exception;
+
+    protected abstract void customizeSettingsRequest(C context, SettingsBuilderRequest settingsBuilderRequest)
+            throws Exception;
+
+    protected abstract void customizeSettingsResult(C context, SettingsBuilderResult settingsBuilderResult)
+            throws Exception;
 }

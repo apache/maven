@@ -41,6 +41,8 @@ import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.Lookup;
+import org.apache.maven.api.services.SettingsBuilderRequest;
+import org.apache.maven.api.services.SettingsBuilderResult;
 import org.apache.maven.api.services.Sources;
 import org.apache.maven.api.services.ToolchainsBuilder;
 import org.apache.maven.api.services.ToolchainsBuilderRequest;
@@ -91,6 +93,14 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
     protected MavenContext createContext(InvokerRequest invokerRequest) {
         return new MavenContext(invokerRequest);
     }
+
+    @Override
+    protected void customizeSettingsRequest(MavenContext context, SettingsBuilderRequest settingsBuilderRequest)
+            throws Exception {}
+
+    @Override
+    protected void customizeSettingsResult(MavenContext context, SettingsBuilderResult settingsBuilderResult)
+            throws Exception {}
 
     @Override
     protected int execute(MavenContext context) throws Exception {

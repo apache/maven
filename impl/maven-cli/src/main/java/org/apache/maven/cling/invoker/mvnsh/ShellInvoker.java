@@ -24,6 +24,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.services.Lookup;
+import org.apache.maven.api.services.SettingsBuilderRequest;
+import org.apache.maven.api.services.SettingsBuilderResult;
 import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.LookupInvoker;
 import org.apache.maven.cling.utils.CLIReportingUtils;
@@ -197,4 +199,12 @@ public class ShellInvoker extends LookupInvoker<LookupContext> {
             }
         }
     }
+
+    @Override
+    protected void customizeSettingsRequest(LookupContext context, SettingsBuilderRequest settingsBuilderRequest)
+            throws Exception {}
+
+    @Override
+    protected void customizeSettingsResult(LookupContext context, SettingsBuilderResult settingsBuilderResult)
+            throws Exception {}
 }
