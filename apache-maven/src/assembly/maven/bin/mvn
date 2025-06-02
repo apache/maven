@@ -228,6 +228,9 @@ handle_args() {
       --shell)
         MAVEN_MAIN_CLASS="org.apache.maven.cling.MavenShellCling"
         ;;
+      --up)
+        MAVEN_MAIN_CLASS="org.apache.maven.cling.MavenUpCling"
+        ;;
       *)
         ;;
     esac

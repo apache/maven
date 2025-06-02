@@ -16,30 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.cli;
-
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Immutable;
+package org.apache.maven.cling.invoker.mvnup.goals;
 
 /**
- * Represents most common tools supported by CLIng.
+ * Plugin upgrade configuration for Maven 4 compatibility.
+ * This record holds information about plugins that need to be upgraded
+ * to specific minimum versions to work properly with Maven 4.
  *
- * @since 4.0.0
+ * @param groupId the Maven groupId of the plugin
+ * @param artifactId the Maven artifactId of the plugin
+ * @param minVersion the minimum version required for Maven 4 compatibility
+ * @param reason the reason why this plugin needs to be upgraded
  */
-@Immutable
-@Experimental
-public final class Tools {
-    private Tools() {}
-
-    public static final String MVN_CMD = "mvn";
-    public static final String MVN_NAME = "Maven";
-
-    public static final String MVNENC_CMD = "mvnenc";
-    public static final String MVNENC_NAME = "Maven Password Encrypting Tool";
-
-    public static final String MVNSHELL_CMD = "mvnsh";
-    public static final String MVNSHELL_NAME = "Maven Shell Tool";
-
-    public static final String MVNUP_CMD = "mvnup";
-    public static final String MVNUP_NAME = "Maven Upgrade Tool";
-}
+public record PluginUpgrade(String groupId, String artifactId, String minVersion, String reason) {}
