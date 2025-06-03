@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
+import java.util.concurrent.CountDownLatch;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -76,50 +77,23 @@ public class CheckThreadSafetyMojo extends AbstractMojo {
 
         getLog().info("[MAVEN-CORE-IT-LOG] Testing concurrent component access");
 
-        ClassLoader pluginRealm = getClass().getClassLoader();
-        ClassLoader coreRealm = MojoExecutionException.class.getClassLoader();
-
-        final Map map = componentMap;
-        final List list = componentList;
-        final List go = new Vector();
-        final List exceptions = new Vector();
+        final List<Exception> exceptions = new Vector<>();
+        final CountDownLatch startLatch = new CountDownLatch(1);
 
         Thread[] threads = new Thread[2];
         for (int i = 0; i < threads.length; i++) {
             // NOTE: The threads need to use different realms to trigger changes of the collections
-            final ClassLoader cl = (i % 2) == 0 ? pluginRealm : coreRealm;
-            threads[i] = new Thread() {
-                private final ClassLoader tccl = cl;
-
-                public void run() {
-                    getLog().info("[MAVEN-CORE-IT-LOG] Thread " + this + " uses " + tccl);
-                    Thread.currentThread().setContextClassLoader(tccl);
-                    while (go.isEmpty()) {
-                        // wait for start
-                    }
-                    for (int j = 0; j < 10 * 1000; j++) {
-                        try {
-                            for (Object o : map.values()) {
-                                o.toString();
-                            }
-                            for (Object aList : list) {
-                                aList.toString();
-                            }
-                        } catch (Exception e) {
-                            getLog().warn("[MAVEN-CORE-IT-LOG] Thread " + this + " encountered concurrency issue", e);
-                            exceptions.add(e);
-                        }
-                    }
-                }
-            };
+            threads[i] = new CheckThreadSafetyThread((i % 2) == 0 ? getClass().getClassLoader() : MojoExecutionException.class.getClassLoader(), startLatch, componentMap, componentList, exceptions);
             threads[i].start();
         }
 
-        go.add(null);
+        startLatch.countDown(); // Signal all threads to start
+
         for (Thread thread : threads) {
             try {
                 thread.join();
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 getLog().warn("[MAVEN-CORE-IT-LOG] Interrupted while joining " + thread);
             }
         }
@@ -144,12 +118,56 @@ public class CheckThreadSafetyMojo extends AbstractMojo {
             if (out != null) {
                 try {
                     out.close();
-                } catch (IOException e) {
-                    // just ignore
+                } catch (IOException ignored) {
                 }
             }
         }
 
         getLog().info("[MAVEN-CORE-IT-LOG] Created output file " + outputFile);
+    }
+
+    class CheckThreadSafetyThread extends Thread {
+        private final ClassLoader tccl;
+        private final CountDownLatch startLatch;
+        private final Map<?, ?> map;
+        private final List<?> list;
+        private final List<Exception> exceptions;
+
+        CheckThreadSafetyThread(ClassLoader cl, CountDownLatch startLatch, Map<?, ?> map, List<?> list, List<Exception> exceptions) {
+            this.tccl = cl;
+            this.startLatch = startLatch;
+            this.map = map;
+            this.list = list;
+            this.exceptions = exceptions;
+        }
+
+        @Override
+        public void run() {
+            getLog().info("[MAVEN-CORE-IT-LOG] Thread " + this + " uses " + tccl);
+            Thread.currentThread().setContextClassLoader(tccl);
+            try {
+                startLatch.await(); // Wait for the start signal
+                checkThreadSafety();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                getLog().warn("[MAVEN-CORE-IT-LOG] Thread " + this + " was interrupted while waiting");
+            }
+        }
+
+        private void checkThreadSafety() {
+            for (int j = 0; j < 10 * 1000; j++) {
+                try {
+                    for (Object o : map.values()) {
+                        o.toString();
+                    }
+                    for (Object aList : list) {
+                        aList.toString();
+                    }
+                } catch (Exception e) {
+                    getLog().warn("[MAVEN-CORE-IT-LOG] Thread " + this + " encountered concurrency issue", e);
+                    exceptions.add(e);
+                }
+            }
+        }
     }
 }
