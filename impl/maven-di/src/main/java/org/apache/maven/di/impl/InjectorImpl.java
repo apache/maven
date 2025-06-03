@@ -220,7 +220,13 @@ public class InjectorImpl implements Injector {
         if (key.getRawType() == List.class) {
             Set<Binding<Object>> res2 = getBindings(key.getTypeParameter(0));
             if (res2 != null) {
-                List<Supplier<Object>> list = res2.stream().map(this::compile).collect(Collectors.toList());
+                // Sort bindings by priority (highest first) for deterministic ordering
+                List<Binding<Object>> sortedBindings = new ArrayList<>(res2);
+                Comparator<Binding<Object>> comparing = Comparator.comparing(Binding::getPriority);
+                sortedBindings.sort(comparing.reversed());
+
+                List<Supplier<Object>> list =
+                        sortedBindings.stream().map(this::compile).collect(Collectors.toList());
                 //noinspection unchecked
                 return () -> (Q) list(list, Supplier::get);
             }
