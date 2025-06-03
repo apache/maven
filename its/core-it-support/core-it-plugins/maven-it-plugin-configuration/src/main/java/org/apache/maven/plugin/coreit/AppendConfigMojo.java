@@ -137,8 +137,6 @@ public class AppendConfigMojo extends AbstractMojo {
         getLog().info("[MAVEN-CORE-IT-LOG] Creating output file: " + outputFile);
 
         PropertiesUtil.write(outputFile, configProps);
-
-        getLog().info("[MAVEN-CORE-IT-LOG] Created output file: " + outputFile);
     }
 
     /**

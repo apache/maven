@@ -62,13 +62,9 @@ public abstract class AbstractDependencyMojo extends AbstractMojo {
 
         getLog().info("[MAVEN-CORE-IT-LOG] Dumping artifact list: " + file);
 
-        BufferedWriter writer = null;
-        try {
-            file.getParentFile().mkdirs();
-
-            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
-
-            if (artifacts != null) {
+        if (artifacts != null) {
+            try (BufferedWriter writer =
+                    new BufferedWriter(new OutputStreamWriter(new FileOutputStream(mkDir(file)), "UTF-8"))) {
                 for (Object artifact1 : artifacts) {
                     Artifact artifact = (Artifact) artifact1;
                     writer.write(artifact.getId());
@@ -80,16 +76,8 @@ public abstract class AbstractDependencyMojo extends AbstractMojo {
                     writer.newLine();
                     getLog().info("[MAVEN-CORE-IT-LOG]   " + artifact.getId() + optional);
                 }
-            }
-        } catch (IOException e) {
-            throw new MojoExecutionException("Failed to write artifact list", e);
-        } finally {
-            if (writer != null) {
-                try {
-                    writer.close();
-                } catch (IOException e) {
-                    // just ignore
-                }
+            } catch (IOException e) {
+                throw new MojoExecutionException("Failed to write artifact list", e);
             }
         }
     }

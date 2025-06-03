@@ -165,8 +165,6 @@ public class EvalMojo extends AbstractMojo {
         } catch (IOException e) {
             throw new MojoExecutionException("Output file could not be created: " + outputFile, e);
         }
-
-        getLog().info("[MAVEN-CORE-IT-LOG] Created output file: " + outputFile);
     }
 
     public void setOutputFile(File outputFile) {

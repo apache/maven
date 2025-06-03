@@ -77,13 +77,9 @@ public abstract class AbstractDependencyMojo extends AbstractMojo {
 
         getLog().info("[MAVEN-CORE-IT-LOG] Dumping artifact list: " + file);
 
-        BufferedWriter writer = null;
-        try {
-            file.getParentFile().mkdirs();
-
-            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
-
-            if (artifacts != null) {
+        if (artifacts != null) {
+            try (BufferedWriter writer =
+                    new BufferedWriter(new OutputStreamWriter(new FileOutputStream(mkDir(file)), "UTF-8"))) {
                 for (Object artifact1 : artifacts) {
                     Artifact artifact = (Artifact) artifact1;
                     String id = getId(artifact);
@@ -96,16 +92,8 @@ public abstract class AbstractDependencyMojo extends AbstractMojo {
                     writer.newLine();
                     getLog().info("[MAVEN-CORE-IT-LOG]   " + id + optional);
                 }
-            }
-        } catch (IOException e) {
-            throw new MojoExecutionException("Failed to write artifact list", e);
-        } finally {
-            if (writer != null) {
-                try {
-                    writer.close();
-                } catch (IOException e) {
-                    // just ignore
-                }
+            } catch (IOException e) {
+                throw new MojoExecutionException("Failed to write artifact list", e);
             }
         }
     }
@@ -132,12 +120,8 @@ public abstract class AbstractDependencyMojo extends AbstractMojo {
 
         getLog().info("[MAVEN-CORE-IT-LOG] Dumping class path: " + file);
 
-        BufferedWriter writer = null;
-        try {
-            file.getParentFile().mkdirs();
-
-            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
-
+        try (BufferedWriter writer =
+                new BufferedWriter(new OutputStreamWriter(new FileOutputStream(mkDir(file)), "UTF-8"))) {
             if (classPath != null) {
                 for (Object aClassPath : classPath) {
                     String element = aClassPath.toString();
@@ -148,14 +132,6 @@ public abstract class AbstractDependencyMojo extends AbstractMojo {
             }
         } catch (IOException e) {
             throw new MojoExecutionException("Failed to write class path list", e);
-        } finally {
-            if (writer != null) {
-                try {
-                    writer.close();
-                } catch (IOException e) {
-                    // just ignore
-                }
-            }
         }
     }
 
@@ -200,7 +176,7 @@ public abstract class AbstractDependencyMojo extends AbstractMojo {
 
         FileOutputStream os = null;
         try {
-            file.getParentFile().mkdirs();
+            mkDir(file);
 
             os = new FileOutputStream(file);
 

@@ -114,26 +114,10 @@ public class CheckMojo extends AbstractMojo {
         if (!outputFile.isAbsolute()) {
             outputFile = new File(basedir, outputFile.getPath());
         }
-
-        getLog().info("[MAVEN-CORE-IT-LOG] Creating output file " + outputFile);
-
-        OutputStream out = null;
-        try {
-            outputFile.getParentFile().mkdirs();
-            out = new FileOutputStream(outputFile);
+        try (OutputStream out = new FileOutputStream(mkDir(outputFile))) {
             componentProperties.store(out, "MAVEN-CORE-IT-LOG");
         } catch (IOException e) {
             throw new MojoExecutionException("Output file could not be created: " + outputFile, e);
-        } finally {
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    // just ignore
-                }
-            }
         }
-
-        getLog().info("[MAVEN-CORE-IT-LOG] Created output file " + outputFile);
     }
 }
