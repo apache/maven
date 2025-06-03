@@ -60,8 +60,7 @@ class WrapperProperties extends Properties {
 
     private synchronized void ensureInitialized() {
         if (!initialized) {
-            Map<String, String> initial = getter.get();
-            orderedProps.putAll(initial);
+            orderedProps.putAll(getter.get());
             initialized = true;
         }
     }
