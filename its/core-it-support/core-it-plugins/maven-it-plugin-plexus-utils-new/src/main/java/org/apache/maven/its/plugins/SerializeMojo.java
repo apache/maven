@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -44,20 +43,12 @@ public class SerializeMojo extends AbstractMojo {
     private File file;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-        Writer writer = null;
-        XmlSerializer s = new MXSerializer();
-        try {
-            file.getParentFile().mkdirs();
-            writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
+        try (Writer writer = new OutputStreamWriter(new FileOutputStream(mkDir(file)), "UTF-8")) {
+            XmlSerializer s = new MXSerializer();
             s.setOutput(writer);
-
-            Xpp3Dom dom = new Xpp3Dom("root");
-
-            dom.writeToSerializer("", s);
+            new Xpp3Dom("root").writeToSerializer("", s);
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(), e);
-        } finally {
-            IOUtils.closeQuietly(writer);
         }
     }
 }

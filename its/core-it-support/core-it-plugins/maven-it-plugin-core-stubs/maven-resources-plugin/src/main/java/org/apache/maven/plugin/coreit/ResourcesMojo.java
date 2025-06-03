@@ -79,10 +79,8 @@ public class ResourcesMojo extends AbstractMojo {
             outputFile = new File(project.getBasedir(), pathname).getAbsoluteFile();
         }
 
-        getLog().info("[MAVEN-CORE-IT-LOG] Creating output file: " + outputFile);
-
+        mkDir(outputFile);
         try {
-            outputFile.getParentFile().mkdirs();
 
             if (message != null && message.length() > 0) {
                 getLog().info("[MAVEN-CORE-IT-LOG]   " + message);
@@ -98,7 +96,5 @@ public class ResourcesMojo extends AbstractMojo {
         } catch (IOException e) {
             throw new MojoExecutionException("Output file could not be created: " + pathname, e);
         }
-
-        getLog().info("[MAVEN-CORE-IT-LOG] Created output file: " + outputFile);
     }
 }

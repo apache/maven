@@ -103,24 +103,13 @@ public class DumpVersionMojo extends AbstractMojo {
             propertiesFile = new File(basedir, propertiesFile.getPath());
         }
 
-        getLog().info("[MAVEN-CORE-IT-LOG] Creating output file " + propertiesFile);
-
-        OutputStream out = null;
-        try {
-            propertiesFile.getParentFile().mkdirs();
-            out = new FileOutputStream(propertiesFile);
+        mkDir(propertiesFile);
+        try (OutputStream out = new FileOutputStream(propertiesFile)) {
             wagonProperties.store(out, "MAVEN-CORE-IT-LOG");
         } catch (IOException e) {
             throw new MojoExecutionException("Output file could not be created: " + propertiesFile, e);
-        } finally {
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    // just ignore
-                }
-            }
         }
+        // just ignore
 
         getLog().info("[MAVEN-CORE-IT-LOG] Created output file " + propertiesFile);
     }

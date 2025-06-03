@@ -49,8 +49,7 @@ public class SerializeMojo extends AbstractMojo {
         Writer writer = null;
         XmlSerializer s = new MXSerializer();
         try {
-            file.getParentFile().mkdirs();
-            writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
+            writer = new OutputStreamWriter(new FileOutputStream(mkDir(file)), "UTF-8");
             s.setOutput(writer);
 
             Xpp3Dom dom = new Xpp3Dom("root");

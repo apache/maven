@@ -63,17 +63,13 @@ public class ItMojo extends AbstractMojo {
         Properties props = new Properties();
         props.setProperty("id", component.getId());
 
-        getLog().info("[MAVEN-CORE-IT-LOG] Creating output file: " + outputFile);
-
+        mkDir(outputFile);
         try {
-            outputFile.getParentFile().mkdirs();
             try (FileOutputStream os = new FileOutputStream(outputFile)) {
                 props.store(os, "MAVEN-CORE-IT-LOG");
             }
         } catch (IOException e) {
             throw new MojoExecutionException("Output file could not be created: " + outputFile, e);
         }
-
-        getLog().info("[MAVEN-CORE-IT-LOG] Created output file: " + outputFile);
     }
 }

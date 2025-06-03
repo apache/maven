@@ -99,25 +99,11 @@ public class DumpRepoLayoutsMojo extends AbstractMojo {
             layoutsFile = new File(basedir, layoutsFile.getPath());
         }
 
-        getLog().info("[MAVEN-CORE-IT-LOG] Creating output file " + layoutsFile);
-
-        OutputStream out = null;
-        try {
-            layoutsFile.getParentFile().mkdirs();
-            out = new FileOutputStream(layoutsFile);
+        mkDir(layoutsFile);
+        try (OutputStream out = new FileOutputStream(layoutsFile)) {
             layoutProperties.store(out, "MAVEN-CORE-IT-LOG");
         } catch (IOException e) {
             throw new MojoExecutionException("Output file could not be created: " + layoutsFile, e);
-        } finally {
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    // just ignore
-                }
-            }
         }
-
-        getLog().info("[MAVEN-CORE-IT-LOG] Created output file " + layoutsFile);
     }
 }

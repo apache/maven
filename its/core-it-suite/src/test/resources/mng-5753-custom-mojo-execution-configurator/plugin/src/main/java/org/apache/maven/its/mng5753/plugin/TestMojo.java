@@ -58,15 +58,9 @@ public class TestMojo extends AbstractMojo {
     private String name;
 
     public void execute() throws MojoExecutionException {
-        try {
-            File file = new File(project.getBasedir(), "configuration.txt");
-            file.getParentFile().mkdirs();
-            Writer w = new OutputStreamWriter(new FileOutputStream(file, true), "UTF-8");
-            try {
-                w.write(name);
-            } finally {
-                w.close();
-            }
+        try (Writer w = new OutputStreamWriter(
+                new FileOutputStream(mkDir(new File(project.getBasedir(), "configuration.txt")), true), "UTF-8")) {
+            w.write(name);
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(), e);
         }

@@ -18,6 +18,7 @@
  */
 package org.apache.maven.plugin;
 
+import java.io.File;
 import java.util.Map;
 
 import org.apache.maven.plugin.logging.Log;
@@ -184,5 +185,13 @@ public abstract class AbstractMojo implements Mojo, ContextEnabled {
     @Override
     public void setPluginContext(Map pluginContext) {
         this.pluginContext = pluginContext;
+    }
+
+    protected File mkDir(File file) {
+        getLog().info("Creating output file " + file);
+        if (file.getParentFile().mkdirs()) {
+            getLog().info("Created output file " + file);
+        }
+        return file;
     }
 }

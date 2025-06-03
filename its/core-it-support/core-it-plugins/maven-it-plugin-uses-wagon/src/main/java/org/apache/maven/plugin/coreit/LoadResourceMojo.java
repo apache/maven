@@ -127,25 +127,12 @@ public class LoadResourceMojo extends AbstractMojo {
                 }
             }
         }
-
-        getLog().info("[MAVEN-CORE-IT-LOG] Creating output file " + wagonClassLoaderOutput);
-
-        OutputStream out = null;
-        try {
-            wagonClassLoaderOutput.getParentFile().mkdirs();
-            out = new FileOutputStream(wagonClassLoaderOutput);
+        try (OutputStream out = new FileOutputStream(mkDir(wagonClassLoaderOutput))) {
             loaderProperties.store(out, "MAVEN-CORE-IT-LOG");
         } catch (IOException e) {
             throw new MojoExecutionException("Output file could not be created: " + wagonClassLoaderOutput, e);
-        } finally {
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    // just ignore
-                }
-            }
         }
+        // just ignore
 
         getLog().info("[MAVEN-CORE-IT-LOG] Created output file " + wagonClassLoaderOutput);
     }
