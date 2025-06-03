@@ -51,7 +51,7 @@ class WrapperProperties extends Properties {
     final Supplier<Map<String, String>> getter;
     final Consumer<Properties> setter;
     private final OrderedProperties orderedProps = new OrderedProperties();
-    private boolean initialized = false;
+    private boolean initialized;
 
     WrapperProperties(Supplier<Map<String, String>> getter, Consumer<Properties> setter) {
         this.getter = getter;
