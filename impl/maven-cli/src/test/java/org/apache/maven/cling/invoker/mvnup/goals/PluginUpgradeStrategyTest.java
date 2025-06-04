@@ -19,6 +19,7 @@
 package org.apache.maven.cling.invoker.mvnup.goals;
 
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -31,6 +32,8 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -576,6 +579,117 @@ class PluginUpgradeStrategyTest {
             assertNotNull(description, "Description should not be null");
             assertFalse(description.trim().isEmpty(), "Description should not be empty");
             assertTrue(description.toLowerCase().contains("plugin"), "Description should mention plugins");
+        }
+    }
+
+    @Nested
+    @DisplayName("XML Formatting")
+    class XmlFormattingTests {
+
+        @Test
+        @DisplayName("should format pluginManagement with proper indentation")
+        void shouldFormatPluginManagementWithProperIndentation() throws Exception {
+            String pomXml =
+                    """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-compiler-plugin</artifactId>
+                                <version>3.1</version>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = saxBuilder.build(new StringReader(pomXml));
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            strategy.apply(context, pomMap);
+
+            // Convert to string to check formatting
+            Format format = Format.getRawFormat();
+            format.setLineSeparator(System.lineSeparator());
+            XMLOutputter out = new XMLOutputter(format);
+            StringWriter writer = new StringWriter();
+            out.output(document.getRootElement(), writer);
+            String result = writer.toString();
+
+            // Check that the plugin version was upgraded
+            assertTrue(result.contains("<version>3.2</version>"), "Plugin version should be upgraded to 3.2");
+
+            // Verify that the XML formatting is correct - no malformed closing tags
+            assertFalse(result.contains("</plugin></plugins>"), "Should not have malformed closing tags");
+            assertFalse(result.contains("</plugins></pluginManagement>"), "Should not have malformed closing tags");
+
+            // Check that proper indentation is maintained
+            assertTrue(result.contains("    <build>"), "Build element should be properly indented");
+            assertTrue(result.contains("        <plugins>"), "Plugins element should be properly indented");
+            assertTrue(result.contains("            <plugin>"), "Plugin element should be properly indented");
+        }
+
+        @Test
+        @DisplayName("should format pluginManagement with proper indentation when added")
+        void shouldFormatPluginManagementWithProperIndentationWhenAdded() throws Exception {
+            // Use a POM that will trigger pluginManagement addition by having a plugin without version
+            String pomXml =
+                    """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-enforcer-plugin</artifactId>
+                                <!-- No version - should trigger pluginManagement addition -->
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = saxBuilder.build(new StringReader(pomXml));
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            strategy.apply(context, pomMap);
+
+            // Convert to string to check formatting
+            Format format = Format.getRawFormat();
+            format.setLineSeparator(System.lineSeparator());
+            XMLOutputter out = new XMLOutputter(format);
+            StringWriter writer = new StringWriter();
+            out.output(document.getRootElement(), writer);
+            String result = writer.toString();
+
+            // If pluginManagement was added, verify proper formatting
+            if (result.contains("<pluginManagement>")) {
+                // Verify that the XML formatting is correct - no malformed closing tags
+                assertFalse(result.contains("</plugin></plugins>"), "Should not have malformed closing tags");
+                assertFalse(result.contains("</plugins></pluginManagement>"), "Should not have malformed closing tags");
+
+                // Check that proper indentation is maintained for pluginManagement
+                assertTrue(
+                        result.contains("        <pluginManagement>"), "PluginManagement should be properly indented");
+                assertTrue(
+                        result.contains("            <plugins>"),
+                        "Plugins in pluginManagement should be properly indented");
+                assertTrue(
+                        result.contains("        </pluginManagement>"),
+                        "PluginManagement closing tag should be properly indented");
+            }
         }
     }
 }

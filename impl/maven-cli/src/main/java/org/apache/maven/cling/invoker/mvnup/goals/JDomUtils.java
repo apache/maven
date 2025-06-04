@@ -216,15 +216,22 @@ public class JDomUtils {
         root.addContent(index, newElement);
         addAppropriateSpacing(root, index, name, indent);
 
+        // Ensure the parent element has proper closing tag formatting
+        ensureProperClosingTagFormatting(root);
+
         return newElement;
     }
 
     /**
      * Creates a new element with proper formatting.
+     * This method ensures that both the opening and closing tags are properly indented.
      */
     private static Element createElement(String name, Namespace namespace, String indent) {
         Element newElement = new Element(name, namespace);
-        newElement.addContent("\n" + indent);
+
+        // Add content with proper formatting for child elements and closing tag
+        newElement.addContent("\n" + indent); // Indentation for child content
+
         return newElement;
     }
 
@@ -246,6 +253,47 @@ public class JDomUtils {
         } else {
             root.addContent(index, new Text("\n" + indent));
         }
+    }
+
+    /**
+     * Ensures that the parent element has proper closing tag formatting.
+     * This method checks if the last content of the element is properly indented
+     * and adds appropriate whitespace if needed.
+     */
+    private static void ensureProperClosingTagFormatting(Element parent) {
+        List<Content> contents = parent.getContent();
+        if (contents.isEmpty()) {
+            return;
+        }
+
+        // Get the parent's indentation level
+        String parentIndent = detectParentIndentation(parent);
+
+        // Check if the last content is a Text node with proper indentation
+        Content lastContent = contents.get(contents.size() - 1);
+        if (lastContent instanceof Text) {
+            String text = ((Text) lastContent).getText();
+            // If the last text doesn't end with proper indentation for the closing tag
+            if (!text.endsWith("\n" + parentIndent)) {
+                // Remove the last text node and add a properly formatted one
+                parent.removeContent(lastContent);
+                parent.addContent(new Text("\n" + parentIndent));
+            }
+        } else {
+            // If the last content is not a text node, add proper indentation for closing tag
+            parent.addContent(new Text("\n" + parentIndent));
+        }
+    }
+
+    /**
+     * Detects the indentation level of the parent element.
+     */
+    private static String detectParentIndentation(Element element) {
+        Parent parent = element.getParent();
+        if (parent instanceof Element) {
+            return detectIndentation((Element) parent);
+        }
+        return "";
     }
 
     /**
