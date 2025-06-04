@@ -24,15 +24,24 @@ import javax.inject.Singleton;
 import javax.xml.stream.XMLStreamException;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.deployment.DeployRequest;
+import org.eclipse.aether.installation.InstallRequest;
 
 import static java.util.Objects.requireNonNull;
 
@@ -53,34 +62,78 @@ class PomInlinerTransformer extends TransformerSupport {
     }
 
     @Override
+    public InstallRequest remapInstallArtifacts(RepositorySystemSession session, InstallRequest request) {
+        return request.setArtifacts(replacePom(session, request.getArtifacts()));
+    }
+
+    @Override
+    public DeployRequest remapDeployArtifacts(RepositorySystemSession session, DeployRequest request) {
+        return request.setArtifacts(replacePom(session, request.getArtifacts()));
+    }
+
+    private Collection<Artifact> replacePom(RepositorySystemSession session, Collection<Artifact> artifacts) {
+        Set<String> needsInlining = needsInlining(session);
+        if (needsInlining.isEmpty()) {
+            return artifacts;
+        }
+        ArrayList<Artifact> newArtifacts = new ArrayList<>(artifacts.size());
+        for (Artifact artifact : artifacts) {
+            if ("pom".equals(artifact.getExtension())
+                    && artifact.getClassifier().isEmpty()) {
+                try {
+                    Path tmpPom = Files.createTempFile("pom-inliner-", ".xml");
+                    String originalPom = Files.readString(artifact.getPath());
+                    String interpolatedPom = interpolator.interpolate(
+                            originalPom,
+                            property -> {
+                                if (needsInlining.contains(property)) {
+                                    return (String)
+                                            session.getConfigProperties().get(property);
+                                }
+                                return null;
+                            },
+                            false);
+                    if (!Objects.equals(originalPom, interpolatedPom)) {
+                        Files.writeString(tmpPom, interpolatedPom);
+                        artifact = artifact.setPath(tmpPom);
+                    }
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
+            newArtifacts.add(artifact);
+        }
+        return newArtifacts;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Set<String> needsInlining(RepositorySystemSession session) {
+        return (Set<String>) session.getData()
+                .computeIfAbsent(
+                        PomInlinerTransformer.class.getName() + ".needsInlining", ConcurrentHashMap::newKeySet);
+    }
+
+    @Override
     public void injectTransformedArtifacts(RepositorySystemSession session, MavenProject project) throws IOException {
         if (!Features.consumerPom(session.getConfigProperties())) {
             try {
                 Model model = read(project.getFile().toPath());
-                boolean parentVersion = false;
                 String version = model.getVersion();
                 if (version == null && model.getParent() != null) {
-                    parentVersion = true;
                     version = model.getParent().getVersion();
                 }
                 String newVersion;
                 if (version != null) {
+                    HashSet<String> usedProperties = new HashSet<>();
                     newVersion = interpolator.interpolate(version.trim(), property -> {
                         if (!session.getConfigProperties().containsKey(property)) {
                             throw new IllegalArgumentException("Cannot inline property " + property);
                         }
+                        usedProperties.add(property);
                         return (String) session.getConfigProperties().get(property);
                     });
                     if (!Objects.equals(version, newVersion)) {
-                        if (parentVersion) {
-                            model = model.withParent(model.getParent().withVersion(newVersion));
-                        } else {
-                            model = model.withVersion(newVersion);
-                        }
-                        Path tmpPom = Files.createTempFile(
-                                project.getArtifactId() + "-" + project.getVersion() + "-", ".xml");
-                        write(model, tmpPom);
-                        project.setFile(tmpPom.toFile());
+                        needsInlining(session).addAll(usedProperties);
                     }
                 }
             } catch (XMLStreamException e) {
