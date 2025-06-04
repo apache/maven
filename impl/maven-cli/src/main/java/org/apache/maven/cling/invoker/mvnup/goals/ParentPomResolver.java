@@ -164,8 +164,7 @@ public class ParentPomResolver {
 
             if (!parentPlugins.isEmpty()) {
                 // Add plugin management entries for plugins found in parent
-                hasUpgrades =
-                        addPluginManagementForParentPlugins(context, pomDocument, parentPlugins, pluginUpgrades);
+                hasUpgrades = addPluginManagementForParentPlugins(context, pomDocument, parentPlugins, pluginUpgrades);
             }
         } else {
             context.debug("Parent POM is local, skipping Maven 4 API check");
