@@ -21,6 +21,7 @@ package org.apache.maven.di.impl;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -30,8 +31,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.di.Key;
-
-import static java.util.stream.Collectors.joining;
 
 public abstract class Binding<T> {
     private final Set<Dependency<?>> dependencies;
@@ -128,10 +127,6 @@ public abstract class Binding<T> {
         return scope;
     }
 
-    public String getDisplayString() {
-        return dependencies.stream().map(Dependency::getDisplayString).collect(joining(", ", "[", "]"));
-    }
-
     public Key<?> getOriginalKey() {
         return originalKey;
     }
@@ -148,6 +143,10 @@ public abstract class Binding<T> {
     @FunctionalInterface
     public interface TupleConstructorN<R> {
         R create(Object... args);
+    }
+
+    public static Comparator<Binding<?>> getPriorityComparator() {
+        return Comparator.<Binding<?>>comparingInt(Binding::getPriority).reversed();
     }
 
     public static class BindingToInstance<T> extends Binding<T> {
