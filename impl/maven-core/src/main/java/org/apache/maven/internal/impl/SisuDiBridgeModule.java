@@ -24,7 +24,6 @@ import javax.inject.Provider;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +51,8 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.sisu.BeanEntry;
 import org.eclipse.sisu.inject.BeanLocator;
+
+import static org.apache.maven.di.impl.Binding.getPriorityComparator;
 
 @Named
 public class SisuDiBridgeModule extends AbstractModule {
@@ -185,7 +186,7 @@ public class SisuDiBridgeModule extends AbstractModule {
                 }
             }
             if (!list.isEmpty()) {
-                list.sort(getBindingComparator());
+                list.sort(getPriorityComparator());
                 //noinspection unchecked
                 return () -> (Q) getInstance(list.iterator().next());
             } else if (dep.optional()) {
@@ -215,7 +216,7 @@ public class SisuDiBridgeModule extends AbstractModule {
                     }
                 }
                 //noinspection unchecked
-                return (Q) list(list.stream().sorted(getBindingComparator()).toList(), this::getInstance);
+                return (Q) list(list.stream().sorted(getPriorityComparator()).toList(), this::getInstance);
             };
         }
 
@@ -226,7 +227,7 @@ public class SisuDiBridgeModule extends AbstractModule {
                 throw new DIException("Only String keys are supported for maps: " + key);
             }
             return () -> {
-                var comparator = getBindingComparator();
+                var comparator = getPriorityComparator();
                 Map<String, Binding<?>> map = new HashMap<>();
                 for (Binding<?> b : getBindings().getOrDefault(valueType, Set.of())) {
                     String name =
@@ -251,11 +252,6 @@ public class SisuDiBridgeModule extends AbstractModule {
 
         private <Q> Q getInstance(Binding<Q> binding) {
             return compile(binding).get();
-        }
-
-        private static Comparator<Binding<?>> getBindingComparator() {
-            Comparator<Binding<?>> comparing = Comparator.comparing(Binding::getPriority);
-            return comparing.reversed();
         }
 
         private <T> boolean isPlexusBean(BeanEntry<Annotation, T> entry) {

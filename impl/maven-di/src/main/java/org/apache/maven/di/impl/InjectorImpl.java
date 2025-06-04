@@ -31,7 +31,6 @@ import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -55,6 +54,8 @@ import org.apache.maven.api.di.Typed;
 import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
 import org.apache.maven.di.Scope;
+
+import static org.apache.maven.di.impl.Binding.getPriorityComparator;
 
 public class InjectorImpl implements Injector {
 
@@ -212,8 +213,7 @@ public class InjectorImpl implements Injector {
         Set<Binding<Q>> res = getBindings(key);
         if (res != null && !res.isEmpty()) {
             List<Binding<Q>> bindingList = new ArrayList<>(res);
-            Comparator<Binding<Q>> comparing = Comparator.comparing(Binding::getPriority);
-            bindingList.sort(comparing.reversed());
+            bindingList.sort(getPriorityComparator());
             Binding<Q> binding = bindingList.get(0);
             return compile(binding);
         }
@@ -222,8 +222,7 @@ public class InjectorImpl implements Injector {
             if (res2 != null) {
                 // Sort bindings by priority (highest first) for deterministic ordering
                 List<Binding<Object>> sortedBindings = new ArrayList<>(res2);
-                Comparator<Binding<Object>> comparing = Comparator.comparing(Binding::getPriority);
-                sortedBindings.sort(comparing.reversed());
+                sortedBindings.sort(getPriorityComparator());
 
                 List<Supplier<Object>> list =
                         sortedBindings.stream().map(this::compile).collect(Collectors.toList());
