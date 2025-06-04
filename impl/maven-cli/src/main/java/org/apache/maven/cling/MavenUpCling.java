@@ -48,7 +48,7 @@ public class MavenUpCling extends ClingSupport {
      * ClassWorld Launcher "enhanced" entry point: returning exitCode and accepts Class World.
      */
     public static int main(String[] args, ClassWorld world) throws IOException {
-        return new MavenUpCling().run(args, null, null, null, false);
+        return new MavenUpCling(world).run(args, null, null, null, false);
     }
 
     /**
