@@ -68,9 +68,8 @@ abstract class TransformerSupport implements PomArtifactTransformer {
     protected static final String SCHEMA_LOCATION_FORMAT = "https://maven.apache.org/xsd/maven-%s.xsd";
 
     protected Model read(Path src) throws IOException, XMLStreamException {
-        MavenStaxReader reader = new MavenStaxReader();
         try (InputStream is = Files.newInputStream(src)) {
-            return reader.read(is, false, null);
+            return new MavenStaxReader().read(is, false, null);
         }
     }
 
