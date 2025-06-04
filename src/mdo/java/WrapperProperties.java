@@ -27,14 +27,19 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.AbstractSet;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.InvalidPropertiesFormatException;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -45,30 +50,43 @@ class WrapperProperties extends Properties {
 
     final Supplier<Map<String, String>> getter;
     final Consumer<Properties> setter;
+    private final OrderedProperties orderedProps = new OrderedProperties();
+    private boolean initialized;
 
     WrapperProperties(Supplier<Map<String, String>> getter, Consumer<Properties> setter) {
         this.getter = getter;
         this.setter = setter;
     }
 
+    private synchronized void ensureInitialized() {
+        if (!initialized) {
+            orderedProps.putAll(getter.get());
+            initialized = true;
+        }
+    }
+
     @Override
     public String getProperty(String key) {
-        return getter.get().get(key);
+        ensureInitialized();
+        return orderedProps.getProperty(key);
     }
 
     @Override
     public String getProperty(String key, String defaultValue) {
-        return getter.get().getOrDefault(key, defaultValue);
+        ensureInitialized();
+        return orderedProps.getProperty(key, defaultValue);
     }
 
     @Override
     public Enumeration<?> propertyNames() {
-        return Collections.enumeration(getter.get().keySet());
+        ensureInitialized();
+        return orderedProps.propertyNames();
     }
 
     @Override
     public Set<String> stringPropertyNames() {
-        return getter.get().keySet();
+        ensureInitialized();
+        return orderedProps.stringPropertyNames();
     }
 
     @Override
@@ -83,123 +101,102 @@ class WrapperProperties extends Properties {
 
     @Override
     public int size() {
-        return getter.get().size();
+        ensureInitialized();
+        return orderedProps.size();
     }
 
     @Override
     public boolean isEmpty() {
-        return getter.get().isEmpty();
+        ensureInitialized();
+        return orderedProps.isEmpty();
     }
 
     @Override
     public Enumeration<Object> keys() {
-        return Collections.enumeration((Set) getter.get().keySet());
+        ensureInitialized();
+        return orderedProps.keys();
     }
 
     @Override
     public Enumeration<Object> elements() {
-        return Collections.enumeration((Collection) getter.get().values());
+        ensureInitialized();
+        return orderedProps.elements();
     }
 
     @Override
     public boolean contains(Object value) {
-        return getter.get().containsKey(value != null ? value.toString() : null);
+        ensureInitialized();
+        return orderedProps.contains(value);
     }
 
     @Override
     public boolean containsValue(Object value) {
-        return getter.get().containsValue(value);
+        ensureInitialized();
+        return orderedProps.containsValue(value);
     }
 
     @Override
     public boolean containsKey(Object key) {
-        return getter.get().containsKey(key);
+        ensureInitialized();
+        return orderedProps.containsKey(key);
     }
 
     @Override
     public Object get(Object key) {
-        return getter.get().get(key);
+        ensureInitialized();
+        return orderedProps.get(key);
     }
 
     @Override
     public synchronized String toString() {
-        return getter.get().toString();
+        ensureInitialized();
+        return orderedProps.toString();
     }
 
     @Override
     public Set<Object> keySet() {
-        return (Set) getter.get().keySet();
+        ensureInitialized();
+        return orderedProps.keySet();
     }
 
     @Override
     public Collection<Object> values() {
-        return (Collection) getter.get().values();
+        ensureInitialized();
+        return orderedProps.values();
     }
 
     @Override
     public Set<Map.Entry<Object, Object>> entrySet() {
-        Set<Map.Entry<String, String>> set = getter.get().entrySet();
-        return new AbstractSet<Map.Entry<Object, Object>>() {
-            @Override
-            public Iterator<Map.Entry<Object, Object>> iterator() {
-                Iterator<Map.Entry<String, String>> it = set.iterator();
-                return new Iterator<Map.Entry<Object, Object>>() {
-                    @Override
-                    public boolean hasNext() {
-                        return it.hasNext();
-                    }
-
-                    @Override
-                    public Map.Entry<Object, Object> next() {
-                        Map.Entry<String, String> entry = it.next();
-                        return new Map.Entry<Object, Object>() {
-                            @Override
-                            public Object getKey() {
-                                return entry.getKey();
-                            }
-
-                            @Override
-                            public Object getValue() {
-                                return entry.getValue();
-                            }
-
-                            @Override
-                            public Object setValue(Object value) {
-                                return writeOperation(p -> p.put(entry.getKey(), value));
-                            }
-                        };
-                    }
-                };
-            }
-
-            @Override
-            public int size() {
-                return set.size();
-            }
-        };
+        ensureInitialized();
+        return orderedProps.entrySet();
     }
 
     @Override
     public synchronized boolean equals(Object o) {
+        ensureInitialized();
         if (o instanceof WrapperProperties wrapperProperties) {
-            o = wrapperProperties.getter.get();
+            wrapperProperties.ensureInitialized();
+            return orderedProps.equals(wrapperProperties.orderedProps);
         }
-        return getter.get().equals(o);
+        return orderedProps.equals(o);
     }
 
     @Override
     public synchronized int hashCode() {
-        return getter.get().hashCode();
+        ensureInitialized();
+        return orderedProps.hashCode();
     }
 
     @Override
     public Object getOrDefault(Object key, Object defaultValue) {
-        return getter.get().getOrDefault(key, defaultValue != null ? defaultValue.toString() : null);
+        ensureInitialized();
+        return orderedProps.getOrDefault(key, defaultValue);
     }
 
     @Override
     public synchronized void forEach(BiConsumer<? super Object, ? super Object> action) {
-        getter.get().forEach(action);
+        ensureInitialized();
+        orderedProps.forEach(action);
     }
 
     interface WriteOp<T> {
@@ -211,22 +208,16 @@ class WrapperProperties extends Properties {
     }
 
     private <T> T writeOperation(WriteOp<T> runner) {
-        Properties props = new Properties();
-        props.putAll(getter.get());
-        T ret = runner.perform(props);
-        if (!props.equals(getter.get())) {
-            setter.accept(props);
-        }
+        ensureInitialized();
+        T ret = runner.perform(orderedProps);
+        setter.accept(orderedProps);
         return ret;
     }
 
     private void writeOperationVoid(WriteOpVoid runner) {
-        Properties props = new Properties();
-        props.putAll(getter.get());
-        runner.perform(props);
-        if (!props.equals(getter.get())) {
-            setter.accept(props);
-        }
+        ensureInitialized();
+        runner.perform(orderedProps);
+        setter.accept(orderedProps);
     }
 
     @Override
@@ -376,5 +367,132 @@ class WrapperProperties extends Properties {
         Properties props = new Properties();
         props.putAll(getter.get());
         return props;
+    }
+
+    private class OrderedProperties extends Properties {
+        private final List<Object> keyOrder = new CopyOnWriteArrayList<>();
+
+        @Override
+        public synchronized void putAll(Map<?, ?> t) {
+            t.forEach(this::put);
+        }
+
+        @Override
+        public Set<Object> keySet() {
+            return new KeySet();
+        }
+
+        @Override
+        public Set<Map.Entry<Object, Object>> entrySet() {
+            return new EntrySet();
+        }
+
+        @Override
+        public synchronized Object put(Object key, Object value) {
+            if (!keyOrder.contains(key)) {
+                keyOrder.add(key);
+            }
+            return super.put(key, value);
+        }
+
+        @Override
+        public synchronized Object setProperty(String key, String value) {
+            if (!keyOrder.contains(key)) {
+                keyOrder.add(key);
+            }
+            return super.setProperty(key, value);
+        }
+
+        @Override
+        public synchronized Object remove(Object key) {
+            keyOrder.remove(key);
+            return super.remove(key);
+        }
+
+        @Override
+        public synchronized void forEach(BiConsumer<? super Object, ? super Object> action) {
+            entrySet().forEach(e -> action.accept(e.getKey(), e.getValue()));
+        }
+
+        private class EntrySet extends AbstractSet<Map.Entry<Object, Object>> {
+            @Override
+            public Iterator<Map.Entry<Object, Object>> iterator() {
+                return new Iterator<Map.Entry<Object, Object>>() {
+                    Iterator<Object> keyIterator = keyOrder.iterator();
+                    @Override
+                    public boolean hasNext() {
+                        return keyIterator.hasNext();
+                    }
+
+                    @Override
+                    public Map.Entry<Object, Object> next() {
+                        Object key = keyIterator.next();
+                        return new Map.Entry<>() {
+                            @Override
+                            public Object getKey() {
+                                return key;
+                            }
+
+                            @Override
+                            public Object getValue() {
+                                return get(key);
+                            }
+
+                            @Override
+                            public Object setValue(Object value) {
+                                return WrapperProperties.this.put(key, value);
+                            }
+                        };
+                    }
+                };
+            }
+
+            @Override
+            public int size() {
+                return keyOrder.size();
+            }
+        }
+
+        private class KeySet extends AbstractSet<Object> {
+            public Iterator<Object> iterator() {
+                final Iterator<Object> iter = keyOrder.iterator();
+                return new Iterator<Object>() {
+                    Object lastRet = null;
+                    @Override
+                    public boolean hasNext() {
+                        return iter.hasNext();
+                    }
+
+                    @Override
+                    public Object next() {
+                        lastRet = iter.next();
+                        return lastRet;
+                    }
+
+                    @Override
+                    public void remove() {
+                        WrapperProperties.super.remove(lastRet);
+                    }
+                };
+            }
+
+            public int size() {
+                return keyOrder.size();
+            }
+
+            public boolean contains(Object o) {
+                return containsKey(o);
+            }
+
+            public boolean remove(Object o) {
+                boolean b = WrapperProperties.this.containsKey(o);
+                WrapperProperties.this.remove(o);
+                return b;
+            }
+
+            public void clear() {
+                WrapperProperties.this.clear();
+            }
+        }
     }
 }

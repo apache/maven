@@ -36,7 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  */
 @Deprecated
-@SuppressWarnings("checkstyle:UnusedLocalVariable")
 class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //
