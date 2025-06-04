@@ -384,8 +384,79 @@ class JDomUtilsTest {
                 "plugin elements should be indented with 16 spaces");
     }
 
+    @Test
+    void testProperClosingTagFormattingWithPluginManagement() throws Exception {
+        String pomXml =
+                """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <project xmlns="http://maven.apache.org/POM/4.0.0">
+                <modelVersion>4.0.0</modelVersion>
+                <groupId>test</groupId>
+                <artifactId>test</artifactId>
+                <version>1.0.0</version>
+                <build>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <version>3.8.1</version>
+                        </plugin>
+                    </plugins>
+                </build>
+            </project>
+            """;
+
+        Document document = saxBuilder.build(new StringReader(pomXml));
+        Element root = document.getRootElement();
+        Element buildElement = root.getChild("build", root.getNamespace());
+
+        // Add pluginManagement section using JDomUtils
+        Element pluginManagementElement = JDomUtils.insertNewElement("pluginManagement", buildElement);
+        Element managedPluginsElement = JDomUtils.insertNewElement("plugins", pluginManagementElement);
+        Element managedPluginElement = JDomUtils.insertNewElement("plugin", managedPluginsElement);
+
+        // Add plugin details
+        JDomUtils.insertContentElement(managedPluginElement, "groupId", "org.apache.maven.plugins");
+        JDomUtils.insertContentElement(managedPluginElement, "artifactId", "maven-enforcer-plugin");
+        JDomUtils.insertContentElement(managedPluginElement, "version", "3.0.0");
+
+        // Verify the output has proper formatting without extra blank lines
+        XMLOutputter outputter = new XMLOutputter(Format.getRawFormat());
+        String pomString = outputter.outputString(document);
+
+        // Verify that the XML is well-formed and contains the expected elements
+        assertTrue(pomString.contains("<pluginManagement>"), "Should contain pluginManagement");
+        assertTrue(pomString.contains("</pluginManagement>"), "Should contain closing pluginManagement");
+        assertTrue(pomString.contains("<plugin>"), "Should contain plugin");
+        assertTrue(pomString.contains("</plugin>"), "Should contain closing plugin");
+        assertTrue(pomString.contains("maven-enforcer-plugin"), "Should contain the plugin artifact ID");
+
+        // Verify that there are no malformed closing tags (the main issue from Spotless)
+        assertFalse(pomString.contains("</plugin></plugins>"), "Should not have malformed closing tags");
+        assertFalse(pomString.contains("</plugins></pluginManagement>"), "Should not have malformed closing tags");
+
+        // Check for whitespace-only lines (lines with only spaces/tabs)
+        String[] lines = pomString.split("\n");
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i];
+            if (line.trim().isEmpty() && !line.isEmpty()) {
+                System.out.println("Found whitespace-only line at index " + i + ": '" + line + "' (length: "
+                        + line.length() + ")");
+                // This is what Spotless complains about - lines with only whitespace
+                assertFalse(
+                        true, "Line " + (i + 1) + " contains only whitespace characters, should be completely empty");
+            }
+        }
+    }
+
     private static void assertTrue(boolean condition, String message) {
         if (!condition) {
+            throw new AssertionError(message);
+        }
+    }
+
+    private static void assertFalse(boolean condition, String message) {
+        if (condition) {
             throw new AssertionError(message);
         }
     }

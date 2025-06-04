@@ -213,11 +213,24 @@ public class JDomUtils {
         String indent = detectIndentation(root);
         Element newElement = createElement(name, root.getNamespace(), indent);
 
+        // If the parent element only has minimal content (just closing tag indentation),
+        // we need to handle it specially to avoid creating whitespace-only lines
+        boolean parentHasMinimalContent = root.getContentSize() == 1
+                && root.getContent(0) instanceof Text
+                && ((Text) root.getContent(0)).getText().trim().isEmpty();
+
+        if (parentHasMinimalContent) {
+            // Remove the minimal content and let addAppropriateSpacing handle the formatting
+            root.removeContent();
+            index = 0; // Reset index since we removed content
+        }
+
         root.addContent(index, newElement);
         addAppropriateSpacing(root, index, name, indent);
 
-        // Ensure the parent element has proper closing tag formatting
+        // Ensure both the parent and new element have proper closing tag formatting
         ensureProperClosingTagFormatting(root);
+        ensureProperClosingTagFormatting(newElement);
 
         return newElement;
     }
@@ -229,8 +242,9 @@ public class JDomUtils {
     private static Element createElement(String name, Namespace namespace, String indent) {
         Element newElement = new Element(name, namespace);
 
-        // Add content with proper formatting for child elements and closing tag
-        newElement.addContent("\n" + indent); // Indentation for child content
+        // Add minimal content to prevent self-closing tag and ensure proper formatting
+        // This will be handled by ensureProperClosingTagFormatting
+        newElement.addContent(new Text(""));
 
         return newElement;
     }
@@ -249,7 +263,10 @@ public class JDomUtils {
         }
 
         if (isBlankLineBetweenElements(prependingElementName, elementName, root)) {
-            root.addContent(index, new Text("\n\n" + indent));
+            // Add a completely empty line followed by proper indentation
+            // We need to be careful to ensure the empty line has no spaces
+            root.addContent(index, new Text("\n")); // End current line
+            root.addContent(index + 1, new Text("\n" + indent)); // Empty line + indentation for next element
         } else {
             root.addContent(index, new Text("\n" + indent));
         }
@@ -262,12 +279,21 @@ public class JDomUtils {
      */
     private static void ensureProperClosingTagFormatting(Element parent) {
         List<Content> contents = parent.getContent();
-        if (contents.isEmpty()) {
-            return;
-        }
 
         // Get the parent's indentation level
         String parentIndent = detectParentIndentation(parent);
+
+        // If the element is empty or only contains empty text nodes, handle it specially
+        if (contents.isEmpty()
+                || (contents.size() == 1
+                        && contents.get(0) instanceof Text
+                        && ((Text) contents.get(0)).getText().trim().isEmpty())) {
+            // For empty elements, add minimal content to ensure proper formatting
+            // We add just a newline and parent indentation, which will be the closing tag line
+            parent.removeContent();
+            parent.addContent(new Text("\n" + parentIndent));
+            return;
+        }
 
         // Check if the last content is a Text node with proper indentation
         Content lastContent = contents.get(contents.size() - 1);
@@ -275,9 +301,14 @@ public class JDomUtils {
             String text = ((Text) lastContent).getText();
             // If the last text doesn't end with proper indentation for the closing tag
             if (!text.endsWith("\n" + parentIndent)) {
-                // Remove the last text node and add a properly formatted one
-                parent.removeContent(lastContent);
-                parent.addContent(new Text("\n" + parentIndent));
+                // If it's only whitespace, replace it; otherwise append
+                if (text.trim().isEmpty()) {
+                    parent.removeContent(lastContent);
+                    parent.addContent(new Text("\n" + parentIndent));
+                } else {
+                    // Append proper indentation
+                    parent.addContent(new Text("\n" + parentIndent));
+                }
             }
         } else {
             // If the last content is not a text node, add proper indentation for closing tag
