@@ -31,8 +31,6 @@ import java.util.stream.Stream;
 
 import org.apache.maven.di.Key;
 
-import static java.util.stream.Collectors.joining;
-
 public abstract class Binding<T> {
     private final Set<Dependency<?>> dependencies;
     private Annotation scope;
@@ -126,10 +124,6 @@ public abstract class Binding<T> {
 
     public Annotation getScope() {
         return scope;
-    }
-
-    public String getDisplayString() {
-        return dependencies.stream().map(Dependency::getDisplayString).collect(joining(", ", "[", "]"));
     }
 
     public Key<?> getOriginalKey() {
