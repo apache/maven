@@ -463,7 +463,7 @@ public final class Constants {
     public static final String MAVEN_CONSUMER_POM = "maven.consumer.pom";
 
     /**
-     * User property for controlling "maven personality". If set to {@code true} Maven will behave
+     * User property for controlling "maven personality". If activated Maven will behave
      * as previous major version, Maven 3.
      *
      * @since 4.0.0
