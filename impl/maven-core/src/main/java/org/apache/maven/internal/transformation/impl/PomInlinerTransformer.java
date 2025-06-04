@@ -37,7 +37,8 @@ import org.eclipse.aether.RepositorySystemSession;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Inliner POM transformer.
+ * Inliner POM transformer. The goal of this transformer is to fix Maven 3 issue about emitting (installing, deploying)
+ * unusable POMs when using CI Friendly Versions.
  *
  * @since TBD
  */
