@@ -132,6 +132,7 @@ class InferenceStrategyTest {
         void shouldRemoveDependencyVersionForProjectArtifact() throws Exception {
             String parentPomXml = PomBuilder.create()
                     .namespace("http://maven.apache.org/POM/4.1.0")
+                    .modelVersion("4.1.0")
                     .groupId("com.example")
                     .artifactId("parent-project")
                     .version("1.0.0")
@@ -140,6 +141,7 @@ class InferenceStrategyTest {
 
             String moduleAPomXml = PomBuilder.create()
                     .namespace("http://maven.apache.org/POM/4.1.0")
+                    .modelVersion("4.1.0")
                     .parent("com.example", "parent-project", "1.0.0")
                     .artifactId("module-a")
                     .build();
@@ -236,6 +238,7 @@ class InferenceStrategyTest {
         void shouldKeepDependencyVersionWhenVersionMismatch() throws Exception {
             String moduleAPomXml = PomBuilder.create()
                     .namespace("http://maven.apache.org/POM/4.1.0")
+                    .modelVersion("4.1.0")
                     .groupId("com.example")
                     .artifactId("module-a")
                     .version("1.0.0")
@@ -243,6 +246,7 @@ class InferenceStrategyTest {
 
             String moduleBPomXml = PomBuilder.create()
                     .namespace("http://maven.apache.org/POM/4.1.0")
+                    .modelVersion("4.1.0")
                     .groupId("com.example")
                     .artifactId("module-b")
                     .version("1.0.0")
@@ -671,6 +675,54 @@ class InferenceStrategyTest {
             assertNotNull(parentElement.getChild("groupId", childRoot.getNamespace()));
             assertNotNull(parentElement.getChild("artifactId", childRoot.getNamespace()));
             assertNotNull(parentElement.getChild("version", childRoot.getNamespace()));
+        }
+
+        @Test
+        @DisplayName("should not apply dependency inference to 4.0.0 models")
+        void shouldNotApplyDependencyInferenceTo400Models() throws Exception {
+            String moduleAPomXml = PomBuilder.create()
+                    .namespace("http://maven.apache.org/POM/4.0.0")
+                    .modelVersion("4.0.0")
+                    .groupId("com.example")
+                    .artifactId("module-a")
+                    .version("1.0.0")
+                    .build();
+
+            String moduleBPomXml = PomBuilder.create()
+                    .namespace("http://maven.apache.org/POM/4.0.0")
+                    .modelVersion("4.0.0")
+                    .groupId("com.example")
+                    .artifactId("module-b")
+                    .version("1.0.0")
+                    .dependency("com.example", "module-a", "1.0.0")
+                    .build();
+
+            Document moduleADoc = saxBuilder.build(new StringReader(moduleAPomXml));
+            Document moduleBDoc = saxBuilder.build(new StringReader(moduleBPomXml));
+
+            Map<Path, Document> pomMap = new HashMap<>();
+            pomMap.put(Paths.get("/project/module-a/pom.xml"), moduleADoc);
+            pomMap.put(Paths.get("/project/module-b/pom.xml"), moduleBDoc);
+
+            Element moduleBRoot = moduleBDoc.getRootElement();
+            Element dependency = moduleBRoot
+                    .getChild("dependencies", moduleBRoot.getNamespace())
+                    .getChildren("dependency", moduleBRoot.getNamespace())
+                    .get(0);
+
+            // Verify dependency elements exist before inference
+            assertNotNull(dependency.getChild("groupId", moduleBRoot.getNamespace()));
+            assertNotNull(dependency.getChild("artifactId", moduleBRoot.getNamespace()));
+            assertNotNull(dependency.getChild("version", moduleBRoot.getNamespace()));
+
+            // Apply inference
+            UpgradeContext context = createMockContext();
+            strategy.apply(context, pomMap);
+
+            // Verify dependency inference was NOT applied (all elements should remain for 4.0.0)
+            assertNotNull(dependency.getChild("groupId", moduleBRoot.getNamespace()));
+            assertNotNull(dependency.getChild("artifactId", moduleBRoot.getNamespace()));
+            assertNotNull(dependency.getChild("version", moduleBRoot.getNamespace()));
         }
     }
 

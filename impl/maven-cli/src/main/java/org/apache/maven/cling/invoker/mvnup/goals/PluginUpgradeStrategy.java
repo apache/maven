@@ -359,10 +359,10 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         Map<String, PluginUpgradeInfo> upgrades = new HashMap<>();
         upgrades.put(
                 DEFAULT_MAVEN_PLUGIN_GROUP_ID + ":maven-compiler-plugin",
-                new PluginUpgradeInfo(DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-compiler-plugin", "3.2.0"));
+                new PluginUpgradeInfo(DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-compiler-plugin", "3.2"));
         upgrades.put(
-                DEFAULT_MAVEN_PLUGIN_GROUP_ID + ":maven-exec-plugin",
-                new PluginUpgradeInfo(DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-exec-plugin", "3.2.0"));
+                "org.codehaus.mojo:exec-maven-plugin",
+                new PluginUpgradeInfo("org.codehaus.mojo", "exec-maven-plugin", "3.2.0"));
         upgrades.put(
                 DEFAULT_MAVEN_PLUGIN_GROUP_ID + ":maven-enforcer-plugin",
                 new PluginUpgradeInfo(DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-enforcer-plugin", "3.0.0"));

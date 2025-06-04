@@ -55,7 +55,9 @@ import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlEle
 import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.VERSION;
 
 /**
- * Strategy for applying Maven 4.1.0+ inference optimizations.
+ * Strategy for applying Maven inference optimizations.
+ * For 4.0.0 models: applies limited inference (parent-related only).
+ * For 4.1.0+ models: applies full inference optimizations.
  * Removes redundant information that can be inferred by Maven during model building.
  */
 @Named
@@ -91,7 +93,7 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
 
     @Override
     public String getDescription() {
-        return "Applying Maven 4.1.0+ inference optimizations";
+        return "Applying Maven inference optimizations";
     }
 
     @Override
@@ -115,22 +117,32 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
             try {
                 if (!ModelVersionUtils.isEligibleForInference(currentVersion)) {
                     context.warning(
-                            "Model version " + currentVersion + " not eligible for inference (requires >= 4.1.0)");
+                            "Model version " + currentVersion + " not eligible for inference (requires >= 4.0.0)");
                     continue;
                 }
 
                 boolean hasInferences = false;
 
-                // Apply all inference optimizations
-                hasInferences |= applyParentInference(context, pomMap, pomDocument);
-                hasInferences |= applyDependencyInference(context, allGAVs, pomDocument);
-                hasInferences |= applyDependencyInferenceRedundancy(context, pomMap, pomDocument);
-                hasInferences |= applySubprojectsInference(context, pomDocument, pomPath);
-                hasInferences |= applyModelVersionInference(context, pomDocument);
+                // Apply limited parent inference for all eligible models (4.0.0+)
+                hasInferences |= applyLimitedParentInference(context, pomDocument);
+
+                // Apply full inference optimizations only for 4.1.0+ models
+                if (MODEL_VERSION_4_1_0.equals(currentVersion) || ModelVersionUtils.isNewerThan410(currentVersion)) {
+                    hasInferences |= applyFullParentInference(context, pomMap, pomDocument);
+                    hasInferences |= applyDependencyInference(context, allGAVs, pomDocument);
+                    hasInferences |= applyDependencyInferenceRedundancy(context, pomMap, pomDocument);
+                    hasInferences |= applySubprojectsInference(context, pomDocument, pomPath);
+                    hasInferences |= applyModelVersionInference(context, pomDocument);
+                }
 
                 if (hasInferences) {
                     modifiedPoms.add(pomPath);
-                    context.success("Inference optimizations applied");
+                    if (MODEL_VERSION_4_1_0.equals(currentVersion)
+                            || ModelVersionUtils.isNewerThan410(currentVersion)) {
+                        context.success("Full inference optimizations applied");
+                    } else {
+                        context.success("Limited inference optimizations applied (parent-related only)");
+                    }
                 } else {
                     context.success("No inference optimizations needed");
                 }
@@ -146,13 +158,12 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
     }
 
     /**
-     * Applies parent-related inference optimizations.
-     * Removes redundant groupId/version that can be inferred from parent.
+     * Applies limited parent-related inference optimizations for Maven 4.0.0+ models.
+     * Removes redundant child groupId/version that can be inferred from parent.
      */
-    private boolean applyParentInference(UpgradeContext context, Map<Path, Document> pomMap, Document pomDocument) {
+    private boolean applyLimitedParentInference(UpgradeContext context, Document pomDocument) {
         Element root = pomDocument.getRootElement();
         Namespace namespace = root.getNamespace();
-        boolean hasChanges = false;
 
         // Check if this POM has a parent
         Element parentElement = root.getChild(PARENT, namespace);
@@ -160,19 +171,26 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
             return false;
         }
 
-        // Determine model version for inference level
-        String modelVersion = getChildText(root, "modelVersion", namespace);
-        boolean isModel410OrHigher = "4.1.0".equals(modelVersion);
+        // Apply limited inference (child groupId/version removal only)
+        return trimParentElementLimited(context, root, parentElement, namespace);
+    }
 
-        if (isModel410OrHigher) {
-            // Full inference for 4.1.0+ models
-            hasChanges |= trimParentElementFull(context, root, parentElement, namespace, pomMap);
-        } else {
-            // Limited inference for 4.0.0 models
-            hasChanges |= trimParentElementLimited(context, root, parentElement, namespace);
+    /**
+     * Applies full parent-related inference optimizations for Maven 4.1.0+ models.
+     * Removes redundant parent elements that can be inferred from relativePath.
+     */
+    private boolean applyFullParentInference(UpgradeContext context, Map<Path, Document> pomMap, Document pomDocument) {
+        Element root = pomDocument.getRootElement();
+        Namespace namespace = root.getNamespace();
+
+        // Check if this POM has a parent
+        Element parentElement = root.getChild(PARENT, namespace);
+        if (parentElement == null) {
+            return false;
         }
 
-        return hasChanges;
+        // Apply full inference (parent element trimming based on relativePath)
+        return trimParentElementFull(context, root, parentElement, namespace, pomMap);
     }
 
     /**

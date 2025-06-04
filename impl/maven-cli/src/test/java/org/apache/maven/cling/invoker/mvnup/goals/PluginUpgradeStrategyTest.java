@@ -333,7 +333,7 @@ class PluginUpgradeStrategyTest {
                     <build>
                         <plugins>
                             <plugin>
-                                <artifactId>maven-exec-plugin</artifactId>
+                                <artifactId>maven-shade-plugin</artifactId>
                                 <version>3.1.0</version>
                             </plugin>
                         </plugins>
@@ -349,7 +349,8 @@ class PluginUpgradeStrategyTest {
 
             assertTrue(result.success(), "Plugin upgrade should succeed");
             assertTrue(
-                    result.modifiedCount() > 0, "Should have upgraded maven-exec-plugin even without explicit groupId");
+                    result.modifiedCount() > 0,
+                    "Should have upgraded maven-shade-plugin even without explicit groupId");
 
             // Verify the version was upgraded
             Element root = document.getRootElement();
@@ -358,7 +359,7 @@ class PluginUpgradeStrategyTest {
                     .getChild("plugins", namespace)
                     .getChild("plugin", namespace);
             Element versionElement = pluginElement.getChild("version", namespace);
-            assertEquals("3.2.0", versionElement.getTextTrim());
+            assertEquals("3.5.0", versionElement.getTextTrim());
         }
 
         @Test
