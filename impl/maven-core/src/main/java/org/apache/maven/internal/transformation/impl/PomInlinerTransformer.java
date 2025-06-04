@@ -18,6 +18,7 @@
  */
 package org.apache.maven.internal.transformation.impl;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.xml.stream.XMLStreamException;
@@ -26,13 +27,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystemSession;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Inliner POM transformer.
@@ -42,7 +44,12 @@ import org.eclipse.aether.RepositorySystemSession;
 @Singleton
 @Named
 class PomInlinerTransformer extends TransformerSupport {
-    protected static final Pattern PLACEHOLDER_EXPRESSION = Pattern.compile("\\$\\{(.+?)}");
+    private final Interpolator interpolator;
+
+    @Inject
+    PomInlinerTransformer(Interpolator interpolator) {
+        this.interpolator = requireNonNull(interpolator);
+    }
 
     @Override
     public void injectTransformedArtifacts(RepositorySystemSession session, MavenProject project) throws IOException {
@@ -50,25 +57,14 @@ class PomInlinerTransformer extends TransformerSupport {
             try {
                 Model model = read(project.getFile().toPath());
                 String version = model.getVersion();
-                String newVersion = version;
-                int lastEnd = -1;
+                String newVersion;
                 if (version != null) {
-                    Matcher m = PLACEHOLDER_EXPRESSION.matcher(version.trim());
-                    while (m.find()) {
-                        String property = m.group(1);
+                    newVersion = interpolator.interpolate(version.trim(), property -> {
                         if (!session.getConfigProperties().containsKey(property)) {
                             throw new IllegalArgumentException("Cannot inline property " + property);
                         }
-                        String propertyValue =
-                                (String) session.getConfigProperties().get(property);
-                        if (lastEnd < 0) {
-                            newVersion = version.substring(0, m.start());
-                        } else {
-                            newVersion += version.substring(lastEnd, m.start());
-                        }
-                        lastEnd = m.end();
-                        newVersion += propertyValue;
-                    }
+                        return (String) session.getConfigProperties().get(property);
+                    });
                     if (!Objects.equals(version, newVersion)) {
                         model = model.withVersion(newVersion);
                         Path tmpPom = Files.createTempFile(

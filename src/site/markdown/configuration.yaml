@@ -154,7 +154,7 @@ props:
       configurationSource: User properties
     - key: maven.maven3Personality
       configurationType: Boolean
-      description: "User property for controlling \"maven personality\". If set to {@code true} Maven will behave as previous major version, Maven 3."
+      description: "User property for controlling \"maven personality\". If activated Maven will behave as previous major version, Maven 3."
       defaultValue: false
       since: 4.0.0
       configurationSource: User properties
