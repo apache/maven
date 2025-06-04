@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.Constants;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Priority;
 import org.apache.maven.api.di.Singleton;
@@ -55,6 +56,7 @@ public final class UserPropertiesArtifactRelocationSource implements MavenArtifa
     private static final Artifact SENTINEL = new DefaultArtifact("org.apache.maven.banned:user-relocation:1.0");
 
     @Override
+    @Nullable
     public Artifact relocatedTarget(
             RepositorySystemSession session, ArtifactDescriptorResult artifactDescriptorResult, Model model)
             throws ArtifactDescriptorException {

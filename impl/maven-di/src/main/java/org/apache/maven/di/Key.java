@@ -154,7 +154,8 @@ public abstract class Key<T> {
      *
      * @return the qualifier object or null if none exists
      */
-    public @Nullable Object getQualifier() {
+    @Nullable
+    public Object getQualifier() {
         return qualifier;
     }
 

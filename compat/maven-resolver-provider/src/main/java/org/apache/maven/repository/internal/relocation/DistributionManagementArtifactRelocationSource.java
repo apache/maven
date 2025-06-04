@@ -21,6 +21,7 @@ package org.apache.maven.repository.internal.relocation;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Relocation;
@@ -51,6 +52,7 @@ public final class DistributionManagementArtifactRelocationSource implements Mav
     private static final Logger LOGGER = LoggerFactory.getLogger(DistributionManagementArtifactRelocationSource.class);
 
     @Override
+    @Nullable
     public Artifact relocatedTarget(
             RepositorySystemSession session, ArtifactDescriptorResult artifactDescriptorResult, Model model) {
         DistributionManagement distMgmt = model.getDistributionManagement();

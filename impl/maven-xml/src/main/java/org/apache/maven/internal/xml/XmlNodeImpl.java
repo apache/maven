@@ -29,6 +29,7 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.api.xml.XmlService;
 
@@ -177,6 +178,7 @@ public class XmlNodeImpl implements Serializable, XmlNode {
 
     @Override
     @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nullable
     public String getAttribute(@Nonnull String name) {
         return attributes.get(name);
     }
@@ -191,6 +193,7 @@ public class XmlNodeImpl implements Serializable, XmlNode {
     // ----------------------------------------------------------------------
 
     @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nullable
     public XmlNode getChild(String name) {
         if (name != null) {
             ListIterator<XmlNode> it = children.listIterator(children.size());

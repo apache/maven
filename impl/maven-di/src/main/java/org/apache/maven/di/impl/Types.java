@@ -505,7 +505,8 @@ public class Types {
         }
 
         @Override
-        public @Nullable Type getOwnerType() {
+        @Nullable
+        public Type getOwnerType() {
             return ownerType;
         }
 

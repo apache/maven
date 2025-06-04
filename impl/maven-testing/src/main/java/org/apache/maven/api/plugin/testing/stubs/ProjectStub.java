@@ -34,6 +34,7 @@ import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.PluginContainer;
 import org.apache.maven.api.model.Profile;
@@ -101,6 +102,7 @@ public class ProjectStub implements Project {
                     }
 
                     @Override
+                    @Nullable
                     public Language getLanguage() {
                         return null;
                     }
@@ -154,12 +156,14 @@ public class ProjectStub implements Project {
 
     @Nonnull
     @Override
+    @Nullable
     public List<DependencyCoordinates> getDependencies() {
         return null;
     }
 
     @Nonnull
     @Override
+    @Nullable
     public List<DependencyCoordinates> getManagedDependencies() {
         return null;
     }

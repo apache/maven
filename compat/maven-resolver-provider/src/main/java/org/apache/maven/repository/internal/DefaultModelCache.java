@@ -18,6 +18,7 @@
  */
 package org.apache.maven.repository.internal;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.model.building.ModelCache;
 import org.eclipse.aether.RepositoryCache;
 import org.eclipse.aether.RepositorySystemSession;
@@ -34,6 +35,7 @@ class DefaultModelCache implements ModelCache {
 
     private final RepositoryCache cache;
 
+    @Nullable
     public static ModelCache newInstance(RepositorySystemSession session) {
         if (session.getCache() == null) {
             return null;

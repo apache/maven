@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.CycleDetectedException;
@@ -156,10 +157,12 @@ public class ReactorManager {
         buildSuccessesByProject.put(getProjectKey(project), new BuildSuccess(project, time));
     }
 
+    @Nullable
     public BuildFailure getBuildFailure(MavenProject project) {
         return buildFailuresByProject.get(getProjectKey(project));
     }
 
+    @Nullable
     public BuildSuccess getBuildSuccess(MavenProject project) {
         return buildSuccessesByProject.get(getProjectKey(project));
     }

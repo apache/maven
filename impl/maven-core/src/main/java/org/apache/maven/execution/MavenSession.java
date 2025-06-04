@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.Session;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.impl.SettingsUtilsV4;
@@ -445,11 +446,13 @@ public class MavenSession implements Cloneable {
     // Used by Tycho and will break users and force them to upgrade to Maven 3.1 so we should really leave
     // this here, possibly indefinitely.
     //
+    @Nullable
     public RepositoryCache getRepositoryCache() {
         return null;
     }
 
     @Deprecated
+    @Nullable
     public EventDispatcher getEventDispatcher() {
         return null;
     }

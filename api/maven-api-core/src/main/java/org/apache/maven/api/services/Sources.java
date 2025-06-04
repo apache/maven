@@ -175,11 +175,13 @@ public final class Sources {
         }
 
         @Override
+        @Nullable
         public Path getPath() {
             return null;
         }
 
         @Override
+        @Nullable
         public Source resolve(String relative) {
             return null;
         }

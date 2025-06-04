@@ -24,6 +24,7 @@ import org.apache.maven.api.Version;
 import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
@@ -152,6 +153,7 @@ public class DefaultModelVersionParser implements ModelVersionParser {
         }
 
         @Override
+        @Nullable
         public Boundary getUpperBoundary() {
             org.eclipse.aether.version.VersionRange.Bound bound = delegate.getUpperBound();
             if (bound == null) {
@@ -171,6 +173,7 @@ public class DefaultModelVersionParser implements ModelVersionParser {
         }
 
         @Override
+        @Nullable
         public Boundary getLowerBoundary() {
             org.eclipse.aether.version.VersionRange.Bound bound = delegate.getLowerBound();
             if (bound == null) {
@@ -236,6 +239,7 @@ public class DefaultModelVersionParser implements ModelVersionParser {
         }
 
         @Override
+        @Nullable
         public VersionRange getVersionRange() {
             if (delegate.getRange() == null) {
                 return null;
@@ -244,6 +248,7 @@ public class DefaultModelVersionParser implements ModelVersionParser {
         }
 
         @Override
+        @Nullable
         public Version getRecommendedVersion() {
             if (delegate.getVersion() == null) {
                 return null;

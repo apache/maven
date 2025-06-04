@@ -18,6 +18,7 @@
  */
 package org.apache.maven.lifecycle.internal.stub;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.prefix.PluginPrefixRequest;
 import org.apache.maven.plugin.prefix.PluginPrefixResolver;
@@ -37,6 +38,7 @@ public class PluginPrefixResolverStub implements PluginPrefixResolver {
                 return "bazbaz";
             }
 
+            @Nullable
             public ArtifactRepository getRepository() {
                 return null;
             }

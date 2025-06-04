@@ -43,6 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.eventspy.EventSpy;
@@ -97,6 +98,7 @@ class ReactorReader implements MavenWorkspaceReader {
         return repository;
     }
 
+    @Nullable
     public File findArtifact(Artifact artifact) {
         MavenProject project = getProject(artifact);
 

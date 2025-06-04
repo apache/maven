@@ -23,6 +23,8 @@ import java.lang.reflect.Modifier;
 import java.util.Hashtable;
 import java.util.Map;
 
+import org.apache.maven.api.annotations.Nullable;
+
 /**
  * A cache of introspection information for a specific class instance.
  * Keys {@link Method} objects by a concatenation of the
@@ -78,6 +80,7 @@ class ClassMap {
      * @return The found method.
      * @throws MethodMap.AmbiguousException in case of duplicate methods.
      */
+    @Nullable
     public Method findMethod(String name, Object... params) throws MethodMap.AmbiguousException {
         String methodKey = makeMethodKey(name, params);
         Object cacheEntry = methodCache.get(methodKey);

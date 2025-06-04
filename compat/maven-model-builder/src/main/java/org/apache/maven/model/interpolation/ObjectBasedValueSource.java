@@ -34,6 +34,7 @@ package org.apache.maven.model.interpolation;
  * limitations under the License.
  */
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.model.interpolation.reflection.ReflectionValueExtractor;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 
@@ -71,6 +72,7 @@ public class ObjectBasedValueSource extends AbstractValueSource {
      * <p><b>NOTE:</b> The object-graph navigation actually takes place via the
      * {@link ReflectionValueExtractor} class.</p>
      */
+    @Nullable
     public Object getValue(String expression) {
         if (expression == null || expression.trim().isEmpty()) {
             return null;

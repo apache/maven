@@ -21,6 +21,7 @@ package org.apache.maven.slf4j;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.logging.api.LogLevelRecorder;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
@@ -42,11 +43,13 @@ public class MavenLoggerFactory implements LogLevelRecorder, ILoggerFactory {
     }
 
     @Override
+    @Nullable
     public Level getMaxLevelReached() {
         return null;
     }
 
     @Override
+    @Nullable
     public Level getMaxLevelAllowed() {
         return null;
     }

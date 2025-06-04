@@ -27,6 +27,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.api.annotations.Nullable;
+
 class Graph {
     private enum DfsState {
         VISITING,
@@ -35,6 +37,7 @@ class Graph {
 
     final Map<String, Vertex> vertices = new LinkedHashMap<>();
 
+    @Nullable
     public Vertex getVertex(String id) {
         return vertices.get(id);
     }

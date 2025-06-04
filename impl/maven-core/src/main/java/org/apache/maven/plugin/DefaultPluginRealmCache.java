@@ -29,6 +29,7 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
@@ -143,6 +144,7 @@ public class DefaultPluginRealmCache implements PluginRealmCache, Disposable {
         return new CacheKey(plugin, parentRealm, foreignImports, dependencyFilter, repositories, session);
     }
 
+    @Nullable
     public CacheRecord get(Key key) {
         return cache.get(key);
     }

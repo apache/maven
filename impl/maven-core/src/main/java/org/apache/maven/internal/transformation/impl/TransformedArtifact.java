@@ -31,6 +31,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.internal.transformation.TransformationFailedException;
@@ -90,7 +91,7 @@ class TransformedArtifact extends DefaultArtifact {
     }
 
     @Override
-    public synchronized File getFile() {
+    public synchronized @Nullable File getFile() {
         try {
             String state = mayUpdate();
             if (state == null) {

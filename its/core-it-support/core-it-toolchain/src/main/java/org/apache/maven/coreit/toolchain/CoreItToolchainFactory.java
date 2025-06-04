@@ -23,6 +23,7 @@ import javax.inject.Named;
 import org.apache.maven.toolchain.ToolchainFactory;
 import org.apache.maven.toolchain.ToolchainPrivate;
 import org.apache.maven.toolchain.model.ToolchainModel;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
  * @author Benjamin Bentmann
@@ -30,10 +31,12 @@ import org.apache.maven.toolchain.model.ToolchainModel;
 @Named("coreit")
 public class CoreItToolchainFactory implements ToolchainFactory {
 
+    @Nullable
     public ToolchainPrivate createDefaultToolchain() {
         return null;
     }
 
+    @Nullable
     public ToolchainPrivate createToolchain(ToolchainModel model) {
         if (model == null) {
             return null;

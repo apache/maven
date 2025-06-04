@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.maven.lifecycle.mapping.Lifecycle;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
  * @author Anton Tanasenko
@@ -47,6 +48,7 @@ public abstract class AbstractLifecycleMapping implements LifecycleMapping {
         return lifecycleMap;
     }
 
+    @Nullable
     public Map<String, String> getPhases(String lifecycle) {
         Lifecycle lifecycleMapping = getLifecycles().get(lifecycle);
         if (lifecycleMapping != null) {
@@ -55,6 +57,7 @@ public abstract class AbstractLifecycleMapping implements LifecycleMapping {
         return null;
     }
 
+    @Nullable
     public List<String> getOptionalMojos(String lifecycle) {
         return null;
     }

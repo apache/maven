@@ -18,6 +18,7 @@
  */
 package org.apache.maven.settings;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.impl.SettingsUtilsV4;
 
 /**
@@ -62,6 +63,7 @@ public final class SettingsUtils {
      * @param settings could be null
      * @return a new instance of settings or null if settings was null.
      */
+    @Nullable
     public static Settings copySettings(Settings settings) {
         if (settings == null) {
             return null;

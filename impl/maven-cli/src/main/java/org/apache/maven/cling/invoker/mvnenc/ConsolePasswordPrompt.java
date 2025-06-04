@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
@@ -58,6 +59,7 @@ public class ConsolePasswordPrompt implements MasterSource, MasterSourceMeta {
     }
 
     @Override
+    @Nullable
     public String handle(String config) throws SecDispatcherException {
         if (NAME.equals(config)) {
             try {
@@ -70,6 +72,7 @@ public class ConsolePasswordPrompt implements MasterSource, MasterSourceMeta {
     }
 
     @Override
+    @Nullable
     public SecDispatcher.ValidationResponse validateConfiguration(String config) {
         if (NAME.equals(config)) {
             return new SecDispatcher.ValidationResponse(getClass().getSimpleName(), true, Map.of(), List.of());

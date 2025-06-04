@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.WeakHashMap;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 
@@ -92,6 +93,7 @@ public class VersionRange {
      * @return a new {@link VersionRange} object that represents the spec
      * @throws InvalidVersionSpecificationException if invalid version specification
      */
+    @Nullable
     public static VersionRange createFromVersionSpec(String spec) throws InvalidVersionSpecificationException {
         if (spec == null) {
             return null;
@@ -202,6 +204,7 @@ public class VersionRange {
         return restriction;
     }
 
+    @Nullable
     public static VersionRange createFromVersion(String version) {
         if (DefaultArtifact.empty(version)) {
             return null;

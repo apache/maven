@@ -20,6 +20,7 @@ package org.apache.maven.lifecycle.internal.stub;
 
 import java.util.List;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.BuildPluginManager;
@@ -34,6 +35,7 @@ import org.eclipse.aether.repository.RemoteRepository;
  */
 public class BuildPluginManagerStub implements BuildPluginManager {
 
+    @Nullable
     public PluginDescriptor loadPlugin(
             Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session) {
         return null;
@@ -44,6 +46,7 @@ public class BuildPluginManagerStub implements BuildPluginManager {
         return MojoExecutorStub.createMojoDescriptor(plugin);
     }
 
+    @Nullable
     public ClassRealm getPluginRealm(MavenSession session, PluginDescriptor pluginDescriptor) {
         return null;
     }

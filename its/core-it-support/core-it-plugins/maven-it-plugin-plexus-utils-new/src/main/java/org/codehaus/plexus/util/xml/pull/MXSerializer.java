@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 
+import org.apache.maven.api.annotations.Nullable;
+
 /**
  *
  */
@@ -32,6 +34,7 @@ public class MXSerializer implements XmlSerializer {
         output = writer;
     }
 
+    @Nullable
     public XmlSerializer attribute(String namespace, String name, String value) {
         return null;
     }
@@ -52,6 +55,7 @@ public class MXSerializer implements XmlSerializer {
         // ignore
     }
 
+    @Nullable
     public XmlSerializer endTag(String namespace, String name) {
         return null;
     }
@@ -72,18 +76,22 @@ public class MXSerializer implements XmlSerializer {
         return false;
     }
 
+    @Nullable
     public String getName() {
         return null;
     }
 
+    @Nullable
     public String getNamespace() {
         return null;
     }
 
+    @Nullable
     public String getPrefix(String namespace, boolean generatePrefix) {
         return null;
     }
 
+    @Nullable
     public Object getProperty(String name) {
         return null;
     }
@@ -122,10 +130,12 @@ public class MXSerializer implements XmlSerializer {
         return this;
     }
 
+    @Nullable
     public XmlSerializer text(String text) {
         return null;
     }
 
+    @Nullable
     public XmlSerializer text(char[] buf, int start, int len) {
         return null;
     }

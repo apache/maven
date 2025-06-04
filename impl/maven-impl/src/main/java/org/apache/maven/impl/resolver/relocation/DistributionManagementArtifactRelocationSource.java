@@ -18,6 +18,7 @@
  */
 package org.apache.maven.impl.resolver.relocation;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Priority;
 import org.apache.maven.api.di.Singleton;
@@ -48,6 +49,7 @@ public final class DistributionManagementArtifactRelocationSource implements Mav
     private static final Logger LOGGER = LoggerFactory.getLogger(DistributionManagementArtifactRelocationSource.class);
 
     @Override
+    @Nullable
     public Artifact relocatedTarget(
             RepositorySystemSession session, ArtifactDescriptorResult artifactDescriptorResult, Model model) {
         DistributionManagement distMgmt = model.getDistributionManagement();

@@ -29,6 +29,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
@@ -69,6 +70,7 @@ public class RepositoryUtils {
         return (string == null || string.isEmpty()) ? null : string;
     }
 
+    @Nullable
     public static org.apache.maven.artifact.Artifact toArtifact(Dependency dependency) {
         if (dependency == null) {
             return null;
@@ -81,6 +83,7 @@ public class RepositoryUtils {
         return result;
     }
 
+    @Nullable
     public static org.apache.maven.artifact.Artifact toArtifact(Artifact artifact) {
         if (artifact == null) {
             return null;
@@ -132,6 +135,7 @@ public class RepositoryUtils {
         }
     }
 
+    @Nullable
     public static Artifact toArtifact(org.apache.maven.artifact.Artifact artifact) {
         if (artifact == null) {
             return null;
@@ -161,6 +165,7 @@ public class RepositoryUtils {
         return result;
     }
 
+    @Nullable
     public static Dependency toDependency(
             org.apache.maven.artifact.Artifact artifact, Collection<org.apache.maven.model.Exclusion> exclusions) {
         if (artifact == null) {

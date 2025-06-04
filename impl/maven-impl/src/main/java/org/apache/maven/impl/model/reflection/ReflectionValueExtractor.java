@@ -78,6 +78,7 @@ public class ReflectionValueExtractor {
             return idx < expression.length() ? expression.charAt(idx++) : EOF;
         }
 
+        @Nullable
         public String nextToken(char delimiter) {
             int start = idx;
 
@@ -93,6 +94,7 @@ public class ReflectionValueExtractor {
             return expression.substring(start, idx++);
         }
 
+        @Nullable
         public String nextPropertyName() {
             final int start = idx;
 
@@ -158,6 +160,7 @@ public class ReflectionValueExtractor {
      * @return the object defined by the expression
      * @throws IntrospectionException if any
      */
+    @Nullable
     public static Object evaluate(@Nonnull String expression, @Nullable Object root, boolean trimRootToken)
             throws IntrospectionException {
         Object value = root;

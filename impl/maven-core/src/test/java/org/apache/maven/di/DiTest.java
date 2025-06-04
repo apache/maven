@@ -30,6 +30,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Binding;
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.spi.ModelParser;
@@ -121,6 +122,7 @@ public class DiTest {
             }
 
             @Override
+            @Nullable
             public Model parse(Source source, Map<String, ?> options) throws ModelParserException {
                 return null;
             }
@@ -193,6 +195,7 @@ public class DiTest {
             }
 
             @Override
+            @Nullable
             public Model parse(Source source, Map<String, ?> options) throws ModelParserException {
                 return null;
             }
@@ -264,6 +267,7 @@ public class DiTest {
             }
 
             @Override
+            @Nullable
             public Model parse(Source source, Map<String, ?> options) throws ModelParserException {
                 return null;
             }
@@ -344,6 +348,7 @@ public class DiTest {
             }
 
             @Override
+            @Nullable
             public Model parse(Source source, Map<String, ?> options) throws ModelParserException {
                 return null;
             }
@@ -357,6 +362,7 @@ public class DiTest {
             }
 
             @Override
+            @Nullable
             public Model parse(Source source, Map<String, ?> options) throws ModelParserException {
                 return null;
             }

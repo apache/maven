@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.lifecycle.internal.ExecutionPlanItem;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
@@ -106,6 +107,7 @@ public class MavenExecutionPlan implements Iterable<ExecutionPlanItem> {
      *                       The execution plan item
      * @return The ExecutionPlanItem or null if none can be found
      */
+    @Nullable
     public ExecutionPlanItem findLastInPhase(String requestedPhase) {
         return lastMojoExecutionForAllPhases.get(requestedPhase);
     }

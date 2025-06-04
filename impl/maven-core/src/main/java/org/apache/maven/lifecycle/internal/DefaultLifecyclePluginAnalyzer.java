@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.internal.impl.DefaultLifecycleRegistry;
@@ -78,6 +79,7 @@ public class DefaultLifecyclePluginAnalyzer implements LifeCyclePluginAnalyzer {
     // from the plugin.xml inside a plugin.
 
     @Override
+    @Nullable
     public Set<Plugin> getPluginsBoundByDefaultToAllLifecycles(String packaging) {
         if (logger.isDebugEnabled()) {
             logger.debug("Looking up lifecycle mappings for packaging " + packaging + " from "

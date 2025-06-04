@@ -24,6 +24,7 @@ import java.util.Iterator;
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.JXPathNotFoundException;
 import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.harness.Xpp3DomPointerFactory;
 
@@ -46,6 +47,7 @@ public class MojoExecutionXPathContainer {
         return context.getValue(expression) != null;
     }
 
+    @Nullable
     public Object getValue(String expression) {
         try {
             return context.getValue(expression);

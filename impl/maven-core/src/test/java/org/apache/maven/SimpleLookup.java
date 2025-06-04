@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.LookupException;
 
@@ -42,6 +43,7 @@ public class SimpleLookup implements Lookup {
     }
 
     @Override
+    @Nullable
     public <T> T lookup(Class<T> type, String name) {
         return null;
     }

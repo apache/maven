@@ -18,6 +18,7 @@
  */
 package org.apache.maven.cling.logging;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.logging.ProjectBuildLogAppender;
 import org.codehaus.plexus.logging.Logger;
 
@@ -140,6 +141,7 @@ public class Slf4jLogger implements Logger {
      * <b>Warning</b>: ignored (always return <code>null</code>).
      */
     @Override
+    @Nullable
     public Logger getChildLogger(String name) {
         return null;
     }

@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
@@ -54,6 +55,7 @@ import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.Repository;
 import org.apache.maven.repository.Proxy;
 import org.apache.maven.settings.Mirror;
 import org.eclipse.aether.RepositorySystemSession;
@@ -97,6 +99,7 @@ public class MavenRepositorySystem {
     }
 
     // DefaultProjectBuilder
+    @Nullable
     public Artifact createDependencyArtifact(Dependency d) {
         if (d.getVersion() == null) {
             return null;
@@ -130,6 +133,7 @@ public class MavenRepositorySystem {
     }
 
     // DefaultProjectBuilder
+    @Nullable
     public Artifact createExtensionArtifact(String groupId, String artifactId, String version) {
         VersionRange versionRange;
         try {
@@ -147,6 +151,7 @@ public class MavenRepositorySystem {
     }
 
     // DefaultProjectBuilder
+    @Nullable
     public Artifact createPluginArtifact(Plugin plugin) {
         VersionRange versionRange;
         try {
@@ -296,9 +301,8 @@ public class MavenRepositorySystem {
     // Taken from LegacyRepositorySystem
     //
 
-    public static org.apache.maven.model.Repository fromSettingsRepository(
-            org.apache.maven.settings.Repository settingsRepository) {
-        org.apache.maven.model.Repository modelRepository = new org.apache.maven.model.Repository();
+    public static Repository fromSettingsRepository(org.apache.maven.settings.Repository settingsRepository) {
+        Repository modelRepository = new Repository();
         modelRepository.setId(settingsRepository.getId());
         modelRepository.setLayout(settingsRepository.getLayout());
         modelRepository.setName(settingsRepository.getName());
@@ -324,8 +328,8 @@ public class MavenRepositorySystem {
         return buildArtifactRepository(fromSettingsRepository(repo));
     }
 
-    public static ArtifactRepository buildArtifactRepository(org.apache.maven.model.Repository repo)
-            throws InvalidRepositoryException {
+    @Nullable
+    public static ArtifactRepository buildArtifactRepository(Repository repo) throws InvalidRepositoryException {
         if (repo != null) {
             String id = repo.getId();
 
@@ -600,6 +604,7 @@ public class MavenRepositorySystem {
      * @return corresponding effective repositories
      * @since 3.6.1
      */
+    @Nullable
     public List<ArtifactRepository> getEffectiveRepositories(List<ArtifactRepository> repositories) {
         if (repositories == null) {
             return null;
@@ -692,6 +697,7 @@ public class MavenRepositorySystem {
 
     private static final String EXTERNAL_HTTP_WILDCARD = "external:http:*";
 
+    @Nullable
     public static Mirror getMirror(ArtifactRepository repository, List<Mirror> mirrors) {
         String repoId = repository.getId();
 

@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.api.annotations.Nullable;
+
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
@@ -99,6 +101,7 @@ public class DefaultLifecycleMapping implements LifecycleMapping {
 
     @Deprecated
     @Override
+    @Nullable
     public List<String> getOptionalMojos(String lifecycle) {
         return null;
     }

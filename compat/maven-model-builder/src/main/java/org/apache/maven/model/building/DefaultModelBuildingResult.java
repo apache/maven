@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 
@@ -81,11 +82,13 @@ class DefaultModelBuildingResult implements ModelBuildingResult {
     }
 
     @Override
+    @Nullable
     public Model getRawModel() {
         return rawModels.get(modelIds.get(0));
     }
 
     @Override
+    @Nullable
     public Model getRawModel(String modelId) {
         return rawModels.get(modelId);
     }
@@ -100,6 +103,7 @@ class DefaultModelBuildingResult implements ModelBuildingResult {
     }
 
     @Override
+    @Nullable
     public List<Profile> getActivePomProfiles(String modelId) {
         return activePomProfiles.get(modelId);
     }

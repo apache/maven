@@ -20,6 +20,7 @@ package org.apache.maven.cli.logging;
 
 import java.io.PrintStream;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 
@@ -61,6 +62,7 @@ public class Slf4jStdoutLogger implements Logger {
     //
     // Don't need any of this
     //
+    @Nullable
     public String getName() {
         return null;
     }

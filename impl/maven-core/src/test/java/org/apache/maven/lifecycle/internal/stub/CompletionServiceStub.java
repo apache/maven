@@ -27,6 +27,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.lifecycle.internal.ProjectSegment;
 
 /**
@@ -62,14 +63,17 @@ public class CompletionServiceStub implements CompletionService<ProjectSegment> 
         return projectBuildFutureTask;
     }
 
+    @Nullable
     public Future<ProjectSegment> take() throws InterruptedException {
         return null;
     }
 
+    @Nullable
     public Future<ProjectSegment> poll() {
         return null;
     }
 
+    @Nullable
     public Future<ProjectSegment> poll(long timeout, TimeUnit unit) throws InterruptedException {
         return null;
     }

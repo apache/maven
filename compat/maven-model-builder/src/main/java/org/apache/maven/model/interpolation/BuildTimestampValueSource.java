@@ -21,6 +21,7 @@ package org.apache.maven.model.interpolation;
 import java.util.Date;
 import java.util.Properties;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 
 /**
@@ -36,6 +37,7 @@ class BuildTimestampValueSource extends AbstractValueSource {
     }
 
     @Override
+    @Nullable
     public Object getValue(String expression) {
         if ("build.timestamp".equals(expression) || "maven.build.timestamp".equals(expression)) {
             return mavenBuildTimestamp.formattedTimestamp();

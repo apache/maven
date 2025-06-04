@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
@@ -71,6 +72,7 @@ public class MojoExecutorStub extends MojoExecutor { // This is being lazy inste
     }
 
     @Override
+    @Nullable
     public List<MavenProject> executeForkedExecutions(MojoExecution mojoExecution, MavenSession session)
             throws LifecycleExecutionException {
         return null;

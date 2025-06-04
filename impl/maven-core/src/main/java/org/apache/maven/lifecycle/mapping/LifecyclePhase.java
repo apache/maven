@@ -28,6 +28,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.annotations.Nullable;
+
 /**
  * Mojo (goals) bindings to a lifecycle phase.
  *
@@ -74,6 +76,7 @@ public class LifecyclePhase {
     }
 
     @Deprecated
+    @Nullable
     public static Map<String, String> toLegacyMap(Map<String, LifecyclePhase> lifecyclePhases) {
         if (lifecyclePhases == null) {
             return null;

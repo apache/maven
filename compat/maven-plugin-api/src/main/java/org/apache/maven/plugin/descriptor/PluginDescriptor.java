@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.plugin.descriptor.lifecycle.Lifecycle;
 import org.apache.maven.api.plugin.descriptor.lifecycle.LifecycleConfiguration;
 import org.apache.maven.artifact.Artifact;
@@ -320,6 +321,7 @@ public class PluginDescriptor extends ComponentSetDescriptor implements Cloneabl
         return 10 + getId().hashCode();
     }
 
+    @Nullable
     public MojoDescriptor getMojo(String goal) {
         if (getMojos() == null) {
             return null; // no mojo in this POM
@@ -415,6 +417,7 @@ public class PluginDescriptor extends ComponentSetDescriptor implements Cloneabl
         this.pluginArtifact = pluginArtifact;
     }
 
+    @Nullable
     public Lifecycle getLifecycleMapping(String lifecycleId) throws IOException, XMLStreamException {
         return getLifecycleMappings().get(lifecycleId);
     }

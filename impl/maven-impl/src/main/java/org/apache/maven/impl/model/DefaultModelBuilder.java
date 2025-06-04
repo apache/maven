@@ -347,6 +347,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             return Math.max(1, Math.min(parallelism, Runtime.getRuntime().availableProcessors()));
         }
 
+        @Nullable
         public Model getRawModel(Path from, String groupId, String artifactId) {
             ModelSource source = getSource(groupId, artifactId);
             if (source != null) {
@@ -362,6 +363,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             return null;
         }
 
+        @Nullable
         public Model getRawModel(Path from, Path path) {
             if (!Files.isRegularFile(path)) {
                 throw new IllegalArgumentException("Not a regular file: " + path);
@@ -390,6 +392,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
 
+        @Nullable
         public ModelSource getSource(String groupId, String artifactId) {
             Set<ModelSource> sources = mappedSources.get(new GAKey(groupId, artifactId));
             if (sources != null) {

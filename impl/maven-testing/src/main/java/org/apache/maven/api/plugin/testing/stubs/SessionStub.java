@@ -128,31 +128,37 @@ public class SessionStub implements Session {
     }
 
     @Override
+    @Nullable
     public LocalRepository getLocalRepository() {
         return null;
     }
 
     @Override
+    @Nullable
     public Path getTopDirectory() {
         return null;
     }
 
     @Override
+    @Nullable
     public Path getRootDirectory() {
         return null;
     }
 
     @Override
+    @Nullable
     public List<RemoteRepository> getRemoteRepositories() {
         return null;
     }
 
     @Override
+    @Nullable
     public SessionData getData() {
         return null;
     }
 
     @Override
+    @Nullable
     public Version getMavenVersion() {
         return null;
     }
@@ -163,31 +169,36 @@ public class SessionStub implements Session {
     }
 
     @Override
+    @Nullable
     public Instant getStartTime() {
         return null;
     }
 
     @Override
+    @Nullable
     public List<Project> getProjects() {
         return null;
     }
 
     @Override
+    @Nullable
     public Map<String, Object> getPluginContext(Project project) {
         return null;
     }
 
     @Override
-    public <T extends Service> T getService(Class<T> clazz) {
+    public <T extends Service> @Nullable T getService(Class<T> clazz) {
         return null;
     }
 
     @Override
+    @Nullable
     public Session withLocalRepository(LocalRepository localRepository) {
         return null;
     }
 
     @Override
+    @Nullable
     public Session withRemoteRepositories(List<RemoteRepository> repositories) {
         return null;
     }
@@ -199,152 +210,181 @@ public class SessionStub implements Session {
     public void unregisterListener(Listener listener) {}
 
     @Override
+    @Nullable
     public Collection<Listener> getListeners() {
         return null;
     }
 
     @Override
+    @Nullable
     public LocalRepository createLocalRepository(Path path) {
         return null;
     }
 
     @Override
+    @Nullable
     public RemoteRepository createRemoteRepository(String id, String url) {
         return null;
     }
 
     @Override
+    @Nullable
     public RemoteRepository createRemoteRepository(Repository repository) {
         return null;
     }
 
     @Override
+    @Nullable
     public Artifact createArtifact(String groupId, String artifactId, String version, String extension) {
         return null;
     }
 
     @Override
+    @Nullable
     public Artifact createArtifact(
             String groupId, String artifactId, String version, String classifier, String extension, String type) {
         return null;
     }
 
     @Override
+    @Nullable
     public ProducedArtifact createProducedArtifact(
             String groupId, String artifactId, String version, String extension) {
         return null;
     }
 
     @Override
+    @Nullable
     public ProducedArtifact createProducedArtifact(
             String groupId, String artifactId, String version, String classifier, String extension, String type) {
         return null;
     }
 
     @Override
+    @Nullable
     public ArtifactCoordinates createArtifactCoordinates(
             String groupId, String artifactId, String version, String extension) {
         return null;
     }
 
     @Override
+    @Nullable
     public ArtifactCoordinates createArtifactCoordinates(String coordString) {
         return null;
     }
 
     @Override
+    @Nullable
     public ArtifactCoordinates createArtifactCoordinates(
             String groupId, String artifactId, String version, String classifier, String extension, String type) {
         return null;
     }
 
     @Override
+    @Nullable
     public ArtifactCoordinates createArtifactCoordinates(Artifact artifact) {
         return null;
     }
 
     @Override
+    @Nullable
     public DependencyCoordinates createDependencyCoordinates(ArtifactCoordinates artifactCoordinates) {
         return null;
     }
 
     @Override
+    @Nullable
     public DependencyCoordinates createDependencyCoordinates(Dependency dependency) {
         return null;
     }
 
     @Override
+    @Nullable
     public DownloadedArtifact resolveArtifact(Artifact artifact) {
         return null;
     }
 
     @Override
+    @Nullable
     public DownloadedArtifact resolveArtifact(ArtifactCoordinates coordinate) {
         return null;
     }
 
     @Override
+    @Nullable
     public DownloadedArtifact resolveArtifact(ArtifactCoordinates coordinates, List<RemoteRepository> repositories) {
         return null;
     }
 
     @Override
+    @Nullable
     public DownloadedArtifact resolveArtifact(Artifact artifact, List<RemoteRepository> repositories) {
         return null;
     }
 
     @Override
+    @Nullable
     public Collection<DownloadedArtifact> resolveArtifacts(ArtifactCoordinates... artifactCoordinates) {
         return null;
     }
 
     @Override
+    @Nullable
     public Collection<DownloadedArtifact> resolveArtifacts(Collection<? extends ArtifactCoordinates> collection) {
         return null;
     }
 
     @Override
+    @Nullable
     public Collection<DownloadedArtifact> resolveArtifacts(Artifact... artifacts) {
         return null;
     }
 
     @Override
+    @Nullable
     public Collection<DownloadedArtifact> resolveArtifacts(
             Collection<? extends ArtifactCoordinates> coordinates, List<RemoteRepository> repositories) {
         return null;
     }
 
     @Override
+    @Nullable
     public List<Node> flattenDependencies(Node node, PathScope scope) {
         return null;
     }
 
     @Override
+    @Nullable
     public List<Path> resolveDependencies(DependencyCoordinates dependencyCoordinates) {
         return null;
     }
 
     @Override
+    @Nullable
     public List<Path> resolveDependencies(List<DependencyCoordinates> dependencyCoordinatess) {
         return null;
     }
 
     @Override
+    @Nullable
     public List<Path> resolveDependencies(Project project, PathScope scope) {
         return null;
     }
 
     @Override
+    @Nullable
     public Version resolveVersion(ArtifactCoordinates artifact) {
         return null;
     }
 
     @Override
+    @Nullable
     public List<Version> resolveVersionRange(ArtifactCoordinates artifact) {
         return null;
     }
 
     @Override
+    @Nullable
     public List<Version> resolveVersionRange(ArtifactCoordinates artifact, List<RemoteRepository> repositories) {
         return null;
     }
@@ -372,41 +412,49 @@ public class SessionStub implements Session {
     }
 
     @Override
+    @Nullable
     public Node collectDependencies(Artifact artifact, PathScope scope) {
         return null;
     }
 
     @Override
+    @Nullable
     public Node collectDependencies(Project project, PathScope scope) {
         return null;
     }
 
     @Override
+    @Nullable
     public Node collectDependencies(DependencyCoordinates dependencyCoordinates, PathScope scope) {
         return null;
     }
 
     @Override
+    @Nullable
     public Path getPathForLocalArtifact(Artifact artifact) {
         return null;
     }
 
     @Override
+    @Nullable
     public Path getPathForRemoteArtifact(RemoteRepository remote, Artifact artifact) {
         return null;
     }
 
     @Override
+    @Nullable
     public Version parseVersion(String version) {
         return null;
     }
 
     @Override
+    @Nullable
     public VersionRange parseVersionRange(String versionRange) {
         return null;
     }
 
     @Override
+    @Nullable
     public VersionConstraint parseVersionConstraint(String s) {
         return null;
     }
@@ -424,31 +472,37 @@ public class SessionStub implements Session {
     }
 
     @Override
+    @Nullable
     public Type requireType(String id) {
         return null;
     }
 
     @Override
+    @Nullable
     public Language requireLanguage(String id) {
         return null;
     }
 
     @Override
+    @Nullable
     public Packaging requirePackaging(String id) {
         return null;
     }
 
     @Override
+    @Nullable
     public ProjectScope requireProjectScope(String id) {
         return null;
     }
 
     @Override
+    @Nullable
     public DependencyScope requireDependencyScope(String id) {
         return null;
     }
 
     @Override
+    @Nullable
     public PathScope requirePathScope(String id) {
         return null;
     }

@@ -22,6 +22,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.maven.api.annotations.Nullable;
+
 /**
  * Holds all POM files that are known to the reactor. This allows the project builder to resolve imported POMs from the
  * reactor when building another project's effective model.
@@ -30,6 +32,7 @@ class ReactorModelPool {
 
     private final Map<CacheKey, File> pomFiles = new HashMap<>();
 
+    @Nullable
     public File get(String groupId, String artifactId, String version) {
         return pomFiles.get(new CacheKey(groupId, artifactId, version));
     }

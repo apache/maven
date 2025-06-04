@@ -172,7 +172,9 @@ public class InjectorImplTest {
 
         @Named
         static class ClassImpl implements TestInterface<String> {
+
             @Override
+            @Nullable
             public String getObj() {
                 return null;
             }
@@ -181,7 +183,9 @@ public class InjectorImplTest {
         @Named
         @Typed
         static class TypedClassImpl implements TestInterface<String> {
+
             @Override
+            @Nullable
             public String getObj() {
                 return null;
             }

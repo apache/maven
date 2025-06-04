@@ -216,6 +216,7 @@ public class ApiRunner {
         }
 
         @Override
+        @Nullable
         public Version getMavenVersion() {
             return null;
         }
@@ -231,6 +232,7 @@ public class ApiRunner {
         }
 
         @Override
+        @Nullable
         public Path getTopDirectory() {
             return null;
         }
