@@ -56,7 +56,12 @@ class PomInlinerTransformer extends TransformerSupport {
         if (!Features.consumerPom(session.getConfigProperties())) {
             try {
                 Model model = read(project.getFile().toPath());
+                boolean parentVersion = false;
                 String version = model.getVersion();
+                if (version == null && model.getParent() != null) {
+                    parentVersion = true;
+                    version = model.getParent().getVersion();
+                }
                 String newVersion;
                 if (version != null) {
                     newVersion = interpolator.interpolate(version.trim(), property -> {
@@ -66,7 +71,11 @@ class PomInlinerTransformer extends TransformerSupport {
                         return (String) session.getConfigProperties().get(property);
                     });
                     if (!Objects.equals(version, newVersion)) {
-                        model = model.withVersion(newVersion);
+                        if (parentVersion) {
+                            model = model.withParent(model.getParent().withVersion(newVersion));
+                        } else {
+                            model = model.withVersion(newVersion);
+                        }
                         Path tmpPom = Files.createTempFile(
                                 project.getArtifactId() + "-" + project.getVersion() + "-", ".xml");
                         write(model, tmpPom);
