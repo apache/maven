@@ -61,6 +61,12 @@ public class MavenITmng8744CIFriendlyTest extends AbstractMavenIntegrationTestCa
 
         verifier = newVerifier(testDir.getAbsolutePath(), false);
         verifier.setAutoclean(false);
+        verifier.addCliArgument("clean");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+
+        verifier = newVerifier(testDir.getAbsolutePath(), false);
+        verifier.setAutoclean(false);
 
         verifier.addCliArgument("-Drevision=1.2");
         verifier.addCliArgument("-Dmaven.maven3Personality=true");
