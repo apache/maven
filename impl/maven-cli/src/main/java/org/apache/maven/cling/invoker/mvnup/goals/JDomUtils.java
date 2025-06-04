@@ -211,7 +211,7 @@ public class JDomUtils {
      */
     public static Element insertNewElement(String name, Element root, int index) {
         String indent = detectIndentation(root);
-        Element newElement = createElement(name, root.getNamespace(), indent);
+        Element newElement = createElement(name, root.getNamespace());
 
         // If the parent element only has minimal content (just closing tag indentation),
         // we need to handle it specially to avoid creating whitespace-only lines
@@ -239,7 +239,7 @@ public class JDomUtils {
      * Creates a new element with proper formatting.
      * This method ensures that both the opening and closing tags are properly indented.
      */
-    private static Element createElement(String name, Namespace namespace, String indent) {
+    private static Element createElement(String name, Namespace namespace) {
         Element newElement = new Element(name, namespace);
 
         // Add minimal content to prevent self-closing tag and ensure proper formatting

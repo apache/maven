@@ -58,7 +58,7 @@ class PluginUpgradeStrategyTest {
 
     @BeforeEach
     void setUp() {
-        strategy = new PluginUpgradeStrategy(new ParentPomResolver());
+        strategy = new PluginUpgradeStrategy();
         saxBuilder = new SAXBuilder();
     }
 

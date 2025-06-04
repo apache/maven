@@ -52,7 +52,7 @@ class UpgradeWorkflowIntegrationTest {
         List<UpgradeStrategy> strategies = List.of(
                 new ModelUpgradeStrategy(),
                 new CompatibilityFixStrategy(),
-                new PluginUpgradeStrategy(new ParentPomResolver()),
+                new PluginUpgradeStrategy(),
                 new InferenceStrategy());
 
         StrategyOrchestrator orchestrator = new StrategyOrchestrator(strategies);
