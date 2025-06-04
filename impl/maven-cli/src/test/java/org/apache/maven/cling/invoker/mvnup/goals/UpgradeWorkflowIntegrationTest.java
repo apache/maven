@@ -43,7 +43,6 @@ class UpgradeWorkflowIntegrationTest {
     @TempDir
     Path tempDir;
 
-    private StrategyOrchestrator orchestrator;
     private Apply applyGoal;
     private Check checkGoal;
 
@@ -53,10 +52,10 @@ class UpgradeWorkflowIntegrationTest {
         List<UpgradeStrategy> strategies = List.of(
                 new ModelUpgradeStrategy(),
                 new CompatibilityFixStrategy(),
-                new PluginUpgradeStrategy(),
+                new PluginUpgradeStrategy(new ParentPomResolver()),
                 new InferenceStrategy());
 
-        orchestrator = new StrategyOrchestrator(strategies);
+        StrategyOrchestrator orchestrator = new StrategyOrchestrator(strategies);
         applyGoal = new Apply(orchestrator);
         checkGoal = new Check(orchestrator);
     }

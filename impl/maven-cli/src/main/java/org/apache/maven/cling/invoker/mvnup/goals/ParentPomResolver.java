@@ -18,18 +18,42 @@
  */
 package org.apache.maven.cling.invoker.mvnup.goals;
 
-import java.io.InputStream;
-import java.net.URL;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.maven.api.RemoteRepository;
+import org.apache.maven.api.Session;
+import org.apache.maven.api.Version;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.di.Singleton;
+import org.apache.maven.api.model.Build;
+import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Plugin;
+import org.apache.maven.api.model.PluginManagement;
+import org.apache.maven.api.model.Repository;
+import org.apache.maven.api.model.RepositoryPolicy;
+import org.apache.maven.api.services.ModelBuilder;
+import org.apache.maven.api.services.ModelBuilderRequest;
+import org.apache.maven.api.services.ModelBuilderResult;
+import org.apache.maven.api.services.RepositoryFactory;
+import org.apache.maven.api.services.Sources;
+import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
+import org.apache.maven.impl.standalone.ApiRunner;
+import org.codehaus.plexus.components.secdispatcher.Dispatcher;
+import org.codehaus.plexus.components.secdispatcher.internal.dispatchers.LegacyDispatcher;
+import org.eclipse.aether.internal.impl.DefaultPathProcessor;
+import org.eclipse.aether.internal.impl.DefaultTransporterProvider;
+import org.eclipse.aether.internal.impl.transport.http.DefaultChecksumExtractor;
+import org.eclipse.aether.spi.connector.transport.TransporterProvider;
+import org.eclipse.aether.transport.file.FileTransporterFactory;
+import org.eclipse.aether.transport.jdk.JdkTransporterFactory;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
-import org.jdom2.input.SAXBuilder;
 
 import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.Plugins.DEFAULT_MAVEN_PLUGIN_GROUP_ID;
 import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.Plugins.MAVEN_PLUGIN_PREFIX;
@@ -44,18 +68,76 @@ import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlEle
 
 /**
  * Utility class for resolving and analyzing parent POMs for plugin upgrades.
- * This class handles downloading parent POMs from Maven Central and checking
- * if they contain plugins that need to be managed locally.
+ * This class uses the Maven 4 API to compute effective POMs and check if they
+ * contain plugins that need to be managed locally. For external parents, it
+ * leverages Maven's model building capabilities to resolve parent hierarchies
+ * and compute the effective model. Falls back to direct HTTP download if needed.
+ *
+ * This is a singleton that caches the Maven 4 session for performance.
  */
+@Named
+@Singleton
 public class ParentPomResolver {
+
+    private Session cachedSession;
+    private final Object sessionLock = new Object();
+
+    /**
+     * Gets or creates the cached Maven 4 session.
+     */
+    private Session getSession() {
+        if (cachedSession == null) {
+            synchronized (sessionLock) {
+                if (cachedSession == null) {
+                    cachedSession = createMaven4Session();
+                }
+            }
+        }
+        return cachedSession;
+    }
+
+    /**
+     * Creates a new Maven 4 session with proper configuration.
+     */
+    private Session createMaven4Session() {
+        Session session = ApiRunner.createSession(injector -> {
+            injector.bindInstance(Dispatcher.class, new LegacyDispatcher());
+
+            injector.bindInstance(
+                    TransporterProvider.class,
+                    new DefaultTransporterProvider(Map.of(
+                            "https",
+                            new JdkTransporterFactory(
+                                    new DefaultChecksumExtractor(Map.of()), new DefaultPathProcessor()),
+                            "file",
+                            new FileTransporterFactory())));
+        });
+
+        // Configure repositories
+        // TODO: we should read settings
+        RemoteRepository central =
+                session.createRemoteRepository(RemoteRepository.CENTRAL_ID, "https://repo.maven.apache.org/maven2");
+        RemoteRepository snapshots = session.getService(RepositoryFactory.class)
+                .createRemote(Repository.newBuilder()
+                        .id("apache-snapshots")
+                        .url("https://repository.apache.org/content/repositories/snapshots/")
+                        .releases(RepositoryPolicy.newBuilder().enabled("false").build())
+                        .snapshots(RepositoryPolicy.newBuilder().enabled("true").build())
+                        .build());
+
+        return session.withRemoteRepositories(List.of(central, snapshots));
+    }
 
     /**
      * Checks parent POMs for plugins that need to be managed locally.
-     * Downloads parent POMs from Maven Central and checks if they contain
+     * Uses Maven 4 API to compute effective POM and checks if it contains
      * any of the target plugins that need version management.
      */
-    public static boolean checkParentPomsForPlugins(
-            UpgradeContext context, Document pomDocument, Map<String, PluginUpgrade> pluginUpgrades) {
+    public boolean checkParentPomsForPlugins(
+            UpgradeContext context,
+            Document pomDocument,
+            Map<String, PluginUpgrade> pluginUpgrades,
+            Map<Path, Document> pomMap) {
         Element root = pomDocument.getRootElement();
         Namespace namespace = root.getNamespace();
         boolean hasUpgrades = false;
@@ -75,118 +157,27 @@ public class ParentPomResolver {
             return false;
         }
 
-        try {
-            // Download and parse parent POM
-            Document parentPom = downloadParentPom(context, parentGroupId, parentArtifactId, parentVersion);
-            if (parentPom == null) {
-                return false;
-            }
-
-            // Check if parent contains any of our target plugins
-            Set<String> parentPlugins = findPluginsInParentPom(parentPom, pluginUpgrades.keySet());
+        // Check if parent is external (not in current project)
+        if (isExternalParent(context, parentGroupId, parentArtifactId, parentVersion, pomMap)) {
+            // Use Maven 4 API to compute effective POM
+            Set<String> parentPlugins = findPluginsUsingMaven4Api(context, pomDocument, pluginUpgrades);
 
             if (!parentPlugins.isEmpty()) {
                 // Add plugin management entries for plugins found in parent
-                hasUpgrades = addPluginManagementForParentPlugins(context, pomDocument, parentPlugins, pluginUpgrades);
+                hasUpgrades =
+                        addPluginManagementForParentPlugins(context, pomDocument, parentPlugins, pluginUpgrades);
             }
-
-        } catch (Exception e) {
-            context.debug("Failed to check parent POM for plugins: " + e.getMessage());
+        } else {
+            context.debug("Parent POM is local, skipping Maven 4 API check");
         }
 
         return hasUpgrades;
     }
 
     /**
-     * Downloads a parent POM from Maven Central.
-     */
-    public static Document downloadParentPom(
-            UpgradeContext context, String groupId, String artifactId, String version) {
-        try {
-            // Construct Maven Central URL
-            String groupPath = groupId.replace('.', '/');
-            String url = String.format(
-                    "https://repo1.maven.org/maven2/%s/%s/%s/%s-%s.pom",
-                    groupPath, artifactId, version, artifactId, version);
-
-            context.debug("Downloading parent POM from: " + url);
-
-            // Download and parse POM
-            URL pomUrl = new URL(url);
-            try (InputStream inputStream = pomUrl.openStream()) {
-                SAXBuilder saxBuilder = new SAXBuilder();
-                return saxBuilder.build(inputStream);
-            }
-
-        } catch (Exception e) {
-            context.debug("Could not download parent POM " + groupId + ":" + artifactId + ":" + version + " - "
-                    + e.getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * Finds plugins in parent POM that match our target plugins.
-     */
-    public static Set<String> findPluginsInParentPom(Document parentPom, Set<String> targetPlugins) {
-        Set<String> foundPlugins = new HashSet<>();
-        Element root = parentPom.getRootElement();
-        Namespace namespace = root.getNamespace();
-
-        // Check build/plugins and build/pluginManagement/plugins in parent
-        Element buildElement = root.getChild(BUILD, namespace);
-        if (buildElement != null) {
-            // Check build/plugins
-            Element pluginsElement = buildElement.getChild(PLUGINS, namespace);
-            if (pluginsElement != null) {
-                foundPlugins.addAll(findTargetPluginsInSection(pluginsElement, namespace, targetPlugins));
-            }
-
-            // Check build/pluginManagement/plugins
-            Element pluginManagementElement = buildElement.getChild(PLUGIN_MANAGEMENT, namespace);
-            if (pluginManagementElement != null) {
-                Element managedPluginsElement = pluginManagementElement.getChild(PLUGINS, namespace);
-                if (managedPluginsElement != null) {
-                    foundPlugins.addAll(findTargetPluginsInSection(managedPluginsElement, namespace, targetPlugins));
-                }
-            }
-        }
-
-        return foundPlugins;
-    }
-
-    /**
-     * Finds target plugins in a specific plugins section.
-     */
-    public static Set<String> findTargetPluginsInSection(
-            Element pluginsElement, Namespace namespace, Set<String> targetPlugins) {
-        Set<String> foundPlugins = new HashSet<>();
-        List<Element> pluginElements = pluginsElement.getChildren(PLUGIN, namespace);
-
-        for (Element pluginElement : pluginElements) {
-            String groupId = getChildText(pluginElement, GROUP_ID, namespace);
-            String artifactId = getChildText(pluginElement, ARTIFACT_ID, namespace);
-
-            // Default groupId for Maven plugins
-            if (groupId == null && artifactId != null && artifactId.startsWith(MAVEN_PLUGIN_PREFIX)) {
-                groupId = DEFAULT_MAVEN_PLUGIN_GROUP_ID;
-            }
-
-            if (groupId != null && artifactId != null) {
-                String pluginKey = groupId + ":" + artifactId;
-                if (targetPlugins.contains(pluginKey)) {
-                    foundPlugins.add(pluginKey);
-                }
-            }
-        }
-
-        return foundPlugins;
-    }
-
-    /**
      * Adds plugin management entries for plugins found in parent POMs.
      */
-    public static boolean addPluginManagementForParentPlugins(
+    public boolean addPluginManagementForParentPlugins(
             UpgradeContext context,
             Document pomDocument,
             Set<String> parentPlugins,
@@ -236,8 +227,7 @@ public class ParentPomResolver {
     /**
      * Finds an existing managed plugin element.
      */
-    public static Element findExistingManagedPlugin(
-            Element pluginsElement, Namespace namespace, PluginUpgrade upgrade) {
+    public Element findExistingManagedPlugin(Element pluginsElement, Namespace namespace, PluginUpgrade upgrade) {
         List<Element> pluginElements = pluginsElement.getChildren(PLUGIN, namespace);
 
         for (Element pluginElement : pluginElements) {
@@ -260,7 +250,7 @@ public class ParentPomResolver {
     /**
      * Upgrades an existing plugin management entry if needed.
      */
-    public static boolean upgradeExistingPluginManagement(
+    public boolean upgradeExistingPluginManagement(
             UpgradeContext context, Element pluginElement, Namespace namespace, PluginUpgrade upgrade) {
         Element versionElement = pluginElement.getChild(VERSION, namespace);
 
@@ -294,48 +284,6 @@ public class ParentPomResolver {
     }
 
     /**
-     * Compares two version strings to determine if the first is below the second.
-     */
-    private static boolean isVersionBelow(String currentVersion, String targetVersion) {
-        // Simple version comparison - this could be enhanced with a proper version comparison library
-        try {
-            String[] currentParts = currentVersion.split("\\.");
-            String[] targetParts = targetVersion.split("\\.");
-
-            int maxLength = Math.max(currentParts.length, targetParts.length);
-
-            for (int i = 0; i < maxLength; i++) {
-                int currentPart = i < currentParts.length ? parseVersionPart(currentParts[i]) : 0;
-                int targetPart = i < targetParts.length ? parseVersionPart(targetParts[i]) : 0;
-
-                if (currentPart < targetPart) {
-                    return true;
-                } else if (currentPart > targetPart) {
-                    return false;
-                }
-            }
-
-            return false; // Versions are equal
-        } catch (Exception e) {
-            // If version parsing fails, assume upgrade is needed
-            return true;
-        }
-    }
-
-    /**
-     * Parses a version part, handling qualifiers like SNAPSHOT.
-     */
-    private static int parseVersionPart(String part) {
-        try {
-            // Remove qualifiers like -SNAPSHOT, -alpha, etc.
-            String numericPart = part.split("-")[0];
-            return Integer.parseInt(numericPart);
-        } catch (NumberFormatException e) {
-            return 0;
-        }
-    }
-
-    /**
      * Adds a plugin management entry for a plugin found in parent POM.
      */
     public static void addPluginManagementEntry(UpgradeContext context, Element pluginsElement, PluginUpgrade upgrade) {
@@ -350,6 +298,197 @@ public class ParentPomResolver {
 
         context.detail("Added plugin management for " + upgrade.groupId() + ":" + upgrade.artifactId() + " version "
                 + upgrade.minVersion() + " (found in parent POM)");
+    }
+
+    /**
+     * Checks if the parent is external (not part of the current project).
+     * A parent is considered external if it's not found in the current project's pomMap.
+     */
+    private boolean isExternalParent(
+            UpgradeContext context,
+            String parentGroupId,
+            String parentArtifactId,
+            String parentVersion,
+            Map<Path, Document> pomMap) {
+
+        // Check if any POM in the current project matches the parent coordinates
+        for (Map.Entry<Path, Document> entry : pomMap.entrySet()) {
+            Document doc = entry.getValue();
+            Element root = doc.getRootElement();
+            Namespace namespace = root.getNamespace();
+
+            // Extract GAV from this POM
+            String groupId = getChildText(root, GROUP_ID, namespace);
+            String artifactId = getChildText(root, ARTIFACT_ID, namespace);
+            String version = getChildText(root, VERSION, namespace);
+
+            // Handle inheritance from parent
+            Element parentElement = root.getChild(PARENT, namespace);
+            if (parentElement != null) {
+                if (groupId == null) {
+                    groupId = getChildText(parentElement, GROUP_ID, namespace);
+                }
+                if (version == null) {
+                    version = getChildText(parentElement, VERSION, namespace);
+                }
+            }
+
+            // Check if this POM matches the parent coordinates
+            if (parentGroupId.equals(groupId) && parentArtifactId.equals(artifactId) && parentVersion.equals(version)) {
+                context.debug("Found parent " + parentGroupId + ":" + parentArtifactId + ":" + parentVersion
+                        + " in local project at " + entry.getKey());
+                return false; // Parent is local
+            }
+        }
+
+        context.debug("Parent " + parentGroupId + ":" + parentArtifactId + ":" + parentVersion + " is external");
+        return true; // Parent not found in local project, so it's external
+    }
+
+    /**
+     * Uses Maven 4 API to compute the effective POM and find plugins that need management.
+     * This method uses the cached session, builds the effective model, and analyzes plugin versions.
+     */
+    private Set<String> findPluginsUsingMaven4Api(
+            UpgradeContext context, Document pomDocument, Map<String, PluginUpgrade> pluginUpgrades) {
+        Set<String> pluginsNeedingUpgrade = new HashSet<>();
+
+        try {
+            // Create a temporary POM file from the JDOM document
+            Path tempPomPath = createTempPomFile(pomDocument);
+
+            // Use cached session
+            Session session = getSession();
+            ModelBuilder modelBuilder = session.getService(ModelBuilder.class);
+
+            // Build effective model
+            ModelBuilderRequest request = ModelBuilderRequest.builder()
+                    .session(session)
+                    .source(Sources.buildSource(tempPomPath))
+                    .requestType(ModelBuilderRequest.RequestType.BUILD_EFFECTIVE)
+                    .recursive(false) // We only want this POM, not its modules
+                    .build();
+
+            ModelBuilderResult result = modelBuilder.newSession().build(request);
+            Model effectiveModel = result.getEffectiveModel();
+
+            // Analyze plugins from effective model and determine which need upgrades
+            pluginsNeedingUpgrade.addAll(analyzePluginsForUpgrades(context, session, effectiveModel, pluginUpgrades));
+
+            context.debug("Found " + pluginsNeedingUpgrade.size()
+                    + " target plugins needing upgrades in effective POM using Maven 4 API");
+
+            // Clean up temp file
+            tempPomPath.toFile().delete();
+
+        } catch (Exception e) {
+            context.debug("Failed to use Maven 4 API for effective POM computation: " + e.getMessage());
+            throw new RuntimeException("Maven 4 API failed", e);
+        }
+
+        return pluginsNeedingUpgrade;
+    }
+
+    /**
+     * Creates a temporary POM file from a JDOM document.
+     */
+    private static Path createTempPomFile(Document pomDocument) throws Exception {
+        Path tempFile = java.nio.file.Files.createTempFile("mvnup-", ".pom");
+        try (java.io.FileWriter writer = new java.io.FileWriter(tempFile.toFile())) {
+            org.jdom2.output.XMLOutputter outputter = new org.jdom2.output.XMLOutputter();
+            outputter.output(pomDocument, writer);
+        }
+        return tempFile;
+    }
+
+    /**
+     * Analyzes plugins from the effective model and determines which ones need upgrades.
+     * This method compares the effective plugin versions against the minimum required versions
+     * and only returns plugins that actually need to be upgraded.
+     */
+    private Set<String> analyzePluginsForUpgrades(
+            UpgradeContext context, Session session, Model effectiveModel, Map<String, PluginUpgrade> pluginUpgrades) {
+        Set<String> pluginsNeedingUpgrade = new HashSet<>();
+
+        Build build = effectiveModel.getBuild();
+        if (build != null) {
+            // Check build/plugins - these are the actual plugins used in the build
+            for (Plugin plugin : build.getPlugins()) {
+                String pluginKey = getPluginKey(plugin);
+                PluginUpgrade upgrade = pluginUpgrades.get(pluginKey);
+                if (upgrade != null) {
+                    String effectiveVersion = plugin.getVersion();
+                    if (effectiveVersion != null
+                            && needsVersionUpgrade(context, effectiveVersion, upgrade.minVersion())) {
+                        pluginsNeedingUpgrade.add(pluginKey);
+                        context.debug("Plugin " + pluginKey + " version " + effectiveVersion + " needs upgrade to "
+                                + upgrade.minVersion());
+                    }
+                }
+            }
+
+            // Check build/pluginManagement/plugins - these provide version management
+            PluginManagement pluginManagement = build.getPluginManagement();
+            if (pluginManagement != null) {
+                for (Plugin plugin : pluginManagement.getPlugins()) {
+                    String pluginKey = getPluginKey(plugin);
+                    PluginUpgrade upgrade = pluginUpgrades.get(pluginKey);
+                    if (upgrade != null) {
+                        String effectiveVersion = plugin.getVersion();
+                        if (effectiveVersion != null
+                                && needsVersionUpgrade(context, effectiveVersion, upgrade.minVersion())) {
+                            pluginsNeedingUpgrade.add(pluginKey);
+                            context.debug("Managed plugin " + pluginKey + " version " + effectiveVersion
+                                    + " needs upgrade to " + upgrade.minVersion());
+                        }
+                    }
+                }
+            }
+        }
+
+        return pluginsNeedingUpgrade;
+    }
+
+    /**
+     * Checks if a plugin version needs to be upgraded based on our minimum requirements.
+     */
+    private boolean needsVersionUpgrade(UpgradeContext context, String currentVersion, String minVersion) {
+        // Compare versions using Maven 4 API
+        boolean needsUpgrade = isVersionBelow(currentVersion, minVersion);
+        if (needsUpgrade) {
+            context.debug("Current version " + currentVersion + " is below minimum " + minVersion);
+        }
+        return needsUpgrade;
+    }
+
+    /**
+     * Compares two version strings to determine if the first is below the second.
+     */
+    private boolean isVersionBelow(String currentVersion, String targetVersion) {
+        try {
+            VersionParser parser = getSession().getService(VersionParser.class);
+            Version cur = parser.parseVersion(currentVersion);
+            Version tgt = parser.parseVersion(targetVersion);
+            return cur.compareTo(tgt) < 0; // Changed from <= to < so equal versions don't trigger upgrades
+        } catch (Exception e) {
+            // Fallback to string comparison if version parsing fails
+            return currentVersion.compareTo(targetVersion) < 0;
+        }
+    }
+
+    /**
+     * Gets the plugin key (groupId:artifactId) for a plugin, handling default groupId.
+     */
+    private static String getPluginKey(Plugin plugin) {
+        String groupId = plugin.getGroupId();
+        String artifactId = plugin.getArtifactId();
+
+        // Default groupId for Maven plugins
+        if (groupId == null && artifactId != null && artifactId.startsWith(MAVEN_PLUGIN_PREFIX)) {
+            groupId = DEFAULT_MAVEN_PLUGIN_GROUP_ID;
+        }
+
+        return groupId + ":" + artifactId;
     }
 
     /**

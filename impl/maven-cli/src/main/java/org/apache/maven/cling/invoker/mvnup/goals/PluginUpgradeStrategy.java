@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.api.cli.mvnup.UpgradeOptions;
+import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Priority;
 import org.apache.maven.api.di.Singleton;
@@ -71,6 +72,13 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     "3.0.0",
                     MAVEN_4_COMPATIBILITY_REASON));
 
+    private final ParentPomResolver parentPomResolver;
+
+    @Inject
+    public PluginUpgradeStrategy(ParentPomResolver parentPomResolver) {
+        this.parentPomResolver = parentPomResolver;
+    }
+
     @Override
     public boolean isApplicable(UpgradeContext context) {
         UpgradeOptions options = getOptions(context);
@@ -102,7 +110,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 // Apply plugin upgrades
                 hasUpgrades |= upgradePluginsInDocument(pomDocument, context);
                 // Add missing plugin management entries if needed
-                hasUpgrades |= addMissingPluginManagement(context, pomDocument);
+                hasUpgrades |= addMissingPluginManagement(context, pomDocument, pomMap);
 
                 if (hasUpgrades) {
                     modifiedPoms.add(pomPath);
@@ -167,7 +175,8 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
      * This ensures that plugins used in the build have proper version management.
      * Only adds entries for plugins that actually need upgrades or lack version management.
      */
-    private boolean addMissingPluginManagement(UpgradeContext context, Document pomDocument) {
+    private boolean addMissingPluginManagement(
+            UpgradeContext context, Document pomDocument, Map<Path, Document> pomMap) {
         Element root = pomDocument.getRootElement();
         Namespace namespace = root.getNamespace();
         boolean hasUpgrades = false;
@@ -218,7 +227,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         // This handles the case where plugins are defined in parent POMs but need local management
         // for Maven 4 compatibility
         try {
-            hasUpgrades |= ParentPomResolver.checkParentPomsForPlugins(context, pomDocument, pluginUpgradeMap);
+            hasUpgrades |= parentPomResolver.checkParentPomsForPlugins(context, pomDocument, pluginUpgradeMap, pomMap);
         } catch (Exception e) {
             context.debug("Failed to check parent POMs for plugins: " + e.getMessage());
         }
