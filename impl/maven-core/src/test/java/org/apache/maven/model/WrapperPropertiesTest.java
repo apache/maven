@@ -28,10 +28,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -44,15 +41,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class WrapperPropertiesTest {
     private final Map<String, String> backingStore = new HashMap<>();
     private final AtomicBoolean getterCalled = new AtomicBoolean(false);
-    private  final AtomicBoolean setterCalled = new AtomicBoolean(false);
-    private final WrapperProperties wrapper = new WrapperProperties(() -> {
-        getterCalled.set(true);
-        return new HashMap<>(backingStore);
-    }, props -> {
-        setterCalled.set(true);
-        backingStore.clear();
-        props.forEach((k, v) -> backingStore.put(k.toString(), v.toString()));
-    });;
+    private final AtomicBoolean setterCalled = new AtomicBoolean(false);
+    private final WrapperProperties wrapper = new WrapperProperties(
+            () -> {
+                getterCalled.set(true);
+                return new HashMap<>(backingStore);
+            },
+            props -> {
+                setterCalled.set(true);
+                backingStore.clear();
+                props.forEach((k, v) -> backingStore.put(k.toString(), v.toString()));
+            });
 
     @Test
     void testInitialization() {
