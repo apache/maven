@@ -191,11 +191,10 @@ class WrapperProperties extends Properties {
     }
 
     private void writeOperationVoid(WriteOpVoid runner) {
-        OrderedProperties props = new OrderedProperties(getter.get());
-        runner.perform(props);
-        if (!props.equals(getter.get())) {
-            setter.accept(props);
-        }
+        writeOperation(properties -> {
+            runner.perform(properties);
+           return null;
+        });
     }
 
     @Override
@@ -302,20 +301,17 @@ class WrapperProperties extends Properties {
 
     @Override
     public void save(OutputStream out, String comments) {
-        OrderedProperties props = new OrderedProperties(getter.get());
-        props.save(out, comments);
+        new OrderedProperties(getter.get()).save(out, comments);
     }
 
     @Override
     public void store(Writer writer, String comments) throws IOException {
-        OrderedProperties props = new OrderedProperties(getter.get());
-        props.store(writer, comments);
+        new OrderedProperties(getter.get()).store(writer, comments);
     }
 
     @Override
     public void store(OutputStream out, String comments) throws IOException {
-        OrderedProperties props = new OrderedProperties(getter.get());
-        props.store(out, comments);
+        new OrderedProperties(getter.get()).store(out, comments);
     }
 
     @Override
@@ -325,29 +321,23 @@ class WrapperProperties extends Properties {
 
     @Override
     public void storeToXML(OutputStream os, String comment) throws IOException {
-        OrderedProperties props = new OrderedProperties(getter.get());
-        props.storeToXML(os, comment);
+        new OrderedProperties(getter.get()).storeToXML(os, comment);
     }
 
     @Override
     public void storeToXML(OutputStream os, String comment, String encoding) throws IOException {
-        OrderedProperties props = new OrderedProperties(getter.get());
-        props.storeToXML(os, comment, encoding);
+        new OrderedProperties(getter.get()).storeToXML(os, comment, encoding);
     }
 
 
     private Object writeReplace() throws java.io.ObjectStreamException {
-        OrderedProperties props = new OrderedProperties(getter.get());
-        return props;
+        return new OrderedProperties(getter.get());
     }
 
     private class OrderedProperties extends Properties {
         private final List<Object> keyOrder = new CopyOnWriteArrayList<>();
 
-        public OrderedProperties() {
-        }
-
-        public OrderedProperties(Map<?, ?> map) {
+        OrderedProperties(Map<?, ?> map) {
             putAll(map);
         }
 
