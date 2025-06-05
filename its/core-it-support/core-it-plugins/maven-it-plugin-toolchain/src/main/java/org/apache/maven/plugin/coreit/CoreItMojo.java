@@ -105,21 +105,11 @@ public class CoreItMojo extends AbstractMojo {
             }
         }
 
-        OutputStream out = null;
-        try {
-            outputFile.getParentFile().mkdirs();
-            out = new FileOutputStream(outputFile);
+        outputFile.getParentFile().mkdirs();
+        try (OutputStream out = new FileOutputStream(outputFile)) {
             properties.store(out, "MAVEN-CORE-IT-LOG");
         } catch (IOException e) {
-            throw new MojoExecutionException(e.getMessage(), e);
-        } finally {
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    // ignore
-                }
-            }
+            throw new MojoExecutionException(e);
         }
     }
 
