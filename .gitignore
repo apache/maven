@@ -3,12 +3,12 @@
 .classpath
 .settings/
 .svn/
+
 # Intellij
 *.ipr
 *.iml
 .idea
 !.idea/icon.png
-.DS_Store
 /bootstrap
 /dependencies.xml
 .java-version
@@ -16,4 +16,7 @@
 .factorypath
 .vscode/
 repo/
-/*.svg
+
+# Mac
+.DS_Store
+
