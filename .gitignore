@@ -3,15 +3,10 @@
 *.iml
 *.ipr
 .DS_Store
-.checkstyle
 .classpath
 .factorypath
 .idea
 .java-version
 .project
-.settings/
-.svn/
-.vscode/
-bootstrap
-dependencies.xml
-repo/
+.settings
+.vscode
