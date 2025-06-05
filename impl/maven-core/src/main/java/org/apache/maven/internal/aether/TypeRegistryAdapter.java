@@ -20,6 +20,7 @@ package org.apache.maven.internal.aether;
 
 import org.apache.maven.api.PathType;
 import org.apache.maven.api.Type;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.impl.resolver.type.DefaultType;
 import org.eclipse.aether.artifact.ArtifactType;
@@ -35,6 +36,7 @@ class TypeRegistryAdapter implements ArtifactTypeRegistry {
     }
 
     @Override
+    @Nullable
     public ArtifactType get(String typeId) {
         Type type = typeRegistry.require(typeId);
         if (type instanceof ArtifactType artifactType) {

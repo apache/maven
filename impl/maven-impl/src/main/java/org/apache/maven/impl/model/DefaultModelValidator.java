@@ -2231,6 +2231,7 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     private static class SourceHint {
+
         @Nullable
         public static SourceHint xmlNodeInputLocation(XmlNode xmlNode) {
             if (xmlNode.inputLocation() != null) {

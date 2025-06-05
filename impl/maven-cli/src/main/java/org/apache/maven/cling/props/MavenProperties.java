@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.impl.model.DefaultInterpolator;
 
 /**
@@ -271,6 +272,7 @@ public class MavenProperties extends AbstractMap<String, String> {
         storage.putAll(m);
     }
 
+    @Nullable
     public String put(String key, List<String> commentLines, List<String> valueLines) {
         commentLines = new ArrayList<>(commentLines);
         valueLines = new ArrayList<>(valueLines);
@@ -304,6 +306,7 @@ public class MavenProperties extends AbstractMap<String, String> {
         return storage.put(key, property[1]);
     }
 
+    @Nullable
     public String put(String key, List<String> commentLines, String value) {
         commentLines = new ArrayList<>(commentLines);
         this.layout.put(key, new Layout(commentLines, null));
@@ -842,6 +845,7 @@ public class MavenProperties extends AbstractMap<String, String> {
          *
          * @throws IOException in case of an I/O error
          */
+        @Nullable
         public String readProperty() throws IOException {
             commentLines.clear();
             valueLines.clear();

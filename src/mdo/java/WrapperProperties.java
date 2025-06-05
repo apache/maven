@@ -46,6 +46,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.apache.maven.api.annotations.Nullable;
+
 class WrapperProperties extends Properties {
 
     final Supplier<Map<String, String>> getter;
@@ -66,6 +68,7 @@ class WrapperProperties extends Properties {
     }
 
     @Override
+    @Nullable
     public String getProperty(String key) {
         ensureInitialized();
         return orderedProps.getProperty(key);
@@ -142,6 +145,7 @@ class WrapperProperties extends Properties {
     }
 
     @Override
+    @Nullable
     public Object get(Object key) {
         ensureInitialized();
         return orderedProps.get(key);

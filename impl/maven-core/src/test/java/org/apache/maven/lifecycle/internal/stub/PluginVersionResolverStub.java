@@ -18,6 +18,7 @@
  */
 package org.apache.maven.lifecycle.internal.stub;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.plugin.version.PluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolver;
@@ -34,6 +35,7 @@ public class PluginVersionResolverStub implements PluginVersionResolver {
                 return "0.42";
             }
 
+            @Nullable
             public ArtifactRepository getRepository() {
                 return null;
             }

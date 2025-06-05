@@ -30,6 +30,7 @@ import java.util.Objects;
 import java.util.Properties;
 
 import org.apache.maven.api.MonotonicClock;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.model.Profile;
@@ -221,6 +222,7 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
     }
 
     @Override
+    @Nullable
     public String getBaseDirectory() {
         if (basedir == null) {
             return null;

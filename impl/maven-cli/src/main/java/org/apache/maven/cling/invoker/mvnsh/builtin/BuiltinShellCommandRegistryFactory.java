@@ -31,6 +31,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.Lifecycle;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.di.Named;
@@ -121,6 +122,7 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
         }
 
         @Override
+        @Nullable
         public CmdDesc commandDescription(List<String> args) {
             return null;
         }

@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.nio.file.Path;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.profile.ProfileActivationContext;
 import org.apache.maven.model.root.RootLocator;
@@ -64,6 +65,7 @@ public class ProfileActivationFilePathInterpolator {
      *
      * @return absolute path or {@code null} if the input was {@code null}
      */
+    @Nullable
     public String interpolate(String path, ProfileActivationContext context) throws InterpolationException {
         if (path == null) {
             return null;
@@ -75,7 +77,9 @@ public class ProfileActivationFilePathInterpolator {
 
         if (basedir != null) {
             interpolator.addValueSource(new AbstractValueSource(false) {
+
                 @Override
+                @Nullable
                 public Object getValue(String expression) {
                     if ("basedir".equals(expression) || "project.basedir".equals(expression)) {
                         return basedir.getAbsolutePath();
@@ -88,7 +92,9 @@ public class ProfileActivationFilePathInterpolator {
         }
 
         interpolator.addValueSource(new AbstractValueSource(false) {
+
             @Override
+            @Nullable
             public Object getValue(String expression) {
                 if ("project.rootDirectory".equals(expression)) {
                     Path base = basedir != null ? basedir.toPath() : null;

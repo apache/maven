@@ -18,6 +18,7 @@
  */
 package org.apache.maven.internal.transformation.impl;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 
 import static java.util.Objects.requireNonNull;
@@ -42,6 +43,7 @@ class TransformedArtifactHandler implements ArtifactHandler {
     }
 
     @Override
+    @Nullable
     public String getDirectory() {
         return null;
     }

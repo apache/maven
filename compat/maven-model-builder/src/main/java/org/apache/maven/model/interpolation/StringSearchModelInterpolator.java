@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -124,6 +125,7 @@ public class StringSearchModelInterpolator extends AbstractStringBasedModelInter
             this.problems = problems;
         }
 
+        @Nullable
         public Object run() {
             while (!interpolationTargets.isEmpty()) {
                 Object obj = interpolationTargets.removeFirst();

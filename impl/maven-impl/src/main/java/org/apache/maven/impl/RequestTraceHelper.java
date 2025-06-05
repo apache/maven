@@ -21,6 +21,7 @@ package org.apache.maven.impl;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.Session;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.services.Request;
 import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.collection.CollectRequest;
@@ -78,6 +79,7 @@ public final class RequestTraceHelper {
      * @param trace The Resolver trace to convert
      * @return A new Maven trace, or null if the input trace was null
      */
+    @Nullable
     public static org.apache.maven.api.services.RequestTrace toMaven(String context, RequestTrace trace) {
         if (trace != null) {
             return new org.apache.maven.api.services.RequestTrace(
@@ -92,6 +94,7 @@ public final class RequestTraceHelper {
      * @param trace The Maven trace to convert
      * @return A new Resolver trace, or null if the input trace was null
      */
+    @Nullable
     public static RequestTrace toResolver(org.apache.maven.api.services.RequestTrace trace) {
         if (trace != null) {
             return RequestTrace.newChild(toResolver(trace.parent()), trace.data());
