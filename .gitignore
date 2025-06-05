@@ -12,7 +12,6 @@
 .settings/
 .svn/
 .vscode/
-*.svg
 bootstrap
 dependencies.xml
 repo/
