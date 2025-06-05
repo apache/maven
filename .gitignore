@@ -14,8 +14,10 @@
 .java-version
 .checkstyle
 .factorypath
-.vscode/
 repo/
+
+# VSCode
+.vscode/
 
 # Mac
 .DS_Store
