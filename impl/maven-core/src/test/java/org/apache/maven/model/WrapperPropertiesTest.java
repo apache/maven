@@ -42,30 +42,17 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class WrapperPropertiesTest {
-    private Map<String, String> backingStore;
-    private AtomicBoolean getterCalled;
-    private AtomicBoolean setterCalled;
-    private WrapperProperties wrapper;
-
-    @BeforeEach
-    void setUp() {
-        backingStore = new HashMap<>();
-        getterCalled = new AtomicBoolean(false);
-        setterCalled = new AtomicBoolean(false);
-
-        Supplier<Map<String, String>> getter = () -> {
-            getterCalled.set(true);
-            return new HashMap<>(backingStore);
-        };
-
-        Consumer<Properties> setter = props -> {
-            setterCalled.set(true);
-            backingStore.clear();
-            props.forEach((k, v) -> backingStore.put(k.toString(), v.toString()));
-        };
-
-        wrapper = new WrapperProperties(getter, setter);
-    }
+    private final Map<String, String> backingStore = new HashMap<>();
+    private final AtomicBoolean getterCalled = new AtomicBoolean(false);
+    private  final AtomicBoolean setterCalled = new AtomicBoolean(false);
+    private final WrapperProperties wrapper = new WrapperProperties(() -> {
+        getterCalled.set(true);
+        return new HashMap<>(backingStore);
+    }, props -> {
+        setterCalled.set(true);
+        backingStore.clear();
+        props.forEach((k, v) -> backingStore.put(k.toString(), v.toString()));
+    });;
 
     @Test
     void testInitialization() {
