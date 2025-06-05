@@ -50,43 +50,30 @@ class WrapperProperties extends Properties {
 
     final Supplier<Map<String, String>> getter;
     final Consumer<Properties> setter;
-    private final OrderedProperties orderedProps = new OrderedProperties();
-    private boolean initialized;
 
     WrapperProperties(Supplier<Map<String, String>> getter, Consumer<Properties> setter) {
         this.getter = getter;
         this.setter = setter;
     }
 
-    private synchronized void ensureInitialized() {
-        if (!initialized) {
-            orderedProps.putAll(getter.get());
-            initialized = true;
-        }
-    }
-
     @Override
     public String getProperty(String key) {
-        ensureInitialized();
-        return orderedProps.getProperty(key);
+        return getter.get().get(key);
     }
 
     @Override
     public String getProperty(String key, String defaultValue) {
-        ensureInitialized();
-        return orderedProps.getProperty(key, defaultValue);
+        return getter.get().getOrDefault(key, defaultValue);
     }
 
     @Override
     public Enumeration<?> propertyNames() {
-        ensureInitialized();
-        return orderedProps.propertyNames();
+        return Collections.enumeration(getter.get().keySet());
     }
 
     @Override
     public Set<String> stringPropertyNames() {
-        ensureInitialized();
-        return orderedProps.stringPropertyNames();
+        return getter.get().keySet();
     }
 
     @Override
@@ -101,102 +88,89 @@ class WrapperProperties extends Properties {
 
     @Override
     public int size() {
-        ensureInitialized();
-        return orderedProps.size();
+        return getter.get().size();
     }
 
     @Override
     public boolean isEmpty() {
-        ensureInitialized();
-        return orderedProps.isEmpty();
+        return getter.get().isEmpty();
     }
 
     @Override
     public Enumeration<Object> keys() {
-        ensureInitialized();
-        return orderedProps.keys();
+        return Collections.enumeration((Set) getter.get().keySet());
     }
 
     @Override
     public Enumeration<Object> elements() {
-        ensureInitialized();
-        return orderedProps.elements();
+        return Collections.enumeration((Collection) getter.get().values());
     }
 
     @Override
     public boolean contains(Object value) {
-        ensureInitialized();
-        return orderedProps.contains(value);
+        return getter.get().containsKey(value != null ? value.toString() : null);
     }
 
     @Override
     public boolean containsValue(Object value) {
-        ensureInitialized();
-        return orderedProps.containsValue(value);
+        return getter.get().containsValue(value);
     }
 
     @Override
     public boolean containsKey(Object key) {
-        ensureInitialized();
-        return orderedProps.containsKey(key);
+        return getter.get().containsKey(key);
     }
 
     @Override
     public Object get(Object key) {
-        ensureInitialized();
-        return orderedProps.get(key);
+        return getter.get().get(key);
     }
 
     @Override
     public synchronized String toString() {
-        ensureInitialized();
-        return orderedProps.toString();
+        return getter.get().toString();
     }
 
     @Override
     public Set<Object> keySet() {
-        ensureInitialized();
-        return orderedProps.keySet();
+        return new OrderedProperties(getter.get()).keySet();
     }
 
     @Override
     public Collection<Object> values() {
-        ensureInitialized();
-        return orderedProps.values();
+        return new OrderedProperties(getter.get()).values();
     }
 
     @Override
     public Set<Map.Entry<Object, Object>> entrySet() {
-        ensureInitialized();
-        return orderedProps.entrySet();
+        return new OrderedProperties(getter.get()).entrySet();
     }
 
     @Override
     public synchronized boolean equals(Object o) {
-        ensureInitialized();
         if (o instanceof WrapperProperties wrapperProperties) {
-            wrapperProperties.ensureInitialized();
-            return orderedProps.equals(wrapperProperties.orderedProps);
+            o = wrapperProperties.getter.get();
         }
-        return orderedProps.equals(o);
+        return getter.get().equals(o);
     }
 
     @Override
     public synchronized int hashCode() {
-        ensureInitialized();
-        return orderedProps.hashCode();
+        return getter.get().hashCode();
     }
 
     @Override
     public Object getOrDefault(Object key, Object defaultValue) {
-        ensureInitialized();
-        return orderedProps.getOrDefault(key, defaultValue);
+        if (key instanceof String str && defaultValue instanceof String def) {
+            return getter.get().getOrDefault(key, def);
+        } else {
+            return defaultValue;
+        }
     }
 
     @Override
     public synchronized void forEach(BiConsumer<? super Object, ? super Object> action) {
-        ensureInitialized();
-        orderedProps.forEach(action);
+        getter.get().forEach(action);
     }
 
     interface WriteOp<T> {
@@ -208,16 +182,20 @@ class WrapperProperties extends Properties {
     }
 
     private <T> T writeOperation(WriteOp<T> runner) {
-        ensureInitialized();
-        T ret = runner.perform(orderedProps);
-        setter.accept(orderedProps);
+        OrderedProperties props = new OrderedProperties(getter.get());
+        T ret = runner.perform(props);
+        if (!props.equals(getter.get())) {
+            setter.accept(props);
+        }
         return ret;
     }
 
     private void writeOperationVoid(WriteOpVoid runner) {
-        ensureInitialized();
-        runner.perform(orderedProps);
-        setter.accept(orderedProps);
+        OrderedProperties props = new OrderedProperties(getter.get());
+        runner.perform(props);
+        if (!props.equals(getter.get())) {
+            setter.accept(props);
+        }
     }
 
     @Override
@@ -324,22 +302,19 @@ class WrapperProperties extends Properties {
 
     @Override
     public void save(OutputStream out, String comments) {
-        Properties props = new Properties();
-        props.putAll(getter.get());
+        OrderedProperties props = new OrderedProperties(getter.get());
         props.save(out, comments);
     }
 
     @Override
     public void store(Writer writer, String comments) throws IOException {
-        Properties props = new Properties();
-        props.putAll(getter.get());
+        OrderedProperties props = new OrderedProperties(getter.get());
         props.store(writer, comments);
     }
 
     @Override
     public void store(OutputStream out, String comments) throws IOException {
-        Properties props = new Properties();
-        props.putAll(getter.get());
+        OrderedProperties props = new OrderedProperties(getter.get());
         props.store(out, comments);
     }
 
@@ -350,27 +325,31 @@ class WrapperProperties extends Properties {
 
     @Override
     public void storeToXML(OutputStream os, String comment) throws IOException {
-        Properties props = new Properties();
-        props.putAll(getter.get());
+        OrderedProperties props = new OrderedProperties(getter.get());
         props.storeToXML(os, comment);
     }
 
     @Override
     public void storeToXML(OutputStream os, String comment, String encoding) throws IOException {
-        Properties props = new Properties();
-        props.putAll(getter.get());
+        OrderedProperties props = new OrderedProperties(getter.get());
         props.storeToXML(os, comment, encoding);
     }
 
 
     private Object writeReplace() throws java.io.ObjectStreamException {
-        Properties props = new Properties();
-        props.putAll(getter.get());
+        OrderedProperties props = new OrderedProperties(getter.get());
         return props;
     }
 
     private class OrderedProperties extends Properties {
         private final List<Object> keyOrder = new CopyOnWriteArrayList<>();
+
+        public OrderedProperties() {
+        }
+
+        public OrderedProperties(Map<?, ?> map) {
+            putAll(map);
+        }
 
         @Override
         public synchronized void putAll(Map<?, ?> t) {
