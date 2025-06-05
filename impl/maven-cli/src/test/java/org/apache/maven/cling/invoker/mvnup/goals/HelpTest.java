@@ -90,7 +90,7 @@ class HelpTest {
         // Verify that the --all option is mentioned with correct description
         Mockito.verify(context.logger)
                 .info(
-                        "  -a, --all             Apply all upgrades (equivalent to --model 4.1.0 --infer --fix-model --plugins)");
+                        "  -a, --all             Apply all upgrades (equivalent to --model-version 4.1.0 --infer --model --plugins)");
     }
 
     @Test
@@ -101,7 +101,7 @@ class HelpTest {
 
         // Verify that the default behavior is explained
         Mockito.verify(context.logger)
-                .info("Default behavior: --fix-model and --plugins are applied if no other options are specified");
+                .info("Default behavior: --model and --plugins are applied if no other options are specified");
     }
 
     @Test

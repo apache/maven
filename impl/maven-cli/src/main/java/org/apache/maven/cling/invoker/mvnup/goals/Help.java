@@ -47,18 +47,18 @@ public class Help implements Goal {
         context.println();
         context.info("Options:");
         context.indent();
-        context.info("-m, --model <version> Target POM model version (4.0.0 or 4.1.0)");
+        context.info("-m, --model-version <version> Target POM model version (4.0.0 or 4.1.0)");
         context.info("-d, --directory <path> Directory to use as starting point for POM discovery");
         context.info("-i, --infer           Remove redundant information that can be inferred by Maven");
-        context.info("    --fix-model       Fix Maven 4 compatibility issues in POM files");
+        context.info("    --model           Fix Maven 4 compatibility issues in POM files");
         context.info("    --plugins         Upgrade plugins known to fail with Maven 4");
         context.info(
-                "-a, --all             Apply all upgrades (equivalent to --model 4.1.0 --infer --fix-model --plugins)");
+                "-a, --all             Apply all upgrades (equivalent to --model-version 4.1.0 --infer --model --plugins)");
         context.info("-f, --force           Overwrite files without asking for confirmation");
         context.info("-y, --yes             Answer \"yes\" to all prompts automatically");
         context.unindent();
         context.println();
-        context.info("Default behavior: --fix-model and --plugins are applied if no other options are specified");
+        context.info("Default behavior: --model and --plugins are applied if no other options are specified");
         context.println();
 
         return 0;
