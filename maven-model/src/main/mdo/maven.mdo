@@ -682,7 +682,7 @@
           <description>The default goal to execute when none is specified for
             the project. In a multi-module build, only the default goal of the top-level
             project is relevant. That is, the default goals of child modules are ignored.
-            Multiple goals/phases can be separated by whitespace.</description>
+            Multiple goals can be separated by whitespace.</description>
           <type>String</type>
         </field>
         <field>
@@ -1087,8 +1087,13 @@
           <version>3.0.0+</version>
           <description>
             <![CDATA[
-            The version of the dependency such as <code>3.2.1</code>. This can also be
-            specified as a range of versions.
+            The version requirement of the dependency such as <code>3.2.1</code>.
+            The actual version will be resolved by dependency mediation.
+            The version requirement can also be
+            specified as a range of versions such as <code>[3.2.0,)</code>.
+            However, this is discouraged since it may break <i>predictability</i> of
+            the resolved version. See the <a href="https://maven.apache.org/pom.html#Dependency_Version_Requirement_Specification">Dependency Version Requirement Specification</a>
+            and <a href="https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#Transitive_Dependencies">Transitive Dependencies</a> for more details.
             ]]>
           </description>
           <type>String</type>
@@ -2570,8 +2575,8 @@
           <description>
             <![CDATA[
             The priority of this execution compared to other executions which are bound to the same phase.
-            <strong>Warning:</strong> This is an internal utility property that is only public for technical reasons,
-            it is not part of the public API. In particular, this property can be changed or deleted without prior
+            <strong>Warning:</strong> This is an internal utility property that is only public for technical reasons.
+            It is not part of the public API. In particular, this property can be changed or deleted without prior
             notice.
             ]]>
           </description>
