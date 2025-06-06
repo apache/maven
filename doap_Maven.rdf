@@ -25,7 +25,7 @@ under the License.
     <asfext:pmc rdf:resource="https://maven.apache.org/"/>
     <shortdesc>Maven is a project development management and comprehension tool.</shortdesc>
     <description>Maven is a project development management and comprehension tool. Based on the concept of a project object model: builds, dependency management, documentation creation, site publication, and distribution publication are all controlled from the declarative file. Maven can be extended by plugins to utilise a number of other development tools for reporting or the build process.</description>
-    <bug-database rdf:resource="https://issues.apache.org/jira/browse/MNG"/>
+    <bug-database rdf:resource="https://github.com/apache/maven/issues"/>
     <mailing-list rdf:resource="https://maven.apache.org/mailing-lists.html"/>
     <download-page rdf:resource="https://maven.apache.org/download.html"/>
     <programming-language>Java</programming-language>
@@ -99,6 +99,15 @@ under the License.
     <release>
       <Version>
         <name>Latest stable release</name>
+        <created>2025-06-01</created>
+        <revision>3.9.10</revision>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.10/binaries/apache-maven-3.9.10-bin.zip</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.10/binaries/apache-maven-3.9.10-bin.tar.gz</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.10/source/apache-maven-3.9.10-src.zip</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.10/source/apache-maven-3.9.10-src.tar.gz</file-release>
+      </Version>
+      <Version>
+        <name>Apache Maven 3.9.9</name>
         <created>2024-08-17</created>
         <revision>3.9.9</revision>
         <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.zip</file-release>

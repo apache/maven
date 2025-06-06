@@ -42,29 +42,35 @@ public class DefaultProjectBuilderConfiguration implements ProjectBuilderConfigu
 
     public DefaultProjectBuilderConfiguration() {}
 
+    @Override
     public ProjectBuilderConfiguration setGlobalProfileManager(ProfileManager globalProfileManager) {
         this.globalProfileManager = globalProfileManager;
         return this;
     }
 
+    @Override
     public ProfileManager getGlobalProfileManager() {
         return globalProfileManager;
     }
 
+    @Override
     public ProjectBuilderConfiguration setLocalRepository(ArtifactRepository localRepository) {
         this.localRepository = localRepository;
         return this;
     }
 
+    @Override
     public ArtifactRepository getLocalRepository() {
         return localRepository;
     }
 
+    @Override
     public ProjectBuilderConfiguration setUserProperties(Properties userProperties) {
         this.userProperties = userProperties;
         return this;
     }
 
+    @Override
     public Properties getUserProperties() {
         if (userProperties == null) {
             userProperties = new Properties();
@@ -73,19 +79,23 @@ public class DefaultProjectBuilderConfiguration implements ProjectBuilderConfigu
         return userProperties;
     }
 
+    @Override
     public Properties getExecutionProperties() {
         return executionProperties;
     }
 
+    @Override
     public ProjectBuilderConfiguration setExecutionProperties(Properties executionProperties) {
         this.executionProperties = executionProperties;
         return this;
     }
 
+    @Override
     public Date getBuildStartTime() {
         return buildStartTime;
     }
 
+    @Override
     public ProjectBuilderConfiguration setBuildStartTime(Date buildStartTime) {
         this.buildStartTime = buildStartTime;
         return this;

@@ -171,6 +171,7 @@ public class DefaultMavenProjectBuilder implements MavenProjectBuilder {
         return e;
     }
 
+    @Override
     public MavenProject build(File pom, ProjectBuilderConfiguration configuration) throws ProjectBuildingException {
         ProjectBuildingRequest request = injectSession(toRequest(configuration));
 
@@ -182,6 +183,7 @@ public class DefaultMavenProjectBuilder implements MavenProjectBuilder {
     }
 
     // This is used by the SITE plugin.
+    @Override
     public MavenProject build(File pom, ArtifactRepository localRepository, ProfileManager profileManager)
             throws ProjectBuildingException {
         ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration();
@@ -209,6 +211,7 @@ public class DefaultMavenProjectBuilder implements MavenProjectBuilder {
         }
     }
 
+    @Override
     public MavenProject buildFromRepository(
             Artifact artifact,
             List<ArtifactRepository> remoteRepositories,
@@ -221,6 +224,7 @@ public class DefaultMavenProjectBuilder implements MavenProjectBuilder {
         return buildFromRepository(artifact, remoteRepositories, configuration, allowStubModel);
     }
 
+    @Override
     public MavenProject buildFromRepository(
             Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository)
             throws ProjectBuildingException {
@@ -231,6 +235,7 @@ public class DefaultMavenProjectBuilder implements MavenProjectBuilder {
      * This is used for pom-less execution like running archetype:generate. I am taking out the profile handling and the
      * interpolation of the base directory until we spec this out properly.
      */
+    @Override
     public MavenProject buildStandaloneSuperProject(ProjectBuilderConfiguration configuration)
             throws ProjectBuildingException {
         ProjectBuildingRequest request = injectSession(toRequest(configuration));
@@ -244,11 +249,13 @@ public class DefaultMavenProjectBuilder implements MavenProjectBuilder {
         return project;
     }
 
+    @Override
     public MavenProject buildStandaloneSuperProject(ArtifactRepository localRepository)
             throws ProjectBuildingException {
         return buildStandaloneSuperProject(localRepository, null);
     }
 
+    @Override
     public MavenProject buildStandaloneSuperProject(ArtifactRepository localRepository, ProfileManager profileManager)
             throws ProjectBuildingException {
         ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration();
@@ -258,6 +265,7 @@ public class DefaultMavenProjectBuilder implements MavenProjectBuilder {
         return buildStandaloneSuperProject(configuration);
     }
 
+    @Override
     public MavenProject buildWithDependencies(
             File pom,
             ArtifactRepository localRepository,
@@ -279,6 +287,7 @@ public class DefaultMavenProjectBuilder implements MavenProjectBuilder {
         }
     }
 
+    @Override
     public MavenProject buildWithDependencies(
             File pom, ArtifactRepository localRepository, ProfileManager profileManager)
             throws ProjectBuildingException, ArtifactResolutionException, ArtifactNotFoundException {

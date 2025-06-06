@@ -60,6 +60,7 @@ public interface VersionRange {
      * {@return the string representation of this version}
      */
     @Nonnull
+    @Override
     String toString();
 
     /**

@@ -51,6 +51,7 @@ public abstract class AbstractVersionTransformation extends AbstractLogEnabled i
     @Inject
     protected WagonManager wagonManager;
 
+    @Override
     public void transformForResolve(
             Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository)
             throws ArtifactResolutionException, ArtifactNotFoundException {

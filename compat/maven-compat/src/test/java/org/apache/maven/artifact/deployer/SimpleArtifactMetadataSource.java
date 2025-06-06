@@ -36,21 +36,25 @@ import org.apache.maven.repository.legacy.metadata.ResolutionGroup;
 @Singleton
 @Deprecated
 public class SimpleArtifactMetadataSource implements ArtifactMetadataSource {
+    @Override
     public ResolutionGroup retrieve(
             Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories) {
         throw new UnsupportedOperationException("Cannot retrieve metadata in this test case");
     }
 
+    @Override
     public List<ArtifactVersion> retrieveAvailableVersions(
             Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories) {
         return Collections.singletonList(new DefaultArtifactVersion("10.1.3"));
     }
 
+    @Override
     public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository(
             Artifact artifact, ArtifactRepository localRepository, ArtifactRepository remoteRepository) {
         return Collections.singletonList(new DefaultArtifactVersion("10.1.3"));
     }
 
+    @Override
     public ResolutionGroup retrieve(MetadataResolutionRequest request) {
         return retrieve(request.getArtifact(), request.getLocalRepository(), request.getRemoteRepositories());
     }

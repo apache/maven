@@ -86,40 +86,48 @@ public class DefaultPluginVersionRequest implements PluginVersionRequest {
         setRepositories(repositories);
     }
 
+    @Override
     public String getGroupId() {
         return groupId;
     }
 
+    @Override
     public DefaultPluginVersionRequest setGroupId(String groupId) {
         this.groupId = groupId;
 
         return this;
     }
 
+    @Override
     public String getArtifactId() {
         return artifactId;
     }
 
+    @Override
     public DefaultPluginVersionRequest setArtifactId(String artifactId) {
         this.artifactId = artifactId;
 
         return this;
     }
 
+    @Override
     public Model getPom() {
         return pom;
     }
 
+    @Override
     public DefaultPluginVersionRequest setPom(Model pom) {
         this.pom = pom;
 
         return this;
     }
 
+    @Override
     public List<RemoteRepository> getRepositories() {
         return repositories;
     }
 
+    @Override
     public DefaultPluginVersionRequest setRepositories(List<RemoteRepository> repositories) {
         if (repositories != null) {
             this.repositories = Collections.unmodifiableList(repositories);
@@ -130,10 +138,12 @@ public class DefaultPluginVersionRequest implements PluginVersionRequest {
         return this;
     }
 
+    @Override
     public RepositorySystemSession getRepositorySession() {
         return session;
     }
 
+    @Override
     public DefaultPluginVersionRequest setRepositorySession(RepositorySystemSession session) {
         this.session = session;
 

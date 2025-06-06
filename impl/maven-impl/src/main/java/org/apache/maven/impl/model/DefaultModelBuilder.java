@@ -202,6 +202,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         this.rootLocator = rootLocator;
     }
 
+    @Override
     public ModelBuilderSession newSession() {
         return new ModelBuilderSessionImpl();
     }
@@ -420,11 +421,13 @@ public class DefaultModelBuilder implements ModelBuilder {
             return result.getProblemCollector();
         }
 
+        @Override
         public void setSource(String source) {
             this.source = source;
             this.sourceModel = null;
         }
 
+        @Override
         public void setSource(Model source) {
             this.sourceModel = source;
             this.source = null;
@@ -434,6 +437,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
 
+        @Override
         public String getSource() {
             if (source == null && sourceModel != null) {
                 source = ModelProblemUtils.toPath(sourceModel);
@@ -445,10 +449,12 @@ public class DefaultModelBuilder implements ModelBuilder {
             return ModelProblemUtils.toId(sourceModel);
         }
 
+        @Override
         public void setRootModel(Model rootModel) {
             this.rootModel = rootModel;
         }
 
+        @Override
         public Model getRootModel() {
             return rootModel;
         }
@@ -490,6 +496,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             add(problem);
         }
 
+        @Override
         public ModelBuilderException newModelBuilderException() {
             return new ModelBuilderException(result);
         }
@@ -2081,6 +2088,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 "checksumPolicy",
                 "updatePolicy");
 
+        @Override
         public String transform(String input, String context) {
             return CONTEXTS.contains(context) ? input.intern() : input;
         }

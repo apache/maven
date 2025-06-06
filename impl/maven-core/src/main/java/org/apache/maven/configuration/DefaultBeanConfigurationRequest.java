@@ -44,27 +44,33 @@ public class DefaultBeanConfigurationRequest implements BeanConfigurationRequest
 
     private BeanConfigurationPathTranslator pathTranslator;
 
+    @Override
     public Object getBean() {
         return bean;
     }
 
+    @Override
     public DefaultBeanConfigurationRequest setBean(Object bean) {
         this.bean = bean;
         return this;
     }
 
+    @Override
     public Object getConfiguration() {
         return configuration;
     }
 
+    @Override
     public String getConfigurationElement() {
         return configurationElement;
     }
 
+    @Override
     public DefaultBeanConfigurationRequest setConfiguration(Object configuration) {
         return setConfiguration(configuration, null);
     }
 
+    @Override
     public DefaultBeanConfigurationRequest setConfiguration(Object configuration, String element) {
         this.configuration = configuration;
         this.configurationElement = element;
@@ -133,28 +139,34 @@ public class DefaultBeanConfigurationRequest implements BeanConfigurationRequest
         return null;
     }
 
+    @Override
     public ClassLoader getClassLoader() {
         return classLoader;
     }
 
+    @Override
     public DefaultBeanConfigurationRequest setClassLoader(ClassLoader classLoader) {
         this.classLoader = classLoader;
         return this;
     }
 
+    @Override
     public BeanConfigurationValuePreprocessor getValuePreprocessor() {
         return valuePreprocessor;
     }
 
+    @Override
     public DefaultBeanConfigurationRequest setValuePreprocessor(BeanConfigurationValuePreprocessor valuePreprocessor) {
         this.valuePreprocessor = valuePreprocessor;
         return this;
     }
 
+    @Override
     public BeanConfigurationPathTranslator getPathTranslator() {
         return pathTranslator;
     }
 
+    @Override
     public DefaultBeanConfigurationRequest setPathTranslator(BeanConfigurationPathTranslator pathTranslator) {
         this.pathTranslator = pathTranslator;
         return this;

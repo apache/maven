@@ -38,10 +38,12 @@ public class FlatRepositoryLayout implements ArtifactRepositoryLayout {
 
     private static final char GROUP_SEPARATOR = '.';
 
+    @Override
     public String getId() {
         return "flat";
     }
 
+    @Override
     public String pathOf(Artifact artifact) {
         ArtifactHandler artifactHandler = artifact.getArtifactHandler();
 
@@ -61,6 +63,7 @@ public class FlatRepositoryLayout implements ArtifactRepositoryLayout {
         return path.toString();
     }
 
+    @Override
     public String pathOfLocalRepositoryMetadata(ArtifactMetadata metadata, ArtifactRepository repository) {
         return pathOfRepositoryMetadata(metadata.getLocalFilename(repository));
     }
@@ -73,6 +76,7 @@ public class FlatRepositoryLayout implements ArtifactRepositoryLayout {
         return path.toString();
     }
 
+    @Override
     public String pathOfRemoteRepositoryMetadata(ArtifactMetadata metadata) {
         return pathOfRepositoryMetadata(metadata.getRemoteFilename());
     }

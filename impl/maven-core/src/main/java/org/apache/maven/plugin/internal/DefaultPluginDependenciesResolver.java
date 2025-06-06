@@ -97,6 +97,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                 session.getArtifactTypeRegistry().get("maven-plugin"));
     }
 
+    @Override
     public Artifact resolve(Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session)
             throws PluginResolutionException {
         RequestTrace trace = RequestTrace.newChild(null, plugin);
@@ -161,6 +162,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
         return resolveInternal(plugin, null /* pluginArtifact */, dependencyFilter, repositories, session);
     }
 
+    @Override
     public DependencyResult resolvePlugin(
             Plugin plugin,
             Artifact pluginArtifact,
@@ -171,6 +173,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
         return resolveInternal(plugin, pluginArtifact, dependencyFilter, repositories, session);
     }
 
+    @Override
     public DependencyNode resolve(
             Plugin plugin,
             Artifact pluginArtifact,

@@ -41,6 +41,7 @@ public class BuildTimestampValueSource extends AbstractValueSource {
         this.format = format;
     }
 
+    @Override
     public Object getValue(String expression) {
         if ("build.timestamp".equals(expression) || "maven.build.timestamp".equals(expression)) {
             if (formattedDate == null && startTime != null) {

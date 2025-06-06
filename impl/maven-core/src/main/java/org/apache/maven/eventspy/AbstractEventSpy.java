@@ -24,9 +24,12 @@ package org.apache.maven.eventspy;
  */
 public abstract class AbstractEventSpy implements EventSpy {
 
+    @Override
     public void init(Context context) throws Exception {}
 
+    @Override
     public void onEvent(Object event) throws Exception {}
 
+    @Override
     public void close() throws Exception {}
 }

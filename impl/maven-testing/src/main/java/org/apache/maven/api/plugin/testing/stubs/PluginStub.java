@@ -111,6 +111,7 @@ public class PluginStub implements Plugin {
         this.dependencies = dependencies;
     }
 
+    @Override
     public Map<String, Dependency> getDependenciesMap() {
         return dependenciesMap;
     }

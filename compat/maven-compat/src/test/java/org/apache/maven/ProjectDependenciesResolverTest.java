@@ -41,6 +41,7 @@ class ProjectDependenciesResolverTest extends AbstractCoreMavenComponentTestCase
     @Inject
     private ProjectDependenciesResolver resolver;
 
+    @Override
     protected String getProjectsDirectory() {
         return "src/test/projects/project-dependencies-resolver";
     }

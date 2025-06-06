@@ -35,6 +35,7 @@ import java.nio.file.Path;
 @Deprecated(since = "4.0.0")
 public class DefaultRootLocator implements RootLocator {
 
+    @Override
     public boolean isRootDirectory(Path dir) {
         if (Files.isDirectory(dir.resolve(".mvn"))) {
             return true;

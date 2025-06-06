@@ -70,36 +70,43 @@ public class DefaultRepositoryRequest implements RepositoryRequest {
         return request;
     }
 
+    @Override
     public boolean isOffline() {
         return offline;
     }
 
+    @Override
     public DefaultRepositoryRequest setOffline(boolean offline) {
         this.offline = offline;
 
         return this;
     }
 
+    @Override
     public boolean isForceUpdate() {
         return forceUpdate;
     }
 
+    @Override
     public DefaultRepositoryRequest setForceUpdate(boolean forceUpdate) {
         this.forceUpdate = forceUpdate;
 
         return this;
     }
 
+    @Override
     public ArtifactRepository getLocalRepository() {
         return localRepository;
     }
 
+    @Override
     public DefaultRepositoryRequest setLocalRepository(ArtifactRepository localRepository) {
         this.localRepository = localRepository;
 
         return this;
     }
 
+    @Override
     public List<ArtifactRepository> getRemoteRepositories() {
         if (remoteRepositories == null) {
             remoteRepositories = new ArrayList<>();
@@ -108,6 +115,7 @@ public class DefaultRepositoryRequest implements RepositoryRequest {
         return remoteRepositories;
     }
 
+    @Override
     public DefaultRepositoryRequest setRemoteRepositories(List<ArtifactRepository> remoteRepositories) {
         this.remoteRepositories = remoteRepositories;
 

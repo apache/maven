@@ -125,6 +125,7 @@ public class DefaultModelProblem implements ModelProblem {
         return columnNumber;
     }
 
+    @Override
     public String getModelId() {
         return modelId;
     }
@@ -161,6 +162,7 @@ public class DefaultModelProblem implements ModelProblem {
         return severity;
     }
 
+    @Override
     public Version getVersion() {
         return version;
     }
