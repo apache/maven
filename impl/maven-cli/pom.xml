@@ -31,11 +31,6 @@ under the License.
   <name>Maven 4 CLI</name>
   <description>Maven 4 CLI component, with CLI and logging support.</description>
 
-  <properties>
-    <!-- in: BaseUpgradeGoal -->
-    <checkstyle.violation.ignore>FileLength</checkstyle.violation.ignore>
-  </properties>
-
   <dependencies>
     <!--  Maven4 API -->
     <dependency>
