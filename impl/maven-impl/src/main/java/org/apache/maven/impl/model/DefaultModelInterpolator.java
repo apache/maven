@@ -110,7 +110,7 @@ public class DefaultModelInterpolator implements ModelInterpolator {
 
         Map<String, Optional<String>> cache = new HashMap<>();
         Function<String, Optional<String>> ucb =
-                v -> Optional.ofNullable(callback(model, projectDir, request, problems, v));
+                v -> Optional.ofNullable(doCallback(model, projectDir, request, problems, v));
         UnaryOperator<String> cb = v -> cache.computeIfAbsent(v, ucb).orElse(null);
         BinaryOperator<String> postprocessor = (e, v) -> postProcess(projectDir, request, e, v);
         return value -> {
@@ -127,19 +127,6 @@ public class DefaultModelInterpolator implements ModelInterpolator {
         return request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT
                 ? PROJECT_PREFIXES_4_0
                 : PROJECT_PREFIXES_3_1;
-    }
-
-    String callback(
-            Model model,
-            Path projectDir,
-            ModelBuilderRequest request,
-            ModelProblemCollector problems,
-            String expression) {
-        String value = doCallback(model, projectDir, request, problems, expression);
-        if (value != null) {
-            // value = postProcess(projectDir, request, expression, value);
-        }
-        return value;
     }
 
     private String postProcess(Path projectDir, ModelBuilderRequest request, String expression, String value) {
