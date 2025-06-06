@@ -55,7 +55,7 @@
     <p>An XSD is available at:</p>
     <ul>
       <li><a href="https://maven.apache.org/xsd/maven-v3_0_0.xsd">https://maven.apache.org/xsd/maven-v3_0_0.xsd</a> for Maven 1.1.</li>
-      <li><a href="https://maven.apache.org/xsd/maven-4.0.0.xsd">https://maven.apache.org/xsd/maven-4.0.0.xsd</a> for Maven 2.0.</li>
+      <li><a href="https://maven.apache.org/xsd/maven-4.0.0.xsd">https://maven.apache.org/xsd/maven-4.0.0.xsd</a> for Maven 3.0.</li>
     </ul>
     ]]>
   </description>
@@ -679,10 +679,10 @@
         <field>
           <name>defaultGoal</name>
           <version>3.0.0+</version>
-          <description>The default goal (or phase in Maven 2) to execute when none is specified for
-            the project. Note that in case of a multi-module build, only the default goal of the top-level
-            project is relevant, i.e. the default goals of child modules are ignored. Since Maven 3,
-            multiple goals/phases can be separated by whitespace.</description>
+          <description>The default goal to execute when none is specified for
+            the project. In a multi-module build, only the default goal of the top-level
+            project is relevant. That is, the default goals of child modules are ignored.
+            Multiple goals can be separated by whitespace.</description>
           <type>String</type>
         </field>
         <field>
@@ -1087,10 +1087,13 @@
           <version>3.0.0+</version>
           <description>
             <![CDATA[
-            The version requirement of the dependency, e.g. <code>3.2.1</code>. The actual version will be resolved based on the usage context.
-            Version requirement can also be specified as a range of versions, e.g. <code>[3.2.0,)</code>. This is discouraged as it may break <i>predictability</i> of resolved version.
-            See <a href="https://s.apache.org/dependency-version">dependency version requirement documentation</a>
-            and <a href="https://s.apache.org/transitive-dependencies-resolution">transitive dependencies resolution</a> for more details.
+            The version requirement of the dependency such as <code>3.2.1</code>.
+            The actual version will be resolved by dependency mediation.
+            The version requirement can also be
+            specified as a range of versions such as <code>[3.2.0,)</code>.
+            However, this is discouraged since it may break <i>predictability</i> of
+            the resolved version. See the <a href="https://maven.apache.org/pom.html#Dependency_Version_Requirement_Specification">Dependency Version Requirement Specification</a>
+            and <a href="https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#Transitive_Dependencies">Transitive Dependencies</a> for more details.
             ]]>
           </description>
           <type>String</type>
@@ -1401,10 +1404,10 @@
             <![CDATA[
             Gives the status of this artifact in the remote repository.
             This must not be set in your local project, as it is updated by
-            tools placing it in the reposiory. Valid values are: <code>none</code> (default),
-            <code>converted</code> (repository manager converted this from an Maven 1 POM),
+            tools placing it in the repository. Valid values are: <code>none</code> (default),
+            <code>converted</code> (repository manager converted this from a Maven 1 POM),
             <code>partner</code>
-            (directly synced from a partner Maven 2 repository), <code>deployed</code> (was deployed from a Maven 2
+            (directly synced from a partner Maven repository), <code>deployed</code> (was deployed from a Maven
             instance), <code>verified</code> (has been hand verified as correct and final).
             ]]>
           </description>
@@ -2572,8 +2575,8 @@
           <description>
             <![CDATA[
             The priority of this execution compared to other executions which are bound to the same phase.
-            <strong>Warning:</strong> This is an internal utility property that is only public for technical reasons,
-            it is not part of the public API. In particular, this property can be changed or deleted without prior
+            <strong>Warning:</strong> This is an internal utility property that is only public for technical reasons.
+            It is not part of the public API. In particular, this property can be changed or deleted without prior
             notice.
             ]]>
           </description>
@@ -3142,11 +3145,7 @@
           <defaultValue>2.0</defaultValue>
           <description><![CDATA[
             For a plugin project (packaging is <code>maven-plugin</code>), the minimum version of
-            Maven required to use the resulting plugin.<br>
-            In Maven 2, this was also specifying the minimum version of Maven required to build a
-            project, but this usage is <b>deprecated</b> in Maven 3 and not checked any more: use
-            the <a href="https://maven.apache.org/enforcer/enforcer-rules/requireMavenVersion.html">Maven Enforcer Plugin's
-            <code>requireMavenVersion</code> rule</a> instead.
+            Maven required to use the resulting plugin.
             ]]>
           </description>
           <required>false</required>
