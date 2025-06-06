@@ -49,6 +49,7 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolver;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,7 +107,7 @@ public class MojoDescriptorCreator {
         return XmlNode.newInstance("configuration", children);
     }
 
-    public static org.codehaus.plexus.util.xml.Xpp3Dom convert(MojoDescriptor mojoDescriptor) {
+    public static Xpp3Dom convert(MojoDescriptor mojoDescriptor) {
         PlexusConfiguration c = mojoDescriptor.getMojoConfiguration();
 
         List<XmlNode> children = new ArrayList<>();
@@ -128,7 +129,7 @@ public class MojoDescriptorCreator {
         }
 
         XmlNode dom = XmlNode.newInstance("configuration", children);
-        return new org.codehaus.plexus.util.xml.Xpp3Dom(dom);
+        return new Xpp3Dom(dom);
     }
 
     // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process@executionId

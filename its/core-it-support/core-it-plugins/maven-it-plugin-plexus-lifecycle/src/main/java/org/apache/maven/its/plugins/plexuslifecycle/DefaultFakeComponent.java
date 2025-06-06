@@ -29,7 +29,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 /**
  * @author Olivier Lamy
  */
-@Component(role = org.apache.maven.its.plugins.plexuslifecycle.FakeComponent.class)
+@Component(role = FakeComponent.class)
 public class DefaultFakeComponent implements FakeComponent, Contextualizable, Disposable, LogEnabled {
     private Logger logger;
 

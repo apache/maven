@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
 
 import org.apache.maven.api.model.ActivationFile;
 import org.apache.maven.api.model.InputLocation;
+import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.settings.Activation;
 import org.apache.maven.api.settings.ActivationOS;
 import org.apache.maven.api.settings.ActivationProperty;
@@ -128,7 +129,7 @@ public final class SettingsUtilsV4 {
                 activation.os(os);
             }
 
-            org.apache.maven.api.model.ActivationFile modelFile = modelActivation.getFile();
+            ActivationFile modelFile = modelActivation.getFile();
 
             if (modelFile != null) {
                 org.apache.maven.api.settings.ActivationFile file =
@@ -356,9 +357,9 @@ public final class SettingsUtilsV4 {
     }
 
     private static org.apache.maven.api.settings.InputLocation toLocation(
-            org.apache.maven.api.model.InputLocation location) {
+            InputLocation location) {
         if (location != null) {
-            org.apache.maven.api.model.InputSource source = location.getSource();
+            InputSource source = location.getSource();
             Map<Object, org.apache.maven.api.settings.InputLocation> locs = location.getLocations().entrySet().stream()
                     .collect(Collectors.toMap(Map.Entry::getKey, e -> toLocation(e.getValue())));
             return new org.apache.maven.api.settings.InputLocation(
@@ -371,16 +372,16 @@ public final class SettingsUtilsV4 {
         }
     }
 
-    private static org.apache.maven.api.model.InputLocation toLocation(
+    private static InputLocation toLocation(
             org.apache.maven.api.settings.InputLocation location) {
         if (location != null) {
             org.apache.maven.api.settings.InputSource source = location.getSource();
             Map<Object, InputLocation> locs = location.getLocations().entrySet().stream()
                     .collect(Collectors.toMap(Map.Entry::getKey, e -> toLocation(e.getValue())));
-            return new org.apache.maven.api.model.InputLocation(
+            return new InputLocation(
                     location.getLineNumber(),
                     location.getColumnNumber(),
-                    source != null ? new org.apache.maven.api.model.InputSource("", source.getLocation()) : null,
+                    source != null ? new InputSource("", source.getLocation()) : null,
                     locs);
         } else {
             return null;

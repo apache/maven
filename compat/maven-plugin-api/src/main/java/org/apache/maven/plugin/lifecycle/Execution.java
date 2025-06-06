@@ -18,13 +18,17 @@
  */
 package org.apache.maven.plugin.lifecycle;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A set of goals to execute.
  *
  * @version $Revision$ $Date$
  */
 @SuppressWarnings("all")
-public class Execution implements java.io.Serializable {
+public class Execution implements Serializable {
 
     // --------------------------/
     // - Class/Member Variables -/
@@ -38,7 +42,7 @@ public class Execution implements java.io.Serializable {
     /**
      * Field goals.
      */
-    private java.util.List<String> goals;
+    private List<String> goals;
 
     // -----------/
     // - Methods -/
@@ -67,9 +71,9 @@ public class Execution implements java.io.Serializable {
      *
      * @return List
      */
-    public java.util.List<String> getGoals() {
+    public List<String> getGoals() {
         if (this.goals == null) {
-            this.goals = new java.util.ArrayList<String>();
+            this.goals = new ArrayList<String>();
         }
 
         return this.goals;
@@ -98,7 +102,7 @@ public class Execution implements java.io.Serializable {
      *
      * @param goals a goals object.
      */
-    public void setGoals(java.util.List<String> goals) {
+    public void setGoals(List<String> goals) {
         this.goals = goals;
     } // -- void setGoals( java.util.List )
 }

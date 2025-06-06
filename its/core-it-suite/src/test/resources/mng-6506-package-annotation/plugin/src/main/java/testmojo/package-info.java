@@ -17,5 +17,5 @@
  * under the License.
  */
 
-@testmojo.TestAnnotation
+@TestAnnotation
 package testmojo;

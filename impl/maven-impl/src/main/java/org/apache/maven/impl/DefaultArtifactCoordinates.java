@@ -23,6 +23,7 @@ import java.util.Objects;
 import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.annotations.Nonnull;
+import org.eclipse.aether.artifact.Artifact;
 
 import static java.util.Objects.requireNonNull;
 
@@ -31,15 +32,15 @@ import static java.util.Objects.requireNonNull;
  */
 public class DefaultArtifactCoordinates implements ArtifactCoordinates {
     private final @Nonnull InternalSession session;
-    private final @Nonnull org.eclipse.aether.artifact.Artifact coordinates;
+    private final @Nonnull Artifact coordinates;
 
     public DefaultArtifactCoordinates(
-            @Nonnull InternalSession session, @Nonnull org.eclipse.aether.artifact.Artifact coordinates) {
+            @Nonnull InternalSession session, @Nonnull Artifact coordinates) {
         this.session = requireNonNull(session, "session");
         this.coordinates = requireNonNull(coordinates, "coordinates");
     }
 
-    public org.eclipse.aether.artifact.Artifact getCoordinates() {
+    public Artifact getCoordinates() {
         return coordinates;
     }
 

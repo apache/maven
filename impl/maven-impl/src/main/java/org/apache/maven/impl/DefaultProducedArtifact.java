@@ -20,6 +20,7 @@ package org.apache.maven.impl;
 
 import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.annotations.Nonnull;
+import org.eclipse.aether.artifact.Artifact;
 
 /**
  * A wrapper class around a maven resolver artifact.
@@ -27,7 +28,7 @@ import org.apache.maven.api.annotations.Nonnull;
 public class DefaultProducedArtifact extends DefaultArtifact implements ProducedArtifact {
 
     public DefaultProducedArtifact(
-            @Nonnull InternalSession session, @Nonnull org.eclipse.aether.artifact.Artifact artifact) {
+            @Nonnull InternalSession session, @Nonnull Artifact artifact) {
         super(session, artifact);
     }
 }

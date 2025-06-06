@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.Objects;
 
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.PluginValidationManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -83,7 +84,7 @@ class DeprecatedCoreExpressionValidator extends AbstractMavenPluginParametersVal
 
     private boolean isDeprecated(Parameter parameter) {
         return Objects.equals(
-                        org.apache.maven.artifact.repository.ArtifactRepository.class.getName(), parameter.getType())
+                        ArtifactRepository.class.getName(), parameter.getType())
                 && DEPRECATED_CORE_PARAMETERS.containsKey(parameter.getDefaultValue());
     }
 }

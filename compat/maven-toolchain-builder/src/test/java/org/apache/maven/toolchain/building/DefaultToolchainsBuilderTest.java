@@ -256,7 +256,7 @@ class DefaultToolchainsBuilderTest {
                         .get(0)
                         .getProvides()
                         .get("key"));
-        org.codehaus.plexus.util.xml.Xpp3Dom toolchainConfiguration = (org.codehaus.plexus.util.xml.Xpp3Dom)
+        Xpp3Dom toolchainConfiguration = (Xpp3Dom)
                 result.getEffectiveToolchains().getToolchains().get(0).getConfiguration();
         assertEquals(
                 interpolatedValue, toolchainConfiguration.getChild("jdkHome").getValue());

@@ -100,6 +100,7 @@ import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.ArtifactType;
+import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.ArtifactRepository;
 import org.eclipse.aether.transfer.TransferResource;
 
@@ -114,7 +115,7 @@ public abstract class AbstractSession implements InternalSession {
     protected final Lookup lookup;
     private final Map<Class<? extends Service>, Service> services = new ConcurrentHashMap<>();
     private final List<Listener> listeners = new CopyOnWriteArrayList<>();
-    private final Map<org.eclipse.aether.graph.DependencyNode, Node> allNodes =
+    private final Map<DependencyNode, Node> allNodes =
             Collections.synchronizedMap(new WeakHashMap<>());
     private final Map<Class<? extends Artifact>, Map<org.eclipse.aether.artifact.Artifact, Artifact>> allArtifacts =
             new ConcurrentHashMap<>();
@@ -207,12 +208,12 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     @Override
-    public Node getNode(org.eclipse.aether.graph.DependencyNode node) {
+    public Node getNode(DependencyNode node) {
         return getNode(node, false);
     }
 
     @Override
-    public Node getNode(org.eclipse.aether.graph.DependencyNode node, boolean verbose) {
+    public Node getNode(DependencyNode node, boolean verbose) {
         return allNodes.computeIfAbsent(node, n -> new DefaultNode(this, n, verbose));
     }
 

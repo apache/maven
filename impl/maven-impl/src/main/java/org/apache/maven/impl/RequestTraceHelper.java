@@ -21,6 +21,7 @@ package org.apache.maven.impl;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.Session;
+import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.services.Request;
 import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.collection.CollectRequest;
@@ -127,7 +128,7 @@ public final class RequestTraceHelper {
                 return "artifact descriptor request for " + request.getArtifact();
             } else if (data instanceof ArtifactRequest request) {
                 return "artifact request for " + request.getArtifact();
-            } else if (data instanceof org.apache.maven.api.model.Plugin plugin) {
+            } else if (data instanceof Plugin plugin) {
                 return "plugin " + plugin.getId();
             }
             requestTrace = requestTrace.getParent();

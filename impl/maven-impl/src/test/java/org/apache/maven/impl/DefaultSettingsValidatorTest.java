@@ -49,7 +49,7 @@ class DefaultSettingsValidatorTest {
         ProblemCollector<BuilderProblem> problems = validator.validate(model);
         assertEquals(0, problems.totalProblemsReported());
 
-        Repository repo = org.apache.maven.api.settings.Repository.newInstance(false);
+        Repository repo = Repository.newInstance(false);
         Settings model2 = Settings.newBuilder()
                 .profiles(List.of(prof.withRepositories(List.of(repo))))
                 .build();

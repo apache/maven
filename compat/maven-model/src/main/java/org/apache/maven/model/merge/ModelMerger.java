@@ -19,6 +19,7 @@
 package org.apache.maven.model.merge;
 
 import java.io.ObjectStreamException;
+import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -2394,7 +2395,7 @@ public class ModelMerger {
      * Merging list
      * @param <V>
      */
-    private static class MergingList<V> extends AbstractList<V> implements java.io.Serializable {
+    private static class MergingList<V> extends AbstractList<V> implements Serializable {
 
         private final KeyComputer<V> keyComputer;
         private Map<Object, V> map;

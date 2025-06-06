@@ -18,6 +18,11 @@
  */
 package org.apache.maven.model;
 
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -26,7 +31,7 @@ import java.util.stream.Collectors;
  * @version $Revision$ $Date$
  */
 @SuppressWarnings("all")
-public final class InputLocation implements java.io.Serializable, Cloneable, InputLocationTracker {
+public final class InputLocation implements Serializable, Cloneable, InputLocationTracker {
 
     // --------------------------/
     // - Class/Member Variables -/
@@ -52,7 +57,7 @@ public final class InputLocation implements java.io.Serializable, Cloneable, Inp
     /**
      * Field locations.
      */
-    private java.util.Map<Object, InputLocation> locations;
+    private Map<Object, InputLocation> locations;
 
     /**
      * Field location.
@@ -106,7 +111,7 @@ public final class InputLocation implements java.io.Serializable, Cloneable, Inp
             InputLocation copy = (InputLocation) super.clone();
 
             if (copy.locations != null) {
-                copy.locations = new java.util.LinkedHashMap(copy.locations);
+                copy.locations = new LinkedHashMap(copy.locations);
             }
 
             return copy;
@@ -162,7 +167,7 @@ public final class InputLocation implements java.io.Serializable, Cloneable, Inp
      *
      * @return Map
      */
-    public java.util.Map<Object, InputLocation> getLocations() {
+    public Map<Object, InputLocation> getLocations() {
         return locations;
     } // -- java.util.Map<Object, InputLocation> getLocations()
 
@@ -198,7 +203,7 @@ public final class InputLocation implements java.io.Serializable, Cloneable, Inp
     public void setOtherLocation(Object key, InputLocation location) {
         if (location != null) {
             if (this.locations == null) {
-                this.locations = new java.util.LinkedHashMap<>();
+                this.locations = new LinkedHashMap<>();
             }
             this.locations.put(key, location);
         }
@@ -260,15 +265,15 @@ public final class InputLocation implements java.io.Serializable, Cloneable, Inp
 
         InputLocation result = new InputLocation(target.getLineNumber(), target.getColumnNumber(), target.getSource());
 
-        java.util.Map<Object, InputLocation> locations;
-        java.util.Map<Object, InputLocation> sourceLocations = source.getLocations();
-        java.util.Map<Object, InputLocation> targetLocations = target.getLocations();
+        Map<Object, InputLocation> locations;
+        Map<Object, InputLocation> sourceLocations = source.getLocations();
+        Map<Object, InputLocation> targetLocations = target.getLocations();
         if (sourceLocations == null) {
             locations = targetLocations;
         } else if (targetLocations == null) {
             locations = sourceLocations;
         } else {
-            locations = new java.util.LinkedHashMap();
+            locations = new LinkedHashMap();
             locations.putAll(sourceDominant ? targetLocations : sourceLocations);
             locations.putAll(sourceDominant ? sourceLocations : targetLocations);
         }
@@ -286,7 +291,7 @@ public final class InputLocation implements java.io.Serializable, Cloneable, Inp
      * @return InputLocation
      */
     public static InputLocation merge(
-            InputLocation target, InputLocation source, java.util.Collection<Integer> indices) {
+            InputLocation target, InputLocation source, Collection<Integer> indices) {
         if (source == null) {
             return target;
         } else if (target == null) {
@@ -295,16 +300,16 @@ public final class InputLocation implements java.io.Serializable, Cloneable, Inp
 
         InputLocation result = new InputLocation(target.getLineNumber(), target.getColumnNumber(), target.getSource());
 
-        java.util.Map<Object, InputLocation> locations;
-        java.util.Map<Object, InputLocation> sourceLocations = source.getLocations();
-        java.util.Map<Object, InputLocation> targetLocations = target.getLocations();
+        Map<Object, InputLocation> locations;
+        Map<Object, InputLocation> sourceLocations = source.getLocations();
+        Map<Object, InputLocation> targetLocations = target.getLocations();
         if (sourceLocations == null) {
             locations = targetLocations;
         } else if (targetLocations == null) {
             locations = sourceLocations;
         } else {
-            locations = new java.util.LinkedHashMap<>();
-            for (java.util.Iterator<Integer> it = indices.iterator(); it.hasNext(); ) {
+            locations = new LinkedHashMap<>();
+            for (Iterator<Integer> it = indices.iterator(); it.hasNext(); ) {
                 InputLocation location;
                 Integer index = it.next();
                 if (index.intValue() < 0) {
@@ -325,7 +330,7 @@ public final class InputLocation implements java.io.Serializable, Cloneable, Inp
      *
      * @param locations
      */
-    public void setLocations(java.util.Map<Object, InputLocation> locations) {
+    public void setLocations(Map<Object, InputLocation> locations) {
         this.locations = locations;
     } // -- void setLocations( java.util.Map )
 

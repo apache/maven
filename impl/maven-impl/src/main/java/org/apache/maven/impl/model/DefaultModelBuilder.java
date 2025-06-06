@@ -1916,8 +1916,8 @@ public class DefaultModelBuilder implements ModelBuilder {
         return superPomProvider.getSuperPom(modelVersion);
     }
 
-    private static org.apache.maven.api.model.Dependency addExclusions(
-            org.apache.maven.api.model.Dependency candidate, List<Exclusion> exclusions) {
+    private static Dependency addExclusions(
+            Dependency candidate, List<Exclusion> exclusions) {
         return candidate.withExclusions(Stream.concat(candidate.getExclusions().stream(), exclusions.stream())
                 .toList());
     }

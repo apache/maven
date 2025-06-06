@@ -26,6 +26,7 @@ import org.apache.maven.api.DependencyScope;
 import org.apache.maven.plugin.PluginValidationManager;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 
 /**
@@ -47,7 +48,7 @@ class Maven3CompatDependenciesValidator extends AbstractMavenPluginDependenciesV
             RepositorySystemSession session,
             Artifact pluginArtifact,
             ArtifactDescriptorResult artifactDescriptorResult) {
-        for (org.eclipse.aether.graph.Dependency dependency : artifactDescriptorResult.getDependencies()) {
+        for (Dependency dependency : artifactDescriptorResult.getDependencies()) {
             if ("org.apache.maven".equals(dependency.getArtifact().getGroupId())
                     && "maven-compat".equals(dependency.getArtifact().getArtifactId())
                     && !DependencyScope.TEST.is(dependency.getScope())) {

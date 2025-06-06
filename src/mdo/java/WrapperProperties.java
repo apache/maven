@@ -18,14 +18,7 @@
  */
 package ${package};
 
-import java.io.IOError;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -363,7 +356,7 @@ class WrapperProperties extends Properties {
     }
 
 
-    private Object writeReplace() throws java.io.ObjectStreamException {
+    private Object writeReplace() throws ObjectStreamException {
         Properties props = new Properties();
         props.putAll(getter.get());
         return props;

@@ -45,6 +45,7 @@ import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Priority;
 import org.apache.maven.api.di.Qualifier;
+import org.apache.maven.api.di.Scope;
 import org.apache.maven.di.Key;
 
 import static java.util.stream.Collectors.toList;
@@ -100,7 +101,7 @@ public final class ReflectionUtils {
     public static @Nullable Annotation scopeOf(AnnotatedElement annotatedElement) {
         Annotation scope = null;
         for (Annotation annotation : annotatedElement.getDeclaredAnnotations()) {
-            if (annotation.annotationType().isAnnotationPresent(org.apache.maven.api.di.Scope.class)) {
+            if (annotation.annotationType().isAnnotationPresent(Scope.class)) {
                 if (scope != null) {
                     throw new DIException("More than one scope annotation on " + annotatedElement);
                 }

@@ -82,7 +82,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setRepositorySession(mavenSession.getRepositorySession());
         ProjectBuildingResult result = getContainer()
-                .lookup(org.apache.maven.project.ProjectBuilder.class)
+                .lookup(ProjectBuilder.class)
                 .build(pomFile, configuration);
 
         assertNotNull(result.getProject().getParentFile());
@@ -96,7 +96,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         configuration.setRepositorySession(mavenSession.getRepositorySession());
 
         ProjectBuildingException e = assertThrows(ProjectBuildingException.class, () -> getContainer()
-                .lookup(org.apache.maven.project.ProjectBuilder.class)
+                .lookup(ProjectBuilder.class)
                 .build(pomFile, configuration));
         assertThat(
                 e.getResults(),
@@ -116,12 +116,12 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
 
         // single project build entry point
         ProjectBuildingResult result = getContainer()
-                .lookup(org.apache.maven.project.ProjectBuilder.class)
+                .lookup(ProjectBuilder.class)
                 .build(pomFile, configuration);
         assertEquals(1, result.getProject().getArtifacts().size());
         // multi projects build entry point
         List<ProjectBuildingResult> results = getContainer()
-                .lookup(org.apache.maven.project.ProjectBuilder.class)
+                .lookup(ProjectBuilder.class)
                 .build(Collections.singletonList(pomFile), false, configuration);
         assertEquals(1, results.size());
         MavenProject mavenProject = results.get(0).getProject();
@@ -150,12 +150,12 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
 
         // single project build entry point
         ProjectBuildingResult result = getContainer()
-                .lookup(org.apache.maven.project.ProjectBuilder.class)
+                .lookup(ProjectBuilder.class)
                 .build(pomFile, configuration);
         assertEquals(0, result.getProject().getArtifacts().size());
         // multi projects build entry point
         List<ProjectBuildingResult> results = getContainer()
-                .lookup(org.apache.maven.project.ProjectBuilder.class)
+                .lookup(ProjectBuilder.class)
                 .build(Collections.singletonList(pomFile), false, configuration);
         assertEquals(1, results.size());
         MavenProject mavenProject = results.get(0).getProject();
@@ -173,8 +173,8 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         mavenSession.getRequest().setRootDirectory(tempDir);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setRepositorySession(mavenSession.getRepositorySession());
-        org.apache.maven.project.ProjectBuilder projectBuilder =
-                getContainer().lookup(org.apache.maven.project.ProjectBuilder.class);
+        ProjectBuilder projectBuilder =
+                getContainer().lookup(ProjectBuilder.class);
         File child = new File(tempDir.toFile(), "child/pom.xml");
         // build project once
         projectBuilder.build(child, configuration);
@@ -198,8 +198,8 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
         configuration.setRepositorySession(mavenSession.getRepositorySession());
-        org.apache.maven.project.ProjectBuilder projectBuilder =
-                getContainer().lookup(org.apache.maven.project.ProjectBuilder.class);
+        ProjectBuilder projectBuilder =
+                getContainer().lookup(ProjectBuilder.class);
 
         // single project build entry point
         ProjectBuildingException ex1 =
@@ -230,8 +230,8 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_STRICT);
         configuration.setRepositorySession(mavenSession.getRepositorySession());
-        org.apache.maven.project.ProjectBuilder projectBuilder =
-                getContainer().lookup(org.apache.maven.project.ProjectBuilder.class);
+        ProjectBuilder projectBuilder =
+                getContainer().lookup(ProjectBuilder.class);
 
         // single project build entry point
         Exception ex = assertThrows(Exception.class, () -> projectBuilder.build(pomFile, configuration));
@@ -260,8 +260,8 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
         configuration.setRepositorySession(mavenSession.getRepositorySession());
-        org.apache.maven.project.ProjectBuilder projectBuilder =
-                getContainer().lookup(org.apache.maven.project.ProjectBuilder.class);
+        ProjectBuilder projectBuilder =
+                getContainer().lookup(ProjectBuilder.class);
 
         // read poms separately
         boolean parentFileWasFoundOnChild = false;
@@ -339,7 +339,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setRepositorySession(mavenSession.getRepositorySession());
         ProjectBuildingResult result = getContainer()
-                .lookup(org.apache.maven.project.ProjectBuilder.class)
+                .lookup(ProjectBuilder.class)
                 .build(pomFile, configuration);
 
         assertEquals(

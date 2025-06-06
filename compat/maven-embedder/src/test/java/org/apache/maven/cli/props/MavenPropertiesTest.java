@@ -26,6 +26,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.maven.impl.model.DefaultInterpolator;
 import org.junit.jupiter.api.BeforeEach;
@@ -101,7 +102,7 @@ public class MavenPropertiesTest {
                 + "dblbackslash=\\\\\n"
                 + "                        \n";
 
-        java.util.Properties props1 = new java.util.Properties();
+        Properties props1 = new Properties();
         props1.load(new StringReader(config));
 
         MavenProperties props2 = new MavenProperties();
@@ -168,7 +169,7 @@ public class MavenPropertiesTest {
         String config = "a=$\\\\\\\\{var}\n" + "ab=${a}b\n" + "abc=${ab}c";
         Map<String, String> expected = Map.of("a", "$\\{var}", "ab", "$\\{var}b", "abc", "$\\{var}bc");
 
-        java.util.Properties props1 = new java.util.Properties();
+        Properties props1 = new Properties();
         props1.load(new StringReader(config));
         new DefaultInterpolator().performSubstitution((Map) props1, null, true);
         assertEquals(expected, props1);
@@ -327,7 +328,7 @@ public class MavenPropertiesTest {
         pw.println("                                 cantaloupe, watermelon, \\");
         pw.println("                                 kiwi, mango");
 
-        java.util.Properties p = new java.util.Properties();
+        Properties p = new Properties();
         p.load(new StringReader(sw.toString()));
         Object o24 = p.getProperty("fruits");
         assertEquals("apple, banana, pear, cantaloupe, watermelon, kiwi, mango", o24);

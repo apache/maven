@@ -24,10 +24,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Date;
-import java.util.Deque;
-import java.util.List;
-import java.util.Map;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.eclipse.jetty.server.Handler;
@@ -88,8 +87,8 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest extends Abstra
                 }
 
                 if (uri.endsWith("dep/0.1-SNAPSHOT/maven-metadata.xml")) {
-                    java.text.DateFormat fmt = new java.text.SimpleDateFormat("yyyyMMddHHmmss");
-                    fmt.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+                    DateFormat fmt = new SimpleDateFormat("yyyyMMddHHmmss");
+                    fmt.setTimeZone(TimeZone.getTimeZone("UTC"));
                     String now = fmt.format(new Date(System.currentTimeMillis() + 3000));
 
                     response.setStatus(HttpServletResponse.SC_OK);

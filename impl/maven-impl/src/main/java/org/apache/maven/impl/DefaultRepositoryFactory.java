@@ -82,7 +82,7 @@ public class DefaultRepositoryFactory implements RepositoryFactory {
                 .toList();
     }
 
-    public static org.eclipse.aether.repository.RepositoryPolicy buildRepositoryPolicy(
+    public static RepositoryPolicy buildRepositoryPolicy(
             org.apache.maven.api.model.RepositoryPolicy policy) {
         boolean enabled = true;
         String updatePolicy = RepositoryPolicy.UPDATE_POLICY_DAILY;
@@ -96,6 +96,6 @@ public class DefaultRepositoryFactory implements RepositoryFactory {
                 checksumPolicy = policy.getChecksumPolicy();
             }
         }
-        return new org.eclipse.aether.repository.RepositoryPolicy(enabled, updatePolicy, checksumPolicy);
+        return new RepositoryPolicy(enabled, updatePolicy, checksumPolicy);
     }
 }

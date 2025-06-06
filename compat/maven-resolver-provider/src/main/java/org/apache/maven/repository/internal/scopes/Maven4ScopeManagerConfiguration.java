@@ -32,6 +32,7 @@ import org.eclipse.aether.impl.scope.CommonBuilds;
 import org.eclipse.aether.impl.scope.InternalScopeManager;
 import org.eclipse.aether.impl.scope.ScopeManagerConfiguration;
 import org.eclipse.aether.internal.impl.scope.ScopeManagerDump;
+import org.eclipse.aether.scope.ResolutionScope;
 
 import static org.eclipse.aether.impl.scope.BuildScopeQuery.all;
 import static org.eclipse.aether.impl.scope.BuildScopeQuery.byBuildPath;
@@ -127,7 +128,7 @@ public final class Maven4ScopeManagerConfiguration implements ScopeManagerConfig
                 MavenArtifactProperties.LOCAL_PATH));
 
         // == sanity check
-        if (result.size() != org.apache.maven.api.DependencyScope.values().length - 1) { // sans "undefined"
+        if (result.size() != DependencyScope.values().length - 1) { // sans "undefined"
             throw new IllegalStateException("Maven4 API dependency scope mismatch");
         }
 
@@ -135,7 +136,7 @@ public final class Maven4ScopeManagerConfiguration implements ScopeManagerConfig
     }
 
     @Override
-    public Collection<org.eclipse.aether.scope.ResolutionScope> buildResolutionScopes(
+    public Collection<ResolutionScope> buildResolutionScopes(
             InternalScopeManager internalScopeManager) {
         Collection<org.eclipse.aether.scope.DependencyScope> allDependencyScopes =
                 internalScopeManager.getDependencyScopeUniverse();
@@ -145,7 +146,7 @@ public final class Maven4ScopeManagerConfiguration implements ScopeManagerConfig
                 .getDependencyScope(DependencyScope.SYSTEM.id())
                 .orElse(null);
 
-        ArrayList<org.eclipse.aether.scope.ResolutionScope> result = new ArrayList<>();
+        ArrayList<ResolutionScope> result = new ArrayList<>();
         result.add(internalScopeManager.createResolutionScope(
                 RS_NONE,
                 InternalScopeManager.Mode.REMOVE,

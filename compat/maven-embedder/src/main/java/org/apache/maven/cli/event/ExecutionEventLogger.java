@@ -32,6 +32,7 @@ import org.apache.maven.execution.BuildSummary;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.logging.api.LogLevelRecorder;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -146,7 +147,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
 
             ILoggerFactory iLoggerFactory = LoggerFactory.getILoggerFactory();
 
-            if (iLoggerFactory instanceof org.apache.maven.logging.api.LogLevelRecorder recorder
+            if (iLoggerFactory instanceof LogLevelRecorder recorder
                     && recorder.hasReachedMaxLevel()) {
                 event.getSession()
                         .getResult()

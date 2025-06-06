@@ -48,6 +48,7 @@ import org.apache.maven.api.PathScope;
 import org.apache.maven.api.PathType;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.plugin.Log;
 import org.apache.maven.api.plugin.descriptor.Resolution;
 import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.DependencyResolverResult;
@@ -550,7 +551,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         Project project = sessionV4.getProject(session.getCurrentProject());
 
         org.apache.maven.api.MojoExecution execution = new DefaultMojoExecution(sessionV4, mojoExecution);
-        org.apache.maven.api.plugin.Log log = new DefaultLog(
+        Log log = new DefaultLog(
                 LoggerFactory.getLogger(mojoExecution.getMojoDescriptor().getFullGoalName()));
         try {
             Injector injector = Injector.create();
@@ -560,7 +561,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             injector.bindInstance(Session.class, sessionV4);
             injector.bindInstance(Project.class, project);
             injector.bindInstance(org.apache.maven.api.MojoExecution.class, execution);
-            injector.bindInstance(org.apache.maven.api.plugin.Log.class, log);
+            injector.bindInstance(Log.class, log);
             mojo = mojoInterface.cast(injector.getInstance(
                     Key.of(mojoDescriptor.getImplementationClass(), mojoDescriptor.getRoleHint())));
 

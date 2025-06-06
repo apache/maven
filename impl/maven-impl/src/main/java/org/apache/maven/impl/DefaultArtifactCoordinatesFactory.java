@@ -25,6 +25,7 @@ import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.ArtifactCoordinatesFactory;
 import org.apache.maven.api.services.ArtifactCoordinatesFactoryRequest;
 import org.eclipse.aether.artifact.ArtifactType;
+import org.eclipse.aether.artifact.DefaultArtifact;
 
 import static java.util.Objects.requireNonNull;
 
@@ -37,7 +38,7 @@ public class DefaultArtifactCoordinatesFactory implements ArtifactCoordinatesFac
         InternalSession session = InternalSession.from(request.getSession());
         if (request.getCoordinatesString() != null) {
             return new DefaultArtifactCoordinates(
-                    session, new org.eclipse.aether.artifact.DefaultArtifact(request.getCoordinatesString()));
+                    session, new DefaultArtifact(request.getCoordinatesString()));
         } else {
             ArtifactType type = null;
             if (request.getType() != null) {
@@ -52,7 +53,7 @@ public class DefaultArtifactCoordinatesFactory implements ArtifactCoordinatesFac
                     str != null && !str.isEmpty() ? request.getExtension() : type != null ? type.getExtension() : "";
             return new DefaultArtifactCoordinates(
                     session,
-                    new org.eclipse.aether.artifact.DefaultArtifact(
+                    new DefaultArtifact(
                             request.getGroupId(),
                             request.getArtifactId(),
                             classifier,

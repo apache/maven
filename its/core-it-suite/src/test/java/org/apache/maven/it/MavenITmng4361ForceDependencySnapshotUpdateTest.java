@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
@@ -81,6 +82,6 @@ public class MavenITmng4361ForceDependencySnapshotUpdateTest extends AbstractMav
     }
 
     private void assertChecksum(String checksum, String jar, Properties checksums) {
-        assertEquals(checksum, checksums.getProperty(jar, "").toLowerCase(java.util.Locale.ENGLISH));
+        assertEquals(checksum, checksums.getProperty(jar, "").toLowerCase(Locale.ENGLISH));
     }
 }

@@ -133,7 +133,7 @@ class DefaultModelResolverTest {
                 .version("(,2.0)")
                 .build();
 
-        AtomicReference<org.apache.maven.api.model.Parent> modified = new AtomicReference<>();
+        AtomicReference<Parent> modified = new AtomicReference<>();
         assertNotNull(this.newModelResolver().resolveModel(session, null, parent, modified));
         assertEquals("1", modified.get().getVersion());
     }
@@ -204,7 +204,7 @@ class DefaultModelResolverTest {
                 .version("(,2.0)")
                 .build();
 
-        AtomicReference<org.apache.maven.api.model.Dependency> modified = new AtomicReference<>();
+        AtomicReference<Dependency> modified = new AtomicReference<>();
         assertNotNull(this.newModelResolver().resolveModel(session, null, dependency, modified));
         assertEquals("1", modified.get().getVersion());
     }

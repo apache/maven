@@ -18,8 +18,7 @@
  */
 package org.apache.maven.impl.cache;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 
 import org.apache.maven.api.ProtoSession;
@@ -199,12 +198,12 @@ class AbstractRequestCacheTest {
                 return false;
             }
             TestRequestImpl that = (TestRequestImpl) obj;
-            return java.util.Objects.equals(id, that.id);
+            return Objects.equals(id, that.id);
         }
 
         @Override
         public int hashCode() {
-            return java.util.Objects.hash(id);
+            return Objects.hash(id);
         }
 
         @Override
@@ -229,7 +228,7 @@ class AbstractRequestCacheTest {
     }
 
     static class TestRequestCache extends AbstractRequestCache {
-        private final java.util.Map<TestRequest, RuntimeException> failures = new java.util.HashMap<>();
+        private final Map<TestRequest, RuntimeException> failures = new HashMap<>();
 
         void addFailure(TestRequest request, RuntimeException exception) {
             failures.put(request, exception);

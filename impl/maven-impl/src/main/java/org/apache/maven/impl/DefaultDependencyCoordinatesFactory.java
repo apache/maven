@@ -26,6 +26,8 @@ import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.DependencyCoordinatesFactory;
 import org.apache.maven.api.services.DependencyCoordinatesFactoryRequest;
 import org.eclipse.aether.artifact.ArtifactType;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.graph.Dependency;
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.maven.impl.ImplUtils.map;
@@ -47,16 +49,16 @@ public class DefaultDependencyCoordinatesFactory implements DependencyCoordinate
         if (request.getCoordinatesString() != null) {
             return new DefaultDependencyCoordinates(
                     session,
-                    new org.eclipse.aether.graph.Dependency(
-                            new org.eclipse.aether.artifact.DefaultArtifact(request.getCoordinatesString()),
+                    new Dependency(
+                            new DefaultArtifact(request.getCoordinatesString()),
                             request.getScope(),
                             request.isOptional(),
                             map(request.getExclusions(), this::toExclusion)));
         } else {
             return new DefaultDependencyCoordinates(
                     session,
-                    new org.eclipse.aether.graph.Dependency(
-                            new org.eclipse.aether.artifact.DefaultArtifact(
+                    new Dependency(
+                            new DefaultArtifact(
                                     request.getGroupId(),
                                     request.getArtifactId(),
                                     request.getClassifier(),

@@ -20,6 +20,8 @@ package org.fusesource.jansi;
 
 import java.util.ArrayList;
 
+import org.apache.maven.jline.MessageUtils;
+
 /**
  * Provides a fluent API for generating
  * <a href="https://en.wikipedia.org/wiki/ANSI_escape_code#CSI_sequences">ANSI escape sequences</a>.
@@ -161,7 +163,7 @@ public class Ansi implements Appendable {
     }
 
     public static boolean isEnabled() {
-        return org.apache.maven.jline.MessageUtils.isColorEnabled() && org.jline.jansi.Ansi.isEnabled();
+        return MessageUtils.isColorEnabled() && org.jline.jansi.Ansi.isEnabled();
     }
 
     public static void setEnabled(final boolean flag) {

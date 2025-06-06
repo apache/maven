@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.util.Locale;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -83,6 +84,6 @@ public class MavenITmng4400RepositoryOrderTest extends AbstractMavenIntegrationT
     }
 
     private void assertChecksum(String checksum, Properties checksums) {
-        assertEquals(checksum, checksums.getProperty("dep-0.1.jar").toLowerCase(java.util.Locale.ENGLISH));
+        assertEquals(checksum, checksums.getProperty("dep-0.1.jar").toLowerCase(Locale.ENGLISH));
     }
 }

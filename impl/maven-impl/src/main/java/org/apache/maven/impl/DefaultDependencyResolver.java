@@ -54,6 +54,7 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.collection.CollectResult;
 import org.eclipse.aether.collection.DependencyCollectionException;
+import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.scope.ResolutionScope;
@@ -154,7 +155,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
         Set<String> scopes =
                 scope.dependencyScopes().stream().map(DependencyScope::id).collect(Collectors.toSet());
         return (n, p) -> {
-            org.eclipse.aether.graph.Dependency d = n.getDependency();
+            Dependency d = n.getDependency();
             return d == null || scopes.contains(d.getScope());
         };
     }

@@ -26,6 +26,7 @@ import java.util.function.UnaryOperator;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.api.services.Interpolator;
@@ -284,7 +285,7 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
         public static final String AT_FILE = "af";
 
         @Override
-        protected void prepareOptions(org.apache.commons.cli.Options options) {
+        protected void prepareOptions(Options options) {
             super.prepareOptions(options);
             options.addOption(Option.builder(ALTERNATE_POM_FILE)
                     .longOpt("file")

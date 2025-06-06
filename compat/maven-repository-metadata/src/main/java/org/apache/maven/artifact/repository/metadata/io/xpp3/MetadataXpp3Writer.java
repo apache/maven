@@ -60,7 +60,7 @@ public class MetadataXpp3Writer {
      * @param metadata a Metadata object
      * @throws java.io.IOException java.io.IOException if any
      */
-    public void write(Writer writer, Metadata metadata) throws java.io.IOException {
+    public void write(Writer writer, Metadata metadata) throws IOException {
         try {
             delegate.write(writer, metadata.getDelegate());
         } catch (XMLStreamException e) {
@@ -75,7 +75,7 @@ public class MetadataXpp3Writer {
      * @param metadata a Metadata object
      * @throws java.io.IOException java.io.IOException if any
      */
-    public void write(OutputStream stream, Metadata metadata) throws java.io.IOException {
+    public void write(OutputStream stream, Metadata metadata) throws IOException {
         try {
             delegate.write(stream, metadata.getDelegate());
         } catch (XMLStreamException e) {

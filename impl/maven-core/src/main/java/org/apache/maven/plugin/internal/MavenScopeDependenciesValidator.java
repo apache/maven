@@ -29,6 +29,7 @@ import org.apache.maven.api.DependencyScope;
 import org.apache.maven.plugin.PluginValidationManager;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 
 /**
@@ -52,7 +53,7 @@ class MavenScopeDependenciesValidator extends AbstractMavenPluginDependenciesVal
             ArtifactDescriptorResult artifactDescriptorResult) {
         Set<String> mavenArtifacts = artifactDescriptorResult.getDependencies().stream()
                 .filter(d -> !DependencyScope.PROVIDED.is(d.getScope()) && !DependencyScope.TEST.is(d.getScope()))
-                .map(org.eclipse.aether.graph.Dependency::getArtifact)
+                .map(Dependency::getArtifact)
                 .filter(a -> "org.apache.maven".equals(a.getGroupId()))
                 .filter(a -> !DefaultPluginValidationManager.EXPECTED_PROVIDED_SCOPE_EXCLUSIONS_GA.contains(
                         a.getGroupId() + ":" + a.getArtifactId()))

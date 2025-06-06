@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.util.Locale;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -72,6 +73,6 @@ public class MavenITmng4281PreferLocalSnapshotTest extends AbstractMavenIntegrat
 
     private void assertChecksum(String checksum, Properties checksums) {
         String actual = checksums.getProperty("dependency-0.1-SNAPSHOT.jar");
-        assertEquals(checksum, actual.toLowerCase(java.util.Locale.ENGLISH));
+        assertEquals(checksum, actual.toLowerCase(Locale.ENGLISH));
     }
 }

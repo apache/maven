@@ -37,7 +37,7 @@ import static java.util.Objects.requireNonNull;
 @Named
 @Singleton
 public class DefaultTransportProvider implements TransportProvider {
-    private final org.eclipse.aether.spi.connector.transport.TransporterProvider transporterProvider;
+    private final TransporterProvider transporterProvider;
 
     @Inject
     public DefaultTransportProvider(TransporterProvider transporterProvider) {
