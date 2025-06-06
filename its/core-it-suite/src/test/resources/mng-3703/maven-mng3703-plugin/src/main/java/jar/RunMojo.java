@@ -43,6 +43,7 @@ import org.apache.maven.project.MavenProject;
  */
 public class RunMojo extends AbstractCheckMojo {
 
+    @Override
     public void execute() throws MojoExecutionException {
         if (forkHasRun) {
             getLog().info("Not running inside a forked execution; skipping this mojo's execution.");
@@ -52,10 +53,12 @@ public class RunMojo extends AbstractCheckMojo {
         super.execute();
     }
 
+    @Override
     protected MavenProject getTestProject() {
         return getMainProject();
     }
 
+    @Override
     protected String getTestProjectLabel() {
         return "main-project";
     }

@@ -285,6 +285,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
             return value.hashCode();
         }
 
+        @Override
         public String toString() {
             return value.toString();
         }
@@ -415,6 +416,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
             return value.hashCode();
         }
 
+        @Override
         public String toString() {
             return value;
         }

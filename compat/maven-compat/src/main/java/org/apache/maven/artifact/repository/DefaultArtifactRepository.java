@@ -113,54 +113,67 @@ public class DefaultArtifactRepository extends Repository implements ArtifactRep
         this.releases = releases;
     }
 
+    @Override
     public String pathOf(Artifact artifact) {
         return layout.pathOf(artifact);
     }
 
+    @Override
     public String pathOfRemoteRepositoryMetadata(ArtifactMetadata artifactMetadata) {
         return layout.pathOfRemoteRepositoryMetadata(artifactMetadata);
     }
 
+    @Override
     public String pathOfLocalRepositoryMetadata(ArtifactMetadata metadata, ArtifactRepository repository) {
         return layout.pathOfLocalRepositoryMetadata(metadata, repository);
     }
 
+    @Override
     public void setLayout(ArtifactRepositoryLayout layout) {
         this.layout = layout;
     }
 
+    @Override
     public ArtifactRepositoryLayout getLayout() {
         return layout;
     }
 
+    @Override
     public void setSnapshotUpdatePolicy(ArtifactRepositoryPolicy snapshots) {
         this.snapshots = snapshots;
     }
 
+    @Override
     public ArtifactRepositoryPolicy getSnapshots() {
         return snapshots;
     }
 
+    @Override
     public void setReleaseUpdatePolicy(ArtifactRepositoryPolicy releases) {
         this.releases = releases;
     }
 
+    @Override
     public ArtifactRepositoryPolicy getReleases() {
         return releases;
     }
 
+    @Override
     public String getKey() {
         return getId();
     }
 
+    @Override
     public boolean isBlacklisted() {
         return blacklisted;
     }
 
+    @Override
     public void setBlacklisted(boolean blacklisted) {
         this.blacklisted = blacklisted;
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(256);
 
@@ -181,6 +194,7 @@ public class DefaultArtifactRepository extends Repository implements ArtifactRep
         return sb.toString();
     }
 
+    @Override
     public Artifact find(Artifact artifact) {
         File artifactFile = new File(getBasedir(), pathOf(artifact));
 
@@ -195,38 +209,47 @@ public class DefaultArtifactRepository extends Repository implements ArtifactRep
         return artifact;
     }
 
+    @Override
     public List<String> findVersions(Artifact artifact) {
         return Collections.emptyList();
     }
 
+    @Override
     public boolean isProjectAware() {
         return false;
     }
 
+    @Override
     public Authentication getAuthentication() {
         return authentication;
     }
 
+    @Override
     public void setAuthentication(Authentication authentication) {
         this.authentication = authentication;
     }
 
+    @Override
     public Proxy getProxy() {
         return proxy;
     }
 
+    @Override
     public void setProxy(Proxy proxy) {
         this.proxy = proxy;
     }
 
+    @Override
     public boolean isUniqueVersion() {
         return true;
     }
 
+    @Override
     public List<ArtifactRepository> getMirroredRepositories() {
         return mirroredRepositories;
     }
 
+    @Override
     public void setMirroredRepositories(List<ArtifactRepository> mirroredRepositories) {
         if (mirroredRepositories != null) {
             this.mirroredRepositories = Collections.unmodifiableList(mirroredRepositories);
@@ -235,10 +258,12 @@ public class DefaultArtifactRepository extends Repository implements ArtifactRep
         }
     }
 
+    @Override
     public boolean isBlocked() {
         return blocked;
     }
 
+    @Override
     public void setBlocked(boolean blocked) {
         this.blocked = blocked;
     }

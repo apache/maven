@@ -55,8 +55,10 @@ public class TransferListenerAdapter implements TransferListener {
         this.transfers = new IdentityHashMap<>();
     }
 
+    @Override
     public void debug(String message) {}
 
+    @Override
     public void transferCompleted(TransferEvent transferEvent) {
         ArtifactTransferEvent event = wrap(transferEvent);
 
@@ -75,6 +77,7 @@ public class TransferListenerAdapter implements TransferListener {
         listener.transferCompleted(event);
     }
 
+    @Override
     public void transferError(TransferEvent transferEvent) {
         synchronized (transfers) {
             transfers.remove(transferEvent.getResource());
@@ -84,10 +87,12 @@ public class TransferListenerAdapter implements TransferListener {
         }
     }
 
+    @Override
     public void transferInitiated(TransferEvent transferEvent) {
         listener.transferInitiated(wrap(transferEvent));
     }
 
+    @Override
     public void transferProgress(TransferEvent transferEvent, byte[] buffer, int length) {
         Long transferred;
         synchronized (transfers) {
@@ -109,6 +114,7 @@ public class TransferListenerAdapter implements TransferListener {
         listener.transferProgress(event);
     }
 
+    @Override
     public void transferStarted(TransferEvent transferEvent) {
         listener.transferStarted(wrap(transferEvent));
     }

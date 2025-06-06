@@ -108,10 +108,12 @@ public class DefaultExtensionRealmCache implements ExtensionRealmCache, Disposab
         return new CacheKey(extensionArtifacts);
     }
 
+    @Override
     public CacheRecord get(Key key) {
         return cache.get(key);
     }
 
+    @Override
     public CacheRecord put(
             Key key, ClassRealm extensionRealm, ExtensionDescriptor extensionDescriptor, List<Artifact> artifacts) {
         Objects.requireNonNull(extensionRealm, "extensionRealm cannot be null");
@@ -127,6 +129,7 @@ public class DefaultExtensionRealmCache implements ExtensionRealmCache, Disposab
         return record;
     }
 
+    @Override
     public void flush() {
         for (CacheRecord record : cache.values()) {
             ClassRealm realm = record.getRealm();
@@ -139,10 +142,12 @@ public class DefaultExtensionRealmCache implements ExtensionRealmCache, Disposab
         cache.clear();
     }
 
+    @Override
     public void register(MavenProject project, Key key, CacheRecord record) {
         // default cache does not track extension usage
     }
 
+    @Override
     public void dispose() {
         flush();
     }

@@ -34,25 +34,36 @@ public class WarningResolutionListener implements ResolutionListener {
         this.logger = logger;
     }
 
+    @Override
     public void testArtifact(Artifact node) {}
 
+    @Override
     public void startProcessChildren(Artifact artifact) {}
 
+    @Override
     public void endProcessChildren(Artifact artifact) {}
 
+    @Override
     public void includeArtifact(Artifact artifact) {}
 
+    @Override
     public void omitForNearer(Artifact omitted, Artifact kept) {}
 
+    @Override
     public void omitForCycle(Artifact omitted) {}
 
+    @Override
     public void updateScopeCurrentPom(Artifact artifact, String scope) {}
 
+    @Override
     public void updateScope(Artifact artifact, String scope) {}
 
+    @Override
     public void manageArtifact(Artifact artifact, Artifact replacement) {}
 
+    @Override
     public void selectVersionFromRange(Artifact artifact) {}
 
+    @Override
     public void restrictRange(Artifact artifact, Artifact replacement, VersionRange newRange) {}
 }

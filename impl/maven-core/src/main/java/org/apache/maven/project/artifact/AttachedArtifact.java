@@ -70,97 +70,118 @@ public class AttachedArtifact extends DefaultArtifact {
         this(parent, type, null, artifactHandler);
     }
 
+    @Override
     public void setArtifactId(String artifactId) {
         throw new UnsupportedOperationException(
                 "Cannot change the artifactId for an attached artifact." + " It is derived from the main artifact.");
     }
 
+    @Override
     public List<ArtifactVersion> getAvailableVersions() {
         return parent.getAvailableVersions();
     }
 
+    @Override
     public void setAvailableVersions(List<ArtifactVersion> availableVersions) {
         throw new UnsupportedOperationException("Cannot change the version information for an attached artifact."
                 + " It is derived from the main artifact.");
     }
 
+    @Override
     public String getBaseVersion() {
         return parent.getBaseVersion();
     }
 
+    @Override
     public void setBaseVersion(String baseVersion) {
         throw new UnsupportedOperationException("Cannot change the version information for an attached artifact."
                 + " It is derived from the main artifact.");
     }
 
+    @Override
     public String getDownloadUrl() {
         return parent.getDownloadUrl();
     }
 
+    @Override
     public void setDownloadUrl(String downloadUrl) {
         throw new UnsupportedOperationException("Cannot change the download information for an attached artifact."
                 + " It is derived from the main artifact.");
     }
 
+    @Override
     public void setGroupId(String groupId) {
         throw new UnsupportedOperationException(
                 "Cannot change the groupId for an attached artifact." + " It is derived from the main artifact.");
     }
 
+    @Override
     public ArtifactRepository getRepository() {
         return parent.getRepository();
     }
 
+    @Override
     public void setRepository(ArtifactRepository repository) {
         throw new UnsupportedOperationException("Cannot change the repository information for an attached artifact."
                 + " It is derived from the main artifact.");
     }
 
+    @Override
     public String getScope() {
         return parent.getScope();
     }
 
+    @Override
     public void setScope(String scope) {
         throw new UnsupportedOperationException("Cannot change the scoping information for an attached artifact."
                 + " It is derived from the main artifact.");
     }
 
+    @Override
     public String getVersion() {
         return parent.getVersion();
     }
 
+    @Override
     public void setVersion(String version) {
         throw new UnsupportedOperationException("Cannot change the version information for an attached artifact."
                 + " It is derived from the main artifact.");
     }
 
+    @Override
     public VersionRange getVersionRange() {
         return parent.getVersionRange();
     }
 
+    @Override
     public void setVersionRange(VersionRange range) {
         throw new UnsupportedOperationException("Cannot change the version information for an attached artifact."
                 + " It is derived from the main artifact.");
     }
 
+    @Override
     public boolean isRelease() {
         return parent.isRelease();
     }
 
+    @Override
     public void setRelease(boolean release) {
         throw new UnsupportedOperationException("Cannot change the version information for an attached artifact."
                 + " It is derived from the main artifact.");
     }
 
+    @Override
     public boolean isSnapshot() {
         return parent.isSnapshot();
     }
 
+    @Override
     public void addMetadata(ArtifactMetadata metadata) {
         // ignore. The parent artifact will handle metadata.
         // we must fail silently here to avoid problems with the artifact transformers.
     }
 
+    @Override
     public Collection<ArtifactMetadata> getMetadataList() {
         return Collections.emptyList();
     }

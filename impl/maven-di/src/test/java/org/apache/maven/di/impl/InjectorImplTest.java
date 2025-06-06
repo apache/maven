@@ -202,6 +202,20 @@ public class InjectorImplTest {
         assertNotSame(services.get(0).getClass(), services.get(1).getClass());
     }
 
+    @Test
+    void injectListWithPriorityTest() {
+        Injector injector = Injector.create().bindImplicit(InjectListWithPriority.class);
+        List<InjectListWithPriority.MyService> services =
+                injector.getInstance(new Key<List<InjectListWithPriority.MyService>>() {});
+        assertNotNull(services);
+        assertEquals(3, services.size());
+
+        // Verify services are ordered by priority (highest first)
+        assertInstanceOf(InjectListWithPriority.HighPriorityServiceImpl.class, services.get(0));
+        assertInstanceOf(InjectListWithPriority.MediumPriorityServiceImpl.class, services.get(1));
+        assertInstanceOf(InjectListWithPriority.LowPriorityServiceImpl.class, services.get(2));
+    }
+
     static class InjectList {
 
         interface MyService {}
@@ -211,6 +225,23 @@ public class InjectorImplTest {
 
         @Named("bar")
         static class AnotherServiceImpl implements MyService {}
+    }
+
+    static class InjectListWithPriority {
+
+        interface MyService {}
+
+        @Named
+        @Priority(100)
+        static class HighPriorityServiceImpl implements MyService {}
+
+        @Named
+        @Priority(50)
+        static class MediumPriorityServiceImpl implements MyService {}
+
+        @Named
+        @Priority(10)
+        static class LowPriorityServiceImpl implements MyService {}
     }
 
     @Test
@@ -392,6 +423,25 @@ public class InjectorImplTest {
                 .hasMessageContaining("MyService");
     }
 
+    @Test
+    void testListInjectionWithMixedPriorities() {
+        Injector injector = Injector.create().bindImplicit(MixedPriorityTest.class);
+        List<MixedPriorityTest.MyService> services =
+                injector.getInstance(new Key<List<MixedPriorityTest.MyService>>() {});
+        assertNotNull(services);
+        assertEquals(4, services.size());
+
+        // Verify services are ordered by priority (highest first)
+        // Priority 200 (highest)
+        assertInstanceOf(MixedPriorityTest.VeryHighPriorityServiceImpl.class, services.get(0));
+        // Priority 100
+        assertInstanceOf(MixedPriorityTest.HighPriorityServiceImpl.class, services.get(1));
+        // Priority 50
+        assertInstanceOf(MixedPriorityTest.MediumPriorityServiceImpl.class, services.get(2));
+        // No priority annotation (default 0)
+        assertInstanceOf(MixedPriorityTest.DefaultPriorityServiceImpl.class, services.get(3));
+    }
+
     static class CircularPriorityTest {
         interface MyService {}
 
@@ -404,5 +454,25 @@ public class InjectorImplTest {
             @Inject
             MyService defaultService; // This tries to inject the default implementation
         }
+    }
+
+    static class MixedPriorityTest {
+
+        interface MyService {}
+
+        @Named
+        @Priority(200)
+        static class VeryHighPriorityServiceImpl implements MyService {}
+
+        @Named
+        @Priority(100)
+        static class HighPriorityServiceImpl implements MyService {}
+
+        @Named
+        @Priority(50)
+        static class MediumPriorityServiceImpl implements MyService {}
+
+        @Named
+        static class DefaultPriorityServiceImpl implements MyService {}
     }
 }

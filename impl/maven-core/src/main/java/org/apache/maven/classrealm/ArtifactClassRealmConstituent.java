@@ -32,26 +32,32 @@ class ArtifactClassRealmConstituent implements ClassRealmConstituent {
         this.artifact = artifact;
     }
 
+    @Override
     public String getGroupId() {
         return artifact.getGroupId();
     }
 
+    @Override
     public String getArtifactId() {
         return artifact.getArtifactId();
     }
 
+    @Override
     public String getType() {
         return artifact.getExtension();
     }
 
+    @Override
     public String getClassifier() {
         return artifact.getClassifier();
     }
 
+    @Override
     public String getVersion() {
         return artifact.getBaseVersion();
     }
 
+    @Override
     public File getFile() {
         return artifact.getFile();
     }

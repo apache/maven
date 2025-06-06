@@ -100,27 +100,33 @@ public class DefaultProjectBuildingRequest implements ProjectBuildingRequest {
         setRepositoryMerging(request.getRepositoryMerging());
     }
 
+    @Override
     public MavenProject getProject() {
         return project;
     }
 
+    @Override
     public void setProject(MavenProject mavenProject) {
         this.project = mavenProject;
     }
 
+    @Override
     public ProjectBuildingRequest setLocalRepository(ArtifactRepository localRepository) {
         this.localRepository = localRepository;
         return this;
     }
 
+    @Override
     public ArtifactRepository getLocalRepository() {
         return localRepository;
     }
 
+    @Override
     public List<ArtifactRepository> getRemoteRepositories() {
         return remoteRepositories;
     }
 
+    @Override
     public ProjectBuildingRequest setRemoteRepositories(List<ArtifactRepository> remoteRepositories) {
         if (remoteRepositories != null) {
             this.remoteRepositories = new ArrayList<>(remoteRepositories);
@@ -131,10 +137,12 @@ public class DefaultProjectBuildingRequest implements ProjectBuildingRequest {
         return this;
     }
 
+    @Override
     public List<ArtifactRepository> getPluginArtifactRepositories() {
         return pluginArtifactRepositories;
     }
 
+    @Override
     public ProjectBuildingRequest setPluginArtifactRepositories(List<ArtifactRepository> pluginArtifactRepositories) {
         if (pluginArtifactRepositories != null) {
             this.pluginArtifactRepositories = new ArrayList<>(pluginArtifactRepositories);
@@ -145,10 +153,12 @@ public class DefaultProjectBuildingRequest implements ProjectBuildingRequest {
         return this;
     }
 
+    @Override
     public Properties getSystemProperties() {
         return systemProperties;
     }
 
+    @Override
     public ProjectBuildingRequest setSystemProperties(Properties systemProperties) {
         if (systemProperties != null) {
             this.systemProperties = SystemProperties.copyProperties(systemProperties);
@@ -159,10 +169,12 @@ public class DefaultProjectBuildingRequest implements ProjectBuildingRequest {
         return this;
     }
 
+    @Override
     public Properties getUserProperties() {
         return userProperties;
     }
 
+    @Override
     public ProjectBuildingRequest setUserProperties(Properties userProperties) {
         if (userProperties != null) {
             this.userProperties = new Properties();
@@ -174,20 +186,24 @@ public class DefaultProjectBuildingRequest implements ProjectBuildingRequest {
         return this;
     }
 
+    @Override
     public boolean isProcessPlugins() {
         return processPlugins;
     }
 
+    @Override
     public ProjectBuildingRequest setProcessPlugins(boolean processPlugins) {
         this.processPlugins = processPlugins;
         return this;
     }
 
+    @Override
     public ProjectBuildingRequest setResolveDependencies(boolean resolveDependencies) {
         this.resolveDependencies = resolveDependencies;
         return this;
     }
 
+    @Override
     public boolean isResolveDependencies() {
         return resolveDependencies;
     }
@@ -198,6 +214,7 @@ public class DefaultProjectBuildingRequest implements ProjectBuildingRequest {
      * Commit 6cf9320942c34bc68205425ab696b1712ace9ba4 updated the way 'MavenProject' objects are initialized.
      */
     @Deprecated
+    @Override
     public ProjectBuildingRequest setResolveVersionRanges(boolean value) {
         this.resolveVersionRanges = value;
         return this;
@@ -209,23 +226,28 @@ public class DefaultProjectBuildingRequest implements ProjectBuildingRequest {
      * Commit 6cf9320942c34bc68205425ab696b1712ace9ba4 updated the way 'MavenProject' objects are initialized.
      */
     @Deprecated
+    @Override
     public boolean isResolveVersionRanges() {
         return this.resolveVersionRanges;
     }
 
+    @Override
     public ProjectBuildingRequest setValidationLevel(int validationLevel) {
         this.validationLevel = validationLevel;
         return this;
     }
 
+    @Override
     public int getValidationLevel() {
         return validationLevel;
     }
 
+    @Override
     public List<String> getActiveProfileIds() {
         return activeProfileIds;
     }
 
+    @Override
     public void setActiveProfileIds(List<String> activeProfileIds) {
         if (activeProfileIds != null) {
             this.activeProfileIds = new ArrayList<>(activeProfileIds);
@@ -234,10 +256,12 @@ public class DefaultProjectBuildingRequest implements ProjectBuildingRequest {
         }
     }
 
+    @Override
     public List<String> getInactiveProfileIds() {
         return inactiveProfileIds;
     }
 
+    @Override
     public void setInactiveProfileIds(List<String> inactiveProfileIds) {
         if (inactiveProfileIds != null) {
             this.inactiveProfileIds = new ArrayList<>(inactiveProfileIds);
@@ -246,6 +270,7 @@ public class DefaultProjectBuildingRequest implements ProjectBuildingRequest {
         }
     }
 
+    @Override
     public void setProfiles(List<Profile> profiles) {
         if (profiles != null) {
             this.profiles = new ArrayList<>(profiles);
@@ -254,46 +279,56 @@ public class DefaultProjectBuildingRequest implements ProjectBuildingRequest {
         }
     }
 
+    @Override
     public void addProfile(Profile profile) {
         profiles.add(profile);
     }
 
+    @Override
     public List<Profile> getProfiles() {
         return profiles;
     }
 
     @Deprecated
+    @Override
     public Date getBuildStartTime() {
         return buildStartTime != null ? new Date(buildStartTime.toEpochMilli()) : null;
     }
 
     @Deprecated
+    @Override
     public void setBuildStartTime(Date buildStartTime) {
         setBuildStartInstant(buildStartTime != null ? Instant.ofEpochMilli(buildStartTime.getTime()) : null);
     }
 
+    @Override
     public Instant getBuildStartInstant() {
         return this.buildStartTime;
     }
 
+    @Override
     public void setBuildStartInstant(Instant buildStartTime) {
         this.buildStartTime = buildStartTime;
     }
 
+    @Override
     public RepositorySystemSession getRepositorySession() {
         return repositorySession;
     }
 
+    @Override
     public DefaultProjectBuildingRequest setRepositorySession(RepositorySystemSession repositorySession) {
         this.repositorySession = repositorySession;
         return this;
     }
 
+    @Override
     public DefaultProjectBuildingRequest setRepositoryMerging(RepositoryMerging repositoryMerging) {
         this.repositoryMerging = Objects.requireNonNull(repositoryMerging, "repositoryMerging cannot be null");
         return this;
     }
 
+    @Override
     public RepositoryMerging getRepositoryMerging() {
         return repositoryMerging;
     }

@@ -64,5 +64,6 @@ public interface EncryptOptions extends Options {
      * @return a new EncryptOptions instance with interpolated values
      */
     @Nonnull
+    @Override
     EncryptOptions interpolate(UnaryOperator<String> callback);
 }

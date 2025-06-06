@@ -47,10 +47,12 @@ public class PluginArtifact extends DefaultArtifact implements ArtifactWithDepen
         setResolved(true);
     }
 
+    @Override
     public List<Dependency> getDependencies() {
         return plugin.getDependencies();
     }
 
+    @Override
     public List<Dependency> getManagedDependencies() {
         return Collections.emptyList();
     }

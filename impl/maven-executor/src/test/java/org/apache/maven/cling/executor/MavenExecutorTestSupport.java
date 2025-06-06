@@ -32,15 +32,16 @@ import org.apache.maven.api.cli.ExecutorRequest;
 import org.apache.maven.cling.executor.embedded.EmbeddedMavenExecutor;
 import org.apache.maven.cling.executor.forked.ForkedMavenExecutor;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.condition.OS.WINDOWS;
 
 public abstract class MavenExecutorTestSupport {
     @Timeout(15)
@@ -63,7 +64,9 @@ public abstract class MavenExecutorTestSupport {
         System.out.println(Files.readString(cwd.resolve(logfile)));
     }
 
-    @Disabled("JUnit on Windows fails to clean up as mvn3 seems does not close log file properly")
+    @DisabledOnOs(
+            value = WINDOWS,
+            disabledReason = "JUnit on Windows fails to clean up as mvn3 does not close log file properly")
     @Timeout(15)
     @Test
     void dump3(
@@ -126,7 +129,9 @@ public abstract class MavenExecutorTestSupport {
                 mavenVersion(mvn4ExecutorRequestBuilder().build()));
     }
 
-    @Disabled("JUnit on Windows fails to clean up as mvn3 seems does not close log file properly")
+    @DisabledOnOs(
+            value = WINDOWS,
+            disabledReason = "JUnit on Windows fails to clean up as mvn3 does not close log file properly")
     @Timeout(15)
     @Test
     void defaultFs3x(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {

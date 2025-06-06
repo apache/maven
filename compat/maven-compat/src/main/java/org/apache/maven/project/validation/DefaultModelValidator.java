@@ -39,6 +39,7 @@ public class DefaultModelValidator implements ModelValidator {
     @Inject
     private org.apache.maven.model.validation.ModelValidator modelValidator;
 
+    @Override
     public ModelValidationResult validate(Model model) {
         ModelValidationResult result = new ModelValidationResult();
 
@@ -60,6 +61,7 @@ public class DefaultModelValidator implements ModelValidator {
             this.result = result;
         }
 
+        @Override
         public void add(ModelProblemCollectorRequest req) {
             if (!ModelProblem.Severity.WARNING.equals(req.getSeverity())) {
                 result.addMessage(req.getMessage());

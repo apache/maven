@@ -27,7 +27,9 @@ import org.apache.maven.plugin.MojoExecution;
  */
 public class ExecutionEventCatapultStub implements ExecutionEventCatapult {
 
+    @Override
     public void fire(Type eventType, MavenSession session, MojoExecution mojoExecution) {}
 
+    @Override
     public void fire(Type eventType, MavenSession session, MojoExecution mojoExecution, Exception exception) {}
 }

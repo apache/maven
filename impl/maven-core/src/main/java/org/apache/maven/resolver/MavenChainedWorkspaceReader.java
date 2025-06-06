@@ -138,6 +138,7 @@ public class MavenChainedWorkspaceReader implements MavenWorkspaceReader {
             return type;
         }
 
+        @Override
         public boolean equals(Object obj) {
             if (this == obj) {
                 return true;
@@ -146,6 +147,7 @@ public class MavenChainedWorkspaceReader implements MavenWorkspaceReader {
             }
         }
 
+        @Override
         public int hashCode() {
             return this.keys.hashCode();
         }

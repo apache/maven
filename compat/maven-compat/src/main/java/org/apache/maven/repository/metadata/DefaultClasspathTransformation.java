@@ -41,6 +41,7 @@ public class DefaultClasspathTransformation implements ClasspathTransformation {
     GraphConflictResolver conflictResolver;
 
     // ----------------------------------------------------------------------------------------------------
+    @Override
     public ClasspathContainer transform(MetadataGraph dirtyGraph, ArtifactScopeEnum scope, boolean resolve)
             throws MetadataGraphTransformationException {
         try {

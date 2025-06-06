@@ -58,6 +58,7 @@ import org.apache.maven.api.cache.CacheRetention;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
+import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
@@ -201,6 +202,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         this.rootLocator = rootLocator;
     }
 
+    @Override
     public ModelBuilderSession newSession() {
         return new ModelBuilderSessionImpl();
     }
@@ -419,11 +421,13 @@ public class DefaultModelBuilder implements ModelBuilder {
             return result.getProblemCollector();
         }
 
+        @Override
         public void setSource(String source) {
             this.source = source;
             this.sourceModel = null;
         }
 
+        @Override
         public void setSource(Model source) {
             this.sourceModel = source;
             this.source = null;
@@ -433,6 +437,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
 
+        @Override
         public String getSource() {
             if (source == null && sourceModel != null) {
                 source = ModelProblemUtils.toPath(sourceModel);
@@ -444,10 +449,12 @@ public class DefaultModelBuilder implements ModelBuilder {
             return ModelProblemUtils.toId(sourceModel);
         }
 
+        @Override
         public void setRootModel(Model rootModel) {
             this.rootModel = rootModel;
         }
 
+        @Override
         public Model getRootModel() {
             return rootModel;
         }
@@ -489,6 +496,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             add(problem);
         }
 
+        @Override
         public ModelBuilderException newModelBuilderException() {
             return new ModelBuilderException(result);
         }
@@ -819,6 +827,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             // effective model validation
             modelValidator.validateEffectiveModel(
+                    session,
                     resultModel,
                     isBuildRequest() ? ModelValidator.VALIDATION_LEVEL_STRICT : ModelValidator.VALIDATION_LEVEL_MINIMAL,
                     this);
@@ -846,7 +855,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 result.setParentModel(parentModel);
             } else {
                 String superModelVersion = childModel.getModelVersion();
-                if (superModelVersion == null || !VALID_MODEL_VERSIONS.contains(superModelVersion)) {
+                if (superModelVersion == null || !KNOWN_MODEL_VERSIONS.contains(superModelVersion)) {
                     // Maven 3.x is always using 4.0.0 version to load the supermodel, so
                     // do the same when loading a dependency.  The model validator will also
                     // check that field later.
@@ -1418,9 +1427,15 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             setSource(model);
             modelValidator.validateFileModel(
+                    session,
                     model,
                     isBuildRequest() ? ModelValidator.VALIDATION_LEVEL_STRICT : ModelValidator.VALIDATION_LEVEL_MINIMAL,
                     this);
+            InternalSession internalSession = InternalSession.from(session);
+            if (Features.mavenMaven3Personality(internalSession.getSession().getConfigProperties())
+                    && Objects.equals(ModelBuilder.MODEL_VERSION_4_1_0, model.getModelVersion())) {
+                add(Severity.FATAL, Version.BASE, "Maven3 mode: no higher model version than 4.0.0 allowed");
+            }
             if (hasFatalErrors()) {
                 throw newModelBuilderException();
             }
@@ -1500,6 +1515,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             modelValidator.validateRawModel(
+                    session,
                     rawModel,
                     isBuildRequest() ? ModelValidator.VALIDATION_LEVEL_STRICT : ModelValidator.VALIDATION_LEVEL_MINIMAL,
                     this);
@@ -2142,6 +2158,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 "checksumPolicy",
                 "updatePolicy");
 
+        @Override
         public String transform(String input, String context) {
             return CONTEXTS.contains(context) ? input.intern() : input;
         }

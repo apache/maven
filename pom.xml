@@ -112,8 +112,8 @@ under the License.
     <url>https://github.com/apache/maven/tree/${project.scm.tag}</url>
   </scm>
   <issueManagement>
-    <system>jira</system>
-    <url>https://issues.apache.org/jira/browse/MNG</url>
+    <system>GitHub Issues</system>
+    <url>https://github.com/apache/maven/issues</url>
   </issueManagement>
   <ciManagement>
     <system>Jenkins</system>
@@ -154,7 +154,7 @@ under the License.
     <jakartaInjectApiVersion>2.0.1</jakartaInjectApiVersion>
     <javaxAnnotationApiVersion>1.3.2</javaxAnnotationApiVersion>
     <jlineVersion>3.30.4</jlineVersion>
-    <junitVersion>5.12.2</junitVersion>
+    <junitVersion>5.13.0</junitVersion>
     <jxpathVersion>1.4.0</jxpathVersion>
     <logbackClassicVersion>1.5.18</logbackClassicVersion>
     <mockitoVersion>5.18.0</mockitoVersion>
@@ -752,7 +752,7 @@ under the License.</licenseText>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>build-helper-maven-plugin</artifactId>
-          <version>3.6.0</version>
+          <version>3.6.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -797,7 +797,7 @@ under the License.</licenseText>
             <dependency>
               <groupId>net.sourceforge.pmd</groupId>
               <artifactId>pmd-core</artifactId>
-              <version>7.13.0</version>
+              <version>7.14.0</version>
             </dependency>
           </dependencies>
         </plugin>

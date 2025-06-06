@@ -51,14 +51,17 @@ public class DefaultPluginDescriptorCache implements PluginDescriptorCache {
     private Map<Key, PluginDescriptor> descriptors = new ConcurrentHashMap<>(128);
     private Map<Key, Key> keys = new ConcurrentHashMap<>();
 
+    @Override
     public void flush() {
         descriptors.clear();
     }
 
+    @Override
     public Key createKey(Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session) {
         return keys.computeIfAbsent(new CacheKey(plugin, repositories, session), k -> k);
     }
 
+    @Override
     public PluginDescriptor get(Key cacheKey) {
         return clone(descriptors.get(cacheKey));
     }
@@ -80,6 +83,7 @@ public class DefaultPluginDescriptorCache implements PluginDescriptorCache {
         return clone(desc);
     }
 
+    @Override
     public void put(Key cacheKey, PluginDescriptor pluginDescriptor) {
         descriptors.put(cacheKey, clone(pluginDescriptor));
     }

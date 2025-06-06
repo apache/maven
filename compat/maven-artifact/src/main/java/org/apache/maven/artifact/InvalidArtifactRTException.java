@@ -49,6 +49,7 @@ public class InvalidArtifactRTException extends RuntimeException {
         this.baseMessage = message;
     }
 
+    @Override
     public String getMessage() {
         return "For artifact {" + getArtifactKey() + "}: " + getBaseMessage();
     }

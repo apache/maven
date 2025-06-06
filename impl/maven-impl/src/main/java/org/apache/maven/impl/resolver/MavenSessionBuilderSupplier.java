@@ -23,6 +23,7 @@ import java.util.function.Supplier;
 
 import org.apache.maven.api.DependencyScope;
 import org.apache.maven.impl.resolver.artifact.FatArtifactTraverser;
+import org.apache.maven.impl.resolver.scopes.Maven3ScopeManagerConfiguration;
 import org.apache.maven.impl.resolver.scopes.Maven4ScopeManagerConfiguration;
 import org.apache.maven.impl.resolver.type.DefaultTypeProvider;
 import org.eclipse.aether.RepositorySystem;
@@ -65,11 +66,16 @@ import static java.util.Objects.requireNonNull;
  */
 public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
     protected final RepositorySystem repositorySystem;
+    protected final boolean mavenMaven3Personality;
     protected final InternalScopeManager scopeManager;
 
-    public MavenSessionBuilderSupplier(RepositorySystem repositorySystem) {
+    public MavenSessionBuilderSupplier(RepositorySystem repositorySystem, boolean mavenMaven3Personality) {
         this.repositorySystem = requireNonNull(repositorySystem);
-        this.scopeManager = new ScopeManagerImpl(Maven4ScopeManagerConfiguration.INSTANCE);
+        this.mavenMaven3Personality = mavenMaven3Personality;
+        this.scopeManager = new ScopeManagerImpl(
+                mavenMaven3Personality
+                        ? Maven3ScopeManagerConfiguration.INSTANCE
+                        : Maven4ScopeManagerConfiguration.INSTANCE);
     }
 
     protected DependencyTraverser getDependencyTraverser() {
@@ -81,7 +87,7 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
     }
 
     protected DependencyManager getDependencyManager() {
-        return getDependencyManager(true); // same default as in Maven4
+        return getDependencyManager(!mavenMaven3Personality);
     }
 
     public DependencyManager getDependencyManager(boolean transitive) {
