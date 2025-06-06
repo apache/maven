@@ -47,6 +47,7 @@ public class PathInterpolationMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project}")
     private MavenProject project;
 
+    @Override
     public void execute() throws MojoExecutionException {
         try {
             Properties props = project.getProperties();

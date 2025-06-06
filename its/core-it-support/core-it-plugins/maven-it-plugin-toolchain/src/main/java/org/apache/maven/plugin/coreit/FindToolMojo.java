@@ -71,6 +71,7 @@ public class FindToolMojo extends AbstractMojo {
     @Parameter(property = "toolchain.tool")
     private String tool;
 
+    @Override
     public void execute() throws MojoExecutionException {
         Toolchain toolchain = toolchainManager.getToolchainFromBuildContext(type, session);
 

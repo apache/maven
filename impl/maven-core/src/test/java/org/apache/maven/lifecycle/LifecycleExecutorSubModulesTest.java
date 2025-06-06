@@ -60,6 +60,7 @@ class LifecycleExecutorSubModulesTest extends AbstractCoreMavenComponentTestCase
     @Inject
     private ExceptionHandler exceptionHandler;
 
+    @Override
     protected String getProjectsDirectory() {
         return "src/test/projects/lifecycle-executor";
     }

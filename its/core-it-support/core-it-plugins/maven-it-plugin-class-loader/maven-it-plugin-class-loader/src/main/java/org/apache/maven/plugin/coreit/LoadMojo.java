@@ -54,6 +54,7 @@ public class LoadMojo extends AbstractLoadMojo {
      *
      * @throws MojoExecutionException If the output file could not be created.
      */
+    @Override
     public void execute() throws MojoExecutionException {
         if (pluginClassLoaderOutput != null) {
             execute(pluginClassLoaderOutput, getClass().getClassLoader());

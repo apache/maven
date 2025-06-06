@@ -123,6 +123,7 @@ public class CustomConfigMojo extends AbstractMojo {
      *
      * @throws MojoExecutionException If the output file could not be created.
      */
+    @Override
     public void execute() throws MojoExecutionException {
         getLog().info("[MAVEN-CORE-IT-LOG] Using output file path: " + propertiesFile);
 

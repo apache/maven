@@ -116,6 +116,7 @@ public class DeployFileMojo extends AbstractMojo {
      *
      * @throws MojoExecutionException If any artifact could not be deployed.
      */
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         getLog().info("[MAVEN-CORE-IT-LOG] Deploying artifacts");
 

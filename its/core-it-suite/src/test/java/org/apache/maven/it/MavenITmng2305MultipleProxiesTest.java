@@ -137,6 +137,7 @@ public class MavenITmng2305MultipleProxiesTest extends AbstractMavenIntegrationT
     }
 
     static class RepoHandler extends AbstractHandler {
+        @Override
         public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
                 throws IOException {
             PrintWriter writer = response.getWriter();

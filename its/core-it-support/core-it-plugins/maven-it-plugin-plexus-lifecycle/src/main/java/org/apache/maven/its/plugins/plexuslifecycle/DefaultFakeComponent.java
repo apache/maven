@@ -33,14 +33,17 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 public class DefaultFakeComponent implements FakeComponent, Contextualizable, Disposable, LogEnabled {
     private Logger logger;
 
+    @Override
     public void enableLogging(Logger logger) {
         this.logger = logger;
     }
 
+    @Override
     public void contextualize(Context context) throws ContextException {
         logger.info("DefaultFakeComponent :: contextualize");
     }
 
+    @Override
     public void dispose() {
         logger.info("DefaultFakeComponent :: dispose");
     }

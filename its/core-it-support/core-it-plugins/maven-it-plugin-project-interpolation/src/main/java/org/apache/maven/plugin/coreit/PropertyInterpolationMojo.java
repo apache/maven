@@ -39,6 +39,7 @@ public class PropertyInterpolationMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project}")
     private MavenProject project;
 
+    @Override
     public void execute() throws MojoExecutionException {
         String value = normalize(project.getProperties().getProperty("myDirectory"));
         String targetValue = normalize(new File(project.getBuild().getDirectory(), "foo").getAbsolutePath());

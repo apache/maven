@@ -44,6 +44,7 @@ public class CompletionServiceStub implements CompletionService<ProjectSegment> 
         this.finishImmediately = finishImmediately;
     }
 
+    @Override
     public Future<ProjectSegment> submit(Callable<ProjectSegment> task) {
         FutureTask<ProjectSegment> projectBuildFutureTask = new FutureTask<>(task);
         projectBuildFutureTasks.add(projectBuildFutureTask);

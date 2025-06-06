@@ -66,6 +66,7 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test extends AbstractMavenInt
     @BeforeEach
     protected void setUp() throws Exception {
         Handler handler = new AbstractHandler() {
+            @Override
             public void handle(
                     String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
                     throws IOException {

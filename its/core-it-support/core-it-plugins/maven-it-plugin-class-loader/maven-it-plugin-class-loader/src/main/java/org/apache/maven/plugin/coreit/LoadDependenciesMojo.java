@@ -61,6 +61,7 @@ public class LoadDependenciesMojo extends AbstractLoadMojo {
      *
      * @throws MojoExecutionException If the output file could not be created.
      */
+    @Override
     public void execute() throws MojoExecutionException {
         URL[] urls = new URL[classPath.size()];
         for (int i = 0; i < urls.length; i++) {

@@ -82,6 +82,7 @@ public class DumpVersionMojo extends AbstractMojo {
      *
      * @throws MojoExecutionException If the output file could not be created.
      */
+    @Override
     public void execute() throws MojoExecutionException {
         Properties wagonProperties = new Properties();
 

@@ -33,6 +33,7 @@ public class CustomRepositoryLayout implements ArtifactRepositoryLayout {
         return "id";
     }
 
+    @Override
     public String pathOf(Artifact artifact) {
         ArtifactHandler artifactHandler = artifact.getArtifactHandler();
 
@@ -52,10 +53,12 @@ public class CustomRepositoryLayout implements ArtifactRepositoryLayout {
         return path.toString();
     }
 
+    @Override
     public String pathOfLocalRepositoryMetadata(ArtifactMetadata metadata, ArtifactRepository repository) {
         return metadata.getLocalFilename(repository);
     }
 
+    @Override
     public String pathOfRemoteRepositoryMetadata(ArtifactMetadata metadata) {
         return metadata.getRemoteFilename();
     }

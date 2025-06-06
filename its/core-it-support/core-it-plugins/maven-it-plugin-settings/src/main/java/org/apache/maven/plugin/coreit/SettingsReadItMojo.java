@@ -42,6 +42,7 @@ public class SettingsReadItMojo extends AbstractMojo {
     @Parameter(defaultValue = "target/settings-dump.xml", required = true)
     private File dumpFile;
 
+    @Override
     public void execute() throws MojoExecutionException {
         if (dumpFile.exists()) {
             dumpFile.delete();

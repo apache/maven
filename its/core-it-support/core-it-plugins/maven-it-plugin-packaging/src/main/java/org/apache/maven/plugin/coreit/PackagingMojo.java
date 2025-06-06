@@ -45,6 +45,7 @@ public class PackagingMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.build.directory}", required = true, readonly = true)
     private File outputDirectory;
 
+    @Override
     public void execute() throws MojoExecutionException {
         File jarFile = new File(outputDirectory, finalName + "-it.jar");
 

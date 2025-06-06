@@ -36,6 +36,7 @@ public class ForkGoalMojo extends AbstractMojo {
     @Parameter(defaultValue = "${executedProject}")
     private MavenProject executedProject;
 
+    @Override
     public void execute() throws MojoExecutionException {
         if (!executedProject.getBuild().getFinalName().equals(TouchMojo.FINAL_NAME)) {
             throw new MojoExecutionException("Unexpected result, final name of executed project is "

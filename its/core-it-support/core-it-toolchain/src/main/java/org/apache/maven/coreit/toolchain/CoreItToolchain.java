@@ -35,18 +35,22 @@ public class CoreItToolchain implements Toolchain, ToolchainPrivate {
         this.model = model;
     }
 
+    @Override
     public String getType() {
         return "coreit";
     }
 
+    @Override
     public String findTool(String toolName) {
         return toolName;
     }
 
+    @Override
     public ToolchainModel getModel() {
         return model;
     }
 
+    @Override
     public boolean matchesRequirements(Map requirements) {
         return true;
     }

@@ -167,6 +167,7 @@ public class MavenITmng4428FollowHttpRedirectTest extends AbstractMavenIntegrati
             this.connector = connector;
         }
 
+        @Override
         public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
                 throws IOException {
             System.out.println("Handling " + request.getMethod() + " " + request.getRequestURL());

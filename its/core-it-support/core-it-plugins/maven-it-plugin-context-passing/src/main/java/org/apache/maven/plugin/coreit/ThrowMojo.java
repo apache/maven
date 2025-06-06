@@ -46,6 +46,7 @@ public class ThrowMojo extends AbstractMojo {
         return value;
     }
 
+    @Override
     public void execute() throws MojoExecutionException {
         getPluginContext().put(THROWN_PARAMETER, value);
     }

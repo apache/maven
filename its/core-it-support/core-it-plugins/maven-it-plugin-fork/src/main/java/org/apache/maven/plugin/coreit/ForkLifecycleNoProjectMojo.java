@@ -39,6 +39,7 @@ public class ForkLifecycleNoProjectMojo extends AbstractMojo {
     @Parameter(defaultValue = "target")
     private File touchDirectory;
 
+    @Override
     public void execute() throws MojoExecutionException {
         TouchMojo.touch(touchDirectory, "fork-lifecycle-no-project.txt");
 

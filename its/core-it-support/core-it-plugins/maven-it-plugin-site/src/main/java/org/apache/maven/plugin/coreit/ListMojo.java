@@ -60,6 +60,7 @@ public class ListMojo extends AbstractMojo {
      *
      * @throws MojoExecutionException If the output file could not be created.
      */
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         Properties reportProperties = new Properties();
 

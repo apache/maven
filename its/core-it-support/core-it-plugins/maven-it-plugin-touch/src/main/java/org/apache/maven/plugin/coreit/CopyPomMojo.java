@@ -45,6 +45,7 @@ public class CopyPomMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.build.directory}/pom-copy.xml", required = true)
     private String outputFile;
 
+    @Override
     public void execute() throws MojoExecutionException {
         try {
             File dest = new File(outputFile);

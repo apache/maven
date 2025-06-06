@@ -70,6 +70,7 @@ public class InjectMojo extends AbstractMojo {
      *
      * @throws MojoExecutionException If an error occured.
      */
+    @Override
     public void execute() throws MojoExecutionException {
         Set artifactKeys = new LinkedHashSet();
 

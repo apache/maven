@@ -62,6 +62,7 @@ public class MavenITmng0768OfflineModeTest extends AbstractMavenIntegrationTestC
         final List<String> requestedUris = Collections.synchronizedList(new ArrayList<>());
 
         Handler repoHandler = new AbstractHandler() {
+            @Override
             public void handle(
                     String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
                     throws IOException {

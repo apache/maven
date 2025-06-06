@@ -78,6 +78,7 @@ public class CoreItMojo extends AbstractMojo {
     @Parameter(property = "toolchain.selected")
     private int selected;
 
+    @Override
     public void execute() throws MojoExecutionException {
         ToolchainPrivate[] tcs = getToolchains();
 

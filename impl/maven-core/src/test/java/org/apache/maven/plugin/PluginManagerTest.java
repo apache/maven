@@ -43,6 +43,7 @@ class PluginManagerTest extends AbstractCoreMavenComponentTestCase {
     @Inject
     private DefaultBuildPluginManager pluginManager;
 
+    @Override
     protected String getProjectsDirectory() {
         return "src/test/projects/plugin-manager";
     }

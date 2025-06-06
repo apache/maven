@@ -89,6 +89,7 @@ public class ResolveMojo extends AbstractMojo {
      *
      * @throws MojoExecutionException If the artifact could not be resolved
      */
+    @Override
     public void execute() throws MojoExecutionException {
         getLog().info("[MAVEN-CORE-IT-LOG] Resolving artifacts");
 
