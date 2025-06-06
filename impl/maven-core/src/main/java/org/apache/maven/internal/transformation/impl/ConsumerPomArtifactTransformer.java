@@ -66,7 +66,6 @@ class ConsumerPomArtifactTransformer extends TransformerSupport {
         this.builder = builder;
     }
 
-    @Override
     @SuppressWarnings("deprecation")
     @Override
     public void injectTransformedArtifacts(RepositorySystemSession session, MavenProject project) throws IOException {
