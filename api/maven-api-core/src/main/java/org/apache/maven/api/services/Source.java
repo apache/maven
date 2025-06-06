@@ -45,7 +45,7 @@ import org.apache.maven.api.annotations.Nullable;
  * </ul>
  *
  * @since 4.0.0
- * @see org.apache.maven.api.services.ProjectBuilder#build(Session, Source)
+ * @see ProjectBuilder#build(Session, Source)
  */
 @Experimental
 public interface Source {

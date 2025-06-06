@@ -52,37 +52,37 @@ public class CliConfigMojo extends AbstractMojo {
     private File propertiesFile;
 
     /**
-     * A simple parameter of type {@link java.lang.String}.
+     * A simple parameter of type {@link String}.
      */
     @Parameter(property = "config.stringParam")
     private String stringParam;
 
     /**
-     * A simple parameter of type {@link java.io.File}.
+     * A simple parameter of type {@link File}.
      */
     @Parameter(property = "config.fileParam")
     private File fileParam;
 
     /**
-     * An array parameter of component type {@link java.lang.String}.
+     * An array parameter of component type {@link String}.
      */
     @Parameter(property = "config.stringParams")
     private String[] stringParams;
 
     /**
-     * An array parameter of component type {@link java.io.File}.
+     * An array parameter of component type {@link File}.
      */
     @Parameter(property = "config.fileParams")
     private File[] fileParams;
 
     /**
-     * A collection parameter of type {@link java.util.List}.
+     * A collection parameter of type {@link List}.
      */
     @Parameter(property = "config.listParam")
     private List listParam;
 
     /**
-     * A collection parameter of type {@link java.util.Set}.
+     * A collection parameter of type {@link Set}.
      */
     @Parameter(property = "config.setParam")
     private Set setParam;

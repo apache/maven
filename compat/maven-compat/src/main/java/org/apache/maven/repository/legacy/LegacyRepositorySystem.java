@@ -68,8 +68,6 @@ import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.apache.maven.settings.crypto.SettingsDecryptionRequest;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
-import org.apache.maven.wagon.ResourceDoesNotExistException;
-import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.apache.maven.wagon.proxy.ProxyUtils;
 import org.codehaus.plexus.PlexusContainer;
@@ -644,9 +642,9 @@ public class LegacyRepositorySystem implements RepositorySystem {
                     TransferListenerAdapter.newAdapter(transferListener),
                     ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN,
                     true);
-        } catch (TransferFailedException e) {
+        } catch (org.apache.maven.wagon.TransferFailedException e) {
             throw new ArtifactTransferFailedException(getMessage(e, "Error transferring artifact."), e);
-        } catch (ResourceDoesNotExistException e) {
+        } catch (org.apache.maven.wagon.ResourceDoesNotExistException e) {
             throw new ArtifactDoesNotExistException(getMessage(e, "Requested artifact does not exist."), e);
         }
     }
@@ -657,7 +655,7 @@ public class LegacyRepositorySystem implements RepositorySystem {
         try {
             wagonManager.putRemoteFile(
                     repository, source, remotePath, TransferListenerAdapter.newAdapter(transferListener));
-        } catch (TransferFailedException e) {
+        } catch (org.apache.maven.wagon.TransferFailedException e) {
             throw new ArtifactTransferFailedException(getMessage(e, "Error transferring artifact."), e);
         }
     }

@@ -62,7 +62,7 @@ public class Premain {
     }
 
     private static class DefaultModelReaderVisitor extends ClassVisitor {
-        DefaultModelReaderVisitor(int api, org.objectweb.asm.ClassVisitor cv) {
+        DefaultModelReaderVisitor(int api, ClassVisitor cv) {
             super(api, cv);
         }
 

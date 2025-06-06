@@ -22,6 +22,7 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.configurator.AbstractComponentConfigurator;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
+import org.codehaus.plexus.component.configurator.ComponentConfigurator;
 import org.codehaus.plexus.component.configurator.ConfigurationListener;
 import org.codehaus.plexus.component.configurator.converters.composite.ObjectWithFieldsConverter;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
@@ -33,7 +34,7 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
  *
  * @author Benjamin Bentmann
  */
-@Component(role = org.codehaus.plexus.component.configurator.ComponentConfigurator.class, hint = "coreit")
+@Component(role = ComponentConfigurator.class, hint = "coreit")
 public class CustomComponentConfigurator extends AbstractComponentConfigurator {
 
     @Override

@@ -31,7 +31,11 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
@@ -688,7 +692,7 @@ public class DefaultWagonManager implements WagonManager {
             throw new UnsupportedProtocolException("Unspecified protocol");
         }
 
-        String hint = protocol.toLowerCase(Locale.ENGLISH);
+        String hint = protocol.toLowerCase(java.util.Locale.ENGLISH);
 
         Wagon wagon;
         try {

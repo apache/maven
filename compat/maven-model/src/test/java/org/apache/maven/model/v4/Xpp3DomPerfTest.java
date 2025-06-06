@@ -86,7 +86,7 @@ public class Xpp3DomPerfTest {
      * <p>main.</p>
      *
      * @param args a {@link String} object.
-     * @throws org.openjdk.jmh.runner.RunnerException if any.
+     * @throws RunnerException if any.
      */
     public static void main(String... args) throws RunnerException {
         Options opts = new OptionsBuilder().forks(1).build();

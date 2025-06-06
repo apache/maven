@@ -164,7 +164,7 @@ class DefaultToolchainManagerTest {
         when(basicPrivate.matchesRequirements(anyMap())).thenReturn(false);
         when(basicPrivate.matchesRequirements(ArgumentMatchers.eq(Map.of("key", "value"))))
                 .thenReturn(true);
-        when(toolchainFactoryBasicType.createToolchain(isA(ToolchainModel.class)))
+        when(toolchainFactoryBasicType.createToolchain(isA(org.apache.maven.api.toolchain.ToolchainModel.class)))
                 .thenReturn(basicPrivate);
 
         List<Toolchain> toolchains =

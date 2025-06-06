@@ -54,7 +54,7 @@ import org.apache.maven.api.annotations.Nullable;
  * during parallel builds.
  *
  * @since 4.0.0
- * @see org.apache.maven.api.services.ProjectBuilder
+ * @see ProjectBuilder
  * @see Project
  */
 @Experimental

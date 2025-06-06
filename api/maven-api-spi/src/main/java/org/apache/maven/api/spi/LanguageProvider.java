@@ -40,8 +40,8 @@ import org.apache.maven.api.di.Named;
  * }
  * </pre>
  *
- * @see org.apache.maven.api.Language
- * @see org.apache.maven.api.spi.ExtensibleEnumProvider
+ * @see Language
+ * @see ExtensibleEnumProvider
  * @since 4.0.0
  */
 @Experimental

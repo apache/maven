@@ -33,6 +33,7 @@ import org.apache.maven.wagon.InputData;
 import org.apache.maven.wagon.OutputData;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
+import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.authorization.AuthorizationException;
@@ -42,7 +43,7 @@ import org.codehaus.plexus.component.annotations.Component;
 /**
  * Shamelessly copied from ScpExternalWagon in this same project...
  */
-@Component(role = org.apache.maven.wagon.Wagon.class, hint = "coreit", instantiationStrategy = "per-lookup")
+@Component(role = Wagon.class, hint = "coreit", instantiationStrategy = "per-lookup")
 public class CoreItWagon extends AbstractWagon {
     @Override
     public void get(String resourceName, File destination)

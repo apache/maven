@@ -80,133 +80,133 @@ public class ConfigMojo extends AbstractMojo {
     private String aliasDefaultExpressionParam;
 
     /**
-     * A simple parameter of type {@link java.lang.Boolean}.
+     * A simple parameter of type {@link Boolean}.
      */
     @Parameter(property = "config.booleanParam")
     private Boolean booleanParam;
 
     /**
-     * A simple parameter of type {@link java.lang.Boolean#TYPE}.
+     * A simple parameter of type {@link Boolean#TYPE}.
      */
     @Parameter(property = "config.primitiveBooleanParam")
     private boolean primitiveBooleanParam;
 
     /**
-     * A simple parameter of type {@link java.lang.Byte}.
+     * A simple parameter of type {@link Byte}.
      */
     @Parameter(property = "config.byteParam")
     private Byte byteParam;
 
     /**
-     * A simple parameter of type {@link java.lang.Short}.
+     * A simple parameter of type {@link Short}.
      */
     @Parameter(property = "config.shortParam")
     private Short shortParam;
 
     /**
-     * A simple parameter of type {@link java.lang.Integer}.
+     * A simple parameter of type {@link Integer}.
      */
     @Parameter(property = "config.integerParam")
     private Integer integerParam;
 
     /**
-     * A simple parameter of type {@link java.lang.Integer#TYPE}.
+     * A simple parameter of type {@link Integer#TYPE}.
      */
     @Parameter(property = "config.primitiveIntegerParam")
     private int primitiveIntegerParam;
 
     /**
-     * A simple parameter of type {@link java.lang.Long}.
+     * A simple parameter of type {@link Long}.
      */
     @Parameter(property = "config.longParam")
     private Long longParam;
 
     /**
-     * A simple parameter of type {@link java.lang.Float}.
+     * A simple parameter of type {@link Float}.
      */
     @Parameter(property = "config.floatParam")
     private Float floatParam;
 
     /**
-     * A simple parameter of type {@link java.lang.Double}.
+     * A simple parameter of type {@link Double}.
      */
     @Parameter(property = "config.doubleParam")
     private Double doubleParam;
 
     /**
-     * A simple parameter of type {@link java.lang.Character}.
+     * A simple parameter of type {@link Character}.
      */
     @Parameter(property = "config.characterParam")
     private Character characterParam;
 
     /**
-     * A simple parameter of type {@link java.lang.String}.
+     * A simple parameter of type {@link String}.
      */
     @Parameter(property = "config.stringParam")
     private String stringParam;
 
     /**
-     * A simple parameter of type {@link java.io.File}.
+     * A simple parameter of type {@link File}.
      */
     @Parameter(property = "config.fileParam")
     private File fileParam;
 
     /**
-     * A simple parameter of type {@link java.util.Date}.
+     * A simple parameter of type {@link Date}.
      */
     @Parameter(property = "config.dateParam")
     private Date dateParam;
 
     /**
-     * A simple parameter of type {@link java.net.URL}.
+     * A simple parameter of type {@link URL}.
      */
     @Parameter(property = "config.urlParam")
     private URL urlParam;
 
     /**
-     * A simple parameter of type {@link java.net.URI} (requires Maven 3.x).
+     * A simple parameter of type {@link URI} (requires Maven 3.x).
      *
      */
     @Parameter
     private URI uriParam;
 
     /**
-     * An array parameter of component type {@link java.lang.String}.
+     * An array parameter of component type {@link String}.
      *
      */
     @Parameter
     private String[] stringParams;
 
     /**
-     * An array parameter of component type {@link java.io.File}.
+     * An array parameter of component type {@link File}.
      *
      */
     @Parameter
     private File[] fileParams;
 
     /**
-     * A collection parameter of type {@link java.util.List}.
+     * A collection parameter of type {@link List}.
      *
      */
     @Parameter
     private List listParam;
 
     /**
-     * A collection parameter of type {@link java.util.Set}.
+     * A collection parameter of type {@link Set}.
      *
      */
     @Parameter
     private Set setParam;
 
     /**
-     * A collection parameter of type {@link java.util.Map}.
+     * A collection parameter of type {@link Map}.
      *
      */
     @Parameter
     private Map mapParam;
 
     /**
-     * A collection parameter of type {@link java.util.Properties}.
+     * A collection parameter of type {@link Properties}.
      *
      */
     @Parameter
@@ -219,7 +219,7 @@ public class ConfigMojo extends AbstractMojo {
     private String[] aliasStringParams;
 
     /**
-     * A complex parameter of type {@link org.apache.maven.plugin.coreit.Bean}.
+     * A complex parameter of type {@link Bean}.
      *
      */
     @Parameter

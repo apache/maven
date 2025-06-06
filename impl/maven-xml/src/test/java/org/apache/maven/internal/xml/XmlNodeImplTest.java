@@ -191,7 +191,7 @@ class XmlNodeImplTest {
     /**
      * <p>testCombineId.</p>
      *
-     * @throws java.lang.Exception if any.
+     * @throws Exception if any.
      */
     @Test
     void testCombineId() throws Exception {
@@ -237,7 +237,7 @@ class XmlNodeImplTest {
     /**
      * <p>testCombineKeys.</p>
      *
-     * @throws java.lang.Exception if any.
+     * @throws Exception if any.
      */
     @Test
     void testCombineKeys() throws Exception {
@@ -548,7 +548,7 @@ class XmlNodeImplTest {
     /**
      * <p>testShouldNotChangeUponMergeWithItselfWhenFirstOrLastSubItemIsEmpty.</p>
      *
-     * @throws java.lang.Exception if any.
+     * @throws Exception if any.
      */
     @Test
     void testShouldNotChangeUponMergeWithItselfWhenFirstOrLastSubItemIsEmpty() throws Exception {
@@ -569,7 +569,7 @@ class XmlNodeImplTest {
     /**
      * <p>testShouldCopyRecessiveChildrenNotPresentInTarget.</p>
      *
-     * @throws java.lang.Exception if any.
+     * @throws Exception if any.
      */
     @Test
     void testShouldCopyRecessiveChildrenNotPresentInTarget() throws Exception {
@@ -601,7 +601,7 @@ class XmlNodeImplTest {
     /**
      * <p>testShouldRemoveEntireElementWithAttributesAndChildren.</p>
      *
-     * @throws java.lang.Exception if any.
+     * @throws Exception if any.
      */
     @Test
     void testShouldRemoveEntireElementWithAttributesAndChildren() throws Exception {
@@ -619,7 +619,7 @@ class XmlNodeImplTest {
     /**
      * <p>testShouldRemoveDoNotRemoveTagWhenSwappedInputDOMs.</p>
      *
-     * @throws java.lang.Exception if any.
+     * @throws Exception if any.
      */
     @Test
     void testShouldRemoveDoNotRemoveTagWhenSwappedInputDOMs() throws Exception {

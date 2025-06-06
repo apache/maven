@@ -33,6 +33,7 @@ import org.apache.maven.wagon.InputData;
 import org.apache.maven.wagon.OutputData;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
+import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.resource.Resource;
@@ -42,7 +43,7 @@ import org.codehaus.plexus.component.annotations.Component;
  * NOTE: Plexus will only pick this correctly if the Class package and name are the same as that in core. This is
  * because the core component descriptor is read, but the class is read from the latter JAR.
  */
-@Component(role = org.apache.maven.wagon.Wagon.class, hint = "scpexe", instantiationStrategy = "per-lookup")
+@Component(role = Wagon.class, hint = "scpexe", instantiationStrategy = "per-lookup")
 public class ScpExternalWagon extends AbstractWagon {
     @Override
     public void get(String resourceName, File destination)

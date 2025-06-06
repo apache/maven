@@ -163,7 +163,7 @@ public abstract class AbstractMojo implements Mojo, ContextEnabled {
      * gets injected by the Plexus container <em>after</em> the mojo has been constructed. Therefore, simply call this
      * method directly whenever you need the logger, it is fast enough and needs no caching.
      *
-     * @see org.apache.maven.plugin.Mojo#getLog()
+     * @see Mojo#getLog()
      * @deprecated Use SLF4J directly
      */
     @Deprecated

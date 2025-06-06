@@ -28,7 +28,7 @@ public interface MavenProjectHelper {
     String ROLE = MavenProjectHelper.class.getName();
 
     /**
-     * See {@link #attachArtifact(MavenProject, String, String, java.io.File)}, but with type set to null.
+     * See {@link #attachArtifact(MavenProject, String, String, File)}, but with type set to null.
      * @param project project reference.
      * @param artifactFile artifact file.
      * @param artifactClassifier artifact classifier.
@@ -36,7 +36,7 @@ public interface MavenProjectHelper {
     void attachArtifact(MavenProject project, File artifactFile, String artifactClassifier);
 
     /**
-     * * See {@link #attachArtifact(MavenProject, String, String, java.io.File)}, but with classifier set to null.
+     * * See {@link #attachArtifact(MavenProject, String, String, File)}, but with classifier set to null.
      * @param project project reference.
      * @param artifactType artifact type.
      * @param artifactFile artifact file.

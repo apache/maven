@@ -36,7 +36,6 @@ import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.ToolchainFactoryException;
 import org.apache.maven.api.services.ToolchainManagerException;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.impl.DefaultToolchainManager;
 import org.apache.maven.impl.MappedList;
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.slf4j.Logger;
@@ -73,18 +72,18 @@ public class ToolchainManagerFactory {
         return new DefaultToolchainManagerV4();
     }
 
-    private DefaultToolchainManager getDelegate() {
+    private org.apache.maven.impl.DefaultToolchainManager getDelegate() {
         return getToolchainManager(lookup, logger);
     }
 
-    private DefaultToolchainManager getToolchainManager(Lookup lookup, Logger logger) {
+    private org.apache.maven.impl.DefaultToolchainManager getToolchainManager(Lookup lookup, Logger logger) {
         return getToolchainManager(
                 lookup.lookupMap(ToolchainFactory.class),
                 lookup.lookupMap(org.apache.maven.api.services.ToolchainFactory.class),
                 logger);
     }
 
-    private DefaultToolchainManager getToolchainManager(
+    private org.apache.maven.impl.DefaultToolchainManager getToolchainManager(
             Map<String, ToolchainFactory> v3Factories,
             Map<String, org.apache.maven.api.services.ToolchainFactory> v4Factories,
             Logger logger) {
@@ -113,7 +112,7 @@ public class ToolchainManagerFactory {
             });
         }
         allFactories.putAll(v4Factories);
-        return new DefaultToolchainManager(allFactories, logger) {};
+        return new org.apache.maven.impl.DefaultToolchainManager(allFactories, logger) {};
     }
 
     public class DefaultToolchainManagerV4 implements org.apache.maven.api.services.ToolchainManager {
@@ -172,7 +171,7 @@ public class ToolchainManagerFactory {
                 return toolchains.stream()
                         .map(ToolchainManagerFactory.this::getToolchainV3)
                         .toArray(ToolchainPrivate[]::new);
-            } catch (ToolchainManagerException e) {
+            } catch (org.apache.maven.api.services.ToolchainManagerException e) {
                 throw new MisconfiguredToolchainException(e.getMessage(), e);
             }
         }

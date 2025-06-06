@@ -123,7 +123,7 @@ public interface ProjectBuildingRequest {
     List<String> getInactiveProfileIds();
 
     /**
-     * Add a {@link org.apache.maven.model.Profile} that has come from an external source. This may be from a custom
+     * Add a {@link Profile} that has come from an external source. This may be from a custom
      * configuration like the MavenCLI settings.xml file, or from a custom dialog in an IDE integration like M2Eclipse.
      *
      * @param profile

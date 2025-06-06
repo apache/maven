@@ -65,54 +65,54 @@ public class CustomConfigMojo extends AbstractMojo {
     private String defaultParam;
 
     /**
-     * A simple parameter of type {@link java.lang.String}.
+     * A simple parameter of type {@link String}.
      */
     @Parameter(property = "config.stringParam")
     private String stringParam;
 
     /**
-     * A simple parameter of type {@link java.io.File}.
+     * A simple parameter of type {@link File}.
      */
     @Parameter(property = "config.fileParam")
     private File fileParam;
 
     /**
-     * An array parameter of component type {@link java.lang.String}.
+     * An array parameter of component type {@link String}.
      *
      */
     @Parameter
     private String[] stringParams;
 
     /**
-     * An array parameter of component type {@link java.io.File}.
+     * An array parameter of component type {@link File}.
      *
      */
     @Parameter
     private File[] fileParams;
 
     /**
-     * A collection parameter of type {@link java.util.List}.
+     * A collection parameter of type {@link List}.
      *
      */
     @Parameter
     private List listParam;
 
     /**
-     * A collection parameter of type {@link java.util.Set}.
+     * A collection parameter of type {@link Set}.
      *
      */
     @Parameter
     private Set setParam;
 
     /**
-     * A collection parameter of type {@link java.util.Map}.
+     * A collection parameter of type {@link Map}.
      *
      */
     @Parameter
     private Map mapParam;
 
     /**
-     * A collection parameter of type {@link java.util.Properties}.
+     * A collection parameter of type {@link Properties}.
      *
      */
     @Parameter

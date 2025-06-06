@@ -31,6 +31,7 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInfo;
@@ -318,6 +319,6 @@ public abstract class AbstractMavenIntegrationTestCase {
     }
 
     public static void fail(String message) {
-        org.junit.jupiter.api.Assertions.fail(message);
+        Assertions.fail(message);
     }
 }

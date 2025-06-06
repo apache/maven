@@ -31,7 +31,7 @@ import org.apache.maven.api.annotations.Nullable;
  * @see Version
  * @see VersionConstraint
  * @see org.apache.maven.api.services.VersionParser#parseVersionRange(String)
- * @see org.apache.maven.api.Session#parseVersionRange(String)
+ * @see Session#parseVersionRange(String)
  * @since 4.0.0
  */
 @Experimental

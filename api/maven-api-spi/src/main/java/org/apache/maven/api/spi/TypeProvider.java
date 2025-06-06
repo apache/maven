@@ -45,8 +45,8 @@ import org.apache.maven.api.di.Named;
  * }
  * </pre>
  *
- * @see org.apache.maven.api.Type
- * @see org.apache.maven.api.spi.ExtensibleEnumProvider
+ * @see Type
+ * @see ExtensibleEnumProvider
  * @since 4.0.0
  */
 @Experimental

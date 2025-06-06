@@ -33,7 +33,6 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
 import org.apache.maven.settings.Mirror;
-import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.eclipse.aether.RepositorySystemSession;
 
@@ -126,7 +125,7 @@ public interface RepositorySystem {
      * @param repositories The repositories into which to inject the proxy information, may be {@code null}.
      * @param proxies The available proxies, may be {@code null}.
      */
-    void injectProxy(List<ArtifactRepository> repositories, List<Proxy> proxies);
+    void injectProxy(List<ArtifactRepository> repositories, List<org.apache.maven.settings.Proxy> proxies);
 
     /**
      * Injects the authentication information into the specified repositories. For each repository that is matched by a
