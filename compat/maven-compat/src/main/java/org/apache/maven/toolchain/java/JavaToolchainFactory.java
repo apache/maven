@@ -46,6 +46,7 @@ import org.slf4j.LoggerFactory;
 public class JavaToolchainFactory implements ToolchainFactory {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    @Override
     public ToolchainPrivate createToolchain(ToolchainModel model) throws MisconfiguredToolchainException {
         if (model == null) {
             return null;
@@ -95,6 +96,7 @@ public class JavaToolchainFactory implements ToolchainFactory {
         return jtc;
     }
 
+    @Override
     public ToolchainPrivate createDefaultToolchain() {
         // not sure it's necessary to provide a default toolchain here.
         // only version can be eventually supplied.

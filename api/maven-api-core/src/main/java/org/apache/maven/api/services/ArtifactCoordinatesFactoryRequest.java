@@ -233,6 +233,7 @@ public interface ArtifactCoordinatesFactoryRequest extends Request<Session> {
                 return type;
             }
 
+            @Override
             public String getCoordinatesString() {
                 return coordinatesString;
             }

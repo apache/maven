@@ -38,5 +38,6 @@ public interface Version extends Comparable<Version> {
      * {@return the string representation of this version}
      */
     @Nonnull
+    @Override
     String toString();
 }

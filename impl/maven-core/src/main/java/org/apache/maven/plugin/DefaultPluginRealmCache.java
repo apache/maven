@@ -133,6 +133,7 @@ public class DefaultPluginRealmCache implements PluginRealmCache, Disposable {
 
     protected final Map<Key, CacheRecord> cache = new ConcurrentHashMap<>();
 
+    @Override
     public Key createKey(
             Plugin plugin,
             ClassLoader parentRealm,
@@ -143,6 +144,7 @@ public class DefaultPluginRealmCache implements PluginRealmCache, Disposable {
         return new CacheKey(plugin, parentRealm, foreignImports, dependencyFilter, repositories, session);
     }
 
+    @Override
     public CacheRecord get(Key key) {
         return cache.get(key);
     }
@@ -169,6 +171,7 @@ public class DefaultPluginRealmCache implements PluginRealmCache, Disposable {
         }
     }
 
+    @Override
     public CacheRecord put(Key key, ClassRealm pluginRealm, List<Artifact> pluginArtifacts) {
         Objects.requireNonNull(pluginRealm, "pluginRealm cannot be null");
         Objects.requireNonNull(pluginArtifacts, "pluginArtifacts cannot be null");
@@ -184,6 +187,7 @@ public class DefaultPluginRealmCache implements PluginRealmCache, Disposable {
         return record;
     }
 
+    @Override
     public void flush() {
         for (CacheRecord record : cache.values()) {
             ClassRealm realm = record.getRealm();
@@ -204,10 +208,12 @@ public class DefaultPluginRealmCache implements PluginRealmCache, Disposable {
         return CacheUtils.pluginEquals(a, b);
     }
 
+    @Override
     public void register(MavenProject project, Key key, CacheRecord record) {
         // default cache does not track plugin usage
     }
 
+    @Override
     public void dispose() {
         flush();
     }

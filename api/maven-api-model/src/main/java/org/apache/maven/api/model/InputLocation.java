@@ -93,6 +93,7 @@ public class InputLocation implements Serializable, InputLocationTracker {
         return source;
     }
 
+    @Override
     public InputLocation getLocation(Object key) {
         return locations != null ? locations.get(key) : null;
     }
@@ -108,6 +109,7 @@ public class InputLocation implements Serializable, InputLocationTracker {
      * @return InputLocation
      * @since 4.0.0
      */
+    @Override
     public InputLocation getImportedFrom() {
         return importedFrom;
     }

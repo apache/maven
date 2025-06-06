@@ -592,6 +592,7 @@ public class Verifier {
     private static void addMetadataToList(File dir, boolean hasCommand, List<String> l, String command) {
         if (dir.exists() && dir.isDirectory()) {
             String[] files = dir.list(new FilenameFilter() {
+                @Override
                 public boolean accept(File dir, String name) {
                     return name.startsWith("maven-metadata") && name.endsWith(".xml");
                 }

@@ -34,18 +34,22 @@ public abstract class AbstractArtifactMetadata implements ArtifactMetadata {
         this.artifact = artifact;
     }
 
+    @Override
     public boolean storedInGroupDirectory() {
         return false;
     }
 
+    @Override
     public String getGroupId() {
         return artifact.getGroupId();
     }
 
+    @Override
     public String getArtifactId() {
         return artifact.getArtifactId();
     }
 
+    @Override
     public String extendedToString() {
         StringBuilder buffer = new StringBuilder(256);
 

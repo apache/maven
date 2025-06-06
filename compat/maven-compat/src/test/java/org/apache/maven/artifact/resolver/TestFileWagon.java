@@ -42,6 +42,7 @@ public class TestFileWagon extends FileWagon {
         super.getTransfer(resource, destination, input, closeInput, maxSize);
     }
 
+    @Override
     public void get(String resourceName, File destination)
             throws TransferFailedException, ResourceDoesNotExistException, AuthorizationException {
         addTransfer("get " + resourceName);
@@ -59,6 +60,7 @@ public class TestFileWagon extends FileWagon {
         }
     }
 
+    @Override
     public boolean getIfNewer(String resourceName, File destination, long timestamp)
             throws TransferFailedException, ResourceDoesNotExistException, AuthorizationException {
         if (!insideGet) {
@@ -67,6 +69,7 @@ public class TestFileWagon extends FileWagon {
         return super.getIfNewer(resourceName, destination, timestamp);
     }
 
+    @Override
     public void addTransferListener(TransferListener listener) {
         if (listener instanceof TestTransferListener t) {
             testTransferListener = t;

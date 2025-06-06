@@ -66,8 +66,10 @@ public class TestRepositoryConnector implements RepositoryConnector {
         }
     }
 
+    @Override
     public void close() {}
 
+    @Override
     public void get(
             Collection<? extends ArtifactDownload> artifactDownloads,
             Collection<? extends MetadataDownload> metadataDownloads) {
@@ -137,6 +139,7 @@ public class TestRepositoryConnector implements RepositoryConnector {
         return path.toString();
     }
 
+    @Override
     public void put(
             Collection<? extends ArtifactUpload> artifactUploads,
             Collection<? extends MetadataUpload> metadataUploads) {

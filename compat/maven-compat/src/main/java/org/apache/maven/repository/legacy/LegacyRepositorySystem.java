@@ -113,23 +113,28 @@ public class LegacyRepositorySystem implements RepositorySystem {
     @Inject
     private SettingsDecrypter settingsDecrypter;
 
+    @Override
     public Artifact createArtifact(String groupId, String artifactId, String version, String scope, String type) {
         return artifactFactory.createArtifact(groupId, artifactId, version, scope, type);
     }
 
+    @Override
     public Artifact createArtifact(String groupId, String artifactId, String version, String packaging) {
         return artifactFactory.createBuildArtifact(groupId, artifactId, version, packaging);
     }
 
+    @Override
     public Artifact createArtifactWithClassifier(
             String groupId, String artifactId, String version, String type, String classifier) {
         return artifactFactory.createArtifactWithClassifier(groupId, artifactId, version, type, classifier);
     }
 
+    @Override
     public Artifact createProjectArtifact(String groupId, String artifactId, String metaVersionId) {
         return artifactFactory.createProjectArtifact(groupId, artifactId, metaVersionId);
     }
 
+    @Override
     public Artifact createDependencyArtifact(Dependency d) {
         VersionRange versionRange;
         try {
@@ -191,6 +196,7 @@ public class LegacyRepositorySystem implements RepositorySystem {
         return artifactFactory.createParentArtifact(groupId, artifactId, version);
     }
 
+    @Override
     public Artifact createPluginArtifact(Plugin plugin) {
         String version = plugin.getVersion();
         if (version == null || version.isEmpty()) {
@@ -233,10 +239,12 @@ public class LegacyRepositorySystem implements RepositorySystem {
         return new ArtifactRepositoryPolicy(enabled, updatePolicy, checksumPolicy);
     }
 
+    @Override
     public ArtifactRepository createDefaultLocalRepository() throws InvalidRepositoryException {
         return createLocalRepository(RepositorySystem.defaultUserLocalRepository);
     }
 
+    @Override
     public ArtifactRepository createLocalRepository(File localRepository) throws InvalidRepositoryException {
         return createRepository(
                 "file://" + localRepository.toURI().getRawPath(),
@@ -248,6 +256,7 @@ public class LegacyRepositorySystem implements RepositorySystem {
                 ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE);
     }
 
+    @Override
     public ArtifactRepository createDefaultRemoteRepository() throws InvalidRepositoryException {
         return createRepository(
                 RepositorySystem.DEFAULT_REMOTE_REPO_URL,
@@ -293,6 +302,7 @@ public class LegacyRepositorySystem implements RepositorySystem {
         return url;
     }
 
+    @Override
     public ArtifactResolutionResult resolve(ArtifactResolutionRequest request) {
         /*
          * Probably is not worth it, but here I make sure I restore request
@@ -331,6 +341,7 @@ public class LegacyRepositorySystem implements RepositorySystem {
         return artifactResolver.resolve(request);
     }
 
+    @Override
     public List<ArtifactRepository> getEffectiveRepositories(List<ArtifactRepository> repositories) {
         if (repositories == null) {
             return null;
@@ -401,10 +412,12 @@ public class LegacyRepositorySystem implements RepositorySystem {
         return effectivePolicy;
     }
 
+    @Override
     public Mirror getMirror(ArtifactRepository repository, List<Mirror> mirrors) {
         return mirrorSelector.getMirror(repository, mirrors);
     }
 
+    @Override
     public void injectMirror(List<ArtifactRepository> repositories, List<Mirror> mirrors) {
         if (repositories != null && mirrors != null) {
             for (ArtifactRepository repository : repositories) {
@@ -432,6 +445,7 @@ public class LegacyRepositorySystem implements RepositorySystem {
         return null;
     }
 
+    @Override
     public void injectMirror(RepositorySystemSession session, List<ArtifactRepository> repositories) {
         if (repositories != null && session != null) {
             for (ArtifactRepository repository : repositories) {
@@ -463,6 +477,7 @@ public class LegacyRepositorySystem implements RepositorySystem {
         }
     }
 
+    @Override
     public void injectAuthentication(List<ArtifactRepository> repositories, List<Server> servers) {
         if (repositories != null) {
             Map<String, Server> serversById = new HashMap<>();
@@ -524,6 +539,7 @@ public class LegacyRepositorySystem implements RepositorySystem {
         return null;
     }
 
+    @Override
     public void injectAuthentication(RepositorySystemSession session, List<ArtifactRepository> repositories) {
         if (repositories != null && session != null) {
             for (ArtifactRepository repository : repositories) {
@@ -559,6 +575,7 @@ public class LegacyRepositorySystem implements RepositorySystem {
         return null;
     }
 
+    @Override
     public void injectProxy(List<ArtifactRepository> repositories, List<org.apache.maven.settings.Proxy> proxies) {
         if (repositories != null) {
             for (ArtifactRepository repository : repositories) {
@@ -620,6 +637,7 @@ public class LegacyRepositorySystem implements RepositorySystem {
         return null;
     }
 
+    @Override
     public void injectProxy(RepositorySystemSession session, List<ArtifactRepository> repositories) {
         if (repositories != null && session != null) {
             for (ArtifactRepository repository : repositories) {
@@ -628,6 +646,7 @@ public class LegacyRepositorySystem implements RepositorySystem {
         }
     }
 
+    @Override
     public void retrieve(
             ArtifactRepository repository,
             File destination,
@@ -649,6 +668,7 @@ public class LegacyRepositorySystem implements RepositorySystem {
         }
     }
 
+    @Override
     public void publish(
             ArtifactRepository repository, File source, String remotePath, ArtifactTransferListener transferListener)
             throws ArtifactTransferFailedException {
@@ -663,6 +683,7 @@ public class LegacyRepositorySystem implements RepositorySystem {
     //
     // Artifact Repository Creation
     //
+    @Override
     public ArtifactRepository buildArtifactRepository(Repository repo) throws InvalidRepositoryException {
         if (repo != null) {
             String id = repo.getId();
@@ -704,6 +725,7 @@ public class LegacyRepositorySystem implements RepositorySystem {
         return createArtifactRepository(repositoryId, url, null, snapshotsPolicy, releasesPolicy);
     }
 
+    @Override
     public ArtifactRepository createArtifactRepository(
             String repositoryId,
             String url,
@@ -755,18 +777,22 @@ public class LegacyRepositorySystem implements RepositorySystem {
             this.fallback = fallback;
         }
 
+        @Override
         public String getId() {
             return id;
         }
 
+        @Override
         public String pathOf(Artifact artifact) {
             return fallback.pathOf(artifact);
         }
 
+        @Override
         public String pathOfLocalRepositoryMetadata(ArtifactMetadata metadata, ArtifactRepository repository) {
             return fallback.pathOfLocalRepositoryMetadata(metadata, repository);
         }
 
+        @Override
         public String pathOfRemoteRepositoryMetadata(ArtifactMetadata metadata) {
             return fallback.pathOfRemoteRepositoryMetadata(metadata);
         }

@@ -52,6 +52,7 @@ public class InstallCustomMojo extends InstallMojo {
      *
      * @throws MojoExecutionException If any artifact could not be installed.
      */
+    @Override
     public void execute() throws MojoExecutionException {
         try {
             String url = "file://" + localRepoDir.toURL().getPath();

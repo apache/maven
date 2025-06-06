@@ -56,6 +56,7 @@ class ExtendedPluginDescriptorTest {
                 return this;
             }
 
+            @Override
             public ExtendedPluginDescriptor build() {
                 return new ExtendedPluginDescriptor(this);
             }

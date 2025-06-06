@@ -41,12 +41,14 @@ import org.apache.maven.metadata.v4.MetadataStaxReader;
 @Singleton
 public class DefaultMetadataReader implements MetadataReader {
 
+    @Override
     public Metadata read(File input, Map<String, ?> options) throws IOException {
         Objects.requireNonNull(input, "input cannot be null");
 
         return read(Files.newInputStream(input.toPath()), options);
     }
 
+    @Override
     public Metadata read(Reader input, Map<String, ?> options) throws IOException {
         Objects.requireNonNull(input, "input cannot be null");
 
@@ -61,6 +63,7 @@ public class DefaultMetadataReader implements MetadataReader {
         }
     }
 
+    @Override
     public Metadata read(InputStream input, Map<String, ?> options) throws IOException {
         Objects.requireNonNull(input, "input cannot be null");
 

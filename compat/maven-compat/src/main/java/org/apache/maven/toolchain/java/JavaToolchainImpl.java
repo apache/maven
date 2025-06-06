@@ -51,10 +51,12 @@ public class JavaToolchainImpl extends DefaultToolchain implements JavaToolchain
         this.javaHome = javaHome;
     }
 
+    @Override
     public String toString() {
         return "JDK[" + getJavaHome() + "]";
     }
 
+    @Override
     public String findTool(String toolName) {
         Path toRet = findTool(toolName, Paths.get(getJavaHome()).normalize());
         if (toRet != null) {

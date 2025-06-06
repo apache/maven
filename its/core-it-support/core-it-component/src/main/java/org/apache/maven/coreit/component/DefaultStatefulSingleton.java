@@ -30,14 +30,17 @@ public class DefaultStatefulSingleton implements StatefulSingleton {
 
     private Properties properties = new Properties();
 
+    @Override
     public String getProperty(String key) {
         return properties.getProperty(key);
     }
 
+    @Override
     public void setProperty(String key, String value) {
         properties.setProperty(key, value);
     }
 
+    @Override
     public void saveProperties(File propertiesFile) throws IOException {
         propertiesFile.getParentFile().mkdirs();
 
