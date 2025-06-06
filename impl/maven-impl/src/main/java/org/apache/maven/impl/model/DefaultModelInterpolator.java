@@ -23,12 +23,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.UnaryOperator;
 
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
@@ -44,6 +40,7 @@ import org.apache.maven.api.services.model.ModelInterpolator;
 import org.apache.maven.api.services.model.PathTranslator;
 import org.apache.maven.api.services.model.RootLocator;
 import org.apache.maven.api.services.model.UrlNormalizer;
+import org.apache.maven.impl.model.reflection.IntrospectionException;
 import org.apache.maven.impl.model.reflection.ReflectionValueExtractor;
 import org.apache.maven.model.v4.MavenTransformer;
 
@@ -101,21 +98,21 @@ public class DefaultModelInterpolator implements ModelInterpolator {
     @Override
     public Model interpolateModel(
             Model model, Path projectDir, ModelBuilderRequest request, ModelProblemCollector problems) {
-        InnerInterpolator innerInterpolator = createInterpolator(model, projectDir, request, problems);
-        return new MavenTransformer(innerInterpolator::interpolate).visit(model);
+        return new MavenTransformer(createInterpolator(model, projectDir, request, problems)::interpolate).visit(model);
     }
 
     private InnerInterpolator createInterpolator(
             Model model, Path projectDir, ModelBuilderRequest request, ModelProblemCollector problems) {
-
-        Map<String, Optional<String>> cache = new HashMap<>();
-        Function<String, Optional<String>> ucb =
-                v -> Optional.ofNullable(callback(model, projectDir, request, problems, v));
-        UnaryOperator<String> cb = v -> cache.computeIfAbsent(v, ucb).orElse(null);
-        BinaryOperator<String> postprocessor = (e, v) -> postProcess(projectDir, request, e, v);
         return value -> {
             try {
-                return interpolator.interpolate(value, cb, postprocessor, false);
+                return interpolator.interpolate(
+                        value,
+                        v -> new HashMap<String, Optional<String>>()
+                                .computeIfAbsent(
+                                        v, v2 -> Optional.ofNullable(doCallback(model, projectDir, request, v2)))
+                                .orElse(null),
+                        (e, v1) -> postProcess(projectDir, request, e, v1),
+                        false);
             } catch (InterpolatorException e) {
                 problems.add(BuilderProblem.Severity.ERROR, ModelProblem.Version.BASE, e.getMessage(), e);
                 return null;
@@ -129,23 +126,9 @@ public class DefaultModelInterpolator implements ModelInterpolator {
                 : PROJECT_PREFIXES_3_1;
     }
 
-    String callback(
-            Model model,
-            Path projectDir,
-            ModelBuilderRequest request,
-            ModelProblemCollector problems,
-            String expression) {
-        String value = doCallback(model, projectDir, request, problems, expression);
-        if (value != null) {
-            // value = postProcess(projectDir, request, expression, value);
-        }
-        return value;
-    }
-
     private String postProcess(Path projectDir, ModelBuilderRequest request, String expression, String value) {
         // path translation
-        String exp = unprefix(expression, getProjectPrefixes(request));
-        if (TRANSLATED_PATH_EXPRESSIONS.contains(exp)) {
+        if (TRANSLATED_PATH_EXPRESSIONS.contains(unprefix(expression, getProjectPrefixes(request)))) {
             value = pathTranslator.alignToBaseDirectory(value, projectDir);
         }
         // normalize url
@@ -164,12 +147,7 @@ public class DefaultModelInterpolator implements ModelInterpolator {
         return expression;
     }
 
-    String doCallback(
-            Model model,
-            Path projectDir,
-            ModelBuilderRequest request,
-            ModelProblemCollector problems,
-            String expression) {
+    String doCallback(Model model, Path projectDir, ModelBuilderRequest request, String expression) {
         // basedir (the prefixed combos are handled below)
         if ("basedir".equals(expression)) {
             return projectProperty(model, projectDir, expression, false);
@@ -220,8 +198,7 @@ public class DefaultModelInterpolator implements ModelInterpolator {
                     if (value != null) {
                         return value.toString();
                     }
-                } catch (Exception e) {
-                    // addFeedback("Failed to extract \'" + expression + "\' from: " + root, e);
+                } catch (IntrospectionException ignored) {
                 }
             } else if (prefixed && subExpr.equals("baseUri")) {
                 return projectDir.toAbsolutePath().toUri().toASCIIString();
@@ -232,8 +209,7 @@ public class DefaultModelInterpolator implements ModelInterpolator {
                     if (value != null) {
                         return value.toString();
                     }
-                } catch (Exception e) {
-                    // addFeedback("Failed to extract \'" + expression + "\' from: " + root, e);
+                } catch (IntrospectionException ignored) {
                 }
             } else if (prefixed && subExpr.equals("rootDirectory")) {
                 return rootLocator.findMandatoryRoot(projectDir).toString();
@@ -244,19 +220,15 @@ public class DefaultModelInterpolator implements ModelInterpolator {
                     if (value != null) {
                         return value.toString();
                     }
-                } catch (Exception e) {
-                    // addFeedback("Failed to extract \'" + expression + "\' from: " + root, e);
+                } catch (IntrospectionException ignored) {
                 }
             }
         }
         try {
             Object value = ReflectionValueExtractor.evaluate(subExpr, model, false);
-            if (value != null) {
-                return value.toString();
-            }
-        } catch (Exception e) {
-            // addFeedback("Failed to extract \'" + expression + "\' from: " + root, e);
+            return value != null ? value.toString() : null;
+        } catch (IntrospectionException ignored) {
+            return null;
         }
-        return null;
     }
 }
