@@ -54,7 +54,7 @@ class ConsumerPomArtifactTransformerTest {
             Model model = new Model(new MavenStaxReader().read(expected));
             MavenProject project = new MavenProject(model);
             project.setOriginalModel(model);
-            DefaultConsumerPomArtifactTransformer t = new DefaultConsumerPomArtifactTransformer((s, p, f) -> {
+            ConsumerPomArtifactTransformer t = new ConsumerPomArtifactTransformer((s, p, f) -> {
                 try (InputStream is = Files.newInputStream(f)) {
                     return DefaultConsumerPomBuilder.transformPom(new MavenStaxReader().read(is), project);
                 }
@@ -81,7 +81,7 @@ class ConsumerPomArtifactTransformerTest {
             Model model = new Model(new MavenStaxReader().read(expected));
             MavenProject project = new MavenProject(model);
             project.setOriginalModel(model);
-            DefaultConsumerPomArtifactTransformer t = new DefaultConsumerPomArtifactTransformer((s, p, f) -> {
+            ConsumerPomArtifactTransformer t = new ConsumerPomArtifactTransformer((s, p, f) -> {
                 try (InputStream is = Files.newInputStream(f)) {
                     return DefaultConsumerPomBuilder.transformNonPom(new MavenStaxReader().read(is), project);
                 }
@@ -100,7 +100,7 @@ class ConsumerPomArtifactTransformerTest {
         SessionData sessionDataMock = Mockito.mock(SessionData.class);
         when(systemSessionMock.getData()).thenReturn(sessionDataMock);
 
-        new DefaultConsumerPomArtifactTransformer((session, project, src) -> null)
+        new ConsumerPomArtifactTransformer((session, project, src) -> null)
                 .injectTransformedArtifacts(systemSessionMock, emptyProject);
 
         assertThat(emptyProject.getAttachedArtifacts()).isEmpty();

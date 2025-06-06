@@ -169,7 +169,7 @@ public abstract class AbstractCoreMavenComponentTestCase {
         File localRepoDir = new File(projectBuildingRequest.getLocalRepository().getBasedir());
         LocalRepository localRepo = new LocalRepository(localRepoDir, "simple");
 
-        RepositorySystemSession session = new MavenSessionBuilderSupplier(repositorySystem)
+        RepositorySystemSession session = new MavenSessionBuilderSupplier(repositorySystem, true)
                 .get()
                 .withLocalRepositories(localRepo)
                 .build();

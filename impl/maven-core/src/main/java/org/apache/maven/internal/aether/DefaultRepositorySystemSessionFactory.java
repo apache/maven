@@ -34,6 +34,7 @@ import org.apache.maven.api.Constants;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
+import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
@@ -155,13 +156,14 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
     public SessionBuilder newRepositorySessionBuilder(MavenExecutionRequest request) {
         requireNonNull(request, "request");
 
-        MavenSessionBuilderSupplier supplier = new MavenSessionBuilderSupplier(repoSystem);
+        // this map is read ONLY to get config from (profiles + env + system + user)
+        Map<String, String> mergedProps = createMergedProperties(request);
+
+        boolean mavenMaven3Personality = Features.mavenMaven3Personality(mergedProps);
+        MavenSessionBuilderSupplier supplier = new MavenSessionBuilderSupplier(repoSystem, mavenMaven3Personality);
         SessionBuilder sessionBuilder = supplier.get();
         sessionBuilder.setArtifactTypeRegistry(new TypeRegistryAdapter(typeRegistry)); // dynamic
         sessionBuilder.setCache(request.getRepositoryCache());
-
-        // this map is read ONLY to get config from (profiles + env + system + user)
-        Map<String, String> mergedProps = createMergedProperties(request);
 
         // configProps map is kept "pristine", is written ONLY, the mandatory resolver config
         Map<String, Object> configProps = new LinkedHashMap<>();
@@ -356,7 +358,7 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
 
         // may be overridden
         String resolverDependencyManagerTransitivity = mergedProps.getOrDefault(
-                Constants.MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY, Boolean.TRUE.toString());
+                Constants.MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY, Boolean.toString(!mavenMaven3Personality));
         sessionBuilder.setDependencyManager(
                 supplier.getDependencyManager(Boolean.parseBoolean(resolverDependencyManagerTransitivity)));
 

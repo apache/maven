@@ -53,7 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Named
-class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
+class DefaultConsumerPomBuilder implements PomBuilder {
     private static final String BOM_PACKAGING = "bom";
 
     public static final String POM_PACKAGING = "pom";
@@ -198,8 +198,7 @@ class DefaultConsumerPomBuilder implements ConsumerPomBuilder {
         request.lifecycleBindingsInjector(lifecycleBindingsInjector::injectLifecycleBindings);
         ModelBuilder.ModelBuilderSession mbSession =
                 iSession.getData().get(SessionData.key(ModelBuilder.ModelBuilderSession.class));
-        ModelBuilderResult result = mbSession.build(request.build());
-        return result;
+        return mbSession.build(request.build());
     }
 
     static Model transformNonPom(Model model, MavenProject project) {

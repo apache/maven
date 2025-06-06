@@ -30,10 +30,9 @@ import org.eclipse.aether.RepositorySystemSession;
 
 /**
  * This interface is not public and the purpose is to allow easy unit testing
- * of {@link DefaultConsumerPomArtifactTransformer}.
+ * of {@link ConsumerPomArtifactTransformer}.
  */
-interface ConsumerPomBuilder {
-
+interface PomBuilder {
     Model build(RepositorySystemSession session, MavenProject project, Path src)
             throws ModelBuilderException, IOException, XMLStreamException;
 }

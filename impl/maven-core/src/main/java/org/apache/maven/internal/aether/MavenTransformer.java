@@ -22,7 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.internal.transformation.ConsumerPomArtifactTransformer;
+import org.apache.maven.internal.transformation.TransformerManager;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.deployment.DeployRequest;
 import org.eclipse.aether.installation.InstallRequest;
@@ -36,20 +36,20 @@ import static java.util.Objects.requireNonNull;
 @Singleton
 @Named
 final class MavenTransformer implements ArtifactTransformer {
-    private final ConsumerPomArtifactTransformer consumerPomArtifactTransformer;
+    private final TransformerManager transformerManager;
 
     @Inject
-    MavenTransformer(ConsumerPomArtifactTransformer consumerPomArtifactTransformer) {
-        this.consumerPomArtifactTransformer = requireNonNull(consumerPomArtifactTransformer);
+    MavenTransformer(TransformerManager transformerManager) {
+        this.transformerManager = requireNonNull(transformerManager);
     }
 
     @Override
     public InstallRequest transformInstallArtifacts(RepositorySystemSession session, InstallRequest request) {
-        return consumerPomArtifactTransformer.remapInstallArtifacts(session, request);
+        return transformerManager.remapInstallArtifacts(session, request);
     }
 
     @Override
     public DeployRequest transformDeployArtifacts(RepositorySystemSession session, DeployRequest request) {
-        return consumerPomArtifactTransformer.remapDeployArtifacts(session, request);
+        return transformerManager.remapDeployArtifacts(session, request);
     }
 }
