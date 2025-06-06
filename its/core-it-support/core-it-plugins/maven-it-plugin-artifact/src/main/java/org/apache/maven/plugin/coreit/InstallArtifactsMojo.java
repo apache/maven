@@ -119,7 +119,6 @@ public class InstallArtifactsMojo extends AbstractMojo {
         }
 
         @Override
-        @Override
         public String pathOf(Artifact artifact) {
             ArtifactHandler artifactHandler = artifact.getArtifactHandler();
 
@@ -140,7 +139,6 @@ public class InstallArtifactsMojo extends AbstractMojo {
         }
 
         @Override
-        @Override
         public String pathOfLocalRepositoryMetadata(ArtifactMetadata metadata, ArtifactRepository repository) {
             return pathOfRepositoryMetadata(metadata.getLocalFilename(repository));
         }
@@ -153,7 +151,6 @@ public class InstallArtifactsMojo extends AbstractMojo {
             return path.toString();
         }
 
-        @Override
         @Override
         public String pathOfRemoteRepositoryMetadata(ArtifactMetadata metadata) {
             return pathOfRepositoryMetadata(metadata.getRemoteFilename());
