@@ -29,16 +29,46 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @PlexusTest
 class ArtifactHandlerTest {
+
+    private static final List<String> PACKAGING_TYPES = List.of(
+            "aar",
+            "apk",
+            "bundle",
+            "ear",
+            "eclipse-plugin",
+            "eclipse-test-plugin",
+            "ejb",
+            "ejb-client",
+            "hpi",
+            "jar",
+            "java-source",
+            "javadoc",
+            "jpi",
+            "kar",
+            "lpkg",
+            "maven-archetype",
+            "maven-plugin",
+            "nar",
+            "par",
+            "pom",
+            "rar",
+            "sar",
+            "swc",
+            "swf",
+            "test-jar",
+            "war",
+            "zip");
+
     @Inject
     PlexusContainer container;
 
     @Test
-    @SuppressWarnings("checkstyle:UnusedLocalVariable")
     void testAptConsistency() throws Exception {
         File apt = getTestFile("src/site/apt/artifact-handlers.apt");
 
@@ -77,8 +107,16 @@ class ArtifactHandlerTest {
                 ArtifactHandler handler =
                         container.lookup(ArtifactHandlerManager.class).getArtifactHandler(type);
                 assertEquals(handler.getExtension(), extension, type + " extension");
-                // Packaging/Directory is Maven1 remnant!!!
-                // assertEquals(handler.getPackaging(), packaging, type + " packaging");
+                assertThat(PACKAGING_TYPES).contains(handler.getPackaging(), packaging);
+                if (handler.getPackaging().equals("test-jar")) {
+                    assertEquals("jar", packaging);
+                } else if (handler.getPackaging().equals("ejb-client")) {
+                    assertEquals("ejb", packaging);
+                } else {
+                    // Packaging/Directory is Maven1 remnant!!!
+                    // TODO test with this assertion only
+                    assertEquals(handler.getPackaging(), packaging, type + " packaging");
+                }
                 assertEquals(handler.getClassifier(), classifier, type + " classifier");
                 assertEquals(handler.getLanguage(), language, type + " language");
                 assertEquals(
