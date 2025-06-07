@@ -48,44 +48,45 @@ import java.util.function.Supplier;
 
 class WrapperProperties extends Properties {
 
-    final Supplier<Map<String, String>> getter;
-    final Consumer<Properties> setter;
     private final OrderedProperties orderedProps = new OrderedProperties();
-    private boolean initialized;
+    private final Supplier<Map<String, String>> getter;
+    private final Consumer<Properties> setter;
 
     WrapperProperties(Supplier<Map<String, String>> getter, Consumer<Properties> setter) {
         this.getter = getter;
         this.setter = setter;
+        orderedProps.putAll(getter.get());
+//        init();
     }
 
-    private synchronized void ensureInitialized() {
-        if (!initialized) {
-            orderedProps.putAll(getter.get());
-            initialized = true;
-        }
-    }
+//    /**
+//     * Initializes the ordered properties by populating it with values retrieved
+//     * from the getter. The retrieved map from the getter is merged into the
+//     * existing `orderedProps` map using the `putAll` method.
+//     *
+//     * This method ensures thread-safe initialization by synchronizing its operation.
+//     */
+//    private synchronized void init() {
+//        orderedProps.putAll(getter.get());
+//    }
 
     @Override
     public String getProperty(String key) {
-        ensureInitialized();
         return orderedProps.getProperty(key);
     }
 
     @Override
     public String getProperty(String key, String defaultValue) {
-        ensureInitialized();
         return orderedProps.getProperty(key, defaultValue);
     }
 
     @Override
     public Enumeration<?> propertyNames() {
-        ensureInitialized();
         return orderedProps.propertyNames();
     }
 
     @Override
     public Set<String> stringPropertyNames() {
-        ensureInitialized();
         return orderedProps.stringPropertyNames();
     }
 
@@ -101,81 +102,67 @@ class WrapperProperties extends Properties {
 
     @Override
     public int size() {
-        ensureInitialized();
         return orderedProps.size();
     }
 
     @Override
     public boolean isEmpty() {
-        ensureInitialized();
         return orderedProps.isEmpty();
     }
 
     @Override
     public Enumeration<Object> keys() {
-        ensureInitialized();
         return orderedProps.keys();
     }
 
     @Override
     public Enumeration<Object> elements() {
-        ensureInitialized();
         return orderedProps.elements();
     }
 
     @Override
     public boolean contains(Object value) {
-        ensureInitialized();
         return orderedProps.contains(value);
     }
 
     @Override
     public boolean containsValue(Object value) {
-        ensureInitialized();
         return orderedProps.containsValue(value);
     }
 
     @Override
     public boolean containsKey(Object key) {
-        ensureInitialized();
         return orderedProps.containsKey(key);
     }
 
     @Override
     public Object get(Object key) {
-        ensureInitialized();
         return orderedProps.get(key);
     }
 
     @Override
     public synchronized String toString() {
-        ensureInitialized();
         return orderedProps.toString();
     }
 
     @Override
     public Set<Object> keySet() {
-        ensureInitialized();
         return orderedProps.keySet();
     }
 
     @Override
     public Collection<Object> values() {
-        ensureInitialized();
         return orderedProps.values();
     }
 
     @Override
     public Set<Map.Entry<Object, Object>> entrySet() {
-        ensureInitialized();
         return orderedProps.entrySet();
     }
 
     @Override
     public synchronized boolean equals(Object o) {
-        ensureInitialized();
         if (o instanceof WrapperProperties wrapperProperties) {
-            wrapperProperties.ensureInitialized();
             return orderedProps.equals(wrapperProperties.orderedProps);
         }
         return orderedProps.equals(o);
@@ -183,19 +170,16 @@ class WrapperProperties extends Properties {
 
     @Override
     public synchronized int hashCode() {
-        ensureInitialized();
         return orderedProps.hashCode();
     }
 
     @Override
     public Object getOrDefault(Object key, Object defaultValue) {
-        ensureInitialized();
         return orderedProps.getOrDefault(key, defaultValue);
     }
 
     @Override
     public synchronized void forEach(BiConsumer<? super Object, ? super Object> action) {
-        ensureInitialized();
         orderedProps.forEach(action);
     }
 
@@ -208,16 +192,19 @@ class WrapperProperties extends Properties {
     }
 
     private <T> T writeOperation(WriteOp<T> runner) {
-        ensureInitialized();
         T ret = runner.perform(orderedProps);
-        setter.accept(orderedProps);
+        accept();
         return ret;
     }
 
     private void writeOperationVoid(WriteOpVoid runner) {
-        ensureInitialized();
         runner.perform(orderedProps);
+        accept();
+    }
+
+    private void accept() {
         setter.accept(orderedProps);
+//        init();
     }
 
     @Override
