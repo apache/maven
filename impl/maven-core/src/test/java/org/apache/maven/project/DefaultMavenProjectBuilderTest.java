@@ -90,6 +90,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
     }
 
     @Disabled("Maven 4 does not allow duplicate plugin declarations")
+//    @RetryingTest(value = 3, onExceptions = BaseRetryableException.class)
     @Test
     void testDuplicatePluginDefinitionsMerged() throws Exception {
         File f1 = getTestFile("src/test/resources/projects/duplicate-plugins-merged-pom.xml");
