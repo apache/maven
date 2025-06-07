@@ -134,21 +134,11 @@ public class CheckThreadSafetyMojo extends AbstractMojo {
 
         getLog().info("[MAVEN-CORE-IT-LOG] Creating output file " + outputFile);
 
-        OutputStream out = null;
-        try {
-            outputFile.getParentFile().mkdirs();
-            out = new FileOutputStream(outputFile);
+        outputFile.getParentFile().mkdirs();
+        try (OutputStream out = new FileOutputStream(outputFile)) {
             componentProperties.store(out, "MAVEN-CORE-IT-LOG");
         } catch (IOException e) {
-            throw new MojoExecutionException("Output file could not be created: " + outputFile, e);
-        } finally {
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    // just ignore
-                }
-            }
+            throw new MojoExecutionException(e);
         }
 
         getLog().info("[MAVEN-CORE-IT-LOG] Created output file " + outputFile);
