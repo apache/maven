@@ -25,6 +25,7 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 import org.apache.maven.cling.executor.ExecutorHelper;
+import org.apache.maven.cling.executor.ExecutorHelper.Mode;
 import org.apache.maven.cling.executor.MavenExecutorTestSupport;
 import org.apache.maven.cling.executor.MimirInfuser;
 import org.apache.maven.cling.executor.internal.HelperImpl;
@@ -32,6 +33,7 @@ import org.apache.maven.cling.executor.internal.ToolboxTool;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -40,6 +42,7 @@ import static org.apache.maven.cling.executor.MavenExecutorTestSupport.mvn3Execu
 import static org.apache.maven.cling.executor.MavenExecutorTestSupport.mvn4ExecutorRequestBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.condition.OS.MAC;
 
 public class ToolboxToolTest {
     @TempDir
@@ -50,6 +53,9 @@ public class ToolboxToolTest {
         MimirInfuser.infuse(userHome);
     }
 
+    @DisabledOnOs(
+            value = MAC,
+            disabledReason = "mvn3 fails to close log file properly, therefore JUnit fails to clean up as well.")
     @Timeout(15)
     @ParameterizedTest
     @EnumSource(ExecutorHelper.Mode.class)
@@ -64,6 +70,9 @@ public class ToolboxToolTest {
         assertEquals(System.getProperty("maven3version"), dump.get("maven.version"));
     }
 
+    @DisabledOnOs(
+            value = MAC,
+            disabledReason = "mvn3 fails to close log file properly, therefore JUnit fails to clean up as well.")
     @Timeout(15)
     @ParameterizedTest
     @EnumSource(ExecutorHelper.Mode.class)
@@ -174,6 +183,10 @@ public class ToolboxToolTest {
     }
 
     @Timeout(15)
+    @DisabledOnOs(
+            value = MAC,
+            disabledReason = "mvn3 fails to close log file properly, therefore JUnit fails to clean up as well.")
+    @EnumSource(Mode.class)
     @ParameterizedTest
     @EnumSource(ExecutorHelper.Mode.class)
     void metadataPath3(ExecutorHelper.Mode mode) {
