@@ -67,6 +67,7 @@ public class ResourcesMojo extends AbstractMojo {
      * @throws MojoExecutionException If the output file could not be created.
      * @throws MojoFailureException   If the output file has not been set.
      */
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         getLog().info("[MAVEN-CORE-IT-LOG] Using output file path: " + pathname);
 

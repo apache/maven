@@ -25,5 +25,6 @@ import org.apache.maven.plugins.annotations.Mojo;
  */
 @Mojo(name = "dummy")
 public class CoreItMojo extends AbstractMojo {
+    @Override
     public void execute() {}
 }

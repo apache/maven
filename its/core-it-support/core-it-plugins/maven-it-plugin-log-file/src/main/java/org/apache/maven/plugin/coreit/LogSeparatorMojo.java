@@ -43,6 +43,7 @@ public class LogSeparatorMojo extends AbstractLogMojo {
      *
      * @throws MojoExecutionException If the output file could not be created.
      */
+    @Override
     public void execute() throws MojoExecutionException {
         StringBuilder buffer = new StringBuilder(length);
         for (int i = 0; i < length; i++) {

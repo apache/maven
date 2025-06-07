@@ -72,6 +72,7 @@ public class CheckMojo extends AbstractMojo {
      *
      * @throws MojoFailureException If the output file could not be created.
      */
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         Properties componentProperties = new Properties();
 

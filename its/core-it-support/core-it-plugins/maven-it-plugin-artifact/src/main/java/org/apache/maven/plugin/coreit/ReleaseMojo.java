@@ -46,6 +46,7 @@ public class ReleaseMojo extends AbstractMojo {
     /**
      * Runs this mojo.
      */
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         Artifact artifact = project.getArtifact();
         artifact.setRelease(true);

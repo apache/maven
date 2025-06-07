@@ -85,6 +85,7 @@ public class LoadResourceMojo extends AbstractMojo {
      *
      * @throws MojoFailureException If the attached file has not been set.
      */
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         getLog().info("[MAVEN-CORE-IT-LOG] Looking up wagon for protocol " + wagonProtocol);
 

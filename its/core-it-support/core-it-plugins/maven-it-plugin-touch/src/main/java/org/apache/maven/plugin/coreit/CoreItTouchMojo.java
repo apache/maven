@@ -83,6 +83,7 @@ public class CoreItTouchMojo extends AbstractMojo {
     @Parameter(property = "fail")
     private boolean fail = false;
 
+    @Override
     public void execute() throws MojoExecutionException {
         if (fail) {
             throw new MojoExecutionException(

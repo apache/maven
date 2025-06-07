@@ -68,6 +68,7 @@ public class ExtensionConfigurationModule implements Module {
             super(transformer);
         }
 
+        @Override
         public XmlNode transform(XmlNode node) {
             return super.transform(node);
         }

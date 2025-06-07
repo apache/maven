@@ -45,6 +45,7 @@ public class SerializeMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.build.directory}/serialized.xml")
     private File file;
 
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         Writer writer = null;
         XmlSerializer s = new MXSerializer();

@@ -42,6 +42,7 @@ public class NoProjectMojo extends AbstractMojo {
     @Parameter(defaultValue = "target/test-basedir-alignment")
     private File basedirAlignmentDirectory;
 
+    @Override
     public void execute() throws MojoExecutionException {
         touch(new File(outputDirectory), "touch.txt");
     }

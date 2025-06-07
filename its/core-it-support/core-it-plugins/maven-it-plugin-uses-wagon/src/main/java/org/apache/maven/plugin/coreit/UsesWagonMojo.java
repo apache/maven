@@ -38,6 +38,7 @@ public class UsesWagonMojo extends AbstractMojo {
     @Component
     private WagonManager wagonManager;
 
+    @Override
     public void execute() throws MojoExecutionException {
         Wagon fileWagon;
         try {

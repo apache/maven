@@ -42,6 +42,7 @@ public class ForkLifecycleMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.build.directory}")
     private File touchDirectory;
 
+    @Override
     public void execute() throws MojoExecutionException {
         TouchMojo.touch(touchDirectory, "fork-lifecycle.txt");
 

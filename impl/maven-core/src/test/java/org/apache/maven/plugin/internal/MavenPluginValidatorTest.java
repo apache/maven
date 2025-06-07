@@ -39,6 +39,7 @@ class MavenPluginValidatorTest extends AbstractCoreMavenComponentTestCase {
     @Inject
     private MavenPluginValidator mavenPluginValidator;
 
+    @Override
     protected String getProjectsDirectory() {
         return "src/test/projects/default-maven";
     }

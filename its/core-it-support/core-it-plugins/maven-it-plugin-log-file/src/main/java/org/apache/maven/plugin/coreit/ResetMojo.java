@@ -37,6 +37,7 @@ public class ResetMojo extends AbstractLogMojo {
      *
      * @throws MojoExecutionException If the output file could not be created.
      */
+    @Override
     public void execute() throws MojoExecutionException {
         reset();
     }

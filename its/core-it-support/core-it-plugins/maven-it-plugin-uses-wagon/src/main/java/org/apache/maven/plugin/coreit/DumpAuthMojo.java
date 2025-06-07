@@ -71,6 +71,7 @@ public class DumpAuthMojo extends AbstractMojo {
      *
      * @throws MojoFailureException If the output file could not be created.
      */
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         Properties authProperties = new Properties();
 

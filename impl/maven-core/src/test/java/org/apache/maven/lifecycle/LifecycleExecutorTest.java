@@ -69,6 +69,7 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     @Inject
     private MojoDescriptorCreator mojoDescriptorCreator;
 
+    @Override
     protected String getProjectsDirectory() {
         return "src/test/projects/lifecycle-executor";
     }

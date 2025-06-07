@@ -30,10 +30,12 @@ import org.apache.maven.toolchain.model.ToolchainModel;
 @Named("coreit")
 public class CoreItToolchainFactory implements ToolchainFactory {
 
+    @Override
     public ToolchainPrivate createDefaultToolchain() {
         return null;
     }
 
+    @Override
     public ToolchainPrivate createToolchain(ToolchainModel model) {
         if (model == null) {
             return null;

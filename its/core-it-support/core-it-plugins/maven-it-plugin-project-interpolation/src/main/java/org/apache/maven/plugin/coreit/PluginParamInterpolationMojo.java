@@ -44,6 +44,7 @@ public class PluginParamInterpolationMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project}")
     private MavenProject project;
 
+    @Override
     public void execute() throws MojoExecutionException {
         myDirectory = normalize(myDirectory);
         String value = normalize(new File(project.getBuild().getDirectory(), "foo").getAbsolutePath());

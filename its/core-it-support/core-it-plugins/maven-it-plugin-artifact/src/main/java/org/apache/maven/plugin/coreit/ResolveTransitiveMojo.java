@@ -99,6 +99,7 @@ public class ResolveTransitiveMojo extends AbstractMojo {
      *
      * @throws MojoExecutionException If the artifacts couldn't be resolved.
      */
+    @Override
     public void execute() throws MojoExecutionException {
         getLog().info("[MAVEN-CORE-IT-LOG] Resolving artifacts");
 

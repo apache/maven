@@ -30,6 +30,7 @@ public class MojoExecutionExceptionMojo extends AbstractMojo {
     @Parameter(property = "error.message", defaultValue = "Planned MojoExecutionException.", required = true)
     private String message;
 
+    @Override
     public void execute() throws MojoExecutionException {
         throw new MojoExecutionException(message);
     }

@@ -28,5 +28,6 @@ import org.apache.maven.plugins.annotations.Mojo;
 @Mojo(name = "mojo-component-lookup-exception", requiresProject = false)
 public class MojoComponentLookupExceptionMojo extends AbstractMojo {
 
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {}
 }

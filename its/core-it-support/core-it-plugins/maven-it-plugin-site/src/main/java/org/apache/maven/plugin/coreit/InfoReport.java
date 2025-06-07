@@ -74,6 +74,7 @@ public class InfoReport extends AbstractMojo implements MavenReport {
      * @throws MojoExecutionException If the output file could not be created.
      * @throws MojoFailureException If the output file has not been set.
      */
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         getLog().info("[MAVEN-CORE-IT-LOG] Using output file path: " + infoFile);
 
@@ -121,6 +122,7 @@ public class InfoReport extends AbstractMojo implements MavenReport {
      *
      * @throws MavenReportException If the report could not be created.
      */
+    @Override
     public void generate(Sink sink, Locale locale) throws MavenReportException {
         this.locale = locale;
         try {
@@ -130,34 +132,42 @@ public class InfoReport extends AbstractMojo implements MavenReport {
         }
     }
 
+    @Override
     public String getOutputName() {
         return "info";
     }
 
+    @Override
     public String getCategoryName() {
         return "Project Reports";
     }
 
+    @Override
     public String getName(Locale locale) {
         return "name";
     }
 
+    @Override
     public String getDescription(Locale locale) {
         return "description";
     }
 
+    @Override
     public void setReportOutputDirectory(File outputDirectory) {
         this.outputDirectory = outputDirectory;
     }
 
+    @Override
     public File getReportOutputDirectory() {
         return outputDirectory;
     }
 
+    @Override
     public boolean isExternalReport() {
         return true;
     }
 
+    @Override
     public boolean canGenerateReport() {
         return true;
     }

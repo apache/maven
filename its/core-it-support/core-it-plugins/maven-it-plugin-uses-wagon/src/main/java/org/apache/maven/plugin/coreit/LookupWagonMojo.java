@@ -68,6 +68,7 @@ public class LookupWagonMojo extends AbstractMojo {
      *
      * @throws MojoFailureException If the attached file has not been set.
      */
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         Properties loaderProperties = new Properties();
 
