@@ -29,7 +29,6 @@ which might be interesting to read and for further discussion.
 Getting Started
 ---------------
 
-+ Make sure you have a [JIRA account](https://issues.apache.org/jira/).
 + Make sure you have a [GitHub account](https://github.com/signup/free).
 + If you're planning to implement a new feature, it makes sense to discuss your changes 
   on the [dev list](https://maven.apache.org/mailing-lists.html) first.
@@ -55,24 +54,11 @@ There are some guidelines which will make applying PRs easier for us:
   + Create minimal diffs - disable on save actions like reformat source code or organize imports. 
     If you feel the source code should be reformatted, create a separate PR for this change.
   + Check for unnecessary whitespace with `git diff --check` before committing.
-+ Make sure your commit messages are in the proper format. Your commit message should contain the key of the JIRA issue.
-```
-[MNG-XXX] - Subject of the JIRA Ticket
- Optional supplemental description.
-```
 + Make sure you have added the necessary tests (JUnit/[Core IT tests][core-it]) for your changes.
 + Run all the tests with `mvn -Prun-its verify` to assure nothing else was accidentally broken.
 + Submit a pull request to the repository in the Apache organization.
-+ Update your JIRA ticket and include a link to the pull request in the ticket.
 
 If you plan to contribute on a regular basis, please consider filing a [contributor license agreement][cla].
-
-Making Trivial Changes
-----------------------
-
-For changes of a trivial nature to comments and documentation, it is not always
-necessary to create a new ticket in JIRA.  In this case, it is appropriate to
-start the first line of a commit with '(doc)' instead of a ticket number.
 
 Additional Resources
 --------------------
@@ -81,9 +67,10 @@ Additional Resources
 + [Apache Maven JIRA project page](https://issues.apache.org/jira/projects/MNG/)
 + [Contributor License Agreement][cla]
 + [General GitHub documentation](https://help.github.com/)
-+ [GitHub pull request documentation](https://help.github.com/send-pull-requests/)
-+ [Apache Maven Twitter Account](https://twitter.com/ASFMavenProject)
-+ #Maven IRC channel on freenode.org
++ [GitHub pull request documentation](https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork)
++ [Apache Maven X Account](https://x.com/ASFMavenProject)
++ [Apache Maven Bluesky Account](https://bsky.app/profile/maven.apache.org)
++ [Apache Maven Mastodon Account](https://mastodon.social/deck/@ASFMavenProject@fosstodon.org)
 
 [dev-ml-list]: https://maven.apache.org/mailing-lists.html
 [code-style]: https://maven.apache.org/developers/conventions/code.html
