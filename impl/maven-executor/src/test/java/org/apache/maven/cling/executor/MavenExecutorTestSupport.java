@@ -136,7 +136,8 @@ public abstract class MavenExecutorTestSupport {
     @DisabledOnOs(
             value = {WINDOWS, MAC},
             disabledReason = "mvn3 fails to close log file properly, therefore JUnit fails to clean up as well.")
-    @Timeout(15) @Test
+    @Timeout(15)
+    @Test
     void defaultFs3x(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
         layDownFiles(tempDir);
         String logfile = "m3.log";
@@ -237,6 +238,9 @@ public abstract class MavenExecutorTestSupport {
 
     @Timeout(15)
     @Test
+    @DisabledOnOs(
+            value = MAC,
+            disabledReason = "mvn3 fails to close log file properly, therefore JUnit fails to clean up as well.")
     void defaultFs3xCaptureOutputWithForcedColor(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir)
             throws Exception {
         layDownFiles(tempDir);
@@ -259,7 +263,8 @@ public abstract class MavenExecutorTestSupport {
     @DisabledOnOs(
             value = MAC,
             disabledReason = "mvn3 fails to close log file properly, therefore JUnit fails to clean up as well.")
-    void defaultFs3xCaptureOutputWithForcedOffColor(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
+    void defaultFs3xCaptureOutputWithForcedOffColor(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir)
+            throws Exception {
         layDownFiles(tempDir);
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
         execute(

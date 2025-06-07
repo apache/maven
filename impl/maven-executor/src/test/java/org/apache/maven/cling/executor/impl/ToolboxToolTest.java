@@ -56,7 +56,8 @@ public class ToolboxToolTest {
     @DisabledOnOs(
             value = MAC,
             disabledReason = "mvn3 fails to close log file properly, therefore JUnit fails to clean up as well.")
-    @Timeout(15) @ParameterizedTest
+    @Timeout(15)
+    @ParameterizedTest
     @EnumSource(ExecutorHelper.Mode.class)
     void dump3(ExecutorHelper.Mode mode) throws Exception {
         ExecutorHelper helper = new HelperImpl(
@@ -72,7 +73,8 @@ public class ToolboxToolTest {
     @DisabledOnOs(
             value = MAC,
             disabledReason = "mvn3 fails to close log file properly, therefore JUnit fails to clean up as well.")
-    @Timeout(15)  @ParameterizedTest
+    @Timeout(15)
+    @ParameterizedTest
     @EnumSource(ExecutorHelper.Mode.class)
     void dump4(ExecutorHelper.Mode mode) throws Exception {
         ExecutorHelper helper = new HelperImpl(
@@ -180,6 +182,7 @@ public class ToolboxToolTest {
                 "path=" + path);
     }
 
+    @Timeout(15)
     @DisabledOnOs(
             value = MAC,
             disabledReason = "mvn3 fails to close log file properly, therefore JUnit fails to clean up as well.")
