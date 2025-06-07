@@ -27,20 +27,20 @@ import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.cling.invoker.ProtoLookup;
-import org.apache.maven.cling.invoker.mvnsh.ShellInvoker;
-import org.apache.maven.cling.invoker.mvnsh.ShellParser;
+import org.apache.maven.cling.invoker.mvnup.UpgradeInvoker;
+import org.apache.maven.cling.invoker.mvnup.UpgradeParser;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
 /**
- * Maven shell.
+ * Maven upgrade CLI "new-gen".
  */
-public class MavenShellCling extends ClingSupport {
+public class MavenUpCling extends ClingSupport {
     /**
      * "Normal" Java entry point. Note: Maven uses ClassWorld Launcher and this entry point is NOT used under normal
      * circumstances.
      */
     public static void main(String[] args) throws IOException {
-        int exitCode = new MavenShellCling().run(args, null, null, null, false);
+        int exitCode = new MavenUpCling().run(args, null, null, null, false);
         System.exit(exitCode);
     }
 
@@ -48,7 +48,7 @@ public class MavenShellCling extends ClingSupport {
      * ClassWorld Launcher "enhanced" entry point: returning exitCode and accepts Class World.
      */
     public static int main(String[] args, ClassWorld world) throws IOException {
-        return new MavenShellCling(world).run(args, null, null, null, false);
+        return new MavenUpCling(world).run(args, null, null, null, false);
     }
 
     /**
@@ -61,30 +61,30 @@ public class MavenShellCling extends ClingSupport {
             @Nullable OutputStream stdOut,
             @Nullable OutputStream stdErr)
             throws IOException {
-        return new MavenShellCling(world).run(args, stdIn, stdOut, stdErr, true);
+        return new MavenUpCling(world).run(args, stdIn, stdOut, stdErr, true);
     }
 
-    public MavenShellCling() {
+    public MavenUpCling() {
         super();
     }
 
-    public MavenShellCling(ClassWorld classWorld) {
+    public MavenUpCling(ClassWorld classWorld) {
         super(classWorld);
     }
 
     @Override
     protected Invoker createInvoker() {
-        return new ShellInvoker(
+        return new UpgradeInvoker(
                 ProtoLookup.builder().addMapping(ClassWorld.class, classWorld).build());
     }
 
     @Override
     protected Parser createParser() {
-        return new ShellParser();
+        return new UpgradeParser();
     }
 
     @Override
     protected ParserRequest.Builder createParserRequestBuilder(String[] args) {
-        return ParserRequest.mvnsh(args, createMessageBuilderFactory());
+        return ParserRequest.mvnup(args, createMessageBuilderFactory());
     }
 }

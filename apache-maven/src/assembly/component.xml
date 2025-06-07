@@ -87,6 +87,7 @@ under the License.
         <include>mvn</include>
         <include>mvnenc</include>
         <include>mvnsh</include>
+        <include>mvnup</include>
         <include>mvnDebug</include>
         <include>mvnencDebug</include>
         <!-- This is so that CI systems can periodically run the profiler -->

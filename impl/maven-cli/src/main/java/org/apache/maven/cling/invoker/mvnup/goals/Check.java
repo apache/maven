@@ -16,30 +16,35 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.cli;
+package org.apache.maven.cling.invoker.mvnup.goals;
 
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Immutable;
+import org.apache.maven.api.di.Inject;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.di.Singleton;
+import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
 
 /**
- * Represents most common tools supported by CLIng.
- *
- * @since 4.0.0
+ * The "check" goal implementation.
  */
-@Immutable
-@Experimental
-public final class Tools {
-    private Tools() {}
+@Named("check")
+@Singleton
+public class Check extends AbstractUpgradeGoal {
 
-    public static final String MVN_CMD = "mvn";
-    public static final String MVN_NAME = "Maven";
+    @Inject
+    public Check(StrategyOrchestrator orchestrator) {
+        super(orchestrator);
+    }
 
-    public static final String MVNENC_CMD = "mvnenc";
-    public static final String MVNENC_NAME = "Maven Password Encrypting Tool";
+    @Override
+    protected boolean shouldSaveModifications() {
+        return false;
+    }
 
-    public static final String MVNSHELL_CMD = "mvnsh";
-    public static final String MVNSHELL_NAME = "Maven Shell Tool";
+    @Override
+    public int execute(UpgradeContext context) throws Exception {
+        context.info("Maven Upgrade Tool - Check");
+        context.println();
 
-    public static final String MVNUP_CMD = "mvnup";
-    public static final String MVNUP_NAME = "Maven Upgrade Tool";
+        return super.execute(context);
+    }
 }
