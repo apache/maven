@@ -69,22 +69,11 @@ class PropertiesUtil {
     }
 
     public static void write(File outputFile, Properties props) throws MojoExecutionException {
-        OutputStream os = null;
-        try {
-            outputFile.getParentFile().mkdirs();
-            os = new FileOutputStream(outputFile);
+        outputFile.getParentFile().mkdirs();
+        try (OutputStream os = new FileOutputStream(outputFile)) {
             props.store(os, "MAVEN-CORE-IT-LOG");
         } catch (IOException e) {
-            throw new MojoExecutionException(
-                    "Output file " + outputFile + " could not be created: " + e.getMessage(), e);
-        } finally {
-            if (os != null) {
-                try {
-                    os.close();
-                } catch (IOException e) {
-                    // just ignore
-                }
-            }
+            throw new MojoExecutionException(e);
         }
     }
 
