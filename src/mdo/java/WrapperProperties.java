@@ -48,9 +48,9 @@ import java.util.function.Supplier;
 
 class WrapperProperties extends Properties {
 
-    final Supplier<Map<String, String>> getter;
-    final Consumer<Properties> setter;
     private final OrderedProperties orderedProps = new OrderedProperties();
+    private final Supplier<Map<String, String>> getter;
+    private final Consumer<Properties> setter;
     private boolean initialized;
 
     WrapperProperties(Supplier<Map<String, String>> getter, Consumer<Properties> setter) {
