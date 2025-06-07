@@ -33,8 +33,9 @@ import org.codehaus.plexus.classworlds.ClassWorld;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
+
+import static org.junit.jupiter.api.io.CleanupMode.ALWAYS;
 
 /**
  * Resident UT.
@@ -54,10 +55,7 @@ public class ResidentMavenInvokerTest extends MavenInvokerTestSupport {
     }
 
     @Test
-    void defaultFs(
-            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
-            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
-            throws Exception {
+    void defaultFs(@TempDir(cleanup = ALWAYS) Path cwd, @TempDir(cleanup = ALWAYS) Path userHome) throws Exception {
         invoke(cwd, userHome, List.of("verify"), List.of());
     }
 

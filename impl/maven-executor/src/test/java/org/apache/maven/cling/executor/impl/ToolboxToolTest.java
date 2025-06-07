@@ -22,129 +22,137 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
 
 import org.apache.maven.cling.executor.ExecutorHelper;
-import org.apache.maven.cling.executor.MavenExecutorTestSupport;
-import org.apache.maven.cling.executor.MimirInfuser;
+import org.apache.maven.cling.executor.ExecutorHelper.Mode;
 import org.apache.maven.cling.executor.internal.HelperImpl;
 import org.apache.maven.cling.executor.internal.ToolboxTool;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
+import static java.lang.System.getProperty;
+import static org.apache.maven.cling.executor.MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR;
+import static org.apache.maven.cling.executor.MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR;
 import static org.apache.maven.cling.executor.MavenExecutorTestSupport.mvn3ExecutorRequestBuilder;
 import static org.apache.maven.cling.executor.MavenExecutorTestSupport.mvn4ExecutorRequestBuilder;
+import static org.apache.maven.cling.executor.MimirInfuser.infuse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.condition.OS.MAC;
 
+@Timeout(15)
 public class ToolboxToolTest {
+    public static final String MAVEN_3_VERSION = "maven3version";
+    public static final String MAVEN_4_VERSION = "maven4version";
+
     @TempDir
     private static Path userHome;
 
     @BeforeAll
     static void beforeAll() throws Exception {
-        MimirInfuser.infuse(userHome);
+        infuse(userHome);
     }
 
-    @Timeout(15)
+    @DisabledOnOs(
+            value = MAC,
+            disabledReason = "mvn3 fails to close log file properly, therefore JUnit fails to clean up as well.")
     @ParameterizedTest
-    @EnumSource(ExecutorHelper.Mode.class)
-    void dump3(ExecutorHelper.Mode mode) throws Exception {
+    @EnumSource(Mode.class)
+    void dump3(Mode mode) {
         ExecutorHelper helper = new HelperImpl(
                 mode,
                 mvn3ExecutorRequestBuilder().build().installationDirectory(),
                 userHome,
-                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
-                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
-        Map<String, String> dump = new ToolboxTool(helper).dump(helper.executorRequest());
-        assertEquals(System.getProperty("maven3version"), dump.get("maven.version"));
+                EMBEDDED_MAVEN_EXECUTOR,
+                FORKED_MAVEN_EXECUTOR);
+        assertEquals(
+                getProperty(MAVEN_3_VERSION),
+                new ToolboxTool(helper).dump(helper.executorRequest()).get("maven.version"));
     }
 
-    @Timeout(15)
+    @DisabledOnOs(
+            value = MAC,
+            disabledReason = "mvn3 fails to close log file properly, therefore JUnit fails to clean up as well.")
     @ParameterizedTest
-    @EnumSource(ExecutorHelper.Mode.class)
-    void dump4(ExecutorHelper.Mode mode) throws Exception {
+    @EnumSource(Mode.class)
+    void dump4(Mode mode) {
         ExecutorHelper helper = new HelperImpl(
                 mode,
                 mvn4ExecutorRequestBuilder().build().installationDirectory(),
                 userHome,
-                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
-                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
-        Map<String, String> dump = new ToolboxTool(helper).dump(helper.executorRequest());
-        assertEquals(System.getProperty("maven4version"), dump.get("maven.version"));
+                EMBEDDED_MAVEN_EXECUTOR,
+                FORKED_MAVEN_EXECUTOR);
+        assertEquals(
+                getProperty(MAVEN_4_VERSION),
+                new ToolboxTool(helper).dump(helper.executorRequest()).get("maven.version"));
     }
 
-    @Timeout(15)
     @ParameterizedTest
-    @EnumSource(ExecutorHelper.Mode.class)
-    void version3(ExecutorHelper.Mode mode) {
+    @EnumSource(Mode.class)
+    void version3(Mode mode) {
         ExecutorHelper helper = new HelperImpl(
                 mode,
                 mvn3ExecutorRequestBuilder().build().installationDirectory(),
                 userHome,
-                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
-                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
-        assertEquals(System.getProperty("maven3version"), helper.mavenVersion());
+                EMBEDDED_MAVEN_EXECUTOR,
+                FORKED_MAVEN_EXECUTOR);
+        assertEquals(getProperty(MAVEN_3_VERSION), helper.mavenVersion());
     }
 
-    @Timeout(15)
     @ParameterizedTest
-    @EnumSource(ExecutorHelper.Mode.class)
-    void version4(ExecutorHelper.Mode mode) {
+    @EnumSource(Mode.class)
+    void version4(Mode mode) {
         ExecutorHelper helper = new HelperImpl(
                 mode,
                 mvn4ExecutorRequestBuilder().build().installationDirectory(),
                 userHome,
-                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
-                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
-        assertEquals(System.getProperty("maven4version"), helper.mavenVersion());
+                EMBEDDED_MAVEN_EXECUTOR,
+                FORKED_MAVEN_EXECUTOR);
+        assertEquals(getProperty(MAVEN_4_VERSION), helper.mavenVersion());
     }
 
-    @Timeout(15)
+    @DisabledOnOs(
+            value = MAC,
+            disabledReason = "mvn3 fails to close log file properly, therefore JUnit fails to clean up as well.")
     @ParameterizedTest
-    @EnumSource(ExecutorHelper.Mode.class)
-    void localRepository3(ExecutorHelper.Mode mode) {
+    @EnumSource(Mode.class)
+    void localRepository3(Mode mode) {
         ExecutorHelper helper = new HelperImpl(
                 mode,
                 mvn3ExecutorRequestBuilder().build().installationDirectory(),
                 userHome,
-                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
-                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
-        String localRepository = new ToolboxTool(helper).localRepository(helper.executorRequest());
-        Path local = Paths.get(localRepository);
-        assertTrue(Files.isDirectory(local));
+                EMBEDDED_MAVEN_EXECUTOR,
+                FORKED_MAVEN_EXECUTOR);
+        assertTrue(Files.isDirectory(Paths.get(new ToolboxTool(helper).localRepository(helper.executorRequest()))));
     }
 
-    @Timeout(15)
     @ParameterizedTest
-    @EnumSource(ExecutorHelper.Mode.class)
+    @EnumSource(Mode.class)
     @Disabled("disable temporarily so that we can get the debug statement")
-    void localRepository4(ExecutorHelper.Mode mode) {
+    void localRepository4(Mode mode) {
         ExecutorHelper helper = new HelperImpl(
                 mode,
                 mvn4ExecutorRequestBuilder().build().installationDirectory(),
                 userHome,
-                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
-                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
-        String localRepository = new ToolboxTool(helper).localRepository(helper.executorRequest());
-        Path local = Paths.get(localRepository);
-        assertTrue(Files.isDirectory(local));
+                EMBEDDED_MAVEN_EXECUTOR,
+                FORKED_MAVEN_EXECUTOR);
+        assertTrue(Files.isDirectory(Paths.get(new ToolboxTool(helper).localRepository(helper.executorRequest()))));
     }
 
-    @Timeout(15)
     @ParameterizedTest
-    @EnumSource(ExecutorHelper.Mode.class)
-    void artifactPath3(ExecutorHelper.Mode mode) {
+    @EnumSource(Mode.class)
+    void artifactPath3(Mode mode) {
         ExecutorHelper helper = new HelperImpl(
                 mode,
                 mvn3ExecutorRequestBuilder().build().installationDirectory(),
                 userHome,
-                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
-                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
+                EMBEDDED_MAVEN_EXECUTOR,
+                FORKED_MAVEN_EXECUTOR);
         String path = new ToolboxTool(helper)
                 .artifactPath(helper.executorRequest(), "aopalliance:aopalliance:1.0", "central");
         // split repository: assert "ends with" as split may introduce prefixes
@@ -154,16 +162,15 @@ public class ToolboxToolTest {
                 "path=" + path);
     }
 
-    @Timeout(15)
     @ParameterizedTest
-    @EnumSource(ExecutorHelper.Mode.class)
-    void artifactPath4(ExecutorHelper.Mode mode) {
+    @EnumSource(Mode.class)
+    void artifactPath4(Mode mode) {
         ExecutorHelper helper = new HelperImpl(
                 mode,
                 mvn4ExecutorRequestBuilder().build().installationDirectory(),
                 userHome,
-                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
-                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
+                EMBEDDED_MAVEN_EXECUTOR,
+                FORKED_MAVEN_EXECUTOR);
         String path = new ToolboxTool(helper)
                 .artifactPath(helper.executorRequest(), "aopalliance:aopalliance:1.0", "central");
         // split repository: assert "ends with" as split may introduce prefixes
@@ -173,31 +180,33 @@ public class ToolboxToolTest {
                 "path=" + path);
     }
 
-    @Timeout(15)
+    @DisabledOnOs(
+            value = MAC,
+            disabledReason = "mvn3 fails to close log file properly, therefore JUnit fails to clean up as well.")
+    @EnumSource(Mode.class)
     @ParameterizedTest
-    @EnumSource(ExecutorHelper.Mode.class)
-    void metadataPath3(ExecutorHelper.Mode mode) {
+    void metadataPath3(Mode mode) {
         ExecutorHelper helper = new HelperImpl(
                 mode,
                 mvn3ExecutorRequestBuilder().build().installationDirectory(),
                 userHome,
-                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
-                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
+                EMBEDDED_MAVEN_EXECUTOR,
+                FORKED_MAVEN_EXECUTOR);
         String path = new ToolboxTool(helper).metadataPath(helper.executorRequest(), "aopalliance", "someremote");
         // split repository: assert "ends with" as split may introduce prefixes
         assertTrue(path.endsWith("aopalliance" + File.separator + "maven-metadata-someremote.xml"), "path=" + path);
     }
 
-    @Timeout(15)
+    @DisabledOnOs(MAC)
     @ParameterizedTest
-    @EnumSource(ExecutorHelper.Mode.class)
-    void metadataPath4(ExecutorHelper.Mode mode) {
+    @EnumSource(Mode.class)
+    void metadataPath4(Mode mode) {
         ExecutorHelper helper = new HelperImpl(
                 mode,
                 mvn4ExecutorRequestBuilder().build().installationDirectory(),
                 userHome,
-                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
-                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
+                EMBEDDED_MAVEN_EXECUTOR,
+                FORKED_MAVEN_EXECUTOR);
         String path = new ToolboxTool(helper).metadataPath(helper.executorRequest(), "aopalliance", "someremote");
         // split repository: assert "ends with" as split may introduce prefixes
         assertTrue(path.endsWith("aopalliance" + File.separator + "maven-metadata-someremote.xml"), "path=" + path);

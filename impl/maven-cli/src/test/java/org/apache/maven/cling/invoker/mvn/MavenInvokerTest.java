@@ -34,13 +34,13 @@ import org.codehaus.plexus.classworlds.ClassWorld;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.io.CleanupMode.ALWAYS;
 
 /**
  * Local UT.
@@ -59,10 +59,7 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
     }
 
     @Test
-    void defaultFs(
-            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
-            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
-            throws Exception {
+    void defaultFs(@TempDir(cleanup = ALWAYS) Path cwd, @TempDir(cleanup = ALWAYS) Path userHome) throws Exception {
         invoke(cwd, userHome, List.of("verify"), List.of());
     }
 
@@ -71,9 +68,7 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
      */
     @Test
     void conflictingExtensionsFromSameSource(
-            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
-            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
-            throws Exception {
+            @TempDir(cleanup = ALWAYS) Path cwd, @TempDir(cleanup = ALWAYS) Path userHome) throws Exception {
         String projectExtensionsXml =
                 """
                 <?xml version="1.0" encoding="UTF-8"?>
@@ -119,9 +114,7 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
      */
     @Test
     void conflictingExtensionsFromDifferentSource(
-            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
-            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
-            throws Exception {
+            @TempDir(cleanup = ALWAYS) Path cwd, @TempDir(cleanup = ALWAYS) Path userHome) throws Exception {
         String extensionsXml =
                 """
                 <?xml version="1.0" encoding="UTF-8"?>
@@ -159,9 +152,7 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
     }
 
     @Test
-    void conflictingSettings(
-            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
-            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
+    void conflictingSettings(@TempDir(cleanup = ALWAYS) Path cwd, @TempDir(cleanup = ALWAYS) Path userHome)
             throws Exception {
         String settingsXml =
                 """

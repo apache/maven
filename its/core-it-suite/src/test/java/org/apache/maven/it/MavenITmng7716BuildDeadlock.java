@@ -42,7 +42,7 @@ class MavenITmng7716BuildDeadlock extends AbstractMavenIntegrationTestCase {
      * @throws Exception in case of failure
      */
     @Test
-    @Timeout(value = 120, unit = TimeUnit.SECONDS)
+    @Timeout(120)
     void testNoDeadlockAtVersionUpdate() throws Exception {
         File testDir = extractResources("/mng-7716");
 
