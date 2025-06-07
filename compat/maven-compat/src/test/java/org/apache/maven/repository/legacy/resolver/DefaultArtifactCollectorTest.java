@@ -293,17 +293,26 @@ class DefaultArtifactCollectorTest {
     }
 
     @Test
-    @SuppressWarnings("checkstyle:UnusedLocalVariable")
     void testResolveRangeWithManagedVersion() throws ArtifactResolutionException, InvalidVersionSpecificationException {
-        ArtifactSpec a = createArtifactSpec("a", "1.0");
-        ArtifactSpec b = a.addDependency("b", "[1.0,3.0]");
-
+        String version = "1.0";
+        ArtifactSpec a = createArtifactSpec("a", version);
+        String versionRange = "[1.0,3.0]";
+        ArtifactSpec b = a.addDependency("b", versionRange);
         ArtifactSpec managedB = createArtifactSpec("b", "5.0");
-
         ArtifactResolutionResult res = collect(a, managedB.artifact);
-        assertEquals(
-                createSet(new Object[] {a.artifact, managedB.artifact}), res.getArtifacts(), "Check artifact list");
-        assertEquals("5.0", getArtifact("b", res.getArtifacts()).getVersion(), "Check version");
+
+        assertEquals(createSet(new Object[] {a.artifact, managedB.artifact}), res.getArtifacts());
+        assertEquals("5.0", getArtifact("b", res.getArtifacts()).getVersion());
+        assertArtifact(a, "a", version, a.artifact.getVersion());
+        assertArtifact(b, "b", versionRange, b.artifact.getVersionRange().toString());
+    }
+
+    private static void assertArtifact(ArtifactSpec artifactSpec, String artifactId, String version, String artifact) {
+        assertEquals("test", artifactSpec.artifact.getGroupId());
+        assertEquals(artifactId, artifactSpec.artifact.getArtifactId());
+        assertEquals(version, artifact);
+        assertEquals("compile", artifactSpec.artifact.getScope());
+        assertEquals("jar", artifactSpec.artifact.getType());
     }
 
     @Test
