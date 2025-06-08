@@ -478,18 +478,18 @@ public abstract class CommonsCliOptions implements Options {
             pw.accept("");
 
             StringWriter sw = new StringWriter();
-            PrintWriter pw2 = new PrintWriter(sw);
-            formatter.printHelp(
-                    pw2,
-                    width,
-                    commandLineSyntax(command),
-                    System.lineSeparator() + "Options:",
-                    options,
-                    HelpFormatter.DEFAULT_LEFT_PAD,
-                    HelpFormatter.DEFAULT_DESC_PAD,
-                    System.lineSeparator(),
-                    false);
-            pw2.flush();
+            try (PrintWriter writer = new PrintWriter(sw)) {
+                formatter.printHelp(
+                        writer,
+                        width,
+                        commandLineSyntax(command),
+                        System.lineSeparator() + "Options:",
+                        options,
+                        HelpFormatter.DEFAULT_LEFT_PAD,
+                        HelpFormatter.DEFAULT_DESC_PAD,
+                        System.lineSeparator(),
+                        false);
+            }
             for (String s : sw.toString().split(System.lineSeparator())) {
                 pw.accept(s);
             }
