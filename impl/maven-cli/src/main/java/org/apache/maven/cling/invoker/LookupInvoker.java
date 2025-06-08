@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
@@ -95,9 +94,12 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.spi.LocationAwareLogger;
 
 import static java.nio.file.Files.newBufferedWriter;
+import static java.util.Locale.ENGLISH;
 import static java.util.Objects.requireNonNull;
 import static org.apache.maven.cling.invoker.CliUtils.toMavenExecutionRequestLoggingLevel;
 import static org.apache.maven.cling.invoker.CliUtils.toProperties;
+import static org.apache.maven.logging.api.LogLevelRecorder.Level.ERROR;
+import static org.apache.maven.logging.api.LogLevelRecorder.Level.WARN;
 
 /**
  * Lookup invoker implementation, that boots up DI container.
@@ -260,7 +262,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                 .color()
                 .orElse(userProperties.getOrDefault(
                         Constants.MAVEN_STYLE_COLOR_PROPERTY, userProperties.getOrDefault("style.color", "auto")))
-                .toLowerCase(Locale.ENGLISH);
+                .toLowerCase(ENGLISH);
         if ("always".equals(styleColor) || "yes".equals(styleColor) || "force".equals(styleColor)) {
             context.coloredOutput = true;
         } else if ("never".equals(styleColor) || "no".equals(styleColor) || "none".equals(styleColor)) {
@@ -413,18 +415,15 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected void activateLogging(C context) {
         context.slf4jConfiguration.activate();
-        context.invokerRequest.options().failOnSeverity().ifPresent(logLevelThreshold -> {
+        context.invokerRequest.options().failOnSeverity().ifPresent(threshold -> {
             if (context.loggerFactory instanceof LogLevelRecorder recorder) {
-                LogLevelRecorder.Level level =
-                        switch (logLevelThreshold.toLowerCase(Locale.ENGLISH)) {
-                            case "warn", "warning" -> LogLevelRecorder.Level.WARN;
-                            case "error" -> LogLevelRecorder.Level.ERROR;
-                            default -> throw new IllegalArgumentException(
-                                    logLevelThreshold
-                                            + " is not a valid log severity threshold. Valid severities are WARN/WARNING and ERROR.");
-                        };
-                recorder.setMaxLevelAllowed(level);
-                context.logger.info("Enabled to break the build on log level " + logLevelThreshold + ".");
+                recorder.setMaxLevelAllowed(switch (threshold.toLowerCase(ENGLISH)) {
+                    case "warn", "warning" -> WARN;
+                    case "error" -> ERROR;
+                    default -> throw new IllegalArgumentException(threshold
+                                    + " is not a valid log severity threshold. Valid severities are WARN/WARNING and ERROR.");
+                });
+                context.logger.info("Enabled to break the build on log level " + threshold + ".");
             } else {
                 context.logger.warn("Expected LoggerFactory to be of type '" + LogLevelRecorder.class.getName()
                         + "', but found '"
