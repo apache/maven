@@ -94,6 +94,7 @@ import org.jline.terminal.spi.TerminalExt;
 import org.slf4j.LoggerFactory;
 import org.slf4j.spi.LocationAwareLogger;
 
+import static java.nio.file.Files.newBufferedWriter;
 import static java.util.Objects.requireNonNull;
 import static org.apache.maven.cling.invoker.CliUtils.toMavenExecutionRequestLoggingLevel;
 import static org.apache.maven.cling.invoker.CliUtils.toProperties;
@@ -396,32 +397,23 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     protected Consumer<String> doDetermineWriter(C context) {
         Options options = context.invokerRequest.options();
         if (options.logFile().isPresent()) {
-            Path logFile = context.cwd.resolve(options.logFile().get());
             try {
-                PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(logFile), true);
+                PrintWriter printWriter = new PrintWriter(newBufferedWriter(context.cwd.resolve(options.logFile().get())), true);
                 context.closeables.add(printWriter);
                 return printWriter::println;
             } catch (IOException e) {
-                throw new MavenException("Unable to redirect logging to " + logFile, e);
+                throw new MavenException(e);
             }
         } else {
             // Given the terminal creation has been offloaded to a different thread,
-            // do not pass directly the terminal writer
-            return msg -> {
-                PrintWriter pw = context.terminal.writer();
-                pw.println(msg);
-                pw.flush();
-            };
+            // do not directly pass the terminal writer.
+            return msg -> context.terminal.writer().println(msg);
         }
     }
 
-    protected void activateLogging(C context) throws Exception {
-        InvokerRequest invokerRequest = context.invokerRequest;
-        Options mavenOptions = invokerRequest.options();
-
+    protected void activateLogging(C context) {
         context.slf4jConfiguration.activate();
-        if (mavenOptions.failOnSeverity().isPresent()) {
-            String logLevelThreshold = mavenOptions.failOnSeverity().get();
+        context.invokerRequest.options().failOnSeverity().ifPresent(logLevelThreshold -> {
             if (context.loggerFactory instanceof LogLevelRecorder recorder) {
                 LogLevelRecorder.Level level =
                         switch (logLevelThreshold.toLowerCase(Locale.ENGLISH)) {
@@ -439,13 +431,10 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                         + context.loggerFactory.getClass().getName() + "' instead. "
                         + "The --fail-on-severity flag will not take effect.");
             }
-        }
-
-        // at this point logging is set up, reply so far accumulated logs, if any and swap logger with real one
-        Logger logger =
-                new Slf4jLogger(context.loggerFactory.getLogger(getClass().getName()));
-        context.logger.drain().forEach(e -> logger.log(e.level(), e.message(), e.error()));
-        context.logger = logger;
+        });
+        // at this point, logging is set up, reply to such far accumulated logs, if any, and swap logger with real one.
+        context.logger = new Slf4jLogger(context.loggerFactory.getLogger(getClass().getName()));
+        context.logger.drain().forEach(e -> context.logger.log(e.level(), e.message(), e.error()));
     }
 
     protected void helpOrVersionAndMayExit(C context) throws Exception {
