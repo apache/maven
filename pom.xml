@@ -798,13 +798,20 @@ under the License.</licenseText>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-pmd-plugin</artifactId>
-          <dependencies>
-            <dependency>
-              <groupId>net.sourceforge.pmd</groupId>
-              <artifactId>pmd-core</artifactId>
-              <version>7.14.0</version>
-            </dependency>
-          </dependencies>
+          <configuration>
+            <analysisCache>true</analysisCache>
+            <printFailingErrors>true</printFailingErrors>
+            <rulesets>
+              <ruleset>.pmd/ruleset.xml</ruleset>
+            </rulesets>
+          </configuration>
+          <executions>
+            <execution>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
         <plugin>
           <groupId>org.eclipse.sisu</groupId>
@@ -821,6 +828,10 @@ under the License.</licenseText>
       </plugins>
     </pluginManagement>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+      </plugin>
       <plugin>
         <groupId>io.github.olamy.maven.plugins</groupId>
         <artifactId>jacoco-aggregator-maven-plugin</artifactId>
