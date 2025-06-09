@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -85,6 +86,8 @@ import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static java.lang.Math.max;
 
 /**
  * The concern of the project is provide runtime values based on the model.
@@ -1545,53 +1548,38 @@ public class MavenProject implements Cloneable {
 
     private ProjectBuildingRequest projectBuilderConfiguration;
 
-    private Map<String, String> moduleAdjustments;
+    private final Map<String, String> moduleAdjustments = new HashMap<>();
 
-    @Deprecated // This appears only to be used in test code
-    public String getModulePathAdjustment(MavenProject moduleProject) throws IOException {
-        // FIXME: This is hacky. What if module directory doesn't match artifactid, and parent
-        // is coming from the repository??
-        String module = moduleProject.getArtifactId();
-
-        File moduleFile = moduleProject.getFile();
-
-        if (moduleFile != null) {
-            File moduleDir = moduleFile.getCanonicalFile().getParentFile();
-
-            module = moduleDir.getName();
+    public String getModulePathAdjustment(MavenProject moduleProject) {
+        if (moduleAdjustments.isEmpty()) {
+            initModuleAdjustments();
         }
-
-        if (moduleAdjustments == null) {
-            moduleAdjustments = new HashMap<>();
-
-            List<String> modules = getModules();
-            if (modules != null) {
-                for (String modulePath : modules) {
-                    String moduleName = modulePath;
-
-                    if (moduleName.endsWith("/") || moduleName.endsWith("\\")) {
-                        moduleName = moduleName.substring(0, moduleName.length() - 1);
+        return Optional.ofNullable(moduleProject.getFile())
+                .map(file -> {
+                    try {
+                        return file.getCanonicalFile().getParentFile().getName();
+                    } catch (IOException e) {
+                        return null;
                     }
+                })
+                .map(moduleAdjustments::get)
+                .orElseGet(() -> moduleAdjustments.get(moduleProject.getArtifactId()));
+    }
 
-                    int lastSlash = moduleName.lastIndexOf('/');
+    private void initModuleAdjustments() {
+        Optional.ofNullable(getModules()).ifPresent(mods -> mods.stream()
+                .filter(Objects::nonNull)
+                .map(this::normalizeModulePath)
+                .forEach(pair -> moduleAdjustments.put(pair.getKey(), pair.getValue())));
+    }
 
-                    if (lastSlash < 0) {
-                        lastSlash = moduleName.lastIndexOf('\\');
-                    }
-
-                    String adjustment = null;
-
-                    if (lastSlash > -1) {
-                        moduleName = moduleName.substring(lastSlash + 1);
-                        adjustment = modulePath.substring(0, lastSlash);
-                    }
-
-                    moduleAdjustments.put(moduleName, adjustment);
-                }
-            }
-        }
-
-        return moduleAdjustments.get(module);
+    private Map.Entry<String, String> normalizeModulePath(String modulePath) {
+        String normalizedPath = Optional.of(modulePath)
+                .filter(path -> path.endsWith("/") || path.endsWith("\\"))
+                .map(path -> path.substring(0, path.length() - 1))
+                .orElse(modulePath);
+        int lastSlash = max(normalizedPath.lastIndexOf('/'), normalizedPath.lastIndexOf('\\'));
+        return Map.entry(normalizedPath.substring(lastSlash + 1), modulePath.substring(0, lastSlash));
     }
 
     @Deprecated
