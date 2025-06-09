@@ -38,6 +38,7 @@ public class ForkTestMojo extends AbstractMojo {
      *
      * @throws MojoExecutionException If an error occured.
      */
+    @Override
     public void execute() throws MojoExecutionException {
         getLog().info("[MAVEN-CORE-IT-LOG] Forked test mojo");
     }

@@ -43,6 +43,7 @@ public class AggregatorDependenciesMojo extends AbstractMojo {
     @Parameter(property = "aggregator.touchFile", defaultValue = "${project.build.directory}/touch.txt")
     private File touchFile;
 
+    @Override
     public void execute() throws MojoExecutionException {
         getLog().info("[MAVEN-CORE-IT-LOG] Touching file: " + touchFile);
 

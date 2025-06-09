@@ -34,6 +34,7 @@ public class LocalRepoMojo extends AbstractMojo {
     @Parameter(defaultValue = "${localRepository}", readonly = true)
     private ArtifactRepository localRepository;
 
+    @Override
     public void execute() throws MojoExecutionException {
         getLog().info("[MAVEN-CORE-IT-LOG] localRepository " + localRepository);
     }

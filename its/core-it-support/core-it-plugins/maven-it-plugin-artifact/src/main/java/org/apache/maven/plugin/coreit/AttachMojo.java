@@ -77,6 +77,7 @@ public class AttachMojo extends AbstractMojo {
      *
      * @throws MojoFailureException If the attached file has not been set.
      */
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         getLog().info("[MAVEN-CORE-IT-LOG] Attaching artifact file: " + attachedFile);
         getLog().info("[MAVEN-CORE-IT-LOG] type=" + artifactType + ", classifier=" + artifactClassifier);

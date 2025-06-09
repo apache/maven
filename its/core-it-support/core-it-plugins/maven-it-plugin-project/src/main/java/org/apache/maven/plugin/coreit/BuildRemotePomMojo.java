@@ -78,6 +78,7 @@ public class BuildRemotePomMojo extends AbstractPomMojo {
      *
      * @throws MojoExecutionException If the artifact file has not been set.
      */
+    @Override
     public void execute() throws MojoExecutionException {
         Properties props = new Properties();
 

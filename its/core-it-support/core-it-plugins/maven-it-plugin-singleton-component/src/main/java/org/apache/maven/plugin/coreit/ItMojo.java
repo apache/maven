@@ -77,6 +77,7 @@ public class ItMojo extends AbstractMojo {
      *
      * @throws MojoExecutionException If the output file could not be created.
      */
+    @Override
     public void execute() throws MojoExecutionException {
         TestComponent componentFromMap =
                 (TestComponent) componentMap.values().iterator().next();

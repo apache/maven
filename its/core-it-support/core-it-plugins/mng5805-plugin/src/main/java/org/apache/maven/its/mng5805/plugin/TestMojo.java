@@ -32,6 +32,7 @@ public class TestMojo extends AbstractMojo {
     @Parameter(defaultValue = "org.apache.maven.its.mng5805.DoesNotExist")
     private String className;
 
+    @Override
     public void execute() throws MojoExecutionException {
 
         getLog().info("CLASS_NAME=" + className);

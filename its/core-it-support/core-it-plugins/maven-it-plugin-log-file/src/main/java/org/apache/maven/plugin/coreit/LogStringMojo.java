@@ -44,6 +44,7 @@ public class LogStringMojo extends AbstractLogMojo {
      *
      * @throws MojoExecutionException If the output file could not be created.
      */
+    @Override
     public void execute() throws MojoExecutionException {
         append(string);
     }

@@ -58,6 +58,7 @@ public class AttachPomMojo extends AbstractMojo {
      *
      * @throws MojoFailureException If the artifact file has not been set.
      */
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         getLog().info("[MAVEN-CORE-IT-LOG] Attaching POM to main artifact: " + pomFile);
 

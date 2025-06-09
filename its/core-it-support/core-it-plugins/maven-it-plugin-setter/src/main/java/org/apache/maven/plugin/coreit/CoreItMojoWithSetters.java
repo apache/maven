@@ -79,6 +79,7 @@ public class CoreItMojoWithSetters extends AbstractMojo {
     //
     // ----------------------------------------------------------------------
 
+    @Override
     public void execute() throws MojoExecutionException {
         touch(new File(outputDirectoryValue), "touch.txt");
 

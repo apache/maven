@@ -46,6 +46,7 @@ public class AppendMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.build.directory}/log.txt")
     private File outputFile;
 
+    @Override
     public void execute() throws MojoExecutionException {
         getLog().info("[MAVEN-CORE-IT-LOG] Creating output file: " + outputFile);
 

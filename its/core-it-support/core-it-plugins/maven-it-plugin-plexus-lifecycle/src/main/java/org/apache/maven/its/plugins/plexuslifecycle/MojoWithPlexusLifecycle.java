@@ -39,15 +39,18 @@ public class MojoWithPlexusLifecycle extends AbstractMojo implements Contextuali
     @Component
     private FakeComponent fakeComponent;
 
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         getLog().info("execute MojoWithPlexusLifecycle");
         fakeComponent.doNothing();
     }
 
+    @Override
     public void dispose() {
         getLog().info("MojoWithPlexusLifecycle :: dispose");
     }
 
+    @Override
     public void contextualize(Context context) throws ContextException {
         getLog().info("MojoWithPlexusLifecycle :: contextualize");
     }

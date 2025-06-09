@@ -97,6 +97,7 @@ public class CompileRuntimeMojo extends AbstractDependencyMojo {
      *
      * @throws MojoExecutionException If the output file could not be created or any dependency could not be resolved.
      */
+    @Override
     public void execute() throws MojoExecutionException {
         try {
             writeArtifacts(projectArtifacts, project.getArtifacts());

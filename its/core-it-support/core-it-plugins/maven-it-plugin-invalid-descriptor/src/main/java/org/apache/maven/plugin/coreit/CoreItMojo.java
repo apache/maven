@@ -28,6 +28,7 @@ import org.apache.maven.plugins.annotations.Mojo;
  */
 @Mojo(name = "test")
 public class CoreItMojo extends AbstractMojo {
+    @Override
     public void execute() throws MojoExecutionException {
         throw new MojoExecutionException("Should not be run");
     }

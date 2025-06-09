@@ -47,6 +47,7 @@ public class PropertyInterpolationVerifierMojo extends AbstractMojo {
     @Parameter(property = "clsldr.pluginClassLoaderOutput")
     private Properties properties;
 
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         Model model = project.getModel();
         if (properties == null) {

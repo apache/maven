@@ -32,6 +32,7 @@ public abstract class AbstractLifecycleMapping implements LifecycleMapping {
 
     private Map<String, Lifecycle> lifecycleMap;
 
+    @Override
     public Map<String, Lifecycle> getLifecycles() {
         if (lifecycleMap != null) {
             return lifecycleMap;
@@ -47,6 +48,7 @@ public abstract class AbstractLifecycleMapping implements LifecycleMapping {
         return lifecycleMap;
     }
 
+    @Override
     public Map<String, String> getPhases(String lifecycle) {
         Lifecycle lifecycleMapping = getLifecycles().get(lifecycle);
         if (lifecycleMapping != null) {
@@ -55,6 +57,7 @@ public abstract class AbstractLifecycleMapping implements LifecycleMapping {
         return null;
     }
 
+    @Override
     public List<String> getOptionalMojos(String lifecycle) {
         return null;
     }

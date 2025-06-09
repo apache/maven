@@ -48,6 +48,7 @@ public abstract class AbstractProjectInheritanceTestCase extends AbstractMavenPr
     // The local repository for this category of tests
     // ----------------------------------------------------------------------
 
+    @Override
     protected File getLocalRepositoryPath() {
         return getTestFile("target/test-classes/inheritance-repo/" + getTestSeries());
     }

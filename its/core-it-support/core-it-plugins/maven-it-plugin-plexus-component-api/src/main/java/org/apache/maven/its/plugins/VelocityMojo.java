@@ -35,6 +35,7 @@ public class VelocityMojo extends AbstractMojo {
     @Component
     protected VelocityComponent velocityComponent;
 
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         // velocityComponent should not be null
         velocityComponent.getEngine();

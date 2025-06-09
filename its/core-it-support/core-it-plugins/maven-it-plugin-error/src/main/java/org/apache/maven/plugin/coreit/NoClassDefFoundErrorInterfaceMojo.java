@@ -33,12 +33,15 @@ public class NoClassDefFoundErrorInterfaceMojo extends TestCase implements org.a
 
     private Log log;
 
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {}
 
+    @Override
     public Log getLog() {
         return log;
     }
 
+    @Override
     public void setLog(Log log) {
         this.log = log;
     }

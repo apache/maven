@@ -35,6 +35,7 @@ public class TouchMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.build.directory}/touch.txt")
     private File touchFile;
 
+    @Override
     public void execute() throws MojoExecutionException {
         getLog().info("[MAVEN-CORE-IT-LOG] Creating touch file: " + touchFile);
 

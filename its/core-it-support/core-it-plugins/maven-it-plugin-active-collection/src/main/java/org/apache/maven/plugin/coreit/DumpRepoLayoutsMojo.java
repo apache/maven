@@ -72,6 +72,7 @@ public class DumpRepoLayoutsMojo extends AbstractMojo {
      *
      * @throws MojoFailureException If the output file could not be created.
      */
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         Properties layoutProperties = new Properties();
 

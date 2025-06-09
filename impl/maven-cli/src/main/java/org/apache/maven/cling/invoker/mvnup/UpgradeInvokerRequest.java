@@ -66,6 +66,7 @@ public class UpgradeInvokerRequest extends BaseInvokerRequest {
     /**
      * The mandatory Upgrade options.
      */
+    @Override
     @Nonnull
     public UpgradeOptions options() {
         return options;

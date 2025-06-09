@@ -40,6 +40,7 @@ public class ForkLifecycleAggregatorMojo extends AbstractMojo {
     @Parameter(defaultValue = "${reactorProjects}")
     private List reactorProjects;
 
+    @Override
     public void execute() throws MojoExecutionException {
         for (Object reactorProject : reactorProjects) {
             MavenProject executedProject = ((MavenProject) reactorProject).getExecutionProject();

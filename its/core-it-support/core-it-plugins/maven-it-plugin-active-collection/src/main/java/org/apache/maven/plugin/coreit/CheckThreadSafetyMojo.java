@@ -71,6 +71,7 @@ public class CheckThreadSafetyMojo extends AbstractMojo {
      *
      * @throws MojoExecutionException If the output file could not be created.
      */
+    @Override
     public void execute() throws MojoExecutionException {
         Properties componentProperties = new Properties();
 

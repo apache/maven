@@ -80,6 +80,7 @@ public final class PlexusXmlBeanConverter implements PlexusBeanConverter {
     // Public methods
     // ----------------------------------------------------------------------
 
+    @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Object convert(final TypeLiteral role, final String value) {
         if (value.trim().startsWith("<")) {

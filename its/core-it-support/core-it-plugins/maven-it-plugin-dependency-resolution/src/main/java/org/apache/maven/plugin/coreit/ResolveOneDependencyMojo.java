@@ -114,6 +114,7 @@ public class ResolveOneDependencyMojo extends AbstractDependencyMojo {
      *
      * @throws MojoExecutionException If the output file could not be created or any dependency could not be resolved.
      */
+    @Override
     public void execute() throws MojoExecutionException {
 
         Artifact projectArtifact = project.getArtifact();

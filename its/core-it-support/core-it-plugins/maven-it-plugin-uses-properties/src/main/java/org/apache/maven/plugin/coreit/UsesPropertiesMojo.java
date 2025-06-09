@@ -42,6 +42,7 @@ public class UsesPropertiesMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.properties}")
     private Properties properties;
 
+    @Override
     public void execute() throws MojoExecutionException {
         try {
             File file = new File(basedir, "target/project.properties");

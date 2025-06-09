@@ -73,6 +73,7 @@ public class ItMojo extends AbstractMojo {
      * @throws MojoExecutionException If the output file could not be created.
      * or if the output file has not been set.
      */
+    @Override
     public void execute() throws MojoExecutionException {
         getLog().info("[MAVEN-CORE-IT-LOG4J]");
 

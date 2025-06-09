@@ -37,6 +37,7 @@ public class NoClassDefFoundErrorComponentMojo extends AbstractMojo {
     @Parameter(defaultValue = "foo")
     private TestCase value;
 
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         value.getName();
     }

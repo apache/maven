@@ -46,6 +46,7 @@ class ArtifactDeployerTest extends AbstractArtifactComponentTestCase {
     @Inject
     private SessionScope sessionScope;
 
+    @Override
     protected String component() {
         return "deployer";
     }

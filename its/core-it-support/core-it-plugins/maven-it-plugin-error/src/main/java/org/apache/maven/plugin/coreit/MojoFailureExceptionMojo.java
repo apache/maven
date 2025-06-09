@@ -46,6 +46,7 @@ public class MojoFailureExceptionMojo extends AbstractMojo {
     @Parameter(property = "error.source")
     private String source;
 
+    @Override
     public void execute() throws MojoFailureException {
         if (longMessage != null) {
             throw new MojoFailureException(source, message, longMessage);

@@ -47,6 +47,7 @@ public class ResolveMojo extends AbstractMojo {
     @Component
     private ProjectDependenciesResolver dependencyResolver;
 
+    @Override
     public void execute() throws MojoExecutionException {
 
         try {

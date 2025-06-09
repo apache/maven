@@ -35,6 +35,7 @@ public class RequirementComponentLookupExceptionMojo extends AbstractMojo {
     @Component(role = TestCase.class, hint = "triggers-error")
     private org.apache.maven.plugin.Mojo dependency;
 
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         dependency.execute();
     }

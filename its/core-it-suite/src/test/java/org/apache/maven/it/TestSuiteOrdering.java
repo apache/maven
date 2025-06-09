@@ -818,6 +818,7 @@ public class TestSuiteOrdering implements ClassOrderer {
         return i != null ? i : -1;
     }
 
+    @Override
     public void orderClasses(ClassOrdererContext context) {
         context.getClassDescriptors().stream()
                 .filter(cd -> !MISSED_TESTS.contains(cd.getTestClass()))

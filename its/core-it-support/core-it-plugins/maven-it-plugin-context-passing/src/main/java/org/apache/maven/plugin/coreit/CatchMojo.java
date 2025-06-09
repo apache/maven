@@ -49,6 +49,7 @@ public class CatchMojo extends AbstractMojo {
         this.outDir = outDir;
     }
 
+    @Override
     public void execute() throws MojoExecutionException {
         String value = (String) getPluginContext().get(ThrowMojo.THROWN_PARAMETER);
 

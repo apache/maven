@@ -54,6 +54,7 @@ public class DeployMojo extends AbstractRepoMojo {
      *
      * @throws MojoExecutionException If any artifact could not be installed.
      */
+    @Override
     public void execute() throws MojoExecutionException {
         getLog().info("[MAVEN-CORE-IT-LOG] Deploying project artifacts");
 

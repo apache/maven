@@ -123,6 +123,7 @@ public class EvalMojo extends AbstractMojo {
      * @throws MojoExecutionException If the output file could not be created.
      * @throws MojoFailureException   If the output file has not been set.
      */
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (outputFile == null) {
             throw new MojoFailureException("Path name for output file has not been specified");

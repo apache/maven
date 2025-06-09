@@ -43,6 +43,7 @@ public class TouchMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.build.directory}", required = true)
     private File outputDirectory;
 
+    @Override
     public void execute() throws MojoExecutionException {
         getLog().info("[MAVEN-CORE-IT-LOG] Project build directory "
                 + project.getBuild().getDirectory());

@@ -41,6 +41,7 @@ class ArtifactInstallerTest extends AbstractArtifactComponentTestCase {
     @Inject
     private SessionScope sessionScope;
 
+    @Override
     protected String component() {
         return "installer";
     }

@@ -63,6 +63,7 @@ public class UpdateSingletonMojo extends AbstractMojo {
      *
      * @throws MojoExecutionException If the output file could not be created.
      */
+    @Override
     public void execute() throws MojoExecutionException {
         getLog().info("[MAVEN-CORE-IT-LOG] Singleton Instance: " + System.identityHashCode(singleton));
         getLog().info("[MAVEN-CORE-IT-LOG] Singleton Class Loader: "

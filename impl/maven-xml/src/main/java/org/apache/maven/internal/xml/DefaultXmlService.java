@@ -213,6 +213,7 @@ public class DefaultXmlService extends XmlService {
      *   </ol></li>
      * </ol>
      */
+    @Override
     @SuppressWarnings("checkstyle:MethodLength")
     public XmlNode doMerge(XmlNode dominant, XmlNode recessive, Boolean childMergeOverride) {
         // TODO: share this as some sort of assembler, implement a walk interface?

@@ -75,6 +75,7 @@ public class InstallArtifactsMojo extends AbstractMojo {
     @Parameter(defaultValue = "repo")
     private String repositoryName;
 
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         ArtifactRepositoryLayout artifactRepositoryLayout = new FlatRepositoryLayout();
@@ -117,6 +118,7 @@ public class InstallArtifactsMojo extends AbstractMojo {
             return "id";
         }
 
+        @Override
         public String pathOf(Artifact artifact) {
             ArtifactHandler artifactHandler = artifact.getArtifactHandler();
 
@@ -136,6 +138,7 @@ public class InstallArtifactsMojo extends AbstractMojo {
             return path.toString();
         }
 
+        @Override
         public String pathOfLocalRepositoryMetadata(ArtifactMetadata metadata, ArtifactRepository repository) {
             return pathOfRepositoryMetadata(metadata.getLocalFilename(repository));
         }
@@ -148,6 +151,7 @@ public class InstallArtifactsMojo extends AbstractMojo {
             return path.toString();
         }
 
+        @Override
         public String pathOfRemoteRepositoryMetadata(ArtifactMetadata metadata) {
             return pathOfRepositoryMetadata(metadata.getRemoteFilename());
         }

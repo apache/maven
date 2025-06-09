@@ -40,6 +40,7 @@ public class TouchMojo extends AbstractMojo {
     @Parameter(alias = "validParameterAlias")
     private String validParameter;
 
+    @Override
     public void execute() throws MojoExecutionException {
 
         getLog().info("[MAVEN-CORE-IT-LOG] Using output directory " + outputDirectory);

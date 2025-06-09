@@ -45,6 +45,7 @@ public class LatestMojo extends AbstractMojo {
     /**
      * Runs this mojo.
      */
+    @Override
     public void execute() throws MojoExecutionException {
         Versioning versioning = new Versioning();
         versioning.setLatest(projectArtifact.getVersion());

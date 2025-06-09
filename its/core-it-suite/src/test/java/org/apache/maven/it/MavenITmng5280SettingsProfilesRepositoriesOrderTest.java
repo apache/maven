@@ -140,6 +140,7 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest extends Abstrac
 
         private volatile boolean artifactRequestedFromRepo2;
 
+        @Override
         public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
                 throws IOException {
             String uri = request.getRequestURI();
@@ -183,6 +184,7 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest extends Abstrac
 
         private volatile boolean pluginRequestedFromRepo2;
 
+        @Override
         public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
                 throws IOException {
             String uri = request.getRequestURI();

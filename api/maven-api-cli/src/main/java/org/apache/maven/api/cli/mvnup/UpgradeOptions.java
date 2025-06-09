@@ -118,6 +118,7 @@ public interface UpgradeOptions extends Options {
      * @param callback a callback to use for interpolation
      * @return a new UpgradeOptions instance with interpolated values
      */
+    @Override
     @Nonnull
     UpgradeOptions interpolate(UnaryOperator<String> callback);
 }

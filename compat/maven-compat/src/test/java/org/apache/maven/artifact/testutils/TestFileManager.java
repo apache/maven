@@ -152,6 +152,7 @@ public class TestFileManager {
         return FileUtils.fileRead(file, encoding);
     }
 
+    @Override
     protected void finalize() throws Throwable {
         maybeWarnAboutCleanUp();
 

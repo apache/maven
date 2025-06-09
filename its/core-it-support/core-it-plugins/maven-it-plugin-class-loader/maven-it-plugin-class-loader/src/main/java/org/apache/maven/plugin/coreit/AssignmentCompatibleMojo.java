@@ -54,6 +54,7 @@ public class AssignmentCompatibleMojo extends AbstractMojo {
      *
      * @throws MojoExecutionException If the output file could not be created.
      */
+    @Override
     public void execute() throws MojoExecutionException {
         ClassLoader coreRealm = Mojo.class.getClassLoader();
         ClassLoader pluginRealm = getClass().getClassLoader();
