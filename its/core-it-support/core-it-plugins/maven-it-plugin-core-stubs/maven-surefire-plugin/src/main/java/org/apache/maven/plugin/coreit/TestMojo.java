@@ -19,7 +19,6 @@
 package org.apache.maven.plugin.coreit;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -28,6 +27,8 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+
+import static org.apache.maven.coreit.component.MojoCompanion.createFile;
 
 /**
  * Creates a text file in the project base directory.
@@ -69,16 +70,6 @@ public class TestMojo extends AbstractMojo {
         if (!outputFile.isAbsolute()) {
             outputFile = new File(project.getBasedir(), pathname).getAbsoluteFile();
         }
-
-        getLog().info("[MAVEN-CORE-IT-LOG] Creating output file: " + outputFile);
-
-        try {
-            outputFile.getParentFile().mkdirs();
-            outputFile.createNewFile();
-        } catch (IOException e) {
-            throw new MojoExecutionException("Output file could not be created: " + pathname, e);
-        }
-
-        getLog().info("[MAVEN-CORE-IT-LOG] Created output file: " + outputFile);
+        createFile(outputFile);
     }
 }

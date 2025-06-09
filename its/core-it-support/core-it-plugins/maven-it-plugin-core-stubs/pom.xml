@@ -50,6 +50,12 @@ under the License.
     <module>maven-surefire-plugin</module>
     <module>maven-war-plugin</module>
   </modules>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.its</groupId>
+      <artifactId>core-it-component</artifactId>
+    </dependency>
+  </dependencies>
 
   <build>
     <plugins>
