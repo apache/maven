@@ -124,7 +124,7 @@ public class MavenProject implements Cloneable {
 
     private ArtifactFilter artifactFilter;
 
-    private Set<Artifact> artifacts;
+    private final Set<Artifact> artifacts = new LinkedHashSet<>();
 
     private Artifact parentArtifact;
 
@@ -861,7 +861,8 @@ public class MavenProject implements Cloneable {
     }
 
     public void setArtifacts(Set<Artifact> artifacts) {
-        this.artifacts = artifacts;
+        this.artifacts.clear();
+        this.artifacts.addAll(artifacts);
 
         // flush the calculated artifactMap
         artifactMap = null;
@@ -876,15 +877,11 @@ public class MavenProject implements Cloneable {
      * @see #getDependencyArtifacts() to get only direct dependencies
      */
     public Set<Artifact> getArtifacts() {
-        if (artifacts == null) {
-            if (artifactFilter == null || resolvedArtifacts == null) {
-                artifacts = new LinkedHashSet<>();
-            } else {
-                artifacts = new LinkedHashSet<>(resolvedArtifacts.size() * 2);
-                for (Artifact artifact : resolvedArtifacts) {
-                    if (artifactFilter.include(artifact)) {
-                        artifacts.add(artifact);
-                    }
+        if (artifactFilter != null && resolvedArtifacts != null) {
+            artifacts.clear();
+            for (Artifact artifact : resolvedArtifacts) {
+                if (artifactFilter.include(artifact)) {
+                    artifacts.add(artifact);
                 }
             }
         }
@@ -1490,7 +1487,7 @@ public class MavenProject implements Cloneable {
      */
     public void setResolvedArtifacts(Set<Artifact> artifacts) {
         this.resolvedArtifacts = (artifacts != null) ? artifacts : Collections.emptySet();
-        this.artifacts = null;
+        this.artifacts.clear();
         this.artifactMap = null;
     }
 
@@ -1504,7 +1501,7 @@ public class MavenProject implements Cloneable {
      */
     public void setArtifactFilter(ArtifactFilter artifactFilter) {
         this.artifactFilter = artifactFilter;
-        this.artifacts = null;
+        this.artifacts.clear();
         this.artifactMap = null;
     }
 

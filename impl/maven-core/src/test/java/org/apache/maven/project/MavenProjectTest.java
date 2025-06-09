@@ -20,6 +20,8 @@ package org.apache.maven.project;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +31,8 @@ import org.apache.maven.model.Parent;
 import org.apache.maven.model.Profile;
 import org.junit.jupiter.api.Test;
 
+import static java.lang.reflect.Modifier.isFinal;
+import static java.lang.reflect.Modifier.isPrivate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -214,5 +218,12 @@ class MavenProjectTest extends AbstractMavenProjectTestCase {
 
     private void assertNoNulls(List<String> elements) {
         assertFalse(elements.contains(null));
+    }
+
+    @Test
+    void testFieldIsPrivateAndFinal() throws NoSuchFieldException {
+        int modifiers = MavenProject.class.getDeclaredField("artifacts").getModifiers();
+        assertTrue(isPrivate(modifiers));
+        assertTrue(isFinal(modifiers));
     }
 }
