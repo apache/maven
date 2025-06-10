@@ -45,17 +45,14 @@ public class EncryptInvoker extends LookupInvoker<EncryptContext> {
     public static final int BAD_OPERATION = 2; // bad user input or alike
     public static final int CANCELED = 3; // user canceled
 
-    public EncryptInvoker(Lookup protoLookup) {
-        this(protoLookup, null);
-    }
-
     public EncryptInvoker(Lookup protoLookup, @Nullable Consumer<LookupContext> contextConsumer) {
         super(protoLookup, contextConsumer);
     }
 
     @Override
     protected EncryptContext createContext(InvokerRequest invokerRequest) {
-        return new EncryptContext(invokerRequest);
+        return new EncryptContext(
+                invokerRequest, (EncryptOptions) invokerRequest.options().orElse(null));
     }
 
     @Override
@@ -84,12 +81,12 @@ public class EncryptInvoker extends LookupInvoker<EncryptContext> {
             context.reader =
                     LineReaderBuilder.builder().terminal(context.terminal).build();
 
-            EncryptOptions options = (EncryptOptions) context.invokerRequest.options();
-            if (options.goals().isEmpty() || options.goals().get().size() != 1) {
+            if (context.options().goals().isEmpty()
+                    || context.options().goals().get().size() != 1) {
                 return badGoalsErrorMessage("No goal or multiple goals specified, specify only one goal.", context);
             }
 
-            String goalName = options.goals().get().get(0);
+            String goalName = context.options().goals().get().get(0);
             Goal goal = context.goals.get(goalName);
 
             if (goal == null) {
@@ -101,7 +98,7 @@ public class EncryptInvoker extends LookupInvoker<EncryptContext> {
             context.logger.error("Goal canceled by user.");
             return CANCELED;
         } catch (Exception e) {
-            if (context.invokerRequest.options().showErrors().orElse(false)) {
+            if (context.options().showErrors().orElse(false)) {
                 context.logger.error(e.getMessage(), e);
             } else {
                 context.logger.error(e.getMessage());

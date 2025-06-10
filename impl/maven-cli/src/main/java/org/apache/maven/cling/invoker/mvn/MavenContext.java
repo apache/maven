@@ -20,16 +20,13 @@ package org.apache.maven.cling.invoker.mvn;
 
 import org.apache.maven.Maven;
 import org.apache.maven.api.cli.InvokerRequest;
+import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.cling.invoker.LookupContext;
 
 @SuppressWarnings("VisibilityModifier")
 public class MavenContext extends LookupContext {
-    public MavenContext(InvokerRequest invokerRequest) {
-        this(invokerRequest, true);
-    }
-
-    public MavenContext(InvokerRequest invokerRequest, boolean containerCapsuleManaged) {
-        super(invokerRequest, containerCapsuleManaged);
+    public MavenContext(InvokerRequest invokerRequest, boolean containerCapsuleManaged, MavenOptions mavenOptions) {
+        super(invokerRequest, containerCapsuleManaged, mavenOptions);
     }
 
     public Maven maven;
@@ -41,5 +38,10 @@ public class MavenContext extends LookupContext {
         } finally {
             maven = null;
         }
+    }
+
+    @Override
+    public MavenOptions options() {
+        return (MavenOptions) super.options();
     }
 }

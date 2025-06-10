@@ -50,7 +50,7 @@ public abstract class ConfiguredGoalSupport extends GoalSupport {
 
     protected boolean validateConfiguration(EncryptContext context) {
         SecDispatcher.ValidationResponse response = secDispatcher.validateConfiguration();
-        if (!response.isValid() || context.invokerRequest.options().verbose().orElse(false)) {
+        if (!response.isValid() || context.options().verbose().orElse(false)) {
             dumpResponse(context, "", response);
         }
         return response.isValid();

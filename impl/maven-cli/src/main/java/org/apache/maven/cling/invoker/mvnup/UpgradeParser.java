@@ -20,28 +20,9 @@ package org.apache.maven.cling.invoker.mvnup;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.api.cli.Options;
-import org.apache.maven.api.cli.mvnup.UpgradeOptions;
 import org.apache.maven.cling.invoker.BaseParser;
 
 public class UpgradeParser extends BaseParser {
-
-    @Override
-    protected UpgradeInvokerRequest getInvokerRequest(LocalContext context) {
-        return new UpgradeInvokerRequest(
-                context.parserRequest,
-                context.parsingFailed,
-                context.cwd,
-                context.installationDirectory,
-                context.userHomeDirectory,
-                context.userProperties,
-                context.systemProperties,
-                context.topDirectory,
-                context.rootDirectory,
-                context.extensions,
-                context.ciInfo,
-                (UpgradeOptions) context.options);
-    }
-
     @Override
     protected Options parseCliOptions(LocalContext context) {
         try {

@@ -79,17 +79,14 @@ import static java.util.Comparator.comparing;
  * The Maven invoker, that expects whole Maven on classpath and invokes it.
  */
 public class MavenInvoker extends LookupInvoker<MavenContext> {
-    public MavenInvoker(Lookup protoLookup) {
-        this(protoLookup, null);
-    }
-
     public MavenInvoker(Lookup protoLookup, @Nullable Consumer<LookupContext> contextConsumer) {
         super(protoLookup, contextConsumer);
     }
 
     @Override
     protected MavenContext createContext(InvokerRequest invokerRequest) {
-        return new MavenContext(invokerRequest);
+        return new MavenContext(
+                invokerRequest, true, (MavenOptions) invokerRequest.options().orElse(null));
     }
 
     @Override
@@ -129,21 +126,19 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
     protected void postCommands(MavenContext context) throws Exception {
         super.postCommands(context);
 
-        InvokerRequest invokerRequest = context.invokerRequest;
-        MavenOptions options = (MavenOptions) invokerRequest.options();
         Logger logger = context.logger;
-        if (options.relaxedChecksums().orElse(false)) {
+        if (context.options().relaxedChecksums().orElse(false)) {
             logger.info("Disabling strict checksum verification on all artifact downloads.");
-        } else if (options.strictChecksums().orElse(false)) {
+        } else if (context.options().strictChecksums().orElse(false)) {
             logger.info("Enabling strict checksum verification on all artifact downloads.");
         }
     }
 
     protected void toolchains(MavenContext context, MavenExecutionRequest request) throws Exception {
         Path userToolchainsFile = null;
-        if (context.invokerRequest.options().altUserToolchains().isPresent()) {
-            userToolchainsFile = context.cwd.resolve(
-                    context.invokerRequest.options().altUserToolchains().get());
+        if (context.options().altUserToolchains().isPresent()) {
+            userToolchainsFile =
+                    context.cwd.resolve(context.options().altUserToolchains().get());
 
             if (!Files.isRegularFile(userToolchainsFile)) {
                 throw new FileNotFoundException(
@@ -158,9 +153,9 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
         }
 
         Path installationToolchainsFile = null;
-        if (context.invokerRequest.options().altInstallationToolchains().isPresent()) {
+        if (context.options().altInstallationToolchains().isPresent()) {
             installationToolchainsFile = context.cwd.resolve(
-                    context.invokerRequest.options().altInstallationToolchains().get());
+                    context.options().altInstallationToolchains().get());
 
             if (!Files.isRegularFile(installationToolchainsFile)) {
                 throw new FileNotFoundException(
@@ -211,7 +206,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
                     "%s %s encountered while building the effective toolchains (use -e to see details)",
                     totalProblems, (totalProblems == 1) ? "problem was" : "problems were"));
 
-            if (context.invokerRequest.options().showErrors().orElse(false)) {
+            if (context.options().showErrors().orElse(false)) {
                 for (BuilderProblem problem :
                         toolchainsResult.getProblems().problems().toList()) {
                     context.logger.warn(problem.getMessage() + " @ " + problem.getLocation());
@@ -239,13 +234,12 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
                         .map(ToolchainModel::new)
                         .collect(Collectors.groupingBy(ToolchainModel::getType)));
 
-        MavenOptions options = (MavenOptions) context.invokerRequest.options();
-        request.setNoSnapshotUpdates(options.suppressSnapshotUpdates().orElse(false));
-        request.setGoals(options.goals().orElse(List.of()));
+        request.setNoSnapshotUpdates(context.options().suppressSnapshotUpdates().orElse(false));
+        request.setGoals(context.options().goals().orElse(List.of()));
         request.setReactorFailureBehavior(determineReactorFailureBehaviour(context));
-        request.setRecursive(!options.nonRecursive().orElse(!request.isRecursive()));
-        request.setOffline(options.offline().orElse(request.isOffline()));
-        request.setUpdateSnapshots(options.updateSnapshots().orElse(false));
+        request.setRecursive(!context.options().nonRecursive().orElse(!request.isRecursive()));
+        request.setOffline(context.options().offline().orElse(request.isOffline()));
+        request.setUpdateSnapshots(context.options().updateSnapshots().orElse(false));
         request.setGlobalChecksumPolicy(determineGlobalChecksumPolicy(context));
 
         Path pom = determinePom(context, lookup);
@@ -263,17 +257,17 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             }
         }
 
-        request.setTransferListener(
-                determineTransferListener(context, options.noTransferProgress().orElse(false)));
+        request.setTransferListener(determineTransferListener(
+                context, context.options().noTransferProgress().orElse(false)));
         request.setExecutionListener(determineExecutionListener(context));
 
-        request.setResumeFrom(options.resumeFrom().orElse(null));
-        request.setResume(options.resume().orElse(false));
+        request.setResumeFrom(context.options().resumeFrom().orElse(null));
+        request.setResume(context.options().resume().orElse(false));
         request.setMakeBehavior(determineMakeBehavior(context));
-        request.setCacheNotFound(options.cacheArtifactNotFound().orElse(true));
+        request.setCacheNotFound(context.options().cacheArtifactNotFound().orElse(true));
         request.setCacheTransferError(false);
 
-        if (options.strictArtifactDescriptorPolicy().orElse(false)) {
+        if (context.options().strictArtifactDescriptorPolicy().orElse(false)) {
             request.setIgnoreMissingArtifactDescriptor(false);
             request.setIgnoreInvalidArtifactDescriptor(false);
         } else {
@@ -282,7 +276,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
         }
 
         request.setIgnoreTransitiveRepositories(
-                options.ignoreTransitiveRepositories().orElse(false));
+                context.options().ignoreTransitiveRepositories().orElse(false));
 
         performProjectActivation(context, request.getProjectActivation());
         performProfileActivation(context, request.getProfileActivation());
@@ -295,9 +289,9 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
         // parameters but this is sufficient for now. Ultimately we want components like Builders to provide a way to
         // extend the command line to accept its own configuration parameters.
         //
-        if (options.threads().isPresent()) {
+        if (context.options().threads().isPresent()) {
             int degreeOfConcurrency =
-                    calculateDegreeOfConcurrency(options.threads().get());
+                    calculateDegreeOfConcurrency(context.options().threads().get());
             if (degreeOfConcurrency > 1) {
                 request.setBuilderId("multithreaded");
                 request.setDegreeOfConcurrency(degreeOfConcurrency);
@@ -307,16 +301,15 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
         //
         // Allow the builder to be overridden by the user if requested. The builders are now pluggable.
         //
-        if (options.builder().isPresent()) {
-            request.setBuilderId(options.builder().get());
+        if (context.options().builder().isPresent()) {
+            request.setBuilderId(context.options().builder().get());
         }
     }
 
     protected Path determinePom(MavenContext context, Lookup lookup) {
         Path current = context.cwd.get();
-        MavenOptions options = (MavenOptions) context.invokerRequest.options();
-        if (options.alternatePomFile().isPresent()) {
-            current = context.cwd.resolve(options.alternatePomFile().get());
+        if (context.options().alternatePomFile().isPresent()) {
+            current = context.cwd.resolve(context.options().alternatePomFile().get());
         }
         ModelProcessor modelProcessor =
                 lookup.lookupOptional(ModelProcessor.class).orElse(null);
@@ -328,12 +321,11 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
     }
 
     protected String determineReactorFailureBehaviour(MavenContext context) {
-        MavenOptions mavenOptions = (MavenOptions) context.invokerRequest.options();
-        if (mavenOptions.failFast().isPresent()) {
+        if (context.options().failFast().isPresent()) {
             return MavenExecutionRequest.REACTOR_FAIL_FAST;
-        } else if (mavenOptions.failAtEnd().isPresent()) {
+        } else if (context.options().failAtEnd().isPresent()) {
             return MavenExecutionRequest.REACTOR_FAIL_AT_END;
-        } else if (mavenOptions.failNever().isPresent()) {
+        } else if (context.options().failNever().isPresent()) {
             return MavenExecutionRequest.REACTOR_FAIL_NEVER;
         } else {
             return MavenExecutionRequest.REACTOR_FAIL_FAST;
@@ -341,10 +333,9 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
     }
 
     protected String determineGlobalChecksumPolicy(MavenContext context) {
-        MavenOptions mavenOptions = (MavenOptions) context.invokerRequest.options();
-        if (mavenOptions.strictChecksums().orElse(false)) {
+        if (context.options().strictChecksums().orElse(false)) {
             return MavenExecutionRequest.CHECKSUM_POLICY_FAIL;
-        } else if (mavenOptions.relaxedChecksums().orElse(false)) {
+        } else if (context.options().relaxedChecksums().orElse(false)) {
             return MavenExecutionRequest.CHECKSUM_POLICY_WARN;
         } else {
             return null;
@@ -360,10 +351,10 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
     }
 
     protected TransferListener determineTransferListener(MavenContext context, boolean noTransferProgress) {
-        boolean quiet = context.invokerRequest.options().quiet().orElse(false);
-        boolean logFile = context.invokerRequest.options().logFile().isPresent();
+        boolean quiet = context.options().quiet().orElse(false);
+        boolean logFile = context.options().logFile().isPresent();
         boolean quietCI = context.invokerRequest.ciInfo().isPresent()
-                && !context.invokerRequest.options().forceInteractive().orElse(false);
+                && !context.options().forceInteractive().orElse(false);
 
         TransferListener delegate;
         if (quiet || noTransferProgress || quietCI) {
@@ -382,15 +373,14 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
     }
 
     protected String determineMakeBehavior(MavenContext context) {
-        MavenOptions mavenOptions = (MavenOptions) context.invokerRequest.options();
-        if (mavenOptions.alsoMake().isPresent()
-                && mavenOptions.alsoMakeDependents().isEmpty()) {
+        if (context.options().alsoMake().isPresent()
+                && context.options().alsoMakeDependents().isEmpty()) {
             return MavenExecutionRequest.REACTOR_MAKE_UPSTREAM;
-        } else if (mavenOptions.alsoMake().isEmpty()
-                && mavenOptions.alsoMakeDependents().isPresent()) {
+        } else if (context.options().alsoMake().isEmpty()
+                && context.options().alsoMakeDependents().isPresent()) {
             return MavenExecutionRequest.REACTOR_MAKE_DOWNSTREAM;
-        } else if (mavenOptions.alsoMake().isPresent()
-                && mavenOptions.alsoMakeDependents().isPresent()) {
+        } else if (context.options().alsoMake().isPresent()
+                && context.options().alsoMakeDependents().isPresent()) {
             return MavenExecutionRequest.REACTOR_MAKE_BOTH;
         } else {
             return null;
@@ -398,10 +388,9 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
     }
 
     protected void performProjectActivation(MavenContext context, ProjectActivation projectActivation) {
-        MavenOptions mavenOptions = (MavenOptions) context.invokerRequest.options();
-        if (mavenOptions.projects().isPresent()
-                && !mavenOptions.projects().get().isEmpty()) {
-            List<String> optionValues = mavenOptions.projects().get();
+        if (context.options().projects().isPresent()
+                && !context.options().projects().get().isEmpty()) {
+            List<String> optionValues = context.options().projects().get();
             for (final String optionValue : optionValues) {
                 for (String token : optionValue.split(",")) {
                     String selector = token.trim();
@@ -426,10 +415,9 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
     }
 
     protected void performProfileActivation(MavenContext context, ProfileActivation profileActivation) {
-        MavenOptions mavenOptions = (MavenOptions) context.invokerRequest.options();
-        if (mavenOptions.activatedProfiles().isPresent()
-                && !mavenOptions.activatedProfiles().get().isEmpty()) {
-            List<String> optionValues = mavenOptions.activatedProfiles().get();
+        if (context.options().activatedProfiles().isPresent()
+                && !context.options().activatedProfiles().get().isEmpty()) {
+            List<String> optionValues = context.options().activatedProfiles().get();
             for (final String optionValue : optionValues) {
                 for (String token : optionValue.split(",")) {
                     String profileId = token.trim();
@@ -480,7 +468,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
 
             context.logger.error("");
 
-            if (!context.invokerRequest.options().showErrors().orElse(false)) {
+            if (!context.options().showErrors().orElse(false)) {
                 context.logger.error("To see the full stack trace of the errors, re-run Maven with the '"
                         + MessageUtils.builder().strong("-e") + "' switch");
             }
@@ -514,7 +502,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
                 }
             }
 
-            if (((MavenOptions) context.invokerRequest.options()).failNever().orElse(false)) {
+            if (context.options().failNever().orElse(false)) {
                 context.logger.info("Build failures were ignored.");
                 return 0;
             } else {
@@ -609,7 +597,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             line = indent + line + ("".equals(nextColor) ? "" : ANSI_RESET);
 
             if ((i == lines.length - 1)
-                    && (context.invokerRequest.options().showErrors().orElse(false)
+                    && (context.options().showErrors().orElse(false)
                             || (summary.getException() instanceof InternalErrorException))) {
                 context.logger.error(line, summary.getException());
             } else {

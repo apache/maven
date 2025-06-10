@@ -23,11 +23,11 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.mvnup.UpgradeOptions;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
-import org.apache.maven.cling.invoker.mvnup.UpgradeInvokerRequest;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -78,7 +78,7 @@ public final class TestUtils {
      * @return a mock UpgradeContext
      */
     public static UpgradeContext createMockContext(Path workingDirectory, UpgradeOptions options) {
-        UpgradeInvokerRequest request = mock(UpgradeInvokerRequest.class);
+        InvokerRequest request = mock(InvokerRequest.class);
 
         // Mock all required properties for LookupContext constructor
         when(request.cwd()).thenReturn(workingDirectory);
@@ -88,7 +88,7 @@ public final class TestUtils {
         when(request.rootDirectory()).thenReturn(Optional.empty());
         when(request.userProperties()).thenReturn(Map.of());
         when(request.systemProperties()).thenReturn(Map.of());
-        when(request.options()).thenReturn(options);
+        when(request.options()).thenReturn(Optional.ofNullable(options));
 
         // Mock parserRequest and logger
         ParserRequest parserRequest = mock(ParserRequest.class);
@@ -96,7 +96,7 @@ public final class TestUtils {
         when(request.parserRequest()).thenReturn(parserRequest);
         when(parserRequest.logger()).thenReturn(logger);
 
-        return new UpgradeContext(request);
+        return new UpgradeContext(request, options);
     }
 
     /**

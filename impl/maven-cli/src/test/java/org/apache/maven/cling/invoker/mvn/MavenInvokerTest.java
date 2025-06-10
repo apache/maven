@@ -50,7 +50,7 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
     @Override
     protected Invoker createInvoker(ClassWorld classWorld) {
         return new MavenInvoker(
-                ProtoLookup.builder().addMapping(ClassWorld.class, classWorld).build());
+                ProtoLookup.builder().addMapping(ClassWorld.class, classWorld).build(), null);
     }
 
     @Override

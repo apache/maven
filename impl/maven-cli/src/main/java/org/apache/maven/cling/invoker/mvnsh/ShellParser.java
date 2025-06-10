@@ -20,28 +20,9 @@ package org.apache.maven.cling.invoker.mvnsh;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.api.cli.Options;
-import org.apache.maven.api.cli.mvnsh.ShellOptions;
 import org.apache.maven.cling.invoker.BaseParser;
 
 public class ShellParser extends BaseParser {
-
-    @Override
-    protected ShellInvokerRequest getInvokerRequest(LocalContext context) {
-        return new ShellInvokerRequest(
-                context.parserRequest,
-                context.parsingFailed,
-                context.cwd,
-                context.installationDirectory,
-                context.userHomeDirectory,
-                context.userProperties,
-                context.systemProperties,
-                context.topDirectory,
-                context.rootDirectory,
-                context.extensions,
-                context.ciInfo,
-                (ShellOptions) context.options);
-    }
-
     @Override
     protected Options parseCliOptions(LocalContext context) {
         try {

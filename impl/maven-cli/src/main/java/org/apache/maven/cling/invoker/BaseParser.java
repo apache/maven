@@ -250,7 +250,21 @@ public abstract class BaseParser implements Parser {
         }
     }
 
-    protected abstract InvokerRequest getInvokerRequest(LocalContext context);
+    protected InvokerRequest getInvokerRequest(LocalContext context) {
+        return new BaseInvokerRequest(
+                context.parserRequest,
+                context.parsingFailed,
+                context.cwd,
+                context.installationDirectory,
+                context.userHomeDirectory,
+                context.userProperties,
+                context.systemProperties,
+                context.topDirectory,
+                context.rootDirectory,
+                context.extensions,
+                context.ciInfo,
+                context.options);
+    }
 
     protected Path getCwd(LocalContext context) {
         if (context.parserRequest.cwd() != null) {

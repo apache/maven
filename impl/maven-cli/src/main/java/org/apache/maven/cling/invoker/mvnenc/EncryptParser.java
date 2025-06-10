@@ -20,28 +20,9 @@ package org.apache.maven.cling.invoker.mvnenc;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.api.cli.Options;
-import org.apache.maven.api.cli.mvnenc.EncryptOptions;
 import org.apache.maven.cling.invoker.BaseParser;
 
 public class EncryptParser extends BaseParser {
-
-    @Override
-    protected EncryptInvokerRequest getInvokerRequest(LocalContext context) {
-        return new EncryptInvokerRequest(
-                context.parserRequest,
-                context.parsingFailed,
-                context.cwd,
-                context.installationDirectory,
-                context.userHomeDirectory,
-                context.userProperties,
-                context.systemProperties,
-                context.topDirectory,
-                context.rootDirectory,
-                context.extensions,
-                context.ciInfo,
-                (EncryptOptions) context.options);
-    }
-
     @Override
     protected Options parseCliOptions(LocalContext context) {
         try {

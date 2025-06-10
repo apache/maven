@@ -32,7 +32,6 @@ import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.cling.invoker.BaseParser;
 
 public class MavenParser extends BaseParser {
-
     @Override
     protected Options parseCliOptions(LocalContext context) {
         ArrayList<MavenOptions> result = new ArrayList<>();
@@ -99,22 +98,5 @@ public class MavenParser extends BaseParser {
 
     protected MavenOptions parseArgs(String source, List<String> args) throws ParseException {
         return CommonsCliMavenOptions.parse(source, args.toArray(new String[0]));
-    }
-
-    @Override
-    protected MavenInvokerRequest getInvokerRequest(LocalContext context) {
-        return new MavenInvokerRequest(
-                context.parserRequest,
-                context.parsingFailed,
-                context.cwd,
-                context.installationDirectory,
-                context.userHomeDirectory,
-                context.userProperties,
-                context.systemProperties,
-                context.topDirectory,
-                context.rootDirectory,
-                context.extensions,
-                context.ciInfo,
-                (MavenOptions) context.options);
     }
 }
