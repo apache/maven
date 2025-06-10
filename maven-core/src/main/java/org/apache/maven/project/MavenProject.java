@@ -182,6 +182,8 @@ public class MavenProject implements Cloneable {
 
     private final Set<String> lifecyclePhases = Collections.synchronizedSet(new LinkedHashSet<>());
 
+    private final Object artifactsMutex = new Object();
+
     public MavenProject() {
         Model model = new Model();
 
@@ -659,8 +661,10 @@ public class MavenProject implements Cloneable {
     }
 
     public void setArtifacts(Set<Artifact> artifacts) {
-        this.artifacts = artifacts;
-        this.artifactMap = ArtifactUtils.artifactMapByVersionlessId(artifacts);
+        synchronized (artifactsMutex) {
+            this.artifacts = artifacts;
+            this.artifactMap = ArtifactUtils.artifactMapByVersionlessId(artifacts);
+        }
     }
 
     /**
@@ -672,11 +676,15 @@ public class MavenProject implements Cloneable {
      * @see #getDependencyArtifacts() to get only direct dependencies
      */
     public Set<Artifact> getArtifacts() {
-        return artifacts;
+        synchronized (artifactsMutex) {
+            return artifacts;
+        }
     }
 
     public Map<String, Artifact> getArtifactMap() {
-        return artifactMap;
+        synchronized (artifactsMutex) {
+            return artifactMap;
+        }
     }
 
     public void setPluginArtifacts(Set<Artifact> pluginArtifacts) {
@@ -1425,9 +1433,11 @@ public class MavenProject implements Cloneable {
      * @param artifacts The set of artifacts, may be {@code null}.
      */
     public void setResolvedArtifacts(Set<Artifact> artifacts) {
-        this.resolvedArtifacts = artifacts != null ? artifacts : Collections.emptySet();
-        this.artifacts = calculateArtifacts(this.artifactFilter, artifacts);
-        this.artifactMap = ArtifactUtils.artifactMapByVersionlessId(this.artifacts);
+        synchronized (artifactsMutex) {
+            this.resolvedArtifacts = artifacts != null ? artifacts : Collections.emptySet();
+            this.artifacts = calculateArtifacts(this.artifactFilter, artifacts);
+            this.artifactMap = ArtifactUtils.artifactMapByVersionlessId(this.artifacts);
+        }
     }
 
     private static Set<Artifact> calculateArtifacts(ArtifactFilter artifactFilter, Set<Artifact> resolvedArtifacts) {
@@ -1452,9 +1462,11 @@ public class MavenProject implements Cloneable {
      * @param artifactFilter The artifact filter, may be {@code null} to exclude all artifacts.
      */
     public void setArtifactFilter(ArtifactFilter artifactFilter) {
-        this.artifactFilter = artifactFilter;
-        this.artifacts = calculateArtifacts(artifactFilter, this.resolvedArtifacts);
-        this.artifactMap = ArtifactUtils.artifactMapByVersionlessId(this.artifacts);
+        synchronized (artifactsMutex) {
+            this.artifactFilter = artifactFilter;
+            this.artifacts = calculateArtifacts(artifactFilter, this.resolvedArtifacts);
+            this.artifactMap = ArtifactUtils.artifactMapByVersionlessId(this.artifacts);
+        }
     }
 
     /**
