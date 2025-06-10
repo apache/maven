@@ -30,7 +30,7 @@ import org.jline.utils.AttributedString;
 import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
 
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.Indentation;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Indentation;
 
 @SuppressWarnings("VisibilityModifier")
 public class UpgradeContext extends LookupContext {

@@ -18,13 +18,11 @@
  */
 package org.apache.maven.cling.invoker.mvnup.goals;
 
-import java.io.StringReader;
 import java.util.stream.Stream;
 
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.input.SAXBuilder;
-import org.junit.jupiter.api.BeforeEach;
+import eu.maveniverse.domtrip.Document;
+import eu.maveniverse.domtrip.Element;
+import eu.maveniverse.domtrip.Parser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -33,6 +31,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.MODEL_VERSION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -46,34 +45,27 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @DisplayName("ModelVersionUtils")
 class ModelVersionUtilsTest {
 
-    private SAXBuilder saxBuilder;
-
-    @BeforeEach
-    void setUp() {
-        saxBuilder = new SAXBuilder();
-    }
-
     @Nested
     @DisplayName("Model Version Detection")
     class ModelVersionDetectionTests {
 
         @Test
         @DisplayName("should detect model version from document")
-        void shouldDetectModelVersionFromDocument() throws Exception {
+        void shouldDetectModelVersionFromDocument() {
             String pomXml = PomBuilder.create()
                     .groupId("test")
                     .artifactId("test")
                     .version("1.0.0")
                     .build();
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             String result = ModelVersionUtils.detectModelVersion(document);
             assertEquals("4.0.0", result);
         }
 
         @Test
         @DisplayName("should detect 4.1.0 model version")
-        void shouldDetect410ModelVersion() throws Exception {
+        void shouldDetect410ModelVersion() {
             String pomXml = PomBuilder.create()
                     .namespace("http://maven.apache.org/POM/4.1.0")
                     .modelVersion("4.1.0")
@@ -82,7 +74,7 @@ class ModelVersionUtilsTest {
                     .version("1.0.0")
                     .build();
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             String result = ModelVersionUtils.detectModelVersion(document);
             assertEquals("4.1.0", result);
         }
@@ -99,7 +91,7 @@ class ModelVersionUtilsTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             String result = ModelVersionUtils.detectModelVersion(document);
             assertEquals("4.0.0", result); // Default version
         }
@@ -116,7 +108,7 @@ class ModelVersionUtilsTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             String result = ModelVersionUtils.detectModelVersion(document);
             assertEquals("4.1.0", result);
         }
@@ -283,11 +275,11 @@ class ModelVersionUtilsTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = new Parser().parse(pomXml);
             ModelVersionUtils.updateModelVersion(document, "4.1.0");
-            Element root = document.getRootElement();
-            Element modelVersionElement = root.getChild("modelVersion", root.getNamespace());
-            assertEquals("4.1.0", modelVersionElement.getTextTrim());
+            Element root = document.root();
+            Element modelVersionElement = root.child("modelVersion").orElse(null);
+            assertEquals("4.1.0", modelVersionElement.textContentTrimmed());
         }
 
         @Test
@@ -302,12 +294,12 @@ class ModelVersionUtilsTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             ModelVersionUtils.updateModelVersion(document, "4.1.0");
-            Element root = document.getRootElement();
-            Element modelVersionElement = root.getChild("modelVersion", root.getNamespace());
+            Element root = document.root();
+            Element modelVersionElement = root.child("modelVersion").orElse(null);
             assertNotNull(modelVersionElement);
-            assertEquals("4.1.0", modelVersionElement.getTextTrim());
+            assertEquals("4.1.0", modelVersionElement.textContentTrimmed());
         }
 
         @Test
@@ -323,12 +315,12 @@ class ModelVersionUtilsTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             boolean result = ModelVersionUtils.removeModelVersion(document);
 
             assertTrue(result);
-            Element root = document.getRootElement();
-            Element modelVersionElement = root.getChild("modelVersion", root.getNamespace());
+            Element root = document.root();
+            Element modelVersionElement = root.child(MODEL_VERSION).orElse(null);
             assertNull(modelVersionElement);
         }
 
@@ -344,7 +336,7 @@ class ModelVersionUtilsTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             boolean result = ModelVersionUtils.removeModelVersion(document);
 
             assertFalse(result); // Nothing to remove
@@ -399,7 +391,7 @@ class ModelVersionUtilsTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
 
             String version = ModelVersionUtils.detectModelVersion(document);
 
@@ -415,7 +407,7 @@ class ModelVersionUtilsTest {
                     "https://maven.apache.org/POM/4.1.0"
                 })
         @DisplayName("should handle various namespace formats")
-        void shouldHandleVariousNamespaceFormats(String namespace) throws Exception {
+        void shouldHandleVariousNamespaceFormats(String namespace) {
             String pomXml = PomBuilder.create()
                     .namespace(namespace)
                     .groupId("com.example")
@@ -424,15 +416,15 @@ class ModelVersionUtilsTest {
                     .build();
 
             // Test that the POM can be parsed successfully and namespace is preserved
-            Document document = saxBuilder.build(new StringReader(pomXml));
-            Element root = document.getRootElement();
+            Document document = Document.of(pomXml);
+            Element root = document.root();
 
-            assertEquals(namespace, root.getNamespaceURI(), "POM should preserve the specified namespace");
+            assertEquals(namespace, root.namespaceURI(), "POM should preserve the specified namespace");
         }
 
         @Test
         @DisplayName("should handle custom modelVersion values")
-        void shouldHandleCustomModelVersionValues() throws Exception {
+        void shouldHandleCustomModelVersionValues() {
             String pomXml = PomBuilder.create()
                     .modelVersion("5.0.0")
                     .groupId("com.example")
@@ -440,7 +432,7 @@ class ModelVersionUtilsTest {
                     .version("1.0.0")
                     .build();
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
 
             String version = ModelVersionUtils.detectModelVersion(document);
 
@@ -460,7 +452,7 @@ class ModelVersionUtilsTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
 
             String version = ModelVersionUtils.detectModelVersion(document);
 
