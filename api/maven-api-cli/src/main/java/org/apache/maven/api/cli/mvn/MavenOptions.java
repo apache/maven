@@ -20,7 +20,6 @@ package org.apache.maven.api.cli.mvn;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.UnaryOperator;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -221,14 +220,4 @@ public interface MavenOptions extends Options {
      */
     @Nonnull
     Optional<List<String>> goals();
-
-    /**
-     * Returns a new instance of {@link MavenOptions} with values interpolated using the given callback.
-     *
-     * @param callback a callback to use for interpolation
-     * @return a new MavenOptions instance with interpolated values
-     */
-    @Nonnull
-    @Override
-    MavenOptions interpolate(@Nonnull UnaryOperator<String> callback);
 }

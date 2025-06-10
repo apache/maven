@@ -168,7 +168,7 @@ public class LayeredMavenOptions<O extends MavenOptions> extends LayeredOptions<
     public MavenOptions interpolate(UnaryOperator<String> callback) {
         ArrayList<MavenOptions> interpolatedOptions = new ArrayList<>(options.size());
         for (MavenOptions o : options) {
-            interpolatedOptions.add(o.interpolate(callback));
+            interpolatedOptions.add((MavenOptions) o.interpolate(callback));
         }
         return layerMavenOptions(interpolatedOptions);
     }

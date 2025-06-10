@@ -34,8 +34,8 @@ import org.apache.maven.cling.invoker.BaseParser;
 public class MavenParser extends BaseParser {
 
     @Override
-    protected List<Options> parseCliOptions(LocalContext context) {
-        ArrayList<Options> result = new ArrayList<>();
+    protected Options parseCliOptions(LocalContext context) {
+        ArrayList<MavenOptions> result = new ArrayList<>();
         // CLI args
         MavenOptions cliOptions = parseMavenCliOptions(context.parserRequest.args());
         result.add(cliOptions);
@@ -53,7 +53,7 @@ public class MavenParser extends BaseParser {
         if (mavenConfig != null && Files.isRegularFile(mavenConfig)) {
             result.add(parseMavenConfigOptions(mavenConfig));
         }
-        return result;
+        return LayeredMavenOptions.layerMavenOptions(result);
     }
 
     protected MavenOptions parseMavenCliOptions(List<String> args) {
@@ -102,15 +102,6 @@ public class MavenParser extends BaseParser {
     }
 
     @Override
-    protected MavenOptions emptyOptions() {
-        try {
-            return CommonsCliMavenOptions.parse(Options.SOURCE_CLI, new String[0]);
-        } catch (ParseException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    @Override
     protected MavenInvokerRequest getInvokerRequest(LocalContext context) {
         return new MavenInvokerRequest(
                 context.parserRequest,
@@ -125,11 +116,5 @@ public class MavenParser extends BaseParser {
                 context.extensions,
                 context.ciInfo,
                 (MavenOptions) context.options);
-    }
-
-    @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    protected MavenOptions assembleOptions(List<Options> parsedOptions) {
-        return LayeredMavenOptions.layerMavenOptions((List) parsedOptions);
     }
 }

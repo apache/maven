@@ -185,7 +185,7 @@ class PluginUpgradeCliTest {
         CommonsCliUpgradeOptions options = CommonsCliUpgradeOptions.parse(args);
 
         // Test that interpolation works (even though there's nothing to interpolate here)
-        UpgradeOptions interpolated = options.interpolate(s -> s);
+        UpgradeOptions interpolated = (CommonsCliUpgradeOptions) options.interpolate(s -> s);
 
         assertTrue(interpolated.plugins().isPresent(), "Interpolated options should preserve --plugins");
         assertTrue(interpolated.plugins().get(), "Interpolated --plugins should be true");

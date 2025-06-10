@@ -18,23 +18,12 @@
  */
 package org.apache.maven.cling.invoker.mvnsh;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.mvnsh.ShellOptions;
 import org.apache.maven.cling.invoker.BaseParser;
 
 public class ShellParser extends BaseParser {
-    @Override
-    protected ShellOptions emptyOptions() {
-        try {
-            return CommonsCliShellOptions.parse(new String[0]);
-        } catch (ParseException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
 
     @Override
     protected ShellInvokerRequest getInvokerRequest(LocalContext context) {
@@ -54,21 +43,11 @@ public class ShellParser extends BaseParser {
     }
 
     @Override
-    protected List<Options> parseCliOptions(LocalContext context) {
-        return Collections.singletonList(parseShellCliOptions(context.parserRequest.args()));
-    }
-
-    protected CommonsCliShellOptions parseShellCliOptions(List<String> args) {
+    protected Options parseCliOptions(LocalContext context) {
         try {
-            return CommonsCliShellOptions.parse(args.toArray(new String[0]));
+            return CommonsCliShellOptions.parse(context.parserRequest.args().toArray(new String[0]));
         } catch (ParseException e) {
             throw new IllegalArgumentException("Failed to parse command line options: " + e.getMessage(), e);
         }
-    }
-
-    @Override
-    protected Options assembleOptions(List<Options> parsedOptions) {
-        // nothing to assemble, we deal with CLI only
-        return parsedOptions.get(0);
     }
 }
