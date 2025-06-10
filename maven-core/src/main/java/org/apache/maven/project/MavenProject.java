@@ -109,11 +109,11 @@ public class MavenProject implements Cloneable {
 
     private File basedir;
 
-    private Set<Artifact> resolvedArtifacts;
+    private Set<Artifact> resolvedArtifacts = Collections.emptySet();
 
-    private ArtifactFilter artifactFilter;
+    private ArtifactFilter artifactFilter = null;
 
-    private Set<Artifact> artifacts;
+    private Set<Artifact> artifacts = Collections.emptySet();
 
     private Artifact parentArtifact;
 
@@ -152,7 +152,7 @@ public class MavenProject implements Cloneable {
     private Artifact artifact;
 
     // calculated.
-    private Map<String, Artifact> artifactMap;
+    private Map<String, Artifact> artifactMap = Collections.emptyMap();
 
     private Model originalModel;
 
@@ -174,13 +174,13 @@ public class MavenProject implements Cloneable {
 
     private File parentFile;
 
-    private Map<String, Object> context;
+    private final Map<String, Object> context = new HashMap<>();
 
     private ClassRealm classRealm;
 
     private DependencyFilter extensionDependencyFilter;
 
-    private final Set<String> lifecyclePhases = Collections.synchronizedSet(new LinkedHashSet<String>());
+    private final Set<String> lifecyclePhases = Collections.synchronizedSet(new LinkedHashSet<>());
 
     public MavenProject() {
         Model model = new Model();
@@ -381,14 +381,15 @@ public class MavenProject implements Cloneable {
     }
 
     public List<String> getCompileClasspathElements() throws DependencyResolutionRequiredException {
-        List<String> list = new ArrayList<>(getArtifacts().size() + 1);
+        Set<Artifact> artifacts = getArtifacts();
+        List<String> list = new ArrayList<>(artifacts.size() + 1);
 
         String d = getBuild().getOutputDirectory();
         if (d != null) {
             list.add(d);
         }
 
-        for (Artifact a : getArtifacts()) {
+        for (Artifact a : artifacts) {
             if (a.getArtifactHandler().isAddedToClasspath()) {
                 // TODO let the scope handler deal with this
                 if (Artifact.SCOPE_COMPILE.equals(a.getScope())
@@ -659,9 +660,7 @@ public class MavenProject implements Cloneable {
 
     public void setArtifacts(Set<Artifact> artifacts) {
         this.artifacts = artifacts;
-
-        // flush the calculated artifactMap
-        artifactMap = null;
+        this.artifactMap = ArtifactUtils.artifactMapByVersionlessId(artifacts);
     }
 
     /**
@@ -673,32 +672,16 @@ public class MavenProject implements Cloneable {
      * @see #getDependencyArtifacts() to get only direct dependencies
      */
     public Set<Artifact> getArtifacts() {
-        if (artifacts == null) {
-            if (artifactFilter == null || resolvedArtifacts == null) {
-                artifacts = new LinkedHashSet<>();
-            } else {
-                artifacts = new LinkedHashSet<>(resolvedArtifacts.size() * 2);
-                for (Artifact artifact : resolvedArtifacts) {
-                    if (artifactFilter.include(artifact)) {
-                        artifacts.add(artifact);
-                    }
-                }
-            }
-        }
         return artifacts;
     }
 
     public Map<String, Artifact> getArtifactMap() {
-        if (artifactMap == null) {
-            artifactMap = ArtifactUtils.artifactMapByVersionlessId(getArtifacts());
-        }
         return artifactMap;
     }
 
     public void setPluginArtifacts(Set<Artifact> pluginArtifacts) {
         this.pluginArtifacts = pluginArtifacts;
-
-        this.pluginArtifactMap = null;
+        this.pluginArtifactMap = ArtifactUtils.artifactMapByVersionlessId(getPluginArtifacts());
     }
 
     public Set<Artifact> getPluginArtifacts() {
@@ -706,10 +689,6 @@ public class MavenProject implements Cloneable {
     }
 
     public Map<String, Artifact> getPluginArtifactMap() {
-        if (pluginArtifactMap == null) {
-            pluginArtifactMap = ArtifactUtils.artifactMapByVersionlessId(getPluginArtifacts());
-        }
-
         return pluginArtifactMap;
     }
 
@@ -882,20 +861,19 @@ public class MavenProject implements Cloneable {
             String pluginGroupId, String pluginArtifactId, String executionId, String goalId) {
         Xpp3Dom dom = null;
 
-        if (getBuildPlugins() != null) {
-            for (Plugin plugin : getBuildPlugins()) {
-                if (pluginGroupId.equals(plugin.getGroupId()) && pluginArtifactId.equals(plugin.getArtifactId())) {
-                    dom = (Xpp3Dom) plugin.getConfiguration();
+        List<Plugin> buildPlugins = getBuildPlugins();
+        for (Plugin plugin : buildPlugins) {
+            if (pluginGroupId.equals(plugin.getGroupId()) && pluginArtifactId.equals(plugin.getArtifactId())) {
+                dom = (Xpp3Dom) plugin.getConfiguration();
 
-                    if (executionId != null) {
-                        PluginExecution execution = plugin.getExecutionsAsMap().get(executionId);
-                        if (execution != null) {
-                            // NOTE: The PluginConfigurationExpander already merged the plugin-level config in
-                            dom = (Xpp3Dom) execution.getConfiguration();
-                        }
+                if (executionId != null) {
+                    PluginExecution execution = plugin.getExecutionsAsMap().get(executionId);
+                    if (execution != null) {
+                        // NOTE: The PluginConfigurationExpander already merged the plugin-level config in
+                        dom = (Xpp3Dom) execution.getConfiguration();
                     }
-                    break;
                 }
+                break;
             }
         }
 
@@ -1378,9 +1356,6 @@ public class MavenProject implements Cloneable {
      * extensions to associate derived state with project instances.
      */
     public void setContextValue(String key, Object value) {
-        if (context == null) {
-            context = new HashMap<>();
-        }
         if (value != null) {
             context.put(key, value);
         } else {
@@ -1392,9 +1367,6 @@ public class MavenProject implements Cloneable {
      * Returns context value of this project associated with the given key or null if this project has no such value.
      */
     public Object getContextValue(String key) {
-        if (context == null) {
-            return null;
-        }
         return context.get(key);
     }
 
@@ -1453,9 +1425,22 @@ public class MavenProject implements Cloneable {
      * @param artifacts The set of artifacts, may be {@code null}.
      */
     public void setResolvedArtifacts(Set<Artifact> artifacts) {
-        this.resolvedArtifacts = (artifacts != null) ? artifacts : Collections.<Artifact>emptySet();
-        this.artifacts = null;
-        this.artifactMap = null;
+        this.resolvedArtifacts = artifacts != null ? artifacts : Collections.emptySet();
+        this.artifacts = calculateArtifacts(this.artifactFilter, artifacts);
+        this.artifactMap = ArtifactUtils.artifactMapByVersionlessId(this.artifacts);
+    }
+
+    private static Set<Artifact> calculateArtifacts(ArtifactFilter artifactFilter, Set<Artifact> resolvedArtifacts) {
+        if (artifactFilter == null || resolvedArtifacts == null) {
+            return Collections.emptySet();
+        }
+        Set<Artifact> result = new LinkedHashSet<>(resolvedArtifacts.size() * 2);
+        for (Artifact artifact : resolvedArtifacts) {
+            if (artifactFilter.include(artifact)) {
+                result.add(artifact);
+            }
+        }
+        return result;
     }
 
     /**
@@ -1468,8 +1453,8 @@ public class MavenProject implements Cloneable {
      */
     public void setArtifactFilter(ArtifactFilter artifactFilter) {
         this.artifactFilter = artifactFilter;
-        this.artifacts = null;
-        this.artifactMap = null;
+        this.artifacts = calculateArtifacts(artifactFilter, this.resolvedArtifacts);
+        this.artifactMap = ArtifactUtils.artifactMapByVersionlessId(this.artifacts);
     }
 
     /**
@@ -1588,9 +1573,10 @@ public class MavenProject implements Cloneable {
 
     @Deprecated
     public List<Artifact> getCompileArtifacts() {
-        List<Artifact> list = new ArrayList<>(getArtifacts().size());
+        Set<Artifact> artifacts = getArtifacts();
+        List<Artifact> list = new ArrayList<>(artifacts.size());
 
-        for (Artifact a : getArtifacts()) {
+        for (Artifact a : artifacts) {
             // TODO classpath check doesn't belong here - that's the other method
             if (a.getArtifactHandler().isAddedToClasspath()) {
                 // TODO let the scope handler deal with this
@@ -1614,7 +1600,7 @@ public class MavenProject implements Cloneable {
 
         List<Dependency> list = new ArrayList<>(artifacts.size());
 
-        for (Artifact a : getArtifacts()) {
+        for (Artifact a : artifacts) {
             // TODO let the scope handler deal with this
             if (Artifact.SCOPE_COMPILE.equals(a.getScope())
                     || Artifact.SCOPE_PROVIDED.equals(a.getScope())
@@ -1636,9 +1622,10 @@ public class MavenProject implements Cloneable {
 
     @Deprecated
     public List<Artifact> getTestArtifacts() {
-        List<Artifact> list = new ArrayList<>(getArtifacts().size());
+        Set<Artifact> artifacts = getArtifacts();
+        List<Artifact> list = new ArrayList<>(artifacts.size());
 
-        for (Artifact a : getArtifacts()) {
+        for (Artifact a : artifacts) {
             // TODO classpath check doesn't belong here - that's the other method
             if (a.getArtifactHandler().isAddedToClasspath()) {
                 list.add(a);
@@ -1657,7 +1644,7 @@ public class MavenProject implements Cloneable {
 
         List<Dependency> list = new ArrayList<>(artifacts.size());
 
-        for (Artifact a : getArtifacts()) {
+        for (Artifact a : artifacts) {
             Dependency dependency = new Dependency();
 
             dependency.setArtifactId(a.getArtifactId());
@@ -1682,7 +1669,7 @@ public class MavenProject implements Cloneable {
 
         List<Dependency> list = new ArrayList<>(artifacts.size());
 
-        for (Artifact a : getArtifacts()) {
+        for (Artifact a : artifacts) {
             // TODO let the scope handler deal with this
             if (Artifact.SCOPE_COMPILE.equals(a.getScope()) || Artifact.SCOPE_RUNTIME.equals(a.getScope())) {
                 Dependency dependency = new Dependency();
@@ -1702,9 +1689,10 @@ public class MavenProject implements Cloneable {
 
     @Deprecated
     public List<Artifact> getRuntimeArtifacts() {
-        List<Artifact> list = new ArrayList<>(getArtifacts().size());
+        Set<Artifact> artifacts = getArtifacts();
+        List<Artifact> list = new ArrayList<>(artifacts.size());
 
-        for (Artifact a : getArtifacts()) {
+        for (Artifact a : artifacts) {
             // TODO classpath check doesn't belong here - that's the other method
             if (a.getArtifactHandler().isAddedToClasspath()
                     // TODO let the scope handler deal with this
@@ -1717,14 +1705,15 @@ public class MavenProject implements Cloneable {
 
     @Deprecated
     public List<String> getSystemClasspathElements() throws DependencyResolutionRequiredException {
-        List<String> list = new ArrayList<>(getArtifacts().size());
+        Set<Artifact> artifacts = getArtifacts();
+        List<String> list = new ArrayList<>(artifacts.size());
 
         String d = getBuild().getOutputDirectory();
         if (d != null) {
             list.add(d);
         }
 
-        for (Artifact a : getArtifacts()) {
+        for (Artifact a : artifacts) {
             if (a.getArtifactHandler().isAddedToClasspath()) {
                 // TODO let the scope handler deal with this
                 if (Artifact.SCOPE_SYSTEM.equals(a.getScope())) {
@@ -1737,9 +1726,10 @@ public class MavenProject implements Cloneable {
 
     @Deprecated
     public List<Artifact> getSystemArtifacts() {
-        List<Artifact> list = new ArrayList<>(getArtifacts().size());
+        Set<Artifact> artifacts = getArtifacts();
+        List<Artifact> list = new ArrayList<>(artifacts.size());
 
-        for (Artifact a : getArtifacts()) {
+        for (Artifact a : artifacts) {
             // TODO classpath check doesn't belong here - that's the other method
             if (a.getArtifactHandler().isAddedToClasspath()) {
                 // TODO let the scope handler deal with this
@@ -1761,7 +1751,7 @@ public class MavenProject implements Cloneable {
 
         List<Dependency> list = new ArrayList<>(artifacts.size());
 
-        for (Artifact a : getArtifacts()) {
+        for (Artifact a : artifacts) {
             // TODO let the scope handler deal with this
             if (Artifact.SCOPE_SYSTEM.equals(a.getScope())) {
                 Dependency dependency = new Dependency();
@@ -1792,8 +1782,7 @@ public class MavenProject implements Cloneable {
     @Deprecated
     public void setReportArtifacts(Set<Artifact> reportArtifacts) {
         this.reportArtifacts = reportArtifacts;
-
-        reportArtifactMap = null;
+        this.reportArtifactMap = ArtifactUtils.artifactMapByVersionlessId(getReportArtifacts());
     }
 
     @Deprecated
@@ -1803,18 +1792,13 @@ public class MavenProject implements Cloneable {
 
     @Deprecated
     public Map<String, Artifact> getReportArtifactMap() {
-        if (reportArtifactMap == null) {
-            reportArtifactMap = ArtifactUtils.artifactMapByVersionlessId(getReportArtifacts());
-        }
-
         return reportArtifactMap;
     }
 
     @Deprecated
     public void setExtensionArtifacts(Set<Artifact> extensionArtifacts) {
         this.extensionArtifacts = extensionArtifacts;
-
-        extensionArtifactMap = null;
+        this.extensionArtifactMap = ArtifactUtils.artifactMapByVersionlessId(getExtensionArtifacts());
     }
 
     @Deprecated
@@ -1824,10 +1808,6 @@ public class MavenProject implements Cloneable {
 
     @Deprecated
     public Map<String, Artifact> getExtensionArtifactMap() {
-        if (extensionArtifactMap == null) {
-            extensionArtifactMap = ArtifactUtils.artifactMapByVersionlessId(getExtensionArtifacts());
-        }
-
         return extensionArtifactMap;
     }
 
@@ -1849,23 +1829,22 @@ public class MavenProject implements Cloneable {
         // for now I have to iterate through and see what we have.
         // ----------------------------------------------------------------------
 
-        if (getReportPlugins() != null) {
-            for (ReportPlugin plugin : getReportPlugins()) {
-                if (pluginGroupId.equals(plugin.getGroupId()) && pluginArtifactId.equals(plugin.getArtifactId())) {
-                    dom = (Xpp3Dom) plugin.getConfiguration();
+        List<ReportPlugin> reportPlugins = getReportPlugins();
+        for (ReportPlugin plugin : reportPlugins) {
+            if (pluginGroupId.equals(plugin.getGroupId()) && pluginArtifactId.equals(plugin.getArtifactId())) {
+                dom = (Xpp3Dom) plugin.getConfiguration();
 
-                    if (reportSetId != null) {
-                        ReportSet reportSet = plugin.getReportSetsAsMap().get(reportSetId);
-                        if (reportSet != null) {
-                            Xpp3Dom executionConfiguration = (Xpp3Dom) reportSet.getConfiguration();
-                            if (executionConfiguration != null) {
-                                Xpp3Dom newDom = new Xpp3Dom(executionConfiguration);
-                                dom = Xpp3Dom.mergeXpp3Dom(newDom, dom);
-                            }
+                if (reportSetId != null) {
+                    ReportSet reportSet = plugin.getReportSetsAsMap().get(reportSetId);
+                    if (reportSet != null) {
+                        Xpp3Dom executionConfiguration = (Xpp3Dom) reportSet.getConfiguration();
+                        if (executionConfiguration != null) {
+                            Xpp3Dom newDom = new Xpp3Dom(executionConfiguration);
+                            dom = Xpp3Dom.mergeXpp3Dom(newDom, dom);
                         }
                     }
-                    break;
                 }
+                break;
             }
         }
 
