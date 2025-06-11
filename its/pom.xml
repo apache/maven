@@ -355,6 +355,20 @@ under the License.
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <!-- Skip this check: IT support contains a lot of legacy -->
+          <execution>
+            <id>ensure-no-guice-with-asm</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <phase>none</phase>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
