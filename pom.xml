@@ -352,11 +352,6 @@ under the License.
         <classifier>classes</classifier>
       </dependency>
       <dependency>
-        <groupId>com.google.inject</groupId>
-        <artifactId>guice</artifactId>
-        <version>${guiceVersion}</version>
-      </dependency>
-      <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <version>${guavaVersion}</version>
@@ -647,6 +642,12 @@ under the License.
         <artifactId>plexus-testing</artifactId>
         <version>${plexusTestingVersion}</version>
         <scope>test</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.junit</groupId>
@@ -885,9 +886,15 @@ under the License.</licenseText>
               <rules>
                 <bannedDependencies>
                   <excludes>
+                    <!-- we use com.google.inject:classes:guice -->
+                    <exclude>com.google.inject:guice:*</exclude>
+                    <!-- we use org.codehaus.plexus:* -->
                     <exclude>org.sonatype.plexus:plexus-sec-dispatcher</exclude>
                     <exclude>org.sonatype.plexus:plexus-cipher</exclude>
                   </excludes>
+                  <includes>
+                    <include>com.google.inject:guice:*:jar:*:classes</include>
+                  </includes>
                   <message>ensure no more org.sonatype.plexus:plexus-cipher and org.sonatype.plexus:plexus-sec-dispatcher.</message>
                 </bannedDependencies>
               </rules>
