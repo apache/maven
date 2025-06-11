@@ -92,11 +92,21 @@ public class LookupWagonMojo extends AbstractMojo {
 
         getLog().info("[MAVEN-CORE-IT-LOG] Creating output file " + outputFile);
 
-        outputFile.getParentFile().mkdirs();
-        try (OutputStream out = new FileOutputStream(outputFile)) {
+        OutputStream out = null;
+        try {
+            outputFile.getParentFile().mkdirs();
+            out = new FileOutputStream(outputFile);
             loaderProperties.store(out, "MAVEN-CORE-IT-LOG");
         } catch (IOException e) {
-            throw new MojoExecutionException(e);
+            throw new MojoExecutionException("Output file could not be created: " + outputFile, e);
+        } finally {
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    // just ignore
+                }
+            }
         }
 
         getLog().info("[MAVEN-CORE-IT-LOG] Created output file " + outputFile);
