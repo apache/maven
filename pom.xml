@@ -877,7 +877,7 @@ under the License.</licenseText>
         <artifactId>maven-enforcer-plugin</artifactId>
         <executions>
           <execution>
-            <id>ensure-no-sonatype-cipher-and-sec-dispatcher</id>
+            <id>ensure-no-guice-with-asm</id>
             <goals>
               <goal>enforce</goal>
             </goals>
@@ -888,13 +888,29 @@ under the License.</licenseText>
                   <excludes>
                     <!-- we use com.google.inject:classes:guice -->
                     <exclude>com.google.inject:guice:*</exclude>
-                    <!-- we use org.codehaus.plexus:* -->
-                    <exclude>org.sonatype.plexus:plexus-sec-dispatcher</exclude>
-                    <exclude>org.sonatype.plexus:plexus-cipher</exclude>
                   </excludes>
                   <includes>
                     <include>com.google.inject:guice:*:jar:*:classes</include>
                   </includes>
+                  <message>use guice without asm shaded in.</message>
+                </bannedDependencies>
+              </rules>
+              <fail>true</fail>
+            </configuration>
+          </execution>
+          <execution>
+            <id>ensure-no-sonatype-cipher-and-sec-dispatcher</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>org.sonatype.plexus:plexus-sec-dispatcher</exclude>
+                    <exclude>org.sonatype.plexus:plexus-cipher</exclude>
+                  </excludes>
                   <message>ensure no more org.sonatype.plexus:plexus-cipher and org.sonatype.plexus:plexus-sec-dispatcher.</message>
                 </bannedDependencies>
               </rules>
