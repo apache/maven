@@ -75,7 +75,7 @@ public class MavenShellCling extends ClingSupport {
     @Override
     protected Invoker createInvoker() {
         return new ShellInvoker(
-                ProtoLookup.builder().addMapping(ClassWorld.class, classWorld).build());
+                ProtoLookup.builder().addMapping(ClassWorld.class, classWorld).build(), null);
     }
 
     @Override

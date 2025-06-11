@@ -45,17 +45,14 @@ public class UpgradeInvoker extends LookupInvoker<UpgradeContext> {
     public static final int BAD_OPERATION = 2; // bad user input or alike
     public static final int CANCELED = 3; // user canceled
 
-    public UpgradeInvoker(Lookup protoLookup) {
-        this(protoLookup, null);
-    }
-
     public UpgradeInvoker(Lookup protoLookup, @Nullable Consumer<LookupContext> contextConsumer) {
         super(protoLookup, contextConsumer);
     }
 
     @Override
     protected UpgradeContext createContext(InvokerRequest invokerRequest) {
-        return new UpgradeContext(invokerRequest);
+        return new UpgradeContext(
+                invokerRequest, (UpgradeOptions) invokerRequest.options().orElse(null));
     }
 
     @Override
@@ -84,12 +81,11 @@ public class UpgradeInvoker extends LookupInvoker<UpgradeContext> {
             context.reader =
                     LineReaderBuilder.builder().terminal(context.terminal).build();
 
-            UpgradeOptions upgradeOptions = ((UpgradeInvokerRequest) context.invokerRequest).options();
-            if (upgradeOptions.goals().isEmpty()) {
+            if (context.options().goals().isEmpty()) {
                 return badGoalsErrorMessage("No goals specified.", context);
             }
 
-            String goalName = upgradeOptions.goals().get().get(0);
+            String goalName = context.options().goals().get().get(0);
             Goal goal = context.goals.get(goalName);
             if (goal == null) {
                 return badGoalsErrorMessage("Unknown goal: " + goalName, context);
@@ -100,7 +96,7 @@ public class UpgradeInvoker extends LookupInvoker<UpgradeContext> {
             context.logger.error("Goal canceled by user.");
             return CANCELED;
         } catch (Exception e) {
-            if (context.invokerRequest.options().showErrors().orElse(false)) {
+            if (context.options().showErrors().orElse(false)) {
                 context.logger.error(e.getMessage(), e);
             } else {
                 context.logger.error(e.getMessage());

@@ -20,7 +20,6 @@ package org.apache.maven.api.cli.mvnup;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.UnaryOperator;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -111,13 +110,4 @@ public interface UpgradeOptions extends Options {
      */
     @Nonnull
     Optional<Boolean> all();
-
-    /**
-     * Returns a new instance of UpgradeOptions with values interpolated using the given properties.
-     *
-     * @param callback a callback to use for interpolation
-     * @return a new UpgradeOptions instance with interpolated values
-     */
-    @Nonnull
-    UpgradeOptions interpolate(UnaryOperator<String> callback);
 }

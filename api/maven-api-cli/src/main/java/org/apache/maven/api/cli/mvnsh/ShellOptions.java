@@ -18,10 +18,7 @@
  */
 package org.apache.maven.api.cli.mvnsh;
 
-import java.util.function.UnaryOperator;
-
 import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.cli.Options;
 
 /**
@@ -31,14 +28,4 @@ import org.apache.maven.api.cli.Options;
  * @since 4.0.0
  */
 @Experimental
-public interface ShellOptions extends Options {
-    /**
-     * Returns a new instance of ShellOptions with values interpolated using the given properties.
-     *
-     * @param callback a callback to use for interpolation
-     * @return a new EncryptOptions instance with interpolated values
-     */
-    @Nonnull
-    @Override
-    ShellOptions interpolate(UnaryOperator<String> callback);
-}
+public interface ShellOptions extends Options {}

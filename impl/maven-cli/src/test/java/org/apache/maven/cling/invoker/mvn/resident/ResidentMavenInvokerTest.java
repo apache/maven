@@ -45,7 +45,7 @@ public class ResidentMavenInvokerTest extends MavenInvokerTestSupport {
     @Override
     protected Invoker createInvoker(ClassWorld classWorld) {
         return new ResidentMavenInvoker(
-                ProtoLookup.builder().addMapping(ClassWorld.class, classWorld).build());
+                ProtoLookup.builder().addMapping(ClassWorld.class, classWorld).build(), null);
     }
 
     @Override

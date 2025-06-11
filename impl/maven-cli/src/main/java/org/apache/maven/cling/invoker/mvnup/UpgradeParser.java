@@ -18,58 +18,17 @@
  */
 package org.apache.maven.cling.invoker.mvnup;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.api.cli.Options;
-import org.apache.maven.api.cli.mvnup.UpgradeOptions;
 import org.apache.maven.cling.invoker.BaseParser;
 
 public class UpgradeParser extends BaseParser {
-
     @Override
-    protected UpgradeOptions emptyOptions() {
+    protected Options parseCliOptions(LocalContext context) {
         try {
-            return CommonsCliUpgradeOptions.parse(new String[0]);
-        } catch (ParseException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    @Override
-    protected UpgradeInvokerRequest getInvokerRequest(LocalContext context) {
-        return new UpgradeInvokerRequest(
-                context.parserRequest,
-                context.parsingFailed,
-                context.cwd,
-                context.installationDirectory,
-                context.userHomeDirectory,
-                context.userProperties,
-                context.systemProperties,
-                context.topDirectory,
-                context.rootDirectory,
-                context.extensions,
-                context.ciInfo,
-                (UpgradeOptions) context.options);
-    }
-
-    @Override
-    protected List<Options> parseCliOptions(LocalContext context) {
-        return Collections.singletonList(parseUpgradeCliOptions(context.parserRequest.args()));
-    }
-
-    protected CommonsCliUpgradeOptions parseUpgradeCliOptions(List<String> args) {
-        try {
-            return CommonsCliUpgradeOptions.parse(args.toArray(new String[0]));
+            return CommonsCliUpgradeOptions.parse(context.parserRequest.args().toArray(new String[0]));
         } catch (ParseException e) {
             throw new IllegalArgumentException("Failed to parse command line options: " + e.getMessage(), e);
         }
-    }
-
-    @Override
-    protected Options assembleOptions(List<Options> parsedOptions) {
-        // nothing to assemble, we deal with CLI only
-        return parsedOptions.get(0);
     }
 }

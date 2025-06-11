@@ -91,6 +91,7 @@ public abstract class BaseParser implements Parser {
         @Nullable
         public CIInfo ciInfo;
 
+        @Nullable
         public Options options;
 
         public Map<String, String> extraInterpolationSource() {
@@ -149,22 +150,12 @@ public abstract class BaseParser implements Parser {
         }
 
         // options
-        List<Options> parsedOptions;
         try {
-            parsedOptions = parseCliOptions(context);
+            context.options = parseCliOptions(context);
         } catch (Exception e) {
             context.parsingFailed = true;
-            parsedOptions = List.of(emptyOptions());
+            context.options = null;
             parserRequest.logger().error("Error parsing program arguments", e);
-        }
-
-        // assemble options if needed
-        try {
-            context.options = assembleOptions(parsedOptions);
-        } catch (Exception e) {
-            context.parsingFailed = true;
-            context.options = emptyOptions();
-            parserRequest.logger().error("Error assembling program arguments", e);
         }
 
         // system and user properties
@@ -184,8 +175,12 @@ public abstract class BaseParser implements Parser {
         }
 
         // options: interpolate
-        context.options = context.options.interpolate(Interpolator.chain(
-                context.extraInterpolationSource()::get, context.userProperties::get, context.systemProperties::get));
+        if (context.options != null) {
+            context.options = context.options.interpolate(Interpolator.chain(
+                    context.extraInterpolationSource()::get,
+                    context.userProperties::get,
+                    context.systemProperties::get));
+        }
 
         // core extensions
         try {
@@ -255,9 +250,21 @@ public abstract class BaseParser implements Parser {
         }
     }
 
-    protected abstract Options emptyOptions();
-
-    protected abstract InvokerRequest getInvokerRequest(LocalContext context);
+    protected InvokerRequest getInvokerRequest(LocalContext context) {
+        return new BaseInvokerRequest(
+                context.parserRequest,
+                context.parsingFailed,
+                context.cwd,
+                context.installationDirectory,
+                context.userHomeDirectory,
+                context.userProperties,
+                context.systemProperties,
+                context.topDirectory,
+                context.rootDirectory,
+                context.extensions,
+                context.ciInfo,
+                context.options);
+    }
 
     protected Path getCwd(LocalContext context) {
         if (context.parserRequest.cwd() != null) {
@@ -435,9 +442,7 @@ public abstract class BaseParser implements Parser {
         return toMap(userProperties);
     }
 
-    protected abstract List<Options> parseCliOptions(LocalContext context);
-
-    protected abstract Options assembleOptions(List<Options> parsedOptions);
+    protected abstract Options parseCliOptions(LocalContext context);
 
     /**
      * Important: This method must return list of {@link CoreExtensions} in precedence order.

@@ -31,6 +31,7 @@ import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
+import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.api.toolchain.PersistedToolchains;
@@ -49,17 +50,15 @@ public class LookupContext implements AutoCloseable {
     public final Path installationDirectory;
     public final Path userDirectory;
     public final boolean containerCapsuleManaged;
+    private final Options options;
 
-    public LookupContext(InvokerRequest invokerRequest) {
-        this(invokerRequest, true);
-    }
-
-    public LookupContext(InvokerRequest invokerRequest, boolean containerCapsuleManaged) {
+    public LookupContext(InvokerRequest invokerRequest, boolean containerCapsuleManaged, Options options) {
         this.invokerRequest = requireNonNull(invokerRequest);
         this.cwd = CWD.create(invokerRequest.cwd());
         this.installationDirectory = CliUtils.getCanonicalPath(invokerRequest.installationDirectory());
         this.userDirectory = CliUtils.getCanonicalPath(invokerRequest.userHomeDirectory());
         this.containerCapsuleManaged = containerCapsuleManaged;
+        this.options = options;
         this.logger = invokerRequest.parserRequest().logger();
 
         Map<String, String> user = new HashMap<>(invokerRequest.userProperties());
@@ -148,5 +147,9 @@ public class LookupContext implements AutoCloseable {
                 containerCapsule = null;
             }
         }
+    }
+
+    public Options options() {
+        return options;
     }
 }

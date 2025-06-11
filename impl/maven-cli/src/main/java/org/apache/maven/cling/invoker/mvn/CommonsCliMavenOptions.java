@@ -20,19 +20,13 @@ package org.apache.maven.cling.invoker.mvn;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Optional;
-import java.util.function.UnaryOperator;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.api.cli.mvn.MavenOptions;
-import org.apache.maven.api.services.Interpolator;
-import org.apache.maven.api.services.InterpolatorException;
 import org.apache.maven.cling.invoker.CommonsCliOptions;
-
-import static org.apache.maven.cling.invoker.CliUtils.createInterpolator;
 
 public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOptions {
     public static CommonsCliMavenOptions parse(String source, String[] args) throws ParseException {
@@ -42,31 +36,6 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
 
     protected CommonsCliMavenOptions(String source, CLIManager cliManager, CommandLine commandLine) {
         super(source, cliManager, commandLine);
-    }
-
-    private static CommonsCliMavenOptions interpolate(CommonsCliMavenOptions options, UnaryOperator<String> callback) {
-        try {
-            // now that we have properties, interpolate all arguments
-            Interpolator interpolator = createInterpolator();
-            CommandLine.Builder commandLineBuilder = new CommandLine.Builder();
-            commandLineBuilder.setDeprecatedHandler(o -> {});
-            for (Option option : options.commandLine.getOptions()) {
-                if (!CLIManager.USER_PROPERTY.equals(option.getOpt())) {
-                    List<String> values = option.getValuesList();
-                    for (ListIterator<String> it = values.listIterator(); it.hasNext(); ) {
-                        it.set(interpolator.interpolate(it.next(), callback));
-                    }
-                }
-                commandLineBuilder.addOption(option);
-            }
-            for (String arg : options.commandLine.getArgList()) {
-                commandLineBuilder.addArg(interpolator.interpolate(arg, callback));
-            }
-            return new CommonsCliMavenOptions(
-                    options.source, (CLIManager) options.cliManager, commandLineBuilder.build());
-        } catch (InterpolatorException e) {
-            throw new IllegalArgumentException("Could not interpolate CommonsCliOptions", e);
-        }
     }
 
     @Override
@@ -255,8 +224,9 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
     }
 
     @Override
-    public MavenOptions interpolate(UnaryOperator<String> callback) {
-        return interpolate(this, callback);
+    protected CommonsCliMavenOptions copy(
+            String source, CommonsCliOptions.CLIManager cliManager, CommandLine commandLine) {
+        return new CommonsCliMavenOptions(source, (CLIManager) cliManager, commandLine);
     }
 
     protected static class CLIManager extends CommonsCliOptions.CLIManager {

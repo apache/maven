@@ -34,12 +34,8 @@ import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.Indent
 
 @SuppressWarnings("VisibilityModifier")
 public class UpgradeContext extends LookupContext {
-    public UpgradeContext(InvokerRequest invokerRequest) {
-        this(invokerRequest, true);
-    }
-
-    public UpgradeContext(InvokerRequest invokerRequest, boolean containerCapsuleManaged) {
-        super(invokerRequest, containerCapsuleManaged);
+    public UpgradeContext(InvokerRequest invokerRequest, UpgradeOptions upgradeOptions) {
+        super(invokerRequest, true, upgradeOptions);
     }
 
     public Map<String, Goal> goals;
@@ -161,20 +157,6 @@ public class UpgradeContext extends LookupContext {
      */
     @Nonnull
     public UpgradeOptions options() {
-        return invokerRequest().options();
-    }
-
-    /**
-     * Gets the upgrade-specific invoker request with proper type casting.
-     * This method provides type-safe access to the UpgradeInvokerRequest,
-     * which contains upgrade-specific options and configuration.
-     *
-     * @return the UpgradeInvokerRequest instance, never null
-     * @throws ClassCastException if the invokerRequest is not an UpgradeInvokerRequest
-     * @see #options() () for convenient access to upgrade options without casting
-     */
-    @Nonnull
-    public UpgradeInvokerRequest invokerRequest() {
-        return (UpgradeInvokerRequest) invokerRequest;
+        return (UpgradeOptions) super.options();
     }
 }

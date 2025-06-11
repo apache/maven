@@ -75,7 +75,7 @@ public class MavenEncCling extends ClingSupport {
     @Override
     protected Invoker createInvoker() {
         return new EncryptInvoker(
-                ProtoLookup.builder().addMapping(ClassWorld.class, classWorld).build());
+                ProtoLookup.builder().addMapping(ClassWorld.class, classWorld).build(), null);
     }
 
     @Override

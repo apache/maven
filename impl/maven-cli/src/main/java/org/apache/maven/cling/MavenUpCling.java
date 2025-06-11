@@ -75,7 +75,7 @@ public class MavenUpCling extends ClingSupport {
     @Override
     protected Invoker createInvoker() {
         return new UpgradeInvoker(
-                ProtoLookup.builder().addMapping(ClassWorld.class, classWorld).build());
+                ProtoLookup.builder().addMapping(ClassWorld.class, classWorld).build(), null);
     }
 
     @Override
