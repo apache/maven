@@ -310,9 +310,9 @@ public class MojoExecutor {
 
         List<MavenProject> forkedProjects = executeForkedExecutions(mojoExecution, session, projectIndex);
 
-        ensureDependenciesAreResolved(mojoDescriptor, session, dependencyContext);
-
         try (ProjectLock lock = new ProjectLock(session, mojoDescriptor)) {
+            ensureDependenciesAreResolved(mojoDescriptor, session, dependencyContext);
+
             doExecute2(session, mojoExecution);
         } finally {
             for (MavenProject forkedProject : forkedProjects) {
