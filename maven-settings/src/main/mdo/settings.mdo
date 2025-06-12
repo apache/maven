@@ -581,7 +581,18 @@
             ]]>
           </description>
         </field>
-      </fields>
+        <field>
+          <name>ids</name>
+          <version>1.3.0+</version>
+          <description>
+            List of additional ids for server.
+          </description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+    </fields>
     </class>
     <class>
       <name>Mirror</name>
