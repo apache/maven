@@ -209,6 +209,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                                 .preserveModelVersion(false)
                                 .root(false)
                                 .parent(null)
+                                .mixins(null)
                                 .build(null),
                         model)
                 .mailingLists(null)
