@@ -356,6 +356,28 @@ public class DefaultModelValidator implements ModelValidator {
             }
         }
 
+        // Validate mixins
+        if (!m.getMixins().isEmpty()) {
+            // Ensure model version is at least 4.2.0 when using mixins
+            if (compareModelVersions("4.2.0", m.getModelVersion()) < 0) {
+                addViolation(
+                        problems,
+                        Severity.ERROR,
+                        Version.V40,
+                        "mixins",
+                        null,
+                        "Mixins are only supported in modelVersion 4.2.0 or higher, but found '" + m.getModelVersion()
+                                + "'.",
+                        m);
+            }
+
+            // Validate each mixin
+            for (Parent mixin : m.getMixins()) {
+                // TODO: additional mixin validation
+                mixin.getId();
+            }
+        }
+
         if (validationLevel == ModelValidator.VALIDATION_LEVEL_MINIMAL) {
             // profiles: they are essential for proper model building (may contribute profiles, dependencies...)
             HashSet<String> minProfileIds = new HashSet<>();

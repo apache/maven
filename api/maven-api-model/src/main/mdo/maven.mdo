@@ -112,6 +112,20 @@
         </field>
 
         <!-- ====================================================================== -->
+        <!-- Mixins                                                                 -->
+        <!-- ====================================================================== -->
+
+        <field xdoc.separator="blank">
+          <name>mixins</name>
+          <version>4.2.0+</version>
+          <description>Mixins...</description>
+          <association>
+            <type>Mixin</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+
+        <!-- ====================================================================== -->
         <!-- groupId/artifactId/Version/Packaging                                   -->
         <!-- ====================================================================== -->
 
@@ -1835,6 +1849,23 @@
         </codeSegment>
       </codeSegments>
 
+    </class>
+    <class>
+        <name>Mixin</name>
+        <version>4.1.0+</version>
+        <superClass>Parent</superClass>
+        <fields>
+            <field>
+                <name>classifier</name>
+                <version>4.1.0+</version>
+                <type>String</type>
+            </field>
+            <field>
+                <name>extension</name>
+                <version>4.1.0+</version>
+                <type>String</type>
+            </field>
+        </fields>
     </class>
     <class>
       <name>Scm</name>
