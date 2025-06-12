@@ -355,6 +355,43 @@ public class DefaultModelValidator implements ModelValidator {
             }
         }
 
+        // Validate mixins
+        if (!model.getMixins().isEmpty()) {
+            // Ensure model version is at least 4.2.0 when using mixins
+            if (compareModelVersions("4.2.0", model.getModelVersion()) < 0) {
+                addViolation(
+                        problems,
+                        Severity.ERROR,
+                        Version.V40,
+                        "mixins",
+                        null,
+                        "Mixins are only supported in modelVersion 4.2.0 or higher, but found '"
+                                + model.getModelVersion() + "'.",
+                        model);
+            }
+
+            // Validate each mixin
+            for (Parent mixin : model.getMixins()) {
+                if (mixin.getRelativePath() != null
+                        && !mixin.getRelativePath().isEmpty()
+                        && (mixin.getGroupId() != null && !mixin.getGroupId().isEmpty()
+                                || mixin.getArtifactId() != null
+                                        && !mixin.getArtifactId().isEmpty())
+                        && validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_4_0
+                        && ModelBuilder.KNOWN_MODEL_VERSIONS.contains(model.getModelVersion())
+                        && !Objects.equals(model.getModelVersion(), ModelBuilder.MODEL_VERSION_4_0_0)) {
+                    addViolation(
+                            problems,
+                            Severity.WARNING,
+                            Version.BASE,
+                            "mixins.mixin.relativePath",
+                            null,
+                            "only specify relativePath or groupId/artifactId for mixin",
+                            mixin);
+                }
+            }
+        }
+
         if (validationLevel == ModelValidator.VALIDATION_LEVEL_MINIMAL) {
             // profiles: they are essential for proper model building (may contribute profiles, dependencies...)
             HashSet<String> minProfileIds = new HashSet<>();
