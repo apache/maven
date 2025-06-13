@@ -46,6 +46,10 @@ import static org.apache.maven.cling.invoker.CliUtils.createInterpolator;
 import static org.apache.maven.cling.invoker.CliUtils.toMap;
 
 public class CommonsCliOptions implements Options {
+    public static CommonsCliOptions parse(String source, String[] args) throws ParseException {
+        CLIManager cliManager = new CLIManager();
+        return new CommonsCliOptions(source, cliManager, cliManager.parse(args));
+    }
 
     protected final String source;
     protected final CLIManager cliManager;

@@ -56,6 +56,7 @@ import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.properties.internal.SystemProperties;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.maven.cling.invoker.CliUtils.createInterpolator;
 import static org.apache.maven.cling.invoker.CliUtils.getCanonicalPath;
 import static org.apache.maven.cling.invoker.CliUtils.or;
 import static org.apache.maven.cling.invoker.CliUtils.prefix;
@@ -399,6 +400,7 @@ public abstract class BaseParser implements Parser {
 
     protected Map<String, String> populateUserProperties(LocalContext context) {
         Properties userProperties = new Properties();
+        Map<String, String> paths = context.extraInterpolationSource();
 
         // ----------------------------------------------------------------------
         // Options that are set on the command line become system properties
@@ -407,12 +409,12 @@ public abstract class BaseParser implements Parser {
         // ----------------------------------------------------------------------
 
         Map<String, String> userSpecifiedProperties =
-                context.options.userProperties().orElse(new HashMap<>());
+                new HashMap<>(context.options.userProperties().orElse(new HashMap<>()));
+        createInterpolator().interpolate(userSpecifiedProperties, paths::get);
 
         // ----------------------------------------------------------------------
         // Load config files
         // ----------------------------------------------------------------------
-        Map<String, String> paths = context.extraInterpolationSource();
         UnaryOperator<String> callback =
                 or(paths::get, prefix("cli.", userSpecifiedProperties::get), context.systemProperties::get);
 
