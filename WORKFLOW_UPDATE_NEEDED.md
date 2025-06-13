@@ -3,21 +3,33 @@
 ## Issue
 The GitHub Actions workflow `.github/workflows/maven.yml` needs to be updated to work with the new integration test default behavior.
 
+## Problem
+The new default behavior expects to find the Maven distribution at:
+`apache-maven/target/apache-maven-${project.version}-bin.zip`
+
+But in the CI workflow, the distribution is downloaded as an artifact to `maven-dist/` directory.
+
 ## Required Change
-In the `integration-tests` job, line 245 needs to be updated from:
+In the `integration-tests` job, after the "Download Maven distribution" step (around line 216), add a new step to copy the distribution to the expected location:
+
 ```yaml
-run: mvn install -e -B -V -Prun-its,mimir
+      - name: Copy distribution for integration tests
+        shell: bash
+        run: |
+          mkdir -p apache-maven/target
+          cp maven-dist/apache-maven-*-bin.zip apache-maven/target/
 ```
 
-To:
+This should be added before the "Extract Maven distribution" step.
+
+## Alternative Solution
+Instead of copying the file, you could use the `maven-distro` profile:
 ```yaml
-run: mvn install -e -B -V -Prun-its,maven-from-build,mimir
+run: mvn install -e -B -V -Prun-its,mimir -DmavenDistro=$PWD/maven-dist/apache-maven-*-bin.zip
 ```
 
 ## Reason
-The integration-tests job downloads the built Maven distribution and uses it to run the build. In this context, we want to test the Maven installation that's running the build (which happens to be the built distribution), so we need to use the `maven-from-build` profile.
-
-Without this change, the default behavior will try to extract the distribution from `apache-maven/target/apache-maven-${project.version}-bin.zip`, which doesn't exist in the CI context where the distribution is downloaded as an artifact.
+The new default behavior extracts and tests the built distribution from the expected location. By copying the downloaded distribution to that location, the default behavior works as intended and we test the actual built distribution.
 
 ## Note
 This file can be deleted after the workflow is updated.
