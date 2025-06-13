@@ -33,11 +33,6 @@ under the License.
   <name>Maven Core IT Support</name>
   <description>Maven Core Integration Tests support tools.</description>
 
-  <properties>
-    <!-- Maven version being tested - inherited from parent -->
-    <maven-version>${project.parent.version}</maven-version>
-  </properties>
-
   <modules>
     <module>maven-it-plugin-bootstrap</module>
     <module>core-it-plugins</module>
@@ -49,6 +44,11 @@ under the License.
     <module>core-it-extension</module>
     <module>core-it-javaagent</module>
   </modules>
+
+  <properties>
+    <!-- Maven version being tested - inherited from parent -->
+    <maven-version>${project.parent.version}</maven-version>
+  </properties>
 
   <dependencyManagement>
     <dependencies>
