@@ -73,6 +73,8 @@ under the License.
     <!--    <maven.compiler.target>8</maven.compiler.target>-->
 
     <maven-plugin-tools-version>3.15.1</maven-plugin-tools-version>
+    <!-- Maven version being tested - must match the parent project version -->
+    <maven-version>4.0.0-rc-4-SNAPSHOT</maven-version>
     <!-- Support artifacts version - kept separate from Maven version -->
     <core-it-support-version>2.1-SNAPSHOT</core-it-support-version>
   </properties>
@@ -82,162 +84,167 @@ under the License.
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-artifact</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-builder-support</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-jline</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-logging</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-support</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-core</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-impl</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-embedder</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-cli</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-model</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-api-core</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-api-annotations</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-api-model</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-api-settings</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-api-spi</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-api-toolchain</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-api-plugin</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-api-xml</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-api-di</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-api-metadata</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-api-cli</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-di</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-model-builder</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-plugin-api</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-repository-metadata</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-resolver-provider</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-settings</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-settings-builder</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-toolchain-model</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-toolchain-builder</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-xml</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-compat</artifactId>
-        <version>${project.version}</version>
+        <version>${maven-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-executor</artifactId>
+        <version>${maven-version}</version>
       </dependency>
 
       <dependency>
