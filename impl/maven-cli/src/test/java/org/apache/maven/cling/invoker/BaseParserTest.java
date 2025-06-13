@@ -89,7 +89,9 @@ public class BaseParserTest {
                 .build());
 
         Assertions.assertTrue(invokerRequest.options().isPresent());
+        Assertions.assertTrue(invokerRequest.userProperties().containsKey("foo"));
         Assertions.assertNotEquals(
                 "${session.rootDirectory}", invokerRequest.userProperties().get("foo"));
+        Assertions.assertFalse(invokerRequest.userProperties().get("foo").trim().isEmpty());
     }
 }
