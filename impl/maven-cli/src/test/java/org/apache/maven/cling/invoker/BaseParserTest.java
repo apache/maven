@@ -18,6 +18,7 @@
  */
 package org.apache.maven.cling.invoker;
 
+import java.nio.file.Path;
 import java.util.Arrays;
 
 import org.apache.commons.cli.ParseException;
@@ -46,20 +47,33 @@ public class BaseParserTest {
     @Test
     void happy() {
         InvokerRequest invokerRequest =
-                subject.parseInvocation(ParserRequest.mvn(Arrays.asList("-v", "-X"), mock(MessageBuilderFactory.class))
+                subject.parseInvocation(ParserRequest.mvn(Arrays.asList("-e", "-X"), mock(MessageBuilderFactory.class))
+                        .cwd(Path.of(System.getProperty("userDir")))
+                        .userHome(Path.of(System.getProperty("userHome")))
                         .build());
 
         Assertions.assertTrue(invokerRequest.options().isPresent());
         Options options = invokerRequest.options().orElseThrow();
         Assertions.assertFalse(options.showVersion().orElse(false));
-        Assertions.assertTrue(options.showVersionAndExit().orElse(false));
+        Assertions.assertFalse(options.showVersionAndExit().orElse(false));
+        Assertions.assertTrue(options.showErrors().orElse(false));
         Assertions.assertTrue(options.verbose().orElse(false));
+
+        // user home
+        Assertions.assertTrue(invokerRequest.userProperties().containsKey("user.property"));
+        Assertions.assertEquals("yes it is", invokerRequest.userProperties().get("user.property"));
+
+        // maven installation
+        Assertions.assertTrue(invokerRequest.userProperties().containsKey("maven.property"));
+        Assertions.assertEquals("yes it is", invokerRequest.userProperties().get("maven.property"));
     }
 
     @Test
     void notHappy() {
         InvokerRequest invokerRequest = subject.parseInvocation(
                 ParserRequest.mvn(Arrays.asList("--what-is-this-option", "-X"), mock(MessageBuilderFactory.class))
+                        .cwd(Path.of(System.getProperty("userDir")))
+                        .userHome(Path.of(System.getProperty("userHome")))
                         .build());
 
         Assertions.assertFalse(invokerRequest.options().isPresent());
@@ -70,6 +84,8 @@ public class BaseParserTest {
     void specials() {
         InvokerRequest invokerRequest = subject.parseInvocation(ParserRequest.mvn(
                         Arrays.asList("-Dfoo=${session.rootDirectory}", "-X"), mock(MessageBuilderFactory.class))
+                .cwd(Path.of(System.getProperty("userDir")))
+                .userHome(Path.of(System.getProperty("userHome")))
                 .build());
 
         Assertions.assertTrue(invokerRequest.options().isPresent());
