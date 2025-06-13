@@ -108,8 +108,9 @@
 //   GPG_KEY_ID          - Your GPG key ID for signing releases
 //
 // Optional (for email automation):
-//   GMAIL_USERNAME      - Your Gmail address
+//   GMAIL_USERNAME      - Your Gmail address (for authentication)
 //   GMAIL_APP_PASSWORD  - Your Gmail app password (not regular password)
+//   GMAIL_SENDER_ADDRESS - Email address to use as sender (optional, defaults to GMAIL_USERNAME)
 //
 // ============================================================================
 // PREREQUISITES
@@ -127,6 +128,7 @@ import picocli.CommandLine.*;
 
 import java.io.*;
 import java.nio.file.*;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
@@ -142,13 +144,14 @@ import org.apache.hc.core5.http.io.entity.StringEntity;
 @Command(name = "release", 
          description = "Maven Release Script - 2-Click Release Automation",
          subcommands = {
-             Release.SetupCommand.class,
-             Release.StartVoteCommand.class, 
-             Release.PublishCommand.class,
-             Release.CancelCommand.class,
+             MavenRelease.SetupCommand.class,
+             MavenRelease.StartVoteCommand.class,
+             MavenRelease.PublishCommand.class,
+             MavenRelease.CancelCommand.class,
+             MavenRelease.StatusCommand.class,
              CommandLine.HelpCommand.class
          })
-public class Release implements Callable<Integer> {
+public class MavenRelease implements Callable<Integer> {
 
     // ANSI color codes for output
     private static final String RED = "\033[0;31m";
@@ -162,12 +165,40 @@ public class Release implements Callable<Integer> {
     private static final String GPG_KEY_ID = System.getenv("GPG_KEY_ID");
     private static final String GMAIL_USERNAME = System.getenv("GMAIL_USERNAME");
     private static final String GMAIL_APP_PASSWORD = System.getenv("GMAIL_APP_PASSWORD");
+    private static final String GMAIL_SENDER_ADDRESS = System.getenv("GMAIL_SENDER_ADDRESS");
 
     private static final Path PROJECT_ROOT = Paths.get(System.getProperty("user.dir"));
     private static final Path TARGET_DIR = PROJECT_ROOT.resolve("target");
+    private static final Path LOGS_DIR = TARGET_DIR.resolve("release-logs");
+
+    // Release step tracking
+    enum ReleaseStep {
+        VALIDATION("validation"),
+        BLOCKER_CHECK("blocker-check"),
+        MILESTONE_INFO("milestone-info"),
+        BUILD_TEST("build-test"),
+        SITE_CHECK("site-check"),
+        PREPARE_RELEASE("prepare-release"),
+        STAGE_ARTIFACTS("stage-artifacts"),
+        STAGE_DOCS("stage-docs"),
+        COPY_DIST("copy-dist"),
+        GENERATE_EMAIL("generate-email"),
+        SAVE_INFO("save-info"),
+        COMPLETED("completed");
+
+        private final String stepName;
+
+        ReleaseStep(String stepName) {
+            this.stepName = stepName;
+        }
+
+        public String getStepName() {
+            return stepName;
+        }
+    }
 
     public static void main(String[] args) {
-        int exitCode = new CommandLine(new Release()).execute(args);
+        int exitCode = new CommandLine(new MavenRelease()).execute(args);
         System.exit(exitCode);
     }
 
@@ -182,6 +213,7 @@ public class Release implements Callable<Integer> {
         System.out.println("  start-vote <version>     Start release vote (Click 1)");
         System.out.println("  publish <version> [repo] Publish release after vote (Click 2)");
         System.out.println("  cancel <version>         Cancel release vote and clean up");
+        System.out.println("  status <version>         Check release status and logs");
         System.out.println("  help                     Show help information");
         System.out.println();
         System.out.println("Examples:");
@@ -193,8 +225,9 @@ public class Release implements Callable<Integer> {
         System.out.println("Environment Variables:");
         System.out.println("  APACHE_USERNAME      Your Apache LDAP username");
         System.out.println("  GPG_KEY_ID           Your GPG key ID for signing");
-        System.out.println("  GMAIL_USERNAME       Your Gmail address (optional)");
+        System.out.println("  GMAIL_USERNAME       Your Gmail address for authentication (optional)");
         System.out.println("  GMAIL_APP_PASSWORD   Your Gmail app password (optional)");
+        System.out.println("  GMAIL_SENDER_ADDRESS Email address to use as sender (optional)");
         return 0;
     }
 
@@ -219,16 +252,123 @@ public class Release implements Callable<Integer> {
         System.out.println(BLUE + "🔄 " + message + NC);
     }
 
-    // Utility methods for running commands
-    static ProcessResult runCommand(String... command) throws IOException, InterruptedException {
+    // Enhanced logging and step tracking methods
+    static void initializeLogging(String version) throws IOException {
+        Files.createDirectories(LOGS_DIR);
+        Path logFile = LOGS_DIR.resolve("release-" + version + ".log");
+
+        // Create or append to log file
+        String timestamp = java.time.LocalDateTime.now().toString();
+        String header = "\n=== Maven Release Log for " + version + " - " + timestamp + " ===\n";
+        Files.writeString(logFile, header, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+
+        logInfo("Logging initialized: " + logFile);
+    }
+
+    static void logToFile(String version, String step, String message) {
+        try {
+            // Ensure logs directory exists
+            Files.createDirectories(LOGS_DIR);
+
+            Path logFile = LOGS_DIR.resolve("release-" + version + ".log");
+            String timestamp = java.time.LocalDateTime.now().toString();
+            String logEntry = "[" + timestamp + "] [" + step + "] " + message + "\n";
+            Files.writeString(logFile, logEntry, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            logWarning("Failed to write to log file: " + LOGS_DIR.resolve("release-" + version + ".log"));
+        }
+    }
+
+    static void saveCurrentStep(String version, ReleaseStep step) {
+        try {
+            // Ensure both target and logs directories exist
+            Files.createDirectories(TARGET_DIR);
+            Files.createDirectories(LOGS_DIR);
+
+            Path stepFile = TARGET_DIR.resolve("current-step-" + version);
+            Files.writeString(stepFile, step.getStepName());
+            logToFile(version, "STEP", "Starting step: " + step.getStepName());
+        } catch (IOException e) {
+            logWarning("Failed to save current step: " + e.getMessage());
+        }
+    }
+
+    static ReleaseStep getCurrentStep(String version) {
+        try {
+            Path stepFile = TARGET_DIR.resolve("current-step-" + version);
+            if (Files.exists(stepFile)) {
+                String stepName = Files.readString(stepFile).trim();
+                for (ReleaseStep step : ReleaseStep.values()) {
+                    if (step.getStepName().equals(stepName)) {
+                        return step;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            logWarning("Failed to read current step: " + e.getMessage());
+        }
+        return ReleaseStep.VALIDATION; // Default to first step
+    }
+
+    static boolean isStepCompleted(String version, ReleaseStep step) {
+        ReleaseStep currentStep = getCurrentStep(version);
+        return currentStep.ordinal() > step.ordinal();
+    }
+
+    // Enhanced command execution with detailed logging
+    static ProcessResult runCommandSimple(String... command) throws IOException, InterruptedException {
+        return runCommandWithLogging(null, null, command);
+    }
+
+    static ProcessResult runCommandWithLogging(String version, String step, String... command) throws IOException, InterruptedException {
         ProcessBuilder pb = new ProcessBuilder(command);
         pb.directory(PROJECT_ROOT.toFile());
+
+        // Log command execution
+        String commandStr = String.join(" ", command);
+        if (version != null && step != null) {
+            logToFile(version, step, "Executing: " + commandStr);
+        }
+
         Process process = pb.start();
-        
+
         String output = new String(process.getInputStream().readAllBytes());
         String error = new String(process.getErrorStream().readAllBytes());
         int exitCode = process.waitFor();
-        
+
+        // Log detailed results
+        if (version != null && step != null) {
+            logToFile(version, step, "Command exit code: " + exitCode);
+            if (!output.isEmpty()) {
+                logToFile(version, step, "STDOUT:\n" + output);
+            }
+            if (!error.isEmpty()) {
+                logToFile(version, step, "STDERR:\n" + error);
+            }
+
+            // Also save command output to separate files for long outputs
+            if (output.length() > 1000 || error.length() > 1000) {
+                try {
+                    // Ensure logs directory exists
+                    Files.createDirectories(LOGS_DIR);
+
+                    String safeCommand = commandStr.replaceAll("[^a-zA-Z0-9-_]", "_");
+                    if (output.length() > 1000) {
+                        Path outputFile = LOGS_DIR.resolve(step + "-" + safeCommand + "-output.log");
+                        Files.writeString(outputFile, output);
+                        logToFile(version, step, "Full output saved to: " + outputFile.getFileName());
+                    }
+                    if (error.length() > 1000) {
+                        Path errorFile = LOGS_DIR.resolve(step + "-" + safeCommand + "-error.log");
+                        Files.writeString(errorFile, error);
+                        logToFile(version, step, "Full error output saved to: " + errorFile.getFileName());
+                    }
+                } catch (IOException e) {
+                    logWarning("Failed to save detailed command output: " + LOGS_DIR);
+                }
+            }
+        }
+
         return new ProcessResult(exitCode, output, error);
     }
 
@@ -257,7 +397,7 @@ public class Release implements Callable<Integer> {
         
         for (String tool : tools) {
             try {
-                ProcessResult result = runCommand("which", tool);
+                ProcessResult result = runCommandSimple("which", tool);
                 if (!result.isSuccess()) {
                     missing.add(tool);
                 }
@@ -280,25 +420,32 @@ public class Release implements Callable<Integer> {
         
         try {
             // Check Git status
-            ProcessResult gitStatus = runCommand("git", "status", "--porcelain");
+            ProcessResult gitStatus = runCommandSimple("git", "status", "--porcelain");
             if (!gitStatus.output.trim().isEmpty()) {
                 logError("Working directory not clean");
                 System.out.println(gitStatus.output);
                 return false;
             }
-            
+
             // Check branch
-            ProcessResult branchResult = runCommand("git", "branch", "--show-current");
+            ProcessResult branchResult = runCommandSimple("git", "branch", "--show-current");
             String currentBranch = branchResult.output.trim();
             if (!"master".equals(currentBranch)) {
-                logError("Not on master branch (currently on: " + currentBranch + ")");
-                return false;
+                logWarning("Not on master branch (currently on: " + currentBranch + ")");
+                System.out.print("Do you want to continue with release from branch '" + currentBranch + "'? (y/N): ");
+                Scanner scanner = new Scanner(System.in);
+                String response = scanner.nextLine();
+                if (!response.equalsIgnoreCase("y")) {
+                    logError("Release cancelled - not on master branch");
+                    return false;
+                }
+                logInfo("Proceeding with release from branch: " + currentBranch);
             }
-            
+
             // Check if up to date
-            runCommand("git", "fetch", "origin", "master");
-            ProcessResult localCommit = runCommand("git", "rev-parse", "HEAD");
-            ProcessResult remoteCommit = runCommand("git", "rev-parse", "origin/master");
+            runCommandSimple("git", "fetch", "origin", "master");
+            ProcessResult localCommit = runCommandSimple("git", "rev-parse", "HEAD");
+            ProcessResult remoteCommit = runCommandSimple("git", "rev-parse", "origin/master");
             
             if (!localCommit.output.trim().equals(remoteCommit.output.trim())) {
                 logError("Local master is not up to date with origin/master");
@@ -319,7 +466,7 @@ public class Release implements Callable<Integer> {
 
         try {
             // Check GitHub CLI
-            ProcessResult ghAuth = runCommand("gh", "auth", "status");
+            ProcessResult ghAuth = runCommandSimple("gh", "auth", "status");
             if (!ghAuth.isSuccess()) {
                 logError("GitHub CLI not authenticated. Run: gh auth login");
                 return false;
@@ -337,10 +484,17 @@ public class Release implements Callable<Integer> {
             }
 
             // Check GPG key
-            ProcessResult gpgCheck = runCommand("gpg", "--list-secret-keys");
-            if (!gpgCheck.output.contains(GPG_KEY_ID)) {
-                logError("GPG key " + GPG_KEY_ID + " not found in secret keyring");
-                return false;
+            ProcessResult gpgCheck = runCommandSimple("gpg", "--list-secret-keys", GPG_KEY_ID);
+            if (!gpgCheck.isSuccess()) {
+                // Try checking if it's a subkey
+                ProcessResult subkeyCheck = runCommandSimple("gpg", "--list-secret-keys", "--with-subkey-fingerprints");
+                if (!subkeyCheck.output.contains(GPG_KEY_ID)) {
+                    logError("GPG key " + GPG_KEY_ID + " not found in secret keyring (neither as primary key nor as subkey)");
+                    return false;
+                }
+                logSuccess("GPG subkey " + GPG_KEY_ID + " found");
+            } else {
+                logSuccess("GPG key " + GPG_KEY_ID + " found");
             }
 
             // Check Maven settings
@@ -354,6 +508,11 @@ public class Release implements Callable<Integer> {
             if (GMAIL_USERNAME != null && !GMAIL_USERNAME.isEmpty() &&
                 GMAIL_APP_PASSWORD != null && !GMAIL_APP_PASSWORD.isEmpty()) {
                 logSuccess("Gmail credentials configured for automatic email sending");
+                if (GMAIL_SENDER_ADDRESS != null && !GMAIL_SENDER_ADDRESS.isEmpty()) {
+                    logInfo("Custom sender address: " + GMAIL_SENDER_ADDRESS);
+                } else {
+                    logInfo("Using Gmail username as sender address: " + GMAIL_USERNAME);
+                }
             } else {
                 logInfo("Gmail credentials not set - emails will be generated but not sent automatically");
             }
@@ -383,7 +542,7 @@ public class Release implements Callable<Integer> {
 
             // Check GitHub CLI
             try {
-                ProcessResult ghAuth = runCommand("gh", "auth", "status");
+                ProcessResult ghAuth = runCommandSimple("gh", "auth", "status");
                 if (!ghAuth.isSuccess()) {
                     logWarning("GitHub CLI not authenticated");
                     System.out.println("Please run: gh auth login");
@@ -416,9 +575,13 @@ public class Release implements Callable<Integer> {
                 System.out.println("To enable automatic email sending:");
                 System.out.println("  export GMAIL_USERNAME=your-email@gmail.com");
                 System.out.println("  export GMAIL_APP_PASSWORD=your-app-password");
+                System.out.println("  export GMAIL_SENDER_ADDRESS=your-sender@domain.org  # optional");
                 System.out.println("See: https://support.google.com/accounts/answer/185833");
             } else {
                 logSuccess("Gmail credentials are set");
+                if (GMAIL_SENDER_ADDRESS != null && !GMAIL_SENDER_ADDRESS.isEmpty()) {
+                    logInfo("Custom sender address configured: " + GMAIL_SENDER_ADDRESS);
+                }
             }
 
             // Check Maven settings
@@ -454,6 +617,7 @@ public class Release implements Callable<Integer> {
             System.out.println("4. (Optional) Set Gmail credentials for automatic email sending:");
             System.out.println("   export GMAIL_USERNAME=your-email@gmail.com");
             System.out.println("   export GMAIL_APP_PASSWORD=your-app-password");
+            System.out.println("   export GMAIL_SENDER_ADDRESS=your-sender@domain.org  # optional");
             System.out.println();
             System.out.println("Then you can start a release:");
             System.out.println("  jbang release.java start-vote 4.0.0-rc-4");
@@ -469,73 +633,175 @@ public class Release implements Callable<Integer> {
         @Parameters(index = "0", description = "Release version (e.g., 4.0.0-rc-4)")
         private String version;
 
+        @Option(names = {"-s", "--skip-tests"}, description = "Skip tests during build phase (faster execution)")
+        private boolean skipTests = false;
+
+        @Option(names = {"-d", "--skip-dry-run"}, description = "Skip dry-run phase (fastest execution, but riskier)")
+        private boolean skipDryRun = false;
+
         @Override
         public Integer call() {
             System.out.println("🚀 Starting Maven release vote for version " + version);
             System.out.println("📁 Project root: " + PROJECT_ROOT);
 
-            // Validation
-            if (!validateTools() || !validateEnvironment() || !validateCredentials()) {
-                return 1;
-            }
-
-            if (!validateVersion(version)) {
-                return 1;
-            }
-
             try {
-                // Check for blocker issues
-                logStep("Checking for blocker issues...");
-                ProcessResult blockerCheck = runCommand("gh", "issue", "list", "--label", "blocker",
-                    "--state", "open", "--json", "number", "--jq", "length");
+                // Initialize logging
+                initializeLogging(version);
 
-                int blockerCount = Integer.parseInt(blockerCheck.output.trim());
-                if (blockerCount > 0) {
-                    logWarning("Found " + blockerCount + " open blocker issues");
-                    ProcessResult blockerList = runCommand("gh", "issue", "list", "--label", "blocker",
-                        "--state", "open", "--json", "number,title", "--jq", ".[] | \"  #\\(.number): \\(.title)\"");
-                    System.out.println(blockerList.output);
-
-                    System.out.println();
-                    System.out.print("Do you want to continue anyway? (y/N): ");
+                // Check if we're resuming from a previous run
+                ReleaseStep currentStep = getCurrentStep(version);
+                if (currentStep != ReleaseStep.VALIDATION) {
+                    logInfo("Resuming from step: " + currentStep.getStepName());
+                    System.out.print("Do you want to resume from step '" + currentStep.getStepName() + "'? (y/N): ");
                     Scanner scanner = new Scanner(System.in);
                     String response = scanner.nextLine();
                     if (!response.equalsIgnoreCase("y")) {
-                        logError("Release cancelled due to blocker issues");
+                        logInfo("Starting fresh release process");
+                        currentStep = ReleaseStep.VALIDATION;
+                    }
+                }
+
+                // Step 1: Validation
+                if (!isStepCompleted(version, ReleaseStep.VALIDATION)) {
+                    saveCurrentStep(version, ReleaseStep.VALIDATION);
+                    logStep("Validating environment and credentials...");
+                    if (!validateTools() || !validateEnvironment() || !validateCredentials()) {
+                        return 1;
+                    }
+                    if (!validateVersion(version)) {
+                        return 1;
+                    }
+                    logToFile(version, "VALIDATION", "All validations passed");
+                } else {
+                    logInfo("Skipping validation (already completed)");
+                }
+
+                // Step 2: Check for blocker issues
+                if (!isStepCompleted(version, ReleaseStep.BLOCKER_CHECK)) {
+                    saveCurrentStep(version, ReleaseStep.BLOCKER_CHECK);
+                    logStep("Checking for blocker issues...");
+                    ProcessResult blockerCheck = runCommandWithLogging(version, "BLOCKER_CHECK", "gh", "issue", "list", "--label", "blocker",
+                        "--state", "open", "--json", "number", "--jq", "length");
+
+                    int blockerCount = Integer.parseInt(blockerCheck.output.trim());
+                    if (blockerCount > 0) {
+                        logWarning("Found " + blockerCount + " open blocker issues");
+                        ProcessResult blockerList = runCommandWithLogging(version, "BLOCKER_CHECK", "gh", "issue", "list", "--label", "blocker",
+                            "--state", "open", "--json", "number,title", "--jq", ".[] | \"  #\\(.number): \\(.title)\"");
+                        System.out.println(blockerList.output);
+
+                        System.out.println();
+                        System.out.print("Do you want to continue anyway? (y/N): ");
+                        Scanner scanner = new Scanner(System.in);
+                        String response = scanner.nextLine();
+                        if (!response.equalsIgnoreCase("y")) {
+                            logError("Release cancelled due to blocker issues");
+                            logToFile(version, "BLOCKER_CHECK", "Release cancelled due to blocker issues");
+                            return 1;
+                        }
+                    }
+                    logToFile(version, "BLOCKER_CHECK", "Blocker check completed");
+                } else {
+                    logInfo("Skipping blocker check (already completed)");
+                }
+
+                // Step 3: Get milestone and release notes
+                String milestoneInfo = "";
+                String releaseNotes = "";
+                if (!isStepCompleted(version, ReleaseStep.MILESTONE_INFO)) {
+                    saveCurrentStep(version, ReleaseStep.MILESTONE_INFO);
+                    logStep("Getting GitHub milestone and release notes...");
+                    milestoneInfo = getMilestoneInfo(version);
+                    releaseNotes = getReleaseNotes(version);
+                    logToFile(version, "MILESTONE_INFO", "Milestone and release notes retrieved");
+                } else {
+                    logInfo("Skipping milestone info (already completed)");
+                    // Load from saved files if available
+                    milestoneInfo = loadMilestoneInfo(version);
+                }
+
+                // Step 4: Build and test
+                if (!isStepCompleted(version, ReleaseStep.BUILD_TEST)) {
+                    saveCurrentStep(version, ReleaseStep.BUILD_TEST);
+                    if (skipTests) {
+                        logInfo("Using --skip-tests option for faster execution");
+                    }
+                    buildAndTest(version, skipTests);
+                } else {
+                    logInfo("Skipping build and test (already completed)");
+                }
+
+                // Step 5: Site compilation check
+                if (!isStepCompleted(version, ReleaseStep.SITE_CHECK)) {
+                    saveCurrentStep(version, ReleaseStep.SITE_CHECK);
+                    checkSiteCompilation(version);
+                } else {
+                    logInfo("Skipping site check (already completed)");
+                }
+
+                // Step 6: Prepare release
+                if (!isStepCompleted(version, ReleaseStep.PREPARE_RELEASE)) {
+                    saveCurrentStep(version, ReleaseStep.PREPARE_RELEASE);
+                    if (skipDryRun) {
+                        logWarning("Using --skip-dry-run option - this is faster but riskier!");
+                    }
+                    prepareRelease(version, skipDryRun);
+                } else {
+                    logInfo("Skipping release preparation (already completed)");
+                }
+
+                // Step 7: Stage artifacts
+                String stagingRepo = "";
+                if (!isStepCompleted(version, ReleaseStep.STAGE_ARTIFACTS)) {
+                    saveCurrentStep(version, ReleaseStep.STAGE_ARTIFACTS);
+                    stagingRepo = stageArtifacts(version);
+                    if (stagingRepo == null || stagingRepo.isEmpty()) {
+                        logError("Failed to get staging repository ID");
+                        return 1;
+                    }
+                } else {
+                    logInfo("Skipping artifact staging (already completed)");
+                    stagingRepo = loadStagingRepo(version);
+                    if (stagingRepo == null || stagingRepo.isEmpty()) {
+                        logError("Could not load staging repository ID from previous run");
                         return 1;
                     }
                 }
 
-                // Get milestone and release notes
-                logStep("Getting GitHub milestone and release notes...");
-                String milestoneInfo = getMilestoneInfo(version);
-                String releaseNotes = getReleaseNotes(version);
-
-                // Build and test
-                buildAndTest();
-                checkSiteCompilation();
-
-                // Prepare release
-                prepareRelease(version);
-
-                // Stage artifacts
-                String stagingRepo = stageArtifacts(version);
-                if (stagingRepo == null || stagingRepo.isEmpty()) {
-                    logError("Failed to get staging repository ID");
-                    return 1;
+                // Step 8: Stage documentation
+                if (!isStepCompleted(version, ReleaseStep.STAGE_DOCS)) {
+                    saveCurrentStep(version, ReleaseStep.STAGE_DOCS);
+                    stageDocumentation(version);
+                } else {
+                    logInfo("Skipping documentation staging (already completed)");
                 }
 
-                // Stage documentation
-                stageDocumentation();
+                // Step 9: Copy to dist area
+                if (!isStepCompleted(version, ReleaseStep.COPY_DIST)) {
+                    saveCurrentStep(version, ReleaseStep.COPY_DIST);
+                    copyToDistArea(version);
+                } else {
+                    logInfo("Skipping dist area copy (already completed)");
+                }
 
-                // Copy to dist area
-                copyToDistArea(version);
+                // Step 10: Generate vote email
+                if (!isStepCompleted(version, ReleaseStep.GENERATE_EMAIL)) {
+                    saveCurrentStep(version, ReleaseStep.GENERATE_EMAIL);
+                    generateVoteEmail(version, stagingRepo, milestoneInfo, releaseNotes);
+                } else {
+                    logInfo("Skipping vote email generation (already completed)");
+                }
 
-                // Generate vote email
-                generateVoteEmail(version, stagingRepo, milestoneInfo, releaseNotes);
+                // Step 11: Save staging info
+                if (!isStepCompleted(version, ReleaseStep.SAVE_INFO)) {
+                    saveCurrentStep(version, ReleaseStep.SAVE_INFO);
+                    saveStagingInfo(version, stagingRepo, milestoneInfo);
+                } else {
+                    logInfo("Skipping save staging info (already completed)");
+                }
 
-                // Save staging info
-                saveStagingInfo(version, stagingRepo, milestoneInfo);
+                // Mark as completed
+                saveCurrentStep(version, ReleaseStep.COMPLETED);
 
                 System.out.println();
                 logSuccess("Release vote started successfully!");
@@ -585,14 +851,14 @@ public class Release implements Callable<Integer> {
 
         try {
             // Check if tag already exists
-            ProcessResult tagCheck = runCommand("git", "tag", "-l");
+            ProcessResult tagCheck = runCommandSimple("git", "tag", "-l");
             if (tagCheck.output.contains("maven-" + version)) {
                 logError("Tag maven-" + version + " already exists");
                 return false;
             }
 
             // Check current version is SNAPSHOT
-            ProcessResult versionCheck = runCommand("mvn", "help:evaluate",
+            ProcessResult versionCheck = runCommandSimple("mvn", "help:evaluate",
                 "-Dexpression=project.version", "-q", "-DforceStdout");
             String currentVersion = versionCheck.output.trim();
             if (!currentVersion.endsWith("-SNAPSHOT")) {
@@ -612,12 +878,12 @@ public class Release implements Callable<Integer> {
     static String getMilestoneInfo(String version) {
         try {
             // Try exact match first
-            ProcessResult result = runCommand("gh", "api", "repos/apache/maven/milestones",
+            ProcessResult result = runCommandSimple("gh", "api", "repos/apache/maven/milestones",
                 "--jq", ".[] | select(.title == \"" + version + "\")");
 
             if (result.output.trim().isEmpty()) {
                 // Try partial match
-                result = runCommand("gh", "api", "repos/apache/maven/milestones",
+                result = runCommandSimple("gh", "api", "repos/apache/maven/milestones",
                     "--jq", ".[] | select(.title | contains(\"" + version + "\"))");
             }
 
@@ -630,7 +896,7 @@ public class Release implements Callable<Integer> {
 
     static String getReleaseNotes(String version) {
         try {
-            ProcessResult result = runCommand("gh", "api", "repos/apache/maven/releases",
+            ProcessResult result = runCommandSimple("gh", "api", "repos/apache/maven/releases",
                 "--jq", ".[] | select(.draft == true and (.tag_name == \"maven-" + version +
                 "\" or .tag_name == \"" + version + "\" or .name | contains(\"" + version + "\"))) | .body");
 
@@ -648,91 +914,215 @@ public class Release implements Callable<Integer> {
         }
     }
 
-    static void buildAndTest() throws Exception {
-        logStep("Building and testing...");
-        ProcessResult result = runCommand("mvn", "clean", "verify", "-Papache-release", "-Dgpg.skip=true");
-        if (!result.isSuccess()) {
-            throw new RuntimeException("Build and test failed: " + result.error);
-        }
-        logSuccess("Build and tests completed");
+    static void buildAndTest(String version) throws Exception {
+        buildAndTest(version, false);
     }
 
-    static void checkSiteCompilation() throws Exception {
+    static void buildAndTest(String version, boolean skipTests) throws Exception {
+        if (skipTests) {
+            logStep("Building (skipping tests for faster execution)...");
+            ProcessResult result = runCommandWithLogging(version, "BUILD_TEST", "mvn", "clean", "compile", "-Papache-release", "-Dgpg.skip=true");
+            if (!result.isSuccess()) {
+                logToFile(version, "BUILD_TEST", "Build failed with exit code: " + result.exitCode);
+                throw new RuntimeException("Build failed. Check logs at: " + LOGS_DIR.resolve("release-" + version + ".log") +
+                    "\nError: " + result.error);
+            }
+            logSuccess("Build completed (tests skipped)");
+            logToFile(version, "BUILD_TEST", "Build completed successfully (tests skipped)");
+        } else {
+            logStep("Building and testing...");
+            ProcessResult result = runCommandWithLogging(version, "BUILD_TEST", "mvn", "clean", "verify", "-Papache-release", "-Dgpg.skip=true");
+            if (!result.isSuccess()) {
+                logToFile(version, "BUILD_TEST", "Build failed with exit code: " + result.exitCode);
+                throw new RuntimeException("Build and test failed. Check logs at: " + LOGS_DIR.resolve("release-" + version + ".log") +
+                    "\nError: " + result.error);
+            }
+            logSuccess("Build and tests completed");
+            logToFile(version, "BUILD_TEST", "Build and tests completed successfully");
+        }
+    }
+
+    static void checkSiteCompilation(String version) throws Exception {
         logStep("Checking site compilation...");
-        ProcessResult result = runCommand("mvn", "-Preporting", "site", "site:stage");
+        ProcessResult result = runCommandWithLogging(version, "SITE_CHECK", "mvn", "-Preporting", "site", "site:stage");
         if (!result.isSuccess()) {
-            throw new RuntimeException("Site compilation failed: " + result.error);
+            logToFile(version, "SITE_CHECK", "Site compilation failed with exit code: " + result.exitCode);
+            throw new RuntimeException("Site compilation failed. Check logs at: " + LOGS_DIR.resolve("release-" + version + ".log") +
+                "\nError: " + result.error);
         }
         logSuccess("Site compilation successful");
+        logToFile(version, "SITE_CHECK", "Site compilation completed successfully");
     }
 
     static void prepareRelease(String version) throws Exception {
+        prepareRelease(version, false);
+    }
+
+    static void prepareRelease(String version, boolean skipDryRun) throws Exception {
         logStep("Preparing release " + version + "...");
 
-        // Dry run first
-        logInfo("Running release:prepare in dry-run mode...");
-        ProcessResult dryRun = runCommand("mvn", "release:prepare", "-DdryRun=true",
-            "-Dtag=maven-" + version, "-DreleaseVersion=" + version,
-            "-DdevelopmentVersion=" + version + "-SNAPSHOT");
+        if (!skipDryRun) {
+            // Dry run first
+            logInfo("Running release:prepare in dry-run mode...");
+            ProcessResult dryRun = runCommandWithLogging(version, "PREPARE_RELEASE", "mvn", "release:prepare", "-DdryRun=true",
+                "-Dtag=maven-" + version, "-DreleaseVersion=" + version,
+                "-DdevelopmentVersion=" + version + "-SNAPSHOT");
 
-        if (!dryRun.isSuccess()) {
-            throw new RuntimeException("Release prepare dry run failed: " + dryRun.error);
-        }
+            if (!dryRun.isSuccess()) {
+                logToFile(version, "PREPARE_RELEASE", "Dry run failed with exit code: " + dryRun.exitCode);
+                throw new RuntimeException("Release prepare dry run failed. Check logs at: " + LOGS_DIR.resolve("release-" + version + ".log") +
+                    "\nError: " + dryRun.error);
+            }
 
-        logInfo("Dry run successful. Proceeding with actual preparation...");
-        runCommand("mvn", "release:clean");
+            logInfo("Dry run successful. Proceeding with actual preparation...");
+            runCommandWithLogging(version, "PREPARE_RELEASE", "mvn", "release:clean");
 
-        ProcessResult actual = runCommand("mvn", "release:prepare",
-            "-Dtag=maven-" + version, "-DreleaseVersion=" + version,
-            "-DdevelopmentVersion=" + version + "-SNAPSHOT");
+            logInfo("Skipping tests during actual release:prepare since dry-run already validated them");
+            ProcessResult actual = runCommandWithLogging(version, "PREPARE_RELEASE", "mvn", "release:prepare",
+                "-Dtag=maven-" + version, "-DreleaseVersion=" + version,
+                "-DdevelopmentVersion=" + version + "-SNAPSHOT",
+                "-DskipTests=true");
 
-        if (!actual.isSuccess()) {
-            throw new RuntimeException("Release prepare failed: " + actual.error);
+            if (!actual.isSuccess()) {
+                logToFile(version, "PREPARE_RELEASE", "Release prepare failed with exit code: " + actual.exitCode);
+                throw new RuntimeException("Release prepare failed. Check logs at: " + LOGS_DIR.resolve("release-" + version + ".log") +
+                    "\nError: " + actual.error);
+            }
+        } else {
+            logWarning("Skipping dry-run as requested - proceeding directly to release:prepare");
+            logInfo("Running release:prepare with tests (since no dry-run validation was done)");
+            ProcessResult actual = runCommandWithLogging(version, "PREPARE_RELEASE", "mvn", "release:prepare",
+                "-Dtag=maven-" + version, "-DreleaseVersion=" + version,
+                "-DdevelopmentVersion=" + version + "-SNAPSHOT");
+
+            if (!actual.isSuccess()) {
+                logToFile(version, "PREPARE_RELEASE", "Release prepare failed with exit code: " + actual.exitCode);
+                throw new RuntimeException("Release prepare failed. Check logs at: " + LOGS_DIR.resolve("release-" + version + ".log") +
+                    "\nError: " + actual.error);
+            }
         }
 
         logSuccess("Release prepared");
+        logToFile(version, "PREPARE_RELEASE", "Release preparation completed successfully");
     }
 
     static String stageArtifacts(String version) throws Exception {
         logStep("Staging artifacts to Nexus...");
-        ProcessResult result = runCommand("mvn", "release:perform",
+        ProcessResult result = runCommandWithLogging(version, "STAGE_ARTIFACTS", "mvn", "release:perform",
             "-Dgoals=deploy nexus-staging:close",
             "-DstagingDescription=VOTE Maven " + version);
 
         if (!result.isSuccess()) {
-            throw new RuntimeException("Artifact staging failed: " + result.error);
+            logToFile(version, "STAGE_ARTIFACTS", "Artifact staging failed with exit code: " + result.exitCode);
+            throw new RuntimeException("Artifact staging failed. Check logs at: " + LOGS_DIR.resolve("release-" + version + ".log") +
+                "\nError: " + result.error);
         }
 
-        // Get staging repository ID
-        ProcessResult repoList = runCommand("mvn", "nexus-staging:rc-list", "-q");
-        String output = repoList.output;
-
-        Pattern pattern = Pattern.compile("orgapachemaven-[0-9]+");
-        java.util.regex.Matcher matcher = pattern.matcher(output);
-
-        if (matcher.find()) {
-            String stagingRepo = matcher.group();
+        // Get staging repository ID - try multiple methods
+        String stagingRepo = findStagingRepository(version);
+        if (stagingRepo != null && !stagingRepo.isEmpty()) {
             logSuccess("Artifacts staged to repository: " + stagingRepo);
+            logToFile(version, "STAGE_ARTIFACTS", "Artifacts staged to repository: " + stagingRepo);
             return stagingRepo;
         } else {
-            throw new RuntimeException("Could not find staging repository ID");
+            logToFile(version, "STAGE_ARTIFACTS", "Could not find staging repository ID using any method");
+            throw new RuntimeException("Could not find staging repository ID. Check the release:perform output for manual staging repo identification.");
         }
     }
 
-    static void stageDocumentation() throws Exception {
+    static void stageDocumentation(String version) throws Exception {
         logStep("Staging documentation...");
 
         Path checkoutDir = PROJECT_ROOT.resolve("target/checkout");
         ProcessBuilder pb = new ProcessBuilder("mvn", "scm-publish:publish-scm", "-Preporting");
         pb.directory(checkoutDir.toFile());
+
+        logToFile(version, "STAGE_DOCS", "Executing: mvn scm-publish:publish-scm -Preporting in " + checkoutDir);
         Process process = pb.start();
 
+        String output = new String(process.getInputStream().readAllBytes());
+        String error = new String(process.getErrorStream().readAllBytes());
         int exitCode = process.waitFor();
+
+        logToFile(version, "STAGE_DOCS", "Documentation staging exit code: " + exitCode);
+        if (!output.isEmpty()) {
+            logToFile(version, "STAGE_DOCS", "STDOUT:\n" + output);
+        }
+        if (!error.isEmpty()) {
+            logToFile(version, "STAGE_DOCS", "STDERR:\n" + error);
+        }
+
         if (exitCode != 0) {
-            throw new RuntimeException("Documentation staging failed");
+            throw new RuntimeException("Documentation staging failed. Check logs at: " + LOGS_DIR.resolve("release-" + version + ".log") +
+                "\nError: " + error);
         }
 
         logSuccess("Documentation staged");
+        logToFile(version, "STAGE_DOCS", "Documentation staging completed successfully");
+    }
+
+    static String findStagingRepository(String version) {
+        logInfo("Searching for staging repository ID...");
+
+        // Method 1: Try nexus-staging plugin if available
+        try {
+            ProcessResult repoList = runCommandWithLogging(version, "STAGE_ARTIFACTS", "mvn", "nexus-staging:rc-list", "-q");
+            if (repoList.isSuccess()) {
+                Pattern pattern = Pattern.compile("orgapachemaven-[0-9]+");
+                java.util.regex.Matcher matcher = pattern.matcher(repoList.output);
+                if (matcher.find()) {
+                    String stagingRepo = matcher.group();
+                    logToFile(version, "STAGE_ARTIFACTS", "Found staging repo via nexus-staging:rc-list: " + stagingRepo);
+                    return stagingRepo;
+                }
+            }
+        } catch (Exception e) {
+            logToFile(version, "STAGE_ARTIFACTS", "nexus-staging:rc-list failed: " + e.getMessage());
+        }
+
+        // Method 2: Parse the release:perform output for staging repository mentions
+        try {
+            Path performLog = LOGS_DIR.resolve("STAGE_ARTIFACTS-mvn_release_perform_-Dgoals_deploy_nexus-staging_close_-DstagingDescription_VOTE_Maven_" + version.replace(".", "_").replace("-", "_") + "-output.log");
+            if (Files.exists(performLog)) {
+                String content = Files.readString(performLog);
+
+                // Look for staging repository patterns in the output
+                Pattern[] patterns = {
+                    Pattern.compile("Staging repository '(orgapachemaven-[0-9]+)'"),
+                    Pattern.compile("stagingRepositoryId=(orgapachemaven-[0-9]+)"),
+                    Pattern.compile("Repository ID: (orgapachemaven-[0-9]+)"),
+                    Pattern.compile("\\[INFO\\].*?(orgapachemaven-[0-9]+).*?closed")
+                };
+
+                for (Pattern pattern : patterns) {
+                    java.util.regex.Matcher matcher = pattern.matcher(content);
+                    if (matcher.find()) {
+                        String stagingRepo = matcher.group(1);
+                        logToFile(version, "STAGE_ARTIFACTS", "Found staging repo in release:perform output: " + stagingRepo);
+                        return stagingRepo;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logToFile(version, "STAGE_ARTIFACTS", "Failed to parse release:perform output: " + e.getMessage());
+        }
+
+        // Method 3: Manual prompt as fallback
+        logWarning("Could not automatically detect staging repository ID");
+        logInfo("Please check the release:perform output manually and look for lines like:");
+        logInfo("  'Staging repository 'orgapachemaven-XXXX' created'");
+        logInfo("  'Repository ID: orgapachemaven-XXXX'");
+
+        System.out.print("Enter staging repository ID (e.g., orgapachemaven-1234) or press Enter to skip: ");
+        Scanner scanner = new Scanner(System.in);
+        String manualRepo = scanner.nextLine().trim();
+
+        if (!manualRepo.isEmpty()) {
+            logToFile(version, "STAGE_ARTIFACTS", "Using manually entered staging repo: " + manualRepo);
+            return manualRepo;
+        }
+
+        return null;
     }
 
     static void copyToDistArea(String version) throws Exception {
@@ -746,7 +1136,7 @@ public class Release implements Callable<Integer> {
         }
 
         // Generate SHA512
-        ProcessResult sha512Result = runCommand("sha512sum", sourceZip.toString());
+        ProcessResult sha512Result = runCommandSimple("sha512sum", sourceZip.toString());
         String sha512 = sha512Result.output.split("\\s+")[0];
         Path sha512File = sourceZip.getParent().resolve("maven-" + version + "-source-release.zip.sha512");
         Files.writeString(sha512File, sha512);
@@ -758,7 +1148,7 @@ public class Release implements Callable<Integer> {
             pb.directory(distDir.toFile());
             pb.start().waitFor();
         } else {
-            runCommand("svn", "checkout", "https://dist.apache.org/repos/dist/release/maven",
+            runCommandSimple("svn", "checkout", "https://dist.apache.org/repos/dist/release/maven",
                 distDir.toString());
         }
 
@@ -781,7 +1171,7 @@ public class Release implements Callable<Integer> {
         logStep("Generating vote email...");
 
         // Get comparison URL
-        ProcessResult lastTagResult = runCommand("git", "describe", "--tags", "--abbrev=0", "--match=maven-*");
+        ProcessResult lastTagResult = runCommandSimple("git", "describe", "--tags", "--abbrev=0", "--match=maven-*");
         String lastTag = lastTagResult.isSuccess() ? lastTagResult.output.trim() : "";
 
         String githubCompare = "https://github.com/apache/maven/commits/maven-" + version;
@@ -795,12 +1185,20 @@ public class Release implements Callable<Integer> {
 
         if (!milestoneInfo.isEmpty()) {
             try {
-                ObjectMapper mapper = new ObjectMapper();
-                JsonNode milestone = mapper.readTree(milestoneInfo);
-                closedIssues = milestone.get("closed_issues").asText("N");
-                String htmlUrl = milestone.get("html_url").asText("");
-                if (!htmlUrl.isEmpty()) {
-                    milestoneUrl = htmlUrl + "?closed=1";
+                // Simple JSON parsing without ObjectMapper for now
+                if (milestoneInfo.contains("\"closed_issues\":")) {
+                    String[] parts = milestoneInfo.split("\"closed_issues\":");
+                    if (parts.length > 1) {
+                        String numberPart = parts[1].split(",")[0].trim();
+                        closedIssues = numberPart.replaceAll("[^0-9]", "");
+                    }
+                }
+                if (milestoneInfo.contains("\"html_url\":")) {
+                    String[] parts = milestoneInfo.split("\"html_url\":\"");
+                    if (parts.length > 1) {
+                        String urlPart = parts[1].split("\"")[0];
+                        milestoneUrl = urlPart + "?closed=1";
+                    }
                 }
             } catch (Exception e) {
                 logWarning("Failed to parse milestone info: " + e.getMessage());
@@ -811,7 +1209,7 @@ public class Release implements Callable<Integer> {
         Path sourceZip = PROJECT_ROOT.resolve("target/checkout/target/maven-" + version + "-source-release.zip");
         String sha512 = "[SHA512 will be calculated]";
         if (Files.exists(sourceZip)) {
-            ProcessResult sha512Result = runCommand("sha512sum", sourceZip.toString());
+            ProcessResult sha512Result = runCommandSimple("sha512sum", sourceZip.toString());
             sha512 = sha512Result.output.split("\\s+")[0];
         }
 
@@ -913,6 +1311,11 @@ public class Release implements Callable<Integer> {
         try {
             logStep("Sending email via Gmail...");
 
+            // Determine sender address - use custom sender if configured, otherwise use Gmail username
+            String senderAddress = (GMAIL_SENDER_ADDRESS != null && !GMAIL_SENDER_ADDRESS.isEmpty())
+                ? GMAIL_SENDER_ADDRESS
+                : GMAIL_USERNAME;
+
             // Create email content with headers
             StringBuilder email = new StringBuilder();
             email.append("To: ").append(to).append("\n");
@@ -920,12 +1323,12 @@ public class Release implements Callable<Integer> {
                 email.append("Cc: ").append(cc).append("\n");
             }
             email.append("Subject: ").append(subject).append("\n");
-            email.append("From: ").append(GMAIL_USERNAME).append("\n\n");
+            email.append("From: ").append(senderAddress).append("\n\n");
             email.append(body);
 
             // Use curl to send via Gmail SMTP
-            ProcessResult result = runCommand("curl", "-s", "--url", "smtps://smtp.gmail.com:465",
-                "--ssl-reqd", "--mail-from", GMAIL_USERNAME, "--mail-rcpt", to,
+            ProcessResult result = runCommandSimple("curl", "-s", "--url", "smtps://smtp.gmail.com:465",
+                "--ssl-reqd", "--mail-from", senderAddress, "--mail-rcpt", to,
                 "--user", GMAIL_USERNAME + ":" + GMAIL_APP_PASSWORD,
                 "--upload-file", "-");
 
@@ -1028,7 +1431,7 @@ public class Release implements Callable<Integer> {
 
     static void promoteStagingRepo(String stagingRepo) throws Exception {
         logStep("Promoting staging repository...");
-        ProcessResult result = runCommand("mvn", "nexus-staging:promote",
+        ProcessResult result = runCommandSimple("mvn", "nexus-staging:promote",
             "-DstagingRepositoryId=" + stagingRepo);
 
         if (!result.isSuccess()) {
@@ -1091,7 +1494,7 @@ public class Release implements Callable<Integer> {
 
         String svnpubsub = "https://svn.apache.org/repos/asf/maven/website/components";
 
-        ProcessResult result = runCommand("svnmucc", "-m", "Publish Maven " + version + " documentation",
+        ProcessResult result = runCommandSimple("svnmucc", "-m", "Publish Maven " + version + " documentation",
             "-U", svnpubsub,
             "cp", "HEAD", "maven-archives/maven-LATEST", "maven-archives/maven-" + version,
             "rm", "maven/maven",
@@ -1110,20 +1513,22 @@ public class Release implements Callable<Integer> {
         // Close milestone if exists and open
         if (!milestoneInfo.isEmpty()) {
             try {
-                ObjectMapper mapper = new ObjectMapper();
-                JsonNode milestone = mapper.readTree(milestoneInfo);
-                String milestoneNumber = milestone.get("number").asText();
-                String milestoneState = milestone.get("state").asText();
+                // Simple parsing without ObjectMapper
+                if (milestoneInfo.contains("\"number\":") && milestoneInfo.contains("\"state\":\"open\"")) {
+                    String[] parts = milestoneInfo.split("\"number\":");
+                    if (parts.length > 1) {
+                        String numberPart = parts[1].split(",")[0].trim();
+                        String milestoneNumber = numberPart.replaceAll("[^0-9]", "");
 
-                if ("open".equals(milestoneState)) {
-                    String currentDate = java.time.Instant.now().toString();
-                    ProcessResult result = runCommand("gh", "api", "repos/apache/maven/milestones/" + milestoneNumber,
-                        "--method", "PATCH",
-                        "--field", "state=closed",
-                        "--field", "due_on=" + currentDate);
+                        String currentDate = java.time.Instant.now().toString();
+                        ProcessResult result = runCommandSimple("gh", "api", "repos/apache/maven/milestones/" + milestoneNumber,
+                            "--method", "PATCH",
+                            "--field", "state=closed",
+                            "--field", "due_on=" + currentDate);
 
-                    if (result.isSuccess()) {
-                        logSuccess("Milestone closed");
+                        if (result.isSuccess()) {
+                            logSuccess("Milestone closed");
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -1135,7 +1540,7 @@ public class Release implements Callable<Integer> {
         String nextVersion = calculateNextVersion(version);
         if (nextVersion != null) {
             try {
-                ProcessResult result = runCommand("gh", "api", "repos/apache/maven/milestones",
+                ProcessResult result = runCommandSimple("gh", "api", "repos/apache/maven/milestones",
                     "--method", "POST",
                     "--field", "title=" + nextVersion,
                     "--field", "description=Maven " + nextVersion + " release",
@@ -1175,7 +1580,7 @@ public class Release implements Callable<Integer> {
         logStep("Publishing GitHub release...");
 
         // Find draft release
-        ProcessResult draftResult = runCommand("gh", "api", "repos/apache/maven/releases",
+        ProcessResult draftResult = runCommandSimple("gh", "api", "repos/apache/maven/releases",
             "--jq", ".[] | select(.draft == true and (.tag_name == \"maven-" + version +
             "\" or .tag_name == \"" + version + "\" or .name | contains(\"" + version + "\"))) | .id");
 
@@ -1183,7 +1588,7 @@ public class Release implements Callable<Integer> {
             String releaseId = draftResult.output.trim();
 
             // Update tag if needed and publish
-            ProcessResult result = runCommand("gh", "api", "repos/apache/maven/releases/" + releaseId,
+            ProcessResult result = runCommandSimple("gh", "api", "repos/apache/maven/releases/" + releaseId,
                 "--method", "PATCH",
                 "--field", "tag_name=maven-" + version,
                 "--field", "target_commitish=maven-" + version,
@@ -1201,7 +1606,7 @@ public class Release implements Callable<Integer> {
                 "- Release notes: https://maven.apache.org/docs/history.html\n" +
                 "- Download: https://maven.apache.org/download.cgi";
 
-            ProcessResult result = runCommand("gh", "release", "create", "maven-" + version,
+            ProcessResult result = runCommandSimple("gh", "release", "create", "maven-" + version,
                 "--title", "Apache Maven " + version,
                 "--notes", releaseNotes,
                 "--target", "maven-" + version);
@@ -1222,7 +1627,7 @@ public class Release implements Callable<Integer> {
         // Get release notes
         String releaseNotes;
         try {
-            ProcessResult result = runCommand("gh", "release", "view", "maven-" + version,
+            ProcessResult result = runCommandSimple("gh", "release", "view", "maven-" + version,
                 "--json", "body", "--jq", ".body");
             releaseNotes = result.isSuccess() ? result.output.trim() :
                 "Please see the release notes at: https://github.com/apache/maven/releases/tag/maven-" + version;
@@ -1363,7 +1768,7 @@ public class Release implements Callable<Integer> {
         try {
             logStep("Dropping staging repository: " + stagingRepo);
 
-            ProcessResult result = runCommand("mvn", "nexus-staging:drop",
+            ProcessResult result = runCommandSimple("mvn", "nexus-staging:drop",
                 "-DstagingRepositoryId=" + stagingRepo);
 
             if (result.isSuccess()) {
@@ -1420,16 +1825,16 @@ public class Release implements Callable<Integer> {
             logStep("Cleaning up Git release preparation...");
 
             // Check if release tag exists
-            ProcessResult tagCheck = runCommand("git", "tag", "-l");
+            ProcessResult tagCheck = runCommandSimple("git", "tag", "-l");
             if (tagCheck.output.contains("maven-" + version)) {
                 logInfo("Removing release tag: maven-" + version);
-                runCommand("git", "tag", "-d", "maven-" + version);
+                runCommandSimple("git", "tag", "-d", "maven-" + version);
             }
 
             // Clean up release plugin files
             if (Files.exists(PROJECT_ROOT.resolve("pom.xml.releaseBackup"))) {
                 logInfo("Cleaning up Maven release plugin files");
-                runCommand("mvn", "release:clean");
+                runCommandSimple("mvn", "release:clean");
             }
 
             logSuccess("Git cleanup completed");
@@ -1638,6 +2043,115 @@ public class Release implements Callable<Integer> {
 
             } catch (Exception e) {
                 logError("Failed to cancel release: " + e.getMessage());
+                e.printStackTrace();
+                return 1;
+            }
+        }
+    }
+
+    // Status Command
+    @Command(name = "status", description = "Check release status and logs")
+    static class StatusCommand implements Callable<Integer> {
+
+        @Parameters(index = "0", description = "Release version")
+        private String version;
+
+        @Override
+        public Integer call() {
+            System.out.println("📊 Checking status for Maven release " + version);
+            System.out.println("📁 Project root: " + PROJECT_ROOT);
+
+            try {
+                // Check if logs directory exists
+                if (!Files.exists(LOGS_DIR)) {
+                    logWarning("No logs directory found: " + LOGS_DIR);
+                    return 0;
+                }
+
+                // Check current step
+                ReleaseStep currentStep = getCurrentStep(version);
+                System.out.println();
+                logInfo("Current step: " + currentStep.getStepName());
+
+                // Show step progress
+                System.out.println();
+                System.out.println("📋 Release Steps Progress:");
+                for (ReleaseStep step : ReleaseStep.values()) {
+                    if (step == ReleaseStep.COMPLETED) continue;
+
+                    String status;
+                    if (isStepCompleted(version, step)) {
+                        status = GREEN + "✅ COMPLETED" + NC;
+                    } else if (step == currentStep) {
+                        status = YELLOW + "🔄 IN PROGRESS" + NC;
+                    } else {
+                        status = "⏳ PENDING";
+                    }
+                    System.out.println("  " + step.getStepName() + ": " + status);
+                }
+
+                // Check for log files
+                Path logFile = LOGS_DIR.resolve("release-" + version + ".log");
+                if (Files.exists(logFile)) {
+                    System.out.println();
+                    logInfo("Main log file: " + logFile);
+
+                    // Show last few log entries
+                    try {
+                        List<String> lines = Files.readAllLines(logFile);
+                        System.out.println();
+                        System.out.println("📄 Last 10 log entries:");
+                        int start = Math.max(0, lines.size() - 10);
+                        for (int i = start; i < lines.size(); i++) {
+                            System.out.println("  " + lines.get(i));
+                        }
+                    } catch (IOException e) {
+                        logWarning("Could not read log file: " + e.getMessage());
+                    }
+                } else {
+                    logWarning("No main log file found: " + logFile);
+                }
+
+                // List other log files
+                try {
+                    List<Path> logFiles = Files.list(LOGS_DIR)
+                        .filter(p -> p.getFileName().toString().contains(version))
+                        .filter(p -> !p.equals(logFile))
+                        .sorted()
+                        .collect(java.util.stream.Collectors.toList());
+
+                    if (!logFiles.isEmpty()) {
+                        System.out.println();
+                        System.out.println("📁 Additional log files:");
+                        for (Path file : logFiles) {
+                            System.out.println("  " + file.getFileName());
+                        }
+                    }
+                } catch (IOException e) {
+                    logWarning("Could not list log files: " + e.getMessage());
+                }
+
+                // Check for staging info
+                String stagingRepo = loadStagingRepo(version);
+                if (stagingRepo != null && !stagingRepo.isEmpty()) {
+                    System.out.println();
+                    logInfo("Staging repository: " + stagingRepo);
+                }
+
+                // Show helpful commands
+                System.out.println();
+                System.out.println("🔧 Helpful commands:");
+                System.out.println("  View full log: cat " + logFile);
+                System.out.println("  View logs directory: ls -la " + LOGS_DIR);
+                if (currentStep != ReleaseStep.COMPLETED) {
+                    System.out.println("  Resume release: jbang " + MavenRelease.class.getSimpleName() + ".java start-vote " + version);
+                }
+                System.out.println("  Cancel release: jbang " + MavenRelease.class.getSimpleName() + ".java cancel " + version);
+
+                return 0;
+
+            } catch (Exception e) {
+                logError("Failed to check status: " + e.getMessage());
                 e.printStackTrace();
                 return 1;
             }
