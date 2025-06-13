@@ -23,10 +23,11 @@ under the License.
   <parent>
     <groupId>org.apache.maven.its</groupId>
     <artifactId>core-its</artifactId>
-    <version>2.1-SNAPSHOT</version>
+    <version>4.0.0-rc-4-SNAPSHOT</version>
   </parent>
 
   <artifactId>core-it-support</artifactId>
+  <version>2.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Maven Core IT Support</name>
