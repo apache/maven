@@ -51,6 +51,7 @@ public class BaseParserTest {
 
         Assertions.assertTrue(invokerRequest.options().isPresent());
         Options options = invokerRequest.options().orElseThrow();
+        Assertions.assertFalse(options.showVersion().orElse(false));
         Assertions.assertTrue(options.showVersionAndExit().orElse(false));
         Assertions.assertTrue(options.verbose().orElse(false));
     }
