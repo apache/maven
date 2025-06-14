@@ -676,14 +676,14 @@
     }
 
     /**
-     * Reset the {@code pluginMap} field to {@code null}
+     * Reset the {@link pluginMap} field to {@code null}
      */
     public void flushPluginMap() {
         this.pluginMap = null;
     }
 
     /**
-     * @return a Map of plugins field with {@code Plugins#getKey()} as key
+     * @return a Map of plugins field with {@link Plugin#getKey()} as key
      * @see Plugin#getKey()
      */
     public Map<String, Plugin> getPluginsAsMap() {
