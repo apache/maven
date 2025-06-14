@@ -2250,20 +2250,13 @@ public class DefaultModelValidator implements ModelValidator {
         }
 
         public static SourceHint dependencyManagementKey(Dependency dependency) {
-            String hint;
-            if (dependency.getClassifier() == null
-                    || dependency.getClassifier().trim().isEmpty()) {
-                hint = String.format(
-                        "groupId=%s, artifactId=%s, type=%s",
-                        nvl(dependency.getGroupId()), nvl(dependency.getArtifactId()), nvl(dependency.getType()));
-            } else {
-                hint = String.format(
-                        "groupId=%s, artifactId=%s, classifier=%s, type=%s",
-                        nvl(dependency.getGroupId()),
-                        nvl(dependency.getArtifactId()),
-                        nvl(dependency.getClassifier()),
-                        nvl(dependency.getType()));
-            }
+            String hint = "groupId=" + nvl(dependency.getGroupId())
+                    + ", artifactId=" + nvl(dependency.getArtifactId())
+                    + (dependency.getClassifier() == null
+                                    || dependency.getClassifier().isBlank()
+                            ? ""
+                            : ", classifier=" + nvl(dependency.getClassifier()))
+                    + ", type=" + nvl(dependency.getType());
             return new SourceHint(hint, null); // DMK
         }
 
