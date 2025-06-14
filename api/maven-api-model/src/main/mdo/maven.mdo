@@ -668,18 +668,41 @@
           <version>4.0.0/4.0.99</version>
           <code>
             <![CDATA[
+
+    static <K, V> Map<K, V> copy(Map<K, V> map) {
+        if (map == null) {
+            return java.util.Collections.emptyMap();
+        }
+        return java.util.Map.copyOf(map);
+    }
+
+    protected void cleanDelegateCache() {
+        this.pluginMap = null;
+    }
+
     /**
      * Reset the {@code pluginsMap} field to {@code null}
      */
     public void flushPluginMap() {
     }
 
+    volatile Map<String, Plugin> pluginMap;
+
     /**
      * @return a Map of plugins field with {@code Plugins#getKey()} as key
      * @see Plugin#getKey()
      */
     public Map<String, Plugin> getPluginsAsMap() {
-        return getPlugins().stream().collect(Collectors.toMap(plugin -> plugin.getKey(), plugin -> plugin));
+        if (pluginMap == null) {
+            synchronized (this) {
+                if (pluginMap == null) {
+                    pluginMap = copy(this.getPlugins().stream().collect(
+                            java.util.stream.Collectors.toMap(
+                                Plugin::getKey, java.util.function.Function.identity())));
+                }
+            }
+        }
+        return pluginMap;
     }
             ]]>
           </code>
