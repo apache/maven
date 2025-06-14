@@ -689,10 +689,10 @@
     public Map<String, Plugin> getPluginsAsMap() {
         if (pluginMap == null) {
             synchronized (this) {
-                List<Plugin> plugins = this.getPlugins();
-                Map.Entry<String, ? extends Plugin>[] entries = new Map.Entry[plugins.size()];
+                Plugin[] pluginArray = this.getPlugins().toArray();
+                Map.Entry<String, ? extends Plugin>[] entries = new Map.Entry[pluginArray.length];
                 int i = 0;
-                for (Plugin plugin : plugins) {
+                for (Plugin plugin : pluginArray) {
                     entries[i] = Map.entry(
                             plugin.getKey(),
                             plugin
@@ -722,9 +722,10 @@
     public Map<String, Plugin> getPluginsAsMap() {
         if (pluginMap == null) {
             synchronized (this) {
-                Map.Entry<String, ? extends Plugin>[] entries = new Map.Entry[plugins.size()];
+                Plugin[] pluginArray = plugins.toArray();
+                Map.Entry<String, ? extends Plugin>[] entries = new Map.Entry[pluginArray.length];
                 int i = 0;
-                for (Plugin plugin : plugins) {
+                for (Plugin plugin : pluginArray) {
                     entries[i] = Map.entry(
                             plugin.getKey(),
                             plugin
