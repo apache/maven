@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -49,6 +50,7 @@ import java.util.stream.Stream;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.SessionData;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.annotations.Nonnull;
@@ -113,6 +115,7 @@ import org.apache.maven.api.spi.ModelParserException;
 import org.apache.maven.api.spi.ModelTransformer;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.RequestTraceHelper;
+import org.apache.maven.impl.cache.DefaultRequestCache;
 import org.apache.maven.impl.util.PhasingExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -241,6 +244,16 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
                 return session.result;
             } finally {
+                // Clean up REQUEST_SCOPED cache entries to prevent memory leaks
+                // This is especially important for BUILD_PROJECT requests which are top-level requests
+                if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
+                    try {
+                        clearRequestScopedCache(request);
+                    } catch (Exception e) {
+                        // Log but don't fail the build due to cache cleanup issues
+                        logger.debug("Failed to clear REQUEST_SCOPED cache for request: {}", request, e);
+                    }
+                }
                 RequestTraceHelper.exit(trace);
             }
         }
@@ -1911,6 +1924,13 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
             return model;
         } finally {
+            // Clean up REQUEST_SCOPED cache entries for raw model building as well
+            try {
+                clearRequestScopedCache(request);
+            } catch (Exception e) {
+                // Log but don't fail the build due to cache cleanup issues
+                logger.debug("Failed to clear REQUEST_SCOPED cache for raw model request: {}", request, e);
+            }
             RequestTraceHelper.exit(trace);
         }
     }
@@ -2162,5 +2182,56 @@ public class DefaultModelBuilder implements ModelBuilder {
         public String transform(String input, String context) {
             return CONTEXTS.contains(context) ? input.intern() : input;
         }
+    }
+
+    /**
+     * Clears REQUEST_SCOPED cache entries for a specific request.
+     * <p>
+     * This method replicates the logic from {@link DefaultRequestCache#clearRequestScopedCache(Request)}
+     * to clean up cache entries without needing direct access to the RequestCache service.
+     * <p>
+     * The method identifies the outer request and removes the corresponding cache entry from the session data.
+     *
+     * @param req the request whose REQUEST_SCOPED cache should be cleared
+     * @param <REQ> the request type
+     */
+    private <REQ extends Request<?>> void clearRequestScopedCache(REQ req) {
+        if (req.getSession() instanceof Session session) {
+            // Use the same key as DefaultRequestCache
+            SessionData.Key<ConcurrentMap> key = SessionData.key(ConcurrentMap.class, CacheMetadata.class);
+
+            // Get the outer request key using the same logic as DefaultRequestCache
+            Object outerRequestKey = getOuterRequest(req);
+
+            Map<Object, Map<Object, ?>> caches = session.getData().get(key);
+            if (caches != null) {
+                Map<Object, ?> removedCache = caches.remove(outerRequestKey);
+                if (removedCache != null) {
+                    int removedSize = removedCache.size();
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(
+                                "Cleared REQUEST_SCOPED cache for request: {}, removed {} entries, remaining caches: {}",
+                                outerRequestKey.getClass().getSimpleName(),
+                                removedSize,
+                                caches.size());
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Gets the outer request for cache key purposes.
+     * This replicates the logic from DefaultRequestCache.doGetOuterRequest().
+     */
+    private Object getOuterRequest(Request<?> req) {
+        RequestTrace trace = req.getTrace();
+        if (trace != null) {
+            RequestTrace parent = trace.parent();
+            if (parent != null && parent.data() instanceof Request<?> parentRequest) {
+                return getOuterRequest(parentRequest);
+            }
+        }
+        return req;
     }
 }

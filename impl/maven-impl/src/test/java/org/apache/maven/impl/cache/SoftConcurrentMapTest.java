@@ -34,12 +34,12 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class SoftIdentityMapTest {
-    private SoftIdentityMap<Object, String> map;
+class SoftConcurrentMapTest {
+    private SoftConcurrentMap<Object, String> map;
 
     @BeforeEach
     void setUp() {
-        map = new SoftIdentityMap<>();
+        map = new SoftConcurrentMap<>();
     }
 
     @Test
@@ -139,7 +139,7 @@ class SoftIdentityMapTest {
     }
 
     @Test
-    void shouldUseIdentityComparison() {
+    void shouldUseEqualsComparison() {
         // Create two equal but distinct keys
         String key1 = new String("key");
         String key2 = new String("key");
@@ -159,7 +159,7 @@ class SoftIdentityMapTest {
             return "value2";
         });
 
-        assertEquals(1, computeCount.get(), "Should compute once for equal but distinct keys");
+        assertEquals(1, computeCount.get(), "Should compute once for equal keys (using equals comparison)");
     }
 
     @Test

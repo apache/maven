@@ -29,22 +29,35 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 /**
- * A Map implementation that uses soft references for both keys and values,
- * and compares keys using identity (==) rather than equals().
+ * A concurrent map implementation that uses soft references for both keys and values,
+ * and supports automatic cleanup of garbage-collected entries.
+ * <p>
+ * This map is designed for caching scenarios where:
+ * <ul>
+ *   <li>Values should be eligible for garbage collection when memory is low</li>
+ *   <li>Concurrent access is required</li>
+ *   <li>Automatic cleanup of stale entries is desired</li>
+ * </ul>
+ * <p>
+ * The map uses soft references for both keys and values, which means they will be garbage collected
+ * before an OutOfMemoryError is thrown, making this suitable for memory-sensitive caches.
+ * <p>
+ * Note: This implementation is thread-safe and optimized for concurrent read access.
+ * Write operations may block briefly during cleanup operations.
  *
  * @param <K> the type of keys maintained by this map
  * @param <V> the type of mapped values
  */
-public class SoftIdentityMap<K, V> implements Map<K, V> {
+public class SoftConcurrentMap<K, V> implements Map<K, V> {
 
     private final ReferenceQueue<K> keyQueue = new ReferenceQueue<>();
     private final ReferenceQueue<V> valueQueue = new ReferenceQueue<>();
-    private final ConcurrentHashMap<SoftIdentityReference<K>, ComputeReference<V>> map = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<SoftConcurrentReference<K>, ComputeReference<V>> map = new ConcurrentHashMap<>();
 
-    private static class SoftIdentityReference<T> extends SoftReference<T> {
+    private static class SoftConcurrentReference<T> extends SoftReference<T> {
         private final int hash;
 
-        SoftIdentityReference(T referent, ReferenceQueue<T> queue) {
+        SoftConcurrentReference(T referent, ReferenceQueue<T> queue) {
             super(referent, queue);
             this.hash = referent.hashCode();
         }
@@ -54,11 +67,12 @@ public class SoftIdentityMap<K, V> implements Map<K, V> {
             if (this == obj) {
                 return true;
             }
-            if (!(obj instanceof SoftIdentityReference<?> other)) {
+            if (!(obj instanceof SoftConcurrentReference<?> other)) {
                 return false;
             }
             T thisRef = this.get();
             Object otherRef = other.get();
+            // Use equals() for proper object comparison
             return thisRef != null && thisRef.equals(otherRef);
         }
 
@@ -94,7 +108,7 @@ public class SoftIdentityMap<K, V> implements Map<K, V> {
         while (true) {
             expungeStaleEntries();
 
-            SoftIdentityReference<K> softKey = new SoftIdentityReference<>(key, keyQueue);
+            SoftConcurrentReference<K> softKey = new SoftConcurrentReference<>(key, keyQueue);
 
             // Try to get existing value
             ComputeReference<V> valueRef = map.get(softKey);
@@ -146,7 +160,7 @@ public class SoftIdentityMap<K, V> implements Map<K, V> {
         // Remove entries where the key has been garbage collected
         Reference<?> ref;
         while ((ref = keyQueue.poll()) != null) {
-            // The ref is a SoftIdentityReference that was used as a key
+            // The ref is a SoftConcurrentReference that was used as a key
             map.remove(ref);
         }
         // Remove entries where the value has been garbage collected
@@ -173,7 +187,7 @@ public class SoftIdentityMap<K, V> implements Map<K, V> {
     @Override
     public boolean containsKey(Object key) {
         expungeStaleEntries();
-        return map.containsKey(new SoftIdentityReference<>((K) key, null));
+        return map.containsKey(new SoftConcurrentReference<>((K) key, null));
     }
 
     @Override
@@ -181,7 +195,7 @@ public class SoftIdentityMap<K, V> implements Map<K, V> {
         expungeStaleEntries();
         for (Reference<V> ref : map.values()) {
             V v = ref.get();
-            if (v != null && v == value) {
+            if (v != null && Objects.equals(v, value)) {
                 return true;
             }
         }
@@ -191,7 +205,7 @@ public class SoftIdentityMap<K, V> implements Map<K, V> {
     @Override
     public V get(Object key) {
         expungeStaleEntries();
-        Reference<V> ref = map.get(new SoftIdentityReference<>((K) key, null));
+        Reference<V> ref = map.get(new SoftConcurrentReference<>((K) key, null));
         return ref != null ? ref.get() : null;
     }
 
@@ -202,7 +216,7 @@ public class SoftIdentityMap<K, V> implements Map<K, V> {
         expungeStaleEntries();
 
         Reference<V> oldValueRef =
-                map.put(new SoftIdentityReference<>(key, keyQueue), new ComputeReference<>(value, valueQueue));
+                map.put(new SoftConcurrentReference<>(key, keyQueue), new ComputeReference<>(value, valueQueue));
 
         return oldValueRef != null ? oldValueRef.get() : null;
     }
@@ -210,7 +224,7 @@ public class SoftIdentityMap<K, V> implements Map<K, V> {
     @Override
     public V remove(Object key) {
         expungeStaleEntries();
-        Reference<V> valueRef = map.remove(new SoftIdentityReference<>((K) key, null));
+        Reference<V> valueRef = map.remove(new SoftConcurrentReference<>((K) key, null));
         return valueRef != null ? valueRef.get() : null;
     }
 
