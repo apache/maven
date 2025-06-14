@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
+import org.apache.maven.api.cli.ExecutorRequest;
 import org.apache.maven.cling.executor.ExecutorHelper;
 import org.apache.maven.cling.executor.MavenExecutorTestSupport;
 import org.apache.maven.cling.executor.MimirInfuser;
@@ -50,6 +51,14 @@ public class ToolboxToolTest {
         MimirInfuser.infuse(userHome);
     }
 
+    private ExecutorRequest.Builder getExecutorRequest(ExecutorHelper helper) {
+        ExecutorRequest.Builder builder = helper.executorRequest();
+        if (System.getProperty("localRepository") != null) {
+            builder.argument("-Dmaven.repo.local.tail=" + System.getProperty("localRepository"));
+        }
+        return builder;
+    }
+
     @Timeout(15)
     @ParameterizedTest
     @EnumSource(ExecutorHelper.Mode.class)
@@ -60,7 +69,7 @@ public class ToolboxToolTest {
                 userHome,
                 MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
                 MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
-        Map<String, String> dump = new ToolboxTool(helper).dump(helper.executorRequest());
+        Map<String, String> dump = new ToolboxTool(helper).dump(getExecutorRequest(helper));
         assertEquals(System.getProperty("maven3version"), dump.get("maven.version"));
     }
 
@@ -74,7 +83,7 @@ public class ToolboxToolTest {
                 userHome,
                 MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
                 MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
-        Map<String, String> dump = new ToolboxTool(helper).dump(helper.executorRequest());
+        Map<String, String> dump = new ToolboxTool(helper).dump(getExecutorRequest(helper));
         assertEquals(System.getProperty("maven4version"), dump.get("maven.version"));
     }
 
@@ -114,7 +123,7 @@ public class ToolboxToolTest {
                 userHome,
                 MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
                 MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
-        String localRepository = new ToolboxTool(helper).localRepository(helper.executorRequest());
+        String localRepository = new ToolboxTool(helper).localRepository(getExecutorRequest(helper));
         Path local = Paths.get(localRepository);
         assertTrue(Files.isDirectory(local));
     }
@@ -130,7 +139,7 @@ public class ToolboxToolTest {
                 userHome,
                 MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
                 MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
-        String localRepository = new ToolboxTool(helper).localRepository(helper.executorRequest());
+        String localRepository = new ToolboxTool(helper).localRepository(getExecutorRequest(helper));
         Path local = Paths.get(localRepository);
         assertTrue(Files.isDirectory(local));
     }
@@ -146,7 +155,7 @@ public class ToolboxToolTest {
                 MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
                 MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
         String path = new ToolboxTool(helper)
-                .artifactPath(helper.executorRequest(), "aopalliance:aopalliance:1.0", "central");
+                .artifactPath(getExecutorRequest(helper), "aopalliance:aopalliance:1.0", "central");
         // split repository: assert "ends with" as split may introduce prefixes
         assertTrue(
                 path.endsWith("aopalliance" + File.separator + "aopalliance" + File.separator + "1.0" + File.separator
@@ -165,7 +174,7 @@ public class ToolboxToolTest {
                 MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
                 MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
         String path = new ToolboxTool(helper)
-                .artifactPath(helper.executorRequest(), "aopalliance:aopalliance:1.0", "central");
+                .artifactPath(getExecutorRequest(helper), "aopalliance:aopalliance:1.0", "central");
         // split repository: assert "ends with" as split may introduce prefixes
         assertTrue(
                 path.endsWith("aopalliance" + File.separator + "aopalliance" + File.separator + "1.0" + File.separator
@@ -183,7 +192,7 @@ public class ToolboxToolTest {
                 userHome,
                 MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
                 MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
-        String path = new ToolboxTool(helper).metadataPath(helper.executorRequest(), "aopalliance", "someremote");
+        String path = new ToolboxTool(helper).metadataPath(getExecutorRequest(helper), "aopalliance", "someremote");
         // split repository: assert "ends with" as split may introduce prefixes
         assertTrue(path.endsWith("aopalliance" + File.separator + "maven-metadata-someremote.xml"), "path=" + path);
     }
@@ -198,7 +207,7 @@ public class ToolboxToolTest {
                 userHome,
                 MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
                 MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
-        String path = new ToolboxTool(helper).metadataPath(helper.executorRequest(), "aopalliance", "someremote");
+        String path = new ToolboxTool(helper).metadataPath(getExecutorRequest(helper), "aopalliance", "someremote");
         // split repository: assert "ends with" as split may introduce prefixes
         assertTrue(path.endsWith("aopalliance" + File.separator + "maven-metadata-someremote.xml"), "path=" + path);
     }
