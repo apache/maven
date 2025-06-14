@@ -692,7 +692,7 @@
                 Object[] pluginArray = this.getPlugins().toArray();
                 Map.Entry<String, ? extends Plugin>[] entries = new Map.Entry[pluginArray.length];
                 int i = 0;
-                for (Plugin pluginObject : pluginArray) {
+                for (Object pluginObject : pluginArray) {
                     Plugin plugin = (Plugin) pluginObject;
                     entries[i] = Map.entry(
                             plugin.getKey(),
@@ -726,7 +726,7 @@
                 Object[] pluginArray = plugins.toArray();
                 Map.Entry<String, ? extends Plugin>[] entries = new Map.Entry[pluginArray.length];
                 int i = 0;
-                for (Plugin pluginObject : pluginArray) {
+                for (Object pluginObject : pluginArray) {
                     Plugin plugin = (Plugin) pluginObject;
                     entries[i] = Map.entry(
                             plugin.getKey(),
