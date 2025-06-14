@@ -49,7 +49,12 @@ public abstract class BaseObject implements Serializable, Cloneable, InputLocati
                 childrenTracking.replace(delegate, newDelegate);
             }
             delegate = newDelegate;
+            this.cleanDelegateCache();
         }
+    }
+
+    protected void cleanDelegateCache() {
+        // Default implementation does nothing, subclasses can override to clean up any cached data
     }
 
     protected boolean replace(Object oldDelegate, Object newDelegate) {
