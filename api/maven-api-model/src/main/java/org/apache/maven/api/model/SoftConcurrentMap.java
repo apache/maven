@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 
 /**
@@ -53,6 +54,10 @@ class SoftConcurrentMap<K, V> implements Map<K, V> {
     private final ReferenceQueue<K> keyQueue = new ReferenceQueue<>();
     private final ReferenceQueue<V> valueQueue = new ReferenceQueue<>();
     private final ConcurrentHashMap<SoftConcurrentReference<K>, ComputeReference<V>> map = new ConcurrentHashMap<>();
+
+    // Eviction statistics
+    private final AtomicLong keyEvictions = new AtomicLong(0);
+    private final AtomicLong valueEvictions = new AtomicLong(0);
 
     private static class SoftConcurrentReference<T> extends SoftReference<T> {
         private final int hash;
@@ -161,14 +166,19 @@ class SoftConcurrentMap<K, V> implements Map<K, V> {
         Reference<?> ref;
         while ((ref = keyQueue.poll()) != null) {
             // The ref is a SoftConcurrentReference that was used as a key
-            map.remove(ref);
+            if (map.remove(ref) != null) {
+                keyEvictions.incrementAndGet();
+            }
         }
         // Remove entries where the value has been garbage collected
         while ((ref = valueQueue.poll()) != null) {
             // The ref is a ComputeReference that was used as a value
             // We need to find and remove the map entry that has this value
             final Reference<?> valueRef = ref;
-            map.entrySet().removeIf(entry -> entry.getValue() == valueRef);
+            boolean removed = map.entrySet().removeIf(entry -> entry.getValue() == valueRef);
+            if (removed) {
+                valueEvictions.incrementAndGet();
+            }
         }
     }
 
@@ -255,5 +265,26 @@ class SoftConcurrentMap<K, V> implements Map<K, V> {
     @Override
     public Set<Entry<K, V>> entrySet() {
         throw new UnsupportedOperationException("entrySet not supported");
+    }
+
+    /**
+     * Returns the number of entries evicted due to key garbage collection.
+     */
+    long getKeyEvictions() {
+        return keyEvictions.get();
+    }
+
+    /**
+     * Returns the number of entries evicted due to value garbage collection.
+     */
+    long getValueEvictions() {
+        return valueEvictions.get();
+    }
+
+    /**
+     * Returns the total number of evictions (keys + values).
+     */
+    long getTotalEvictions() {
+        return keyEvictions.get() + valueEvictions.get();
     }
 }

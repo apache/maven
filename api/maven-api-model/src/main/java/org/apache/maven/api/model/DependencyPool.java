@@ -76,9 +76,50 @@ class DependencyPool {
                 && Objects.equals(dep1.getScope(), dep2.getScope())
                 && Objects.equals(dep1.getSystemPath(), dep2.getSystemPath())
                 && dep1.isOptional() == dep2.isOptional()
-                && Objects.equals(dep1.getExclusions(), dep2.getExclusions())
-                && Objects.equals(dep1.getLocation(""), dep2.getLocation(""));
+                && exclusionsEqual(dep1.getExclusions(), dep2.getExclusions());
     };
+
+    /**
+     * Deep equality comparison for exclusion lists.
+     * Compares exclusions by content (groupId, artifactId) rather than object identity.
+     */
+    private static boolean exclusionsEqual(java.util.List<Exclusion> list1, java.util.List<Exclusion> list2) {
+        if (list1 == list2) {
+            return true;
+        }
+        if (list1 == null || list2 == null) {
+            return false;
+        }
+        if (list1.size() != list2.size()) {
+            return false;
+        }
+
+        // Compare each exclusion by content
+        for (int i = 0; i < list1.size(); i++) {
+            Exclusion exc1 = list1.get(i);
+            Exclusion exc2 = list2.get(i);
+
+            if (!exclusionEqual(exc1, exc2)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Deep equality comparison for individual exclusions.
+     * Compares exclusions by content (groupId, artifactId) rather than object identity.
+     */
+    private static boolean exclusionEqual(Exclusion exc1, Exclusion exc2) {
+        if (exc1 == exc2) {
+            return true;
+        }
+        if (exc1 == null || exc2 == null) {
+            return false;
+        }
+        return Objects.equals(exc1.getGroupId(), exc2.getGroupId())
+                && Objects.equals(exc1.getArtifactId(), exc2.getArtifactId());
+    }
 
     /**
      * Private constructor to prevent instantiation.

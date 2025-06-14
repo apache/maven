@@ -160,9 +160,10 @@ class ObjectPool<T> {
         long total = totalInternCalls.get();
         long hits = cacheHits.get();
         double hitRatio = total > 0 ? (double) hits / total : 0.0;
+        long evictions = pool.getTotalEvictions();
         return String.format(
-                "ObjectPool[size=%d, totalCalls=%d, hits=%d, hitRatio=%.2f%%]",
-                pool.size(), total, hits, hitRatio * 100);
+                "ObjectPool[size=%d, totalCalls=%d, hits=%d, hitRatio=%.2f%%, evictions=%d]",
+                pool.size(), total, hits, hitRatio * 100, evictions);
     }
 
     /**
