@@ -669,17 +669,18 @@
           <code>
             <![CDATA[
 
+    volatile Map<String, Plugin> pluginMap;
+
     protected void cleanDelegateCache() {
-        this.pluginMap = null;
+        this.flushPluginMap();
     }
 
     /**
-     * Reset the {@code pluginsMap} field to {@code null}
+     * Reset the {@code pluginMap} field to {@code null}
      */
     public void flushPluginMap() {
+        this.pluginMap = null;
     }
-
-    volatile Map<String, Plugin> pluginMap;
 
     /**
      * @return a Map of plugins field with {@code Plugins#getKey()} as key
