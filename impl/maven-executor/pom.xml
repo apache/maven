@@ -121,6 +121,7 @@ under the License.
             <maven4version>${maven4version}</maven4version>
             <maven3home>${project.build.directory}/dependency/apache-maven-${maven3version}</maven3home>
             <maven4home>${project.build.directory}/dependency/apache-maven-${maven4version}</maven4home>
+            <localRepository>${settings.localRepository}</localRepository>
           </systemPropertyVariables>
         </configuration>
       </plugin>
