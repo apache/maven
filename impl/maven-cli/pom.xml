@@ -310,6 +310,8 @@ under the License.
           <promoteUserPropertiesToSystemProperties>false</promoteUserPropertiesToSystemProperties>
           <systemPropertyVariables>
             <maven.home>${basedir}/src/test/resources/mavenHome</maven.home>
+            <userHome>${basedir}/src/test/resources/userHome</userHome>
+            <userDir>${basedir}/src/test/resources/userDir</userDir>
           </systemPropertyVariables>
         </configuration>
       </plugin>
