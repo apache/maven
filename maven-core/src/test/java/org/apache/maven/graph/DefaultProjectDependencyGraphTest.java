@@ -39,6 +39,13 @@ public class DefaultProjectDependencyGraphTest extends TestCase {
 
     private final MavenProject cProject = createProject(Arrays.asList(toDependency(bProject)), "cProject");
 
+    private final MavenProject dProject = createProject(
+        Arrays.asList(toDependency(aProject), toDependency(bProject), toDependency(cProject)), "dProject");
+
+    private final MavenProject eProject = createProject(
+        Arrays.asList(toDependency(aProject), toDependency(bProject), toDependency(cProject), toDependency(dProject)),
+        "eProject");
+
     private final MavenProject depender1 = createProject(Arrays.asList(toDependency(aProject)), "depender1");
 
     private final MavenProject depender2 = createProject(Arrays.asList(toDependency(aProject)), "depender2");
@@ -59,6 +66,37 @@ public class DefaultProjectDependencyGraphTest extends TestCase {
         assertEquals(cProject, sortedProjects.get(1));
 
         assertTrue(graph.getDownstreamProjects(aProject, false).contains(cProject));
+    }
+
+    // Test verifying that getDownstreamProjects does not contain duplicates.
+    // This is a regression test for https://github.com/apache/maven/issues/2487.
+    //
+    // The graph is:
+    // aProject -> bProject
+    //        | -> dProject
+    //        | -> eProject
+    // bProject -> cProject
+    //        | -> dProject
+    //        | -> eProject
+    // cProject -> dProject
+    //        | -> eProject
+    // dProject -> eProject
+    //
+    // When getting the non-transitive, downstream projects of aProject with a whitelist of aProject, dProject,
+    // and eProject, we expect to get dProject, and eProject with no duplicates.
+    // Before the fix, this would return dProject and eProject twice, once from bProject and once from cProject. As
+    // aProject is whitelisted, it should not be returned as a downstream project for itself. bProject and cProject
+    // are not whitelisted, so they should return their downstream projects, both have dProject and eProject as
+    // downstream projects. Which would result in dProject and eProject being returned twice, but now the results are
+    // made unique.
+    public void testGetDownstreamDoesNotDuplicateProjects() throws CycleDetectedException, DuplicateProjectException {
+        ProjectDependencyGraph graph = new DefaultProjectDependencyGraph(
+            Arrays.asList(aProject, bProject, cProject, dProject, eProject));
+        graph = new FilteredProjectDependencyGraph(graph, Arrays.asList(aProject, dProject, eProject));
+        final List<MavenProject> downstreamProjects = graph.getDownstreamProjects(aProject, false);
+        assertEquals(2, downstreamProjects.size());
+        assertTrue(downstreamProjects.contains(dProject));
+        assertTrue(downstreamProjects.contains(eProject));
     }
 
     public void testGetSortedProjects() throws DuplicateProjectException, CycleDetectedException {
