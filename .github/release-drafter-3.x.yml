@@ -16,3 +16,4 @@
 # under the License.
 
 _extends: maven-gh-actions-shared:.github/release-drafter.yml
+tag-template: maven-$RESOLVED_VERSION
