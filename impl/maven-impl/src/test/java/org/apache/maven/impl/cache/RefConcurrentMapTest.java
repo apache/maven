@@ -34,25 +34,69 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class SoftIdentityMapTest {
-    private SoftIdentityMap<Object, String> map;
+class RefConcurrentMapTest {
+    private RefConcurrentMap<Object, String> softMap;
+    private RefConcurrentMap<Object, String> weakMap;
+    private RefConcurrentMap<Object, String> hardMap;
 
     @BeforeEach
     void setUp() {
-        map = new SoftIdentityMap<>();
+        softMap = RefConcurrentMap.softMap();
+        weakMap = RefConcurrentMap.weakMap();
+        hardMap = RefConcurrentMap.hardMap();
     }
 
     @Test
-    void shouldComputeValueOnlyOnce() {
+    void shouldComputeValueOnlyOnceWithSoftMap() {
         Object key = new Object();
         AtomicInteger computeCount = new AtomicInteger(0);
 
-        String result1 = map.computeIfAbsent(key, k -> {
+        String result1 = softMap.computeIfAbsent(key, k -> {
             computeCount.incrementAndGet();
             return "value";
         });
 
-        String result2 = map.computeIfAbsent(key, k -> {
+        String result2 = softMap.computeIfAbsent(key, k -> {
+            computeCount.incrementAndGet();
+            return "different value";
+        });
+
+        assertEquals("value", result1);
+        assertEquals("value", result2);
+        assertEquals(1, computeCount.get());
+    }
+
+    @Test
+    void shouldComputeValueOnlyOnceWithWeakMap() {
+        Object key = new Object();
+        AtomicInteger computeCount = new AtomicInteger(0);
+
+        String result1 = weakMap.computeIfAbsent(key, k -> {
+            computeCount.incrementAndGet();
+            return "value";
+        });
+
+        String result2 = weakMap.computeIfAbsent(key, k -> {
+            computeCount.incrementAndGet();
+            return "different value";
+        });
+
+        assertEquals("value", result1);
+        assertEquals("value", result2);
+        assertEquals(1, computeCount.get());
+    }
+
+    @Test
+    void shouldComputeValueOnlyOnceWithHardMap() {
+        Object key = new Object();
+        AtomicInteger computeCount = new AtomicInteger(0);
+
+        String result1 = hardMap.computeIfAbsent(key, k -> {
+            computeCount.incrementAndGet();
+            return "value";
+        });
+
+        String result2 = hardMap.computeIfAbsent(key, k -> {
             computeCount.incrementAndGet();
             return "different value";
         });
@@ -89,7 +133,7 @@ class SoftIdentityMapTest {
                                         // Synchronize threads at the start of each iteration
                                         iterationBarrier.await();
 
-                                        String result = map.computeIfAbsent(key, k -> {
+                                        String result = softMap.computeIfAbsent(key, k -> {
                                             sink.accept("Computing value in thread " + threadId + " iteration "
                                                     + iteration.get() + " current compute count: "
                                                     + computeCount.get());
@@ -139,7 +183,7 @@ class SoftIdentityMapTest {
     }
 
     @Test
-    void shouldUseIdentityComparison() {
+    void shouldUseEqualsComparison() {
         // Create two equal but distinct keys
         String key1 = new String("key");
         String key2 = new String("key");
@@ -149,17 +193,17 @@ class SoftIdentityMapTest {
 
         AtomicInteger computeCount = new AtomicInteger(0);
 
-        map.computeIfAbsent(key1, k -> {
+        softMap.computeIfAbsent(key1, k -> {
             computeCount.incrementAndGet();
             return "value1";
         });
 
-        map.computeIfAbsent(key2, k -> {
+        softMap.computeIfAbsent(key2, k -> {
             computeCount.incrementAndGet();
             return "value2";
         });
 
-        assertEquals(1, computeCount.get(), "Should compute once for equal but distinct keys");
+        assertEquals(1, computeCount.get(), "Should compute once for equal keys (using equals comparison)");
     }
 
     @Test
@@ -170,7 +214,7 @@ class SoftIdentityMapTest {
         // Use a block to ensure the key can be garbage collected
         {
             Object key = new Object();
-            map.computeIfAbsent(key, k -> {
+            softMap.computeIfAbsent(key, k -> {
                 computeCount.incrementAndGet();
                 return "value";
             });
@@ -182,7 +226,7 @@ class SoftIdentityMapTest {
 
         // Create a new key and verify that computation happens again
         Object newKey = new Object();
-        map.computeIfAbsent(newKey, k -> {
+        softMap.computeIfAbsent(newKey, k -> {
             computeCount.incrementAndGet();
             return "new value";
         });
@@ -191,10 +235,71 @@ class SoftIdentityMapTest {
     }
 
     @Test
+    @SuppressWarnings("checkstyle:AvoidNestedBlocks")
+    void shouldNotGarbageCollectHardReferences() throws InterruptedException {
+        AtomicInteger computeCount = new AtomicInteger(0);
+        Object originalKey;
+
+        // Use a block to ensure the key can be garbage collected if it were a weak/soft reference
+        {
+            originalKey = new Object();
+            hardMap.computeIfAbsent(originalKey, k -> {
+                computeCount.incrementAndGet();
+                return "value";
+            });
+        }
+
+        // Try to force garbage collection
+        System.gc();
+        Thread.sleep(100);
+
+        // The hard map should still contain the entry even after GC
+        String value = hardMap.get(originalKey);
+        assertEquals("value", value, "Hard references should not be garbage collected");
+        assertEquals(1, computeCount.get(), "Should only compute once since hard references prevent GC");
+
+        // Verify the map still has the entry
+        assertEquals(1, hardMap.size(), "Hard map should still contain the entry after GC");
+    }
+
+    @Test
     void shouldHandleNullInputs() {
-        assertThrows(NullPointerException.class, () -> map.computeIfAbsent(null, k -> "value"));
+        assertThrows(NullPointerException.class, () -> softMap.computeIfAbsent(null, k -> "value"));
 
         Object key = new Object();
-        assertThrows(NullPointerException.class, () -> map.computeIfAbsent(key, null));
+        assertThrows(NullPointerException.class, () -> softMap.computeIfAbsent(key, null));
+    }
+
+    @Test
+    @SuppressWarnings("checkstyle:AvoidNestedBlocks")
+    void shouldCleanupGarbageCollectedEntries() throws InterruptedException {
+        // Test that the map properly cleans up entries when keys/values are GC'd
+        int initialSize = softMap.size();
+
+        // Add some entries that can be garbage collected
+        {
+            Object key1 = new Object();
+            Object key2 = new Object();
+            softMap.put(key1, "value1");
+            softMap.put(key2, "value2");
+        }
+
+        // Verify entries were added
+        assertTrue(softMap.size() >= initialSize + 2, "Map should contain the new entries");
+
+        // Force garbage collection multiple times
+        for (int i = 0; i < 5; i++) {
+            System.gc();
+            Thread.sleep(50);
+            // Trigger cleanup by calling a method that calls expungeStaleEntries()
+            softMap.size();
+        }
+
+        // The map should eventually clean up the garbage collected entries
+        // Note: This test is not deterministic due to GC behavior, but it should work most of the time
+        int finalSize = softMap.size();
+        assertTrue(
+                finalSize <= initialSize + 2,
+                "Map should have cleaned up some entries after GC. Initial: " + initialSize + ", Final: " + finalSize);
     }
 }

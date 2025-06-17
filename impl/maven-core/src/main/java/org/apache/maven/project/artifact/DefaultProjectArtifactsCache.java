@@ -30,10 +30,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.impl.cache.RefConcurrentMap;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.SetWithResolutionResult;
 import org.apache.maven.project.MavenProject;
@@ -158,8 +158,8 @@ public class DefaultProjectArtifactsCache implements ProjectArtifactsCache {
         }
     }
 
-    protected final Map<Key, CacheRecord> cache = new ConcurrentHashMap<>();
-    protected final Map<Key, Key> keys = new ConcurrentHashMap<>();
+    protected final Map<Key, CacheRecord> cache = RefConcurrentMap.softMap();
+    protected final Map<Key, Key> keys = RefConcurrentMap.softMap();
 
     @Override
     public Key createKey(
