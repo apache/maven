@@ -16,6 +16,7 @@
 # under the License.
 
 _extends: maven-gh-actions-shared
+tag-template: maven-$RESOLVED_VERSION
 
 include-pre-releases: true
 prerelease: true
