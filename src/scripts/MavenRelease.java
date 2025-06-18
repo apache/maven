@@ -57,11 +57,11 @@
 //   5. Build and test project with Apache release profile
 //   6. Check site compilation works
 //   7. Prepare release using Maven release plugin (dry-run then actual)
-//   8. Stage artifacts to Apache Nexus with proper description
+//   8. Stage artifacts to Apache Nexus with proper description (saves staging repo ID)
 //   9. Stage documentation to Maven website
 //  10. Copy source release to Apache dist area (staged, not committed)
 //  11. Generate vote email with all required information
-//  12. Save staging repository ID and milestone info to target/ directory
+//  12. Save milestone info to target/ directory (staging repo ID already saved)
 //  13. Optionally send vote email via Gmail if configured
 //  14. Display next steps and voting requirements
 //
@@ -293,6 +293,30 @@ public class MavenRelease implements Callable<Integer> {
         }
     }
 
+    static void markStepCompleted(String version, ReleaseStep step) {
+        try {
+            // Ensure target directory exists
+            Files.createDirectories(TARGET_DIR);
+
+            Path completedFile = TARGET_DIR.resolve("completed-steps-" + version);
+            Set<String> completedSteps = new HashSet<>();
+
+            // Load existing completed steps
+            if (Files.exists(completedFile)) {
+                completedSteps.addAll(Files.readAllLines(completedFile));
+            }
+
+            // Add this step
+            completedSteps.add(step.getStepName());
+
+            // Save back to file
+            Files.write(completedFile, completedSteps);
+            logToFile(version, "STEP", "Completed step: " + step.getStepName());
+        } catch (IOException e) {
+            logWarning("Failed to mark step as completed: " + e.getMessage());
+        }
+    }
+
     static ReleaseStep getCurrentStep(String version) {
         try {
             Path stepFile = TARGET_DIR.resolve("current-step-" + version);
@@ -311,8 +335,16 @@ public class MavenRelease implements Callable<Integer> {
     }
 
     static boolean isStepCompleted(String version, ReleaseStep step) {
-        ReleaseStep currentStep = getCurrentStep(version);
-        return currentStep.ordinal() > step.ordinal();
+        try {
+            Path completedFile = TARGET_DIR.resolve("completed-steps-" + version);
+            if (Files.exists(completedFile)) {
+                Set<String> completedSteps = new HashSet<>(Files.readAllLines(completedFile));
+                return completedSteps.contains(step.getStepName());
+            }
+        } catch (IOException e) {
+            logWarning("Failed to read completed steps: " + e.getMessage());
+        }
+        return false;
     }
 
     // Enhanced command execution with detailed logging
@@ -417,14 +449,40 @@ public class MavenRelease implements Callable<Integer> {
 
     static boolean validateEnvironment() {
         logStep("Checking environment...");
-        
+
         try {
             // Check Git status
             ProcessResult gitStatus = runCommandSimple("git", "status", "--porcelain");
             if (!gitStatus.output.trim().isEmpty()) {
-                logError("Working directory not clean");
-                System.out.println(gitStatus.output);
-                return false;
+                // Check if the untracked files are release-related and can be ignored
+                String[] lines = gitStatus.output.trim().split("\n");
+                boolean hasNonReleaseFiles = false;
+
+                for (String line : lines) {
+                    String fileName = line.substring(3); // Remove status prefix
+                    // Allow release-related files
+                    if (!fileName.startsWith(".staging-repo-") &&
+                        !fileName.startsWith(".milestone-info-") &&
+                        !fileName.startsWith("target/staging-repo-") &&
+                        !fileName.startsWith("target/milestone-info-") &&
+                        !fileName.startsWith("target/current-step-") &&
+                        !fileName.startsWith("target/completed-steps-") &&
+                        !fileName.startsWith("target/release-logs/") &&
+                        !fileName.startsWith("vote-email-") &&
+                        !fileName.equals("release.properties") &&
+                        !fileName.endsWith(".releaseBackup")) {
+                        hasNonReleaseFiles = true;
+                        break;
+                    }
+                }
+
+                if (hasNonReleaseFiles) {
+                    logError("Working directory not clean");
+                    System.out.println(gitStatus.output);
+                    return false;
+                } else {
+                    logInfo("Working directory contains release-related files (allowed during resume)");
+                }
             }
 
             // Check branch
@@ -633,7 +691,7 @@ public class MavenRelease implements Callable<Integer> {
         @Parameters(index = "0", description = "Release version (e.g., 4.0.0-rc-4)")
         private String version;
 
-        @Option(names = {"-s", "--skip-tests"}, description = "Skip tests during build phase (faster execution)")
+        @Option(names = {"-s", "--skip-tests"}, description = "Skip tests throughout the entire release process (fastest execution)")
         private boolean skipTests = false;
 
         @Option(names = {"-d", "--skip-dry-run"}, description = "Skip dry-run phase (fastest execution, but riskier)")
@@ -672,6 +730,7 @@ public class MavenRelease implements Callable<Integer> {
                         return 1;
                     }
                     logToFile(version, "VALIDATION", "All validations passed");
+                    markStepCompleted(version, ReleaseStep.VALIDATION);
                 } else {
                     logInfo("Skipping validation (already completed)");
                 }
@@ -701,6 +760,7 @@ public class MavenRelease implements Callable<Integer> {
                         }
                     }
                     logToFile(version, "BLOCKER_CHECK", "Blocker check completed");
+                    markStepCompleted(version, ReleaseStep.BLOCKER_CHECK);
                 } else {
                     logInfo("Skipping blocker check (already completed)");
                 }
@@ -714,6 +774,7 @@ public class MavenRelease implements Callable<Integer> {
                     milestoneInfo = getMilestoneInfo(version);
                     releaseNotes = getReleaseNotes(version);
                     logToFile(version, "MILESTONE_INFO", "Milestone and release notes retrieved");
+                    markStepCompleted(version, ReleaseStep.MILESTONE_INFO);
                 } else {
                     logInfo("Skipping milestone info (already completed)");
                     // Load from saved files if available
@@ -727,6 +788,7 @@ public class MavenRelease implements Callable<Integer> {
                         logInfo("Using --skip-tests option for faster execution");
                     }
                     buildAndTest(version, skipTests);
+                    markStepCompleted(version, ReleaseStep.BUILD_TEST);
                 } else {
                     logInfo("Skipping build and test (already completed)");
                 }
@@ -735,6 +797,7 @@ public class MavenRelease implements Callable<Integer> {
                 if (!isStepCompleted(version, ReleaseStep.SITE_CHECK)) {
                     saveCurrentStep(version, ReleaseStep.SITE_CHECK);
                     checkSiteCompilation(version);
+                    markStepCompleted(version, ReleaseStep.SITE_CHECK);
                 } else {
                     logInfo("Skipping site check (already completed)");
                 }
@@ -745,7 +808,11 @@ public class MavenRelease implements Callable<Integer> {
                     if (skipDryRun) {
                         logWarning("Using --skip-dry-run option - this is faster but riskier!");
                     }
-                    prepareRelease(version, skipDryRun);
+                    if (skipTests) {
+                        logWarning("Using --skip-tests option - tests will be skipped throughout the release process!");
+                    }
+                    prepareRelease(version, skipDryRun, skipTests);
+                    markStepCompleted(version, ReleaseStep.PREPARE_RELEASE);
                 } else {
                     logInfo("Skipping release preparation (already completed)");
                 }
@@ -754,11 +821,12 @@ public class MavenRelease implements Callable<Integer> {
                 String stagingRepo = "";
                 if (!isStepCompleted(version, ReleaseStep.STAGE_ARTIFACTS)) {
                     saveCurrentStep(version, ReleaseStep.STAGE_ARTIFACTS);
-                    stagingRepo = stageArtifacts(version);
+                    stagingRepo = stageArtifacts(version, skipTests);
                     if (stagingRepo == null || stagingRepo.isEmpty()) {
                         logError("Failed to get staging repository ID");
                         return 1;
                     }
+                    markStepCompleted(version, ReleaseStep.STAGE_ARTIFACTS);
                 } else {
                     logInfo("Skipping artifact staging (already completed)");
                     stagingRepo = loadStagingRepo(version);
@@ -772,6 +840,7 @@ public class MavenRelease implements Callable<Integer> {
                 if (!isStepCompleted(version, ReleaseStep.STAGE_DOCS)) {
                     saveCurrentStep(version, ReleaseStep.STAGE_DOCS);
                     stageDocumentation(version);
+                    markStepCompleted(version, ReleaseStep.STAGE_DOCS);
                 } else {
                     logInfo("Skipping documentation staging (already completed)");
                 }
@@ -780,6 +849,7 @@ public class MavenRelease implements Callable<Integer> {
                 if (!isStepCompleted(version, ReleaseStep.COPY_DIST)) {
                     saveCurrentStep(version, ReleaseStep.COPY_DIST);
                     copyToDistArea(version);
+                    markStepCompleted(version, ReleaseStep.COPY_DIST);
                 } else {
                     logInfo("Skipping dist area copy (already completed)");
                 }
@@ -788,16 +858,18 @@ public class MavenRelease implements Callable<Integer> {
                 if (!isStepCompleted(version, ReleaseStep.GENERATE_EMAIL)) {
                     saveCurrentStep(version, ReleaseStep.GENERATE_EMAIL);
                     generateVoteEmail(version, stagingRepo, milestoneInfo, releaseNotes);
+                    markStepCompleted(version, ReleaseStep.GENERATE_EMAIL);
                 } else {
                     logInfo("Skipping vote email generation (already completed)");
                 }
 
-                // Step 11: Save staging info
+                // Step 11: Save milestone info (staging repo ID already saved)
                 if (!isStepCompleted(version, ReleaseStep.SAVE_INFO)) {
                     saveCurrentStep(version, ReleaseStep.SAVE_INFO);
-                    saveStagingInfo(version, stagingRepo, milestoneInfo);
+                    saveMilestoneInfo(version, milestoneInfo);
+                    markStepCompleted(version, ReleaseStep.SAVE_INFO);
                 } else {
-                    logInfo("Skipping save staging info (already completed)");
+                    logInfo("Skipping save milestone info (already completed)");
                 }
 
                 // Mark as completed
@@ -921,7 +993,7 @@ public class MavenRelease implements Callable<Integer> {
     static void buildAndTest(String version, boolean skipTests) throws Exception {
         if (skipTests) {
             logStep("Building (skipping tests for faster execution)...");
-            ProcessResult result = runCommandWithLogging(version, "BUILD_TEST", "mvn", "clean", "compile", "-Papache-release", "-Dgpg.skip=true");
+            ProcessResult result = runCommandWithLogging(version, "BUILD_TEST", "mvn", "-V", "clean", "compile", "-Papache-release", "-Dgpg.skip=true");
             if (!result.isSuccess()) {
                 logToFile(version, "BUILD_TEST", "Build failed with exit code: " + result.exitCode);
                 throw new RuntimeException("Build failed. Check logs at: " + LOGS_DIR.resolve("release-" + version + ".log") +
@@ -931,7 +1003,7 @@ public class MavenRelease implements Callable<Integer> {
             logToFile(version, "BUILD_TEST", "Build completed successfully (tests skipped)");
         } else {
             logStep("Building and testing...");
-            ProcessResult result = runCommandWithLogging(version, "BUILD_TEST", "mvn", "clean", "verify", "-Papache-release", "-Dgpg.skip=true");
+            ProcessResult result = runCommandWithLogging(version, "BUILD_TEST", "mvn", "-V", "clean", "verify", "-Papache-release", "-Dgpg.skip=true");
             if (!result.isSuccess()) {
                 logToFile(version, "BUILD_TEST", "Build failed with exit code: " + result.exitCode);
                 throw new RuntimeException("Build and test failed. Check logs at: " + LOGS_DIR.resolve("release-" + version + ".log") +
@@ -944,7 +1016,7 @@ public class MavenRelease implements Callable<Integer> {
 
     static void checkSiteCompilation(String version) throws Exception {
         logStep("Checking site compilation...");
-        ProcessResult result = runCommandWithLogging(version, "SITE_CHECK", "mvn", "-Preporting", "site", "site:stage");
+        ProcessResult result = runCommandWithLogging(version, "SITE_CHECK", "mvn", "-V", "-Preporting", "site", "site:stage");
         if (!result.isSuccess()) {
             logToFile(version, "SITE_CHECK", "Site compilation failed with exit code: " + result.exitCode);
             throw new RuntimeException("Site compilation failed. Check logs at: " + LOGS_DIR.resolve("release-" + version + ".log") +
@@ -955,18 +1027,24 @@ public class MavenRelease implements Callable<Integer> {
     }
 
     static void prepareRelease(String version) throws Exception {
-        prepareRelease(version, false);
+        prepareRelease(version, false, false);
     }
 
     static void prepareRelease(String version, boolean skipDryRun) throws Exception {
+        prepareRelease(version, skipDryRun, false);
+    }
+
+    static void prepareRelease(String version, boolean skipDryRun, boolean skipTests) throws Exception {
         logStep("Preparing release " + version + "...");
 
         if (!skipDryRun) {
             // Dry run first
-            logInfo("Running release:prepare in dry-run mode...");
-            ProcessResult dryRun = runCommandWithLogging(version, "PREPARE_RELEASE", "mvn", "release:prepare", "-DdryRun=true",
+            String dryRunTestsParam = skipTests ? "-DskipTests=true" : "";
+            logInfo("Running release:prepare in dry-run mode" + (skipTests ? " (skipping tests)" : "") + "...");
+            ProcessResult dryRun = runCommandWithLogging(version, "PREPARE_RELEASE", "mvn", "-V", "release:prepare", "-DdryRun=true",
                 "-Dtag=maven-" + version, "-DreleaseVersion=" + version,
-                "-DdevelopmentVersion=" + version + "-SNAPSHOT");
+                "-DdevelopmentVersion=" + version + "-SNAPSHOT",
+                dryRunTestsParam);
 
             if (!dryRun.isSuccess()) {
                 logToFile(version, "PREPARE_RELEASE", "Dry run failed with exit code: " + dryRun.exitCode);
@@ -975,13 +1053,16 @@ public class MavenRelease implements Callable<Integer> {
             }
 
             logInfo("Dry run successful. Proceeding with actual preparation...");
-            runCommandWithLogging(version, "PREPARE_RELEASE", "mvn", "release:clean");
+            runCommandWithLogging(version, "PREPARE_RELEASE", "mvn", "-V", "release:clean");
 
-            logInfo("Skipping tests during actual release:prepare since dry-run already validated them");
-            ProcessResult actual = runCommandWithLogging(version, "PREPARE_RELEASE", "mvn", "release:prepare",
+            String actualTestsParam = skipTests ? "-DskipTests=true" : "-DskipTests=true"; // Always skip in actual since dry-run validated
+            String testMessage = skipTests ? "Skipping tests during actual release:prepare (tests skipped throughout)" :
+                                           "Skipping tests during actual release:prepare since dry-run already validated them";
+            logInfo(testMessage);
+            ProcessResult actual = runCommandWithLogging(version, "PREPARE_RELEASE", "mvn", "-V", "release:prepare",
                 "-Dtag=maven-" + version, "-DreleaseVersion=" + version,
                 "-DdevelopmentVersion=" + version + "-SNAPSHOT",
-                "-DskipTests=true");
+                actualTestsParam);
 
             if (!actual.isSuccess()) {
                 logToFile(version, "PREPARE_RELEASE", "Release prepare failed with exit code: " + actual.exitCode);
@@ -990,10 +1071,13 @@ public class MavenRelease implements Callable<Integer> {
             }
         } else {
             logWarning("Skipping dry-run as requested - proceeding directly to release:prepare");
-            logInfo("Running release:prepare with tests (since no dry-run validation was done)");
-            ProcessResult actual = runCommandWithLogging(version, "PREPARE_RELEASE", "mvn", "release:prepare",
+            String testsParam = skipTests ? "-DskipTests=true" : "";
+            String testMessage = skipTests ? "Running release:prepare without tests" : "Running release:prepare with tests (since no dry-run validation was done)";
+            logInfo(testMessage);
+            ProcessResult actual = runCommandWithLogging(version, "PREPARE_RELEASE", "mvn", "-V", "release:prepare",
                 "-Dtag=maven-" + version, "-DreleaseVersion=" + version,
-                "-DdevelopmentVersion=" + version + "-SNAPSHOT");
+                "-DdevelopmentVersion=" + version + "-SNAPSHOT",
+                testsParam);
 
             if (!actual.isSuccess()) {
                 logToFile(version, "PREPARE_RELEASE", "Release prepare failed with exit code: " + actual.exitCode);
@@ -1007,34 +1091,96 @@ public class MavenRelease implements Callable<Integer> {
     }
 
     static String stageArtifacts(String version) throws Exception {
-        logStep("Staging artifacts to Nexus...");
-        ProcessResult result = runCommandWithLogging(version, "STAGE_ARTIFACTS", "mvn", "release:perform",
-            "-Dgoals=deploy nexus-staging:close",
-            "-DstagingDescription=VOTE Maven " + version);
+        return stageArtifacts(version, false);
+    }
 
-        if (!result.isSuccess()) {
-            logToFile(version, "STAGE_ARTIFACTS", "Artifact staging failed with exit code: " + result.exitCode);
-            throw new RuntimeException("Artifact staging failed. Check logs at: " + LOGS_DIR.resolve("release-" + version + ".log") +
-                "\nError: " + result.error);
+    static String stageArtifacts(String version, boolean skipTests) throws Exception {
+        logStep("Staging artifacts to Nexus...");
+
+        // Step 1: Deploy artifacts (this creates the staging repository)
+        // Use default goals but add apache-release profile and optionally skip tests
+        String goals = skipTests ? "deploy -Papache-release -DskipTests=true" : "deploy -Papache-release";
+        if (skipTests) {
+            logInfo("Skipping tests during release:perform for faster execution");
+        }
+        logInfo("Using goals: " + goals + " (includes apache-release profile for source release generation)");
+
+        ProcessResult deployResult = runCommandWithLogging(version, "STAGE_ARTIFACTS", "mvn", "-V", "release:perform",
+            "-Dgoals=" + goals);
+
+        if (!deployResult.isSuccess()) {
+            logToFile(version, "STAGE_ARTIFACTS", "Artifact deployment failed with exit code: " + deployResult.exitCode);
+            throw new RuntimeException("Artifact deployment failed. Check logs at: " + LOGS_DIR.resolve("release-" + version + ".log") +
+                "\nError: " + deployResult.error);
         }
 
-        // Get staging repository ID - try multiple methods
+        // Step 2: Find the staging repository ID
         String stagingRepo = findStagingRepository(version);
-        if (stagingRepo != null && !stagingRepo.isEmpty()) {
-            logSuccess("Artifacts staged to repository: " + stagingRepo);
-            logToFile(version, "STAGE_ARTIFACTS", "Artifacts staged to repository: " + stagingRepo);
-            return stagingRepo;
-        } else {
+        if (stagingRepo == null || stagingRepo.isEmpty()) {
             logToFile(version, "STAGE_ARTIFACTS", "Could not find staging repository ID using any method");
             throw new RuntimeException("Could not find staging repository ID. Check the release:perform output for manual staging repo identification.");
         }
+
+        logInfo("Found staging repository: " + stagingRepo);
+        logToFile(version, "STAGE_ARTIFACTS", "Found staging repository: " + stagingRepo);
+
+        // Step 3: Close the staging repository
+        logInfo("Closing staging repository...");
+        ProcessResult closeResult = runCommandWithLogging(version, "STAGE_ARTIFACTS", "mvn", "-V",
+            "org.sonatype.plugins:nexus-staging-maven-plugin:1.7.0:close",
+            "-DstagingRepositoryId=" + stagingRepo,
+            "-DstagingDescription=VOTE Maven " + version,
+            "-DnexusUrl=https://repository.apache.org/",
+            "-DserverId=apache.releases.https");
+
+        if (!closeResult.isSuccess()) {
+            logToFile(version, "STAGE_ARTIFACTS", "Staging repository close failed with exit code: " + closeResult.exitCode);
+            throw new RuntimeException("Failed to close staging repository " + stagingRepo + ". Check logs at: " + LOGS_DIR.resolve("release-" + version + ".log") +
+                "\nError: " + closeResult.error);
+        }
+
+        logSuccess("Artifacts staged and closed in repository: " + stagingRepo);
+        logToFile(version, "STAGE_ARTIFACTS", "Artifacts staged and closed in repository: " + stagingRepo);
+
+        // Save staging repository ID immediately for resumability
+        saveStagingRepoOnly(version, stagingRepo);
+
+        return stagingRepo;
     }
 
     static void stageDocumentation(String version) throws Exception {
         logStep("Staging documentation...");
 
         Path checkoutDir = PROJECT_ROOT.resolve("target/checkout");
-        ProcessBuilder pb = new ProcessBuilder("mvn", "scm-publish:publish-scm", "-Preporting");
+
+        // First, generate the site in the checkout directory
+        logInfo("Generating site in checkout directory...");
+        ProcessBuilder siteBuilder = new ProcessBuilder("mvn", "-V", "-Preporting", "site", "site:stage");
+        siteBuilder.directory(checkoutDir.toFile());
+
+        logToFile(version, "STAGE_DOCS", "Executing: mvn site site:stage -Preporting in " + checkoutDir);
+        Process siteProcess = siteBuilder.start();
+
+        String siteOutput = new String(siteProcess.getInputStream().readAllBytes());
+        String siteError = new String(siteProcess.getErrorStream().readAllBytes());
+        int siteExitCode = siteProcess.waitFor();
+
+        logToFile(version, "STAGE_DOCS", "Site generation exit code: " + siteExitCode);
+        if (!siteOutput.isEmpty()) {
+            logToFile(version, "STAGE_DOCS", "Site STDOUT:\n" + siteOutput);
+        }
+        if (!siteError.isEmpty()) {
+            logToFile(version, "STAGE_DOCS", "Site STDERR:\n" + siteError);
+        }
+
+        if (siteExitCode != 0) {
+            throw new RuntimeException("Site generation failed. Check logs at: " + LOGS_DIR.resolve("release-" + version + ".log") +
+                "\nError: " + siteError);
+        }
+
+        // Then, publish the site using scm-publish from the checkout directory
+        logInfo("Publishing site from checkout directory...");
+        ProcessBuilder pb = new ProcessBuilder("mvn", "-V", "scm-publish:publish-scm", "-Preporting");
         pb.directory(checkoutDir.toFile());
 
         logToFile(version, "STAGE_DOCS", "Executing: mvn scm-publish:publish-scm -Preporting in " + checkoutDir);
@@ -1064,16 +1210,78 @@ public class MavenRelease implements Callable<Integer> {
     static String findStagingRepository(String version) {
         logInfo("Searching for staging repository ID...");
 
-        // Method 1: Try nexus-staging plugin if available
+        // Method 1: Parse deployment output for repository creation messages
+        String repoFromDeployment = findStagingRepoFromDeploymentOutput(version);
+        if (repoFromDeployment != null && !repoFromDeployment.isEmpty()) {
+            logToFile(version, "STAGE_ARTIFACTS", "Found staging repo from deployment output: " + repoFromDeployment);
+            return repoFromDeployment;
+        }
+
+        // Method 2: Use nexus-staging plugin with content verification
         try {
-            ProcessResult repoList = runCommandWithLogging(version, "STAGE_ARTIFACTS", "mvn", "nexus-staging:rc-list", "-q");
+            ProcessResult repoList = runCommandWithLogging(version, "STAGE_ARTIFACTS", "mvn", "-V",
+                "org.sonatype.plugins:nexus-staging-maven-plugin:1.7.0:rc-list", "-q",
+                "-DnexusUrl=https://repository.apache.org/",
+                "-DserverId=apache.releases.https");
             if (repoList.isSuccess()) {
-                Pattern pattern = Pattern.compile("orgapachemaven-[0-9]+");
-                java.util.regex.Matcher matcher = pattern.matcher(repoList.output);
-                if (matcher.find()) {
-                    String stagingRepo = matcher.group();
-                    logToFile(version, "STAGE_ARTIFACTS", "Found staging repo via nexus-staging:rc-list: " + stagingRepo);
-                    return stagingRepo;
+                String[] lines = repoList.output.split("\n");
+
+                // Look for repositories that match our criteria
+                List<String> candidateRepos = new ArrayList<>();
+                for (String line : lines) {
+                    if (line.contains("OPEN") && (line.contains("maven-") || line.contains("orgapachemaven-"))) {
+                        Pattern pattern = Pattern.compile("(orgapachemaven-[0-9]+|maven-[0-9]+)\\s+OPEN");
+                        java.util.regex.Matcher matcher = pattern.matcher(line);
+                        if (matcher.find()) {
+                            candidateRepos.add(matcher.group(1));
+                        }
+                    }
+                }
+
+                // Log all candidates found
+                if (!candidateRepos.isEmpty()) {
+                    logInfo("Found " + candidateRepos.size() + " candidate staging repositories: " + candidateRepos);
+                    logToFile(version, "STAGE_ARTIFACTS", "Candidate repositories: " + candidateRepos);
+                }
+
+                // Verify each candidate repository contains our artifacts
+                for (String candidateRepo : candidateRepos) {
+                    if (verifyStagingRepositoryContents(candidateRepo, version)) {
+                        logToFile(version, "STAGE_ARTIFACTS", "Verified staging repo contains our artifacts: " + candidateRepo);
+                        return candidateRepo;
+                    }
+                }
+
+                // If no verified repo found but we have candidates, prompt user
+                if (!candidateRepos.isEmpty()) {
+                    logWarning("Found " + candidateRepos.size() + " OPEN Maven repositories but could not verify contents:");
+                    for (int i = 0; i < candidateRepos.size(); i++) {
+                        System.out.println("  " + (i + 1) + ". " + candidateRepos.get(i));
+                    }
+
+                    if (candidateRepos.size() == 1) {
+                        String onlyCandidate = candidateRepos.get(0);
+                        System.out.print("Use repository " + onlyCandidate + "? (y/N): ");
+                        Scanner scanner = new Scanner(System.in);
+                        String response = scanner.nextLine();
+                        if (response.equalsIgnoreCase("y")) {
+                            logToFile(version, "STAGE_ARTIFACTS", "User confirmed staging repo: " + onlyCandidate);
+                            return onlyCandidate;
+                        }
+                    } else {
+                        System.out.print("Enter repository number (1-" + candidateRepos.size() + ") or 0 to skip: ");
+                        Scanner scanner = new Scanner(System.in);
+                        try {
+                            int choice = Integer.parseInt(scanner.nextLine().trim());
+                            if (choice > 0 && choice <= candidateRepos.size()) {
+                                String chosenRepo = candidateRepos.get(choice - 1);
+                                logToFile(version, "STAGE_ARTIFACTS", "User selected staging repo: " + chosenRepo);
+                                return chosenRepo;
+                            }
+                        } catch (NumberFormatException e) {
+                            logWarning("Invalid selection");
+                        }
+                    }
                 }
             }
         } catch (Exception e) {
@@ -1082,16 +1290,20 @@ public class MavenRelease implements Callable<Integer> {
 
         // Method 2: Parse the release:perform output for staging repository mentions
         try {
-            Path performLog = LOGS_DIR.resolve("STAGE_ARTIFACTS-mvn_release_perform_-Dgoals_deploy_nexus-staging_close_-DstagingDescription_VOTE_Maven_" + version.replace(".", "_").replace("-", "_") + "-output.log");
+            Path performLog = LOGS_DIR.resolve("STAGE_ARTIFACTS-mvn_-V_release_perform_-Dgoals_deploy-output.log");
             if (Files.exists(performLog)) {
                 String content = Files.readString(performLog);
 
                 // Look for staging repository patterns in the output
                 Pattern[] patterns = {
-                    Pattern.compile("Staging repository '(orgapachemaven-[0-9]+)'"),
-                    Pattern.compile("stagingRepositoryId=(orgapachemaven-[0-9]+)"),
-                    Pattern.compile("Repository ID: (orgapachemaven-[0-9]+)"),
-                    Pattern.compile("\\[INFO\\].*?(orgapachemaven-[0-9]+).*?closed")
+                    Pattern.compile("Staging repository '(orgapachemaven-[0-9]+|maven-[0-9]+)'"),
+                    Pattern.compile("stagingRepositoryId=(orgapachemaven-[0-9]+|maven-[0-9]+)"),
+                    Pattern.compile("Repository ID: (orgapachemaven-[0-9]+|maven-[0-9]+)"),
+                    Pattern.compile("\\[INFO\\].*?(orgapachemaven-[0-9]+|maven-[0-9]+).*?closed"),
+                    Pattern.compile("Created staging repository with ID \"(orgapachemaven-[0-9]+|maven-[0-9]+)\""),
+                    Pattern.compile("Closing staging repository with ID \"(orgapachemaven-[0-9]+|maven-[0-9]+)\""),
+                    Pattern.compile("\\* Created staging repository with id \"(orgapachemaven-[0-9]+|maven-[0-9]+)\""),
+                    Pattern.compile("\\* Closing staging repository with id \"(orgapachemaven-[0-9]+|maven-[0-9]+)\"")
                 };
 
                 for (Pattern pattern : patterns) {
@@ -1125,54 +1337,276 @@ public class MavenRelease implements Callable<Integer> {
         return null;
     }
 
+    static String findStagingRepoFromDeploymentOutput(String version) {
+        try {
+            Path deployLog = LOGS_DIR.resolve("STAGE_ARTIFACTS-mvn_-V_release_perform_-Dgoals_deploy-output.log");
+            if (!Files.exists(deployLog)) {
+                logToFile(version, "STAGE_ARTIFACTS", "Deployment log not found: " + deployLog);
+                return null;
+            }
+
+            String content = Files.readString(deployLog);
+
+            // Look for Nexus staging repository creation messages
+            Pattern[] patterns = {
+                // Nexus staging plugin messages
+                Pattern.compile("\\* Created staging repository with id \"(orgapachemaven-[0-9]+|maven-[0-9]+)\""),
+                Pattern.compile("Created staging repository with ID \"(orgapachemaven-[0-9]+|maven-[0-9]+)\""),
+                Pattern.compile("Staging repository '(orgapachemaven-[0-9]+|maven-[0-9]+)' created"),
+                Pattern.compile("stagingRepositoryId=(orgapachemaven-[0-9]+|maven-[0-9]+)"),
+
+                // Maven deploy plugin messages that might indicate auto-staging
+                Pattern.compile("Uploading to apache\\.releases\\.https: https://repository\\.apache\\.org/service/local/staging/deployByRepositoryId/(orgapachemaven-[0-9]+|maven-[0-9]+)/"),
+                Pattern.compile("Uploaded to apache\\.releases\\.https: https://repository\\.apache\\.org/service/local/staging/deployByRepositoryId/(orgapachemaven-[0-9]+|maven-[0-9]+)/"),
+
+                // Generic repository ID patterns in deployment output
+                Pattern.compile("Repository ID: (orgapachemaven-[0-9]+|maven-[0-9]+)"),
+                Pattern.compile("\\[INFO\\].*?(orgapachemaven-[0-9]+|maven-[0-9]+).*?staging")
+            };
+
+            for (Pattern pattern : patterns) {
+                java.util.regex.Matcher matcher = pattern.matcher(content);
+                if (matcher.find()) {
+                    String stagingRepo = matcher.group(1);
+                    logToFile(version, "STAGE_ARTIFACTS", "Found staging repo in deployment output using pattern: " + pattern.pattern());
+                    return stagingRepo;
+                }
+            }
+
+            logToFile(version, "STAGE_ARTIFACTS", "No staging repository ID found in deployment output");
+            return null;
+
+        } catch (Exception e) {
+            logToFile(version, "STAGE_ARTIFACTS", "Failed to parse deployment output: " + e.getMessage());
+            return null;
+        }
+    }
+
+    static boolean verifyStagingRepositoryContents(String stagingRepo, String version) {
+        try {
+            logToFile(version, "STAGE_ARTIFACTS", "Verifying staging repository contents: " + stagingRepo);
+
+            // Use curl to check if our specific Maven artifacts are in this repository
+            String baseUrl = "https://repository.apache.org/service/local/repositories/" + stagingRepo + "/content/org/apache/maven/maven/" + version + "/";
+
+            ProcessResult curlResult = runCommandSimple("curl", "-s", "-f", "-I", baseUrl + "maven-" + version + ".pom");
+
+            if (curlResult.isSuccess()) {
+                logToFile(version, "STAGE_ARTIFACTS", "Verified: Repository " + stagingRepo + " contains maven-" + version + ".pom");
+                return true;
+            } else {
+                logToFile(version, "STAGE_ARTIFACTS", "Repository " + stagingRepo + " does not contain our artifacts (HTTP " + curlResult.exitCode + ")");
+                return false;
+            }
+
+        } catch (Exception e) {
+            logToFile(version, "STAGE_ARTIFACTS", "Failed to verify repository contents for " + stagingRepo + ": " + e.getMessage());
+            return false;
+        }
+    }
+
     static void copyToDistArea(String version) throws Exception {
-        logStep("Copying source release to Apache distribution area...");
+        logStep("Copying release distributions to Apache distribution area...");
 
-        Path sourceZip = PROJECT_ROOT.resolve("target/checkout/target/maven-" + version + "-source-release.zip");
-        Path sourceAsc = PROJECT_ROOT.resolve("target/checkout/target/maven-" + version + "-source-release.zip.asc");
+        // Look for all distribution files in apache-maven/target
+        Path apacheMavenTarget = PROJECT_ROOT.resolve("target/checkout/apache-maven/target");
 
-        if (!Files.exists(sourceZip) || !Files.exists(sourceAsc)) {
-            throw new RuntimeException("Source release files not found");
+        // Define all expected distribution files
+        String[] distributionFiles = {
+            "apache-maven-" + version + "-src.zip",
+            "apache-maven-" + version + "-src.zip.asc",
+            "apache-maven-" + version + "-src.zip.sha512",
+            "apache-maven-" + version + "-src.tar.gz",
+            "apache-maven-" + version + "-src.tar.gz.asc",
+            "apache-maven-" + version + "-src.tar.gz.sha512",
+            "apache-maven-" + version + "-bin.zip",
+            "apache-maven-" + version + "-bin.zip.asc",
+            "apache-maven-" + version + "-bin.zip.sha512",
+            "apache-maven-" + version + "-bin.tar.gz",
+            "apache-maven-" + version + "-bin.tar.gz.asc",
+            "apache-maven-" + version + "-bin.tar.gz.sha512"
+        };
+
+        // Check which files exist
+        java.util.List<String> missingFiles = new java.util.ArrayList<>();
+        java.util.List<Path> existingFiles = new java.util.ArrayList<>();
+
+        for (String fileName : distributionFiles) {
+            Path filePath = apacheMavenTarget.resolve(fileName);
+            if (Files.exists(filePath)) {
+                existingFiles.add(filePath);
+            } else {
+                missingFiles.add(fileName);
+            }
         }
 
-        // Generate SHA512
-        ProcessResult sha512Result = runCommandSimple("sha512sum", sourceZip.toString());
-        String sha512 = sha512Result.output.split("\\s+")[0];
-        Path sha512File = sourceZip.getParent().resolve("maven-" + version + "-source-release.zip.sha512");
-        Files.writeString(sha512File, sha512);
+        if (!missingFiles.isEmpty()) {
+            logWarning("Some distribution files are missing:");
+            missingFiles.forEach(f -> logWarning("  Missing: " + f));
+
+            // List what files are actually available
+            if (Files.exists(apacheMavenTarget)) {
+                logInfo("Available files in apache-maven/target:");
+                try {
+                    Files.list(apacheMavenTarget)
+                        .filter(p -> p.getFileName().toString().contains(version))
+                        .forEach(p -> logInfo("  " + p.getFileName()));
+                } catch (Exception e) {
+                    logError("Failed to list files: " + e.getMessage());
+                }
+            }
+        }
+
+        if (existingFiles.isEmpty()) {
+            throw new RuntimeException("No distribution files found in " + apacheMavenTarget);
+        }
 
         // Checkout/update dist area
         Path distDir = PROJECT_ROOT.resolve("maven-dist-staging");
         if (Files.exists(distDir)) {
+            logInfo("Updating Apache dist area...");
             ProcessBuilder pb = new ProcessBuilder("svn", "update");
             pb.directory(distDir.toFile());
             pb.start().waitFor();
         } else {
-            runCommandSimple("svn", "checkout", "https://dist.apache.org/repos/dist/release/maven",
+            logInfo("Checking out Apache dist dev area...");
+            runCommandSimple("svn", "checkout", "https://dist.apache.org/repos/dist/dev/maven",
                 distDir.toString());
         }
 
-        // Copy files
-        Path versionDir = distDir.resolve("maven-" + version);
-        Files.createDirectories(versionDir);
-        Files.copy(sourceZip, versionDir.resolve(sourceZip.getFileName()));
-        Files.copy(sourceAsc, versionDir.resolve(sourceAsc.getFileName()));
-        Files.copy(sha512File, versionDir.resolve(sha512File.getFileName()));
+        // Create proper Maven distribution structure: maven-4/version/source/ and maven-4/version/binaries/
+        Path maven4Dir = distDir.resolve("maven-4");
+        Path versionDir = maven4Dir.resolve(version);
+        Path sourceDir = versionDir.resolve("source");
+        Path binariesDir = versionDir.resolve("binaries");
+
+        Files.createDirectories(sourceDir);
+        Files.createDirectories(binariesDir);
+
+        logInfo("Copying " + existingFiles.size() + " distribution files to proper Maven structure");
+
+        for (Path sourceFile : existingFiles) {
+            String fileName = sourceFile.getFileName().toString();
+            Path targetFile;
+
+            // Determine target directory based on file type
+            if (fileName.contains("-src.")) {
+                targetFile = sourceDir.resolve(fileName);
+                logInfo("  Copying to source/: " + fileName);
+            } else if (fileName.contains("-bin.")) {
+                targetFile = binariesDir.resolve(fileName);
+                logInfo("  Copying to binaries/: " + fileName);
+            } else {
+                // Fallback for any other files
+                targetFile = versionDir.resolve(fileName);
+                logInfo("  Copying to root: " + fileName);
+            }
+
+            Files.copy(sourceFile, targetFile, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        }
 
         // Stage for commit
-        ProcessBuilder pb = new ProcessBuilder("svn", "add", "maven-" + version);
+        ProcessBuilder pb = new ProcessBuilder("svn", "add", "maven-4");
         pb.directory(distDir.toFile());
         pb.start().waitFor();
 
-        logSuccess("Source release staged in Apache dist area");
+        // Commit with proper authentication
+        logInfo("Committing distribution files to Apache dist dev area...");
+        String svnUsername = System.getenv("APACHE_USERNAME");
+        String svnPassword = System.getenv("APACHE_PASSWORD");
+
+        if (svnUsername == null || svnUsername.isEmpty()) {
+            logWarning("APACHE_USERNAME environment variable not set");
+            logInfo("You'll need to commit manually:");
+            logInfo("  cd " + distDir);
+            logInfo("  svn commit --username your-apache-username -m 'Add Apache Maven " + version + " release candidate'");
+        } else if (svnPassword == null || svnPassword.isEmpty()) {
+            logWarning("APACHE_PASSWORD environment variable not set");
+            logInfo("You'll need to commit manually:");
+            logInfo("  cd " + distDir);
+            logInfo("  svn commit --username " + svnUsername + " -m 'Add Apache Maven " + version + " release candidate'");
+        } else {
+            ProcessBuilder commitPb = new ProcessBuilder("svn", "commit",
+                "--non-interactive", "--trust-server-cert",
+                "--username", svnUsername,
+                "--password", svnPassword,
+                "-m", "Add Apache Maven " + version + " release candidate for vote");
+            commitPb.directory(distDir.toFile());
+            Process commitProcess = commitPb.start();
+            int commitExitCode = commitProcess.waitFor();
+
+            if (commitExitCode == 0) {
+                logSuccess("Distribution files committed to Apache dist dev area");
+            } else {
+                logWarning("SVN commit failed. You may need to commit manually:");
+                logInfo("  cd " + distDir);
+                logInfo("  svn commit --username " + svnUsername + " -m 'Add Apache Maven " + version + " release candidate'");
+            }
+        }
+
+        logSuccess("All distribution files staged in proper Apache Maven structure:");
+        logInfo("  Source files: " + sourceDir);
+        logInfo("  Binary files: " + binariesDir);
+        logInfo("Distribution staging URL: https://dist.apache.org/repos/dist/dev/maven/maven-4/" + version + "/");
+    }
+
+    static void createSourceReleaseManually(String version, Path checkoutDir) throws Exception {
+        logInfo("Creating source release zip manually...");
+
+        Path targetDir = checkoutDir.resolve("target");
+        Path sourceZip = targetDir.resolve("maven-" + version + "-source-release.zip");
+        Path sourceAsc = targetDir.resolve("maven-" + version + "-source-release.zip.asc");
+
+        // Create the source release zip using tar/zip
+        ProcessBuilder zipBuilder = new ProcessBuilder("zip", "-r",
+            "maven-" + version + "-source-release.zip",
+            ".",
+            "-x", "target/*", ".git/*", "*.class");
+        zipBuilder.directory(checkoutDir.toFile());
+
+        Process zipProcess = zipBuilder.start();
+        int zipExitCode = zipProcess.waitFor();
+
+        if (zipExitCode != 0) {
+            throw new RuntimeException("Failed to create source release zip");
+        }
+
+        // Move the zip to the target directory
+        Path createdZip = checkoutDir.resolve("maven-" + version + "-source-release.zip");
+        if (Files.exists(createdZip)) {
+            Files.move(createdZip, sourceZip);
+        } else {
+            throw new RuntimeException("Source release zip was not created");
+        }
+
+        // Sign the zip file
+        ProcessBuilder signBuilder = new ProcessBuilder("gpg", "--armor", "--detach-sign", sourceZip.toString());
+        Process signProcess = signBuilder.start();
+        int signExitCode = signProcess.waitFor();
+
+        if (signExitCode != 0) {
+            throw new RuntimeException("Failed to sign source release zip");
+        }
+
+        logSuccess("Source release files created manually: " + sourceZip.getFileName());
     }
 
     static void generateVoteEmail(String version, String stagingRepo, String milestoneInfo, String releaseNotes) throws Exception {
         logStep("Generating vote email...");
 
-        // Get comparison URL
-        ProcessResult lastTagResult = runCommandSimple("git", "describe", "--tags", "--abbrev=0", "--match=maven-*");
-        String lastTag = lastTagResult.isSuccess() ? lastTagResult.output.trim() : "";
+        // Get comparison URL - find the previous tag for proper comparison
+        ProcessResult allTagsResult = runCommandSimple("git", "tag", "-l", "--sort=-version:refname", "--merged", "HEAD");
+        String lastTag = "";
+        if (allTagsResult.isSuccess()) {
+            String[] tags = allTagsResult.output.trim().split("\n");
+            // Find the previous tag (skip the current one if it exists)
+            for (String tag : tags) {
+                if (tag.startsWith("maven-") && !tag.equals("maven-" + version)) {
+                    lastTag = tag;
+                    break;
+                }
+            }
+        }
 
         String githubCompare = "https://github.com/apache/maven/commits/maven-" + version;
         if (!lastTag.isEmpty()) {
@@ -1181,7 +1615,7 @@ public class MavenRelease implements Callable<Integer> {
 
         // Parse milestone info
         String closedIssues = "N";
-        String milestoneUrl = "https://github.com/apache/maven/issues?q=is%3Aissue+is%3Aclosed+milestone%3A" + version;
+        String milestoneUrl = "https://github.com/apache/maven/issues?q=is%3Aclosed%20milestone%3A" + version;
 
         if (!milestoneInfo.isEmpty()) {
             try {
@@ -1205,13 +1639,30 @@ public class MavenRelease implements Callable<Integer> {
             }
         }
 
-        // Calculate SHA512
-        Path sourceZip = PROJECT_ROOT.resolve("target/checkout/target/maven-" + version + "-source-release.zip");
-        String sha512 = "[SHA512 will be calculated]";
-        if (Files.exists(sourceZip)) {
-            ProcessResult sha512Result = runCommandSimple("sha512sum", sourceZip.toString());
-            sha512 = sha512Result.output.split("\\s+")[0];
+        // Calculate SHA512 checksums for all distribution files
+        Path apacheMavenTarget = PROJECT_ROOT.resolve("target/checkout/apache-maven/target");
+        StringBuilder checksums = new StringBuilder();
+
+        String[] distributionFiles = {
+            "apache-maven-" + version + "-src.zip",
+            "apache-maven-" + version + "-src.tar.gz",
+            "apache-maven-" + version + "-bin.zip",
+            "apache-maven-" + version + "-bin.tar.gz"
+        };
+
+        for (String fileName : distributionFiles) {
+            Path file = apacheMavenTarget.resolve(fileName);
+            if (Files.exists(file)) {
+                ProcessResult sha512Result = runCommandSimple("shasum", "-a", "512", file.toString());
+                if (sha512Result.isSuccess()) {
+                    String sha512 = sha512Result.output.split("\\s+")[0];
+                    checksums.append(fileName).append(" sha512: ").append(sha512).append("\n");
+                }
+            }
         }
+
+        // Get GitHub release notes URL
+        String releaseNotesUrl = "https://github.com/apache/maven/releases/tag/maven-" + version;
 
         // Generate email content
         StringBuilder email = new StringBuilder();
@@ -1224,15 +1675,19 @@ public class MavenRelease implements Callable<Integer> {
         email.append("https://github.com/apache/maven/issues?q=is%3Aissue+is%3Aopen\n\n");
         email.append("Changes since the last release:\n");
         email.append(githubCompare).append("\n\n");
+        email.append("Draft release notes:\n");
+        email.append(releaseNotesUrl).append("\n\n");
         email.append("Staging repo:\n");
         email.append("https://repository.apache.org/content/repositories/").append(stagingRepo).append("/\n");
         email.append("https://repository.apache.org/content/repositories/").append(stagingRepo)
             .append("/org/apache/maven/apache-maven/").append(version)
-            .append("/apache-maven-").append(version).append("-source-release.zip\n\n");
+            .append("/apache-maven-").append(version).append("-src.zip\n\n");
+        email.append("Distribution staging area:\n");
+        email.append("https://dist.apache.org/repos/dist/dev/maven/maven-4/").append(version).append("/\n\n");
         email.append("Source release checksum(s):\n");
-        email.append("apache-maven-").append(version).append("-source-release.zip sha512: ").append(sha512).append("\n\n");
+        email.append(checksums.toString()).append("\n");
         email.append("Staging site:\n");
-        email.append("https://maven.apache.org/ref/").append(version).append("/\n\n");
+        email.append("https://maven.apache.org/ref/4-LATEST/\n\n");
         email.append("Guide to testing staged releases:\n");
         email.append("https://maven.apache.org/guides/development/guide-testing-releases.html\n\n");
         email.append("Vote open for at least 72 hours.\n\n");
@@ -1249,6 +1704,32 @@ public class MavenRelease implements Callable<Integer> {
         Files.writeString(emailFile, email.toString());
 
         logSuccess("Vote email generated: vote-email-" + version + ".txt");
+    }
+
+    static void saveStagingRepoOnly(String version, String stagingRepo) throws Exception {
+        // Create target directory if it doesn't exist
+        Files.createDirectories(TARGET_DIR);
+
+        // Save staging repository ID in target directory (persistent across builds)
+        Files.writeString(TARGET_DIR.resolve("staging-repo-" + version), stagingRepo);
+
+        // Also save in project root for backward compatibility
+        Files.writeString(PROJECT_ROOT.resolve(".staging-repo-" + version), stagingRepo);
+
+        logSuccess("Staging repository ID saved to target/staging-repo-" + version);
+    }
+
+    static void saveMilestoneInfo(String version, String milestoneInfo) throws Exception {
+        // Create target directory if it doesn't exist
+        Files.createDirectories(TARGET_DIR);
+
+        // Save milestone info in target directory (persistent across builds)
+        Files.writeString(TARGET_DIR.resolve("milestone-info-" + version), milestoneInfo);
+
+        // Also save in project root for backward compatibility
+        Files.writeString(PROJECT_ROOT.resolve(".milestone-info-" + version), milestoneInfo);
+
+        logSuccess("Milestone info saved to target/milestone-info-" + version);
     }
 
     static void saveStagingInfo(String version, String stagingRepo, String milestoneInfo) throws Exception {
@@ -1431,8 +1912,11 @@ public class MavenRelease implements Callable<Integer> {
 
     static void promoteStagingRepo(String stagingRepo) throws Exception {
         logStep("Promoting staging repository...");
-        ProcessResult result = runCommandSimple("mvn", "nexus-staging:promote",
-            "-DstagingRepositoryId=" + stagingRepo);
+        ProcessResult result = runCommandSimple("mvn", "-V",
+            "org.sonatype.plugins:nexus-staging-maven-plugin:1.7.0:promote",
+            "-DstagingRepositoryId=" + stagingRepo,
+            "-DnexusUrl=https://repository.apache.org/",
+            "-DserverId=apache.releases.https");
 
         if (!result.isSuccess()) {
             throw new RuntimeException("Failed to promote staging repository: " + result.error);
@@ -1768,8 +2252,11 @@ public class MavenRelease implements Callable<Integer> {
         try {
             logStep("Dropping staging repository: " + stagingRepo);
 
-            ProcessResult result = runCommandSimple("mvn", "nexus-staging:drop",
-                "-DstagingRepositoryId=" + stagingRepo);
+            ProcessResult result = runCommandSimple("mvn",
+                "org.sonatype.plugins:nexus-staging-maven-plugin:1.7.0:drop",
+                "-DstagingRepositoryId=" + stagingRepo,
+                "-DnexusUrl=https://repository.apache.org/",
+                "-DserverId=apache.releases.https");
 
             if (result.isSuccess()) {
                 logSuccess("Staging repository " + stagingRepo + " dropped");
