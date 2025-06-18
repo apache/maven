@@ -149,7 +149,24 @@ class FilteredProjectDependencyGraph implements ProjectDependencyGraph {
                 filtered.addAll(upstream ? getUpstreamProjects(project, false) : getDownstreamProjects(project, false));
             }
         }
-        return filtered;
+        if (filtered.isEmpty() || filtered.size() == 1) {
+            // Optimization to skip streaming, distincting, and collecting to a new list when there is zero or one
+            // project, aka there can't be duplicates.
+            return filtered;
+        }
+
+        // Distinct the projects to avoid duplicates.  Duplicates are possible in multi-module projects.
+        //
+        // Given a scenario where there is an aggregate POM with modules A, B, C, D, and E and project E depends on
+        // A, B, C, and D. If the aggregate POM is being filtered for non-transitive and downstream dependencies where
+        // only A, C, and E are whitelisted duplicates will occur. When scanning projects A, C, and E, those will be
+        // added to 'filtered' as they are whitelisted. When scanning B and D, they are not whitelisted, and since
+        // transitive is false, their downstream dependencies will be added to 'filtered'. E is a downstream dependency
+        // of A, B, C, and D, so when scanning B and D, E will be added again 'filtered'.
+        //
+        // Without de-duplication, the final list would contain E three times, once for E being in the projects and
+        // whitelisted, and twice more for E being a downstream dependency of B and D.
+        return filtered.stream().distinct().collect(Collectors.toList());
     }
 
     @Override
