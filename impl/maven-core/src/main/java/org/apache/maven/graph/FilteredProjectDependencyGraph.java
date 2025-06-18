@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.project.MavenProject;
@@ -141,7 +140,7 @@ class FilteredProjectDependencyGraph implements ProjectDependencyGraph {
         //
         // Without de-duplication, the final list would contain E three times, once for E being in the projects and
         // whitelisted, and twice more for E being a downstream dependency of B and D.
-        return filtered.stream().distinct().collect(Collectors.toList());
+        return filtered.stream().distinct().toList();
     }
 
     @Override
