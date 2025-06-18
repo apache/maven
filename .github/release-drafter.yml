@@ -17,5 +17,10 @@
 
 _extends: maven-gh-actions-shared
 
+# Configuration for Release Drafter to match Maven tag format
+name-template: 'Apache Maven $RESOLVED_VERSION'
+tag-template: 'maven-$RESOLVED_VERSION'
+version-template: '$MAJOR.$MINOR.$PATCH$PRERELEASE'
+
 include-pre-releases: true
 prerelease: true
