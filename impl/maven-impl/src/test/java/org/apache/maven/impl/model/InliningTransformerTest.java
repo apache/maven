@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -65,9 +66,14 @@ class InliningTransformerTest {
         assertSame(modelVersion1, modelVersion2, "modelVersion should be interned");
 
         // Test that contexts not in the CONTEXTS set are not interned
-        String nonInterned1 = transformer.transform("some-value", "nonInterned");
-        String nonInterned2 = transformer.transform("some-value", "nonInterned");
-        assertNotSame(nonInterned1, nonInterned2, "non-interned context should not be interned");
+        // Use new String() to avoid automatic interning by JVM
+        String value1 = new String("some-value");
+        String value2 = new String("some-value");
+        String nonInterned1 = transformer.transform(value1, "nonInterned");
+        String nonInterned2 = transformer.transform(value2, "nonInterned");
+        assertSame(value1, nonInterned1, "non-interned context should return same instance");
+        assertSame(value2, nonInterned2, "non-interned context should return same instance");
+        assertNotSame(nonInterned1, nonInterned2, "different input instances should remain different");
         assertEquals(nonInterned1, nonInterned2, "but values should still be equal");
     }
 
@@ -110,7 +116,8 @@ class InliningTransformerTest {
         // Test with null value
         String result1 = transformer.transform(null, "groupId");
         String result2 = transformer.transform(null, "groupId");
-        assertSame(result1, result2, "null values should be interned");
+        assertNull(result1);
+        assertNull(result2);
 
         // Test with empty string
         String empty1 = transformer.transform("", "artifactId");

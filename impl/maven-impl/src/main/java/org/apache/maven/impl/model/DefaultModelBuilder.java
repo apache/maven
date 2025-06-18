@@ -2189,7 +2189,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         @Override
         public String transform(String input, String context) {
-            return CONTEXTS.contains(context) ? input.intern() : input;
+            return input != null && CONTEXTS.contains(context) ? input.intern() : input;
         }
     }
 }
