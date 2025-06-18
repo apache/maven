@@ -698,7 +698,7 @@
                             plugin.getKey(),
                             plugin
                     );
-                    i+=1;
+                    i += 1;
                 }
                 pluginMap = Map.ofEntries(
                     entries
@@ -732,7 +732,7 @@
                             plugin.getKey(),
                             plugin
                     );
-                    i+=1;
+                    i += 1;
                 }
                 pluginMap = Map.ofEntries(
                     entries
