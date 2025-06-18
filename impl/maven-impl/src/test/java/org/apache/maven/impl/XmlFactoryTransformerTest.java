@@ -169,7 +169,7 @@ class XmlFactoryTransformerTest {
         assertEquals("openjdk", toolchains.getToolchains().get(0).getProvides().get("vendor"));
         assertEquals(
                 "/path/to/jdk17",
-                toolchains.getToolchains().get(0).getConfiguration().get("jdkHome"));
+                toolchains.getToolchains().get(0).getConfiguration().child("jdkHome").value());
 
         // Verify that the transformer was called
         assertFalse(calledContexts.isEmpty(), "Transformer should have been called");
