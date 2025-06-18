@@ -42,11 +42,12 @@ class DefaultProjectDependencyGraphTest {
     private final MavenProject cProject = createProject(Arrays.asList(toDependency(bProject)), "cProject");
 
     private final MavenProject dProject = createProject(
-        Arrays.asList(toDependency(aProject), toDependency(bProject), toDependency(cProject)), "dProject");
+            Arrays.asList(toDependency(aProject), toDependency(bProject), toDependency(cProject)), "dProject");
 
     private final MavenProject eProject = createProject(
-        Arrays.asList(toDependency(aProject), toDependency(bProject), toDependency(cProject), toDependency(dProject)),
-        "eProject");
+            Arrays.asList(
+                    toDependency(aProject), toDependency(bProject), toDependency(cProject), toDependency(dProject)),
+            "eProject");
 
     private final MavenProject depender1 = createProject(Arrays.asList(toDependency(aProject)), "depender1");
 
@@ -92,9 +93,10 @@ class DefaultProjectDependencyGraphTest {
     // are not whitelisted, so they should return their downstream projects, both have dProject and eProject as
     // downstream projects. Which would result in dProject and eProject being returned twice, but now the results are
     // made unique.
+    @Test
     public void testGetDownstreamDoesNotDuplicateProjects() throws CycleDetectedException, DuplicateProjectException {
-        ProjectDependencyGraph graph = new DefaultProjectDependencyGraph(
-            Arrays.asList(aProject, bProject, cProject, dProject, eProject));
+        ProjectDependencyGraph graph =
+                new DefaultProjectDependencyGraph(Arrays.asList(aProject, bProject, cProject, dProject, eProject));
         graph = new FilteredProjectDependencyGraph(graph, Arrays.asList(aProject, dProject, eProject));
         final List<MavenProject> downstreamProjects = graph.getDownstreamProjects(aProject, false);
         assertEquals(2, downstreamProjects.size());
