@@ -28,7 +28,7 @@ under the License.
   </parent>
 
   <artifactId>maven</artifactId>
-  <version>4.0.0-rc-4</version>
+  <version>4.0.0-rc-4-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Apache Maven</name>
@@ -108,7 +108,7 @@ under the License.
   <scm>
     <connection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</connection>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</developerConnection>
-    <tag>maven-4.0.0-rc-4</tag>
+    <tag>maven-4.0.0-rc-1</tag>
     <url>https://github.com/apache/maven/tree/${project.scm.tag}</url>
   </scm>
   <issueManagement>
@@ -140,7 +140,7 @@ under the License.
     <distributionShortName>Maven</distributionShortName>
     <distributionName>Apache Maven</distributionName>
     <maven.site.path>ref/4-LATEST</maven.site.path>
-    <project.build.outputTimestamp>2025-06-18T10:25:51Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2025-06-18T10:29:55Z</project.build.outputTimestamp>
     <!-- various versions -->
     <assertjVersion>3.27.3</assertjVersion>
     <asmVersion>9.8</asmVersion>
