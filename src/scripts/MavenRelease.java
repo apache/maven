@@ -1,24 +1,5 @@
 ///usr/bin/env jbang "$0" "$@" ; exit $?
 
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 //DEPS info.picocli:picocli:4.7.5
 //DEPS org.apache.httpcomponents.client5:httpclient5:5.2.1
 //DEPS com.fasterxml.jackson.core:jackson-databind:2.15.2
@@ -141,11 +122,12 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 
-@Command(name = "release", 
+@Command(name = "release",
          description = "Maven Release Script - 2-Click Release Automation",
          subcommands = {
              MavenRelease.SetupCommand.class,
              MavenRelease.StartVoteCommand.class,
+             MavenRelease.SendVoteCommand.class,
              MavenRelease.PublishCommand.class,
              MavenRelease.CancelCommand.class,
              MavenRelease.StatusCommand.class,
@@ -908,6 +890,70 @@ public class MavenRelease implements Callable<Integer> {
 
             } catch (Exception e) {
                 logError("Failed to start vote: " + e.getMessage());
+                e.printStackTrace();
+                return 1;
+            }
+        }
+    }
+
+    // Send Vote Command
+    @Command(name = "send-vote", description = "Send vote email for release")
+    static class SendVoteCommand implements Callable<Integer> {
+
+        @Parameters(index = "0", description = "Release version (e.g., 4.0.0-rc-4)")
+        private String version;
+
+        @Override
+        public Integer call() {
+            try {
+                System.out.println("📧 Sending vote email for Maven " + version);
+                System.out.println("📁 Project root: " + PROJECT_ROOT);
+                System.out.println();
+
+                // Check if vote email exists
+                Path emailFile = PROJECT_ROOT.resolve("vote-email-" + version + ".txt");
+                if (!Files.exists(emailFile)) {
+                    logError("Vote email file not found: " + emailFile);
+                    logInfo("Please run 'start-vote " + version + "' first to generate the vote email");
+                    return 1;
+                }
+
+                // Check Gmail configuration
+                if (GMAIL_USERNAME == null || GMAIL_USERNAME.isEmpty() ||
+                    GMAIL_APP_PASSWORD == null || GMAIL_APP_PASSWORD.isEmpty()) {
+                    logWarning("Gmail credentials not configured");
+                    logInfo("Please set environment variables:");
+                    logInfo("  GMAIL_USERNAME=your-email@gmail.com");
+                    logInfo("  GMAIL_APP_PASSWORD=your-app-password");
+                    logInfo("Or send the email manually: " + emailFile);
+                    return 1;
+                }
+
+                // Send the email
+                boolean emailSent = sendVoteEmailWithResult(version);
+
+                System.out.println();
+                if (emailSent) {
+                    logSuccess("Vote email sent successfully!");
+                    System.out.println();
+                    System.out.println("⏰ Vote period: 72 hours minimum");
+                    System.out.println("📊 Required: 3+ PMC votes");
+                    System.out.println();
+                    System.out.println("Next steps:");
+                    System.out.println("1. Wait for vote results (72+ hours)");
+                    System.out.println("2. If vote passes, run: jbang release.java publish " + version);
+                } else {
+                    logWarning("Vote email was NOT sent automatically");
+                    logInfo("Please send the email manually:");
+                    logInfo("  File: vote-email-" + version + ".txt");
+                    logInfo("  To: dev@maven.apache.org");
+                    logInfo("  Subject: [VOTE] Release Apache Maven " + version);
+                }
+
+                return 0;
+
+            } catch (Exception e) {
+                logError("Failed to send vote email: " + e.getMessage());
                 e.printStackTrace();
                 return 1;
             }
@@ -1748,13 +1794,17 @@ public class MavenRelease implements Callable<Integer> {
     }
 
     static void sendVoteEmail(String version) {
+        sendVoteEmailWithResult(version);
+    }
+
+    static boolean sendVoteEmailWithResult(String version) {
         try {
             logStep("Sending vote email...");
 
             Path emailFile = PROJECT_ROOT.resolve("vote-email-" + version + ".txt");
             if (!Files.exists(emailFile)) {
                 logError("Vote email file not found: " + emailFile);
-                return;
+                return false;
             }
 
             String emailContent = Files.readString(emailFile);
@@ -1775,18 +1825,23 @@ public class MavenRelease implements Callable<Integer> {
                 }
             }
 
-            sendEmail("dev@maven.apache.org", "", subject, body.toString());
+            return sendEmailWithResult("dev@maven.apache.org", "", subject, body.toString());
 
         } catch (Exception e) {
             logError("Failed to send vote email: " + e.getMessage());
+            return false;
         }
     }
 
     static void sendEmail(String to, String cc, String subject, String body) {
+        sendEmailWithResult(to, cc, subject, body);
+    }
+
+    static boolean sendEmailWithResult(String to, String cc, String subject, String body) {
         if (GMAIL_USERNAME == null || GMAIL_USERNAME.isEmpty() ||
             GMAIL_APP_PASSWORD == null || GMAIL_APP_PASSWORD.isEmpty()) {
             logWarning("Gmail credentials not configured - email not sent automatically");
-            return;
+            return false;
         }
 
         try {
@@ -1807,27 +1862,52 @@ public class MavenRelease implements Callable<Integer> {
             email.append("From: ").append(senderAddress).append("\n\n");
             email.append(body);
 
-            // Use curl to send via Gmail SMTP
-            ProcessResult result = runCommandSimple("curl", "-s", "--url", "smtps://smtp.gmail.com:465",
-                "--ssl-reqd", "--mail-from", senderAddress, "--mail-rcpt", to,
-                "--user", GMAIL_USERNAME + ":" + GMAIL_APP_PASSWORD,
-                "--upload-file", "-");
+            // Create temporary file for email content
+            Path tempEmailFile = Files.createTempFile("maven-release-email-", ".txt");
+            try {
+                Files.writeString(tempEmailFile, email.toString());
 
-            // Note: This is a simplified approach. In a real implementation, you'd want to use
-            // proper SMTP libraries or save to a temp file and upload that.
+                // Use curl to send via Gmail SMTP with verbose logging
+                logInfo("Attempting to send email via Gmail SMTP...");
+                logInfo("From: " + senderAddress);
+                logInfo("To: " + to);
+                logInfo("Subject: " + subject);
 
-            if (result.isSuccess()) {
-                logSuccess("Email sent successfully to " + to);
-                if (cc != null && !cc.isEmpty()) {
-                    logInfo("CC: " + cc);
+                ProcessResult result = runCommandSimple("curl", "-v", "--url", "smtps://smtp.gmail.com:465",
+                    "--ssl-reqd", "--mail-from", senderAddress, "--mail-rcpt", to,
+                    "--user", GMAIL_USERNAME + ":" + GMAIL_APP_PASSWORD,
+                    "--upload-file", tempEmailFile.toString());
+
+                // Clean up temp file
+                Files.deleteIfExists(tempEmailFile);
+
+                if (result.isSuccess()) {
+                    logSuccess("Email sent successfully to " + to);
+                    if (cc != null && !cc.isEmpty()) {
+                        logInfo("CC: " + cc);
+                    }
+                    logInfo("Gmail SMTP response: " + result.output.trim());
+                    return true;
+                } else {
+                    logError("Failed to send email via Gmail");
+                    logError("Exit code: " + result.exitCode);
+                    if (!result.output.trim().isEmpty()) {
+                        logError("STDOUT: " + result.output.trim());
+                    }
+                    if (!result.error.trim().isEmpty()) {
+                        logError("STDERR: " + result.error.trim());
+                    }
+                    logInfo("Please send manually");
+                    return false;
                 }
-            } else {
-                logError("Failed to send email via Gmail");
-                logInfo("Please send manually");
+            } catch (Exception fileException) {
+                logError("Failed to create temp file: " + fileException.getMessage());
+                return false;
             }
 
         } catch (Exception e) {
             logError("Failed to send email: " + e.getMessage());
+            return false;
         }
     }
 
