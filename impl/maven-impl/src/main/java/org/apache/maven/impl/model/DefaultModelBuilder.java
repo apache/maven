@@ -2146,17 +2146,46 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     static class InliningTransformer implements XmlReaderRequest.Transformer {
         static final Set<String> CONTEXTS = Set.of(
+                // Core Maven coordinates
                 "groupId",
                 "artifactId",
                 "version",
                 "namespaceUri",
                 "packaging",
+
+                // Dependency-related fields
                 "scope",
+                "type",
+                "classifier",
+
+                // Build and plugin-related fields
                 "phase",
+                "goal",
+                "execution",
+
+                // Repository-related fields
                 "layout",
                 "policy",
                 "checksumPolicy",
-                "updatePolicy");
+                "updatePolicy",
+
+                // Common metadata fields
+                "modelVersion",
+                "name",
+                "url",
+                "system",
+                "distribution",
+                "status",
+
+                // SCM fields
+                "connection",
+                "developerConnection",
+                "tag",
+
+                // Common enum-like values that appear frequently
+                "id",
+                "inherited",
+                "optional");
 
         @Override
         public String transform(String input, String context) {
