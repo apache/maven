@@ -56,8 +56,8 @@ public class DefaultSettingsXmlFactory implements SettingsXmlFactory {
                 source = new InputSource(request.getLocation());
             }
             SettingsStaxReader xml = request.getTransformer() != null
-                ? new SettingsStaxReader(request.getTransformer()::transform)
-                : new SettingsStaxReader();
+                    ? new SettingsStaxReader(request.getTransformer()::transform)
+                    : new SettingsStaxReader();
             xml.setAddDefaultEntities(request.isAddDefaultEntities());
             if (reader != null) {
                 return xml.read(reader, request.isStrict(), source);

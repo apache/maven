@@ -38,32 +38,32 @@ class InliningTransformerTest {
     @Test
     void testTransformerInternsCorrectContexts() {
         DefaultModelBuilder.InliningTransformer transformer = new DefaultModelBuilder.InliningTransformer();
-        
+
         // Test that contexts in the CONTEXTS set are interned
         String groupId1 = transformer.transform("org.apache.maven", "groupId");
         String groupId2 = transformer.transform("org.apache.maven", "groupId");
         assertSame(groupId1, groupId2, "groupId should be interned");
-        
+
         String type1 = transformer.transform("jar", "type");
         String type2 = transformer.transform("jar", "type");
         assertSame(type1, type2, "type should be interned");
-        
+
         String scope1 = transformer.transform("compile", "scope");
         String scope2 = transformer.transform("compile", "scope");
         assertSame(scope1, scope2, "scope should be interned");
-        
+
         String classifier1 = transformer.transform("sources", "classifier");
         String classifier2 = transformer.transform("sources", "classifier");
         assertSame(classifier1, classifier2, "classifier should be interned");
-        
+
         String goal1 = transformer.transform("compile", "goal");
         String goal2 = transformer.transform("compile", "goal");
         assertSame(goal1, goal2, "goal should be interned");
-        
+
         String modelVersion1 = transformer.transform("4.0.0", "modelVersion");
         String modelVersion2 = transformer.transform("4.0.0", "modelVersion");
         assertSame(modelVersion1, modelVersion2, "modelVersion should be interned");
-        
+
         // Test that contexts not in the CONTEXTS set are not interned
         String nonInterned1 = transformer.transform("some-value", "nonInterned");
         String nonInterned2 = transformer.transform("some-value", "nonInterned");
@@ -96,7 +96,7 @@ class InliningTransformerTest {
         assertTrue(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("id"));
         assertTrue(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("inherited"));
         assertTrue(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("optional"));
-        
+
         // Verify that non-interned contexts are not in the set
         assertFalse(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("nonInterned"));
         assertFalse(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("description"));
@@ -106,17 +106,17 @@ class InliningTransformerTest {
     @Test
     void testTransformerWithNullAndEmptyValues() {
         DefaultModelBuilder.InliningTransformer transformer = new DefaultModelBuilder.InliningTransformer();
-        
+
         // Test with null value
         String result1 = transformer.transform(null, "groupId");
         String result2 = transformer.transform(null, "groupId");
         assertSame(result1, result2, "null values should be interned");
-        
+
         // Test with empty string
         String empty1 = transformer.transform("", "artifactId");
         String empty2 = transformer.transform("", "artifactId");
         assertSame(empty1, empty2, "empty strings should be interned");
-        
+
         // Test with whitespace
         String whitespace1 = transformer.transform("   ", "version");
         String whitespace2 = transformer.transform("   ", "version");
@@ -131,8 +131,9 @@ class InliningTransformerTest {
             calledContexts.add(context);
             return value;
         };
-        
-        String pomXml = """
+
+        String pomXml =
+                """
             <?xml version="1.0" encoding="UTF-8"?>
             <project xmlns="http://maven.apache.org/POM/4.0.0">
                 <modelVersion>4.0.0</modelVersion>
@@ -140,7 +141,7 @@ class InliningTransformerTest {
                 <artifactId>test-project</artifactId>
                 <version>1.0.0</version>
                 <packaging>jar</packaging>
-                
+
                 <dependencies>
                     <dependency>
                         <groupId>org.apache.maven</groupId>
@@ -153,21 +154,21 @@ class InliningTransformerTest {
                 </dependencies>
             </project>
             """;
-        
+
         DefaultModelXmlFactory factory = new DefaultModelXmlFactory();
         XmlReaderRequest request = XmlReaderRequest.builder()
                 .reader(new StringReader(pomXml))
                 .transformer(trackingTransformer)
                 .build();
-        
+
         Model model = factory.read(request);
-        
+
         // Verify the model was parsed correctly
         assertEquals("com.example", model.getGroupId());
         assertEquals("test-project", model.getArtifactId());
         assertEquals("1.0.0", model.getVersion());
         assertEquals("jar", model.getPackaging());
-        
+
         // Verify that the transformer was called for the expected contexts
         assertTrue(calledContexts.contains("groupId"), "groupId context should be called");
         assertTrue(calledContexts.contains("artifactId"), "artifactId context should be called");
@@ -176,7 +177,7 @@ class InliningTransformerTest {
         assertTrue(calledContexts.contains("scope"), "scope context should be called");
         assertTrue(calledContexts.contains("type"), "type context should be called");
         assertTrue(calledContexts.contains("classifier"), "classifier context should be called");
-        
+
         // Verify specific paths are called correctly
         long groupIdCount = calledContexts.stream().filter("groupId"::equals).count();
         assertTrue(groupIdCount >= 2, "groupId should be called at least 2 times (project, dependency)");
@@ -184,7 +185,8 @@ class InliningTransformerTest {
 
     @Test
     void testInliningTransformerWithRealPomParsing() throws Exception {
-        String pomXml = """
+        String pomXml =
+                """
             <?xml version="1.0" encoding="UTF-8"?>
             <project xmlns="http://maven.apache.org/POM/4.0.0">
                 <modelVersion>4.0.0</modelVersion>
@@ -192,7 +194,7 @@ class InliningTransformerTest {
                 <artifactId>maven-core</artifactId>
                 <version>4.0.0</version>
                 <packaging>jar</packaging>
-                
+
                 <dependencies>
                     <dependency>
                         <groupId>org.apache.maven</groupId>
@@ -203,23 +205,23 @@ class InliningTransformerTest {
                 </dependencies>
             </project>
             """;
-        
+
         DefaultModelXmlFactory factory = new DefaultModelXmlFactory();
         DefaultModelBuilder.InliningTransformer transformer = new DefaultModelBuilder.InliningTransformer();
-        
+
         XmlReaderRequest request = XmlReaderRequest.builder()
                 .reader(new StringReader(pomXml))
                 .transformer(transformer)
                 .build();
-        
+
         Model model = factory.read(request);
-        
+
         // Verify the model was parsed correctly
         assertEquals("org.apache.maven", model.getGroupId());
         assertEquals("maven-core", model.getArtifactId());
         assertEquals("4.0.0", model.getVersion());
         assertEquals("jar", model.getPackaging());
-        
+
         // Verify dependency was parsed
         assertEquals(1, model.getDependencies().size());
         assertEquals("org.apache.maven", model.getDependencies().get(0).getGroupId());

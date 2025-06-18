@@ -46,8 +46,9 @@ class XmlFactoryTransformerTest {
             calledContexts.add(context);
             return value;
         };
-        
-        String pomXml = """
+
+        String pomXml =
+                """
             <?xml version="1.0" encoding="UTF-8"?>
             <project xmlns="http://maven.apache.org/POM/4.0.0">
                 <modelVersion>4.0.0</modelVersion>
@@ -57,21 +58,21 @@ class XmlFactoryTransformerTest {
                 <packaging>jar</packaging>
             </project>
             """;
-        
+
         DefaultModelXmlFactory factory = new DefaultModelXmlFactory();
         XmlReaderRequest request = XmlReaderRequest.builder()
                 .reader(new StringReader(pomXml))
                 .transformer(trackingTransformer)
                 .build();
-        
+
         Model model = factory.read(request);
-        
+
         // Verify the model was parsed correctly
         assertEquals("com.example", model.getGroupId());
         assertEquals("test-project", model.getArtifactId());
         assertEquals("1.0.0", model.getVersion());
         assertEquals("jar", model.getPackaging());
-        
+
         // Verify that the transformer was called
         assertFalse(calledContexts.isEmpty(), "Transformer should have been called");
         assertTrue(calledContexts.contains("groupId"), "groupId context should be called");
@@ -88,8 +89,9 @@ class XmlFactoryTransformerTest {
             calledContexts.add(context);
             return value;
         };
-        
-        String settingsXml = """
+
+        String settingsXml =
+                """
             <?xml version="1.0" encoding="UTF-8"?>
             <settings xmlns="http://maven.apache.org/SETTINGS/1.2.0">
                 <localRepository>/path/to/local/repo</localRepository>
@@ -102,22 +104,22 @@ class XmlFactoryTransformerTest {
                 </servers>
             </settings>
             """;
-        
+
         DefaultSettingsXmlFactory factory = new DefaultSettingsXmlFactory();
         XmlReaderRequest request = XmlReaderRequest.builder()
                 .reader(new StringReader(settingsXml))
                 .transformer(trackingTransformer)
                 .build();
-        
+
         Settings settings = factory.read(request);
-        
+
         // Verify the settings were parsed correctly
         assertEquals("/path/to/local/repo", settings.getLocalRepository());
         assertEquals(1, settings.getServers().size());
         assertEquals("test-server", settings.getServers().get(0).getId());
         assertEquals("testuser", settings.getServers().get(0).getUsername());
         assertEquals("testpass", settings.getServers().get(0).getPassword());
-        
+
         // Verify that the transformer was called
         assertFalse(calledContexts.isEmpty(), "Transformer should have been called");
         assertTrue(calledContexts.contains("localRepository"), "localRepository context should be called");
@@ -134,8 +136,9 @@ class XmlFactoryTransformerTest {
             calledContexts.add(context);
             return value;
         };
-        
-        String toolchainsXml = """
+
+        String toolchainsXml =
+                """
             <?xml version="1.0" encoding="UTF-8"?>
             <toolchains xmlns="http://maven.apache.org/TOOLCHAINS/1.1.0">
                 <toolchain>
@@ -150,22 +153,24 @@ class XmlFactoryTransformerTest {
                 </toolchain>
             </toolchains>
             """;
-        
+
         DefaultToolchainsXmlFactory factory = new DefaultToolchainsXmlFactory();
         XmlReaderRequest request = XmlReaderRequest.builder()
                 .reader(new StringReader(toolchainsXml))
                 .transformer(trackingTransformer)
                 .build();
-        
+
         PersistedToolchains toolchains = factory.read(request);
-        
+
         // Verify the toolchains were parsed correctly
         assertEquals(1, toolchains.getToolchains().size());
         assertEquals("jdk", toolchains.getToolchains().get(0).getType());
         assertEquals("17", toolchains.getToolchains().get(0).getProvides().get("version"));
         assertEquals("openjdk", toolchains.getToolchains().get(0).getProvides().get("vendor"));
-        assertEquals("/path/to/jdk17", toolchains.getToolchains().get(0).getConfiguration().get("jdkHome"));
-        
+        assertEquals(
+                "/path/to/jdk17",
+                toolchains.getToolchains().get(0).getConfiguration().get("jdkHome"));
+
         // Verify that the transformer was called
         assertFalse(calledContexts.isEmpty(), "Transformer should have been called");
         assertTrue(calledContexts.contains("type"), "type context should be called");
@@ -182,8 +187,9 @@ class XmlFactoryTransformerTest {
             calledContexts.add(context);
             return value;
         };
-        
-        String pluginXml = """
+
+        String pluginXml =
+                """
             <?xml version="1.0" encoding="UTF-8"?>
             <plugin>
                 <name>test-plugin</name>
@@ -200,15 +206,15 @@ class XmlFactoryTransformerTest {
                 </mojos>
             </plugin>
             """;
-        
+
         DefaultPluginXmlFactory factory = new DefaultPluginXmlFactory();
         XmlReaderRequest request = XmlReaderRequest.builder()
                 .reader(new StringReader(pluginXml))
                 .transformer(trackingTransformer)
                 .build();
-        
+
         PluginDescriptor plugin = factory.read(request);
-        
+
         // Verify the plugin was parsed correctly
         assertEquals("test-plugin", plugin.getName());
         assertEquals("com.example", plugin.getGroupId());
@@ -219,7 +225,7 @@ class XmlFactoryTransformerTest {
         assertEquals("compile", plugin.getMojos().get(0).getGoal());
         assertEquals("compile", plugin.getMojos().get(0).getPhase());
         assertEquals("com.example.TestMojo", plugin.getMojos().get(0).getImplementation());
-        
+
         // Verify that the transformer was called
         assertFalse(calledContexts.isEmpty(), "Transformer should have been called");
         assertTrue(calledContexts.contains("name"), "name context should be called");

@@ -57,8 +57,8 @@ public class DefaultPluginXmlFactory implements PluginXmlFactory {
         }
         try {
             PluginDescriptorStaxReader xml = request.getTransformer() != null
-                ? new PluginDescriptorStaxReader(request.getTransformer()::transform)
-                : new PluginDescriptorStaxReader();
+                    ? new PluginDescriptorStaxReader(request.getTransformer()::transform)
+                    : new PluginDescriptorStaxReader();
             xml.setAddDefaultEntities(request.isAddDefaultEntities());
             if (inputStream != null) {
                 return xml.read(inputStream, request.isStrict());
