@@ -1254,7 +1254,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                             .path(modelSource.getPath())
                             .rootDirectory(rootDirectory)
                             .inputStream(is)
-                            .transformer(new InliningTransformer())
+                            .transformer(new InterningTransformer())
                             .build());
                 } catch (XmlReaderException e) {
                     if (!strict) {
@@ -1267,7 +1267,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                                 .path(modelSource.getPath())
                                 .rootDirectory(rootDirectory)
                                 .inputStream(is)
-                                .transformer(new InliningTransformer())
+                                .transformer(new InterningTransformer())
                                 .build());
                     } catch (XmlReaderException ne) {
                         // still unreadable even in non-strict mode, rethrow original error
@@ -2144,23 +2144,52 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
     }
 
-    static class InliningTransformer implements XmlReaderRequest.Transformer {
+    static class InterningTransformer implements XmlReaderRequest.Transformer {
         static final Set<String> CONTEXTS = Set.of(
+                // Core Maven coordinates
                 "groupId",
                 "artifactId",
                 "version",
                 "namespaceUri",
                 "packaging",
+
+                // Dependency-related fields
                 "scope",
+                "type",
+                "classifier",
+
+                // Build and plugin-related fields
                 "phase",
+                "goal",
+                "execution",
+
+                // Repository-related fields
                 "layout",
                 "policy",
                 "checksumPolicy",
-                "updatePolicy");
+                "updatePolicy",
+
+                // Common metadata fields
+                "modelVersion",
+                "name",
+                "url",
+                "system",
+                "distribution",
+                "status",
+
+                // SCM fields
+                "connection",
+                "developerConnection",
+                "tag",
+
+                // Common enum-like values that appear frequently
+                "id",
+                "inherited",
+                "optional");
 
         @Override
         public String transform(String input, String context) {
-            return CONTEXTS.contains(context) ? input.intern() : input;
+            return input != null && CONTEXTS.contains(context) ? input.intern() : input;
         }
     }
 }
