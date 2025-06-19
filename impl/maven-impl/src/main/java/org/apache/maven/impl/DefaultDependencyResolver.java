@@ -68,6 +68,22 @@ import static org.apache.maven.impl.ImplUtils.map;
 @Singleton
 public class DefaultDependencyResolver implements DependencyResolver {
 
+    /**
+     * Cache of information about the modules contained in a path element.
+     *
+     * <p><b>TODO:</b> This field should not be in this class, because the cache should be global to the session.
+     * This field exists here only temporarily, until clarified where to store session-wide caches.</p>
+     */
+    private final PathModularizationCache moduleCache;
+
+    /**
+     * Creates an initially empty resolver.
+     */
+    public DefaultDependencyResolver() {
+        // TODO: the cache should not be instantiated here, but should rather be session-wide.
+        moduleCache = new PathModularizationCache();
+    }
+
     @Nonnull
     @Override
     public DependencyResolverResult collect(@Nonnull DependencyResolverRequest request)
@@ -126,7 +142,11 @@ public class DefaultDependencyResolver implements DependencyResolver {
                 final CollectResult result =
                         session.getRepositorySystem().collectDependencies(systemSession, collectRequest);
                 return new DefaultDependencyResolverResult(
-                        null, null, result.getExceptions(), session.getNode(result.getRoot(), request.getVerbose()), 0);
+                        null,
+                        moduleCache,
+                        result.getExceptions(),
+                        session.getNode(result.getRoot(), request.getVerbose()),
+                        0);
             } catch (DependencyCollectionException e) {
                 throw new DependencyResolverException("Unable to collect dependencies", e);
             }
@@ -171,8 +191,8 @@ public class DefaultDependencyResolver implements DependencyResolver {
         InternalSession session =
                 InternalSession.from(requireNonNull(request, "request").getSession());
         RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
+        DependencyResolverResult result;
         try {
-            DependencyResolverResult result;
             DependencyResolverResult collectorResult = collect(request);
             List<RemoteRepository> repositories = request.getRepositories() != null
                     ? request.getRepositories()
@@ -191,18 +211,13 @@ public class DefaultDependencyResolver implements DependencyResolver {
                         .map(Artifact::toCoordinates)
                         .collect(Collectors.toList());
                 Predicate<PathType> filter = request.getPathTypeFilter();
+                DefaultDependencyResolverResult resolverResult = new DefaultDependencyResolverResult(
+                        null, moduleCache, collectorResult.getExceptions(), collectorResult.getRoot(), nodes.size());
                 if (request.getRequestType() == DependencyResolverRequest.RequestType.FLATTEN) {
-                    DefaultDependencyResolverResult flattenResult = new DefaultDependencyResolverResult(
-                            null, null, collectorResult.getExceptions(), collectorResult.getRoot(), nodes.size());
                     for (Node node : nodes) {
-                        flattenResult.addNode(node);
+                        resolverResult.addNode(node);
                     }
-                    result = flattenResult;
                 } else {
-                    PathModularizationCache cache =
-                            new PathModularizationCache(); // TODO: should be project-wide cache.
-                    DefaultDependencyResolverResult resolverResult = new DefaultDependencyResolverResult(
-                            null, cache, collectorResult.getExceptions(), collectorResult.getRoot(), nodes.size());
                     ArtifactResolverResult artifactResolverResult =
                             session.getService(ArtifactResolver.class).resolve(session, coordinates, repositories);
                     for (Node node : nodes) {
@@ -217,13 +232,13 @@ public class DefaultDependencyResolver implements DependencyResolver {
                             throw cannotReadModuleInfo(path, e);
                         }
                     }
-                    result = resolverResult;
                 }
+                result = resolverResult;
             }
-            return result;
         } finally {
             RequestTraceHelper.exit(trace);
         }
+        return result;
     }
 
     private static DependencyResolverException cannotReadModuleInfo(final Path path, final IOException cause) {
