@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.maven.api.Language;
 import org.apache.maven.api.model.DependencyManagement;
@@ -33,6 +34,9 @@ import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Prerequisites;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.RepositoryFactory;
+import org.apache.maven.api.services.Request;
+import org.apache.maven.api.services.RequestTrace;
+import org.apache.maven.api.services.Result;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.resolver.artifact.MavenArtifactProperties;
 import org.apache.maven.impl.resolver.type.DefaultType;
@@ -43,7 +47,10 @@ import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.Exclusion;
+import org.eclipse.aether.repository.ArtifactRepository;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
+import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 
 /**
  * Populates Aether {@link ArtifactDescriptorResult} from Maven project {@link Model}.
@@ -52,7 +59,99 @@ import org.eclipse.aether.resolution.ArtifactDescriptorResult;
  * @since 3.2.4
  */
 public class ArtifactDescriptorReaderDelegate {
+    private static final RequestTrace EMPTY = new RequestTrace(null, null, null);
+
+    static class Key implements Request<InternalSession> {
+        private final InternalSession session;
+        private final Artifact artifact;
+        private final ArtifactRepository repository;
+
+        private Key(InternalSession session, Artifact artifact, ArtifactRepository repository) {
+            this.session = session;
+            this.artifact = artifact;
+            this.repository = repository;
+        }
+
+        @Override
+        public InternalSession getSession() {
+            return session;
+        }
+
+        @Override
+        public RequestTrace getTrace() {
+            return EMPTY;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(repository, artifact);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) {
+                return true;
+            }
+            if (!(obj instanceof Key other)) {
+                return false;
+            }
+            return Objects.equals(repository, other.repository) && Objects.equals(artifact, other.artifact);
+        }
+
+        @Override
+        public String toString() {
+            return ArtifactIdUtils.toId(artifact) + "@" + repository.getId();
+        }
+    }
+
+    static class Value implements Result<Key> {
+        private final Key key;
+        private final List<Dependency> dependencies;
+        private final List<Dependency> managedDependencies;
+        private final List<RemoteRepository> repositories;
+        private final Map<String, Object> properties;
+
+        private Value(
+                Key key,
+                List<Dependency> dependencies,
+                List<Dependency> managedDependencies,
+                List<RemoteRepository> repositories,
+                Map<String, Object> properties) {
+            this.key = key;
+            this.dependencies = dependencies;
+            this.managedDependencies = managedDependencies;
+            this.repositories = repositories;
+            this.properties = properties;
+        }
+
+        @Override
+        public Key getRequest() {
+            return key;
+        }
+    }
+
     public void populateResult(InternalSession session, ArtifactDescriptorResult result, Model model) {
+        Key key = new Key(session, result.getArtifact(), result.getRepository());
+        Value value = session.request(key, k -> doPopulateResultForCache(key, session, result, model));
+
+        result.setDependencies(value.dependencies);
+        result.setManagedDependencies(value.managedDependencies);
+        result.setRepositories(value.repositories);
+        result.setProperties(value.properties);
+    }
+
+    private Value doPopulateResultForCache(
+            Key key, InternalSession session, ArtifactDescriptorResult result, Model model) {
+        doPopulateResult(session, result, model);
+        return new Value(
+                key,
+                Collections.unmodifiableList(result.getDependencies()),
+                Collections.unmodifiableList(result.getManagedDependencies()),
+                Collections.unmodifiableList(result.getRepositories()),
+                Collections.unmodifiableMap(result.getProperties()));
+    }
+
+    private void doPopulateResult(InternalSession session, ArtifactDescriptorResult result, Model model) {
         ArtifactTypeRegistry stereotypes = session.getSession().getArtifactTypeRegistry();
 
         for (Repository r : model.getRepositories()) {
