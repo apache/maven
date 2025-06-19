@@ -1254,7 +1254,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                             .path(modelSource.getPath())
                             .rootDirectory(rootDirectory)
                             .inputStream(is)
-                            .transformer(new InliningTransformer())
+                            .transformer(new InterningTransformer())
                             .build());
                 } catch (XmlReaderException e) {
                     if (!strict) {
@@ -1267,7 +1267,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                                 .path(modelSource.getPath())
                                 .rootDirectory(rootDirectory)
                                 .inputStream(is)
-                                .transformer(new InliningTransformer())
+                                .transformer(new InterningTransformer())
                                 .build());
                     } catch (XmlReaderException ne) {
                         // still unreadable even in non-strict mode, rethrow original error
@@ -2144,7 +2144,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
     }
 
-    static class InliningTransformer implements XmlReaderRequest.Transformer {
+    static class InterningTransformer implements XmlReaderRequest.Transformer {
         static final Set<String> CONTEXTS = Set.of(
                 // Core Maven coordinates
                 "groupId",

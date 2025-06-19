@@ -34,11 +34,16 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class InliningTransformerTest {
+/**
+ * Test class for {@link DefaultModelBuilder.InterningTransformer}.
+ * Verifies that the transformer correctly interns commonly used string values
+ * to reduce memory usage during Maven POM parsing.
+ */
+class InterningTransformerTest {
 
     @Test
     void testTransformerInternsCorrectContexts() {
-        DefaultModelBuilder.InliningTransformer transformer = new DefaultModelBuilder.InliningTransformer();
+        DefaultModelBuilder.InterningTransformer transformer = new DefaultModelBuilder.InterningTransformer();
 
         // Test that contexts in the CONTEXTS set are interned
         String groupId1 = transformer.transform("org.apache.maven", "groupId");
@@ -80,38 +85,38 @@ class InliningTransformerTest {
     @Test
     void testTransformerContainsExpectedContexts() {
         // Verify that the CONTEXTS set contains all the expected fields
-        assertTrue(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("groupId"));
-        assertTrue(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("artifactId"));
-        assertTrue(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("version"));
-        assertTrue(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("packaging"));
-        assertTrue(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("scope"));
-        assertTrue(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("type"));
-        assertTrue(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("classifier"));
-        assertTrue(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("goal"));
-        assertTrue(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("execution"));
-        assertTrue(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("phase"));
-        assertTrue(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("modelVersion"));
-        assertTrue(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("name"));
-        assertTrue(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("url"));
-        assertTrue(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("system"));
-        assertTrue(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("distribution"));
-        assertTrue(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("status"));
-        assertTrue(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("connection"));
-        assertTrue(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("developerConnection"));
-        assertTrue(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("tag"));
-        assertTrue(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("id"));
-        assertTrue(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("inherited"));
-        assertTrue(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("optional"));
+        assertTrue(DefaultModelBuilder.InterningTransformer.CONTEXTS.contains("groupId"));
+        assertTrue(DefaultModelBuilder.InterningTransformer.CONTEXTS.contains("artifactId"));
+        assertTrue(DefaultModelBuilder.InterningTransformer.CONTEXTS.contains("version"));
+        assertTrue(DefaultModelBuilder.InterningTransformer.CONTEXTS.contains("packaging"));
+        assertTrue(DefaultModelBuilder.InterningTransformer.CONTEXTS.contains("scope"));
+        assertTrue(DefaultModelBuilder.InterningTransformer.CONTEXTS.contains("type"));
+        assertTrue(DefaultModelBuilder.InterningTransformer.CONTEXTS.contains("classifier"));
+        assertTrue(DefaultModelBuilder.InterningTransformer.CONTEXTS.contains("goal"));
+        assertTrue(DefaultModelBuilder.InterningTransformer.CONTEXTS.contains("execution"));
+        assertTrue(DefaultModelBuilder.InterningTransformer.CONTEXTS.contains("phase"));
+        assertTrue(DefaultModelBuilder.InterningTransformer.CONTEXTS.contains("modelVersion"));
+        assertTrue(DefaultModelBuilder.InterningTransformer.CONTEXTS.contains("name"));
+        assertTrue(DefaultModelBuilder.InterningTransformer.CONTEXTS.contains("url"));
+        assertTrue(DefaultModelBuilder.InterningTransformer.CONTEXTS.contains("system"));
+        assertTrue(DefaultModelBuilder.InterningTransformer.CONTEXTS.contains("distribution"));
+        assertTrue(DefaultModelBuilder.InterningTransformer.CONTEXTS.contains("status"));
+        assertTrue(DefaultModelBuilder.InterningTransformer.CONTEXTS.contains("connection"));
+        assertTrue(DefaultModelBuilder.InterningTransformer.CONTEXTS.contains("developerConnection"));
+        assertTrue(DefaultModelBuilder.InterningTransformer.CONTEXTS.contains("tag"));
+        assertTrue(DefaultModelBuilder.InterningTransformer.CONTEXTS.contains("id"));
+        assertTrue(DefaultModelBuilder.InterningTransformer.CONTEXTS.contains("inherited"));
+        assertTrue(DefaultModelBuilder.InterningTransformer.CONTEXTS.contains("optional"));
 
         // Verify that non-interned contexts are not in the set
-        assertFalse(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("nonInterned"));
-        assertFalse(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("description"));
-        assertFalse(DefaultModelBuilder.InliningTransformer.CONTEXTS.contains("randomField"));
+        assertFalse(DefaultModelBuilder.InterningTransformer.CONTEXTS.contains("nonInterned"));
+        assertFalse(DefaultModelBuilder.InterningTransformer.CONTEXTS.contains("description"));
+        assertFalse(DefaultModelBuilder.InterningTransformer.CONTEXTS.contains("randomField"));
     }
 
     @Test
     void testTransformerWithNullAndEmptyValues() {
-        DefaultModelBuilder.InliningTransformer transformer = new DefaultModelBuilder.InliningTransformer();
+        DefaultModelBuilder.InterningTransformer transformer = new DefaultModelBuilder.InterningTransformer();
 
         // Test with null value
         String result1 = transformer.transform(null, "groupId");
@@ -191,7 +196,7 @@ class InliningTransformerTest {
     }
 
     @Test
-    void testInliningTransformerWithRealPomParsing() throws Exception {
+    void testInterningTransformerWithRealPomParsing() throws Exception {
         String pomXml =
                 """
             <?xml version="1.0" encoding="UTF-8"?>
@@ -214,7 +219,7 @@ class InliningTransformerTest {
             """;
 
         DefaultModelXmlFactory factory = new DefaultModelXmlFactory();
-        DefaultModelBuilder.InliningTransformer transformer = new DefaultModelBuilder.InliningTransformer();
+        DefaultModelBuilder.InterningTransformer transformer = new DefaultModelBuilder.InterningTransformer();
 
         XmlReaderRequest request = XmlReaderRequest.builder()
                 .reader(new StringReader(pomXml))
