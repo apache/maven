@@ -19,9 +19,9 @@ name: Java CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ maven-4.0.x ]
   pull_request:
-    branches: [ master ]
+    branches: [ maven-4.0.x ]
 
 # clear all permissions for GITHUB_TOKEN
 permissions: {}
