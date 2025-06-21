@@ -195,6 +195,16 @@ public class DefaultInheritanceAssembler implements InheritanceAssembler {
         }
 
         @Override
+        protected void mergeModel_Mixins(
+                Model.Builder builder,
+                Model target,
+                Model source,
+                boolean sourceDominant,
+                Map<Object, Object> context) {
+            // do not merge
+        }
+
+        @Override
         protected void mergeModelBase_Properties(
                 ModelBase.Builder builder,
                 ModelBase target,
