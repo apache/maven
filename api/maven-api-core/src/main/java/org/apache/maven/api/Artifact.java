@@ -39,7 +39,7 @@ import org.apache.maven.api.annotations.Nonnull;
 @Immutable
 public interface Artifact {
     /**
-     * {@return a unique identifier for this artifact}
+     * {@return a unique identifier for this artifact}.
      * The identifier is composed of groupId, artifactId, extension, classifier, and version.
      *
      * @see ArtifactCoordinates#getId()
@@ -58,7 +58,7 @@ public interface Artifact {
     }
 
     /**
-     * {@return the group identifier of the artifact}
+     * {@return the group identifier of the artifact}.
      *
      * @see ArtifactCoordinates#getGroupId()
      */
@@ -66,7 +66,7 @@ public interface Artifact {
     String getGroupId();
 
     /**
-     * {@return the identifier of the artifact}
+     * {@return the identifier of the artifact}.
      *
      * @see ArtifactCoordinates#getArtifactId()
      */
@@ -74,7 +74,7 @@ public interface Artifact {
     String getArtifactId();
 
     /**
-     * {@return the version of the artifact}
+     * {@return the version of the artifact}.
      * Contrarily to {@link ArtifactCoordinates},
      * each {@code Artifact} is associated to a specific version instead of a range of versions.
      * If the {@linkplain #getBaseVersion() base version} contains a meta-version such as {@code SNAPSHOT},
@@ -86,7 +86,7 @@ public interface Artifact {
     Version getVersion();
 
     /**
-     * {@return the version or meta-version of the artifact}
+     * {@return the version or meta-version of the artifact}.
      * A meta-version is a version suffixed with the {@code SNAPSHOT} keyword.
      * Meta-versions are represented in a base version by their symbols (e.g., {@code SNAPSHOT}),
      * while they are replaced by, for example, the actual timestamp in the {@linkplain #getVersion() version}.
@@ -122,7 +122,7 @@ public interface Artifact {
     boolean isSnapshot();
 
     /**
-     * {@return coordinates with the same identifiers as this artifact}
+     * {@return coordinates with the same identifiers as this artifact}.
      * This is a shortcut for {@code session.createArtifactCoordinates(artifact)}.
      *
      * @see org.apache.maven.api.Session#createArtifactCoordinates(Artifact)
