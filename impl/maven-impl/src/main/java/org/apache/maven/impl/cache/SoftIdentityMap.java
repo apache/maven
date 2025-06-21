@@ -143,12 +143,18 @@ public class SoftIdentityMap<K, V> implements Map<K, V> {
     }
 
     private void expungeStaleEntries() {
+        // Remove entries where the key has been garbage collected
         Reference<?> ref;
         while ((ref = keyQueue.poll()) != null) {
+            // The ref is a SoftIdentityReference that was used as a key
             map.remove(ref);
         }
+        // Remove entries where the value has been garbage collected
         while ((ref = valueQueue.poll()) != null) {
-            map.values().remove(ref);
+            // The ref is a ComputeReference that was used as a value
+            // We need to find and remove the map entry that has this value
+            final Reference<?> valueRef = ref;
+            map.entrySet().removeIf(entry -> entry.getValue() == valueRef);
         }
     }
 
