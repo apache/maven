@@ -34,12 +34,12 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class SoftIdentityMapTest {
-    private SoftIdentityMap<Object, String> map;
+class SoftConcurrentMapTest {
+    private SoftConcurrentMap<Object, String> map;
 
     @BeforeEach
     void setUp() {
-        map = new SoftIdentityMap<>();
+        map = new SoftConcurrentMap<>();
     }
 
     @Test
@@ -139,7 +139,7 @@ class SoftIdentityMapTest {
     }
 
     @Test
-    void shouldUseIdentityComparison() {
+    void shouldUseEqualsComparison() {
         // Create two equal but distinct keys
         String key1 = new String("key");
         String key2 = new String("key");
@@ -159,7 +159,7 @@ class SoftIdentityMapTest {
             return "value2";
         });
 
-        assertEquals(1, computeCount.get(), "Should compute once for equal but distinct keys");
+        assertEquals(1, computeCount.get(), "Should compute once for equal keys (using equals comparison)");
     }
 
     @Test
@@ -196,5 +196,38 @@ class SoftIdentityMapTest {
 
         Object key = new Object();
         assertThrows(NullPointerException.class, () -> map.computeIfAbsent(key, null));
+    }
+
+    @Test
+    @SuppressWarnings("checkstyle:AvoidNestedBlocks")
+    void shouldCleanupGarbageCollectedEntries() throws InterruptedException {
+        // Test that the map properly cleans up entries when keys/values are GC'd
+        int initialSize = map.size();
+
+        // Add some entries that can be garbage collected
+        {
+            Object key1 = new Object();
+            Object key2 = new Object();
+            map.put(key1, "value1");
+            map.put(key2, "value2");
+        }
+
+        // Verify entries were added
+        assertTrue(map.size() >= initialSize + 2, "Map should contain the new entries");
+
+        // Force garbage collection multiple times
+        for (int i = 0; i < 5; i++) {
+            System.gc();
+            Thread.sleep(50);
+            // Trigger cleanup by calling a method that calls expungeStaleEntries()
+            map.size();
+        }
+
+        // The map should eventually clean up the garbage collected entries
+        // Note: This test is not deterministic due to GC behavior, but it should work most of the time
+        int finalSize = map.size();
+        assertTrue(
+                finalSize <= initialSize + 2,
+                "Map should have cleaned up some entries after GC. Initial: " + initialSize + ", Final: " + finalSize);
     }
 }

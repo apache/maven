@@ -497,7 +497,12 @@ public class ${class.name}
             ) {
                 return base;
             }
+    #if ( $class.name == "Dependency" && $package == "org.apache.maven.api.model" )
+            ${class.name} newInstance = new ${class.name}(this);
+            return DependencyPool.intern(newInstance);
+    #else
             return new ${class.name}(this);
+    #end
         }
 
     #if ( $locationTracking && ! $class.superClass )
