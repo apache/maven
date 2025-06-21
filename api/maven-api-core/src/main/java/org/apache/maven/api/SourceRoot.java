@@ -68,9 +68,8 @@ public interface SourceRoot {
      * If no syntax is specified, or if its length is 1 character (interpreted as a Windows drive),
      * the default is a Maven-specific variation of the {@code "glob"} pattern.
      *
-     * <p>
-     * The default implementation returns an empty list, which means to apply a language-dependent pattern.
-     * For example, for the Java language, the pattern includes all files with the {@code .java} suffix.
+     * <p>The default implementation returns an empty list, which means to apply a language-dependent pattern.
+     * For example, for the Java language, the pattern includes all files with the {@code .java} suffix.</p>
      *
      * @see java.nio.file.FileSystem#getPathMatcher(String)
      */
