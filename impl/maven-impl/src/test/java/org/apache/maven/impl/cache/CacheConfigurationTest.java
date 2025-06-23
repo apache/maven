@@ -23,10 +23,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.api.Constants;
+import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.cache.CacheRetention;
+import org.apache.maven.api.model.ModelSource;
+import org.apache.maven.api.model.Profile;
+import org.apache.maven.api.model.RepositoryMerging;
 import org.apache.maven.api.services.ModelBuilderRequest;
+import org.apache.maven.api.services.ModelBuilderRequest.RequestType;
+import org.apache.maven.api.services.ModelTransformer;
 import org.apache.maven.api.services.Request;
+import org.apache.maven.api.services.RequestTrace;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -35,6 +42,7 @@ import org.mockito.MockitoAnnotations;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -165,49 +173,47 @@ class CacheConfigurationTest {
         PartialCacheConfig config = PartialCacheConfig.complete(CacheRetention.SESSION_SCOPED, Cache.ReferenceType.HARD);
         CacheSelector selector = CacheSelector.forRequestType("ModelBuilderRequest", config);
 
-        // Create a mock request that implements ModelBuilderRequest interface
-        Request<?> mockRequest = mock(Request.class);
-        when(mockRequest.getClass()).thenReturn((Class) TestRequestImpl.class);
-        when(mockRequest.getTrace()).thenReturn(null);
+        // Create a test request instance that implements ModelBuilderRequest interface
+        TestRequestImpl testRequest = new TestRequestImpl();
 
         // Should match because TestRequestImpl implements ModelBuilderRequest
-        assertTrue(selector.matches(mockRequest));
+        assertTrue(selector.matches(testRequest));
 
         // Test with a selector for a different interface
         CacheSelector requestSelector = CacheSelector.forRequestType("Request", config);
-        assertTrue(requestSelector.matches(mockRequest)); // Should match Request interface
+        assertTrue(requestSelector.matches(testRequest)); // Should match Request interface
     }
 
     // Test implementation class that implements ModelBuilderRequest
     private static class TestRequestImpl implements ModelBuilderRequest {
         @Override
-        public org.apache.maven.api.Session getSession() { return null; }
+        public Session getSession() { return null; }
         @Override
-        public org.apache.maven.api.services.RequestTrace getTrace() { return null; }
+        public RequestTrace getTrace() { return null; }
         @Override
-        public RequestType getRequestType() { return null; }
+        public RequestType getRequestType() { return RequestType.BUILD_PROJECT; }
         @Override
         public boolean isLocationTracking() { return false; }
         @Override
         public boolean isRecursive() { return false; }
         @Override
-        public org.apache.maven.api.model.ModelSource getSource() { return null; }
+        public ModelSource getSource() { return null; }
         @Override
-        public java.util.Collection<org.apache.maven.api.model.Profile> getProfiles() { return null; }
+        public java.util.Collection<Profile> getProfiles() { return java.util.List.of(); }
         @Override
-        public java.util.List<String> getActiveProfileIds() { return null; }
+        public java.util.List<String> getActiveProfileIds() { return java.util.List.of(); }
         @Override
-        public java.util.List<String> getInactiveProfileIds() { return null; }
+        public java.util.List<String> getInactiveProfileIds() { return java.util.List.of(); }
         @Override
-        public java.util.Map<String, String> getSystemProperties() { return null; }
+        public java.util.Map<String, String> getSystemProperties() { return java.util.Map.of(); }
         @Override
-        public java.util.Map<String, String> getUserProperties() { return null; }
+        public java.util.Map<String, String> getUserProperties() { return java.util.Map.of(); }
         @Override
-        public org.apache.maven.api.model.RepositoryMerging getRepositoryMerging() { return null; }
+        public RepositoryMerging getRepositoryMerging() { return RepositoryMerging.POM_DOMINANT; }
         @Override
-        public java.util.List<org.apache.maven.api.RemoteRepository> getRepositories() { return null; }
+        public java.util.List<RemoteRepository> getRepositories() { return java.util.List.of(); }
         @Override
-        public org.apache.maven.api.services.ModelTransformer getLifecycleBindingsInjector() { return null; }
+        public ModelTransformer getLifecycleBindingsInjector() { return null; }
     }
 
     @Test
