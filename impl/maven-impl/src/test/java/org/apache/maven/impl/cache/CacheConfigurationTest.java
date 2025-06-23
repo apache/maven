@@ -160,6 +160,57 @@ class CacheConfigurationTest {
     }
 
     @Test
+    void testInterfaceMatching() {
+        // Test that selectors match against implemented interfaces, not just class names
+        PartialCacheConfig config = PartialCacheConfig.complete(CacheRetention.SESSION_SCOPED, Cache.ReferenceType.HARD);
+        CacheSelector selector = CacheSelector.forRequestType("ModelBuilderRequest", config);
+
+        // Create a mock request that implements ModelBuilderRequest interface
+        Request<?> mockRequest = mock(Request.class);
+        when(mockRequest.getClass()).thenReturn((Class) TestRequestImpl.class);
+        when(mockRequest.getTrace()).thenReturn(null);
+
+        // Should match because TestRequestImpl implements ModelBuilderRequest
+        assertTrue(selector.matches(mockRequest));
+
+        // Test with a selector for a different interface
+        CacheSelector requestSelector = CacheSelector.forRequestType("Request", config);
+        assertTrue(requestSelector.matches(mockRequest)); // Should match Request interface
+    }
+
+    // Test implementation class that implements ModelBuilderRequest
+    private static class TestRequestImpl implements ModelBuilderRequest {
+        @Override
+        public org.apache.maven.api.Session getSession() { return null; }
+        @Override
+        public org.apache.maven.api.services.RequestTrace getTrace() { return null; }
+        @Override
+        public RequestType getRequestType() { return null; }
+        @Override
+        public boolean isLocationTracking() { return false; }
+        @Override
+        public boolean isRecursive() { return false; }
+        @Override
+        public org.apache.maven.api.model.ModelSource getSource() { return null; }
+        @Override
+        public java.util.Collection<org.apache.maven.api.model.Profile> getProfiles() { return null; }
+        @Override
+        public java.util.List<String> getActiveProfileIds() { return null; }
+        @Override
+        public java.util.List<String> getInactiveProfileIds() { return null; }
+        @Override
+        public java.util.Map<String, String> getSystemProperties() { return null; }
+        @Override
+        public java.util.Map<String, String> getUserProperties() { return null; }
+        @Override
+        public org.apache.maven.api.model.RepositoryMerging getRepositoryMerging() { return null; }
+        @Override
+        public java.util.List<org.apache.maven.api.RemoteRepository> getRepositories() { return null; }
+        @Override
+        public org.apache.maven.api.services.ModelTransformer getLifecycleBindingsInjector() { return null; }
+    }
+
+    @Test
     void testInvalidConfiguration() {
         String configString = "InvalidSyntax without braces";
         List<CacheSelector> selectors = CacheSelectorParser.parse(configString);

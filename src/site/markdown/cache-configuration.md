@@ -53,12 +53,15 @@ maven.cache.config
 ```
 
 Where:
-- `RequestType`: Short class name of the request (e.g., `ModelBuilderRequest`)
-- `ParentRequestType`: Optional parent request type or `*` for any parent
+- `RequestType`: Short interface name implemented by the request (e.g., `ModelBuilderRequest`)
+- `ParentRequestType`: Optional parent request interface name or `*` for any parent
 - `scope`: Cache retention scope (optional)
 - `ref`: Reference type for cache entries (optional)
 
-**Note**: You can specify only `scope` or only `ref` - missing values will be merged from less specific selectors or use defaults.
+**Note**:
+- You can specify only `scope` or only `ref` - missing values will be merged from less specific selectors or use defaults
+- Selectors match against all interfaces implemented by the request class, not just the class name
+- This allows matching against `ModelBuilderRequest` interface even if the actual class is `DefaultModelBuilderRequest`
 
 ### Available Values
 
@@ -145,6 +148,7 @@ For a `ModelBuilderRequest` with `ModelBuildRequest` parent:
 
 ### Modified Classes
 - `DefaultRequestCache.doCache()`: Enhanced with configurable behavior
+- `CacheSelector.matches()`: Enhanced to match against all implemented interfaces
 - Early return for non-Session requests
 - Removed hardcoded reference types
 - Integrated configuration resolution

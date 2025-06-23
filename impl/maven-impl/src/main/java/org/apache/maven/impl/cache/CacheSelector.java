@@ -65,10 +65,8 @@ public record CacheSelector(String parentRequestType, String requestType, Partia
      * @return true if this selector matches the request
      */
     public boolean matches(Request<?> req) {
-        String reqTypeName = getShortClassName(req.getClass());
-
-        // Check if request type matches
-        if (!"*".equals(requestType) && !requestType.equals(reqTypeName)) {
+        // Check if request type matches any of the implemented interfaces
+        if (!"*".equals(requestType) && !matchesAnyInterface(req.getClass(), requestType)) {
             return false;
         }
 
@@ -87,6 +85,39 @@ public record CacheSelector(String parentRequestType, String requestType, Partia
     }
 
     /**
+     * Checks if a class or any of its implemented interfaces matches the given type name.
+     *
+     * @param clazz the class to check
+     * @param typeName the type name to match against
+     * @return true if the class or any of its interfaces matches the type name
+     */
+    private boolean matchesAnyInterface(Class<?> clazz, String typeName) {
+        // Check the class itself first
+        if (typeName.equals(getShortClassName(clazz))) {
+            return true;
+        }
+
+        // Check all implemented interfaces
+        for (Class<?> iface : clazz.getInterfaces()) {
+            if (typeName.equals(getShortClassName(iface))) {
+                return true;
+            }
+            // Recursively check parent interfaces
+            if (matchesAnyInterface(iface, typeName)) {
+                return true;
+            }
+        }
+
+        // Check superclass if it exists
+        Class<?> superClass = clazz.getSuperclass();
+        if (superClass != null && superClass != Object.class) {
+            return matchesAnyInterface(superClass, typeName);
+        }
+
+        return false;
+    }
+
+    /**
      * Gets the short class name (without package) of a class.
      */
     private String getShortClassName(Class<?> clazz) {
@@ -96,18 +127,50 @@ public record CacheSelector(String parentRequestType, String requestType, Partia
 
     /**
      * Gets the parent request type from the request trace.
+     * Returns the first interface name that matches a known request interface pattern.
      */
     private String getParentRequestType(Request<?> req) {
         RequestTrace trace = req.getTrace();
         if (trace != null && trace.parent() != null) {
             Object parentData = trace.parent().data();
             if (parentData instanceof Request<?> parentReq) {
-                return getShortClassName(parentReq.getClass());
+                // Try to find the most specific interface name
+                return getBestInterfaceName(parentReq.getClass());
             }
         }
         return null;
     }
 
+    /**
+     * Gets the best interface name for a request class.
+     * Prefers Request-specific interfaces over generic ones.
+     */
+    private String getBestInterfaceName(Class<?> clazz) {
+        // First, check if the class itself is a good match (not Object or generic classes)
+        String className = getShortClassName(clazz);
+        if (!className.equals("Object") && !className.startsWith("$")) {
+            return className;
+        }
+
+        // Look for Request-specific interfaces first
+        for (Class<?> iface : clazz.getInterfaces()) {
+            String ifaceName = getShortClassName(iface);
+            if (ifaceName.endsWith("Request") && !ifaceName.equals("Request")) {
+                return ifaceName;
+            }
+        }
+
+        // Fall back to any interface
+        for (Class<?> iface : clazz.getInterfaces()) {
+            String ifaceName = getShortClassName(iface);
+            if (!ifaceName.equals("Request")) {
+                return ifaceName;
+            }
+        }
+
+        // Fall back to class name
+        return className;
+    }
     @Override
     public String toString() {
         if (parentRequestType == null) {
