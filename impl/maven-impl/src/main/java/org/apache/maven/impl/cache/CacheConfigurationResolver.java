@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.cache.CacheMetadata;
 import org.apache.maven.api.cache.CacheRetention;
@@ -34,20 +35,15 @@ import org.slf4j.LoggerFactory;
  */
 public class CacheConfigurationResolver {
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheConfigurationResolver.class);
-    
-    /**
-     * User property key for cache configuration.
-     */
-    public static final String CACHE_CONFIG_PROPERTY = "maven.cache.config";
-    
+
     /**
      * Cache for parsed selectors per session to avoid re-parsing.
      */
     private static final ConcurrentMap<String, List<CacheSelector>> SELECTOR_CACHE = new ConcurrentHashMap<>();
-    
+
     /**
      * Resolves cache configuration for the given request and session.
-     * 
+     *
      * @param req the request to resolve configuration for
      * @param session the session containing user properties
      * @return the resolved cache configuration
@@ -58,9 +54,9 @@ public class CacheConfigurationResolver {
         if (req instanceof CacheMetadata metadata) {
             legacyRetention = metadata.getCacheRetention();
         }
-        
+
         // Get user-defined configuration
-        String configString = session.getUserProperties().get(CACHE_CONFIG_PROPERTY);
+        String configString = session.getUserProperties().get(Constants.MAVEN_CACHE_CONFIG_PROPERTY);
         if (configString == null || configString.trim().isEmpty()) {
             // No user configuration, use legacy behavior or defaults
             if (legacyRetention != null) {
@@ -68,7 +64,7 @@ public class CacheConfigurationResolver {
             }
             return CacheConfig.DEFAULT;
         }
-        
+
         // Parse and cache selectors
         List<CacheSelector> selectors = SELECTOR_CACHE.computeIfAbsent(configString, CacheSelectorParser::parse);
 
@@ -78,13 +74,20 @@ public class CacheConfigurationResolver {
             if (selector.matches(req)) {
                 if (mergedConfig == null) {
                     mergedConfig = selector.config();
-                    LOGGER.debug("Cache config for {}: matched selector '{}' with config {}",
-                        req.getClass().getSimpleName(), selector, selector.config());
+                    LOGGER.debug(
+                            "Cache config for {}: matched selector '{}' with config {}",
+                            req.getClass().getSimpleName(),
+                            selector,
+                            selector.config());
                 } else {
                     PartialCacheConfig previousConfig = mergedConfig;
                     mergedConfig = mergedConfig.mergeWith(selector.config());
-                    LOGGER.debug("Cache config for {}: merged selector '{}' with previous config {} -> {}",
-                        req.getClass().getSimpleName(), selector, previousConfig, mergedConfig);
+                    LOGGER.debug(
+                            "Cache config for {}: merged selector '{}' with previous config {} -> {}",
+                            req.getClass().getSimpleName(),
+                            selector,
+                            previousConfig,
+                            mergedConfig);
                 }
 
                 // If we have a complete configuration, we can stop
@@ -100,20 +103,21 @@ public class CacheConfigurationResolver {
             LOGGER.debug("Final cache config for {}: {}", req.getClass().getSimpleName(), finalConfig);
             return finalConfig;
         }
-        
+
         // No selector matched, use legacy behavior or defaults
         if (legacyRetention != null) {
             CacheConfig config = new CacheConfig(legacyRetention, getDefaultReferenceType(legacyRetention));
-            LOGGER.debug("Cache config for {}: {} (legacy CacheMetadata)", 
-                req.getClass().getSimpleName(), config);
+            LOGGER.debug(
+                    "Cache config for {}: {} (legacy CacheMetadata)",
+                    req.getClass().getSimpleName(),
+                    config);
             return config;
         }
-        
-        LOGGER.debug("Cache config for {}: {} (default)", 
-            req.getClass().getSimpleName(), CacheConfig.DEFAULT);
+
+        LOGGER.debug("Cache config for {}: {} (default)", req.getClass().getSimpleName(), CacheConfig.DEFAULT);
         return CacheConfig.DEFAULT;
     }
-    
+
     /**
      * Gets the default reference type for a given cache retention.
      * This maintains backward compatibility with the original hardcoded behavior.
@@ -126,7 +130,7 @@ public class CacheConfigurationResolver {
             case DISABLED -> Cache.ReferenceType.NONE;
         };
     }
-    
+
     /**
      * Clears the selector cache. Useful for testing.
      */

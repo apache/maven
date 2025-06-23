@@ -622,5 +622,12 @@ public final class Constants {
      */
     public static final String MAVEN_LOGGER_LOG_PREFIX = MAVEN_LOGGER_PREFIX + "log.";
 
+    /**
+     * User property key for cache configuration.
+     *
+     * @since 4.1.0
+     */
+    public static final String MAVEN_CACHE_CONFIG_PROPERTY = "maven.cache.config";
+
     private Constants() {}
 }

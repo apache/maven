@@ -18,7 +18,6 @@
  */
 package org.apache.maven.impl.cache;
 
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 
@@ -26,7 +25,6 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.SessionData;
 import org.apache.maven.api.cache.CacheMetadata;
 import org.apache.maven.api.cache.CacheRetention;
-import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.Request;
 import org.apache.maven.api.services.RequestTrace;
 import org.apache.maven.api.services.Result;

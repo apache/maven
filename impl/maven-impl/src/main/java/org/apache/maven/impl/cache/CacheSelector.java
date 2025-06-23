@@ -31,14 +31,18 @@ import org.apache.maven.api.services.RequestTrace;
  * - "ParentType RequestType" matches RequestType with ParentType as parent
  * - "ParentType *" matches any request with ParentType as parent
  * - "* RequestType" matches RequestType with any parent (equivalent to just "RequestType")
+ *
+ * @param parentRequestType
+ * @param requestType
+ * @param config
  */
 public record CacheSelector(String parentRequestType, String requestType, PartialCacheConfig config) {
-    
+
     public CacheSelector {
         Objects.requireNonNull(requestType, "requestType cannot be null");
         Objects.requireNonNull(config, "config cannot be null");
     }
-    
+
     /**
      * Creates a selector that matches any request of the specified type.
      */
@@ -49,38 +53,39 @@ public record CacheSelector(String parentRequestType, String requestType, Partia
     /**
      * Creates a selector that matches requests with a specific parent type.
      */
-    public static CacheSelector forParentAndRequestType(String parentRequestType, String requestType, PartialCacheConfig config) {
+    public static CacheSelector forParentAndRequestType(
+            String parentRequestType, String requestType, PartialCacheConfig config) {
         return new CacheSelector(parentRequestType, requestType, config);
     }
-    
+
     /**
      * Checks if this selector matches the given request.
-     * 
+     *
      * @param req the request to match
      * @return true if this selector matches the request
      */
     public boolean matches(Request<?> req) {
         String reqTypeName = getShortClassName(req.getClass());
-        
+
         // Check if request type matches
         if (!"*".equals(requestType) && !requestType.equals(reqTypeName)) {
             return false;
         }
-        
+
         // If no parent type specified, it matches
         if (parentRequestType == null) {
             return true;
         }
-        
+
         // Check parent request type
         String parentTypeName = getParentRequestType(req);
         if (parentTypeName == null) {
             return false;
         }
-        
+
         return "*".equals(parentRequestType) || parentRequestType.equals(parentTypeName);
     }
-    
+
     /**
      * Gets the short class name (without package) of a class.
      */
@@ -88,7 +93,7 @@ public record CacheSelector(String parentRequestType, String requestType, Partia
         String name = clazz.getSimpleName();
         return name.isEmpty() ? clazz.getName() : name;
     }
-    
+
     /**
      * Gets the parent request type from the request trace.
      */
@@ -102,7 +107,7 @@ public record CacheSelector(String parentRequestType, String requestType, Partia
         }
         return null;
     }
-    
+
     @Override
     public String toString() {
         if (parentRequestType == null) {

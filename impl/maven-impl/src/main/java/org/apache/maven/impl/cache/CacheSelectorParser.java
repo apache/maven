@@ -42,31 +42,27 @@ import org.slf4j.LoggerFactory;
  */
 public class CacheSelectorParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheSelectorParser.class);
-    
+
     // Pattern to match selector rules: "[ParentType] RequestType { properties }"
-    private static final Pattern RULE_PATTERN = Pattern.compile(
-        "([\\w*]+)(?:\\s+([\\w*]+))?\\s*\\{([^}]+)\\}",
-        Pattern.MULTILINE
-    );
-    
+    private static final Pattern RULE_PATTERN =
+            Pattern.compile("([\\w*]+)(?:\\s+([\\w*]+))?\\s*\\{([^}]+)\\}", Pattern.MULTILINE);
+
     // Pattern to match properties within braces: "key: value"
-    private static final Pattern PROPERTY_PATTERN = Pattern.compile(
-        "(\\w+)\\s*:\\s*([\\w]+)"
-    );
-    
+    private static final Pattern PROPERTY_PATTERN = Pattern.compile("(\\w+)\\s*:\\s*([\\w]+)");
+
     /**
      * Parses a cache configuration string into a list of cache selectors.
-     * 
+     *
      * @param configString the configuration string to parse
      * @return list of parsed cache selectors, ordered by specificity (most specific first)
      */
     public static List<CacheSelector> parse(String configString) {
         List<CacheSelector> selectors = new ArrayList<>();
-        
+
         if (configString == null || configString.trim().isEmpty()) {
             return selectors;
         }
-        
+
         Matcher ruleMatcher = RULE_PATTERN.matcher(configString);
         while (ruleMatcher.find()) {
             try {
@@ -78,13 +74,13 @@ public class CacheSelectorParser {
                 LOGGER.warn("Failed to parse cache selector rule: {}", ruleMatcher.group(), e);
             }
         }
-        
+
         // Sort by specificity (most specific first)
         selectors.sort((a, b) -> compareSpecificity(b, a));
-        
+
         return selectors;
     }
-    
+
     /**
      * Parses a single rule from a regex matcher.
      */
@@ -110,7 +106,7 @@ public class CacheSelectorParser {
 
         return new CacheSelector(parentType, requestType, config);
     }
-    
+
     /**
      * Parses properties string into a PartialCacheConfig.
      */
@@ -139,7 +135,7 @@ public class CacheSelectorParser {
         // Return partial configuration (null values are allowed)
         return new PartialCacheConfig(scope, referenceType);
     }
-    
+
     /**
      * Parses a scope string into CacheRetention.
      */
@@ -155,7 +151,7 @@ public class CacheSelectorParser {
             }
         };
     }
-    
+
     /**
      * Parses a reference type string into Cache.ReferenceType.
      */
@@ -171,7 +167,7 @@ public class CacheSelectorParser {
             }
         };
     }
-    
+
     /**
      * Compares specificity of two selectors. More specific selectors should be checked first.
      * Specificity order: parent + request > request only > wildcard
@@ -181,10 +177,10 @@ public class CacheSelectorParser {
         int bScore = getSpecificityScore(b);
         return Integer.compare(aScore, bScore);
     }
-    
+
     private static int getSpecificityScore(CacheSelector selector) {
         int score = 0;
-        
+
         // Parent type specificity
         if (selector.parentRequestType() != null) {
             if (!"*".equals(selector.parentRequestType())) {
@@ -193,14 +189,14 @@ public class CacheSelectorParser {
                 score += 50; // Wildcard parent type
             }
         }
-        
+
         // Request type specificity
         if (!"*".equals(selector.requestType())) {
             score += 10; // Specific request type
         } else {
             score += 1; // Wildcard request type
         }
-        
+
         return score;
     }
 }

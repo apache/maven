@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.cache.CacheRetention;
 import org.apache.maven.api.services.ModelBuilderRequest;
@@ -31,8 +32,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 /**
  * Test for cache configuration functionality.
@@ -70,7 +73,7 @@ class CacheConfigurationTest {
     void testParseSimpleSelector() {
         String configString = "ModelBuilderRequest { scope: session, ref: hard }";
         List<CacheSelector> selectors = CacheSelectorParser.parse(configString);
-        
+
         assertEquals(1, selectors.size());
         CacheSelector selector = selectors.get(0);
         assertEquals("ModelBuilderRequest", selector.requestType());
@@ -107,25 +110,26 @@ class CacheConfigurationTest {
 
     @Test
     void testParseMultipleSelectors() {
-        String configString = """
+        String configString =
+                """
             ModelBuilderRequest { scope: session, ref: soft }
             ArtifactResolutionRequest { scope: request, ref: hard }
             * VersionRangeRequest { ref: weak }
             """;
         List<CacheSelector> selectors = CacheSelectorParser.parse(configString);
-        
+
         assertEquals(3, selectors.size());
-        
+
         // Check first selector
         CacheSelector first = selectors.get(0);
         assertEquals("VersionRangeRequest", first.requestType());
         assertEquals("*", first.parentRequestType());
-        
+
         // Check second selector
         CacheSelector second = selectors.get(1);
         assertEquals("ModelBuilderRequest", second.requestType());
         assertNull(second.parentRequestType());
-        
+
         // Check third selector
         CacheSelector third = selectors.get(2);
         assertEquals("ArtifactResolutionRequest", third.requestType());
@@ -134,11 +138,10 @@ class CacheConfigurationTest {
 
     @Test
     void testConfigurationResolution() {
-        userProperties.put(CacheConfigurationResolver.CACHE_CONFIG_PROPERTY, 
-            "ModelBuilderRequest { scope: session, ref: hard }");
-        
+        userProperties.put(Constants.MAVEN_CACHE_CONFIG_PROPERTY, "ModelBuilderRequest { scope: session, ref: hard }");
+
         when(modelBuilderRequest.getClass()).thenReturn((Class) ModelBuilderRequest.class);
-        
+
         CacheConfig config = CacheConfigurationResolver.resolveConfig(modelBuilderRequest, session);
         assertEquals(CacheRetention.SESSION_SCOPED, config.scope());
         assertEquals(Cache.ReferenceType.HARD, config.referenceType());
@@ -146,7 +149,8 @@ class CacheConfigurationTest {
 
     @Test
     void testSelectorMatching() {
-        PartialCacheConfig config = PartialCacheConfig.complete(CacheRetention.SESSION_SCOPED, Cache.ReferenceType.HARD);
+        PartialCacheConfig config =
+                PartialCacheConfig.complete(CacheRetention.SESSION_SCOPED, Cache.ReferenceType.HARD);
         CacheSelector selector = CacheSelector.forRequestType("ModelBuilderRequest", config);
 
         when(modelBuilderRequest.getClass()).thenReturn((Class) ModelBuilderRequest.class);
@@ -171,8 +175,9 @@ class CacheConfigurationTest {
 
     @Test
     void testPartialConfigurationMerging() {
-        userProperties.put(CacheConfigurationResolver.CACHE_CONFIG_PROPERTY,
-            """
+        userProperties.put(
+                Constants.MAVEN_CACHE_CONFIG_PROPERTY,
+                """
             ModelBuilderRequest { scope: session }
             * ModelBuilderRequest { ref: hard }
             """);

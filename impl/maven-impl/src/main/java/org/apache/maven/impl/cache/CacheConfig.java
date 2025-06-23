@@ -22,24 +22,24 @@ import org.apache.maven.api.cache.CacheRetention;
 
 /**
  * Configuration for cache behavior including scope and reference type.
- * 
+ *
  * @param scope the cache retention scope
  * @param referenceType the reference type to use for cache entries
  */
 public record CacheConfig(CacheRetention scope, Cache.ReferenceType referenceType) {
-    
+
     /**
      * Default cache configuration with REQUEST_SCOPED and SOFT reference type.
      */
     public static final CacheConfig DEFAULT = new CacheConfig(CacheRetention.REQUEST_SCOPED, Cache.ReferenceType.SOFT);
-    
+
     /**
      * Creates a cache configuration with the specified scope and default SOFT reference type.
      */
     public static CacheConfig withScope(CacheRetention scope) {
         return new CacheConfig(scope, Cache.ReferenceType.SOFT);
     }
-    
+
     /**
      * Creates a cache configuration with the specified reference type and default REQUEST_SCOPED scope.
      */
