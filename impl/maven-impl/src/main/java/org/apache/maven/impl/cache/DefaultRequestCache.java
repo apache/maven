@@ -98,16 +98,24 @@ public class DefaultRequestCache extends AbstractRequestCache {
     @SuppressWarnings("unchecked")
     protected <REQ extends Request<?>, REP extends Result<REQ>> CachingSupplier<REQ, REP> doCache(
             REQ req, Function<REQ, REP> supplier) {
-        CacheRetention retention = Objects.requireNonNullElseGet(
-                req instanceof CacheMetadata metadata ? metadata.getCacheRetention() : null,
-                () -> CacheRetention.REQUEST_SCOPED);
+        // Early return for non-Session requests (e.g., ProtoSession)
+        if (!(req.getSession() instanceof Session session)) {
+            return new CachingSupplier<>(supplier);
+        }
 
-        Cache.ReferenceType referenceType = Cache.ReferenceType.NONE;
+        CacheConfig config = getCacheConfig(req, session);
+        CacheRetention retention = config.scope();
+        Cache.ReferenceType referenceType = config.referenceType();
+
+        // Handle disabled caching
+        if (retention == CacheRetention.DISABLED || referenceType == Cache.ReferenceType.NONE) {
+            return new CachingSupplier<>(supplier);
+        }
 
         Cache<Object, CachingSupplier<?, ?>> cache = null;
         String cacheType = "NONE";
 
-        if (retention == CacheRetention.SESSION_SCOPED && req.getSession() instanceof Session session) {
+        if (retention == CacheRetention.SESSION_SCOPED) {
             Cache<Object, Cache<Object, CachingSupplier<?, ?>>> caches =
                     session.getData().computeIfAbsent(KEY, () -> Cache.newCache(Cache.ReferenceType.SOFT));
             cache = caches.computeIfAbsent(ROOT, k -> Cache.newCache(Cache.ReferenceType.SOFT));
@@ -123,34 +131,30 @@ public class DefaultRequestCache extends AbstractRequestCache {
                         caches.size(),
                         ROOT);
             }
-        } else if (retention == CacheRetention.REQUEST_SCOPED && req.getSession() instanceof Session session) {
+        } else if (retention == CacheRetention.REQUEST_SCOPED) {
             Object key = doGetOuterRequest(req);
-            if (key instanceof ModelBuilderRequest) {
-                Cache<Object, Cache<Object, CachingSupplier<?, ?>>> caches =
-                        session.getData().computeIfAbsent(KEY, () -> Cache.newCache(Cache.ReferenceType.SOFT));
-                cache = caches.computeIfAbsent(key, k -> Cache.newCache(Cache.ReferenceType.SOFT));
-                referenceType = Cache.ReferenceType.HARD;
-                cacheType = "REQUEST_SCOPED";
-                REQUEST_SCOPED_CACHE_COUNT.incrementAndGet();
+            Cache<Object, Cache<Object, CachingSupplier<?, ?>>> caches =
+                    session.getData().computeIfAbsent(KEY, () -> Cache.newCache(Cache.ReferenceType.SOFT));
+            cache = caches.computeIfAbsent(key, k -> Cache.newCache(Cache.ReferenceType.SOFT));
+            cacheType = "REQUEST_SCOPED";
+            REQUEST_SCOPED_CACHE_COUNT.incrementAndGet();
 
-                // Debug logging for cache sizes
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug(
-                            "Cache access: type={}, request={}, cacheSize={}, totalCaches={}, key={}",
-                            cacheType,
-                            req.getClass().getSimpleName(),
-                            cache.size(),
-                            caches.size(),
-                            key.getClass().getSimpleName());
-                }
+            // Debug logging for cache sizes
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(
+                        "Cache access: type={}, request={}, cacheSize={}, totalCaches={}, key={}",
+                        cacheType,
+                        req.getClass().getSimpleName(),
+                        cache.size(),
+                        caches.size(),
+                        key.getClass().getSimpleName());
             }
 
-        } else if (retention == CacheRetention.PERSISTENT && req.getSession() instanceof Session session) {
+        } else if (retention == CacheRetention.PERSISTENT) {
             Cache<Object, Cache<Object, CachingSupplier<?, ?>>> caches =
                     session.getData().computeIfAbsent(KEY, () -> Cache.newCache(Cache.ReferenceType.SOFT));
             cache = caches.computeIfAbsent(KEY, k -> Cache.newCache(Cache.ReferenceType.SOFT));
 
-            referenceType = Cache.ReferenceType.HARD;
             cacheType = "PERSISTENT";
             PERSISTENT_CACHE_COUNT.incrementAndGet();
 
@@ -257,5 +261,16 @@ public class DefaultRequestCache extends AbstractRequestCache {
                 .append("\n");
 
         return stats.toString();
+    }
+
+    /**
+     * Gets the cache configuration for the given request and session.
+     *
+     * @param req the request to get configuration for
+     * @param session the session containing user properties
+     * @return the resolved cache configuration
+     */
+    private <REQ extends Request<?>> CacheConfig getCacheConfig(REQ req, Session session) {
+        return CacheConfigurationResolver.resolveConfig(req, session);
     }
 }
