@@ -114,7 +114,7 @@ import org.apache.maven.api.spi.ModelParserException;
 import org.apache.maven.api.spi.ModelTransformer;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.RequestTraceHelper;
-import org.apache.maven.impl.cache.RefConcurrentMap;
+import org.apache.maven.impl.cache.Cache;
 import org.apache.maven.impl.util.PhasingExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -2196,17 +2196,17 @@ public class DefaultModelBuilder implements ModelBuilder {
     private <REQ extends Request<?>> void clearRequestScopedCache(REQ req) {
         if (req.getSession() instanceof Session session) {
             // Use the same key as DefaultRequestCache
-            SessionData.Key<RefConcurrentMap> key = SessionData.key(RefConcurrentMap.class, CacheMetadata.class);
+            SessionData.Key<Cache> key = SessionData.key(Cache.class, CacheMetadata.class);
 
             // Get the outer request key using the same logic as DefaultRequestCache
             Object outerRequestKey = getOuterRequest(req);
 
-            Map<?, ?> caches = session.getData().get(key);
+            Cache<Object, Object> caches = session.getData().get(key);
             if (caches != null) {
                 Object removedCache = caches.get(outerRequestKey);
-                if (removedCache instanceof RefConcurrentMap<?, ?> map) {
+                if (removedCache instanceof Cache<?, ?> map) {
                     int beforeSize = map.size();
-                    map.keySet().removeIf(r -> !(r instanceof RgavCacheKey) && !(r instanceof SourceCacheKey));
+                    map.removeIf((k, v) -> !(k instanceof RgavCacheKey) && !(k instanceof SourceCacheKey));
                     int afterSize = map.size();
                     if (logger.isDebugEnabled()) {
                         logger.debug(

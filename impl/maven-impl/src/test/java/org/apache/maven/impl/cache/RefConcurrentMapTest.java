@@ -35,15 +35,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RefConcurrentMapTest {
-    private RefConcurrentMap<Object, String> softMap;
-    private RefConcurrentMap<Object, String> weakMap;
-    private RefConcurrentMap<Object, String> hardMap;
+    private Cache.RefConcurrentMap<Object, String> softMap;
+    private Cache.RefConcurrentMap<Object, String> weakMap;
+    private Cache.RefConcurrentMap<Object, String> hardMap;
 
     @BeforeEach
     void setUp() {
-        softMap = RefConcurrentMap.softMap();
-        weakMap = RefConcurrentMap.weakMap();
-        hardMap = RefConcurrentMap.hardMap();
+        softMap = Cache.RefConcurrentMap.newCache(Cache.ReferenceType.SOFT);
+        weakMap = Cache.RefConcurrentMap.newCache(Cache.ReferenceType.WEAK);
+        hardMap = Cache.RefConcurrentMap.newCache(Cache.ReferenceType.HARD);
     }
 
     @Test

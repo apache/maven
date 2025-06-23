@@ -18,9 +18,7 @@
  */
 package org.apache.maven.impl.cache;
 
-import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 
@@ -40,16 +38,14 @@ public class DefaultRequestCache extends AbstractRequestCache {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultRequestCache.class);
 
-    protected static final SessionData.Key<RefConcurrentMap> KEY =
-            SessionData.key(RefConcurrentMap.class, CacheMetadata.class);
+    protected static final SessionData.Key<Cache> KEY = SessionData.key(Cache.class, CacheMetadata.class);
     protected static final Object ROOT = new Object();
-
-    protected final Map<Object, CachingSupplier<?, ?>> forever = new ConcurrentHashMap<>();
 
     // Debug counters for memory analysis
     private static final AtomicLong REQUEST_SCOPED_CACHE_COUNT = new AtomicLong(0);
     private static final AtomicLong SESSION_SCOPED_CACHE_COUNT = new AtomicLong(0);
     private static final AtomicLong PERSISTENT_CACHE_COUNT = new AtomicLong(0);
+    private static final AtomicLong PERSISTENT_CACHE_SIZE = new AtomicLong(0);
     private static final AtomicLong TOTAL_CACHE_HITS = new AtomicLong(0);
     private static final AtomicLong TOTAL_CACHE_MISSES = new AtomicLong(0);
 
@@ -90,7 +86,10 @@ public class DefaultRequestCache extends AbstractRequestCache {
         stats.append("  Session scoped cache accesses: ")
                 .append(SESSION_SCOPED_CACHE_COUNT.get())
                 .append("\n");
-        stats.append("  Persistent cache accesses: ").append(PERSISTENT_CACHE_COUNT.get());
+        stats.append("  Persistent cache accesses: ")
+                .append(PERSISTENT_CACHE_COUNT.get())
+                .append("\n");
+        stats.append("  Persistent cache size: ").append(PERSISTENT_CACHE_SIZE.get());
 
         return stats.toString();
     }
@@ -103,13 +102,15 @@ public class DefaultRequestCache extends AbstractRequestCache {
                 req instanceof CacheMetadata metadata ? metadata.getCacheRetention() : null,
                 () -> CacheRetention.REQUEST_SCOPED);
 
-        Map<Object, CachingSupplier<?, ?>> cache = null;
+        Cache.ReferenceType referenceType = Cache.ReferenceType.NONE;
+
+        Cache<Object, CachingSupplier<?, ?>> cache = null;
         String cacheType = "NONE";
 
         if (retention == CacheRetention.SESSION_SCOPED && req.getSession() instanceof Session session) {
-            Map<Object, Map<Object, CachingSupplier<?, ?>>> caches =
-                    session.getData().computeIfAbsent(KEY, RefConcurrentMap::softMap);
-            cache = caches.computeIfAbsent(ROOT, k -> RefConcurrentMap.<Object, CachingSupplier<?, ?>>softMap());
+            Cache<Object, Cache<Object, CachingSupplier<?, ?>>> caches =
+                    session.getData().computeIfAbsent(KEY, () -> Cache.newCache(Cache.ReferenceType.SOFT));
+            cache = caches.computeIfAbsent(ROOT, k -> Cache.newCache(Cache.ReferenceType.SOFT));
             cacheType = "SESSION_SCOPED";
             SESSION_SCOPED_CACHE_COUNT.incrementAndGet();
             // Debug logging for cache sizes
@@ -125,10 +126,10 @@ public class DefaultRequestCache extends AbstractRequestCache {
         } else if (retention == CacheRetention.REQUEST_SCOPED && req.getSession() instanceof Session session) {
             Object key = doGetOuterRequest(req);
             if (key instanceof ModelBuilderRequest) {
-                Map<Object, Map<Object, CachingSupplier<?, ?>>> caches =
-                        session.getData().computeIfAbsent(KEY, RefConcurrentMap::softMap);
-                cache = caches.computeIfAbsent(key, k -> RefConcurrentMap.<Object, CachingSupplier<?, ?>>softMap());
-
+                Cache<Object, Cache<Object, CachingSupplier<?, ?>>> caches =
+                        session.getData().computeIfAbsent(KEY, () -> Cache.newCache(Cache.ReferenceType.SOFT));
+                cache = caches.computeIfAbsent(key, k -> Cache.newCache(Cache.ReferenceType.SOFT));
+                referenceType = Cache.ReferenceType.HARD;
                 cacheType = "REQUEST_SCOPED";
                 REQUEST_SCOPED_CACHE_COUNT.incrementAndGet();
 
@@ -144,8 +145,12 @@ public class DefaultRequestCache extends AbstractRequestCache {
                 }
             }
 
-        } else if (retention == CacheRetention.PERSISTENT) {
-            cache = forever;
+        } else if (retention == CacheRetention.PERSISTENT && req.getSession() instanceof Session session) {
+            Cache<Object, Cache<Object, CachingSupplier<?, ?>>> caches =
+                    session.getData().computeIfAbsent(KEY, () -> Cache.newCache(Cache.ReferenceType.SOFT));
+            cache = caches.computeIfAbsent(KEY, k -> Cache.newCache(Cache.ReferenceType.SOFT));
+
+            referenceType = Cache.ReferenceType.HARD;
             cacheType = "PERSISTENT";
             PERSISTENT_CACHE_COUNT.incrementAndGet();
 
@@ -154,15 +159,18 @@ public class DefaultRequestCache extends AbstractRequestCache {
                         "Cache access: type={}, request={}, persistentCacheSize={}",
                         cacheType,
                         req.getClass().getSimpleName(),
-                        forever.size());
+                        PERSISTENT_CACHE_SIZE.get());
             }
         }
 
         if (cache != null) {
             boolean isNewEntry = !cache.containsKey(req);
-            CachingSupplier<REQ, REP> result =
-                    (CachingSupplier<REQ, REP>) cache.computeIfAbsent(req, r -> new CachingSupplier<>(supplier));
+            CachingSupplier<REQ, REP> result = (CachingSupplier<REQ, REP>)
+                    cache.computeIfAbsent(req, r -> new CachingSupplier<>(supplier), referenceType);
 
+            if (isNewEntry && retention == CacheRetention.PERSISTENT) {
+                PERSISTENT_CACHE_SIZE.incrementAndGet();
+            }
             if (isNewEntry) {
                 TOTAL_CACHE_MISSES.incrementAndGet();
                 if (LOGGER.isTraceEnabled()) {
@@ -194,7 +202,7 @@ public class DefaultRequestCache extends AbstractRequestCache {
                         REQUEST_SCOPED_CACHE_COUNT.get(),
                         SESSION_SCOPED_CACHE_COUNT.get(),
                         PERSISTENT_CACHE_COUNT.get(),
-                        forever.size());
+                        PERSISTENT_CACHE_SIZE.get());
             }
 
             return result;
@@ -243,31 +251,11 @@ public class DefaultRequestCache extends AbstractRequestCache {
         stats.append("  Persistent cache accesses: ")
                 .append(PERSISTENT_CACHE_COUNT.get())
                 .append("\n");
-        stats.append("  Persistent cache size: ").append(forever.size()).append("\n");
+
+        stats.append("  Persistent cache size: ")
+                .append(PERSISTENT_CACHE_SIZE.get())
+                .append("\n");
 
         return stats.toString();
-    }
-
-    /**
-     * Force garbage collection and log cache sizes to help debug memory retention issues.
-     * This method should only be used for debugging purposes.
-     */
-    public void debugMemoryUsage() {
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Before GC - Persistent cache size: {}", forever.size());
-
-            // Force garbage collection to see if SoftConcurrentMap releases entries
-            System.gc();
-            System.runFinalization();
-
-            try {
-                Thread.sleep(100); // Give GC time to work
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-
-            LOGGER.info("After GC - Persistent cache size: {}", forever.size());
-            LOGGER.info("Cache statistics:\n{}", getCacheStatistics());
-        }
     }
 }

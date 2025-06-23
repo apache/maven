@@ -120,6 +120,7 @@ public class InputSource implements Serializable {
     }
 
     public static InputSource merge(InputSource src1, InputSource src2) {
-        return new InputSource(Stream.concat(src1.sources(), src2.sources()).collect(Collectors.toSet()));
+        return new InputSource(
+                Stream.concat(src1.sources(), src2.sources()).distinct().toList());
     }
 }

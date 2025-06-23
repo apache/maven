@@ -43,11 +43,19 @@ import java.util.function.ToIntFunction;
  */
 class DependencyPool {
 
-    private static final RefConcurrentMap<PoolKey, Dependency> POOL = RefConcurrentMap.weakMap();
+    private static final Cache<PoolKey, Dependency> POOL;
     private static final AtomicLong TOTAL_INTERN_CALLS = new AtomicLong(0);
     private static final AtomicLong CACHE_HITS = new AtomicLong(0);
 
     static {
+        // Initialize cache
+        String prop = System.getProperty("maven.cache.model.dependency", "none");
+        POOL = switch (prop.toLowerCase().trim()) {
+            case "none" -> Cache.newCache(Cache.ReferenceType.NONE);
+            case "weak" -> Cache.newCache(Cache.ReferenceType.WEAK);
+            case "soft" -> Cache.newCache(Cache.ReferenceType.SOFT);
+            case "hard" -> Cache.newCache(Cache.ReferenceType.HARD);
+            default -> throw new IllegalArgumentException("Unknown cache model property: " + prop);};
         // Add shutdown hook to print statistics
         Runtime.getRuntime()
                 .addShutdownHook(new Thread(
@@ -145,26 +153,6 @@ class DependencyPool {
      */
     static int size() {
         return POOL.size();
-    }
-
-    /**
-     * Removes all dependencies from the pool.
-     * <p>
-     * This method is primarily useful for testing and cleanup purposes.
-     */
-    static void clear() {
-        POOL.clear();
-        TOTAL_INTERN_CALLS.set(0);
-        CACHE_HITS.set(0);
-    }
-
-    /**
-     * Returns true if the pool contains no dependencies.
-     *
-     * @return true if the pool is empty, false otherwise
-     */
-    static boolean isEmpty() {
-        return POOL.isEmpty();
     }
 
     /**

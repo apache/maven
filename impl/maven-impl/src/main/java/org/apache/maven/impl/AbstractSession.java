@@ -95,7 +95,7 @@ import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.VersionRangeResolver;
 import org.apache.maven.api.services.VersionResolver;
 import org.apache.maven.api.services.VersionResolverException;
-import org.apache.maven.impl.cache.RefConcurrentMap;
+import org.apache.maven.impl.cache.Cache;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -114,12 +114,14 @@ public abstract class AbstractSession implements InternalSession {
     protected final Lookup lookup;
     private final Map<Class<? extends Service>, Service> services = new ConcurrentHashMap<>();
     private final List<Listener> listeners = new CopyOnWriteArrayList<>();
-    private final Map<org.eclipse.aether.graph.DependencyNode, Node> allNodes = RefConcurrentMap.weakMap();
-    private final Map<Class<? extends Artifact>, Map<org.eclipse.aether.artifact.Artifact, Artifact>> allArtifacts =
+    private final Cache<org.eclipse.aether.graph.DependencyNode, Node> allNodes =
+            Cache.newCache(Cache.ReferenceType.WEAK);
+    private final Map<Class<? extends Artifact>, Cache<org.eclipse.aether.artifact.Artifact, Artifact>> allArtifacts =
             new ConcurrentHashMap<>();
-    private final Map<org.eclipse.aether.repository.RemoteRepository, RemoteRepository> allRepositories =
-            RefConcurrentMap.weakMap();
-    private final Map<org.eclipse.aether.graph.Dependency, Dependency> allDependencies = RefConcurrentMap.weakMap();
+    private final Cache<org.eclipse.aether.repository.RemoteRepository, RemoteRepository> allRepositories =
+            Cache.newCache(Cache.ReferenceType.WEAK);
+    private final Cache<org.eclipse.aether.graph.Dependency, Dependency> allDependencies =
+            Cache.newCache(Cache.ReferenceType.WEAK);
     private volatile RequestCache requestCache;
 
     static {
@@ -223,8 +225,8 @@ public abstract class AbstractSession implements InternalSession {
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Artifact> T getArtifact(Class<T> clazz, org.eclipse.aether.artifact.Artifact artifact) {
-        Map<org.eclipse.aether.artifact.Artifact, Artifact> map =
-                allArtifacts.computeIfAbsent(clazz, c -> RefConcurrentMap.weakMap());
+        Cache<org.eclipse.aether.artifact.Artifact, Artifact> map =
+                allArtifacts.computeIfAbsent(clazz, c -> Cache.newCache(Cache.ReferenceType.WEAK));
         if (clazz == Artifact.class) {
             return (T) map.computeIfAbsent(artifact, a -> new DefaultArtifact(this, a));
         } else if (clazz == DownloadedArtifact.class) {
