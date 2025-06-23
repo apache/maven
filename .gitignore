@@ -22,3 +22,5 @@ repo/
 # Mac
 .DS_Store
 
+# Compiled class files
+*.class

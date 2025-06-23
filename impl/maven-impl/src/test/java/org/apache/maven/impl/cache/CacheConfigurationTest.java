@@ -294,4 +294,26 @@ class CacheConfigurationTest {
         assertEquals(CacheRetention.SESSION_SCOPED, merged2.scope()); // base takes precedence
         assertEquals(Cache.ReferenceType.WEAK, merged2.referenceType()); // from override2
     }
+
+    @Test
+    void testParentInterfaceMatching() {
+        // Test that parent request matching works with interfaces
+        PartialCacheConfig config = PartialCacheConfig.complete(CacheRetention.SESSION_SCOPED, Cache.ReferenceType.HARD);
+        CacheSelector selector = CacheSelector.forParentAndRequestType("ModelBuilderRequest", "Request", config);
+
+        // Create a child request with a parent that implements ModelBuilderRequest
+        TestRequestImpl childRequest = new TestRequestImpl();
+        TestRequestImpl parentRequest = new TestRequestImpl();
+
+        // Mock the trace to simulate parent-child relationship
+        RequestTrace parentTrace = mock(RequestTrace.class);
+        RequestTrace childTrace = mock(RequestTrace.class);
+
+        when(parentTrace.data()).thenReturn(parentRequest);
+        when(childTrace.parent()).thenReturn(parentTrace);
+        when(childRequest.getTrace()).thenReturn(childTrace);
+
+        // Should match because parent implements ModelBuilderRequest interface
+        assertTrue(selector.matches(childRequest));
+    }
 }
