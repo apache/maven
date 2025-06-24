@@ -223,6 +223,9 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
                                 case "version":
                                     parentVersion = text;
                                     break;
+                                default:
+                                    // Ignore other elements
+                                    break;
                             }
                         } else {
                             switch (currentElement) {
@@ -234,6 +237,9 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
                                     break;
                                 case "version":
                                     version = text;
+                                    break;
+                                default:
+                                    // Ignore other elements
                                     break;
                             }
                         }

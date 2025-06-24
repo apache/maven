@@ -23,7 +23,10 @@ import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.ModelObjectProcessor;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test for DefaultModelObjectPool.
@@ -159,7 +162,8 @@ class DefaultModelObjectPoolTest {
     @Test
     void testPerTypeReferenceType() {
         String originalDefault = System.getProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE);
-        String originalDependency = System.getProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE_PREFIX + "Dependency");
+        String originalDependency =
+                System.getProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE_PREFIX + "Dependency");
 
         try {
             // Set default to WEAK and Dependency-specific to HARD
@@ -187,7 +191,8 @@ class DefaultModelObjectPoolTest {
             }
 
             if (originalDependency != null) {
-                System.setProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE_PREFIX + "Dependency", originalDependency);
+                System.setProperty(
+                        Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE_PREFIX + "Dependency", originalDependency);
             } else {
                 System.clearProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE_PREFIX + "Dependency");
             }

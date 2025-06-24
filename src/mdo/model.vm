@@ -60,7 +60,9 @@
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Nonnull" ) )
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.NotThreadSafe" ) )
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.ThreadSafe" ) )
+    #if ( $package == "org.apache.maven.api.model" )
     #set ( $dummy = $imports.add( "org.apache.maven.api.model.ModelObjectProcessor" ) )
+    #end
     #foreach ( $field in $allFields )
       #if ( $field.type == "java.util.List" )
         #set ( $dummy = $imports.add( "java.util.ArrayList" ) )
@@ -499,7 +501,11 @@ public class ${class.name}
                 return base;
             }
             ${class.name} newInstance = new ${class.name}(this);
+    #if ( $package == "org.apache.maven.api.model" )
             return ModelObjectProcessor.processObject(newInstance);
+    #else
+            return newInstance;
+    #end
         }
 
     #if ( $locationTracking && ! $class.superClass )

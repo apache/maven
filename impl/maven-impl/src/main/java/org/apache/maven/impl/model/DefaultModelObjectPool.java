@@ -126,9 +126,8 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
      */
     private static Cache.ReferenceType getDefaultReferenceType() {
         try {
-            String referenceTypeProperty = System.getProperty(
-                    Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE,
-                    Cache.ReferenceType.HARD.name());
+            String referenceTypeProperty =
+                    System.getProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE, Cache.ReferenceType.HARD.name());
             return Cache.ReferenceType.valueOf(referenceTypeProperty.toUpperCase());
         } catch (IllegalArgumentException e) {
             System.err.println("Unknown default reference type, using HARD");
@@ -178,8 +177,12 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj) return true;
-            if (!(obj instanceof PoolKey other)) return false;
+            if (this == obj) {
+                return true;
+            }
+            if (!(obj instanceof PoolKey other)) {
+                return false;
+            }
 
             // Use the object's equals method which should properly include all fields
             return Objects.equals(object, other.object);
@@ -209,7 +212,8 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
         long missCount = misses != null ? misses.get() : 0;
         double hitRatio = total > 0 ? (double) hitCount / total : 0.0;
 
-        return String.format("%s: Total=%d, Hits=%d, Misses=%d, Hit Ratio=%.2f%%",
+        return String.format(
+                "%s: Total=%d, Hits=%d, Misses=%d, Hit Ratio=%.2f%%",
                 objectType.getSimpleName(), total, hitCount, missCount, hitRatio * 100);
     }
 
