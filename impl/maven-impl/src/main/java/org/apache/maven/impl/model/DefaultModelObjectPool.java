@@ -27,9 +27,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.Constants;
-import org.apache.maven.api.model.Cache;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.ModelObjectProcessor;
+import org.apache.maven.impl.cache.Cache;
 
 /**
  * Default implementation of ModelObjectProcessor that provides memory optimization

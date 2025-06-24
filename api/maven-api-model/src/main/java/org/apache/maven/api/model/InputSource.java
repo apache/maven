@@ -41,6 +41,8 @@ public class InputSource implements Serializable {
     private final List<InputSource> inputs;
     private final InputLocation importedFrom;
 
+    private volatile int hashCode = 0; // Cached hashCode for performance
+
     public InputSource(String modelId, String location) {
         this(modelId, location, null);
     }
@@ -87,8 +89,6 @@ public class InputSource implements Serializable {
     public InputLocation getImportedFrom() {
         return importedFrom;
     }
-
-    private volatile int hashCode = 0; // Cached hashCode for performance
 
     @Override
     public boolean equals(Object o) {
