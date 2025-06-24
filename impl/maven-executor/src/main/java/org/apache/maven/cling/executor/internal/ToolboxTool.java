@@ -40,7 +40,7 @@ import static java.util.Objects.requireNonNull;
  * @see <a href="https://github.com/maveniverse/toolbox">Maveniverse Toolbox</a>
  */
 public class ToolboxTool implements ExecutorTool {
-    private static final String TOOLBOX = "eu.maveniverse.maven.plugins:toolbox:0.7.4:";
+    private static final String TOOLBOX = "eu.maveniverse.maven.plugins:toolbox:0.11.2:";
 
     private final ExecutorHelper helper;
 
