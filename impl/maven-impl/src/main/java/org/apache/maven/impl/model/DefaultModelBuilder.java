@@ -21,7 +21,6 @@ package org.apache.maven.impl.model;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -1293,18 +1292,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                             e);
                 }
 
-                InputLocation loc = model.getLocation("");
-                InputSource v4src = loc != null ? loc.getSource() : null;
-                if (v4src != null) {
-                    try {
-                        Field field = InputSource.class.getDeclaredField("modelId");
-                        field.setAccessible(true);
-                        field.set(v4src, ModelProblemUtils.toId(model));
-                    } catch (Throwable t) {
-                        // TODO: use a lazy source ?
-                        throw new IllegalStateException("Unable to set modelId on InputSource", t);
-                    }
-                }
+                // ModelId is now properly set by DefaultModelXmlFactory during parsing
+                // No need for the reflection hack anymore
             } catch (XmlReaderException e) {
                 add(
                         Severity.FATAL,

@@ -18,6 +18,7 @@
  */
 package org.apache.maven.impl;
 
+import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
@@ -26,6 +27,9 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Function;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamReader;
 
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.Named;
@@ -87,11 +91,25 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
             throw new IllegalArgumentException("path, url, reader or inputStream must be non null");
         }
         try {
-            InputSource source = null;
-            if (request.getModelId() != null || request.getLocation() != null) {
-                source = new InputSource(
-                        request.getModelId(), path != null ? path.toUri().toString() : null);
+            // If modelId is not provided and we're reading from a file, try to extract it
+            String modelId = request.getModelId();
+            String location = request.getLocation();
+
+            if (modelId == null && path != null) {
+                // For file-based reading, extract modelId from the POM content
+                try (InputStream is = Files.newInputStream(path)) {
+                    modelId = extractModelId(is);
+                    if (location == null) {
+                        location = path.toUri().toString();
+                    }
+                }
             }
+
+            InputSource source = null;
+            if (modelId != null || location != null) {
+                source = new InputSource(modelId, location);
+            }
+
             MavenStaxReader xml = new MavenStaxReader();
             xml.setAddDefaultEntities(request.isAddDefaultEntities());
             if (inputStream != null) {
@@ -140,6 +158,111 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
         } catch (Exception e) {
             throw new XmlWriterException("Unable to write model: " + getMessage(e), getLocation(e), e);
         }
+    }
+
+    /**
+     * Extracts the modelId (groupId:artifactId:version) from a POM XML stream
+     * by parsing just enough XML to get the GAV coordinates.
+     *
+     * @param inputStream the input stream to read from
+     * @return the modelId in format "groupId:artifactId:version" or null if not determinable
+     */
+    private String extractModelId(InputStream inputStream) {
+        try {
+            // Use a buffered stream to allow efficient reading
+            BufferedInputStream bufferedStream = new BufferedInputStream(inputStream, 8192);
+
+            XMLInputFactory factory = XMLInputFactory.newInstance();
+            factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
+            XMLStreamReader reader = factory.createXMLStreamReader(bufferedStream);
+
+            String groupId = null;
+            String artifactId = null;
+            String version = null;
+            String parentGroupId = null;
+            String parentVersion = null;
+
+            boolean inProject = false;
+            boolean inParent = false;
+            String currentElement = null;
+
+            while (reader.hasNext()) {
+                int event = reader.next();
+
+                if (event == XMLStreamConstants.START_ELEMENT) {
+                    String localName = reader.getLocalName();
+
+                    if ("project".equals(localName)) {
+                        inProject = true;
+                    } else if ("parent".equals(localName) && inProject) {
+                        inParent = true;
+                    } else if (inProject && ("groupId".equals(localName) || "artifactId".equals(localName) || "version".equals(localName))) {
+                        currentElement = localName;
+                    }
+                } else if (event == XMLStreamConstants.END_ELEMENT) {
+                    String localName = reader.getLocalName();
+
+                    if ("parent".equals(localName)) {
+                        inParent = false;
+                    } else if ("project".equals(localName)) {
+                        break; // We've processed the main project element
+                    }
+                    currentElement = null;
+                } else if (event == XMLStreamConstants.CHARACTERS && currentElement != null) {
+                    String text = reader.getText().trim();
+                    if (!text.isEmpty()) {
+                        if (inParent) {
+                            switch (currentElement) {
+                                case "groupId":
+                                    parentGroupId = text;
+                                    break;
+                                case "version":
+                                    parentVersion = text;
+                                    break;
+                            }
+                        } else {
+                            switch (currentElement) {
+                                case "groupId":
+                                    groupId = text;
+                                    break;
+                                case "artifactId":
+                                    artifactId = text;
+                                    break;
+                                case "version":
+                                    version = text;
+                                    break;
+                            }
+                        }
+                    }
+                }
+
+                // Early exit if we have enough information
+                if (artifactId != null && (groupId != null || parentGroupId != null) && (version != null || parentVersion != null)) {
+                    break;
+                }
+            }
+
+            reader.close();
+
+            // Use parent values as fallback
+            if (groupId == null) {
+                groupId = parentGroupId;
+            }
+            if (version == null) {
+                version = parentVersion;
+            }
+
+            // Return modelId if we have all required components
+            if (groupId != null && artifactId != null && version != null) {
+                return groupId + ":" + artifactId + ":" + version;
+            }
+
+        } catch (Exception e) {
+            // If extraction fails, return null and let the normal parsing handle it
+            // This is not a critical failure
+        }
+
+        return null;
     }
 
     /**
