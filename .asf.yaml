@@ -19,6 +19,11 @@ github:
         strict: true
       required_pull_request_reviews:
         required_approving_review_count: 1
+    maven-3.9.x:
+      required_status_checks:
+        strict: true
+      required_pull_request_reviews:
+        required_approving_review_count: 1
   autolink_jira:
     - MNG
   pull_requests:
