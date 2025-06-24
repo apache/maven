@@ -146,9 +146,9 @@ class CacheConfigurationTest {
     void testConfigurationResolution() {
         userProperties.put(Constants.MAVEN_CACHE_CONFIG_PROPERTY, "ModelBuilderRequest { scope: session, ref: hard }");
 
-        when(modelBuilderRequest.getClass()).thenReturn((Class) ModelBuilderRequest.class);
+        ModelBuilderRequest request = new TestRequestImpl();
 
-        CacheConfig config = CacheConfigurationResolver.resolveConfig(modelBuilderRequest, session);
+        CacheConfig config = CacheConfigurationResolver.resolveConfig(request, session);
         assertEquals(CacheRetention.SESSION_SCOPED, config.scope());
         assertEquals(Cache.ReferenceType.HARD, config.referenceType());
     }
@@ -159,10 +159,9 @@ class CacheConfigurationTest {
                 PartialCacheConfig.complete(CacheRetention.SESSION_SCOPED, Cache.ReferenceType.HARD);
         CacheSelector selector = CacheSelector.forRequestType("ModelBuilderRequest", config);
 
-        when(modelBuilderRequest.getClass()).thenReturn((Class) ModelBuilderRequest.class);
-        when(modelBuilderRequest.getTrace()).thenReturn(null);
+        ModelBuilderRequest request = new TestRequestImpl();
 
-        assertTrue(selector.matches(modelBuilderRequest));
+        assertTrue(selector.matches(request));
     }
 
     @Test
@@ -279,10 +278,9 @@ class CacheConfigurationTest {
             * ModelBuilderRequest { ref: hard }
             """);
 
-        when(modelBuilderRequest.getClass()).thenReturn((Class) ModelBuilderRequest.class);
-        when(modelBuilderRequest.getTrace()).thenReturn(null);
+        ModelBuilderRequest request = new TestRequestImpl();
 
-        CacheConfig config = CacheConfigurationResolver.resolveConfig(modelBuilderRequest, session);
+        CacheConfig config = CacheConfigurationResolver.resolveConfig(request, session);
         assertEquals(CacheRetention.SESSION_SCOPED, config.scope()); // from first selector
         assertEquals(Cache.ReferenceType.HARD, config.referenceType()); // from second selector
     }
@@ -343,12 +341,12 @@ class CacheConfigurationTest {
         CacheSelector selector = CacheSelector.forParentAndRequestType("ModelBuilderRequest", "Request", config);
 
         // Create a child request with a parent that implements ModelBuilderRequest
-        TestRequestImpl childRequest = new TestRequestImpl();
         TestRequestImpl parentRequest = new TestRequestImpl();
 
         // Mock the trace to simulate parent-child relationship
         RequestTrace parentTrace = mock(RequestTrace.class);
         RequestTrace childTrace = mock(RequestTrace.class);
+        Request childRequest = mock(Request.class);
 
         when(parentTrace.data()).thenReturn(parentRequest);
         when(childTrace.parent()).thenReturn(parentTrace);

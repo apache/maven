@@ -427,7 +427,8 @@ public interface Cache<K, V> {
          * If referenceType is null, uses the map's default reference type.
          */
         private ComputeReference<V> getValueReference(V value, ReferenceType referenceType) {
-            return switch (referenceType) {
+            ReferenceType refType = referenceType != null ? referenceType : defaultReferenceType;
+            return switch (refType) {
                 case SOFT -> new SoftComputeReference<>(value, valueQueue);
                 case WEAK -> new WeakComputeReference<>(value, valueQueue);
                 case HARD -> new HardComputeReference<>(value, valueQueue);
