@@ -50,9 +50,6 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
     // Cache for each pooled object type
     private static final Map<Class<?>, Cache<PoolKey, Object>> OBJECT_POOLS = new ConcurrentHashMap<>();
 
-    // Configuration
-    private static final Set<String> POOLED_TYPES = getPooledTypes();
-
     // Statistics tracking
     private static final Map<Class<?>, AtomicLong> TOTAL_CALLS = new ConcurrentHashMap<>();
     private static final Map<Class<?>, AtomicLong> CACHE_HITS = new ConcurrentHashMap<>();
@@ -68,8 +65,9 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
         Class<?> objectType = object.getClass();
         String simpleClassName = objectType.getSimpleName();
 
-        // Check if this object type should be pooled
-        if (!POOLED_TYPES.contains(simpleClassName)) {
+        // Check if this object type should be pooled (read configuration dynamically)
+        Set<String> pooledTypes = getPooledTypes();
+        if (!pooledTypes.contains(simpleClassName)) {
             return object;
         }
 
@@ -164,7 +162,7 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
 
     /**
      * Key class for pooling any model object based on their content.
-     * Holds the object directly and pre-computes hashCode for performance.
+     * Uses custom equality strategies for different object types.
      */
     private static class PoolKey {
         private final Object object;
@@ -172,7 +170,7 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
 
         PoolKey(Object object) {
             this.object = object;
-            this.hashCode = object.hashCode();
+            this.hashCode = computeHashCode(object);
         }
 
         @Override
@@ -184,13 +182,116 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
                 return false;
             }
 
-            // Use the object's equals method which should properly include all fields
-            return Objects.equals(object, other.object);
+            return objectsEqual(object, other.object);
         }
 
         @Override
         public int hashCode() {
             return hashCode;
+        }
+
+        /**
+         * Custom equality check for different object types.
+         */
+        private static boolean objectsEqual(Object obj1, Object obj2) {
+            if (obj1 == obj2) {
+                return true;
+            }
+            if (obj1 == null || obj2 == null) {
+                return false;
+            }
+            if (obj1.getClass() != obj2.getClass()) {
+                return false;
+            }
+
+            // Custom equality for Dependency objects
+            if (obj1 instanceof org.apache.maven.api.model.Dependency) {
+                return dependenciesEqual(
+                        (org.apache.maven.api.model.Dependency) obj1, (org.apache.maven.api.model.Dependency) obj2);
+            }
+
+            // For other objects, use default equals
+            return obj1.equals(obj2);
+        }
+
+        /**
+         * Custom equality check for Dependency objects based on all fields.
+         */
+        private static boolean dependenciesEqual(
+                org.apache.maven.api.model.Dependency dep1, org.apache.maven.api.model.Dependency dep2) {
+            return Objects.equals(dep1.getGroupId(), dep2.getGroupId())
+                    && Objects.equals(dep1.getArtifactId(), dep2.getArtifactId())
+                    && Objects.equals(dep1.getVersion(), dep2.getVersion())
+                    && Objects.equals(dep1.getType(), dep2.getType())
+                    && Objects.equals(dep1.getClassifier(), dep2.getClassifier())
+                    && Objects.equals(dep1.getScope(), dep2.getScope())
+                    && Objects.equals(dep1.getSystemPath(), dep2.getSystemPath())
+                    && Objects.equals(dep1.getExclusions(), dep2.getExclusions())
+                    && Objects.equals(dep1.getOptional(), dep2.getOptional())
+                    && Objects.equals(dep1.getLocationKeys(), dep2.getLocationKeys())
+                    && locationsEqual(dep1, dep2)
+                    && Objects.equals(dep1.getImportedFrom(), dep2.getImportedFrom());
+        }
+
+        /**
+         * Compare locations maps for two dependencies.
+         */
+        private static boolean locationsEqual(
+                org.apache.maven.api.model.Dependency dep1, org.apache.maven.api.model.Dependency dep2) {
+            var keys1 = dep1.getLocationKeys();
+            var keys2 = dep2.getLocationKeys();
+
+            if (!Objects.equals(keys1, keys2)) {
+                return false;
+            }
+
+            for (Object key : keys1) {
+                if (!Objects.equals(dep1.getLocation(key), dep2.getLocation(key))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /**
+         * Custom hash code computation for different object types.
+         */
+        private static int computeHashCode(Object obj) {
+            if (obj instanceof org.apache.maven.api.model.Dependency) {
+                return dependencyHashCode((org.apache.maven.api.model.Dependency) obj);
+            }
+            return obj.hashCode();
+        }
+
+        /**
+         * Custom hash code for Dependency objects based on all fields.
+         */
+        private static int dependencyHashCode(org.apache.maven.api.model.Dependency dep) {
+            return Objects.hash(
+                    dep.getGroupId(),
+                    dep.getArtifactId(),
+                    dep.getVersion(),
+                    dep.getType(),
+                    dep.getClassifier(),
+                    dep.getScope(),
+                    dep.getSystemPath(),
+                    dep.getExclusions(),
+                    dep.getOptional(),
+                    dep.getLocationKeys(),
+                    locationsHashCode(dep),
+                    dep.getImportedFrom());
+        }
+
+        /**
+         * Compute hash code for locations map.
+         */
+        private static int locationsHashCode(org.apache.maven.api.model.Dependency dep) {
+            int hash = 1;
+            for (Object key : dep.getLocationKeys()) {
+                hash = 31 * hash + Objects.hashCode(key);
+                hash = 31 * hash + Objects.hashCode(dep.getLocation(key));
+            }
+            return hash;
         }
     }
 

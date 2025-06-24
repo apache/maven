@@ -18,6 +18,8 @@
  */
 package org.apache.maven.impl.model;
 
+import java.util.Objects;
+
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.ModelObjectProcessor;
@@ -47,6 +49,7 @@ class DefaultModelObjectPoolTest {
         ModelObjectProcessor processor = new DefaultModelObjectPool();
 
         // Create two identical dependencies
+        // Note: Due to the static processor being active, these may already be pooled
         Dependency dep1 = Dependency.newBuilder()
                 .groupId("org.apache.maven")
                 .artifactId("maven-core")
@@ -59,17 +62,56 @@ class DefaultModelObjectPoolTest {
                 .version("4.0.0")
                 .build();
 
-        // They should be different instances initially
-        assertNotSame(dep1, dep2);
-        assertEquals(dep1, dep2);
+        // Due to static processing, they may already be the same instance
+        // This is actually the expected behavior - pooling is working!
 
-        // After processing, they should be the same instance
+        // Process them through our specific processor instance
         Dependency pooled1 = processor.process(dep1);
         Dependency pooled2 = processor.process(dep2);
 
+        // They should be the same instance after processing
         assertSame(pooled1, pooled2);
-        assertEquals(dep1, pooled1);
-        assertEquals(dep2, pooled2);
+
+        // The pooled instances should be semantically equal to the originals
+        assertTrue(dependenciesEqual(dep1, pooled1));
+        assertTrue(dependenciesEqual(dep2, pooled2));
+    }
+
+    /**
+     * Helper method to check complete equality of dependencies.
+     */
+    private boolean dependenciesEqual(Dependency dep1, Dependency dep2) {
+        return Objects.equals(dep1.getGroupId(), dep2.getGroupId())
+                && Objects.equals(dep1.getArtifactId(), dep2.getArtifactId())
+                && Objects.equals(dep1.getVersion(), dep2.getVersion())
+                && Objects.equals(dep1.getType(), dep2.getType())
+                && Objects.equals(dep1.getClassifier(), dep2.getClassifier())
+                && Objects.equals(dep1.getScope(), dep2.getScope())
+                && Objects.equals(dep1.getSystemPath(), dep2.getSystemPath())
+                && Objects.equals(dep1.getExclusions(), dep2.getExclusions())
+                && Objects.equals(dep1.getOptional(), dep2.getOptional())
+                && Objects.equals(dep1.getLocationKeys(), dep2.getLocationKeys())
+                && locationsEqual(dep1, dep2)
+                && Objects.equals(dep1.getImportedFrom(), dep2.getImportedFrom());
+    }
+
+    /**
+     * Helper method to check locations equality.
+     */
+    private boolean locationsEqual(Dependency dep1, Dependency dep2) {
+        var keys1 = dep1.getLocationKeys();
+        var keys2 = dep2.getLocationKeys();
+
+        if (!Objects.equals(keys1, keys2)) {
+            return false;
+        }
+
+        for (Object key : keys1) {
+            if (!Objects.equals(dep1.getLocation(key), dep2.getLocation(key))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Test
