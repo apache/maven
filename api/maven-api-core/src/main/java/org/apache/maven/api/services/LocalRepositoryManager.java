@@ -26,15 +26,61 @@ import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
+ * Manages the organization and access of artifacts within the local Maven repository.
+ * The local repository serves as a cache for downloaded remote artifacts and storage
+ * for locally installed artifacts. This manager provides services to determine the
+ * appropriate paths for artifacts within the local repository structure.
  *
- * @since 4.0
+ * <p>The LocalRepositoryManager is responsible for:
+ * <ul>
+ *   <li>Determining the storage path for locally installed artifacts</li>
+ *   <li>Managing the layout and organization of cached remote artifacts</li>
+ *   <li>Maintaining consistency in artifact storage patterns</li>
+ * </ul>
+ *
+ * <p>This interface is part of Maven's repository management system and works in
+ * conjunction with {@link RemoteRepository} and {@link LocalRepository} to provide
+ * a complete artifact resolution and storage solution.
+ *
+ * @since 4.0.0
+ * @see LocalRepository
+ * @see RemoteRepository
+ * @see Artifact
  */
 @Experimental
 public interface LocalRepositoryManager extends Service {
 
-    Path getPathForLocalArtifact(Session session, LocalRepository local, Artifact artifact);
+    /**
+     * Gets the relative path for a locally installed artifact.
+     * Note that the artifact need not actually exist yet at
+     * the returned location, the path merely indicates where
+     * the artifact would eventually be stored.
+     *
+     * @param session The session to use, must not be {@code null}.
+     * @param artifact The artifact for which to determine the path, must not be {@code null}.
+     * @return The path, resolved against the local repository's base directory.
+     */
+    @Nonnull
+    Path getPathForLocalArtifact(@Nonnull Session session, @Nonnull LocalRepository local, @Nonnull Artifact artifact);
 
-    Path getPathForRemoteArtifact(Session session, LocalRepository local, RemoteRepository remote, Artifact artifact);
+    /**
+     * Gets the relative path for an artifact cached from a remote repository.
+     * Note that the artifact need not actually exist yet at the returned location,
+     * the path merely indicates where the artifact would eventually be stored.
+     *
+     * @param session The session to use, must not be {@code null}.
+     * @param local The local repository, must not be {@code null}.
+     * @param artifact The artifact for which to determine the path, must not be {@code null}.
+     * @param remote – The source repository of the artifact, must not be {@code null}.
+     * @return The path, relative to the local repository's base directory.
+     */
+    @Nonnull
+    Path getPathForRemoteArtifact(
+            @Nonnull Session session,
+            @Nonnull LocalRepository local,
+            @Nonnull RemoteRepository remote,
+            @Nonnull Artifact artifact);
 }

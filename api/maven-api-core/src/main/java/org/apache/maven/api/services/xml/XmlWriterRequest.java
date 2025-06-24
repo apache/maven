@@ -21,25 +21,35 @@ package org.apache.maven.api.services.xml;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.nio.file.Path;
+import java.util.function.Function;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
  * An XML writer request.
  *
- * @since 4.0
+ * @since 4.0.0
  * @param <T> the object type to read
  */
 @Experimental
 public interface XmlWriterRequest<T> {
 
+    @Nullable
     Path getPath();
 
+    @Nullable
     OutputStream getOutputStream();
 
+    @Nullable
     Writer getWriter();
 
+    @Nonnull
     T getContent();
+
+    @Nullable
+    Function<Object, String> getInputLocationFormatter();
 
     static <T> XmlWriterRequestBuilder<T> builder() {
         return new XmlWriterRequestBuilder<>();
@@ -50,6 +60,7 @@ public interface XmlWriterRequest<T> {
         OutputStream outputStream;
         Writer writer;
         T content;
+        Function<Object, String> inputLocationFormatter;
 
         public XmlWriterRequestBuilder<T> path(Path path) {
             this.path = path;
@@ -71,8 +82,13 @@ public interface XmlWriterRequest<T> {
             return this;
         }
 
+        public XmlWriterRequestBuilder<T> inputLocationFormatter(Function<Object, String> inputLocationFormatter) {
+            this.inputLocationFormatter = inputLocationFormatter;
+            return this;
+        }
+
         public XmlWriterRequest<T> build() {
-            return new DefaultXmlWriterRequest<>(path, outputStream, writer, content);
+            return new DefaultXmlWriterRequest<>(path, outputStream, writer, content, inputLocationFormatter);
         }
 
         private static class DefaultXmlWriterRequest<T> implements XmlWriterRequest<T> {
@@ -80,12 +96,19 @@ public interface XmlWriterRequest<T> {
             final OutputStream outputStream;
             final Writer writer;
             final T content;
+            final Function<Object, String> inputLocationFormatter;
 
-            DefaultXmlWriterRequest(Path path, OutputStream outputStream, Writer writer, T content) {
+            DefaultXmlWriterRequest(
+                    Path path,
+                    OutputStream outputStream,
+                    Writer writer,
+                    T content,
+                    Function<Object, String> inputLocationFormatter) {
                 this.path = path;
                 this.outputStream = outputStream;
                 this.writer = writer;
                 this.content = content;
+                this.inputLocationFormatter = inputLocationFormatter;
             }
 
             @Override
@@ -106,6 +129,11 @@ public interface XmlWriterRequest<T> {
             @Override
             public T getContent() {
                 return content;
+            }
+
+            @Override
+            public Function<Object, String> getInputLocationFormatter() {
+                return inputLocationFormatter;
             }
         }
     }

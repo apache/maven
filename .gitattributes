@@ -6,3 +6,5 @@
 *.css    text
 *.js     text
 *.sql    text
+*.jar    binary
+*.war    binary

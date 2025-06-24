@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>4.0.0-alpha-5-SNAPSHOT</version>
+    <version>4.0.0-rc-4-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-api</artifactId>
@@ -32,38 +32,22 @@
   <description>A new immutable API for Maven 4 to better manage what plugins and extensions can influence.</description>
 
   <modules>
-    <module>maven-api-meta</module>
+    <module>maven-api-annotations</module>
+    <module>maven-api-di</module>
     <module>maven-api-xml</module>
     <module>maven-api-model</module>
+    <module>maven-api-plugin</module>
     <module>maven-api-settings</module>
     <module>maven-api-toolchain</module>
+    <module>maven-api-metadata</module>
     <module>maven-api-core</module>
+    <module>maven-api-spi</module>
+    <module>maven-api-cli</module>
   </modules>
 
   <properties>
     <project.directory>api</project.directory>
   </properties>
-
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.codehaus.modello</groupId>
-          <artifactId>modello-maven-plugin</artifactId>
-          <executions>
-            <execution>
-              <id>modello-site-docs</id>
-              <goals>
-                <goal>xdoc</goal>
-                <goal>xsd</goal>
-              </goals>
-              <phase>none</phase>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
 
   <profiles>
     <profile>

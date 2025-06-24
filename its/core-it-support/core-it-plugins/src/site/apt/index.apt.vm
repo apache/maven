@@ -1,0 +1,13 @@
+ -----
+ About
+ -----
+ Hervé Boutemy
+ -----
+ 2012-10-13
+ -----
+
+${project.name}
+
+ About ${project.description}
+
+ See {{{./modules.html}Project Modules}} report for a complete list with description.

@@ -18,15 +18,21 @@
  */
 package org.apache.maven.api.services;
 
+import java.io.Serial;
+
 import org.apache.maven.api.annotations.Experimental;
 
 /**
  * The Exception class throw by the {@link ToolchainManager}.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public class ToolchainManagerException extends MavenException {
+
+    @Serial
+    private static final long serialVersionUID = -9465854226608498L;
+
     /**
      * @param message the message to give
      * @param e the {@link Exception}

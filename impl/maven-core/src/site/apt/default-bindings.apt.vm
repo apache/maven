@@ -1,0 +1,64 @@
+~~ Licensed to the Apache Software Foundation (ASF) under one
+~~ or more contributor license agreements.  See the NOTICE file
+~~ distributed with this work for additional information
+~~ regarding copyright ownership.  The ASF licenses this file
+~~ to you under the Apache License, Version 2.0 (the
+~~ "License"); you may not use this file except in compliance
+~~ with the License.  You may obtain a copy of the License at
+~~
+~~ http://www.apache.org/licenses/LICENSE-2.0
+~~
+~~ Unless required by applicable law or agreed to in writing,
+~~ software distributed under the License is distributed on an
+~~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+~~ KIND, either express or implied.  See the License for the
+~~ specific language governing permissions and limitations
+~~ under the License.
+
+ ---
+ Plugins Bindings for Default Lifecycle Reference
+ ---
+ Hervé Boutemy
+ ---
+ 2013-08-02
+ ---
+
+Plugins Bindings for <<<default>>> Lifecycle Reference
+
+  The {{{./lifecycles.html}<<<default>>> lifecycle}} is defined without any plugin binding; plugins bindings are defined separately
+  in {{{./apidocs/org/apache/maven/lifecycle/providers/packaging/package-summary.html}<<<org.apache.maven.lifecycle.providers.packaging>>>}} package
+  because they are specific for each packaging:
+
+%{toc|fromDepth=2}
+
+  Versions of the plugins are shared in a few constants:
+
+%{snippet|id=versions|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/packaging/AbstractLifecycleMappingProvider.java}
+
+* Plugin bindings for <<<pom>>> packaging
+
+%{snippet|id=pom|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/packaging/PomLifecycleMappingProvider.java}
+
+* Plugin bindings for <<<jar>>> packaging
+
+%{snippet|id=jar|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/packaging/JarLifecycleMappingProvider.java}
+
+* Plugin bindings for <<<ejb>>> packaging
+
+%{snippet|id=ejb|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/packaging/EjbLifecycleMappingProvider.java}
+
+* Plugin bindings for <<<maven-plugin>>> packaging
+
+%{snippet|id=maven-plugin|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/packaging/MavenPluginLifecycleMappingProvider.java}
+
+* Plugin bindings for <<<war>>> packaging
+
+%{snippet|id=war|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/packaging/WarLifecycleMappingProvider.java}
+
+* Plugin bindings for <<<ear>>> packaging
+
+%{snippet|id=ear|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/packaging/EarLifecycleMappingProvider.java}
+
+* Plugin bindings for <<<rar>>> packaging
+
+%{snippet|id=rar|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/packaging/RarLifecycleMappingProvider.java}

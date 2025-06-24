@@ -18,15 +18,21 @@
  */
 package org.apache.maven.api.services;
 
+import java.io.Serial;
+
 import org.apache.maven.api.annotations.Experimental;
 
 /**
  * The Exception class throw by the {@link SettingsBuilder}.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
-public class SettingsBuilderException extends MavenException {
+public class SettingsBuilderException extends MavenBuilderException {
+
+    @Serial
+    private static final long serialVersionUID = 4714858598345418083L;
+
     /**
      * @param message the message to give
      * @param e the {@link Exception}
@@ -35,5 +41,7 @@ public class SettingsBuilderException extends MavenException {
         super(message, e);
     }
 
-    // TODO: add SettingsBuilderResult
+    public SettingsBuilderException(String message, ProblemCollector<BuilderProblem> problems) {
+        super(message, problems);
+    }
 }

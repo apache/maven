@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng4273</groupId>
+  <artifactId>test</artifactId>
+  <version>0.1</version>
+  <packaging>maven-plugin</packaging>
+
+  <name>Maven Integration Test :: MNG-4273</name>
+  <description>Verify that internal utility/implementation classes used by the Maven core do not leak into the plugin realm.
+    Otherwise, we risk linkage errors when a plugin creates a custom class loader with parent-first delegation on
+    top of the plugin realm because the custom class loader will prefer potentially incompatible classes from the
+    core realm over classes from itself.</description>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-class-loader</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <configuration>
+          <projectClassLoaderOutput>target/class.properties</projectClassLoaderOutput>
+          <!--
+          To exhibit the bug, the following classes have been chosen:
+          - org.codehaus.plexus.util.FileUtils$FilterWrapper
+            This is only available in plexus-utils:1.2+ and hence present in all recent Maven versions that try to hide plexus-utils.
+            We can't use a simpler class like StringUtils because there's a hack in Maven 2.x that automatically puts
+            plexus-utils:1.1 in the plugin realm.
+          - org.apache.xerces.util.ParserConfigurationSettings
+            This is from xercesMinimal:1.9.6.2 or xercesImpl:2.6.2 and the crux from the original issue report.
+          -->
+          <classNames>org.codehaus.plexus.util.FileUtils$FilterWrapper,org.apache.xerces.util.ParserConfigurationSettings</classNames>
+        </configuration>
+        <executions>
+          <execution>
+            <id>test</id>
+            <goals>
+              <goal>load-dependencies</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

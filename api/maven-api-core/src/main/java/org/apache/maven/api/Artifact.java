@@ -23,67 +23,92 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * An artifact points to a resource such as a jar file or war application.
+ * A Maven artifact is a file, typically a JAR, that is produced and used by Maven projects.
+ * It is identified by a unique combination of a group ID, artifact ID, version, classifier,
+ * and extension, and it is stored in a repository for dependency management and build purposes.
  *
- * @since 4.0
+ * <p>Each {@code Artifact} instance is basically an exact pointer to a file in a Maven repository.
+ * {@code Artifact} instances are created when <dfn>resolving</dfn> {@link ArtifactCoordinates} instances.
+ * Resolving is the process that selects a {@linkplain #getVersion() particular version}
+ * and downloads the artifact in the local repository.  This operation returns a {@link DownloadedArtifact}.
+ * </p>
+ *
+ * @since 4.0.0
  */
 @Experimental
 @Immutable
 public interface Artifact {
-
     /**
-     * Returns a unique identifier for this artifact.
-     * The identifier is composed of groupId, artifactId, version, classifier, extension.
+     * {@return a unique identifier for this artifact}
+     * The identifier is composed of groupId, artifactId, extension, classifier, and version.
      *
-     * @return the unique identifier
+     * @see ArtifactCoordinates#getId()
      */
+    @Nonnull
     default String key() {
+        String c = getClassifier();
         return getGroupId()
                 + ':'
                 + getArtifactId()
                 + ':'
                 + getExtension()
-                + (getClassifier().length() > 0 ? ":" + getClassifier() : "")
+                + (c.isEmpty() ? "" : ":" + c)
                 + ':'
                 + getVersion();
     }
 
     /**
-     * The groupId of the artifact.
+     * {@return the group identifier of the artifact}
      *
-     * @return the groupId
+     * @see ArtifactCoordinates#getGroupId()
      */
     @Nonnull
     String getGroupId();
 
     /**
-     * The artifactId of the artifact.
+     * {@return the identifier of the artifact}
      *
-     * @return the artifactId
+     * @see ArtifactCoordinates#getArtifactId()
      */
     @Nonnull
     String getArtifactId();
 
     /**
-     * The version of the artifact.
+     * {@return the version of the artifact}
+     * Contrarily to {@link ArtifactCoordinates},
+     * each {@code Artifact} is associated to a specific version instead of a range of versions.
+     * If the {@linkplain #getBaseVersion() base version} contains a meta-version such as {@code SNAPSHOT},
+     * those keywords are replaced by, for example, the actual timestamp.
      *
-     * @return the version
+     * @see ArtifactCoordinates#getVersionConstraint()
      */
     @Nonnull
     Version getVersion();
 
     /**
-     * The classifier of the artifact.
+     * {@return the version or meta-version of the artifact}
+     * A meta-version is a version suffixed with the {@code SNAPSHOT} keyword.
+     * Meta-versions are represented in a base version by their symbols (e.g., {@code SNAPSHOT}),
+     * while they are replaced by, for example, the actual timestamp in the {@linkplain #getVersion() version}.
+     */
+    @Nonnull
+    Version getBaseVersion();
+
+    /**
+     * Returns the classifier of the artifact.
      *
      * @return the classifier or an empty string if none, never {@code null}
+     * @see ArtifactCoordinates#getClassifier()
      */
     @Nonnull
     String getClassifier();
 
     /**
-     * The file extension of the artifact.
+     * Returns the file extension of the artifact.
+     * The dot separator is <em>not</em> included in the returned string.
      *
-     * @return the extension
+     * @return the file extension or an empty string if none, never {@code null}
+     * @see ArtifactCoordinates#getExtension()
      */
     @Nonnull
     String getExtension();
@@ -97,11 +122,11 @@ public interface Artifact {
     boolean isSnapshot();
 
     /**
-     * Shortcut for {@code session.createArtifactCoordinate(artifact)}
+     * {@return coordinates with the same identifiers as this artifact}
+     * This is a shortcut for {@code session.createArtifactCoordinates(artifact)}.
      *
-     * @return an {@link ArtifactCoordinate}
-     * @see org.apache.maven.api.Session#createArtifactCoordinate(Artifact)
+     * @see org.apache.maven.api.Session#createArtifactCoordinates(Artifact)
      */
     @Nonnull
-    ArtifactCoordinate toCoordinate();
+    ArtifactCoordinates toCoordinates();
 }

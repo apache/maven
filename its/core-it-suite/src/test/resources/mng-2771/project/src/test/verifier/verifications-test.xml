@@ -1,0 +1,8 @@
+<verifications>
+  <files>
+    <file>
+      <location>target/lookup.log</location>
+      <contains>org.apache.maven.its.it0124.CustomArtifactFactory</contains>
+    </file>
+  </files>
+</verifications>

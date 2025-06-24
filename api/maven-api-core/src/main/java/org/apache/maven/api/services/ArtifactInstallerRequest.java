@@ -20,8 +20,10 @@ package org.apache.maven.api.services;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
-import org.apache.maven.api.Artifact;
+import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
@@ -29,22 +31,19 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
 
-import static org.apache.maven.api.services.BaseRequest.nonNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * A request for installing one or more artifacts in the local repository.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @Immutable
-public interface ArtifactInstallerRequest {
+public interface ArtifactInstallerRequest extends Request<Session> {
 
     @Nonnull
-    Session getSession();
-
-    @Nonnull
-    Collection<Artifact> getArtifacts();
+    Collection<ProducedArtifact> getArtifacts();
 
     @Nonnull
     static ArtifactInstallerRequestBuilder builder() {
@@ -52,17 +51,18 @@ public interface ArtifactInstallerRequest {
     }
 
     @Nonnull
-    static ArtifactInstallerRequest build(Session session, Collection<Artifact> artifacts) {
+    static ArtifactInstallerRequest build(Session session, Collection<ProducedArtifact> artifacts) {
         return builder()
-                .session(nonNull(session, "session cannot be null"))
-                .artifacts(nonNull(artifacts, "artifacts cannot be null"))
+                .session(requireNonNull(session, "session cannot be null"))
+                .artifacts(requireNonNull(artifacts, "artifacts cannot be null"))
                 .build();
     }
 
     @NotThreadSafe
     class ArtifactInstallerRequestBuilder {
         Session session;
-        Collection<Artifact> artifacts = Collections.emptyList();
+        RequestTrace trace;
+        Collection<ProducedArtifact> artifacts = Collections.emptyList();
 
         ArtifactInstallerRequestBuilder() {}
 
@@ -73,29 +73,53 @@ public interface ArtifactInstallerRequest {
         }
 
         @Nonnull
-        public ArtifactInstallerRequestBuilder artifacts(@Nullable Collection<Artifact> artifacts) {
+        public ArtifactInstallerRequestBuilder trace(RequestTrace trace) {
+            this.trace = trace;
+            return this;
+        }
+
+        @Nonnull
+        public ArtifactInstallerRequestBuilder artifacts(@Nullable Collection<ProducedArtifact> artifacts) {
             this.artifacts = artifacts != null ? artifacts : Collections.emptyList();
             return this;
         }
 
         @Nonnull
         public ArtifactInstallerRequest build() {
-            return new DefaultArtifactInstallerRequest(session, artifacts);
+            return new DefaultArtifactInstallerRequest(session, trace, artifacts);
         }
 
-        static class DefaultArtifactInstallerRequest extends BaseRequest implements ArtifactInstallerRequest {
+        static class DefaultArtifactInstallerRequest extends BaseRequest<Session> implements ArtifactInstallerRequest {
 
-            private final Collection<Artifact> artifacts;
+            private final Collection<ProducedArtifact> artifacts;
 
-            DefaultArtifactInstallerRequest(@Nonnull Session session, @Nonnull Collection<Artifact> artifacts) {
-                super(session);
-                this.artifacts = unmodifiable(nonNull(artifacts, "artifacts cannot be null"));
+            DefaultArtifactInstallerRequest(
+                    @Nonnull Session session,
+                    @Nullable RequestTrace trace,
+                    @Nonnull Collection<ProducedArtifact> artifacts) {
+                super(session, trace);
+                this.artifacts = List.copyOf(requireNonNull(artifacts, "artifacts cannot be null"));
             }
 
             @Nonnull
             @Override
-            public Collection<Artifact> getArtifacts() {
+            public Collection<ProducedArtifact> getArtifacts() {
                 return artifacts;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                return o instanceof DefaultArtifactInstallerRequest that && Objects.equals(artifacts, that.artifacts);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hashCode(artifacts);
+            }
+
+            @Override
+            public String toString() {
+                return "ArtifactInstallerRequest[" + "artifacts=" + artifacts + ']';
             }
         }
     }

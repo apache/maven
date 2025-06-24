@@ -19,10 +19,11 @@
 package org.apache.maven.api.services;
 
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
-import org.apache.maven.api.Artifact;
-import org.apache.maven.api.ArtifactCoordinate;
+import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
@@ -30,170 +31,241 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
 
-import static org.apache.maven.api.services.BaseRequest.nonNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Request used to build a {@link org.apache.maven.api.Project} using
  * the {@link ProjectBuilder} service.
  *
- * @since 4.0
+ * TODO: add validationLevel, activeProfileIds, inactiveProfileIds, resolveDependencies
+ *
+ * @since 4.0.0
  */
 @Experimental
 @Immutable
-public interface ProjectBuilderRequest {
+public interface ProjectBuilderRequest extends Request<Session> {
 
-    @Nonnull
-    Session getSession();
-
+    /**
+     * Gets the path to the project to build.
+     * This is typically the path to a pom.xml file or a directory containing a pom.xml file.
+     *
+     * @return an optional containing the path to the project, or empty if not specified
+     */
     @Nonnull
     Optional<Path> getPath();
 
+    /**
+     * Gets the source of the project to build.
+     * This is an alternative to specifying a path, allowing the project to be built from
+     * a model source such as a string or input stream.
+     *
+     * @return an optional containing the source of the project, or empty if not specified
+     */
     @Nonnull
     Optional<Source> getSource();
 
-    @Nonnull
-    Optional<Artifact> getArtifact();
-
-    @Nonnull
-    Optional<ArtifactCoordinate> getCoordinate();
-
+    /**
+     * Determines whether a stub model should be allowed when the POM is missing or unreadable.
+     * A stub model contains only minimal information derived from the project's coordinates.
+     *
+     * @return true if a stub model should be allowed, false otherwise
+     */
     boolean isAllowStubModel();
 
+    /**
+     * Determines whether the project builder should recursively build parent/child projects.
+     * When true, the builder will process parent POMs and child modules as needed.
+     *
+     * @return true if the build should be recursive, false otherwise
+     */
     boolean isRecursive();
 
+    /**
+     * Determines whether plugins should be processed during project building.
+     * When true, the builder will process plugin information which may include
+     * resolving plugin dependencies and executing plugin goals that participate in project building.
+     *
+     * @return true if plugins should be processed, false otherwise
+     */
     boolean isProcessPlugins();
 
-    boolean isResolveDependencies();
+    /**
+     * Gets the list of remote repositories to use for resolving dependencies during project building.
+     * These repositories will be used in addition to any repositories defined in the project itself.
+     *
+     * @return the list of remote repositories, or null if not specified
+     */
+    @Nullable
+    List<RemoteRepository> getRepositories();
 
+    /**
+     * Creates a new ProjectBuilderRequest with the specified session and source.
+     *
+     * @param session the Maven session
+     * @param source the source of the project to build
+     * @return a new ProjectBuilderRequest
+     * @throws NullPointerException if session or source is null
+     */
     @Nonnull
     static ProjectBuilderRequest build(@Nonnull Session session, @Nonnull Source source) {
         return builder()
-                .session(nonNull(session, "session cannot be null"))
-                .source(nonNull(source, "source cannot be null"))
+                .session(requireNonNull(session, "session cannot be null"))
+                .source(requireNonNull(source, "source cannot be null"))
                 .build();
     }
 
+    /**
+     * Creates a new ProjectBuilderRequest with the specified session and path.
+     *
+     * @param session the Maven session
+     * @param path the path to the project to build
+     * @return a new ProjectBuilderRequest
+     * @throws NullPointerException if session or path is null
+     */
     @Nonnull
     static ProjectBuilderRequest build(@Nonnull Session session, @Nonnull Path path) {
         return builder()
-                .session(nonNull(session, "session cannot be null"))
-                .path(nonNull(path, "path cannot be null"))
+                .session(requireNonNull(session, "session cannot be null"))
+                .path(requireNonNull(path, "path cannot be null"))
                 .build();
     }
 
-    @Nonnull
-    static ProjectBuilderRequest build(@Nonnull Session session, @Nonnull Artifact artifact) {
-        return builder()
-                .session(nonNull(session, "session cannot be null"))
-                .artifact(nonNull(artifact, "artifact cannot be null"))
-                .build();
-    }
-
-    @Nonnull
-    static ProjectBuilderRequest build(@Nonnull Session session, @Nonnull ArtifactCoordinate coordinate) {
-        return builder()
-                .session(nonNull(session, "session cannot be null"))
-                .coordinate(nonNull(coordinate, "coordinate cannot be null"))
-                .build();
-    }
-
+    /**
+     * Creates a new builder for constructing a ProjectBuilderRequest.
+     *
+     * @return a new ProjectBuilderRequestBuilder
+     */
     @Nonnull
     static ProjectBuilderRequestBuilder builder() {
         return new ProjectBuilderRequestBuilder();
     }
 
+    /**
+     * Builder for creating ProjectBuilderRequest instances.
+     * This builder provides a fluent API for setting the various properties of a request.
+     */
     @NotThreadSafe
     class ProjectBuilderRequestBuilder {
         Session session;
+        RequestTrace trace;
         Path path;
         Source source;
-        Artifact artifact;
-        ArtifactCoordinate coordinate;
         boolean allowStubModel;
         boolean recursive;
         boolean processPlugins = true;
-        boolean resolveDependencies = true;
+        List<RemoteRepository> repositories;
 
         ProjectBuilderRequestBuilder() {}
 
+        /**
+         * Sets the Maven session for this request.
+         *
+         * @param session the Maven session
+         * @return this builder instance
+         */
         public ProjectBuilderRequestBuilder session(Session session) {
             this.session = session;
             return this;
         }
 
+        /**
+         * Sets the request trace for this request.
+         * The trace is used for debugging and monitoring purposes.
+         *
+         * @param trace the request trace
+         * @return this builder instance
+         */
+        public ProjectBuilderRequestBuilder trace(RequestTrace trace) {
+            this.trace = trace;
+            return this;
+        }
+
+        /**
+         * Sets the path to the project to build.
+         * This is typically the path to a pom.xml file or a directory containing a pom.xml file.
+         *
+         * @param path the path to the project
+         * @return this builder instance
+         */
         public ProjectBuilderRequestBuilder path(Path path) {
             this.path = path;
             return this;
         }
 
+        /**
+         * Sets the source of the project to build.
+         * This is an alternative to specifying a path, allowing the project to be built from
+         * a model source such as a string or input stream.
+         *
+         * @param source the source of the project
+         * @return this builder instance
+         */
         public ProjectBuilderRequestBuilder source(Source source) {
             this.source = source;
             return this;
         }
 
-        public ProjectBuilderRequestBuilder artifact(Artifact artifact) {
-            this.artifact = artifact;
-            return this;
-        }
-
-        public ProjectBuilderRequestBuilder coordinate(ArtifactCoordinate coordinate) {
-            this.coordinate = coordinate;
-            return this;
-        }
-
+        /**
+         * Sets whether plugins should be processed during project building.
+         * When true, the builder will process plugin information which may include
+         * resolving plugin dependencies and executing plugin goals that participate in project building.
+         *
+         * @param processPlugins true if plugins should be processed, false otherwise
+         * @return this builder instance
+         */
         public ProjectBuilderRequestBuilder processPlugins(boolean processPlugins) {
             this.processPlugins = processPlugins;
             return this;
         }
 
-        public ProjectBuilderRequestBuilder resolveDependencies(boolean resolveDependencies) {
-            this.resolveDependencies = resolveDependencies;
+        /**
+         * Sets the list of remote repositories to use for resolving dependencies during project building.
+         * These repositories will be used in addition to any repositories defined in the project itself.
+         *
+         * @param repositories the list of remote repositories
+         * @return this builder instance
+         */
+        public ProjectBuilderRequestBuilder repositories(List<RemoteRepository> repositories) {
+            this.repositories = repositories;
             return this;
         }
 
+        /**
+         * Builds a new ProjectBuilderRequest with the current builder settings.
+         *
+         * @return a new ProjectBuilderRequest instance
+         */
         public ProjectBuilderRequest build() {
             return new DefaultProjectBuilderRequest(
-                    session,
-                    path,
-                    source,
-                    artifact,
-                    coordinate,
-                    allowStubModel,
-                    recursive,
-                    processPlugins,
-                    resolveDependencies);
+                    session, trace, path, source, allowStubModel, recursive, processPlugins, repositories);
         }
 
-        private static class DefaultProjectBuilderRequest extends BaseRequest implements ProjectBuilderRequest {
+        private static class DefaultProjectBuilderRequest extends BaseRequest<Session>
+                implements ProjectBuilderRequest {
             private final Path path;
             private final Source source;
-            private final Artifact artifact;
-            private final ArtifactCoordinate coordinate;
             private final boolean allowStubModel;
             private final boolean recursive;
             private final boolean processPlugins;
-            private final boolean resolveDependencies;
+            private final List<RemoteRepository> repositories;
 
             @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultProjectBuilderRequest(
                     @Nonnull Session session,
+                    @Nullable RequestTrace trace,
                     @Nullable Path path,
                     @Nullable Source source,
-                    @Nullable Artifact artifact,
-                    @Nullable ArtifactCoordinate coordinate,
                     boolean allowStubModel,
                     boolean recursive,
                     boolean processPlugins,
-                    boolean resolveDependencies) {
-                super(session);
+                    @Nullable List<RemoteRepository> repositories) {
+                super(session, trace);
                 this.path = path;
                 this.source = source;
-                this.artifact = artifact;
-                this.coordinate = coordinate;
                 this.allowStubModel = allowStubModel;
                 this.recursive = recursive;
                 this.processPlugins = processPlugins;
-                this.resolveDependencies = resolveDependencies;
+                this.repositories = repositories;
             }
 
             @Nonnull
@@ -206,18 +278,6 @@ public interface ProjectBuilderRequest {
             @Override
             public Optional<Source> getSource() {
                 return Optional.ofNullable(source);
-            }
-
-            @Nonnull
-            @Override
-            public Optional<Artifact> getArtifact() {
-                return Optional.ofNullable(artifact);
-            }
-
-            @Nonnull
-            @Override
-            public Optional<ArtifactCoordinate> getCoordinate() {
-                return Optional.ofNullable(coordinate);
             }
 
             @Override
@@ -236,8 +296,35 @@ public interface ProjectBuilderRequest {
             }
 
             @Override
-            public boolean isResolveDependencies() {
-                return resolveDependencies;
+            public List<RemoteRepository> getRepositories() {
+                return repositories;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                return o instanceof DefaultProjectBuilderRequest that
+                        && allowStubModel == that.allowStubModel
+                        && recursive == that.recursive
+                        && processPlugins == that.processPlugins
+                        && Objects.equals(path, that.path)
+                        && Objects.equals(source, that.source)
+                        && Objects.equals(repositories, that.repositories);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(path, source, allowStubModel, recursive, processPlugins, repositories);
+            }
+
+            @Override
+            public String toString() {
+                return "ProjectBuilderRequest[" + "path="
+                        + path + ", source="
+                        + source + ", allowStubModel="
+                        + allowStubModel + ", recursive="
+                        + recursive + ", processPlugins="
+                        + processPlugins + ", repositories="
+                        + repositories + ']';
             }
         }
     }

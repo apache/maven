@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng2363</groupId>
+  <artifactId>parent</artifactId>
+  <version>0.1</version>
+  <packaging>pom</packaging>
+
+  <name>Maven Integration Test :: MNG-2363</name>
+  <description>Test that the file-based profile activator resolves relative paths against the current project's base directory
+    and also interpolates ${basedir} if explicitly given, just like usual for other parts of the POM.</description>
+
+  <modules>
+    <module>sub-a</module>
+    <module>sub-b</module>
+  </modules>
+
+  <profiles>
+    <profile>
+      <id>relative-path-1</id>
+      <activation>
+        <file>
+          <exists>file1.txt</exists>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.its.plugins</groupId>
+            <artifactId>maven-it-plugin-log-file</artifactId>
+            <version>2.1-SNAPSHOT</version>
+            <executions>
+              <execution>
+                <id>test-1</id>
+                <goals>
+                  <goal>reset</goal>
+                </goals>
+                <phase>validate</phase>
+                <configuration>
+                  <logFile>target/file1.txt</logFile>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>relative-path-2</id>
+      <activation>
+        <file>
+          <exists>parent1.txt</exists>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.its.plugins</groupId>
+            <artifactId>maven-it-plugin-log-file</artifactId>
+            <version>2.1-SNAPSHOT</version>
+            <executions>
+              <execution>
+                <id>test-2</id>
+                <goals>
+                  <goal>reset</goal>
+                </goals>
+                <phase>validate</phase>
+                <configuration>
+                  <logFile>target/parent1.txt</logFile>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>basedir-path-1</id>
+      <activation>
+        <file>
+          <exists>${basedir}/file2.txt</exists>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.its.plugins</groupId>
+            <artifactId>maven-it-plugin-log-file</artifactId>
+            <version>2.1-SNAPSHOT</version>
+            <executions>
+              <execution>
+                <id>test-3</id>
+                <goals>
+                  <goal>reset</goal>
+                </goals>
+                <phase>validate</phase>
+                <configuration>
+                  <logFile>target/file2.txt</logFile>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>basedir-path-2</id>
+      <activation>
+        <file>
+          <exists>${basedir}/parent2.txt</exists>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.its.plugins</groupId>
+            <artifactId>maven-it-plugin-log-file</artifactId>
+            <version>2.1-SNAPSHOT</version>
+            <executions>
+              <execution>
+                <id>test-4</id>
+                <goals>
+                  <goal>reset</goal>
+                </goals>
+                <phase>validate</phase>
+                <configuration>
+                  <logFile>target/parent2.txt</logFile>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

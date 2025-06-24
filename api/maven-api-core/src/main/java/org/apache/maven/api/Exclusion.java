@@ -22,10 +22,10 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nullable;
 
 /**
- * A dependency exlusion.
+ * A dependency exclusion.
  *
- * @since 4.0
- * @see DependencyCoordinate#getExclusions()
+ * @since 4.0.0
+ * @see DependencyCoordinates#getExclusions()
  */
 @Experimental
 public interface Exclusion {

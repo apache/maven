@@ -18,15 +18,21 @@
  */
 package org.apache.maven.api.services;
 
+import java.io.Serial;
+
 import org.apache.maven.api.annotations.Experimental;
 
 /**
  * The Exception class thrown by {@link VersionParser}.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public class VersionParserException extends MavenException {
+
+    @Serial
+    private static final long serialVersionUID = 1504740189114877333L;
+
     /**
      * @param message the message to give
      * @param e the {@link Exception}

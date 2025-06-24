@@ -18,12 +18,14 @@
  */
 package org.apache.maven.api.services;
 
+import java.io.Serial;
+
 import org.apache.maven.api.annotations.Experimental;
 
 /**
  * An artifact could not correctly being deployed.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public class ArtifactDeployerException extends MavenException {
@@ -31,6 +33,7 @@ public class ArtifactDeployerException extends MavenException {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 7421964724059077698L;
 
     /**

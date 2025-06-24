@@ -18,10 +18,12 @@
  */
 package org.apache.maven.api.services;
 
+import java.io.Serial;
+
 import org.apache.maven.api.annotations.Experimental;
 
 /**
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public class ArtifactInstallerException extends MavenException {
@@ -29,6 +31,7 @@ public class ArtifactInstallerException extends MavenException {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 3652561971360586373L;
 
     /**

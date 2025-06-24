@@ -21,9 +21,36 @@ package org.apache.maven.api;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.model.ModelBase;
 
 /**
- * A remote repository that can be used to download or upload artifacts.
+ * <p>A <dfn>remote repository</dfn> is a central or distributed location
+ * from which Maven can download project dependencies, plugins, and other
+ * build artifacts. When Maven cannot find an artifact in the local
+ * repository, it attempts to retrieve it from one or more remote
+ * repositories.</p>
+ *
+ * <p>There are several types of remote repositories:</p><ul>
+ * <li><dfn>Central Repository</dfn>: The default remote repository used by Maven. It is a large, publicly accessible repository maintained by the Maven community at https://repo.maven.apache.org/maven2. Most common Java libraries and frameworks are hosted here.</li>
+ * <li><dfn>Private Remote Repository</dfn>: Organizations often maintain their own private remote repositories, which may host proprietary or custom-built artifacts that are not available in the central repository. These repositories can be managed using tools like Apache Archiva, Sonatype Nexus, or JFrog Artifactory.</li>
+ * <li><dfn>Third-Party Repositories</dfn>: Some projects or organizations host their own remote repositories for distributing specific artifacts that are not available in the central repository. These repositories must be explicitly added to the Maven pom.xml or settings.xml files for Maven to access them.</li></ul>
+ *
+ * <h2>Repository Configuration</h2>
+ *
+ * <p>Repositories can be configured at various levels:</p><ol>
+ * <li>POM: Repositories can be specified in the {@code pom.xml} file under the {@code <repositories>} and {@code <pluginRepositories>} sections.</li>
+ * <li>Settings: the {@code settings.xml} can be used to provide additional repositories in the three level of settings (user, project, installation).</li>
+ * </ol>
+ * <p>By understanding and properly configuring repositories, developers can control where Maven looks for dependencies, manage access to proprietary artifacts, and optimize the build process to ensure consistency and reliability across projects.
+ * </p>
+ *
+ *
+ * @since 4.0.0
+ * @see Repository
+ * @see LocalRepository
+ * @see Session#getSettings()
+ * @see ModelBase#getRepositories()
+ * @see ModelBase#getPluginRepositories()
  */
 @Experimental
 @Immutable

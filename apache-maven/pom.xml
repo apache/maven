@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>4.0.0-alpha-5-SNAPSHOT</version>
+    <version>4.0.0-rc-4-SNAPSHOT</version>
   </parent>
 
   <artifactId>apache-maven</artifactId>
@@ -32,11 +32,11 @@ under the License.
   <name>Apache Maven Distribution</name>
   <description>The Apache Maven distribution, source and binary, in zip and tar.gz formats.</description>
 
-  <properties>
-    <distributionFileName>${distributionId}-${project.version}</distributionFileName>
-  </properties>
-
   <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-cli</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-embedder</artifactId>
@@ -49,11 +49,7 @@ under the License.
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-compat</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.eclipse.sisu</groupId>
-      <artifactId>org.eclipse.sisu.plexus</artifactId>
-    </dependency>
-    <!-- CLI -->
+
     <dependency>
       <groupId>commons-cli</groupId>
       <artifactId>commons-cli</artifactId>
@@ -66,6 +62,8 @@ under the License.
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-file</artifactId>
     </dependency>
+
+    <!-- CLI -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
@@ -80,21 +78,78 @@ under the License.
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-transport-file</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-transport-http</artifactId>
-    </dependency>
+    <!-- HTTP/1.1, lowest priority, Java8+ (still must as some ITs force it) -->
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-transport-wagon</artifactId>
     </dependency>
+    <!-- HTTP/1.1, medium priority, Java8+ -->
     <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-slf4j-provider</artifactId>
+      <groupId>org.apache.maven.resolver</groupId>
+      <artifactId>maven-resolver-transport-apache</artifactId>
+    </dependency>
+    <!-- HTTP/1.1 and HTTP/2, high priority, Java11+ -->
+    <dependency>
+      <groupId>org.apache.maven.resolver</groupId>
+      <artifactId>maven-resolver-transport-jdk</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.fusesource.jansi</groupId>
-      <artifactId>jansi</artifactId>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-logging</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jline</groupId>
+      <artifactId>jline-reader</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jline</groupId>
+      <artifactId>jline-terminal-jni</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jline</groupId>
+      <artifactId>jline-terminal-ffm</artifactId>
+    </dependency>
+
+    <!-- (legacy) DI annotations -->
+    <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.annotation</groupId>
+      <artifactId>javax.annotation-api</artifactId>
+    </dependency>
+
+    <!-- DI Runtime -->
+    <dependency>
+      <groupId>org.eclipse.sisu</groupId>
+      <artifactId>org.eclipse.sisu.plexus</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.sisu</groupId>
+      <artifactId>org.eclipse.sisu.inject</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.inject</groupId>
+      <artifactId>guice</artifactId>
+      <classifier>classes</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.resolver</groupId>
+      <artifactId>maven-resolver-tools</artifactId>
+      <version>${resolverVersion}</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-nop</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 
@@ -112,42 +167,19 @@ under the License.
   </pluginRepositories>
 
   <build>
-    <finalName>${distributionFileName}</finalName>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.rat</groupId>
-          <artifactId>apache-rat-plugin</artifactId>
-          <configuration>
-            <excludes combine.children="append">
-              <exclude>src/assembly/maven/bin/m2.conf</exclude>
-              <!-- these are partial scripts, resulting in mvn scripts -->
-              <exclude>src/assembly/shared/init</exclude>
-              <exclude>src/assembly/shared/init.cmd</exclude>
-              <exclude>src/assembly/shared/mvnlauncher</exclude>
-              <exclude>src/assembly/shared/mvnlauncher.cmd</exclude>
-              <exclude>src/assembly/shared/mvnvalidate</exclude>
-              <exclude>src/assembly/shared/mvnvalidate.cmd</exclude>
-              <exclude>src/assembly/shared/run</exclude>
-              <exclude>src/assembly/shared/run.cmd</exclude>
-            </excludes>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
-            <id>unpack-jansi-native</id>
+            <id>unpack-jline-native</id>
             <goals>
               <goal>unpack-dependencies</goal>
             </goals>
             <configuration>
-              <includeArtifactIds>jansi</includeArtifactIds>
-              <includes>org/fusesource/jansi/internal/native/Windows/**</includes>
+              <includeArtifactIds>jline-native</includeArtifactIds>
+              <includes>org/jline/nativ/**</includes>
             </configuration>
           </execution>
         </executions>
@@ -195,6 +227,77 @@ under the License.
               <descriptors>
                 <descriptor>src/assembly/bin.xml</descriptor>
               </descriptors>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>eu.maveniverse.maven.plugins</groupId>
+        <artifactId>bom-builder3</artifactId>
+        <version>1.1.1</version>
+        <executions>
+          <execution>
+            <id>skinny-bom</id>
+            <goals>
+              <goal>build-bom</goal>
+            </goals>
+            <configuration>
+              <bomClassifier>skinny</bomClassifier>
+              <bomName>Maven Dependencies Skinny BOM</bomName>
+              <bomDescription>Bill Of Materials for Apache Maven - Maven JARS only</bomDescription>
+              <outputFilename>maven-skinny-bom.xml</outputFilename>
+              <reactorDependencies>REACTOR</reactorDependencies>
+              <transitiveDependencies>NONE</transitiveDependencies>
+              <usePropertiesForVersion>true</usePropertiesForVersion>
+              <attach>true</attach>
+            </configuration>
+          </execution>
+          <execution>
+            <id>fat-bom</id>
+            <goals>
+              <goal>build-bom</goal>
+            </goals>
+            <configuration>
+              <bomClassifier>fat</bomClassifier>
+              <bomName>Maven Dependencies Fat BOM</bomName>
+              <bomDescription>Bill Of Materials for Apache Maven - All dependencies</bomDescription>
+              <outputFilename>maven-fat-bom.xml</outputFilename>
+              <reactorDependencies>REACTOR</reactorDependencies>
+              <transitiveDependencies>CURRENT_PROJECT</transitiveDependencies>
+              <usePropertiesForVersion>true</usePropertiesForVersion>
+              <attach>true</attach>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.5.1</version>
+        <executions>
+          <execution>
+            <id>render-configuration-page</id>
+            <goals>
+              <goal>java</goal>
+            </goals>
+            <phase>verify</phase>
+            <configuration>
+              <classpathScope>test</classpathScope>
+              <additionalClasspathElements>
+                <additionalClasspathElement>${basedir}/src/test/resources</additionalClasspathElement>
+              </additionalClasspathElements>
+              <mainClass>org.eclipse.aether.tools.CollectConfiguration</mainClass>
+              <arguments>
+                <argument>--mode=maven</argument>
+                <!--
+                TODO: templates are loaded from classpath, in "normal" JAR project local template would override docgen one,
+                but in this case the packaging=pom all I could do is use additionalClasspathElement that APPENDS classpath,
+                hence template is renamed to maven-configuration.md.vm, to avoid conflict (and picking up resolver template)
+                -->
+                <argument>--templates=maven-configuration.md,configuration.properties,configuration.yaml</argument>
+                <argument>${basedir}/..</argument>
+                <argument>${basedir}/../src/site/markdown/</argument>
+              </arguments>
             </configuration>
           </execution>
         </executions>
@@ -258,6 +361,34 @@ under the License.
       </build>
     </profile>
     <profile>
+      <id>run-its</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>create-distribution-dir</id>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+                <phase>package</phase>
+                <configuration>
+                  <finalName>./</finalName>
+                  <appendAssemblyId>false</appendAssemblyId>
+                  <attach>false</attach>
+                  <outputDirectory>${basedir}/target/maven</outputDirectory>
+                  <descriptors>
+                    <descriptor>src/assembly/dir.xml</descriptor>
+                  </descriptors>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
       <id>apache-release</id>
       <build>
         <plugins>
@@ -283,6 +414,7 @@ under the License.
           <plugin>
             <groupId>net.nicoulaj.maven.plugins</groupId>
             <artifactId>checksum-maven-plugin</artifactId>
+            <version>1.11</version>
             <executions>
               <execution>
                 <id>source-release-checksum</id>

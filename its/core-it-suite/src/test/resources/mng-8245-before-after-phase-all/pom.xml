@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" root="true" xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 https://maven.apache.org/xsd/maven-4.1.0.xsd">
+
+  <groupId>org.apahce.maven.its</groupId>
+  <artifactId>mng-8245</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.soebes.maven.plugins</groupId>
+        <artifactId>echo-maven-plugin</artifactId>
+        <version>0.5.0</version>
+        <executions>
+          <execution>
+            <id>before-clean</id>
+            <goals>
+              <goal>echo</goal>
+            </goals>
+            <phase>before:clean</phase>
+            <configuration>
+              <echos>
+                <echo>Hallo 'before:clean' phase.</echo>
+              </echos>
+            </configuration>
+          </execution>
+          <execution>
+            <id>after-clean</id>
+            <goals>
+              <goal>echo</goal>
+            </goals>
+            <phase>after:clean</phase>
+            <configuration>
+              <echos>
+                <echo>Hallo 'after:clean' phase.</echo>
+              </echos>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+
+  </build>
+
+</project>

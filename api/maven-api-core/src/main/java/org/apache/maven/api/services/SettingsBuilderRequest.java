@@ -18,51 +18,43 @@
  */
 package org.apache.maven.api.services;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 
-import org.apache.maven.api.Session;
+import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
 
-import static org.apache.maven.api.services.BaseRequest.nonNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Collects settings that control the building of effective settings.
  */
 @Experimental
 @Immutable
-public interface SettingsBuilderRequest {
-
-    @Nonnull
-    Session getSession();
+public interface SettingsBuilderRequest extends Request<ProtoSession> {
 
     /**
-     * Gets the global settings path.
+     * Gets the installation settings source.
      *
-     * @return the global settings path or {@code null} if none
+     * @return the installation settings source or {@code null} if none
      */
     @Nonnull
-    Optional<Path> getGlobalSettingsPath();
+    Optional<Source> getInstallationSettingsSource();
 
     /**
-     * Gets the global settings source.
+     * Gets the project settings source.
      *
-     * @return the global settings source or {@code null} if none
+     * @return the project settings source or {@code null} if none
      */
     @Nonnull
-    Optional<Source> getGlobalSettingsSource();
-
-    /**
-     * Gets the user settings path.
-     *
-     * @return the user settings path or {@code null} if none
-     */
-    @Nonnull
-    Optional<Path> getUserSettingsPath();
+    Optional<Source> getProjectSettingsSource();
 
     /**
      * Gets the user settings source.
@@ -72,23 +64,62 @@ public interface SettingsBuilderRequest {
     @Nonnull
     Optional<Source> getUserSettingsSource();
 
+    /**
+     * The optional interpolation source used for interpolation.
+     *
+     * @return the interpolation source for interpolation
+     */
+    @Nonnull
+    Optional<UnaryOperator<String>> getInterpolationSource();
+
     @Nonnull
     static SettingsBuilderRequest build(
-            @Nonnull Session session, @Nonnull Source globalSettingsSource, @Nonnull Source userSettingsSource) {
+            @Nonnull ProtoSession session,
+            @Nonnull Source installationSettingsSource,
+            @Nonnull Source userSettingsSource) {
+        return build(session, installationSettingsSource, null, userSettingsSource);
+    }
+
+    @Nonnull
+    static SettingsBuilderRequest build(
+            @Nonnull ProtoSession session, @Nonnull Path installationSettingsPath, @Nonnull Path userSettingsPath) {
+        return build(session, Sources.fromPath(installationSettingsPath), null, Sources.fromPath(userSettingsPath));
+    }
+
+    @Nonnull
+    static SettingsBuilderRequest build(
+            @Nonnull ProtoSession session,
+            @Nullable Source installationSettingsSource,
+            @Nullable Source projectSettingsSource,
+            @Nullable Source userSettingsSource) {
         return builder()
-                .session(nonNull(session, "session cannot be null"))
-                .globalSettingsSource(nonNull(globalSettingsSource, "globalSettingsSource cannot be null"))
-                .userSettingsSource(nonNull(userSettingsSource, "userSettingsSource cannot be null"))
+                .session(requireNonNull(session, "session cannot be null"))
+                .installationSettingsSource(installationSettingsSource)
+                .projectSettingsSource(projectSettingsSource)
+                .userSettingsSource(userSettingsSource)
                 .build();
     }
 
     @Nonnull
     static SettingsBuilderRequest build(
-            @Nonnull Session session, @Nonnull Path globalSettingsPath, @Nonnull Path userSettingsPath) {
+            @Nonnull ProtoSession session,
+            @Nullable Path installationSettingsPath,
+            @Nullable Path projectSettingsPath,
+            @Nullable Path userSettingsPath) {
         return builder()
-                .session(nonNull(session, "session cannot be null"))
-                .globalSettingsPath(nonNull(globalSettingsPath, "globalSettingsPath cannot be null"))
-                .userSettingsPath(nonNull(userSettingsPath, "userSettingsPath cannot be null"))
+                .session(requireNonNull(session, "session cannot be null"))
+                .installationSettingsSource(
+                        installationSettingsPath != null && Files.exists(installationSettingsPath)
+                                ? Sources.fromPath(installationSettingsPath)
+                                : null)
+                .projectSettingsSource(
+                        projectSettingsPath != null && Files.exists(projectSettingsPath)
+                                ? Sources.fromPath(projectSettingsPath)
+                                : null)
+                .userSettingsSource(
+                        userSettingsPath != null && Files.exists(userSettingsPath)
+                                ? Sources.fromPath(userSettingsPath)
+                                : null)
                 .build();
     }
 
@@ -99,29 +130,30 @@ public interface SettingsBuilderRequest {
 
     @NotThreadSafe
     class SettingsBuilderRequestBuilder {
-        Session session;
-        Path globalSettingsPath;
-        Source globalSettingsSource;
-        Path userSettingsPath;
+        ProtoSession session;
+        RequestTrace trace;
+        Source installationSettingsSource;
+        Source projectSettingsSource;
         Source userSettingsSource;
+        UnaryOperator<String> interpolationSource;
 
-        public SettingsBuilderRequestBuilder session(Session session) {
+        public SettingsBuilderRequestBuilder session(ProtoSession session) {
             this.session = session;
             return this;
         }
 
-        public SettingsBuilderRequestBuilder globalSettingsPath(Path globalSettingsPath) {
-            this.globalSettingsPath = globalSettingsPath;
+        public SettingsBuilderRequestBuilder trace(RequestTrace trace) {
+            this.trace = trace;
             return this;
         }
 
-        public SettingsBuilderRequestBuilder globalSettingsSource(Source globalSettingsSource) {
-            this.globalSettingsSource = globalSettingsSource;
+        public SettingsBuilderRequestBuilder installationSettingsSource(Source installationSettingsSource) {
+            this.installationSettingsSource = installationSettingsSource;
             return this;
         }
 
-        public SettingsBuilderRequestBuilder userSettingsPath(Path userSettingsPath) {
-            this.userSettingsPath = userSettingsPath;
+        public SettingsBuilderRequestBuilder projectSettingsSource(Source projectSettingsSource) {
+            this.projectSettingsSource = projectSettingsSource;
             return this;
         }
 
@@ -130,53 +162,89 @@ public interface SettingsBuilderRequest {
             return this;
         }
 
-        public SettingsBuilderRequest build() {
-            return new DefaultSettingsBuilderRequest(
-                    session, globalSettingsPath, globalSettingsSource, userSettingsPath, userSettingsSource);
+        public SettingsBuilderRequestBuilder interpolationSource(UnaryOperator<String> interpolationSource) {
+            this.interpolationSource = interpolationSource;
+            return this;
         }
 
-        private static class DefaultSettingsBuilderRequest extends BaseRequest implements SettingsBuilderRequest {
-            private final Path globalSettingsPath;
-            private final Source globalSettingsSource;
-            private final Path userSettingsPath;
+        public SettingsBuilderRequest build() {
+            return new DefaultSettingsBuilderRequest(
+                    session,
+                    trace,
+                    installationSettingsSource,
+                    projectSettingsSource,
+                    userSettingsSource,
+                    interpolationSource);
+        }
+
+        private static class DefaultSettingsBuilderRequest extends BaseRequest<ProtoSession>
+                implements SettingsBuilderRequest {
+            private final Source installationSettingsSource;
+            private final Source projectSettingsSource;
             private final Source userSettingsSource;
+            private final UnaryOperator<String> interpolationSource;
 
             @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultSettingsBuilderRequest(
-                    @Nonnull Session session,
-                    @Nullable Path globalSettingsPath,
-                    @Nullable Source globalSettingsSource,
-                    @Nullable Path userSettingsPath,
-                    @Nullable Source userSettingsSource) {
-                super(session);
-                this.globalSettingsPath = globalSettingsPath;
-                this.globalSettingsSource = globalSettingsSource;
-                this.userSettingsPath = userSettingsPath;
+                    @Nonnull ProtoSession session,
+                    @Nullable RequestTrace trace,
+                    @Nullable Source installationSettingsSource,
+                    @Nullable Source projectSettingsSource,
+                    @Nullable Source userSettingsSource,
+                    @Nullable UnaryOperator<String> interpolationSource) {
+                super(session, trace);
+                this.installationSettingsSource = installationSettingsSource;
+                this.projectSettingsSource = projectSettingsSource;
                 this.userSettingsSource = userSettingsSource;
+                this.interpolationSource = interpolationSource;
             }
 
             @Nonnull
             @Override
-            public Optional<Path> getGlobalSettingsPath() {
-                return Optional.ofNullable(globalSettingsPath);
+            public Optional<Source> getInstallationSettingsSource() {
+                return Optional.ofNullable(installationSettingsSource);
             }
 
             @Nonnull
             @Override
-            public Optional<Source> getGlobalSettingsSource() {
-                return Optional.ofNullable(globalSettingsSource);
-            }
-
-            @Nonnull
-            @Override
-            public Optional<Path> getUserSettingsPath() {
-                return Optional.ofNullable(userSettingsPath);
+            public Optional<Source> getProjectSettingsSource() {
+                return Optional.ofNullable(projectSettingsSource);
             }
 
             @Nonnull
             @Override
             public Optional<Source> getUserSettingsSource() {
                 return Optional.ofNullable(userSettingsSource);
+            }
+
+            @Nonnull
+            @Override
+            public Optional<UnaryOperator<String>> getInterpolationSource() {
+                return Optional.ofNullable(interpolationSource);
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                return o instanceof DefaultSettingsBuilderRequest that
+                        && Objects.equals(installationSettingsSource, that.installationSettingsSource)
+                        && Objects.equals(projectSettingsSource, that.projectSettingsSource)
+                        && Objects.equals(userSettingsSource, that.userSettingsSource)
+                        && Objects.equals(interpolationSource, that.interpolationSource);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(
+                        installationSettingsSource, projectSettingsSource, userSettingsSource, interpolationSource);
+            }
+
+            @Override
+            public String toString() {
+                return "SettingsBuilderRequest[" + "installationSettingsSource="
+                        + installationSettingsSource + ", projectSettingsSource="
+                        + projectSettingsSource + ", userSettingsSource="
+                        + userSettingsSource + ", interpolationSource="
+                        + interpolationSource + ']';
             }
         }
     }

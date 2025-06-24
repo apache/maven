@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.1.0" root="true">
+  <groupId>com.github.mattnelson</groupId>
+  <artifactId>profiles</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <profiles>
+    <profile>
+      <id>profile_active_by_default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <profile_active_by_default>parent</profile_active_by_default>
+      </properties>
+    </profile>
+    <profile>
+      <id>profile_active_from_mvn_config</id>
+      <properties>
+        <profile_active_from_mvn_config>parent</profile_active_from_mvn_config>
+      </properties>
+    </profile>
+    <profile>
+      <id>profile_active_from_condition</id>
+      <activation>
+        <property>
+          <name>profile_active_from_condition</name>
+        </property>
+      </activation>
+      <properties>
+        <profile_active_from_condition>parent</profile_active_from_condition>
+      </properties>
+    </profile>
+  </profiles>
+</project>

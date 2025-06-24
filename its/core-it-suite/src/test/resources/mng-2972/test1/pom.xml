@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng2972</groupId>
+  <artifactId>test1</artifactId>
+  <version>1.0</version>
+
+  <name>Maven Integration Test :: MNG-2972</name>
+  <description>Verify that a project-level plugin dependency replaces the original dependency from the plugin POM.</description>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-class-loader</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <configuration>
+          <classNames>org.apache.maven.its.mng2972.MNG2972,org.apache.maven.plugin.coreit.ClassA,org.apache.maven.plugin.coreit.ClassB</classNames>
+          <resourcePaths>org/apache/maven/its/mng2972/mng-2972.properties,org/apache/maven/plugin/coreit/a.properties,org/apache/maven/plugin/coreit/b.properties</resourcePaths>
+          <pluginClassLoaderOutput>target/pcl.properties</pluginClassLoaderOutput>
+        </configuration>
+        <dependencies>
+          <!--
+          This dependency should replace the plugins's original dependency on
+            org.apache.maven.its.plugins.class-loader:dep-b
+          In detail, this replacement should have the following effects on both lifecycle invocations and command line
+          invocations of the plugin:
+            a) classes/resources from the custom dependency are available
+            b) classes/resources from the original dependency are not available at all
+            c) the transitive dependency on dep-a via the original dep-b is dropped
+          -->
+          <dependency>
+            <groupId>org.apache.maven.its.plugins.class-loader</groupId>
+            <artifactId>dep-b</artifactId>
+            <version>0.2-mng-2972</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <id>load</id>
+            <goals>
+              <goal>load</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

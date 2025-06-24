@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng4528</groupId>
+  <artifactId>test</artifactId>
+  <version>0.1</version>
+
+  <name>Maven Integration Test :: MNG-4528</name>
+  <description>Test that wagon providers pulled in via transitive dependencies of Maven core artifacts get excluded from
+    plugin realms (in favor of potentially newer wagons bundled with the core). This requirement is mostly a
+    hack to compensate for the historic slip of Maven core artifacts depending on wagon providers. Those old
+    wagon providers conflict with the usually newer wagons bundled with the core distro and cause grief under
+    a class loader hierarchy where wagons are loaded from the plugin realm (if available) like in Maven 3.</description>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-uses-wagon</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <configuration>
+          <propertiesFile>target/wagon.properties</propertiesFile>
+          <providerHint>scpexe</providerHint>
+          <providerGroupId>org.apache.maven.wagon</providerGroupId>
+          <providerArtifactId>wagon-ssh-external</providerArtifactId>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <!--
+            This Maven core artifact has a dependency on wagon-ssh-external:1.0-alpha-6 but this wagon version
+            must not be used by the plugin. In real projects, the constellation
+            maven-core:2.0.6 -> wagon-lightweight-http:1.0-beta-2 is most problematic.
+            -->
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-core</artifactId>
+            <version>2.0.2</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <goals>
+              <goal>dump-version</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

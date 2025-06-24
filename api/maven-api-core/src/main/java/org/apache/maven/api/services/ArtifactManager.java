@@ -22,13 +22,14 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import org.apache.maven.api.Artifact;
+import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public interface ArtifactManager extends Service {
@@ -43,5 +44,5 @@ public interface ArtifactManager extends Service {
     /**
      * Associates the given file path to the artifact.
      */
-    void setPath(@Nonnull Artifact artifact, Path path);
+    void setPath(@Nonnull ProducedArtifact artifact, Path path);
 }

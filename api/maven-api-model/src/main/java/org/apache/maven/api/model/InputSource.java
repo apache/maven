@@ -19,18 +19,44 @@
 package org.apache.maven.api.model;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
- * Class InputSource.
+ * Represents the source of a model input, such as a POM file.
+ * <p>
+ * This class tracks the origin of model elements, including their location in source files
+ * and relationships between imported models. It's used for error reporting and debugging
+ * to help identify where specific model elements came from.
+ *
+ * @since 4.0.0
  */
 public class InputSource implements Serializable {
 
     private final String modelId;
     private final String location;
+    private final List<InputSource> inputs;
+    private final InputLocation importedFrom;
 
     public InputSource(String modelId, String location) {
+        this(modelId, location, null);
+    }
+
+    public InputSource(String modelId, String location, InputLocation importedFrom) {
         this.modelId = modelId;
         this.location = location;
+        this.inputs = null;
+        this.importedFrom = importedFrom;
+    }
+
+    public InputSource(Collection<InputSource> inputs) {
+        this.modelId = null;
+        this.location = null;
+        this.inputs = ImmutableCollections.copy(inputs);
+        this.importedFrom = null;
     }
 
     /**
@@ -51,8 +77,49 @@ public class InputSource implements Serializable {
         return this.modelId;
     }
 
+    /**
+     * Gets the parent InputLocation where this InputLocation may have been imported from.
+     * Can return {@code null}.
+     *
+     * @return InputLocation
+     * @since 4.0.0
+     */
+    public InputLocation getImportedFrom() {
+        return importedFrom;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        InputSource that = (InputSource) o;
+        return Objects.equals(modelId, that.modelId)
+                && Objects.equals(location, that.location)
+                && Objects.equals(inputs, that.inputs);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(modelId, location, inputs);
+    }
+
+    Stream<InputSource> sources() {
+        return inputs != null ? inputs.stream() : Stream.of(this);
+    }
+
     @Override
     public String toString() {
+        if (inputs != null) {
+            return inputs.stream().map(InputSource::toString).collect(Collectors.joining(", ", "merged[", "]"));
+        }
         return getModelId() + " " + getLocation();
+    }
+
+    public static InputSource merge(InputSource src1, InputSource src2) {
+        return new InputSource(Stream.concat(src1.sources(), src2.sources()).collect(Collectors.toSet()));
     }
 }

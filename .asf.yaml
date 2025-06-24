@@ -19,8 +19,14 @@ github:
         strict: true
       required_pull_request_reviews:
         required_approving_review_count: 1
+  autolink_jira:
+    - MNG
+  pull_requests:
+    del_branch_on_merge: true
+  features:
+    issues: true
 notifications:
   commits: commits@maven.apache.org
   issues: issues@maven.apache.org
   pullrequests: issues@maven.apache.org
-  jira_options: link label comment
+  jira_options: link label

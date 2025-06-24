@@ -29,10 +29,10 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * Result of a project build call.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
-public interface ProjectBuilderResult {
+public interface ProjectBuilderResult extends Result<ProjectBuilderRequest> {
 
     /**
      * Gets the identifier of the project that could not be built. The general format of the identifier is {@code
@@ -75,5 +75,5 @@ public interface ProjectBuilderResult {
      * @return the result of the dependency resolution for the project
      */
     @Nonnull
-    Optional<DependencyCollectorResult> getDependencyResolverResult();
+    Optional<DependencyResolverResult> getDependencyResolverResult();
 }

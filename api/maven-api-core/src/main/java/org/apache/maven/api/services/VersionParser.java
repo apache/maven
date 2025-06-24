@@ -20,6 +20,7 @@ package org.apache.maven.api.services;
 
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Version;
+import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -27,10 +28,11 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * Service interface to parse {@link Version} and {@link VersionRange}.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public interface VersionParser extends Service {
+
     /**
      * Parses the specified version string, for example "1.0".
      *
@@ -51,6 +53,16 @@ public interface VersionParser extends Service {
      */
     @Nonnull
     VersionRange parseVersionRange(@Nonnull String range);
+
+    /**
+     * Parses the specified version constraint specification, for example "1.0" or "[1.0,2.0)".
+     *
+     * @param constraint the constraint specification to parse, must not be {@code null}
+     * @return the parsed version constraint, never {@code null}
+     * @throws VersionParserException if the range specification violates the syntax rules of this scheme
+     */
+    @Nonnull
+    VersionConstraint parseVersionConstraint(@Nonnull String constraint);
 
     /**
      * Checks whether a given artifact version is considered a {@code SNAPSHOT} or not.

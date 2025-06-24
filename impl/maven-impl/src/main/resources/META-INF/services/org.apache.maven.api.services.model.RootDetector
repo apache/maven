@@ -1,0 +1,2 @@
+org.apache.maven.impl.model.rootlocator.DotMvnRootDetector
+org.apache.maven.impl.model.rootlocator.PomXmlRootDetector

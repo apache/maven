@@ -25,17 +25,33 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.apache.maven.api.ResolutionScope;
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * This annotation will mark your class as a Mojo (ie. goal in a Maven plugin).
+ * This annotation will mark your class as a Mojo, which is the implementation of a goal in a Maven plugin.
+ * <p>
+ * The mojo can be annotated with {@code org.apache.maven.api.di.*} annotations to
+ * control the lifecycle of the mojo itself, and to inject other beans.
+ * </p>
+ * <p>
+ * The mojo class can also be injected with an {@link Execute} annotation to specify a
+ * forked lifecycle.
+ * </p>
+ * <p>
+ * The {@link Parameter} annotation can be added on fields to inject data
+ * from the plugin configuration or from other components.
+ * </p>
+ * <p>
+ * Fields can also be annotated with the {@link Resolution} annotation to be injected
+ * with the dependency collection or resolution result for the project.
+ * </p>
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @Documented
-@Retention(RetentionPolicy.CLASS)
+@Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Inherited
 public @interface Mojo {
@@ -43,41 +59,25 @@ public @interface Mojo {
      * goal name (required).
      * @return the goal name
      */
+    @Nonnull
     String name();
 
     /**
      * default phase to bind your mojo.
      * @return the default phase
      */
-    LifecyclePhase defaultPhase() default LifecyclePhase.NONE;
-
-    /**
-     * the required dependency resolution scope.
-     * @return the required dependency resolution scope
-     */
-    ResolutionScope requiresDependencyResolution() default ResolutionScope.NONE;
-
-    /**
-     * the required dependency collection scope.
-     * @return the required dependency collection scope
-     */
-    ResolutionScope requiresDependencyCollection() default ResolutionScope.NONE;
-
-    /**
-     * your Mojo instantiation strategy. (Only <code>per-lookup</code> and <code>singleton</code> are supported)
-     * @return the instantiation strategy
-     */
-    InstantiationStrategy instantiationStrategy() default InstantiationStrategy.PER_LOOKUP;
+    @Nonnull
+    String defaultPhase() default "";
 
     /**
      * does your mojo requires a project to be executed?
      * @return requires a project
      */
-    boolean requiresProject() default true;
+    boolean projectRequired() default true;
 
     /**
-     * if the Mojo uses the Maven project and its child modules.
-     * @return uses the Maven project and its child modules
+     * if the Mojo uses the Maven project and its subprojects.
+     * @return uses the Maven project and its subprojects
      */
     boolean aggregator() default false;
 
@@ -85,11 +85,31 @@ public @interface Mojo {
      * does this Mojo need to be online to be executed?
      * @return need to be online
      */
-    boolean requiresOnline() default false;
+    boolean onlineRequired() default false;
 
     /**
+     * TODO: v4: add a SPI for the configurator
      * configurator bean name.
      * @return the configurator bean name
      */
+    @Nonnull
     String configurator() default "";
+
+    /**
+     * Indicates whether dependency collection will be
+     * required when executing the Mojo.
+     * If not set, it will be inferred from the fields
+     * annotated with the {@link Resolution} annotation.
+     */
+    @Nonnull
+    boolean dependencyCollection() default false;
+
+    /**
+     * Comma separated list of path scopes that will be
+     * required for dependency resolution.
+     * If not set, it will be inferred from the fields
+     * annotated with the {@link Resolution} annotation.
+     */
+    @Nonnull
+    String dependencyResolutionPathScopes() default "";
 }

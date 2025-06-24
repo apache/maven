@@ -21,15 +21,16 @@ package org.apache.maven.api.services;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.apache.maven.api.Artifact;
+import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * Installs {@link Artifact}s to the local repository.
+ * Installs {@link ProducedArtifact}s to the local repository.
  *
- * @since 4.0
+ * @since 4.0.0
  * @see Session#withLocalRepository(org.apache.maven.api.LocalRepository)
  */
 @Experimental
@@ -39,31 +40,31 @@ public interface ArtifactInstaller extends Service {
      * @throws ArtifactInstallerException in case of an error
      * @throws IllegalArgumentException in case {@code request} is {@code null}
      */
-    void install(ArtifactInstallerRequest request);
+    void install(@Nonnull ArtifactInstallerRequest request);
 
     /**
      * @param session the repository session
-     * @param artifact the {@link Artifact} to install
-     * @throws ArtifactInstallerException In case of an error which can be the a given artifact cannot be found or the
-     *             installation has failed.
-     * @throws IllegalArgumentException in case of parameter {@code session} is {@code null} or
-     *          {@code artifact} is {@code null}.
+     * @param artifact the {@link ProducedArtifact} to install
+     * @throws ArtifactInstallerException in case of an error which can be a given artifact cannot be found or the
+     *             installation has failed
+     * @throws IllegalArgumentException if a parameter {@code session} is {@code null} or
+     *          {@code artifact} is {@code null}
      */
-    default void install(Session session, Artifact artifact) {
+    default void install(Session session, ProducedArtifact artifact) {
         install(session, Collections.singletonList(artifact));
     }
 
     /**
      * @param session the repository session
-     * @param artifacts Collection of {@link Artifact MavenArtifacts}
-     * @throws ArtifactInstallerException In case of an error which can be the a given artifact cannot be found or the
-     *             installation has failed.
-     * @throws IllegalArgumentException in case of parameter {@code request} is {@code null} or parameter
+     * @param artifacts Collection of {@link ProducedArtifact MavenArtifacts}
+     * @throws ArtifactInstallerException if the given artifact cannot be found or the
+     *             installation has failed
+     * @throws IllegalArgumentException if {@code request} is {@code null} or parameter
      *             {@code localRepository} is {@code null} or {@code localRepository} is not a directory
      *             or parameter {@code mavenArtifacts} is {@code null} or
      *             {@code mavenArtifacts.isEmpty()} is {@code true}.
      */
-    default void install(Session session, Collection<Artifact> artifacts) {
+    default void install(Session session, Collection<ProducedArtifact> artifacts) {
         install(ArtifactInstallerRequest.build(session, artifacts));
     }
 }

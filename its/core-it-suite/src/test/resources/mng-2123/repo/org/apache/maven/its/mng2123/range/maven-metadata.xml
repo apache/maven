@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>org.apache.maven.its.mng2123</groupId>
+  <artifactId>range</artifactId>
+  <version>0.1</version>
+  <versioning>
+    <release>0.1</release>
+    <versions>
+      <version>0.1</version>
+    </versions>
+    <lastUpdated>20090228183131</lastUpdated>
+  </versioning>
+</metadata>

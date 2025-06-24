@@ -29,23 +29,24 @@ under the License.
  |
  |                 -s /path/to/user/settings.xml
  |
- |  2. Global Level. This settings.xml file provides configuration for all Maven
+ |  2. Installation Level.
+ |                 This settings.xml file provides configuration for all Maven
  |                 users on a machine (assuming they're all using the same Maven
  |                 installation). It's normally provided in
- |                 ${maven.conf}/settings.xml.
+ |                 ${maven.installation.conf}/settings.xml.
  |
  |                 NOTE: This location can be overridden with the CLI option:
  |
- |                 -gs /path/to/global/settings.xml
+ |                 -is /path/to/installation/settings.xml
  |
  | The sections in this sample file are intended to give you a running start at
  | getting the most out of your Maven installation. Where appropriate, the default
  | values (values used when the setting is not specified) are provided.
  |
  |-->
-<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0"
+<settings xmlns="http://maven.apache.org/SETTINGS/2.0.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 https://maven.apache.org/xsd/settings-1.2.0.xsd">
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/2.0.0 https://maven.apache.org/xsd/settings-2.0.0.xsd">
   <!-- localRepository
    | The path to the local repository maven will use to store artifacts.
    |
@@ -165,6 +166,35 @@ under the License.
       <blocked>true</blocked>
     </mirror>
   </mirrors>
+
+  <!-- repositories
+   | Specifies the list of default remote repositories that maven will search artifacts for.
+  -->
+  <repositories>
+    <repository>
+      <id>central</id>
+      <name>Maven Central Repository</name>
+      <url>${maven.repo.central}</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <!-- plugin repositories
+   | Specifies the list of default remote repositories that maven will search plugins for.
+  -->
+  <pluginRepositories>
+    <pluginRepository>
+      <id>central</id>
+      <name>Maven Central Repository</name>
+      <url>${maven.repo.central}</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
+
 
   <!-- profiles
    | This is a list of profiles which can be activated in a variety of ways, and which can modify

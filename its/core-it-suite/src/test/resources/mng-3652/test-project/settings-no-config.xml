@@ -1,0 +1,11 @@
+<settings>
+  <servers>
+    <server>
+      <id>test</id>
+      <configuration>
+        <timeout>30</timeout>
+      </configuration>
+    </server>
+  </servers>
+</settings>
+

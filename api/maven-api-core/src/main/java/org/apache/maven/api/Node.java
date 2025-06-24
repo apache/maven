@@ -26,20 +26,30 @@ import java.util.stream.Stream;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.annotations.Provider;
 
 /**
  * Represents a dependency node within a Maven project's dependency collector.
  *
- * @since 4.0
- * @see org.apache.maven.api.services.DependencyCollectorResult#getRoot()
+ * @since 4.0.0
+ * @see org.apache.maven.api.services.DependencyResolverResult#getRoot()
  */
 @Experimental
 @Immutable
+@Provider
 public interface Node {
+
+    /**
+     * @return artifact for this node
+     */
+    @Nullable
+    Artifact getArtifact();
 
     /**
      * @return dependency for this node
      */
+    @Nullable
     Dependency getDependency();
 
     /**
@@ -78,19 +88,37 @@ public interface Node {
      * @param filter the filter to apply
      * @return a new filtered graph
      */
-    Node filter(Predicate<Node> filter);
+    @Nonnull
+    Node filter(@Nonnull Predicate<Node> filter);
 
     /**
-     * Returns a string representation of this dependency node.
+     * Returns a detailed string representation of this dependency node.
+     * <p>
+     * When verbose mode is disabled, returns the basic string representation in the format:
+     * {@code groupId:artifactId:version[:scope]}
+     * <p>
+     * When verbose mode is enabled, additional details are included with the following format:
+     * <ul>
+     *   <li>For included dependencies: {@code groupId:artifactId:version[:scope] (details)}</li>
+     *   <li>For omitted dependencies: {@code (groupId:artifactId:version[:scope] - details)}</li>
+     * </ul>
+     * Where details may include:
+     * <ul>
+     *   <li>Version management information (if the version was managed from a different version)</li>
+     *   <li>Scope management information (if the scope was managed from a different scope)</li>
+     *   <li>Scope updates (if the scope was changed during resolution)</li>
+     *   <li>Conflict resolution information (if the dependency was omitted due to conflicts or duplicates)</li>
+     * </ul>
      *
-     * @return the string representation
+     * @return a string representation of this dependency node with optional detailed information
      */
+    @Nonnull
     String asString();
 
     /**
-     * Obtain a Stream containing this node and all its descendant.
+     * Obtain a Stream containing this node and all its descendants.
      *
-     * @return a stream containing this node and its descendant
+     * @return a stream containing this node and its descendants
      */
     @Nonnull
     default Stream<Node> stream() {

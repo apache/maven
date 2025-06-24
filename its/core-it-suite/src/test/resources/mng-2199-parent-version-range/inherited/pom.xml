@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.apache</groupId>
+    <artifactId>apache</artifactId>
+    <version>[1,14]</version>
+  </parent>
+  <groupId>org.apache.maven.its.mng2199</groupId>
+  <artifactId>inherited</artifactId>
+  <packaging>pom</packaging>
+
+  <name>Maven Integration Test :: MNG-2199 :: Version invalidly inherited</name>
+  <description>Verifies that the build fails when using a parent version range in combination with an inherited version.</description>
+</project>

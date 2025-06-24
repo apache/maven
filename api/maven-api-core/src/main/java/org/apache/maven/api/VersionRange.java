@@ -20,17 +20,22 @@ package org.apache.maven.api;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
  * A range of versions.
  *
- * @since 4.0
+ * {@code VersionConstraint} objects are created using the
+ * {@linkplain org.apache.maven.api.services.VersionParser} service.
+ *
+ * @see Version
+ * @see VersionConstraint
+ * @see org.apache.maven.api.services.VersionParser#parseVersionRange(String)
+ * @see org.apache.maven.api.Session#parseVersionRange(String)
+ * @since 4.0.0
  */
 @Experimental
 public interface VersionRange {
-
-    // TODO: add access to the version information
-
     /**
      * Determines whether the specified version is contained within this range.
      *
@@ -40,9 +45,36 @@ public interface VersionRange {
     boolean contains(@Nonnull Version version);
 
     /**
-     * Returns a string representation of this version range
-     * @return the string representation of this version range
+     * Returns the upper boundary of this range, or {@code null} if none.
+     */
+    @Nullable
+    Boundary getUpperBoundary();
+
+    /**
+     * Returns the lower boundary of this range, or {@code null} if none.
+     */
+    @Nullable
+    Boundary getLowerBoundary();
+
+    /**
+     * {@return the string representation of this version}
      */
     @Nonnull
-    String asString();
+    @Override
+    String toString();
+
+    /**
+     * Represents range boundary.
+     */
+    interface Boundary {
+        /**
+         * The bounding version.
+         */
+        Version getVersion();
+
+        /**
+         * Returns {@code true} if version is included of the range.
+         */
+        boolean isInclusive();
+    }
 }

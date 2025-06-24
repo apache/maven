@@ -34,7 +34,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * Transport for specified remote repository (using provided remote repository base URI as root). Must be treated as a
  * resource, best in try-with-resource block.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @Consumer

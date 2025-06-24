@@ -17,10 +17,10 @@
 Apache Maven
 ============
 
-[![ASF Jira](https://img.shields.io/endpoint?url=https%3A%2F%2Fmaven.apache.org%2Fbadges%2Fasf_jira-MNG.json)][jira]
 [![Apache License, Version 2.0, January 2004](https://img.shields.io/github/license/apache/maven.svg?label=License)][license]
+[![Maven Central](https://img.shields.io/maven-central/v/org.apache.maven/apache-maven.svg?label=Maven%20Central&versionPrefix=3.)](https://search.maven.org/artifact/org.apache.maven/apache-maven)
 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.maven/apache-maven.svg?label=Maven%20Central)](https://search.maven.org/artifact/org.apache.maven/apache-maven)
-[![Reproducible Builds](https://img.shields.io/badge/Reproducible_Builds-ok-green?labelColor=blue)](https://github.com/jvm-repo-rebuild/reproducible-central/blob/master/content/org/apache/maven/maven/README.md)
+[![Reproducible Builds](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jvm-repo-rebuild/reproducible-central/master/content/org/apache/maven/maven/badge.json)](https://github.com/jvm-repo-rebuild/reproducible-central/blob/master/content/org/apache/maven/maven/README.md)
 [![Jenkins Status](https://img.shields.io/jenkins/s/https/ci-maven.apache.org/job/Maven/job/maven-box/job/maven/job/master.svg?)][build]
 [![Jenkins tests](https://img.shields.io/jenkins/t/https/ci-maven.apache.org/job/Maven/job/maven-box/job/maven/job/master.svg?)][test-results]
 
@@ -29,7 +29,7 @@ Apache Maven is a software project management and comprehension tool. Based on
 the concept of a project object model (POM), Maven can manage a project's
 build, reporting and documentation from a central piece of information.
 
-If you think you have found a bug, please file an issue in the [Maven Issue Tracker][jira].
+If you think you have found a bug, please file an issue in the [Maven Issue Tracker](https://github.com/apache/maven/issues).
 
 Documentation
 -------------
@@ -65,8 +65,8 @@ Do you like Apache Maven? Then [donate back to the ASF](https://www.apache.org/f
 Quick Build
 -------
 If you want to bootstrap Maven, you'll need:
-- Java 8+
-- Maven 3.0.5 or later
+- Java 17+
+- Maven 3.6.3 or later
 - Run Maven, specifying a location into which the completed Maven distro should be installed:
     ```
     mvn -DdistributionTargetDir="$HOME/app/maven/apache-maven-4.0.x-SNAPSHOT" clean package
@@ -74,7 +74,6 @@ If you want to bootstrap Maven, you'll need:
 
 
 [home]: https://maven.apache.org/
-[jira]: https://issues.apache.org/jira/projects/MNG/
 [license]: https://www.apache.org/licenses/LICENSE-2.0
 [build]: https://ci-maven.apache.org/job/Maven/job/maven-box/job/maven/job/master/
 [test-results]: https://ci-maven.apache.org/job/Maven/job/maven-box/job/maven/job/master/lastCompletedBuild/testReport/

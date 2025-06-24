@@ -34,7 +34,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * Generic interface to read/write objects to/from XML.
  *
  * @param <T> the object type to read/write
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public interface XmlFactory<T> extends Service {
@@ -97,18 +97,20 @@ public interface XmlFactory<T> extends Service {
      * @throws XmlReaderException if an error occurs during the parsing
      * @see #toXmlString(Object)
      */
+    @Nonnull
     default T fromXmlString(@Nonnull String xml) throws XmlReaderException {
         return read(new StringReader(xml));
     }
 
     /**
-     * Simply converts the given content to an xml string.
+     * Converts the given content to an XML string.
      *
      * @param content the object to convert
      * @return the xml string representation
      * @throws XmlWriterException if an error occurs during the transformation
      * @see #fromXmlString(String)
      */
+    @Nonnull
     default String toXmlString(@Nonnull T content) throws XmlWriterException {
         StringWriter sw = new StringWriter();
         write(content, sw);

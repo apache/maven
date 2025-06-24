@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.codehaus.jira.mng.2289</groupId>
+    <artifactId>parent</artifactId>
+    <packaging>pom</packaging>
+    <name>Parent POM for issue 2289</name>
+    <version>SNAPSHOT</version>
+    <inceptionYear>2006</inceptionYear>
+
+    <build/>
+    <profiles/>
+    <reporting/>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <repositories>
+        <repository>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+            <id>local-snapshot-repo</id>
+            <name>Local snapshot repository</name>
+            <url>file:///tmp/repo-m2-snapshot</url>
+        </repository>
+    </repositories>
+
+    <!-- Define the locations for artifact distribution -->
+    <distributionManagement>
+        <snapshotRepository>
+            <id>demo-snapshot</id>
+            <name>Demo Maven 2 snapshot repository</name>
+            <url>file:///tmp/repo-m2-snapshot</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
+</project>

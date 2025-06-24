@@ -21,20 +21,62 @@ package org.apache.maven.api;
 import java.util.Map;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.toolchain.ToolchainModel;
 
 /**
- * Toolchain interface.
+ * Represents a toolchain in the Maven build system.
  *
- * @since 4.0
+ * <p>A toolchain is a set of tools that can be used to build a project.
+ * This interface allows users to define and configure various toolchains
+ * that can be utilized by Maven during the build process. Toolchains can
+ * include compilers, interpreters, and other tools that are necessary
+ * for building a project in a specific environment.</p>
+ *
+ * <p>Toolchains are defined in the Maven toolchains.xml file and can be
+ * referenced in the project's POM file. This allows for greater flexibility
+ * and control over the build environment, enabling developers to specify
+ * the exact versions of tools they wish to use.</p>
+ *
+ * <p>
+ * Toolchains can be obtained through the {@link org.apache.maven.api.services.ToolchainManager ToolchainManager}
+ * service. This service provides methods to retrieve and manage toolchains defined
+ * in the Maven configuration.
+ * </p>
+ *
+ * <p>
+ * The following are key functionalities provided by the Toolchain interface:</p><ul>
+ *   <li>Access to the type of the toolchain (e.g., JDK, compiler).</li>
+ *   <li>Retrieval of the specific version of the toolchain.</li>
+ *   <li>Configuration of toolchain properties to match the project's requirements.</li>
+ * </ul>
+ *
+ * <p>Example usage:</p>
+ * <pre>
+ * Toolchain toolchain = ...; // Obtain a Toolchain instance
+ * String type = toolchain.getType(); // Get the type of the toolchain
+ * String version = toolchain.getVersion(); // Get the version of the toolchain
+ * </pre>
+ *
+ *
+ * @since 4.0.0
+ * @see JavaToolchain
+ * @see org.apache.maven.api.services.ToolchainManager
  */
 @Experimental
 public interface Toolchain {
     /**
-     * get the type of toolchain.
+     * Gets the type of toolchain.
      *
      * @return the toolchain type
      */
     String getType();
+
+    /**
+     * Gets the underlying toolchain model.
+     *
+     * @return the toolchain model
+     */
+    ToolchainModel getModel();
 
     /**
      * Gets the platform tool executable.
@@ -47,7 +89,8 @@ public interface Toolchain {
     /**
      * Let the toolchain decide if it matches requirements defined
      * in the toolchain plugin configuration.
-     * @param requirements Map&lt;String, String&gt; key value pair, may not be {@code null}
+     *
+     * @param requirements key value pair, may not be {@code null}
      * @return {@code true} if the requirements match, otherwise {@code false}
      */
     boolean matchesRequirements(Map<String, String> requirements);

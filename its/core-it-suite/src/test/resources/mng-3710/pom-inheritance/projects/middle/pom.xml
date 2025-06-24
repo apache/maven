@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.maven.its.mng3710</groupId>
+    <artifactId>projects</artifactId>
+    <version>1</version>
+  </parent>
+  <groupId>org.apache.maven.its.mng3710</groupId>
+  <artifactId>middle</artifactId>
+  <version>1</version>
+  <packaging>pom</packaging>
+  <modules>
+    <module>child</module>
+  </modules>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.its.mng3710</groupId>
+          <artifactId>mavenit-mng3710-pomInheritance-plugin</artifactId>
+
+          <executions>
+            <execution>
+              <id>touch</id>
+              <goals>
+                <goal>touch</goal>
+              </goals>
+              <phase>validate</phase>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>

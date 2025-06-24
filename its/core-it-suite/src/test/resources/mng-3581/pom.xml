@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.its.mng3581</groupId>
+  <artifactId>test</artifactId>
+  <version>1.0</version>
+
+  <distributionManagement>
+    <repository>
+      <id>maven-core-it</id>
+      <url>file:///${basedir}/target/null</url>
+    </repository>
+  </distributionManagement>
+
+  <build>
+    <plugins>
+      <plugin>
+        <!-- NOTE: This plugin will (indirectly) use the file wagon from the core which must have no impact on the test plugin below -->
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-artifact</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <configuration>
+          <mainFile>pom.xml</mainFile>
+        </configuration>
+        <executions>
+          <execution>
+            <id>test</id>
+            <goals>
+              <goal>set</goal>
+              <goal>deploy</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-uses-wagon</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>use-wagon</goal>
+            </goals>
+            <phase>initialize</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

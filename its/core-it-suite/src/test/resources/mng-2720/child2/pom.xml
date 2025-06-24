@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.apache.maven.its.mng2720</groupId>
+    <artifactId>project-hierarchy</artifactId>
+    <version>1</version>
+  </parent>
+
+  <artifactId>child2</artifactId>
+
+  <name>MNG-2720 Project Hierarchy 1 Child 2</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.its.mng2720</groupId>
+      <artifactId>child1</artifactId>
+      <version>1</version>
+      <type>jar</type>
+    </dependency>
+  </dependencies>
+</project>

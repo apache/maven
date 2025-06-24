@@ -19,10 +19,11 @@ under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-api</artifactId>
-    <version>4.0.0-alpha-5-SNAPSHOT</version>
+    <version>4.0.0-rc-4-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-api-toolchain</artifactId>
@@ -33,8 +34,11 @@ under the License.
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-xml</artifactId>
-      <version>4.0.0-alpha-5-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
@@ -43,25 +47,30 @@ under the License.
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
+        <configuration>
+          <version>1.2.0</version>
+          <velocityBasedir>${project.basedir}/../../src/mdo</velocityBasedir>
+          <models>
+            <model>src/main/mdo/toolchains.mdo</model>
+          </models>
+          <templates>
+            <template>model.vm</template>
+          </templates>
+          <params>
+            <param>packageModelV4=org.apache.maven.api.toolchain</param>
+            <param>locationTracking=true</param>
+            <param>generateLocationClasses=true</param>
+          </params>
+        </configuration>
         <executions>
           <execution>
-            <id>velocity</id>
+            <id>modello</id>
             <goals>
               <goal>velocity</goal>
+              <goal>xdoc</goal>
+              <goal>xsd</goal>
             </goals>
-            <configuration>
-              <version>1.2.0</version>
-              <velocityBasedir>${project.basedir}/../../src/mdo</velocityBasedir>
-              <models>
-                <model>src/main/mdo/toolchains.mdo</model>
-              </models>
-              <templates>
-                <template>model.vm</template>
-              </templates>
-              <params>
-                <param>packageModelV4=org.apache.maven.api.toolchain</param>
-              </params>
-            </configuration>
+            <phase>generate-resources</phase>
           </execution>
         </executions>
       </plugin>
@@ -76,5 +85,24 @@ under the License.
       </plugin>
     </plugins>
   </build>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/package-info.java</exclude>
+          </excludes>
+          <sourceFileIncludes>
+            <sourceFileInclude>**/*.java</sourceFileInclude>
+          </sourceFileIncludes>
+          <failOnError>false</failOnError>
+          <quiet>true</quiet>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
 
 </project>

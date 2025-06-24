@@ -1,0 +1,17 @@
+<project xmlns="http://maven.apache.org/POM/4.1.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 http://maven.apache.org/xsd/maven-4.1.0.xsd"
+         root="true">
+  <modelVersion>4.1.0</modelVersion>
+
+  <groupId>gid</groupId>
+  <artifactId>aid</artifactId>
+  <version>${revision}</version>
+  <packaging>pom</packaging>
+
+  <properties>
+    <versionCore>0.1.0</versionCore>
+    <revision>${versionCore}${release:+:--DEVELOPER}</revision>
+  </properties>
+
+</project>

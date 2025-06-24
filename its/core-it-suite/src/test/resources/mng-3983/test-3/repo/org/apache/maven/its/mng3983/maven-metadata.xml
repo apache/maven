@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?><metadata>
+  <plugins>
+    <plugin>
+      <name>Unnamed - org.apache.maven.its.mng3983:p:maven-plugin:0.1</name>
+      <prefix>p</prefix>
+      <artifactId>p</artifactId>
+    </plugin>
+  </plugins>
+</metadata>

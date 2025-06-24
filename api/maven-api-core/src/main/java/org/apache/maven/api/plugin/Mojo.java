@@ -20,25 +20,49 @@ package org.apache.maven.api.plugin;
 
 import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.ThreadSafe;
 
 /**
- * This interface forms the contract required for <code>Mojos</code> to interact with the <code>Maven</code>
- * infrastructure.<br>
- * It features an <code>execute()</code> method, which triggers the Mojo's build-process behavior, and can throw
- * a MojoException if error conditions occur.<br>
+ * Represents the contract for Mojos to interact with the Maven infrastructure.
+ * Implementations of this interface define specific build-process behaviors
+ * that are triggered during a Maven build lifecycle.
  *
- * @since 4.0
+ * The primary entry point is the {@link #execute()} method, which encapsulates
+ * the behavior of the Mojo and serves as the integration point with Maven. This
+ * method may throw an {@link Exception} to signal any issues that prevent
+ * successful execution of the Mojo.
+ *
+ * <p>
+ * Annotations:
+ * </p>
+ * <ul>
+ * <li>{@link Experimental}: Indicates that this interface or its implementation
+ * may still be evolving and could change in future versions.</li>
+ * <li>{@link FunctionalInterface}: Denotes that this is a functional interface,
+ * allowing implementations as lambda expressions or method references.</li>
+ * <li>{@link Consumer}: Signifies that this type is intended to be implemented
+ * or extended by Maven plugins or extensions and consumed by Maven itself.</li>
+ * <li>{@link ThreadSafe}: Implies that implementations of this interface must
+ * be safe to invoke from multiple threads concurrently.</li>
+ * </ul>
+ *
+ * @since 4.0.0
  */
 @Experimental
 @FunctionalInterface
 @Consumer
+@ThreadSafe
 public interface Mojo {
     /**
-     * Perform whatever build-process behavior this <code>Mojo</code> implements.<br>
-     * This is the main trigger for the <code>Mojo</code> inside the <code>Maven</code> system, and allows
-     * the <code>Mojo</code> to communicate errors.
+     * Executes the behavior defined by this {@code Mojo}. This method is invoked
+     * during the Maven build lifecycle to perform the Mojo's designated task.
      *
-     * @throws MojoException if a problem occurs
+     * <p>Implementations should handle any task-specific logic and may communicate
+     * errors by throwing an {@link Exception}. Error conditions should provide
+     * sufficient detail to aid troubleshooting.</p>
+     *
+     * @throws Exception if any issue occurs that prevents the successful execution
+     *                   of the Mojo
      */
-    void execute();
+    void execute() throws Exception;
 }

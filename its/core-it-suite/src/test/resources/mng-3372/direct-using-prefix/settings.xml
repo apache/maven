@@ -1,0 +1,5 @@
+<settings>
+  <pluginGroups>
+    <pluginGroup>org.apache.maven.its.mng3372</pluginGroup>
+  </pluginGroups>
+</settings>
