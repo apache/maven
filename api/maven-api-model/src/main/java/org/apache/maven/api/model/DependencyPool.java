@@ -232,8 +232,8 @@ class DependencyPool {
     }
 
     /**
-     * Compares all InputLocation mappings between two dependencies by content rather than object identity.
-     * InputLocation doesn't override equals(), so we need to compare by content.
+     * Compares all InputLocation mappings between two dependencies using proper equals() methods.
+     * Now that InputLocation implements equals(), we can use standard equality comparison.
      */
     private static boolean inputLocationsEqual(Dependency dep1, Dependency dep2) {
         Set<Object> keys1 = dep1.getLocationKeys();
@@ -243,33 +243,16 @@ class DependencyPool {
             return false;
         }
 
-        // Compare each location mapping
+        // Compare each location mapping using proper equals()
         for (Object key : keys1) {
             InputLocation loc1 = dep1.getLocation(key);
             InputLocation loc2 = dep2.getLocation(key);
 
-            if (!inputLocationEqual(loc1, loc2)) {
+            if (!Objects.equals(loc1, loc2)) {
                 return false;
             }
         }
         return true;
-    }
-
-    /**
-     * Compares individual InputLocation objects by content rather than object identity.
-     * InputLocation doesn't override equals(), so we need to compare by content.
-     */
-    private static boolean inputLocationEqual(InputLocation loc1, InputLocation loc2) {
-        if (loc1 == loc2) {
-            return true;
-        }
-        if (loc1 == null || loc2 == null) {
-            return false;
-        }
-        return loc1.getLineNumber() == loc2.getLineNumber()
-                && loc1.getColumnNumber() == loc2.getColumnNumber()
-                && Objects.equals(loc1.getSource(), loc2.getSource());
-        // Note: We ignore nested locations and importedFrom for simplicity
     }
 
     /**

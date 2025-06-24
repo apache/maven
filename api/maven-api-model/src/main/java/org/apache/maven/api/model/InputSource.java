@@ -88,6 +88,8 @@ public class InputSource implements Serializable {
         return importedFrom;
     }
 
+    private volatile int hashCode = 0; // Cached hashCode for performance
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -99,12 +101,18 @@ public class InputSource implements Serializable {
         InputSource that = (InputSource) o;
         return Objects.equals(modelId, that.modelId)
                 && Objects.equals(location, that.location)
-                && Objects.equals(inputs, that.inputs);
+                && Objects.equals(inputs, that.inputs)
+                && Objects.equals(importedFrom, that.importedFrom);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(modelId, location, inputs);
+        int result = hashCode;
+        if (result == 0) {
+            result = Objects.hash(modelId, location, inputs, importedFrom);
+            hashCode = result;
+        }
+        return result;
     }
 
     Stream<InputSource> sources() {

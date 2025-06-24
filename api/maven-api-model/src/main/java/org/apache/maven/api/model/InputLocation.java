@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Represents the location of an element within a model source file.
@@ -39,6 +40,8 @@ public class InputLocation implements Serializable, InputLocationTracker {
     private final InputSource source;
     private final Map<Object, InputLocation> locations;
     private final InputLocation importedFrom;
+
+    private volatile int hashCode = 0; // Cached hashCode for performance
 
     private static final InputLocation EMPTY = new InputLocation(-1, -1);
 
@@ -205,6 +208,32 @@ public class InputLocation implements Serializable, InputLocationTracker {
          * Method toString.
          */
         String toString(InputLocation location);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        InputLocation that = (InputLocation) o;
+        return lineNumber == that.lineNumber
+                && columnNumber == that.columnNumber
+                && Objects.equals(source, that.source)
+                && Objects.equals(locations, that.locations)
+                && Objects.equals(importedFrom, that.importedFrom);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = hashCode;
+        if (result == 0) {
+            result = Objects.hash(lineNumber, columnNumber, source, locations, importedFrom);
+            hashCode = result;
+        }
+        return result;
     }
 
     @Override
