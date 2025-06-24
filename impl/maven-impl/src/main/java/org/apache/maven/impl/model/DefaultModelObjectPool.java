@@ -24,25 +24,25 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.maven.api.model.Dependency;
-import org.apache.maven.api.model.ModelObjectPool;
+import org.apache.maven.api.model.ModelObjectProcessor;
 
 /**
- * Default implementation of ModelObjectPool that provides memory optimization
+ * Default implementation of ModelObjectProcessor that provides memory optimization
  * through object pooling and interning.
- * 
+ *
  * <p>This implementation focuses on pooling {@link Dependency} objects, which are
  * frequently duplicated in large Maven projects. Other model objects are passed
  * through unchanged.</p>
- * 
+ *
  * <p>The pool uses hard references to prevent premature garbage collection and
  * provides thread-safe access through ConcurrentHashMap.</p>
- * 
+ *
  * @since 4.0.0
  */
-public class DefaultModelObjectPool implements ModelObjectPool {
+public class DefaultModelObjectPool implements ModelObjectProcessor {
 
     private static final ConcurrentHashMap<PoolKey, Dependency> DEPENDENCY_POOL = new ConcurrentHashMap<>();
-    
+
     // Statistics tracking
     private static final AtomicLong TOTAL_INTERN_CALLS = new AtomicLong(0);
     private static final AtomicLong CACHE_HITS = new AtomicLong(0);
@@ -50,27 +50,12 @@ public class DefaultModelObjectPool implements ModelObjectPool {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T intern(T object) {
+    public <T> T process(T object) {
         if (object instanceof Dependency dependency) {
             return (T) internDependency(dependency);
         }
         // For other types, return as-is (could be extended in the future)
         return object;
-    }
-
-    @Override
-    public int getPriority() {
-        return 100; // Higher than default (0)
-    }
-
-    @Override
-    public boolean supports(Class<?> objectType) {
-        return Dependency.class.isAssignableFrom(objectType);
-    }
-
-    @Override
-    public PoolStatistics getStatistics() {
-        return new DefaultPoolStatistics();
     }
 
     /**
@@ -129,15 +114,14 @@ public class DefaultModelObjectPool implements ModelObjectPool {
 
         private int computeHashCode() {
             return Objects.hash(
-                    groupId, artifactId, version, type, classifier, 
-                    scope, systemPath, optional, exclusionKeys);
+                    groupId, artifactId, version, type, classifier, scope, systemPath, optional, exclusionKeys);
         }
 
         @Override
         public boolean equals(Object obj) {
             if (this == obj) return true;
             if (!(obj instanceof PoolKey other)) return false;
-            
+
             return Objects.equals(groupId, other.groupId)
                     && Objects.equals(artifactId, other.artifactId)
                     && Objects.equals(version, other.version)
@@ -152,26 +136,6 @@ public class DefaultModelObjectPool implements ModelObjectPool {
         @Override
         public int hashCode() {
             return hashCode;
-        }
-    }
-
-    /**
-     * Implementation of PoolStatistics.
-     */
-    private static class DefaultPoolStatistics implements PoolStatistics {
-        @Override
-        public long getPoolSize() {
-            return DEPENDENCY_POOL.size();
-        }
-
-        @Override
-        public long getHitCount() {
-            return CACHE_HITS.get();
-        }
-
-        @Override
-        public long getMissCount() {
-            return CACHE_MISSES.get();
         }
     }
 }

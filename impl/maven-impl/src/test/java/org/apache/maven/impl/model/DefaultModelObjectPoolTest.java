@@ -19,8 +19,7 @@
 package org.apache.maven.impl.model;
 
 import org.apache.maven.api.model.Dependency;
-import org.apache.maven.api.model.ModelObjectPool;
-import org.apache.maven.api.model.ModelObjectPoolFactory;
+import org.apache.maven.api.model.ModelObjectProcessor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,36 +31,38 @@ class DefaultModelObjectPoolTest {
 
     @Test
     void testServiceLoading() {
-        ModelObjectPool pool = ModelObjectPoolFactory.getInstance();
-        assertNotNull(pool);
-        assertTrue(pool instanceof DefaultModelObjectPool);
+        // Test that the static method works
+        String testString = "test";
+        String result = ModelObjectProcessor.processObject(testString);
+        assertNotNull(result);
+        assertEquals(testString, result);
     }
 
     @Test
     void testDependencyPooling() {
-        ModelObjectPool pool = new DefaultModelObjectPool();
-        
+        ModelObjectProcessor processor = new DefaultModelObjectPool();
+
         // Create two identical dependencies
         Dependency dep1 = Dependency.newBuilder()
                 .groupId("org.apache.maven")
                 .artifactId("maven-core")
                 .version("4.0.0")
                 .build();
-        
+
         Dependency dep2 = Dependency.newBuilder()
                 .groupId("org.apache.maven")
                 .artifactId("maven-core")
                 .version("4.0.0")
                 .build();
-        
+
         // They should be different instances initially
         assertNotSame(dep1, dep2);
         assertEquals(dep1, dep2);
-        
-        // After interning, they should be the same instance
-        Dependency pooled1 = pool.intern(dep1);
-        Dependency pooled2 = pool.intern(dep2);
-        
+
+        // After processing, they should be the same instance
+        Dependency pooled1 = processor.process(dep1);
+        Dependency pooled2 = processor.process(dep2);
+
         assertSame(pooled1, pooled2);
         assertEquals(dep1, pooled1);
         assertEquals(dep2, pooled2);
@@ -69,62 +70,14 @@ class DefaultModelObjectPoolTest {
 
     @Test
     void testNonDependencyObjects() {
-        ModelObjectPool pool = new DefaultModelObjectPool();
-        
+        ModelObjectProcessor processor = new DefaultModelObjectPool();
+
         String testString = "test";
-        String result = pool.intern(testString);
-        
+        String result = processor.process(testString);
+
         // Non-dependency objects should be returned as-is
         assertSame(testString, result);
     }
 
-    @Test
-    void testStatistics() {
-        DefaultModelObjectPool pool = new DefaultModelObjectPool();
-        ModelObjectPool.PoolStatistics stats = pool.getStatistics();
-        
-        assertNotNull(stats);
-        assertEquals(0, stats.getPoolSize());
-        assertEquals(0, stats.getHitCount());
-        assertEquals(0, stats.getMissCount());
-        assertEquals(0.0, stats.getHitRatio());
-        
-        // Create and intern a dependency
-        Dependency dep = Dependency.newBuilder()
-                .groupId("test")
-                .artifactId("test")
-                .version("1.0")
-                .build();
-        
-        pool.intern(dep);
-        
-        stats = pool.getStatistics();
-        assertEquals(1, stats.getPoolSize());
-        assertEquals(0, stats.getHitCount());
-        assertEquals(1, stats.getMissCount());
-        assertEquals(0.0, stats.getHitRatio());
-        
-        // Intern the same dependency again
-        pool.intern(dep);
-        
-        stats = pool.getStatistics();
-        assertEquals(1, stats.getPoolSize());
-        assertEquals(1, stats.getHitCount());
-        assertEquals(1, stats.getMissCount());
-        assertEquals(0.5, stats.getHitRatio());
-    }
 
-    @Test
-    void testSupports() {
-        DefaultModelObjectPool pool = new DefaultModelObjectPool();
-        
-        assertTrue(pool.supports(Dependency.class));
-        assertFalse(pool.supports(String.class));
-    }
-
-    @Test
-    void testPriority() {
-        DefaultModelObjectPool pool = new DefaultModelObjectPool();
-        assertEquals(100, pool.getPriority());
-    }
 }

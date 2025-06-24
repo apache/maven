@@ -18,6 +18,10 @@
  */
 package org.apache.maven.impl;
 
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamReader;
+
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -27,9 +31,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Function;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamReader;
 
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.Named;
@@ -196,7 +197,10 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
                         inProject = true;
                     } else if ("parent".equals(localName) && inProject) {
                         inParent = true;
-                    } else if (inProject && ("groupId".equals(localName) || "artifactId".equals(localName) || "version".equals(localName))) {
+                    } else if (inProject
+                            && ("groupId".equals(localName)
+                                    || "artifactId".equals(localName)
+                                    || "version".equals(localName))) {
                         currentElement = localName;
                     }
                 } else if (event == XMLStreamConstants.END_ELEMENT) {
@@ -237,7 +241,9 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
                 }
 
                 // Early exit if we have enough information
-                if (artifactId != null && (groupId != null || parentGroupId != null) && (version != null || parentVersion != null)) {
+                if (artifactId != null
+                        && (groupId != null || parentGroupId != null)
+                        && (version != null || parentVersion != null)) {
                     break;
                 }
             }
