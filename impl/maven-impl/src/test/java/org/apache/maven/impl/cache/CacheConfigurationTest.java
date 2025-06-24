@@ -26,11 +26,9 @@ import org.apache.maven.api.Constants;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.cache.CacheRetention;
-import org.apache.maven.api.model.ModelSource;
 import org.apache.maven.api.model.Profile;
-import org.apache.maven.api.model.RepositoryMerging;
 import org.apache.maven.api.services.ModelBuilderRequest;
-import org.apache.maven.api.services.ModelBuilderRequest.RequestType;
+import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.ModelTransformer;
 import org.apache.maven.api.services.Request;
 import org.apache.maven.api.services.RequestTrace;
@@ -170,7 +168,8 @@ class CacheConfigurationTest {
     @Test
     void testInterfaceMatching() {
         // Test that selectors match against implemented interfaces, not just class names
-        PartialCacheConfig config = PartialCacheConfig.complete(CacheRetention.SESSION_SCOPED, Cache.ReferenceType.HARD);
+        PartialCacheConfig config =
+                PartialCacheConfig.complete(CacheRetention.SESSION_SCOPED, Cache.ReferenceType.HARD);
         CacheSelector selector = CacheSelector.forRequestType("ModelBuilderRequest", config);
 
         // Create a test request instance that implements ModelBuilderRequest interface
@@ -187,33 +186,74 @@ class CacheConfigurationTest {
     // Test implementation class that implements ModelBuilderRequest
     private static class TestRequestImpl implements ModelBuilderRequest {
         @Override
-        public Session getSession() { return null; }
+        public Session getSession() {
+            return null;
+        }
+
         @Override
-        public RequestTrace getTrace() { return null; }
+        public RequestTrace getTrace() {
+            return null;
+        }
+
         @Override
-        public RequestType getRequestType() { return RequestType.BUILD_PROJECT; }
+        public RequestType getRequestType() {
+            return RequestType.BUILD_PROJECT;
+        }
+
         @Override
-        public boolean isLocationTracking() { return false; }
+        public boolean isLocationTracking() {
+            return false;
+        }
+
         @Override
-        public boolean isRecursive() { return false; }
+        public boolean isRecursive() {
+            return false;
+        }
+
         @Override
-        public ModelSource getSource() { return null; }
+        public ModelSource getSource() {
+            return null;
+        }
+
         @Override
-        public java.util.Collection<Profile> getProfiles() { return java.util.List.of(); }
+        public java.util.Collection<Profile> getProfiles() {
+            return java.util.List.of();
+        }
+
         @Override
-        public java.util.List<String> getActiveProfileIds() { return java.util.List.of(); }
+        public java.util.List<String> getActiveProfileIds() {
+            return java.util.List.of();
+        }
+
         @Override
-        public java.util.List<String> getInactiveProfileIds() { return java.util.List.of(); }
+        public java.util.List<String> getInactiveProfileIds() {
+            return java.util.List.of();
+        }
+
         @Override
-        public java.util.Map<String, String> getSystemProperties() { return java.util.Map.of(); }
+        public java.util.Map<String, String> getSystemProperties() {
+            return java.util.Map.of();
+        }
+
         @Override
-        public java.util.Map<String, String> getUserProperties() { return java.util.Map.of(); }
+        public java.util.Map<String, String> getUserProperties() {
+            return java.util.Map.of();
+        }
+
         @Override
-        public RepositoryMerging getRepositoryMerging() { return RepositoryMerging.POM_DOMINANT; }
+        public RepositoryMerging getRepositoryMerging() {
+            return RepositoryMerging.POM_DOMINANT;
+        }
+
         @Override
-        public java.util.List<RemoteRepository> getRepositories() { return java.util.List.of(); }
+        public java.util.List<RemoteRepository> getRepositories() {
+            return java.util.List.of();
+        }
+
         @Override
-        public ModelTransformer getLifecycleBindingsInjector() { return null; }
+        public ModelTransformer getLifecycleBindingsInjector() {
+            return null;
+        }
     }
 
     @Test
@@ -298,7 +338,8 @@ class CacheConfigurationTest {
     @Test
     void testParentInterfaceMatching() {
         // Test that parent request matching works with interfaces
-        PartialCacheConfig config = PartialCacheConfig.complete(CacheRetention.SESSION_SCOPED, Cache.ReferenceType.HARD);
+        PartialCacheConfig config =
+                PartialCacheConfig.complete(CacheRetention.SESSION_SCOPED, Cache.ReferenceType.HARD);
         CacheSelector selector = CacheSelector.forParentAndRequestType("ModelBuilderRequest", "Request", config);
 
         // Create a child request with a parent that implements ModelBuilderRequest

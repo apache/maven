@@ -150,7 +150,6 @@ public record CacheSelector(String parentRequestType, String requestType, Partia
         return name.isEmpty() ? clazz.getName() : name;
     }
 
-
     @Override
     public String toString() {
         if (parentRequestType == null) {
