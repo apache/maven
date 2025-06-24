@@ -64,11 +64,6 @@ public interface ModelObjectProcessor {
     <T> T process(T object);
 
     /**
-     * Cached processor instance for performance.
-     */
-    AtomicReference<ModelObjectProcessor> CACHED_PROCESSOR = new AtomicReference<>();
-
-    /**
      * Process a model object using the first available processor implementation.
      *
      * <p>This method discovers processor implementations via ServiceLoader and
@@ -80,11 +75,18 @@ public interface ModelObjectProcessor {
      * @return the processed object
      */
     static <T> T processObject(T object) {
-        ModelObjectProcessor processor = CACHED_PROCESSOR.get();
+        class ProcessorHolder {
+            /**
+             * Cached processor instance for performance.
+             */
+            private static final AtomicReference<ModelObjectProcessor> CACHED_PROCESSOR = new AtomicReference<>();
+        }
+
+        ModelObjectProcessor processor = ProcessorHolder.CACHED_PROCESSOR.get();
         if (processor == null) {
             processor = loadProcessor();
-            CACHED_PROCESSOR.compareAndSet(null, processor);
-            processor = CACHED_PROCESSOR.get();
+            ProcessorHolder.CACHED_PROCESSOR.compareAndSet(null, processor);
+            processor = ProcessorHolder.CACHED_PROCESSOR.get();
         }
         return processor.process(object);
     }
@@ -93,6 +95,16 @@ public interface ModelObjectProcessor {
      * Load the first available processor implementation.
      */
     private static ModelObjectProcessor loadProcessor() {
+        /*
+         * No-op processor that returns objects unchanged.
+         */
+        class NoOpProcessor implements ModelObjectProcessor {
+            @Override
+            public <T> T process(T object) {
+                return object;
+            }
+        }
+
         try {
             ServiceLoader<ModelObjectProcessor> loader = ServiceLoader.load(ModelObjectProcessor.class);
             for (ModelObjectProcessor processor : loader) {
@@ -102,15 +114,5 @@ public interface ModelObjectProcessor {
             // If service loading fails, use no-op processor
         }
         return new NoOpProcessor();
-    }
-
-    /**
-     * No-op processor that returns objects unchanged.
-     */
-    class NoOpProcessor implements ModelObjectProcessor {
-        @Override
-        public <T> T process(T object) {
-            return object;
-        }
     }
 }

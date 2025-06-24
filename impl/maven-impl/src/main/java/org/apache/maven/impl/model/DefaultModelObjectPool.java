@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.maven.api.model.Cache;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.ModelObjectProcessor;
 
@@ -41,7 +42,7 @@ import org.apache.maven.api.model.ModelObjectProcessor;
  */
 public class DefaultModelObjectPool implements ModelObjectProcessor {
 
-    private static final ConcurrentHashMap<PoolKey, Dependency> DEPENDENCY_POOL = new ConcurrentHashMap<>();
+    private static final Cache<PoolKey, Dependency> DEPENDENCY_POOL = Cache.newCache(Cache.ReferenceType.WEAK);
 
     // Statistics tracking
     private static final AtomicLong TOTAL_INTERN_CALLS = new AtomicLong(0);
@@ -72,7 +73,7 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
         }
 
         // Use putIfAbsent to handle concurrent access
-        existing = DEPENDENCY_POOL.putIfAbsent(key, dependency);
+        existing = DEPENDENCY_POOL.computeIfAbsent(key, k -> dependency);
         if (existing != null) {
             CACHE_HITS.incrementAndGet();
             return existing;
