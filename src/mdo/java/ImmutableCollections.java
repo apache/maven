@@ -64,7 +64,7 @@ class ImmutableCollections {
         }
     };
 
-    static <E> List<E> copy(Collection<E> collection) {
+    static <E1, E2 extends E1> List<E1> copy(Collection<E2> collection) {
         return collection == null ? List.of() : List.copyOf(collection);
     }
 
