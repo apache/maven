@@ -629,5 +629,15 @@ public final class Constants {
      */
     public static final String MAVEN_CACHE_CONFIG_PROPERTY = "maven.cache.config";
 
+    /**
+     * User property key for configuring the reference type used by ModelObjectProcessor.
+     * Valid values are: "soft", "hard", "weak", "none".
+     * Default is "hard" for optimal performance.
+     *
+     * @since 4.1.0
+     */
+    @Config(defaultValue = "hard")
+    public static final String MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE = "maven.model.processor.referenceType";
+
     private Constants() {}
 }

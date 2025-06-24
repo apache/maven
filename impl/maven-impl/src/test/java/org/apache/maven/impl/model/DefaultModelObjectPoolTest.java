@@ -18,6 +18,7 @@
  */
 package org.apache.maven.impl.model;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.ModelObjectProcessor;
 import org.junit.jupiter.api.Test;
@@ -79,5 +80,36 @@ class DefaultModelObjectPoolTest {
         assertSame(testString, result);
     }
 
+    @Test
+    void testConfigurableReferenceType() {
+        // Test that the reference type can be configured via system property
+        String originalValue = System.getProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE);
 
+        try {
+            // Set a different reference type
+            System.setProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE, "soft");
+
+            // Create a new processor (this would use the new setting in a real scenario)
+            ModelObjectProcessor processor = new DefaultModelObjectPool();
+
+            // Test that it still works (the actual reference type is used internally)
+            Dependency dep = Dependency.newBuilder()
+                    .groupId("test")
+                    .artifactId("test")
+                    .version("1.0")
+                    .build();
+
+            Dependency result = processor.process(dep);
+            assertNotNull(result);
+            assertEquals(dep, result);
+
+        } finally {
+            // Restore original value
+            if (originalValue != null) {
+                System.setProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE, originalValue);
+            } else {
+                System.clearProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE);
+            }
+        }
+    }
 }

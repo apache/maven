@@ -19,10 +19,9 @@
 package org.apache.maven.impl.model;
 
 import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.model.Cache;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.ModelObjectProcessor;
@@ -42,7 +41,7 @@ import org.apache.maven.api.model.ModelObjectProcessor;
  */
 public class DefaultModelObjectPool implements ModelObjectProcessor {
 
-    private static final Cache<PoolKey, Dependency> DEPENDENCY_POOL = Cache.newCache(Cache.ReferenceType.WEAK);
+    private static final Cache<PoolKey, Dependency> DEPENDENCY_POOL = Cache.newCache(getReferenceType());
 
     // Statistics tracking
     private static final AtomicLong TOTAL_INTERN_CALLS = new AtomicLong(0);
@@ -57,6 +56,23 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
         }
         // For other types, return as-is (could be extended in the future)
         return object;
+    }
+
+    /**
+     * Gets the reference type to use for the dependency pool from system properties.
+     */
+    private static Cache.ReferenceType getReferenceType() {
+        String referenceTypeProperty = System.getProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE, "hard");
+        return switch (referenceTypeProperty.toLowerCase()) {
+            case "soft" -> Cache.ReferenceType.SOFT;
+            case "weak" -> Cache.ReferenceType.WEAK;
+            case "none" -> Cache.ReferenceType.NONE;
+            case "hard" -> Cache.ReferenceType.HARD;
+            default -> {
+                System.err.println("Unknown reference type: " + referenceTypeProperty + ", using default HARD");
+                yield Cache.ReferenceType.HARD;
+            }
+        };
     }
 
     /**
@@ -85,37 +101,29 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
 
     /**
      * Key class for pooling dependencies based on their content.
+     * Holds the dependency directly and pre-computes hashCode for performance.
      */
     private static class PoolKey {
-        private final String groupId;
-        private final String artifactId;
-        private final String version;
-        private final String type;
-        private final String classifier;
-        private final String scope;
-        private final String systemPath;
-        private final String optional;
-        private final Set<Object> exclusionKeys;
-        private final boolean inputLocationsEqual;
+        private final Dependency dependency;
         private final int hashCode;
 
         PoolKey(Dependency dependency) {
-            this.groupId = dependency.getGroupId();
-            this.artifactId = dependency.getArtifactId();
-            this.version = dependency.getVersion();
-            this.type = dependency.getType();
-            this.classifier = dependency.getClassifier();
-            this.scope = dependency.getScope();
-            this.systemPath = dependency.getSystemPath();
-            this.optional = dependency.getOptional();
-            this.exclusionKeys = dependency.getLocationKeys();
-            this.inputLocationsEqual = true; // Simplified for now
-            this.hashCode = computeHashCode();
+            this.dependency = dependency;
+            this.hashCode = computeHashCode(dependency);
         }
 
-        private int computeHashCode() {
+        private static int computeHashCode(Dependency dependency) {
             return Objects.hash(
-                    groupId, artifactId, version, type, classifier, scope, systemPath, optional, exclusionKeys);
+                    dependency.getGroupId(),
+                    dependency.getArtifactId(),
+                    dependency.getVersion(),
+                    dependency.getType(),
+                    dependency.getClassifier(),
+                    dependency.getScope(),
+                    dependency.getSystemPath(),
+                    dependency.getOptional(),
+                    dependency.getExclusions(),
+                    dependency.getLocationKeys());
         }
 
         @Override
@@ -123,15 +131,8 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
             if (this == obj) return true;
             if (!(obj instanceof PoolKey other)) return false;
 
-            return Objects.equals(groupId, other.groupId)
-                    && Objects.equals(artifactId, other.artifactId)
-                    && Objects.equals(version, other.version)
-                    && Objects.equals(type, other.type)
-                    && Objects.equals(classifier, other.classifier)
-                    && Objects.equals(scope, other.scope)
-                    && Objects.equals(systemPath, other.systemPath)
-                    && Objects.equals(optional, other.optional)
-                    && Objects.equals(exclusionKeys, other.exclusionKeys);
+            // Use the dependency's equals method which now properly includes all fields
+            return Objects.equals(dependency, other.dependency);
         }
 
         @Override
