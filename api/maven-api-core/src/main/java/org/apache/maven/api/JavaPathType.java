@@ -264,7 +264,7 @@ public enum JavaPathType implements PathType {
             throw new IllegalStateException("No option is associated to this path type.");
         }
         String prefix = (moduleName == null) ? "\"" : (moduleName + "=\"");
-        var joiner = new StringJoiner(File.pathSeparator, prefix, "\"");
+        StringJoiner joiner = new StringJoiner(File.pathSeparator, prefix, "\"");
         joiner.setEmptyValue("");
         for (Path p : paths) {
             joiner.add(p.toString());

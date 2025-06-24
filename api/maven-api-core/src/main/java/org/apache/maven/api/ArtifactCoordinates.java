@@ -53,7 +53,7 @@ public interface ArtifactCoordinates {
     String getClassifier();
 
     /**
-     * {@return the specific version, range of versions or meta-version of the artifact}.
+     * {@return the specific version, range of versions, or meta-version of the artifact}.
      * A meta-version is a version suffixed with the {@code SNAPSHOT} keyword.
      */
     @Nonnull
@@ -69,7 +69,7 @@ public interface ArtifactCoordinates {
     String getExtension();
 
     /**
-     * {@return a unique string representation identifying this artifact}.
+     * {@return a unique string identifying this artifact}.
      *
      * The default implementation returns a colon-separated list of group
      * identifier, artifact identifier, extension, classifier and version.
