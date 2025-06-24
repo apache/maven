@@ -87,7 +87,7 @@ class DefaultModelObjectPoolTest {
 
         try {
             // Set a different reference type
-            System.setProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE, "soft");
+            System.setProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE, "SOFT");
 
             // Create a new processor (this would use the new setting in a real scenario)
             ModelObjectProcessor processor = new DefaultModelObjectPool();
@@ -111,5 +111,110 @@ class DefaultModelObjectPoolTest {
                 System.clearProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE);
             }
         }
+    }
+
+    @Test
+    void testConfigurablePooledTypes() {
+        String originalPooledTypes = System.getProperty(Constants.MAVEN_MODEL_PROCESSOR_POOLED_TYPES);
+
+        try {
+            // Configure to only pool Dependencies
+            System.setProperty(Constants.MAVEN_MODEL_PROCESSOR_POOLED_TYPES, "Dependency");
+
+            ModelObjectProcessor processor = new DefaultModelObjectPool();
+
+            // Dependencies should be pooled
+            Dependency dep1 = Dependency.newBuilder()
+                    .groupId("test")
+                    .artifactId("test")
+                    .version("1.0")
+                    .build();
+
+            Dependency dep2 = Dependency.newBuilder()
+                    .groupId("test")
+                    .artifactId("test")
+                    .version("1.0")
+                    .build();
+
+            Dependency result1 = processor.process(dep1);
+            Dependency result2 = processor.process(dep2);
+
+            // Should be the same instance due to pooling
+            assertSame(result1, result2);
+
+            // Non-dependency objects should not be pooled (pass through)
+            String str1 = "test";
+            String str2 = processor.process(str1);
+            assertSame(str1, str2); // Same instance because it's not pooled
+
+        } finally {
+            if (originalPooledTypes != null) {
+                System.setProperty(Constants.MAVEN_MODEL_PROCESSOR_POOLED_TYPES, originalPooledTypes);
+            } else {
+                System.clearProperty(Constants.MAVEN_MODEL_PROCESSOR_POOLED_TYPES);
+            }
+        }
+    }
+
+    @Test
+    void testPerTypeReferenceType() {
+        String originalDefault = System.getProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE);
+        String originalDependency = System.getProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE_PREFIX + "Dependency");
+
+        try {
+            // Set default to WEAK and Dependency-specific to HARD
+            System.setProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE, "WEAK");
+            System.setProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE_PREFIX + "Dependency", "HARD");
+
+            ModelObjectProcessor processor = new DefaultModelObjectPool();
+
+            // Test that dependencies still work with per-type configuration
+            Dependency dep = Dependency.newBuilder()
+                    .groupId("test")
+                    .artifactId("test")
+                    .version("1.0")
+                    .build();
+
+            Dependency result = processor.process(dep);
+            assertNotNull(result);
+            assertEquals(dep, result);
+
+        } finally {
+            if (originalDefault != null) {
+                System.setProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE, originalDefault);
+            } else {
+                System.clearProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE);
+            }
+
+            if (originalDependency != null) {
+                System.setProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE_PREFIX + "Dependency", originalDependency);
+            } else {
+                System.clearProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE_PREFIX + "Dependency");
+            }
+        }
+    }
+
+    @Test
+    void testStatistics() {
+        ModelObjectProcessor processor = new DefaultModelObjectPool();
+
+        // Process some dependencies
+        for (int i = 0; i < 5; i++) {
+            Dependency dep = Dependency.newBuilder()
+                    .groupId("test")
+                    .artifactId("test-" + (i % 2)) // Create some duplicates
+                    .version("1.0")
+                    .build();
+            processor.process(dep);
+        }
+
+        // Check that statistics are available
+        String stats = DefaultModelObjectPool.getStatistics(Dependency.class);
+        assertNotNull(stats);
+        assertTrue(stats.contains("Dependency"));
+
+        String allStats = DefaultModelObjectPool.getAllStatistics();
+        assertNotNull(allStats);
+        assertTrue(allStats.contains("ModelObjectPool Statistics"));
     }
 }

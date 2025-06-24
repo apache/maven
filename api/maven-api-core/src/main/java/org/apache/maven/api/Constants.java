@@ -630,14 +630,33 @@ public final class Constants {
     public static final String MAVEN_CACHE_CONFIG_PROPERTY = "maven.cache.config";
 
     /**
-     * User property key for configuring the reference type used by ModelObjectProcessor.
-     * Valid values are: "soft", "hard", "weak", "none".
-     * Default is "hard" for optimal performance.
+     * User property key for configuring which object types are pooled by ModelObjectProcessor.
+     * Value should be a comma-separated list of simple class names (e.g., "Dependency,Plugin,Build").
+     * Default is "Dependency" for backward compatibility.
      *
      * @since 4.1.0
      */
-    @Config(defaultValue = "hard")
+    @Config(defaultValue = "Dependency")
+    public static final String MAVEN_MODEL_PROCESSOR_POOLED_TYPES = "maven.model.processor.pooledTypes";
+
+    /**
+     * User property key for configuring the default reference type used by ModelObjectProcessor.
+     * Valid values are: "SOFT", "HARD", "WEAK", "NONE".
+     * Default is "HARD" for optimal performance.
+     *
+     * @since 4.1.0
+     */
+    @Config(defaultValue = "HARD")
     public static final String MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE = "maven.model.processor.referenceType";
+
+    /**
+     * User property key prefix for configuring per-object-type reference types.
+     * Format: maven.model.processor.referenceType.{ClassName} = {ReferenceType}
+     * Example: maven.model.processor.referenceType.Dependency = SOFT
+     *
+     * @since 4.1.0
+     */
+    public static final String MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE_PREFIX = "maven.model.processor.referenceType.";
 
     private Constants() {}
 }

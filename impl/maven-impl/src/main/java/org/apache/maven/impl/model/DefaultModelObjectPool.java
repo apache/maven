@@ -18,8 +18,13 @@
  */
 package org.apache.maven.impl.model;
 
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.model.Cache;
@@ -30,100 +35,145 @@ import org.apache.maven.api.model.ModelObjectProcessor;
  * Default implementation of ModelObjectProcessor that provides memory optimization
  * through object pooling and interning.
  *
- * <p>This implementation focuses on pooling {@link Dependency} objects, which are
- * frequently duplicated in large Maven projects. Other model objects are passed
- * through unchanged.</p>
+ * <p>This implementation can pool any model object type based on configuration.
+ * By default, it pools {@link Dependency} objects, which are frequently duplicated
+ * in large Maven projects. Other model objects are passed through unchanged unless
+ * explicitly configured for pooling.</p>
  *
- * <p>The pool uses hard references to prevent premature garbage collection and
- * provides thread-safe access through ConcurrentHashMap.</p>
+ * <p>The pool uses configurable reference types and provides thread-safe access
+ * through ConcurrentHashMap-based caches.</p>
  *
  * @since 4.0.0
  */
 public class DefaultModelObjectPool implements ModelObjectProcessor {
 
-    private static final Cache<PoolKey, Dependency> DEPENDENCY_POOL = Cache.newCache(getReferenceType());
+    // Cache for each pooled object type
+    private static final Map<Class<?>, Cache<PoolKey, Object>> OBJECT_POOLS = new ConcurrentHashMap<>();
+
+    // Configuration
+    private static final Set<String> POOLED_TYPES = getPooledTypes();
 
     // Statistics tracking
-    private static final AtomicLong TOTAL_INTERN_CALLS = new AtomicLong(0);
-    private static final AtomicLong CACHE_HITS = new AtomicLong(0);
-    private static final AtomicLong CACHE_MISSES = new AtomicLong(0);
+    private static final Map<Class<?>, AtomicLong> TOTAL_CALLS = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, AtomicLong> CACHE_HITS = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, AtomicLong> CACHE_MISSES = new ConcurrentHashMap<>();
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T process(T object) {
-        if (object instanceof Dependency dependency) {
-            return (T) internDependency(dependency);
+        if (object == null) {
+            return null;
         }
-        // For other types, return as-is (could be extended in the future)
-        return object;
+
+        Class<?> objectType = object.getClass();
+        String simpleClassName = objectType.getSimpleName();
+
+        // Check if this object type should be pooled
+        if (!POOLED_TYPES.contains(simpleClassName)) {
+            return object;
+        }
+
+        // Get or create cache for this object type
+        Cache<PoolKey, Object> cache = OBJECT_POOLS.computeIfAbsent(objectType, this::createCacheForType);
+
+        return (T) internObject(object, cache, objectType);
     }
 
     /**
-     * Gets the reference type to use for the dependency pool from system properties.
+     * Gets the set of object types that should be pooled.
      */
-    private static Cache.ReferenceType getReferenceType() {
-        String referenceTypeProperty = System.getProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE, "hard");
-        return switch (referenceTypeProperty.toLowerCase()) {
-            case "soft" -> Cache.ReferenceType.SOFT;
-            case "weak" -> Cache.ReferenceType.WEAK;
-            case "none" -> Cache.ReferenceType.NONE;
-            case "hard" -> Cache.ReferenceType.HARD;
-            default -> {
-                System.err.println("Unknown reference type: " + referenceTypeProperty + ", using default HARD");
-                yield Cache.ReferenceType.HARD;
+    private static Set<String> getPooledTypes() {
+        String pooledTypesProperty = System.getProperty(Constants.MAVEN_MODEL_PROCESSOR_POOLED_TYPES, "Dependency");
+        return Arrays.stream(pooledTypesProperty.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * Creates a cache for the specified object type with the appropriate reference type.
+     */
+    private Cache<PoolKey, Object> createCacheForType(Class<?> objectType) {
+        Cache.ReferenceType referenceType = getReferenceTypeForClass(objectType);
+        return Cache.newCache(referenceType);
+    }
+
+    /**
+     * Gets the reference type to use for a specific object type.
+     * Checks for per-type configuration first, then falls back to default.
+     */
+    private static Cache.ReferenceType getReferenceTypeForClass(Class<?> objectType) {
+        String className = objectType.getSimpleName();
+
+        // Check for per-type configuration first
+        String perTypeProperty = Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE_PREFIX + className;
+        String perTypeValue = System.getProperty(perTypeProperty);
+
+        if (perTypeValue != null) {
+            try {
+                return Cache.ReferenceType.valueOf(perTypeValue.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                System.err.println("Unknown reference type for " + className + ": " + perTypeValue + ", using default");
             }
-        };
+        }
+
+        // Fall back to default reference type
+        return getDefaultReferenceType();
     }
 
     /**
-     * Interns a dependency object in the pool.
+     * Gets the default reference type from system properties.
      */
-    private Dependency internDependency(Dependency dependency) {
-        TOTAL_INTERN_CALLS.incrementAndGet();
-
-        PoolKey key = new PoolKey(dependency);
-        Dependency existing = DEPENDENCY_POOL.get(key);
-        if (existing != null) {
-            CACHE_HITS.incrementAndGet();
-            return existing;
+    private static Cache.ReferenceType getDefaultReferenceType() {
+        try {
+            String referenceTypeProperty = System.getProperty(
+                    Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE,
+                    Cache.ReferenceType.HARD.name());
+            return Cache.ReferenceType.valueOf(referenceTypeProperty.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            System.err.println("Unknown default reference type, using HARD");
+            return Cache.ReferenceType.HARD;
         }
-
-        // Use putIfAbsent to handle concurrent access
-        existing = DEPENDENCY_POOL.computeIfAbsent(key, k -> dependency);
-        if (existing != null) {
-            CACHE_HITS.incrementAndGet();
-            return existing;
-        }
-
-        CACHE_MISSES.incrementAndGet();
-        return dependency;
     }
 
     /**
-     * Key class for pooling dependencies based on their content.
-     * Holds the dependency directly and pre-computes hashCode for performance.
+     * Interns an object in the appropriate pool.
+     */
+    private Object internObject(Object object, Cache<PoolKey, Object> cache, Class<?> objectType) {
+        // Update statistics
+        TOTAL_CALLS.computeIfAbsent(objectType, k -> new AtomicLong(0)).incrementAndGet();
+
+        PoolKey key = new PoolKey(object);
+        Object existing = cache.get(key);
+        if (existing != null) {
+            CACHE_HITS.computeIfAbsent(objectType, k -> new AtomicLong(0)).incrementAndGet();
+            return existing;
+        }
+
+        // Use computeIfAbsent to handle concurrent access
+        existing = cache.computeIfAbsent(key, k -> object);
+        if (existing == object) {
+            // We added the object to the cache
+            CACHE_MISSES.computeIfAbsent(objectType, k -> new AtomicLong(0)).incrementAndGet();
+        } else {
+            // Another thread added it first
+            CACHE_HITS.computeIfAbsent(objectType, k -> new AtomicLong(0)).incrementAndGet();
+        }
+
+        return existing;
+    }
+
+    /**
+     * Key class for pooling any model object based on their content.
+     * Holds the object directly and pre-computes hashCode for performance.
      */
     private static class PoolKey {
-        private final Dependency dependency;
+        private final Object object;
         private final int hashCode;
 
-        PoolKey(Dependency dependency) {
-            this.dependency = dependency;
-            this.hashCode = computeHashCode(dependency);
-        }
-
-        private static int computeHashCode(Dependency dependency) {
-            return Objects.hash(
-                    dependency.getGroupId(),
-                    dependency.getArtifactId(),
-                    dependency.getVersion(),
-                    dependency.getType(),
-                    dependency.getClassifier(),
-                    dependency.getScope(),
-                    dependency.getSystemPath(),
-                    dependency.getOptional(),
-                    dependency.getExclusions(),
-                    dependency.getLocationKeys());
+        PoolKey(Object object) {
+            this.object = object;
+            this.hashCode = object.hashCode();
         }
 
         @Override
@@ -131,13 +181,46 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
             if (this == obj) return true;
             if (!(obj instanceof PoolKey other)) return false;
 
-            // Use the dependency's equals method which now properly includes all fields
-            return Objects.equals(dependency, other.dependency);
+            // Use the object's equals method which should properly include all fields
+            return Objects.equals(object, other.object);
         }
 
         @Override
         public int hashCode() {
             return hashCode;
         }
+    }
+
+    /**
+     * Get statistics for a specific object type.
+     * Useful for monitoring and debugging.
+     */
+    public static String getStatistics(Class<?> objectType) {
+        AtomicLong totalCalls = TOTAL_CALLS.get(objectType);
+        AtomicLong hits = CACHE_HITS.get(objectType);
+        AtomicLong misses = CACHE_MISSES.get(objectType);
+
+        if (totalCalls == null) {
+            return objectType.getSimpleName() + ": No statistics available";
+        }
+
+        long total = totalCalls.get();
+        long hitCount = hits != null ? hits.get() : 0;
+        long missCount = misses != null ? misses.get() : 0;
+        double hitRatio = total > 0 ? (double) hitCount / total : 0.0;
+
+        return String.format("%s: Total=%d, Hits=%d, Misses=%d, Hit Ratio=%.2f%%",
+                objectType.getSimpleName(), total, hitCount, missCount, hitRatio * 100);
+    }
+
+    /**
+     * Get statistics for all pooled object types.
+     */
+    public static String getAllStatistics() {
+        StringBuilder sb = new StringBuilder("ModelObjectPool Statistics:\n");
+        for (Class<?> type : OBJECT_POOLS.keySet()) {
+            sb.append("  ").append(getStatistics(type)).append("\n");
+        }
+        return sb.toString();
     }
 }
