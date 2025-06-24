@@ -60,6 +60,7 @@
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Nonnull" ) )
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.NotThreadSafe" ) )
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.ThreadSafe" ) )
+    #set ( $dummy = $imports.add( "org.apache.maven.api.model.ModelObjectPoolFactory" ) )
     #foreach ( $field in $allFields )
       #if ( $field.type == "java.util.List" )
         #set ( $dummy = $imports.add( "java.util.ArrayList" ) )
@@ -497,12 +498,8 @@ public class ${class.name}
             ) {
                 return base;
             }
-    #if ( $class.name == "Dependency" && $package == "org.apache.maven.api.model" )
             ${class.name} newInstance = new ${class.name}(this);
-            return DependencyPool.intern(newInstance);
-    #else
-            return new ${class.name}(this);
-    #end
+            return ModelObjectPoolFactory.getInstance().intern(newInstance);
         }
 
     #if ( $locationTracking && ! $class.superClass )
