@@ -35,7 +35,9 @@ public class MavenITmng3991ValidDependencyScopeTest extends AbstractMavenIntegra
     }
 
     /**
-     * Test that invalid dependency scopes cause a validation error during building.
+     * Test that invalid dependency scopes cause a validation warning during building.
+     * In Maven 4, invalid dependency scopes generate warnings instead of errors
+     * to maintain backward compatibility with extensions that use custom scopes.
      *
      * @throws Exception in case of failure
      */
@@ -46,13 +48,19 @@ public class MavenITmng3991ValidDependencyScopeTest extends AbstractMavenIntegra
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        try {
-            verifier.addCliArgument("validate");
-            verifier.execute();
-            verifier.verifyErrorFreeLog();
-            fail("Invalid dependency scope did not cause validation error");
-        } catch (VerificationException e) {
-            // expected
+        verifier.addCliArgument("validate");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+
+        // Verify that warnings are generated for invalid dependency scopes
+        List<String> lines = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        boolean foundWarning = false;
+        for (String line : lines) {
+            if (line.contains("WARNING") && line.contains("dependencies.dependency.scope") && line.contains("'invalid'")) {
+                foundWarning = true;
+                break;
+            }
         }
+        assertTrue(foundWarning, "Expected warning about invalid dependency scope 'invalid' was not found in build log");
     }
 }
