@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Represents the location of an element within a model source file.
@@ -39,6 +40,8 @@ public class InputLocation implements Serializable, InputLocationTracker {
     private final InputSource source;
     private final Map<Object, InputLocation> locations;
     private final InputLocation importedFrom;
+
+    private volatile int hashCode = 0; // Cached hashCode for performance
 
     public InputLocation(InputSource source) {
         this.lineNumber = -1;
@@ -183,6 +186,88 @@ public class InputLocation implements Serializable, InputLocationTracker {
 
         return new InputLocation(-1, -1, InputSource.merge(source.getSource(), target.getSource()), locations);
     } // -- InputLocation merge( InputLocation, InputLocation, java.util.Collection )
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        InputLocation that = (InputLocation) o;
+        return lineNumber == that.lineNumber
+                && columnNumber == that.columnNumber
+                && Objects.equals(source, that.source)
+                && safeLocationsEquals(this, locations, that, that.locations)
+                && Objects.equals(importedFrom, that.importedFrom);
+    }
+
+    /**
+     * Safely compares two locations maps, treating self-references as equal.
+     */
+    private static boolean safeLocationsEquals(
+            InputLocation this1,
+            Map<Object, InputLocation> map1,
+            InputLocation this2,
+            Map<Object, InputLocation> map2) {
+        if (map1 == map2) {
+            return true;
+        }
+        if (map1 == null || map2 == null) {
+            return false;
+        }
+        if (map1.size() != map2.size()) {
+            return false;
+        }
+
+        for (Map.Entry<Object, InputLocation> entry1 : map1.entrySet()) {
+            Object key = entry1.getKey();
+            InputLocation value1 = entry1.getValue();
+            InputLocation value2 = map2.get(key);
+
+            if (value1 == this1) {
+                if (value2 == this2) {
+                    continue;
+                }
+                return false;
+            } else {
+                if (Objects.equals(value1, value2)) {
+                    continue;
+                }
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = hashCode;
+        if (result == 0) {
+            result = Objects.hash(lineNumber, columnNumber, source, safeHash(locations), importedFrom);
+            hashCode = result;
+        }
+        return result;
+    }
+
+    /**
+     * Safely calculates hash code for locations map, avoiding infinite recursion on self-references.
+     */
+    private int safeHash(Map<Object, InputLocation> locations) {
+        if (locations == null) {
+            return 0;
+        }
+        int result = 1;
+        for (Map.Entry<Object, InputLocation> entry : locations.entrySet()) {
+            result = 31 * result + Objects.hashCode(entry.getKey());
+            if (entry.getValue() != this) {
+                result = 31 * result + Objects.hashCode(entry.getValue());
+            }
+        }
+        return result;
+    }
 
     /**
      * Class StringFormatter.
