@@ -38,7 +38,7 @@ public class JavaPathTypeTest {
      * Converts paths from Unix style to platform-dependent style.
      *
      * @param expected the option value expected by the test
-     * @return the given expected value with separators of the host
+     * @return the expected value with separators of the host
      */
     private static String toPlatformSpecific(String expected) {
         return expected.replace("/", File.separator).replace(":", File.pathSeparator);
@@ -49,10 +49,10 @@ public class JavaPathTypeTest {
      */
     @Test
     public void testOption() {
-        String[] f = JavaPathType.MODULES.option(paths());
-        assertEquals(2, f.length);
-        assertEquals("--module-path", f[0]);
-        assertEquals(toPlatformSpecific("\"src/foo.java:src/bar.java\""), f[1]);
+        String[] formatted = JavaPathType.MODULES.option(paths());
+        assertEquals(2, formatted.length);
+        assertEquals("--module-path", formatted[0]);
+        assertEquals(toPlatformSpecific("\"src/foo.java:src/bar.java\""), formatted[1]);
     }
 
     /**
@@ -60,9 +60,9 @@ public class JavaPathTypeTest {
      */
     @Test
     public void testModularOption() {
-        String[] f = JavaPathType.patchModule("my.module").option(paths());
-        assertEquals(2, f.length);
-        assertEquals("--patch-module", f[0]);
-        assertEquals(toPlatformSpecific("my.module=\"src/foo.java:src/bar.java\""), f[1]);
+        String[] formatted = JavaPathType.patchModule("my.module").option(paths());
+        assertEquals(2, formatted.length);
+        assertEquals("--patch-module", formatted[0]);
+        assertEquals(toPlatformSpecific("my.module=\"src/foo.java:src/bar.java\""), formatted[1]);
     }
 }
