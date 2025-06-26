@@ -25,6 +25,7 @@ import java.util.function.Function;
 import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.cache.BatchRequestException;
+import org.apache.maven.api.cache.CacheStatistics;
 import org.apache.maven.api.cache.RequestResult;
 import org.apache.maven.api.services.Request;
 import org.apache.maven.api.services.RequestTrace;
@@ -233,6 +234,11 @@ class AbstractRequestCacheTest {
 
         void addFailure(TestRequest request, RuntimeException exception) {
             failures.put(request, exception);
+        }
+
+        @Override
+        public CacheStatistics getStatistics() {
+            return null; // Not implemented for test
         }
 
         @Override

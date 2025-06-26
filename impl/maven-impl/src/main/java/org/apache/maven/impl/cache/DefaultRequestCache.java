@@ -25,6 +25,7 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.SessionData;
 import org.apache.maven.api.cache.CacheMetadata;
 import org.apache.maven.api.cache.CacheRetention;
+import org.apache.maven.api.cache.CacheStatistics;
 import org.apache.maven.api.services.Request;
 import org.apache.maven.api.services.RequestTrace;
 import org.apache.maven.api.services.Result;
@@ -39,7 +40,10 @@ public class DefaultRequestCache extends AbstractRequestCache {
     protected static final SessionData.Key<Cache> KEY = SessionData.key(Cache.class, CacheMetadata.class);
     protected static final Object ROOT = new Object();
 
-    // Debug counters for memory analysis
+    // Comprehensive cache statistics
+    private final DefaultCacheStatistics statistics = new DefaultCacheStatistics();
+
+    // Legacy debug counters for backward compatibility with existing logging
     private static final AtomicLong REQUEST_SCOPED_CACHE_COUNT = new AtomicLong(0);
     private static final AtomicLong SESSION_SCOPED_CACHE_COUNT = new AtomicLong(0);
     private static final AtomicLong PERSISTENT_CACHE_COUNT = new AtomicLong(0);
@@ -58,6 +62,15 @@ public class DefaultRequestCache extends AbstractRequestCache {
                             }
                         },
                         "DefaultRequestCache-Statistics"));
+    }
+
+    public DefaultRequestCache() {
+        // Register cache size suppliers for different retention policies
+        // Note: These provide approximate sizes since the improved cache architecture
+        // uses distributed caches across sessions
+        statistics.registerCacheSizeSupplier(CacheRetention.PERSISTENT, PERSISTENT_CACHE_SIZE::get);
+        statistics.registerCacheSizeSupplier(CacheRetention.SESSION_SCOPED, SESSION_SCOPED_CACHE_COUNT::get);
+        statistics.registerCacheSizeSupplier(CacheRetention.REQUEST_SCOPED, REQUEST_SCOPED_CACHE_COUNT::get);
     }
 
     /**
@@ -93,11 +106,18 @@ public class DefaultRequestCache extends AbstractRequestCache {
     }
 
     @Override
+    public CacheStatistics getStatistics() {
+        return statistics;
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     protected <REQ extends Request<?>, REP extends Result<REQ>> CachingSupplier<REQ, REP> doCache(
             REQ req, Function<REQ, REP> supplier) {
         // Early return for non-Session requests (e.g., ProtoSession)
         if (!(req.getSession() instanceof Session session)) {
+            // Record as a miss since no caching is performed for non-Session requests
+            statistics.recordMiss(req.getClass().getSimpleName(), CacheRetention.DISABLED);
             return new CachingSupplier<>(supplier);
         }
 
@@ -107,6 +127,8 @@ public class DefaultRequestCache extends AbstractRequestCache {
 
         // Handle disabled caching
         if (retention == CacheRetention.DISABLED || referenceType == Cache.ReferenceType.NONE) {
+            // Record as a miss since no caching is performed
+            statistics.recordMiss(req.getClass().getSimpleName(), retention);
             return new CachingSupplier<>(supplier);
         }
 
@@ -173,22 +195,20 @@ public class DefaultRequestCache extends AbstractRequestCache {
             if (isNewEntry && retention == CacheRetention.PERSISTENT) {
                 PERSISTENT_CACHE_SIZE.incrementAndGet();
             }
+            // Record statistics for both legacy counters and new comprehensive system
+            String requestType = req.getClass().getSimpleName();
             if (isNewEntry) {
                 TOTAL_CACHE_MISSES.incrementAndGet();
+                statistics.recordMiss(requestType, retention);
                 if (LOGGER.isTraceEnabled()) {
                     LOGGER.trace(
-                            "Cache MISS: type={}, request={}, newCacheSize={}",
-                            cacheType,
-                            req.getClass().getSimpleName(),
-                            cache.size());
+                            "Cache MISS: type={}, request={}, newCacheSize={}", cacheType, requestType, cache.size());
                 }
             } else {
                 TOTAL_CACHE_HITS.incrementAndGet();
+                statistics.recordHit(requestType, retention);
                 if (LOGGER.isTraceEnabled()) {
-                    LOGGER.trace(
-                            "Cache HIT: type={}, request={}",
-                            cacheType,
-                            req.getClass().getSimpleName());
+                    LOGGER.trace("Cache HIT: type={}, request={}", cacheType, requestType);
                 }
             }
 
@@ -209,6 +229,8 @@ public class DefaultRequestCache extends AbstractRequestCache {
 
             return result;
         } else {
+            // Record as a miss since no cache was available
+            statistics.recordMiss(req.getClass().getSimpleName(), retention);
             if (LOGGER.isTraceEnabled()) {
                 LOGGER.trace("No cache: request={}", req.getClass().getSimpleName());
             }
