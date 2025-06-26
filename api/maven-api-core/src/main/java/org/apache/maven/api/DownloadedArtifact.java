@@ -33,7 +33,7 @@ import org.apache.maven.api.annotations.Immutable;
 public interface DownloadedArtifact extends Artifact {
 
     /**
-     * {@return the actual file that has been downloaded in the file system}
+     * {@return the a path to the file that has been downloaded to the file system}.
      */
     Path getPath();
 }
