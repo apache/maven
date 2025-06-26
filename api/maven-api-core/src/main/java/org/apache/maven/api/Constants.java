@@ -511,6 +511,16 @@ public final class Constants {
     public static final String MAVEN_BUILDER_MAX_PROBLEMS = "maven.builder.maxProblems";
 
     /**
+     * Comma-separated list of XML contexts/fields to intern during POM parsing for memory optimization.
+     * When not specified, a default set of commonly repeated contexts will be used.
+     * Example: "groupId,artifactId,version,scope,type"
+     *
+     * @since 4.0.0
+     */
+    @Config
+    public static final String MAVEN_MODEL_BUILDER_INTERNS = "maven.modelBuilder.interns";
+
+    /**
      * All system properties used by Maven Logger start with this prefix.
      *
      * @since 4.0.0
