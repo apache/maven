@@ -56,7 +56,9 @@ public class DefaultPluginXmlFactory implements PluginXmlFactory {
             throw new IllegalArgumentException("path, url, reader or inputStream must be non null");
         }
         try {
-            PluginDescriptorStaxReader xml = new PluginDescriptorStaxReader();
+            PluginDescriptorStaxReader xml = request.getTransformer() != null
+                    ? new PluginDescriptorStaxReader(request.getTransformer()::transform)
+                    : new PluginDescriptorStaxReader();
             xml.setAddDefaultEntities(request.isAddDefaultEntities());
             if (inputStream != null) {
                 return xml.read(inputStream, request.isStrict());

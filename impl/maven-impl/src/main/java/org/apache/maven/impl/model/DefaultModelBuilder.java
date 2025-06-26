@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1254,7 +1255,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                             .path(modelSource.getPath())
                             .rootDirectory(rootDirectory)
                             .inputStream(is)
-                            .transformer(new InliningTransformer())
+                            .transformer(new InterningTransformer(session))
                             .build());
                 } catch (XmlReaderException e) {
                     if (!strict) {
@@ -1267,7 +1268,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                                 .path(modelSource.getPath())
                                 .rootDirectory(rootDirectory)
                                 .inputStream(is)
-                                .transformer(new InliningTransformer())
+                                .transformer(new InterningTransformer(session))
                                 .build());
                     } catch (XmlReaderException ne) {
                         // still unreadable even in non-strict mode, rethrow original error
@@ -2144,23 +2145,94 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
     }
 
-    static class InliningTransformer implements XmlReaderRequest.Transformer {
-        static final Set<String> CONTEXTS = Set.of(
+    static class InterningTransformer implements XmlReaderRequest.Transformer {
+        static final Set<String> DEFAULT_CONTEXTS = Set.of(
+                // Core Maven coordinates
                 "groupId",
                 "artifactId",
                 "version",
                 "namespaceUri",
                 "packaging",
+
+                // Dependency-related fields
                 "scope",
+                "type",
+                "classifier",
+
+                // Build and plugin-related fields
                 "phase",
+                "goal",
+                "execution",
+
+                // Repository-related fields
                 "layout",
                 "policy",
                 "checksumPolicy",
-                "updatePolicy");
+                "updatePolicy",
+
+                // Common metadata fields
+                "modelVersion",
+                "name",
+                "url",
+                "system",
+                "distribution",
+                "status",
+
+                // SCM fields
+                "connection",
+                "developerConnection",
+                "tag",
+
+                // Common enum-like values that appear frequently
+                "id",
+                "inherited",
+                "optional");
+
+        private final Set<String> contexts;
+
+        /**
+         * Creates an InterningTransformer with default contexts.
+         */
+        InterningTransformer() {
+            this.contexts = DEFAULT_CONTEXTS;
+        }
+
+        /**
+         * Creates an InterningTransformer with contexts from session properties.
+         *
+         * @param session the Maven session to read properties from
+         */
+        InterningTransformer(Session session) {
+            this.contexts = parseContextsFromSession(session);
+        }
+
+        private Set<String> parseContextsFromSession(Session session) {
+            String contextsProperty = session.getUserProperties().get(Constants.MAVEN_MODEL_BUILDER_INTERNS);
+            if (contextsProperty == null) {
+                contextsProperty = session.getSystemProperties().get(Constants.MAVEN_MODEL_BUILDER_INTERNS);
+            }
+
+            if (contextsProperty == null || contextsProperty.trim().isEmpty()) {
+                return DEFAULT_CONTEXTS;
+            }
+
+            return Arrays.stream(contextsProperty.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .collect(Collectors.toSet());
+        }
 
         @Override
         public String transform(String input, String context) {
-            return CONTEXTS.contains(context) ? input.intern() : input;
+            return input != null && contexts.contains(context) ? input.intern() : input;
+        }
+
+        /**
+         * Get the contexts that will be interned by this transformer.
+         * Used for testing purposes.
+         */
+        Set<String> getContexts() {
+            return contexts;
         }
     }
 }
