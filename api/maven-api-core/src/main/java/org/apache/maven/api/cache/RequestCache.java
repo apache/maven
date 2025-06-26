@@ -77,4 +77,15 @@ public interface RequestCache {
      */
     <REQ extends Request<?>, REP extends Result<REQ>> List<REP> requests(
             List<REQ> req, Function<List<REQ>, List<REP>> supplier);
+
+    /**
+     * Returns detailed statistics about cache performance and usage.
+     * <p>
+     * The statistics include hit/miss ratios, request type distribution,
+     * cache retention policy effectiveness, and current cache sizes.
+     * </p>
+     *
+     * @return Cache statistics, or null if statistics are not available
+     */
+    CacheStatistics getStatistics();
 }

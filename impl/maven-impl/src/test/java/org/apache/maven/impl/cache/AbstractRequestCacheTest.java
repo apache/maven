@@ -25,6 +25,7 @@ import java.util.function.Function;
 import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.cache.BatchRequestException;
+import org.apache.maven.api.cache.CacheStatistics;
 import org.apache.maven.api.cache.RequestResult;
 import org.apache.maven.api.services.Request;
 import org.apache.maven.api.services.RequestTrace;
@@ -247,6 +248,11 @@ class AbstractRequestCacheTest {
 
             // For non-failure cases, return a normal caching supplier
             return new CachingSupplier<>(supplier);
+        }
+
+        @Override
+        public CacheStatistics getStatistics() {
+            return null; // Not implemented for test
         }
 
         // Custom CachingSupplier that simulates a pre-cached failure

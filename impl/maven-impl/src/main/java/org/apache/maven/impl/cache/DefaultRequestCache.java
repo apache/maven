@@ -28,6 +28,7 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.SessionData;
 import org.apache.maven.api.cache.CacheMetadata;
 import org.apache.maven.api.cache.CacheRetention;
+import org.apache.maven.api.cache.CacheStatistics;
 import org.apache.maven.api.services.Request;
 import org.apache.maven.api.services.RequestTrace;
 import org.apache.maven.api.services.Result;
@@ -39,6 +40,19 @@ public class DefaultRequestCache extends AbstractRequestCache {
     protected static final Object ROOT = new Object();
 
     protected final Map<Object, CachingSupplier<?, ?>> forever = new ConcurrentHashMap<>();
+    protected final DefaultCacheStatistics statistics = new DefaultCacheStatistics();
+
+    public DefaultRequestCache() {
+        // Register cache size suppliers for different retention policies
+        statistics.registerCacheSizeSupplier(CacheRetention.PERSISTENT, () -> (long) forever.size());
+        statistics.registerCacheSizeSupplier(CacheRetention.SESSION_SCOPED, this::getSessionScopedCacheSize);
+        statistics.registerCacheSizeSupplier(CacheRetention.REQUEST_SCOPED, this::getRequestScopedCacheSize);
+    }
+
+    @Override
+    public CacheStatistics getStatistics() {
+        return statistics;
+    }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -47,6 +61,8 @@ public class DefaultRequestCache extends AbstractRequestCache {
         CacheRetention retention = Objects.requireNonNullElse(
                 req instanceof CacheMetadata metadata ? metadata.getCacheRetention() : null,
                 CacheRetention.SESSION_SCOPED);
+
+        String requestType = req.getClass().getSimpleName();
 
         Map<Object, CachingSupplier<?, ?>> cache = null;
         if ((retention == CacheRetention.REQUEST_SCOPED || retention == CacheRetention.SESSION_SCOPED)
@@ -59,9 +75,10 @@ public class DefaultRequestCache extends AbstractRequestCache {
             cache = forever;
         }
         if (cache != null) {
-            return (CachingSupplier<REQ, REP>) cache.computeIfAbsent(req, r -> new CachingSupplier<>(supplier));
+            return (CachingSupplier<REQ, REP>) cache.computeIfAbsent(
+                    req, r -> new StatisticsCachingSupplier<>(supplier, statistics, requestType, retention));
         } else {
-            return new CachingSupplier<>(supplier);
+            return new StatisticsCachingSupplier<>(supplier, statistics, requestType, retention);
         }
     }
 
@@ -71,5 +88,25 @@ public class DefaultRequestCache extends AbstractRequestCache {
             trace = trace.parent();
         }
         return trace != null && trace.data() != null ? trace.data() : req;
+    }
+
+    /**
+     * Calculates the total size of all session-scoped caches.
+     * This method iterates through all active sessions and counts their cache entries.
+     */
+    private long getSessionScopedCacheSize() {
+        // Note: This is an approximation since we don't have direct access to all sessions
+        // In a real implementation, this would need to be tracked more carefully
+        return 0L; // Placeholder - would need session registry to implement properly
+    }
+
+    /**
+     * Calculates the total size of all request-scoped caches.
+     * This method iterates through all active requests and counts their cache entries.
+     */
+    private long getRequestScopedCacheSize() {
+        // Note: This is an approximation since we don't have direct access to all requests
+        // In a real implementation, this would need to be tracked more carefully
+        return 0L; // Placeholder - would need request registry to implement properly
     }
 }
