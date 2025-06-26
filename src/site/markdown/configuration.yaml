@@ -158,6 +158,12 @@ props:
       defaultValue: false
       since: 4.0.0
       configurationSource: User properties
+    - key: maven.modelBuilder.interns
+      configurationType: String
+      description: "Comma-separated list of XML contexts/fields to intern during POM parsing for memory optimization. When not specified, a default set of commonly repeated contexts will be used. Example: \"groupId,artifactId,version,scope,type\""
+      defaultValue: 
+      since: 4.0.0
+      configurationSource: User properties
     - key: maven.modelBuilder.parallelism
       configurationType: Integer
       description: "ProjectBuilder parallelism."
