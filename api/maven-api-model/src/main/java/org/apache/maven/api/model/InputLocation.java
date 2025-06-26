@@ -41,8 +41,6 @@ public class InputLocation implements Serializable, InputLocationTracker {
     private final Map<Object, InputLocation> locations;
     private final InputLocation importedFrom;
 
-    private volatile int hashCode = 0; // Cached hashCode for performance
-
     public InputLocation(InputSource source) {
         this.lineNumber = -1;
         this.columnNumber = -1;
@@ -244,12 +242,7 @@ public class InputLocation implements Serializable, InputLocationTracker {
 
     @Override
     public int hashCode() {
-        int result = hashCode;
-        if (result == 0) {
-            result = Objects.hash(lineNumber, columnNumber, source, safeHash(locations), importedFrom);
-            hashCode = result;
-        }
-        return result;
+        return Objects.hash(lineNumber, columnNumber, source, safeHash(locations), importedFrom);
     }
 
     /**
