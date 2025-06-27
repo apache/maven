@@ -1,0 +1,312 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+name: Auto Port
+
+on:
+  pull_request:
+    types: [labeled, closed]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  auto-port:
+    runs-on: ubuntu-latest
+    if: |
+      (github.event.action == 'labeled' && 
+       (contains(github.event.label.name, 'backport-to-4.0.x') || 
+        contains(github.event.label.name, 'forward-port-to-master'))) ||
+      (github.event.action == 'closed' && github.event.pull_request.merged == true &&
+       (contains(github.event.pull_request.labels.*.name, 'backport-to-4.0.x') ||
+        contains(github.event.pull_request.labels.*.name, 'forward-port-to-master'))) ||
+      (github.event.issue.pull_request && 
+       (contains(github.event.comment.body, '/backport') || 
+        contains(github.event.comment.body, '/forward-port') ||
+        contains(github.event.comment.body, '/recreate-port')))
+    
+    steps:
+      - name: Check permissions
+        if: github.event_name == 'issue_comment'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: collaborator } = await github.rest.repos.getCollaboratorPermissionLevel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              username: context.actor
+            });
+            
+            if (!['admin', 'write'].includes(collaborator.permission)) {
+              core.setFailed(`@${context.actor} does not have permission to trigger auto-port commands`);
+              return;
+            }
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Determine port parameters
+        id: port-params
+        uses: actions/github-script@v7
+        with:
+          script: |
+            let sourceRef, targetBranch, prNumber, portType;
+            
+            if (context.eventName === 'pull_request') {
+              prNumber = context.payload.pull_request.number;
+              sourceRef = context.payload.pull_request.base.ref;
+              
+              const labels = context.payload.pull_request.labels.map(l => l.name);
+              
+              if (labels.includes('backport-to-4.0.x')) {
+                targetBranch = 'maven-4.0.x';
+                portType = 'backport';
+              } else if (labels.includes('forward-port-to-master')) {
+                targetBranch = 'master';
+                portType = 'forward-port';
+              }
+            } else if (context.eventName === 'issue_comment') {
+              prNumber = context.payload.issue.number;
+              const comment = context.payload.comment.body;
+              
+              // Parse comment commands
+              const backportMatch = comment.match(/\/backport(?:\s+(\S+))?/);
+              const forwardPortMatch = comment.match(/\/forward-port(?:\s+(\S+))?/);
+              const recreateMatch = comment.match(/\/recreate-port/);
+              
+              if (backportMatch) {
+                targetBranch = backportMatch[1] || 'maven-4.0.x';
+                portType = 'backport';
+              } else if (forwardPortMatch) {
+                targetBranch = forwardPortMatch[1] || 'master';
+                portType = 'forward-port';
+              } else if (recreateMatch) {
+                // For recreate, we need to determine from existing labels
+                const { data: pr } = await github.rest.pulls.get({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: prNumber
+                });
+                
+                const labels = pr.labels.map(l => l.name);
+                if (labels.includes('backport-to-4.0.x')) {
+                  targetBranch = 'maven-4.0.x';
+                  portType = 'backport';
+                } else if (labels.includes('forward-port-to-master')) {
+                  targetBranch = 'master';
+                  portType = 'forward-port';
+                }
+              }
+              
+              // Get PR details for source ref
+              const { data: pr } = await github.rest.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber
+              });
+              sourceRef = pr.base.ref;
+            }
+            
+            if (!targetBranch || !portType) {
+              core.setFailed('Could not determine port parameters');
+              return;
+            }
+            
+            core.setOutput('source-ref', sourceRef);
+            core.setOutput('target-branch', targetBranch);
+            core.setOutput('pr-number', prNumber);
+            core.setOutput('port-type', portType);
+            
+            console.log(`Port parameters: ${portType} from ${sourceRef} to ${targetBranch} for PR #${prNumber}`);
+
+      - name: Get PR details
+        id: pr-details
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: ${{ steps.port-params.outputs.pr-number }}
+            });
+            
+            core.setOutput('merge-commit-sha', pr.merge_commit_sha);
+            core.setOutput('title', pr.title);
+            core.setOutput('body', pr.body || '');
+            core.setOutput('author', pr.user.login);
+            
+            return pr;
+
+      - name: Create port branch
+        id: create-branch
+        run: |
+          TARGET_BRANCH="${{ steps.port-params.outputs.target-branch }}"
+          PORT_TYPE="${{ steps.port-params.outputs.port-type }}"
+          PR_NUMBER="${{ steps.port-params.outputs.pr-number }}"
+          
+          # Create branch name
+          if [ "$PORT_TYPE" = "backport" ]; then
+            BRANCH_NAME="backport/pr-${PR_NUMBER}-to-4.0.x"
+          else
+            BRANCH_NAME="forward-port/pr-${PR_NUMBER}-to-master"
+          fi
+          
+          echo "branch-name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+          
+          # Check if target branch exists, create if it doesn't
+          if ! git show-ref --verify --quiet refs/remotes/origin/$TARGET_BRANCH; then
+            echo "Target branch $TARGET_BRANCH does not exist, creating it from master"
+            git checkout -b $TARGET_BRANCH origin/master
+            git push origin $TARGET_BRANCH
+          fi
+          
+          # Create port branch from target
+          git checkout -b $BRANCH_NAME origin/$TARGET_BRANCH
+          
+          echo "Created branch $BRANCH_NAME from $TARGET_BRANCH"
+
+      - name: Cherry-pick commits
+        id: cherry-pick
+        run: |
+          MERGE_COMMIT_SHA="${{ steps.pr-details.outputs.merge-commit-sha }}"
+          
+          if [ -z "$MERGE_COMMIT_SHA" ] || [ "$MERGE_COMMIT_SHA" = "null" ]; then
+            echo "PR is not merged yet, cannot cherry-pick"
+            echo "success=false" >> $GITHUB_OUTPUT
+            echo "error=PR is not merged" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # Try to cherry-pick with -x flag for traceability
+          if git cherry-pick -x $MERGE_COMMIT_SHA; then
+            echo "success=true" >> $GITHUB_OUTPUT
+            echo "Cherry-pick successful"
+          else
+            echo "success=false" >> $GITHUB_OUTPUT
+            echo "error=Cherry-pick conflicts detected" >> $GITHUB_OUTPUT
+            
+            # Add conflict markers and commit
+            git add .
+            git commit -m "Cherry-pick of $MERGE_COMMIT_SHA with conflicts
+            
+            This commit contains conflicts that need to be resolved manually.
+            Original PR: #${{ steps.port-params.outputs.pr-number }}
+            
+            (cherry picked from commit $MERGE_COMMIT_SHA)"
+            
+            echo "Created commit with conflict markers"
+          fi
+
+      - name: Push port branch
+        run: |
+          BRANCH_NAME="${{ steps.create-branch.outputs.branch-name }}"
+          git push origin $BRANCH_NAME
+          echo "Pushed branch $BRANCH_NAME"
+
+      - name: Create port PR
+        id: create-pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const targetBranch = '${{ steps.port-params.outputs.target-branch }}';
+            const portType = '${{ steps.port-params.outputs.port-type }}';
+            const prNumber = '${{ steps.port-params.outputs.pr-number }}';
+            const branchName = '${{ steps.create-branch.outputs.branch-name }}';
+            const originalTitle = '${{ steps.pr-details.outputs.title }}';
+            const originalBody = '${{ steps.pr-details.outputs.body }}';
+            const originalAuthor = '${{ steps.pr-details.outputs.author }}';
+            const cherryPickSuccess = '${{ steps.cherry-pick.outputs.success }}' === 'true';
+            const cherryPickError = '${{ steps.cherry-pick.outputs.error }}';
+            
+            const portTypeTitle = portType === 'backport' ? 'Backport' : 'Forward-port';
+            const title = `[${portTypeTitle}] ${originalTitle}`;
+            
+            let body = `This is an automated ${portType} of #${prNumber} to \`${targetBranch}\`.\n\n`;
+            body += `**Original PR:** #${prNumber} by @${originalAuthor}\n\n`;
+            
+            if (!cherryPickSuccess) {
+              body += `⚠️ **Conflicts detected during cherry-pick!**\n`;
+              body += `This PR contains conflicts that need to be resolved manually.\n`;
+              body += `Error: ${cherryPickError}\n\n`;
+            }
+            
+            body += `---\n\n${originalBody}`;
+            
+            const { data: pr } = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              head: branchName,
+              base: targetBranch,
+              draft: !cherryPickSuccess
+            });
+            
+            // Add auto-port label
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              labels: ['auto-port']
+            });
+            
+            core.setOutput('pr-number', pr.number);
+            core.setOutput('pr-url', pr.html_url);
+            
+            return pr;
+
+      - name: Comment on original PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const originalPrNumber = '${{ steps.port-params.outputs.pr-number }}';
+            const portPrNumber = '${{ steps.create-pr.outputs.pr-number }}';
+            const portPrUrl = '${{ steps.create-pr.outputs.pr-url }}';
+            const portType = '${{ steps.port-params.outputs.port-type }}';
+            const targetBranch = '${{ steps.port-params.outputs.target-branch }}';
+            const cherryPickSuccess = '${{ steps.cherry-pick.outputs.success }}' === 'true';
+            
+            const portTypeText = portType === 'backport' ? 'backported' : 'forward-ported';
+            const emoji = cherryPickSuccess ? '✅' : '⚠️';
+            
+            let message = `${emoji} This PR has been automatically ${portTypeText} to \`${targetBranch}\`: #${portPrNumber}\n\n`;
+            
+            if (!cherryPickSuccess) {
+              message += `**Note:** The ${portType} contains conflicts that need to be resolved manually. `;
+              message += `Please review and resolve the conflicts in #${portPrNumber}.\n\n`;
+            }
+            
+            message += `You can recreate the ${portType} by commenting \`/recreate-port\` on this PR.`;
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: originalPrNumber,
+              body: message
+            });
