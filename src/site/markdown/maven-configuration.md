@@ -34,6 +34,7 @@ To modify this file, edit the template and regenerate.
 | `maven.build.timestamp.format` | `String` | Build timestamp format. |  `yyyy-MM-dd'T'HH:mm:ssXXX`  | 3.0.0 | Model properties |
 | `maven.build.version` | `String` | Maven build version: a human-readable string containing this Maven version, buildnumber, and time of its build. |  -  | 3.0.0 | system_properties |
 | `maven.builder.maxProblems` | `Integer` | Max number of problems for each severity level retained by the model builder. |  `100`  | 4.0.0 | User properties |
+| `maven.cache.stats` | `Boolean` | User property to enable cache statistics display at the end of the build. When set to true, detailed cache statistics including hit/miss ratios, request type breakdowns, and retention policy effectiveness will be displayed when the build completes. |  `false`  | 4.1.0 | User properties |
 | `maven.consumer.pom` | `Boolean` | User property for enabling/disabling the consumer POM feature. |  `true`  | 4.0.0 | User properties |
 | `maven.deploy.snapshot.buildNumber` | `Integer` | User property for overriding calculated "build number" for snapshot deploys. Caution: this property should be RARELY used (if used at all). It may help in special cases like "aligning" a reactor build subprojects build numbers to perform a "snapshot lock down". Value given here must be <code>maxRemoteBuildNumber + 1</code> or greater, otherwise build will fail. How the number to be obtained is left to user (ie by inspecting snapshot repository metadata or alike). Note: this feature is present in Maven 3.9.7 but with different key: <code>maven.buildNumber</code>. In Maven 4 as part of cleanup effort this key was renamed to properly reflect its purpose. |  -  | 4.0.0 | User properties |
 | `maven.ext.class.path` | `String` | Extensions class path. |  -  |  | User properties |
@@ -54,6 +55,8 @@ To modify this file, edit the template and regenerate.
 | `maven.logger.showThreadName` | `Boolean` | Set to true if you want to output the current thread name. Defaults to true. |  `true`  | 4.0.0 | User properties |
 | `maven.logger.warnLevelString` | `String` | The string value output for the warn level. Defaults to WARN. |  `WARN`  | 4.0.0 | User properties |
 | `maven.maven3Personality` | `Boolean` | User property for controlling "maven personality". If activated Maven will behave as previous major version, Maven 3. |  `false`  | 4.0.0 | User properties |
+| `maven.model.processor.pooledTypes` | `String` | User property key for configuring which object types are pooled by ModelObjectProcessor. Value should be a comma-separated list of simple class names (e.g., "Dependency,Plugin,Build"). Default is "Dependency" for backward compatibility. |  `Dependency`  | 4.1.0 | User properties |
+| `maven.model.processor.referenceType` | `String` | User property key for configuring the default reference type used by ModelObjectProcessor. Valid values are: "SOFT", "HARD", "WEAK", "NONE". Default is "HARD" for optimal performance. |  `HARD`  | 4.1.0 | User properties |
 | `maven.modelBuilder.parallelism` | `Integer` | ProjectBuilder parallelism. |  `cores/2 + 1`  | 4.0.0 | User properties |
 | `maven.plugin.validation` | `String` | Plugin validation level. |  `inline`  | 3.9.2 | User properties |
 | `maven.plugin.validation.excludes` | `String` | Plugin validation exclusions. |  -  | 3.9.6 | User properties |

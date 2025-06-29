@@ -39,6 +39,12 @@ props:
       defaultValue: 100
       since: 4.0.0
       configurationSource: User properties
+    - key: maven.cache.stats
+      configurationType: Boolean
+      description: "User property to enable cache statistics display at the end of the build. When set to true, detailed cache statistics including hit/miss ratios, request type breakdowns, and retention policy effectiveness will be displayed when the build completes."
+      defaultValue: false
+      since: 4.1.0
+      configurationSource: User properties
     - key: maven.consumer.pom
       configurationType: Boolean
       description: "User property for enabling/disabling the consumer POM feature."
@@ -157,6 +163,18 @@ props:
       description: "User property for controlling \"maven personality\". If activated Maven will behave as previous major version, Maven 3."
       defaultValue: false
       since: 4.0.0
+      configurationSource: User properties
+    - key: maven.model.processor.pooledTypes
+      configurationType: String
+      description: "User property key for configuring which object types are pooled by ModelObjectProcessor. Value should be a comma-separated list of simple class names (e.g., \"Dependency,Plugin,Build\"). Default is \"Dependency\" for backward compatibility."
+      defaultValue: Dependency
+      since: 4.1.0
+      configurationSource: User properties
+    - key: maven.model.processor.referenceType
+      configurationType: String
+      description: "User property key for configuring the default reference type used by ModelObjectProcessor. Valid values are: \"SOFT\", \"HARD\", \"WEAK\", \"NONE\". Default is \"HARD\" for optimal performance."
+      defaultValue: HARD
+      since: 4.1.0
       configurationSource: User properties
     - key: maven.modelBuilder.parallelism
       configurationType: Integer
