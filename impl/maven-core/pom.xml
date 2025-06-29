@@ -240,6 +240,11 @@ under the License.
       <artifactId>assertj-core</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.google.jimfs</groupId>
+      <artifactId>jimfs</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <!-- Used in TestApi -->
     <dependency>

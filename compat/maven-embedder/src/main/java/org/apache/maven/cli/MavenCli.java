@@ -860,7 +860,7 @@ public class MavenCli {
             if (Files.exists(extensionsPath)) {
                 try (InputStream is = Files.newInputStream(extensionsPath)) {
                     return new CoreExtensionsStaxReader()
-                            .read(is, true, new InputSource(extensionsFile))
+                            .read(is, true, InputSource.of(extensionsFile))
                             .getExtensions();
                 }
             }

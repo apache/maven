@@ -64,6 +64,11 @@ public final class InputLocation implements java.io.Serializable, Cloneable, Inp
      */
     private InputLocation importedFrom;
 
+    /**
+     * Cached hashCode for performance.
+     */
+    private volatile int hashCode = 0;
+
     // ----------------/
     // - Constructors -/
     // ----------------/
@@ -377,6 +382,32 @@ public final class InputLocation implements java.io.Serializable, Cloneable, Inp
          * @return String
          */
         public abstract String toString(InputLocation location);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        InputLocation that = (InputLocation) o;
+        return lineNumber == that.lineNumber
+                && columnNumber == that.columnNumber
+                && java.util.Objects.equals(source, that.source)
+                && java.util.Objects.equals(locations, that.locations)
+                && java.util.Objects.equals(importedFrom, that.importedFrom);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = hashCode;
+        if (result == 0) {
+            result = java.util.Objects.hash(lineNumber, columnNumber, source, locations, importedFrom);
+            hashCode = result;
+        }
+        return result;
     }
 
     @Override

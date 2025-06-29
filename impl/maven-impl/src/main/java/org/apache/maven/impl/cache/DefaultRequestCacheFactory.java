@@ -27,8 +27,10 @@ import org.apache.maven.api.di.Singleton;
 @Singleton
 public class DefaultRequestCacheFactory implements RequestCacheFactory {
 
+    private static final RequestCache REQUEST_CACHE = new DefaultRequestCache();
+
     @Override
     public RequestCache createCache() {
-        return new DefaultRequestCache();
+        return REQUEST_CACHE;
     }
 }
