@@ -18,6 +18,15 @@
  */
 package org.apache.maven.impl;
 
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.CharArrayReader;
+import java.io.CharArrayWriter;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
@@ -87,10 +96,36 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
             throw new IllegalArgumentException("path, url, reader or inputStream must be non null");
         }
         try {
+            // If modelId is not provided and we're reading from a file, try to extract it
+            String modelId = request.getModelId();
+            String location = request.getLocation();
+
+            if (modelId == null) {
+                if (inputStream != null) {
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    inputStream.transferTo(baos);
+                    byte[] buf = baos.toByteArray();
+                    modelId = extractModelId(new ByteArrayInputStream(buf));
+                    inputStream = new ByteArrayInputStream(buf);
+                } else if (reader != null) {
+                    CharArrayWriter caw = new CharArrayWriter();
+                    reader.transferTo(caw);
+                    char[] buf = caw.toCharArray();
+                    modelId = extractModelId(new CharArrayReader(buf));
+                    reader = new CharArrayReader(buf);
+                } else if (path != null) {
+                    try (InputStream is = Files.newInputStream(path)) {
+                        modelId = extractModelId(is);
+                        if (location == null) {
+                            location = path.toUri().toString();
+                        }
+                    }
+                }
+            }
+
             InputSource source = null;
-            if (request.getModelId() != null || request.getLocation() != null) {
-                source = new InputSource(
-                        request.getModelId(), path != null ? path.toUri().toString() : null);
+            if (modelId != null || location != null) {
+                source = InputSource.of(modelId, path != null ? path.toUri().toString() : null);
             }
             MavenStaxReader xml = request.getTransformer() != null
                     ? new MavenStaxReader(request.getTransformer()::transform)
@@ -142,6 +177,147 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
         } catch (Exception e) {
             throw new XmlWriterException("Unable to write model: " + getMessage(e), getLocation(e), e);
         }
+    }
+
+    static class InputFactoryHolder {
+        static final XMLInputFactory XML_INPUT_FACTORY;
+
+        static {
+            XMLInputFactory factory = XMLInputFactory.newFactory();
+            factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, true);
+            factory.setProperty(XMLInputFactory.IS_COALESCING, true);
+            XML_INPUT_FACTORY = factory;
+        }
+    }
+
+    /**
+     * Extracts the modelId (groupId:artifactId:version) from a POM XML stream
+     * by parsing just enough XML to get the GAV coordinates.
+     *
+     * @param inputStream the input stream to read from
+     * @return the modelId in format "groupId:artifactId:version" or null if not determinable
+     */
+    private String extractModelId(InputStream inputStream) {
+        try {
+            XMLStreamReader reader = InputFactoryHolder.XML_INPUT_FACTORY.createXMLStreamReader(inputStream);
+            try {
+                return extractModelId(reader);
+            } finally {
+                reader.close();
+            }
+        } catch (Exception e) {
+            // If extraction fails, return null and let the normal parsing handle it
+            // This is not a critical failure
+            return null;
+        }
+    }
+
+    private String extractModelId(Reader reader) {
+        try {
+            // Use a buffered stream to allow efficient reading
+            XMLStreamReader xmlReader = InputFactoryHolder.XML_INPUT_FACTORY.createXMLStreamReader(reader);
+            try {
+                return extractModelId(xmlReader);
+            } finally {
+                xmlReader.close();
+            }
+        } catch (Exception e) {
+            // If extraction fails, return null and let the normal parsing handle it
+            // This is not a critical failure
+            return null;
+        }
+    }
+
+    private static String extractModelId(XMLStreamReader reader) throws XMLStreamException {
+        String groupId = null;
+        String artifactId = null;
+        String version = null;
+        String parentGroupId = null;
+        String parentVersion = null;
+
+        boolean inProject = false;
+        boolean inParent = false;
+        String currentElement = null;
+
+        while (reader.hasNext()) {
+            int event = reader.next();
+
+            if (event == XMLStreamConstants.START_ELEMENT) {
+                String localName = reader.getLocalName();
+
+                if ("project".equals(localName)) {
+                    inProject = true;
+                } else if ("parent".equals(localName) && inProject) {
+                    inParent = true;
+                } else if (inProject
+                        && ("groupId".equals(localName)
+                                || "artifactId".equals(localName)
+                                || "version".equals(localName))) {
+                    currentElement = localName;
+                }
+            } else if (event == XMLStreamConstants.END_ELEMENT) {
+                String localName = reader.getLocalName();
+
+                if ("parent".equals(localName)) {
+                    inParent = false;
+                } else if ("project".equals(localName)) {
+                    break; // We've processed the main project element
+                }
+                currentElement = null;
+            } else if (event == XMLStreamConstants.CHARACTERS && currentElement != null) {
+                String text = reader.getText().trim();
+                if (!text.isEmpty()) {
+                    if (inParent) {
+                        switch (currentElement) {
+                            case "groupId":
+                                parentGroupId = text;
+                                break;
+                            case "version":
+                                parentVersion = text;
+                                break;
+                            default:
+                                // Ignore other elements
+                                break;
+                        }
+                    } else {
+                        switch (currentElement) {
+                            case "groupId":
+                                groupId = text;
+                                break;
+                            case "artifactId":
+                                artifactId = text;
+                                break;
+                            case "version":
+                                version = text;
+                                break;
+                            default:
+                                // Ignore other elements
+                                break;
+                        }
+                    }
+                }
+            }
+
+            // Early exit if we have enough information
+            if (artifactId != null && groupId != null && version != null) {
+                break;
+            }
+        }
+
+        // Use parent values as fallback
+        if (groupId == null) {
+            groupId = parentGroupId;
+        }
+        if (version == null) {
+            version = parentVersion;
+        }
+
+        // Return modelId if we have all required components
+        if (groupId != null && artifactId != null && version != null) {
+            return groupId + ":" + artifactId + ":" + version;
+        }
+
+        return null;
     }
 
     /**

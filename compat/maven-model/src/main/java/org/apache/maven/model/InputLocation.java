@@ -64,10 +64,21 @@ public final class InputLocation implements java.io.Serializable, Cloneable, Inp
      */
     private InputLocation importedFrom;
 
+    /**
+     * Cached hashCode for performance.
+     */
+    private volatile int hashCode = 0;
+
     // ----------------/
     // - Constructors -/
     // ----------------/
 
+    /**
+     * Creates a new InputLocation from an API model InputLocation.
+     * This constructor is used for converting between the API model and the compat model.
+     *
+     * @param location the API model InputLocation to convert from
+     */
     public InputLocation(org.apache.maven.api.model.InputLocation location) {
         this.lineNumber = location.getLineNumber();
         this.columnNumber = location.getColumnNumber();
@@ -137,10 +148,10 @@ public final class InputLocation implements java.io.Serializable, Cloneable, Inp
     } // -- int getLineNumber()
 
     /**
+     * Gets the InputLocation for a specific nested element key.
      *
-     *
-     * @param key
-     * @return InputLocation
+     * @param key the key to look up
+     * @return the InputLocation for the specified key, or null if not found
      */
     @Override
     public InputLocation getLocation(Object key) {
@@ -159,19 +170,19 @@ public final class InputLocation implements java.io.Serializable, Cloneable, Inp
     } // -- InputLocation getLocation( Object )
 
     /**
+     * Gets the map of nested element locations within this location.
      *
-     *
-     * @return Map
+     * @return a map of keys to InputLocation instances for nested elements, or null if none
      */
     public java.util.Map<Object, InputLocation> getLocations() {
         return locations;
     } // -- java.util.Map<Object, InputLocation> getLocations()
 
     /**
+     * Sets the InputLocation for a specific nested element key.
      *
-     *
-     * @param key
-     * @param location
+     * @param key the key to set the location for
+     * @param location the InputLocation to associate with the key
      */
     @Override
     public void setLocation(Object key, InputLocation location) {
@@ -192,10 +203,11 @@ public final class InputLocation implements java.io.Serializable, Cloneable, Inp
     } // -- void setLocation( Object, InputLocation )
 
     /**
+     * Sets the InputLocation for a specific nested element key in the locations map.
+     * This is a helper method that manages the internal locations map.
      *
-     *
-     * @param key
-     * @param location
+     * @param key the key to set the location for
+     * @param location the InputLocation to associate with the key
      */
     public void setOtherLocation(Object key, InputLocation location) {
         if (location != null) {
@@ -331,20 +343,26 @@ public final class InputLocation implements java.io.Serializable, Cloneable, Inp
         this.locations = locations;
     } // -- void setLocations( java.util.Map )
 
+    /**
+     * Converts this compat model InputLocation to an API model InputLocation.
+     * This method is used for converting between the compat model and the API model.
+     *
+     * @return the equivalent API model InputLocation
+     */
     public org.apache.maven.api.model.InputLocation toApiLocation() {
         if (locations != null && locations.values().contains(this)) {
             if (locations.size() == 1 && locations.values().iterator().next() == this) {
-                return new org.apache.maven.api.model.InputLocation(
+                return org.apache.maven.api.model.InputLocation.of(
                         lineNumber,
                         columnNumber,
                         source != null ? source.toApiSource() : null,
                         locations.keySet().iterator().next());
             } else {
-                return new org.apache.maven.api.model.InputLocation(
+                return org.apache.maven.api.model.InputLocation.of(
                         lineNumber, columnNumber, source != null ? source.toApiSource() : null);
             }
         } else {
-            return new org.apache.maven.api.model.InputLocation(
+            return org.apache.maven.api.model.InputLocation.of(
                     lineNumber,
                     columnNumber,
                     source != null ? source.toApiSource() : null,
@@ -377,6 +395,32 @@ public final class InputLocation implements java.io.Serializable, Cloneable, Inp
          * @return String
          */
         public abstract String toString(InputLocation location);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        InputLocation that = (InputLocation) o;
+        return lineNumber == that.lineNumber
+                && columnNumber == that.columnNumber
+                && java.util.Objects.equals(source, that.source)
+                && java.util.Objects.equals(locations, that.locations)
+                && java.util.Objects.equals(importedFrom, that.importedFrom);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = hashCode;
+        if (result == 0) {
+            result = java.util.Objects.hash(lineNumber, columnNumber, source, locations, importedFrom);
+            hashCode = result;
+        }
+        return result;
     }
 
     @Override
