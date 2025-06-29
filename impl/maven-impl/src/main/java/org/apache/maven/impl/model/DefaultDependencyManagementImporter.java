@@ -185,8 +185,6 @@ public class DefaultDependencyManagementImporter implements DependencyManagement
 
         // We modify the input location that is used for the whole file.
         // This is likely correct because the POM hierarchy applies to the whole POM, not just one dependency.
-        return Dependency.newBuilder(dependency, true)
-                .importedFrom(new InputLocation(bomLocation))
-                .build();
+        return Dependency.newBuilder(dependency, true).importedFrom(bomLocation).build();
     }
 }

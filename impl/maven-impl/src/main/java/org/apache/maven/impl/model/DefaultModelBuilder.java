@@ -21,7 +21,6 @@ package org.apache.maven.impl.model;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -49,6 +48,7 @@ import java.util.stream.Stream;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.SessionData;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.annotations.Nonnull;
@@ -64,7 +64,6 @@ import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Exclusion;
 import org.apache.maven.api.model.InputLocation;
-import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Profile;
@@ -113,6 +112,7 @@ import org.apache.maven.api.spi.ModelParserException;
 import org.apache.maven.api.spi.ModelTransformer;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.RequestTraceHelper;
+import org.apache.maven.impl.cache.Cache;
 import org.apache.maven.impl.util.PhasingExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -241,6 +241,16 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
                 return session.result;
             } finally {
+                // Clean up REQUEST_SCOPED cache entries to prevent memory leaks
+                // This is especially important for BUILD_PROJECT requests which are top-level requests
+                if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
+                    try {
+                        clearRequestScopedCache(request);
+                    } catch (Exception e) {
+                        // Log but don't fail the build due to cache cleanup issues
+                        logger.debug("Failed to clear REQUEST_SCOPED cache for request: {}", request, e);
+                    }
+                }
                 RequestTraceHelper.exit(trace);
             }
         }
@@ -1281,18 +1291,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                             e);
                 }
 
-                InputLocation loc = model.getLocation("");
-                InputSource v4src = loc != null ? loc.getSource() : null;
-                if (v4src != null) {
-                    try {
-                        Field field = InputSource.class.getDeclaredField("modelId");
-                        field.setAccessible(true);
-                        field.set(v4src, ModelProblemUtils.toId(model));
-                    } catch (Throwable t) {
-                        // TODO: use a lazy source ?
-                        throw new IllegalStateException("Unable to set modelId on InputSource", t);
-                    }
-                }
+                // ModelId is now properly set by DefaultModelXmlFactory during parsing
+                // No need for the reflection hack anymore
             } catch (XmlReaderException e) {
                 add(
                         Severity.FATAL,
@@ -1911,6 +1911,13 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
             return model;
         } finally {
+            // Clean up REQUEST_SCOPED cache entries for raw model building as well
+            try {
+                clearRequestScopedCache(request);
+            } catch (Exception e) {
+                // Log but don't fail the build due to cache cleanup issues
+                logger.debug("Failed to clear REQUEST_SCOPED cache for raw model request: {}", request, e);
+            }
             RequestTraceHelper.exit(trace);
         }
     }
@@ -2106,7 +2113,9 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         @Override
         public CacheRetention getCacheRetention() {
-            return source instanceof CacheMetadata cacheMetadata ? cacheMetadata.getCacheRetention() : null;
+            return source instanceof CacheMetadata cacheMetadata
+                    ? cacheMetadata.getCacheRetention()
+                    : CacheRetention.REQUEST_SCOPED;
         }
 
         @Override
@@ -2162,5 +2171,55 @@ public class DefaultModelBuilder implements ModelBuilder {
         public String transform(String input, String context) {
             return CONTEXTS.contains(context) ? input.intern() : input;
         }
+    }
+
+    /**
+     * Clears REQUEST_SCOPED cache entries for a specific request.
+     * <p>
+     * The method identifies the outer request and removes the corresponding cache entry from the session data.
+     *
+     * @param req the request whose REQUEST_SCOPED cache should be cleared
+     * @param <REQ> the request type
+     */
+    private <REQ extends Request<?>> void clearRequestScopedCache(REQ req) {
+        if (req.getSession() instanceof Session session) {
+            // Use the same key as DefaultRequestCache
+            SessionData.Key<Cache> key = SessionData.key(Cache.class, CacheMetadata.class);
+
+            // Get the outer request key using the same logic as DefaultRequestCache
+            Object outerRequestKey = getOuterRequest(req);
+
+            Cache<Object, Object> caches = session.getData().get(key);
+            if (caches != null) {
+                Object removedCache = caches.get(outerRequestKey);
+                if (removedCache instanceof Cache<?, ?> map) {
+                    int beforeSize = map.size();
+                    map.removeIf((k, v) -> !(k instanceof RgavCacheKey) && !(k instanceof SourceCacheKey));
+                    int afterSize = map.size();
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(
+                                "Cleared REQUEST_SCOPED cache for request: {}, removed {} entries, remaining entries: {}",
+                                outerRequestKey.getClass().getSimpleName(),
+                                afterSize - beforeSize,
+                                afterSize);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Gets the outer request for cache key purposes.
+     * This replicates the logic from DefaultRequestCache.doGetOuterRequest().
+     */
+    private Object getOuterRequest(Request<?> req) {
+        RequestTrace trace = req.getTrace();
+        if (trace != null) {
+            RequestTrace parent = trace.parent();
+            if (parent != null && parent.data() instanceof Request<?> parentRequest) {
+                return getOuterRequest(parentRequest);
+            }
+        }
+        return req;
     }
 }

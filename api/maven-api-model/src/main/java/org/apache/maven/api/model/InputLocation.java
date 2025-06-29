@@ -20,9 +20,9 @@ package org.apache.maven.api.model;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Represents the location of an element within a model source file.
@@ -40,11 +40,15 @@ public class InputLocation implements Serializable, InputLocationTracker {
     private final Map<Object, InputLocation> locations;
     private final InputLocation importedFrom;
 
+    private volatile int hashCode = 0; // Cached hashCode for performance
+
+    private static final InputLocation EMPTY = new InputLocation(-1, -1);
+
     public InputLocation(InputSource source) {
         this.lineNumber = -1;
         this.columnNumber = -1;
         this.source = source;
-        this.locations = Collections.singletonMap(0, this);
+        this.locations = ImmutableCollections.singletonMap(0, this);
         this.importedFrom = null;
     }
 
@@ -60,8 +64,9 @@ public class InputLocation implements Serializable, InputLocationTracker {
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
         this.source = source;
-        this.locations =
-                selfLocationKey != null ? Collections.singletonMap(selfLocationKey, this) : Collections.emptyMap();
+        this.locations = selfLocationKey != null
+                ? ImmutableCollections.singletonMap(selfLocationKey, this)
+                : ImmutableCollections.emptyMap();
         this.importedFrom = null;
     }
 
@@ -73,12 +78,75 @@ public class InputLocation implements Serializable, InputLocationTracker {
         this.importedFrom = null;
     }
 
-    public InputLocation(InputLocation original) {
-        this.lineNumber = original.lineNumber;
-        this.columnNumber = original.columnNumber;
-        this.source = original.source;
-        this.locations = original.locations;
-        this.importedFrom = original.importedFrom;
+    // Factory methods
+
+    public static InputLocation of() {
+        return EMPTY;
+    }
+
+    /**
+     * Creates a new InputLocation with the specified source.
+     * The created instance is processed through ModelObjectProcessor for optimization.
+     *
+     * @param source the input source
+     * @return a new InputLocation instance
+     */
+    public static InputLocation of(InputSource source) {
+        return ModelObjectProcessor.processObject(new InputLocation(source));
+    }
+
+    /**
+     * Creates a new InputLocation with the specified line and column numbers.
+     * The created instance is processed through ModelObjectProcessor for optimization.
+     *
+     * @param lineNumber the line number
+     * @param columnNumber the column number
+     * @return a new InputLocation instance
+     */
+    public static InputLocation of(int lineNumber, int columnNumber) {
+        return ModelObjectProcessor.processObject(new InputLocation(lineNumber, columnNumber));
+    }
+
+    /**
+     * Creates a new InputLocation with the specified line number, column number, and source.
+     * The created instance is processed through ModelObjectProcessor for optimization.
+     *
+     * @param lineNumber the line number
+     * @param columnNumber the column number
+     * @param source the input source
+     * @return a new InputLocation instance
+     */
+    public static InputLocation of(int lineNumber, int columnNumber, InputSource source) {
+        return ModelObjectProcessor.processObject(new InputLocation(lineNumber, columnNumber, source));
+    }
+
+    /**
+     * Creates a new InputLocation with the specified line number, column number, source, and self location key.
+     * The created instance is processed through ModelObjectProcessor for optimization.
+     *
+     * @param lineNumber the line number
+     * @param columnNumber the column number
+     * @param source the input source
+     * @param selfLocationKey the self location key
+     * @return a new InputLocation instance
+     */
+    public static InputLocation of(int lineNumber, int columnNumber, InputSource source, Object selfLocationKey) {
+        return ModelObjectProcessor.processObject(new InputLocation(lineNumber, columnNumber, source, selfLocationKey));
+    }
+
+    /**
+     * Creates a new InputLocation with the specified line number, column number, source, and locations map.
+     * The created instance is processed through ModelObjectProcessor for optimization.
+     *
+     * @param lineNumber the line number
+     * @param columnNumber the column number
+     * @param source the input source
+     * @param locations the locations map
+     * @return a new InputLocation instance
+     */
+    public static InputLocation of(
+            int lineNumber, int columnNumber, InputSource source, Map<Object, InputLocation> locations) {
+        return ModelObjectProcessor.processObject(new InputLocation(lineNumber, columnNumber, source, locations));
     }
 
     public int getLineNumber() {
@@ -184,21 +252,83 @@ public class InputLocation implements Serializable, InputLocationTracker {
         return new InputLocation(-1, -1, InputSource.merge(source.getSource(), target.getSource()), locations);
     } // -- InputLocation merge( InputLocation, InputLocation, java.util.Collection )
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        InputLocation that = (InputLocation) o;
+        return lineNumber == that.lineNumber
+                && columnNumber == that.columnNumber
+                && Objects.equals(source, that.source)
+                && safeLocationsEquals(this, locations, that, that.locations)
+                && Objects.equals(importedFrom, that.importedFrom);
+    }
+
     /**
-     * Class StringFormatter.
-     *
-     * @version $Revision$ $Date$
+     * Safely compares two locations maps, treating self-references as equal.
      */
-    public interface StringFormatter {
+    private static boolean safeLocationsEquals(
+            InputLocation this1,
+            Map<Object, InputLocation> map1,
+            InputLocation this2,
+            Map<Object, InputLocation> map2) {
+        if (map1 == map2) {
+            return true;
+        }
+        if (map1 == null || map2 == null) {
+            return false;
+        }
+        if (map1.size() != map2.size()) {
+            return false;
+        }
 
-        // -----------/
-        // - Methods -/
-        // -----------/
+        for (Map.Entry<Object, InputLocation> entry1 : map1.entrySet()) {
+            Object key = entry1.getKey();
+            InputLocation value1 = entry1.getValue();
+            InputLocation value2 = map2.get(key);
 
-        /**
-         * Method toString.
-         */
-        String toString(InputLocation location);
+            if (value1 == this1) {
+                if (value2 == this2) {
+                    continue;
+                }
+                return false;
+            } else {
+                if (Objects.equals(value1, value2)) {
+                    continue;
+                }
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = hashCode;
+        if (result == 0) {
+            result = Objects.hash(lineNumber, columnNumber, source, safeHash(locations), importedFrom);
+            hashCode = result;
+        }
+        return result;
+    }
+
+    public int safeHash(Map<Object, InputLocation> locations) {
+        if (locations == null) {
+            return 0;
+        }
+        int result = 1;
+        for (Map.Entry<Object, InputLocation> entry : locations.entrySet()) {
+            result = 31 * result + Objects.hashCode(entry.getKey());
+            if (entry.getValue() != this) {
+                result = 31 * result + Objects.hashCode(entry.getValue());
+            }
+        }
+        return result;
     }
 
     @Override

@@ -264,7 +264,9 @@ public class StringSearchModelInterpolator extends AbstractStringBasedModelInter
 
         private boolean isQualifiedForInterpolation(Class<?> cls) {
             return !cls.getPackage().getName().startsWith("java")
-                    && !cls.getPackage().getName().startsWith("sun.nio.fs");
+                    && !cls.getPackage().getName().startsWith("sun.nio.fs")
+                    // org.apache.maven.api.model.InputLocation can be self-referencing
+                    && !cls.getName().equals("org.apache.maven.api.model.InputLocation");
         }
 
         private boolean isQualifiedForInterpolation(Field field, Class<?> fieldType) {
