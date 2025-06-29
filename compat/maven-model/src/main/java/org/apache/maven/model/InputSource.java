@@ -58,6 +58,11 @@ public class InputSource implements java.io.Serializable, Cloneable {
      */
     private InputLocation importedFrom;
 
+    /**
+     * Cached hashCode for performance.
+     */
+    private volatile int hashCode = 0;
+
     // ----------------/
     // - Constructors -/
     // ----------------/
@@ -147,11 +152,35 @@ public class InputSource implements java.io.Serializable, Cloneable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        InputSource that = (InputSource) o;
+        return java.util.Objects.equals(modelId, that.modelId)
+                && java.util.Objects.equals(location, that.location)
+                && java.util.Objects.equals(importedFrom, that.importedFrom);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = hashCode;
+        if (result == 0) {
+            result = java.util.Objects.hash(modelId, location, importedFrom);
+            hashCode = result;
+        }
+        return result;
+    }
+
+    @Override
     public String toString() {
         return getModelId() + " " + getLocation();
     }
 
     public org.apache.maven.api.model.InputSource toApiSource() {
-        return new org.apache.maven.api.model.InputSource(modelId, location);
+        return org.apache.maven.api.model.InputSource.of(modelId, location);
     }
 }
