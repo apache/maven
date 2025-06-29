@@ -31,7 +31,8 @@ public class MavenITmng3991ValidDependencyScopeTest extends AbstractMavenIntegra
 
     public MavenITmng3991ValidDependencyScopeTest() {
         // TODO: One day, we should be able to error out but this requires to consider extensions and their use cases
-        super("[4.0,)");
+        // Disabled for Maven 4.x due to behavior change - see GitHub issue #2510
+        super("[5.0,)");
     }
 
     /**
