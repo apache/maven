@@ -250,6 +250,11 @@ under the License.
       <artifactId>jmh-generator-annprocess</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.google.jimfs</groupId>
+      <artifactId>jimfs</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <!-- Used in TestApi -->
     <dependency>
