@@ -38,7 +38,7 @@ public class DefaultRequestCache extends AbstractRequestCache {
             SessionData.key(ConcurrentMap.class, CacheMetadata.class);
     protected static final Object ROOT = new Object();
 
-    protected final Map<Object, CachingSupplier<?, ?>> forever = new ConcurrentHashMap<>();
+    protected final Cache<Object, CachingSupplier<?, ?>> forever = Cache.newCache();
 
     @Override
     @SuppressWarnings("unchecked")
@@ -48,13 +48,13 @@ public class DefaultRequestCache extends AbstractRequestCache {
                 req instanceof CacheMetadata metadata ? metadata.getCacheRetention() : null,
                 CacheRetention.SESSION_SCOPED);
 
-        Map<Object, CachingSupplier<?, ?>> cache = null;
+        Cache<Object, CachingSupplier<?, ?>> cache = null;
         if ((retention == CacheRetention.REQUEST_SCOPED || retention == CacheRetention.SESSION_SCOPED)
                 && req.getSession() instanceof Session session) {
             Object key = retention == CacheRetention.REQUEST_SCOPED ? doGetOuterRequest(req) : ROOT;
-            Map<Object, Map<Object, CachingSupplier<?, ?>>> caches =
+            Map<Object, Cache<Object, CachingSupplier<?, ?>>> caches =
                     session.getData().computeIfAbsent(KEY, ConcurrentHashMap::new);
-            cache = caches.computeIfAbsent(key, k -> new SoftIdentityMap<>());
+            cache = caches.computeIfAbsent(key, k -> Cache.newCache());
         } else if (retention == CacheRetention.PERSISTENT) {
             cache = forever;
         }
@@ -70,6 +70,23 @@ public class DefaultRequestCache extends AbstractRequestCache {
         while (trace != null && trace.parent() != null) {
             trace = trace.parent();
         }
-        return trace != null && trace.data() != null ? trace.data() : req;
+        Object traceData = trace != null ? trace.data() : null;
+
+        // Enhanced parent request matching with interface checking for better cache hits
+        if (traceData != null) {
+            // If the trace data implements the same interface as the request,
+            // use it for better cache key matching
+            Class<?> reqClass = req.getClass();
+            Class<?> traceClass = traceData.getClass();
+
+            // Check if they share common interfaces (excluding basic Object methods)
+            for (Class<?> reqInterface : reqClass.getInterfaces()) {
+                if (reqInterface.isAssignableFrom(traceClass)) {
+                    return traceData;
+                }
+            }
+        }
+
+        return traceData != null ? traceData : req;
     }
 }
