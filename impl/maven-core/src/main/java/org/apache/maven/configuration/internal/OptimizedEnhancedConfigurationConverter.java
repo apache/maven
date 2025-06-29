@@ -18,6 +18,9 @@
  */
 package org.apache.maven.configuration.internal;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ConfigurationListener;
 import org.codehaus.plexus.component.configurator.converters.composite.ObjectWithFieldsConverter;
@@ -28,10 +31,18 @@ import org.codehaus.plexus.component.configurator.expression.TypeAwareExpression
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
 /**
- * An enhanced {@link ObjectWithFieldsConverter} leveraging the {@link TypeAwareExpressionEvaluator}
- * interface.
+ * Optimized version of EnhancedConfigurationConverter with caching for improved performance.
+ * This implementation caches expression evaluation results and uses optimized bean helpers.
  */
-class EnhancedConfigurationConverter extends ObjectWithFieldsConverter {
+class OptimizedEnhancedConfigurationConverter extends ObjectWithFieldsConverter {
+
+    // Cache for expression evaluation results to avoid repeated evaluations
+    private static final ConcurrentMap<String, Object> EXPRESSION_CACHE = new ConcurrentHashMap<>();
+
+    // Cache for class instantiation to avoid repeated reflection
+    private static final ConcurrentMap<Class<?>, Boolean> INSTANTIATION_CACHE = new ConcurrentHashMap<>();
+
+    @Override
     protected Object fromExpression(
             final PlexusConfiguration configuration, final ExpressionEvaluator evaluator, final Class<?> type)
             throws ComponentConfigurationException {
@@ -39,10 +50,23 @@ class EnhancedConfigurationConverter extends ObjectWithFieldsConverter {
         try {
             Object result = null;
             if (null != value && !value.isEmpty()) {
-                if (evaluator instanceof TypeAwareExpressionEvaluator typeAwareExpressionEvaluator) {
-                    result = typeAwareExpressionEvaluator.evaluate(value, type);
-                } else {
-                    result = evaluator.evaluate(value);
+                // Try to get from cache first for simple expressions
+                String cacheKey = value + ":" + type.getName();
+                if (isSimpleExpression(value)) {
+                    result = EXPRESSION_CACHE.get(cacheKey);
+                }
+
+                if (result == null) {
+                    if (evaluator instanceof TypeAwareExpressionEvaluator typeAwareExpressionEvaluator) {
+                        result = typeAwareExpressionEvaluator.evaluate(value, type);
+                    } else {
+                        result = evaluator.evaluate(value);
+                    }
+
+                    // Cache simple expressions
+                    if (isSimpleExpression(value) && result != null) {
+                        EXPRESSION_CACHE.putIfAbsent(cacheKey, result);
+                    }
                 }
             }
             if (null == result && configuration.getChildCount() == 0) {
@@ -84,11 +108,11 @@ class EnhancedConfigurationConverter extends ObjectWithFieldsConverter {
             if (null == value && implType.isInterface() && configuration.getChildCount() == 0) {
                 return null; // nothing to process
             }
-            final Object bean = instantiateObject(implType);
+            final Object bean = instantiateObjectOptimized(implType);
             if (null == value) {
                 processConfiguration(lookup, bean, loader, configuration, evaluator, listener);
             } else {
-                // Use optimized helper for better performance
+                // Use our optimized helper for better performance
                 new OptimizedCompositeBeanHelper(lookup, loader, evaluator, listener)
                         .setDefault(bean, value, configuration);
             }
@@ -99,5 +123,49 @@ class EnhancedConfigurationConverter extends ObjectWithFieldsConverter {
             }
             throw e;
         }
+    }
+
+    /**
+     * Optimized object instantiation with caching.
+     */
+    private Object instantiateObjectOptimized(Class<?> implType) throws ComponentConfigurationException {
+        // Check if we've successfully instantiated this type before
+        Boolean canInstantiate = INSTANTIATION_CACHE.get(implType);
+        if (canInstantiate != null && !canInstantiate) {
+            throw new ComponentConfigurationException("Cannot instantiate " + implType);
+        }
+
+        try {
+            Object instance = instantiateObject(implType);
+            INSTANTIATION_CACHE.putIfAbsent(implType, true);
+            return instance;
+        } catch (ComponentConfigurationException e) {
+            INSTANTIATION_CACHE.putIfAbsent(implType, false);
+            throw e;
+        }
+    }
+
+    /**
+     * Check if an expression is simple enough to cache.
+     * Simple expressions are those that don't contain dynamic elements.
+     */
+    private boolean isSimpleExpression(String expression) {
+        // Don't cache expressions that contain session, project, or other dynamic references
+        return expression != null
+                && !expression.contains("${session")
+                && !expression.contains("${project")
+                && !expression.contains("${settings")
+                && !expression.contains("${env")
+                && !expression.contains("${sys")
+                && expression.length() < 100; // Don't cache very long expressions
+    }
+
+    /**
+     * Clear all caches. Useful for testing or memory management.
+     */
+    public static void clearCaches() {
+        EXPRESSION_CACHE.clear();
+        INSTANTIATION_CACHE.clear();
+        OptimizedCompositeBeanHelper.clearCaches();
     }
 }
