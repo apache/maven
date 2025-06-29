@@ -497,7 +497,12 @@ public class ${class.name}
             ) {
                 return base;
             }
-            return new ${class.name}(this);
+            ${class.name} instance = new ${class.name}(this);
+    #if ( $packageModelV4 && $packageModelV4.equals("org.apache.maven.api.model") )
+            return org.apache.maven.api.model.ModelObjectProcessor.process(instance);
+    #else
+            return instance;
+    #end
         }
 
     #if ( $locationTracking && ! $class.superClass )

@@ -41,6 +41,8 @@ public class InputSource implements Serializable {
     private final List<InputSource> inputs;
     private final InputLocation importedFrom;
 
+    private volatile int hashCode = 0; // Cached hashCode for performance
+
     public InputSource(String modelId, String location) {
         this(modelId, location, null);
     }
@@ -99,12 +101,18 @@ public class InputSource implements Serializable {
         InputSource that = (InputSource) o;
         return Objects.equals(modelId, that.modelId)
                 && Objects.equals(location, that.location)
-                && Objects.equals(inputs, that.inputs);
+                && Objects.equals(inputs, that.inputs)
+                && Objects.equals(importedFrom, that.importedFrom);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(modelId, location, inputs);
+        int result = hashCode;
+        if (result == 0) {
+            result = Objects.hash(modelId, location, inputs, importedFrom);
+            hashCode = result;
+        }
+        return result;
     }
 
     Stream<InputSource> sources() {
@@ -120,6 +128,7 @@ public class InputSource implements Serializable {
     }
 
     public static InputSource merge(InputSource src1, InputSource src2) {
-        return new InputSource(Stream.concat(src1.sources(), src2.sources()).collect(Collectors.toSet()));
+        return new InputSource(
+                Stream.concat(src1.sources(), src2.sources()).distinct().toList());
     }
 }
