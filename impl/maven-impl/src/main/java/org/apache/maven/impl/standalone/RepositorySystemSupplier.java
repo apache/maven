@@ -384,6 +384,12 @@ public class RepositorySystemSupplier {
     }
 
     @Provides
+    @Named(NameMappers.FILE_STATIC_NAME)
+    static NameMapper fileStaticNameMapper() {
+        return NameMappers.fileStaticNameMapper();
+    }
+
+    @Provides
     static RepositorySystemLifecycle newRepositorySystemLifecycle() {
         return new DefaultRepositorySystemLifecycle();
     }

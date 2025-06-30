@@ -576,6 +576,11 @@ under the License.
         <artifactId>maven-resolver-transport-wagon</artifactId>
         <version>${resolverVersion}</version>
       </dependency>
+      <dependency>
+        <groupId>org.apache.maven.resolver</groupId>
+        <artifactId>maven-resolver-named-locks-ipc</artifactId>
+        <version>${resolverVersion}</version>
+      </dependency>
       <!--  Commons -->
       <dependency>
         <groupId>commons-cli</groupId>

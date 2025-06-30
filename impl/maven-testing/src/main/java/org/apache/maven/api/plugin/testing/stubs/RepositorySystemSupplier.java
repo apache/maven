@@ -379,6 +379,7 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
         result.put(NameMappers.DISCRIMINATING_NAME, NameMappers.discriminatingNameMapper());
         result.put(NameMappers.FILE_GAV_NAME, NameMappers.fileGavNameMapper());
         result.put(NameMappers.FILE_HGAV_NAME, NameMappers.fileHashingGavNameMapper());
+        result.put(NameMappers.FILE_STATIC_NAME, NameMappers.fileStaticNameMapper());
         return result;
     }
 

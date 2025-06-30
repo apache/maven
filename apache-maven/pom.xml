@@ -63,6 +63,11 @@ under the License.
       <artifactId>wagon-file</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.apache.maven.resolver</groupId>
+      <artifactId>maven-resolver-named-locks-ipc</artifactId>
+    </dependency>
+
     <!-- CLI -->
     <dependency>
       <groupId>org.slf4j</groupId>
