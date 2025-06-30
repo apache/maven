@@ -62,8 +62,8 @@ include. Each item may be enclosed in quotes to gracefully include spaces.
 Items are trimmed before being loaded.  If the first character of an item 
 is a question mark, the load will silently fail if the file does not exist.
 ```
-${includes} = ?"${maven.user.conf}/maven.properties", \
-              ?"${maven.project.conf}/maven.properties"
+${includes} = ?"${maven.user.conf}/maven-system.properties", \
+              ?"${maven.project.conf}/maven-system.properties"
 ```
 
 ### Property Substitution
@@ -80,9 +80,13 @@ being loaded, the following properties are defined:
 * `cli.OPT` to refer to the `OPT` command line option
 * system properties
 
-The main `${maven.home}/conf/maven.properties` defines a few basic properties,
-but more importantly, loads the _user_ properties from `~/.m2/maven.properties`
-and the _project_ specific properties from `${session.rootDirectory}/.mvn/maven.properties`.
+The main system properties source `${maven.home}/conf/maven-system.properties` defines a few basic properties,
+but more importantly, loads the _user wide_ system properties from `~/.m2/maven-system.properties`
+and the _project_ specific system properties from `${session.rootDirectory}/.mvn/maven-system.properties`.
+
+The main user properties source `${maven.home}/conf/maven-user.properties` defines a few inclusions only, to
+load the _user wide_ user properties from `~/.m2/maven-user.properties` and the _project_ specific user properties 
+from `${session.rootDirectory}/.mvn/maven-user.properties`.
 
 ## Settings
 
