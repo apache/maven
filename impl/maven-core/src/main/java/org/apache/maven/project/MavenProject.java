@@ -149,7 +149,7 @@ public class MavenProject implements Cloneable {
     /**
      * All sources of this project, in the order they were added.
      */
-    private Set<SourceRoot> sources = new LinkedHashSet<>();
+    Set<SourceRoot> sources = new LinkedHashSet<>();
 
     @Deprecated
     private ArtifactRepository releaseArtifactRepository;
@@ -798,7 +798,10 @@ public class MavenProject implements Cloneable {
 
             @Override
             public ListIterator<Resource> listIterator(int index) {
-                return sources().map(MavenProject::toResource).toList().listIterator(index);
+                return sources()
+                        .map(sourceRoot -> toConnectedResource(sourceRoot, scope))
+                        .toList()
+                        .listIterator(index);
             }
 
             @Override
@@ -826,6 +829,10 @@ public class MavenProject implements Cloneable {
                 .excludes(sourceRoot.excludes())
                 .filtering(Boolean.toString(sourceRoot.stringFiltering()))
                 .build());
+    }
+
+    private Resource toConnectedResource(SourceRoot sourceRoot, ProjectScope scope) {
+        return new ConnectedResource(sourceRoot, scope, this);
     }
 
     private void addResource(ProjectScope scope, Resource resource) {
