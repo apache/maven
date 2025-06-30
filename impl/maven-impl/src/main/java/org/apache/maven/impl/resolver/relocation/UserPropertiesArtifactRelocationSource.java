@@ -199,7 +199,8 @@ public final class UserPropertiesArtifactRelocationSource implements MavenArtifa
             case 4 -> new DefaultArtifact(parts[0], parts[1], "*", parts[2], parts[3]);
             case 5 -> new DefaultArtifact(parts[0], parts[1], parts[2], parts[3], parts[4]);
             default -> throw new IllegalArgumentException("Bad artifact coordinates " + coords
-                    + ", expected format is <groupId>:<artifactId>[:<extension>[:<classifier>]]:<version>");};
+                    + ", expected format is <groupId>:<artifactId>[:<extension>[:<classifier>]]:<version>");
+        };
         return s;
     }
 }
