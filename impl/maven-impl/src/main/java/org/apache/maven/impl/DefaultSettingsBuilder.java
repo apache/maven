@@ -300,7 +300,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
     }
 
     private Path getSecuritySettings(ProtoSession session) {
-        Map<String, String> properties = session.getUserProperties();
+        Map<String, String> properties = session.getEffectiveProperties();
         String settingsSecurity = properties.get(Constants.MAVEN_SETTINGS_SECURITY);
         if (settingsSecurity != null) {
             return Paths.get(settingsSecurity);

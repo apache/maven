@@ -59,6 +59,12 @@ public interface ProtoSession {
     Map<String, String> getSystemProperties();
 
     /**
+     * Returns the properly overlaid map of properties: system + user.
+     */
+    @Nonnull
+    Map<String, String> getEffectiveProperties();
+
+    /**
      * Returns the start time of the session.
      *
      * @return the start time as an Instant object, never {@code null}
@@ -163,6 +169,7 @@ public interface ProtoSession {
         private static class Impl implements ProtoSession {
             private final Map<String, String> userProperties;
             private final Map<String, String> systemProperties;
+            private final Map<String, String> effectiveProperties;
             private final Instant startTime;
             private final Path topDirectory;
             private final Path rootDirectory;
@@ -173,8 +180,11 @@ public interface ProtoSession {
                     Instant startTime,
                     Path topDirectory,
                     Path rootDirectory) {
-                this.userProperties = requireNonNull(userProperties);
-                this.systemProperties = requireNonNull(systemProperties);
+                this.userProperties = Map.copyOf(userProperties);
+                this.systemProperties = Map.copyOf(systemProperties);
+                Map<String, String> cp = new HashMap<>(systemProperties);
+                cp.putAll(userProperties);
+                this.effectiveProperties = Map.copyOf(cp);
                 this.startTime = requireNonNull(startTime);
                 this.topDirectory = requireNonNull(topDirectory);
                 this.rootDirectory = rootDirectory;
@@ -188,6 +198,11 @@ public interface ProtoSession {
             @Override
             public Map<String, String> getSystemProperties() {
                 return systemProperties;
+            }
+
+            @Override
+            public Map<String, String> getEffectiveProperties() {
+                return effectiveProperties;
             }
 
             @Override
