@@ -63,33 +63,130 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Create backport pull request
-        uses: korthout/backport-action@v3
+      - name: Set up Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Get PR information
+        id: pr-info
+        uses: actions/github-script@v7
         with:
-          # Use label pattern to detect backport-to-4.0.x labels
-          label_pattern: '^backport-to-4\.0\.x$'
-          # Target maven-4.0.x branch
-          target_branches: 'maven-4.0.x'
-          # Custom PR title
-          pull_title: '[Backport maven-4.0.x] ${pull_title}'
-          # Custom PR description
-          pull_description: |
-            # Backport to maven-4.0.x
+          script: |
+            let prNumber, prTitle, prAuthor, prDescription;
 
-            This is an automated backport of #${pull_number} to the `maven-4.0.x` branch.
+            if (context.eventName === 'pull_request_target') {
+              prNumber = context.payload.pull_request.number;
+              prTitle = context.payload.pull_request.title;
+              prAuthor = context.payload.pull_request.user.login;
+              prDescription = context.payload.pull_request.body || '';
+            } else if (context.eventName === 'issue_comment') {
+              prNumber = context.payload.issue.number;
+              const { data: pr } = await github.rest.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber
+              });
+              prTitle = pr.title;
+              prAuthor = pr.user.login;
+              prDescription = pr.body || '';
+            }
 
-            **Original PR:** #${pull_number} by @${pull_author}
+            core.setOutput('pr-number', prNumber);
+            core.setOutput('pr-title', prTitle);
+            core.setOutput('pr-author', prAuthor);
+            core.setOutput('pr-description', prDescription);
+
+      - name: Create backport branch and cherry-pick
+        id: backport
+        run: |
+          set -e
+
+          PR_NUMBER="${{ steps.pr-info.outputs.pr-number }}"
+          BRANCH_NAME="backport-${PR_NUMBER}-to-maven-4.0.x"
+
+          # Create and switch to backport branch
+          git checkout -b "$BRANCH_NAME" origin/maven-4.0.x
+
+          # Get the merge commit SHA
+          MERGE_COMMIT=$(git log --oneline --grep="Merge pull request #${PR_NUMBER}" --format="%H" -n 1 origin/master)
+
+          if [ -z "$MERGE_COMMIT" ]; then
+            echo "Could not find merge commit for PR #${PR_NUMBER}"
+            exit 1
+          fi
+
+          echo "Found merge commit: $MERGE_COMMIT"
+
+          # Get the commits from the PR (excluding the merge commit)
+          COMMITS=$(git rev-list --reverse "${MERGE_COMMIT}^1..${MERGE_COMMIT}^2")
+
+          echo "Commits to cherry-pick:"
+          echo "$COMMITS"
+
+          # Cherry-pick each commit
+          CONFLICT=false
+          for commit in $COMMITS; do
+            echo "Cherry-picking $commit"
+            if ! git cherry-pick -x "$commit"; then
+              echo "Conflict detected during cherry-pick of $commit"
+              CONFLICT=true
+              # Add the conflicted files and commit
+              git add .
+              git -c core.editor=true cherry-pick --continue || true
+              break
+            fi
+          done
+
+          # Push the branch
+          git push origin "$BRANCH_NAME"
+
+          echo "branch-name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+          echo "has-conflicts=$CONFLICT" >> $GITHUB_OUTPUT
+
+      - name: Create backport pull request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = '${{ steps.pr-info.outputs.pr-number }}';
+            const prTitle = '${{ steps.pr-info.outputs.pr-title }}';
+            const prAuthor = '${{ steps.pr-info.outputs.pr-author }}';
+            const prDescription = `${{ steps.pr-info.outputs.pr-description }}`;
+            const branchName = '${{ steps.backport.outputs.branch-name }}';
+            const hasConflicts = '${{ steps.backport.outputs.has-conflicts }}' === 'true';
+
+            const title = `[Backport maven-4.0.x] ${prTitle}`;
+            const body = `# Backport to maven-4.0.x
+
+            This is an automated backport of #${prNumber} to the \`maven-4.0.x\` branch.
+
+            **Original PR:** #${prNumber} by @${prAuthor}
+
+            ${hasConflicts ? '⚠️ **This PR has conflicts that need to be resolved manually.**' : ''}
 
             ---
 
-            ${pull_description}
-          # Add labels to backport PRs
-          add_labels: 'auto-port'
-          # Handle conflicts gracefully
-          experimental: |
-            {
-              "conflict_resolution": "draft_commit_conflicts"
-            }
+            ${prDescription}`;
+
+            const { data: pr } = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              head: branchName,
+              base: 'maven-4.0.x',
+              body: body,
+              draft: hasConflicts
+            });
+
+            // Add auto-port label
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              labels: ['auto-port']
+            });
+
+            console.log(`Created backport PR #${pr.number}: ${pr.html_url}`);
 
   forward-port:
     name: Forward-port to master
@@ -125,30 +222,127 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Create forward-port pull request
-        uses: korthout/backport-action@v3
+      - name: Set up Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Get PR information
+        id: pr-info
+        uses: actions/github-script@v7
         with:
-          # Use label pattern to detect forward-port-to-master labels
-          label_pattern: '^forward-port-to-master$'
-          # Target master branch
-          target_branches: 'master'
-          # Custom PR title
-          pull_title: '[Forward-port master] ${pull_title}'
-          # Custom PR description
-          pull_description: |
-            # Forward-port to master
+          script: |
+            let prNumber, prTitle, prAuthor, prDescription;
 
-            This is an automated forward-port of #${pull_number} to the `master` branch.
+            if (context.eventName === 'pull_request_target') {
+              prNumber = context.payload.pull_request.number;
+              prTitle = context.payload.pull_request.title;
+              prAuthor = context.payload.pull_request.user.login;
+              prDescription = context.payload.pull_request.body || '';
+            } else if (context.eventName === 'issue_comment') {
+              prNumber = context.payload.issue.number;
+              const { data: pr } = await github.rest.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber
+              });
+              prTitle = pr.title;
+              prAuthor = pr.user.login;
+              prDescription = pr.body || '';
+            }
 
-            **Original PR:** #${pull_number} by @${pull_author}
+            core.setOutput('pr-number', prNumber);
+            core.setOutput('pr-title', prTitle);
+            core.setOutput('pr-author', prAuthor);
+            core.setOutput('pr-description', prDescription);
+
+      - name: Create forward-port branch and cherry-pick
+        id: forward-port
+        run: |
+          set -e
+
+          PR_NUMBER="${{ steps.pr-info.outputs.pr-number }}"
+          BRANCH_NAME="backport-${PR_NUMBER}-to-master"
+
+          # Create and switch to forward-port branch
+          git checkout -b "$BRANCH_NAME" origin/master
+
+          # Get the merge commit SHA
+          MERGE_COMMIT=$(git log --oneline --grep="Merge pull request #${PR_NUMBER}" --format="%H" -n 1 origin/maven-4.0.x)
+
+          if [ -z "$MERGE_COMMIT" ]; then
+            echo "Could not find merge commit for PR #${PR_NUMBER}"
+            exit 1
+          fi
+
+          echo "Found merge commit: $MERGE_COMMIT"
+
+          # Get the commits from the PR (excluding the merge commit)
+          COMMITS=$(git rev-list --reverse "${MERGE_COMMIT}^1..${MERGE_COMMIT}^2")
+
+          echo "Commits to cherry-pick:"
+          echo "$COMMITS"
+
+          # Cherry-pick each commit
+          CONFLICT=false
+          for commit in $COMMITS; do
+            echo "Cherry-picking $commit"
+            if ! git cherry-pick -x "$commit"; then
+              echo "Conflict detected during cherry-pick of $commit"
+              CONFLICT=true
+              # Add the conflicted files and commit
+              git add .
+              git -c core.editor=true cherry-pick --continue || true
+              break
+            fi
+          done
+
+          # Push the branch
+          git push origin "$BRANCH_NAME"
+
+          echo "branch-name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+          echo "has-conflicts=$CONFLICT" >> $GITHUB_OUTPUT
+
+      - name: Create forward-port pull request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = '${{ steps.pr-info.outputs.pr-number }}';
+            const prTitle = '${{ steps.pr-info.outputs.pr-title }}';
+            const prAuthor = '${{ steps.pr-info.outputs.pr-author }}';
+            const prDescription = `${{ steps.pr-info.outputs.pr-description }}`;
+            const branchName = '${{ steps.forward-port.outputs.branch-name }}';
+            const hasConflicts = '${{ steps.forward-port.outputs.has-conflicts }}' === 'true';
+
+            const title = `[Forward-port master] ${prTitle}`;
+            const body = `# Forward-port to master
+
+            This is an automated forward-port of #${prNumber} to the \`master\` branch.
+
+            **Original PR:** #${prNumber} by @${prAuthor}
+
+            ${hasConflicts ? '⚠️ **This PR has conflicts that need to be resolved manually.**' : ''}
 
             ---
 
-            ${pull_description}
-          # Add labels to forward-port PRs
-          add_labels: 'auto-port'
-          # Handle conflicts gracefully
-          experimental: |
-            {
-              "conflict_resolution": "draft_commit_conflicts"
-            }
+            ${prDescription}`;
+
+            const { data: pr } = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              head: branchName,
+              base: 'master',
+              body: body,
+              draft: hasConflicts
+            });
+
+            // Add auto-port label
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              labels: ['auto-port']
+            });
+
+            console.log(`Created forward-port PR #${pr.number}: ${pr.html_url}`);

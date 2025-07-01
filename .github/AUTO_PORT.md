@@ -20,11 +20,11 @@ This document describes the automated porting system for Maven that helps mainta
 
 ## Overview
 
-The auto-port system uses the proven [korthout/backport-action](https://github.com/korthout/backport-action) to automatically create cherry-pick PRs to port changes between branches when:
+The auto-port system automatically creates cherry-pick PRs to port changes between branches when:
 1. PRs with port labels are merged
 2. Comment commands are used on merged PRs
 
-This system is more reliable and maintainable than custom solutions, leveraging a battle-tested GitHub Action used by many open-source projects.
+This system uses only built-in GitHub Actions to comply with Apache Software Foundation policies that prohibit external actions.
 
 ## Labels
 
@@ -73,7 +73,7 @@ The backport action automatically creates branches with the pattern:
 - **Forward-port branches**: `backport-{pr-number}-to-master`
 
 ### Cherry-pick Process
-The [korthout/backport-action](https://github.com/korthout/backport-action) handles the cherry-picking:
+The auto-port system handles the cherry-picking:
 1. Creates a new branch from the target branch
 2. Cherry-picks commits using `git cherry-pick -x` for traceability
 3. Automatically detects the appropriate commits based on merge method
@@ -154,7 +154,7 @@ When cherry-pick conflicts occur:
 
 ### Implementation
 - **Workflow File**: `.github/workflows/auto-port.yml`
-- **Action Used**: [korthout/backport-action@v3](https://github.com/korthout/backport-action)
+- **Actions Used**: Built-in GitHub Actions only (`actions/checkout@v4`, `actions/github-script@v7`)
 - **Trigger**: `pull_request_target` (for merged PRs) and `issue_comment` (for commands)
 
 ### Permissions Required
@@ -167,11 +167,11 @@ When cherry-pick conflicts occur:
 - Permission checks for comment commands
 - Respects branch protection rules
 
-### Advantages of Using korthout/backport-action
-- **Battle-tested**: Used by many open-source projects
+### Advantages of Custom Implementation
+- **ASF Compliant**: Uses only built-in GitHub Actions as required by Apache Software Foundation
 - **Reliable**: Handles edge cases and different merge methods
-- **Maintained**: Actively developed and updated
-- **Flexible**: Supports various conflict resolution strategies
-- **Fast**: Optimized for performance with shallow clones
+- **Transparent**: All logic is visible in the workflow file
+- **Flexible**: Supports conflict resolution with draft PRs
+- **Secure**: No external dependencies or third-party actions
 
 For questions or issues with the auto-port system, please create an issue or contact the maintainers.
