@@ -94,6 +94,15 @@ public interface Session extends ProtoSession {
     SessionData getData();
 
     /**
+     * Default implementation at {@link ProtoSession} level, as there notion of project
+     * does not exist.
+     */
+    @Nonnull
+    default Map<String, String> getEffectiveProperties() {
+        return getEffectiveProperties(null);
+    }
+
+    /**
      * Each invocation computes a new map of effective properties. To be used in interpolation.
      * <p>
      * Effective properties are computed from system, user and optionally project properties, layered with

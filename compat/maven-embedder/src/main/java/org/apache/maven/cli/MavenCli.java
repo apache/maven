@@ -916,7 +916,7 @@ public class MavenCli {
                 slf4jLogger.warn(
                         "The property '{}' has been set using a JVM system property which is deprecated. "
                                 + "The property can be passed as a Maven argument or in the Maven project configuration file,"
-                                + "usually located at ${session.rootDirectory}/.mvn/maven.properties.",
+                                + "usually located at ${session.rootDirectory}/.mvn/maven-user.properties.",
                         Constants.MAVEN_EXT_CLASS_PATH);
             }
         }
@@ -1409,7 +1409,7 @@ public class MavenCli {
                 slf4jLogger.warn(
                         "The property '{}' has been set using a JVM system property which is deprecated. "
                                 + "The property can be passed as a Maven argument or in the Maven project configuration file,"
-                                + "usually located at ${session.rootDirectory}/.mvn/maven.properties.",
+                                + "usually located at ${session.rootDirectory}/.mvn/maven-user.properties.",
                         Constants.MAVEN_REPO_LOCAL);
             }
         }
@@ -1669,8 +1669,10 @@ public class MavenCli {
         } else {
             mavenConf = fileSystem.getPath("");
         }
-        Path propertiesFile = mavenConf.resolve("maven.properties");
-        MavenPropertiesLoader.loadProperties(userProperties, propertiesFile, callback, false);
+        Path systemPropertiesFile = mavenConf.resolve("maven-system.properties");
+        MavenPropertiesLoader.loadProperties(systemProperties, systemPropertiesFile, callback, false);
+        Path userPropertiesFile = mavenConf.resolve("maven-user.properties");
+        MavenPropertiesLoader.loadProperties(userProperties, userPropertiesFile, callback, false);
 
         // ----------------------------------------------------------------------
         // I'm leaving the setting of system properties here as not to break

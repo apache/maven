@@ -250,11 +250,11 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected void configureLogging(C context) throws Exception {
         // LOG COLOR
-        Map<String, String> userProperties = context.protoSession.getUserProperties();
+        Map<String, String> configProperties = context.protoSession.getEffectiveProperties();
         String styleColor = context.options()
                 .color()
-                .orElse(userProperties.getOrDefault(
-                        Constants.MAVEN_STYLE_COLOR_PROPERTY, userProperties.getOrDefault("style.color", "auto")))
+                .orElse(configProperties.getOrDefault(
+                        Constants.MAVEN_STYLE_COLOR_PROPERTY, configProperties.getOrDefault("style.color", "auto")))
                 .toLowerCase(Locale.ENGLISH);
         if ("always".equals(styleColor) || "yes".equals(styleColor) || "force".equals(styleColor)) {
             context.coloredOutput = true;
@@ -592,7 +592,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             }
         } else {
             String userSettingsFileStr =
-                    context.protoSession.getUserProperties().get(Constants.MAVEN_USER_SETTINGS);
+                    context.protoSession.getEffectiveProperties().get(Constants.MAVEN_USER_SETTINGS);
             if (userSettingsFileStr != null) {
                 userSettingsFile =
                         context.userDirectory.resolve(userSettingsFileStr).normalize();
@@ -610,7 +610,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             }
         } else {
             String projectSettingsFileStr =
-                    context.protoSession.getUserProperties().get(Constants.MAVEN_PROJECT_SETTINGS);
+                    context.protoSession.getEffectiveProperties().get(Constants.MAVEN_PROJECT_SETTINGS);
             if (projectSettingsFileStr != null) {
                 projectSettingsFile = context.cwd.resolve(projectSettingsFileStr);
             }
@@ -627,7 +627,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             }
         } else {
             String installationSettingsFileStr =
-                    context.protoSession.getUserProperties().get(Constants.MAVEN_INSTALLATION_SETTINGS);
+                    context.protoSession.getEffectiveProperties().get(Constants.MAVEN_INSTALLATION_SETTINGS);
             if (installationSettingsFileStr != null) {
                 installationSettingsFile = context.installationDirectory
                         .resolve(installationSettingsFileStr)
@@ -639,8 +639,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         context.projectSettingsPath = projectSettingsFile;
         context.userSettingsPath = userSettingsFile;
 
-        UnaryOperator<String> interpolationSource = Interpolator.chain(
-                context.protoSession.getUserProperties()::get, context.protoSession.getSystemProperties()::get);
+        UnaryOperator<String> interpolationSource =
+                Interpolator.chain(context.protoSession.getEffectiveProperties()::get);
         SettingsBuilderRequest settingsRequest = SettingsBuilderRequest.builder()
                 .session(context.protoSession)
                 .installationSettingsSource(
@@ -726,14 +726,15 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected Path localRepositoryPath(C context) {
         // user override
-        String userDefinedLocalRepo = context.protoSession.getUserProperties().get(Constants.MAVEN_REPO_LOCAL);
+        String userDefinedLocalRepo =
+                context.protoSession.getEffectiveProperties().get(Constants.MAVEN_REPO_LOCAL);
         if (userDefinedLocalRepo == null) {
-            userDefinedLocalRepo = context.protoSession.getUserProperties().get(Constants.MAVEN_REPO_LOCAL);
+            userDefinedLocalRepo = context.protoSession.getEffectiveProperties().get(Constants.MAVEN_REPO_LOCAL);
             if (userDefinedLocalRepo != null) {
                 context.logger.warn("The property '" + Constants.MAVEN_REPO_LOCAL
                         + "' has been set using a JVM system property which is deprecated. "
                         + "The property can be passed as a Maven argument or in the Maven project configuration file,"
-                        + "usually located at ${session.rootDirectory}/.mvn/maven.properties.");
+                        + "usually located at ${session.rootDirectory}/.mvn/maven-user.properties.");
             }
         }
         if (userDefinedLocalRepo != null) {
@@ -746,7 +747,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         }
         // defaults
         return context.userDirectory
-                .resolve(context.protoSession.getUserProperties().get(Constants.MAVEN_USER_CONF))
+                .resolve(context.protoSession.getEffectiveProperties().get(Constants.MAVEN_USER_CONF))
                 .resolve("repository")
                 .normalize();
     }
