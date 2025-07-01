@@ -1,0 +1,154 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+name: Auto Port
+
+on:
+  pull_request_target:
+    types: [closed]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  backport:
+    name: Backport to maven-4.0.x
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'pull_request_target' &&
+       github.event.pull_request.merged &&
+       github.event.pull_request.base.ref == 'master' &&
+       contains(github.event.pull_request.labels.*.name, 'backport-to-4.0.x')) ||
+      (github.event_name == 'issue_comment' &&
+       github.event.issue.pull_request &&
+       contains(github.event.comment.body, '/backport'))
+
+    steps:
+      - name: Check comment permissions
+        if: github.event_name == 'issue_comment'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: collaborator } = await github.rest.repos.getCollaboratorPermissionLevel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              username: context.actor
+            });
+
+            if (!['admin', 'write'].includes(collaborator.permission)) {
+              core.setFailed(`@${context.actor} does not have permission to trigger backport commands`);
+              return;
+            }
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create backport pull request
+        uses: korthout/backport-action@v3
+        with:
+          # Use label pattern to detect backport-to-4.0.x labels
+          label_pattern: '^backport-to-4\.0\.x$'
+          # Target maven-4.0.x branch
+          target_branches: 'maven-4.0.x'
+          # Custom PR title
+          pull_title: '[Backport maven-4.0.x] ${pull_title}'
+          # Custom PR description
+          pull_description: |
+            # Backport to maven-4.0.x
+
+            This is an automated backport of #${pull_number} to the `maven-4.0.x` branch.
+
+            **Original PR:** #${pull_number} by @${pull_author}
+
+            ---
+
+            ${pull_description}
+          # Add labels to backport PRs
+          add_labels: 'auto-port'
+          # Handle conflicts gracefully
+          experimental: |
+            {
+              "conflict_resolution": "draft_commit_conflicts"
+            }
+
+  forward-port:
+    name: Forward-port to master
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'pull_request_target' &&
+       github.event.pull_request.merged &&
+       github.event.pull_request.base.ref == 'maven-4.0.x' &&
+       contains(github.event.pull_request.labels.*.name, 'forward-port-to-master')) ||
+      (github.event_name == 'issue_comment' &&
+       github.event.issue.pull_request &&
+       contains(github.event.comment.body, '/forward-port'))
+
+    steps:
+      - name: Check comment permissions
+        if: github.event_name == 'issue_comment'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: collaborator } = await github.rest.repos.getCollaboratorPermissionLevel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              username: context.actor
+            });
+
+            if (!['admin', 'write'].includes(collaborator.permission)) {
+              core.setFailed(`@${context.actor} does not have permission to trigger forward-port commands`);
+              return;
+            }
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create forward-port pull request
+        uses: korthout/backport-action@v3
+        with:
+          # Use label pattern to detect forward-port-to-master labels
+          label_pattern: '^forward-port-to-master$'
+          # Target master branch
+          target_branches: 'master'
+          # Custom PR title
+          pull_title: '[Forward-port master] ${pull_title}'
+          # Custom PR description
+          pull_description: |
+            # Forward-port to master
+
+            This is an automated forward-port of #${pull_number} to the `master` branch.
+
+            **Original PR:** #${pull_number} by @${pull_author}
+
+            ---
+
+            ${pull_description}
+          # Add labels to forward-port PRs
+          add_labels: 'auto-port'
+          # Handle conflicts gracefully
+          experimental: |
+            {
+              "conflict_resolution": "draft_commit_conflicts"
+            }
