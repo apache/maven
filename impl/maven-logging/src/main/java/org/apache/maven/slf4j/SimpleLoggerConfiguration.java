@@ -232,7 +232,7 @@ public class SimpleLoggerConfiguration {
         } else {
             try {
                 FileOutputStream fos = new FileOutputStream(logFile, true);
-                PrintStream printStream = new PrintStream(fos);
+                PrintStream printStream = new PrintStream(fos, true);
                 return new OutputChoice(printStream);
             } catch (FileNotFoundException e) {
                 Reporter.error("Could not open [" + logFile + "]. Defaulting to System.err", e);
