@@ -56,8 +56,6 @@ public class ToolboxToolTest {
         if (System.getProperty("localRepository") != null) {
             builder.argument("-Dmaven.repo.local.tail=" + System.getProperty("localRepository"));
         }
-        // TODO: The default IPC locking has testing issues fixed in https://github.com/apache/maven-resolver/pull/1514
-        builder.argument("-Daether.syncContext.named.factory=rwlock-local");
         return builder;
     }
 

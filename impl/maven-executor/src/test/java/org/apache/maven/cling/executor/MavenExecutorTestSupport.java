@@ -329,16 +329,11 @@ public abstract class MavenExecutorTestSupport {
     }
 
     public static ExecutorRequest.Builder mvn3ExecutorRequestBuilder() {
-        return ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven3home")))
-                // if IPC locking used; do not fork to have to wait for forked process to die off
-                .argument("-Daether.named.ipc.nofork");
+        return ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven3home")));
     }
 
     public static ExecutorRequest.Builder mvn4ExecutorRequestBuilder() {
-        return ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven4home")))
-                // TODO: The default IPC locking has testing issues fixed in
-                // https://github.com/apache/maven-resolver/pull/1514
-                .argument("-Daether.syncContext.named.factory=rwlock-local");
+        return ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven4home")));
     }
 
     protected void layDownFiles(Path cwd) throws IOException {
