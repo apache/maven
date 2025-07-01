@@ -26,6 +26,15 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    target-branch: "maven-4.0.x"
+    labels:
+      - "mvn40"
+      - "dependencies"
+
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "daily"
     target-branch: "maven-3.9.x"
     labels:
       - "mvn3"
@@ -35,6 +44,15 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "maven-4.0.x"
+    labels:
+      - "mvn40"
+      - "dependencies"
 
   - package-ecosystem: "github-actions"
     directory: "/"
