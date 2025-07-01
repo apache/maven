@@ -56,6 +56,8 @@ public class ToolboxToolTest {
         if (System.getProperty("localRepository") != null) {
             builder.argument("-Dmaven.repo.local.tail=" + System.getProperty("localRepository"));
         }
+        // if IPC locking used; do not fork to have to wait for forked process to die off
+        builder.argument("-Daether.named.ipc.nofork");
         return builder;
     }
 

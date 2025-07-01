@@ -329,11 +329,15 @@ public abstract class MavenExecutorTestSupport {
     }
 
     public static ExecutorRequest.Builder mvn3ExecutorRequestBuilder() {
-        return ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven3home")));
+        return ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven3home")))
+                // if IPC locking used; do not fork to have to wait for forked process to die off
+                .argument("-Daether.named.ipc.nofork");
     }
 
     public static ExecutorRequest.Builder mvn4ExecutorRequestBuilder() {
-        return ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven4home")));
+        return ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven4home")))
+                // if IPC locking used; do not fork to have to wait for forked process to die off
+                .argument("-Daether.named.ipc.nofork");
     }
 
     protected void layDownFiles(Path cwd) throws IOException {
