@@ -147,7 +147,7 @@ under the License.
     <byteBuddyVersion>1.17.5</byteBuddyVersion>
     <classWorldsVersion>2.9.0</classWorldsVersion>
     <commonsCliVersion>1.9.0</commonsCliVersion>
-    <guiceVersion>5.1.0</guiceVersion>
+    <guiceVersion>7.0.0</guiceVersion>
     <guavaVersion>33.4.8-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
     <hamcrestVersion>3.0</hamcrestVersion>
