@@ -48,7 +48,6 @@ import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.cisupport.CIInfo;
 import org.apache.maven.api.cli.logging.AccumulatingLogger;
 import org.apache.maven.api.services.BuilderProblem;
-import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.services.MessageBuilder;
@@ -250,11 +249,11 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected void configureLogging(C context) throws Exception {
         // LOG COLOR
-        Map<String, String> configProperties = context.protoSession.getEffectiveProperties();
+        Map<String, String> effectiveProperties = context.protoSession.getEffectiveProperties();
         String styleColor = context.options()
                 .color()
-                .orElse(configProperties.getOrDefault(
-                        Constants.MAVEN_STYLE_COLOR_PROPERTY, configProperties.getOrDefault("style.color", "auto")))
+                .orElse(effectiveProperties.getOrDefault(
+                        Constants.MAVEN_STYLE_COLOR_PROPERTY, effectiveProperties.getOrDefault("style.color", "auto")))
                 .toLowerCase(Locale.ENGLISH);
         if ("always".equals(styleColor) || "yes".equals(styleColor) || "force".equals(styleColor)) {
             context.coloredOutput = true;
@@ -639,8 +638,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         context.projectSettingsPath = projectSettingsFile;
         context.userSettingsPath = userSettingsFile;
 
-        UnaryOperator<String> interpolationSource =
-                Interpolator.chain(context.protoSession.getEffectiveProperties()::get);
+        UnaryOperator<String> interpolationSource = context.protoSession.getEffectiveProperties()::get;
         SettingsBuilderRequest settingsRequest = SettingsBuilderRequest.builder()
                 .session(context.protoSession)
                 .installationSettingsSource(
