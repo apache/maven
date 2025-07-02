@@ -80,14 +80,14 @@ public @interface Config {
     enum Source {
         /**
          * Maven system properties. These properties are evaluated very early during the boot process,
-         * typically set by Maven itself and flagged as readOnly=true. System properties are initialized
-         * before the build starts and are available throughout the entire Maven execution. They are used
-         * for core Maven functionality that needs to be established at startup.
+         * typically set by Maven itself and flagged as readOnly=true or by users via maven-system.properties files.
+         * System properties are initialized before the build starts and are available throughout the entire Maven
+         * execution. They are used for core Maven functionality that needs to be established at startup.
          */
         SYSTEM_PROPERTIES,
         /**
          * Maven user properties. These are properties that users configure through various means such as
-         * maven.properties files, maven.config files, command line parameters (-D flags), settings.xml,
+         * maven-user.properties files, maven.config files, command line parameters (-D flags), settings.xml,
          * or environment variables. They are evaluated during the build process and represent the primary
          * way for users to customize Maven's behavior at runtime.
          */

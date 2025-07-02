@@ -120,13 +120,7 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
 
         container.setLoggerManager(createLoggerManager());
         ProtoSession protoSession = context.protoSession;
-        UnaryOperator<String> extensionSource = expression -> {
-            String value = protoSession.getUserProperties().get(expression);
-            if (value == null) {
-                value = protoSession.getSystemProperties().get(expression);
-            }
-            return value;
-        };
+        UnaryOperator<String> extensionSource = protoSession.getEffectiveProperties()::get;
         List<Throwable> failures = new ArrayList<>();
         for (LoadedCoreExtension extension : loadedExtensions) {
             container.discoverComponents(
