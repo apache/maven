@@ -94,8 +94,8 @@ public interface Session extends ProtoSession {
     SessionData getData();
 
     /**
-     * Default implementation at {@link ProtoSession} level, as there notion of project
-     * does not exist.
+     * Default implementation at {@link ProtoSession} level, as the notion of project
+     * does not exist there.
      */
     @Nonnull
     default Map<String, String> getEffectiveProperties() {

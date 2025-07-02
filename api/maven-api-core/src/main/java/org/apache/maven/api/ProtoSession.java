@@ -169,7 +169,7 @@ public interface ProtoSession {
         private static class Impl implements ProtoSession {
             private final Map<String, String> userProperties;
             private final Map<String, String> systemProperties;
-            private final Map<String, String> configProperties;
+            private final Map<String, String> effectiveProperties;
             private final Instant startTime;
             private final Path topDirectory;
             private final Path rootDirectory;
@@ -184,7 +184,7 @@ public interface ProtoSession {
                 this.systemProperties = Map.copyOf(systemProperties);
                 Map<String, String> cp = new HashMap<>(systemProperties);
                 cp.putAll(userProperties);
-                this.configProperties = Map.copyOf(cp);
+                this.effectiveProperties = Map.copyOf(cp);
                 this.startTime = requireNonNull(startTime);
                 this.topDirectory = requireNonNull(topDirectory);
                 this.rootDirectory = rootDirectory;
@@ -202,7 +202,7 @@ public interface ProtoSession {
 
             @Override
             public Map<String, String> getEffectiveProperties() {
-                return configProperties;
+                return effectiveProperties;
             }
 
             @Override
