@@ -183,6 +183,7 @@ public abstract class BaseParser implements Parser {
                     context.systemProperties::get));
         }
 
+        // below we use effective properties as both system + user are present
         // core extensions
         try {
             context.extensions = readCoreExtensionsDescriptor(context);
@@ -363,6 +364,7 @@ public abstract class BaseParser implements Parser {
 
         EnvironmentUtils.addEnvVars(systemProperties);
         SystemProperties.addSystemProperties(systemProperties);
+        systemProperties.putAll(context.systemPropertiesOverrides);
 
         // ----------------------------------------------------------------------
         // Properties containing info about the currently running version of Maven
@@ -392,6 +394,31 @@ public abstract class BaseParser implements Parser {
 
         String mavenBuildVersion = CLIReportingUtils.createMavenVersionString(buildProperties);
         systemProperties.setProperty(Constants.MAVEN_BUILD_VERSION, mavenBuildVersion);
+
+        Path mavenConf;
+        if (systemProperties.getProperty(Constants.MAVEN_INSTALLATION_CONF) != null) {
+            mavenConf = context.installationDirectory.resolve(
+                    systemProperties.getProperty(Constants.MAVEN_INSTALLATION_CONF));
+        } else if (systemProperties.getProperty("maven.conf") != null) {
+            mavenConf = context.installationDirectory.resolve(systemProperties.getProperty("maven.conf"));
+        } else if (systemProperties.getProperty(Constants.MAVEN_HOME) != null) {
+            mavenConf = context.installationDirectory
+                    .resolve(systemProperties.getProperty(Constants.MAVEN_HOME))
+                    .resolve("conf");
+        } else {
+            mavenConf = context.installationDirectory.resolve("");
+        }
+
+        UnaryOperator<String> callback = or(
+                context.extraInterpolationSource()::get,
+                context.systemPropertiesOverrides::get,
+                systemProperties::getProperty);
+        Path propertiesFile = mavenConf.resolve("maven-system.properties");
+        try {
+            MavenPropertiesLoader.loadProperties(systemProperties, propertiesFile, callback, false);
+        } catch (IOException e) {
+            throw new IllegalStateException("Error loading properties from " + propertiesFile, e);
+        }
 
         Map<String, String> result = toMap(systemProperties);
         result.putAll(context.systemPropertiesOverrides);
@@ -431,12 +458,15 @@ public abstract class BaseParser implements Parser {
         } else {
             mavenConf = context.installationDirectory.resolve("");
         }
-        Path propertiesFile = mavenConf.resolve("maven.properties");
+        Path propertiesFile = mavenConf.resolve("maven-user.properties");
         try {
             MavenPropertiesLoader.loadProperties(userProperties, propertiesFile, callback, false);
         } catch (IOException e) {
             throw new IllegalStateException("Error loading properties from " + propertiesFile, e);
         }
+
+        // Warn about deprecated maven.properties files
+        warnAboutDeprecatedPropertiesFiles(context);
 
         // CLI specified properties are most dominant
         userProperties.putAll(userSpecifiedProperties);
@@ -454,23 +484,25 @@ public abstract class BaseParser implements Parser {
         Path file;
         List<CoreExtension> loaded;
 
+        Map<String, String> eff = new HashMap<>(context.systemProperties);
+        eff.putAll(context.userProperties);
+
         // project
-        file = context.cwd.resolve(context.userProperties.get(Constants.MAVEN_PROJECT_EXTENSIONS));
+        file = context.cwd.resolve(eff.get(Constants.MAVEN_PROJECT_EXTENSIONS));
         loaded = readCoreExtensionsDescriptorFromFile(file);
         if (!loaded.isEmpty()) {
             result.add(new CoreExtensions(file, loaded));
         }
 
         // user
-        file = context.userHomeDirectory.resolve(context.userProperties.get(Constants.MAVEN_USER_EXTENSIONS));
+        file = context.userHomeDirectory.resolve(eff.get(Constants.MAVEN_USER_EXTENSIONS));
         loaded = readCoreExtensionsDescriptorFromFile(file);
         if (!loaded.isEmpty()) {
             result.add(new CoreExtensions(file, loaded));
         }
 
         // installation
-        file = context.installationDirectory.resolve(
-                context.userProperties.get(Constants.MAVEN_INSTALLATION_EXTENSIONS));
+        file = context.installationDirectory.resolve(eff.get(Constants.MAVEN_INSTALLATION_EXTENSIONS));
         loaded = readCoreExtensionsDescriptorFromFile(file);
         if (!loaded.isEmpty()) {
             result.add(new CoreExtensions(file, loaded));
@@ -529,5 +561,32 @@ public abstract class BaseParser implements Parser {
                             + detected.stream().map(CIInfo::name).collect(Collectors.joining(", ")));
         }
         return detected.get(0);
+    }
+
+    private void warnAboutDeprecatedPropertiesFiles(LocalContext context) {
+        Map<String, String> systemProperties = context.systemProperties;
+
+        // Check for deprecated ~/.m2/maven.properties
+        String userConfig = systemProperties.get("maven.user.conf");
+        Path userMavenProperties = userConfig != null ? Path.of(userConfig).resolve("maven.properties") : null;
+        if (userMavenProperties != null && Files.exists(userMavenProperties)) {
+            context.parserRequest
+                    .logger()
+                    .warn("Loading deprecated properties file: " + userMavenProperties + ". "
+                            + "Please rename to 'maven-user.properties'. "
+                            + "Support for 'maven.properties' will be removed in Maven 4.1.0.");
+        }
+
+        // Check for deprecated .mvn/maven.properties in project directory
+        String projectConfig = systemProperties.get("maven.project.conf");
+        Path projectMavenProperties =
+                projectConfig != null ? Path.of(projectConfig).resolve("maven.properties") : null;
+        if (projectMavenProperties != null && Files.exists(projectMavenProperties)) {
+            context.parserRequest
+                    .logger()
+                    .warn("Loading deprecated properties file: " + projectMavenProperties + ". "
+                            + "Please rename to 'maven-user.properties'. "
+                            + "Support for 'maven.properties' will be removed in Maven 4.1.0.");
+        }
     }
 }

@@ -916,7 +916,7 @@ public class MavenCli {
                 slf4jLogger.warn(
                         "The property '{}' has been set using a JVM system property which is deprecated. "
                                 + "The property can be passed as a Maven argument or in the Maven project configuration file,"
-                                + "usually located at ${session.rootDirectory}/.mvn/maven.properties.",
+                                + "usually located at ${session.rootDirectory}/.mvn/maven-user.properties.",
                         Constants.MAVEN_EXT_CLASS_PATH);
             }
         }
@@ -1409,7 +1409,7 @@ public class MavenCli {
                 slf4jLogger.warn(
                         "The property '{}' has been set using a JVM system property which is deprecated. "
                                 + "The property can be passed as a Maven argument or in the Maven project configuration file,"
-                                + "usually located at ${session.rootDirectory}/.mvn/maven.properties.",
+                                + "usually located at ${session.rootDirectory}/.mvn/maven-user.properties.",
                         Constants.MAVEN_REPO_LOCAL);
             }
         }
@@ -1669,8 +1669,13 @@ public class MavenCli {
         } else {
             mavenConf = fileSystem.getPath("");
         }
-        Path propertiesFile = mavenConf.resolve("maven.properties");
-        MavenPropertiesLoader.loadProperties(userProperties, propertiesFile, callback, false);
+        Path systemPropertiesFile = mavenConf.resolve("maven-system.properties");
+        MavenPropertiesLoader.loadProperties(systemProperties, systemPropertiesFile, callback, false);
+        Path userPropertiesFile = mavenConf.resolve("maven-user.properties");
+        MavenPropertiesLoader.loadProperties(userProperties, userPropertiesFile, callback, false);
+
+        // Warn about deprecated maven.properties files
+        warnAboutDeprecatedPropertiesFiles(systemProperties);
 
         // ----------------------------------------------------------------------
         // I'm leaving the setting of system properties here as not to break
@@ -1748,6 +1753,29 @@ public class MavenCli {
 
     protected ModelProcessor createModelProcessor(PlexusContainer container) throws ComponentLookupException {
         return container.lookup(ModelProcessor.class);
+    }
+
+    private void warnAboutDeprecatedPropertiesFiles(Properties systemProperties) {
+        // Check for deprecated ~/.m2/maven.properties
+        String userConfig = systemProperties.getProperty("maven.user.conf");
+        Path userMavenProperties = userConfig != null ? Path.of(userConfig).resolve("maven.properties") : null;
+        if (userMavenProperties != null && Files.exists(userMavenProperties)) {
+            slf4jLogger.warn(
+                    "Loading deprecated properties file: {}. " + "Please rename to 'maven-user.properties'. "
+                            + "Support for 'maven.properties' will be removed in Maven 4.1.0.",
+                    userMavenProperties);
+        }
+
+        // Check for deprecated .mvn/maven.properties in project directory
+        String projectConfig = systemProperties.getProperty("maven.project.conf");
+        Path projectMavenProperties =
+                projectConfig != null ? Path.of(projectConfig).resolve("maven.properties") : null;
+        if (projectMavenProperties != null && Files.exists(projectMavenProperties)) {
+            slf4jLogger.warn(
+                    "Loading deprecated properties file: {}. " + "Please rename to 'maven-user.properties'. "
+                            + "Support for 'maven.properties' will be removed in Maven 4.1.0.",
+                    projectMavenProperties);
+        }
     }
 
     public void setFileSystem(FileSystem fileSystem) {

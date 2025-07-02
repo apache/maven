@@ -1169,9 +1169,6 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             Model model = inheritanceAssembler.assembleModelInheritance(inputModel, parentModel, request, this);
 
-            // model normalization
-            model = modelNormalizer.mergeDuplicates(model, request, this);
-
             // profile activation
             profileActivationContext.setModel(model);
 
@@ -1185,6 +1182,9 @@ public class DefaultModelBuilder implements ModelBuilder {
             // model interpolation
             Model resultModel = model;
             resultModel = interpolateModel(resultModel, request, this);
+
+            // model normalization
+            resultModel = modelNormalizer.mergeDuplicates(resultModel, request, this);
 
             // url normalization
             resultModel = modelUrlNormalizer.normalize(resultModel, request);
@@ -1402,7 +1402,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 } else {
                     properties.putAll(model.getProperties());
                 }
-                properties.putAll(session.getUserProperties());
+                properties.putAll(session.getEffectiveProperties());
                 model = model.with()
                         .version(replaceCiFriendlyVersion(properties, model.getVersion()))
                         .parent(
