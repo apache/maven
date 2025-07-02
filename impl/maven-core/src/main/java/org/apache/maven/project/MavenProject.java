@@ -1241,7 +1241,7 @@ public class MavenProject implements Cloneable {
 
     public Plugin getPlugin(String pluginKey) {
         var plugin = getBuild().getDelegate().getPluginsAsMap().get(pluginKey);
-        return plugin != null ? new Plugin(plugin) : null;
+        return plugin != null ? new Plugin(plugin, getBuild()) : null;
     }
 
     /**
