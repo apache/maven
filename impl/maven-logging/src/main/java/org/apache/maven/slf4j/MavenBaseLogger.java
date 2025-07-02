@@ -229,7 +229,6 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
         synchronized (CONFIG_PARAMS) {
             targetStream.println(buf.toString());
             writeThrowable(t, targetStream);
-            targetStream.flush();
         }
     }
 
