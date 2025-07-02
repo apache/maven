@@ -1674,9 +1674,6 @@ public class MavenCli {
         Path userPropertiesFile = mavenConf.resolve("maven-user.properties");
         MavenPropertiesLoader.loadProperties(userProperties, userPropertiesFile, callback, false);
 
-        // Warn about deprecated maven.properties files
-        warnAboutDeprecatedPropertiesFiles(systemProperties);
-
         // ----------------------------------------------------------------------
         // I'm leaving the setting of system properties here as not to break
         // the SystemPropertyProfileActivator. This won't harm embedding. jvz.
@@ -1753,29 +1750,6 @@ public class MavenCli {
 
     protected ModelProcessor createModelProcessor(PlexusContainer container) throws ComponentLookupException {
         return container.lookup(ModelProcessor.class);
-    }
-
-    private void warnAboutDeprecatedPropertiesFiles(Properties systemProperties) {
-        // Check for deprecated ~/.m2/maven.properties
-        String userConfig = systemProperties.getProperty("maven.user.conf");
-        Path userMavenProperties = userConfig != null ? Path.of(userConfig).resolve("maven.properties") : null;
-        if (userMavenProperties != null && Files.exists(userMavenProperties)) {
-            slf4jLogger.warn(
-                    "Loading deprecated properties file: {}. " + "Please rename to 'maven-user.properties'. "
-                            + "Support for 'maven.properties' will be removed in Maven 4.1.0.",
-                    userMavenProperties);
-        }
-
-        // Check for deprecated .mvn/maven.properties in project directory
-        String projectConfig = systemProperties.getProperty("maven.project.conf");
-        Path projectMavenProperties =
-                projectConfig != null ? Path.of(projectConfig).resolve("maven.properties") : null;
-        if (projectMavenProperties != null && Files.exists(projectMavenProperties)) {
-            slf4jLogger.warn(
-                    "Loading deprecated properties file: {}. " + "Please rename to 'maven-user.properties'. "
-                            + "Support for 'maven.properties' will be removed in Maven 4.1.0.",
-                    projectMavenProperties);
-        }
     }
 
     public void setFileSystem(FileSystem fileSystem) {

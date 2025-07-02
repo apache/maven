@@ -465,9 +465,6 @@ public abstract class BaseParser implements Parser {
             throw new IllegalStateException("Error loading properties from " + propertiesFile, e);
         }
 
-        // Warn about deprecated maven.properties files
-        warnAboutDeprecatedPropertiesFiles(context);
-
         // CLI specified properties are most dominant
         userProperties.putAll(userSpecifiedProperties);
 
@@ -561,32 +558,5 @@ public abstract class BaseParser implements Parser {
                             + detected.stream().map(CIInfo::name).collect(Collectors.joining(", ")));
         }
         return detected.get(0);
-    }
-
-    private void warnAboutDeprecatedPropertiesFiles(LocalContext context) {
-        Map<String, String> systemProperties = context.systemProperties;
-
-        // Check for deprecated ~/.m2/maven.properties
-        String userConfig = systemProperties.get("maven.user.conf");
-        Path userMavenProperties = userConfig != null ? Path.of(userConfig).resolve("maven.properties") : null;
-        if (userMavenProperties != null && Files.exists(userMavenProperties)) {
-            context.parserRequest
-                    .logger()
-                    .warn("Loading deprecated properties file: " + userMavenProperties + ". "
-                            + "Please rename to 'maven-user.properties'. "
-                            + "Support for 'maven.properties' will be removed in Maven 4.1.0.");
-        }
-
-        // Check for deprecated .mvn/maven.properties in project directory
-        String projectConfig = systemProperties.get("maven.project.conf");
-        Path projectMavenProperties =
-                projectConfig != null ? Path.of(projectConfig).resolve("maven.properties") : null;
-        if (projectMavenProperties != null && Files.exists(projectMavenProperties)) {
-            context.parserRequest
-                    .logger()
-                    .warn("Loading deprecated properties file: " + projectMavenProperties + ". "
-                            + "Please rename to 'maven-user.properties'. "
-                            + "Support for 'maven.properties' will be removed in Maven 4.1.0.");
-        }
     }
 }
