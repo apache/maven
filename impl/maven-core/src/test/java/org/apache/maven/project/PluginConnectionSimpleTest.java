@@ -28,7 +28,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Simple test to verify that Plugin objects returned by MavenProject.getPlugin() are connected to the project model.
- * This test specifically verifies the fix for the issue where getPlugin() was returning disconnected Plugin objects.
+ * This test specifically verifies the fix for the <a href="https://github.com/apache/maven/pull/2530">issue</a> where
+ * getPlugin() was returning disconnected Plugin objects.
  */
 class PluginConnectionSimpleTest {
 
