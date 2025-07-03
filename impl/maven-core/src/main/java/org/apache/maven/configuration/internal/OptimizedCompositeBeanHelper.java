@@ -247,13 +247,7 @@ public final class OptimizedCompositeBeanHelper {
             throws ComponentConfigurationException {
 
         TypeLiteral<?> paramType = TypeLiteral.get(methodInfo.parameterType);
-        Class<?> rawPropertyType = paramType.getRawType();
-
-        if (valueType != null && rawPropertyType.isAssignableFrom(valueType)) {
-            rawPropertyType = valueType; // pick more specific type
-        }
-
-        return convertProperty(beanType, rawPropertyType, paramType.getType(), configuration);
+        return convertProperty(beanType, valueType, configuration, paramType);
     }
 
     /**
@@ -264,13 +258,19 @@ public final class OptimizedCompositeBeanHelper {
             throws ComponentConfigurationException {
 
         TypeLiteral<?> fieldType = TypeLiteral.get(field.getGenericType());
-        Class<?> rawPropertyType = fieldType.getRawType();
+        return convertProperty(beanType, valueType, configuration, fieldType);
+    }
+
+    private Object convertProperty(
+            Class<?> beanType, Class<?> valueType, PlexusConfiguration configuration, TypeLiteral<?> paramType)
+            throws ComponentConfigurationException {
+        Class<?> rawPropertyType = paramType.getRawType();
 
         if (valueType != null && rawPropertyType.isAssignableFrom(valueType)) {
             rawPropertyType = valueType; // pick more specific type
         }
 
-        return convertProperty(beanType, rawPropertyType, fieldType.getType(), configuration);
+        return convertProperty(beanType, rawPropertyType, paramType.getType(), configuration);
     }
 
     /**
