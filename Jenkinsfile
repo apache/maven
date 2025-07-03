@@ -62,7 +62,7 @@ def mavenBuild(jdk, extraArgs) {
                "MAVEN_OPTS=-Xms4G -Xmx4G -Djava.awt.headless=true"]) {
         sh "mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper -Dmaven=3.9.10"
         sh "echo run Its"
-        sh "./mvnw install $extraArgs -e -B -V -Prun-its -DmavenDistro=./apache-maven/target/apache-maven-4.1.0-SNAPSHOT-bin.zip"
+        sh "./mvnw install $extraArgs -e -B -V -Prun-its"
       }
     }
     finally {
