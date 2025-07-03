@@ -1402,7 +1402,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 } else {
                     properties.putAll(model.getProperties());
                 }
-                properties.putAll(session.getUserProperties());
+                properties.putAll(session.getEffectiveProperties());
                 model = model.with()
                         .version(replaceCiFriendlyVersion(properties, model.getVersion()))
                         .parent(
