@@ -19,6 +19,7 @@
 package org.apache.maven.configuration.internal;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
@@ -113,7 +114,7 @@ public final class OptimizedCompositeBeanHelper {
                     listener.notifyFieldChangeUsingSetter("", value, bean);
                 }
                 setterInfo.method.invoke(bean, value);
-            } catch (Exception | LinkageError e) {
+            } catch (IllegalAccessException | InvocationTargetException | LinkageError e) {
                 throw new ComponentConfigurationException(configuration, "Cannot set default", e);
             }
         }
@@ -143,7 +144,7 @@ public final class OptimizedCompositeBeanHelper {
                     methodInfo.method.invoke(bean, value);
                     return;
                 }
-            } catch (Exception | LinkageError e) {
+            } catch (IllegalAccessException | InvocationTargetException | LinkageError e) {
                 // Fall through to field access
             }
         }
@@ -160,7 +161,7 @@ public final class OptimizedCompositeBeanHelper {
                     setFieldValue(bean, field, value);
                     return;
                 }
-            } catch (Exception | LinkageError e) {
+            } catch (IllegalAccessException | LinkageError e) {
                 // Continue to error handling
             }
         }
@@ -310,10 +311,10 @@ public final class OptimizedCompositeBeanHelper {
     /**
      * Set field value with cached accessibility.
      */
-    private void setFieldValue(Object bean, Field field, Object value) throws Exception {
+    private void setFieldValue(Object bean, Field field, Object value) throws IllegalAccessException {
         Boolean isAccessible = ACCESSIBLE_FIELD_CACHE.get(field);
         if (isAccessible == null) {
-            isAccessible = field.isAccessible();
+            isAccessible = field.canAccess(bean);
             if (!isAccessible) {
                 field.setAccessible(true);
                 isAccessible = true;
