@@ -23,7 +23,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -67,10 +66,7 @@ public final class OptimizedCompositeBeanHelper {
     private record MethodInfo(Method method, Type parameterType) {}
 
     public OptimizedCompositeBeanHelper(
-            ConverterLookup lookup,
-            ClassLoader loader,
-            ExpressionEvaluator evaluator,
-            ConfigurationListener listener) {
+            ConverterLookup lookup, ClassLoader loader, ExpressionEvaluator evaluator, ConfigurationListener listener) {
         this.lookup = lookup;
         this.loader = loader;
         this.evaluator = evaluator;
@@ -123,11 +119,7 @@ public final class OptimizedCompositeBeanHelper {
     /**
      * Sets a property in the bean using cached lookups for improved performance.
      */
-    public void setProperty(
-            Object bean,
-            String propertyName,
-            Class<?> valueType,
-            PlexusConfiguration configuration)
+    public void setProperty(Object bean, String propertyName, Class<?> valueType, PlexusConfiguration configuration)
             throws ComponentConfigurationException {
 
         Class<?> beanType = bean.getClass();
