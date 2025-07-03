@@ -2260,7 +2260,7 @@ public class DefaultModelValidator implements ModelValidator {
                             + ", classifier=" + valueToValueString(dependency.getClassifier())
                             + ", type=" + valueToValueString(dependency.getType());
                 }
-                return hint; // DMK
+                return hint;
             };
         }
 
@@ -2269,16 +2269,16 @@ public class DefaultModelValidator implements ModelValidator {
         }
 
         static SourceHint pluginKey(Plugin plugin) {
-            return () -> plugin.getKey(); // PK
+            return plugin::getKey;
         }
 
         static SourceHint repoId(Repository repository) {
-            return () -> repository.getId(); // ID
+            return repository::getId;
         }
 
         @Nullable
         static SourceHint resourceDirectory(Resource resource) {
-            return () -> resource.getDirectory(); // DIR
+            return resource::getDirectory;
         }
     }
 }
