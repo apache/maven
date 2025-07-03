@@ -353,7 +353,6 @@ public final class Constants {
      *     <li>"l" or "l(num)" - lowest version or bottom list of lowest ones filter</li>
      *     <li>"s" - contextual snapshot filter</li>
      *     <li>"ns" - unconditional snapshot filter (no snapshots selected from ranges)</li>
-     *     <li>"nr" - unconditional release filter (no releases selected from ranges)</li>
      *     <li>"e(G:A:V)" - predicate filter (leaves out G:A:V from range, if hit, V can be range)</li>
      * </ul>
      * Example filter expression: <code>"h(5);s;e(org.foo:bar:1)</code> will cause: ranges are filtered for "top 5" (instead

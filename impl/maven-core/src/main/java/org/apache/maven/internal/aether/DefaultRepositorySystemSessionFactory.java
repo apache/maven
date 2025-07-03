@@ -438,8 +438,6 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
                     filters.add(new ContextualSnapshotVersionFilter());
                 } else if ("ns".equals(expression)) {
                     filters.add(new SnapshotVersionFilter());
-                } else if ("nr".equals(expression)) {
-                    // TODO: filters.add(new ReleaseVersionFilter());
                 } else if (expression.startsWith("e(") && expression.endsWith(")")) {
                     Artifact artifact = new DefaultArtifact(expression.substring(2, expression.length() - 1));
                     VersionRange versionRange =
