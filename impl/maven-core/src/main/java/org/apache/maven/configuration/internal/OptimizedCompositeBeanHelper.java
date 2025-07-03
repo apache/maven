@@ -22,8 +22,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -64,21 +63,13 @@ public final class OptimizedCompositeBeanHelper {
     /**
      * Holds information about a method including its parameter type.
      */
-    private static class MethodInfo {
-        final Method method;
-        final Type parameterType;
-
-        MethodInfo(Method method, Type parameterType) {
-            this.method = method;
-            this.parameterType = parameterType;
-        }
-    }
+    private record MethodInfo(Method method, Type parameterType) {}
 
     public OptimizedCompositeBeanHelper(
-            final ConverterLookup lookup,
-            final ClassLoader loader,
-            final ExpressionEvaluator evaluator,
-            final ConfigurationListener listener) {
+            ConverterLookup lookup,
+            ClassLoader loader,
+            ExpressionEvaluator evaluator,
+            ConfigurationListener listener) {
         this.lookup = lookup;
         this.loader = loader;
         this.evaluator = evaluator;
@@ -88,10 +79,10 @@ public final class OptimizedCompositeBeanHelper {
     /**
      * Calls the default "set" method on the bean; re-converts the configuration if necessary.
      */
-    public void setDefault(final Object bean, final Object defaultValue, final PlexusConfiguration configuration)
+    public void setDefault(Object bean, Object defaultValue, PlexusConfiguration configuration)
             throws ComponentConfigurationException {
 
-        final Class<?> beanType = bean.getClass();
+        Class<?> beanType = bean.getClass();
 
         // Find the default "set" method
         MethodInfo setterInfo = findCachedMethod(beanType, "", null);
@@ -106,7 +97,7 @@ public final class OptimizedCompositeBeanHelper {
         }
 
         Object value = defaultValue;
-        final TypeLiteral<?> paramType = TypeLiteral.get(setterInfo.parameterType);
+        TypeLiteral<?> paramType = TypeLiteral.get(setterInfo.parameterType);
 
         if (!paramType.getRawType().isInstance(value)) {
             if (configuration.getChildCount() > 0) {
@@ -132,13 +123,13 @@ public final class OptimizedCompositeBeanHelper {
      * Sets a property in the bean using cached lookups for improved performance.
      */
     public void setProperty(
-            final Object bean,
-            final String propertyName,
-            final Class<?> valueType,
-            final PlexusConfiguration configuration)
+            Object bean,
+            String propertyName,
+            Class<?> valueType,
+            PlexusConfiguration configuration)
             throws ComponentConfigurationException {
 
-        final Class<?> beanType = bean.getClass();
+        Class<?> beanType = bean.getClass();
 
         // Try setter/adder methods first
         MethodInfo methodInfo = findCachedMethod(beanType, propertyName, valueType);
@@ -324,18 +315,12 @@ public final class OptimizedCompositeBeanHelper {
         if (isAccessible == null) {
             isAccessible = field.isAccessible();
             if (!isAccessible) {
-                AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
-                    field.setAccessible(true);
-                    return null;
-                });
+                field.setAccessible(true);
                 isAccessible = true;
             }
             ACCESSIBLE_FIELD_CACHE.put(field, isAccessible);
         } else if (!isAccessible) {
-            AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
-                field.setAccessible(true);
-                return null;
-            });
+            field.setAccessible(true);
             ACCESSIBLE_FIELD_CACHE.put(field, true);
         }
 
