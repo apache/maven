@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -55,6 +56,7 @@ import org.eclipse.aether.resolution.VersionRangeResult;
 import org.eclipse.aether.spi.locator.Service;
 import org.eclipse.aether.spi.locator.ServiceLocator;
 import org.eclipse.aether.spi.synccontext.SyncContextFactory;
+import org.eclipse.aether.util.ConfigUtils;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
@@ -68,6 +70,16 @@ import org.eclipse.aether.version.VersionScheme;
 @Named
 @Singleton
 public class DefaultVersionRangeResolver implements VersionRangeResolver, Service {
+    /**
+     * Configuration property for version range resolution used metadata {@link Metadata.Nature}.
+     * It may contain string names of {@link Metadata.Nature} enum values, or string value {@code "auto"}
+     * to decide based on range: if any of the boundary versions is snapshot, {@link Metadata.Nature#RELEASE_OR_SNAPSHOT}
+     * will be used, otherwise {@link Metadata.Nature#RELEASE}.
+     * Default (when unset) is existing Maven 3 behaviour, using {@link Metadata.Nature#RELEASE_OR_SNAPSHOT}.
+     *
+     * @since 3.9.11
+     */
+    public static final String MAVEN_VERSION_RANGE_RESOLUTION_NATURE = "maven.versionRangeResolutionNature";
 
     private static final String MAVEN_METADATA_XML = "maven-metadata.xml";
 
@@ -138,11 +150,34 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver, Servic
             result.addVersion(versionConstraint.getVersion());
         } else {
             VersionRange.Bound lowerBound = versionConstraint.getRange().getLowerBound();
-            if (lowerBound != null
-                    && lowerBound.equals(versionConstraint.getRange().getUpperBound())) {
+            VersionRange.Bound upperBound = versionConstraint.getRange().getUpperBound();
+            if (lowerBound != null && lowerBound.equals(upperBound)) {
                 result.addVersion(lowerBound.getVersion());
             } else {
-                Map<String, ArtifactRepository> versionIndex = getVersions(session, result, request);
+                Metadata.Nature wantedNature;
+                String natureString = ConfigUtils.getString(
+                        session, Metadata.Nature.RELEASE_OR_SNAPSHOT.name(), MAVEN_VERSION_RANGE_RESOLUTION_NATURE);
+                if ("auto".equals(natureString)) {
+                    org.eclipse.aether.artifact.Artifact lowerArtifact = lowerBound != null
+                            ? request.getArtifact()
+                                    .setVersion(lowerBound.getVersion().toString())
+                            : null;
+                    org.eclipse.aether.artifact.Artifact upperArtifact = upperBound != null
+                            ? request.getArtifact()
+                                    .setVersion(upperBound.getVersion().toString())
+                            : null;
+
+                    if (lowerArtifact != null && lowerArtifact.isSnapshot()
+                            || upperArtifact != null && upperArtifact.isSnapshot()) {
+                        wantedNature = Metadata.Nature.RELEASE_OR_SNAPSHOT;
+                    } else {
+                        wantedNature = Metadata.Nature.RELEASE;
+                    }
+                } else {
+                    wantedNature = Metadata.Nature.valueOf(natureString.toUpperCase(Locale.ROOT));
+                }
+
+                Map<String, ArtifactRepository> versionIndex = getVersions(session, result, request, wantedNature);
 
                 List<Version> versions = new ArrayList<>();
                 for (Map.Entry<String, ArtifactRepository> v : versionIndex.entrySet()) {
@@ -166,7 +201,10 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver, Servic
     }
 
     private Map<String, ArtifactRepository> getVersions(
-            RepositorySystemSession session, VersionRangeResult result, VersionRangeRequest request) {
+            RepositorySystemSession session,
+            VersionRangeResult result,
+            VersionRangeRequest request,
+            Metadata.Nature wantedNature) {
         RequestTrace trace = RequestTrace.newChild(request.getTrace(), request);
 
         Map<String, ArtifactRepository> versionIndex = new HashMap<>();
@@ -175,7 +213,7 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver, Servic
                 request.getArtifact().getGroupId(),
                 request.getArtifact().getArtifactId(),
                 MAVEN_METADATA_XML,
-                Metadata.Nature.RELEASE_OR_SNAPSHOT);
+                wantedNature);
 
         List<MetadataRequest> metadataRequests =
                 new ArrayList<>(request.getRepositories().size());
