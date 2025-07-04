@@ -185,7 +185,7 @@
             </goals>
             <phase>generate-sources</phase>
             <configuration>
-              <version>4.1.0</version>
+              <version>4.2.0</version>
               <basedir>${project.basedir}/../../api/maven-api-model</basedir>
               <velocityBasedir>${project.basedir}/../../src/mdo</velocityBasedir>
               <models>
