@@ -407,11 +407,6 @@ under the License.
         <version>${sisuVersion}</version>
       </dependency>
       <dependency>
-        <groupId>jakarta.inject</groupId>
-        <artifactId>jakarta.inject-api</artifactId>
-        <version>${jakartaInjectApiVersion}</version>
-      </dependency>
-      <dependency>
         <groupId>org.ow2.asm</groupId>
         <artifactId>asm</artifactId>
         <version>${asmVersion}</version>
