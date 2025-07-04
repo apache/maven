@@ -71,14 +71,15 @@ import org.eclipse.aether.version.VersionScheme;
 @Singleton
 public class DefaultVersionRangeResolver implements VersionRangeResolver, Service {
     /**
-     * User property for version range handling. It may contain values of {@link Metadata.Nature} enum, or
-     * value "auto" to decide based on range: if any of the boundary version is snapshot, snapshots will be
-     * allowed, otherwise not. Default (unset) is "behave as before", query all repositories available in scope,
-     * so even snapshot repositories.
+     * Configuration property for version range resolution used metadata {@link Metadata.Nature}.
+     * It may contain string names of {@link Metadata.Nature} enum values, or string value {@code "auto"}
+     * to decide based on range: if any of the boundary versions is snapshot, {@link Metadata.Nature#RELEASE_OR_SNAPSHOT}
+     * will be used, otherwise {@link Metadata.Nature#RELEASE}.
+     * Default (when unset) is existing Maven 3 behaviour, using {@link Metadata.Nature#RELEASE_OR_SNAPSHOT}.
      *
      * @since 3.9.11
      */
-    public static final String MAVEN_VERSION_RANGE_HANDLING = "maven.versionRangeResolutionNature";
+    public static final String MAVEN_VERSION_RANGE_RESOLUTION_NATURE = "maven.versionRangeResolutionNature";
 
     private static final String MAVEN_METADATA_XML = "maven-metadata.xml";
 
@@ -154,9 +155,9 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver, Servic
                 result.addVersion(lowerBound.getVersion());
             } else {
                 Metadata.Nature wantedNature;
-                String handling = ConfigUtils.getString(
-                        session, Metadata.Nature.RELEASE_OR_SNAPSHOT.name(), MAVEN_VERSION_RANGE_HANDLING);
-                if ("auto".equals(handling)) {
+                String natureString = ConfigUtils.getString(
+                        session, Metadata.Nature.RELEASE_OR_SNAPSHOT.name(), MAVEN_VERSION_RANGE_RESOLUTION_NATURE);
+                if ("auto".equals(natureString)) {
                     org.eclipse.aether.artifact.Artifact lowerArtifact = lowerBound != null
                             ? request.getArtifact()
                                     .setVersion(lowerBound.getVersion().toString())
@@ -173,7 +174,7 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver, Servic
                         wantedNature = Metadata.Nature.RELEASE;
                     }
                 } else {
-                    wantedNature = Metadata.Nature.valueOf(handling.toUpperCase(Locale.ROOT));
+                    wantedNature = Metadata.Nature.valueOf(natureString.toUpperCase(Locale.ROOT));
                 }
 
                 Map<String, ArtifactRepository> versionIndex = getVersions(session, result, request, wantedNature);
