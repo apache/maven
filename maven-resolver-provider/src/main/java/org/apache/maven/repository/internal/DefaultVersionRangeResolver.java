@@ -73,7 +73,8 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver, Servic
     /**
      * User property for version range handling. It may contain values of {@link Metadata.Nature} enum, or
      * value "auto" to decide based on range: if any of the boundary version is snapshot, snapshots will be
-     * allowed, otherwise not.
+     * allowed, otherwise not. Default (unset) is "behave as before", query all repositories available in scope,
+     * so even snapshot repositories.
      *
      * @since 3.9.11
      */
@@ -153,8 +154,8 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver, Servic
                 result.addVersion(lowerBound.getVersion());
             } else {
                 Metadata.Nature wantedNature;
-                String handling =
-                        ConfigUtils.getString(session, request.getNature().name(), MAVEN_VERSION_RANGE_HANDLING);
+                String handling = ConfigUtils.getString(
+                        session, Metadata.Nature.RELEASE_OR_SNAPSHOT.name(), MAVEN_VERSION_RANGE_HANDLING);
                 if ("auto".equals(handling)) {
                     org.eclipse.aether.artifact.Artifact lowerArtifact = lowerBound != null
                             ? request.getArtifact()
