@@ -19,37 +19,23 @@
 package org.apache.maven.internal.xml;
 
 import java.io.Serializable;
-import java.util.AbstractList;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Properties;
-import java.util.RandomAccess;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 
+/**
+ * This should be removed when https://bugs.openjdk.org/browse/JDK-8323729
+ * is released in our minimum JDK.
+ */
 class ImmutableCollections {
-
-    private static final List<?> EMPTY_LIST = new AbstractImmutableList<Object>() {
-        @Override
-        public Object get(int index) {
-            throw new IndexOutOfBoundsException();
-        }
-
-        @Override
-        public int size() {
-            return 0;
-        }
-    };
 
     private static final Map<?, ?> EMPTY_MAP = new AbstractImmutableMap<Object, Object>() {
         @Override
@@ -78,31 +64,8 @@ class ImmutableCollections {
         }
     };
 
-    static <E> List<E> copy(Collection<E> collection) {
-        if (collection == null) {
-            return emptyList();
-        } else if (collection instanceof AbstractImmutableList) {
-            return (List<E>) collection;
-        } else {
-            return switch (collection.size()) {
-                case 0 -> emptyList();
-                case 1 -> singletonList(collection.iterator().next());
-                case 2 -> {
-                    Iterator<E> it = collection.iterator();
-                    yield new List2<>(it.next(), it.next());
-                }
-                default -> new ListN<>(collection);
-            };
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    static <E> List<E> emptyList() {
-        return (List<E>) EMPTY_LIST;
-    }
-
-    static <E> List<E> singletonList(E element) {
-        return new List1<>(element);
+    static <E1, E2 extends E1> List<E1> copy(Collection<E2> collection) {
+        return collection == null ? List.of() : List.copyOf(collection);
     }
 
     static <K, V> Map<K, V> copy(Map<K, V> map) {
@@ -111,14 +74,15 @@ class ImmutableCollections {
         } else if (map instanceof AbstractImmutableMap) {
             return map;
         } else {
-            return switch (map.size()) {
-                case 0 -> emptyMap();
-                case 1 -> {
+            switch (map.size()) {
+                case 0:
+                    return emptyMap();
+                case 1:
                     Map.Entry<K, V> entry = map.entrySet().iterator().next();
-                    yield singletonMap(entry.getKey(), entry.getValue());
-                }
-                default -> new MapN<>(map);
-            };
+                    return singletonMap(entry.getKey(), entry.getValue());
+                default:
+                    return new MapN<>(map);
+            }
         }
     }
 
@@ -129,315 +93,6 @@ class ImmutableCollections {
 
     static <K, V> Map<K, V> singletonMap(K key, V value) {
         return new Map1<>(key, value);
-    }
-
-    static Properties copy(Properties properties) {
-        if (properties instanceof ROProperties) {
-            return properties;
-        }
-        return new ROProperties(properties);
-    }
-
-    private static class List1<E> extends AbstractImmutableList<E> {
-        private final E element;
-
-        private List1(E element) {
-            this.element = element;
-        }
-
-        @Override
-        public E get(int index) {
-            if (index == 0) {
-                return element;
-            }
-            throw outOfBounds(index);
-        }
-
-        @Override
-        public int size() {
-            return 1;
-        }
-    }
-
-    private static class List2<E> extends AbstractImmutableList<E> {
-        private final E element1;
-        private final E element2;
-
-        private List2(E element1, E element2) {
-            this.element1 = element1;
-            this.element2 = element2;
-        }
-
-        @Override
-        public E get(int index) {
-            if (index == 0) {
-                return element1;
-            } else if (index == 1) {
-                return element2;
-            }
-            throw outOfBounds(index);
-        }
-
-        @Override
-        public int size() {
-            return 2;
-        }
-    }
-
-    private static class ListN<E> extends AbstractImmutableList<E> {
-        private final Object[] elements;
-
-        private ListN(Collection<E> elements) {
-            this.elements = elements.toArray();
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public E get(int index) {
-            return (E) elements[index];
-        }
-
-        @Override
-        public int size() {
-            return elements.length;
-        }
-    }
-
-    private abstract static class AbstractImmutableList<E> extends AbstractList<E>
-            implements RandomAccess, Serializable {
-        @Override
-        public boolean add(E e) {
-            throw uoe();
-        }
-
-        @Override
-        public boolean remove(Object o) {
-            throw uoe();
-        }
-
-        @Override
-        public boolean addAll(Collection<? extends E> c) {
-            throw uoe();
-        }
-
-        @Override
-        public boolean removeAll(Collection<?> c) {
-            throw uoe();
-        }
-
-        @Override
-        public boolean retainAll(Collection<?> c) {
-            throw uoe();
-        }
-
-        @Override
-        public void clear() {
-            throw uoe();
-        }
-
-        @Override
-        public boolean removeIf(Predicate<? super E> filter) {
-            throw uoe();
-        }
-
-        @Override
-        public void replaceAll(UnaryOperator<E> operator) {
-            throw uoe();
-        }
-
-        @Override
-        public void sort(Comparator<? super E> c) {
-            throw uoe();
-        }
-
-        @Override
-        public Iterator<E> iterator() {
-            return new Itr(0);
-        }
-
-        @Override
-        public ListIterator<E> listIterator() {
-            return new Itr(0);
-        }
-
-        @Override
-        public ListIterator<E> listIterator(int index) {
-            if (index < 0 || index > size()) {
-                throw outOfBounds(index);
-            }
-            return new Itr(index);
-        }
-
-        @Override
-        public List<E> subList(int fromIndex, int toIndex) {
-            if (fromIndex < 0) {
-                throw new IndexOutOfBoundsException("fromIndex = " + fromIndex);
-            }
-            if (toIndex > size()) {
-                throw new IndexOutOfBoundsException("toIndex = " + toIndex);
-            }
-            if (fromIndex > toIndex) {
-                throw new IllegalArgumentException("fromIndex(" + fromIndex + ") > toIndex(" + toIndex + ")");
-            }
-            return new SubList(fromIndex, toIndex);
-        }
-
-        protected IndexOutOfBoundsException outOfBounds(int index) {
-            return new IndexOutOfBoundsException("Index: " + index + ", Size: " + size());
-        }
-
-        private class SubList extends AbstractImmutableList<E> {
-            private final int fromIndex;
-            private final int toIndex;
-
-            private SubList(int fromIndex, int toIndex) {
-                this.fromIndex = fromIndex;
-                this.toIndex = toIndex;
-            }
-
-            @Override
-            public E get(int index) {
-                if (index < 0 || index > size()) {
-                    throw outOfBounds(index);
-                }
-                return AbstractImmutableList.this.get(fromIndex + index);
-            }
-
-            @Override
-            public int size() {
-                return toIndex - fromIndex;
-            }
-        }
-
-        private class Itr implements ListIterator<E> {
-            int index;
-
-            private Itr(int index) {
-                this.index = index;
-            }
-
-            @Override
-            public boolean hasNext() {
-                return index < size();
-            }
-
-            @Override
-            public E next() {
-                return get(index++);
-            }
-
-            @Override
-            public boolean hasPrevious() {
-                return index > 0;
-            }
-
-            @Override
-            public E previous() {
-                return get(--index);
-            }
-
-            @Override
-            public int nextIndex() {
-                return index;
-            }
-
-            @Override
-            public int previousIndex() {
-                return index - 1;
-            }
-
-            @Override
-            public void remove() {
-                throw uoe();
-            }
-
-            @Override
-            public void set(E e) {
-                throw uoe();
-            }
-
-            @Override
-            public void add(E e) {
-                throw uoe();
-            }
-        }
-    }
-
-    private static class ROProperties extends Properties {
-        private ROProperties(Properties props) {
-            super();
-            if (props != null) {
-                // Do not use super.putAll, as it may delegate to put which throws an UnsupportedOperationException
-                for (Map.Entry<Object, Object> e : props.entrySet()) {
-                    super.put(e.getKey(), e.getValue());
-                }
-            }
-        }
-
-        @Override
-        public Object put(Object key, Object value) {
-            throw uoe();
-        }
-
-        @Override
-        public Object remove(Object key) {
-            throw uoe();
-        }
-
-        @Override
-        public void putAll(Map<?, ?> t) {
-            throw uoe();
-        }
-
-        @Override
-        public void clear() {
-            throw uoe();
-        }
-
-        @Override
-        public void replaceAll(BiFunction<? super Object, ? super Object, ?> function) {
-            throw uoe();
-        }
-
-        @Override
-        public Object putIfAbsent(Object key, Object value) {
-            throw uoe();
-        }
-
-        @Override
-        public boolean remove(Object key, Object value) {
-            throw uoe();
-        }
-
-        @Override
-        public boolean replace(Object key, Object oldValue, Object newValue) {
-            throw uoe();
-        }
-
-        @Override
-        public Object replace(Object key, Object value) {
-            throw uoe();
-        }
-
-        @Override
-        public Object computeIfAbsent(Object key, Function<? super Object, ?> mappingFunction) {
-            throw uoe();
-        }
-
-        @Override
-        public Object computeIfPresent(Object key, BiFunction<? super Object, ? super Object, ?> remappingFunction) {
-            throw uoe();
-        }
-
-        @Override
-        public Object compute(Object key, BiFunction<? super Object, ? super Object, ?> remappingFunction) {
-            throw uoe();
-        }
-
-        @Override
-        public Object merge(Object key, Object value, BiFunction<? super Object, ? super Object, ?> remappingFunction) {
-            throw uoe();
-        }
     }
 
     private static class Map1<K, V> extends AbstractImmutableMap<K, V> {
