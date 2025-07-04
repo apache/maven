@@ -129,7 +129,8 @@ class ConsumerPomArtifactTransformer extends TransformerSupport {
     @Override
     public InstallRequest remapInstallArtifacts(RepositorySystemSession session, InstallRequest request) {
         if (consumerPomPresent(request.getArtifacts())) {
-            request.setArtifacts(replacePom(request.getArtifacts()));
+            // For install, we always include build POMs as they may be needed locally
+            request.setArtifacts(replacePom(request.getArtifacts(), true));
         }
         return request;
     }
@@ -137,7 +138,8 @@ class ConsumerPomArtifactTransformer extends TransformerSupport {
     @Override
     public DeployRequest remapDeployArtifacts(RepositorySystemSession session, DeployRequest request) {
         if (consumerPomPresent(request.getArtifacts())) {
-            request.setArtifacts(replacePom(request.getArtifacts()));
+            boolean deployBuildPom = Features.deployBuildPom(session.getConfigProperties());
+            request.setArtifacts(replacePom(request.getArtifacts(), deployBuildPom));
         }
         return request;
     }
@@ -147,7 +149,7 @@ class ConsumerPomArtifactTransformer extends TransformerSupport {
                 .anyMatch(a -> "pom".equals(a.getExtension()) && CONSUMER_POM_CLASSIFIER.equals(a.getClassifier()));
     }
 
-    private Collection<Artifact> replacePom(Collection<Artifact> artifacts) {
+    private Collection<Artifact> replacePom(Collection<Artifact> artifacts, boolean deployBuildPom) {
         List<Artifact> consumers = new ArrayList<>();
         List<Artifact> mains = new ArrayList<>();
         for (Artifact artifact : artifacts) {
@@ -163,17 +165,22 @@ class ConsumerPomArtifactTransformer extends TransformerSupport {
             ArrayList<Artifact> result = new ArrayList<>(artifacts);
             for (Artifact main : mains) {
                 result.remove(main);
-                result.add(new DefaultArtifact(
-                        main.getGroupId(),
-                        main.getArtifactId(),
-                        BUILD_POM_CLASSIFIER,
-                        main.getExtension(),
-                        main.getVersion(),
-                        main.getProperties(),
-                        main.getPath()));
+                if (deployBuildPom) {
+                    // Add the main POM as a build POM with "build" classifier
+                    result.add(new DefaultArtifact(
+                            main.getGroupId(),
+                            main.getArtifactId(),
+                            BUILD_POM_CLASSIFIER,
+                            main.getExtension(),
+                            main.getVersion(),
+                            main.getProperties(),
+                            main.getPath()));
+                }
+                // If deployBuildPom is false, we simply don't add the build POM to the result
             }
             for (Artifact consumer : consumers) {
                 result.remove(consumer);
+                // Replace the consumer POM as the main POM (no classifier)
                 result.add(new DefaultArtifact(
                         consumer.getGroupId(),
                         consumer.getArtifactId(),
