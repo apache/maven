@@ -24,6 +24,7 @@ import java.util.Map;
 import org.apache.maven.api.Constants;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -71,50 +72,72 @@ class FeaturesTest {
     }
 
     @Test
-    void testDeployBuildPomWithVariousStringValues() {
-        // Test case-insensitive string parsing
-        Map<String, Object> properties;
-
-        properties = Map.of(Constants.MAVEN_DEPLOY_BUILD_POM, "TRUE");
+    void testDeployBuildPomWithStringTrueUpperCase() {
+        // Test case-insensitive string parsing - TRUE
+        Map<String, Object> properties = Map.of(Constants.MAVEN_DEPLOY_BUILD_POM, "TRUE");
         assertTrue(Features.deployBuildPom(properties));
+    }
 
-        properties = Map.of(Constants.MAVEN_DEPLOY_BUILD_POM, "FALSE");
-        assertFalse(Features.deployBuildPom(properties));
-
-        properties = Map.of(Constants.MAVEN_DEPLOY_BUILD_POM, "True");
-        assertTrue(Features.deployBuildPom(properties));
-
-        properties = Map.of(Constants.MAVEN_DEPLOY_BUILD_POM, "False");
+    @Test
+    void testDeployBuildPomWithStringFalseUpperCase() {
+        // Test case-insensitive string parsing - FALSE
+        Map<String, Object> properties = Map.of(Constants.MAVEN_DEPLOY_BUILD_POM, "FALSE");
         assertFalse(Features.deployBuildPom(properties));
     }
 
     @Test
-    void testDeployBuildPomWithInvalidStringValues() {
+    void testDeployBuildPomWithStringTrueMixedCase() {
+        // Test case-insensitive string parsing - True
+        Map<String, Object> properties = Map.of(Constants.MAVEN_DEPLOY_BUILD_POM, "True");
+        assertTrue(Features.deployBuildPom(properties));
+    }
+
+    @Test
+    void testDeployBuildPomWithStringFalseMixedCase() {
+        // Test case-insensitive string parsing - False
+        Map<String, Object> properties = Map.of(Constants.MAVEN_DEPLOY_BUILD_POM, "False");
+        assertFalse(Features.deployBuildPom(properties));
+    }
+
+    @Test
+    void testDeployBuildPomWithInvalidStringValue() {
         // Test that invalid string values default to false (Boolean.parseBoolean behavior)
-        Map<String, Object> properties;
-
-        properties = Map.of(Constants.MAVEN_DEPLOY_BUILD_POM, "invalid");
-        assertFalse(Features.deployBuildPom(properties));
-
-        properties = Map.of(Constants.MAVEN_DEPLOY_BUILD_POM, "");
-        assertFalse(Features.deployBuildPom(properties));
-
-        properties = Map.of(Constants.MAVEN_DEPLOY_BUILD_POM, "yes");
-        assertFalse(Features.deployBuildPom(properties));
-
-        properties = Map.of(Constants.MAVEN_DEPLOY_BUILD_POM, "1");
+        Map<String, Object> properties = Map.of(Constants.MAVEN_DEPLOY_BUILD_POM, "invalid");
         assertFalse(Features.deployBuildPom(properties));
     }
 
     @Test
-    void testDeployBuildPomWithNonStringNonBooleanValue() {
-        // Test with other object types (should use toString() and then parseBoolean)
-        Map<String, Object> properties;
+    void testDeployBuildPomWithEmptyString() {
+        // Test that empty string defaults to false
+        Map<String, Object> properties = Map.of(Constants.MAVEN_DEPLOY_BUILD_POM, "");
+        assertFalse(Features.deployBuildPom(properties));
+    }
 
-        properties = Map.of(Constants.MAVEN_DEPLOY_BUILD_POM, 1);
+    @Test
+    void testDeployBuildPomWithYesString() {
+        // Test that "yes" string defaults to false (not a valid boolean)
+        Map<String, Object> properties = Map.of(Constants.MAVEN_DEPLOY_BUILD_POM, "yes");
+        assertFalse(Features.deployBuildPom(properties));
+    }
+
+    @Test
+    void testDeployBuildPomWithNumericString() {
+        // Test that numeric string defaults to false
+        Map<String, Object> properties = Map.of(Constants.MAVEN_DEPLOY_BUILD_POM, "1");
+        assertFalse(Features.deployBuildPom(properties));
+    }
+
+    @Test
+    void testDeployBuildPomWithIntegerOne() {
+        // Test with integer 1 (should use toString() and then parseBoolean)
+        Map<String, Object> properties = Map.of(Constants.MAVEN_DEPLOY_BUILD_POM, 1);
         assertFalse(Features.deployBuildPom(properties)); // "1".parseBoolean() = false
+    }
 
-        properties = Map.of(Constants.MAVEN_DEPLOY_BUILD_POM, 0);
+    @Test
+    void testDeployBuildPomWithIntegerZero() {
+        // Test with integer 0 (should use toString() and then parseBoolean)
+        Map<String, Object> properties = Map.of(Constants.MAVEN_DEPLOY_BUILD_POM, 0);
         assertFalse(Features.deployBuildPom(properties)); // "0".parseBoolean() = false
     }
 
@@ -127,8 +150,8 @@ class FeaturesTest {
         assertFalse(Features.deployBuildPom(properties));
 
         // Verify the map wasn't modified
-        assertTrue(properties.size() == 1);
-        assertTrue("false".equals(properties.get(Constants.MAVEN_DEPLOY_BUILD_POM)));
+        assertEquals(1, properties.size());
+        assertEquals("false", properties.get(Constants.MAVEN_DEPLOY_BUILD_POM));
     }
 
     @Test
@@ -148,16 +171,20 @@ class FeaturesTest {
     }
 
     @Test
-    void testConsistencyWithOtherFeatureMethods() {
-        // Test that deployBuildPom behaves consistently with other feature methods
+    void testConsistencyWithOtherFeatureMethodsFalse() {
+        // Test that deployBuildPom behaves consistently with other feature methods when false
         Map<String, Object> properties = Map.of(
                 Constants.MAVEN_DEPLOY_BUILD_POM, "false",
                 Constants.MAVEN_CONSUMER_POM, "false");
 
         assertFalse(Features.deployBuildPom(properties));
         assertFalse(Features.consumerPom(properties));
+    }
 
-        properties = Map.of(
+    @Test
+    void testConsistencyWithOtherFeatureMethodsTrue() {
+        // Test that deployBuildPom behaves consistently with other feature methods when true
+        Map<String, Object> properties = Map.of(
                 Constants.MAVEN_DEPLOY_BUILD_POM, "true",
                 Constants.MAVEN_CONSUMER_POM, "true");
 
