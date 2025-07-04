@@ -24,9 +24,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
@@ -52,6 +54,7 @@ import org.eclipse.aether.resolution.VersionRangeRequest;
 import org.eclipse.aether.resolution.VersionRangeResolutionException;
 import org.eclipse.aether.resolution.VersionRangeResult;
 import org.eclipse.aether.spi.synccontext.SyncContextFactory;
+import org.eclipse.aether.util.ConfigUtils;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionConstraint;
@@ -104,11 +107,36 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
             result.addVersion(versionConstraint.getVersion());
         } else {
             VersionRange.Bound lowerBound = versionConstraint.getRange().getLowerBound();
-            if (lowerBound != null
-                    && lowerBound.equals(versionConstraint.getRange().getUpperBound())) {
+            VersionRange.Bound upperBound = versionConstraint.getRange().getUpperBound();
+            if (lowerBound != null && lowerBound.equals(upperBound)) {
                 result.addVersion(lowerBound.getVersion());
             } else {
-                Map<String, ArtifactRepository> versionIndex = getVersions(session, result, request);
+                Metadata.Nature wantedNature;
+                String natureString = ConfigUtils.getString(
+                        session,
+                        Metadata.Nature.RELEASE_OR_SNAPSHOT.name(),
+                        Constants.MAVEN_VERSION_RANGE_RESOLVER_NATURE_OVERRIDE);
+                if ("auto".equals(natureString)) {
+                    org.eclipse.aether.artifact.Artifact lowerArtifact = lowerBound != null
+                            ? request.getArtifact()
+                                    .setVersion(lowerBound.getVersion().toString())
+                            : null;
+                    org.eclipse.aether.artifact.Artifact upperArtifact = upperBound != null
+                            ? request.getArtifact()
+                                    .setVersion(upperBound.getVersion().toString())
+                            : null;
+
+                    if (lowerArtifact != null && lowerArtifact.isSnapshot()
+                            || upperArtifact != null && upperArtifact.isSnapshot()) {
+                        wantedNature = Metadata.Nature.RELEASE_OR_SNAPSHOT;
+                    } else {
+                        wantedNature = Metadata.Nature.RELEASE;
+                    }
+                } else {
+                    wantedNature = Metadata.Nature.valueOf(natureString.toUpperCase(Locale.ROOT));
+                }
+
+                Map<String, ArtifactRepository> versionIndex = getVersions(session, result, request, wantedNature);
 
                 List<Version> versions = new ArrayList<>();
                 for (Map.Entry<String, ArtifactRepository> v : versionIndex.entrySet()) {
@@ -132,7 +160,10 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
     }
 
     private Map<String, ArtifactRepository> getVersions(
-            RepositorySystemSession session, VersionRangeResult result, VersionRangeRequest request) {
+            RepositorySystemSession session,
+            VersionRangeResult result,
+            VersionRangeRequest request,
+            Metadata.Nature wantedNature) {
         RequestTrace trace = RequestTrace.newChild(request.getTrace(), request);
 
         Map<String, ArtifactRepository> versionIndex = new HashMap<>();
@@ -141,7 +172,7 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
                 request.getArtifact().getGroupId(),
                 request.getArtifact().getArtifactId(),
                 MAVEN_METADATA_XML,
-                Metadata.Nature.RELEASE_OR_SNAPSHOT);
+                wantedNature);
 
         List<MetadataRequest> metadataRequests =
                 new ArrayList<>(request.getRepositories().size());
