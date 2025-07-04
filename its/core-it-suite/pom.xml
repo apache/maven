@@ -565,7 +565,7 @@ under the License.
             <configuration>
               <target>
                 <delete dir="${mavenHome}" />
-                <unzip dest="${mavenHome}" src="${session.rootDirectory}/apache-maven/target/apache-maven-${project.version}-bin.zip">
+                <unzip dest="${mavenHome}" src="${sessionRootDirectory}/apache-maven/target/apache-maven-${project.version}-bin.zip">
                   <regexpmapper from="^([^/]+)/(.*)$" handledirsep="true" to="\2" />
                 </unzip>
                 <chmod dir="${mavenHome}/bin" includes="mvn,mvnDebug,mvnenc" perm="ugo+rx" />
@@ -621,7 +621,7 @@ under the License.
                 <configuration>
                   <target>
                     <delete dir="${preparedUserHome}" />
-                    <copy file="${session.rootDirectory}/.github/ci-extensions.xml" toFile="${preparedUserHome}/.m2/extensions.xml" />
+                    <copy file="${sessionRootDirectory}/.github/ci-extensions.xml" toFile="${preparedUserHome}/.m2/extensions.xml" />
                     <copy file="${project.build.testOutputDirectory}/it-mimir.properties" toFile="${preparedUserHome}/.mimir/mimir.properties" />
                   </target>
                 </configuration>
@@ -681,6 +681,7 @@ under the License.
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <skip>false</skip>
+              <redirectTestOutputToFile>false</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>
