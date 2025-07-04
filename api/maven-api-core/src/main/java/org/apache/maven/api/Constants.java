@@ -495,6 +495,19 @@ public final class Constants {
     public static final String MAVEN_DEPLOY_SNAPSHOT_BUILD_NUMBER = "maven.deploy.snapshot.buildNumber";
 
     /**
+     * User property for controlling whether build POMs are deployed alongside consumer POMs.
+     * When set to <code>false</code>, only the consumer POM will be deployed, and the build POM
+     * will be excluded from deployment. This is useful to avoid deploying internal build information
+     * that is not needed by consumers of the artifact.
+     * <br/>
+     * Default: <code>"true"</code>.
+     *
+     * @since 4.1.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "true")
+    public static final String MAVEN_DEPLOY_BUILD_POM = "maven.deploy.buildPom";
+
+    /**
      * User property used to store the build timestamp.
      *
      * @since 4.0.0
