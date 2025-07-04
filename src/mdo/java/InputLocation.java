@@ -33,6 +33,28 @@ public class InputLocation implements Serializable, InputLocationTracker {
     private final InputSource source;
     private final Map<Object, InputLocation> locations;
 
+    private static final InputLocation EMPTY = new InputLocation(-1, -1);
+
+    public static InputLocation of() {
+        return EMPTY;
+    }
+
+    public static InputLocation of(int lineNumber, int columnNumber) {
+        return new InputLocation(lineNumber, columnNumber);
+    }
+
+    public static InputLocation of(int lineNumber, int columnNumber, InputSource source) {
+        return new InputLocation(lineNumber, columnNumber, source);
+    }
+
+    public static InputLocation of(int lineNumber, int columnNumber, InputSource source, Object selfLocationKey) {
+        return new InputLocation(lineNumber, columnNumber, source, selfLocationKey);
+    }
+
+    public static InputLocation of(int lineNumber, int columnNumber, InputSource source, Map<Object, InputLocation> locations) {
+        return new InputLocation(lineNumber, columnNumber, source, locations);
+    }
+
     public InputLocation(InputSource source) {
         this.lineNumber = -1;
         this.columnNumber = -1;

@@ -41,6 +41,8 @@ public class InputSource implements Serializable {
     private final List<InputSource> inputs;
     private final InputLocation importedFrom;
 
+    private volatile int hashCode = 0; // Cached hashCode for performance
+
     public InputSource(String modelId, String location) {
         this(modelId, location, null);
     }
@@ -57,6 +59,44 @@ public class InputSource implements Serializable {
         this.location = null;
         this.inputs = ImmutableCollections.copy(inputs);
         this.importedFrom = null;
+    }
+
+    // Factory methods
+
+    /**
+     * Creates a new InputSource with the specified model ID and location.
+     * The created instance is processed through ModelObjectProcessor for optimization.
+     *
+     * @param modelId the model ID
+     * @param location the location
+     * @return a new InputSource instance
+     */
+    public static InputSource of(String modelId, String location) {
+        return ModelObjectProcessor.processObject(new InputSource(modelId, location));
+    }
+
+    /**
+     * Creates a new InputSource with the specified model ID, location, and imported from location.
+     * The created instance is processed through ModelObjectProcessor for optimization.
+     *
+     * @param modelId the model ID
+     * @param location the location
+     * @param importedFrom the imported from location
+     * @return a new InputSource instance
+     */
+    public static InputSource of(String modelId, String location, InputLocation importedFrom) {
+        return ModelObjectProcessor.processObject(new InputSource(modelId, location, importedFrom));
+    }
+
+    /**
+     * Creates a new InputSource from a collection of input sources.
+     * The created instance is processed through ModelObjectProcessor for optimization.
+     *
+     * @param inputs the collection of input sources
+     * @return a new InputSource instance
+     */
+    public static InputSource of(Collection<InputSource> inputs) {
+        return ModelObjectProcessor.processObject(new InputSource(inputs));
     }
 
     /**
@@ -99,12 +139,18 @@ public class InputSource implements Serializable {
         InputSource that = (InputSource) o;
         return Objects.equals(modelId, that.modelId)
                 && Objects.equals(location, that.location)
-                && Objects.equals(inputs, that.inputs);
+                && Objects.equals(inputs, that.inputs)
+                && Objects.equals(importedFrom, that.importedFrom);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(modelId, location, inputs);
+        int result = hashCode;
+        if (result == 0) {
+            result = Objects.hash(modelId, location, inputs, importedFrom);
+            hashCode = result;
+        }
+        return result;
     }
 
     Stream<InputSource> sources() {
@@ -120,6 +166,7 @@ public class InputSource implements Serializable {
     }
 
     public static InputSource merge(InputSource src1, InputSource src2) {
-        return new InputSource(Stream.concat(src1.sources(), src2.sources()).collect(Collectors.toSet()));
+        return new InputSource(
+                Stream.concat(src1.sources(), src2.sources()).distinct().toList());
     }
 }
