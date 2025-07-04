@@ -27,6 +27,7 @@ import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +36,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.InterpolatorException;
 import org.apache.maven.api.services.ModelBuilderException;
@@ -460,5 +462,31 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     private static Map<String, String> unmodifiable(Map<String, String> map) {
         return map != null ? Collections.unmodifiableMap(map) : Collections.emptyMap();
+    }
+
+    // Cascading profile activation methods
+
+    @Override
+    public void addProfileProperties(Collection<Profile> activatedProfiles) {
+        // Inject properties from activated profiles into the model
+        // This enables cascading profile activation
+        if (model != null && activatedProfiles != null && !activatedProfiles.isEmpty()) {
+            Map<String, String> modelProperties = new HashMap<>();
+            if (model.getProperties() != null) {
+                modelProperties.putAll(model.getProperties());
+            }
+
+            // Add properties from each activated profile
+            for (Profile profile : activatedProfiles) {
+                if (profile.getProperties() != null) {
+                    modelProperties.putAll(profile.getProperties());
+                }
+            }
+
+            // Update the model with the new properties if there are changes
+            if (!modelProperties.equals(model.getProperties())) {
+                this.model = model.withProperties(modelProperties);
+            }
+        }
     }
 }
