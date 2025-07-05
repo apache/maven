@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.shared.verifier.VerificationException;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -28,9 +27,9 @@ import org.junit.jupiter.api.Test;
  *
  * Verifies that the -itr (ignore transitive repositories) option works correctly.
  */
-class MavenITgh2576IgnoreTransitiveRepositoriesTest extends AbstractMavenIntegrationTestCase {
+public class MavenITgh2576IgnoreTransitiveRepositoriesTest extends AbstractMavenIntegrationTestCase {
 
-    MavenITgh2576IgnoreTransitiveRepositoriesTest() {
+    public MavenITgh2576IgnoreTransitiveRepositoriesTest() {
         super("[4.0.0-alpha-1,)");
     }
 
@@ -43,7 +42,7 @@ class MavenITgh2576IgnoreTransitiveRepositoriesTest extends AbstractMavenIntegra
      * @throws Exception in case of failure
      */
     @Test
-    void testIgnoreTransitiveRepositories() throws Exception {
+    public void testIgnoreTransitiveRepositories() throws Exception {
         File testDir = extractResources("/gh-2576-ignore-transitive-repositories");
 
         // First test without -itr - should succeed
