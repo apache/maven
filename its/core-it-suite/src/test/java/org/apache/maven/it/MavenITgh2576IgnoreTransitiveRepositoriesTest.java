@@ -58,19 +58,22 @@ public class MavenITgh2576IgnoreTransitiveRepositoriesTest extends AbstractMaven
         verifier.verifyErrorFreeLog();
 
         // Now test with -itr - should fail because transitive repo is ignored
-        verifier.resetStreams();
-        verifier.deleteDirectory("target");
-        verifier.addCliArgument("--settings");
-        verifier.addCliArgument("settings.xml");
-        verifier.addCliArgument("-itr");
-        verifier.addCliArgument("validate");
+        Verifier verifierWithItr = newVerifier(testDir.getAbsolutePath());
+        verifierWithItr.setAutoclean(false);
+        verifierWithItr.deleteDirectory("target");
+        verifierWithItr.deleteArtifacts("org.apache.maven.its.gh2576");
+        verifierWithItr.filterFile("settings-template.xml", "settings.xml");
+        verifierWithItr.addCliArgument("--settings");
+        verifierWithItr.addCliArgument("settings.xml");
+        verifierWithItr.addCliArgument("-itr");
+        verifierWithItr.addCliArgument("validate");
         try {
-            verifier.execute();
+            verifierWithItr.execute();
             // If we get here, the test failed because it should have thrown an exception
             throw new AssertionError("Build should have failed with -itr option");
         } catch (VerificationException e) {
             // Expected - the build should fail when transitive repositories are ignored
-            verifier.verifyTextInLog("Could not resolve dependencies");
+            verifierWithItr.verifyTextInLog("Could not resolve dependencies");
         }
     }
 }
