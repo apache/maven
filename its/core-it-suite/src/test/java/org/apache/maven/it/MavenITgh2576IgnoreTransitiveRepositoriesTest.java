@@ -42,7 +42,7 @@ public class MavenITgh2576IgnoreTransitiveRepositoriesTest extends AbstractMaven
      * @throws Exception in case of failure
      */
     @Test
-    public void testIgnoreTransitiveRepositories() throws Exception {
+    void testIgnoreTransitiveRepositories() throws Exception {
         File testDir = extractResources("/gh-2576-ignore-transitive-repositories");
 
         // First test without -itr - should succeed
