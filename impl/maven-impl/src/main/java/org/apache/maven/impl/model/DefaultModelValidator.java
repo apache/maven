@@ -2251,23 +2251,20 @@ public class DefaultModelValidator implements ModelValidator {
 
         public static SourceHint dependencyManagementKey(Dependency dependency) {
             String hint;
-            if (dependency.getClassifier() == null
-                    || dependency.getClassifier().trim().isEmpty()) {
-                hint = String.format(
-                        "groupId=%s, artifactId=%s, type=%s",
-                        nvl(dependency.getGroupId()), nvl(dependency.getArtifactId()), nvl(dependency.getType()));
+            if (dependency.getClassifier() == null || dependency.getClassifier().isBlank()) {
+                hint = "groupId=" + valueToValueString(dependency.getGroupId())
+                        + ", artifactId=" + valueToValueString(dependency.getArtifactId())
+                        + ", type=" + valueToValueString(dependency.getType());
             } else {
-                hint = String.format(
-                        "groupId=%s, artifactId=%s, classifier=%s, type=%s",
-                        nvl(dependency.getGroupId()),
-                        nvl(dependency.getArtifactId()),
-                        nvl(dependency.getClassifier()),
-                        nvl(dependency.getType()));
+                hint = "groupId=" + valueToValueString(dependency.getGroupId())
+                        + ", artifactId=" + valueToValueString(dependency.getArtifactId())
+                        + ", classifier=" + valueToValueString(dependency.getClassifier())
+                        + ", type=" + valueToValueString(dependency.getType());
             }
             return new SourceHint(hint, null); // DMK
         }
 
-        private static String nvl(String value) {
+        private static String valueToValueString(String value) {
             return value == null ? "" : "'" + value + "'";
         }
 
