@@ -55,9 +55,11 @@ public class ArtifactDescriptorReaderDelegate {
     public void populateResult(InternalSession session, ArtifactDescriptorResult result, Model model) {
         ArtifactTypeRegistry stereotypes = session.getSession().getArtifactTypeRegistry();
 
-        for (Repository r : model.getRepositories()) {
-            result.addRepository(session.toRepository(
-                    session.getService(RepositoryFactory.class).createRemote(r)));
+        if (!session.getSession().isIgnoreArtifactDescriptorRepositories()) {
+            for (Repository r : model.getRepositories()) {
+                result.addRepository(session.toRepository(
+                        session.getService(RepositoryFactory.class).createRemote(r)));
+            }
         }
 
         for (org.apache.maven.api.model.Dependency dependency : model.getDependencies()) {
