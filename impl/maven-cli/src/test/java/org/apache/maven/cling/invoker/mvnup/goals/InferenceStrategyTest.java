@@ -492,6 +492,62 @@ class InferenceStrategyTest {
             assertNotNull(parentElement.getChild("artifactId", childRoot.getNamespace()));
             assertNotNull(parentElement.getChild("version", childRoot.getNamespace()));
         }
+
+        @Test
+        @DisplayName("should trim parent elements when parent is in reactor")
+        void shouldTrimParentElementsWhenParentIsInReactor() throws Exception {
+            // Create parent POM
+            String parentPomXml =
+                    """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.1.0">
+                    <modelVersion>4.1.0</modelVersion>
+                    <groupId>com.example</groupId>
+                    <artifactId>parent-project</artifactId>
+                    <version>1.0.0</version>
+                    <packaging>pom</packaging>
+                </project>
+                """;
+
+            // Create child POM that references the parent
+            String childPomXml =
+                    """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.1.0">
+                    <modelVersion>4.1.0</modelVersion>
+                    <parent>
+                        <groupId>com.example</groupId>
+                        <artifactId>parent-project</artifactId>
+                        <version>1.0.0</version>
+                    </parent>
+                    <artifactId>child-project</artifactId>
+                    <!-- No explicit groupId or version - would inherit from parent -->
+                </project>
+                """;
+
+            Document parentDoc = saxBuilder.build(new StringReader(parentPomXml));
+            Document childDoc = saxBuilder.build(new StringReader(childPomXml));
+
+            // Both POMs are in the reactor
+            Map<Path, Document> pomMap = Map.of(
+                    Paths.get("pom.xml"), parentDoc,
+                    Paths.get("child", "pom.xml"), childDoc);
+
+            Element childRoot = childDoc.getRootElement();
+            Element parentElement = childRoot.getChild("parent", childRoot.getNamespace());
+
+            // Apply inference
+            UpgradeContext context = createMockContext();
+            strategy.apply(context, pomMap);
+
+            // Verify correct behavior for reactor parent:
+            // - groupId should be removed (child has no explicit groupId, parent is in reactor)
+            // - artifactId should be removed (can be inferred from relativePath)
+            // - version should be removed (child has no explicit version, parent is in reactor)
+            assertNull(parentElement.getChild("groupId", childRoot.getNamespace()));
+            assertNull(parentElement.getChild("artifactId", childRoot.getNamespace()));
+            assertNull(parentElement.getChild("version", childRoot.getNamespace()));
+        }
     }
 
     @Nested

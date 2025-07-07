@@ -433,33 +433,38 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
 
     /**
      * Determines if the parent is part of the same reactor (multi-module project)
-     * vs. an external parent POM.
+     * vs. an external parent POM by checking if the parent exists in the pomMap.
      */
     private boolean isParentInReactor(Element parentElement, Namespace namespace, Map<Path, Document> pomMap) {
-        // Get relativePath (default is "../pom.xml" if not specified)
-        String relativePath = getChildText(parentElement, RELATIVE_PATH, namespace);
-
         // If relativePath is explicitly set to empty, parent is definitely external
+        String relativePath = getChildText(parentElement, RELATIVE_PATH, namespace);
         if (relativePath != null && relativePath.trim().isEmpty()) {
             return false;
         }
 
-        // If relativePath is null, use Maven default
-        if (relativePath == null) {
-            relativePath = DEFAULT_PARENT_RELATIVE_PATH;
+        // Get parent GAV to match against POMs in the reactor
+        String parentGroupId = getChildText(parentElement, GROUP_ID, namespace);
+        String parentArtifactId = getChildText(parentElement, ARTIFACT_ID, namespace);
+        String parentVersion = getChildText(parentElement, VERSION, namespace);
+
+        // Check if any POM in our reactor matches the parent GAV
+        for (Document pomDocument : pomMap.values()) {
+            Element pomRoot = pomDocument.getRootElement();
+            Namespace pomNamespace = pomRoot.getNamespace();
+
+            String pomGroupId = getChildText(pomRoot, GROUP_ID, pomNamespace);
+            String pomArtifactId = getChildText(pomRoot, ARTIFACT_ID, pomNamespace);
+            String pomVersion = getChildText(pomRoot, VERSION, pomNamespace);
+
+            // Match groupId, artifactId, and version
+            if (Objects.equals(parentGroupId, pomGroupId)
+                    && Objects.equals(parentArtifactId, pomArtifactId)
+                    && Objects.equals(parentVersion, pomVersion)) {
+                return true;
+            }
         }
 
-        // Check if any POM in our reactor could be the parent based on relativePath
-        // This is a heuristic - if we have multiple POMs and the relativePath suggests
-        // a local parent, it's likely in the reactor
-        if (pomMap.size() > 1
-                && (relativePath.equals(DEFAULT_PARENT_RELATIVE_PATH)
-                        || relativePath.startsWith("../")
-                        || relativePath.startsWith("./"))) {
-            return true;
-        }
-
-        // If we only have one POM and it references a parent, it's likely external
+        // Parent not found in reactor, must be external
         return false;
     }
 
