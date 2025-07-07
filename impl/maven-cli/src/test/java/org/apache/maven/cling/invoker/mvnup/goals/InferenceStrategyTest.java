@@ -484,12 +484,13 @@ class InferenceStrategyTest {
             strategy.apply(context, pomMap);
 
             // Verify correct behavior for external parent:
-            // - groupId should be removed (child doesn't have explicit groupId, can inherit from parent)
-            // - version should be removed (child doesn't have explicit version, can inherit from parent)
-            // - artifactId should be removed (Maven 4.1.0+ can infer from relativePath even for external parents)
-            assertNull(parentElement.getChild("groupId", childRoot.getNamespace()));
-            assertNull(parentElement.getChild("artifactId", childRoot.getNamespace()));
-            assertNull(parentElement.getChild("version", childRoot.getNamespace()));
+            // - groupId should NOT be removed (external parents need groupId to be located)
+            // - artifactId should NOT be removed (external parents need artifactId to be located)
+            // - version should NOT be removed (external parents need version to be located)
+            // This prevents the "parent.groupId is missing" error reported in issue #7934
+            assertNotNull(parentElement.getChild("groupId", childRoot.getNamespace()));
+            assertNotNull(parentElement.getChild("artifactId", childRoot.getNamespace()));
+            assertNotNull(parentElement.getChild("version", childRoot.getNamespace()));
         }
     }
 

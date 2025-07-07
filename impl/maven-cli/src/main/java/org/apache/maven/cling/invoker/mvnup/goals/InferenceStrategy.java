@@ -388,44 +388,79 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
             Map<Path, Document> pomMap) {
         boolean hasChanges = false;
 
-        // First apply limited inference (child elements)
-        hasChanges |= trimParentElementLimited(context, root, parentElement, namespace);
-
-        // Get child GAV
+        // Get child GAV before applying any changes
         String childGroupId = getChildText(root, GROUP_ID, namespace);
         String childVersion = getChildText(root, VERSION, namespace);
 
-        // Remove parent groupId if child has no explicit groupId
-        if (childGroupId == null) {
-            Element parentGroupIdElement = parentElement.getChild(GROUP_ID, namespace);
-            if (parentGroupIdElement != null) {
-                removeElementWithFormatting(parentGroupIdElement);
-                context.detail("Removed: parent groupId (child has no explicit groupId)");
-                hasChanges = true;
-            }
-        }
+        // First apply limited inference (child elements) - this removes matching child groupId/version
+        hasChanges |= trimParentElementLimited(context, root, parentElement, namespace);
 
-        // Remove parent version if child has no explicit version
-        if (childVersion == null) {
-            Element parentVersionElement = parentElement.getChild(VERSION, namespace);
-            if (parentVersionElement != null) {
-                removeElementWithFormatting(parentVersionElement);
-                context.detail("Removed: parent version (child has no explicit version)");
-                hasChanges = true;
+        // Only remove parent elements if the parent is in the same reactor (not external)
+        if (isParentInReactor(parentElement, namespace, pomMap)) {
+            // Remove parent groupId if child has no explicit groupId
+            if (childGroupId == null) {
+                Element parentGroupIdElement = parentElement.getChild(GROUP_ID, namespace);
+                if (parentGroupIdElement != null) {
+                    removeElementWithFormatting(parentGroupIdElement);
+                    context.detail("Removed: parent groupId (child has no explicit groupId)");
+                    hasChanges = true;
+                }
             }
-        }
 
-        // Remove parent artifactId if it can be inferred from relativePath
-        if (canInferParentArtifactId(parentElement, namespace, pomMap)) {
-            Element parentArtifactIdElement = parentElement.getChild(ARTIFACT_ID, namespace);
-            if (parentArtifactIdElement != null) {
-                removeElementWithFormatting(parentArtifactIdElement);
-                context.detail("Removed: parent artifactId (can be inferred from relativePath)");
-                hasChanges = true;
+            // Remove parent version if child has no explicit version
+            if (childVersion == null) {
+                Element parentVersionElement = parentElement.getChild(VERSION, namespace);
+                if (parentVersionElement != null) {
+                    removeElementWithFormatting(parentVersionElement);
+                    context.detail("Removed: parent version (child has no explicit version)");
+                    hasChanges = true;
+                }
+            }
+
+            // Remove parent artifactId if it can be inferred from relativePath
+            if (canInferParentArtifactId(parentElement, namespace, pomMap)) {
+                Element parentArtifactIdElement = parentElement.getChild(ARTIFACT_ID, namespace);
+                if (parentArtifactIdElement != null) {
+                    removeElementWithFormatting(parentArtifactIdElement);
+                    context.detail("Removed: parent artifactId (can be inferred from relativePath)");
+                    hasChanges = true;
+                }
             }
         }
 
         return hasChanges;
+    }
+
+    /**
+     * Determines if the parent is part of the same reactor (multi-module project)
+     * vs. an external parent POM.
+     */
+    private boolean isParentInReactor(Element parentElement, Namespace namespace, Map<Path, Document> pomMap) {
+        // Get relativePath (default is "../pom.xml" if not specified)
+        String relativePath = getChildText(parentElement, RELATIVE_PATH, namespace);
+
+        // If relativePath is explicitly set to empty, parent is definitely external
+        if (relativePath != null && relativePath.trim().isEmpty()) {
+            return false;
+        }
+
+        // If relativePath is null, use Maven default
+        if (relativePath == null) {
+            relativePath = DEFAULT_PARENT_RELATIVE_PATH;
+        }
+
+        // Check if any POM in our reactor could be the parent based on relativePath
+        // This is a heuristic - if we have multiple POMs and the relativePath suggests
+        // a local parent, it's likely in the reactor
+        if (pomMap.size() > 1
+                && (relativePath.equals(DEFAULT_PARENT_RELATIVE_PATH)
+                        || relativePath.startsWith("../")
+                        || relativePath.startsWith("./"))) {
+            return true;
+        }
+
+        // If we only have one POM and it references a parent, it's likely external
+        return false;
     }
 
     /**
@@ -438,11 +473,9 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
             relativePath = DEFAULT_PARENT_RELATIVE_PATH; // Maven default
         }
 
-        // For now, we use a simple heuristic: if relativePath is the default "../pom.xml"
-        // and we have parent POMs in our pomMap, we can likely infer the artifactId.
-        // A more sophisticated implementation would resolve the actual path and check
-        // if the parent POM exists in pomMap.
-        return DEFAULT_PARENT_RELATIVE_PATH.equals(relativePath) && !pomMap.isEmpty();
+        // Only infer artifactId if relativePath is the default and we have multiple POMs
+        // indicating this is likely a multi-module project
+        return DEFAULT_PARENT_RELATIVE_PATH.equals(relativePath) && pomMap.size() > 1;
     }
 
     /**

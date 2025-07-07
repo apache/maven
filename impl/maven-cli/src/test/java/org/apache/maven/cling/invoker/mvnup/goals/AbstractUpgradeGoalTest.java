@@ -39,7 +39,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -189,8 +188,8 @@ class AbstractUpgradeGoalTest {
         }
 
         @Test
-        @DisplayName("should not create .mvn directory when model version is 4.1.0")
-        void shouldNotCreateMvnDirectoryWhenModelVersion410() throws Exception {
+        @DisplayName("should create .mvn directory when model version is 4.1.0")
+        void shouldCreateMvnDirectoryWhenModelVersion410() throws Exception {
             Path projectDir = tempDir.resolve("project");
             Files.createDirectories(projectDir);
 
@@ -200,11 +199,13 @@ class AbstractUpgradeGoalTest {
             when(mockOrchestrator.executeStrategies(Mockito.any(), Mockito.any()))
                     .thenReturn(UpgradeResult.empty());
 
-            // Execute with target model 4.1.0 (should not create .mvn directory)
+            // Execute with target model 4.1.0 (should create .mvn directory to avoid root warnings)
             upgradeGoal.testExecuteWithTargetModel(context, "4.1.0");
 
             Path mvnDir = projectDir.resolve(".mvn");
-            assertFalse(Files.exists(mvnDir), ".mvn directory should not be created for 4.1.0");
+            assertTrue(
+                    Files.exists(mvnDir),
+                    ".mvn directory should be created for 4.1.0 to avoid root directory warnings");
         }
 
         @Test
