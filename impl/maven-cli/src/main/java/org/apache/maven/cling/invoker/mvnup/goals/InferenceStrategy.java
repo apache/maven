@@ -396,7 +396,7 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
         hasChanges |= trimParentElementLimited(context, root, parentElement, namespace);
 
         // Only remove parent elements if the parent is in the same reactor (not external)
-        if (isParentInReactor(parentElement, namespace, pomMap)) {
+        if (isParentInReactor(parentElement, namespace, pomMap, context)) {
             // Remove parent groupId if child has no explicit groupId
             if (childGroupId == null) {
                 Element parentGroupIdElement = parentElement.getChild(GROUP_ID, namespace);
@@ -435,31 +435,30 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
      * Determines if the parent is part of the same reactor (multi-module project)
      * vs. an external parent POM by checking if the parent exists in the pomMap.
      */
-    private boolean isParentInReactor(Element parentElement, Namespace namespace, Map<Path, Document> pomMap) {
+    private boolean isParentInReactor(
+            Element parentElement, Namespace namespace, Map<Path, Document> pomMap, UpgradeContext context) {
         // If relativePath is explicitly set to empty, parent is definitely external
         String relativePath = getChildText(parentElement, RELATIVE_PATH, namespace);
         if (relativePath != null && relativePath.trim().isEmpty()) {
             return false;
         }
 
-        // Get parent GAV to match against POMs in the reactor
+        // Extract parent GAV
         String parentGroupId = getChildText(parentElement, GROUP_ID, namespace);
         String parentArtifactId = getChildText(parentElement, ARTIFACT_ID, namespace);
         String parentVersion = getChildText(parentElement, VERSION, namespace);
 
-        // Check if any POM in our reactor matches the parent GAV
+        if (parentGroupId == null || parentArtifactId == null || parentVersion == null) {
+            // Cannot determine parent GAV, assume external
+            return false;
+        }
+
+        GAV parentGAV = new GAV(parentGroupId, parentArtifactId, parentVersion);
+
+        // Check if any POM in our reactor matches the parent GAV using GAVUtils
         for (Document pomDocument : pomMap.values()) {
-            Element pomRoot = pomDocument.getRootElement();
-            Namespace pomNamespace = pomRoot.getNamespace();
-
-            String pomGroupId = getChildText(pomRoot, GROUP_ID, pomNamespace);
-            String pomArtifactId = getChildText(pomRoot, ARTIFACT_ID, pomNamespace);
-            String pomVersion = getChildText(pomRoot, VERSION, pomNamespace);
-
-            // Match groupId, artifactId, and version
-            if (Objects.equals(parentGroupId, pomGroupId)
-                    && Objects.equals(parentArtifactId, pomArtifactId)
-                    && Objects.equals(parentVersion, pomVersion)) {
+            GAV pomGAV = GAVUtils.extractGAVWithParentResolution(context, pomDocument);
+            if (pomGAV != null && pomGAV.equals(parentGAV)) {
                 return true;
             }
         }
