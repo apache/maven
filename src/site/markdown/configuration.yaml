@@ -391,6 +391,12 @@ props:
       defaultValue: 
       since: 4.0.0
       configurationSource: system_properties
+    - key: maven.versionRangeResolver.natureOverride
+      configurationType: String
+      description: "Configuration property for version range resolution used metadata \"nature\". It may contain following string values: <ul> <li>\"auto\" - decision done based on range being resolver: if any boundary is snapshot, use \"release_or_snapshot\", otherwise \"release\"</li> <li>\"release_or_snapshot\" - the default</li> <li>\"release\" - query only release repositories to discover versions</li> <li>\"snapshot\" - query only snapshot repositories to discover versions</li> </ul> Default (when unset) is existing Maven behaviour: \"release_or_snapshots\"."
+      defaultValue: release_or_snapshot
+      since: 4.0.0
+      configurationSource: User properties
     - key: maven.versionResolver.noCache
       configurationType: Boolean
       description: "User property for disabling version resolver cache."
