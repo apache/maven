@@ -94,5 +94,6 @@ To modify this file, edit the template and regenerate.
 | `maven.version.minor` | `String` | Maven minor version: contains the minor segment of this Maven version. |  -  | 4.0.0 | system_properties |
 | `maven.version.patch` | `String` | Maven patch version: contains the patch segment of this Maven version. |  -  | 4.0.0 | system_properties |
 | `maven.version.snapshot` | `String` | Maven snapshot: contains "true" if this Maven is a snapshot version. |  -  | 4.0.0 | system_properties |
+| `maven.versionRangeResolver.natureOverride` | `String` | Configuration property for version range resolution used metadata "nature". It may contain following string values: <ul> <li>"auto" - decision done based on range being resolver: if any boundary is snapshot, use "release_or_snapshot", otherwise "release"</li> <li>"release_or_snapshot" - the default</li> <li>"release" - query only release repositories to discover versions</li> <li>"snapshot" - query only snapshot repositories to discover versions</li> </ul> Default (when unset) is existing Maven behaviour: "release_or_snapshots". |  `release_or_snapshot`  | 4.0.0 | User properties |
 | `maven.versionResolver.noCache` | `Boolean` | User property for disabling version resolver cache. |  `false`  | 3.0.0 | User properties |
 
