@@ -20,7 +20,7 @@
 properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: env.BRANCH_NAME=='maven-3.9.x'?'5':'1'))])
 
 def buildOs = 'linux'
-def buildJdk = '8'
+def buildJdk = '21'
 def buildMvn = '3.x.x'
 def runITsOses = ['linux']
 def runITsJdks = ['8', '11', '17']
