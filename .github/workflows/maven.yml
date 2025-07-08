@@ -31,13 +31,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4
         with:
           java-version: 17
           distribution: 'temurin'
 
       - name: Checkout maven
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
           persist-credentials: false
 
@@ -49,7 +49,7 @@ jobs:
           cp .github/ci-mimir-daemon.properties ~/.mimir/daemon.properties
 
       - name: Handle Mimir caches
-        uses: actions/cache@v4
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
         with:
           path: ~/.mimir/local
           key: mimir-${{ runner.os }}-initial-${{ hashFiles('**/pom.xml') }}
@@ -70,7 +70,7 @@ jobs:
         run: ls -la apache-maven/target
 
       - name: Upload Maven distributions
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: maven-distributions
           path: |
@@ -87,7 +87,7 @@ jobs:
         java: ['17', '21', '24']
     steps:
       - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
@@ -105,7 +105,7 @@ jobs:
         run: choco install graphviz
 
       - name: Checkout maven
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
           persist-credentials: false
 
@@ -118,7 +118,7 @@ jobs:
           cp .github/ci-mimir-daemon.properties ~/.mimir/daemon.properties
 
       - name: Handle Mimir caches
-        uses: actions/cache@v4
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
         with:
           path: ~/.mimir/local
           key: mimir-${{ runner.os }}-full-${{ hashFiles('**/pom.xml') }}
@@ -127,7 +127,7 @@ jobs:
             mimir-${{ runner.os }}-
 
       - name: Download Maven distribution
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: maven-distributions
           path: maven-dist
@@ -166,7 +166,7 @@ jobs:
         run: mvn site -e -B -V -Preporting
 
       - name: Upload test artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: failure()
         with:
           name: ${{ github.run_number }}-full-build-artifact-${{ runner.os }}-${{ matrix.java }}
@@ -182,13 +182,13 @@ jobs:
         java: ['17', '21', '24']
     steps:
       - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
 
       - name: Checkout maven
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
           persist-credentials: false
 
@@ -201,7 +201,7 @@ jobs:
           cp .github/ci-mimir-daemon.properties ~/.mimir/daemon.properties
 
       - name: Handle Mimir caches
-        uses: actions/cache@v4
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
         with:
           path: ~/.mimir/local
           key: mimir-${{ runner.os }}-its-${{ hashFiles('**/pom.xml') }}
@@ -210,7 +210,7 @@ jobs:
             mimir-${{ runner.os }}-
 
       - name: Download Maven distribution
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: maven-distributions
           path: maven-dist
@@ -245,7 +245,7 @@ jobs:
         run: mvn install -e -B -V -Prun-its,mimir
 
       - name: Upload test artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: failure()
         with:
           name: ${{ github.run_number }}-integration-test-artifact-${{ runner.os }}-${{ matrix.java }}
