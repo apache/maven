@@ -1506,7 +1506,7 @@ public class DefaultModelValidator implements ModelValidator {
                     "modelVersion",
                     null,
                     "of '" + string + "' is older than the versions supported by this Maven version ("
-                            +getMavenVersion()
+                            + getMavenVersion()
                             + ").\n Supported modelVersions are: " + values
                             + ". Building this project requires an older version of Maven.",
                     tracker);
@@ -1740,6 +1740,7 @@ public class DefaultModelValidator implements ModelValidator {
         }
     }
 
+    // duplicate code, trying to call RuntimeInformation produces a pom induced cycle.
     private String getMavenVersion() {
         Properties properties = new Properties();
 
