@@ -1465,21 +1465,24 @@ public class DefaultModelValidator implements ModelValidator {
 
     @SuppressWarnings("checkstyle:parameternumber")
     private boolean validateModelVersion(
-            ModelProblemCollector problems, String string, InputLocationTracker tracker, String... validVersions) {
-        if (string == null || string.length() <= 0) {
+            ModelProblemCollector problems,
+            String requestedModel,
+            InputLocationTracker tracker,
+            String... validVersions) {
+        if (requestedModel == null || requestedModel.length() <= 0) {
             return true;
         }
 
-        List<String> values = Arrays.asList(validVersions);
+        List<String> validVersionsList = Arrays.asList(validVersions);
 
-        if (values.contains(string)) {
+        if (validVersionsList.contains(requestedModel)) {
             return true;
         }
 
         boolean newerThanAll = true;
         boolean olderThanAll = true;
         for (String validValue : validVersions) {
-            final int comparison = compareModelVersions(validValue, string);
+            final int comparison = compareModelVersions(validValue, requestedModel);
             newerThanAll = newerThanAll && comparison < 0;
             olderThanAll = olderThanAll && comparison > 0;
         }
@@ -1491,10 +1494,12 @@ public class DefaultModelValidator implements ModelValidator {
                     Version.V20,
                     "modelVersion",
                     null,
-                    "of '" + string + "' is newer than the versions supported by this Maven version ("
+                    "of '" + requestedModel + "' is newer than the versions supported by this Maven version ("
                             + getMavenVersion()
-                            + ").\n Supported modelVersions are: " + values
-                            + ".\n Building this project requires a newer version of Maven.",
+                            + ")." + System.lineSeparator()
+                            + " Supported modelVersions are: " + validVersionsList
+                            + "." + System.lineSeparator()
+                            + " Building this project requires a newer version of Maven.",
                     tracker);
 
         } else if (olderThanAll) {
@@ -1505,10 +1510,12 @@ public class DefaultModelValidator implements ModelValidator {
                     Version.V20,
                     "modelVersion",
                     null,
-                    "of '" + string + "' is older than the versions supported by this Maven version ("
+                    "of '" + requestedModel + "' is older than the versions supported by this Maven version ("
                             + getMavenVersion()
-                            + ").\n Supported modelVersions are: " + values
-                            + ". Building this project requires an older version of Maven.",
+                            + ")." + System.lineSeparator()
+                            + "Supported modelVersions are: " + validVersionsList
+                            + "." + System.lineSeparator()
+                            + " Building this project requires an older version of Maven.",
                     tracker);
 
         } else {
@@ -1518,7 +1525,7 @@ public class DefaultModelValidator implements ModelValidator {
                     Version.V20,
                     "modelVersion",
                     null,
-                    "must be one of " + values + " but is '" + string + "'.",
+                    "must be one of " + validVersionsList + " but is '" + requestedModel + "'.",
                     tracker);
         }
 
