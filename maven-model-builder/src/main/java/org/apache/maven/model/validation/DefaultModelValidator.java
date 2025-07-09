@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -1489,8 +1491,10 @@ public class DefaultModelValidator implements ModelValidator {
                     Version.V20,
                     "modelVersion",
                     null,
-                    "of '" + string + "' is newer than the versions supported by this version of Maven: " + values
-                            + ". Building this project requires a newer version of Maven.",
+                    "of '" + string + "' is newer than the versions supported by this Maven version("
+                            + getMavenVersion()
+                            + ").\n Supported modelVersions are: " + values
+                            + ".\n Building this project requires a newer version of Maven.",
                     tracker);
 
         } else if (olderThanAll) {
@@ -1732,5 +1736,21 @@ public class DefaultModelValidator implements ModelValidator {
         } else {
             return Severity.ERROR;
         }
+    }
+
+    private String getMavenVersion() {
+        Properties properties = new Properties();
+
+        try (InputStream resourceAsStream =
+                getClass().getResourceAsStream("/org/apache/maven/messages/build.properties")) {
+
+            if (resourceAsStream != null) {
+                properties.load(resourceAsStream);
+            }
+        } catch (Exception e) {
+            System.err.println("Unable determine version from JAR file: " + e.getMessage());
+        }
+
+        return properties.getProperty("version");
     }
 }
