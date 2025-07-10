@@ -16,8 +16,8 @@ pipeline {
           checkout scm
           mavenBuild("jdk_17_latest", "")
           script {
-            properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: env.BRANCH_NAME == 'master' ? '30' : '5'))])
-            if (env.BRANCH_NAME == 'master') {
+            properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: isDeployedBranch() ? '30' : '5'))])
+            if (isDeployedBranch()) {
               withEnv(["JAVA_HOME=${tool "jdk_17_latest"}",
                        "PATH+MAVEN=${ tool "jdk_17_latest" }/bin:${tool "maven_3_latest"}/bin",
                        "MAVEN_OPTS=-Xms4G -Xmx4G -Djava.awt.headless=true"]) {
@@ -29,6 +29,10 @@ pipeline {
       }
     }
   }
+}
+
+boolean isDeployedBranch() {
+  return env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'maven-4.0.x' || env.BRANCH_NAME == 'maven-3.9.x'
 }
 
 /**
