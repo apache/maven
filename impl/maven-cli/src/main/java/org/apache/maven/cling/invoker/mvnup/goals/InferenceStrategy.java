@@ -388,44 +388,83 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
             Map<Path, Document> pomMap) {
         boolean hasChanges = false;
 
-        // First apply limited inference (child elements)
-        hasChanges |= trimParentElementLimited(context, root, parentElement, namespace);
-
-        // Get child GAV
+        // Get child GAV before applying any changes
         String childGroupId = getChildText(root, GROUP_ID, namespace);
         String childVersion = getChildText(root, VERSION, namespace);
 
-        // Remove parent groupId if child has no explicit groupId
-        if (childGroupId == null) {
-            Element parentGroupIdElement = parentElement.getChild(GROUP_ID, namespace);
-            if (parentGroupIdElement != null) {
-                removeElementWithFormatting(parentGroupIdElement);
-                context.detail("Removed: parent groupId (child has no explicit groupId)");
-                hasChanges = true;
-            }
-        }
+        // First apply limited inference (child elements) - this removes matching child groupId/version
+        hasChanges |= trimParentElementLimited(context, root, parentElement, namespace);
 
-        // Remove parent version if child has no explicit version
-        if (childVersion == null) {
-            Element parentVersionElement = parentElement.getChild(VERSION, namespace);
-            if (parentVersionElement != null) {
-                removeElementWithFormatting(parentVersionElement);
-                context.detail("Removed: parent version (child has no explicit version)");
-                hasChanges = true;
+        // Only remove parent elements if the parent is in the same reactor (not external)
+        if (isParentInReactor(parentElement, namespace, pomMap, context)) {
+            // Remove parent groupId if child has no explicit groupId
+            if (childGroupId == null) {
+                Element parentGroupIdElement = parentElement.getChild(GROUP_ID, namespace);
+                if (parentGroupIdElement != null) {
+                    removeElementWithFormatting(parentGroupIdElement);
+                    context.detail("Removed: parent groupId (child has no explicit groupId)");
+                    hasChanges = true;
+                }
             }
-        }
 
-        // Remove parent artifactId if it can be inferred from relativePath
-        if (canInferParentArtifactId(parentElement, namespace, pomMap)) {
-            Element parentArtifactIdElement = parentElement.getChild(ARTIFACT_ID, namespace);
-            if (parentArtifactIdElement != null) {
-                removeElementWithFormatting(parentArtifactIdElement);
-                context.detail("Removed: parent artifactId (can be inferred from relativePath)");
-                hasChanges = true;
+            // Remove parent version if child has no explicit version
+            if (childVersion == null) {
+                Element parentVersionElement = parentElement.getChild(VERSION, namespace);
+                if (parentVersionElement != null) {
+                    removeElementWithFormatting(parentVersionElement);
+                    context.detail("Removed: parent version (child has no explicit version)");
+                    hasChanges = true;
+                }
+            }
+
+            // Remove parent artifactId if it can be inferred from relativePath
+            if (canInferParentArtifactId(parentElement, namespace, pomMap)) {
+                Element parentArtifactIdElement = parentElement.getChild(ARTIFACT_ID, namespace);
+                if (parentArtifactIdElement != null) {
+                    removeElementWithFormatting(parentArtifactIdElement);
+                    context.detail("Removed: parent artifactId (can be inferred from relativePath)");
+                    hasChanges = true;
+                }
             }
         }
 
         return hasChanges;
+    }
+
+    /**
+     * Determines if the parent is part of the same reactor (multi-module project)
+     * vs. an external parent POM by checking if the parent exists in the pomMap.
+     */
+    private boolean isParentInReactor(
+            Element parentElement, Namespace namespace, Map<Path, Document> pomMap, UpgradeContext context) {
+        // If relativePath is explicitly set to empty, parent is definitely external
+        String relativePath = getChildText(parentElement, RELATIVE_PATH, namespace);
+        if (relativePath != null && relativePath.trim().isEmpty()) {
+            return false;
+        }
+
+        // Extract parent GAV
+        String parentGroupId = getChildText(parentElement, GROUP_ID, namespace);
+        String parentArtifactId = getChildText(parentElement, ARTIFACT_ID, namespace);
+        String parentVersion = getChildText(parentElement, VERSION, namespace);
+
+        if (parentGroupId == null || parentArtifactId == null || parentVersion == null) {
+            // Cannot determine parent GAV, assume external
+            return false;
+        }
+
+        GAV parentGAV = new GAV(parentGroupId, parentArtifactId, parentVersion);
+
+        // Check if any POM in our reactor matches the parent GAV using GAVUtils
+        for (Document pomDocument : pomMap.values()) {
+            GAV pomGAV = GAVUtils.extractGAVWithParentResolution(context, pomDocument);
+            if (pomGAV != null && pomGAV.equals(parentGAV)) {
+                return true;
+            }
+        }
+
+        // Parent not found in reactor, must be external
+        return false;
     }
 
     /**
@@ -438,11 +477,9 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
             relativePath = DEFAULT_PARENT_RELATIVE_PATH; // Maven default
         }
 
-        // For now, we use a simple heuristic: if relativePath is the default "../pom.xml"
-        // and we have parent POMs in our pomMap, we can likely infer the artifactId.
-        // A more sophisticated implementation would resolve the actual path and check
-        // if the parent POM exists in pomMap.
-        return DEFAULT_PARENT_RELATIVE_PATH.equals(relativePath) && !pomMap.isEmpty();
+        // Only infer artifactId if relativePath is the default and we have multiple POMs
+        // indicating this is likely a multi-module project
+        return DEFAULT_PARENT_RELATIVE_PATH.equals(relativePath) && pomMap.size() > 1;
     }
 
     /**

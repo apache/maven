@@ -118,35 +118,35 @@ public class UpgradeContext extends LookupContext {
      * Logs a successful operation with a checkmark icon.
      */
     public void success(String message) {
-        logger.info(getCurrentIndent() + "✓ " + message);
+        logger.info(getCurrentIndent() + ConsoleIcon.SUCCESS.getIcon(terminal) + " " + message);
     }
 
     /**
      * Logs an error with an X icon.
      */
     public void failure(String message) {
-        logger.error(getCurrentIndent() + "✗ " + message);
+        logger.error(getCurrentIndent() + ConsoleIcon.ERROR.getIcon(terminal) + " " + message);
     }
 
     /**
      * Logs a warning with a warning icon.
      */
     public void warning(String message) {
-        logger.warn(getCurrentIndent() + "⚠ " + message);
+        logger.warn(getCurrentIndent() + ConsoleIcon.WARNING.getIcon(terminal) + " " + message);
     }
 
     /**
      * Logs detailed information with a bullet point.
      */
     public void detail(String message) {
-        logger.info(getCurrentIndent() + "• " + message);
+        logger.info(getCurrentIndent() + ConsoleIcon.DETAIL.getIcon(terminal) + " " + message);
     }
 
     /**
      * Logs a performed action with an arrow icon.
      */
     public void action(String message) {
-        logger.info(getCurrentIndent() + "→ " + message);
+        logger.info(getCurrentIndent() + ConsoleIcon.ACTION.getIcon(terminal) + " " + message);
     }
 
     /**

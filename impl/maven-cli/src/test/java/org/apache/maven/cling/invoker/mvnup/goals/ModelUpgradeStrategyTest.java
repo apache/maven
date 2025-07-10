@@ -323,4 +323,63 @@ class ModelUpgradeStrategyTest {
                     "Description should mention model or upgrade");
         }
     }
+
+    @Nested
+    @DisplayName("Downgrade Handling")
+    class DowngradeHandlingTests {
+
+        @Test
+        @DisplayName("should fail with error when attempting downgrade from 4.1.0 to 4.0.0")
+        void shouldFailWhenAttemptingDowngrade() throws Exception {
+            String pomXml =
+                    """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.1.0">
+                    <modelVersion>4.1.0</modelVersion>
+                    <groupId>com.example</groupId>
+                    <artifactId>test-project</artifactId>
+                    <version>1.0.0</version>
+                </project>
+                """;
+
+            Document document = saxBuilder.build(new StringReader(pomXml));
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = TestUtils.createMockContext(TestUtils.createOptionsWithModelVersion("4.0.0"));
+
+            UpgradeResult result = strategy.apply(context, pomMap);
+
+            // Should have errors (not just warnings)
+            assertTrue(result.errorCount() > 0, "Downgrade should result in errors");
+            assertFalse(result.success(), "Downgrade should not be successful");
+            assertEquals(1, result.errorCount(), "Should have exactly one error");
+        }
+
+        @Test
+        @DisplayName("should succeed when upgrading from 4.0.0 to 4.1.0")
+        void shouldSucceedWhenUpgrading() throws Exception {
+            String pomXml =
+                    """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>com.example</groupId>
+                    <artifactId>test-project</artifactId>
+                    <version>1.0.0</version>
+                </project>
+                """;
+
+            Document document = saxBuilder.build(new StringReader(pomXml));
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = TestUtils.createMockContext(TestUtils.createOptionsWithModelVersion("4.1.0"));
+
+            UpgradeResult result = strategy.apply(context, pomMap);
+
+            // Should succeed
+            assertTrue(result.success(), "Valid upgrade should be successful");
+            assertEquals(0, result.errorCount(), "Should have no errors");
+            assertEquals(1, result.modifiedCount(), "Should have modified one POM");
+        }
+    }
 }

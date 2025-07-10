@@ -30,7 +30,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -94,8 +93,8 @@ class UpgradeWorkflowIntegrationTest {
         }
 
         @Test
-        @DisplayName("should not create .mvn directory when upgrading to 4.1.0")
-        void shouldNotCreateMvnDirectoryFor41Upgrade() throws Exception {
+        @DisplayName("should create .mvn directory when upgrading to 4.1.0")
+        void shouldCreateMvnDirectoryFor41Upgrade() throws Exception {
             Path pomFile = tempDir.resolve("pom.xml");
             String originalPom = PomBuilder.create()
                     .groupId("com.example")
@@ -110,7 +109,9 @@ class UpgradeWorkflowIntegrationTest {
             applyGoal.execute(context);
 
             Path mvnDir = tempDir.resolve(".mvn");
-            assertFalse(Files.exists(mvnDir), ".mvn directory should not be created for 4.1.0 upgrade");
+            assertTrue(
+                    Files.exists(mvnDir),
+                    ".mvn directory should be created for 4.1.0 upgrade to avoid root directory warnings");
         }
     }
 
