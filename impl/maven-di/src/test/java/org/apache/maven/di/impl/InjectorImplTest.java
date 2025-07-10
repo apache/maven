@@ -475,4 +475,34 @@ public class InjectorImplTest {
         @Named
         static class DefaultPriorityServiceImpl implements MyService {}
     }
+
+    @Test
+    void testDisposeClearsBindingsAndCache() {
+        final Injector injector = Injector.create()
+                // bind two simple beans
+                .bindImplicit(DisposeTest.Foo.class)
+                .bindImplicit(DisposeTest.Bar.class);
+
+        // make sure they really get created
+        assertNotNull(injector.getInstance(DisposeTest.Foo.class));
+        assertNotNull(injector.getInstance(DisposeTest.Bar.class));
+
+        // now dispose
+        injector.dispose();
+
+        // after dispose, bindings should be gone => DIException on lookup
+        assertThrows(DIException.class, () -> injector.getInstance(DisposeTest.Foo.class));
+        assertThrows(DIException.class, () -> injector.getInstance(DisposeTest.Bar.class));
+    }
+
+    /**
+     * Simple test classes for dispose().
+     */
+    static class DisposeTest {
+        @Named
+        static class Foo {}
+
+        @Named
+        static class Bar {}
+    }
 }
