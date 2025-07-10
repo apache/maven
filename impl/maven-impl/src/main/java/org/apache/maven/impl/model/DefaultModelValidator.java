@@ -80,8 +80,6 @@ import org.apache.maven.model.v4.MavenTransformer;
 import org.eclipse.aether.scope.DependencyScope;
 import org.eclipse.aether.scope.ScopeManager;
 
-import static java.util.Objects.requireNonNull;
-
 /**
  */
 @Named
@@ -2180,7 +2178,10 @@ public class DefaultModelValidator implements ModelValidator {
         buffer.append('\'').append(fieldName).append('\'');
 
         if (sourceHint != null) {
-            buffer.append(" for ").append(sourceHint);
+            String hint = sourceHint.get();
+            if (hint != null) {
+                buffer.append(" for ").append(hint);
+            }
         }
 
         buffer.append(' ').append(message);
@@ -2235,73 +2236,49 @@ public class DefaultModelValidator implements ModelValidator {
         }
     }
 
-    private static class SourceHint {
-        @Nullable
-        public static SourceHint xmlNodeInputLocation(XmlNode xmlNode) {
-            if (xmlNode.inputLocation() != null) {
-                return new SourceHint(xmlNode.inputLocation().toString(), null);
-            } else {
-                return null;
-            }
+    private interface SourceHint extends Supplier<String> {
+        static SourceHint xmlNodeInputLocation(XmlNode xmlNode) {
+            return () ->
+                    xmlNode.inputLocation() != null ? xmlNode.inputLocation().toString() : null;
         }
 
-        public static SourceHint gav(String gav) {
-            return new SourceHint(gav, null); // GAV
+        static SourceHint gav(String gav) {
+            return () -> gav; // GAV
         }
 
-        public static SourceHint dependencyManagementKey(Dependency dependency) {
-            String hint;
-            if (dependency.getClassifier() == null
-                    || dependency.getClassifier().trim().isEmpty()) {
-                hint = String.format(
-                        "groupId=%s, artifactId=%s, type=%s",
-                        nvl(dependency.getGroupId()), nvl(dependency.getArtifactId()), nvl(dependency.getType()));
-            } else {
-                hint = String.format(
-                        "groupId=%s, artifactId=%s, classifier=%s, type=%s",
-                        nvl(dependency.getGroupId()),
-                        nvl(dependency.getArtifactId()),
-                        nvl(dependency.getClassifier()),
-                        nvl(dependency.getType()));
-            }
-            return new SourceHint(hint, null); // DMK
+        static SourceHint dependencyManagementKey(Dependency dependency) {
+            return () -> {
+                String hint;
+                if (dependency.getClassifier() == null
+                        || dependency.getClassifier().isBlank()) {
+                    hint = "groupId=" + valueToValueString(dependency.getGroupId())
+                            + ", artifactId=" + valueToValueString(dependency.getArtifactId())
+                            + ", type=" + valueToValueString(dependency.getType());
+                } else {
+                    hint = "groupId=" + valueToValueString(dependency.getGroupId())
+                            + ", artifactId=" + valueToValueString(dependency.getArtifactId())
+                            + ", classifier=" + valueToValueString(dependency.getClassifier())
+                            + ", type=" + valueToValueString(dependency.getType());
+                }
+                return hint;
+            };
         }
 
-        private static String nvl(String value) {
+        private static String valueToValueString(String value) {
             return value == null ? "" : "'" + value + "'";
         }
 
-        public static SourceHint pluginKey(Plugin plugin) {
-            return new SourceHint(plugin.getKey(), null); // PK
+        static SourceHint pluginKey(Plugin plugin) {
+            return plugin::getKey;
         }
 
-        public static SourceHint repoId(Repository repository) {
-            return new SourceHint(repository.getId(), null); // ID
+        static SourceHint repoId(Repository repository) {
+            return repository::getId;
         }
 
         @Nullable
-        public static SourceHint resourceDirectory(Resource resource) {
-            if (resource.getDirectory() == null) {
-                return null;
-            }
-            return new SourceHint(resource.getDirectory(), null); // DIR
-        }
-
-        private final String hint;
-        private final String format;
-
-        private SourceHint(String hint, String format) {
-            this.hint = requireNonNull(hint, "hint");
-            this.format = format;
-        }
-
-        @Override
-        public String toString() {
-            String result = hint;
-            if (format != null) {
-                result = result + " (" + format + ")";
-            }
-            return result;
+        static SourceHint resourceDirectory(Resource resource) {
+            return resource::getDirectory;
         }
     }
 }
