@@ -329,11 +329,18 @@ public abstract class MavenExecutorTestSupport {
     }
 
     public static ExecutorRequest.Builder mvn3ExecutorRequestBuilder() {
-        return ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven3home")));
+        return addTailRepo(ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven3home"))));
     }
 
     public static ExecutorRequest.Builder mvn4ExecutorRequestBuilder() {
-        return ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven4home")));
+        return addTailRepo(ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven4home"))));
+    }
+
+    private static ExecutorRequest.Builder addTailRepo(ExecutorRequest.Builder builder) {
+        if (System.getProperty("localRepository") != null) {
+            builder.argument("-Dmaven.repo.local.tail=" + System.getProperty("localRepository"));
+        }
+        return builder;
     }
 
     protected void layDownFiles(Path cwd) throws IOException {
