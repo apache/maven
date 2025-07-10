@@ -1463,7 +1463,16 @@ public class DefaultModelValidator implements ModelValidator {
                 Matcher m = EXPRESSION_NAME_PATTERN.matcher(repository.getUrl());
                 while (m.find()) {
                     String expr = m.group(1);
-                    if (!("basedir".equals(expr)
+                    if ("project.baseUri".equals(expr)) {
+                        addViolation(
+                                problems,
+                                Severity.WARNING,
+                                Version.V40,
+                                prefix + prefix2 + "[" + repository.getId() + "].url",
+                                null,
+                                "contains a deprecated 'project.baseUri' expression,  use 'project.basedir.uri' instead.",
+                                repository);
+                    } else if (!("basedir".equals(expr)
                             || "project.basedir".equals(expr)
                             || expr.startsWith("project.basedir.")
                             || "project.rootDirectory".equals(expr)
