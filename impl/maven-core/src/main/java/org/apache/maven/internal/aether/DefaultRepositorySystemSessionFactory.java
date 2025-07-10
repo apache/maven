@@ -63,6 +63,7 @@ import org.eclipse.aether.util.graph.version.ContextualSnapshotVersionFilter;
 import org.eclipse.aether.util.graph.version.HighestVersionFilter;
 import org.eclipse.aether.util.graph.version.LowestVersionFilter;
 import org.eclipse.aether.util.graph.version.PredicateVersionFilter;
+import org.eclipse.aether.util.graph.version.SnapshotVersionFilter;
 import org.eclipse.aether.util.listener.ChainedRepositoryListener;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
 import org.eclipse.aether.util.repository.ChainedLocalRepositoryManager;
@@ -435,6 +436,8 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
                     filters.add(new LowestVersionFilter(num));
                 } else if ("s".equals(expression)) {
                     filters.add(new ContextualSnapshotVersionFilter());
+                } else if ("ns".equals(expression)) {
+                    filters.add(new SnapshotVersionFilter());
                 } else if (expression.startsWith("e(") && expression.endsWith(")")) {
                     Artifact artifact = new DefaultArtifact(expression.substring(2, expression.length() - 1));
                     VersionRange versionRange =
