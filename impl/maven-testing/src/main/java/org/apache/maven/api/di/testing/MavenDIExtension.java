@@ -108,8 +108,7 @@ public class MavenDIExtension implements BeforeEachCallback, AfterEachCallback {
     @Override
     public void afterEach(ExtensionContext context) throws Exception {
         if (injector != null) {
-            // TODO: implement
-            // injector.dispose();
+            injector.dispose();
             injector = null;
         }
     }

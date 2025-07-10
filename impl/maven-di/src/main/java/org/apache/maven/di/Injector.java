@@ -161,4 +161,16 @@ public interface Injector {
      */
     @Nonnull
     <T> T getInstance(@Nonnull Key<T> key);
+
+    /**
+     * Disposes this Injector, clearing all internal state (bindings, caches, scopes, etc.).
+     * After calling this, the Injector should not be used again.
+     * @since 4.1
+     */
+    default void dispose() {
+        // delegate to the implementation
+        if (this instanceof InjectorImpl) {
+            ((InjectorImpl) this).dispose();
+        }
+    }
 }
