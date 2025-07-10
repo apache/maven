@@ -33,6 +33,7 @@ pipeline {
 
 /**
  * To other developers, if you are using this method above, please use the following syntax.
+ * By default this method does NOT execute ITs anymore, just "install".
  *
  * mavenBuild("<jdk>", "<profiles> <goals> <plugins> <properties>"
  *
@@ -47,7 +48,7 @@ def mavenBuild(jdk, extraArgs) {
                "MAVEN_OPTS=-Xms4G -Xmx4G -Djava.awt.headless=true"]) {
         sh "mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper -Dmaven=3.9.10"
         sh "echo run Its"
-        sh "./mvnw install $extraArgs -e -B -V -P run-its"
+        sh "./mvnw -e -B -V install $extraArgs"
       }
     }
     finally {
