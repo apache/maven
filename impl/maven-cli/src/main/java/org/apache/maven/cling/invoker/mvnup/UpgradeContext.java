@@ -48,9 +48,6 @@ public class UpgradeContext extends LookupContext {
     private int indentLevel = 0;
     private String indentString = Indentation.DEFAULT;
 
-    // Console compatibility - use ASCII fallbacks for systems that don't support Unicode
-    private final boolean useUnicodeIcons = supportsUnicode();
-
     public void addInHeader(String text) {
         addInHeader(AttributedStyle.DEFAULT, text);
     }
@@ -121,40 +118,35 @@ public class UpgradeContext extends LookupContext {
      * Logs a successful operation with a checkmark icon.
      */
     public void success(String message) {
-        String icon = useUnicodeIcons ? "✓" : "[OK]";
-        logger.info(getCurrentIndent() + icon + " " + message);
+        logger.info(getCurrentIndent() + ConsoleIcon.SUCCESS.getIcon(terminal) + " " + message);
     }
 
     /**
      * Logs an error with an X icon.
      */
     public void failure(String message) {
-        String icon = useUnicodeIcons ? "✗" : "[ERROR]";
-        logger.error(getCurrentIndent() + icon + " " + message);
+        logger.error(getCurrentIndent() + ConsoleIcon.ERROR.getIcon(terminal) + " " + message);
     }
 
     /**
      * Logs a warning with a warning icon.
      */
     public void warning(String message) {
-        String icon = useUnicodeIcons ? "⚠" : "[WARNING]";
-        logger.warn(getCurrentIndent() + icon + " " + message);
+        logger.warn(getCurrentIndent() + ConsoleIcon.WARNING.getIcon(terminal) + " " + message);
     }
 
     /**
      * Logs detailed information with a bullet point.
      */
     public void detail(String message) {
-        String icon = useUnicodeIcons ? "•" : "-";
-        logger.info(getCurrentIndent() + icon + " " + message);
+        logger.info(getCurrentIndent() + ConsoleIcon.DETAIL.getIcon(terminal) + " " + message);
     }
 
     /**
      * Logs a performed action with an arrow icon.
      */
     public void action(String message) {
-        String icon = useUnicodeIcons ? "→" : ">";
-        logger.info(getCurrentIndent() + icon + " " + message);
+        logger.info(getCurrentIndent() + ConsoleIcon.ACTION.getIcon(terminal) + " " + message);
     }
 
     /**
@@ -166,28 +158,5 @@ public class UpgradeContext extends LookupContext {
     @Nonnull
     public UpgradeOptions options() {
         return (UpgradeOptions) super.options();
-    }
-
-    /**
-     * Detects if the current console supports Unicode characters.
-     * Uses the terminal's stdout encoding to determine Unicode support.
-     *
-     * @return true if Unicode is likely supported, false otherwise
-     */
-    private boolean supportsUnicode() {
-        try {
-            // Use the terminal's actual stdout encoding if available
-            if (terminal != null && terminal.stdoutEncoding() != null) {
-                String encoding = terminal.stdoutEncoding().name().toLowerCase();
-                // UTF-8 and UTF-16 encodings support Unicode
-                return encoding.contains("utf");
-            }
-        } catch (Exception e) {
-            // If we can't determine the terminal encoding, fall back to system encoding
-        }
-
-        // Fallback to system file encoding
-        String systemEncoding = System.getProperty("file.encoding", "").toLowerCase();
-        return systemEncoding.contains("utf");
     }
 }

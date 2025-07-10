@@ -44,7 +44,7 @@ class UpgradeContextTest {
         assertNotNull(context.options(), "Options should be available");
 
         // Test that icon methods don't throw exceptions
-        // (The actual icon choice depends on Unicode detection)
+        // (The actual icon choice depends on terminal charset capabilities)
         context.success("Test success message");
         context.failure("Test failure message");
         context.warning("Test warning message");
@@ -69,17 +69,19 @@ class UpgradeContextTest {
     }
 
     @Test
-    @DisplayName("should detect Unicode support based on terminal encoding")
-    void shouldDetectUnicodeSupportBasedOnTerminalEncoding() {
+    @DisplayName("should handle icon rendering based on terminal capabilities")
+    void shouldHandleIconRenderingBasedOnTerminalCapabilities() {
         UpgradeContext context = TestUtils.createMockContext(Paths.get("/test"));
 
-        // Test that Unicode detection doesn't throw exceptions
-        // The actual result depends on the terminal encoding, but the method should work
-        context.success("Unicode detection test");
-        context.failure("Unicode detection test");
-        context.warning("Unicode detection test");
+        // Test that icon rendering doesn't throw exceptions
+        // The actual icons used depend on the terminal's charset capabilities
+        context.success("Icon rendering test");
+        context.failure("Icon rendering test");
+        context.warning("Icon rendering test");
+        context.detail("Icon rendering test");
+        context.action("Icon rendering test");
 
-        // The exact icons used depend on Unicode support detection
         // We just verify the methods work without throwing exceptions
+        // The specific icons (Unicode vs ASCII) depend on terminal charset
     }
 }
