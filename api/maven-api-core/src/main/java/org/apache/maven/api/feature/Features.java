@@ -48,6 +48,13 @@ public final class Features {
         return doGet(userProperties, Constants.MAVEN_CONSUMER_POM, !mavenMaven3Personality(userProperties));
     }
 
+    /**
+     * Check if build POM deployment is enabled.
+     */
+    public static boolean deployBuildPom(@Nullable Map<String, ?> userProperties) {
+        return doGet(userProperties, Constants.MAVEN_DEPLOY_BUILD_POM, true);
+    }
+
     private static boolean doGet(Properties userProperties, String key, boolean def) {
         return doGet(userProperties != null ? userProperties.get(key) : null, def);
     }

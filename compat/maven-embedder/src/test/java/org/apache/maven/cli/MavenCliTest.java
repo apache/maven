@@ -592,14 +592,14 @@ class MavenCliTest {
         Files.createDirectories(mavenHome);
         Path mavenConf = mavenHome.resolve("conf");
         Files.createDirectories(mavenConf);
-        Path mavenUserProps = mavenConf.resolve("maven.properties");
-        Files.writeString(mavenUserProps, "${includes} = ?${session.rootDirectory}/.mvn/maven.properties\n");
+        Path mavenUserProps = mavenConf.resolve("maven-user.properties");
+        Files.writeString(mavenUserProps, "${includes} = ?${session.rootDirectory}/.mvn/maven-user.properties\n");
         Path rootDirectory = fs.getPath("C:\\myRootDirectory");
         Path topDirectory = rootDirectory.resolve("myTopDirectory");
         Path mvn = rootDirectory.resolve(".mvn");
         Files.createDirectories(mvn);
         Files.writeString(
-                mvn.resolve("maven.properties"),
+                mvn.resolve("maven-user.properties"),
                 "${includes} = env-${envName}.properties\nfro = ${bar}z\n" + "bar = chti${java.version}\n");
         Files.writeString(mvn.resolve("env-test.properties"), "\n");
 
