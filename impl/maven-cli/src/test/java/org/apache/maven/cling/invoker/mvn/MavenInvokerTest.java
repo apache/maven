@@ -34,6 +34,8 @@ import org.codehaus.plexus.classworlds.ClassWorld;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -231,6 +233,65 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
     void jimFs() throws Exception {
         try (FileSystem fs = Jimfs.newFileSystem(Configuration.unix())) {
             invoke(fs.getPath("/cwd"), fs.getPath("/home"), List.of("verify"), List.of());
+        }
+    }
+
+    @Test
+    @EnabledOnOs(OS.WINDOWS)
+    void msysRepoPathIsNormalised(@TempDir Path tmp) throws Exception {
+
+        final Path cwd = tmp.resolve("project");
+        final Path userHome = tmp.resolve("userHome");
+        Files.createDirectories(cwd);
+        Files.createDirectories(userHome.resolve(".m2"));
+
+        /* ---------- PATCH: write minimal, well-formed toolchains.xml ---------- */
+        Files.writeString(
+                userHome.resolve(".m2/toolchains.xml"),
+                """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <toolchains xmlns="http://maven.apache.org/TOOLCHAINS/1.1.0"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://maven.apache.org/TOOLCHAINS/1.1.0 https://maven.apache.org/xsd/toolchains-1.1.0.xsd">
+            </toolchains>
+            """);
+
+        /* minimal POM so Maven has something to parse */
+        Files.writeString(
+                cwd.resolve("pom.xml"),
+                """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <project xmlns="http://maven.apache.org/POM/4.0.0"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+                <modelVersion>4.0.0</modelVersion>
+                <groupId>org.apache.maven.samples</groupId>
+                <artifactId>sample</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </project>
+            """);
+
+        /* pretend we are on Windows so the normaliser runs */
+        final String origOs = System.getProperty("os.name");
+        System.setProperty("os.name", "Windows 10");
+        try {
+            final List<String> args = List.of("-Dmaven.repo.local=/c/projects/mmm/conf/.m2/repository");
+            final List<String> goals = List.of("validate");
+
+            final Map<String, String> logs = invoke(cwd, userHome, goals, args);
+            final String log = String.join("", logs.values());
+
+            /* no doubled-drive repository attempt */
+            assertFalse(
+                    log.contains("\\c\\projects") || log.contains("\\d\\projects"),
+                    "Maven still tried to use a doubled-drive path:\n" + log);
+
+        } finally {
+            if (origOs == null) {
+                System.clearProperty("os.name");
+            } else {
+                System.setProperty("os.name", origOs);
+            }
         }
     }
 }
