@@ -45,9 +45,12 @@ public class ConcurrencyDependencyGraph {
 
     private final Set<MavenProject> finishedProjects = new HashSet<>();
 
+    private final SmartProjectComparator projectComparator;
+
     public ConcurrencyDependencyGraph(ProjectBuildList projectBuilds, ProjectDependencyGraph projectDependencyGraph) {
         this.projectDependencyGraph = projectDependencyGraph;
         this.projectBuilds = projectBuilds;
+        this.projectComparator = new SmartProjectComparator(projectDependencyGraph);
     }
 
     public int getNumberOfBuilds() {
@@ -55,9 +58,9 @@ public class ConcurrencyDependencyGraph {
     }
 
     /**
-     * Gets all the builds that have no reactor-dependencies
+     * Gets all the builds that have no reactor-dependencies, ordered by critical path priority
      *
-     * @return A set of all the initial builds
+     * @return A list of all the initial builds, ordered by priority (critical path first)
      */
     public List<MavenProject> getRootSchedulableBuilds() {
         Set<MavenProject> result = new LinkedHashSet<>();
@@ -72,7 +75,11 @@ public class ConcurrencyDependencyGraph {
             // Must return at least one project
             result.add(projectBuilds.get(0).getProject());
         }
-        return new ArrayList<>(result);
+
+        // Sort by critical path priority (projects with longer critical paths first)
+        List<MavenProject> sortedResult = new ArrayList<>(result);
+        sortedResult.sort(projectComparator.getComparator());
+        return sortedResult;
     }
 
     /**
@@ -96,6 +103,9 @@ public class ConcurrencyDependencyGraph {
                 result.add(dependentProject);
             }
         }
+
+        // Sort newly schedulable projects by critical path priority
+        result.sort(projectComparator.getComparator());
         return result;
     }
 
@@ -139,5 +149,14 @@ public class ConcurrencyDependencyGraph {
         List<MavenProject> activeDependencies = projectDependencyGraph.getUpstreamProjects(p, false);
         activeDependencies.removeAll(finishedProjects);
         return activeDependencies;
+    }
+
+    /**
+     * Gets the smart project comparator used for critical path scheduling.
+     *
+     * @return the project comparator
+     */
+    public SmartProjectComparator getProjectComparator() {
+        return projectComparator;
     }
 }
