@@ -99,6 +99,7 @@ public class MultiThreadedBuilder implements Builder {
             try {
                 ConcurrencyDependencyGraph analyzer =
                         new ConcurrencyDependencyGraph(segmentProjectBuilds, session.getProjectDependencyGraph());
+
                 multiThreadedProjectTaskSegmentBuild(
                         analyzer, reactorContext, session, service, taskSegment, projectBuildMap);
                 if (reactorContext.getReactorBuildStatus().isHalted()) {
@@ -131,7 +132,7 @@ public class MultiThreadedBuilder implements Builder {
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toSet());
 
-        // schedule independent projects
+        // schedule independent projects (ordered by critical path priority)
         for (MavenProject mavenProject : analyzer.getRootSchedulableBuilds()) {
             ProjectSegment projectSegment = projectBuildList.get(mavenProject);
             logger.debug("Scheduling: {}", projectSegment.getProject());
