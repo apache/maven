@@ -534,7 +534,7 @@ public class PathSelector implements PathMatcher {
     }
 
     /**
-     * Returns {@code true} if at least one pattern requires path to be relativized before to be matched.
+     * Returns {@code true} if at least one pattern requires path being relativized before to be matched.
      *
      * @param patterns include or exclude patterns
      * @return whether at least one pattern require relativization
@@ -561,11 +561,11 @@ public class PathSelector implements PathMatcher {
     }
 
     /**
-     * {@return whether there is no include or exclude filters}.
+     * {@return whether there are no include or exclude filters}.
      * In such case, this {@code PathSelector} instance should be ignored.
      */
     public boolean isEmpty() {
-        return (includes.length | excludes.length) == 0;
+        return includes.length == 0 && excludes.length == 0;
     }
 
     /**
