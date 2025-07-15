@@ -83,7 +83,7 @@ public final class DefaultSourceRoot implements SourceRoot {
         } else {
             Path src = baseDir.resolve("src");
             if (moduleName != null) {
-                src = src.resolve(language.id());
+                src = src.resolve(moduleName);
             }
             directory = src.resolve(scope.id()).resolve(language.id());
         }
