@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Deque;
@@ -1757,7 +1758,7 @@ public class DefaultModelValidator implements ModelValidator {
             if (resourceAsStream != null) {
                 properties.load(resourceAsStream);
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.err.println("Unable determine version from JAR file: " + e.getMessage());
         }
 
