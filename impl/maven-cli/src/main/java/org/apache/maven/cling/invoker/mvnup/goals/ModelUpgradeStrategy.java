@@ -114,7 +114,9 @@ public class ModelUpgradeStrategy extends AbstractUpgradeStrategy {
                     context.success("Model upgrade completed");
                     modifiedPoms.add(pomPath);
                 } else {
-                    context.warning("Cannot upgrade from " + currentVersion + " to " + targetModelVersion);
+                    // Treat invalid upgrades (including downgrades) as errors, not warnings
+                    context.failure("Cannot upgrade from " + currentVersion + " to " + targetModelVersion);
+                    errorPoms.add(pomPath);
                 }
             } catch (Exception e) {
                 context.failure("Model upgrade failed: " + e.getMessage());

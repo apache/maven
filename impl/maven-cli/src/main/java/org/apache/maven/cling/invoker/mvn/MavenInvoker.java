@@ -146,7 +146,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             }
         } else {
             String userToolchainsFileStr =
-                    context.protoSession.getUserProperties().get(Constants.MAVEN_USER_TOOLCHAINS);
+                    context.protoSession.getEffectiveProperties().get(Constants.MAVEN_USER_TOOLCHAINS);
             if (userToolchainsFileStr != null) {
                 userToolchainsFile = context.cwd.resolve(userToolchainsFileStr);
             }
@@ -163,7 +163,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             }
         } else {
             String installationToolchainsFileStr =
-                    context.protoSession.getUserProperties().get(Constants.MAVEN_INSTALLATION_TOOLCHAINS);
+                    context.protoSession.getEffectiveProperties().get(Constants.MAVEN_INSTALLATION_TOOLCHAINS);
             if (installationToolchainsFileStr != null) {
                 installationToolchainsFile = context.installationDirectory
                         .resolve(installationToolchainsFileStr)

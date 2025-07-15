@@ -495,6 +495,19 @@ public final class Constants {
     public static final String MAVEN_DEPLOY_SNAPSHOT_BUILD_NUMBER = "maven.deploy.snapshot.buildNumber";
 
     /**
+     * User property for controlling whether build POMs are deployed alongside consumer POMs.
+     * When set to <code>false</code>, only the consumer POM will be deployed, and the build POM
+     * will be excluded from deployment. This is useful to avoid deploying internal build information
+     * that is not needed by consumers of the artifact.
+     * <br/>
+     * Default: <code>"true"</code>.
+     *
+     * @since 4.1.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "true")
+    public static final String MAVEN_DEPLOY_BUILD_POM = "maven.deploy.buildPom";
+
+    /**
      * User property used to store the build timestamp.
      *
      * @since 4.0.0
@@ -509,6 +522,22 @@ public final class Constants {
      */
     @Config(type = "java.lang.Integer", defaultValue = "100")
     public static final String MAVEN_BUILDER_MAX_PROBLEMS = "maven.builder.maxProblems";
+
+    /**
+     * Configuration property for version range resolution used metadata "nature".
+     * It may contain following string values:
+     * <ul>
+     *     <li>"auto" - decision done based on range being resolver: if any boundary is snapshot, use "release_or_snapshot", otherwise "release"</li>
+     *     <li>"release_or_snapshot" - the default</li>
+     *     <li>"release" - query only release repositories to discover versions</li>
+     *     <li>"snapshot" - query only snapshot repositories to discover versions</li>
+     * </ul>
+     * Default (when unset) is existing Maven behaviour: "release_or_snapshots".
+     * @since 4.0.0
+     */
+    @Config(defaultValue = "release_or_snapshot")
+    public static final String MAVEN_VERSION_RANGE_RESOLVER_NATURE_OVERRIDE =
+            "maven.versionRangeResolver.natureOverride";
 
     /**
      * All system properties used by Maven Logger start with this prefix.

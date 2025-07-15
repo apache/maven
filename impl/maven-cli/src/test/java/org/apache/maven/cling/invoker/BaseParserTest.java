@@ -64,8 +64,8 @@ public class BaseParserTest {
         Assertions.assertEquals("yes it is", invokerRequest.userProperties().get("user.property"));
 
         // maven installation
-        Assertions.assertTrue(invokerRequest.userProperties().containsKey("maven.property"));
-        Assertions.assertEquals("yes it is", invokerRequest.userProperties().get("maven.property"));
+        Assertions.assertTrue(invokerRequest.systemProperties().containsKey("maven.property"));
+        Assertions.assertEquals("yes it is", invokerRequest.systemProperties().get("maven.property"));
     }
 
     @Test

@@ -59,7 +59,7 @@ under the License.
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
-      <version>5.13.1</version>
+      <version>5.13.3</version>
       <scope>test</scope>
     </dependency>
     <!-- dedicated IT artifact that is surely not shadowed by the Maven core -->
@@ -83,6 +83,7 @@ under the License.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-plugin-plugin</artifactId>
+        <version>3.15.1</version>
         <configuration>
           <goalPrefix>class-loader</goalPrefix>
         </configuration>
