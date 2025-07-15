@@ -78,75 +78,12 @@ public class InputLocation implements Serializable, InputLocationTracker {
         this.importedFrom = null;
     }
 
-    // Factory methods
-
-    public static InputLocation of() {
-        return EMPTY;
-    }
-
-    /**
-     * Creates a new InputLocation with the specified source.
-     * The created instance is processed through ModelObjectProcessor for optimization.
-     *
-     * @param source the input source
-     * @return a new InputLocation instance
-     */
-    public static InputLocation of(InputSource source) {
-        return ModelObjectProcessor.processObject(new InputLocation(source));
-    }
-
-    /**
-     * Creates a new InputLocation with the specified line and column numbers.
-     * The created instance is processed through ModelObjectProcessor for optimization.
-     *
-     * @param lineNumber the line number
-     * @param columnNumber the column number
-     * @return a new InputLocation instance
-     */
-    public static InputLocation of(int lineNumber, int columnNumber) {
-        return ModelObjectProcessor.processObject(new InputLocation(lineNumber, columnNumber));
-    }
-
-    /**
-     * Creates a new InputLocation with the specified line number, column number, and source.
-     * The created instance is processed through ModelObjectProcessor for optimization.
-     *
-     * @param lineNumber the line number
-     * @param columnNumber the column number
-     * @param source the input source
-     * @return a new InputLocation instance
-     */
-    public static InputLocation of(int lineNumber, int columnNumber, InputSource source) {
-        return ModelObjectProcessor.processObject(new InputLocation(lineNumber, columnNumber, source));
-    }
-
-    /**
-     * Creates a new InputLocation with the specified line number, column number, source, and self location key.
-     * The created instance is processed through ModelObjectProcessor for optimization.
-     *
-     * @param lineNumber the line number
-     * @param columnNumber the column number
-     * @param source the input source
-     * @param selfLocationKey the self location key
-     * @return a new InputLocation instance
-     */
-    public static InputLocation of(int lineNumber, int columnNumber, InputSource source, Object selfLocationKey) {
-        return ModelObjectProcessor.processObject(new InputLocation(lineNumber, columnNumber, source, selfLocationKey));
-    }
-
-    /**
-     * Creates a new InputLocation with the specified line number, column number, source, and locations map.
-     * The created instance is processed through ModelObjectProcessor for optimization.
-     *
-     * @param lineNumber the line number
-     * @param columnNumber the column number
-     * @param source the input source
-     * @param locations the locations map
-     * @return a new InputLocation instance
-     */
-    public static InputLocation of(
-            int lineNumber, int columnNumber, InputSource source, Map<Object, InputLocation> locations) {
-        return ModelObjectProcessor.processObject(new InputLocation(lineNumber, columnNumber, source, locations));
+    public InputLocation(InputLocation original) {
+        this.lineNumber = original.lineNumber;
+        this.columnNumber = original.columnNumber;
+        this.source = original.source;
+        this.locations = original.locations;
+        this.importedFrom = original.importedFrom;
     }
 
     public int getLineNumber() {
@@ -211,7 +148,7 @@ public class InputLocation implements Serializable, InputLocationTracker {
         }
 
         return new InputLocation(-1, -1, InputSource.merge(source.getSource(), target.getSource()), locations);
-    } // -- InputLocation merge( InputLocation, InputLocation, boolean )
+    }
 
     /**
      * Merges the {@code source} location into the {@code target} location.
@@ -250,7 +187,7 @@ public class InputLocation implements Serializable, InputLocationTracker {
         }
 
         return new InputLocation(-1, -1, InputSource.merge(source.getSource(), target.getSource()), locations);
-    } // -- InputLocation merge( InputLocation, InputLocation, java.util.Collection )
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -329,6 +266,23 @@ public class InputLocation implements Serializable, InputLocationTracker {
             }
         }
         return result;
+    }
+
+    /**
+     * Class StringFormatter.
+     *
+     * @version $Revision$ $Date$
+     */
+    public interface StringFormatter {
+
+        // -----------/
+        // - Methods -/
+        // -----------/
+
+        /**
+         * Method toString.
+         */
+        String toString(InputLocation location);
     }
 
     @Override

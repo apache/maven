@@ -125,7 +125,7 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
 
             InputSource source = null;
             if (modelId != null || location != null) {
-                source = InputSource.of(modelId, path != null ? path.toUri().toString() : null);
+                source = new InputSource(modelId, path != null ? path.toUri().toString() : null);
             }
 
             MavenStaxReader xml = new MavenStaxReader();

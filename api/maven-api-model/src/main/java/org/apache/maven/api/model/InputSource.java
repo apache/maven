@@ -61,44 +61,6 @@ public class InputSource implements Serializable {
         this.importedFrom = null;
     }
 
-    // Factory methods
-
-    /**
-     * Creates a new InputSource with the specified model ID and location.
-     * The created instance is processed through ModelObjectProcessor for optimization.
-     *
-     * @param modelId the model ID
-     * @param location the location
-     * @return a new InputSource instance
-     */
-    public static InputSource of(String modelId, String location) {
-        return ModelObjectProcessor.processObject(new InputSource(modelId, location));
-    }
-
-    /**
-     * Creates a new InputSource with the specified model ID, location, and imported from location.
-     * The created instance is processed through ModelObjectProcessor for optimization.
-     *
-     * @param modelId the model ID
-     * @param location the location
-     * @param importedFrom the imported from location
-     * @return a new InputSource instance
-     */
-    public static InputSource of(String modelId, String location, InputLocation importedFrom) {
-        return ModelObjectProcessor.processObject(new InputSource(modelId, location, importedFrom));
-    }
-
-    /**
-     * Creates a new InputSource from a collection of input sources.
-     * The created instance is processed through ModelObjectProcessor for optimization.
-     *
-     * @param inputs the collection of input sources
-     * @return a new InputSource instance
-     */
-    public static InputSource of(Collection<InputSource> inputs) {
-        return ModelObjectProcessor.processObject(new InputSource(inputs));
-    }
-
     /**
      * Get the path/URL of the POM or {@code null} if unknown.
      *
@@ -165,6 +127,13 @@ public class InputSource implements Serializable {
         return getModelId() + " " + getLocation();
     }
 
+    /**
+     * Merges two InputSource instances.
+     *
+     * @param src1 the first input source
+     * @param src2 the second input source
+     * @return a new merged InputSource
+     */
     public static InputSource merge(InputSource src1, InputSource src2) {
         return new InputSource(
                 Stream.concat(src1.sources(), src2.sources()).distinct().toList());

@@ -32,7 +32,7 @@ class StringSearchModelInterpolatorTest {
     void interpolate() throws ModelInterpolationException, InitializationException {
         Model model = Model.newBuilder()
                 .groupId("group")
-                .location("groupId", InputLocation.of(InputSource.of("model", null)))
+                .location("groupId", new InputLocation(new InputSource("model", null)))
                 .build();
         StringSearchModelInterpolator interpolator = new StringSearchModelInterpolator();
         interpolator.initialize();

@@ -380,7 +380,7 @@ public final class SettingsUtilsV4 {
             return new org.apache.maven.api.model.InputLocation(
                     location.getLineNumber(),
                     location.getColumnNumber(),
-                    source != null ? org.apache.maven.api.model.InputSource.of("", source.getLocation()) : null,
+                    source != null ? new org.apache.maven.api.model.InputSource("", source.getLocation()) : null,
                     locs);
         } else {
             return null;

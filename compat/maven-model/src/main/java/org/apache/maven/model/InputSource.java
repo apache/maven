@@ -181,6 +181,6 @@ public class InputSource implements java.io.Serializable, Cloneable {
     }
 
     public org.apache.maven.api.model.InputSource toApiSource() {
-        return org.apache.maven.api.model.InputSource.of(modelId, location);
+        return new org.apache.maven.api.model.InputSource(modelId, location);
     }
 }
