@@ -39,7 +39,6 @@ under the License.
     <module>core-it-component</module>
     <module>core-it-toolchain</module>
     <module>core-it-wagon</module>
-    <module>core-it-support-artifacts</module>
     <module>maven-it-helper</module>
     <module>core-it-extension</module>
     <module>core-it-javaagent</module>
