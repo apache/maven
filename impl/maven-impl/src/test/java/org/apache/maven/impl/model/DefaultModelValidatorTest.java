@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.maven.api.Version;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.model.ModelValidator;
 import org.apache.maven.impl.InternalSession;
@@ -130,6 +131,11 @@ class DefaultModelValidatorTest {
         when(repoSession.getScopeManager()).thenReturn(scopeManager);
         session = mock(InternalSession.class);
         when(session.getSession()).thenReturn(repoSession);
+
+        // Mock Maven version for error message testing
+        Version mavenVersion = mock(Version.class);
+        when(mavenVersion.toString()).thenReturn("4.0.0-test");
+        when(session.getMavenVersion()).thenReturn(mavenVersion);
     }
 
     @AfterEach
@@ -168,6 +174,21 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 1, 0);
 
         assertTrue(result.getErrors().get(0).contains("'modelVersion' must be one of"));
+    }
+
+    @Test
+    void testModelVersionMessageIncludesMavenVersion() throws Exception {
+        SimpleProblemCollector result = validateFile("bad-modelVersion.xml");
+
+        assertViolations(result, 1, 0, 0);
+
+        String errorMessage = result.getFatals().get(0);
+        assertTrue(errorMessage.contains("modelVersion"));
+        // Should include Maven version (either "4.0.0-test" from mock or "unknown" as fallback)
+        assertTrue(
+                errorMessage.contains("4.0.0-test") || errorMessage.contains("unknown"),
+                "Error message should include Maven version: " + errorMessage);
+        assertTrue(errorMessage.contains("newer than the versions supported by this Maven version"));
     }
 
     @Test

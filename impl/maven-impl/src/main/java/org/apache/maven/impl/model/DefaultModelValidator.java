@@ -372,7 +372,7 @@ public class DefaultModelValidator implements ModelValidator {
         } else if (validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_2_0) {
             validateStringNotEmpty("modelVersion", problems, Severity.ERROR, Version.V20, m.getModelVersion(), m);
 
-            validateModelVersion(problems, m.getModelVersion(), m, ModelBuilder.KNOWN_MODEL_VERSIONS);
+            validateModelVersion(s, problems, m.getModelVersion(), m, ModelBuilder.KNOWN_MODEL_VERSIONS);
 
             Set<String> modules = new HashSet<>();
             for (int i = 0, n = m.getModules().size(); i < n; i++) {
@@ -1956,19 +1956,23 @@ public class DefaultModelValidator implements ModelValidator {
 
     @SuppressWarnings("checkstyle:parameternumber")
     private boolean validateModelVersion(
-            ModelProblemCollector problems, String string, InputLocationTracker tracker, List<String> validVersions) {
-        if (string == null || string.isEmpty()) {
+            Session session,
+            ModelProblemCollector problems,
+            String requestedModel,
+            InputLocationTracker tracker,
+            List<String> validVersions) {
+        if (requestedModel == null || requestedModel.isEmpty()) {
             return true;
         }
 
-        if (validVersions.contains(string)) {
+        if (validVersions.contains(requestedModel)) {
             return true;
         }
 
         boolean newerThanAll = true;
         boolean olderThanAll = true;
         for (String validValue : validVersions) {
-            final int comparison = compareModelVersions(validValue, string);
+            final int comparison = compareModelVersions(validValue, requestedModel);
             newerThanAll = newerThanAll && comparison < 0;
             olderThanAll = olderThanAll && comparison > 0;
         }
@@ -1980,8 +1984,10 @@ public class DefaultModelValidator implements ModelValidator {
                     Version.V20,
                     "modelVersion",
                     null,
-                    "of '" + string + "' is newer than the versions supported by this version of Maven: "
-                            + validVersions + ". Building this project requires a newer version of Maven.",
+                    "of '" + requestedModel + "' is newer than the versions supported by this Maven version ("
+                            + getMavenVersionString(session)
+                            + "). Supported modelVersions are: " + validVersions
+                            + ". Building this project requires a newer version of Maven.",
                     tracker);
 
         } else if (olderThanAll) {
@@ -1992,8 +1998,10 @@ public class DefaultModelValidator implements ModelValidator {
                     Version.V20,
                     "modelVersion",
                     null,
-                    "of '" + string + "' is older than the versions supported by this version of Maven: "
-                            + validVersions + ". Building this project requires an older version of Maven.",
+                    "of '" + requestedModel + "' is older than the versions supported by this Maven version ("
+                            + getMavenVersionString(session)
+                            + "). Supported modelVersions are: " + validVersions
+                            + ". Building this project requires an older version of Maven.",
                     tracker);
 
         } else {
@@ -2003,11 +2011,20 @@ public class DefaultModelValidator implements ModelValidator {
                     Version.V20,
                     "modelVersion",
                     null,
-                    "must be one of " + validVersions + " but is '" + string + "'.",
+                    "must be one of " + validVersions + " but is '" + requestedModel + "'.",
                     tracker);
         }
 
         return false;
+    }
+
+    private String getMavenVersionString(Session session) {
+        try {
+            return session.getMavenVersion().toString();
+        } catch (Exception e) {
+            // Fallback for test contexts where RuntimeInformation might not be available
+            return "unknown";
+        }
     }
 
     /**
