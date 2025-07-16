@@ -84,8 +84,8 @@ public final class ModelVersionUtils {
      */
     public static boolean isValidModelVersion(String modelVersion) {
         return MODEL_VERSION_4_0_0.equals(modelVersion)
-            || MODEL_VERSION_4_1_0.equals(modelVersion)
-            || MODEL_VERSION_4_2_0.equals(modelVersion);
+                || MODEL_VERSION_4_1_0.equals(modelVersion)
+                || MODEL_VERSION_4_2_0.equals(modelVersion);
     }
 
     /**
@@ -120,8 +120,8 @@ public final class ModelVersionUtils {
      */
     public static boolean isEligibleForInference(String modelVersion) {
         return MODEL_VERSION_4_0_0.equals(modelVersion)
-            || MODEL_VERSION_4_1_0.equals(modelVersion)
-            || MODEL_VERSION_4_2_0.equals(modelVersion);
+                || MODEL_VERSION_4_1_0.equals(modelVersion)
+                || MODEL_VERSION_4_2_0.equals(modelVersion);
     }
 
     /**
