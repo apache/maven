@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.cling.executor.ExecutorHelper;
 import org.junit.jupiter.api.ClassDescriptor;
 import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.ClassOrdererContext;
@@ -66,10 +67,11 @@ public class TestSuiteOrdering implements ClassOrderer {
             Verifier verifier = new Verifier("");
             String mavenVersion = verifier.getMavenVersion();
             String executable = verifier.getExecutable();
+            ExecutorHelper.Mode defaultMode = verifier.getDefaultMode();
 
             out.println("Running integration tests for Maven " + mavenVersion + System.lineSeparator()
                     + "\tusing Maven executable: " + executable + System.lineSeparator()
-                    + "\twith verifier.forkMode: " + System.getProperty("verifier.forkMode", "not defined == fork"));
+                    + "\twith verifier.forkMode: " + defaultMode);
 
             System.setProperty("maven.version", mavenVersion);
 

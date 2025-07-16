@@ -538,6 +538,10 @@ under the License.
             <maven.home>${preparedMavenHome}</maven.home>
             <maven.it.global-settings.dir>${project.build.testOutputDirectory}</maven.it.global-settings.dir>
           </systemPropertyVariables>
+          <excludedEnvironmentVariables>
+            <excludedEnvironmentVariable>MAVEN_ARGS</excludedEnvironmentVariable>
+            <excludedEnvironmentVariable>MAVEN_OPTS</excludedEnvironmentVariable>
+          </excludedEnvironmentVariables>
         </configuration>
       </plugin>
       <plugin>

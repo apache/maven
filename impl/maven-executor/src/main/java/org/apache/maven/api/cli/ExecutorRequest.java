@@ -145,6 +145,13 @@ public interface ExecutorRequest {
     Optional<OutputStream> stdErr();
 
     /**
+     * Indicate if {@code ~/.mavenrc} should be skipped during execution.
+     * <br/>
+     * Affected only for forked executor by adding MAVEN_SKIP_RC environment variable
+     */
+    boolean skipMavenRc();
+
+    /**
      * Returns {@link Builder} created from this instance.
      */
     @Nonnull
@@ -160,7 +167,8 @@ public interface ExecutorRequest {
                 jvmArguments().orElse(null),
                 stdIn().orElse(null),
                 stdOut().orElse(null),
-                stdErr().orElse(null));
+                stdErr().orElse(null),
+                skipMavenRc());
     }
 
     /**
@@ -182,7 +190,8 @@ public interface ExecutorRequest {
                 null,
                 null,
                 null,
-                null);
+                null,
+                false);
     }
 
     class Builder {
@@ -197,6 +206,7 @@ public interface ExecutorRequest {
         private InputStream stdIn;
         private OutputStream stdOut;
         private OutputStream stdErr;
+        private boolean skipMavenRc;
 
         private Builder() {}
 
@@ -212,7 +222,8 @@ public interface ExecutorRequest {
                 List<String> jvmArguments,
                 InputStream stdIn,
                 OutputStream stdOut,
-                OutputStream stdErr) {
+                OutputStream stdErr,
+                boolean skipMavenRc) {
             this.command = command;
             this.arguments = arguments;
             this.cwd = cwd;
@@ -224,6 +235,7 @@ public interface ExecutorRequest {
             this.stdIn = stdIn;
             this.stdOut = stdOut;
             this.stdErr = stdErr;
+            this.skipMavenRc = skipMavenRc;
         }
 
         @Nonnull
@@ -333,6 +345,11 @@ public interface ExecutorRequest {
             return this;
         }
 
+        public Builder skipMavenRc(boolean skipMavenRc) {
+            this.skipMavenRc = skipMavenRc;
+            return this;
+        }
+
         @Nonnull
         public ExecutorRequest build() {
             return new Impl(
@@ -346,7 +363,8 @@ public interface ExecutorRequest {
                     jvmArguments,
                     stdIn,
                     stdOut,
-                    stdErr);
+                    stdErr,
+                    skipMavenRc);
         }
 
         private static class Impl implements ExecutorRequest {
@@ -361,6 +379,7 @@ public interface ExecutorRequest {
             private final InputStream stdIn;
             private final OutputStream stdOut;
             private final OutputStream stdErr;
+            private final boolean skipMavenRc;
 
             @SuppressWarnings("ParameterNumber")
             private Impl(
@@ -374,7 +393,8 @@ public interface ExecutorRequest {
                     List<String> jvmArguments,
                     InputStream stdIn,
                     OutputStream stdOut,
-                    OutputStream stdErr) {
+                    OutputStream stdErr,
+                    boolean skipMavenRc) {
                 this.command = requireNonNull(command);
                 this.arguments = arguments == null ? List.of() : List.copyOf(arguments);
                 this.cwd = getCanonicalPath(requireNonNull(cwd));
@@ -386,6 +406,7 @@ public interface ExecutorRequest {
                 this.stdIn = stdIn;
                 this.stdOut = stdOut;
                 this.stdErr = stdErr;
+                this.skipMavenRc = skipMavenRc;
             }
 
             @Override
@@ -444,6 +465,11 @@ public interface ExecutorRequest {
             }
 
             @Override
+            public boolean skipMavenRc() {
+                return skipMavenRc;
+            }
+
+            @Override
             public String toString() {
                 return getClass().getSimpleName() + "{" + "command='"
                         + command + '\'' + ", arguments="
@@ -456,7 +482,8 @@ public interface ExecutorRequest {
                         + jvmArguments + ", stdinProvider="
                         + stdIn + ", stdoutConsumer="
                         + stdOut + ", stderrConsumer="
-                        + stdErr + '}';
+                        + stdErr + ", skipMavenRc="
+                        + skipMavenRc + "}";
             }
         }
     }
