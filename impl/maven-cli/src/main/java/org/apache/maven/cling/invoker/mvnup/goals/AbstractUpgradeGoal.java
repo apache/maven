@@ -208,10 +208,9 @@ public abstract class AbstractUpgradeGoal implements Goal {
         try {
             UpgradeResult result = orchestrator.executeStrategies(context, pomMap);
 
-            // Create .mvn directory if needed (when not upgrading to 4.1.0)
-            if (!MODEL_VERSION_4_1_0.equals(targetModel)) {
-                createMvnDirectoryIfNeeded(context);
-            }
+            // Create .mvn directory if needed to avoid root directory warnings
+            // This is needed for both 4.0.0 and 4.1.0 to help Maven find the project root
+            createMvnDirectoryIfNeeded(context);
 
             return result.success() ? 0 : 1;
         } catch (Exception e) {
