@@ -312,7 +312,8 @@ public class DefaultModelValidator implements ModelValidator {
             validateStringNotEmpty(
                     "parent.artifactId", problems, Severity.FATAL, Version.BASE, parent.getArtifactId(), parent);
 
-            if (equals(parent.getGroupId(), model.getGroupId()) && equals(parent.getArtifactId(), model.getArtifactId())) {
+            if (equals(parent.getGroupId(), model.getGroupId())
+                    && equals(parent.getArtifactId(), model.getArtifactId())) {
                 addViolation(
                         problems,
                         Severity.FATAL,
@@ -370,7 +371,8 @@ public class DefaultModelValidator implements ModelValidator {
                 }
             }
         } else if (validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_2_0) {
-            validateStringNotEmpty("modelVersion", problems, Severity.ERROR, Version.V20, model.getModelVersion(), model);
+            validateStringNotEmpty(
+                    "modelVersion", problems, Severity.ERROR, Version.V20, model.getModelVersion(), model);
 
             validateModelVersion(session, problems, model.getModelVersion(), model, ModelBuilder.KNOWN_MODEL_VERSIONS);
 
@@ -444,10 +446,13 @@ public class DefaultModelValidator implements ModelValidator {
             if (isModelVersion41OrMore) {
                 validateStringNoExpression("groupId", problems, Severity.FATAL, Version.V41, model.getGroupId(), model);
 
-                validateStringNotEmpty("artifactId", problems, Severity.FATAL, Version.V20, model.getArtifactId(), model);
-                validateStringNoExpression("artifactId", problems, Severity.FATAL, Version.V20, model.getArtifactId(), model);
+                validateStringNotEmpty(
+                        "artifactId", problems, Severity.FATAL, Version.V20, model.getArtifactId(), model);
+                validateStringNoExpression(
+                        "artifactId", problems, Severity.FATAL, Version.V20, model.getArtifactId(), model);
 
-                validateVersionNoExpression("version", problems, Severity.FATAL, Version.V41, model.getVersion(), model);
+                validateVersionNoExpression(
+                        "version", problems, Severity.FATAL, Version.V41, model.getVersion(), model);
 
                 if (parent != null) {
                     validateStringNoExpression(
@@ -458,21 +463,26 @@ public class DefaultModelValidator implements ModelValidator {
                             "version", problems, Severity.FATAL, Version.V41, parent.getVersion(), model);
                 }
             } else {
-                validateStringNoExpression("groupId", problems, Severity.WARNING, Version.V20, model.getGroupId(), model);
+                validateStringNoExpression(
+                        "groupId", problems, Severity.WARNING, Version.V20, model.getGroupId(), model);
                 if (parent == null) {
                     validateStringNotEmpty("groupId", problems, Severity.FATAL, Version.V20, model.getGroupId(), model);
                 }
 
-                validateStringNoExpression("artifactId", problems, Severity.WARNING, Version.V20, model.getArtifactId(), model);
-                validateStringNotEmpty("artifactId", problems, Severity.FATAL, Version.V20, model.getArtifactId(), model);
+                validateStringNoExpression(
+                        "artifactId", problems, Severity.WARNING, Version.V20, model.getArtifactId(), model);
+                validateStringNotEmpty(
+                        "artifactId", problems, Severity.FATAL, Version.V20, model.getArtifactId(), model);
 
-                validateVersionNoExpression("version", problems, Severity.WARNING, Version.V20, model.getVersion(), model);
+                validateVersionNoExpression(
+                        "version", problems, Severity.WARNING, Version.V20, model.getVersion(), model);
                 if (parent == null) {
                     validateStringNotEmpty("version", problems, Severity.FATAL, Version.V20, model.getVersion(), model);
                 }
             }
 
-            validateStringNoExpression("packaging", problems, Severity.WARNING, Version.V20, model.getPackaging(), model);
+            validateStringNoExpression(
+                    "packaging", problems, Severity.WARNING, Version.V20, model.getPackaging(), model);
 
             validate20RawDependencies(
                     problems,
@@ -482,7 +492,8 @@ public class DefaultModelValidator implements ModelValidator {
                     isModelVersion41OrMore,
                     validationLevel);
 
-            validate20RawDependenciesSelfReferencing(problems, model, model.getDependencies(), "dependencies.dependency");
+            validate20RawDependenciesSelfReferencing(
+                    problems, model, model.getDependencies(), "dependencies.dependency");
 
             if (model.getDependencyManagement() != null) {
                 validate20RawDependencies(
@@ -494,7 +505,8 @@ public class DefaultModelValidator implements ModelValidator {
                         validationLevel);
             }
 
-            validateRawRepositories(problems, model.getRepositories(), "repositories.repository.", EMPTY, validationLevel);
+            validateRawRepositories(
+                    problems, model.getRepositories(), "repositories.repository.", EMPTY, validationLevel);
 
             validateRawRepositories(
                     problems,
@@ -612,7 +624,8 @@ public class DefaultModelValidator implements ModelValidator {
             validateStringNotEmpty(
                     "parent.version", problems, Severity.FATAL, Version.BASE, parent.getVersion(), parent);
 
-            if (equals(parent.getGroupId(), model.getGroupId()) && equals(parent.getArtifactId(), model.getArtifactId())) {
+            if (equals(parent.getGroupId(), model.getGroupId())
+                    && equals(parent.getArtifactId(), model.getArtifactId())) {
                 addViolation(
                         problems,
                         Severity.FATAL,
@@ -659,7 +672,9 @@ public class DefaultModelValidator implements ModelValidator {
             String location = frameIterator.next().location;
             ActivationFrame parent = frameIterator.next();
 
-            return parent.parent.map(parentTracker -> parentTracker.getLocation(location)).orElse(null);
+            return parent.parent
+                    .map(parentTracker -> parentTracker.getLocation(location))
+                    .orElse(null);
         };
         final UnaryOperator<String> transformer = stringValue -> {
             if (hasProjectExpression(stringValue)) {
@@ -830,7 +845,8 @@ public class DefaultModelValidator implements ModelValidator {
 
     @Override
     @SuppressWarnings("checkstyle:MethodLength")
-    public void validateEffectiveModel(Session session, Model model, int validationLevel, ModelProblemCollector problems) {
+    public void validateEffectiveModel(
+            Session session, Model model, int validationLevel, ModelProblemCollector problems) {
         validateStringNotEmpty("modelVersion", problems, Severity.ERROR, Version.BASE, model.getModelVersion(), model);
 
         validateCoordinatesId("groupId", problems, model.getGroupId(), model);
@@ -892,7 +908,15 @@ public class DefaultModelValidator implements ModelValidator {
             Severity errOn31 = getSeverity(validationLevel, ModelValidator.VALIDATION_LEVEL_MAVEN_3_1);
 
             validateBannedCharacters(
-                    EMPTY, "version", problems, errOn31, Version.V20, model.getVersion(), null, model, ILLEGAL_VERSION_CHARS);
+                    EMPTY,
+                    "version",
+                    problems,
+                    errOn31,
+                    Version.V20,
+                    model.getVersion(),
+                    null,
+                    model,
+                    ILLEGAL_VERSION_CHARS);
             validate20ProperSnapshotVersion("version", problems, errOn31, Version.V20, model.getVersion(), null, model);
             if (hasExpression(model.getVersion())) {
                 Severity versionExpressionSeverity = Severity.ERROR;
@@ -923,7 +947,12 @@ public class DefaultModelValidator implements ModelValidator {
                             plugin);
 
                     validateStringNotEmpty(
-                            "build.plugins.plugin.groupId", problems, Severity.ERROR, Version.V20, plugin.getGroupId(), plugin);
+                            "build.plugins.plugin.groupId",
+                            problems,
+                            Severity.ERROR,
+                            Version.V20,
+                            plugin.getGroupId(),
+                            plugin);
 
                     validate20PluginVersion(
                             "build.plugins.plugin.version",
@@ -1292,7 +1321,11 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     private void validateEffectiveDependency(
-            ModelProblemCollector problems, Dependency dependency, boolean management, String prefix, int validationLevel) {
+            ModelProblemCollector problems,
+            Dependency dependency,
+            boolean management,
+            String prefix,
+            int validationLevel) {
         validateCoordinatesId(
                 prefix,
                 "artifactId",
@@ -1362,7 +1395,8 @@ public class DefaultModelValidator implements ModelValidator {
                             dependency);
                 }
             }
-        } else if (dependency.getSystemPath() != null && !dependency.getSystemPath().isEmpty()) {
+        } else if (dependency.getSystemPath() != null
+                && !dependency.getSystemPath().isEmpty()) {
             addViolation(
                     problems,
                     Severity.ERROR,
@@ -1621,7 +1655,12 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     private boolean isValidCoordinatesIdCharacter(char character) {
-        return character >= 'a' && character <= 'z' || character >= 'A' && character <= 'Z' || character >= '0' && character <= '9' || character == '-' || character == '_' || character == '.';
+        return character >= 'a' && character <= 'z'
+                || character >= 'A' && character <= 'Z'
+                || character >= '0' && character <= '9'
+                || character == '-'
+                || character == '_'
+                || character == '.';
     }
 
     @SuppressWarnings("checkstyle:parameternumber")
