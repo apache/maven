@@ -141,6 +141,10 @@ public class ForkedMavenExecutor implements Executor {
         }
         env.remove("MAVEN_ARGS"); // we already used it if configured to do so
 
+        if (executorRequest.skipMavenRc()) {
+            env.put("MAVEN_SKIP_RC", "true");
+        }
+
         try {
             ProcessBuilder pb = new ProcessBuilder()
                     .directory(executorRequest.cwd().toFile())
