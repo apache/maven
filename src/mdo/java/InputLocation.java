@@ -112,6 +112,66 @@ public final class InputLocation implements Serializable, InputLocationTracker {
     }
 
     /**
+     * Creates an InputLocation with line and column numbers but no source.
+     *
+     * @param lineNumber the line number in the source file (1-based)
+     * @param columnNumber the column number in the source file (1-based)
+     * @deprecated Use {@link #of(int, int)} instead. This constructor will become package-protected in Maven 4.1.0.
+     */
+    @Deprecated
+    public InputLocation(int lineNumber, int columnNumber) {
+        this(lineNumber, columnNumber, null, null);
+    }
+
+    /**
+     * Creates an InputLocation with line number, column number, and source.
+     *
+     * @param lineNumber the line number in the source file (1-based)
+     * @param columnNumber the column number in the source file (1-based)
+     * @param source the input source where this location originates from
+     * @deprecated Use {@link #of(int, int, InputSource)} instead. This constructor will become package-protected in Maven 4.1.0.
+     */
+    @Deprecated
+    public InputLocation(int lineNumber, int columnNumber, InputSource source) {
+        this(lineNumber, columnNumber, source, null);
+    }
+
+    /**
+     * Creates an InputLocation with line number, column number, source, and a self-location key.
+     *
+     * @param lineNumber the line number in the source file (1-based)
+     * @param columnNumber the column number in the source file (1-based)
+     * @param source the input source where this location originates from
+     * @param selfLocationKey the key to map this location to itself in the locations map
+     * @deprecated Use {@link #of(int, int, InputSource, Object)} instead. This constructor will become package-protected in Maven 4.1.0.
+     */
+    @Deprecated
+    public InputLocation(int lineNumber, int columnNumber, InputSource source, Object selfLocationKey) {
+        this.lineNumber = lineNumber;
+        this.columnNumber = columnNumber;
+        this.source = source;
+        this.locations =
+                selfLocationKey != null ? Collections.singletonMap(selfLocationKey, this) : Collections.emptyMap();
+    }
+
+    /**
+     * Creates an InputLocation with line number, column number, source, and a complete locations map.
+     *
+     * @param lineNumber the line number in the source file (1-based)
+     * @param columnNumber the column number in the source file (1-based)
+     * @param source the input source where this location originates from
+     * @param locations a map of keys to InputLocation instances for nested elements
+     * @deprecated Use {@link #of(int, int, InputSource, Map)} instead. This constructor will become package-protected in Maven 4.1.0.
+     */
+    @Deprecated
+    public InputLocation(int lineNumber, int columnNumber, InputSource source, Map<Object, InputLocation> locations) {
+        this.lineNumber = lineNumber;
+        this.columnNumber = columnNumber;
+        this.source = source;
+        this.locations = ImmutableCollections.copy(locations);
+    }
+
+    /**
      * Creates an empty InputLocation with no line/column information.
      * This is a singleton instance representing an unknown or unspecified location.
      *

@@ -61,6 +61,34 @@ public final class InputSource implements Serializable {
         this.importedFrom = null;
     }
 
+    /**
+     * Creates a new InputSource with the specified model ID and location.
+     *
+     * @param modelId the model ID
+     * @param location the location
+     * @deprecated Use {@link #of(String, String)} instead. This constructor will become package-protected in Maven 4.1.0.
+     */
+    @Deprecated
+    public InputSource(String modelId, String location) {
+        this(modelId, location, null);
+    }
+
+    /**
+     * Creates a new InputSource with the specified model ID, location, and imported from location.
+     *
+     * @param modelId the model ID
+     * @param location the location
+     * @param importedFrom the imported from location
+     * @deprecated Use {@link #of(String, String, InputLocation)} instead. This constructor will become package-protected in Maven 4.1.0.
+     */
+    @Deprecated
+    public InputSource(String modelId, String location, InputLocation importedFrom) {
+        this.modelId = modelId;
+        this.location = location;
+        this.inputs = null;
+        this.importedFrom = importedFrom;
+    }
+
     // Factory methods
 
     /**

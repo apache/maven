@@ -48,6 +48,17 @@ public final class InputSource implements Serializable {
 
     /**
      * Creates a new InputSource with the specified location.
+     *
+     * @param location the path/URL of the input source, may be null
+     * @deprecated Use {@link #of(String)} instead. This constructor will become package-protected in Maven 4.1.0.
+     */
+    @Deprecated
+    public InputSource(String location) {
+        this.location = location;
+    }
+
+    /**
+     * Creates a new InputSource with the specified location.
      * The location typically represents a file path, URL, or other identifier
      * that describes where the input originated from.
      *
