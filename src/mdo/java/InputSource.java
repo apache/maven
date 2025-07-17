@@ -21,25 +21,62 @@ package ${package};
 import java.io.Serializable;
 
 /**
- * Class InputSource.
+ * Represents the source of a model input, such as a POM file.
+ * <p>
+ * This class tracks the origin of model elements, providing location information
+ * used primarily for error reporting and debugging to help identify where specific
+ * model elements came from. The location typically represents a file path, URL,
+ * or other identifier that describes the source of the input.
+ * <p>
+ * InputSource instances are immutable and can be safely shared across threads.
+ * The class provides factory methods for convenient creation of instances.
+ *
+ * @since 4.0.0
  */
-public class InputSource implements Serializable {
+public final class InputSource implements Serializable {
 
     private final String location;
 
-    public InputSource(String location) {
+    /**
+     * Creates a new InputSource with the specified location.
+     *
+     * @param location the path/URL of the input source, may be null
+     */
+    InputSource(String location) {
         this.location = location;
     }
 
     /**
-     * Get the path/URL of the settings definition or {@code null} if unknown.
+     * Creates a new InputSource with the specified location.
+     * The location typically represents a file path, URL, or other identifier
+     * that describes where the input originated from.
      *
-     * @return the location
+     * @param location the path/URL of the input source, may be null
+     * @return a new InputSource instance
+     */
+    public static InputSource of(String location) {
+        return new InputSource(location);
+    }
+
+    /**
+     * Gets the path/URL of the input source or {@code null} if unknown.
+     * <p>
+     * The location typically represents a file path, URL, or other identifier
+     * that describes where the input originated from. This information is
+     * primarily used for error reporting and debugging purposes.
+     *
+     * @return the location string, or null if unknown
      */
     public String getLocation() {
         return this.location;
     }
 
+    /**
+     * Returns a string representation of this InputSource.
+     * The string representation is the location if available, or null.
+     *
+     * @return the location string, or null if no location is set
+     */
     @Override
     public String toString() {
         return getLocation();
