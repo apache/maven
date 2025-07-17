@@ -88,7 +88,7 @@ public class DefaultRequestCache extends AbstractRequestCache {
      * @param stats the cache statistics to format
      * @return a formatted string containing cache statistics
      */
-    private static String formatCacheStatistics(CacheStatistics stats) {
+    static String formatCacheStatistics(CacheStatistics stats) {
         StringBuilder sb = new StringBuilder();
         sb.append("Request Cache Statistics:\n");
         sb.append("  Total requests: ").append(stats.getTotalRequests()).append("\n");

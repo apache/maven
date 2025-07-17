@@ -414,17 +414,15 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
             String actualLocation = location.getSource().getLocation();
             String expectedPath = "pom-with-profiles" + separator + "pom.xml";
 
-            // Log the actual vs expected for debugging
-            System.out.println("=== Cross-Platform Path Test [" + fsName + "] ===");
-            System.out.println("Expected path pattern: " + expectedPath);
-            System.out.println("Actual location: " + actualLocation);
-            System.out.println("Contains expected pattern: " + actualLocation.contains(expectedPath));
-            System.out.println("File.separator on this system: '" + File.separator + "'");
-
             // The test will pass with File.separator but this shows the platform differences
             assertThat(
                     "Location should contain path with proper separators for " + fsName + " (actual: " + actualLocation
-                            + ")",
+                            + ")\n"
+                            + "=== Cross-Platform Path Test [" + fsName + "] ===\n"
+                            + "Expected path pattern: " + expectedPath + "\n"
+                            + "Actual location: " + actualLocation + "\n"
+                            + "Contains expected pattern: " + actualLocation.contains(expectedPath) + "\n"
+                            + "File.separator on this system: '" + File.separator + "'",
                     actualLocation,
                     containsString("pom-with-profiles/pom.xml"));
         }
@@ -487,17 +485,15 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
             String actualLocation = location.getSource().getLocation();
             String expectedPath = "pom-with-profiles" + separator + "pom.xml";
 
-            // Log the actual vs expected for debugging
-            System.out.println("=== Cross-Platform Path Test [" + fsName + "] - External Profile ===");
-            System.out.println("Expected path pattern: " + expectedPath);
-            System.out.println("Actual location: " + actualLocation);
-            System.out.println("Contains expected pattern: " + actualLocation.contains(expectedPath));
-            System.out.println("File.separator on this system: '" + File.separator + "'");
-
             // The test will pass with File.separator but this shows the platform differences
             assertThat(
                     "Location should contain path with proper separators for " + fsName + " (actual: " + actualLocation
-                            + ")",
+                            + ")\n"
+                            + "=== Cross-Platform Path Test [" + fsName + "] - External Profile ===\n"
+                            + "Expected path pattern: " + expectedPath + "\n"
+                            + "Actual location: " + actualLocation + "\n"
+                            + "Contains expected pattern: " + actualLocation.contains(expectedPath) + "\n"
+                            + "File.separator on this system: '" + File.separator + "'",
                     actualLocation,
                     containsString("pom-with-profiles/pom.xml"));
 

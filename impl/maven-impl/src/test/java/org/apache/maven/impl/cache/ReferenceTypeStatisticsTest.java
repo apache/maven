@@ -93,4 +93,75 @@ class ReferenceTypeStatisticsTest {
         var refTypeStats = statistics.getReferenceTypeStatistics();
         assertTrue(refTypeStats.isEmpty());
     }
+
+    @Test
+    void shouldDisplayReferenceTypeStatisticsInOutput() {
+        CacheStatistics statistics = new CacheStatistics();
+
+        // Simulate cache usage with different reference types
+        statistics.recordCacheCreation("HARD", "HARD", CacheRetention.SESSION_SCOPED);
+        statistics.recordCacheCreation("SOFT", "WEAK", CacheRetention.REQUEST_SCOPED);
+        statistics.recordCacheCreation("WEAK", "SOFT", CacheRetention.PERSISTENT);
+
+        // Simulate cache accesses
+        statistics.recordCacheAccess("HARD", "HARD", true);
+        statistics.recordCacheAccess("HARD", "HARD", true);
+        statistics.recordCacheAccess("HARD", "HARD", false);
+
+        statistics.recordCacheAccess("SOFT", "WEAK", true);
+        statistics.recordCacheAccess("SOFT", "WEAK", false);
+        statistics.recordCacheAccess("SOFT", "WEAK", false);
+
+        statistics.recordCacheAccess("WEAK", "SOFT", false);
+
+        // Simulate some regular cache statistics
+        statistics.recordHit("TestRequest", CacheRetention.SESSION_SCOPED);
+        statistics.recordMiss("TestRequest", CacheRetention.SESSION_SCOPED);
+
+        // Capture the formatted output (not used in this test, but could be useful for future enhancements)
+
+        String output = DefaultRequestCache.formatCacheStatistics(statistics);
+
+        // Verify that reference type information is included
+        assertTrue(output.contains("Reference type usage:"), "Should contain reference type section\n" + output);
+        assertTrue(output.contains("HARD/HARD:"), "Should show HARD/HARD reference type\n" + output);
+        assertTrue(output.contains("SOFT/WEAK:"), "Should show SOFT/WEAK reference type\n" + output);
+        assertTrue(output.contains("WEAK/SOFT:"), "Should show WEAK/SOFT reference type\n" + output);
+        assertTrue(output.contains("caches"), "Should show cache creation count\n" + output);
+        assertTrue(output.contains("accesses"), "Should show access count\n" + output);
+        assertTrue(output.contains("hit ratio"), "Should show hit ratio\n" + output);
+
+        // Verify that different hit ratios are shown correctly
+        assertTrue(output.contains("66.7%") || output.contains("66.6%"), "Should show HARD/HARD hit ratio (~66.7%)");
+        assertTrue(output.contains("33.3%"), "Should show SOFT/WEAK hit ratio (33.3%)");
+        assertTrue(output.contains("0.0%"), "Should show WEAK/SOFT hit ratio (0.0%)");
+    }
+
+    @Test
+    void shouldShowMemoryPressureIndicators() {
+        CacheStatistics statistics = new CacheStatistics();
+
+        // Create scenario that might indicate memory pressure
+        statistics.recordCacheCreation("HARD", "HARD", CacheRetention.SESSION_SCOPED);
+        statistics.recordCacheCreation("SOFT", "SOFT", CacheRetention.SESSION_SCOPED);
+
+        // Simulate many cache accesses with hard references (potential OOM risk)
+        for (int i = 0; i < 1000; i++) {
+            statistics.recordCacheAccess("HARD", "HARD", true);
+        }
+
+        // Simulate some soft reference usage
+        for (int i = 0; i < 100; i++) {
+            statistics.recordCacheAccess("SOFT", "SOFT", i % 2 == 0);
+        }
+
+        String output = DefaultRequestCache.formatCacheStatistics(statistics);
+
+        System.out.println("=== Memory Pressure Analysis ===");
+        System.out.println(output);
+
+        // Should show high usage of hard references
+        assertTrue(output.contains("HARD/HARD:"), "Should show hard reference usage");
+        assertTrue(output.contains("1000 accesses"), "Should show high access count for hard references");
+    }
 }

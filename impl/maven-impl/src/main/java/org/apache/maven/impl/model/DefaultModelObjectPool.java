@@ -30,6 +30,8 @@ import org.apache.maven.api.Constants;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.ModelObjectProcessor;
 import org.apache.maven.impl.cache.Cache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of ModelObjectProcessor that provides memory optimization
@@ -54,6 +56,8 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
     private static final Map<Class<?>, AtomicLong> TOTAL_CALLS = new ConcurrentHashMap<>();
     private static final Map<Class<?>, AtomicLong> CACHE_HITS = new ConcurrentHashMap<>();
     private static final Map<Class<?>, AtomicLong> CACHE_MISSES = new ConcurrentHashMap<>();
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultModelObjectPool.class);
 
     @Override
     @SuppressWarnings("unchecked")
@@ -111,7 +115,7 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
             try {
                 return Cache.ReferenceType.valueOf(perTypeValue.toUpperCase());
             } catch (IllegalArgumentException e) {
-                System.err.println("Unknown reference type for " + className + ": " + perTypeValue + ", using default");
+                LOGGER.warn("Unknown reference type for " + className + ": " + perTypeValue + ", using default");
             }
         }
 
@@ -128,7 +132,7 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
                     System.getProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE, Cache.ReferenceType.HARD.name());
             return Cache.ReferenceType.valueOf(referenceTypeProperty.toUpperCase());
         } catch (IllegalArgumentException e) {
-            System.err.println("Unknown default reference type, using HARD");
+            LOGGER.warn("Unknown default reference type, using HARD");
             return Cache.ReferenceType.HARD;
         }
     }

@@ -22,23 +22,18 @@ This document describes the enhanced cache configuration functionality in Maven'
 
 ## Overview
 
-The DefaultRequestCache has been enhanced to support configurable reference types and cache scopes through user-defined selectors. This allows fine-grained control over caching behavior for different request types.
+The DefaultRequestCache supports configurable reference types and cache scopes through user-defined selectors. This allows fine-grained control over caching behavior for different request types.
 
 ## Key Features
 
 ### 1. Early Return for ProtoSession
-- The `doCache` method now returns early when the request session is not a `Session` instance (e.g., `ProtoSession`)
-- This prevents caching attempts for non-session contexts
+- The `doCache` method now returns early when the request session is not a `Session` instance (e.g., `ProtoSession`).
+- This prevents caching attempts for non-session contexts.
 
 ### 2. Configurable Cache Behavior
-- Cache scope and reference type can be configured via session user properties
-- Configuration uses CSS-like selectors to match request types
-- Supports parent-child request relationships
-
-### 3. Backward Compatibility
-- Existing `CacheMetadata` interface still supported
-- Default behavior unchanged when no configuration provided
-- Legacy hardcoded behavior maintained as fallback
+- Cache scope and reference type can be configured via session user properties.
+- Configuration uses CSS-like selectors to match request types.
+- Supports parent-child request relationships.
 
 ## Configuration Syntax
 
@@ -59,9 +54,9 @@ Where:
 - `ref`: Reference type for cache entries (optional)
 
 **Note**:
-- You can specify only `scope` or only `ref` - missing values will be merged from less specific selectors or use defaults
-- Selectors match against all interfaces implemented by the request class, not just the class name
-- This allows matching against `ModelBuilderRequest` interface even if the actual class is `DefaultModelBuilderRequest`
+- You can specify only `scope` or only `ref` - missing values will be merged from less specific selectors or use defaults.
+- Selectors match against all interfaces implemented by the request class, not just the class name.
+- This allows matching against `ModelBuilderRequest` interface even if the actual class is `DefaultModelBuilderRequest`.
 
 ### Available Values
 
@@ -138,39 +133,6 @@ For a `ModelBuilderRequest` with `ModelBuildRequest` parent:
 - Final config: `scope: session, ref: soft`
 
 ## Implementation Details
-
-### New Classes
-- `CacheConfig`: Record holding complete scope and reference type configuration
-- `PartialCacheConfig`: Record holding partial configuration (allows null values)
-- `CacheSelector`: Represents a selector rule with matching logic
-- `CacheSelectorParser`: Parses configuration strings into selectors
-- `CacheConfigurationResolver`: Resolves and merges configuration for requests
-
-### Modified Classes
-- `DefaultRequestCache.doCache()`: Enhanced with configurable behavior
-- `CacheSelector.matches()`: Enhanced to match against all implemented interfaces
-- Early return for non-Session requests
-- Removed hardcoded reference types
-- Integrated configuration resolution
-
-## Migration Guide
-
-### For Users
-- No changes required for existing builds
-- New configuration is opt-in via user properties
-- Existing behavior preserved when no configuration provided
-
-### For Developers
-- `CacheMetadata` interface still supported for backward compatibility
-- New configuration takes precedence over `CacheMetadata`
-- Default reference types changed to SOFT for consistency
-
-## Testing
-
-The implementation includes comprehensive tests:
-- `CacheConfigurationTest`: Unit tests for configuration parsing and resolution
-- Integration tests for selector matching and priority
-- Backward compatibility tests
 
 ## Performance Considerations
 
