@@ -28,7 +28,10 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Determines whether a path is selected according to include/exclude patterns.
@@ -163,7 +166,7 @@ public class PathSelector implements PathMatcher {
      *
      * @see #simplify()
      */
-    private static final PathMatcher INCLUDES_ALL = (path) -> true;
+    static final PathMatcher INCLUDES_ALL = (path) -> true;
 
     /**
      * String representations of the normalized include filters.
@@ -219,13 +222,17 @@ public class PathSelector implements PathMatcher {
      * @param includes the patterns of the files to include, or null or empty for including all files
      * @param excludes the patterns of the files to exclude, or null or empty for no exclusion
      * @param useDefaultExcludes whether to augment the excludes with a default set of <abbr>SCM</abbr> patterns
+     * @throws NullPointerException if directory is null
      */
     public PathSelector(
-            Path directory, Collection<String> includes, Collection<String> excludes, boolean useDefaultExcludes) {
+            @Nonnull Path directory,
+            Collection<String> includes,
+            Collection<String> excludes,
+            boolean useDefaultExcludes) {
+        baseDirectory = Objects.requireNonNull(directory, "directory cannot be null");
         includePatterns = normalizePatterns(includes, false);
         excludePatterns = normalizePatterns(effectiveExcludes(excludes, includePatterns, useDefaultExcludes), true);
-        baseDirectory = directory;
-        FileSystem system = directory.getFileSystem();
+        FileSystem system = baseDirectory.getFileSystem();
         this.includes = matchers(system, includePatterns);
         this.excludes = matchers(system, excludePatterns);
         dirIncludes = matchers(system, directoryPatterns(includePatterns, false));
@@ -568,6 +575,17 @@ public class PathSelector implements PathMatcher {
             }
         }
         return false;
+    }
+
+    /**
+     * Returns whether {@link #couldHoldSelected(Path)} may return {@code false} for some directories.
+     * This method can be used to determine if directory filtering optimization is possible.
+     *
+     * @return {@code true} if directory filtering is possible, {@code false} if all directories
+     *         will be considered as potentially containing selected files
+     */
+    boolean canFilterDirectories() {
+        return dirIncludes.length != 0 || dirExcludes.length != 0;
     }
 
     /**
