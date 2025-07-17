@@ -25,3 +25,5 @@ on:
 jobs:
    update_release_draft:
       uses: apache/maven-gh-actions-shared/.github/workflows/release-drafter.yml@v4
+      with:
+        commitish: 'bed0f8174bf728978f86fac533aa38a9511f3872' # 4.0.0-rc4, TODO remove after first release from maven-4.0.x
