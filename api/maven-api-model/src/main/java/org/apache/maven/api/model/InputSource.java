@@ -34,29 +34,69 @@ import java.util.stream.Stream;
  *
  * @since 4.0.0
  */
-public class InputSource implements Serializable {
+public final class InputSource implements Serializable {
 
     private final String modelId;
     private final String location;
     private final List<InputSource> inputs;
     private final InputLocation importedFrom;
 
-    public InputSource(String modelId, String location) {
+    private volatile int hashCode = 0; // Cached hashCode for performance
+
+    InputSource(String modelId, String location) {
         this(modelId, location, null);
     }
 
-    public InputSource(String modelId, String location, InputLocation importedFrom) {
+    InputSource(String modelId, String location, InputLocation importedFrom) {
         this.modelId = modelId;
         this.location = location;
         this.inputs = null;
         this.importedFrom = importedFrom;
     }
 
-    public InputSource(Collection<InputSource> inputs) {
+    InputSource(Collection<InputSource> inputs) {
         this.modelId = null;
         this.location = null;
         this.inputs = ImmutableCollections.copy(inputs);
         this.importedFrom = null;
+    }
+
+    // Factory methods
+
+    /**
+     * Creates a new InputSource with the specified model ID and location.
+     * The created instance is processed through ModelObjectProcessor for optimization.
+     *
+     * @param modelId the model ID
+     * @param location the location
+     * @return a new InputSource instance
+     */
+    public static InputSource of(String modelId, String location) {
+        return ModelObjectProcessor.processObject(new InputSource(modelId, location));
+    }
+
+    /**
+     * Creates a new InputSource with the specified model ID, location, and imported from location.
+     * The created instance is processed through ModelObjectProcessor for optimization.
+     *
+     * @param modelId the model ID
+     * @param location the location
+     * @param importedFrom the imported from location
+     * @return a new InputSource instance
+     */
+    public static InputSource of(String modelId, String location, InputLocation importedFrom) {
+        return ModelObjectProcessor.processObject(new InputSource(modelId, location, importedFrom));
+    }
+
+    /**
+     * Creates a new InputSource from a collection of input sources.
+     * The created instance is processed through ModelObjectProcessor for optimization.
+     *
+     * @param inputs the collection of input sources
+     * @return a new InputSource instance
+     */
+    public static InputSource of(Collection<InputSource> inputs) {
+        return ModelObjectProcessor.processObject(new InputSource(inputs));
     }
 
     /**
@@ -99,14 +139,26 @@ public class InputSource implements Serializable {
         InputSource that = (InputSource) o;
         return Objects.equals(modelId, that.modelId)
                 && Objects.equals(location, that.location)
-                && Objects.equals(inputs, that.inputs);
+                && Objects.equals(inputs, that.inputs)
+                && Objects.equals(importedFrom, that.importedFrom);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(modelId, location, inputs);
+        int result = hashCode;
+        if (result == 0) {
+            result = Objects.hash(modelId, location, inputs, importedFrom);
+            hashCode = result;
+        }
+        return result;
     }
 
+    /**
+     * Returns a stream of all input sources contained in this instance.
+     * For merged sources, returns all constituent sources; for single sources, returns this instance.
+     *
+     * @return a stream of InputSource instances
+     */
     Stream<InputSource> sources() {
         return inputs != null ? inputs.stream() : Stream.of(this);
     }
@@ -119,7 +171,16 @@ public class InputSource implements Serializable {
         return getModelId() + " " + getLocation();
     }
 
+    /**
+     * Merges two InputSource instances into a single merged InputSource.
+     * The resulting InputSource will contain all distinct sources from both inputs.
+     *
+     * @param src1 the first input source to merge
+     * @param src2 the second input source to merge
+     * @return a new merged InputSource containing all distinct sources from both inputs
+     */
     public static InputSource merge(InputSource src1, InputSource src2) {
-        return new InputSource(Stream.concat(src1.sources(), src2.sources()).collect(Collectors.toSet()));
+        return new InputSource(
+                Stream.concat(src1.sources(), src2.sources()).distinct().toList());
     }
 }
