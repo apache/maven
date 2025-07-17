@@ -385,7 +385,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         externalProfile.setLocation(
                 "",
                 new org.apache.maven.model.InputLocation(
-                        1, 1, new org.apache.maven.model.InputSource(new InputSource(null, "settings.xml", null))));
+                        1, 1, new org.apache.maven.model.InputSource(InputSource.of(null, "settings.xml", null))));
         externalProfile.setId("external-profile");
         request.addProfile(externalProfile);
         request.setActiveProfileIds(List.of(externalProfile.getId()));

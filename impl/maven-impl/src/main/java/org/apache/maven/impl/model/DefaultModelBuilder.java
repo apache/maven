@@ -21,7 +21,6 @@ package org.apache.maven.impl.model;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -64,7 +63,6 @@ import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Exclusion;
 import org.apache.maven.api.model.InputLocation;
-import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Profile;
@@ -1251,6 +1249,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     model = modelProcessor.read(XmlReaderRequest.builder()
                             .strict(strict)
                             .location(modelSource.getLocation())
+                            .modelId(modelSource.getModelId())
                             .path(modelSource.getPath())
                             .rootDirectory(rootDirectory)
                             .inputStream(is)
@@ -1264,6 +1263,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                         model = modelProcessor.read(XmlReaderRequest.builder()
                                 .strict(false)
                                 .location(modelSource.getLocation())
+                                .modelId(modelSource.getModelId())
                                 .path(modelSource.getPath())
                                 .rootDirectory(rootDirectory)
                                 .inputStream(is)
@@ -1279,19 +1279,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                             Version.V20,
                             "Malformed POM " + modelSource.getLocation() + ": " + e.getMessage(),
                             e);
-                }
-
-                InputLocation loc = model.getLocation("");
-                InputSource v4src = loc != null ? loc.getSource() : null;
-                if (v4src != null) {
-                    try {
-                        Field field = InputSource.class.getDeclaredField("modelId");
-                        field.setAccessible(true);
-                        field.set(v4src, ModelProblemUtils.toId(model));
-                    } catch (Throwable t) {
-                        // TODO: use a lazy source ?
-                        throw new IllegalStateException("Unable to set modelId on InputSource", t);
-                    }
                 }
             } catch (XmlReaderException e) {
                 add(

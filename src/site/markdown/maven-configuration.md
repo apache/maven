@@ -54,6 +54,8 @@ To modify this file, edit the template and regenerate.
 | `maven.logger.showThreadName` | `Boolean` | Set to true if you want to output the current thread name. Defaults to true. |  `true`  | 4.0.0 | User properties |
 | `maven.logger.warnLevelString` | `String` | The string value output for the warn level. Defaults to WARN. |  `WARN`  | 4.0.0 | User properties |
 | `maven.maven3Personality` | `Boolean` | User property for controlling "maven personality". If activated Maven will behave as previous major version, Maven 3. |  `false`  | 4.0.0 | User properties |
+| `maven.model.processor.pooledTypes` | `String` | User property key for configuring which object types are pooled by ModelObjectProcessor. Value should be a comma-separated list of simple class names (e.g., "Dependency,Plugin,Build"). Default is "Dependency" for backward compatibility. |  `Dependency`  | 4.1.0 | User properties |
+| `maven.model.processor.referenceType` | `String` | User property key for configuring the default reference type used by ModelObjectProcessor. Valid values are: "SOFT", "HARD", "WEAK", "NONE". Default is "HARD" for optimal performance. |  `HARD`  | 4.1.0 | User properties |
 | `maven.modelBuilder.parallelism` | `Integer` | ProjectBuilder parallelism. |  `cores/2 + 1`  | 4.0.0 | User properties |
 | `maven.plugin.validation` | `String` | Plugin validation level. |  `inline`  | 3.9.2 | User properties |
 | `maven.plugin.validation.excludes` | `String` | Plugin validation exclusions. |  -  | 3.9.6 | User properties |
