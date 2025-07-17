@@ -1261,6 +1261,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     model = modelProcessor.read(XmlReaderRequest.builder()
                             .strict(strict)
                             .location(modelSource.getLocation())
+                            .modelId(modelSource.getModelId())
                             .path(modelSource.getPath())
                             .rootDirectory(rootDirectory)
                             .inputStream(is)
@@ -1274,6 +1275,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                         model = modelProcessor.read(XmlReaderRequest.builder()
                                 .strict(false)
                                 .location(modelSource.getLocation())
+                                .modelId(modelSource.getModelId())
                                 .path(modelSource.getPath())
                                 .rootDirectory(rootDirectory)
                                 .inputStream(is)
@@ -1290,9 +1292,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                             "Malformed POM " + modelSource.getLocation() + ": " + e.getMessage(),
                             e);
                 }
-
-                // ModelId is now properly set by DefaultModelXmlFactory during parsing
-                // No need for the reflection hack anymore
             } catch (XmlReaderException e) {
                 add(
                         Severity.FATAL,

@@ -64,14 +64,16 @@ class SourcesTest {
 
     @Test
     void testResolvedSource() {
-        Path path = Paths.get("/tmp");
-        String location = "custom-location";
-        ModelSource source = Sources.resolvedSource(path, location);
+        String location = "/tmp";
+        Path path = Paths.get(location);
+        String modelId = "org.example:test:1.0.0";
+        ModelSource source = Sources.resolvedSource(path, modelId);
 
         assertNotNull(source);
         assertInstanceOf(Sources.ResolvedPathSource.class, source);
         assertNull(source.getPath());
-        assertEquals(location, source.getLocation());
+        assertEquals(path.toString(), source.getLocation());
+        assertEquals(modelId, source.getModelId());
     }
 
     @Test
@@ -109,12 +111,14 @@ class SourcesTest {
     @Test
     void testResolvedPathSourceFunctionality() {
         // Test resolved source functionality
-        Path path = Paths.get("/tmp");
-        String location = "custom-location";
-        Sources.ResolvedPathSource source = (Sources.ResolvedPathSource) Sources.resolvedSource(path, location);
+        String location = "/tmp";
+        Path path = Paths.get(location);
+        String modelId = "org.example:test:1.0.0";
+        Sources.ResolvedPathSource source = (Sources.ResolvedPathSource) Sources.resolvedSource(path, modelId);
 
         assertNull(source.getPath());
-        assertEquals(location, source.getLocation());
+        assertEquals(path.toString(), source.getLocation());
+        assertEquals(modelId, source.getModelId());
         assertNull(source.resolve("subdir"));
 
         ModelSource.ModelLocator locator = mock(ModelSource.ModelLocator.class);
@@ -140,6 +144,6 @@ class SourcesTest {
     void testNullHandling() {
         assertThrows(NullPointerException.class, () -> Sources.fromPath(null));
         assertThrows(NullPointerException.class, () -> Sources.buildSource(null));
-        assertThrows(NullPointerException.class, () -> Sources.resolvedSource(null, "location"));
+        assertThrows(NullPointerException.class, () -> Sources.resolvedSource(null, "modelId"));
     }
 }

@@ -33,7 +33,7 @@ import java.util.Objects;
  *
  * @since 4.0.0
  */
-public class InputLocation implements Serializable, InputLocationTracker {
+public final class InputLocation implements Serializable, InputLocationTracker {
     private final int lineNumber;
     private final int columnNumber;
     private final InputSource source;
@@ -44,7 +44,7 @@ public class InputLocation implements Serializable, InputLocationTracker {
 
     private static final InputLocation EMPTY = new InputLocation(-1, -1);
 
-    public InputLocation(InputSource source) {
+    InputLocation(InputSource source) {
         this.lineNumber = -1;
         this.columnNumber = -1;
         this.source = source;
@@ -52,15 +52,15 @@ public class InputLocation implements Serializable, InputLocationTracker {
         this.importedFrom = null;
     }
 
-    public InputLocation(int lineNumber, int columnNumber) {
+    InputLocation(int lineNumber, int columnNumber) {
         this(lineNumber, columnNumber, null, null);
     }
 
-    public InputLocation(int lineNumber, int columnNumber, InputSource source) {
+    InputLocation(int lineNumber, int columnNumber, InputSource source) {
         this(lineNumber, columnNumber, source, null);
     }
 
-    public InputLocation(int lineNumber, int columnNumber, InputSource source, Object selfLocationKey) {
+    InputLocation(int lineNumber, int columnNumber, InputSource source, Object selfLocationKey) {
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
         this.source = source;
@@ -70,7 +70,7 @@ public class InputLocation implements Serializable, InputLocationTracker {
         this.importedFrom = null;
     }
 
-    public InputLocation(int lineNumber, int columnNumber, InputSource source, Map<Object, InputLocation> locations) {
+    InputLocation(int lineNumber, int columnNumber, InputSource source, Map<Object, InputLocation> locations) {
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
         this.source = source;
@@ -80,12 +80,17 @@ public class InputLocation implements Serializable, InputLocationTracker {
 
     // Factory methods
 
+    /**
+     * Returns an empty InputLocation.
+     *
+     * @return a new InputLocation instance
+     */
     public static InputLocation of() {
         return EMPTY;
     }
 
     /**
-     * Creates a new InputLocation with the specified source.
+     * Returns an InputLocation with the specified source.
      * The created instance is processed through ModelObjectProcessor for optimization.
      *
      * @param source the input source
@@ -96,7 +101,7 @@ public class InputLocation implements Serializable, InputLocationTracker {
     }
 
     /**
-     * Creates a new InputLocation with the specified line and column numbers.
+     * Returns an InputLocation with the specified line and column numbers.
      * The created instance is processed through ModelObjectProcessor for optimization.
      *
      * @param lineNumber the line number
@@ -108,7 +113,7 @@ public class InputLocation implements Serializable, InputLocationTracker {
     }
 
     /**
-     * Creates a new InputLocation with the specified line number, column number, and source.
+     * Returns an InputLocation with the specified line number, column number, and source.
      * The created instance is processed through ModelObjectProcessor for optimization.
      *
      * @param lineNumber the line number
@@ -121,7 +126,7 @@ public class InputLocation implements Serializable, InputLocationTracker {
     }
 
     /**
-     * Creates a new InputLocation with the specified line number, column number, source, and self location key.
+     * Returns an InputLocation with the specified line number, column number, source, and self location key.
      * The created instance is processed through ModelObjectProcessor for optimization.
      *
      * @param lineNumber the line number
@@ -135,7 +140,7 @@ public class InputLocation implements Serializable, InputLocationTracker {
     }
 
     /**
-     * Creates a new InputLocation with the specified line number, column number, source, and locations map.
+     * Returns an InputLocation with the specified line number, column number, source, and locations map.
      * The created instance is processed through ModelObjectProcessor for optimization.
      *
      * @param lineNumber the line number
@@ -149,23 +154,49 @@ public class InputLocation implements Serializable, InputLocationTracker {
         return ModelObjectProcessor.processObject(new InputLocation(lineNumber, columnNumber, source, locations));
     }
 
+    /**
+     * Gets the one-based line number where this element is located in the source file.
+     *
+     * @return the line number, or -1 if unknown
+     */
     public int getLineNumber() {
         return lineNumber;
     }
 
+    /**
+     * Gets the one-based column number where this element is located in the source file.
+     *
+     * @return the column number, or -1 if unknown
+     */
     public int getColumnNumber() {
         return columnNumber;
     }
 
+    /**
+     * Gets the input source where this location originates from.
+     *
+     * @return the input source, or null if unknown
+     */
     public InputSource getSource() {
         return source;
     }
 
+    /**
+     * Gets the InputLocation for a specific nested element key.
+     *
+     * @param key the key to look up
+     * @return the InputLocation for the specified key, or null if not found
+     */
     @Override
     public InputLocation getLocation(Object key) {
         return locations != null ? locations.get(key) : null;
     }
 
+    /**
+     * Gets the map of nested element locations within this location.
+     *
+     * @return an immutable map of keys to InputLocation instances for nested elements
+     */
     public Map<Object, InputLocation> getLocations() {
         return locations;
     }

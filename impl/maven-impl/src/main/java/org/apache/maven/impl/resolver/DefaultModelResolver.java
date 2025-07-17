@@ -150,10 +150,8 @@ public class DefaultModelResolver implements ModelResolver {
                     .toString();
             String resultVersion = version.equals(newVersion) ? null : newVersion;
             Path path = getPath(session, repositories, groupId, artifactId, newVersion, classifier);
-            return new ModelResolverResult(
-                    request,
-                    Sources.resolvedSource(path, groupId + ":" + artifactId + ":" + newVersion),
-                    resultVersion);
+            String gav = groupId + ":" + artifactId + ":" + newVersion;
+            return new ModelResolverResult(request, Sources.resolvedSource(path, gav), resultVersion);
         } catch (VersionRangeResolverException | ArtifactResolverException e) {
             throw new ModelResolverException(
                     e.getMessage() + " (remote repositories: "

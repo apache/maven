@@ -34,7 +34,7 @@ import java.util.stream.Stream;
  *
  * @since 4.0.0
  */
-public class InputSource implements Serializable {
+public final class InputSource implements Serializable {
 
     private final String modelId;
     private final String location;
@@ -43,18 +43,18 @@ public class InputSource implements Serializable {
 
     private volatile int hashCode = 0; // Cached hashCode for performance
 
-    public InputSource(String modelId, String location) {
+    InputSource(String modelId, String location) {
         this(modelId, location, null);
     }
 
-    public InputSource(String modelId, String location, InputLocation importedFrom) {
+    InputSource(String modelId, String location, InputLocation importedFrom) {
         this.modelId = modelId;
         this.location = location;
         this.inputs = null;
         this.importedFrom = importedFrom;
     }
 
-    public InputSource(Collection<InputSource> inputs) {
+    InputSource(Collection<InputSource> inputs) {
         this.modelId = null;
         this.location = null;
         this.inputs = ImmutableCollections.copy(inputs);
@@ -153,6 +153,12 @@ public class InputSource implements Serializable {
         return result;
     }
 
+    /**
+     * Returns a stream of all input sources contained in this instance.
+     * For merged sources, returns all constituent sources; for single sources, returns this instance.
+     *
+     * @return a stream of InputSource instances
+     */
     Stream<InputSource> sources() {
         return inputs != null ? inputs.stream() : Stream.of(this);
     }
@@ -165,6 +171,14 @@ public class InputSource implements Serializable {
         return getModelId() + " " + getLocation();
     }
 
+    /**
+     * Merges two InputSource instances into a single merged InputSource.
+     * The resulting InputSource will contain all distinct sources from both inputs.
+     *
+     * @param src1 the first input source to merge
+     * @param src2 the second input source to merge
+     * @return a new merged InputSource containing all distinct sources from both inputs
+     */
     public static InputSource merge(InputSource src1, InputSource src2) {
         return new InputSource(
                 Stream.concat(src1.sources(), src2.sources()).distinct().toList());

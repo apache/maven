@@ -67,8 +67,17 @@ public class InputSource implements java.io.Serializable, Cloneable {
     // - Constructors -/
     // ----------------/
 
+    /**
+     * Default constructor for InputSource.
+     */
     public InputSource() {}
 
+    /**
+     * Creates a new InputSource from an API model InputSource.
+     * This constructor is used for converting between the API model and the compat model.
+     *
+     * @param source the API model InputSource to convert from
+     */
     public InputSource(org.apache.maven.api.model.InputSource source) {
         this.modelId = source.getModelId();
         this.location = source.getLocation();
@@ -134,9 +143,10 @@ public class InputSource implements java.io.Serializable, Cloneable {
     } // -- void setModelId( String )
 
     /**
-     * Get the location of the POM from which this POM was
+     * Get the location of the POM from which this POM was imported from.
+     * Can return {@code null} if this POM was not imported.
      *
-     * @return
+     * @return the InputLocation where this POM was imported from, or null if not imported
      */
     public InputLocation getImportedFrom() {
         return importedFrom;
@@ -145,7 +155,7 @@ public class InputSource implements java.io.Serializable, Cloneable {
     /**
      * Set the location of the POM from which this POM was imported from.
      *
-     * @param importedFrom
+     * @param importedFrom the InputLocation where this POM was imported from, or null if not imported
      */
     public void setImportedFrom(InputLocation importedFrom) {
         this.importedFrom = importedFrom;
@@ -180,6 +190,12 @@ public class InputSource implements java.io.Serializable, Cloneable {
         return getModelId() + " " + getLocation();
     }
 
+    /**
+     * Converts this compat model InputSource to an API model InputSource.
+     * This method is used for converting between the compat model and the API model.
+     *
+     * @return the equivalent API model InputSource
+     */
     public org.apache.maven.api.model.InputSource toApiSource() {
         return org.apache.maven.api.model.InputSource.of(modelId, location);
     }
