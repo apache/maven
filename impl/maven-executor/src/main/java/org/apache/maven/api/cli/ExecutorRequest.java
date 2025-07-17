@@ -146,7 +146,7 @@ public interface ExecutorRequest {
 
     /**
      * Indicate if {@code ~/.mavenrc} should be skipped during execution.
-     * <br/>
+     * <p>
      * Affected only for forked executor by adding MAVEN_SKIP_RC environment variable
      */
     boolean skipMavenRc();
@@ -345,6 +345,7 @@ public interface ExecutorRequest {
             return this;
         }
 
+        @Nonnull
         public Builder skipMavenRc(boolean skipMavenRc) {
             this.skipMavenRc = skipMavenRc;
             return this;
