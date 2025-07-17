@@ -302,9 +302,9 @@ public class DefaultModelValidator implements ModelValidator {
 
     @Override
     @SuppressWarnings("checkstyle:MethodLength")
-    public void validateFileModel(Session s, Model m, int validationLevel, ModelProblemCollector problems) {
+    public void validateFileModel(Session session, Model model, int validationLevel, ModelProblemCollector problems) {
 
-        Parent parent = m.getParent();
+        Parent parent = model.getParent();
         if (parent != null) {
             validateStringNotEmpty(
                     "parent.groupId", problems, Severity.FATAL, Version.BASE, parent.getGroupId(), parent);
@@ -312,7 +312,8 @@ public class DefaultModelValidator implements ModelValidator {
             validateStringNotEmpty(
                     "parent.artifactId", problems, Severity.FATAL, Version.BASE, parent.getArtifactId(), parent);
 
-            if (equals(parent.getGroupId(), m.getGroupId()) && equals(parent.getArtifactId(), m.getArtifactId())) {
+            if (equals(parent.getGroupId(), model.getGroupId())
+                    && equals(parent.getArtifactId(), model.getArtifactId())) {
                 addViolation(
                         problems,
                         Severity.FATAL,
@@ -341,8 +342,8 @@ public class DefaultModelValidator implements ModelValidator {
                             || parent.getArtifactId() != null
                                     && !parent.getArtifactId().isEmpty())
                     && validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_4_0
-                    && ModelBuilder.KNOWN_MODEL_VERSIONS.contains(m.getModelVersion())
-                    && !Objects.equals(m.getModelVersion(), ModelBuilder.MODEL_VERSION_4_0_0)) {
+                    && ModelBuilder.KNOWN_MODEL_VERSIONS.contains(model.getModelVersion())
+                    && !Objects.equals(model.getModelVersion(), ModelBuilder.MODEL_VERSION_4_0_0)) {
                 addViolation(
                         problems,
                         Severity.WARNING,
@@ -357,7 +358,7 @@ public class DefaultModelValidator implements ModelValidator {
         if (validationLevel == ModelValidator.VALIDATION_LEVEL_MINIMAL) {
             // profiles: they are essential for proper model building (may contribute profiles, dependencies...)
             HashSet<String> minProfileIds = new HashSet<>();
-            for (Profile profile : m.getProfiles()) {
+            for (Profile profile : model.getProfiles()) {
                 if (!minProfileIds.add(profile.getId())) {
                     addViolation(
                             problems,
@@ -370,27 +371,28 @@ public class DefaultModelValidator implements ModelValidator {
                 }
             }
         } else if (validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_2_0) {
-            validateStringNotEmpty("modelVersion", problems, Severity.ERROR, Version.V20, m.getModelVersion(), m);
+            validateStringNotEmpty(
+                    "modelVersion", problems, Severity.ERROR, Version.V20, model.getModelVersion(), model);
 
-            validateModelVersion(s, problems, m.getModelVersion(), m, ModelBuilder.KNOWN_MODEL_VERSIONS);
+            validateModelVersion(session, problems, model.getModelVersion(), model, ModelBuilder.KNOWN_MODEL_VERSIONS);
 
             Set<String> modules = new HashSet<>();
-            for (int i = 0, n = m.getModules().size(); i < n; i++) {
-                String module = m.getModules().get(i);
+            for (int index = 0, size = model.getModules().size(); index < size; index++) {
+                String module = model.getModules().get(index);
                 if (!modules.add(module)) {
                     addViolation(
                             problems,
                             Severity.ERROR,
                             Version.V20,
-                            "modules.module[" + i + "]",
+                            "modules.module[" + index + "]",
                             null,
                             "specifies duplicate child module " + module,
-                            m.getLocation("modules"));
+                            model.getLocation("modules"));
                 }
             }
-            String modelVersion = m.getModelVersion();
+            String modelVersion = model.getModelVersion();
             if (Objects.equals(modelVersion, ModelBuilder.MODEL_VERSION_4_0_0)) {
-                if (!m.getSubprojects().isEmpty()) {
+                if (!model.getSubprojects().isEmpty()) {
                     addViolation(
                             problems,
                             Severity.ERROR,
@@ -398,21 +400,21 @@ public class DefaultModelValidator implements ModelValidator {
                             "subprojects",
                             null,
                             "unexpected subprojects element",
-                            m.getLocation("subprojects"));
+                            model.getLocation("subprojects"));
                 }
             } else {
                 Set<String> subprojects = new HashSet<>();
-                for (int i = 0, n = m.getSubprojects().size(); i < n; i++) {
-                    String subproject = m.getSubprojects().get(i);
+                for (int index = 0, size = model.getSubprojects().size(); index < size; index++) {
+                    String subproject = model.getSubprojects().get(index);
                     if (!subprojects.add(subproject)) {
                         addViolation(
                                 problems,
                                 Severity.ERROR,
                                 Version.V41,
-                                "subprojects.subproject[" + i + "]",
+                                "subprojects.subproject[" + index + "]",
                                 null,
                                 "specifies duplicate subproject " + subproject,
-                                m.getLocation("subprojects"));
+                                model.getLocation("subprojects"));
                     }
                 }
                 if (!modules.isEmpty()) {
@@ -424,7 +426,7 @@ public class DefaultModelValidator implements ModelValidator {
                                 "modules",
                                 null,
                                 "deprecated modules element, use subprojects instead",
-                                m.getLocation("modules"));
+                                model.getLocation("modules"));
                     } else {
                         addViolation(
                                 problems,
@@ -433,77 +435,87 @@ public class DefaultModelValidator implements ModelValidator {
                                 "modules",
                                 null,
                                 "cannot use both modules and subprojects element",
-                                m.getLocation("modules"));
+                                model.getLocation("modules"));
                     }
                 }
             }
 
             Severity errOn30 = getSeverity(validationLevel, ModelValidator.VALIDATION_LEVEL_MAVEN_3_0);
 
-            boolean isModelVersion41OrMore = !Objects.equals(ModelBuilder.MODEL_VERSION_4_0_0, m.getModelVersion());
+            boolean isModelVersion41OrMore = !Objects.equals(ModelBuilder.MODEL_VERSION_4_0_0, model.getModelVersion());
             if (isModelVersion41OrMore) {
-                validateStringNoExpression("groupId", problems, Severity.FATAL, Version.V41, m.getGroupId(), m);
+                validateStringNoExpression("groupId", problems, Severity.FATAL, Version.V41, model.getGroupId(), model);
 
-                validateStringNotEmpty("artifactId", problems, Severity.FATAL, Version.V20, m.getArtifactId(), m);
-                validateStringNoExpression("artifactId", problems, Severity.FATAL, Version.V20, m.getArtifactId(), m);
+                validateStringNotEmpty(
+                        "artifactId", problems, Severity.FATAL, Version.V20, model.getArtifactId(), model);
+                validateStringNoExpression(
+                        "artifactId", problems, Severity.FATAL, Version.V20, model.getArtifactId(), model);
 
-                validateVersionNoExpression("version", problems, Severity.FATAL, Version.V41, m.getVersion(), m);
+                validateVersionNoExpression(
+                        "version", problems, Severity.FATAL, Version.V41, model.getVersion(), model);
 
                 if (parent != null) {
                     validateStringNoExpression(
-                            "groupId", problems, Severity.FATAL, Version.V41, parent.getGroupId(), m);
+                            "groupId", problems, Severity.FATAL, Version.V41, parent.getGroupId(), model);
                     validateStringNoExpression(
-                            "artifactId", problems, Severity.FATAL, Version.V41, parent.getArtifactId(), m);
+                            "artifactId", problems, Severity.FATAL, Version.V41, parent.getArtifactId(), model);
                     validateVersionNoExpression(
-                            "version", problems, Severity.FATAL, Version.V41, parent.getVersion(), m);
+                            "version", problems, Severity.FATAL, Version.V41, parent.getVersion(), model);
                 }
             } else {
-                validateStringNoExpression("groupId", problems, Severity.WARNING, Version.V20, m.getGroupId(), m);
+                validateStringNoExpression(
+                        "groupId", problems, Severity.WARNING, Version.V20, model.getGroupId(), model);
                 if (parent == null) {
-                    validateStringNotEmpty("groupId", problems, Severity.FATAL, Version.V20, m.getGroupId(), m);
+                    validateStringNotEmpty("groupId", problems, Severity.FATAL, Version.V20, model.getGroupId(), model);
                 }
 
-                validateStringNoExpression("artifactId", problems, Severity.WARNING, Version.V20, m.getArtifactId(), m);
-                validateStringNotEmpty("artifactId", problems, Severity.FATAL, Version.V20, m.getArtifactId(), m);
+                validateStringNoExpression(
+                        "artifactId", problems, Severity.WARNING, Version.V20, model.getArtifactId(), model);
+                validateStringNotEmpty(
+                        "artifactId", problems, Severity.FATAL, Version.V20, model.getArtifactId(), model);
 
-                validateVersionNoExpression("version", problems, Severity.WARNING, Version.V20, m.getVersion(), m);
+                validateVersionNoExpression(
+                        "version", problems, Severity.WARNING, Version.V20, model.getVersion(), model);
                 if (parent == null) {
-                    validateStringNotEmpty("version", problems, Severity.FATAL, Version.V20, m.getVersion(), m);
+                    validateStringNotEmpty("version", problems, Severity.FATAL, Version.V20, model.getVersion(), model);
                 }
             }
 
-            validateStringNoExpression("packaging", problems, Severity.WARNING, Version.V20, m.getPackaging(), m);
+            validateStringNoExpression(
+                    "packaging", problems, Severity.WARNING, Version.V20, model.getPackaging(), model);
 
             validate20RawDependencies(
                     problems,
-                    m.getDependencies(),
+                    model.getDependencies(),
                     "dependencies.dependency.",
                     EMPTY,
                     isModelVersion41OrMore,
                     validationLevel);
 
-            validate20RawDependenciesSelfReferencing(problems, m, m.getDependencies(), "dependencies.dependency");
+            validate20RawDependenciesSelfReferencing(
+                    problems, model, model.getDependencies(), "dependencies.dependency");
 
-            if (m.getDependencyManagement() != null) {
+            if (model.getDependencyManagement() != null) {
                 validate20RawDependencies(
                         problems,
-                        m.getDependencyManagement().getDependencies(),
+                        model.getDependencyManagement().getDependencies(),
                         "dependencyManagement.dependencies.dependency.",
                         EMPTY,
                         isModelVersion41OrMore,
                         validationLevel);
             }
 
-            validateRawRepositories(problems, m.getRepositories(), "repositories.repository.", EMPTY, validationLevel);
+            validateRawRepositories(
+                    problems, model.getRepositories(), "repositories.repository.", EMPTY, validationLevel);
 
             validateRawRepositories(
                     problems,
-                    m.getPluginRepositories(),
+                    model.getPluginRepositories(),
                     "pluginRepositories.pluginRepository.",
                     EMPTY,
                     validationLevel);
 
-            Build build = m.getBuild();
+            Build build = model.getBuild();
             if (build != null) {
                 validate20RawPlugins(problems, build.getPlugins(), "build.plugins.plugin.", EMPTY, validationLevel);
 
@@ -520,10 +532,10 @@ public class DefaultModelValidator implements ModelValidator {
 
             Set<String> profileIds = new HashSet<>();
 
-            for (Profile profile : m.getProfiles()) {
+            for (Profile profile : model.getProfiles()) {
                 String prefix = "profiles.profile[" + profile.getId() + "].";
 
-                validateProfileId(prefix, "id", problems, Severity.ERROR, Version.V40, profile.getId(), null, m);
+                validateProfileId(prefix, "id", problems, Severity.ERROR, Version.V40, profile.getId(), null, model);
 
                 if (!profileIds.add(profile.getId())) {
                     addViolation(
@@ -585,11 +597,11 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     @Override
-    public void validateRawModel(Session s, Model m, int validationLevel, ModelProblemCollector problems) {
+    public void validateRawModel(Session session, Model model, int validationLevel, ModelProblemCollector problems) {
         // Check that the model version is correctly set wrt the model definition, i.e., that the
         // user does not use an attribute or element that is not available in the modelVersion used.
-        String minVersion = new MavenModelVersion().getModelVersion(m);
-        if (m.getModelVersion() != null && compareModelVersions(minVersion, m.getModelVersion()) > 0) {
+        String minVersion = new MavenModelVersion().getModelVersion(model);
+        if (model.getModelVersion() != null && compareModelVersions(minVersion, model.getModelVersion()) > 0) {
             addViolation(
                     problems,
                     Severity.FATAL,
@@ -597,10 +609,10 @@ public class DefaultModelValidator implements ModelValidator {
                     "model",
                     null,
                     "the model contains elements that require a model version of " + minVersion,
-                    m);
+                    model);
         }
 
-        Parent parent = m.getParent();
+        Parent parent = model.getParent();
 
         if (parent != null) {
             validateStringNotEmpty(
@@ -612,7 +624,8 @@ public class DefaultModelValidator implements ModelValidator {
             validateStringNotEmpty(
                     "parent.version", problems, Severity.FATAL, Version.BASE, parent.getVersion(), parent);
 
-            if (equals(parent.getGroupId(), m.getGroupId()) && equals(parent.getArtifactId(), m.getArtifactId())) {
+            if (equals(parent.getGroupId(), model.getGroupId())
+                    && equals(parent.getArtifactId(), model.getArtifactId())) {
                 addViolation(
                         problems,
                         Severity.FATAL,
@@ -654,17 +667,19 @@ public class DefaultModelValidator implements ModelValidator {
             if (stk.size() < 2) {
                 return null;
             }
-            Iterator<ActivationFrame> f = stk.iterator();
+            Iterator<ActivationFrame> frameIterator = stk.iterator();
 
-            String location = f.next().location;
-            ActivationFrame parent = f.next();
+            String location = frameIterator.next().location;
+            ActivationFrame parent = frameIterator.next();
 
-            return parent.parent.map(p -> p.getLocation(location)).orElse(null);
+            return parent.parent
+                    .map(parentTracker -> parentTracker.getLocation(location))
+                    .orElse(null);
         };
-        final UnaryOperator<String> transformer = s -> {
-            if (hasProjectExpression(s)) {
+        final UnaryOperator<String> transformer = stringValue -> {
+            if (hasProjectExpression(stringValue)) {
                 String path = pathSupplier.get();
-                Matcher matcher = EXPRESSION_PROJECT_NAME_PATTERN.matcher(s);
+                Matcher matcher = EXPRESSION_PROJECT_NAME_PATTERN.matcher(stringValue);
                 while (matcher.find()) {
                     String propertyName = matcher.group(0);
 
@@ -677,12 +692,12 @@ public class DefaultModelValidator implements ModelValidator {
                             Version.V30,
                             prefix + path,
                             null,
-                            "Failed to interpolate profile activation property " + s + ": " + propertyName
+                            "Failed to interpolate profile activation property " + stringValue + ": " + propertyName
                                     + " expressions are not supported during profile activation.",
                             locationSupplier.get());
                 }
             }
-            return s;
+            return stringValue;
         };
         new ActivationWalker(stk, transformer).transformActivation(activation);
     }
@@ -830,35 +845,36 @@ public class DefaultModelValidator implements ModelValidator {
 
     @Override
     @SuppressWarnings("checkstyle:MethodLength")
-    public void validateEffectiveModel(Session s, Model m, int validationLevel, ModelProblemCollector problems) {
-        validateStringNotEmpty("modelVersion", problems, Severity.ERROR, Version.BASE, m.getModelVersion(), m);
+    public void validateEffectiveModel(
+            Session session, Model model, int validationLevel, ModelProblemCollector problems) {
+        validateStringNotEmpty("modelVersion", problems, Severity.ERROR, Version.BASE, model.getModelVersion(), model);
 
-        validateCoordinatesId("groupId", problems, m.getGroupId(), m);
+        validateCoordinatesId("groupId", problems, model.getGroupId(), model);
 
-        validateCoordinatesId("artifactId", problems, m.getArtifactId(), m);
+        validateCoordinatesId("artifactId", problems, model.getArtifactId(), model);
 
-        validateStringNotEmpty("packaging", problems, Severity.ERROR, Version.BASE, m.getPackaging(), m);
+        validateStringNotEmpty("packaging", problems, Severity.ERROR, Version.BASE, model.getPackaging(), model);
 
-        if (!m.getModules().isEmpty()) {
-            if (!"pom".equals(m.getPackaging())) {
+        if (!model.getModules().isEmpty()) {
+            if (!"pom".equals(model.getPackaging())) {
                 addViolation(
                         problems,
                         Severity.ERROR,
                         Version.BASE,
                         "packaging",
                         null,
-                        "with value '" + m.getPackaging() + "' is invalid. Aggregator projects "
+                        "with value '" + model.getPackaging() + "' is invalid. Aggregator projects "
                                 + "require 'pom' as packaging.",
-                        m);
+                        model);
             }
 
-            for (int i = 0, n = m.getModules().size(); i < n; i++) {
-                String module = m.getModules().get(i);
+            for (int index = 0, size = model.getModules().size(); index < size; index++) {
+                String module = model.getModules().get(index);
 
                 boolean isBlankModule = true;
                 if (module != null) {
-                    for (int j = 0; j < module.length(); j++) {
-                        if (!Character.isWhitespace(module.charAt(j))) {
+                    for (int charIndex = 0; charIndex < module.length(); charIndex++) {
+                        if (!Character.isWhitespace(module.charAt(charIndex))) {
                             isBlankModule = false;
                         }
                     }
@@ -869,36 +885,44 @@ public class DefaultModelValidator implements ModelValidator {
                             problems,
                             Severity.ERROR,
                             Version.BASE,
-                            "modules.module[" + i + "]",
+                            "modules.module[" + index + "]",
                             null,
                             "has been specified without a path to the project directory.",
-                            m.getLocation("modules"));
+                            model.getLocation("modules"));
                 }
             }
         }
 
-        validateStringNotEmpty("version", problems, Severity.ERROR, Version.BASE, m.getVersion(), m);
+        validateStringNotEmpty("version", problems, Severity.ERROR, Version.BASE, model.getVersion(), model);
 
         Severity errOn30 = getSeverity(validationLevel, ModelValidator.VALIDATION_LEVEL_MAVEN_3_0);
 
-        validateEffectiveDependencies(s, problems, m, m.getDependencies(), false, validationLevel);
+        validateEffectiveDependencies(session, problems, model, model.getDependencies(), false, validationLevel);
 
-        DependencyManagement mgmt = m.getDependencyManagement();
+        DependencyManagement mgmt = model.getDependencyManagement();
         if (mgmt != null) {
-            validateEffectiveDependencies(s, problems, m, mgmt.getDependencies(), true, validationLevel);
+            validateEffectiveDependencies(session, problems, model, mgmt.getDependencies(), true, validationLevel);
         }
 
         if (validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_2_0) {
             Severity errOn31 = getSeverity(validationLevel, ModelValidator.VALIDATION_LEVEL_MAVEN_3_1);
 
             validateBannedCharacters(
-                    EMPTY, "version", problems, errOn31, Version.V20, m.getVersion(), null, m, ILLEGAL_VERSION_CHARS);
-            validate20ProperSnapshotVersion("version", problems, errOn31, Version.V20, m.getVersion(), null, m);
-            if (hasExpression(m.getVersion())) {
+                    EMPTY,
+                    "version",
+                    problems,
+                    errOn31,
+                    Version.V20,
+                    model.getVersion(),
+                    null,
+                    model,
+                    ILLEGAL_VERSION_CHARS);
+            validate20ProperSnapshotVersion("version", problems, errOn31, Version.V20, model.getVersion(), null, model);
+            if (hasExpression(model.getVersion())) {
                 Severity versionExpressionSeverity = Severity.ERROR;
-                if (m.getProperties() != null
+                if (model.getProperties() != null
                         && Boolean.parseBoolean(
-                                m.getProperties().get(BUILD_ALLOW_EXPRESSION_IN_EFFECTIVE_PROJECT_VERSION))) {
+                                model.getProperties().get(BUILD_ALLOW_EXPRESSION_IN_EFFECTIVE_PROJECT_VERSION))) {
                     versionExpressionSeverity = Severity.WARNING;
                 }
                 addViolation(
@@ -907,30 +931,35 @@ public class DefaultModelValidator implements ModelValidator {
                         Version.V20,
                         "version",
                         null,
-                        "must be a constant version but is '" + m.getVersion() + "'.",
-                        m);
+                        "must be a constant version but is '" + model.getVersion() + "'.",
+                        model);
             }
 
-            Build build = m.getBuild();
+            Build build = model.getBuild();
             if (build != null) {
-                for (Plugin p : build.getPlugins()) {
+                for (Plugin plugin : build.getPlugins()) {
                     validateStringNotEmpty(
                             "build.plugins.plugin.artifactId",
                             problems,
                             Severity.ERROR,
                             Version.V20,
-                            p.getArtifactId(),
-                            p);
+                            plugin.getArtifactId(),
+                            plugin);
 
                     validateStringNotEmpty(
-                            "build.plugins.plugin.groupId", problems, Severity.ERROR, Version.V20, p.getGroupId(), p);
+                            "build.plugins.plugin.groupId",
+                            problems,
+                            Severity.ERROR,
+                            Version.V20,
+                            plugin.getGroupId(),
+                            plugin);
 
                     validate20PluginVersion(
                             "build.plugins.plugin.version",
                             problems,
-                            p.getVersion(),
-                            SourceHint.pluginKey(p),
-                            p,
+                            plugin.getVersion(),
+                            SourceHint.pluginKey(plugin),
+                            plugin,
                             validationLevel);
 
                     validateBoolean(
@@ -939,9 +968,9 @@ public class DefaultModelValidator implements ModelValidator {
                             problems,
                             errOn30,
                             Version.V20,
-                            p.getInherited(),
-                            SourceHint.pluginKey(p),
-                            p);
+                            plugin.getInherited(),
+                            SourceHint.pluginKey(plugin),
+                            plugin);
 
                     validateBoolean(
                             "build.plugins.plugin.extensions",
@@ -949,11 +978,11 @@ public class DefaultModelValidator implements ModelValidator {
                             problems,
                             errOn30,
                             Version.V20,
-                            p.getExtensions(),
-                            SourceHint.pluginKey(p),
-                            p);
+                            plugin.getExtensions(),
+                            SourceHint.pluginKey(plugin),
+                            plugin);
 
-                    validate20EffectivePluginDependencies(problems, p, validationLevel);
+                    validate20EffectivePluginDependencies(problems, plugin, validationLevel);
                 }
 
                 validate20RawResources(problems, build.getResources(), "build.resources.resource.", validationLevel);
@@ -962,37 +991,37 @@ public class DefaultModelValidator implements ModelValidator {
                         problems, build.getTestResources(), "build.testResources.testResource.", validationLevel);
             }
 
-            Reporting reporting = m.getReporting();
+            Reporting reporting = model.getReporting();
             if (reporting != null) {
-                for (ReportPlugin p : reporting.getPlugins()) {
+                for (ReportPlugin reportPlugin : reporting.getPlugins()) {
                     validateStringNotEmpty(
                             "reporting.plugins.plugin.artifactId",
                             problems,
                             Severity.ERROR,
                             Version.V20,
-                            p.getArtifactId(),
-                            p);
+                            reportPlugin.getArtifactId(),
+                            reportPlugin);
 
                     validateStringNotEmpty(
                             "reporting.plugins.plugin.groupId",
                             problems,
                             Severity.ERROR,
                             Version.V20,
-                            p.getGroupId(),
-                            p);
+                            reportPlugin.getGroupId(),
+                            reportPlugin);
                 }
             }
 
-            for (Repository repository : m.getRepositories()) {
+            for (Repository repository : model.getRepositories()) {
                 validate20EffectiveRepository(problems, repository, "repositories.repository.", validationLevel);
             }
 
-            for (Repository repository : m.getPluginRepositories()) {
+            for (Repository repository : model.getPluginRepositories()) {
                 validate20EffectiveRepository(
                         problems, repository, "pluginRepositories.pluginRepository.", validationLevel);
             }
 
-            DistributionManagement distMgmt = m.getDistributionManagement();
+            DistributionManagement distMgmt = model.getDistributionManagement();
             if (distMgmt != null) {
                 if (distMgmt.getStatus() != null) {
                     addViolation(
@@ -1128,7 +1157,7 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     private void validate20RawDependenciesSelfReferencing(
-            ModelProblemCollector problems, Model m, List<Dependency> dependencies, String prefix) {
+            ModelProblemCollector problems, Model model, List<Dependency> dependencies, String prefix) {
         // We only check for groupId/artifactId/version/classifier cause if there is another
         // module with the same groupId/artifactId/version/classifier this will fail the build
         // earlier like "Project '...' is duplicated in the reactor.
@@ -1137,8 +1166,8 @@ public class DefaultModelValidator implements ModelValidator {
         for (Dependency dependency : dependencies) {
             String key = dependency.getGroupId() + ":" + dependency.getArtifactId() + ":" + dependency.getVersion()
                     + (dependency.getClassifier() != null ? ":" + dependency.getClassifier() : EMPTY);
-            String mKey = m.getGroupId() + ":" + m.getArtifactId() + ":" + m.getVersion();
-            if (key.equals(mKey)) {
+            String modelKey = model.getGroupId() + ":" + model.getArtifactId() + ":" + model.getVersion();
+            if (key.equals(modelKey)) {
                 // This means a module which is build has a dependency which has the same
                 // groupId, artifactId, version and classifier coordinates. This is in consequence
                 // a self reference or in other words a circular reference which can not being resolved.
@@ -1155,9 +1184,9 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     private void validateEffectiveDependencies(
-            Session s,
+            Session session,
             ModelProblemCollector problems,
-            Model m,
+            Model model,
             List<Dependency> dependencies,
             boolean management,
             int validationLevel) {
@@ -1165,8 +1194,8 @@ public class DefaultModelValidator implements ModelValidator {
 
         String prefix = management ? "dependencyManagement.dependencies.dependency." : "dependencies.dependency.";
 
-        for (Dependency d : dependencies) {
-            validateEffectiveDependency(problems, d, management, prefix, validationLevel);
+        for (Dependency dependency : dependencies) {
+            validateEffectiveDependency(problems, dependency, management, prefix, validationLevel);
 
             if (validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_2_0) {
                 validateBoolean(
@@ -1175,9 +1204,9 @@ public class DefaultModelValidator implements ModelValidator {
                         problems,
                         errOn30,
                         Version.V20,
-                        d.getOptional(),
-                        SourceHint.dependencyManagementKey(d),
-                        d);
+                        dependency.getOptional(),
+                        SourceHint.dependencyManagementKey(dependency),
+                        dependency);
 
                 if (!management) {
                     validateVersion(
@@ -1186,34 +1215,34 @@ public class DefaultModelValidator implements ModelValidator {
                             problems,
                             errOn30,
                             Version.V20,
-                            d.getVersion(),
-                            SourceHint.dependencyManagementKey(d),
-                            d);
+                            dependency.getVersion(),
+                            SourceHint.dependencyManagementKey(dependency),
+                            dependency);
 
                     /*
                      * TODO Extensions like Flex Mojos use custom scopes like "merged", "internal", "external", etc. In
                      * order to don't break backward-compat with those, only warn but don't error out.
                      */
                     ScopeManager scopeManager =
-                            InternalSession.from(s).getSession().getScopeManager();
+                            InternalSession.from(session).getSession().getScopeManager();
                     validateEnum(
                             prefix,
                             "scope",
                             problems,
                             Severity.WARNING,
                             Version.V20,
-                            d.getScope(),
-                            SourceHint.dependencyManagementKey(d),
-                            d,
+                            dependency.getScope(),
+                            SourceHint.dependencyManagementKey(dependency),
+                            dependency,
                             scopeManager.getDependencyScopeUniverse().stream()
                                     .map(DependencyScope::getId)
                                     .distinct()
                                     .toArray(String[]::new));
 
-                    validateEffectiveModelAgainstDependency(prefix, problems, m, d);
+                    validateEffectiveModelAgainstDependency(prefix, problems, model, dependency);
                 } else {
                     ScopeManager scopeManager =
-                            InternalSession.from(s).getSession().getScopeManager();
+                            InternalSession.from(session).getSession().getScopeManager();
                     Set<String> scopes = scopeManager.getDependencyScopeUniverse().stream()
                             .map(DependencyScope::getId)
                             .collect(Collectors.toCollection(HashSet::new));
@@ -1224,9 +1253,9 @@ public class DefaultModelValidator implements ModelValidator {
                             problems,
                             Severity.WARNING,
                             Version.V20,
-                            d.getScope(),
-                            SourceHint.dependencyManagementKey(d),
-                            d,
+                            dependency.getScope(),
+                            SourceHint.dependencyManagementKey(dependency),
+                            dependency,
                             scopes.toArray(new String[0]));
                 }
             }
@@ -1234,11 +1263,11 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     private void validateEffectiveModelAgainstDependency(
-            String prefix, ModelProblemCollector problems, Model m, Dependency d) {
-        String key = d.getGroupId() + ":" + d.getArtifactId() + ":" + d.getVersion()
-                + (d.getClassifier() != null ? ":" + d.getClassifier() : EMPTY);
-        String mKey = m.getGroupId() + ":" + m.getArtifactId() + ":" + m.getVersion();
-        if (key.equals(mKey)) {
+            String prefix, ModelProblemCollector problems, Model model, Dependency dependency) {
+        String key = dependency.getGroupId() + ":" + dependency.getArtifactId() + ":" + dependency.getVersion()
+                + (dependency.getClassifier() != null ? ":" + dependency.getClassifier() : EMPTY);
+        String modelKey = model.getGroupId() + ":" + model.getArtifactId() + ":" + model.getVersion();
+        if (key.equals(modelKey)) {
             // This means a module which is build has a dependency which has the same
             // groupId, artifactId, version and classifier coordinates. This is in consequence
             // a self reference or in other words a circular reference which can not being resolved.
@@ -1249,7 +1278,7 @@ public class DefaultModelValidator implements ModelValidator {
                     prefix + "[" + key + "]",
                     SourceHint.gav(key),
                     "is referencing itself.",
-                    d);
+                    dependency);
         }
     }
 
@@ -1262,8 +1291,8 @@ public class DefaultModelValidator implements ModelValidator {
 
             Severity errOn30 = getSeverity(validationLevel, ModelValidator.VALIDATION_LEVEL_MAVEN_3_0);
 
-            for (Dependency d : dependencies) {
-                validateEffectiveDependency(problems, d, false, prefix, validationLevel);
+            for (Dependency dependency : dependencies) {
+                validateEffectiveDependency(problems, dependency, false, prefix, validationLevel);
 
                 validateVersion(
                         prefix,
@@ -1271,9 +1300,9 @@ public class DefaultModelValidator implements ModelValidator {
                         problems,
                         errOn30,
                         Version.BASE,
-                        d.getVersion(),
-                        SourceHint.dependencyManagementKey(d),
-                        d);
+                        dependency.getVersion(),
+                        SourceHint.dependencyManagementKey(dependency),
+                        dependency);
 
                 validateEnum(
                         prefix,
@@ -1281,9 +1310,9 @@ public class DefaultModelValidator implements ModelValidator {
                         problems,
                         errOn30,
                         Version.BASE,
-                        d.getScope(),
-                        SourceHint.dependencyManagementKey(d),
-                        d,
+                        dependency.getScope(),
+                        SourceHint.dependencyManagementKey(dependency),
+                        dependency,
                         "compile",
                         "runtime",
                         "system");
@@ -1292,16 +1321,20 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     private void validateEffectiveDependency(
-            ModelProblemCollector problems, Dependency d, boolean management, String prefix, int validationLevel) {
+            ModelProblemCollector problems,
+            Dependency dependency,
+            boolean management,
+            String prefix,
+            int validationLevel) {
         validateCoordinatesId(
                 prefix,
                 "artifactId",
                 problems,
                 Severity.ERROR,
                 Version.BASE,
-                d.getArtifactId(),
-                SourceHint.dependencyManagementKey(d),
-                d);
+                dependency.getArtifactId(),
+                SourceHint.dependencyManagementKey(dependency),
+                dependency);
 
         validateCoordinatesId(
                 prefix,
@@ -1309,9 +1342,9 @@ public class DefaultModelValidator implements ModelValidator {
                 problems,
                 Severity.ERROR,
                 Version.BASE,
-                d.getGroupId(),
-                SourceHint.dependencyManagementKey(d),
-                d);
+                dependency.getGroupId(),
+                SourceHint.dependencyManagementKey(dependency),
+                dependency);
 
         if (!management) {
             validateStringNotEmpty(
@@ -1320,15 +1353,15 @@ public class DefaultModelValidator implements ModelValidator {
                     problems,
                     Severity.ERROR,
                     Version.BASE,
-                    d.getType(),
-                    SourceHint.dependencyManagementKey(d),
-                    d);
+                    dependency.getType(),
+                    SourceHint.dependencyManagementKey(dependency),
+                    dependency);
 
-            validateDependencyVersion(problems, d, prefix);
+            validateDependencyVersion(problems, dependency, prefix);
         }
 
-        if ("system".equals(d.getScope())) {
-            String systemPath = d.getSystemPath();
+        if ("system".equals(dependency.getScope())) {
+            String systemPath = dependency.getSystemPath();
 
             if (systemPath == null || systemPath.isEmpty()) {
                 addViolation(
@@ -1336,9 +1369,9 @@ public class DefaultModelValidator implements ModelValidator {
                         Severity.ERROR,
                         Version.BASE,
                         prefix + "systemPath",
-                        SourceHint.dependencyManagementKey(d),
+                        SourceHint.dependencyManagementKey(dependency),
                         "is missing.",
-                        d);
+                        dependency);
             } else {
                 File sysFile = new File(systemPath);
                 if (!sysFile.isAbsolute()) {
@@ -1347,9 +1380,9 @@ public class DefaultModelValidator implements ModelValidator {
                             Severity.ERROR,
                             Version.BASE,
                             prefix + "systemPath",
-                            SourceHint.dependencyManagementKey(d),
+                            SourceHint.dependencyManagementKey(dependency),
                             "must specify an absolute path but is " + systemPath,
-                            d);
+                            dependency);
                 } else if (!sysFile.isFile()) {
                     String msg = "refers to a non-existing file " + sysFile.getAbsolutePath() + ".";
                     addViolation(
@@ -1357,24 +1390,25 @@ public class DefaultModelValidator implements ModelValidator {
                             Severity.WARNING,
                             Version.BASE,
                             prefix + "systemPath",
-                            SourceHint.dependencyManagementKey(d),
+                            SourceHint.dependencyManagementKey(dependency),
                             msg,
-                            d);
+                            dependency);
                 }
             }
-        } else if (d.getSystemPath() != null && !d.getSystemPath().isEmpty()) {
+        } else if (dependency.getSystemPath() != null
+                && !dependency.getSystemPath().isEmpty()) {
             addViolation(
                     problems,
                     Severity.ERROR,
                     Version.BASE,
                     prefix + "systemPath",
-                    SourceHint.dependencyManagementKey(d),
+                    SourceHint.dependencyManagementKey(dependency),
                     "must be omitted. This field may only be specified for a dependency with system scope.",
-                    d);
+                    dependency);
         }
 
         if (validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_2_0) {
-            for (Exclusion exclusion : d.getExclusions()) {
+            for (Exclusion exclusion : dependency.getExclusions()) {
                 if (validationLevel < ModelValidator.VALIDATION_LEVEL_MAVEN_3_0) {
                     validateCoordinatesId(
                             prefix,
@@ -1383,7 +1417,7 @@ public class DefaultModelValidator implements ModelValidator {
                             Severity.WARNING,
                             Version.V20,
                             exclusion.getGroupId(),
-                            SourceHint.dependencyManagementKey(d),
+                            SourceHint.dependencyManagementKey(dependency),
                             exclusion);
 
                     validateCoordinatesId(
@@ -1393,7 +1427,7 @@ public class DefaultModelValidator implements ModelValidator {
                             Severity.WARNING,
                             Version.V20,
                             exclusion.getArtifactId(),
-                            SourceHint.dependencyManagementKey(d),
+                            SourceHint.dependencyManagementKey(dependency),
                             exclusion);
                 } else {
                     validateCoordinatesIdWithWildcards(
@@ -1403,7 +1437,7 @@ public class DefaultModelValidator implements ModelValidator {
                             Severity.WARNING,
                             Version.V30,
                             exclusion.getGroupId(),
-                            SourceHint.dependencyManagementKey(d),
+                            SourceHint.dependencyManagementKey(dependency),
                             exclusion);
 
                     validateCoordinatesIdWithWildcards(
@@ -1413,7 +1447,7 @@ public class DefaultModelValidator implements ModelValidator {
                             Severity.WARNING,
                             Version.V30,
                             exclusion.getArtifactId(),
-                            SourceHint.dependencyManagementKey(d),
+                            SourceHint.dependencyManagementKey(dependency),
                             exclusion);
                 }
             }
@@ -1423,16 +1457,16 @@ public class DefaultModelValidator implements ModelValidator {
     /**
      * @since 3.2.4
      */
-    protected void validateDependencyVersion(ModelProblemCollector problems, Dependency d, String prefix) {
+    protected void validateDependencyVersion(ModelProblemCollector problems, Dependency dependency, String prefix) {
         validateStringNotEmpty(
                 prefix,
                 "version",
                 problems,
                 Severity.ERROR,
                 Version.BASE,
-                d.getVersion(),
-                SourceHint.dependencyManagementKey(d),
-                d);
+                dependency.getVersion(),
+                SourceHint.dependencyManagementKey(dependency),
+                dependency);
     }
 
     private void validateRawRepositories(
@@ -1458,9 +1492,9 @@ public class DefaultModelValidator implements ModelValidator {
                     null,
                     repository)) {
                 // only allow ${basedir} and ${project.basedir}
-                Matcher m = EXPRESSION_NAME_PATTERN.matcher(repository.getUrl());
-                while (m.find()) {
-                    String expr = m.group(1);
+                Matcher matcher = EXPRESSION_NAME_PATTERN.matcher(repository.getUrl());
+                while (matcher.find()) {
+                    String expr = matcher.group(1);
                     if (!("basedir".equals(expr)
                             || "project.basedir".equals(expr)
                             || expr.startsWith("project.basedir.")
@@ -1611,17 +1645,22 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     private boolean isValidCoordinatesId(String id) {
-        for (int i = 0; i < id.length(); i++) {
-            char c = id.charAt(i);
-            if (!isValidCoordinatesIdCharacter(c)) {
+        for (int index = 0; index < id.length(); index++) {
+            char character = id.charAt(index);
+            if (!isValidCoordinatesIdCharacter(character)) {
                 return false;
             }
         }
         return true;
     }
 
-    private boolean isValidCoordinatesIdCharacter(char c) {
-        return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9' || c == '-' || c == '_' || c == '.';
+    private boolean isValidCoordinatesIdCharacter(char character) {
+        return character >= 'a' && character <= 'z'
+                || character >= 'A' && character <= 'Z'
+                || character >= '0' && character <= '9'
+                || character == '-'
+                || character == '_'
+                || character == '.';
     }
 
     @SuppressWarnings("checkstyle:parameternumber")
@@ -1695,17 +1734,17 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     private boolean isValidCoordinatesIdWithWildCards(String id) {
-        for (int i = 0; i < id.length(); i++) {
-            char c = id.charAt(i);
-            if (!isValidCoordinatesIdWithWildCardCharacter(c)) {
+        for (int index = 0; index < id.length(); index++) {
+            char character = id.charAt(index);
+            if (!isValidCoordinatesIdWithWildCardCharacter(character)) {
                 return false;
             }
         }
         return true;
     }
 
-    private boolean isValidCoordinatesIdWithWildCardCharacter(char c) {
-        return isValidCoordinatesIdCharacter(c) || c == '?' || c == '*';
+    private boolean isValidCoordinatesIdWithWildCardCharacter(char character) {
+        return isValidCoordinatesIdCharacter(character) || character == '?' || character == '*';
     }
 
     private boolean validateStringNoExpression(
@@ -1742,8 +1781,8 @@ public class DefaultModelValidator implements ModelValidator {
             return true;
         }
 
-        Matcher m = EXPRESSION_NAME_PATTERN.matcher(string.trim());
-        if (m.find()) {
+        Matcher matcher = EXPRESSION_NAME_PATTERN.matcher(string.trim());
+        if (matcher.find()) {
             addViolation(
                     problems,
                     severity,
@@ -2021,7 +2060,7 @@ public class DefaultModelValidator implements ModelValidator {
     private String getMavenVersionString(Session session) {
         try {
             return session.getMavenVersion().toString();
-        } catch (Exception e) {
+        } catch (Exception exception) {
             // Fallback for test contexts where RuntimeInformation might not be available
             return "unknown";
         }
@@ -2039,8 +2078,8 @@ public class DefaultModelValidator implements ModelValidator {
         // we use a dedicated comparator because we control our model version scheme.
         String[] firstSegments = first.split("\\.");
         String[] secondSegments = second.split("\\.");
-        for (int i = 0; i < Math.max(firstSegments.length, secondSegments.length); i++) {
-            int result = asLong(i, firstSegments).compareTo(asLong(i, secondSegments));
+        for (int index = 0; index < Math.max(firstSegments.length, secondSegments.length); index++) {
+            int result = asLong(index, firstSegments).compareTo(asLong(index, secondSegments));
             if (result != 0) {
                 return result;
             }
@@ -2051,7 +2090,7 @@ public class DefaultModelValidator implements ModelValidator {
     private static Long asLong(int index, String[] segments) {
         try {
             return Long.valueOf(index < segments.length ? segments[index] : "0");
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException exception) {
             return 0L;
         }
     }
@@ -2068,15 +2107,15 @@ public class DefaultModelValidator implements ModelValidator {
             InputLocationTracker tracker,
             String banned) {
         if (string != null) {
-            for (int i = string.length() - 1; i >= 0; i--) {
-                if (banned.indexOf(string.charAt(i)) >= 0) {
+            for (int index = string.length() - 1; index >= 0; index--) {
+                if (banned.indexOf(string.charAt(index)) >= 0) {
                     addViolation(
                             problems,
                             severity,
                             version,
                             prefix + fieldName,
                             sourceHint,
-                            "must not contain any of these characters " + banned + " but found " + string.charAt(i),
+                            "must not contain any of these characters " + banned + " but found " + string.charAt(index),
                             tracker);
                     return false;
                 }
@@ -2223,7 +2262,7 @@ public class DefaultModelValidator implements ModelValidator {
                     key = fieldName.substring(fieldName.lastIndexOf('[') + 1, fieldName.length() - 1);
                     try {
                         key = Integer.valueOf(key.toString());
-                    } catch (NumberFormatException e) {
+                    } catch (NumberFormatException exception) {
                         // use key as is
                     }
                 }
