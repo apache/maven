@@ -243,11 +243,11 @@ public class PathSelector implements PathMatcher {
         baseDirectory = Objects.requireNonNull(directory, "directory cannot be null");
         includePatterns = normalizePatterns(includes, false);
         excludePatterns = normalizePatterns(effectiveExcludes(excludes, includePatterns, useDefaultExcludes), true);
-        FileSystem fs = baseDirectory.getFileSystem();
-        this.includes = matchers(fs, includePatterns);
-        this.excludes = matchers(fs, excludePatterns);
-        dirIncludes = matchers(fs, directoryPatterns(includePatterns, false));
-        dirExcludes = matchers(fs, directoryPatterns(excludePatterns, true));
+        FileSystem fileSystem = baseDirectory.getFileSystem();
+        this.includes = matchers(fileSystem, includePatterns);
+        this.excludes = matchers(fileSystem, excludePatterns);
+        dirIncludes = matchers(fileSystem, directoryPatterns(includePatterns, false));
+        dirExcludes = matchers(fileSystem, directoryPatterns(excludePatterns, true));
         needRelativize = needRelativize(includePatterns) || needRelativize(excludePatterns);
     }
 
