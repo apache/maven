@@ -456,4 +456,24 @@ public class InjectorImpl implements Injector {
                     });
         }
     }
+
+    /**
+     * Release all internal state so this Injector can be GC’d
+     * (and so that subsequent tests start from a clean slate).
+     * @since 4.1
+     */
+    public void dispose() {
+        // First, clear any singleton‐scope caches
+        scopes.values().stream()
+                .map(Supplier::get)
+                .filter(scope -> scope instanceof SingletonScope)
+                .map(scope -> (SingletonScope) scope)
+                .forEach(singleton -> singleton.cache.clear());
+
+        // Now clear everything else
+        bindings.clear();
+        scopes.clear();
+        loadedUrls.clear();
+        resolutionStack.remove();
+    }
 }

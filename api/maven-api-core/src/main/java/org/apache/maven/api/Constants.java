@@ -352,6 +352,7 @@ public final class Constants {
      *     <li>"h" or "h(num)" - highest version or top list of highest ones filter</li>
      *     <li>"l" or "l(num)" - lowest version or bottom list of lowest ones filter</li>
      *     <li>"s" - contextual snapshot filter</li>
+     *     <li>"ns" - unconditional snapshot filter (no snapshots selected from ranges)</li>
      *     <li>"e(G:A:V)" - predicate filter (leaves out G:A:V from range, if hit, V can be range)</li>
      * </ul>
      * Example filter expression: <code>"h(5);s;e(org.foo:bar:1)</code> will cause: ranges are filtered for "top 5" (instead
@@ -538,6 +539,16 @@ public final class Constants {
     @Config(defaultValue = "release_or_snapshot")
     public static final String MAVEN_VERSION_RANGE_RESOLVER_NATURE_OVERRIDE =
             "maven.versionRangeResolver.natureOverride";
+
+    /**
+     * Comma-separated list of XML contexts/fields to intern during POM parsing for memory optimization.
+     * When not specified, a default set of commonly repeated contexts will be used.
+     * Example: "groupId,artifactId,version,scope,type"
+     *
+     * @since 4.0.0
+     */
+    @Config
+    public static final String MAVEN_MODEL_BUILDER_INTERNS = "maven.modelBuilder.interns";
 
     /**
      * All system properties used by Maven Logger start with this prefix.
