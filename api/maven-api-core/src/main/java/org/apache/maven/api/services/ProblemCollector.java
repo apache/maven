@@ -182,7 +182,7 @@ public interface ProblemCollector<P extends BuilderProblem> {
     static <P extends BuilderProblem> ProblemCollector<P> create(@Nullable ProtoSession protoSession) {
         if (protoSession != null
                 && protoSession.getUserProperties().containsKey(Constants.MAVEN_BUILDER_MAX_PROBLEMS)) {
-            final int limit =
+            int limit =
                     Integer.parseInt(protoSession.getUserProperties().get(Constants.MAVEN_BUILDER_MAX_PROBLEMS));
             return create(limit, p -> true);
         } else {
