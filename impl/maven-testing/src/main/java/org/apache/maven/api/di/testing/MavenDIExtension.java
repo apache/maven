@@ -84,18 +84,34 @@ public class MavenDIExtension implements BeforeEachCallback, AfterEachCallback {
      * Creates and configures the DI container for test execution.
      * Performs component discovery and sets up basic bindings.
      *
-     * @throws IllegalArgumentException if container setup fails
+     * @throws IllegalStateException if the ExtensionContext is null, the required test class is unavailable,
+     *         the required test instance is unavailable, or if container setup fails
      */
-    @SuppressWarnings("unchecked")
     protected void setupContainer() {
+        if (context == null) {
+            throw new IllegalStateException("ExtensionContext must not be null");
+        }
+        final Class<?> testClass = context.getRequiredTestClass();
+        if (testClass == null) {
+            throw new IllegalStateException("Required test class is not available in ExtensionContext");
+        }
+        final Object testInstance = context.getRequiredTestInstance();
+        if (testInstance == null) {
+            throw new IllegalStateException("Required test instance is not available in ExtensionContext");
+        }
+
         try {
             injector = Injector.create();
             injector.bindInstance(ExtensionContext.class, context);
-            injector.discover(context.getRequiredTestClass().getClassLoader());
+            injector.discover(testClass.getClassLoader());
             injector.bindInstance(Injector.class, injector);
-            injector.bindInstance((Class) context.getRequiredTestClass(), context.getRequiredTestInstance());
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Failed to create DI injector.", e);
+            injector.bindInstance(testClass.asSubclass(Object.class), (Object) testInstance); // Safe generics handling
+        } catch (final Exception e) {
+            throw new IllegalStateException(
+                    String.format(
+                            "Failed to set up DI injector for test class '%s': %s",
+                            testClass.getName(), e.getMessage()),
+                    e);
         }
     }
 
@@ -108,8 +124,7 @@ public class MavenDIExtension implements BeforeEachCallback, AfterEachCallback {
     @Override
     public void afterEach(ExtensionContext context) throws Exception {
         if (injector != null) {
-            // TODO: implement
-            // injector.dispose();
+            injector.dispose();
             injector = null;
         }
     }

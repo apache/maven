@@ -77,6 +77,7 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
         this.metadataReader = metadataReader;
     }
 
+    @Override
     public PluginPrefixResult resolve(PluginPrefixRequest request) throws NoPluginFoundForPrefixException {
         logger.debug("Resolving plugin prefix {} from {}", request.getPrefix(), request.getPluginGroups());
 

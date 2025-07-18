@@ -150,7 +150,14 @@ public abstract class AbstractRequestCache implements RequestCache {
         }
 
         if (hasFailures) {
-            throw new BatchRequestException("One or more requests failed", allResults);
+            BatchRequestException exception = new BatchRequestException("One or more requests failed", allResults);
+            // Add all individual exceptions as suppressed exceptions to preserve stack traces
+            for (RequestResult<REQ, REP> result : allResults) {
+                if (result.error() != null) {
+                    exception.addSuppressed(result.error());
+                }
+            }
+            throw exception;
         }
 
         return allResults.stream().map(RequestResult::result).toList();

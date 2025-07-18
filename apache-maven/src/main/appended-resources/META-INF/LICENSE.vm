@@ -39,13 +39,14 @@ subject to the terms and conditions of the following licenses:
 #*      *##set ( $spdx = 'EPL-1.0' )
 #*    *##elseif ( $license.name == "Eclipse Public License, Version 2.0" )
 #*      *##set ( $spdx = 'EPL-2.0' )
-#*    *##elseif ( $license.url.contains( "www.apache.org/licenses/LICENSE-2.0" ) )
+#*    *##elseif ( $license.url.contains( "www.apache.org/licenses/LICENSE-2.0" )
+                    || $license.url.contains( "https://raw.github.com/hunterhacker/jdom/master/LICENSE.txt" ) )
 #*      *##set ( $spdx = 'Apache-2.0' )
 #*    *##elseif ( $license.name == "BSD-2-Clause" || $license.name == "The BSD 2-Clause License"
-                    || $license.url.contains("www.opensource.org/licenses/bsd-license") )
+                    || $license.url.contains( "www.opensource.org/licenses/bsd-license" ) )
 #*      *##set ( $spdx = 'BSD-2-Clause' )
 #*    *##elseif ( $license.name == "BSD-3-Clause"
-                    || $license.url.contains("opensource.org/licenses/BSD-3-Clause") )
+                    || $license.url.contains( "opensource.org/licenses/BSD-3-Clause" ) )
 #*      *##set ( $spdx = 'BSD-3-Clause' )
 #*    *##elseif ( $license.name == "Public Domain" )
 #*      *##set ( $spdx = 'Public-Domain' )
@@ -53,7 +54,7 @@ subject to the terms and conditions of the following licenses:
 #*      *##set ( $spdx = 'CDDL+GPLv2-with-classpath-exception' )
 #*    *##else
 #*      *### unrecognized license will require analysis to know obligations
-#*      *##set ( $spdx = 'unrecognized' )
+#*      *##set ( $spdx = $license )
 #*    *##end
 #*    *###
 #*    *### fix project urls that are wrong in pom

@@ -39,11 +39,26 @@ public interface SourceRoot {
      * The path is relative to the <abbr>POM</abbr> file.
      *
      * <h4>Default implementation</h4>
-     * The default value is <code>src/{@linkplain #scope() scope}/{@linkplain #language() language}</code>
-     * as a relative path. Implementation classes may override this default with an absolute path instead.
+     * The default value depends on whether a {@linkplain #module() module name} is specified in this source root:
+     * <ul>
+     *   <li>
+     *     If no module name, then the default directory is
+     *     <code>src/{@linkplain #scope() scope}/{@linkplain #language() language}</code>.
+     *   </li><li>
+     *     If a module name is present, then the default directory is
+     *     <code>src/{@linkplain #module() module}/{@linkplain #scope() scope}/{@linkplain #language() language}</code>.
+     *   </li>
+     * </ul>
+     *
+     * The default value is relative.
+     * Implementation may override with absolute path instead.
      */
     default Path directory() {
-        return Path.of("src", scope().id(), language().id());
+        Path src = Path.of("src");
+        return module().map(src::resolve)
+                .orElse(src)
+                .resolve(scope().id())
+                .resolve(language().id());
     }
 
     /**
@@ -53,9 +68,8 @@ public interface SourceRoot {
      * If no syntax is specified, or if its length is 1 character (interpreted as a Windows drive),
      * the default is a Maven-specific variation of the {@code "glob"} pattern.
      *
-     * <p>
-     * The default implementation returns an empty list, which means to apply a language-dependent pattern.
-     * For example, for the Java language, the pattern includes all files with the {@code .java} suffix.
+     * <p>The default implementation returns an empty list, which means to apply a language-dependent pattern.
+     * For example, for the Java language, the pattern includes all files with the {@code .java} suffix.</p>
      *
      * @see java.nio.file.FileSystem#getPathMatcher(String)
      */

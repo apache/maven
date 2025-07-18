@@ -57,6 +57,7 @@ public class DefaultArtifactVersion implements ArtifactVersion {
         return false;
     }
 
+    @Override
     public int compareTo(ArtifactVersion otherVersion) {
         if (otherVersion instanceof DefaultArtifactVersion defaultArtifactVersion) {
             return this.comparable.compareTo(defaultArtifactVersion.comparable);
@@ -65,26 +66,32 @@ public class DefaultArtifactVersion implements ArtifactVersion {
         }
     }
 
+    @Override
     public int getMajorVersion() {
         return majorVersion != null ? majorVersion : 0;
     }
 
+    @Override
     public int getMinorVersion() {
         return minorVersion != null ? minorVersion : 0;
     }
 
+    @Override
     public int getIncrementalVersion() {
         return incrementalVersion != null ? incrementalVersion : 0;
     }
 
+    @Override
     public int getBuildNumber() {
         return buildNumber != null ? buildNumber : 0;
     }
 
+    @Override
     public String getQualifier() {
         return qualifier;
     }
 
+    @Override
     public final void parseVersion(String version) {
         comparable = new ComparableVersion(version);
 

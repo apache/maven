@@ -87,6 +87,7 @@ abstract class ExtensibleEnums {
          *
          * @return the identifier
          */
+        @Override
         public String id() {
             return id;
         }

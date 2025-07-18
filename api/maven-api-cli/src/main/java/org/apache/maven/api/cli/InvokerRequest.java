@@ -50,7 +50,7 @@ public interface InvokerRequest {
     /**
      * Flag representing parser processing result: if there were some fatal errors during
      * {@link Parser#parseInvocation(ParserRequest)} this method will return {@code true} and invoker should
-     * handle this request as "early failure".
+     * handle this request as "early failure". In these cases, {@link #options()} usually is absent.
      */
     boolean parsingFailed();
 
@@ -195,16 +195,17 @@ public interface InvokerRequest {
     /**
      * Returns the options associated with this invocation request.
      *
-     * @return the options object
+     * @return the options optional. It will be absent if {@link #parsingFailed()} return {@code true}.
      */
     @Nonnull
-    Options options();
+    Optional<Options> options();
 
     /**
      * This method returns "verbose" option value derived from multiple places: CLI options, but also CI detection,
      * if applicable.
      */
     default boolean effectiveVerbose() {
-        return options().verbose().orElse(ciInfo().isPresent() && ciInfo().get().isVerbose());
+        return options().isPresent() && options().orElseThrow().verbose().orElse(false)
+                || ciInfo().isPresent() && ciInfo().orElseThrow().isVerbose();
     }
 }

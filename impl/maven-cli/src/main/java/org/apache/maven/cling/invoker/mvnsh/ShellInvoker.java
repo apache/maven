@@ -21,7 +21,9 @@ package org.apache.maven.cling.invoker.mvnsh;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.cling.invoker.LookupContext;
@@ -53,13 +55,13 @@ import org.jline.widget.TailTipWidgets;
  */
 public class ShellInvoker extends LookupInvoker<LookupContext> {
 
-    public ShellInvoker(Lookup protoLookup) {
-        super(protoLookup, null);
+    public ShellInvoker(Lookup protoLookup, @Nullable Consumer<LookupContext> contextConsumer) {
+        super(protoLookup, contextConsumer);
     }
 
     @Override
     protected LookupContext createContext(InvokerRequest invokerRequest) {
-        return new LookupContext(invokerRequest);
+        return new LookupContext(invokerRequest, true, invokerRequest.options().orElse(null));
     }
 
     public static final int OK = 0; // OK
@@ -98,7 +100,7 @@ public class ShellInvoker extends LookupInvoker<LookupContext> {
                 ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░  ░▒▓█▓▓█▓▒░  ░▒▓█▓▒░░▒▓█▓▒░       ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░\s
                 ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░   ░▒▓██▓▒░   ░▒▓█▓▒░░▒▓█▓▒░░▒▓███████▓▒░ ░▒▓█▓▒░░▒▓█▓▒░""";
         context.writer.accept(banner);
-        if (!context.invokerRequest.options().showVersion().orElse(false)) {
+        if (!context.options().showVersion().orElse(false)) {
             context.writer.accept(CLIReportingUtils.showVersionMinimal());
         }
         context.writer.accept("");
@@ -174,7 +176,7 @@ public class ShellInvoker extends LookupInvoker<LookupContext> {
                             .builder()
                             .error("Error: " + e.getMessage())
                             .build());
-                    if (context.invokerRequest.options().showErrors().orElse(false)) {
+                    if (context.options().showErrors().orElse(false)) {
                         e.printStackTrace(context.terminal.writer());
                     }
                     return ERROR;

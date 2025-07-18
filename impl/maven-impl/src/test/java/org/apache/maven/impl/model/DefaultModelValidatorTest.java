@@ -19,12 +19,19 @@
 package org.apache.maven.impl.model;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import org.apache.maven.api.Version;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.model.ModelValidator;
+import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.model.profile.SimpleProblemCollector;
 import org.apache.maven.model.v4.MavenStaxReader;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.scope.DependencyScope;
+import org.eclipse.aether.scope.ScopeManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,12 +39,16 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  */
 class DefaultModelValidatorTest {
 
     private ModelValidator validator;
+
+    private InternalSession session;
 
     private Model read(String pom) throws Exception {
         String resource = "/poms/validation/" + pom;
@@ -63,7 +74,7 @@ class DefaultModelValidatorTest {
     private SimpleProblemCollector validateEffective(String pom, int level) throws Exception {
         Model model = read(pom);
         SimpleProblemCollector problems = new SimpleProblemCollector();
-        validator.validateEffectiveModel(model, level, problems);
+        validator.validateEffectiveModel(session, model, level, problems);
         return problems;
     }
 
@@ -71,7 +82,7 @@ class DefaultModelValidatorTest {
     private SimpleProblemCollector validateFile(String pom, int level) throws Exception {
         Model model = read(pom);
         SimpleProblemCollector problems = new SimpleProblemCollector();
-        validator.validateFileModel(model, level, problems);
+        validator.validateFileModel(session, model, level, problems);
         return problems;
     }
 
@@ -79,7 +90,7 @@ class DefaultModelValidatorTest {
     private SimpleProblemCollector validateRaw(String pom, int level) throws Exception {
         Model model = read(pom);
         SimpleProblemCollector problems = new SimpleProblemCollector();
-        validator.validateRawModel(model, level, problems);
+        validator.validateRawModel(session, model, level, problems);
         return problems;
     }
 
@@ -87,9 +98,44 @@ class DefaultModelValidatorTest {
         assertTrue(msg.contains(substring), "\"" + substring + "\" was not found in: " + msg);
     }
 
+    private static class DepScope implements DependencyScope {
+        private final String id;
+
+        private DepScope(String id) {
+            this.id = id;
+        }
+
+        @Override
+        public String getId() {
+            return id;
+        }
+
+        @Override
+        public boolean isTransitive() {
+            return false;
+        }
+    }
+
     @BeforeEach
     void setUp() throws Exception {
         validator = new DefaultModelValidator();
+
+        Collection<DependencyScope> scopes = new ArrayList<>();
+        scopes.add(new DepScope("compile"));
+        scopes.add(new DepScope("runtime"));
+        scopes.add(new DepScope("provided"));
+        scopes.add(new DepScope("test"));
+        ScopeManager scopeManager = mock(ScopeManager.class);
+        when(scopeManager.getDependencyScopeUniverse()).thenReturn(scopes);
+        RepositorySystemSession repoSession = mock(RepositorySystemSession.class);
+        when(repoSession.getScopeManager()).thenReturn(scopeManager);
+        session = mock(InternalSession.class);
+        when(session.getSession()).thenReturn(repoSession);
+
+        // Mock Maven version for error message testing
+        Version mavenVersion = mock(Version.class);
+        when(mavenVersion.toString()).thenReturn("4.0.0-test");
+        when(session.getMavenVersion()).thenReturn(mavenVersion);
     }
 
     @AfterEach
@@ -128,6 +174,21 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 1, 0);
 
         assertTrue(result.getErrors().get(0).contains("'modelVersion' must be one of"));
+    }
+
+    @Test
+    void testModelVersionMessageIncludesMavenVersion() throws Exception {
+        SimpleProblemCollector result = validateFile("bad-modelVersion.xml");
+
+        assertViolations(result, 1, 0, 0);
+
+        String errorMessage = result.getFatals().get(0);
+        assertTrue(errorMessage.contains("modelVersion"));
+        // Should include Maven version (either "4.0.0-test" from mock or "unknown" as fallback)
+        assertTrue(
+                errorMessage.contains("4.0.0-test") || errorMessage.contains("unknown"),
+                "Error message should include Maven version: " + errorMessage);
+        assertTrue(errorMessage.contains("newer than the versions supported by this Maven version"));
     }
 
     @Test

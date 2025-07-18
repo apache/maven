@@ -165,7 +165,9 @@ public class MavenModelMerger extends MavenMerger {
     @Override
     protected void mergeModel_Profiles(
             Model.Builder builder, Model target, Model source, boolean sourceDominant, Map<Object, Object> context) {
-        // neither inherited nor injected
+        // Profiles are neither inherited nor injected during inheritance assembly.
+        // Parent profiles are processed and injected into the parent model before inheritance,
+        // so only child profiles remain to be processed.
     }
 
     @Override

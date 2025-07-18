@@ -34,6 +34,7 @@ public class DefaultComponent implements TestComponent {
         id = Integer.toString(System.identityHashCode(this));
     }
 
+    @Override
     public String getId() {
         return id;
     }

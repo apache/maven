@@ -36,8 +36,8 @@ import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.services.xml.XmlWriterException;
 import org.apache.maven.api.services.xml.XmlWriterRequest;
 import org.apache.maven.impl.model.DefaultModelProcessor;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.io.TempDir;
 
 import static java.util.UUID.randomUUID;
@@ -45,6 +45,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.condition.OS.WINDOWS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -251,7 +252,9 @@ class DefaultPluginXmlFactoryReadWriteTest {
     }
 
     @Test
-    @Disabled("maybe bug in JUnit, as MS-DOS only https://github.com/apache/maven/pull/2312#issuecomment-2876291814")
+    @DisabledOnOs(
+            value = WINDOWS,
+            disabledReason = "windows related issue https://github.com/apache/maven/pull/2312#issuecomment-2876291814")
     void readFromUrlParsesPluginDescriptorCorrectly() throws Exception {
         Path xmlFile = tempDir.resolve("plugin.xml");
         Files.write(xmlFile, SAMPLE_PLUGIN_XML.getBytes());

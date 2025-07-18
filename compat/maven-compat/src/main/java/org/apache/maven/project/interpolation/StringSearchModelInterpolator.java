@@ -59,6 +59,7 @@ public class StringSearchModelInterpolator extends AbstractStringBasedModelInter
         super(pathTranslator);
     }
 
+    @Override
     public Model interpolate(Model model, File projectDir, ProjectBuilderConfiguration config, boolean debugEnabled)
             throws ModelInterpolationException {
         interpolateObject(model, model, projectDir, config, debugEnabled);
@@ -86,6 +87,7 @@ public class StringSearchModelInterpolator extends AbstractStringBasedModelInter
         }
     }
 
+    @Override
     protected Interpolator createInterpolator() {
         StringSearchInterpolator interpolator = new StringSearchInterpolator();
         interpolator.setCacheAnswers(true);
@@ -120,6 +122,7 @@ public class StringSearchModelInterpolator extends AbstractStringBasedModelInter
             this.logger = logger;
         }
 
+        @Override
         public ModelInterpolationException run() {
             while (!interpolationTargets.isEmpty()) {
                 Object obj = interpolationTargets.removeFirst();

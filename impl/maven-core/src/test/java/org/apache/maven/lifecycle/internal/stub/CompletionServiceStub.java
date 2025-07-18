@@ -53,6 +53,7 @@ public class CompletionServiceStub implements CompletionService<ProjectSegment> 
         return projectBuildFutureTask;
     }
 
+    @Override
     public Future<ProjectSegment> submit(Runnable task, ProjectSegment result) {
         FutureTask<ProjectSegment> projectBuildFutureTask = new FutureTask<>(task, result);
         projectBuildFutureTasks.add(projectBuildFutureTask);
@@ -62,14 +63,17 @@ public class CompletionServiceStub implements CompletionService<ProjectSegment> 
         return projectBuildFutureTask;
     }
 
+    @Override
     public Future<ProjectSegment> take() throws InterruptedException {
         return null;
     }
 
+    @Override
     public Future<ProjectSegment> poll() {
         return null;
     }
 
+    @Override
     public Future<ProjectSegment> poll(long timeout, TimeUnit unit) throws InterruptedException {
         return null;
     }

@@ -23,15 +23,18 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.impl.InternalSession;
+import org.apache.maven.impl.resolver.scopes.Maven4ScopeManagerConfiguration;
 import org.apache.maven.internal.impl.DefaultLookup;
 import org.apache.maven.internal.impl.DefaultSession;
 import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.internal.impl.scope.ScopeManagerImpl;
 
 public class MavenTestHelper {
     public static DefaultRepositorySystemSession createSession(
             MavenRepositorySystem repositorySystem, PlexusContainer container) {
         DefaultRepositorySystemSession repoSession = new DefaultRepositorySystemSession(h -> false);
+        repoSession.setScopeManager(new ScopeManagerImpl(Maven4ScopeManagerConfiguration.INSTANCE));
         DefaultMavenExecutionRequest request = new DefaultMavenExecutionRequest();
         MavenSession mavenSession = new MavenSession(repoSession, request, new DefaultMavenExecutionResult());
         DefaultSession session =

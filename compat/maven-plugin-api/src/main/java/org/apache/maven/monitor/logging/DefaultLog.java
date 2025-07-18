@@ -32,6 +32,7 @@ public class DefaultLog implements Log {
         this.logger = logger;
     }
 
+    @Override
     public void debug(CharSequence content) {
         logger.debug(toString(content));
     }
@@ -44,62 +45,77 @@ public class DefaultLog implements Log {
         }
     }
 
+    @Override
     public void debug(CharSequence content, Throwable error) {
         logger.debug(toString(content), error);
     }
 
+    @Override
     public void debug(Throwable error) {
         logger.debug("", error);
     }
 
+    @Override
     public void info(CharSequence content) {
         logger.info(toString(content));
     }
 
+    @Override
     public void info(CharSequence content, Throwable error) {
         logger.info(toString(content), error);
     }
 
+    @Override
     public void info(Throwable error) {
         logger.info("", error);
     }
 
+    @Override
     public void warn(CharSequence content) {
         logger.warn(toString(content));
     }
 
+    @Override
     public void warn(CharSequence content, Throwable error) {
         logger.warn(toString(content), error);
     }
 
+    @Override
     public void warn(Throwable error) {
         logger.warn("", error);
     }
 
+    @Override
     public void error(CharSequence content) {
         logger.error(toString(content));
     }
 
+    @Override
     public void error(CharSequence content, Throwable error) {
         logger.error(toString(content), error);
     }
 
+    @Override
     public void error(Throwable error) {
         logger.error("", error);
     }
 
+    @Override
     public boolean isDebugEnabled() {
         return logger.isDebugEnabled();
     }
 
+    @Override
     public boolean isInfoEnabled() {
         return logger.isInfoEnabled();
     }
 
+    @Override
     public boolean isWarnEnabled() {
         return logger.isWarnEnabled();
     }
 
+    @Override
     public boolean isErrorEnabled() {
         return logger.isErrorEnabled();
     }

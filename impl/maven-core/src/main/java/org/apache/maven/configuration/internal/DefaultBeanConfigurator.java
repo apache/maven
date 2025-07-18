@@ -62,6 +62,7 @@ public class DefaultBeanConfigurator implements BeanConfigurator {
         converterLookup = new EnhancedConverterLookup();
     }
 
+    @Override
     public void configureBean(BeanConfigurationRequest request) throws BeanConfigurationException {
         Objects.requireNonNull(request, "request cannot be null");
         Objects.requireNonNull(request.getBean(), "request.bean cannot be null");
@@ -113,6 +114,7 @@ public class DefaultBeanConfigurator implements BeanConfigurator {
             translator = request.getPathTranslator();
         }
 
+        @Override
         public Object evaluate(String expression, Class<?> type) throws ExpressionEvaluationException {
             if (preprocessor != null) {
                 try {
@@ -124,10 +126,12 @@ public class DefaultBeanConfigurator implements BeanConfigurator {
             return expression;
         }
 
+        @Override
         public Object evaluate(String expression) throws ExpressionEvaluationException {
             return evaluate(expression, null);
         }
 
+        @Override
         public File alignToBaseDirectory(File file) {
             if (translator != null) {
                 return translator.translatePath(file);

@@ -19,6 +19,7 @@
 package org.apache.maven.impl.standalone;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.apache.maven.api.ArtifactCoordinates;
@@ -46,9 +47,14 @@ class TestApiStandalone {
 
     @Test
     void testStandalone() {
-        Session session = ApiRunner.createSession(injector -> {
-            injector.bindInstance(TestApiStandalone.class, this);
-        });
+        Path localRepo =
+                System.getProperty("localRepository") != null ? Path.of(System.getProperty("localRepository")) : null;
+
+        Session session = ApiRunner.createSession(
+                injector -> {
+                    injector.bindInstance(TestApiStandalone.class, this);
+                },
+                localRepo);
 
         ModelBuilder builder = session.getService(ModelBuilder.class);
         ModelBuilderResult result = builder.newSession()

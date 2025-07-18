@@ -23,14 +23,14 @@ import java.nio.file.Path;
 import org.apache.maven.api.LocalRepository;
 import org.apache.maven.api.annotations.Nonnull;
 
-import static org.apache.maven.impl.ImplUtils.nonNull;
+import static java.util.Objects.requireNonNull;
 
 public class DefaultLocalRepository implements LocalRepository {
 
     private final @Nonnull org.eclipse.aether.repository.LocalRepository repository;
 
     public DefaultLocalRepository(@Nonnull org.eclipse.aether.repository.LocalRepository repository) {
-        this.repository = nonNull(repository, "repository");
+        this.repository = requireNonNull(repository, "repository");
     }
 
     @Nonnull

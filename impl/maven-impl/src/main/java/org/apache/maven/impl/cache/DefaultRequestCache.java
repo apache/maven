@@ -40,6 +40,7 @@ public class DefaultRequestCache extends AbstractRequestCache {
 
     protected final Map<Object, CachingSupplier<?, ?>> forever = new ConcurrentHashMap<>();
 
+    @Override
     @SuppressWarnings("unchecked")
     protected <REQ extends Request<?>, REP extends Result<REQ>> CachingSupplier<REQ, REP> doCache(
             REQ req, Function<REQ, REP> supplier) {

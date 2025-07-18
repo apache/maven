@@ -36,6 +36,7 @@ public interface MetadataResolutionRequest extends RepositoryRequest {
      *
      * @return {@code true} if remote access has been disabled, {@code false} otherwise.
      */
+    @Override
     boolean isOffline();
 
     /**
@@ -44,6 +45,7 @@ public interface MetadataResolutionRequest extends RepositoryRequest {
      * @param offline {@code true} to disable remote access, {@code false} to allow network access.
      * @return This request, never {@code null}.
      */
+    @Override
     MetadataResolutionRequest setOffline(boolean offline);
 
     /**
@@ -66,6 +68,7 @@ public interface MetadataResolutionRequest extends RepositoryRequest {
      *
      * @return The local repository to use for the resolution or {@code null} if not set.
      */
+    @Override
     ArtifactRepository getLocalRepository();
 
     /**
@@ -74,6 +77,7 @@ public interface MetadataResolutionRequest extends RepositoryRequest {
      * @param localRepository The local repository to use for the resolution.
      * @return This request, never {@code null}.
      */
+    @Override
     MetadataResolutionRequest setLocalRepository(ArtifactRepository localRepository);
 
     /**
@@ -81,6 +85,7 @@ public interface MetadataResolutionRequest extends RepositoryRequest {
      *
      * @return The remote repositories to use for the resolution, never {@code null}.
      */
+    @Override
     List<ArtifactRepository> getRemoteRepositories();
 
     /**
@@ -89,6 +94,7 @@ public interface MetadataResolutionRequest extends RepositoryRequest {
      * @param remoteRepositories The remote repositories to use for the resolution.
      * @return This request, never {@code null}.
      */
+    @Override
     MetadataResolutionRequest setRemoteRepositories(List<ArtifactRepository> remoteRepositories);
 
     /**

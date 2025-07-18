@@ -32,6 +32,7 @@ import java.util.List;
 @Deprecated
 public class DefaultResolutionErrorHandler implements ResolutionErrorHandler {
 
+    @Override
     public void throwErrors(ArtifactResolutionRequest request, ArtifactResolutionResult result)
             throws ArtifactResolutionException {
         // Metadata cannot be found

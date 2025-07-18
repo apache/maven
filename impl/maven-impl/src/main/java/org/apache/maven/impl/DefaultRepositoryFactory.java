@@ -32,7 +32,7 @@ import org.apache.maven.api.services.RepositoryFactory;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.repository.RepositoryPolicy;
 
-import static org.apache.maven.impl.ImplUtils.nonNull;
+import static java.util.Objects.requireNonNull;
 
 @Named
 @Singleton
@@ -71,11 +71,11 @@ public class DefaultRepositoryFactory implements RepositoryFactory {
             List<RemoteRepository> dominant,
             List<RemoteRepository> recessive,
             boolean processRecessive) {
-        InternalSession internalSession = InternalSession.from(nonNull(session, "session"));
+        InternalSession internalSession = InternalSession.from(requireNonNull(session, "session"));
         List<org.eclipse.aether.repository.RemoteRepository> repos = remoteRepositoryManager.aggregateRepositories(
                 internalSession.getSession(),
-                internalSession.toRepositories(nonNull(dominant, "dominant")),
-                internalSession.toRepositories(nonNull(recessive, "recessive")),
+                internalSession.toRepositories(requireNonNull(dominant, "dominant")),
+                internalSession.toRepositories(requireNonNull(recessive, "recessive")),
                 processRecessive);
         return repos.stream()
                 .<RemoteRepository>map(DefaultRemoteRepository::new)

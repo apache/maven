@@ -134,6 +134,7 @@ public interface Type extends ExtensibleEnum {
      * @return the id of this type, never {@code null}.
      */
     @Nonnull
+    @Override
     String id();
 
     /**

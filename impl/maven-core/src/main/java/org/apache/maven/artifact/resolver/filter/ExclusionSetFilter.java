@@ -37,6 +37,7 @@ public class ExclusionSetFilter implements ArtifactFilter {
         this.excludes = excludes;
     }
 
+    @Override
     public boolean include(Artifact artifact) {
         String id = artifact.getArtifactId();
 

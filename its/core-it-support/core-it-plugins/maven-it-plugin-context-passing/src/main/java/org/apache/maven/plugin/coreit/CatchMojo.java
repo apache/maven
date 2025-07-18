@@ -58,23 +58,10 @@ public class CatchMojo extends AbstractMojo {
 
         File outfile = new File(outDir, value);
 
-        Writer writer = null;
-        try {
-            writer = new FileWriter(outfile);
-
+        try (Writer writer = new FileWriter(outfile)) {
             writer.write(value);
-
-            writer.flush();
         } catch (IOException e) {
             throw new MojoExecutionException("Cannot write output file: " + outfile, e);
-        } finally {
-            if (writer != null) {
-                try {
-                    writer.close();
-                } catch (IOException e) {
-                    // ignore
-                }
-            }
         }
     }
 }

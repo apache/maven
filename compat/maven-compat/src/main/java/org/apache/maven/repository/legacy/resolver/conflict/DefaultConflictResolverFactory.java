@@ -53,6 +53,7 @@ public class DefaultConflictResolverFactory implements ConflictResolverFactory, 
      * @see org.apache.maven.artifact.resolver.conflict.ConflictResolverFactory#getConflictResolver(java.lang.String)
      */
 
+    @Override
     public ConflictResolver getConflictResolver(String type) throws ConflictResolverNotFoundException {
         try {
             return (ConflictResolver) container.lookup(ConflictResolver.ROLE, type);
@@ -67,6 +68,7 @@ public class DefaultConflictResolverFactory implements ConflictResolverFactory, 
      * @see org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable#contextualize(org.codehaus.plexus.context.Context)
      */
 
+    @Override
     public void contextualize(Context context) throws ContextException {
         container = (PlexusContainer) context.get(PlexusConstants.PLEXUS_KEY);
     }

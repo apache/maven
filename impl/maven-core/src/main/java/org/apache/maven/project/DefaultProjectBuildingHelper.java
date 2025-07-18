@@ -83,6 +83,7 @@ public class DefaultProjectBuildingHelper implements ProjectBuildingHelper {
         this.pluginManager = pluginManager;
     }
 
+    @Override
     public List<ArtifactRepository> createArtifactRepositories(
             List<Repository> pomRepositories,
             List<ArtifactRepository> externalRepositories,
@@ -134,6 +135,7 @@ public class DefaultProjectBuildingHelper implements ProjectBuildingHelper {
         return artifactRepositories;
     }
 
+    @Override
     public synchronized ProjectRealmCache.CacheRecord createProjectRealm(
             MavenProject project, Model model, ProjectBuildingRequest request)
             throws PluginResolutionException, PluginVersionResolutionException, PluginManagerException {
@@ -254,6 +256,7 @@ public class DefaultProjectBuildingHelper implements ProjectBuildingHelper {
         return record;
     }
 
+    @Override
     public void selectProjectRealm(MavenProject project) {
         ClassLoader projectRealm = project.getClassRealm();
 

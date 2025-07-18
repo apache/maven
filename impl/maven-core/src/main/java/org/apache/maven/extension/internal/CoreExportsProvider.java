@@ -45,6 +45,7 @@ public class CoreExportsProvider implements Provider<CoreExports> {
         this.exports = Objects.requireNonNull(exports);
     }
 
+    @Override
     public CoreExports get() {
         return exports;
     }

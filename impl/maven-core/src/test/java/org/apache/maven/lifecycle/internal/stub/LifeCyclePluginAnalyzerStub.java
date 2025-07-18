@@ -29,6 +29,7 @@ import org.apache.maven.model.PluginExecution;
 /**
  */
 public class LifeCyclePluginAnalyzerStub implements LifeCyclePluginAnalyzer {
+    @Override
     public Set<Plugin> getPluginsBoundByDefaultToAllLifecycles(String packaging) {
         Set<Plugin> plugins;
 

@@ -43,15 +43,18 @@ public class DefaultArtifactFactory implements ArtifactFactory {
         this.artifactHandlerManager = artifactHandlerManager;
     }
 
+    @Override
     public Artifact createArtifact(String groupId, String artifactId, String version, String scope, String type) {
         return createArtifact(groupId, artifactId, version, scope, type, null, null);
     }
 
+    @Override
     public Artifact createArtifactWithClassifier(
             String groupId, String artifactId, String version, String type, String classifier) {
         return createArtifact(groupId, artifactId, version, null, type, classifier, null);
     }
 
+    @Override
     public Artifact createDependencyArtifact(
             String groupId,
             String artifactId,
@@ -62,6 +65,7 @@ public class DefaultArtifactFactory implements ArtifactFactory {
         return createArtifact(groupId, artifactId, versionRange, type, classifier, scope, null);
     }
 
+    @Override
     public Artifact createDependencyArtifact(
             String groupId,
             String artifactId,
@@ -73,6 +77,7 @@ public class DefaultArtifactFactory implements ArtifactFactory {
         return createArtifact(groupId, artifactId, versionRange, type, classifier, scope, null, optional);
     }
 
+    @Override
     public Artifact createDependencyArtifact(
             String groupId,
             String artifactId,
@@ -84,6 +89,7 @@ public class DefaultArtifactFactory implements ArtifactFactory {
         return createArtifact(groupId, artifactId, versionRange, type, classifier, scope, inheritedScope);
     }
 
+    @Override
     public Artifact createDependencyArtifact(
             String groupId,
             String artifactId,
@@ -96,26 +102,32 @@ public class DefaultArtifactFactory implements ArtifactFactory {
         return createArtifact(groupId, artifactId, versionRange, type, classifier, scope, inheritedScope, optional);
     }
 
+    @Override
     public Artifact createBuildArtifact(String groupId, String artifactId, String version, String packaging) {
         return createArtifact(groupId, artifactId, version, null, packaging, null, null);
     }
 
+    @Override
     public Artifact createProjectArtifact(String groupId, String artifactId, String version) {
         return createProjectArtifact(groupId, artifactId, version, null);
     }
 
+    @Override
     public Artifact createParentArtifact(String groupId, String artifactId, String version) {
         return createProjectArtifact(groupId, artifactId, version);
     }
 
+    @Override
     public Artifact createPluginArtifact(String groupId, String artifactId, VersionRange versionRange) {
         return createArtifact(groupId, artifactId, versionRange, "maven-plugin", null, Artifact.SCOPE_RUNTIME, null);
     }
 
+    @Override
     public Artifact createProjectArtifact(String groupId, String artifactId, String version, String scope) {
         return createArtifact(groupId, artifactId, version, scope, "pom");
     }
 
+    @Override
     public Artifact createExtensionArtifact(String groupId, String artifactId, VersionRange versionRange) {
         return createArtifact(groupId, artifactId, versionRange, "jar", null, Artifact.SCOPE_RUNTIME, null);
     }

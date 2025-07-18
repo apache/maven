@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.LongAdder;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.Constants;
@@ -181,11 +182,25 @@ public interface ProblemCollector<P extends BuilderProblem> {
     static <P extends BuilderProblem> ProblemCollector<P> create(@Nullable ProtoSession protoSession) {
         if (protoSession != null
                 && protoSession.getUserProperties().containsKey(Constants.MAVEN_BUILDER_MAX_PROBLEMS)) {
-            return new Impl<>(
-                    Integer.parseInt(protoSession.getUserProperties().get(Constants.MAVEN_BUILDER_MAX_PROBLEMS)));
+            int limit = Integer.parseInt(protoSession.getUserProperties().get(Constants.MAVEN_BUILDER_MAX_PROBLEMS));
+            return create(limit, p -> true);
         } else {
             return create(100);
         }
+    }
+
+    /**
+     * Creates new instance of problem collector with the specified maximum problem count limit,
+     * but only preserves problems that match the given filter.
+     *
+     * @param <P>           the type of problem
+     * @param maxCountLimit the maximum number of problems to preserve
+     * @param filter        predicate to decide which problems to record
+     * @return a new filtered problem collector instance
+     */
+    @Nonnull
+    static <P extends BuilderProblem> ProblemCollector<P> create(int maxCountLimit, Predicate<? super P> filter) {
+        return new Impl<>(maxCountLimit, filter);
     }
 
     /**
@@ -198,7 +213,7 @@ public interface ProblemCollector<P extends BuilderProblem> {
      */
     @Nonnull
     static <P extends BuilderProblem> ProblemCollector<P> create(int maxCountLimit) {
-        return new Impl<>(maxCountLimit);
+        return create(maxCountLimit, p -> true);
     }
 
     /**
@@ -212,13 +227,14 @@ public interface ProblemCollector<P extends BuilderProblem> {
         private final AtomicInteger totalCount;
         private final ConcurrentMap<BuilderProblem.Severity, LongAdder> counters;
         private final ConcurrentMap<BuilderProblem.Severity, List<P>> problems;
+        private final Predicate<? super P> filter;
 
         private static final List<BuilderProblem.Severity> REVERSED_ORDER = Arrays.stream(
                         BuilderProblem.Severity.values())
                 .sorted(Comparator.reverseOrder())
                 .toList();
 
-        private Impl(int maxCountLimit) {
+        private Impl(int maxCountLimit, Predicate<? super P> filter) {
             if (maxCountLimit < 0) {
                 throw new IllegalArgumentException("maxCountLimit must be non-negative");
             }
@@ -226,6 +242,7 @@ public interface ProblemCollector<P extends BuilderProblem> {
             this.totalCount = new AtomicInteger();
             this.counters = new ConcurrentHashMap<>();
             this.problems = new ConcurrentHashMap<>();
+            this.filter = requireNonNull(filter, "filter");
         }
 
         @Override
@@ -245,6 +262,11 @@ public interface ProblemCollector<P extends BuilderProblem> {
         @Override
         public boolean reportProblem(P problem) {
             requireNonNull(problem, "problem");
+            // first apply filter
+            if (!filter.test(problem)) {
+                // drop without counting towards preserved problems
+                return false;
+            }
             int currentCount = totalCount.incrementAndGet();
             getCounter(problem.getSeverity()).increment();
             if (currentCount <= maxCountLimit || dropProblemWithLowerSeverity(problem.getSeverity())) {

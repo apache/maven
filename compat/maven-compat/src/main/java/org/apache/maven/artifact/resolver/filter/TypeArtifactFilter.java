@@ -29,6 +29,7 @@ public class TypeArtifactFilter implements ArtifactFilter {
         this.type = type;
     }
 
+    @Override
     public boolean include(Artifact artifact) {
         return type.equals(artifact.getType());
     }

@@ -37,6 +37,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 @Deprecated
 public class LatestArtifactTransformation extends AbstractVersionTransformation {
 
+    @Override
     public void transformForResolve(Artifact artifact, RepositoryRequest request)
             throws ArtifactResolutionException, ArtifactNotFoundException {
         if (Artifact.LATEST_VERSION.equals(artifact.getVersion())) {
@@ -54,15 +55,18 @@ public class LatestArtifactTransformation extends AbstractVersionTransformation 
         }
     }
 
+    @Override
     public void transformForInstall(Artifact artifact, ArtifactRepository localRepository) {
         // metadata is added via addPluginArtifactMetadata
     }
 
+    @Override
     public void transformForDeployment(
             Artifact artifact, ArtifactRepository remoteRepository, ArtifactRepository localRepository) {
         // metadata is added via addPluginArtifactMetadata
     }
 
+    @Override
     protected String constructVersion(Versioning versioning, String baseVersion) {
         return versioning.getLatest();
     }

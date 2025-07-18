@@ -36,7 +36,7 @@ import org.apache.maven.api.annotations.Nonnull;
 @Immutable
 public interface Dependency extends Artifact {
     /**
-     * {@return the type of the dependency}
+     * {@return the type of the dependency}.
      * A dependency can be a <abbr>JAR</abbr> file,
      * a modular-<abbr>JAR</abbr> if it is intended to be placed on the module path,
      * a <abbr>JAR</abbr> containing test classes, <i>etc.</i>
@@ -47,7 +47,7 @@ public interface Dependency extends Artifact {
     Type getType();
 
     /**
-     * {@return the time at which the dependency will be used}
+     * {@return the time at which the dependency will be used}.
      * It may be, for example, at compile time only, at run time or at test time.
      *
      * @see DependencyCoordinates#getScope()
@@ -66,7 +66,7 @@ public interface Dependency extends Artifact {
     boolean isOptional();
 
     /**
-     * {@return coordinates with the same identifiers as this dependency}
+     * {@return coordinates with the same identifiers as this dependency}.
      */
     @Nonnull
     @Override

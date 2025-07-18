@@ -83,10 +83,12 @@ public class DefaultProfileManager implements ProfileManager {
         this.requestProperties = props;
     }
 
+    @Override
     public Properties getRequestProperties() {
         return requestProperties;
     }
 
+    @Override
     public Map<String, Profile> getProfilesById() {
         return profilesById;
     }
@@ -94,6 +96,7 @@ public class DefaultProfileManager implements ProfileManager {
     /* (non-Javadoc)
      * @see org.apache.maven.profiles.ProfileManager#addProfile(org.apache.maven.model.Profile)
      */
+    @Override
     public void addProfile(Profile profile) {
         String profileId = profile.getId();
 
@@ -115,6 +118,7 @@ public class DefaultProfileManager implements ProfileManager {
     /* (non-Javadoc)
      * @see org.apache.maven.profiles.ProfileManager#explicitlyActivate(java.lang.String)
      */
+    @Override
     public void explicitlyActivate(String profileId) {
         if (!activatedIds.contains(profileId)) {
             logger.debug("Profile with id: '" + profileId + "' has been explicitly activated.");
@@ -126,6 +130,7 @@ public class DefaultProfileManager implements ProfileManager {
     /* (non-Javadoc)
      * @see org.apache.maven.profiles.ProfileManager#explicitlyActivate(java.util.List)
      */
+    @Override
     public void explicitlyActivate(List<String> profileIds) {
         for (String profileId1 : profileIds) {
             explicitlyActivate(profileId1);
@@ -135,6 +140,7 @@ public class DefaultProfileManager implements ProfileManager {
     /* (non-Javadoc)
      * @see org.apache.maven.profiles.ProfileManager#explicitlyDeactivate(java.lang.String)
      */
+    @Override
     public void explicitlyDeactivate(String profileId) {
         if (!deactivatedIds.contains(profileId)) {
             logger.debug("Profile with id: '" + profileId + "' has been explicitly deactivated.");
@@ -146,6 +152,7 @@ public class DefaultProfileManager implements ProfileManager {
     /* (non-Javadoc)
      * @see org.apache.maven.profiles.ProfileManager#explicitlyDeactivate(java.util.List)
      */
+    @Override
     public void explicitlyDeactivate(List<String> profileIds) {
         for (String profileId1 : profileIds) {
             explicitlyDeactivate(profileId1);
@@ -155,6 +162,7 @@ public class DefaultProfileManager implements ProfileManager {
     /* (non-Javadoc)
      * @see org.apache.maven.profiles.ProfileManager#getActiveProfiles()
      */
+    @Override
     public List getActiveProfiles() throws ProfileActivationException {
         DefaultProfileActivationContext context = new DefaultProfileActivationContext();
         context.setActiveProfileIds(activatedIds);
@@ -180,6 +188,7 @@ public class DefaultProfileManager implements ProfileManager {
     /* (non-Javadoc)
      * @see org.apache.maven.profiles.ProfileManager#addProfiles(java.util.List)
      */
+    @Override
     public void addProfiles(List<Profile> profiles) {
         for (Profile profile1 : profiles) {
             addProfile(profile1);
@@ -192,14 +201,17 @@ public class DefaultProfileManager implements ProfileManager {
         }
     }
 
+    @Override
     public List<String> getExplicitlyActivatedIds() {
         return activatedIds;
     }
 
+    @Override
     public List<String> getExplicitlyDeactivatedIds() {
         return deactivatedIds;
     }
 
+    @Override
     public List getIdsActivatedByDefault() {
         return defaultIds;
     }

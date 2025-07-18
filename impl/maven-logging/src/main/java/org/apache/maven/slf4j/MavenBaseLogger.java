@@ -229,7 +229,6 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
         synchronized (CONFIG_PARAMS) {
             targetStream.println(buf.toString());
             writeThrowable(t, targetStream);
-            targetStream.flush();
         }
     }
 
@@ -256,26 +255,31 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
     }
 
     /** Are {@code trace} messages currently enabled? */
+    @Override
     public boolean isTraceEnabled() {
         return isLevelEnabled(LOG_LEVEL_TRACE);
     }
 
     /** Are {@code debug} messages currently enabled? */
+    @Override
     public boolean isDebugEnabled() {
         return isLevelEnabled(LOG_LEVEL_DEBUG);
     }
 
     /** Are {@code info} messages currently enabled? */
+    @Override
     public boolean isInfoEnabled() {
         return isLevelEnabled(LOG_LEVEL_INFO);
     }
 
     /** Are {@code warn} messages currently enabled? */
+    @Override
     public boolean isWarnEnabled() {
         return isLevelEnabled(LOG_LEVEL_WARN);
     }
 
     /** Are {@code error} messages currently enabled? */
+    @Override
     public boolean isErrorEnabled() {
         return isLevelEnabled(LOG_LEVEL_ERROR);
     }

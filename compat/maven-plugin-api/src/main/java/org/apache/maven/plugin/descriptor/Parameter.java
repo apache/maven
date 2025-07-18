@@ -116,10 +116,12 @@ public class Parameter implements Cloneable {
         this.deprecated = deprecated;
     }
 
+    @Override
     public int hashCode() {
         return name.hashCode();
     }
 
+    @Override
     public boolean equals(Object other) {
         return (other instanceof Parameter parameter) && getName().equals(parameter.getName());
     }
@@ -148,6 +150,7 @@ public class Parameter implements Cloneable {
         return defaultValue;
     }
 
+    @Override
     public String toString() {
         return "Mojo parameter [name: '" + getName() + "'; alias: '" + getAlias() + "']";
     }

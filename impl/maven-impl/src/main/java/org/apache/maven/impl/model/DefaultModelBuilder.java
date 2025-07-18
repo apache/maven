@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,6 +59,7 @@ import org.apache.maven.api.cache.CacheRetention;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
+import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
@@ -201,6 +203,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         this.rootLocator = rootLocator;
     }
 
+    @Override
     public ModelBuilderSession newSession() {
         return new ModelBuilderSessionImpl();
     }
@@ -419,11 +422,13 @@ public class DefaultModelBuilder implements ModelBuilder {
             return result.getProblemCollector();
         }
 
+        @Override
         public void setSource(String source) {
             this.source = source;
             this.sourceModel = null;
         }
 
+        @Override
         public void setSource(Model source) {
             this.sourceModel = source;
             this.source = null;
@@ -433,6 +438,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
 
+        @Override
         public String getSource() {
             if (source == null && sourceModel != null) {
                 source = ModelProblemUtils.toPath(sourceModel);
@@ -444,10 +450,12 @@ public class DefaultModelBuilder implements ModelBuilder {
             return ModelProblemUtils.toId(sourceModel);
         }
 
+        @Override
         public void setRootModel(Model rootModel) {
             this.rootModel = rootModel;
         }
 
+        @Override
         public Model getRootModel() {
             return rootModel;
         }
@@ -489,6 +497,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             add(problem);
         }
 
+        @Override
         public ModelBuilderException newModelBuilderException() {
             return new ModelBuilderException(result);
         }
@@ -819,6 +828,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             // effective model validation
             modelValidator.validateEffectiveModel(
+                    session,
                     resultModel,
                     isBuildRequest() ? ModelValidator.VALIDATION_LEVEL_STRICT : ModelValidator.VALIDATION_LEVEL_MINIMAL,
                     this);
@@ -846,7 +856,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 result.setParentModel(parentModel);
             } else {
                 String superModelVersion = childModel.getModelVersion();
-                if (superModelVersion == null || !VALID_MODEL_VERSIONS.contains(superModelVersion)) {
+                if (superModelVersion == null || !KNOWN_MODEL_VERSIONS.contains(superModelVersion)) {
                     // Maven 3.x is always using 4.0.0 version to load the supermodel, so
                     // do the same when loading a dependency.  The model validator will also
                     // check that field later.
@@ -1160,9 +1170,6 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             Model model = inheritanceAssembler.assembleModelInheritance(inputModel, parentModel, request, this);
 
-            // model normalization
-            model = modelNormalizer.mergeDuplicates(model, request, this);
-
             // profile activation
             profileActivationContext.setModel(model);
 
@@ -1176,6 +1183,9 @@ public class DefaultModelBuilder implements ModelBuilder {
             // model interpolation
             Model resultModel = model;
             resultModel = interpolateModel(resultModel, request, this);
+
+            // model normalization
+            resultModel = modelNormalizer.mergeDuplicates(resultModel, request, this);
 
             // url normalization
             resultModel = modelUrlNormalizer.normalize(resultModel, request);
@@ -1245,7 +1255,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                             .path(modelSource.getPath())
                             .rootDirectory(rootDirectory)
                             .inputStream(is)
-                            .transformer(new InliningTransformer())
+                            .transformer(new InterningTransformer(session))
                             .build());
                 } catch (XmlReaderException e) {
                     if (!strict) {
@@ -1258,7 +1268,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                                 .path(modelSource.getPath())
                                 .rootDirectory(rootDirectory)
                                 .inputStream(is)
-                                .transformer(new InliningTransformer())
+                                .transformer(new InterningTransformer(session))
                                 .build());
                     } catch (XmlReaderException ne) {
                         // still unreadable even in non-strict mode, rethrow original error
@@ -1393,7 +1403,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 } else {
                     properties.putAll(model.getProperties());
                 }
-                properties.putAll(session.getUserProperties());
+                properties.putAll(session.getEffectiveProperties());
                 model = model.with()
                         .version(replaceCiFriendlyVersion(properties, model.getVersion()))
                         .parent(
@@ -1418,9 +1428,15 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             setSource(model);
             modelValidator.validateFileModel(
+                    session,
                     model,
                     isBuildRequest() ? ModelValidator.VALIDATION_LEVEL_STRICT : ModelValidator.VALIDATION_LEVEL_MINIMAL,
                     this);
+            InternalSession internalSession = InternalSession.from(session);
+            if (Features.mavenMaven3Personality(internalSession.getSession().getConfigProperties())
+                    && Objects.equals(ModelBuilder.MODEL_VERSION_4_1_0, model.getModelVersion())) {
+                add(Severity.FATAL, Version.BASE, "Maven3 mode: no higher model version than 4.0.0 allowed");
+            }
             if (hasFatalErrors()) {
                 throw newModelBuilderException();
             }
@@ -1500,6 +1516,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             modelValidator.validateRawModel(
+                    session,
                     rawModel,
                     isBuildRequest() ? ModelValidator.VALIDATION_LEVEL_STRICT : ModelValidator.VALIDATION_LEVEL_MINIMAL,
                     this);
@@ -1512,27 +1529,53 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         /**
+         * Record to store both the parent model and its activated profiles for caching.
+         */
+        private record ParentModelWithProfiles(Model model, List<Profile> activatedProfiles) {}
+
+        /**
          * Reads the request source's parent.
          */
         Model readAsParentModel(DefaultProfileActivationContext profileActivationContext) throws ModelBuilderException {
-            Map<DefaultProfileActivationContext.Record, Model> parentsPerContext =
+            Map<DefaultProfileActivationContext.Record, ParentModelWithProfiles> parentsPerContext =
                     cache(request.getSource(), PARENT, ConcurrentHashMap::new);
-            for (Map.Entry<DefaultProfileActivationContext.Record, Model> e : parentsPerContext.entrySet()) {
+
+            for (Map.Entry<DefaultProfileActivationContext.Record, ParentModelWithProfiles> e :
+                    parentsPerContext.entrySet()) {
                 if (e.getKey().matches(profileActivationContext)) {
-                    return e.getValue();
+                    ParentModelWithProfiles cached = e.getValue();
+                    // CRITICAL: On cache hit, we need to replay the cached record's keys into the
+                    // current recording context. The matches() method already re-evaluated the
+                    // conditions and recorded some keys in ctx, but we also need to ensure all
+                    // the keys from the cached record are recorded in the current context.
+                    if (profileActivationContext.record != null) {
+                        replayRecordIntoContext(e.getKey(), profileActivationContext);
+                    }
+                    // Add the activated profiles from cache to the result
+                    addActivePomProfiles(cached.activatedProfiles());
+                    return cached.model();
                 }
             }
-            DefaultProfileActivationContext.Record prev = profileActivationContext.start();
-            Model model = doReadAsParentModel(profileActivationContext);
-            DefaultProfileActivationContext.Record record = profileActivationContext.stop(prev);
-            parentsPerContext.put(record, model);
-            return model;
+
+            // Cache miss: process the parent model
+            // CRITICAL: Use a separate recording context to avoid recording intermediate keys
+            // that aren't essential to the final result. Only replay the final essential keys
+            // into the parent recording context to maintain clean cache keys and avoid
+            // over-recording during parent model processing.
+            DefaultProfileActivationContext ctx = profileActivationContext.start();
+            ParentModelWithProfiles modelWithProfiles = doReadAsParentModel(ctx);
+            DefaultProfileActivationContext.Record record = ctx.stop();
+            replayRecordIntoContext(record, profileActivationContext);
+
+            parentsPerContext.put(record, modelWithProfiles);
+            addActivePomProfiles(modelWithProfiles.activatedProfiles());
+            return modelWithProfiles.model();
         }
 
-        private Model doReadAsParentModel(DefaultProfileActivationContext profileActivationContext)
-                throws ModelBuilderException {
+        private ParentModelWithProfiles doReadAsParentModel(
+                DefaultProfileActivationContext childProfileActivationContext) throws ModelBuilderException {
             Model raw = readRawModel();
-            Model parentData = readParent(raw, profileActivationContext);
+            Model parentData = readParent(raw, childProfileActivationContext);
             Model parent = new DefaultInheritanceAssembler(new DefaultInheritanceAssembler.InheritanceModelMerger() {
                         @Override
                         protected void mergeModel_Modules(
@@ -1552,15 +1595,23 @@ public class DefaultModelBuilder implements ModelBuilder {
                     })
                     .assembleModelInheritance(raw, parentData, request, this);
 
-            // activate profiles
-            List<Profile> parentActivePomProfiles = getActiveProfiles(parent.getProfiles(), profileActivationContext);
-            // profile injection
+            // Profile injection SHOULD be performed on parent models to ensure
+            // that profile content becomes part of the parent model before inheritance.
+            // This ensures proper precedence: child elements override parent elements,
+            // including elements that came from parent profiles.
+            //
+            // Use the child's activation context (passed as parameter) to determine
+            // which parent profiles should be active, ensuring consistency.
+            List<Profile> parentActivePomProfiles =
+                    getActiveProfiles(parent.getProfiles(), childProfileActivationContext);
+
+            // Inject profiles into parent model
             Model injectedParentModel = profileInjector
                     .injectProfiles(parent, parentActivePomProfiles, request, this)
-                    .withProfiles(List.of());
-            addActivePomProfiles(parentActivePomProfiles);
+                    .withProfiles(List.of()); // Remove profiles after injection to avoid double-processing
 
-            return injectedParentModel.withParent(null);
+            // Note: addActivePomProfiles() will be called by the caller for cache miss case
+            return new ParentModelWithProfiles(injectedParentModel.withParent(null), parentActivePomProfiles);
         }
 
         private Model importDependencyManagement(Model model, Collection<String> importIds) {
@@ -1802,6 +1853,43 @@ public class DefaultModelBuilder implements ModelBuilder {
         boolean isBuildRequestWithActivation() {
             return request.getRequestType() != ModelBuilderRequest.RequestType.BUILD_CONSUMER;
         }
+
+        /**
+         * Replays the keys from a cached record into the current recording context.
+         * This ensures that when there's a cache hit, all the keys that were originally
+         * accessed during the cached computation are recorded in the current context.
+         */
+        private void replayRecordIntoContext(
+                DefaultProfileActivationContext.Record cachedRecord, DefaultProfileActivationContext targetContext) {
+            if (targetContext.record == null) {
+                return; // Target context is not recording
+            }
+
+            // Replay all the recorded keys from the cached record into the target context's record
+            // We need to access the mutable maps in the target context's record
+            DefaultProfileActivationContext.Record targetRecord = targetContext.record;
+
+            // Replay active profiles
+            cachedRecord.usedActiveProfiles.forEach(targetRecord.usedActiveProfiles::putIfAbsent);
+
+            // Replay inactive profiles
+            cachedRecord.usedInactiveProfiles.forEach(targetRecord.usedInactiveProfiles::putIfAbsent);
+
+            // Replay system properties
+            cachedRecord.usedSystemProperties.forEach(targetRecord.usedSystemProperties::putIfAbsent);
+
+            // Replay user properties
+            cachedRecord.usedUserProperties.forEach(targetRecord.usedUserProperties::putIfAbsent);
+
+            // Replay model properties
+            cachedRecord.usedModelProperties.forEach(targetRecord.usedModelProperties::putIfAbsent);
+
+            // Replay model infos
+            cachedRecord.usedModelInfos.forEach(targetRecord.usedModelInfos::putIfAbsent);
+
+            // Replay exists checks
+            cachedRecord.usedExists.forEach(targetRecord.usedExists::putIfAbsent);
+        }
     }
 
     @SuppressWarnings("deprecation")
@@ -1845,16 +1933,15 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     private DefaultProfileActivationContext getProfileActivationContext(ModelBuilderRequest request, Model model) {
-        DefaultProfileActivationContext context =
-                new DefaultProfileActivationContext(pathTranslator, rootLocator, interpolator);
-
-        context.setActiveProfileIds(request.getActiveProfileIds());
-        context.setInactiveProfileIds(request.getInactiveProfileIds());
-        context.setSystemProperties(request.getSystemProperties());
-        context.setUserProperties(request.getUserProperties());
-        context.setModel(model);
-
-        return context;
+        return new DefaultProfileActivationContext(
+                pathTranslator,
+                rootLocator,
+                interpolator,
+                request.getActiveProfileIds(),
+                request.getInactiveProfileIds(),
+                request.getSystemProperties(),
+                request.getUserProperties(),
+                model);
     }
 
     private Map<String, Activation> getProfileActivations(Model model) {
@@ -2058,22 +2145,94 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
     }
 
-    static class InliningTransformer implements XmlReaderRequest.Transformer {
-        static final Set<String> CONTEXTS = Set.of(
+    static class InterningTransformer implements XmlReaderRequest.Transformer {
+        static final Set<String> DEFAULT_CONTEXTS = Set.of(
+                // Core Maven coordinates
                 "groupId",
                 "artifactId",
                 "version",
                 "namespaceUri",
                 "packaging",
+
+                // Dependency-related fields
                 "scope",
+                "type",
+                "classifier",
+
+                // Build and plugin-related fields
                 "phase",
+                "goal",
+                "execution",
+
+                // Repository-related fields
                 "layout",
                 "policy",
                 "checksumPolicy",
-                "updatePolicy");
+                "updatePolicy",
 
+                // Common metadata fields
+                "modelVersion",
+                "name",
+                "url",
+                "system",
+                "distribution",
+                "status",
+
+                // SCM fields
+                "connection",
+                "developerConnection",
+                "tag",
+
+                // Common enum-like values that appear frequently
+                "id",
+                "inherited",
+                "optional");
+
+        private final Set<String> contexts;
+
+        /**
+         * Creates an InterningTransformer with default contexts.
+         */
+        InterningTransformer() {
+            this.contexts = DEFAULT_CONTEXTS;
+        }
+
+        /**
+         * Creates an InterningTransformer with contexts from session properties.
+         *
+         * @param session the Maven session to read properties from
+         */
+        InterningTransformer(Session session) {
+            this.contexts = parseContextsFromSession(session);
+        }
+
+        private Set<String> parseContextsFromSession(Session session) {
+            String contextsProperty = session.getUserProperties().get(Constants.MAVEN_MODEL_BUILDER_INTERNS);
+            if (contextsProperty == null) {
+                contextsProperty = session.getSystemProperties().get(Constants.MAVEN_MODEL_BUILDER_INTERNS);
+            }
+
+            if (contextsProperty == null || contextsProperty.trim().isEmpty()) {
+                return DEFAULT_CONTEXTS;
+            }
+
+            return Arrays.stream(contextsProperty.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .collect(Collectors.toSet());
+        }
+
+        @Override
         public String transform(String input, String context) {
-            return CONTEXTS.contains(context) ? input.intern() : input;
+            return input != null && contexts.contains(context) ? input.intern() : input;
+        }
+
+        /**
+         * Get the contexts that will be interned by this transformer.
+         * Used for testing purposes.
+         */
+        Set<String> getContexts() {
+            return contexts;
         }
     }
 }

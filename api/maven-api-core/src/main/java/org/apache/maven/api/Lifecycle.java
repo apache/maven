@@ -244,6 +244,7 @@ public interface Lifecycle extends ExtensibleEnum {
          *
          * @return the PROJECT pointer type
          */
+        @Override
         default Type type() {
             return Type.PROJECT;
         }
@@ -262,6 +263,7 @@ public interface Lifecycle extends ExtensibleEnum {
          *
          * @return the DEPENDENCIES pointer type
          */
+        @Override
         default Type type() {
             return Type.DEPENDENCIES;
         }
@@ -273,6 +275,7 @@ public interface Lifecycle extends ExtensibleEnum {
          *
          * @return the CHILDREN pointer type
          */
+        @Override
         default Type type() {
             return Type.CHILDREN;
         }

@@ -402,8 +402,6 @@ public class ApiRunner {
                         mavenUserHome.resolve("settings.xml"))
                 .getEffectiveSettings();
 
-        settings.getProfiles();
-
         // local repository
         String localRepository = settings.getLocalRepository() != null
                         && !settings.getLocalRepository().isEmpty()

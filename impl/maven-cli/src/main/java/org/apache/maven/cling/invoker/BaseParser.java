@@ -56,6 +56,7 @@ import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.properties.internal.SystemProperties;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.maven.cling.invoker.CliUtils.createInterpolator;
 import static org.apache.maven.cling.invoker.CliUtils.getCanonicalPath;
 import static org.apache.maven.cling.invoker.CliUtils.or;
 import static org.apache.maven.cling.invoker.CliUtils.prefix;
@@ -91,6 +92,7 @@ public abstract class BaseParser implements Parser {
         @Nullable
         public CIInfo ciInfo;
 
+        @Nullable
         public Options options;
 
         public Map<String, String> extraInterpolationSource() {
@@ -149,22 +151,12 @@ public abstract class BaseParser implements Parser {
         }
 
         // options
-        List<Options> parsedOptions;
         try {
-            parsedOptions = parseCliOptions(context);
+            context.options = parseCliOptions(context);
         } catch (Exception e) {
             context.parsingFailed = true;
-            parsedOptions = List.of(emptyOptions());
+            context.options = null;
             parserRequest.logger().error("Error parsing program arguments", e);
-        }
-
-        // assemble options if needed
-        try {
-            context.options = assembleOptions(parsedOptions);
-        } catch (Exception e) {
-            context.parsingFailed = true;
-            context.options = emptyOptions();
-            parserRequest.logger().error("Error assembling program arguments", e);
         }
 
         // system and user properties
@@ -184,9 +176,14 @@ public abstract class BaseParser implements Parser {
         }
 
         // options: interpolate
-        context.options = context.options.interpolate(Interpolator.chain(
-                context.extraInterpolationSource()::get, context.userProperties::get, context.systemProperties::get));
+        if (context.options != null) {
+            context.options = context.options.interpolate(Interpolator.chain(
+                    context.extraInterpolationSource()::get,
+                    context.userProperties::get,
+                    context.systemProperties::get));
+        }
 
+        // below we use effective properties as both system + user are present
         // core extensions
         try {
             context.extensions = readCoreExtensionsDescriptor(context);
@@ -255,9 +252,21 @@ public abstract class BaseParser implements Parser {
         }
     }
 
-    protected abstract Options emptyOptions();
-
-    protected abstract InvokerRequest getInvokerRequest(LocalContext context);
+    protected InvokerRequest getInvokerRequest(LocalContext context) {
+        return new BaseInvokerRequest(
+                context.parserRequest,
+                context.parsingFailed,
+                context.cwd,
+                context.installationDirectory,
+                context.userHomeDirectory,
+                context.userProperties,
+                context.systemProperties,
+                context.topDirectory,
+                context.rootDirectory,
+                context.extensions,
+                context.ciInfo,
+                context.options);
+    }
 
     protected Path getCwd(LocalContext context) {
         if (context.parserRequest.cwd() != null) {
@@ -355,6 +364,7 @@ public abstract class BaseParser implements Parser {
 
         EnvironmentUtils.addEnvVars(systemProperties);
         SystemProperties.addSystemProperties(systemProperties);
+        systemProperties.putAll(context.systemPropertiesOverrides);
 
         // ----------------------------------------------------------------------
         // Properties containing info about the currently running version of Maven
@@ -385,6 +395,31 @@ public abstract class BaseParser implements Parser {
         String mavenBuildVersion = CLIReportingUtils.createMavenVersionString(buildProperties);
         systemProperties.setProperty(Constants.MAVEN_BUILD_VERSION, mavenBuildVersion);
 
+        Path mavenConf;
+        if (systemProperties.getProperty(Constants.MAVEN_INSTALLATION_CONF) != null) {
+            mavenConf = context.installationDirectory.resolve(
+                    systemProperties.getProperty(Constants.MAVEN_INSTALLATION_CONF));
+        } else if (systemProperties.getProperty("maven.conf") != null) {
+            mavenConf = context.installationDirectory.resolve(systemProperties.getProperty("maven.conf"));
+        } else if (systemProperties.getProperty(Constants.MAVEN_HOME) != null) {
+            mavenConf = context.installationDirectory
+                    .resolve(systemProperties.getProperty(Constants.MAVEN_HOME))
+                    .resolve("conf");
+        } else {
+            mavenConf = context.installationDirectory.resolve("");
+        }
+
+        UnaryOperator<String> callback = or(
+                context.extraInterpolationSource()::get,
+                context.systemPropertiesOverrides::get,
+                systemProperties::getProperty);
+        Path propertiesFile = mavenConf.resolve("maven-system.properties");
+        try {
+            MavenPropertiesLoader.loadProperties(systemProperties, propertiesFile, callback, false);
+        } catch (IOException e) {
+            throw new IllegalStateException("Error loading properties from " + propertiesFile, e);
+        }
+
         Map<String, String> result = toMap(systemProperties);
         result.putAll(context.systemPropertiesOverrides);
         return result;
@@ -392,6 +427,7 @@ public abstract class BaseParser implements Parser {
 
     protected Map<String, String> populateUserProperties(LocalContext context) {
         Properties userProperties = new Properties();
+        Map<String, String> paths = context.extraInterpolationSource();
 
         // ----------------------------------------------------------------------
         // Options that are set on the command line become system properties
@@ -400,12 +436,12 @@ public abstract class BaseParser implements Parser {
         // ----------------------------------------------------------------------
 
         Map<String, String> userSpecifiedProperties =
-                context.options.userProperties().orElse(new HashMap<>());
+                new HashMap<>(context.options.userProperties().orElse(new HashMap<>()));
+        createInterpolator().interpolate(userSpecifiedProperties, paths::get);
 
         // ----------------------------------------------------------------------
         // Load config files
         // ----------------------------------------------------------------------
-        Map<String, String> paths = context.extraInterpolationSource();
         UnaryOperator<String> callback =
                 or(paths::get, prefix("cli.", userSpecifiedProperties::get), context.systemProperties::get);
 
@@ -422,7 +458,7 @@ public abstract class BaseParser implements Parser {
         } else {
             mavenConf = context.installationDirectory.resolve("");
         }
-        Path propertiesFile = mavenConf.resolve("maven.properties");
+        Path propertiesFile = mavenConf.resolve("maven-user.properties");
         try {
             MavenPropertiesLoader.loadProperties(userProperties, propertiesFile, callback, false);
         } catch (IOException e) {
@@ -435,9 +471,7 @@ public abstract class BaseParser implements Parser {
         return toMap(userProperties);
     }
 
-    protected abstract List<Options> parseCliOptions(LocalContext context);
-
-    protected abstract Options assembleOptions(List<Options> parsedOptions);
+    protected abstract Options parseCliOptions(LocalContext context);
 
     /**
      * Important: This method must return list of {@link CoreExtensions} in precedence order.
@@ -447,23 +481,25 @@ public abstract class BaseParser implements Parser {
         Path file;
         List<CoreExtension> loaded;
 
+        Map<String, String> eff = new HashMap<>(context.systemProperties);
+        eff.putAll(context.userProperties);
+
         // project
-        file = context.cwd.resolve(context.userProperties.get(Constants.MAVEN_PROJECT_EXTENSIONS));
+        file = context.cwd.resolve(eff.get(Constants.MAVEN_PROJECT_EXTENSIONS));
         loaded = readCoreExtensionsDescriptorFromFile(file);
         if (!loaded.isEmpty()) {
             result.add(new CoreExtensions(file, loaded));
         }
 
         // user
-        file = context.userHomeDirectory.resolve(context.userProperties.get(Constants.MAVEN_USER_EXTENSIONS));
+        file = context.userHomeDirectory.resolve(eff.get(Constants.MAVEN_USER_EXTENSIONS));
         loaded = readCoreExtensionsDescriptorFromFile(file);
         if (!loaded.isEmpty()) {
             result.add(new CoreExtensions(file, loaded));
         }
 
         // installation
-        file = context.installationDirectory.resolve(
-                context.userProperties.get(Constants.MAVEN_INSTALLATION_EXTENSIONS));
+        file = context.installationDirectory.resolve(eff.get(Constants.MAVEN_INSTALLATION_EXTENSIONS));
         loaded = readCoreExtensionsDescriptorFromFile(file);
         if (!loaded.isEmpty()) {
             result.add(new CoreExtensions(file, loaded));

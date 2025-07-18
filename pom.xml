@@ -23,12 +23,12 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>44</version>
+    <version>45</version>
     <relativePath />
   </parent>
 
   <artifactId>maven</artifactId>
-  <version>4.0.0-rc-4-SNAPSHOT</version>
+  <version>4.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Apache Maven</name>
@@ -112,8 +112,8 @@ under the License.
     <url>https://github.com/apache/maven/tree/${project.scm.tag}</url>
   </scm>
   <issueManagement>
-    <system>jira</system>
-    <url>https://issues.apache.org/jira/browse/MNG</url>
+    <system>GitHub Issues</system>
+    <url>https://github.com/apache/maven/issues</url>
   </issueManagement>
   <ciManagement>
     <system>Jenkins</system>
@@ -140,36 +140,37 @@ under the License.
     <distributionShortName>Maven</distributionShortName>
     <distributionName>Apache Maven</distributionName>
     <maven.site.path>ref/4-LATEST</maven.site.path>
-    <project.build.outputTimestamp>2025-03-05T09:43:59Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2025-06-24T20:18:00Z</project.build.outputTimestamp>
     <!-- various versions -->
     <assertjVersion>3.27.3</assertjVersion>
     <asmVersion>9.8</asmVersion>
-    <byteBuddyVersion>1.17.5</byteBuddyVersion>
+    <byteBuddyVersion>1.17.6</byteBuddyVersion>
     <classWorldsVersion>2.9.0</classWorldsVersion>
     <commonsCliVersion>1.9.0</commonsCliVersion>
-    <guiceVersion>6.0.0</guiceVersion>
+    <guiceVersion>5.1.0</guiceVersion>
     <guavaVersion>33.4.8-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
     <hamcrestVersion>3.0</hamcrestVersion>
     <jakartaInjectApiVersion>2.0.1</jakartaInjectApiVersion>
     <javaxAnnotationApiVersion>1.3.2</javaxAnnotationApiVersion>
-    <jlineVersion>3.30.0</jlineVersion>
-    <junitVersion>5.12.2</junitVersion>
+    <jlineVersion>3.30.4</jlineVersion>
+    <jmhVersion>1.37</jmhVersion>
+    <junitVersion>5.13.3</junitVersion>
     <jxpathVersion>1.4.0</jxpathVersion>
     <logbackClassicVersion>1.5.18</logbackClassicVersion>
-    <mockitoVersion>5.17.0</mockitoVersion>
+    <mockitoVersion>5.18.0</mockitoVersion>
     <plexusInteractivityVersion>1.4</plexusInteractivityVersion>
     <plexusInterpolationVersion>1.28</plexusInterpolationVersion>
     <plexusTestingVersion>1.5.0</plexusTestingVersion>
     <plexusXmlVersion>4.1.0</plexusXmlVersion>
-    <resolverVersion>2.0.8</resolverVersion>
+    <resolverVersion>2.0.10</resolverVersion>
     <securityDispatcherVersion>4.1.0</securityDispatcherVersion>
-    <sisuVersion>0.9.0.M3</sisuVersion>
+    <sisuVersion>0.9.0.M4</sisuVersion>
     <slf4jVersion>2.0.17</slf4jVersion>
     <stax2ApiVersion>4.2.2</stax2ApiVersion>
     <wagonVersion>3.5.3</wagonVersion>
-    <woodstoxVersion>7.1.0</woodstoxVersion>
-    <xmlunitVersion>2.10.0</xmlunitVersion>
+    <woodstoxVersion>7.1.1</woodstoxVersion>
+    <xmlunitVersion>2.10.3</xmlunitVersion>
     <jacocoArgLine />
   </properties>
 
@@ -352,11 +353,6 @@ under the License.
         <classifier>classes</classifier>
       </dependency>
       <dependency>
-        <groupId>com.google.inject</groupId>
-        <artifactId>guice</artifactId>
-        <version>${guiceVersion}</version>
-      </dependency>
-      <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <version>${guavaVersion}</version>
@@ -410,17 +406,6 @@ under the License.
         <groupId>org.eclipse.sisu</groupId>
         <artifactId>org.eclipse.sisu.inject</artifactId>
         <version>${sisuVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.sisu</groupId>
-        <artifactId>org.eclipse.sisu.inject</artifactId>
-        <version>${sisuVersion}</version>
-        <classifier>no_asm</classifier>
-      </dependency>
-      <dependency>
-        <groupId>jakarta.inject</groupId>
-        <artifactId>jakarta.inject-api</artifactId>
-        <version>${jakartaInjectApiVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.ow2.asm</groupId>
@@ -653,6 +638,12 @@ under the License.
         <artifactId>plexus-testing</artifactId>
         <version>${plexusTestingVersion}</version>
         <scope>test</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.junit</groupId>
@@ -676,7 +667,22 @@ under the License.
       <dependency>
         <groupId>com.google.jimfs</groupId>
         <artifactId>jimfs</artifactId>
-        <version>1.3.0</version>
+        <version>1.3.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jdom</groupId>
+        <artifactId>jdom2</artifactId>
+        <version>2.0.6.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openjdk.jmh</groupId>
+        <artifactId>jmh-core</artifactId>
+        <version>${jmhVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openjdk.jmh</groupId>
+        <artifactId>jmh-generator-annprocess</artifactId>
+        <version>${jmhVersion}</version>
       </dependency>
     </dependencies>
     <!--bootstrap-start-comment-->
@@ -703,32 +709,9 @@ under the License.
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.5.2</version>
           <configuration>
             <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory" />
             <argLine>-Xmx256m @{jacocoArgLine}</argLine>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.modello</groupId>
-          <artifactId>modello-maven-plugin</artifactId>
-          <configuration>
-            <licenseText>Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.</licenseText>
           </configuration>
         </plugin>
         <!-- enforce backwards compatibility -->
@@ -758,7 +741,7 @@ under the License.</licenseText>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>build-helper-maven-plugin</artifactId>
-          <version>3.6.0</version>
+          <version>3.6.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -803,7 +786,19 @@ under the License.</licenseText>
             <dependency>
               <groupId>net.sourceforge.pmd</groupId>
               <artifactId>pmd-core</artifactId>
-              <version>7.12.0</version>
+              <version>7.15.0</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+        <plugin>
+          <groupId>org.eclipse.sisu</groupId>
+          <artifactId>sisu-maven-plugin</artifactId>
+          <version>${sisuVersion}</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.ow2.asm</groupId>
+              <artifactId>asm</artifactId>
+              <version>${asmVersion}</version>
             </dependency>
           </dependencies>
         </plugin>
@@ -813,7 +808,7 @@ under the License.</licenseText>
       <plugin>
         <groupId>io.github.olamy.maven.plugins</groupId>
         <artifactId>jacoco-aggregator-maven-plugin</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.3</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -864,6 +859,28 @@ under the License.</licenseText>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
         <executions>
+          <execution>
+            <id>ensure-no-guice-with-asm</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <excludes>
+                    <!-- we use com.google.inject:classes:guice -->
+                    <exclude>com.google.inject:guice:*</exclude>
+                  </excludes>
+                  <includes>
+                    <include>com.google.inject:guice:*:jar:*:classes</include>
+                  </includes>
+                  <message>use guice without asm shaded in.</message>
+                </bannedDependencies>
+              </rules>
+              <fail>true</fail>
+            </configuration>
+          </execution>
           <execution>
             <id>ensure-no-sonatype-cipher-and-sec-dispatcher</id>
             <goals>

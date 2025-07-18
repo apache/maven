@@ -49,21 +49,25 @@ public class DefaultArtifactRepositoryFactory implements ArtifactRepositoryFacto
     @Inject
     private PlexusContainer container;
 
+    @Override
     public ArtifactRepositoryLayout getLayout(String layoutId) throws UnknownRepositoryLayoutException {
         return factory.getLayout(layoutId);
     }
 
+    @Override
     public ArtifactRepository createDeploymentArtifactRepository(
             String id, String url, String layoutId, boolean uniqueVersion) throws UnknownRepositoryLayoutException {
         return injectSession(factory.createDeploymentArtifactRepository(id, url, layoutId, uniqueVersion), false);
     }
 
+    @Override
     public ArtifactRepository createDeploymentArtifactRepository(
             String id, String url, ArtifactRepositoryLayout repositoryLayout, boolean uniqueVersion) {
         return injectSession(
                 factory.createDeploymentArtifactRepository(id, url, repositoryLayout, uniqueVersion), false);
     }
 
+    @Override
     public ArtifactRepository createArtifactRepository(
             String id,
             String url,
@@ -74,6 +78,7 @@ public class DefaultArtifactRepositoryFactory implements ArtifactRepositoryFacto
         return injectSession(factory.createArtifactRepository(id, url, layoutId, snapshots, releases), true);
     }
 
+    @Override
     public ArtifactRepository createArtifactRepository(
             String id,
             String url,
@@ -83,10 +88,12 @@ public class DefaultArtifactRepositoryFactory implements ArtifactRepositoryFacto
         return injectSession(factory.createArtifactRepository(id, url, repositoryLayout, snapshots, releases), true);
     }
 
+    @Override
     public void setGlobalUpdatePolicy(String updatePolicy) {
         factory.setGlobalUpdatePolicy(updatePolicy);
     }
 
+    @Override
     public void setGlobalChecksumPolicy(String checksumPolicy) {
         factory.setGlobalChecksumPolicy(checksumPolicy);
     }

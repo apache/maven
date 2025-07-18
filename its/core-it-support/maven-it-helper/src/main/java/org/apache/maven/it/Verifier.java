@@ -122,6 +122,8 @@ public class Verifier {
 
     private Path logFile;
 
+    private boolean skipMavenRc = true;
+
     public Verifier(String basedir) throws VerificationException {
         this(basedir, null);
     }
@@ -168,6 +170,10 @@ public class Verifier {
 
     public void setExecutable(String executable) {
         this.executable = requireNonNull(executable);
+    }
+
+    public ExecutorHelper.Mode getDefaultMode() {
+        return executorHelper.getDefaultMode();
     }
 
     public void execute() throws VerificationException {
@@ -221,7 +227,8 @@ public class Verifier {
                     .cwd(basedir)
                     .userHomeDirectory(userHomeDirectory)
                     .jvmArguments(jvmArguments)
-                    .arguments(args);
+                    .arguments(args)
+                    .skipMavenRc(skipMavenRc);
             if (!systemProperties.isEmpty()) {
                 builder.jvmSystemProperties(new HashMap(systemProperties));
             }
@@ -335,6 +342,10 @@ public class Verifier {
 
     public void setForkJvm(boolean forkJvm) {
         this.forkJvm = forkJvm;
+    }
+
+    public void setSkipMavenRc(boolean skipMavenRc) {
+        this.skipMavenRc = skipMavenRc;
     }
 
     public void setHandleLocalRepoTail(boolean handleLocalRepoTail) {
@@ -592,6 +603,7 @@ public class Verifier {
     private static void addMetadataToList(File dir, boolean hasCommand, List<String> l, String command) {
         if (dir.exists() && dir.isDirectory()) {
             String[] files = dir.list(new FilenameFilter() {
+                @Override
                 public boolean accept(File dir, String name) {
                     return name.startsWith("maven-metadata") && name.endsWith(".xml");
                 }

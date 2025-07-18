@@ -33,7 +33,7 @@ import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectExecutionEvent;
 import org.apache.maven.execution.ProjectExecutionListener;
-import org.apache.maven.internal.transformation.ConsumerPomArtifactTransformer;
+import org.apache.maven.internal.transformation.TransformerManager;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.plugin.MojoExecution;
@@ -55,7 +55,7 @@ public class LifecycleModuleBuilder {
     private final BuilderCommon builderCommon;
     private final ExecutionEventCatapult eventCatapult;
     private final ProjectExecutionListener projectExecutionListener;
-    private final ConsumerPomArtifactTransformer consumerPomArtifactTransformer;
+    private final TransformerManager transformerManager;
 
     @Inject
     public LifecycleModuleBuilder(
@@ -63,12 +63,12 @@ public class LifecycleModuleBuilder {
             BuilderCommon builderCommon,
             ExecutionEventCatapult eventCatapult,
             List<ProjectExecutionListener> listeners,
-            ConsumerPomArtifactTransformer consumerPomArtifactTransformer) {
+            TransformerManager transformerManager) {
         this.mojoExecutor = mojoExecutor;
         this.builderCommon = builderCommon;
         this.eventCatapult = eventCatapult;
         this.projectExecutionListener = new CompoundProjectExecutionListener(listeners);
-        this.consumerPomArtifactTransformer = consumerPomArtifactTransformer;
+        this.transformerManager = transformerManager;
     }
 
     public void buildProject(
@@ -93,7 +93,7 @@ public class LifecycleModuleBuilder {
                 return;
             }
 
-            consumerPomArtifactTransformer.injectTransformedArtifacts(session.getRepositorySession(), currentProject);
+            transformerManager.injectTransformedArtifacts(session.getRepositorySession(), currentProject);
 
             BuilderCommon.attachToThread(currentProject);
 

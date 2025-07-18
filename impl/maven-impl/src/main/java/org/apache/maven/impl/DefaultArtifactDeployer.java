@@ -31,7 +31,7 @@ import org.apache.maven.api.services.ArtifactDeployerRequest;
 import org.eclipse.aether.deployment.DeployRequest;
 import org.eclipse.aether.deployment.DeploymentException;
 
-import static org.apache.maven.impl.ImplUtils.nonNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Implementation of {@link ArtifactDeployer} service.
@@ -42,10 +42,10 @@ public class DefaultArtifactDeployer implements ArtifactDeployer {
 
     @Override
     public void deploy(@Nonnull ArtifactDeployerRequest request) {
-        nonNull(request, "request");
+        requireNonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
-        Collection<ProducedArtifact> artifacts = nonNull(request.getArtifacts(), "request.artifacts");
-        RemoteRepository repository = nonNull(request.getRepository(), "request.repository");
+        Collection<ProducedArtifact> artifacts = requireNonNull(request.getArtifacts(), "request.artifacts");
+        RemoteRepository repository = requireNonNull(request.getRepository(), "request.repository");
         try {
             DeployRequest deployRequest = new DeployRequest()
                     .setRepository(session.toRepository(repository))

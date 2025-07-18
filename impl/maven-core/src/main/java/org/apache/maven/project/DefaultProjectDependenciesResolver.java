@@ -68,6 +68,7 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
         this.decorators = decorators;
     }
 
+    @Override
     public DependencyResolutionResult resolve(DependencyResolutionRequest request)
             throws DependencyResolutionException {
         final RequestTrace trace = RequestTrace.newChild(null, request);

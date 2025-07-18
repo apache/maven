@@ -28,6 +28,7 @@ import org.apache.maven.model.PluginExecution;
 /**
  */
 public class EmptyLifecyclePluginAnalyzer implements LifeCyclePluginAnalyzer {
+    @Override
     public Set<Plugin> getPluginsBoundByDefaultToAllLifecycles(String packaging) {
         Set<Plugin> plugins;
 

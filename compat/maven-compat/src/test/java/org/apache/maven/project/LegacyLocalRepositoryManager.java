@@ -44,10 +44,12 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
         this.repository = new LocalRepository(basedir.getAbsoluteFile(), "legacy");
     }
 
+    @Override
     public LocalRepository getRepository() {
         return repository;
     }
 
+    @Override
     public String getPathForLocalArtifact(Artifact artifact) {
         StringBuilder path = new StringBuilder(128);
 
@@ -66,14 +68,17 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
         return path.toString();
     }
 
+    @Override
     public String getPathForRemoteArtifact(Artifact artifact, RemoteRepository repository, String context) {
         return getPathForLocalArtifact(artifact);
     }
 
+    @Override
     public String getPathForLocalMetadata(Metadata metadata) {
         return getPath(metadata, "local");
     }
 
+    @Override
     public String getPathForRemoteMetadata(Metadata metadata, RemoteRepository repository, String context) {
         return getPath(metadata, getRepositoryKey(repository, context));
     }
@@ -113,6 +118,7 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
         return result;
     }
 
+    @Override
     public LocalArtifactResult find(RepositorySystemSession session, LocalArtifactRequest request) {
         String path = getPathForLocalArtifact(request.getArtifact());
         File file = new File(getRepository().getBasedir(), path);
@@ -126,10 +132,12 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
         return result;
     }
 
+    @Override
     public void add(RepositorySystemSession session, LocalArtifactRegistration request) {
         // noop
     }
 
+    @Override
     public LocalMetadataResult find(RepositorySystemSession session, LocalMetadataRequest request) {
         LocalMetadataResult result = new LocalMetadataResult(request);
 
@@ -153,10 +161,12 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
         return result;
     }
 
+    @Override
     public void add(RepositorySystemSession session, LocalMetadataRegistration request) {
         // noop
     }
 
+    @Override
     public String toString() {
         return String.valueOf(getRepository());
     }

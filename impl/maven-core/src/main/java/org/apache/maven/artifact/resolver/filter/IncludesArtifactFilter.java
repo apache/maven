@@ -37,6 +37,7 @@ public class IncludesArtifactFilter implements ArtifactFilter {
         this.patterns = new LinkedHashSet<>(patterns);
     }
 
+    @Override
     public boolean include(Artifact artifact) {
         String id = artifact.getGroupId() + ":" + artifact.getArtifactId();
 

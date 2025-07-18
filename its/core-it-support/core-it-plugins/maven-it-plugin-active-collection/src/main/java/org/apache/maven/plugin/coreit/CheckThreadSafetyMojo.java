@@ -91,6 +91,7 @@ public class CheckThreadSafetyMojo extends AbstractMojo {
             threads[i] = new Thread() {
                 private final ClassLoader tccl = cl;
 
+                @Override
                 public void run() {
                     getLog().info("[MAVEN-CORE-IT-LOG] Thread " + this + " uses " + tccl);
                     Thread.currentThread().setContextClassLoader(tccl);

@@ -37,10 +37,12 @@ public class DefaultRepositoryLayout implements ArtifactRepositoryLayout {
 
     private static final char ARTIFACT_SEPARATOR = '-';
 
+    @Override
     public String getId() {
         return "default";
     }
 
+    @Override
     public String pathOf(Artifact artifact) {
         ArtifactHandler artifactHandler = artifact.getArtifactHandler();
 
@@ -63,6 +65,7 @@ public class DefaultRepositoryLayout implements ArtifactRepositoryLayout {
         return path.toString();
     }
 
+    @Override
     public String pathOfLocalRepositoryMetadata(ArtifactMetadata metadata, ArtifactRepository repository) {
         return pathOfRepositoryMetadata(metadata, metadata.getLocalFilename(repository));
     }
@@ -84,6 +87,7 @@ public class DefaultRepositoryLayout implements ArtifactRepositoryLayout {
         return path.toString();
     }
 
+    @Override
     public String pathOfRemoteRepositoryMetadata(ArtifactMetadata metadata) {
         return pathOfRepositoryMetadata(metadata, metadata.getRemoteFilename());
     }

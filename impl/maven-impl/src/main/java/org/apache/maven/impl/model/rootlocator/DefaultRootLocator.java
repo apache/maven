@@ -58,6 +58,7 @@ public class DefaultRootLocator implements RootLocator {
     }
 
     @Nonnull
+    @Override
     public Path findMandatoryRoot(@Nonnull Path basedir) {
         Path rootDirectory = findRoot(basedir);
         Optional<Path> rdf = getRootDirectoryFallback();

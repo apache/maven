@@ -44,6 +44,7 @@ public class MavenXpp3WriterEx extends MavenXpp3Writer {
      *
      * @param fileComment a fileComment object.
      */
+    @Override
     public void setFileComment(String fileComment) {
         super.setFileComment(fileComment);
     } // -- void setFileComment( String )
@@ -53,6 +54,7 @@ public class MavenXpp3WriterEx extends MavenXpp3Writer {
      *
      * @param stringFormatter
      */
+    @Override
     public void setStringFormatter(InputLocation.StringFormatter stringFormatter) {
         super.setStringFormatter(stringFormatter);
     } // -- void setStringFormatter( InputLocation.StringFormatter )
@@ -64,6 +66,7 @@ public class MavenXpp3WriterEx extends MavenXpp3Writer {
      * @param model a model object.
      * @throws IOException java.io.IOException if any.
      */
+    @Override
     public void write(Writer writer, Model model) throws IOException {
         super.write(writer, model);
     } // -- void write( Writer, Model )
@@ -75,6 +78,7 @@ public class MavenXpp3WriterEx extends MavenXpp3Writer {
      * @param model a model object.
      * @throws IOException java.io.IOException if any.
      */
+    @Override
     public void write(OutputStream stream, Model model) throws IOException {
         super.write(stream, model);
     } // -- void write( OutputStream, Model )

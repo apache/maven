@@ -93,10 +93,12 @@ class ReactorReader implements MavenWorkspaceReader {
     // Public API
     //
 
+    @Override
     public WorkspaceRepository getRepository() {
         return repository;
     }
 
+    @Override
     public File findArtifact(Artifact artifact) {
         MavenProject project = getProject(artifact);
 
@@ -111,10 +113,12 @@ class ReactorReader implements MavenWorkspaceReader {
         // No project, but most certainly a dependency which has been built previously
         File packagedArtifactFile = findInProjectLocalRepository(artifact);
         if (packagedArtifactFile != null && packagedArtifactFile.exists()) {
-            // Check if artifact is up-to-date
-            project = getProject(artifact, getAllProjects());
-            if (project != null) {
-                isPackagedArtifactUpToDate(project, packagedArtifactFile);
+            // Check if artifact is up-to-date (only for non-POM artifacts)
+            if (!"pom".equals(artifact.getExtension())) {
+                project = getProject(artifact, getAllProjects());
+                if (project != null) {
+                    isPackagedArtifactUpToDate(project, packagedArtifactFile);
+                }
             }
             return packagedArtifactFile;
         }
@@ -122,6 +126,7 @@ class ReactorReader implements MavenWorkspaceReader {
         return null;
     }
 
+    @Override
     public List<String> findVersions(Artifact artifact) {
         List<String> versions = getProjects()
                 .getOrDefault(artifact.getGroupId(), Collections.emptyMap())
@@ -173,7 +178,9 @@ class ReactorReader implements MavenWorkspaceReader {
         File packagedArtifactFile = findInProjectLocalRepository(artifact);
         if (packagedArtifactFile != null
                 && packagedArtifactFile.exists()
-                && (!checkUptodate || isPackagedArtifactUpToDate(project, packagedArtifactFile))) {
+                && (!checkUptodate
+                        || "pom".equals(artifact.getExtension())
+                        || isPackagedArtifactUpToDate(project, packagedArtifactFile))) {
             return packagedArtifactFile;
         }
 
@@ -249,7 +256,14 @@ class ReactorReader implements MavenWorkspaceReader {
                                     + "please run a full `mvn package` build",
                             relativizeOutputFile(outputFile),
                             project.getArtifactId());
-                    return true;
+                    return false;
+                } else if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(
+                            "File '{}' timestamp {} vs artifact timestamp {} for '{}'",
+                            relativizeOutputFile(outputFile),
+                            outputFileLastModified,
+                            artifactLastModified,
+                            project.getArtifactId());
                 }
             }
 

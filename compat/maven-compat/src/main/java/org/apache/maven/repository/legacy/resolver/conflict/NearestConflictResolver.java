@@ -40,6 +40,7 @@ public class NearestConflictResolver implements ConflictResolver {
      *      org.apache.maven.artifact.resolver.ResolutionNode)
      */
 
+    @Override
     public ResolutionNode resolveConflict(ResolutionNode node1, ResolutionNode node2) {
         return node1.getDepth() <= node2.getDepth() ? node1 : node2;
     }

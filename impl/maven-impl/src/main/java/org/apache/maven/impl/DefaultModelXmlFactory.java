@@ -40,7 +40,7 @@ import org.apache.maven.api.services.xml.XmlWriterRequest;
 import org.apache.maven.model.v4.MavenStaxReader;
 import org.apache.maven.model.v4.MavenStaxWriter;
 
-import static org.apache.maven.impl.ImplUtils.nonNull;
+import static java.util.Objects.requireNonNull;
 import static org.apache.maven.impl.StaxLocation.getLocation;
 import static org.apache.maven.impl.StaxLocation.getMessage;
 
@@ -50,7 +50,7 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
     @Override
     @Nonnull
     public Model read(@Nonnull XmlReaderRequest request) throws XmlReaderException {
-        nonNull(request, "request");
+        requireNonNull(request, "request");
         Model model = doRead(request);
         if (isModelVersionGreaterThan400(model)
                 && !model.getNamespaceUri().startsWith("http://maven.apache.org/POM/")) {
@@ -92,7 +92,9 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
                 source = new InputSource(
                         request.getModelId(), path != null ? path.toUri().toString() : null);
             }
-            MavenStaxReader xml = new MavenStaxReader();
+            MavenStaxReader xml = request.getTransformer() != null
+                    ? new MavenStaxReader(request.getTransformer()::transform)
+                    : new MavenStaxReader();
             xml.setAddDefaultEntities(request.isAddDefaultEntities());
             if (inputStream != null) {
                 return xml.read(inputStream, request.isStrict(), source);
@@ -114,8 +116,8 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
 
     @Override
     public void write(XmlWriterRequest<Model> request) throws XmlWriterException {
-        nonNull(request, "request");
-        Model content = nonNull(request.getContent(), "content");
+        requireNonNull(request, "request");
+        Model content = requireNonNull(request.getContent(), "content");
         Path path = request.getPath();
         OutputStream outputStream = request.getOutputStream();
         Writer writer = request.getWriter();

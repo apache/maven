@@ -105,14 +105,17 @@ public class DefaultProjectDependencyGraph implements ProjectDependencyGraph {
     /**
      * @since 3.5.0
      */
+    @Override
     public List<MavenProject> getAllProjects() {
         return this.allProjects;
     }
 
+    @Override
     public List<MavenProject> getSortedProjects() {
         return new ArrayList<>(sorter.getSortedProjects());
     }
 
+    @Override
     public List<MavenProject> getDownstreamProjects(MavenProject project, boolean transitive) {
         Objects.requireNonNull(project, "project cannot be null");
 
@@ -131,6 +134,7 @@ public class DefaultProjectDependencyGraph implements ProjectDependencyGraph {
         }
     }
 
+    @Override
     public List<MavenProject> getUpstreamProjects(MavenProject project, boolean transitive) {
         Objects.requireNonNull(project, "project cannot be null");
 

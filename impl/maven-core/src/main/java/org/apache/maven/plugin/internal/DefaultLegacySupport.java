@@ -40,6 +40,7 @@ public class DefaultLegacySupport implements LegacySupport {
 
     private static final ThreadLocal<AtomicReference<MavenSession>> SESSION = new InheritableThreadLocal<>();
 
+    @Override
     public void setSession(MavenSession session) {
         AtomicReference<MavenSession> reference = DefaultLegacySupport.SESSION.get();
         if (reference != null) {
@@ -53,11 +54,13 @@ public class DefaultLegacySupport implements LegacySupport {
         }
     }
 
+    @Override
     public MavenSession getSession() {
         AtomicReference<MavenSession> currentSession = DefaultLegacySupport.SESSION.get();
         return currentSession != null ? currentSession.get() : null;
     }
 
+    @Override
     public RepositorySystemSession getRepositorySession() {
         MavenSession session = getSession();
         return (session != null) ? session.getRepositorySession() : null;

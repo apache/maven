@@ -29,11 +29,13 @@ import org.apache.maven.utils.Os;
 @Deprecated
 public class OperatingSystemProfileActivator implements ProfileActivator {
 
+    @Override
     public boolean canDetermineActivation(Profile profile) {
         Activation activation = profile.getActivation();
         return activation != null && activation.getOs() != null;
     }
 
+    @Override
     public boolean isActive(Profile profile) {
         Activation activation = profile.getActivation();
         ActivationOS os = activation.getOs();

@@ -39,6 +39,7 @@ import org.apache.maven.model.Resource;
 public class DefaultPathTranslator implements PathTranslator {
     private static final String[] BASEDIR_EXPRESSIONS = {"${basedir}", "${pom.basedir}", "${project.basedir}"};
 
+    @Override
     public void alignToBaseDirectory(Model model, File basedir) {
         if (basedir == null) {
             return;
@@ -81,6 +82,7 @@ public class DefaultPathTranslator implements PathTranslator {
         }
     }
 
+    @Override
     public String alignToBaseDirectory(String path, File basedir) {
         if (basedir == null) {
             return path;
@@ -146,6 +148,7 @@ public class DefaultPathTranslator implements PathTranslator {
         return path;
     }
 
+    @Override
     public void unalignFromBaseDirectory(Model model, File basedir) {
         if (basedir == null) {
             return;
@@ -188,6 +191,7 @@ public class DefaultPathTranslator implements PathTranslator {
         }
     }
 
+    @Override
     public String unalignFromBaseDirectory(String path, File basedir) {
         if (basedir == null) {
             return path;

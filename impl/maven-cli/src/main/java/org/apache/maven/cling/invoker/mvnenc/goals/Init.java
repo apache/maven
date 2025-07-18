@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.maven.api.cli.mvnenc.EncryptOptions;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
@@ -62,9 +61,8 @@ public class Init extends InteractiveGoalSupport {
     @SuppressWarnings("MethodLength")
     @Override
     public int doExecute(EncryptContext context) throws Exception {
-        EncryptOptions options = (EncryptOptions) context.invokerRequest.options();
-        boolean force = options.force().orElse(false);
-        boolean yes = options.yes().orElse(false);
+        boolean force = context.options().force().orElse(false);
+        boolean yes = context.options().yes().orElse(false);
 
         if (configExists() && !force) {
             context.logger.error(messageBuilderFactory

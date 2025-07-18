@@ -51,10 +51,12 @@ public class ProjectArtifact extends DefaultArtifact implements ArtifactWithDepe
         return project;
     }
 
+    @Override
     public List<Dependency> getDependencies() {
         return project.getModel().getDependencies();
     }
 
+    @Override
     public List<Dependency> getManagedDependencies() {
         DependencyManagement depMngt = project.getModel().getDependencyManagement();
         return (depMngt != null) ? Collections.unmodifiableList(depMngt.getDependencies()) : Collections.emptyList();

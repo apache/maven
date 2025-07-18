@@ -27,12 +27,13 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.CoreExtensions;
 import org.apache.maven.api.cli.InvokerRequest;
+import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.cisupport.CIInfo;
 
 import static java.util.Objects.requireNonNull;
 
-public abstract class BaseInvokerRequest implements InvokerRequest {
+public class BaseInvokerRequest implements InvokerRequest {
     private final ParserRequest parserRequest;
     private final boolean parsingFailed;
     private final Path cwd;
@@ -44,6 +45,7 @@ public abstract class BaseInvokerRequest implements InvokerRequest {
     private final Path rootDirectory;
     private final List<CoreExtensions> coreExtensions;
     private final CIInfo ciInfo;
+    private final Options options;
 
     @SuppressWarnings("ParameterNumber")
     public BaseInvokerRequest(
@@ -57,7 +59,8 @@ public abstract class BaseInvokerRequest implements InvokerRequest {
             @Nonnull Path topDirectory,
             @Nullable Path rootDirectory,
             @Nullable List<CoreExtensions> coreExtensions,
-            @Nullable CIInfo ciInfo) {
+            @Nullable CIInfo ciInfo,
+            @Nullable Options options) {
         this.parserRequest = requireNonNull(parserRequest);
         this.parsingFailed = parsingFailed;
         this.cwd = requireNonNull(cwd);
@@ -70,6 +73,7 @@ public abstract class BaseInvokerRequest implements InvokerRequest {
         this.rootDirectory = rootDirectory;
         this.coreExtensions = coreExtensions;
         this.ciInfo = ciInfo;
+        this.options = options;
     }
 
     @Override
@@ -125,5 +129,9 @@ public abstract class BaseInvokerRequest implements InvokerRequest {
     @Override
     public Optional<CIInfo> ciInfo() {
         return Optional.ofNullable(ciInfo);
+    }
+
+    public Optional<Options> options() {
+        return Optional.ofNullable(options);
     }
 }

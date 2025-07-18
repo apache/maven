@@ -87,12 +87,14 @@ public class DefaultPluginManager implements PluginManager {
         this.legacySupport = legacySupport;
     }
 
+    @Override
     public void executeMojo(MavenProject project, MojoExecution execution, MavenSession session)
             throws MojoExecutionException, ArtifactResolutionException, MojoFailureException, ArtifactNotFoundException,
                     InvalidDependencyVersionException, PluginManagerException, PluginConfigurationException {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public Object getPluginComponent(Plugin plugin, String role, String roleHint)
             throws PluginManagerException, ComponentLookupException {
         MavenSession session = legacySupport.getSession();
@@ -117,6 +119,7 @@ public class DefaultPluginManager implements PluginManager {
         }
     }
 
+    @Override
     public Map<String, Object> getPluginComponents(Plugin plugin, String role)
             throws ComponentLookupException, PluginManagerException {
         MavenSession session = legacySupport.getSession();
@@ -141,6 +144,7 @@ public class DefaultPluginManager implements PluginManager {
         }
     }
 
+    @Override
     public Plugin getPluginDefinitionForPrefix(String prefix, MavenSession session, MavenProject project) {
         PluginPrefixRequest request = new DefaultPluginPrefixRequest(prefix, session);
         request.setPom(project.getModel());
@@ -158,6 +162,7 @@ public class DefaultPluginManager implements PluginManager {
         }
     }
 
+    @Override
     public PluginDescriptor getPluginDescriptorForPrefix(String prefix) {
         MavenSession session = legacySupport.getSession();
 
@@ -176,6 +181,7 @@ public class DefaultPluginManager implements PluginManager {
         }
     }
 
+    @Override
     public PluginDescriptor loadPluginDescriptor(Plugin plugin, MavenProject project, MavenSession session)
             throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,
                     InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException,
@@ -183,6 +189,7 @@ public class DefaultPluginManager implements PluginManager {
         return verifyPlugin(plugin, project, session.getSettings(), session.getLocalRepository());
     }
 
+    @Override
     public PluginDescriptor loadPluginFully(Plugin plugin, MavenProject project, MavenSession session)
             throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,
                     InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException,
@@ -198,6 +205,7 @@ public class DefaultPluginManager implements PluginManager {
         return pluginDescriptor;
     }
 
+    @Override
     public PluginDescriptor verifyPlugin(
             Plugin plugin, MavenProject project, Settings settings, ArtifactRepository localRepository)
             throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,

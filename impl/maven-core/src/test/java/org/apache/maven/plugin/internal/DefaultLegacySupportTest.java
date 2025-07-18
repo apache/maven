@@ -55,6 +55,7 @@ class DefaultLegacySupportTest {
 
         private volatile MavenSession session;
 
+        @Override
         public void run() {
             try {
                 latch.await();

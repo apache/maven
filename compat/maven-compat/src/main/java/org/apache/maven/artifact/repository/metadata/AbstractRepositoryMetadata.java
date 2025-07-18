@@ -47,14 +47,17 @@ public abstract class AbstractRepositoryMetadata implements RepositoryMetadata {
         this.metadata = metadata;
     }
 
+    @Override
     public String getRemoteFilename() {
         return "maven-metadata.xml";
     }
 
+    @Override
     public String getLocalFilename(ArtifactRepository repository) {
         return "maven-metadata-" + repository.getKey() + ".xml";
     }
 
+    @Override
     public void storeInLocalRepository(ArtifactRepository localRepository, ArtifactRepository remoteRepository)
             throws RepositoryMetadataStoreException {
         try {
@@ -117,6 +120,7 @@ public abstract class AbstractRepositoryMetadata implements RepositoryMetadata {
         }
     }
 
+    @Override
     public String toString() {
         return "repository metadata for: '" + getKey() + "'";
     }
@@ -136,14 +140,17 @@ public abstract class AbstractRepositoryMetadata implements RepositoryMetadata {
         return versioning;
     }
 
+    @Override
     public void setMetadata(Metadata metadata) {
         this.metadata = metadata;
     }
 
+    @Override
     public Metadata getMetadata() {
         return metadata;
     }
 
+    @Override
     public void merge(org.apache.maven.repository.legacy.metadata.ArtifactMetadata metadata) {
         // TODO not sure that it should assume this, maybe the calls to addMetadata should pre-merge, then artifact
         // replaces?
@@ -151,6 +158,7 @@ public abstract class AbstractRepositoryMetadata implements RepositoryMetadata {
         this.metadata.merge(repoMetadata.getMetadata());
     }
 
+    @Override
     public void merge(ArtifactMetadata metadata) {
         // TODO not sure that it should assume this, maybe the calls to addMetadata should pre-merge, then artifact
         // replaces?
@@ -158,6 +166,7 @@ public abstract class AbstractRepositoryMetadata implements RepositoryMetadata {
         this.metadata.merge(repoMetadata.getMetadata());
     }
 
+    @Override
     public String extendedToString() {
         StringBuilder buffer = new StringBuilder(256);
 
@@ -169,10 +178,12 @@ public abstract class AbstractRepositoryMetadata implements RepositoryMetadata {
         return buffer.toString();
     }
 
+    @Override
     public int getNature() {
         return RELEASE;
     }
 
+    @Override
     public ArtifactRepositoryPolicy getPolicy(ArtifactRepository repository) {
         int nature = getNature();
         if ((nature & RepositoryMetadata.RELEASE_OR_SNAPSHOT) == RepositoryMetadata.RELEASE_OR_SNAPSHOT) {

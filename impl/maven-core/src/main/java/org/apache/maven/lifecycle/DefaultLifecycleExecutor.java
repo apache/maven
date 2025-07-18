@@ -78,6 +78,7 @@ public class DefaultLifecycleExecutor implements LifecycleExecutor {
         this.lifecycleStarter = lifecycleStarter;
     }
 
+    @Override
     public void execute(MavenSession session) {
         lifecycleStarter.execute(session);
     }
@@ -94,6 +95,7 @@ public class DefaultLifecycleExecutor implements LifecycleExecutor {
     // TODO This whole method could probably removed by injecting lifeCyclePluginAnalyzer straight into client site.
     // TODO But for some reason the whole plexus appcontext refuses to start when I try this.
 
+    @Override
     public Set<Plugin> getPluginsBoundByDefaultToAllLifecycles(String packaging) {
         return lifeCyclePluginAnalyzer.getPluginsBoundByDefaultToAllLifecycles(packaging);
     }
@@ -107,6 +109,7 @@ public class DefaultLifecycleExecutor implements LifecycleExecutor {
 
     // Used by m2eclipse
 
+    @Override
     @SuppressWarnings({"UnusedDeclaration"})
     public MavenExecutionPlan calculateExecutionPlan(MavenSession session, boolean setup, String... tasks)
             throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
@@ -126,6 +129,7 @@ public class DefaultLifecycleExecutor implements LifecycleExecutor {
                 session, session.getCurrentProject(), mergedSegment.getTasks(), setup);
     }
 
+    @Override
     public MavenExecutionPlan calculateExecutionPlan(MavenSession session, String... tasks)
             throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
                     MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
@@ -135,6 +139,7 @@ public class DefaultLifecycleExecutor implements LifecycleExecutor {
     }
 
     // Site 3.x
+    @Override
     public void calculateForkedExecutions(MojoExecution mojoExecution, MavenSession session)
             throws MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
                     PluginDescriptorParsingException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
@@ -143,6 +148,7 @@ public class DefaultLifecycleExecutor implements LifecycleExecutor {
     }
 
     // Site 3.x
+    @Override
     public List<MavenProject> executeForkedExecutions(MojoExecution mojoExecution, MavenSession session)
             throws LifecycleExecutionException {
         return mojoExecutor.executeForkedExecutions(mojoExecution, session);

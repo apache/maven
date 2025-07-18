@@ -24,70 +24,87 @@ package org.apache.maven.execution;
  */
 public class AbstractExecutionListener implements ExecutionListener {
 
+    @Override
     public void projectDiscoveryStarted(ExecutionEvent event) {
         // default does nothing
     }
 
+    @Override
     public void sessionStarted(ExecutionEvent event) {
         // default does nothing
     }
 
+    @Override
     public void sessionEnded(ExecutionEvent event) {
         // default does nothing
     }
 
+    @Override
     public void projectSkipped(ExecutionEvent event) {
         // default does nothing
     }
 
+    @Override
     public void projectStarted(ExecutionEvent event) {
         // default does nothing
     }
 
+    @Override
     public void projectSucceeded(ExecutionEvent event) {
         // default does nothing
     }
 
+    @Override
     public void projectFailed(ExecutionEvent event) {
         // default does nothing
     }
 
+    @Override
     public void forkStarted(ExecutionEvent event) {
         // default does nothing
     }
 
+    @Override
     public void forkSucceeded(ExecutionEvent event) {
         // default does nothing
     }
 
+    @Override
     public void forkFailed(ExecutionEvent event) {
         // default does nothing
     }
 
+    @Override
     public void mojoSkipped(ExecutionEvent event) {
         // default does nothing
     }
 
+    @Override
     public void mojoStarted(ExecutionEvent event) {
         // default does nothing
     }
 
+    @Override
     public void mojoSucceeded(ExecutionEvent event) {
         // default does nothing
     }
 
+    @Override
     public void mojoFailed(ExecutionEvent event) {
         // default does nothing
     }
 
+    @Override
     public void forkedProjectStarted(ExecutionEvent event) {
         // default does nothing
     }
 
+    @Override
     public void forkedProjectSucceeded(ExecutionEvent event) {
         // default does nothing
     }
 
+    @Override
     public void forkedProjectFailed(ExecutionEvent event) {
         // default does nothing
     }

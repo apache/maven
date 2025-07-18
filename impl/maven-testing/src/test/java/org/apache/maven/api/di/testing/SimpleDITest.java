@@ -25,9 +25,13 @@ import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.plugin.testing.stubs.SessionMock;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
 import static org.apache.maven.api.di.testing.MavenDIExtension.getBasedir;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @MavenDITest
 public class SimpleDITest {
@@ -47,4 +51,26 @@ public class SimpleDITest {
     Session createSession() {
         return SessionMock.getMockSession(LOCAL_REPO);
     }
+
+    @Test
+    void testSetupContainerWithNullContext() {
+        MavenDIExtension extension = new MavenDIExtension();
+        MavenDIExtension.context = null;
+        assertThrows(IllegalStateException.class, extension::setupContainer);
+    }
+
+    @Test
+    void testSetupContainerWithNullTestClass() {
+        final MavenDIExtension extension = new MavenDIExtension();
+        final ExtensionContext context = mock(ExtensionContext.class);
+        when(context.getRequiredTestClass()).thenReturn(null); // Mock null test class
+        when(context.getRequiredTestInstance()).thenReturn(new TestClass()); // Valid instance
+        MavenDIExtension.context = context;
+        assertThrows(
+                IllegalStateException.class,
+                extension::setupContainer,
+                "Should throw IllegalStateException for null test class");
+    }
+
+    static class TestClass {}
 }

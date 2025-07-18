@@ -45,11 +45,9 @@ import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
-import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.cisupport.CIInfo;
 import org.apache.maven.api.cli.logging.AccumulatingLogger;
 import org.apache.maven.api.services.BuilderProblem;
-import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.services.MessageBuilder;
@@ -169,7 +167,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     protected InvokerException.ExitException handleException(C context, Exception e) {
         printErrors(
                 context,
-                context.invokerRequest.options().showErrors().orElse(false),
+                context.options().showErrors().orElse(false),
                 List.of(new Logger.Entry(Logger.Level.ERROR, e.getMessage(), e.getCause())),
                 context.logger);
         return new InvokerException.ExitException(2);
@@ -217,9 +215,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         }
 
         // warn about deprecated options
-        context.invokerRequest
-                .options()
-                .warnAboutDeprecatedOptions(context.invokerRequest.parserRequest(), context.logger::warn);
+        context.options().warnAboutDeprecatedOptions(context.invokerRequest.parserRequest(), context.logger::warn);
     }
 
     protected void pushCoreProperties(C context) throws Exception {
@@ -253,12 +249,11 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected void configureLogging(C context) throws Exception {
         // LOG COLOR
-        Options mavenOptions = context.invokerRequest.options();
-        Map<String, String> userProperties = context.protoSession.getUserProperties();
-        String styleColor = mavenOptions
+        Map<String, String> effectiveProperties = context.protoSession.getEffectiveProperties();
+        String styleColor = context.options()
                 .color()
-                .orElse(userProperties.getOrDefault(
-                        Constants.MAVEN_STYLE_COLOR_PROPERTY, userProperties.getOrDefault("style.color", "auto")))
+                .orElse(effectiveProperties.getOrDefault(
+                        Constants.MAVEN_STYLE_COLOR_PROPERTY, effectiveProperties.getOrDefault("style.color", "auto")))
                 .toLowerCase(Locale.ENGLISH);
         if ("always".equals(styleColor) || "yes".equals(styleColor) || "force".equals(styleColor)) {
             context.coloredOutput = true;
@@ -268,9 +263,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             throw new IllegalArgumentException(
                     "Invalid color configuration value '" + styleColor + "'. Supported are 'auto', 'always', 'never'.");
         } else {
-            boolean isBatchMode = !mavenOptions.forceInteractive().orElse(false)
-                    && mavenOptions.nonInteractive().orElse(false);
-            if (isBatchMode || mavenOptions.logFile().isPresent()) {
+            boolean isBatchMode = !context.options().forceInteractive().orElse(false)
+                    && context.options().nonInteractive().orElse(false);
+            if (isBatchMode || context.options().logFile().isPresent()) {
                 context.coloredOutput = false;
             }
         }
@@ -281,7 +276,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         context.loggerLevel = Slf4jConfiguration.Level.INFO;
         if (context.invokerRequest.effectiveVerbose()) {
             context.loggerLevel = Slf4jConfiguration.Level.DEBUG;
-        } else if (mavenOptions.quiet().orElse(false)) {
+        } else if (context.options().quiet().orElse(false)) {
             context.loggerLevel = Slf4jConfiguration.Level.ERROR;
         }
         context.slf4jConfiguration.setRootLoggerLevel(context.loggerLevel);
@@ -346,7 +341,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
      */
     protected final void doConfigureWithTerminal(C context, Terminal terminal) {
         context.terminal = terminal;
-        Options options = context.invokerRequest.options();
         // tricky thing: align what JLine3 detected and Maven thinks:
         // if embedded, we default to context.coloredOutput=false unless overridden (see above)
         // if not embedded, JLine3 may detect redirection and will create dumb terminal.
@@ -357,7 +351,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                 context.coloredOutput != null ? context.coloredOutput : !Terminal.TYPE_DUMB.equals(terminal.getType()));
 
         // handle rawStreams: some would like to act on true, some on false
-        if (options.rawStreams().orElse(false)) {
+        if (context.options().rawStreams().orElse(false)) {
             doConfigureWithTerminalWithRawStreamsEnabled(context);
         } else {
             doConfigureWithTerminalWithRawStreamsDisabled(context);
@@ -394,9 +388,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected Consumer<String> doDetermineWriter(C context) {
-        Options options = context.invokerRequest.options();
-        if (options.logFile().isPresent()) {
-            Path logFile = context.cwd.resolve(options.logFile().get());
+        if (context.options().logFile().isPresent()) {
+            Path logFile = context.cwd.resolve(context.options().logFile().get());
             try {
                 PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(logFile), true);
                 context.closeables.add(printWriter);
@@ -416,12 +409,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected void activateLogging(C context) throws Exception {
-        InvokerRequest invokerRequest = context.invokerRequest;
-        Options mavenOptions = invokerRequest.options();
-
         context.slf4jConfiguration.activate();
-        if (mavenOptions.failOnSeverity().isPresent()) {
-            String logLevelThreshold = mavenOptions.failOnSeverity().get();
+        if (context.options().failOnSeverity().isPresent()) {
+            String logLevelThreshold = context.options().failOnSeverity().get();
             if (context.loggerFactory instanceof LogLevelRecorder recorder) {
                 LogLevelRecorder.Level level =
                         switch (logLevelThreshold.toLowerCase(Locale.ENGLISH)) {
@@ -449,13 +439,12 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected void helpOrVersionAndMayExit(C context) throws Exception {
-        InvokerRequest invokerRequest = context.invokerRequest;
-        if (invokerRequest.options().help().isPresent()) {
+        if (context.options().help().isPresent()) {
             Consumer<String> writer = determineWriter(context);
-            invokerRequest.options().displayHelp(context.invokerRequest.parserRequest(), writer);
+            context.options().displayHelp(context.invokerRequest.parserRequest(), writer);
             throw new InvokerException.ExitException(0);
         }
-        if (invokerRequest.options().showVersionAndExit().isPresent()) {
+        if (context.options().showVersionAndExit().isPresent()) {
             showVersion(context);
             throw new InvokerException.ExitException(0);
         }
@@ -463,10 +452,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected void showVersion(C context) {
         Consumer<String> writer = determineWriter(context);
-        InvokerRequest invokerRequest = context.invokerRequest;
-        if (invokerRequest.options().quiet().orElse(false)) {
+        if (context.options().quiet().orElse(false)) {
             writer.accept(CLIReportingUtils.showVersionMinimal());
-        } else if (invokerRequest.effectiveVerbose()) {
+        } else if (context.invokerRequest.effectiveVerbose()) {
             writer.accept(CLIReportingUtils.showVersion(
                     ProcessHandle.current().info().commandLine().orElse(null), describe(context.terminal)));
 
@@ -495,7 +483,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected void preCommands(C context) throws Exception {
         boolean verbose = context.invokerRequest.effectiveVerbose();
-        boolean version = context.invokerRequest.options().showVersion().orElse(false);
+        boolean version = context.options().showVersion().orElse(false);
         if (verbose || version) {
             showVersion(context);
         }
@@ -550,12 +538,11 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected void postCommands(C context) throws Exception {
-        InvokerRequest invokerRequest = context.invokerRequest;
         Logger logger = context.logger;
-        if (invokerRequest.options().showErrors().orElse(false)) {
+        if (context.options().showErrors().orElse(false)) {
             logger.info("Error stacktraces are turned on.");
         }
-        if (context.invokerRequest.options().verbose().orElse(false)) {
+        if (context.options().verbose().orElse(false)) {
             logger.debug("Message scheme: " + (MessageUtils.isColorEnabled() ? "color" : "plain"));
             if (MessageUtils.isColorEnabled()) {
                 MessageBuilder buff = MessageUtils.builder();
@@ -594,19 +581,17 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
      */
     protected Runnable settings(C context, boolean emitSettingsWarnings, SettingsBuilder settingsBuilder)
             throws Exception {
-        Options mavenOptions = context.invokerRequest.options();
-
         Path userSettingsFile = null;
-        if (mavenOptions.altUserSettings().isPresent()) {
+        if (context.options().altUserSettings().isPresent()) {
             userSettingsFile =
-                    context.cwd.resolve(mavenOptions.altUserSettings().get());
+                    context.cwd.resolve(context.options().altUserSettings().get());
 
             if (!Files.isRegularFile(userSettingsFile)) {
                 throw new FileNotFoundException("The specified user settings file does not exist: " + userSettingsFile);
             }
         } else {
             String userSettingsFileStr =
-                    context.protoSession.getUserProperties().get(Constants.MAVEN_USER_SETTINGS);
+                    context.protoSession.getEffectiveProperties().get(Constants.MAVEN_USER_SETTINGS);
             if (userSettingsFileStr != null) {
                 userSettingsFile =
                         context.userDirectory.resolve(userSettingsFileStr).normalize();
@@ -614,9 +599,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         }
 
         Path projectSettingsFile = null;
-        if (mavenOptions.altProjectSettings().isPresent()) {
+        if (context.options().altProjectSettings().isPresent()) {
             projectSettingsFile =
-                    context.cwd.resolve(mavenOptions.altProjectSettings().get());
+                    context.cwd.resolve(context.options().altProjectSettings().get());
 
             if (!Files.isRegularFile(projectSettingsFile)) {
                 throw new FileNotFoundException(
@@ -624,16 +609,16 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             }
         } else {
             String projectSettingsFileStr =
-                    context.protoSession.getUserProperties().get(Constants.MAVEN_PROJECT_SETTINGS);
+                    context.protoSession.getEffectiveProperties().get(Constants.MAVEN_PROJECT_SETTINGS);
             if (projectSettingsFileStr != null) {
                 projectSettingsFile = context.cwd.resolve(projectSettingsFileStr);
             }
         }
 
         Path installationSettingsFile = null;
-        if (mavenOptions.altInstallationSettings().isPresent()) {
-            installationSettingsFile =
-                    context.cwd.resolve(mavenOptions.altInstallationSettings().get());
+        if (context.options().altInstallationSettings().isPresent()) {
+            installationSettingsFile = context.cwd.resolve(
+                    context.options().altInstallationSettings().get());
 
             if (!Files.isRegularFile(installationSettingsFile)) {
                 throw new FileNotFoundException(
@@ -641,7 +626,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             }
         } else {
             String installationSettingsFileStr =
-                    context.protoSession.getUserProperties().get(Constants.MAVEN_INSTALLATION_SETTINGS);
+                    context.protoSession.getEffectiveProperties().get(Constants.MAVEN_INSTALLATION_SETTINGS);
             if (installationSettingsFileStr != null) {
                 installationSettingsFile = context.installationDirectory
                         .resolve(installationSettingsFileStr)
@@ -653,8 +638,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         context.projectSettingsPath = projectSettingsFile;
         context.userSettingsPath = userSettingsFile;
 
-        UnaryOperator<String> interpolationSource = Interpolator.chain(
-                context.protoSession.getUserProperties()::get, context.protoSession.getSystemProperties()::get);
+        UnaryOperator<String> interpolationSource = context.protoSession.getEffectiveProperties()::get;
         SettingsBuilderRequest settingsRequest = SettingsBuilderRequest.builder()
                 .session(context.protoSession)
                 .installationSettingsSource(
@@ -698,7 +682,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                     "%s %s encountered while building the effective settings (use -e to see details)",
                     totalProblems, (totalProblems == 1) ? "problem was" : "problems were"));
 
-            if (context.invokerRequest.options().showErrors().orElse(false)) {
+            if (context.options().showErrors().orElse(false)) {
                 for (BuilderProblem problem :
                         settingsResult.getProblems().problems().toList()) {
                     context.logger.warn(problem.getMessage() + " @ " + problem.getLocation());
@@ -722,8 +706,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     protected void customizeSettingsResult(C context, SettingsBuilderResult settingsBuilderResult) throws Exception {}
 
     protected boolean mayDisableInteractiveMode(C context, boolean proposedInteractive) {
-        if (!context.invokerRequest.options().forceInteractive().orElse(false)) {
-            if (context.invokerRequest.options().nonInteractive().orElse(false)) {
+        if (!context.options().forceInteractive().orElse(false)) {
+            if (context.options().nonInteractive().orElse(false)) {
                 return false;
             } else {
                 if (context.invokerRequest.ciInfo().isPresent()) {
@@ -740,14 +724,15 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected Path localRepositoryPath(C context) {
         // user override
-        String userDefinedLocalRepo = context.protoSession.getUserProperties().get(Constants.MAVEN_REPO_LOCAL);
+        String userDefinedLocalRepo =
+                context.protoSession.getEffectiveProperties().get(Constants.MAVEN_REPO_LOCAL);
         if (userDefinedLocalRepo == null) {
-            userDefinedLocalRepo = context.protoSession.getUserProperties().get(Constants.MAVEN_REPO_LOCAL);
+            userDefinedLocalRepo = context.protoSession.getEffectiveProperties().get(Constants.MAVEN_REPO_LOCAL);
             if (userDefinedLocalRepo != null) {
                 context.logger.warn("The property '" + Constants.MAVEN_REPO_LOCAL
                         + "' has been set using a JVM system property which is deprecated. "
                         + "The property can be passed as a Maven argument or in the Maven project configuration file,"
-                        + "usually located at ${session.rootDirectory}/.mvn/maven.properties.");
+                        + "usually located at ${session.rootDirectory}/.mvn/maven-user.properties.");
             }
         }
         if (userDefinedLocalRepo != null) {
@@ -760,7 +745,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         }
         // defaults
         return context.userDirectory
-                .resolve(context.protoSession.getUserProperties().get(Constants.MAVEN_USER_CONF))
+                .resolve(context.protoSession.getEffectiveProperties().get(Constants.MAVEN_USER_CONF))
                 .resolve("repository")
                 .normalize();
     }
@@ -768,13 +753,12 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     protected void populateRequest(C context, Lookup lookup, MavenExecutionRequest request) throws Exception {
         populateRequestFromSettings(request, context.effectiveSettings);
 
-        Options options = context.invokerRequest.options();
         request.setLoggingLevel(toMavenExecutionRequestLoggingLevel(context.loggerLevel));
         request.setLocalRepositoryPath(context.localRepositoryPath.toFile());
         request.setLocalRepository(createLocalArtifactRepository(context.localRepositoryPath));
 
         request.setInteractiveMode(context.interactive);
-        request.setShowErrors(options.showErrors().orElse(false));
+        request.setShowErrors(context.options().showErrors().orElse(false));
         request.setBaseDirectory(context.invokerRequest.topDirectory().toFile());
         request.setSystemProperties(toProperties(context.protoSession.getSystemProperties()));
         request.setUserProperties(toProperties(context.protoSession.getUserProperties()));

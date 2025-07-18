@@ -85,6 +85,7 @@ public class DefaultLegacyArtifactCollector implements LegacyArtifactCollector {
         }
     }
 
+    @Override
     @SuppressWarnings("checkstyle:parameternumber")
     public ArtifactResolutionResult collect(
             Set<Artifact> artifacts,
@@ -104,6 +105,7 @@ public class DefaultLegacyArtifactCollector implements LegacyArtifactCollector {
                 artifacts, originatingArtifact, managedVersions, request, source, filter, listeners, conflictResolvers);
     }
 
+    @Override
     @SuppressWarnings("checkstyle:parameternumber")
     public ArtifactResolutionResult collect(
             Set<Artifact> artifacts,
@@ -714,6 +716,7 @@ public class DefaultLegacyArtifactCollector implements LegacyArtifactCollector {
         }
     }
 
+    @Override
     @SuppressWarnings("checkstyle:parameternumber")
     public ArtifactResolutionResult collect(
             Set<Artifact> artifacts,

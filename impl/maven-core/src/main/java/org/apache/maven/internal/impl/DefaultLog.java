@@ -32,6 +32,7 @@ public class DefaultLog implements Log {
         this.logger = requireNonNull(logger);
     }
 
+    @Override
     public void debug(CharSequence content) {
         if (isDebugEnabled()) {
             logger.debug(toString(content));

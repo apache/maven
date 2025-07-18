@@ -192,21 +192,26 @@ public class MavenProperties extends AbstractMap<String, String> {
                     final Iterator<Entry<String, String>> keyIterator =
                             storage.entrySet().iterator();
 
+                    @Override
                     public boolean hasNext() {
                         return keyIterator.hasNext();
                     }
 
+                    @Override
                     public Entry<String, String> next() {
                         final Entry<String, String> entry = keyIterator.next();
                         return new Entry<String, String>() {
+                            @Override
                             public String getKey() {
                                 return entry.getKey();
                             }
 
+                            @Override
                             public String getValue() {
                                 return entry.getValue();
                             }
 
+                            @Override
                             public String setValue(String value) {
                                 String old = entry.setValue(value);
                                 if (old == null || !old.equals(value)) {
@@ -220,6 +225,7 @@ public class MavenProperties extends AbstractMap<String, String> {
                         };
                     }
 
+                    @Override
                     public void remove() {
                         keyIterator.remove();
                     }

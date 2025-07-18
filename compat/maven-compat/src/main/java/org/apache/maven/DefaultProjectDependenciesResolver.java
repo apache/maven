@@ -64,11 +64,13 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
         this.resolutionErrorHandler = resolutionErrorHandler;
     }
 
+    @Override
     public Set<Artifact> resolve(MavenProject project, Collection<String> scopesToResolve, MavenSession session)
             throws ArtifactResolutionException, ArtifactNotFoundException {
         return resolve(Collections.singleton(project), scopesToResolve, session);
     }
 
+    @Override
     public Set<Artifact> resolve(
             MavenProject project,
             Collection<String> scopesToCollect,
@@ -80,12 +82,14 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
                 mavenProjects, scopesToCollect, scopesToResolve, session, getIgnorableArtifacts(mavenProjects));
     }
 
+    @Override
     public Set<Artifact> resolve(
             Collection<? extends MavenProject> projects, Collection<String> scopesToResolve, MavenSession session)
             throws ArtifactResolutionException, ArtifactNotFoundException {
         return resolveImpl(projects, null, scopesToResolve, session, getIgnorableArtifacts(projects));
     }
 
+    @Override
     public Set<Artifact> resolve(
             MavenProject project,
             Collection<String> scopesToCollect,

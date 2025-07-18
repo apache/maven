@@ -48,7 +48,7 @@ public class MavenShellCling extends ClingSupport {
      * ClassWorld Launcher "enhanced" entry point: returning exitCode and accepts Class World.
      */
     public static int main(String[] args, ClassWorld world) throws IOException {
-        return new MavenShellCling().run(args, null, null, null, false);
+        return new MavenShellCling(world).run(args, null, null, null, false);
     }
 
     /**
@@ -75,7 +75,7 @@ public class MavenShellCling extends ClingSupport {
     @Override
     protected Invoker createInvoker() {
         return new ShellInvoker(
-                ProtoLookup.builder().addMapping(ClassWorld.class, classWorld).build());
+                ProtoLookup.builder().addMapping(ClassWorld.class, classWorld).build(), null);
     }
 
     @Override

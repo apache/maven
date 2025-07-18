@@ -47,6 +47,7 @@ public class ClasspathContainer implements Iterable<ArtifactMetadata> {
     }
 
     // -------------------------------------------------------------------------------------------
+    @Override
     public Iterator<ArtifactMetadata> iterator() {
         return classpath == null ? null : classpath.iterator();
     }

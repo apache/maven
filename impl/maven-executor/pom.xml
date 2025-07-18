@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-impl-modules</artifactId>
-    <version>4.0.0-rc-4-SNAPSHOT</version>
+    <version>4.1.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-executor</artifactId>
@@ -121,6 +121,7 @@ under the License.
             <maven4version>${maven4version}</maven4version>
             <maven3home>${project.build.directory}/dependency/apache-maven-${maven3version}</maven3home>
             <maven4home>${project.build.directory}/dependency/apache-maven-${maven4version}</maven4home>
+            <localRepository>${settings.localRepository}</localRepository>
           </systemPropertyVariables>
         </configuration>
       </plugin>

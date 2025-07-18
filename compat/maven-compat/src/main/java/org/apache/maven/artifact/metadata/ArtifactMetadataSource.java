@@ -32,8 +32,10 @@ import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
 @Deprecated
 public interface ArtifactMetadataSource extends org.apache.maven.repository.legacy.metadata.ArtifactMetadataSource {
 
+    @Override
     ResolutionGroup retrieve(MetadataResolutionRequest request) throws ArtifactMetadataRetrievalException;
 
+    @Override
     ResolutionGroup retrieve(
             Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories)
             throws ArtifactMetadataRetrievalException;
@@ -41,10 +43,12 @@ public interface ArtifactMetadataSource extends org.apache.maven.repository.lega
     List<ArtifactVersion> retrieveAvailableVersions(MetadataResolutionRequest request)
             throws ArtifactMetadataRetrievalException;
 
+    @Override
     List<ArtifactVersion> retrieveAvailableVersions(
             Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories)
             throws ArtifactMetadataRetrievalException;
 
+    @Override
     List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository(
             Artifact artifact, ArtifactRepository localRepository, ArtifactRepository remoteRepository)
             throws ArtifactMetadataRetrievalException;

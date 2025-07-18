@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.api.cli.InvokerRequest;
+import org.apache.maven.api.cli.mvnenc.EncryptOptions;
 import org.apache.maven.cling.invoker.LookupContext;
 import org.jline.reader.LineReader;
 import org.jline.utils.AttributedString;
@@ -30,12 +31,8 @@ import org.jline.utils.AttributedStyle;
 
 @SuppressWarnings("VisibilityModifier")
 public class EncryptContext extends LookupContext {
-    public EncryptContext(InvokerRequest invokerRequest) {
-        this(invokerRequest, true);
-    }
-
-    public EncryptContext(InvokerRequest invokerRequest, boolean containerCapsuleManaged) {
-        super(invokerRequest, containerCapsuleManaged);
+    public EncryptContext(InvokerRequest invokerRequest, EncryptOptions encryptOptions) {
+        super(invokerRequest, true, encryptOptions);
     }
 
     public Map<String, Goal> goals;
@@ -52,5 +49,10 @@ public class EncryptContext extends LookupContext {
         AttributedStringBuilder asb = new AttributedStringBuilder();
         asb.style(style).append(text);
         header.add(asb.toAttributedString());
+    }
+
+    @Override
+    public EncryptOptions options() {
+        return (EncryptOptions) super.options();
     }
 }

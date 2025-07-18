@@ -31,6 +31,7 @@ public class InversionArtifactFilter implements ArtifactFilter {
         this.toInvert = toInvert;
     }
 
+    @Override
     public boolean include(Artifact artifact) {
         return !toInvert.include(artifact);
     }

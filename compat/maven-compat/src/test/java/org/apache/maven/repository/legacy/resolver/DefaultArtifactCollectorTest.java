@@ -828,6 +828,7 @@ class DefaultArtifactCollectorTest {
 
         private Map<String, List<ArtifactVersion>> versions = new HashMap<>();
 
+        @Override
         public ResolutionGroup retrieve(
                 Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories)
                 throws ArtifactMetadataRetrievalException {
@@ -901,12 +902,14 @@ class DefaultArtifactCollectorTest {
             }
         }
 
+        @Override
         public List<ArtifactVersion> retrieveAvailableVersions(
                 Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories)
                 throws ArtifactMetadataRetrievalException {
             return retrieveAvailableVersions(artifact);
         }
 
+        @Override
         public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository(
                 Artifact artifact, ArtifactRepository localRepository, ArtifactRepository remoteRepository)
                 throws ArtifactMetadataRetrievalException {
@@ -921,10 +924,12 @@ class DefaultArtifactCollectorTest {
             return artifactVersions;
         }
 
+        @Override
         public ResolutionGroup retrieve(MetadataResolutionRequest request) throws ArtifactMetadataRetrievalException {
             return retrieve(request.getArtifact(), request.getLocalRepository(), request.getRemoteRepositories());
         }
 
+        @Override
         public List<ArtifactVersion> retrieveAvailableVersions(MetadataResolutionRequest request)
                 throws ArtifactMetadataRetrievalException {
             return retrieveAvailableVersions(

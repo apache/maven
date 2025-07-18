@@ -128,6 +128,7 @@ public class DefaultArtifactResolver implements ArtifactResolver, Disposable {
         }
     }
 
+    @Override
     public void resolve(
             Artifact artifact,
             List<ArtifactRepository> remoteRepositories,
@@ -137,6 +138,7 @@ public class DefaultArtifactResolver implements ArtifactResolver, Disposable {
         resolve(artifact, remoteRepositories, getSession(localRepository));
     }
 
+    @Override
     public void resolveAlways(
             Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository)
             throws ArtifactResolutionException, ArtifactNotFoundException {
@@ -217,6 +219,7 @@ public class DefaultArtifactResolver implements ArtifactResolver, Disposable {
         }
     }
 
+    @Override
     public ArtifactResolutionResult resolveTransitively(
             Set<Artifact> artifacts,
             Artifact originatingArtifact,
@@ -235,6 +238,7 @@ public class DefaultArtifactResolver implements ArtifactResolver, Disposable {
                 filter);
     }
 
+    @Override
     public ArtifactResolutionResult resolveTransitively(
             Set<Artifact> artifacts,
             Artifact originatingArtifact,
@@ -247,6 +251,7 @@ public class DefaultArtifactResolver implements ArtifactResolver, Disposable {
                 artifacts, originatingArtifact, managedVersions, localRepository, remoteRepositories, source, null);
     }
 
+    @Override
     public ArtifactResolutionResult resolveTransitively(
             Set<Artifact> artifacts,
             Artifact originatingArtifact,
@@ -267,6 +272,7 @@ public class DefaultArtifactResolver implements ArtifactResolver, Disposable {
                 null);
     }
 
+    @Override
     public ArtifactResolutionResult resolveTransitively(
             Set<Artifact> artifacts,
             Artifact originatingArtifact,
@@ -277,6 +283,7 @@ public class DefaultArtifactResolver implements ArtifactResolver, Disposable {
         return resolveTransitively(artifacts, originatingArtifact, localRepository, remoteRepositories, source, null);
     }
 
+    @Override
     public ArtifactResolutionResult resolveTransitively(
             Set<Artifact> artifacts,
             Artifact originatingArtifact,
@@ -296,6 +303,7 @@ public class DefaultArtifactResolver implements ArtifactResolver, Disposable {
                 listeners);
     }
 
+    @Override
     @SuppressWarnings("checkstyle:parameternumber")
     public ArtifactResolutionResult resolveTransitively(
             Set<Artifact> artifacts,
@@ -365,6 +373,7 @@ public class DefaultArtifactResolver implements ArtifactResolver, Disposable {
     //
     // ------------------------------------------------------------------------
 
+    @Override
     @SuppressWarnings("checkstyle:methodlength")
     public ArtifactResolutionResult resolve(ArtifactResolutionRequest request) {
         Artifact rootArtifact = request.getArtifact();
@@ -523,6 +532,7 @@ public class DefaultArtifactResolver implements ArtifactResolver, Disposable {
         return result;
     }
 
+    @Override
     public void resolve(
             Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository)
             throws ArtifactResolutionException, ArtifactNotFoundException {
@@ -540,6 +550,7 @@ public class DefaultArtifactResolver implements ArtifactResolver, Disposable {
 
         static final AtomicInteger THREAD_NUMBER = new AtomicInteger(1);
 
+        @Override
         public Thread newThread(Runnable r) {
             Thread newThread = new Thread(GROUP, r, "resolver-" + THREAD_NUMBER.getAndIncrement());
             newThread.setDaemon(true);
@@ -577,6 +588,7 @@ public class DefaultArtifactResolver implements ArtifactResolver, Disposable {
             this.result = result;
         }
 
+        @Override
         public void run() {
             ClassLoader old = Thread.currentThread().getContextClassLoader();
             try {

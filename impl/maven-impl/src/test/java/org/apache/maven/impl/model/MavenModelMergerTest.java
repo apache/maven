@@ -79,11 +79,12 @@ class MavenModelMergerTest {
         assertEquals(modelPrerequisites, builder.build().getPrerequisites());
     }
 
-    // Profiles are neither inherited nor injected
+    // Profiles are neither inherited nor injected during inheritance assembly
     @Test
     void testMergeModelProfiles() {
+        Profile parentProfile = Profile.newBuilder().id("PARENT").build();
         Model parent = Model.newBuilder()
-                .profiles(Collections.singletonList(Profile.newInstance()))
+                .profiles(Collections.singletonList(parentProfile))
                 .build();
         Model model = Model.newInstance();
         Model.Builder builder = Model.newBuilder(model);
@@ -95,7 +96,8 @@ class MavenModelMergerTest {
                 .profiles(Collections.singletonList(modelProfile))
                 .build();
         builder = Model.newBuilder(model);
-        modelMerger.mergeModel_Prerequisites(builder, model, parent, false, null);
-        assertEquals(Collections.singletonList(modelProfile), builder.build().getProfiles());
+        modelMerger.mergeModel_Profiles(builder, model, parent, false, null);
+        assertEquals(1, builder.build().getProfiles().size());
+        assertEquals("MODEL", builder.build().getProfiles().get(0).getId());
     }
 }

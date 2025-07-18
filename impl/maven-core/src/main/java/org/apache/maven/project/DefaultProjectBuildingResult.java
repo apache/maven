@@ -73,22 +73,27 @@ class DefaultProjectBuildingResult implements ProjectBuildingResult {
         this.dependencyResolutionResult = null;
     }
 
+    @Override
     public String getProjectId() {
         return projectId;
     }
 
+    @Override
     public File getPomFile() {
         return pomFile;
     }
 
+    @Override
     public MavenProject getProject() {
         return project;
     }
 
+    @Override
     public List<ModelProblem> getProblems() {
         return problems;
     }
 
+    @Override
     public DependencyResolutionResult getDependencyResolutionResult() {
         return dependencyResolutionResult;
     }

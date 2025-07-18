@@ -78,6 +78,7 @@ public class ConcurrentLifecycleStarter implements LifecycleStarter {
         this.mojoDescriptorCreator = mojoDescriptorCreator;
     }
 
+    @Override
     public void execute(MavenSession session) {
         eventCatapult.fire(ExecutionEvent.Type.SessionStarted, session, null);
 

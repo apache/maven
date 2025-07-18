@@ -48,6 +48,7 @@ public class DefaultMavenSettingsBuilder extends AbstractLogEnabled implements M
         this.settingsBuilder = settingsBuilder;
     }
 
+    @Override
     public Settings buildSettings() throws IOException, XmlPullParserException {
         File userSettingsFile = getFile(
                 "${user.home}/.m2/settings.xml", "user.home", MavenSettingsBuilder.ALT_USER_SETTINGS_XML_LOCATION);
@@ -55,10 +56,12 @@ public class DefaultMavenSettingsBuilder extends AbstractLogEnabled implements M
         return buildSettings(userSettingsFile);
     }
 
+    @Override
     public Settings buildSettings(boolean useCachedSettings) throws IOException, XmlPullParserException {
         return buildSettings();
     }
 
+    @Override
     public Settings buildSettings(File userSettingsFile) throws IOException, XmlPullParserException {
         File globalSettingsFile = getFile(
                 "${maven.conf}/settings.xml", "maven.conf", MavenSettingsBuilder.ALT_GLOBAL_SETTINGS_XML_LOCATION);
@@ -70,6 +73,7 @@ public class DefaultMavenSettingsBuilder extends AbstractLogEnabled implements M
         return build(request);
     }
 
+    @Override
     public Settings buildSettings(File userSettingsFile, boolean useCachedSettings)
             throws IOException, XmlPullParserException {
         return buildSettings(userSettingsFile);
@@ -84,6 +88,7 @@ public class DefaultMavenSettingsBuilder extends AbstractLogEnabled implements M
     }
 
     /** @since 2.1 */
+    @Override
     public Settings buildSettings(MavenExecutionRequest request) throws IOException, XmlPullParserException {
         SettingsBuildingRequest settingsRequest = new DefaultSettingsBuildingRequest();
         settingsRequest.setUserSettingsFile(request.getUserSettingsFile());

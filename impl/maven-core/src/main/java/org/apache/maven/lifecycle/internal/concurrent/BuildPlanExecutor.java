@@ -58,7 +58,7 @@ import org.apache.maven.execution.ProjectExecutionListener;
 import org.apache.maven.impl.util.PhasingExecutor;
 import org.apache.maven.internal.MultilineMessageHelper;
 import org.apache.maven.internal.impl.DefaultLifecycleRegistry;
-import org.apache.maven.internal.transformation.ConsumerPomArtifactTransformer;
+import org.apache.maven.internal.transformation.TransformerManager;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
@@ -156,7 +156,7 @@ public class BuildPlanExecutor {
     private final MojoExecutor mojoExecutor;
     private final ExecutionEventCatapult eventCatapult;
     private final ProjectExecutionListener projectExecutionListener;
-    private final ConsumerPomArtifactTransformer consumerPomArtifactTransformer;
+    private final TransformerManager transformerManager;
     private final BuildPlanLogger buildPlanLogger;
     private final Map<String, MojoExecutionConfigurator> mojoExecutionConfigurators;
     private final MavenPluginManager mavenPluginManager;
@@ -169,7 +169,7 @@ public class BuildPlanExecutor {
             @Named("concurrent") MojoExecutor mojoExecutor,
             ExecutionEventCatapult eventCatapult,
             List<ProjectExecutionListener> listeners,
-            ConsumerPomArtifactTransformer consumerPomArtifactTransformer,
+            TransformerManager transformerManager,
             BuildPlanLogger buildPlanLogger,
             Map<String, MojoExecutionConfigurator> mojoExecutionConfigurators,
             MavenPluginManager mavenPluginManager,
@@ -178,7 +178,7 @@ public class BuildPlanExecutor {
         this.mojoExecutor = mojoExecutor;
         this.eventCatapult = eventCatapult;
         this.projectExecutionListener = new CompoundProjectExecutionListener(listeners);
-        this.consumerPomArtifactTransformer = consumerPomArtifactTransformer;
+        this.transformerManager = transformerManager;
         this.buildPlanLogger = buildPlanLogger;
         this.mojoExecutionConfigurators = mojoExecutionConfigurators;
         this.mavenPluginManager = mavenPluginManager;
@@ -499,8 +499,7 @@ public class BuildPlanExecutor {
                     throw new IllegalStateException();
                 case SETUP:
                     attachToThread(step);
-                    consumerPomArtifactTransformer.injectTransformedArtifacts(
-                            session.getRepositorySession(), step.project);
+                    transformerManager.injectTransformedArtifacts(session.getRepositorySession(), step.project);
                     projectExecutionListener.beforeProjectExecution(new ProjectExecutionEvent(session, step.project));
                     eventCatapult.fire(ExecutionEvent.Type.ProjectStarted, session, null);
                     break;

@@ -31,18 +31,21 @@ class CompoundMojoExecutionListener implements MojoExecutionListener {
         this.listeners = listeners; // NB this is live injected collection
     }
 
+    @Override
     public void beforeMojoExecution(MojoExecutionEvent event) throws MojoExecutionException {
         for (MojoExecutionListener listener : listeners) {
             listener.beforeMojoExecution(event);
         }
     }
 
+    @Override
     public void afterMojoExecutionSuccess(MojoExecutionEvent event) throws MojoExecutionException {
         for (MojoExecutionListener listener : listeners) {
             listener.afterMojoExecutionSuccess(event);
         }
     }
 
+    @Override
     public void afterExecutionFailure(MojoExecutionEvent event) {
         for (MojoExecutionListener listener : listeners) {
             listener.afterExecutionFailure(event);

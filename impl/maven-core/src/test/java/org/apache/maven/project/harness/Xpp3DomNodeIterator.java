@@ -71,6 +71,7 @@ class Xpp3DomNodeIterator implements NodeIterator {
         }
     }
 
+    @Override
     public NodePointer getNodePointer() {
         if (position == 0) {
             setPosition(1);
@@ -78,10 +79,12 @@ class Xpp3DomNodeIterator implements NodeIterator {
         return (child == null) ? null : new Xpp3DomNodePointer(parent, child);
     }
 
+    @Override
     public int getPosition() {
         return position;
     }
 
+    @Override
     public boolean setPosition(int position) {
         this.position = position;
         filterChildren(position);

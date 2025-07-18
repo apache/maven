@@ -41,6 +41,7 @@ class PlexusContainerDefaultDependenciesValidator extends AbstractMavenPluginDep
         super(pluginValidationManager);
     }
 
+    @Override
     protected void doValidate(
             RepositorySystemSession session,
             Artifact pluginArtifact,

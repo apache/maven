@@ -28,12 +28,15 @@ import org.eclipse.aether.repository.ArtifactRepository;
  */
 public class PluginVersionResolverStub implements PluginVersionResolver {
 
+    @Override
     public PluginVersionResult resolve(PluginVersionRequest request) throws PluginVersionResolutionException {
         return new PluginVersionResult() {
+            @Override
             public String getVersion() {
                 return "0.42";
             }
 
+            @Override
             public ArtifactRepository getRepository() {
                 return null;
             }

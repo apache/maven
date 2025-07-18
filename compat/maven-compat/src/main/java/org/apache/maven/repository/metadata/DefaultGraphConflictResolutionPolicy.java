@@ -44,6 +44,7 @@ public class DefaultGraphConflictResolutionPolicy implements GraphConflictResolu
     @Configuration(name = "newer-first", value = "true")
     private boolean newerFirst = true;
 
+    @Override
     public MetadataGraphEdge apply(MetadataGraphEdge e1, MetadataGraphEdge e2) {
         int depth1 = e1.getDepth();
         int depth2 = e2.getDepth();

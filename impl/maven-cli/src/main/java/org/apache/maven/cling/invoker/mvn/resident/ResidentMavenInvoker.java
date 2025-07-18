@@ -20,10 +20,14 @@ package org.apache.maven.cling.invoker.mvn.resident;
 
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
+import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.api.services.Lookup;
+import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.mvn.MavenContext;
 import org.apache.maven.cling.invoker.mvn.MavenInvoker;
 
@@ -38,8 +42,8 @@ public class ResidentMavenInvoker extends MavenInvoker {
 
     private final ConcurrentHashMap<String, MavenContext> residentContext;
 
-    public ResidentMavenInvoker(Lookup protoLookup) {
-        super(protoLookup, null);
+    public ResidentMavenInvoker(Lookup protoLookup, @Nullable Consumer<LookupContext> contextConsumer) {
+        super(protoLookup, contextConsumer);
         this.residentContext = new ConcurrentHashMap<>();
     }
 
@@ -64,7 +68,10 @@ public class ResidentMavenInvoker extends MavenInvoker {
     protected MavenContext createContext(InvokerRequest invokerRequest) {
         // TODO: in a moment Maven stop pushing user properties to system properties (and maybe something more)
         // and allow multiple instances per JVM, this may become a pool? derive key based in invokerRequest?
-        MavenContext result = residentContext.computeIfAbsent("resident", k -> new MavenContext(invokerRequest, false));
+        MavenContext result = residentContext.computeIfAbsent(
+                "resident",
+                k -> new MavenContext(invokerRequest, false, (MavenOptions)
+                        invokerRequest.options().orElse(null)));
         return copyIfDifferent(result, invokerRequest);
     }
 
@@ -72,7 +79,8 @@ public class ResidentMavenInvoker extends MavenInvoker {
         if (invokerRequest == mavenContext.invokerRequest) {
             return mavenContext;
         }
-        MavenContext shadow = new MavenContext(invokerRequest, false);
+        MavenContext shadow = new MavenContext(
+                invokerRequest, false, (MavenOptions) invokerRequest.options().orElse(null));
 
         // we carry over only "resident" things
         shadow.containerCapsule = mavenContext.containerCapsule;

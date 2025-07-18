@@ -50,6 +50,7 @@ class DefaultPluginPrefixResult implements PluginPrefixResult {
         this.repository = repository;
     }
 
+    @Override
     public String getGroupId() {
         return groupId;
     }
@@ -58,6 +59,7 @@ class DefaultPluginPrefixResult implements PluginPrefixResult {
         this.groupId = groupId;
     }
 
+    @Override
     public String getArtifactId() {
         return artifactId;
     }
@@ -66,6 +68,7 @@ class DefaultPluginPrefixResult implements PluginPrefixResult {
         this.artifactId = artifactId;
     }
 
+    @Override
     public ArtifactRepository getRepository() {
         return repository;
     }

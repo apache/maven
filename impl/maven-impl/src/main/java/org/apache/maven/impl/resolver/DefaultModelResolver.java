@@ -78,6 +78,7 @@ public class DefaultModelResolver implements ModelResolver {
     }
 
     @Nonnull
+    @Override
     public ModelSource resolveModel(
             @Nonnull Session session,
             @Nullable List<RemoteRepository> repositories,

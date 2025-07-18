@@ -24,15 +24,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
-import org.eclipse.aether.artifact.ArtifactProperties;
+import org.apache.maven.api.DependencyScope;
+import org.apache.maven.impl.resolver.artifact.MavenArtifactProperties;
 import org.eclipse.aether.impl.scope.BuildScopeMatrixSource;
 import org.eclipse.aether.impl.scope.BuildScopeSource;
 import org.eclipse.aether.impl.scope.CommonBuilds;
 import org.eclipse.aether.impl.scope.InternalScopeManager;
 import org.eclipse.aether.impl.scope.ScopeManagerConfiguration;
 import org.eclipse.aether.internal.impl.scope.ScopeManagerDump;
-import org.eclipse.aether.scope.DependencyScope;
-import org.eclipse.aether.scope.ResolutionScope;
 
 import static org.eclipse.aether.impl.scope.BuildScopeQuery.all;
 import static org.eclipse.aether.impl.scope.BuildScopeQuery.byBuildPath;
@@ -50,11 +49,7 @@ import static org.eclipse.aether.impl.scope.BuildScopeQuery.union;
  */
 public final class Maven3ScopeManagerConfiguration implements ScopeManagerConfiguration {
     public static final Maven3ScopeManagerConfiguration INSTANCE = new Maven3ScopeManagerConfiguration();
-    public static final String DS_COMPILE = "compile";
-    public static final String DS_RUNTIME = "runtime";
-    public static final String DS_PROVIDED = "provided";
-    public static final String DS_SYSTEM = "system";
-    public static final String DS_TEST = "test";
+
     public static final String RS_NONE = "none";
     public static final String RS_MAIN_COMPILE = "main-compile";
     public static final String RS_MAIN_COMPILE_PLUS_RUNTIME = "main-compilePlusRuntime";
@@ -89,33 +84,37 @@ public final class Maven3ScopeManagerConfiguration implements ScopeManagerConfig
     }
 
     @Override
-    public Collection<DependencyScope> buildDependencyScopes(InternalScopeManager internalScopeManager) {
-        ArrayList<DependencyScope> result = new ArrayList<>();
-        result.add(internalScopeManager.createDependencyScope(DS_COMPILE, true, all()));
+    public Collection<org.eclipse.aether.scope.DependencyScope> buildDependencyScopes(
+            InternalScopeManager internalScopeManager) {
+        ArrayList<org.eclipse.aether.scope.DependencyScope> result = new ArrayList<>();
+        result.add(internalScopeManager.createDependencyScope(DependencyScope.COMPILE.id(), true, all()));
         result.add(internalScopeManager.createDependencyScope(
-                DS_RUNTIME, true, byBuildPath(CommonBuilds.BUILD_PATH_RUNTIME)));
+                DependencyScope.RUNTIME.id(), true, byBuildPath(CommonBuilds.BUILD_PATH_RUNTIME)));
         result.add(internalScopeManager.createDependencyScope(
-                DS_PROVIDED,
+                DependencyScope.PROVIDED.id(),
                 false,
                 union(
                         byBuildPath(CommonBuilds.BUILD_PATH_COMPILE),
                         select(CommonBuilds.PROJECT_PATH_TEST, CommonBuilds.BUILD_PATH_RUNTIME))));
         result.add(internalScopeManager.createDependencyScope(
-                DS_TEST, false, byProjectPath(CommonBuilds.PROJECT_PATH_TEST)));
+                DependencyScope.TEST.id(), false, byProjectPath(CommonBuilds.PROJECT_PATH_TEST)));
         result.add(internalScopeManager.createSystemDependencyScope(
-                DS_SYSTEM, false, all(), ArtifactProperties.LOCAL_PATH));
+                DependencyScope.SYSTEM.id(), false, all(), MavenArtifactProperties.LOCAL_PATH));
         return result;
     }
 
     @Override
-    public Collection<ResolutionScope> buildResolutionScopes(InternalScopeManager internalScopeManager) {
-        Collection<DependencyScope> allDependencyScopes = internalScopeManager.getDependencyScopeUniverse();
-        Collection<DependencyScope> nonTransitiveDependencyScopes =
+    public Collection<org.eclipse.aether.scope.ResolutionScope> buildResolutionScopes(
+            InternalScopeManager internalScopeManager) {
+        Collection<org.eclipse.aether.scope.DependencyScope> allDependencyScopes =
+                internalScopeManager.getDependencyScopeUniverse();
+        Collection<org.eclipse.aether.scope.DependencyScope> nonTransitiveDependencyScopes =
                 allDependencyScopes.stream().filter(s -> !s.isTransitive()).collect(Collectors.toSet());
-        DependencyScope system =
-                internalScopeManager.getDependencyScope(DS_SYSTEM).orElse(null);
+        org.eclipse.aether.scope.DependencyScope system = internalScopeManager
+                .getDependencyScope(DependencyScope.SYSTEM.id())
+                .orElse(null);
 
-        ArrayList<ResolutionScope> result = new ArrayList<>();
+        ArrayList<org.eclipse.aether.scope.ResolutionScope> result = new ArrayList<>();
         result.add(internalScopeManager.createResolutionScope(
                 RS_NONE,
                 InternalScopeManager.Mode.REMOVE,

@@ -16,6 +16,10 @@
 # specific language governing permissions and limitations
 # under the License.
 #
+# THIS FILE IS GENERATED - DO NOT EDIT
+# Generated from: maven-resolver-tools/src/main/resources/configuration.yaml.vm
+# To modify this file, edit the template and regenerate.
+#
 props:
     - key: maven.build.timestamp.format
       configurationType: String
@@ -40,6 +44,12 @@ props:
       description: "User property for enabling/disabling the consumer POM feature."
       defaultValue: true
       since: 4.0.0
+      configurationSource: User properties
+    - key: maven.deploy.buildPom
+      configurationType: Boolean
+      description: "User property for controlling whether build POMs are deployed alongside consumer POMs. When set to <code>false</code>, only the consumer POM will be deployed, and the build POM will be excluded from deployment. This is useful to avoid deploying internal build information that is not needed by consumers of the artifact. <br/> Default: <code>\"true\"</code>."
+      defaultValue: true
+      since: 4.1.0
       configurationSource: User properties
     - key: maven.deploy.snapshot.buildNumber
       configurationType: Integer
@@ -146,6 +156,18 @@ props:
       configurationType: String
       description: "The string value output for the warn level. Defaults to WARN."
       defaultValue: WARN
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.maven3Personality
+      configurationType: Boolean
+      description: "User property for controlling \"maven personality\". If activated Maven will behave as previous major version, Maven 3."
+      defaultValue: false
+      since: 4.0.0
+      configurationSource: User properties
+    - key: maven.modelBuilder.interns
+      configurationType: String
+      description: "Comma-separated list of XML contexts/fields to intern during POM parsing for memory optimization. When not specified, a default set of commonly repeated contexts will be used. Example: \"groupId,artifactId,version,scope,type\""
+      defaultValue: 
       since: 4.0.0
       configurationSource: User properties
     - key: maven.modelBuilder.parallelism
@@ -381,6 +403,12 @@ props:
       defaultValue: 
       since: 4.0.0
       configurationSource: system_properties
+    - key: maven.versionRangeResolver.natureOverride
+      configurationType: String
+      description: "Configuration property for version range resolution used metadata \"nature\". It may contain following string values: <ul> <li>\"auto\" - decision done based on range being resolver: if any boundary is snapshot, use \"release_or_snapshot\", otherwise \"release\"</li> <li>\"release_or_snapshot\" - the default</li> <li>\"release\" - query only release repositories to discover versions</li> <li>\"snapshot\" - query only snapshot repositories to discover versions</li> </ul> Default (when unset) is existing Maven behaviour: \"release_or_snapshots\"."
+      defaultValue: release_or_snapshot
+      since: 4.0.0
+      configurationSource: User properties
     - key: maven.versionResolver.noCache
       configurationType: Boolean
       description: "User property for disabling version resolver cache."

@@ -43,6 +43,7 @@ public class DefaultMirrorSelector implements MirrorSelector {
 
     private static final String EXTERNAL_HTTP_WILDCARD = "external:http:*";
 
+    @Override
     public Mirror getMirror(ArtifactRepository repository, List<Mirror> mirrors) {
         String repoId = repository.getId();
 

@@ -19,6 +19,12 @@ specific language governing permissions and limitations
 under the License.
 -->
 
+<!--
+THIS FILE IS GENERATED - DO NOT EDIT
+Generated from: apache-maven/src/test/resources/maven-configuration.md.vm
+To modify this file, edit the template and regenerate.
+-->
+
 
 
 
@@ -29,6 +35,7 @@ under the License.
 | `maven.build.version` | `String` | Maven build version: a human-readable string containing this Maven version, buildnumber, and time of its build. |  -  | 3.0.0 | system_properties |
 | `maven.builder.maxProblems` | `Integer` | Max number of problems for each severity level retained by the model builder. |  `100`  | 4.0.0 | User properties |
 | `maven.consumer.pom` | `Boolean` | User property for enabling/disabling the consumer POM feature. |  `true`  | 4.0.0 | User properties |
+| `maven.deploy.buildPom` | `Boolean` | User property for controlling whether build POMs are deployed alongside consumer POMs. When set to <code>false</code>, only the consumer POM will be deployed, and the build POM will be excluded from deployment. This is useful to avoid deploying internal build information that is not needed by consumers of the artifact. <br/> Default: <code>"true"</code>. |  `true`  | 4.1.0 | User properties |
 | `maven.deploy.snapshot.buildNumber` | `Integer` | User property for overriding calculated "build number" for snapshot deploys. Caution: this property should be RARELY used (if used at all). It may help in special cases like "aligning" a reactor build subprojects build numbers to perform a "snapshot lock down". Value given here must be <code>maxRemoteBuildNumber + 1</code> or greater, otherwise build will fail. How the number to be obtained is left to user (ie by inspecting snapshot repository metadata or alike). Note: this feature is present in Maven 3.9.7 but with different key: <code>maven.buildNumber</code>. In Maven 4 as part of cleanup effort this key was renamed to properly reflect its purpose. |  -  | 4.0.0 | User properties |
 | `maven.ext.class.path` | `String` | Extensions class path. |  -  |  | User properties |
 | `maven.home` | `String` | Maven home. |  -  | 3.0.0 | system_properties |
@@ -47,6 +54,8 @@ under the License.
 | `maven.logger.showThreadId` | `Boolean` | If you would like to output the current thread id, then set to true. Defaults to false. |  `false`  | 4.0.0 | User properties |
 | `maven.logger.showThreadName` | `Boolean` | Set to true if you want to output the current thread name. Defaults to true. |  `true`  | 4.0.0 | User properties |
 | `maven.logger.warnLevelString` | `String` | The string value output for the warn level. Defaults to WARN. |  `WARN`  | 4.0.0 | User properties |
+| `maven.maven3Personality` | `Boolean` | User property for controlling "maven personality". If activated Maven will behave as previous major version, Maven 3. |  `false`  | 4.0.0 | User properties |
+| `maven.modelBuilder.interns` | `String` | Comma-separated list of XML contexts/fields to intern during POM parsing for memory optimization. When not specified, a default set of commonly repeated contexts will be used. Example: "groupId,artifactId,version,scope,type" |  -  | 4.0.0 | User properties |
 | `maven.modelBuilder.parallelism` | `Integer` | ProjectBuilder parallelism. |  `cores/2 + 1`  | 4.0.0 | User properties |
 | `maven.plugin.validation` | `String` | Plugin validation level. |  `inline`  | 3.9.2 | User properties |
 | `maven.plugin.validation.excludes` | `String` | Plugin validation exclusions. |  -  | 3.9.6 | User properties |
@@ -86,5 +95,6 @@ under the License.
 | `maven.version.minor` | `String` | Maven minor version: contains the minor segment of this Maven version. |  -  | 4.0.0 | system_properties |
 | `maven.version.patch` | `String` | Maven patch version: contains the patch segment of this Maven version. |  -  | 4.0.0 | system_properties |
 | `maven.version.snapshot` | `String` | Maven snapshot: contains "true" if this Maven is a snapshot version. |  -  | 4.0.0 | system_properties |
+| `maven.versionRangeResolver.natureOverride` | `String` | Configuration property for version range resolution used metadata "nature". It may contain following string values: <ul> <li>"auto" - decision done based on range being resolver: if any boundary is snapshot, use "release_or_snapshot", otherwise "release"</li> <li>"release_or_snapshot" - the default</li> <li>"release" - query only release repositories to discover versions</li> <li>"snapshot" - query only snapshot repositories to discover versions</li> </ul> Default (when unset) is existing Maven behaviour: "release_or_snapshots". |  `release_or_snapshot`  | 4.0.0 | User properties |
 | `maven.versionResolver.noCache` | `Boolean` | User property for disabling version resolver cache. |  `false`  | 3.0.0 | User properties |
 

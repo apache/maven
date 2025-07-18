@@ -34,14 +34,17 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 public class SystemPropertyProfileActivator extends DetectedProfileActivator implements Contextualizable {
     private Properties properties;
 
+    @Override
     public void contextualize(Context context) throws ContextException {
         properties = (Properties) context.get("SystemProperties");
     }
 
+    @Override
     protected boolean canDetectActivation(Profile profile) {
         return profile.getActivation() != null && profile.getActivation().getProperty() != null;
     }
 
+    @Override
     public boolean isActive(Profile profile) throws ProfileActivationException {
         Activation activation = profile.getActivation();
 

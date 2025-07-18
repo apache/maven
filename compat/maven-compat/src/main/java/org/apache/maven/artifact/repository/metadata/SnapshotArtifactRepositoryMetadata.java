@@ -40,42 +40,52 @@ public class SnapshotArtifactRepositoryMetadata extends AbstractRepositoryMetada
         this.artifact = artifact;
     }
 
+    @Override
     public boolean storedInGroupDirectory() {
         return false;
     }
 
+    @Override
     public boolean storedInArtifactVersionDirectory() {
         return true;
     }
 
+    @Override
     public String getGroupId() {
         return artifact.getGroupId();
     }
 
+    @Override
     public String getArtifactId() {
         return artifact.getArtifactId();
     }
 
+    @Override
     public String getBaseVersion() {
         return artifact.getBaseVersion();
     }
 
+    @Override
     public Object getKey() {
         return "snapshot " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getBaseVersion();
     }
 
+    @Override
     public boolean isSnapshot() {
         return artifact.isSnapshot();
     }
 
+    @Override
     public int getNature() {
         return isSnapshot() ? SNAPSHOT : RELEASE;
     }
 
+    @Override
     public ArtifactRepository getRepository() {
         return artifact.getRepository();
     }
 
+    @Override
     public void setRepository(ArtifactRepository remoteRepository) {
         artifact.setRepository(remoteRepository);
     }

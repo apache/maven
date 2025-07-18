@@ -38,6 +38,7 @@ public class BasedirBeanConfigurationPathTranslator implements BeanConfiguration
         this.basedir = basedir;
     }
 
+    @Override
     public File translatePath(File path) {
         File result = path;
 

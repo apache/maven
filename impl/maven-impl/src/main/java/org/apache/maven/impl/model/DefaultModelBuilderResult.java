@@ -135,6 +135,7 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
         return children;
     }
 
+    @Override
     public String toString() {
         String modelId;
         if (effectiveModel != null) {

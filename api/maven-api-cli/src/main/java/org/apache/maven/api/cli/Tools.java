@@ -39,4 +39,7 @@ public final class Tools {
 
     public static final String MVNSHELL_CMD = "mvnsh";
     public static final String MVNSHELL_NAME = "Maven Shell Tool";
+
+    public static final String MVNUP_CMD = "mvnup";
+    public static final String MVNUP_NAME = "Maven Upgrade Tool";
 }
