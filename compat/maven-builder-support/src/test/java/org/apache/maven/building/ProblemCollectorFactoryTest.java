@@ -49,12 +49,12 @@ class ProblemCollectorFactoryTest {
         private final Exception cause;
 
         TestProblem(
-                final String message,
-                final Problem.Severity severity,
-                final String source,
-                final int lineNumber,
-                final int columnNumber,
-                final Exception cause) {
+                String message,
+                Problem.Severity severity,
+                String source,
+                int lineNumber,
+                int columnNumber,
+                Exception cause) {
             this.message = message;
             this.severity = severity;
             this.source = source != null ? source : "";
