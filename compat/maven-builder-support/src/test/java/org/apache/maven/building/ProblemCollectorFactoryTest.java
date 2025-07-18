@@ -108,7 +108,7 @@ class ProblemCollectorFactoryTest {
 
     @Test
     void testAddProblem() {
-        final ProblemCollector collector = ProblemCollectorFactory.newInstance(null);
+        ProblemCollector collector = ProblemCollectorFactory.newInstance(null);
         collector.setSource("pom.xml");
         collector.add(Problem.Severity.ERROR, "Error message", 10, 5, null);
         collector.add(Problem.Severity.WARNING, "Warning message", 15, 3, null);
