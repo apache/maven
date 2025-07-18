@@ -62,7 +62,8 @@ public class LifecycleExecutionPlanCalculatorTest extends AbstractCoreMavenCompo
                 new BuildPluginManagerStub(),
                 DefaultLifecyclesStub.createDefaultLifecycles(),
                 mojoDescriptorCreator,
-                lifecyclePluginResolver);
+                lifecyclePluginResolver,
+                new LifecyclePluginSkipper());
     }
 
     public static MojoDescriptorCreator createMojoDescriptorCreator() {
