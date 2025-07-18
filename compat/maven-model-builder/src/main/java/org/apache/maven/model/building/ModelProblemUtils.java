@@ -100,11 +100,11 @@ public class ModelProblemUtils {
     static String toId(String groupId, String artifactId, String version) {
         StringBuilder buffer = new StringBuilder(128);
 
-        buffer.append((groupId != null && groupId.length() > 0) ? groupId : "[unknown-group-id]");
+        buffer.append((groupId != null && !groupId.isEmpty()) ? groupId : "[unknown-group-id]");
         buffer.append(':');
-        buffer.append((artifactId != null && artifactId.length() > 0) ? artifactId : "[unknown-artifact-id]");
+        buffer.append((artifactId != null && !artifactId.isEmpty()) ? artifactId : "[unknown-artifact-id]");
         buffer.append(':');
-        buffer.append((version != null && version.length() > 0) ? version : "[unknown-version]");
+        buffer.append((version != null && !version.isEmpty()) ? version : "[unknown-version]");
 
         return buffer.toString();
     }
@@ -125,8 +125,8 @@ public class ModelProblemUtils {
         if (!problem.getModelId().equals(projectId)) {
             buffer.append(problem.getModelId());
 
-            if (problem.getSource().length() > 0) {
-                if (buffer.length() > 0) {
+            if (!problem.getSource().isEmpty()) {
+                if (!buffer.isEmpty()) {
                     buffer.append(", ");
                 }
                 buffer.append(problem.getSource());
@@ -134,14 +134,14 @@ public class ModelProblemUtils {
         }
 
         if (problem.getLineNumber() > 0) {
-            if (buffer.length() > 0) {
+            if (!buffer.isEmpty()) {
                 buffer.append(", ");
             }
             buffer.append("line ").append(problem.getLineNumber());
         }
 
         if (problem.getColumnNumber() > 0) {
-            if (buffer.length() > 0) {
+            if (!buffer.isEmpty()) {
                 buffer.append(", ");
             }
             buffer.append("column ").append(problem.getColumnNumber());

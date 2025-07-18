@@ -58,7 +58,7 @@ public class ModelValidationResult {
     }
 
     public String render(String indentation) {
-        if (messages.size() == 0) {
+        if (messages.isEmpty()) {
             return indentation + "There were no validation errors.";
         }
 

@@ -65,7 +65,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
         assertEquals(pom0Basedir, project1.getParent().getBasedir());
         Set set = project1.getArtifacts();
         assertNotNull(set, "No artifacts");
-        assertTrue(set.size() > 0, "No Artifacts");
+        assertTrue(!set.isEmpty(), "No Artifacts");
         Iterator iter = set.iterator();
         assertTrue(set.size() == 4, "Set size should be 4, is " + set.size());
 
