@@ -493,17 +493,12 @@ public interface XmlNode {
 
             @Override
             public boolean equals(Object o) {
-                if (this == o) {
-                    return true;
-                }
-                if (o == null || getClass() != o.getClass()) {
-                    return false;
-                }
-                Impl that = (Impl) o;
-                return Objects.equals(this.name, that.name)
-                        && Objects.equals(this.value, that.value)
-                        && Objects.equals(this.attributes, that.attributes)
-                        && Objects.equals(this.children, that.children);
+                return this == o
+                        || o instanceof XmlNode that
+                                && Objects.equals(this.name, that.name())
+                                && Objects.equals(this.value, that.value())
+                                && Objects.equals(this.attributes, that.attributes())
+                                && Objects.equals(this.children, that.children());
             }
 
             @Override
