@@ -59,9 +59,6 @@ import org.apache.maven.api.annotations.Nonnull;
  * If above changes are not desired, put an explicit {@code "glob:"} prefix before the pattern.
  * Note that putting such a prefix is recommended anyway for better performances.
  *
- * @author Benjamin Bentmann
- * @author Martin Desruisseaux
- *
  * @see java.nio.file.FileSystem#getPathMatcher(String)
  */
 public class PathSelector implements PathMatcher {
@@ -171,6 +168,7 @@ public class PathSelector implements PathMatcher {
     /**
      * String representations of the normalized include filters.
      * Each pattern shall be prefixed by its syntax, which is {@value #DEFAULT_SYNTAX} by default.
+     * An empty array means to include all files.
      *
      * @see #toString()
      */
@@ -178,7 +176,8 @@ public class PathSelector implements PathMatcher {
 
     /**
      * String representations of the normalized exclude filters.
-     * Each pattern shall be prefixed by its syntax, which is {@value #DEFAULT_SYNTAX} by default.
+     * Each pattern shall be prefixed by its syntax. If no syntax is specified,
+     * the default is a Maven 3 syntax similar, but not identical, to {@value #DEFAULT_SYNTAX}.
      * This array may be longer or shorter than the user-supplied excludes, depending on whether
      * default excludes have been added and whether some unnecessary excludes have been omitted.
      *
@@ -188,6 +187,7 @@ public class PathSelector implements PathMatcher {
 
     /**
      * The matcher for includes. The length of this array is equal to {@link #includePatterns} array length.
+     * An empty array means to include all files.
      */
     private final PathMatcher[] includes;
 
@@ -200,6 +200,7 @@ public class PathSelector implements PathMatcher {
      * The matcher for all directories to include. This array includes the parents of all those directories,
      * because they need to be accepted before we can walk to the sub-directories.
      * This is an optimization for skipping whole directories when possible.
+     * An empty array means to include all directories.
      */
     private final PathMatcher[] dirIncludes;
 
@@ -214,6 +215,13 @@ public class PathSelector implements PathMatcher {
      * The base directory. All files will be relativized to that directory before to be matched.
      */
     private final Path baseDirectory;
+
+    /**
+     * Whether paths must be relativized before to be given to a matcher. If {@code true}, then every paths
+     * will be made relative to {@link #baseDirectory} for allowing patterns like {@code "foo/bar/*.java"}
+     * to work. As a slight optimization, we can skip this step if all patterns start with {@code "**"}.
+     */
+    private final boolean needRelativize;
 
     /**
      * Creates a new selector from the given includes and excludes.
@@ -232,17 +240,18 @@ public class PathSelector implements PathMatcher {
         baseDirectory = Objects.requireNonNull(directory, "directory cannot be null");
         includePatterns = normalizePatterns(includes, false);
         excludePatterns = normalizePatterns(effectiveExcludes(excludes, includePatterns, useDefaultExcludes), true);
-        FileSystem system = baseDirectory.getFileSystem();
-        this.includes = matchers(system, includePatterns);
-        this.excludes = matchers(system, excludePatterns);
-        dirIncludes = matchers(system, directoryPatterns(includePatterns, false));
-        dirExcludes = matchers(system, directoryPatterns(excludePatterns, true));
+        FileSystem fileSystem = baseDirectory.getFileSystem();
+        this.includes = matchers(fileSystem, includePatterns);
+        this.excludes = matchers(fileSystem, excludePatterns);
+        dirIncludes = matchers(fileSystem, directoryPatterns(includePatterns, false));
+        dirExcludes = matchers(fileSystem, directoryPatterns(excludePatterns, true));
+        needRelativize = needRelativize(includePatterns) || needRelativize(excludePatterns);
     }
 
     /**
      * Returns the given array of excludes, optionally expanded with a default set of excludes,
      * then with unnecessary excludes omitted. An unnecessary exclude is an exclude which will never
-     * match a file because there is no include which would accept a file that could match the exclude.
+     * match a file because there are no include which would accept a file that could match the exclude.
      * For example, if the only include is {@code "*.java"}, then the <code>"**&sol;project.pj"</code>,
      * <code>"**&sol;.DS_Store"</code> and other excludes will never match a file and can be omitted.
      * Because the list of {@linkplain #DEFAULT_EXCLUDES default excludes} contains many elements,
@@ -269,9 +278,13 @@ public class PathSelector implements PathMatcher {
             }
         } else {
             excludes = new ArrayList<>(excludes);
+            excludes.removeIf(Objects::isNull);
             if (useDefaultExcludes) {
                 excludes.addAll(DEFAULT_EXCLUDES);
             }
+        }
+        if (includes.length == 0) {
+            return excludes;
         }
         /*
          * Get the prefixes and suffixes of all includes, stopping at the first special character.
@@ -473,7 +486,7 @@ public class PathSelector implements PathMatcher {
      * Applies some heuristic rules for simplifying the set of patterns,
      * then returns the patterns as an array.
      *
-     * @param patterns the patterns to simplify and return asarray
+     * @param patterns the patterns to simplify and return as an array
      * @param excludes whether the patterns are exclude patterns
      * @return the set content as an array, after simplification
      */
@@ -524,6 +537,21 @@ public class PathSelector implements PathMatcher {
     }
 
     /**
+     * Returns {@code true} if at least one pattern requires path being relativized before to be matched.
+     *
+     * @param patterns include or exclude patterns
+     * @return whether at least one pattern require relativization
+     */
+    private static boolean needRelativize(String[] patterns) {
+        for (String pattern : patterns) {
+            if (!pattern.startsWith(DEFAULT_SYNTAX + "**/")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Creates the path matchers for the given patterns.
      * The syntax (usually {@value #DEFAULT_SYNTAX}) must be specified for each pattern.
      */
@@ -536,11 +564,19 @@ public class PathSelector implements PathMatcher {
     }
 
     /**
+     * {@return whether there are no include or exclude filters}.
+     * In such case, this {@code PathSelector} instance should be ignored.
+     */
+    public boolean isEmpty() {
+        return includes.length == 0 && excludes.length == 0;
+    }
+
+    /**
      * {@return a potentially simpler matcher equivalent to this matcher}.
      */
     @SuppressWarnings("checkstyle:MissingSwitchDefault")
     public PathMatcher simplify() {
-        if (excludes.length == 0) {
+        if (!needRelativize && excludes.length == 0) {
             switch (includes.length) {
                 case 0:
                     return INCLUDES_ALL;
@@ -560,7 +596,9 @@ public class PathSelector implements PathMatcher {
      */
     @Override
     public boolean matches(Path path) {
-        path = baseDirectory.relativize(path);
+        if (needRelativize) {
+            path = baseDirectory.relativize(path);
+        }
         return (includes.length == 0 || isMatched(path, includes))
                 && (excludes.length == 0 || !isMatched(path, excludes));
     }
