@@ -479,6 +479,18 @@ class XmlNodeImplTest {
     }
 
     /**
+     * <p>testEqualsComplex.</p>
+     */
+    @Test
+    void testEqualsComplex() throws XMLStreamException, XmlPullParserException, IOException {
+        String testDom = "<configuration><items thing='blah'><item>one</item><item>two</item></items></configuration>";
+        XmlNode dom1 = XmlService.read(new StringReader(testDom));
+        XmlNode dom2 = XmlNodeBuilder.build(new StringReader(testDom));
+
+        assertEquals(dom1, dom2);
+    }
+
+    /**
      * <p>testEqualsIsNullSafe.</p>
      */
     @Test
