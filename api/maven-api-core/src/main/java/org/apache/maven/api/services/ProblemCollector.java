@@ -236,7 +236,7 @@ public interface ProblemCollector<P extends BuilderProblem> {
                 .sorted(Comparator.reverseOrder())
                 .toList();
 
-        private Impl(int maxCountLimit, final Predicate<? super P> filter) {
+        private Impl(int maxCountLimit, Predicate<? super P> filter) {
             if (maxCountLimit < 0) {
                 throw new IllegalArgumentException("maxCountLimit must be non-negative");
             }
