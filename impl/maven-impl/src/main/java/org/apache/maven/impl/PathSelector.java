@@ -59,9 +59,6 @@ import org.apache.maven.api.annotations.Nonnull;
  * If above changes are not desired, put an explicit {@code "glob:"} prefix before the pattern.
  * Note that putting such a prefix is recommended anyway for better performances.
  *
- * @author Benjamin Bentmann
- * @author Martin Desruisseaux
- *
  * @see java.nio.file.FileSystem#getPathMatcher(String)
  */
 public class PathSelector implements PathMatcher {
@@ -254,7 +251,7 @@ public class PathSelector implements PathMatcher {
     /**
      * Returns the given array of excludes, optionally expanded with a default set of excludes,
      * then with unnecessary excludes omitted. An unnecessary exclude is an exclude which will never
-     * match a file because there is no include which would accept a file that could match the exclude.
+     * match a file because there are no include which would accept a file that could match the exclude.
      * For example, if the only include is {@code "*.java"}, then the <code>"**&sol;project.pj"</code>,
      * <code>"**&sol;.DS_Store"</code> and other excludes will never match a file and can be omitted.
      * Because the list of {@linkplain #DEFAULT_EXCLUDES default excludes} contains many elements,
