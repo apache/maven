@@ -201,7 +201,7 @@ public interface ProblemCollector<P extends BuilderProblem> {
      */
     @Nonnull
     static <P extends BuilderProblem> ProblemCollector<P> create(
-            final int maxCountLimit, final Predicate<? super P> filter) {
+            int maxCountLimit, Predicate<? super P> filter) {
         return new Impl<>(maxCountLimit, filter);
     }
 
