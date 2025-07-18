@@ -506,6 +506,10 @@ public class DefaultModelBuilder implements ModelBuilder {
             if (model.getRepositories().isEmpty()) {
                 return;
             }
+            // Check if we should ignore repositories from artifact descriptors (dependency POMs)
+            if (session.getSession().isIgnoreArtifactDescriptorRepositories()) {
+                return;
+            }
             // We need to interpolate the repositories before we can use them
             Model interpolatedModel = interpolateModel(
                     Model.newBuilder()
