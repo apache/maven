@@ -113,7 +113,7 @@ class ProblemCollectorFactoryTest {
         collector.add(Problem.Severity.ERROR, "Error message", 10, 5, null);
         collector.add(Problem.Severity.WARNING, "Warning message", 15, 3, null);
 
-        final List<Problem> problems = collector.getProblems();
+        List<Problem> problems = collector.getProblems();
         assertEquals(2, problems.size(), "Should collect both problems");
         assertEquals(Problem.Severity.ERROR, problems.get(0).getSeverity(), "First problem should be ERROR");
         assertEquals("Error message", problems.get(0).getMessage(), "First problem should have correct message");
