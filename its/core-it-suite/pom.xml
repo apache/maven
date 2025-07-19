@@ -532,7 +532,8 @@ under the License.
           <promoteUserPropertiesToSystemProperties>false</promoteUserPropertiesToSystemProperties>
           <systemPropertyVariables>
             <maven.test.user.home>${preparedUserHome}</maven.test.user.home>
-            <maven.test.repo.local>${settings.localRepository}</maven.test.repo.local>
+            <maven.test.repo.outer>${settings.localRepository}</maven.test.repo.outer>
+            <maven.test.repo.local>${preparedUserHome}/.m2/repository</maven.test.repo.local>
             <maven.test.tmpdir>${project.build.testOutputDirectory}</maven.test.tmpdir>
             <maven.version>${maven.version}</maven.version>
             <maven.home>${preparedMavenHome}</maven.home>
