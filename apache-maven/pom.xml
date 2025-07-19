@@ -138,19 +138,6 @@ under the License.
       <groupId>org.ow2.asm</groupId>
       <artifactId>asm</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-tools</artifactId>
-      <version>${resolverVersion}</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-nop</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
   </dependencies>
 
   <pluginRepositories>
@@ -266,38 +253,6 @@ under the License.
               <transitiveDependencies>CURRENT_PROJECT</transitiveDependencies>
               <usePropertiesForVersion>true</usePropertiesForVersion>
               <attach>true</attach>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>3.5.1</version>
-        <executions>
-          <execution>
-            <id>render-configuration-page</id>
-            <goals>
-              <goal>java</goal>
-            </goals>
-            <phase>verify</phase>
-            <configuration>
-              <classpathScope>test</classpathScope>
-              <additionalClasspathElements>
-                <additionalClasspathElement>${basedir}/src/test/resources</additionalClasspathElement>
-              </additionalClasspathElements>
-              <mainClass>org.eclipse.aether.tools.CollectConfiguration</mainClass>
-              <arguments>
-                <argument>--mode=maven</argument>
-                <!--
-                TODO: templates are loaded from classpath, in "normal" JAR project local template would override docgen one,
-                but in this case the packaging=pom all I could do is use additionalClasspathElement that APPENDS classpath,
-                hence template is renamed to maven-configuration.md.vm, to avoid conflict (and picking up resolver template)
-                -->
-                <argument>--templates=maven-configuration.md,configuration.properties,configuration.yaml</argument>
-                <argument>${basedir}/..</argument>
-                <argument>${basedir}/../src/site/markdown/</argument>
-              </arguments>
             </configuration>
           </execution>
         </executions>
