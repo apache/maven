@@ -71,7 +71,7 @@ public class ConcurrencyDependencyGraph {
                 result.add(projectBuild.getProject());
             }
         }
-        if (result.isEmpty() && projectBuilds.size() > 0) {
+        if (result.isEmpty() && !projectBuilds.isEmpty()) {
             // Must return at least one project
             result.add(projectBuilds.get(0).getProject());
         }

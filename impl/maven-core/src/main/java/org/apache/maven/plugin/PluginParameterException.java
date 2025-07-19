@@ -52,7 +52,7 @@ public class PluginParameterException extends PluginConfigurationException {
         StringBuilder buffer = new StringBuilder(128);
         if (parameters != null) {
             for (Parameter parameter : parameters) {
-                if (buffer.length() > 0) {
+                if (!buffer.isEmpty()) {
                     buffer.append(", ");
                 }
                 buffer.append('\'').append(parameter.getName()).append('\'');

@@ -871,7 +871,7 @@ public class MavenProperties extends AbstractMap<String, String> {
                     line = line.substring(0, line.length() - 1);
                 }
                 valueLines.add(line);
-                while (line.length() > 0 && contains(WHITE_SPACE, line.charAt(0))) {
+                while (!line.isEmpty() && contains(WHITE_SPACE, line.charAt(0))) {
                     line = line.substring(1, line.length());
                 }
                 buffer.append(line);

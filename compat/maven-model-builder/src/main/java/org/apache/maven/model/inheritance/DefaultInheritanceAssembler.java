@@ -154,7 +154,7 @@ public class DefaultInheritanceAssembler implements InheritanceAssembler {
             StringBuilder url = new StringBuilder(parentUrl.length()
                     + pathAdjustment.length()
                     + childPath.length()
-                    + ((pathAdjustment.length() == 0) ? 1 : 2));
+                    + ((pathAdjustment.isEmpty()) ? 1 : 2));
 
             url.append(parentUrl);
             concatPath(url, pathAdjustment);
@@ -164,7 +164,7 @@ public class DefaultInheritanceAssembler implements InheritanceAssembler {
         }
 
         private void concatPath(StringBuilder url, String path) {
-            if (path.length() > 0) {
+            if (!path.isEmpty()) {
                 boolean initialUrlEndsWithSlash = url.charAt(url.length() - 1) == '/';
                 boolean pathStartsWithSlash = path.charAt(0) == '/';
 

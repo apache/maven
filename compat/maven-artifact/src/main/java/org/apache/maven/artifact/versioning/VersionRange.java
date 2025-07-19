@@ -255,7 +255,7 @@ public class VersionRange {
         }
 
         ArtifactVersion version = null;
-        if (restrictions.size() > 0) {
+        if (!restrictions.isEmpty()) {
             for (Restriction r : restrictions) {
                 if (recommendedVersion != null && r.containsVersion(recommendedVersion)) {
                     // if we find the original, use that
@@ -398,7 +398,7 @@ public class VersionRange {
         if (recommendedVersion != null) {
             version = recommendedVersion;
         } else {
-            if (restrictions.size() == 0) {
+            if (restrictions.isEmpty()) {
                 throw new OverConstrainedVersionException("The artifact has no valid ranges", artifact);
             }
 
@@ -412,7 +412,7 @@ public class VersionRange {
         if (recommendedVersion != null) {
             value = true;
         } else {
-            if (restrictions.size() == 0) {
+            if (restrictions.isEmpty()) {
                 throw new OverConstrainedVersionException("The artifact has no valid ranges", artifact);
             }
         }

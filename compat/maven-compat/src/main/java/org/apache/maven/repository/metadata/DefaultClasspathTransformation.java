@@ -104,7 +104,7 @@ public class DefaultClasspathTransformation implements ClasspathTransformation {
 
             List<MetadataGraphEdge> exits = graph.getExcidentEdges(node);
 
-            if (exits != null && exits.size() > 0) {
+            if (exits != null && !exits.isEmpty()) {
                 MetadataGraphEdge[] sortedExits = exits.toArray(new MetadataGraphEdge[0]);
                 Arrays.sort(sortedExits, (e1, e2) -> {
                     if (e1.getDepth() == e2.getDepth()) {

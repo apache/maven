@@ -274,8 +274,8 @@ public class RepositoryUtils {
             stereotype = new DefaultArtifactType(dependency.getType());
         }
 
-        boolean system =
-                dependency.getSystemPath() != null && dependency.getSystemPath().length() > 0;
+        boolean system = dependency.getSystemPath() != null
+                && !dependency.getSystemPath().isEmpty();
 
         Map<String, String> props = null;
         if (system) {

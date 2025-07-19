@@ -71,7 +71,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
         System.out.println("Project " + project1.getId() + " " + project1);
         Map map = project1.getArtifactMap();
         assertNotNull(map, "No artifacts");
-        assertTrue(map.size() > 0, "No Artifacts");
+        assertTrue(!map.isEmpty(), "No Artifacts");
         assertTrue(map.size() == 3, "Set size should be 3, is " + map.size());
 
         Artifact a = (Artifact) map.get("maven-test:t10-a");
