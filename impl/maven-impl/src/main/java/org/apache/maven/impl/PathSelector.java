@@ -217,7 +217,7 @@ public class PathSelector implements PathMatcher {
     private final Path baseDirectory;
 
     /**
-     * Whether paths must be relativized before to be given to a matcher. If {@code true}, then every paths
+     * Whether paths must be relativized before being given to a matcher. If {@code true}, then every paths
      * will be made relative to {@link #baseDirectory} for allowing patterns like {@code "foo/bar/*.java"}
      * to work. As a slight optimization, we can skip this step if all patterns start with {@code "**"}.
      */
@@ -251,7 +251,7 @@ public class PathSelector implements PathMatcher {
     /**
      * Returns the given array of excludes, optionally expanded with a default set of excludes,
      * then with unnecessary excludes omitted. An unnecessary exclude is an exclude which will never
-     * match a file because there are no include which would accept a file that could match the exclude.
+     * match a file because there are no includes which would accept a file that could match the exclude.
      * For example, if the only include is {@code "*.java"}, then the <code>"**&sol;project.pj"</code>,
      * <code>"**&sol;.DS_Store"</code> and other excludes will never match a file and can be omitted.
      * Because the list of {@linkplain #DEFAULT_EXCLUDES default excludes} contains many elements,
@@ -510,7 +510,7 @@ public class PathSelector implements PathMatcher {
      *
      * @param patterns the normalized include or exclude patterns
      * @param excludes whether the patterns are exclude patterns
-     * @return pattens of directories to include or exclude
+     * @return patterns of directories to include or exclude
      */
     private static String[] directoryPatterns(final String[] patterns, final boolean excludes) {
         // TODO: use `LinkedHashSet.newLinkedHashSet(int)` instead with JDK19.
