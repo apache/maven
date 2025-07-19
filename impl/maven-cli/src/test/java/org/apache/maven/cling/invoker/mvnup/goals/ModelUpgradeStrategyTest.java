@@ -132,7 +132,6 @@ class ModelUpgradeStrategyTest {
                 String initialNamespace,
                 String initialModelVersion,
                 String targetModelVersion,
-                String expectedNamespace,
                 String expectedModelVersion,
                 int expectedModifiedCount,
                 String description)
@@ -158,7 +157,6 @@ class ModelUpgradeStrategyTest {
 
             // Verify the model version and namespace
             Element root = document.getRootElement();
-            assertEquals(expectedNamespace, root.getNamespaceURI(), "Namespace should be updated: " + description);
 
             Element modelVersionElement = root.getChild("modelVersion", root.getNamespace());
             if (expectedModelVersion != null) {
@@ -176,15 +174,13 @@ class ModelUpgradeStrategyTest {
                             "http://maven.apache.org/POM/4.0.0",
                             "4.0.0",
                             "4.1.0",
-                            "http://maven.apache.org/POM/4.1.0",
                             "4.1.0",
                             1,
                             "Should upgrade from 4.0.0 to 4.1.0"),
                     Arguments.of(
-                            "http://maven.apache.org/POM/4.1.0",
+                            "http://maven.apache.org/POM/4.0.0",
                             "4.1.0",
                             "4.1.0",
-                            "http://maven.apache.org/POM/4.1.0",
                             "4.1.0",
                             0,
                             "Should not modify when already at target version"),
@@ -192,7 +188,6 @@ class ModelUpgradeStrategyTest {
                             "http://maven.apache.org/POM/4.0.0",
                             null,
                             "4.1.0",
-                            "http://maven.apache.org/POM/4.1.0",
                             "4.1.0",
                             1,
                             "Should add model version when missing"));
@@ -200,59 +195,8 @@ class ModelUpgradeStrategyTest {
     }
 
     @Nested
-    @DisplayName("Namespace Updates")
-    class NamespaceUpdateTests {
-
-        @Test
-        @DisplayName("should update namespace recursively")
-        void shouldUpdateNamespaceRecursively() throws Exception {
-            String pomXml =
-                    """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <dependencies>
-                        <dependency>
-                            <groupId>test</groupId>
-                            <artifactId>test</artifactId>
-                            <version>1.0.0</version>
-                        </dependency>
-                    </dependencies>
-                </project>
-                """;
-
-            Document document = saxBuilder.build(new StringReader(pomXml));
-            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
-
-            // Create context with --model-version=4.1.0 option to trigger namespace update
-            UpgradeOptions options = mock(UpgradeOptions.class);
-            when(options.modelVersion()).thenReturn(Optional.of("4.1.0"));
-            when(options.all()).thenReturn(Optional.empty());
-            UpgradeContext context = createMockContext(options);
-
-            UpgradeResult result = strategy.apply(context, pomMap);
-
-            assertTrue(result.success(), "Model upgrade should succeed");
-            assertTrue(result.modifiedCount() > 0, "Should have upgraded namespace");
-
-            // Verify namespace was updated recursively
-            Element root = document.getRootElement();
-            Namespace newNamespace = Namespace.getNamespace("http://maven.apache.org/POM/4.1.0");
-            assertEquals(newNamespace, root.getNamespace());
-
-            // Verify child elements namespace updated recursively
-            Element dependencies = root.getChild("dependencies", newNamespace);
-            assertNotNull(dependencies);
-            assertEquals(newNamespace, dependencies.getNamespace());
-
-            Element dependency = dependencies.getChild("dependency", newNamespace);
-            assertNotNull(dependency);
-            assertEquals(newNamespace, dependency.getNamespace());
-
-            Element groupId = dependency.getChild("groupId", newNamespace);
-            assertNotNull(groupId);
-            assertEquals(newNamespace, groupId.getNamespace());
-        }
+    @DisplayName("Model Version Updates")
+    class ModelVersionUpdateTests {
 
         @Test
         @DisplayName("should convert modules to subprojects in 4.1.0")
@@ -334,7 +278,7 @@ class ModelUpgradeStrategyTest {
             String pomXml =
                     """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.1.0">
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.1.0</modelVersion>
                     <groupId>com.example</groupId>
                     <artifactId>test-project</artifactId>

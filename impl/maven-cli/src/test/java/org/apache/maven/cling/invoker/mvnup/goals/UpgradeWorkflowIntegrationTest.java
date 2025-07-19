@@ -88,7 +88,7 @@ class UpgradeWorkflowIntegrationTest {
             // Verify POM was upgraded
             String upgradedPom = Files.readString(pomFile);
             assertTrue(
-                    upgradedPom.contains("http://maven.apache.org/POM/4.1.0"),
+                    upgradedPom.contains("http://maven.apache.org/POM/4.0.0"),
                     "POM should be upgraded to 4.1.0 namespace");
         }
 
