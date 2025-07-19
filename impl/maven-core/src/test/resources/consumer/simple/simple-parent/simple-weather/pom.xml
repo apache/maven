@@ -31,6 +31,7 @@ under the License.
     <dependency>
       <groupId>org.sonatype.mavenbook.multi</groupId>
       <artifactId>simple-testutils</artifactId>
+      <version>0.9-MNG6656-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

@@ -1,4 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" root="true">
+    <modelVersion>4.1.0</modelVersion>
     <groupId>org.apache.maven.ut</groupId>
     <artifactId>parent</artifactId>
     <version>1.0-SNAPSHOT</version>
