@@ -16,6 +16,7 @@
  limitations under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.1.0</modelVersion>
     <parent>
         <relativePath>props-and-profiles-grand-parent.xml</relativePath>
     </parent>
