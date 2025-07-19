@@ -131,7 +131,7 @@ class InferenceStrategyTest {
         @DisplayName("should remove dependency version for project artifact")
         void shouldRemoveDependencyVersionForProjectArtifact() throws Exception {
             String parentPomXml = PomBuilder.create()
-                    .namespace("http://maven.apache.org/POM/4.1.0")
+                    .namespace("http://maven.apache.org/POM/4.0.0")
                     .modelVersion("4.1.0")
                     .groupId("com.example")
                     .artifactId("parent-project")
@@ -140,7 +140,7 @@ class InferenceStrategyTest {
                     .build();
 
             String moduleAPomXml = PomBuilder.create()
-                    .namespace("http://maven.apache.org/POM/4.1.0")
+                    .namespace("http://maven.apache.org/POM/4.0.0")
                     .modelVersion("4.1.0")
                     .parent("com.example", "parent-project", "1.0.0")
                     .artifactId("module-a")
@@ -149,7 +149,7 @@ class InferenceStrategyTest {
             String moduleBPomXml =
                     """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.1.0">
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <parent>
                         <groupId>com.example</groupId>
                         <artifactId>parent-project</artifactId>
@@ -202,7 +202,7 @@ class InferenceStrategyTest {
             String modulePomXml =
                     """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.1.0">
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <groupId>com.example</groupId>
                     <artifactId>my-module</artifactId>
                     <version>1.0.0</version>
@@ -237,7 +237,7 @@ class InferenceStrategyTest {
         @DisplayName("should keep dependency version when version mismatch")
         void shouldKeepDependencyVersionWhenVersionMismatch() throws Exception {
             String moduleAPomXml = PomBuilder.create()
-                    .namespace("http://maven.apache.org/POM/4.1.0")
+                    .namespace("http://maven.apache.org/POM/4.0.0")
                     .modelVersion("4.1.0")
                     .groupId("com.example")
                     .artifactId("module-a")
@@ -245,7 +245,7 @@ class InferenceStrategyTest {
                     .build();
 
             String moduleBPomXml = PomBuilder.create()
-                    .namespace("http://maven.apache.org/POM/4.1.0")
+                    .namespace("http://maven.apache.org/POM/4.0.0")
                     .modelVersion("4.1.0")
                     .groupId("com.example")
                     .artifactId("module-b")
@@ -283,7 +283,7 @@ class InferenceStrategyTest {
             String moduleAPomXml =
                     """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.1.0">
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <groupId>com.example</groupId>
                     <artifactId>module-a</artifactId>
                     <version>1.0.0</version>
@@ -293,7 +293,7 @@ class InferenceStrategyTest {
             String moduleBPomXml =
                     """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.1.0">
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <groupId>com.example</groupId>
                     <artifactId>module-b</artifactId>
                     <version>1.0.0</version>
@@ -350,7 +350,7 @@ class InferenceStrategyTest {
             String parentPomXml =
                     """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.1.0">
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.1.0</modelVersion>
                     <groupId>com.example</groupId>
                     <artifactId>parent-project</artifactId>
@@ -361,7 +361,7 @@ class InferenceStrategyTest {
             String childPomXml =
                     """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.1.0">
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.1.0</modelVersion>
                     <parent>
                         <groupId>com.example</groupId>
@@ -407,7 +407,7 @@ class InferenceStrategyTest {
             String parentPomXml =
                     """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.1.0">
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.1.0</modelVersion>
                     <groupId>com.example</groupId>
                     <artifactId>parent-project</artifactId>
@@ -418,7 +418,7 @@ class InferenceStrategyTest {
             String childPomXml =
                     """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.1.0">
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.1.0</modelVersion>
                     <parent>
                         <groupId>com.example</groupId>
@@ -459,7 +459,7 @@ class InferenceStrategyTest {
             String childPomXml =
                     """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.1.0">
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.1.0</modelVersion>
                     <parent>
                         <groupId>org.springframework.boot</groupId>
@@ -500,7 +500,7 @@ class InferenceStrategyTest {
             String parentPomXml =
                     """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.1.0">
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.1.0</modelVersion>
                     <groupId>com.example</groupId>
                     <artifactId>parent-project</artifactId>
@@ -513,7 +513,7 @@ class InferenceStrategyTest {
             String childPomXml =
                     """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.1.0">
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.1.0</modelVersion>
                     <parent>
                         <groupId>com.example</groupId>

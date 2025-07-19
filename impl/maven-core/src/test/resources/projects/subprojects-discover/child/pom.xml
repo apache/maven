@@ -1,4 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.1.0">
+<project xmlns="http://maven.apache.org/POM/4.0.0">
   <parent>
     <groupId>subprojects-discover</groupId>
     <artifactId>parent</artifactId>

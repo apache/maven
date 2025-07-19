@@ -75,7 +75,7 @@ class ModelVersionUtilsTest {
         @DisplayName("should detect 4.1.0 model version")
         void shouldDetect410ModelVersion() throws Exception {
             String pomXml = PomBuilder.create()
-                    .namespace("http://maven.apache.org/POM/4.1.0")
+                    .namespace("http://maven.apache.org/POM/4.0.0")
                     .modelVersion("4.1.0")
                     .groupId("test")
                     .artifactId("test")
@@ -111,7 +111,7 @@ class ModelVersionUtilsTest {
             String pomXml =
                     """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.1.0">
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <groupId>test</groupId>
                     <artifactId>test</artifactId>
                     <version>1.0.0</version>
@@ -417,7 +417,7 @@ class ModelVersionUtilsTest {
         @ValueSource(
                 strings = {
                     "http://maven.apache.org/POM/4.0.0",
-                    "http://maven.apache.org/POM/4.1.0",
+                    "http://maven.apache.org/POM/4.0.0",
                     "https://maven.apache.org/POM/4.0.0",
                     "https://maven.apache.org/POM/4.1.0"
                 })

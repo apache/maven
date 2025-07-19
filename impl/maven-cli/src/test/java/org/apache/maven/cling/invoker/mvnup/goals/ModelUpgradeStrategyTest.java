@@ -176,15 +176,15 @@ class ModelUpgradeStrategyTest {
                             "http://maven.apache.org/POM/4.0.0",
                             "4.0.0",
                             "4.1.0",
-                            "http://maven.apache.org/POM/4.1.0",
+                            "http://maven.apache.org/POM/4.0.0",
                             "4.1.0",
                             1,
                             "Should upgrade from 4.0.0 to 4.1.0"),
                     Arguments.of(
-                            "http://maven.apache.org/POM/4.1.0",
+                            "http://maven.apache.org/POM/4.0.0",
                             "4.1.0",
                             "4.1.0",
-                            "http://maven.apache.org/POM/4.1.0",
+                            "http://maven.apache.org/POM/4.0.0",
                             "4.1.0",
                             0,
                             "Should not modify when already at target version"),
@@ -192,7 +192,7 @@ class ModelUpgradeStrategyTest {
                             "http://maven.apache.org/POM/4.0.0",
                             null,
                             "4.1.0",
-                            "http://maven.apache.org/POM/4.1.0",
+                            "http://maven.apache.org/POM/4.0.0",
                             "4.1.0",
                             1,
                             "Should add model version when missing"));
@@ -237,7 +237,7 @@ class ModelUpgradeStrategyTest {
 
             // Verify namespace was updated recursively
             Element root = document.getRootElement();
-            Namespace newNamespace = Namespace.getNamespace("http://maven.apache.org/POM/4.1.0");
+            Namespace newNamespace = Namespace.getNamespace("http://maven.apache.org/POM/4.0.0");
             assertEquals(newNamespace, root.getNamespace());
 
             // Verify child elements namespace updated recursively
@@ -334,7 +334,7 @@ class ModelUpgradeStrategyTest {
             String pomXml =
                     """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.1.0">
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.1.0</modelVersion>
                     <groupId>com.example</groupId>
                     <artifactId>test-project</artifactId>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.1.0" root="true">
+<project xmlns="http://maven.apache.org/POM/4.0.0" root="true">
   <groupId>org.apache.maven.its.mng7891</groupId>
   <artifactId>extension</artifactId>
   <version>1.0-SNAPSHOT</version>
