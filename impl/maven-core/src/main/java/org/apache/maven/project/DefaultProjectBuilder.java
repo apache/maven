@@ -493,7 +493,16 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                             "The projects in the reactor contain a cyclic reference: " + cycle.getMessage(),
                             (CycleDetectedException) cycle.getException()));
                 }
-                throw new ProjectBuildingException(results);
+                StringBuilder message = new StringBuilder("Project building failed with the following problems:\n");
+                for (ProjectBuildingResult result : results) {
+                    for (org.apache.maven.model.building.ModelProblem problem : result.getProblems()) {
+                        if (problem.getSeverity() != org.apache.maven.model.building.ModelProblem.Severity.WARNING) {
+                            message.append("- ").append(problem.getMessage()).append("\n");
+                        }
+                    }
+                }
+
+                throw new ProjectBuildingException(message.toString(), results);
             }
 
             return results;
