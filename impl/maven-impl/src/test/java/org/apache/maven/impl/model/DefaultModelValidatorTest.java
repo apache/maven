@@ -42,8 +42,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- */
 class DefaultModelValidatorTest {
 
     private ModelValidator validator;
@@ -188,7 +186,7 @@ class DefaultModelValidatorTest {
         assertTrue(
                 errorMessage.contains("4.0.0-test") || errorMessage.contains("unknown"),
                 "Error message should include Maven version: " + errorMessage);
-        assertTrue(errorMessage.contains("newer than the versions supported by this Maven version"));
+        assertTrue(errorMessage.contains("is not supported by this Maven version"));
     }
 
     @Test
