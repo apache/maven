@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
 
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.impl.resolver.artifact.MavenArtifactProperties;
@@ -305,24 +304,6 @@ public class RepositoryUtils {
 
     private static Exclusion toExclusion(org.apache.maven.model.Exclusion exclusion) {
         return new Exclusion(exclusion.getGroupId(), exclusion.getArtifactId(), "*", "*");
-    }
-
-    public static ArtifactTypeRegistry newArtifactTypeRegistry(ArtifactHandlerManager handlerManager) {
-        return new MavenArtifactTypeRegistry(handlerManager);
-    }
-
-    static class MavenArtifactTypeRegistry implements ArtifactTypeRegistry {
-
-        private final ArtifactHandlerManager handlerManager;
-
-        MavenArtifactTypeRegistry(ArtifactHandlerManager handlerManager) {
-            this.handlerManager = handlerManager;
-        }
-
-        public ArtifactType get(String stereotypeId) {
-            ArtifactHandler handler = handlerManager.getArtifactHandler(stereotypeId);
-            return newArtifactType(stereotypeId, handler);
-        }
     }
 
     public static Collection<Artifact> toArtifacts(Collection<org.apache.maven.artifact.Artifact> artifactsToConvert) {

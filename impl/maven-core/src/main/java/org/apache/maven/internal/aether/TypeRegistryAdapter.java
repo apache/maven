@@ -40,15 +40,12 @@ class TypeRegistryAdapter implements ArtifactTypeRegistry {
         if (type instanceof ArtifactType artifactType) {
             return artifactType;
         }
-        if (type != null) {
-            return new DefaultType(
-                    type.id(),
-                    type.getLanguage(),
-                    type.getExtension(),
-                    type.getClassifier(),
-                    type.isIncludesDependencies(),
-                    type.getPathTypes().toArray(new PathType[0]));
-        }
-        return null;
+        return new DefaultType(
+                type.id(),
+                type.getLanguage(),
+                type.getExtension(),
+                type.getClassifier(),
+                type.isIncludesDependencies(),
+                type.getPathTypes().toArray(new PathType[0]));
     }
 }
