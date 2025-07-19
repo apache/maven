@@ -275,8 +275,8 @@ public class RepositoryUtils {
             stereotype = new DefaultArtifactType(dependency.getType());
         }
 
-        boolean system = dependency.getSystemPath() != null
-                && !dependency.getSystemPath().isEmpty();
+        boolean system =
+                dependency.getSystemPath() != null && dependency.getSystemPath().length() > 0;
 
         Map<String, String> props = null;
         if (system) {
@@ -319,7 +319,6 @@ public class RepositoryUtils {
             this.handlerManager = handlerManager;
         }
 
-        @Override
         public ArtifactType get(String stereotypeId) {
             ArtifactHandler handler = handlerManager.getArtifactHandler(stereotypeId);
             return newArtifactType(stereotypeId, handler);
