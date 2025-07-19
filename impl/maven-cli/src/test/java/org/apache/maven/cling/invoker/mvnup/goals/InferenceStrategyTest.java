@@ -150,6 +150,7 @@ class InferenceStrategyTest {
                     """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.1.0</modelVersion>
                     <parent>
                         <groupId>com.example</groupId>
                         <artifactId>parent-project</artifactId>
@@ -284,6 +285,7 @@ class InferenceStrategyTest {
                     """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.1.0</modelVersion>
                     <groupId>com.example</groupId>
                     <artifactId>module-a</artifactId>
                     <version>1.0.0</version>
@@ -294,6 +296,7 @@ class InferenceStrategyTest {
                     """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.1.0</modelVersion>
                     <groupId>com.example</groupId>
                     <artifactId>module-b</artifactId>
                     <version>1.0.0</version>

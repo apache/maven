@@ -104,24 +104,6 @@ class ModelVersionUtilsTest {
             String result = ModelVersionUtils.detectModelVersion(document);
             assertEquals("4.0.0", result); // Default version
         }
-
-        @Test
-        @DisplayName("should detect version from namespace when model version is missing")
-        void shouldDetectVersionFromNamespaceWhenModelVersionMissing() throws Exception {
-            String pomXml =
-                    """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                </project>
-                """;
-
-            Document document = saxBuilder.build(new StringReader(pomXml));
-            String result = ModelVersionUtils.detectModelVersion(document);
-            assertEquals("4.1.0", result);
-        }
     }
 
     @Nested
