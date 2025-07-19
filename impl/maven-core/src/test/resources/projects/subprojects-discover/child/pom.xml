@@ -4,7 +4,6 @@
     <groupId>subprojects-discover</groupId>
     <artifactId>parent</artifactId>
   </parent>
-  <modelVersion>4.1.0</modelVersion>
   <artifactId>child</artifactId>
   <packaging>jar</packaging>
 </project>
