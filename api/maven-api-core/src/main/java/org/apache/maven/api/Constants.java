@@ -410,9 +410,9 @@ public final class Constants {
 
     /**
      * User property for selecting dependency manager behaviour regarding transitive dependencies and dependency
-     * management entries in their POMs. Maven 3 targeted full backward compatibility with Maven2, hence it ignored
-     * dependency management entries in transitive dependency POMs. Maven 4 enables "transitivity" by default, hence
-     * unlike Maven2, obeys dependency management entries deep in dependency graph as well.
+     * management entries in their POMs. Maven 3 targeted full backward compatibility with Maven 2. Hence, it ignored
+     * dependency management entries in transitive dependency POMs. Maven 4 enables "transitivity" by default. Hence
+     * unlike Maven 3, it obeys dependency management entries deep in the dependency graph as well.
      * <br/>
      * Default: <code>"true"</code>.
      *
@@ -465,7 +465,7 @@ public final class Constants {
 
     /**
      * User property for controlling "maven personality". If activated Maven will behave
-     * as previous major version, Maven 3.
+     * like the previous major version, Maven 3.
      *
      * @since 4.0.0
      */
