@@ -1015,6 +1015,65 @@ under the License.
               </execution>
             </executions>
           </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <inherited>false</inherited>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <phase>pre-site</phase>
+                <configuration>
+                  <target>
+                    <!-- directory should be created by org.eclipse.aether.tools.CollectConfiguration -->
+                    <mkdir dir="${project.build.directory}/generated-site/markdown" />
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>3.5.1</version>
+            <inherited>false</inherited>
+            <dependencies>
+              <dependency>
+                <groupId>org.apache.maven.resolver</groupId>
+                <artifactId>maven-resolver-tools</artifactId>
+                <version>${resolverVersion}</version>
+              </dependency>
+            </dependencies>
+            <executions>
+              <execution>
+                <id>render-configuration-page</id>
+                <goals>
+                  <goal>java</goal>
+                </goals>
+                <phase>pre-site</phase>
+                <configuration>
+                  <additionalClasspathElements>
+                    <additionalClasspathElement>${project.basedir}/src/configuration-templates</additionalClasspathElement>
+                  </additionalClasspathElements>
+                  <includePluginDependencies>true</includePluginDependencies>
+                  <mainClass>org.eclipse.aether.tools.CollectConfiguration</mainClass>
+                  <arguments>
+                    <argument>--mode=maven</argument>
+                    <!--
+                    TODO: templates are loaded from classpath, in "normal" JAR project local template would override docgen one,
+                    but in this case the packaging=pom all I could do is use additionalClasspathElement that APPENDS classpath,
+                    hence template is renamed to maven-configuration.md.vm, to avoid conflict (and picking up resolver template)
+                    -->
+                    <argument>--templates=maven-configuration.md,configuration.properties,configuration.yaml</argument>
+                    <argument>${project.basedir}</argument>
+                    <argument>${project.build.directory}/generated-site/markdown</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
         </plugins>
       </build>
     </profile>
