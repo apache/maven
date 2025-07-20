@@ -41,7 +41,6 @@ public class MavenToolchainsXpp3Writer {
 
     public MavenToolchainsXpp3Writer() {
         delegate = new MavenToolchainsStaxWriter();
-        delegate.setAddLocationInformation(false);
     }
 
     /**

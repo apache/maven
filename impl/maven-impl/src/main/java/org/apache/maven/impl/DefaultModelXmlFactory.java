@@ -127,9 +127,7 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
         }
         try {
             MavenStaxWriter w = new MavenStaxWriter();
-            w.setAddLocationInformation(false);
             if (inputLocationFormatter != null) {
-                w.setAddLocationInformation(true);
                 w.setStringFormatter((Function) inputLocationFormatter);
             }
             if (writer != null) {

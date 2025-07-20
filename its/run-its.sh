@@ -25,10 +25,10 @@
 # In rare occasions, some ITs may depend on latest maven snapshots.
 # In such cases you need to:
 #  - build maven using `mvn install -PversionlessMavenDist -Dmaven.repo.local=[my-repo-local]`
-#  - run ITs using `mvn clean install -Prun-its,embedded -Dmaven.repo.local=[my-repo-local] -DmavenDistro=[maven-source-tree]/apache-maven/target/maven-bin.zip`
+#  - run ITs using `mvn clean install -Prun-its -Dmaven.repo.local=[my-repo-local] -DmavenDistro=[maven-source-tree]/apache-maven/target/maven-bin.zip`
 
-mvn clean install -Prun-its,embedded -Dmaven.repo.local=`pwd`/repo
+mvn clean install -Prun-its -Dmaven.repo.local=`pwd`/repo
 
 # If behind a proxy try this
 
-# mvn clean install -Prun-its,embedded -Dmaven.repo.local=`pwd`/repo -Dproxy.host=<host> -Dproxy.port=<port> -Dproxy.user= -Dproxy.pass= -Dproxy.nonProxyHosts=<hosts>
+# mvn clean install -Prun-its -Dmaven.repo.local=`pwd`/repo -Dproxy.host=<host> -Dproxy.port=<port> -Dproxy.user= -Dproxy.pass= -Dproxy.nonProxyHosts=<hosts>

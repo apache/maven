@@ -89,7 +89,6 @@ class ModelXmlTest {
     String toXml(Model model) throws IOException, XMLStreamException {
         StringWriter sw = new StringWriter();
         MavenStaxWriter writer = new MavenStaxWriter();
-        writer.setAddLocationInformation(false);
         writer.write(sw, model);
         return sw.toString();
     }

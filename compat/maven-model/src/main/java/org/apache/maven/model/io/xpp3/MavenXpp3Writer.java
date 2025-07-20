@@ -23,13 +23,14 @@ import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.util.function.Function;
 
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.v4.MavenStaxWriter;
 
 /**
- * @deprecated Use MavenStaxWriter instead
+ * @deprecated Use {@link MavenStaxWriter} instead
  */
 @Deprecated
 public class MavenXpp3Writer {
@@ -44,11 +45,11 @@ public class MavenXpp3Writer {
     // -----------/
 
     public MavenXpp3Writer() {
-        this(false);
+        this((inputLocation) -> inputLocation.toString());
     }
 
-    protected MavenXpp3Writer(boolean addLocationInformation) {
-        delegate.setAddLocationInformation(addLocationInformation);
+    protected MavenXpp3Writer(Function<org.apache.maven.api.model.InputLocation, String> formatter) {
+        delegate.setStringFormatter(formatter);
     }
 
     /**
