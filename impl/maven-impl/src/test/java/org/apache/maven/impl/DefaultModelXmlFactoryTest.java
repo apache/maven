@@ -29,7 +29,6 @@ import org.apache.maven.api.services.xml.XmlWriterRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -167,7 +166,7 @@ class DefaultModelXmlFactoryTest {
         factory.write(request);
 
         final String processedPomAsString = writer.toString();
-        assertThat(processedPomAsString).isEqualTo(expected);
+        assertEquals(expected, processedPomAsString);
     }
 
     @Test
@@ -211,6 +210,6 @@ class DefaultModelXmlFactoryTest {
         factory.write(request);
 
         final String processedPomAsString = writer.toString();
-        assertThat(processedPomAsString).isEqualTo(expected);
+        assertEquals(expected, processedPomAsString);
     }
 }
