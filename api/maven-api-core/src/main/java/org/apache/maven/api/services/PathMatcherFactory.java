@@ -138,4 +138,19 @@ public interface PathMatcherFactory extends Service {
      */
     @Nonnull
     PathMatcher deriveDirectoryMatcher(@Nonnull PathMatcher fileMatcher);
+
+    /**
+     * Returns the patch matcher that unconditionally returns {@code true} for all files.
+     * It should be the matcher returned by the other methods of this interface when the
+     * given patterns match all files. Therefore, the following idiom can be used:
+     *
+     * {@snippet lang="java" :
+     * PathMatcher fileMatcher = factory.createPathMatcher(dir, includes, excludes);
+     * boolean selectedAllFiles = (fileMatcher == factory.includesAll);
+     * }
+     *
+     * @return patch matcher that unconditionally returns {@code true} for all files
+     */
+    @Nonnull
+    PathMatcher includesAll();
 }
