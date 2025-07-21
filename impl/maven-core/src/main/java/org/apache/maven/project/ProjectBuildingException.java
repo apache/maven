@@ -21,6 +21,8 @@ package org.apache.maven.project;
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.model.building.ModelProblem;
+
 /**
  */
 public class ProjectBuildingException extends Exception {
@@ -109,7 +111,7 @@ public class ProjectBuildingException extends Exception {
 
         long errorProblems = results.stream()
                 .flatMap(r -> r.getProblems().stream())
-                .filter(p -> p.getSeverity() != org.apache.maven.model.building.ModelProblem.Severity.WARNING)
+                .filter(p -> p.getSeverity() != ModelProblem.Severity.WARNING)
                 .count();
 
         StringBuilder buffer = new StringBuilder(1024);
@@ -137,9 +139,9 @@ public class ProjectBuildingException extends Exception {
 
                 buffer.append("\n[").append(projectInfo).append("]\n");
 
-                for (org.apache.maven.model.building.ModelProblem problem : result.getProblems()) {
+                for (ModelProblem problem : result.getProblems()) {
                     if (errorProblems > 0
-                            && problem.getSeverity() == org.apache.maven.model.building.ModelProblem.Severity.WARNING) {
+                            && problem.getSeverity() == ModelProblem.Severity.WARNING) {
                         continue;
                     }
 
