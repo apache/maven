@@ -13,7 +13,7 @@
         <artifactId>build-helper-maven-plugin</artifactId>
         <version>3.4.0</version>
         <configuration>
-          <project>
+          <project xmlns="http://maven.apache.org/POM/4.0.0">
             <groupId>com.flowlogix</groupId>
             <artifactId>flowlogix</artifactId>
           </project>

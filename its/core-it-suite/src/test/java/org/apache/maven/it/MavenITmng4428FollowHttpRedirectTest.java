@@ -186,7 +186,7 @@ public class MavenITmng4428FollowHttpRedirectTest extends AbstractMavenIntegrati
                 }
                 response.setHeader("Location", location);
             } else if (uri.endsWith(".pom")) {
-                writer.println("<project>");
+                writer.println("<project xmlns="http://maven.apache.org/POM/4.0.0">");
                 writer.println("  <modelVersion>4.0.0</modelVersion>");
                 writer.println("  <groupId>org.apache.maven.its.mng4428</groupId>");
                 writer.println("  <artifactId>dep</artifactId>");

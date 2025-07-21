@@ -20,7 +20,7 @@ under the License.
 <!--
 NOTE: This POM's XML declaration specified no encoding which should therefore default to UTF-8.
 -->
-<project>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>

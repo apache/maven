@@ -21,7 +21,7 @@ under the License.
 
 <!-- NOTE: It's crucial part of the test that the checksums don't match this POM -->
 
-<project>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.its.mng3470</groupId>
