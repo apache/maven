@@ -204,7 +204,7 @@ for /F "usebackq tokens=* delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.conf
         )
     )
 )
-@endlocal & set "JVM_CONFIG_MAVEN_OPTS=%JVM_CONFIG_MAVEN_OPTS%"
+@endlocal & set JVM_CONFIG_MAVEN_OPTS=%JVM_CONFIG_MAVEN_OPTS%
 
 :endReadJvmConfig
 
