@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.ProtoSession;
@@ -62,7 +63,6 @@ import org.codehaus.plexus.components.secdispatcher.internal.DefaultSecDispatche
 
 /**
  * Builds the effective settings from a user settings file and/or a global settings file.
- *
  */
 @Named
 public class DefaultSettingsBuilder implements SettingsBuilder {
@@ -203,6 +203,10 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         settings = interpolate(settings, request, problems);
         settings = decrypt(settingsSource, settings, request, problems);
 
+        if (!isProjectSettings) {
+            settings = settings.withServers(serversByIds(settings.getServers()));
+        }
+
         settingsValidator.validate(settings, isProjectSettings, problems);
 
         if (isProjectSettings) {
@@ -226,6 +230,17 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         }
 
         return settings;
+    }
+
+    private List<Server> serversByIds(List<Server> servers) {
+        return servers.stream()
+                .flatMap(server -> Stream.concat(
+                        Stream.of(server), server.getIds().stream().map(id -> serverAlias(server, id))))
+                .toList();
+    }
+
+    private Server serverAlias(Server server, String id) {
+        return Server.newBuilder(server, true).id(id).ids(List.of()).build();
     }
 
     private Settings interpolate(
@@ -332,7 +347,6 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
     /**
      * Collects the output of the settings builder.
-     *
      */
     static class DefaultSettingsBuilderResult implements SettingsBuilderResult {
 
