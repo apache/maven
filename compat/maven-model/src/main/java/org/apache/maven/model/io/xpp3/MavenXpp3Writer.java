@@ -44,8 +44,7 @@ public class MavenXpp3Writer {
     // - Methods -/
     // -----------/
 
-    public MavenXpp3Writer() {
-    }
+    public MavenXpp3Writer() {}
 
     protected MavenXpp3Writer(Function<org.apache.maven.api.model.InputLocation, String> formatter) {
         delegate.setStringFormatter(formatter);
