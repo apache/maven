@@ -31,8 +31,7 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -239,8 +238,8 @@ class ProjectSorterTest {
         assertEquals(parentProject, projects.get(0));
 
         // the order of these two is non-deterministic, based on when they're added to the reactor.
-        assertThat(projects, hasItem(pluginProject));
-        assertThat(projects, hasItem(pluginLevelDepProject));
+        assertThat(projects).contains(pluginProject);
+        assertThat(projects).contains(pluginLevelDepProject);
 
         // the declaring project MUST be listed after the plugin and its plugin-level dep, though.
         assertEquals(declaringProject, projects.get(3));
@@ -276,8 +275,8 @@ class ProjectSorterTest {
         assertEquals(parentProject, projects.get(0));
 
         // the order of these two is non-deterministic, based on when they're added to the reactor.
-        assertThat(projects, hasItem(pluginProject));
-        assertThat(projects, hasItem(pluginLevelDepProject));
+        assertThat(projects).contains(pluginProject);
+        assertThat(projects).contains(pluginLevelDepProject);
     }
 
     @Test
@@ -294,8 +293,8 @@ class ProjectSorterTest {
 
         projects = new ProjectSorter(projects).getSortedProjects();
 
-        assertThat(projects, hasItem(pluginProjectA));
-        assertThat(projects, hasItem(pluginProjectB));
+        assertThat(projects).contains(pluginProjectA);
+        assertThat(projects).contains(pluginProjectB);
     }
 
     @Test

@@ -49,8 +49,7 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -288,7 +287,7 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     void testLifecyclePluginsRetrievalForDefaultLifecycle() throws Exception {
         List<Plugin> plugins = new ArrayList<>(lifecycleExecutor.getPluginsBoundByDefaultToAllLifecycles("jar"));
 
-        assertThat(plugins.toString(), plugins, hasSize(8));
+        assertThat(plugins).as(plugins.toString()).hasSize(8);
     }
 
     @Test

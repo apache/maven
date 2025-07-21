@@ -39,15 +39,7 @@ import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import static org.apache.maven.project.ProjectBuildingResultWithLocationMatcher.projectBuildingResultWithLocation;
-import static org.apache.maven.project.ProjectBuildingResultWithProblemMessageMatcher.projectBuildingResultWithProblemMessage;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -98,12 +90,12 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         ProjectBuildingException e = assertThrows(ProjectBuildingException.class, () -> getContainer()
                 .lookup(org.apache.maven.project.ProjectBuilder.class)
                 .build(pomFile, configuration));
-        assertThat(
-                e.getResults(),
-                contains(
-                        projectBuildingResultWithProblemMessage(
-                                "'dependencies.dependency.version' for groupId='org.apache.maven.its', artifactId='a', type='jar' is missing")));
-        assertThat(e.getResults(), contains(projectBuildingResultWithLocation(5, 9)));
+        assertThat(e.getResults()).hasSize(1);
+        ProjectBuildingResultWithProblemMessageAssert.assertThat(e.getResults().get(0))
+                .hasProblemMessage(
+                        "'dependencies.dependency.version' for groupId='org.apache.maven.its', artifactId='a', type='jar' is missing");
+        ProjectBuildingResultWithLocationAssert.assertThat(e.getResults().get(0))
+                .hasLocation(9, 5);
     }
 
     @Test
@@ -187,7 +179,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         Files.write(parent.toPath(), parentContent.getBytes(StandardCharsets.UTF_8));
         // re-build pom with modified parent
         ProjectBuildingResult result = projectBuilder.build(child, configuration);
-        assertThat(result.getProject().getProperties(), hasKey((Object) "addedProperty"));
+        assertThat(result.getProject().getProperties()).containsKey("addedProperty");
     }
 
     @Test
@@ -235,7 +227,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
 
         // single project build entry point
         Exception ex = assertThrows(Exception.class, () -> projectBuilder.build(pomFile, configuration));
-        assertThat(ex.getMessage(), containsString("Received non-all-whitespace CHARACTERS or CDATA event"));
+        assertThat(ex.getMessage()).contains("Received non-all-whitespace CHARACTERS or CDATA event");
 
         // multi projects build entry point
         ProjectBuildingException pex = assertThrows(
@@ -243,11 +235,10 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
                 () -> projectBuilder.build(Collections.singletonList(pomFile), false, configuration));
         assertEquals(1, pex.getResults().size());
         assertNotNull(pex.getResults().get(0).getPomFile());
-        assertThat(pex.getResults().get(0).getProblems().size(), greaterThan(0));
-        assertThat(
-                pex.getResults(),
-                contains(projectBuildingResultWithProblemMessage(
-                        "Received non-all-whitespace CHARACTERS or CDATA event in nextTag()")));
+        assertThat(pex.getResults().get(0).getProblems().size()).isGreaterThan(0);
+        ProjectBuildingResultWithProblemMessageAssert.assertThat(
+                        pex.getResults().get(0))
+                .hasProblemMessage("Received non-all-whitespace CHARACTERS or CDATA event in nextTag()");
     }
 
     @Test
@@ -298,7 +289,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
 
     private void assertResultShowNoError(List<ProjectBuildingResult> results) {
         for (ProjectBuildingResult result : results) {
-            assertThat(result.getProblems(), is(empty()));
+            assertThat(result.getProblems()).isEmpty();
             assertNotNull(result.getProject());
         }
     }

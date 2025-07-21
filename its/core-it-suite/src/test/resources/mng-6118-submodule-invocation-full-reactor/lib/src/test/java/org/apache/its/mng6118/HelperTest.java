@@ -39,15 +39,13 @@ package org.apache.its.mng6118;
 
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class HelperTest {
     private final Helper helper = new Helper();
 
     @Test
     public void shouldAnswerWithTrue() {
-        assertThat(helper.generateObject(), is(notNullValue()));
+        assertThat(helper.generateObject()).isNotNull();
     }
 }

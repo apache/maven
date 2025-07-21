@@ -24,9 +24,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.not;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class MavenITmng7228LeakyModelTest extends AbstractMavenIntegrationTestCase {
 
@@ -60,16 +58,16 @@ class MavenITmng7228LeakyModelTest extends AbstractMavenIntegrationTestCase {
         String pom = FileUtils.readFileToString(new File(
                 verifier.getArtifactPath("org.apache.maven.its.mng7228", "test", "1.0.0-SNAPSHOT", "pom", classifier)));
 
-        assertThat(pom, containsString("projectProperty"));
-        assertThat(pom, not(containsString("activeProperty")));
-        assertThat(pom, not(containsString("manualProperty")));
+        assertThat(pom).contains("projectProperty");
+        assertThat(pom).doesNotContain("activeProperty");
+        assertThat(pom).doesNotContain("manualProperty");
 
-        assertThat(pom, containsString("project-repo"));
-        assertThat(pom, not(containsString("active-repo")));
-        assertThat(pom, not(containsString("manual-repo")));
+        assertThat(pom).contains("project-repo");
+        assertThat(pom).doesNotContain("active-repo");
+        assertThat(pom).doesNotContain("manual-repo");
 
-        assertThat(pom, containsString("project-plugin-repo"));
-        assertThat(pom, not(containsString("active-plugin-repo")));
-        assertThat(pom, not(containsString("manual-plugin-repo")));
+        assertThat(pom).contains("project-plugin-repo");
+        assertThat(pom).doesNotContain("active-plugin-repo");
+        assertThat(pom).doesNotContain("manual-plugin-repo");
     }
 }

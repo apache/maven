@@ -26,8 +26,7 @@ import org.apache.maven.model.Exclusion;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -53,7 +52,7 @@ class ExclusionArtifactFilterTest {
         exclusion.setArtifactId("maven-core");
         ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
 
-        assertThat(filter.include(artifact), is(false));
+        assertThat(filter.include(artifact)).isEqualTo(false);
     }
 
     @Test
@@ -63,7 +62,7 @@ class ExclusionArtifactFilterTest {
         exclusion.setArtifactId("maven-model");
         ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
 
-        assertThat(filter.include(artifact), is(true));
+        assertThat(filter.include(artifact)).isEqualTo(true);
     }
 
     @Test
@@ -73,7 +72,7 @@ class ExclusionArtifactFilterTest {
         exclusion.setArtifactId("maven-core");
         ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
 
-        assertThat(filter.include(artifact), is(false));
+        assertThat(filter.include(artifact)).isEqualTo(false);
     }
 
     @Test
@@ -83,7 +82,7 @@ class ExclusionArtifactFilterTest {
         exclusion.setArtifactId("maven-compat");
         ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
 
-        assertThat(filter.include(artifact), is(true));
+        assertThat(filter.include(artifact)).isEqualTo(true);
     }
 
     @Test
@@ -93,7 +92,7 @@ class ExclusionArtifactFilterTest {
         exclusion.setArtifactId("*");
         ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
 
-        assertThat(filter.include(artifact), is(false));
+        assertThat(filter.include(artifact)).isEqualTo(false);
     }
 
     @Test
@@ -103,7 +102,7 @@ class ExclusionArtifactFilterTest {
         exclusion.setArtifactId("*");
         ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
 
-        assertThat(filter.include(artifact), is(true));
+        assertThat(filter.include(artifact)).isEqualTo(true);
     }
 
     @Test
@@ -113,7 +112,7 @@ class ExclusionArtifactFilterTest {
         exclusion.setArtifactId("*");
         ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
 
-        assertThat(filter.include(artifact), is(false));
+        assertThat(filter.include(artifact)).isEqualTo(false);
     }
 
     @Test
@@ -128,7 +127,7 @@ class ExclusionArtifactFilterTest {
 
         ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Arrays.asList(exclusion1, exclusion2));
 
-        assertThat(filter.include(artifact), is(false));
+        assertThat(filter.include(artifact)).isEqualTo(false);
     }
 
     @Test
@@ -143,7 +142,7 @@ class ExclusionArtifactFilterTest {
 
         ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Arrays.asList(exclusion1, exclusion2));
 
-        assertThat(filter.include(artifact), is(false));
+        assertThat(filter.include(artifact)).isEqualTo(false);
     }
 
     @Test
@@ -153,8 +152,8 @@ class ExclusionArtifactFilterTest {
         exclusion.setArtifactId("maven-*");
         ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
 
-        assertThat(filter.include(artifact), is(false));
-        assertThat(filter.include(artifact2), is(true));
+        assertThat(filter.include(artifact)).isEqualTo(false);
+        assertThat(filter.include(artifact2)).isEqualTo(true);
     }
 
     @Test
@@ -164,7 +163,7 @@ class ExclusionArtifactFilterTest {
         exclusion.setArtifactId("maven-**");
         ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
 
-        assertThat(filter.include(artifact), is(false));
-        assertThat(filter.include(artifact2), is(true));
+        assertThat(filter.include(artifact)).isEqualTo(false);
+        assertThat(filter.include(artifact2)).isEqualTo(true);
     }
 }

@@ -23,9 +23,7 @@ import java.util.List;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 
@@ -46,6 +44,6 @@ class DefaultMavenExecutionTest {
         result.setTopologicallySortedProjects(null);
         List<MavenProject> projects = result.getTopologicallySortedProjects();
         assertNotNull(projects);
-        assertThat(projects, is(empty()));
+        assertThat(projects).isEmpty();
     }
 }

@@ -39,8 +39,7 @@ import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -80,7 +79,7 @@ class DefaultModelResolverTest {
                 () -> newModelResolver().resolveModel(session, null, parent, new AtomicReference<>()),
                 "Expected 'ModelResolverException' not thrown.");
         assertNotNull(e.getMessage());
-        assertThat(e.getMessage(), containsString("Could not find artifact org.apache:apache:pom:0 in central"));
+        assertThat(e.getMessage()).contains("Could not find artifact org.apache:apache:pom:0 in central");
     }
 
     @Test
@@ -151,7 +150,7 @@ class DefaultModelResolverTest {
                 () -> newModelResolver().resolveModel(session, null, dependency, new AtomicReference<>()),
                 "Expected 'ModelResolverException' not thrown.");
         assertNotNull(e.getMessage());
-        assertThat(e.getMessage(), containsString("Could not find artifact org.apache:apache:pom:0 in central"));
+        assertThat(e.getMessage()).contains("Could not find artifact org.apache:apache:pom:0 in central");
     }
 
     @Test

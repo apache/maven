@@ -56,7 +56,6 @@ import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.aether.transfer.TransferListener;
-import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -68,12 +67,7 @@ import org.mockito.InOrder;
 import static java.util.Arrays.asList;
 import static org.apache.maven.cli.MavenCli.performProfileActivation;
 import static org.apache.maven.cli.MavenCli.performProjectActivation;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -118,19 +112,19 @@ class MavenCliTest {
 
         activation = new ProfileActivation();
         performProfileActivation(parser.parse(options, new String[] {"-P", "test1,+test2,?test3,+?test4"}), activation);
-        assertThat(activation.getRequiredActiveProfileIds(), containsInAnyOrder("test1", "test2"));
-        assertThat(activation.getOptionalActiveProfileIds(), containsInAnyOrder("test3", "test4"));
+        assertThat(activation.getRequiredActiveProfileIds()).containsExactlyInAnyOrder("test1", "test2");
+        assertThat(activation.getOptionalActiveProfileIds()).containsExactlyInAnyOrder("test3", "test4");
 
         activation = new ProfileActivation();
         performProfileActivation(
                 parser.parse(options, new String[] {"-P", "!test1,-test2,-?test3,!?test4"}), activation);
-        assertThat(activation.getRequiredInactiveProfileIds(), containsInAnyOrder("test1", "test2"));
-        assertThat(activation.getOptionalInactiveProfileIds(), containsInAnyOrder("test3", "test4"));
+        assertThat(activation.getRequiredInactiveProfileIds()).containsExactlyInAnyOrder("test1", "test2");
+        assertThat(activation.getOptionalInactiveProfileIds()).containsExactlyInAnyOrder("test3", "test4");
 
         activation = new ProfileActivation();
         performProfileActivation(parser.parse(options, new String[] {"-P", "-test1,+test2"}), activation);
-        assertThat(activation.getRequiredActiveProfileIds(), containsInAnyOrder("test2"));
-        assertThat(activation.getRequiredInactiveProfileIds(), containsInAnyOrder("test1"));
+        assertThat(activation.getRequiredActiveProfileIds()).containsExactlyInAnyOrder("test2");
+        assertThat(activation.getRequiredInactiveProfileIds()).containsExactlyInAnyOrder("test1");
     }
 
     @Test
@@ -145,19 +139,19 @@ class MavenCliTest {
         activation = new ProjectActivation();
         performProjectActivation(
                 parser.parse(options, new String[] {"-pl", "test1,+test2,?test3,+?test4"}), activation);
-        assertThat(activation.getRequiredActiveProjectSelectors(), containsInAnyOrder("test1", "test2"));
-        assertThat(activation.getOptionalActiveProjectSelectors(), containsInAnyOrder("test3", "test4"));
+        assertThat(activation.getRequiredActiveProjectSelectors()).containsExactlyInAnyOrder("test1", "test2");
+        assertThat(activation.getOptionalActiveProjectSelectors()).containsExactlyInAnyOrder("test3", "test4");
 
         activation = new ProjectActivation();
         performProjectActivation(
                 parser.parse(options, new String[] {"-pl", "!test1,-test2,-?test3,!?test4"}), activation);
-        assertThat(activation.getRequiredInactiveProjectSelectors(), containsInAnyOrder("test1", "test2"));
-        assertThat(activation.getOptionalInactiveProjectSelectors(), containsInAnyOrder("test3", "test4"));
+        assertThat(activation.getRequiredInactiveProjectSelectors()).containsExactlyInAnyOrder("test1", "test2");
+        assertThat(activation.getOptionalInactiveProjectSelectors()).containsExactlyInAnyOrder("test3", "test4");
 
         activation = new ProjectActivation();
         performProjectActivation(parser.parse(options, new String[] {"-pl", "-test1,+test2"}), activation);
-        assertThat(activation.getRequiredActiveProjectSelectors(), containsInAnyOrder("test2"));
-        assertThat(activation.getRequiredInactiveProjectSelectors(), containsInAnyOrder("test1"));
+        assertThat(activation.getRequiredActiveProjectSelectors()).containsExactlyInAnyOrder("test2");
+        assertThat(activation.getRequiredInactiveProjectSelectors()).containsExactlyInAnyOrder("test1");
     }
 
     @Test
@@ -445,7 +439,7 @@ class MavenCliTest {
 
         String selector = cli.getResumeFromSelector(allProjects, failedProject);
 
-        assertThat(selector, is(":module-a"));
+        assertThat(selector).isEqualTo(":module-a");
     }
 
     @Test
@@ -456,7 +450,7 @@ class MavenCliTest {
 
         String selector = cli.getResumeFromSelector(allProjects, failedProject);
 
-        assertThat(selector, is("group-a:module"));
+        assertThat(selector).isEqualTo("group-a:module");
     }
 
     @Test
@@ -469,19 +463,21 @@ class MavenCliTest {
         // Use default
         cli.cli(request);
         executionRequest = cli.populateRequest(request);
-        assertThat(executionRequest.getLocalRepositoryPath(), is(nullValue()));
+        assertThat(executionRequest.getLocalRepositoryPath()).isNull();
 
         // System-properties override default
         request.getSystemProperties().setProperty(Constants.MAVEN_REPO_LOCAL, "." + File.separatorChar + "custom1");
         executionRequest = cli.populateRequest(request);
-        assertThat(executionRequest.getLocalRepositoryPath(), is(notNullValue()));
-        assertThat(executionRequest.getLocalRepositoryPath().toString(), is("." + File.separatorChar + "custom1"));
+        assertThat(executionRequest.getLocalRepositoryPath()).isNotNull();
+        assertThat(executionRequest.getLocalRepositoryPath().toString())
+                .isEqualTo("." + File.separatorChar + "custom1");
 
         // User-properties override system properties
         request.getUserProperties().setProperty(Constants.MAVEN_REPO_LOCAL, "." + File.separatorChar + "custom2");
         executionRequest = cli.populateRequest(request);
-        assertThat(executionRequest.getLocalRepositoryPath(), is(notNullValue()));
-        assertThat(executionRequest.getLocalRepositoryPath().toString(), is("." + File.separatorChar + "custom2"));
+        assertThat(executionRequest.getLocalRepositoryPath()).isNotNull();
+        assertThat(executionRequest.getLocalRepositoryPath().toString())
+                .isEqualTo("." + File.separatorChar + "custom2");
     }
 
     /**
@@ -522,7 +518,7 @@ class MavenCliTest {
         cli.properties(request);
 
         // Assert
-        assertThat(request.getUserProperties().getProperty("w"), is("x=y"));
+        assertThat(request.getUserProperties().getProperty("w")).isEqualTo("x=y");
     }
 
     @Test
@@ -535,7 +531,7 @@ class MavenCliTest {
         cli.properties(request);
 
         // Assert
-        assertThat(request.getUserProperties().getProperty("z"), is("2"));
+        assertThat(request.getUserProperties().getProperty("z")).isEqualTo("2");
     }
 
     @Test
@@ -548,7 +544,7 @@ class MavenCliTest {
         cli.properties(request);
 
         // Assert
-        assertThat(request.getUserProperties().getProperty("x"), is("true"));
+        assertThat(request.getUserProperties().getProperty("x")).isEqualTo("true");
     }
 
     @Test
@@ -561,8 +557,8 @@ class MavenCliTest {
         cli.properties(request);
 
         // Assert
-        assertThat(request.getUserProperties().getProperty("x"), is("1"));
-        assertThat(request.getUserProperties().getProperty("y"), is("true"));
+        assertThat(request.getUserProperties().getProperty("x")).isEqualTo("1");
+        assertThat(request.getUserProperties().getProperty("y")).isEqualTo("true");
     }
 
     @Test
@@ -575,7 +571,7 @@ class MavenCliTest {
         cli.properties(request);
 
         // Assert
-        assertThat(request.getUserProperties().getProperty("x"), is("false"));
+        assertThat(request.getUserProperties().getProperty("x")).isEqualTo("false");
     }
 
     @Test
@@ -628,18 +624,18 @@ class MavenCliTest {
         cli.properties(request);
 
         // Assert
-        assertThat(request.getUserProperties().getProperty("fro"), CoreMatchers.startsWith("chti"));
-        assertThat(request.getUserProperties().getProperty("valFound"), is("sbari"));
-        assertThat(request.getUserProperties().getProperty("valNotFound"), is("s${foz}i"));
-        assertThat(request.getUserProperties().getProperty("valRootDirectory"), is("C:\\myRootDirectory/.mvn/foo"));
-        assertThat(
-                request.getUserProperties().getProperty("valTopDirectory"),
-                is("C:\\myRootDirectory\\myTopDirectory/pom.xml"));
-        assertThat(request.getCommandLine().getOptionValue('f'), is("C:\\myRootDirectory/my-child"));
-        assertThat(request.getCommandLine().getArgs(), equalTo(new String[] {"prefix:3.0.0:bar", "validate"}));
+        assertThat(request.getUserProperties().getProperty("fro")).startsWith("chti");
+        assertThat(request.getUserProperties().getProperty("valFound")).isEqualTo("sbari");
+        assertThat(request.getUserProperties().getProperty("valNotFound")).isEqualTo("s${foz}i");
+        assertThat(request.getUserProperties().getProperty("valRootDirectory"))
+                .isEqualTo("C:\\myRootDirectory/.mvn/foo");
+        assertThat(request.getUserProperties().getProperty("valTopDirectory"))
+                .isEqualTo("C:\\myRootDirectory\\myTopDirectory/pom.xml");
+        assertThat(request.getCommandLine().getOptionValue('f')).isEqualTo("C:\\myRootDirectory/my-child");
+        assertThat(request.getCommandLine().getArgs()).isEqualTo(new String[] {"prefix:3.0.0:bar", "validate"});
 
         Path p = fs.getPath(request.getUserProperties().getProperty("valTopDirectory"));
-        assertThat(p.toString(), is("C:\\myRootDirectory\\myTopDirectory\\pom.xml"));
+        assertThat(p.toString()).isEqualTo("C:\\myRootDirectory\\myTopDirectory\\pom.xml");
     }
 
     @Test
@@ -667,7 +663,7 @@ class MavenCliTest {
 
         boolean batchMode = !cli.populateRequest(request).isInteractiveMode();
 
-        assertThat(batchMode, is(isBatchMode));
+        assertThat(batchMode).isEqualTo(isBatchMode);
     }
 
     public static Stream<Arguments> activateBatchModeArguments() {
@@ -699,7 +695,7 @@ class MavenCliTest {
             transferListener = simplexTransferListener.getDelegate();
         }
 
-        assertThat(transferListener.getClass(), is(expectedSubClass));
+        assertThat(transferListener.getClass()).isEqualTo(expectedSubClass);
     }
 
     public static Stream<Arguments> calculateTransferListenerArguments() {

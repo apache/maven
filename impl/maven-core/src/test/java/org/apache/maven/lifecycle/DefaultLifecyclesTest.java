@@ -34,10 +34,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.arrayWithSize;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -51,29 +48,29 @@ class DefaultLifecyclesTest {
     @Test
     void testDefaultLifecycles() {
         final List<Lifecycle> lifecycles = defaultLifeCycles.getLifeCycles();
-        assertThat(lifecycles, hasSize(3));
-        assertThat(DefaultLifecycles.STANDARD_LIFECYCLES, arrayWithSize(3));
+        assertThat(lifecycles).hasSize(3);
+        assertThat(DefaultLifecycles.STANDARD_LIFECYCLES).hasSize(3);
     }
 
     @Test
     void testDefaultLifecycle() {
         final Lifecycle lifecycle = getLifeCycleById("default");
-        assertThat(lifecycle.getId(), is("default"));
-        assertThat(lifecycle.getPhases(), hasSize(54));
+        assertThat(lifecycle.getId()).isEqualTo("default");
+        assertThat(lifecycle.getPhases()).hasSize(54);
     }
 
     @Test
     void testCleanLifecycle() {
         final Lifecycle lifecycle = getLifeCycleById("clean");
-        assertThat(lifecycle.getId(), is("clean"));
-        assertThat(lifecycle.getPhases(), hasSize(3));
+        assertThat(lifecycle.getId()).isEqualTo("clean");
+        assertThat(lifecycle.getPhases()).hasSize(3);
     }
 
     @Test
     void testSiteLifecycle() {
         final Lifecycle lifecycle = getLifeCycleById("site");
-        assertThat(lifecycle.getId(), is("site"));
-        assertThat(lifecycle.getPhases(), hasSize(6));
+        assertThat(lifecycle.getId()).isEqualTo("site");
+        assertThat(lifecycle.getPhases()).hasSize(6);
     }
 
     @Test
@@ -93,10 +90,10 @@ class DefaultLifecyclesTest {
                         List.of(new DefaultLifecycleRegistry.LifecycleWrapperProvider(mockedPlexusContainer))),
                 new DefaultLookup(mockedPlexusContainer));
 
-        assertThat(dl.getLifeCycles().get(0).getId(), is("clean"));
-        assertThat(dl.getLifeCycles().get(1).getId(), is("default"));
-        assertThat(dl.getLifeCycles().get(2).getId(), is("site"));
-        assertThat(dl.getLifeCycles().get(3).getId(), is("etl"));
+        assertThat(dl.getLifeCycles().get(0).getId()).isEqualTo("clean");
+        assertThat(dl.getLifeCycles().get(1).getId()).isEqualTo("default");
+        assertThat(dl.getLifeCycles().get(2).getId()).isEqualTo("site");
+        assertThat(dl.getLifeCycles().get(3).getId()).isEqualTo("etl");
     }
 
     private Lifecycle getLifeCycleById(String id) {

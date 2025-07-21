@@ -28,9 +28,7 @@ import org.apache.maven.model.io.DefaultModelWriter;
 import org.apache.maven.model.io.ModelWriter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.xmlunit.matchers.CompareMatcher;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -190,8 +188,11 @@ class DefaultInheritanceAssemblerTest {
         // check with getPom( baseName + "-expected" )
         File expected = getPom(baseName + "-expected");
 
-        assertThat(
-                actual, CompareMatcher.isIdenticalTo(expected).ignoreComments().ignoreWhitespace());
+        org.xmlunit.assertj.XmlAssert.assertThat(actual)
+                .and(expected)
+                .ignoreComments()
+                .ignoreWhitespace()
+                .areIdentical();
     }
 
     @Test
@@ -211,7 +212,10 @@ class DefaultInheritanceAssemblerTest {
         // check with getPom( "module-path-not-artifactId-effective" )
         File expected = getPom("module-path-not-artifactId-expected");
 
-        assertThat(
-                actual, CompareMatcher.isIdenticalTo(expected).ignoreComments().ignoreWhitespace());
+        org.xmlunit.assertj.XmlAssert.assertThat(actual)
+                .and(expected)
+                .ignoreComments()
+                .ignoreWhitespace()
+                .areIdentical();
     }
 }

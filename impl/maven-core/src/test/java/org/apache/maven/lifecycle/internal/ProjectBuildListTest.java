@@ -22,9 +22,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -35,10 +33,9 @@ class ProjectBuildListTest {
         final MavenSession session = ProjectDependencyGraphStub.getMavenSession();
         ProjectBuildList projectBuildList = ProjectDependencyGraphStub.getProjectBuildList(session);
         TaskSegment taskSegment = projectBuildList.get(0).getTaskSegment();
-        assertThat(
-                "This test assumes there are at least 6 elements in projectBuilds",
-                projectBuildList.size(),
-                is(greaterThanOrEqualTo(6)));
+        assertThat(projectBuildList.size())
+                .as("This test assumes there are at least 6 elements in projectBuilds")
+                .isGreaterThanOrEqualTo(6);
 
         final ProjectBuildList byTaskSegment = projectBuildList.getByTaskSegment(taskSegment);
         assertEquals(projectBuildList.size(), byTaskSegment.size()); // TODO Make multiple segments on projectBuildList

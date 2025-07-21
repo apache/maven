@@ -26,9 +26,7 @@ import org.apache.maven.api.model.Model;
 import org.apache.maven.model.v4.MavenMerger;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * MavenMerger is based on same instances, subclasses should override KeyComputer per type
@@ -43,10 +41,10 @@ class MavenMergerTest {
         Model source = Model.newBuilder().artifactId("SOURCE").build();
 
         Model merged = mavenMerger.merge(target, source, true, null);
-        assertThat(merged.getArtifactId(), is("SOURCE"));
+        assertThat(merged.getArtifactId()).isEqualTo("SOURCE");
 
         merged = mavenMerger.merge(target, source, false, null);
-        assertThat(merged.getArtifactId(), is("TARGET"));
+        assertThat(merged.getArtifactId()).isEqualTo("TARGET");
     }
 
     @Test
@@ -62,7 +60,7 @@ class MavenMergerTest {
 
         Model merged = mavenMerger.merge(target, source, true, null);
 
-        assertThat(merged.getContributors(), contains(contributor));
+        assertThat(merged.getContributors()).containsExactly(contributor);
     }
 
     @Test
@@ -81,6 +79,6 @@ class MavenMergerTest {
 
         Model merged = mavenMerger.merge(target, source, true, null);
 
-        assertThat(merged.getDependencies(), contains(dependency));
+        assertThat(merged.getDependencies()).containsExactly(dependency);
     }
 }

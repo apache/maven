@@ -22,8 +22,7 @@ import org.apache.maven.logging.api.LogLevelRecorder;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
@@ -37,7 +36,7 @@ class MavenLoggerFactoryTest {
 
         Logger logger = mavenLoggerFactory.getLogger("Test");
 
-        assertThat(logger, instanceOf(MavenSimpleLogger.class));
+        assertThat(logger).isInstanceOf(MavenSimpleLogger.class);
     }
 
     @Test

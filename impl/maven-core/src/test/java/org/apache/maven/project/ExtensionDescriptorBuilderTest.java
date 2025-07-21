@@ -27,9 +27,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -63,9 +61,9 @@ class ExtensionDescriptorBuilderTest {
 
         assertNotNull(ed);
         assertNotNull(ed.getExportedPackages());
-        assertThat(ed.getExportedPackages(), is(empty()));
+        assertThat(ed.getExportedPackages()).isEmpty();
         assertNotNull(ed.getExportedArtifacts());
-        assertThat(ed.getExportedArtifacts(), is(empty()));
+        assertThat(ed.getExportedArtifacts()).isEmpty();
     }
 
     @Test

@@ -39,13 +39,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
 
-import static org.apache.maven.project.ProjectBuildingResultWithProblemMessageMatcher.projectBuildingResultWithProblemMessage;
+import static org.apache.maven.project.ProjectBuildingResultWithProblemMessageAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -107,7 +103,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
 
         ProjectBuildingException e = assertThrows(
                 ProjectBuildingException.class, () -> getProject(f1), "Expected to fail for future versions");
-        assertThat(e.getMessage(), containsString("Building this project requires a newer version of Maven"));
+        assertThat(e.getMessage()).contains("Building this project requires a newer version of Maven");
     }
 
     @Test
@@ -118,7 +114,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
 
         ProjectBuildingException e = assertThrows(
                 ProjectBuildingException.class, () -> getProject(f1), "Expected to fail for past versions");
-        assertThat(e.getMessage(), containsString("Building this project requires an older version of Maven"));
+        assertThat(e.getMessage()).contains("Building this project requires an older version of Maven");
     }
 
     @Test
@@ -127,7 +123,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
 
         ProjectBuildingException e = assertThrows(
                 ProjectBuildingException.class, () -> getProject(f1), "Expected to fail for future versions");
-        assertThat(e.getMessage(), containsString("Building this project requires a newer version of Maven"));
+        assertThat(e.getMessage()).contains("Building this project requires a newer version of Maven");
     }
 
     @Test
@@ -200,7 +196,9 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
                 ProjectBuildingException.class,
                 () -> getProject(f1),
                 "Expected 'ProjectBuildingException' not thrown.");
-        assertThat(e.getResults(), contains(projectBuildingResultWithProblemMessage("Version must be a constant")));
+        org.assertj.core.api.Assertions.assertThat(e.getResults()).hasSize(1);
+        ProjectBuildingResultWithProblemMessageAssert.assertThat(e.getResults().get(0))
+                .hasProblemMessage("Version must be a constant");
     }
 
     /**
@@ -215,7 +213,9 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
                 ProjectBuildingException.class,
                 () -> getProject(f1),
                 "Expected 'ProjectBuildingException' not thrown.");
-        assertThat(e.getResults(), contains(projectBuildingResultWithProblemMessage("Version must be a constant")));
+        org.assertj.core.api.Assertions.assertThat(e.getResults()).hasSize(1);
+        ProjectBuildingResultWithProblemMessageAssert.assertThat(e.getResults().get(0))
+                .hasProblemMessage("Version must be a constant");
     }
 
     /**
@@ -278,7 +278,9 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
                 ProjectBuildingException.class,
                 () -> getProjectFromRemoteRepository(f1),
                 "Expected 'ProjectBuildingException' not thrown.");
-        assertThat(e.getResults(), contains(projectBuildingResultWithProblemMessage("Version must be a constant")));
+        org.assertj.core.api.Assertions.assertThat(e.getResults()).hasSize(1);
+        ProjectBuildingResultWithProblemMessageAssert.assertThat(e.getResults().get(0))
+                .hasProblemMessage("Version must be a constant");
     }
 
     /**
@@ -293,7 +295,9 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
                 ProjectBuildingException.class,
                 () -> getProjectFromRemoteRepository(f1),
                 "Expected 'ProjectBuildingException' not thrown.");
-        assertThat(e.getResults(), contains(projectBuildingResultWithProblemMessage("Version must be a constant")));
+        org.assertj.core.api.Assertions.assertThat(e.getResults()).hasSize(1);
+        ProjectBuildingResultWithProblemMessageAssert.assertThat(e.getResults().get(0))
+                .hasProblemMessage("Version must be a constant");
     }
 
     /**
@@ -316,7 +320,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
 
         MavenProject project =
                 projectBuilder.build(pom.toFile(), buildingRequest).getProject();
-        assertThat(project.getName(), is("aid")); // inherited from artifactId
+        assertThat(project.getName()).isEqualTo("aid"); // inherited from artifactId
 
         try (InputStream pomResource =
                 DefaultMavenProjectBuilderTest.class.getResourceAsStream("/projects/reread/pom2.xml")) {
@@ -324,7 +328,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         }
 
         project = projectBuilder.build(pom.toFile(), buildingRequest).getProject();
-        assertThat(project.getName(), is("PROJECT NAME"));
+        assertThat(project.getName()).isEqualTo("PROJECT NAME");
     }
 
     @Test
@@ -368,10 +372,10 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         assertEquals("active-by-default", profile.getId());
         InputLocation location = profile.getLocation("");
         assertNotNull(location);
-        assertThat(location.getLineNumber(), greaterThan(0));
-        assertThat(location.getColumnNumber(), greaterThan(0));
+        assertThat(location.getLineNumber()).isGreaterThan(0);
+        assertThat(location.getColumnNumber()).isGreaterThan(0);
         assertNotNull(location.getSource());
-        assertThat(location.getSource().getLocation(), containsString("pom-with-profiles/pom.xml"));
+        assertThat(location.getSource().getLocation()).contains("pom-with-profiles/pom.xml");
     }
 
     @Test
@@ -406,18 +410,18 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         assertEquals("active-by-default", profile.getId());
         InputLocation location = profile.getLocation("");
         assertNotNull(location);
-        assertThat(location.getLineNumber(), greaterThan(0));
-        assertThat(location.getColumnNumber(), greaterThan(0));
+        assertThat(location.getLineNumber()).isGreaterThan(0);
+        assertThat(location.getColumnNumber()).isGreaterThan(0);
         assertNotNull(location.getSource());
-        assertThat(location.getSource().getLocation(), containsString("pom-with-profiles/pom.xml"));
+        assertThat(location.getSource().getLocation()).contains("pom-with-profiles/pom.xml");
         profile = activeProfiles.get(1);
         assertEquals("external-profile", profile.getId());
         location = profile.getLocation("");
         assertNotNull(location);
-        assertThat(location.getLineNumber(), greaterThan(0));
-        assertThat(location.getColumnNumber(), greaterThan(0));
+        assertThat(location.getLineNumber()).isGreaterThan(0);
+        assertThat(location.getColumnNumber()).isGreaterThan(0);
         assertNotNull(location.getSource());
-        assertThat(location.getSource().getLocation(), containsString("settings.xml"));
+        assertThat(location.getSource().getLocation()).contains("settings.xml");
     }
 
     @Test
