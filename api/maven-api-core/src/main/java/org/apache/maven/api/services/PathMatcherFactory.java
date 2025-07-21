@@ -145,7 +145,7 @@ public interface PathMatcherFactory extends Service {
      * given patterns match all files. Therefore, the following idiom can be used:
      *
      * <pre>PathMatcher fileMatcher = factory.createPathMatcher(dir, includes, excludes);
-     * boolean selectedAllFiles = (fileMatcher == factory.includesAll);</pre>
+     * boolean selectedAllFiles = fileMatcher == factory.includesAll();</pre>
      *
      * @return patch matcher that unconditionally returns {@code true} for all files
      */
