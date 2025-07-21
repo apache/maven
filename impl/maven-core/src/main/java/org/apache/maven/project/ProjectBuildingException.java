@@ -59,7 +59,7 @@ public class ProjectBuildingException extends Exception {
     }
 
     public ProjectBuildingException(List<ProjectBuildingResult> results) {
-        super("Some problems were encountered while processing the POMs");
+        super(createMessage(results));
         this.projectId = "";
         this.results = results;
     }
@@ -95,6 +95,82 @@ public class ProjectBuildingException extends Exception {
         if (pomFile != null) {
             buffer.append(" at ").append(pomFile.getAbsolutePath());
         }
+        return buffer.toString();
+    }
+
+    @SuppressWarnings("deprecation")
+    private static String createMessage(List<ProjectBuildingResult> results) {
+        if (results == null || results.isEmpty()) {
+            return "Some problems were encountered while processing the POMs";
+        }
+
+        long totalProblems =
+                results.stream().mapToLong(r -> r.getProblems().size()).sum();
+
+        long errorProblems = results.stream()
+                .flatMap(r -> r.getProblems().stream())
+                .filter(p -> p.getSeverity() != org.apache.maven.model.building.ModelProblem.Severity.WARNING)
+                .count();
+
+        StringBuilder buffer = new StringBuilder(1024);
+        buffer.append(totalProblems);
+        buffer.append(totalProblems == 1 ? " problem was " : " problems were ");
+        buffer.append("encountered while processing the POMs");
+
+        if (errorProblems > 0) {
+            buffer.append(" (").append(errorProblems).append(" error");
+            if (errorProblems > 1) {
+                buffer.append("s");
+            }
+            buffer.append(")");
+        }
+
+        buffer.append(":\n");
+
+        for (ProjectBuildingResult result : results) {
+            if (!result.getProblems().isEmpty()) {
+                String projectInfo = result.getProjectId();
+                if (projectInfo.trim().isEmpty()) {
+                    projectInfo =
+                            result.getPomFile() != null ? result.getPomFile().getName() : "unknown project";
+                }
+
+                buffer.append("\n[").append(projectInfo).append("]\n");
+
+                for (org.apache.maven.model.building.ModelProblem problem : result.getProblems()) {
+                    if (errorProblems > 0
+                            && problem.getSeverity() == org.apache.maven.model.building.ModelProblem.Severity.WARNING) {
+                        continue;
+                    }
+
+                    buffer.append("  [").append(problem.getSeverity()).append("] ");
+                    buffer.append(problem.getMessage());
+
+                    String location = "";
+                    if (!problem.getSource().trim().isEmpty()) {
+                        location = problem.getSource();
+                    }
+                    if (problem.getLineNumber() > 0) {
+                        if (!location.isEmpty()) {
+                            location += ", ";
+                        }
+                        location += "line " + problem.getLineNumber();
+                    }
+                    if (problem.getColumnNumber() > 0) {
+                        if (!location.isEmpty()) {
+                            location += ", ";
+                        }
+                        location += "column " + problem.getColumnNumber();
+                    }
+
+                    if (!location.isEmpty()) {
+                        buffer.append(" @ ").append(location);
+                    }
+                    buffer.append("\n");
+                }
+            }
+        }
+
         return buffer.toString();
     }
 }
