@@ -34,7 +34,7 @@ under the License.
     <!-- collect the effective property values as derived by interpolation -->
     <pom>${pomProperty}</pom>
     <profiles>${profilesProperty}</profiles>
-    <settings xmlns='http://maven.apache.org/SETTINGS/1.0.0'>${settingsProperty}</settings>
+    <settings>${settingsProperty}</settings>
   </properties>
 
   <build>
