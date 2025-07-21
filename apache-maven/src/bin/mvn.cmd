@@ -175,11 +175,12 @@ set CLASSWORLDS_LAUNCHER=org.codehaus.plexus.classworlds.launcher.Launcher
 @REM MNG-8248
 "%JAVACMD%" --enable-native-access=ALL-UNNAMED -version >nul 2>&1
 if ERRORLEVEL 1 goto skipEnableNativeAccess
-set "MAVEN_OPTS=--enable-native-access=ALL-UNNAMED %MAVEN_OPTS%"
+set "INTERNAL_MAVEN_OPTS=--enable-native-access=ALL-UNNAMED %INTERNAL_MAVEN_OPTS%"
 :skipEnableNativeAccess
 
 "%JAVACMD%" ^
   %JVM_CONFIG_MAVEN_PROPS% ^
+  %INTERNAL_MAVEN_OPTS% ^
   %MAVEN_OPTS% ^
   %MAVEN_DEBUG_OPTS% ^
   -classpath %CLASSWORLDS_JAR% ^
