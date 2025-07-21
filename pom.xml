@@ -1028,7 +1028,9 @@ under the License.
                 <configuration>
                   <target>
                     <!-- directory should be created by org.eclipse.aether.tools.CollectConfiguration -->
+                    <!-- TODO: remove with next version of resolver-tools -->
                     <mkdir dir="${project.build.directory}/generated-site/markdown" />
+                    <mkdir dir="${project.build.directory}/generated-site/resources" />
                   </target>
                 </configuration>
               </execution>
@@ -1066,9 +1068,33 @@ under the License.
                     but in this case the packaging=pom all I could do is use additionalClasspathElement that APPENDS classpath,
                     hence template is renamed to maven-configuration.md.vm, to avoid conflict (and picking up resolver template)
                     -->
-                    <argument>--templates=maven-configuration.md,configuration.properties,configuration.yaml</argument>
+                    <argument>--templates=maven-configuration.md</argument>
                     <argument>${project.basedir}</argument>
                     <argument>${project.build.directory}/generated-site/markdown</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>render-configuration-properties</id>
+                <goals>
+                  <goal>java</goal>
+                </goals>
+                <phase>pre-site</phase>
+                <configuration>
+                  <additionalClasspathElements>
+                    <additionalClasspathElement>${project.basedir}/src/configuration-templates</additionalClasspathElement>
+                  </additionalClasspathElements>
+                  <includePluginDependencies>true</includePluginDependencies>
+                  <mainClass>org.eclipse.aether.tools.CollectConfiguration</mainClass>
+                  <arguments>
+                    <argument>--mode=maven</argument>
+                    <!--
+                    TODO: add feature to resolver-tools to allow multiple output directory for different templates
+                    to avoid double execution
+                    -->
+                    <argument>--templates=configuration.properties,configuration.yaml</argument>
+                    <argument>${project.basedir}</argument>
+                    <argument>${project.build.directory}/generated-site/resources</argument>
                   </arguments>
                 </configuration>
               </execution>
