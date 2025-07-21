@@ -90,7 +90,7 @@ class DefaultMavenTest extends AbstractCoreMavenComponentTestCase {
     @Test
     void testThatNamespacePrefixAreAllowed() throws Exception {
         MavenExecutionRequest request =
-            createMavenExecutionRequest(getProject("prefix")).setGoals(asList("validate"));
+                createMavenExecutionRequest(getProject("prefix")).setGoals(asList("validate"));
 
         MavenExecutionResult result = maven.execute(request);
 
