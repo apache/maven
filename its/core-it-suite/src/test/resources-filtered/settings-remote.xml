@@ -24,7 +24,7 @@ These settings are meant for ITs that download artifacts from remote servers. In
 plugins/artifacts from test repos so use of these settings should be the exceptional case, not the default.
 -->
 
-<settings>
+<settings xmlns='http://maven.apache.org/SETTINGS/1.0.0'>
   <proxies>
     <proxy>
       <id>it-proxy</id>
