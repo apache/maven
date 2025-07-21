@@ -88,6 +88,16 @@ class DefaultMavenTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
+    void testThatNamespacePrefixAreAllowed() throws Exception {
+        MavenExecutionRequest request =
+            createMavenExecutionRequest(getProject("prefix")).setGoals(asList("validate"));
+
+        MavenExecutionResult result = maven.execute(request);
+
+        assertTrue(result.getExceptions().isEmpty());
+    }
+
+    @Test
     void testMavenProjectNoDuplicateArtifacts() throws Exception {
         MavenProjectHelper mavenProjectHelper = getContainer().lookup(MavenProjectHelper.class);
         MavenProject mavenProject = new MavenProject();
