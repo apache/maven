@@ -157,7 +157,7 @@ public interface PathMatcherFactory extends Service {
      *
      * @param matcher the matcher to test
      */
-    default boolean isIncludesAll(PathMatcher matcher) {
+    default boolean isIncludesAll(@Nonnull PathMatcher matcher) {
         return Objects.requireNonNull(matcher) == includesAll();
     }
 }
