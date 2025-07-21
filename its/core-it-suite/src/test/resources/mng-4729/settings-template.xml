@@ -19,7 +19,7 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<settings>
+<settings xmlns='http://maven.apache.org/SETTINGS/1.0.0'>
   <mirrors>
     <!-- if the mirror is not applied, Maven would try downloading from the wrong directory -->
     <mirror>
