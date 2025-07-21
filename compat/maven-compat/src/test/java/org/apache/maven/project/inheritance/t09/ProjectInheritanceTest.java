@@ -78,7 +78,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
         Map map = project1.getArtifactMap();
 
         assertNotNull(map, "No artifacts");
-        assertTrue(!map.isEmpty(), "No Artifacts");
+        assertFalse(map.isEmpty(), "No Artifacts");
         assertTrue(map.size() == 2, "Set size should be 2, is " + map.size());
 
         assertTrue(map.containsKey("maven-test:t09-a"), "maven-test:t09-a is not in the project");
@@ -111,7 +111,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
         assertEquals(pom0Basedir, project2.getParent().getBasedir());
         Map map = project2.getArtifactMap();
         assertNotNull(map, "No artifacts");
-        assertTrue(!map.isEmpty(), "No Artifacts");
+        assertFalse(map.isEmpty(), "No Artifacts");
         assertTrue(map.size() == 4, "Set size should be 4, is " + map.size());
 
         assertTrue(map.containsKey("maven-test:t09-a"), "maven-test:t09-a is not in the project");
