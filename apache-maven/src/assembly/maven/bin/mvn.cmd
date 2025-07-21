@@ -35,6 +35,10 @@ title %0
 @REM enable echoing by setting MAVEN_BATCH_ECHO to 'on'
 @if "%MAVEN_BATCH_ECHO%"=="on" echo %MAVEN_BATCH_ECHO%
 
+@REM Clear/define a variable for any options to be inserted via script
+@REM We want to avoid trying to parse the external MAVEN_OPTS variable
+SET INTERNAL_MAVEN_OPTS=
+
 @REM Execute a user defined script before this one
 if not "%MAVEN_SKIP_RC%"=="" goto skipRc
 if exist "%PROGRAMDATA%\mavenrc.cmd" call "%PROGRAMDATA%\mavenrc.cmd" %*
