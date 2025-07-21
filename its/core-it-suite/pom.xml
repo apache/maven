@@ -93,7 +93,7 @@ under the License.
     <!-- Support artifacts version - kept separate from Maven version -->
     <core-it-support-version>2.1-SNAPSHOT</core-it-support-version>
 
-    <its.forkCount>1</its.forkCount>
+    <its.forkCount>0.75C</its.forkCount>
   </properties>
 
   <dependencies>
