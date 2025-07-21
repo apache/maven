@@ -89,7 +89,7 @@ public class MavenITmng4360WebDavSupportTest extends AbstractMavenIntegrationTes
                 response.setStatus(HttpServletResponse.SC_OK);
 
                 if (request.getRequestURI().endsWith(".pom")) {
-                    writer.println("<project xmlns="http://maven.apache.org/POM/4.0.0">");
+                    writer.println("<project xmlns=\"http://maven.apache.org/POM/4.0.0\">");
                     writer.println("  <modelVersion>4.0.0</modelVersion>");
                     writer.println("  <groupId>org.apache.maven.its.mng4360</groupId>");
                     writer.println("  <artifactId>dep</artifactId>");
