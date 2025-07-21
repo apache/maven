@@ -249,6 +249,24 @@ final class PathSelector implements PathMatcher {
     }
 
     /**
+     * Creates a new matcher from the given includes and excludes.
+     *
+     * @param directory the base directory of the files to filter
+     * @param includes the patterns of the files to include, or null or empty for including all files
+     * @param excludes the patterns of the files to exclude, or null or empty for no exclusion
+     * @param useDefaultExcludes whether to augment the excludes with a default set of <abbr>SCM</abbr> patterns
+     * @throws NullPointerException if directory is null
+     * @return a path matcher for the given includes and excludes
+     */
+    public static PathMatcher of(
+            @Nonnull Path directory,
+            Collection<String> includes,
+            Collection<String> excludes,
+            boolean useDefaultExcludes) {
+        return new PathSelector(directory, includes, excludes, useDefaultExcludes).simplify();
+    }
+
+    /**
      * Returns the given array of excludes, optionally expanded with a default set of excludes,
      * then with unnecessary excludes omitted. An unnecessary exclude is an exclude which will never
      * match a file because there are no include which would accept a file that could match the exclude.
@@ -561,24 +579,6 @@ final class PathSelector implements PathMatcher {
             matchers[i] = fs.getPathMatcher(patterns[i]);
         }
         return matchers;
-    }
-
-    /**
-     * Creates a new matcher from the given includes and excludes.
-     *
-     * @param directory the base directory of the files to filter
-     * @param includes the patterns of the files to include, or null or empty for including all files
-     * @param excludes the patterns of the files to exclude, or null or empty for no exclusion
-     * @param useDefaultExcludes whether to augment the excludes with a default set of <abbr>SCM</abbr> patterns
-     * @throws NullPointerException if directory is null
-     * @return a path matcher for the given includes and excludes
-     */
-    public static PathMatcher of(
-            @Nonnull Path directory,
-            Collection<String> includes,
-            Collection<String> excludes,
-            boolean useDefaultExcludes) {
-        return new PathSelector(directory, includes, excludes, useDefaultExcludes).simplify();
     }
 
     /**
