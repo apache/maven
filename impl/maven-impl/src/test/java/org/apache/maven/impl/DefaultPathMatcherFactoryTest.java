@@ -185,7 +185,7 @@ public class DefaultPathMatcherFactoryTest {
 
         // Test that PathSelector constructor also throws NPE for null directory
         assertThrows(
-                NullPointerException.class, () -> new PathSelector(null, List.of("*.txt"), List.of("*.tmp"), false));
+                NullPointerException.class, () -> PathSelector.of(null, List.of("*.txt"), List.of("*.tmp"), false));
 
         // Test that deriveDirectoryMatcher throws NPE for null fileMatcher
         assertThrows(NullPointerException.class, () -> factory.deriveDirectoryMatcher(null));

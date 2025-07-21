@@ -52,7 +52,7 @@ public class DefaultPathMatcherFactory implements PathMatcherFactory {
             boolean useDefaultExcludes) {
         requireNonNull(baseDirectory, "baseDirectory cannot be null");
 
-        return new PathSelector(baseDirectory, includes, excludes, useDefaultExcludes).simplify();
+        return PathSelector.of(baseDirectory, includes, excludes, useDefaultExcludes);
     }
 
     @Nonnull

@@ -61,7 +61,7 @@ import org.apache.maven.api.annotations.Nonnull;
  *
  * @see java.nio.file.FileSystem#getPathMatcher(String)
  */
-public class PathSelector implements PathMatcher {
+final class PathSelector implements PathMatcher {
     /**
      * Patterns which should be excluded by default, like <abbr>SCM</abbr> files.
      *
@@ -232,7 +232,7 @@ public class PathSelector implements PathMatcher {
      * @param useDefaultExcludes whether to augment the excludes with a default set of <abbr>SCM</abbr> patterns
      * @throws NullPointerException if directory is null
      */
-    public PathSelector(
+    private PathSelector(
             @Nonnull Path directory,
             Collection<String> includes,
             Collection<String> excludes,
@@ -564,18 +564,28 @@ public class PathSelector implements PathMatcher {
     }
 
     /**
-     * {@return whether there are no include or exclude filters}.
-     * In such case, this {@code PathSelector} instance should be ignored.
+     * Creates a new matcher from the given includes and excludes.
+     *
+     * @param directory the base directory of the files to filter
+     * @param includes the patterns of the files to include, or null or empty for including all files
+     * @param excludes the patterns of the files to exclude, or null or empty for no exclusion
+     * @param useDefaultExcludes whether to augment the excludes with a default set of <abbr>SCM</abbr> patterns
+     * @throws NullPointerException if directory is null
+     * @return a path matcher for the given includes and excludes
      */
-    public boolean isEmpty() {
-        return includes.length == 0 && excludes.length == 0;
+    public static PathMatcher of(
+            @Nonnull Path directory,
+            Collection<String> includes,
+            Collection<String> excludes,
+            boolean useDefaultExcludes) {
+        return new PathSelector(directory, includes, excludes, useDefaultExcludes).simplify();
     }
 
     /**
      * {@return a potentially simpler matcher equivalent to this matcher}.
      */
     @SuppressWarnings("checkstyle:MissingSwitchDefault")
-    public PathMatcher simplify() {
+    private PathMatcher simplify() {
         if (!needRelativize && excludes.length == 0) {
             switch (includes.length) {
                 case 0:
