@@ -140,8 +140,7 @@ public class ProjectBuildingException extends Exception {
                 buffer.append("\n[").append(projectInfo).append("]\n");
 
                 for (ModelProblem problem : result.getProblems()) {
-                    if (errorProblems > 0
-                            && problem.getSeverity() == ModelProblem.Severity.WARNING) {
+                    if (errorProblems > 0 && problem.getSeverity() == ModelProblem.Severity.WARNING) {
                         continue;
                     }
 
