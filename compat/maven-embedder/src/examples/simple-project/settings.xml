@@ -18,7 +18,7 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<settings>
+<settings xmlns='http://maven.apache.org/SETTINGS/1.0.0'>
   <pluginGroups>
     <pluginGroup>org.codehaus.tycho</pluginGroup>
     <pluginGroup>org.sonatype.pwt</pluginGroup>

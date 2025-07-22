@@ -155,7 +155,7 @@ under the License.
     <javaxAnnotationApiVersion>1.3.2</javaxAnnotationApiVersion>
     <jlineVersion>3.30.4</jlineVersion>
     <jmhVersion>1.37</jmhVersion>
-    <junitVersion>5.13.3</junitVersion>
+    <junitVersion>5.13.4</junitVersion>
     <jxpathVersion>1.4.0</jxpathVersion>
     <logbackClassicVersion>1.5.18</logbackClassicVersion>
     <mockitoVersion>5.18.0</mockitoVersion>
@@ -1011,6 +1011,91 @@ under the License.
                   <jbangargs>
                     <arg>--verbose</arg>
                   </jbangargs>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <inherited>false</inherited>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <phase>pre-site</phase>
+                <configuration>
+                  <target>
+                    <!-- directory should be created by org.eclipse.aether.tools.CollectConfiguration -->
+                    <!-- TODO: remove with next version of resolver-tools -->
+                    <mkdir dir="${project.build.directory}/generated-site/markdown" />
+                    <mkdir dir="${project.build.directory}/generated-site/resources" />
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>3.5.1</version>
+            <inherited>false</inherited>
+            <dependencies>
+              <dependency>
+                <groupId>org.apache.maven.resolver</groupId>
+                <artifactId>maven-resolver-tools</artifactId>
+                <version>${resolverVersion}</version>
+              </dependency>
+            </dependencies>
+            <executions>
+              <execution>
+                <id>render-configuration-page</id>
+                <goals>
+                  <goal>java</goal>
+                </goals>
+                <phase>pre-site</phase>
+                <configuration>
+                  <additionalClasspathElements>
+                    <additionalClasspathElement>${project.basedir}/src/configuration-templates</additionalClasspathElement>
+                  </additionalClasspathElements>
+                  <includePluginDependencies>true</includePluginDependencies>
+                  <mainClass>org.eclipse.aether.tools.CollectConfiguration</mainClass>
+                  <arguments>
+                    <argument>--mode=maven</argument>
+                    <!--
+                    TODO: templates are loaded from classpath, in "normal" JAR project local template would override docgen one,
+                    but in this case the packaging=pom all I could do is use additionalClasspathElement that APPENDS classpath,
+                    hence template is renamed to maven-configuration.md.vm, to avoid conflict (and picking up resolver template)
+                    -->
+                    <argument>--templates=maven-configuration.md</argument>
+                    <argument>${project.basedir}</argument>
+                    <argument>${project.build.directory}/generated-site/markdown</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>render-configuration-properties</id>
+                <goals>
+                  <goal>java</goal>
+                </goals>
+                <phase>pre-site</phase>
+                <configuration>
+                  <additionalClasspathElements>
+                    <additionalClasspathElement>${project.basedir}/src/configuration-templates</additionalClasspathElement>
+                  </additionalClasspathElements>
+                  <includePluginDependencies>true</includePluginDependencies>
+                  <mainClass>org.eclipse.aether.tools.CollectConfiguration</mainClass>
+                  <arguments>
+                    <argument>--mode=maven</argument>
+                    <!--
+                    TODO: add feature to resolver-tools to allow multiple output directory for different templates
+                    to avoid double execution
+                    -->
+                    <argument>--templates=configuration.properties,configuration.yaml</argument>
+                    <argument>${project.basedir}</argument>
+                    <argument>${project.build.directory}/generated-site/resources</argument>
+                  </arguments>
                 </configuration>
               </execution>
             </executions>
