@@ -63,7 +63,7 @@ public class MavenITmng3379ParallelArtifactDownloadsTest extends AbstractMavenIn
 
         String gid = "org.apache.maven.its.mng3379.";
         assertArtifact(verifier, gid + "a", "x", "0.2-SNAPSHOT", "", "jar", "69c041c12f35894230c7c23c49cd245886c6fb6f");
-        assertArtifact(verifier, gid + "a", "x", "0.2-SNAPSHOT", "", "pom", "04a8ecb6dc279585b6d17552a4518805f0ff33b9");
+        assertArtifact(verifier, gid + "a", "x", "0.2-SNAPSHOT", "", "pom", "f9bde7791bf97bac962281abc8471d84b35937f1");
         assertArtifact(
                 verifier, gid + "a", "x", "0.2-SNAPSHOT", "tests", "jar", "69c041c12f35894230c7c23c49cd245886c6fb6f");
         assertArtifact(
