@@ -688,20 +688,6 @@ under the License.
     <!--bootstrap-start-comment-->
   </dependencyManagement>
   <!--bootstrap-end-comment-->
-  <!--
-  <dependencies>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-api</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest</artifactId>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-  -->
 
   <build>
     <pluginManagement>
