@@ -100,7 +100,6 @@ public class ProjectBuildingException extends Exception {
         return buffer.toString();
     }
 
-    @SuppressWarnings("deprecation")
     private static String createMessage(List<ProjectBuildingResult> results) {
         if (results == null || results.isEmpty()) {
             return "Some problems were encountered while processing the POMs";
