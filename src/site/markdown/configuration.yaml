@@ -160,7 +160,7 @@ props:
       configurationSource: User properties
     - key: maven.maven3Personality
       configurationType: Boolean
-      description: "User property for controlling \"maven personality\". If activated Maven will behave as previous major version, Maven 3."
+      description: "User property for controlling \"maven personality\". If activated Maven will behave like the previous major version, Maven 3."
       defaultValue: false
       since: 4.0.0
       configurationSource: User properties
@@ -250,7 +250,7 @@ props:
       configurationSource: User properties
     - key: maven.resolver.dependencyManagerTransitivity
       configurationType: String
-      description: "User property for selecting dependency manager behaviour regarding transitive dependencies and dependency management entries in their POMs. Maven 3 targeted full backward compatibility with Maven2, hence it ignored dependency management entries in transitive dependency POMs. Maven 4 enables \"transitivity\" by default, hence unlike Maven2, obeys dependency management entries deep in dependency graph as well. <br/> Default: <code>\"true\"</code>."
+      description: "User property for selecting dependency manager behaviour regarding transitive dependencies and dependency management entries in their POMs. Maven 3 targeted full backward compatibility with Maven 2. Hence, it ignored dependency management entries in transitive dependency POMs. Maven 4 enables \"transitivity\" by default. Hence unlike Maven 3, it obeys dependency management entries deep in the dependency graph as well. <br/> Default: <code>\"true\"</code>."
       defaultValue: true
       since: 4.0.0
       configurationSource: User properties
@@ -262,7 +262,7 @@ props:
       configurationSource: User properties
     - key: maven.session.versionFilter
       configurationType: String
-      description: "User property for version filter expression used in session, applied to resolving ranges: a semicolon separated list of filters to apply. By default, no version filter is applied (like in Maven 3). <br/> Supported filters: <ul> <li>\"h\" or \"h(num)\" - highest version or top list of highest ones filter</li> <li>\"l\" or \"l(num)\" - lowest version or bottom list of lowest ones filter</li> <li>\"s\" - contextual snapshot filter</li> <li>\"e(G:A:V)\" - predicate filter (leaves out G:A:V from range, if hit, V can be range)</li> </ul> Example filter expression: <code>\"h(5);s;e(org.foo:bar:1)</code> will cause: ranges are filtered for \"top 5\" (instead full range), snapshots are banned if root project is not a snapshot, and if range for <code>org.foo:bar</code> is being processed, version 1 is omitted. Value in this property builds <code>org.eclipse.aether.collection.VersionFilter</code> instance."
+      description: "User property for version filter expression used in session, applied to resolving ranges: a semicolon separated list of filters to apply. By default, no version filter is applied (like in Maven 3). <br/> Supported filters: <ul> <li>\"h\" or \"h(num)\" - highest version or top list of highest ones filter</li> <li>\"l\" or \"l(num)\" - lowest version or bottom list of lowest ones filter</li> <li>\"s\" - contextual snapshot filter</li> <li>\"ns\" - unconditional snapshot filter (no snapshots selected from ranges)</li> <li>\"e(G:A:V)\" - predicate filter (leaves out G:A:V from range, if hit, V can be range)</li> </ul> Example filter expression: <code>\"h(5);s;e(org.foo:bar:1)</code> will cause: ranges are filtered for \"top 5\" (instead full range), snapshots are banned if root project is not a snapshot, and if range for <code>org.foo:bar</code> is being processed, version 1 is omitted. Value in this property builds <code>org.eclipse.aether.collection.VersionFilter</code> instance."
       defaultValue: 
       since: 4.0.0
       configurationSource: User properties
