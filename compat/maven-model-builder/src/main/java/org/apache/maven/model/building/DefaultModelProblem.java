@@ -25,9 +25,7 @@ import org.apache.maven.model.Model;
  * or a simple string message. In addition, a problem carries a hint about its source, e.g. the POM file that exhibits
  * the problem.
  *
- * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
-@Deprecated(since = "4.0.0")
 public class DefaultModelProblem implements ModelProblem {
 
     private final String source;
@@ -57,7 +55,6 @@ public class DefaultModelProblem implements ModelProblem {
      * @param columnNumber The one-based index of the column containing the error or {@code -1} if unknown.
      * @param exception The exception that caused this problem, may be {@code null}.
      */
-    // mkleint: does this need to be public?
     public DefaultModelProblem(
             String message,
             Severity severity,

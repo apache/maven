@@ -22,10 +22,7 @@ package org.apache.maven.model.building;
  * Describes a problem that was encountered during model building. A problem can either be an exception that was thrown
  * or a simple string message. In addition, a problem carries a hint about its source, e.g. the POM file that exhibits
  * the problem.
- *
- * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
  */
-@Deprecated(since = "4.0.0")
 public interface ModelProblem {
 
     /**
