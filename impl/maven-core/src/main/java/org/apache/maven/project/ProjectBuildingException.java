@@ -106,13 +106,19 @@ public class ProjectBuildingException extends Exception {
             return "Some problems were encountered while processing the POMs";
         }
 
-        long totalProblems =
-                results.stream().mapToLong(r -> r.getProblems().size()).sum();
+        long totalProblems = 0;
+        long errorProblems = 0;
 
-        long errorProblems = results.stream()
-                .flatMap(r -> r.getProblems().stream())
-                .filter(p -> p.getSeverity() != ModelProblem.Severity.WARNING)
-                .count();
+        for (ProjectBuildingResult result : results) {
+            List<ModelProblem> problems = result.getProblems();
+            totalProblems += problems.size();
+
+            for (ModelProblem problem : problems) {
+                if (problem.getSeverity() != ModelProblem.Severity.WARNING) {
+                    errorProblems++;
+                }
+            }
+        }
 
         StringBuilder buffer = new StringBuilder(1024);
         buffer.append(totalProblems);
