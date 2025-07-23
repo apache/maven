@@ -700,6 +700,14 @@ under the License.
             <argLine>-Xmx256m @{jacocoArgLine}</argLine>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <configuration>
+            <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory" />
+            <argLine>-Xmx256m @{jacocoArgLine}</argLine>
+          </configuration>
+        </plugin>
         <!-- enforce backwards compatibility -->
         <plugin>
           <groupId>com.github.siom79.japicmp</groupId>
