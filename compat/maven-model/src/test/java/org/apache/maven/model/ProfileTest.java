@@ -45,7 +45,7 @@ class ProfileTest {
     @Test
     void testEqualsIdentity() {
         Profile thing = new Profile();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test

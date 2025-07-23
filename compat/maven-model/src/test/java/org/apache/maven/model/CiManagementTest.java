@@ -45,7 +45,7 @@ class CiManagementTest {
     @Test
     void testEqualsIdentity() {
         CiManagement thing = new CiManagement();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test

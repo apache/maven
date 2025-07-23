@@ -77,7 +77,8 @@ public class BaseParserTest {
                         .build());
 
         Assertions.assertFalse(invokerRequest.options().isPresent());
-        Assertions.assertTrue(invokerRequest.parsingFailed());
+        Assertions.assertTrue(
+                invokerRequest.parsingFailed(), "Expected " + invokerRequest + ".parsingFailed() to return true");
     }
 
     @Test

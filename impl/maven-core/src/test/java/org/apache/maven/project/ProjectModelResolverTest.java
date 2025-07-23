@@ -35,11 +35,10 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.junit.jupiter.api.Test;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test cases for the project {@code ModelResolver} implementation.
@@ -67,7 +66,7 @@ class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
                 () -> newModelResolver().resolveModel(parent),
                 "Expected 'UnresolvableModelException' not thrown.");
         assertNotNull(e.getMessage());
-        assertThat(e.getMessage(), containsString("Could not find artifact org.apache:apache:pom:0 in central"));
+        assertTrue(e.getMessage().contains("Could not find artifact org.apache:apache:pom:0 in central"));
     }
 
     @Test
@@ -132,7 +131,7 @@ class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
                 () -> newModelResolver().resolveModel(dependency),
                 "Expected 'UnresolvableModelException' not thrown.");
         assertNotNull(e.getMessage());
-        assertThat(e.getMessage(), containsString("Could not find artifact org.apache:apache:pom:0 in central"));
+        assertTrue(e.getMessage().contains("Could not find artifact org.apache:apache:pom:0 in central"));
     }
 
     @Test

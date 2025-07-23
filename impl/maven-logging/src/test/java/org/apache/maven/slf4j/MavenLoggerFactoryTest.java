@@ -22,9 +22,8 @@ import org.apache.maven.logging.api.LogLevelRecorder;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -37,7 +36,7 @@ class MavenLoggerFactoryTest {
 
         Logger logger = mavenLoggerFactory.getLogger("Test");
 
-        assertThat(logger, instanceOf(MavenSimpleLogger.class));
+        assertInstanceOf(MavenSimpleLogger.class, logger, "Expected logger to be instance of MavenSimpleLogger");
     }
 
     @Test
@@ -60,15 +59,23 @@ class MavenLoggerFactoryTest {
         mavenLoggerFactory.logLevelRecorder.setMaxLevelAllowed(LogLevelRecorder.Level.ERROR);
 
         MavenFailOnSeverityLogger logger = (MavenFailOnSeverityLogger) mavenLoggerFactory.getLogger("Test");
-        assertFalse(mavenLoggerFactory.logLevelRecorder.metThreshold());
+        assertFalse(
+                mavenLoggerFactory.logLevelRecorder.metThreshold(),
+                "Expected " + mavenLoggerFactory.logLevelRecorder + ".metThreshold() to return false");
 
         logger.warn("This should not hit the fail threshold");
-        assertFalse(mavenLoggerFactory.logLevelRecorder.metThreshold());
+        assertFalse(
+                mavenLoggerFactory.logLevelRecorder.metThreshold(),
+                "Expected " + mavenLoggerFactory.logLevelRecorder + ".metThreshold() to return false");
 
         logger.error("This should hit the fail threshold");
-        assertTrue(mavenLoggerFactory.logLevelRecorder.metThreshold());
+        assertTrue(
+                mavenLoggerFactory.logLevelRecorder.metThreshold(),
+                "Expected " + mavenLoggerFactory.logLevelRecorder + ".metThreshold() to return true");
 
         logger.warn("This should not reset the fail threshold");
-        assertTrue(mavenLoggerFactory.logLevelRecorder.metThreshold());
+        assertTrue(
+                mavenLoggerFactory.logLevelRecorder.metThreshold(),
+                "Expected " + mavenLoggerFactory.logLevelRecorder + ".metThreshold() to return true");
     }
 }
