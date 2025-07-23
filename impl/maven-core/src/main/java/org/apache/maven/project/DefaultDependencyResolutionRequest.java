@@ -22,7 +22,9 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.graph.DependencyFilter;
 
 /**
+ * @deprecated use {@code org.apache.maven.api.services.ProjectBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public class DefaultDependencyResolutionRequest implements DependencyResolutionRequest {
 
     private MavenProject project;

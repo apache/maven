@@ -33,7 +33,10 @@ import org.eclipse.aether.RepositorySystemSession;
 
 /**
  * DefaultProjectBuildingRequest
+ *
+ * @deprecated use {@code org.apache.maven.api.services.ProjectBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public class DefaultProjectBuildingRequest implements ProjectBuildingRequest {
 
     private RepositorySystemSession repositorySession;
