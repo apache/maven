@@ -30,9 +30,26 @@ public class MavenITmng5958LifecyclePhaseBinaryCompat extends AbstractMavenInteg
 
     @Test
     public void testGood() throws Exception {
-        File testDir = extractResources("/mng-5958-lifecycle-phases/good");
+        File testDir = extractResources("/mng-5958-lifecycle-phases");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        // First, build the test extension
+        Verifier verifier = newVerifier(new File(testDir, "mng5958-extension").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("install");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+
+        // Then, build the test plugin
+        verifier = newVerifier(new File(testDir, "mng5958-plugin").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("install");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+
+        // Finally, run the good test project
+        verifier = newVerifier(new File(testDir, "good").getAbsolutePath());
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -41,9 +58,25 @@ public class MavenITmng5958LifecyclePhaseBinaryCompat extends AbstractMavenInteg
 
     @Test
     public void testBad() throws Exception {
-        File testDir = extractResources("/mng-5958-lifecycle-phases/bad");
+        File testDir = extractResources("/mng-5958-lifecycle-phases");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        // Extension and plugin are already built by testGood, but let's ensure they're available
+        // Build the test extension
+        Verifier verifier = newVerifier(new File(testDir, "mng5958-extension").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.addCliArgument("install");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+
+        // Build the test plugin
+        verifier = newVerifier(new File(testDir, "mng5958-plugin").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.addCliArgument("install");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+
+        // Run the bad test project
+        verifier = newVerifier(new File(testDir, "bad").getAbsolutePath());
         try {
             verifier.addCliArgument("validate");
             verifier.execute();
