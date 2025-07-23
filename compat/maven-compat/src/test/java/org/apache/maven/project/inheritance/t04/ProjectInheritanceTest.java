@@ -27,6 +27,7 @@ import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -68,7 +69,7 @@ class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
         assertEquals(pom0Basedir, project1.getParent().getBasedir());
         Set set = project1.getArtifacts();
         assertNotNull(set, "No artifacts");
-        assertTrue(set.size() > 0, "No Artifacts");
+        assertFalse(set.isEmpty(), "No Artifacts");
         assertTrue(set.size() == 3, "Set size should be 3, is " + set.size());
 
         for (Object aSet : set) {

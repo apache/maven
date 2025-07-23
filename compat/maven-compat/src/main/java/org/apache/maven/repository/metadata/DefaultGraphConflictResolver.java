@@ -144,7 +144,7 @@ public class DefaultGraphConflictResolver implements GraphConflictResolver {
             }
         }
 
-        if (dropList.size() < 1) {
+        if (dropList.isEmpty()) {
             return g;
         }
 
@@ -167,7 +167,7 @@ public class DefaultGraphConflictResolver implements GraphConflictResolver {
 
         List<MetadataGraphEdge> exitList = graph.getExcidentEdges(from);
         // String s = "|---> "+from.getMd().toString()+" - "+(exitList == null ? -1 : exitList.size()) + " exit links";
-        if (exitList != null && exitList.size() > 0) {
+        if (exitList != null && !exitList.isEmpty()) {
             for (MetadataGraphEdge e : graph.getExcidentEdges(from)) {
                 visit(e.getTarget(), visited, graph);
             }

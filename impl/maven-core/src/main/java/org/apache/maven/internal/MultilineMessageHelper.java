@@ -52,12 +52,12 @@ public class MultilineMessageHelper {
             sb.setLength(0);
             String[] words = S_FILTER.split(line);
             for (String word : words) {
-                if (sb.length() >= remainder - word.length() - (sb.length() > 0 ? 1 : 0)) {
+                if (sb.length() >= remainder - word.length() - (!sb.isEmpty() ? 1 : 0)) {
                     repeat(sb, ' ', remainder - sb.length());
                     result.add(BOX_CHAR + " " + sb + " " + BOX_CHAR);
                     sb.setLength(0);
                 }
-                if (sb.length() > 0) {
+                if (!sb.isEmpty()) {
                     sb.append(' ');
                 }
                 sb.append(word);
