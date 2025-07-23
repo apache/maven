@@ -22,7 +22,9 @@ import java.io.File;
 import java.util.List;
 
 /**
+ * @deprecated use {@code org.apache.maven.api.services.ProjectBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public class ProjectBuildingException extends Exception {
     private final String projectId;
 

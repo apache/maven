@@ -28,7 +28,9 @@ import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyNode;
 
 /**
+ * @deprecated use {@code org.apache.maven.api.services.ProjectBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 class DefaultDependencyResolutionResult implements DependencyResolutionResult {
 
     private DependencyNode root;

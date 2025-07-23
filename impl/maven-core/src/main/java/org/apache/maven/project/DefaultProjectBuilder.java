@@ -105,7 +105,10 @@ import org.slf4j.LoggerFactory;
 
 /**
  * DefaultProjectBuilder
+ *
+ * @deprecated use {@code org.apache.maven.api.services.ProjectBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 @Named
 @Singleton
 public class DefaultProjectBuilder implements ProjectBuilder {
