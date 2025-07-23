@@ -74,7 +74,7 @@ public class MavenITmng4679SnapshotUpdateInPluginTest extends AbstractMavenInteg
         verifier.verifyErrorFreeLog();
 
         assertChecksum(verifier, "jar", "f3d46277c2ab45ff9bbd97605c942bed7fc27f97");
-        assertChecksum(verifier, "pom", "127f0dc26035352bb54890315ad7d2ada067756a");
+        assertChecksum(verifier, "pom", "ddfa2de1fd5765bbd72829841abfa7a1fde7ff21");
     }
 
     private void assertChecksum(Verifier verifier, String ext, String checksum) throws Exception {
