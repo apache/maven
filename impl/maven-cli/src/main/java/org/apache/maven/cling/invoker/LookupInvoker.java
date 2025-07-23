@@ -149,6 +149,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         validate(context);
         pushCoreProperties(context);
         pushUserProperties(context);
+        setupGuiceClassLoading(context);
         configureLogging(context);
         createTerminal(context);
         activateLogging(context);
@@ -244,6 +245,16 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             protoSession.getUserProperties().entrySet().stream()
                     .filter(k -> context.pushedUserProperties.contains(k.getKey()) || !sys.contains(k.getKey()))
                     .forEach(k -> System.setProperty(k.getKey(), k.getValue()));
+        }
+    }
+
+    /**
+     * Sets up Guice class loading mode to CHILD, if not already set.
+     * Default Guice class loading mode uses a terminally deprecated JDK memory-access classes.
+     */
+    protected void setupGuiceClassLoading(C context) {
+        if (System.getProperty("guice_custom_class_loading", "").isBlank()) {
+            System.setProperty("guice_custom_class_loading", "CHILD");
         }
     }
 

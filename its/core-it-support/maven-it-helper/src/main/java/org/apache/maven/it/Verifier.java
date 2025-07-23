@@ -124,6 +124,10 @@ public class Verifier {
 
     private boolean skipMavenRc = true;
 
+    private ByteArrayOutputStream stdout;
+
+    private ByteArrayOutputStream stderr;
+
     public Verifier(String basedir) throws VerificationException {
         this(basedir, null);
     }
@@ -240,8 +244,8 @@ public class Verifier {
             if (forkJvm) {
                 mode = ExecutorHelper.Mode.FORKED;
             }
-            ByteArrayOutputStream stdout = new ByteArrayOutputStream();
-            ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+            stdout = new ByteArrayOutputStream();
+            stderr = new ByteArrayOutputStream();
             ExecutorRequest request = builder.stdOut(stdout).stdErr(stderr).build();
             int ret = executorHelper.execute(mode, request);
             if (ret > 0) {
@@ -470,6 +474,14 @@ public class Verifier {
         if (!result) {
             throw new VerificationException("Text not found in log: " + text);
         }
+    }
+
+    public String getStdout() {
+        return stdout != null ? stdout.toString(StandardCharsets.UTF_8) : "";
+    }
+
+    public String getStderr() {
+        return stderr != null ? stderr.toString(StandardCharsets.UTF_8) : "";
     }
 
     public static String stripAnsi(String msg) {
