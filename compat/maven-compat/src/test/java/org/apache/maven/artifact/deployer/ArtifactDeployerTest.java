@@ -67,7 +67,7 @@ class ArtifactDeployerTest extends AbstractArtifactComponentTestCase {
 
             ArtifactRepository remoteRepository = remoteRepository();
             File deployedFile = new File(remoteRepository.getBasedir(), remoteRepository.pathOf(artifact));
-            assertTrue(deployedFile.exists());
+            assertTrue(deployedFile.exists(), "Expected " + deployedFile + ".exists() to return true");
             assertEquals("dummy", new String(Files.readAllBytes(deployedFile.toPath()), StandardCharsets.UTF_8).trim());
         } finally {
             sessionScope.exit();

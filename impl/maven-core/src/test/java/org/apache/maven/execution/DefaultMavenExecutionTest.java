@@ -23,11 +23,9 @@ import java.util.List;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  */
@@ -46,6 +44,8 @@ class DefaultMavenExecutionTest {
         result.setTopologicallySortedProjects(null);
         List<MavenProject> projects = result.getTopologicallySortedProjects();
         assertNotNull(projects);
-        assertThat(projects, is(empty()));
+        assertTrue(
+                projects.isEmpty(),
+                "Expected collection to be empty but had " + projects.size() + " elements: " + projects);
     }
 }

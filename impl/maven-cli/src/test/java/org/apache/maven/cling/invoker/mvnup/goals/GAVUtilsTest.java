@@ -233,7 +233,7 @@ class GAVUtilsTest {
             Set<GAV> gavs = GAVUtils.computeAllGAVs(context, pomMap);
 
             assertNotNull(gavs);
-            assertTrue(gavs.isEmpty());
+            assertTrue(gavs.isEmpty(), "Expected collection to be empty but had " + gavs.size() + " elements: " + gavs);
         }
 
         @Test

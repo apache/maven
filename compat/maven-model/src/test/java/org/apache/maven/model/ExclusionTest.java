@@ -45,7 +45,7 @@ class ExclusionTest {
     @Test
     void testEqualsIdentity() {
         Exclusion thing = new Exclusion();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test

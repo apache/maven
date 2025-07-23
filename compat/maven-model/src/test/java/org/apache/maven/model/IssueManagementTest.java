@@ -45,7 +45,7 @@ class IssueManagementTest {
     @Test
     void testEqualsIdentity() {
         IssueManagement thing = new IssueManagement();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test

@@ -181,12 +181,14 @@ class DefaultModelValidatorTest {
         assertViolations(result, 1, 0, 0);
 
         String errorMessage = result.getFatals().get(0);
-        assertTrue(errorMessage.contains("modelVersion"));
+        assertTrue(errorMessage.contains("modelVersion"), "Expected " + errorMessage + " to contain " + "modelVersion");
         // Should include Maven version (either "4.0.0-test" from mock or "unknown" as fallback)
         assertTrue(
                 errorMessage.contains("4.0.0-test") || errorMessage.contains("unknown"),
                 "Error message should include Maven version: " + errorMessage);
-        assertTrue(errorMessage.contains("is not supported by this Maven version"));
+        assertTrue(
+                errorMessage.contains("is not supported by this Maven version"),
+                "Expected " + errorMessage + " to contain " + "is not supported by this Maven version");
     }
 
     @Test
@@ -322,10 +324,18 @@ class DefaultModelValidatorTest {
 
         List<String> messages = result.getErrors();
 
-        assertTrue(messages.contains("'modelVersion' is missing."));
-        assertTrue(messages.contains("'groupId' is missing."));
-        assertTrue(messages.contains("'artifactId' is missing."));
-        assertTrue(messages.contains("'version' is missing."));
+        assertTrue(
+                messages.contains("'modelVersion' is missing."),
+                "Expected " + messages + " to contain " + "'modelVersion' is missing.");
+        assertTrue(
+                messages.contains("'groupId' is missing."),
+                "Expected " + messages + " to contain " + "'groupId' is missing.");
+        assertTrue(
+                messages.contains("'artifactId' is missing."),
+                "Expected " + messages + " to contain " + "'artifactId' is missing.");
+        assertTrue(
+                messages.contains("'version' is missing."),
+                "Expected " + messages + " to contain " + "'version' is missing.");
         // type is inherited from the super pom
     }
 

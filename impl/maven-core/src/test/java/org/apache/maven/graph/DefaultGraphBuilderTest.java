@@ -63,8 +63,9 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.maven.execution.MavenExecutionRequest.REACTOR_MAKE_DOWNSTREAM;
 import static org.apache.maven.execution.MavenExecutionRequest.REACTOR_MAKE_UPSTREAM;
 import static org.apache.maven.graph.DefaultGraphBuilderTest.ScenarioBuilder.scenario;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -314,25 +315,22 @@ class DefaultGraphBuilderTest {
 
         // Then
         if (parameterExpectedResult instanceof SelectedProjectsResult selectedProjectsResult) {
-            assertThat(result.hasErrors())
-                    .withFailMessage("Expected result not to have errors")
-                    .isFalse();
+            assertFalse(result.hasErrors(), "Expected result not to have errors");
             List<String> expectedProjectNames = selectedProjectsResult.projectNames;
             List<MavenProject> actualReactorProjects = result.get().getSortedProjects();
             List<MavenProject> expectedReactorProjects =
                     expectedProjectNames.stream().map(artifactIdProjectMap::get).collect(toList());
             assertEquals(expectedReactorProjects, actualReactorProjects, parameterDescription);
         } else {
-            assertThat(result.hasErrors())
-                    .withFailMessage("Expected result to have errors")
-                    .isTrue();
+            assertTrue(result.hasErrors(), "Expected result to have errors");
             Class<? extends Throwable> expectedException = ((ExceptionThrown) parameterExpectedResult).expected;
             String partOfMessage = ((ExceptionThrown) parameterExpectedResult).partOfMessage;
 
-            assertThat(result.getProblems()).hasSize(1);
-            result.getProblems().forEach(p -> assertThat(p.getException())
-                    .isInstanceOf(expectedException)
-                    .hasMessageContaining(partOfMessage));
+            assertEquals(1, ((Collection) result.getProblems()).size());
+            result.getProblems().forEach(p -> {
+                assertTrue(expectedException.isInstance(p.getException()));
+                assertTrue(p.getException().getMessage().contains(partOfMessage));
+            });
         }
     }
 
@@ -368,9 +366,7 @@ class DefaultGraphBuilderTest {
 
         Result<ProjectDependencyGraph> result = graphBuilder.build(session);
 
-        assertThat(result.hasErrors())
-                .withFailMessage("Expected result not to have errors")
-                .isFalse();
+        assertFalse(result.hasErrors(), "Expected result not to have errors");
         List<MavenProject> actualReactorProjects = result.get().getSortedProjects();
         assertEquals(2, actualReactorProjects.size());
         assertEquals("pom", actualReactorProjects.get(1).getPackaging());

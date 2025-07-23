@@ -38,7 +38,6 @@ import org.apache.maven.di.Key;
 import org.junit.jupiter.api.Test;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -46,6 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SuppressWarnings("unused")
 public class InjectorImplTest {
@@ -416,11 +416,20 @@ public class InjectorImplTest {
         DIException exception = assertThrows(DIException.class, () -> {
             injector.getInstance(CircularPriorityTest.MyService.class);
         });
-        assertThat(exception).isInstanceOf(DIException.class).hasMessageContaining("HighPriorityServiceImpl");
-        assertThat(exception.getCause())
-                .isInstanceOf(DIException.class)
-                .hasMessageContaining("Cyclic dependency detected")
-                .hasMessageContaining("MyService");
+        assertInstanceOf(DIException.class, exception, "Expected exception to be DIException");
+        assertTrue(
+                exception.getMessage().contains("HighPriorityServiceImpl"),
+                "Expected exception message to contain 'HighPriorityServiceImpl' but was: " + exception.getMessage());
+
+        assertInstanceOf(DIException.class, exception.getCause(), "Expected cause to be DIException");
+        assertTrue(
+                exception.getCause().getMessage().contains("Cyclic dependency detected"),
+                "Expected cause message to contain 'Cyclic dependency detected' but was: "
+                        + exception.getCause().getMessage());
+        assertTrue(
+                exception.getCause().getMessage().contains("MyService"),
+                "Expected cause message to contain 'MyService' but was: "
+                        + exception.getCause().getMessage());
     }
 
     @Test

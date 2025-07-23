@@ -45,7 +45,7 @@ class PrerequisitesTest {
     @Test
     void testEqualsIdentity() {
         Prerequisites thing = new Prerequisites();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test

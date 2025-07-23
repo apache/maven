@@ -28,8 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.matchesPattern;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MavenBaseLoggerTimestampTest {
     private ByteArrayOutputStream logOutput;
@@ -71,8 +70,9 @@ class MavenBaseLoggerTimestampTest {
         String output = getLastLine(logOutput.toString());
 
         // Then
-        assertThat(
-                "Should not include timestamp", output, matchesPattern("^\\[main\\] INFO test.logger - Test message$"));
+        assertTrue(
+                output.matches("^\\[main\\] INFO test.logger - Test message$"),
+                "Should not include timestamp but was: " + output);
     }
 
     @Test
@@ -86,10 +86,9 @@ class MavenBaseLoggerTimestampTest {
         String output = getLastLine(logOutput.toString());
 
         // Then
-        assertThat(
-                "Should show elapsed time when no format specified",
-                output,
-                matchesPattern("^\\d+ \\[main\\] INFO test.logger - Test message$"));
+        assertTrue(
+                output.matches("^\\d+ \\[main\\] INFO test.logger - Test message$"),
+                "Should show elapsed time when no format specified but was: " + output);
     }
 
     @ParameterizedTest
@@ -116,10 +115,9 @@ class MavenBaseLoggerTimestampTest {
                 .replace("/", "\\/")
                 .replace(".", "\\.");
 
-        assertThat(
-                "Should match custom date format",
-                output,
-                matchesPattern("^" + patternStr + " \\[main\\] INFO test.logger - Test message$"));
+        assertTrue(
+                output.matches("^" + patternStr + " \\[main\\] INFO test.logger - Test message$"),
+                "Should match custom date format but was: " + output);
     }
 
     @Test
@@ -134,10 +132,9 @@ class MavenBaseLoggerTimestampTest {
         String output = getLastLine(logOutput.toString());
 
         // Then
-        assertThat(
-                "Should show elapsed milliseconds when format is invalid",
-                output,
-                matchesPattern("^\\d+ \\[main\\] INFO test.logger - Test message$"));
+        assertTrue(
+                output.matches("^\\d+ \\[main\\] INFO test.logger - Test message$"),
+                "Should show elapsed milliseconds when format is invalid but was: " + output);
     }
 
     private void initializeLogger() {

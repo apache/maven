@@ -31,10 +31,9 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test sorting projects by dependencies.
@@ -239,8 +238,10 @@ class ProjectSorterTest {
         assertEquals(parentProject, projects.get(0));
 
         // the order of these two is non-deterministic, based on when they're added to the reactor.
-        assertThat(projects, hasItem(pluginProject));
-        assertThat(projects, hasItem(pluginLevelDepProject));
+        assertTrue(projects.contains(pluginProject), "Expected " + projects + " to contain " + pluginProject);
+        assertTrue(
+                projects.contains(pluginLevelDepProject),
+                "Expected " + projects + " to contain " + pluginLevelDepProject);
 
         // the declaring project MUST be listed after the plugin and its plugin-level dep, though.
         assertEquals(declaringProject, projects.get(3));
@@ -276,8 +277,10 @@ class ProjectSorterTest {
         assertEquals(parentProject, projects.get(0));
 
         // the order of these two is non-deterministic, based on when they're added to the reactor.
-        assertThat(projects, hasItem(pluginProject));
-        assertThat(projects, hasItem(pluginLevelDepProject));
+        assertTrue(projects.contains(pluginProject), "Expected " + projects + " to contain " + pluginProject);
+        assertTrue(
+                projects.contains(pluginLevelDepProject),
+                "Expected " + projects + " to contain " + pluginLevelDepProject);
     }
 
     @Test
@@ -294,8 +297,8 @@ class ProjectSorterTest {
 
         projects = new ProjectSorter(projects).getSortedProjects();
 
-        assertThat(projects, hasItem(pluginProjectA));
-        assertThat(projects, hasItem(pluginProjectB));
+        assertTrue(projects.contains(pluginProjectA), "Expected " + projects + " to contain " + pluginProjectA);
+        assertTrue(projects.contains(pluginProjectB), "Expected " + projects + " to contain " + pluginProjectB);
     }
 
     @Test

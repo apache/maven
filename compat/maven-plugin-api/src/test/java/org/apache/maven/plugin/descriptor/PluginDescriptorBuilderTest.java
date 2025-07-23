@@ -54,8 +54,8 @@ class PluginDescriptorBuilderTest {
         assertEquals("2.3-SNAPSHOT", pd.getVersion());
         assertEquals("jar", pd.getGoalPrefix());
         assertEquals("plugin-description", pd.getDescription());
-        assertFalse(pd.isIsolatedRealm());
-        assertTrue(pd.isInheritedByDefault());
+        assertFalse(pd.isIsolatedRealm(), "Expected " + pd + ".isIsolatedRealm() to return false");
+        assertTrue(pd.isInheritedByDefault(), "Expected " + pd + ".isInheritedByDefault() to return true");
         assertEquals(2, pd.getMojos().size());
         assertEquals(1, pd.getDependencies().size());
 
@@ -65,12 +65,12 @@ class PluginDescriptorBuilderTest {
         assertEquals("mojo-description", md.getDescription());
         assertEquals("runtime", md.getDependencyResolutionRequired());
         assertEquals("test", md.getDependencyCollectionRequired());
-        assertFalse(md.isAggregator());
-        assertFalse(md.isDirectInvocationOnly());
-        assertTrue(md.isInheritedByDefault());
-        assertFalse(md.isOnlineRequired());
-        assertTrue(md.isProjectRequired());
-        assertFalse(md.isThreadSafe());
+        assertFalse(md.isAggregator(), "Expected " + md + ".isAggregator() to return false");
+        assertFalse(md.isDirectInvocationOnly(), "Expected " + md + ".isDirectInvocationOnly() to return false");
+        assertTrue(md.isInheritedByDefault(), "Expected " + md + ".isInheritedByDefault() to return true");
+        assertFalse(md.isOnlineRequired(), "Expected " + md + ".isOnlineRequired() to return false");
+        assertTrue(md.isProjectRequired(), "Expected " + md + ".isProjectRequired() to return true");
+        assertFalse(md.isThreadSafe(), "Expected " + md + ".isThreadSafe() to return false");
         assertEquals("package", md.getPhase());
         assertEquals("org.apache.maven.plugin.jar.JarMojo", md.getImplementation());
         assertEquals("antrun", md.getComponentConfigurator());
@@ -99,8 +99,8 @@ class PluginDescriptorBuilderTest {
         assertEquals("jarName", mp.getAlias());
         assertEquals("java.lang.String", mp.getType());
         assertEquals("java.lang.String", mp.getImplementation());
-        assertTrue(mp.isEditable());
-        assertFalse(mp.isRequired());
+        assertTrue(mp.isEditable(), "Expected " + mp + ".isEditable() to return true");
+        assertFalse(mp.isRequired(), "Expected " + mp + ".isRequired() to return false");
         assertEquals("parameter-description", mp.getDescription());
         assertEquals("deprecated-parameter", mp.getDeprecated());
         assertEquals("${jar.finalName}", mp.getExpression());
@@ -125,6 +125,6 @@ class PluginDescriptorBuilderTest {
         assertEquals("war", md.getGoal());
         assertNull(md.getDependencyResolutionRequired());
         assertNull(md.getDependencyCollectionRequired());
-        assertTrue(md.isThreadSafe());
+        assertTrue(md.isThreadSafe(), "Expected " + md + ".isThreadSafe() to return true");
     }
 }

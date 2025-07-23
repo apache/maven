@@ -165,7 +165,9 @@ class UpgradeWorkflowIntegrationTest {
 
             // Verify POM was potentially modified (depending on strategy applicability)
             String pomContent = Files.readString(pomFile);
-            assertTrue(pomContent.contains("<groupId>com.example</groupId>"));
+            assertTrue(
+                    pomContent.contains("<groupId>com.example</groupId>"),
+                    "Expected " + pomContent + " to contain " + "<groupId>com.example</groupId>");
             // Note: The exact modifications depend on which strategies are applicable
             // This test mainly verifies that apply goal can modify files
         }
