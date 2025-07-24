@@ -21,6 +21,7 @@ package org.apache.maven.impl;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -60,9 +61,9 @@ public class PathSelectorTest {
      */
     private static void assertFilteredFilesContains(final Path directory, final String syntax, final String... expected)
             throws IOException {
-        var includes = List.of(syntax + "**/*.txt");
-        var excludes = List.of(syntax + "baz/**");
-        var matcher = new PathSelector(directory, includes, excludes, false);
+        List<String> includes = List.of(syntax + "**/*.txt");
+        List<String> excludes = List.of(syntax + "baz/**");
+        PathMatcher matcher = PathSelector.of(directory, includes, excludes, false);
         Set<Path> filtered =
                 new HashSet<>(Files.walk(directory).filter(matcher::matches).toList());
         for (String path : expected) {
@@ -81,9 +82,9 @@ public class PathSelectorTest {
     @Test
     public void testExcludeOmission() {
         Path directory = Path.of("dummy");
-        var includes = List.of("**/*.java");
-        var excludes = List.of("baz/**");
-        var matcher = new PathSelector(directory, includes, excludes, true);
+        List<String> includes = List.of("**/*.java");
+        List<String> excludes = List.of("baz/**");
+        PathMatcher matcher = PathSelector.of(directory, includes, excludes, true);
         String s = matcher.toString();
         assertTrue(s.contains("glob:**/*.java"));
         assertFalse(s.contains("project.pj")); // Unnecessary exclusion should have been omitted.

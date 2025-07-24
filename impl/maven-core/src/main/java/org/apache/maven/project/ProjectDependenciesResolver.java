@@ -21,7 +21,9 @@ package org.apache.maven.project;
 /**
  * Resolves the transitive dependencies of a project.
  *
+ * @deprecated use {@code org.apache.maven.api.services.ProjectBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface ProjectDependenciesResolver {
 
     /**

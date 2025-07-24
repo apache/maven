@@ -22,7 +22,7 @@ under the License.
 NOTE: This file being encoded in UTF-8 is essential part of this test!
 
 -->
-<project>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.its.mng2362</groupId>

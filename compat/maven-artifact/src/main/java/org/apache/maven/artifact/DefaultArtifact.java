@@ -184,7 +184,7 @@ public class DefaultArtifact implements Artifact {
     }
 
     public static boolean empty(String value) {
-        return (value == null) || (value.trim().length() < 1);
+        return value == null || value.isBlank();
     }
 
     @Override

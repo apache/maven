@@ -152,7 +152,7 @@ public class MetadataGraph {
     }
     // ------------------------------------------------------------------------
     public MetadataGraphVertex findVertex(ArtifactMetadata md) {
-        if (md == null || vertices == null || vertices.size() < 1) {
+        if (md == null || vertices == null || vertices.isEmpty()) {
             return null;
         }
 

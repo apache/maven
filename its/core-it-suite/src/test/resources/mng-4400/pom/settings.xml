@@ -19,6 +19,6 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<settings>
+<settings xmlns='http://maven.apache.org/SETTINGS/1.0.0'>
   <!-- enforce default user settings (e.g. no mirrors) -->
 </settings>

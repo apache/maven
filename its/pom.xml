@@ -255,7 +255,7 @@ under the License.
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter</artifactId>
-        <version>5.13.3</version>
+        <version>5.13.4</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.plugin-tools</groupId>
@@ -283,15 +283,6 @@ under the License.
   <build>
     <pluginManagement>
       <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <configuration>
-            <environmentVariables>
-              <JENKINS_MAVEN_AGENT_DISABLED>true</JENKINS_MAVEN_AGENT_DISABLED>
-            </environmentVariables>
-          </configuration>
-        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>

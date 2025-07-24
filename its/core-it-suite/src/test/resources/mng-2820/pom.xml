@@ -21,7 +21,7 @@ under the License.
 <!--
 DOCUMENT-COMMENT-PRE-2
 -->
-<project>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
   <!-- MODEL-COMMENT -->
   <modelVersion>4.0.0</modelVersion>
 

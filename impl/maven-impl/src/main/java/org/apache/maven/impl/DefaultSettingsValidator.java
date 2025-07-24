@@ -271,7 +271,7 @@ public class DefaultSettingsValidator {
      */
     private static boolean validateStringEmpty(
             ProblemCollector<BuilderProblem> problems, String fieldName, String string, String message) {
-        if (string == null || string.length() == 0) {
+        if (string == null || string.isEmpty()) {
             return true;
         }
 

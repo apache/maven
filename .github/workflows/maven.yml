@@ -167,7 +167,7 @@ jobs:
 
       - name: Upload test artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        if: failure()
+        if: failure() || cancelled()
         with:
           name: ${{ github.run_number }}-full-build-artifact-${{ runner.os }}-${{ matrix.java }}
           path: '**/target/surefire-reports/*'
@@ -242,11 +242,11 @@ jobs:
 
       - name: Build Maven and ITs and run them
         shell: bash
-        run: mvn install -e -B -V -Prun-its,mimir
+        run: mvn verify -e -B -V -Prun-its,mimir
 
       - name: Upload test artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        if: failure()
+        if: failure() || cancelled()
         with:
           name: ${{ github.run_number }}-integration-test-artifact-${{ runner.os }}-${{ matrix.java }}
           path: ./its/core-it-suite/target/test-classes/

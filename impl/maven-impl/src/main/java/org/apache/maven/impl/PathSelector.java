@@ -61,7 +61,7 @@ import org.apache.maven.api.annotations.Nonnull;
  *
  * @see java.nio.file.FileSystem#getPathMatcher(String)
  */
-public class PathSelector implements PathMatcher {
+final class PathSelector implements PathMatcher {
     /**
      * Patterns which should be excluded by default, like <abbr>SCM</abbr> files.
      *
@@ -217,7 +217,7 @@ public class PathSelector implements PathMatcher {
     private final Path baseDirectory;
 
     /**
-     * Whether paths must be relativized before to be given to a matcher. If {@code true}, then every paths
+     * Whether paths must be relativized before being given to a matcher. If {@code true}, then every paths
      * will be made relative to {@link #baseDirectory} for allowing patterns like {@code "foo/bar/*.java"}
      * to work. As a slight optimization, we can skip this step if all patterns start with {@code "**"}.
      */
@@ -232,7 +232,7 @@ public class PathSelector implements PathMatcher {
      * @param useDefaultExcludes whether to augment the excludes with a default set of <abbr>SCM</abbr> patterns
      * @throws NullPointerException if directory is null
      */
-    public PathSelector(
+    private PathSelector(
             @Nonnull Path directory,
             Collection<String> includes,
             Collection<String> excludes,
@@ -249,9 +249,27 @@ public class PathSelector implements PathMatcher {
     }
 
     /**
+     * Creates a new matcher from the given includes and excludes.
+     *
+     * @param directory the base directory of the files to filter
+     * @param includes the patterns of the files to include, or null or empty for including all files
+     * @param excludes the patterns of the files to exclude, or null or empty for no exclusion
+     * @param useDefaultExcludes whether to augment the excludes with a default set of <abbr>SCM</abbr> patterns
+     * @throws NullPointerException if directory is null
+     * @return a path matcher for the given includes and excludes
+     */
+    public static PathMatcher of(
+            @Nonnull Path directory,
+            Collection<String> includes,
+            Collection<String> excludes,
+            boolean useDefaultExcludes) {
+        return new PathSelector(directory, includes, excludes, useDefaultExcludes).simplify();
+    }
+
+    /**
      * Returns the given array of excludes, optionally expanded with a default set of excludes,
      * then with unnecessary excludes omitted. An unnecessary exclude is an exclude which will never
-     * match a file because there are no include which would accept a file that could match the exclude.
+     * match a file because there are no includes which would accept a file that could match the exclude.
      * For example, if the only include is {@code "*.java"}, then the <code>"**&sol;project.pj"</code>,
      * <code>"**&sol;.DS_Store"</code> and other excludes will never match a file and can be omitted.
      * Because the list of {@linkplain #DEFAULT_EXCLUDES default excludes} contains many elements,
@@ -510,7 +528,7 @@ public class PathSelector implements PathMatcher {
      *
      * @param patterns the normalized include or exclude patterns
      * @param excludes whether the patterns are exclude patterns
-     * @return pattens of directories to include or exclude
+     * @return patterns of directories to include or exclude
      */
     private static String[] directoryPatterns(final String[] patterns, final boolean excludes) {
         // TODO: use `LinkedHashSet.newLinkedHashSet(int)` instead with JDK19.
@@ -564,18 +582,10 @@ public class PathSelector implements PathMatcher {
     }
 
     /**
-     * {@return whether there are no include or exclude filters}.
-     * In such case, this {@code PathSelector} instance should be ignored.
-     */
-    public boolean isEmpty() {
-        return includes.length == 0 && excludes.length == 0;
-    }
-
-    /**
      * {@return a potentially simpler matcher equivalent to this matcher}.
      */
     @SuppressWarnings("checkstyle:MissingSwitchDefault")
-    public PathMatcher simplify() {
+    private PathMatcher simplify() {
         if (!needRelativize && excludes.length == 0) {
             switch (includes.length) {
                 case 0:

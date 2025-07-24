@@ -2023,7 +2023,7 @@ public class DefaultModelValidator implements ModelValidator {
                     Version.V20,
                     "modelVersion",
                     null,
-                    "of '" + requestedModel + "' is newer than the versions supported by this Maven version ("
+                    requestedModel + "' is not supported by this Maven version ("
                             + getMavenVersionString(session)
                             + "). Supported modelVersions are: " + validVersions
                             + ". Building this project requires a newer version of Maven.",
@@ -2037,7 +2037,7 @@ public class DefaultModelValidator implements ModelValidator {
                     Version.V20,
                     "modelVersion",
                     null,
-                    "of '" + requestedModel + "' is older than the versions supported by this Maven version ("
+                    requestedModel + "' is not supported by this Maven version ("
                             + getMavenVersionString(session)
                             + "). Supported modelVersions are: " + validVersions
                             + ". Building this project requires an older version of Maven.",

@@ -23,7 +23,9 @@ import java.util.List;
 import org.eclipse.aether.graph.Dependency;
 
 /**
+ * @deprecated use {@code org.apache.maven.api.services.ProjectBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public class DependencyResolutionException extends Exception {
 
     private final transient DependencyResolutionResult result;
