@@ -39,8 +39,15 @@ public class MavenITmng3503Xpp3ShadingTest extends AbstractMavenIntegrationTestC
     public void testitMNG3503NoLinkageErrors() throws Exception {
         File dir = extractResources("/mng-3503/mng-3503-xpp3Shading-pu11");
 
-        Verifier verifier;
+        // First, build the test plugin
+        Verifier verifier = newVerifier(new File(dir, "maven-it-plugin-plexus-utils-11").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("install");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
 
+        // Then, run the test project that uses the plugin
         verifier = newVerifier(dir.getAbsolutePath());
 
         verifier.addCliArgument("validate");
@@ -54,7 +61,17 @@ public class MavenITmng3503Xpp3ShadingTest extends AbstractMavenIntegrationTestC
     @Test
     public void testitMNG3503Xpp3Shading() throws Exception {
         File dir = extractResources("/mng-3503/mng-3503-xpp3Shading-pu-new");
-        Verifier verifier = newVerifier(dir.getAbsolutePath());
+
+        // First, build the test plugin
+        Verifier verifier = newVerifier(new File(dir, "maven-it-plugin-plexus-utils-new").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("install");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+
+        // Then, run the test project that uses the plugin
+        verifier = newVerifier(dir.getAbsolutePath());
 
         verifier.addCliArgument("validate");
         verifier.execute();

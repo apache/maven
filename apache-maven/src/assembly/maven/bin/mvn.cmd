@@ -35,6 +35,10 @@ title %0
 @REM enable echoing by setting MAVEN_BATCH_ECHO to 'on'
 @if "%MAVEN_BATCH_ECHO%"=="on" echo %MAVEN_BATCH_ECHO%
 
+@REM Clear/define a variable for any options to be inserted via script
+@REM We want to avoid trying to parse the external MAVEN_OPTS variable
+SET INTERNAL_MAVEN_OPTS=
+
 @REM Execute a user defined script before this one
 if not "%MAVEN_SKIP_RC%"=="" goto skipRc
 if exist "%PROGRAMDATA%\mavenrc.cmd" call "%PROGRAMDATA%\mavenrc.cmd" %*
@@ -204,7 +208,7 @@ for /F "usebackq tokens=* delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.conf
         )
     )
 )
-@endlocal & set "MAVEN_OPTS=%MAVEN_OPTS% %JVM_CONFIG_MAVEN_OPTS%"
+@endlocal & set JVM_CONFIG_MAVEN_OPTS=%JVM_CONFIG_MAVEN_OPTS%
 
 :endReadJvmConfig
 
@@ -224,7 +228,7 @@ if "%~1"=="--debug" (
         echo Error: Unable to autodetect the YJP library location. Please set YJPLIB variable >&2
         exit /b 1
     )
-    set "MAVEN_OPTS=-agentpath:%YJPLIB%=onexit=snapshot,onexit=memory,tracing,onlylocal %MAVEN_OPTS%"
+    set "INTERNAL_MAVEN_OPTS=-agentpath:%YJPLIB%=onexit=snapshot,onexit=memory,tracing,onlylocal %INTERNAL_MAVEN_OPTS%"
 ) else if "%~1"=="--enc" (
     set "MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenEncCling"
 ) else if "%~1"=="--shell" (
@@ -248,7 +252,9 @@ set LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
 if "%MAVEN_MAIN_CLASS%"=="" @set MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenCling
 
 "%JAVACMD%" ^
+  %INTERNAL_MAVEN_OPTS% ^
   %MAVEN_OPTS% ^
+  %JVM_CONFIG_MAVEN_OPTS% ^
   %MAVEN_DEBUG_OPTS% ^
   --enable-native-access=ALL-UNNAMED ^
   -classpath %LAUNCHER_JAR% ^

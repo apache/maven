@@ -106,6 +106,8 @@ under the License.
         <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.11/source/apache-maven-3.9.11-src.zip</file-release>
         <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.11/source/apache-maven-3.9.11-src.tar.gz</file-release>
       </Version>
+    </release>
+    <release>
       <Version>
         <name>Apache Maven 3.9.10</name>
         <created>2025-06-01</created>
@@ -115,6 +117,8 @@ under the License.
         <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.10/source/apache-maven-3.9.10-src.zip</file-release>
         <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.10/source/apache-maven-3.9.10-src.tar.gz</file-release>
       </Version>
+    </release>
+    <release>
       <Version>
         <name>Apache Maven 3.9.9</name>
         <created>2024-08-17</created>

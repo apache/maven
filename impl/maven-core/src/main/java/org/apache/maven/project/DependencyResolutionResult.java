@@ -26,7 +26,9 @@ import org.eclipse.aether.graph.DependencyNode;
 /**
  * The result of a project dependency resolution.
  *
+ * @deprecated use {@code org.apache.maven.api.services.ProjectBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface DependencyResolutionResult {
 
     /**

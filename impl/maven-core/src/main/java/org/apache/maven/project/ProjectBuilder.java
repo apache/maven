@@ -26,7 +26,10 @@ import org.apache.maven.model.building.ModelSource;
 
 /**
  * Builds in-memory descriptions of projects.
+ *
+ * @deprecated use {@code org.apache.maven.api.services.ProjectBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface ProjectBuilder {
 
     /**

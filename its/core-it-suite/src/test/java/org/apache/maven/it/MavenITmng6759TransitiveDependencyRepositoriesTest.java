@@ -45,7 +45,17 @@ public class MavenITmng6759TransitiveDependencyRepositoriesTest extends Abstract
         installDependencyCInCustomRepo();
         File testDir = extractResources(projectBaseDir);
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        // First, build the test plugin
+        Verifier verifier =
+                newVerifier(new File(testDir, "mng6759-plugin-resolves-project-dependencies").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("install");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+
+        // Then, run the test project that uses the plugin
+        verifier = newVerifier(testDir.getAbsolutePath());
 
         verifier.addCliArgument("package");
         verifier.execute();

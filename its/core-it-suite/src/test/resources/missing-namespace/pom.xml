@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <!-- Test that we can parse a pom.xml with no namespace -->
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>missing-namespace</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+</project>

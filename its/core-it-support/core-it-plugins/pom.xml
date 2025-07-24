@@ -38,49 +38,25 @@ under the License.
     <module>maven-it-plugin-artifact</module>
     <module>maven-it-plugin-class-loader</module>
     <module>maven-it-plugin-configuration</module>
-    <module>maven-it-plugin-context-passing</module>
     <module>maven-it-plugin-core-stubs</module>
-    <module>maven-it-plugin-dependency-collection</module>
     <module>maven-it-plugin-dependency-resolution</module>
     <module>maven-it-plugin-expression</module>
     <module>maven-it-plugin-error</module>
-    <module>maven-it-plugin-extension-consumer</module>
     <module>maven-it-plugin-extension-provider</module>
     <module>maven-it-plugin-fork</module>
-    <module>maven-it-plugin-invalid-descriptor</module>
     <module>maven-it-plugin-log-file</module>
-    <module>maven-it-plugin-model-interpolation</module>
-    <module>maven-it-plugin-no-default-comp</module>
-    <module>maven-it-plugin-no-project</module>
-    <module>maven-it-plugin-online</module>
-    <module>maven-it-plugin-optional-mojos</module>
     <module>maven-it-plugin-packaging</module>
-    <module>maven-it-plugin-plugin-dependency</module>
     <module>maven-it-plugin-project</module>
     <module>maven-it-plugin-project-interpolation</module>
-    <module>maven-it-plugin-setter</module>
-    <module>maven-it-plugin-singleton-component</module>
     <module>maven-it-plugin-site</module>
     <module>maven-it-plugin-toolchain</module>
     <module>maven-it-plugin-touch</module>
-    <module>maven-it-plugin-uses-properties</module>
     <module>maven-it-plugin-uses-wagon</module>
     <module>maven-it-plugin-all</module>
-    <module>maven-it-plugin-plexus-utils-11</module>
-    <module>maven-it-plugin-plexus-utils-new</module>
     <module>maven-it-plugin-plexus-component-api</module>
-    <module>maven-it-plugin-log4j</module>
     <module>maven-it-plugin-extension1</module>
-    <module>maven-it-plugin-extension2</module>
     <module>maven-it-plugin-plexus-lifecycle</module>
-    <module>maven-it-plugin-settings</module>
-    <module>mng5805-extension</module>
-    <module>mng5805-extension2</module>
-    <module>mng5805-plugin</module>
-    <module>mng5805-plugin-dep</module>
-    <module>mng5958-extension</module>
-    <module>mng6759-plugin-resolves-project-dependencies</module>
-    <module>mng7529-plugin</module>
+
   </modules>
 
   <distributionManagement>

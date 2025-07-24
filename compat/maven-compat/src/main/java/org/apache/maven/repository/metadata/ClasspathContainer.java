@@ -70,7 +70,7 @@ public class ClasspathContainer implements Iterable<ArtifactMetadata> {
 
     // -------------------------------------------------------------------------------------------
     public MetadataTreeNode getClasspathAsTree() throws MetadataResolutionException {
-        if (classpath == null || classpath.size() < 1) {
+        if (classpath == null || classpath.isEmpty()) {
             return null;
         }
 

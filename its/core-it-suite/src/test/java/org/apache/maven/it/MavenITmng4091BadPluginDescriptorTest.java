@@ -41,7 +41,16 @@ public class MavenITmng4091BadPluginDescriptorTest extends AbstractMavenIntegrat
     public void testitMNG4091InvalidDescriptor() throws Exception {
         File testDir = extractResources("/mng-4091/invalid");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        // First, build the test plugin
+        Verifier verifier = newVerifier(new File(testDir, "maven-it-plugin-invalid-descriptor").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("install");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+
+        // Then, run the test project that uses the plugin (should fail)
+        verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
 
         verifier.addCliArgument("validate");
@@ -66,7 +75,16 @@ public class MavenITmng4091BadPluginDescriptorTest extends AbstractMavenIntegrat
     public void testitMNG4091PluginDependency() throws Exception {
         File testDir = extractResources("/mng-4091/plugin-dependency");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        // First, build the test plugin
+        Verifier verifier = newVerifier(new File(testDir, "maven-it-plugin-plugin-dependency").getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("install");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+
+        // Then, run the test project that uses the plugin
+        verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
 
         verifier.addCliArgument("validate");

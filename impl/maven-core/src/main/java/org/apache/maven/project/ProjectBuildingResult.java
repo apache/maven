@@ -26,7 +26,9 @@ import org.apache.maven.model.building.ModelProblem;
 /**
  * Collects the output of the project builder.
  *
+ * @deprecated use {@code org.apache.maven.api.services.ProjectBuilder} instead
  */
+@Deprecated(since = "4.0.0")
 public interface ProjectBuildingResult {
 
     /**
