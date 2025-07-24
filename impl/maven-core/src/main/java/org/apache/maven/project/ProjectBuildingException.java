@@ -125,11 +125,7 @@ public class ProjectBuildingException extends Exception {
         buffer.append("encountered while processing the POMs");
 
         if (errorProblems > 0) {
-            buffer.append(" (").append(errorProblems).append(" error");
-            if (errorProblems > 1) {
-                buffer.append("s");
-            }
-            buffer.append(")");
+            buffer.append(" (").append(errorProblems).append(" ").append(errorProblems > 1 ? "errors" : "error").append(")");
         }
 
         buffer.append(":\n");
