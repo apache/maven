@@ -49,7 +49,7 @@ public class MavenITmng4644StrictPomParsingRejectsMisplacedTextTest extends Abst
             verifier.execute();
             verifier.verifyErrorFreeLog();
 
-            fail("Should fail to validate the POM syntax due to misplaced text in <project> element.");
+            fail("Should fail to validate the POM syntax due to misplaced text in project element.");
         } catch (VerificationException e) {
             // expected
         }

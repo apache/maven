@@ -23,7 +23,7 @@ under the License.
 NOTE: This POM's XML declaration intentionally declares Latin-1 encoding.
 -->
 
-<project>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>

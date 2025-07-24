@@ -63,7 +63,7 @@ public class MavenITmng3379ParallelArtifactDownloadsTest extends AbstractMavenIn
 
         String gid = "org.apache.maven.its.mng3379.";
         assertArtifact(verifier, gid + "a", "x", "0.2-SNAPSHOT", "", "jar", "69c041c12f35894230c7c23c49cd245886c6fb6f");
-        assertArtifact(verifier, gid + "a", "x", "0.2-SNAPSHOT", "", "pom", "04a8ecb6dc279585b6d17552a4518805f0ff33b9");
+        assertArtifact(verifier, gid + "a", "x", "0.2-SNAPSHOT", "", "pom", "f9bde7791bf97bac962281abc8471d84b35937f1");
         assertArtifact(
                 verifier, gid + "a", "x", "0.2-SNAPSHOT", "tests", "jar", "69c041c12f35894230c7c23c49cd245886c6fb6f");
         assertArtifact(
@@ -73,7 +73,7 @@ public class MavenITmng3379ParallelArtifactDownloadsTest extends AbstractMavenIn
         assertMetadata(verifier, gid + "a", "x", "0.2-SNAPSHOT", "e1cfc3a77657fc46bb624dee25c61b290e5b4dd7");
 
         assertArtifact(verifier, gid + "b", "x", "0.2-SNAPSHOT", "", "jar", "efb7c4046565774cd7e44645e02f06ecdf91098d");
-        assertArtifact(verifier, gid + "b", "x", "0.2-SNAPSHOT", "", "pom", "834b45a91af07702a59855bf99614c099979c065");
+        assertArtifact(verifier, gid + "b", "x", "0.2-SNAPSHOT", "", "pom", "0356f3576a4244c23f8ad5574065619bf0230c23");
         assertArtifact(
                 verifier, gid + "b", "x", "0.2-SNAPSHOT", "tests", "jar", "efb7c4046565774cd7e44645e02f06ecdf91098d");
         assertArtifact(
@@ -84,7 +84,7 @@ public class MavenITmng3379ParallelArtifactDownloadsTest extends AbstractMavenIn
         assertMetadata(verifier, gid + "b", "x", "8f38b1041871f22dcb031544d8a3436c335bfcdb");
 
         assertArtifact(verifier, gid + "c", "x", "0.2-SNAPSHOT", "", "jar", "1eb0d5a421b3074e8a69b0dcca7e325c0636a932");
-        assertArtifact(verifier, gid + "c", "x", "0.2-SNAPSHOT", "", "pom", "f25d7907d7bd9807e823d15f49363de7826204b0");
+        assertArtifact(verifier, gid + "c", "x", "0.2-SNAPSHOT", "", "pom", "1854c48bff9f2118a85b87ec722dd6431fbd7ca6");
         assertArtifact(
                 verifier, gid + "c", "x", "0.2-SNAPSHOT", "tests", "jar", "1eb0d5a421b3074e8a69b0dcca7e325c0636a932");
         assertArtifact(
@@ -95,7 +95,7 @@ public class MavenITmng3379ParallelArtifactDownloadsTest extends AbstractMavenIn
         assertMetadata(verifier, gid + "c", "x", "c4848e60d226ec6304df3abd9eba8fdb301b3660");
 
         assertArtifact(verifier, gid + "d", "x", "0.2-SNAPSHOT", "", "jar", "3d606c564625a594165bcbbe4a24c8f11b18b5a0");
-        assertArtifact(verifier, gid + "d", "x", "0.2-SNAPSHOT", "", "pom", "4255f7a5781e1be7564a09c86eee140fad042de8");
+        assertArtifact(verifier, gid + "d", "x", "0.2-SNAPSHOT", "", "pom", "dac99e0f617b8c2bb178e8d0a9b6e1ca04261dff");
         assertArtifact(
                 verifier, gid + "d", "x", "0.2-SNAPSHOT", "tests", "jar", "3d606c564625a594165bcbbe4a24c8f11b18b5a0");
         assertArtifact(
