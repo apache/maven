@@ -80,7 +80,18 @@ public class SmartProjectComparator {
      * @return the project's weight (higher means longer dependency chain)
      */
     public long getProjectWeight(MavenProject project) {
-        return projectWeights.computeIfAbsent(project, this::calculateWeight);
+        // First check if weight is already calculated
+        Long existingWeight = projectWeights.get(project);
+        if (existingWeight != null) {
+            return existingWeight;
+        }
+
+        // Calculate weight without using computeIfAbsent to avoid recursive update issues
+        long weight = calculateWeight(project);
+
+        // Use putIfAbsent to handle concurrent access safely
+        Long previousWeight = projectWeights.putIfAbsent(project, weight);
+        return previousWeight != null ? previousWeight : weight;
     }
 
     private Comparator<MavenProject> createComparator() {
