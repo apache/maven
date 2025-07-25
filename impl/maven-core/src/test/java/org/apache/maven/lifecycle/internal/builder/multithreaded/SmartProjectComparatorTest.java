@@ -207,7 +207,7 @@ class SmartProjectComparatorTest {
 
         if (exception.get() != null) {
             if (exception.get() instanceof IllegalStateException
-                && exception.get().getMessage().contains("Recursive update")) {
+                    && exception.get().getMessage().contains("Recursive update")) {
                 fail("Recursive update detected: " + exception.get().getMessage());
             } else {
                 throw new RuntimeException("Unexpected exception", exception.get());
