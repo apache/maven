@@ -69,7 +69,7 @@ class MavenStaxReaderTest {
     @Test
     void testNamespaceInconsistencyThrows() {
         String xml = "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n"
-                + "  <build xmlns=\"http://maven.apache.org/POM/4.1.0\">\n"
+                + "  <build xmlns=\"http://maven.apache.org/POM\">\n"
                 + "    <plugins>\n"
                 + "      <plugin>\n"
                 + "        <artifactId>maven-test-plugin</artifactId>\n"
@@ -80,7 +80,7 @@ class MavenStaxReaderTest {
 
         XMLStreamException ex = assertThrows(XMLStreamException.class, () -> fromXml(xml));
         assertTrue(ex.getMessage().contains("Unexpected namespace for element 'build'"));
-        assertTrue(ex.getMessage().contains("found 'http://maven.apache.org/POM/4.1.0'"));
+        assertTrue(ex.getMessage().contains("found 'http://maven.apache.org/POM'"));
         assertTrue(ex.getMessage().contains("expected 'http://maven.apache.org/POM/4.0.0'"));
     }
 
