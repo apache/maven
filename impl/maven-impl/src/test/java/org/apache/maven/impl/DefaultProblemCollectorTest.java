@@ -37,16 +37,16 @@ class DefaultProblemCollectorTest {
         ProblemCollector<BuilderProblem> collector = ProblemCollector.create(5);
 
         assertFalse(collector.hasProblemsFor(BuilderProblem.Severity.WARNING));
-        assertFalse(collector.hasErrorProblems());
-        assertFalse(collector.hasFatalProblems());
+        assertFalse(collector.hasErrorProblems(), "Expected " + collector + ".hasErrorProblems() to return false");
+        assertFalse(collector.hasFatalProblems(), "Expected " + collector + ".hasFatalProblems() to return false");
 
         collector.reportProblem(
                 new DefaultBuilderProblem("source", 0, 0, null, "message", BuilderProblem.Severity.FATAL));
 
         // fatal triggers all
         assertTrue(collector.hasProblemsFor(BuilderProblem.Severity.WARNING));
-        assertTrue(collector.hasErrorProblems());
-        assertTrue(collector.hasFatalProblems());
+        assertTrue(collector.hasErrorProblems(), "Expected " + collector + ".hasErrorProblems() to return true");
+        assertTrue(collector.hasFatalProblems(), "Expected " + collector + ".hasFatalProblems() to return true");
     }
 
     @Test
@@ -54,16 +54,16 @@ class DefaultProblemCollectorTest {
         ProblemCollector<BuilderProblem> collector = ProblemCollector.create(5);
 
         assertFalse(collector.hasProblemsFor(BuilderProblem.Severity.WARNING));
-        assertFalse(collector.hasErrorProblems());
-        assertFalse(collector.hasFatalProblems());
+        assertFalse(collector.hasErrorProblems(), "Expected " + collector + ".hasErrorProblems() to return false");
+        assertFalse(collector.hasFatalProblems(), "Expected " + collector + ".hasFatalProblems() to return false");
 
         collector.reportProblem(
                 new DefaultBuilderProblem("source", 0, 0, null, "message", BuilderProblem.Severity.ERROR));
 
         // error triggers error + warning
         assertTrue(collector.hasProblemsFor(BuilderProblem.Severity.WARNING));
-        assertTrue(collector.hasErrorProblems());
-        assertFalse(collector.hasFatalProblems());
+        assertTrue(collector.hasErrorProblems(), "Expected " + collector + ".hasErrorProblems() to return true");
+        assertFalse(collector.hasFatalProblems(), "Expected " + collector + ".hasFatalProblems() to return false");
     }
 
     @Test
@@ -71,16 +71,16 @@ class DefaultProblemCollectorTest {
         ProblemCollector<BuilderProblem> collector = ProblemCollector.create(5);
 
         assertFalse(collector.hasProblemsFor(BuilderProblem.Severity.WARNING));
-        assertFalse(collector.hasErrorProblems());
-        assertFalse(collector.hasFatalProblems());
+        assertFalse(collector.hasErrorProblems(), "Expected " + collector + ".hasErrorProblems() to return false");
+        assertFalse(collector.hasFatalProblems(), "Expected " + collector + ".hasFatalProblems() to return false");
 
         collector.reportProblem(
                 new DefaultBuilderProblem("source", 0, 0, null, "message", BuilderProblem.Severity.WARNING));
 
         // warning triggers warning only
         assertTrue(collector.hasProblemsFor(BuilderProblem.Severity.WARNING));
-        assertFalse(collector.hasErrorProblems());
-        assertFalse(collector.hasFatalProblems());
+        assertFalse(collector.hasErrorProblems(), "Expected " + collector + ".hasErrorProblems() to return false");
+        assertFalse(collector.hasFatalProblems(), "Expected " + collector + ".hasFatalProblems() to return false");
     }
 
     @Test

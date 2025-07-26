@@ -87,7 +87,8 @@ class DefaultToolchainManagerTest {
     @Test
     void getToolchainsWithInvalidType() {
         List<Toolchain> result = manager.getToolchains(session, "invalid", null);
-        assertTrue(result.isEmpty());
+        assertTrue(
+                result.isEmpty(), "Expected collection to be empty but had " + result.size() + " elements: " + result);
     }
 
     @Test
@@ -106,7 +107,7 @@ class DefaultToolchainManagerTest {
         manager.storeToolchainToBuildContext(session, mockToolchain);
         Optional<Toolchain> result = manager.getToolchainFromBuildContext(session, "jdk");
 
-        assertTrue(result.isPresent());
+        assertTrue(result.isPresent(), "Expected " + result + ".isPresent() to return true");
         assertEquals(mockToolchain, result.get());
     }
 

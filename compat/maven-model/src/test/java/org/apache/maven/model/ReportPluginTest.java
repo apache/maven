@@ -45,7 +45,7 @@ class ReportPluginTest {
     @Test
     void testEqualsIdentity() {
         ReportPlugin thing = new ReportPlugin();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test

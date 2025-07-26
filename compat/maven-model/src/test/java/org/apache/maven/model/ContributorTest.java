@@ -45,7 +45,7 @@ class ContributorTest {
     @Test
     void testEqualsIdentity() {
         Contributor thing = new Contributor();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test

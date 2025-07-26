@@ -42,11 +42,11 @@ class AndArtifactFilterTest {
 
         AndArtifactFilter filter2 = new AndArtifactFilter(Arrays.asList(newSubFilter()));
 
-        assertFalse(filter1.equals(null));
-        assertTrue(filter1.equals(filter1));
+        assertFalse(filter1.equals(null), "Expected " + filter1 + " to not equal " + null);
+        assertTrue(filter1.equals(filter1), "Expected " + filter1 + " to equal " + filter1);
         assertEquals(filter1.hashCode(), filter1.hashCode());
 
-        assertFalse(filter1.equals(filter2));
-        assertFalse(filter2.equals(filter1));
+        assertFalse(filter1.equals(filter2), "Expected " + filter1 + " to not equal " + filter2);
+        assertFalse(filter2.equals(filter1), "Expected " + filter2 + " to not equal " + filter1);
     }
 }

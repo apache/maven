@@ -45,7 +45,7 @@ class DeploymentRepositoryTest {
     @Test
     void testEqualsIdentity() {
         DeploymentRepository thing = new DeploymentRepository();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test

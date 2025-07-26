@@ -86,8 +86,10 @@ public class PathSelectorTest {
         List<String> excludes = List.of("baz/**");
         PathMatcher matcher = PathSelector.of(directory, includes, excludes, true);
         String s = matcher.toString();
-        assertTrue(s.contains("glob:**/*.java"));
-        assertFalse(s.contains("project.pj")); // Unnecessary exclusion should have been omitted.
-        assertFalse(s.contains(".DS_Store"));
+        assertTrue(s.contains("glob:**/*.java"), "Expected " + s + " to contain " + "glob:**/*.java");
+        assertFalse(
+                s.contains("project.pj"),
+                "Expected " + s + " to not contain " + "project.pj"); // Unnecessary exclusion should have been omitted.
+        assertFalse(s.contains(".DS_Store"), "Expected " + s + " to not contain " + ".DS_Store");
     }
 }

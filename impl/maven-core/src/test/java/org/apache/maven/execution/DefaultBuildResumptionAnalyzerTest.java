@@ -28,8 +28,9 @@ import org.junit.jupiter.api.Test;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DefaultBuildResumptionAnalyzerTest {
     private final DefaultBuildResumptionAnalyzer analyzer = new DefaultBuildResumptionAnalyzer();
@@ -49,8 +50,8 @@ class DefaultBuildResumptionAnalyzerTest {
 
         Optional<BuildResumptionData> result = analyzer.determineBuildResumptionData(executionResult);
 
-        assertThat(result.isPresent(), is(true));
-        assertThat(result.get().getRemainingProjects(), is(asList("test:B")));
+        assertTrue(result.isPresent(), "Expected " + result + ".isPresent() to return true");
+        assertEquals(asList("test:B"), result.get().getRemainingProjects());
     }
 
     @Test
@@ -61,7 +62,7 @@ class DefaultBuildResumptionAnalyzerTest {
 
         Optional<BuildResumptionData> result = analyzer.determineBuildResumptionData(executionResult);
 
-        assertThat(result.isPresent(), is(false));
+        assertFalse(result.isPresent(), "Expected " + result + ".isPresent() to return false");
     }
 
     @Test
@@ -73,8 +74,8 @@ class DefaultBuildResumptionAnalyzerTest {
 
         Optional<BuildResumptionData> result = analyzer.determineBuildResumptionData(executionResult);
 
-        assertThat(result.isPresent(), is(true));
-        assertThat(result.get().getRemainingProjects(), is(asList("test:B")));
+        assertTrue(result.isPresent(), "Expected " + result + ".isPresent() to return true");
+        assertEquals(asList("test:B"), result.get().getRemainingProjects());
     }
 
     @Test
@@ -87,8 +88,8 @@ class DefaultBuildResumptionAnalyzerTest {
 
         Optional<BuildResumptionData> result = analyzer.determineBuildResumptionData(executionResult);
 
-        assertThat(result.isPresent(), is(true));
-        assertThat(result.get().getRemainingProjects(), is(asList("test:B", "test:C")));
+        assertTrue(result.isPresent(), "Expected " + result + ".isPresent() to return true");
+        assertEquals(asList("test:B", "test:C"), result.get().getRemainingProjects());
     }
 
     @Test
@@ -101,8 +102,8 @@ class DefaultBuildResumptionAnalyzerTest {
 
         Optional<BuildResumptionData> result = analyzer.determineBuildResumptionData(executionResult);
 
-        assertThat(result.isPresent(), is(true));
-        assertThat(result.get().getRemainingProjects(), is(asList("test:B", "test:D")));
+        assertTrue(result.isPresent(), "Expected " + result + ".isPresent() to return true");
+        assertEquals(asList("test:B", "test:D"), result.get().getRemainingProjects());
     }
 
     private MavenProject createMavenProject(String artifactId) {

@@ -45,7 +45,7 @@ class ResourceTest {
     @Test
     void testEqualsIdentity() {
         Resource thing = new Resource();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test
