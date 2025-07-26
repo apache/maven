@@ -38,7 +38,6 @@ public class SettingsXpp3Writer {
 
     public SettingsXpp3Writer() {
         delegate = new SettingsStaxWriter();
-        delegate.setAddLocationInformation(false);
     }
     /**
      * Method setFileComment.
