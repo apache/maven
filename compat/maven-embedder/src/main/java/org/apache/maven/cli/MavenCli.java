@@ -174,6 +174,25 @@ public class MavenCli {
 
     private static final Pattern NEXT_LINE = Pattern.compile("\r?\n");
 
+    /** Matches “/d/whatever” or “/C/…”.  */
+    private static final Pattern MSYS_PATH = Pattern.compile("^/([a-zA-Z])/(.*)$");
+
+    /**
+     * Turns “/d/projects/foo” into “D:\\projects\\foo”.
+     * Returns the original string if it isn't an MSYS-style path.
+     */
+    static String msysToWindowsPath(final String p) {
+        if (p == null) {
+            return null;
+        }
+        final Matcher m = MSYS_PATH.matcher(p);
+        if (m.matches()) {
+            return Character.toUpperCase(m.group(1).charAt(0)) + ":\\"
+                    + m.group(2).replace('/', '\\');
+        }
+        return p;
+    }
+
     public MavenCli() {
         this(null);
     }
@@ -362,6 +381,22 @@ public class MavenCli {
         // Windows paths.
         //
         String mavenHome = System.getProperty(Constants.MAVEN_HOME);
+
+        if (org.codehaus.plexus.util.Os.isFamily("windows")) {
+            System.setProperty("user.home", msysToWindowsPath(System.getProperty("user.home")));
+
+            for (final String k : new String[] {
+                Constants.MAVEN_REPO_LOCAL, // -Dmaven.repo.local
+                "user.settings", // -s / --settings
+                "alternateSettings",
+                "user.toolchains"
+            }) {
+                final String v = System.getProperty(k);
+                if (v != null) {
+                    System.setProperty(k, msysToWindowsPath(v));
+                }
+            }
+        }
 
         if (mavenHome != null) {
             System.setProperty(
