@@ -37,8 +37,10 @@ import org.jdom2.Namespace;
 import static org.apache.maven.cling.invoker.mvnup.goals.ModelVersionUtils.getSchemaLocationForModelVersion;
 import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.ModelVersions.MODEL_VERSION_4_0_0;
 import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.ModelVersions.MODEL_VERSION_4_1_0;
+import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.ModelVersions.MODEL_VERSION_4_2_0;
 import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.Namespaces.MAVEN_4_0_0_NAMESPACE;
 import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.Namespaces.MAVEN_4_1_0_NAMESPACE;
+import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.Namespaces.MAVEN_4_2_0_NAMESPACE;
 import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlAttributes.SCHEMA_LOCATION;
 import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlAttributes.XSI_NAMESPACE_PREFIX;
 import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlAttributes.XSI_NAMESPACE_URI;
@@ -246,7 +248,9 @@ public class ModelUpgradeStrategy extends AbstractUpgradeStrategy {
      * Gets the namespace URI for a model version.
      */
     private String getNamespaceForModelVersion(String modelVersion) {
-        if (MODEL_VERSION_4_1_0.equals(modelVersion)) {
+        if (MODEL_VERSION_4_2_0.equals(modelVersion)) {
+            return MAVEN_4_2_0_NAMESPACE;
+        } else if (MODEL_VERSION_4_1_0.equals(modelVersion)) {
             return MAVEN_4_1_0_NAMESPACE;
         } else {
             return MAVEN_4_0_0_NAMESPACE;

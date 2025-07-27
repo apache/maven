@@ -112,6 +112,20 @@
         </field>
 
         <!-- ====================================================================== -->
+        <!-- Mixins                                                                 -->
+        <!-- ====================================================================== -->
+
+        <field xdoc.separator="blank">
+          <name>mixins</name>
+          <version>4.2.0+</version>
+          <description>Mixins...</description>
+          <association>
+            <type>Mixin</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+
+        <!-- ====================================================================== -->
         <!-- groupId/artifactId/Version/Packaging                                   -->
         <!-- ====================================================================== -->
 
@@ -526,7 +540,7 @@
       <fields>
         <field xdoc.separator="blank">
           <name>modules</name>
-          <version>4.0.0/4.1.0</version>
+          <version>4.0.0/4.2.0</version>
           <description>
             @deprecated Use {@link #subprojects} instead.
           </description>
@@ -540,7 +554,7 @@
         </field>
         <field xdoc.separator="blank">
           <name>subprojects</name>
-          <version>4.1.0</version>
+          <version>4.1.0+</version>
           <description>The subprojects (formerly called modules) to build as a part of this
             project. Each subproject listed is a relative path to the directory containing the subproject.
             To be consistent with the way default URLs are calculated from parent, it is recommended
@@ -1835,6 +1849,23 @@
         </codeSegment>
       </codeSegments>
 
+    </class>
+    <class>
+        <name>Mixin</name>
+        <version>4.1.0+</version>
+        <superClass>Parent</superClass>
+        <fields>
+            <field>
+                <name>classifier</name>
+                <version>4.1.0+</version>
+                <type>String</type>
+            </field>
+            <field>
+                <name>extension</name>
+                <version>4.1.0+</version>
+                <type>String</type>
+            </field>
+        </fields>
     </class>
     <class>
       <name>Scm</name>

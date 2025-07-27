@@ -129,14 +129,14 @@ class ModelVersionUtilsTest {
     class ModelVersionValidationTests {
 
         @ParameterizedTest
-        @ValueSource(strings = {"4.0.0", "4.1.0"})
+        @ValueSource(strings = {"4.0.0", "4.1.0", "4.2.0"})
         @DisplayName("should validate supported model versions")
         void shouldValidateSupportedModelVersions(String version) {
             assertTrue(ModelVersionUtils.isValidModelVersion(version));
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {"3.0.0", "5.0.0", "4.2.0", "2.0.0", "6.0.0"})
+        @ValueSource(strings = {"3.0.0", "5.0.0", "2.0.0", "6.0.0"})
         @DisplayName("should reject unsupported model versions")
         void shouldRejectUnsupportedModelVersions(String version) {
             assertFalse(ModelVersionUtils.isValidModelVersion(version));
@@ -381,11 +381,11 @@ class ModelVersionUtilsTest {
         @DisplayName("should handle unknown model version in schema location")
         void shouldHandleUnknownModelVersionInSchemaLocation() {
             String schemaLocation = ModelVersionUtils.getSchemaLocationForModelVersion("5.0.0");
-            assertNotNull(schemaLocation); // Should return 4.1.0 schema for newer versions
-            // The method returns the 4.1.0 schema location for versions newer than 4.1.0
+            assertNotNull(schemaLocation); // Should return 4.2.0 schema for newer versions
+            // The method returns the 4.2.0 schema location for versions newer than 4.1.0
             assertTrue(
-                    schemaLocation.contains("4.1.0"),
-                    "Expected schema location to contain '4.1.0', but was: " + schemaLocation);
+                    schemaLocation.contains("4.2.0"),
+                    "Expected schema location to contain '4.2.0', but was: " + schemaLocation);
         }
     }
 

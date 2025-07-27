@@ -29,7 +29,9 @@ public interface ModelBuilder extends Service {
 
     String MODEL_VERSION_4_1_0 = "4.1.0";
 
-    List<String> KNOWN_MODEL_VERSIONS = List.of(MODEL_VERSION_4_0_0, MODEL_VERSION_4_1_0);
+    String MODEL_VERSION_4_2_0 = "4.2.0";
+
+    List<String> KNOWN_MODEL_VERSIONS = List.of(MODEL_VERSION_4_0_0, MODEL_VERSION_4_1_0, MODEL_VERSION_4_2_0);
 
     ModelBuilderSession newSession();
 

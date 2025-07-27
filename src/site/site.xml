@@ -44,6 +44,11 @@ under the License.
       <item name="Download" href="../../download.cgi"/>
     </menu>
 
+    <menu name="User Guide">
+      <item name="Maven Mixins" href="mixins.html"/>
+      <item name="Configuring Maven" href="configuring.html"/>
+    </menu>
+
     <menu inherit="bottom" name="Descriptors Reference">
       <item name="POM" href="./api/maven-api-model/maven.html"/>
       <item name="Settings" href="./api/maven-api-settings/settings.html"/>
