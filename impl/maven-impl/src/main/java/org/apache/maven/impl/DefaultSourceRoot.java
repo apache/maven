@@ -219,7 +219,7 @@ public final class DefaultSourceRoot implements SourceRoot {
         if (actual == null || actual.isEmpty()) {
             actual = defaultIncludes;
         }
-        return new PathSelector(directory(), actual, excludes(), useDefaultExcludes).simplify();
+        return PathSelector.of(directory(), actual, excludes(), useDefaultExcludes);
     }
 
     /**

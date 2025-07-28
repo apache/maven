@@ -33,6 +33,7 @@ import org.junit.jupiter.api.io.TempDir;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -134,11 +135,12 @@ public class DefaultPathMatcherFactoryTest {
     }
 
     @Test
-    public void testPathMatcherReturnsPathSelector(@TempDir Path tempDir) {
+    public void testIncludesAll(@TempDir Path tempDir) {
         PathMatcher matcher = factory.createPathMatcher(tempDir, null, null, false);
 
-        // Verify that the returned matcher is actually a PathSelector
-        assertTrue(matcher instanceof PathSelector);
+        // Because no pattern has been specified, simplify to includes all.
+        // IT must be the same instance, by method contract.
+        assertSame(factory.includesAll(), matcher);
     }
 
     /**
@@ -183,7 +185,7 @@ public class DefaultPathMatcherFactoryTest {
 
         // Test that PathSelector constructor also throws NPE for null directory
         assertThrows(
-                NullPointerException.class, () -> new PathSelector(null, List.of("*.txt"), List.of("*.tmp"), false));
+                NullPointerException.class, () -> PathSelector.of(null, List.of("*.txt"), List.of("*.tmp"), false));
 
         // Test that deriveDirectoryMatcher throws NPE for null fileMatcher
         assertThrows(NullPointerException.class, () -> factory.deriveDirectoryMatcher(null));

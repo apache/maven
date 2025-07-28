@@ -21,6 +21,7 @@ package org.apache.maven.api.services;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.Collection;
+import java.util.Objects;
 
 import org.apache.maven.api.Service;
 import org.apache.maven.api.annotations.Experimental;
@@ -138,4 +139,25 @@ public interface PathMatcherFactory extends Service {
      */
     @Nonnull
     PathMatcher deriveDirectoryMatcher(@Nonnull PathMatcher fileMatcher);
+
+    /**
+     * Returns the path matcher that unconditionally returns {@code true} for all files.
+     * It should be the matcher returned by the other methods of this interface when the
+     * given patterns match all files.
+     *
+     * @return path matcher that unconditionally returns {@code true} for all files
+     */
+    @Nonnull
+    PathMatcher includesAll();
+
+    /**
+     * {@return whether the given matcher includes all files}.
+     * This method may conservatively returns {@code false} if case of doubt.
+     * A return value of {@code true} means that the pattern is certain to match all files.
+     *
+     * @param matcher the matcher to test
+     */
+    default boolean isIncludesAll(@Nonnull PathMatcher matcher) {
+        return Objects.requireNonNull(matcher) == includesAll();
+    }
 }
