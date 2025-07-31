@@ -41,10 +41,11 @@ import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.io.TempDir;
 
 import static java.util.UUID.randomUUID;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.condition.OS.WINDOWS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -74,37 +75,37 @@ class DefaultPluginXmlFactoryReadWriteTest {
         PluginDescriptor descriptor = defaultPluginXmlFactory.read(XmlReaderRequest.builder()
                 .inputStream(new ByteArrayInputStream(SAMPLE_PLUGIN_XML.getBytes()))
                 .build());
-        assertThat(descriptor.getName()).isEqualTo(NAME);
-        assertThat(descriptor.getGroupId()).isEqualTo("org.example");
-        assertThat(descriptor.getArtifactId()).isEqualTo("sample-plugin");
-        assertThat(descriptor.getVersion()).isEqualTo("1.0.0");
+        assertEquals(NAME, descriptor.getName());
+        assertEquals("org.example", descriptor.getGroupId());
+        assertEquals("sample-plugin", descriptor.getArtifactId());
+        assertEquals("1.0.0", descriptor.getVersion());
     }
 
     @Test
     void parsePlugin() {
-        assertThat(defaultPluginXmlFactory
-                        .read(XmlReaderRequest.builder()
-                                .reader(new StringReader(SAMPLE_PLUGIN_XML))
-                                .build())
-                        .getName())
-                .isEqualTo(NAME);
+        String actualName = defaultPluginXmlFactory
+                .read(XmlReaderRequest.builder()
+                        .reader(new StringReader(SAMPLE_PLUGIN_XML))
+                        .build())
+                .getName();
+        assertEquals(NAME, actualName, "Expected plugin name to be " + NAME + " but was " + actualName);
     }
 
     @Test
     void readFromPathParsesPluginDescriptorCorrectly() throws Exception {
         Path xmlFile = tempDir.resolve("plugin.xml");
         Files.write(xmlFile, SAMPLE_PLUGIN_XML.getBytes());
-        assertThat(defaultPluginXmlFactory
-                        .read(XmlReaderRequest.builder().path(xmlFile).build())
-                        .getName())
-                .isEqualTo(NAME);
+        String actualName = defaultPluginXmlFactory
+                .read(XmlReaderRequest.builder().path(xmlFile).build())
+                .getName();
+        assertEquals(NAME, actualName, "Expected plugin name to be " + NAME + " but was " + actualName);
     }
 
     @Test
     void readWithNoInputThrowsIllegalArgumentException() {
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() ->
-                        defaultPluginXmlFactory.read(XmlReaderRequest.builder().build()));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> defaultPluginXmlFactory.read(XmlReaderRequest.builder().build()));
     }
 
     @Test
@@ -120,8 +121,12 @@ class DefaultPluginXmlFactoryReadWriteTest {
                         .build())
                 .build());
         String output = writer.toString();
-        assertThat(output).contains("<name>" + NAME + "</name>");
-        assertThat(output).contains("<groupId>org.example</groupId>");
+        assertTrue(
+                output.contains("<name>" + NAME + "</name>"),
+                "Expected " + output + " to contain " + "<name>" + NAME + "</name>");
+        assertTrue(
+                output.contains("<groupId>org.example</groupId>"),
+                "Expected " + output + " to contain " + "<groupId>org.example</groupId>");
     }
 
     @Test
@@ -131,7 +136,10 @@ class DefaultPluginXmlFactoryReadWriteTest {
                 .outputStream(outputStream)
                 .content(PluginDescriptor.newBuilder().name(NAME).build())
                 .build());
-        assertThat(outputStream.toString()).contains("<name>" + NAME + "</name>");
+        String output = outputStream.toString();
+        assertTrue(
+                output.contains("<name>" + NAME + "</name>"),
+                "Expected output to contain <name>" + NAME + "</name> but was: " + output);
     }
 
     @Test
@@ -141,16 +149,31 @@ class DefaultPluginXmlFactoryReadWriteTest {
                 .path(xmlFile)
                 .content(PluginDescriptor.newBuilder().name(NAME).build())
                 .build());
-        assertThat(Files.readString(xmlFile)).contains("<name>" + NAME + "</name>");
+        String fileContent = Files.readString(xmlFile);
+        assertTrue(
+                fileContent.contains("<name>" + NAME + "</name>"),
+                "Expected file content to contain <name>" + NAME + "</name> but was: " + fileContent);
     }
 
     @Test
     void fromXmlStringParsesValidXml() {
         PluginDescriptor descriptor = defaultPluginXmlFactory.fromXmlString(SAMPLE_PLUGIN_XML);
-        assertThat(descriptor.getName()).isEqualTo(NAME);
-        assertThat(descriptor.getGroupId()).isEqualTo("org.example");
-        assertThat(descriptor.getArtifactId()).isEqualTo("sample-plugin");
-        assertThat(descriptor.getVersion()).isEqualTo("1.0.0");
+        assertEquals(
+                NAME,
+                descriptor.getName(),
+                "Expected descriptor name to be " + NAME + " but was " + descriptor.getName());
+        assertEquals(
+                "org.example",
+                descriptor.getGroupId(),
+                "Expected descriptor groupId to be org.example but was " + descriptor.getGroupId());
+        assertEquals(
+                "sample-plugin",
+                descriptor.getArtifactId(),
+                "Expected descriptor artifactId to be sample-plugin but was " + descriptor.getArtifactId());
+        assertEquals(
+                "1.0.0",
+                descriptor.getVersion(),
+                "Expected descriptor version to be 1.0.0 but was " + descriptor.getVersion());
     }
 
     @Test
@@ -161,19 +184,39 @@ class DefaultPluginXmlFactoryReadWriteTest {
                 .artifactId("sample-plugin")
                 .version("1.0.0")
                 .build());
-        assertThat(xml).contains("<name>" + NAME + "</name>");
-        assertThat(xml).contains("<groupId>org.example</groupId>");
-        assertThat(xml).contains("<artifactId>sample-plugin</artifactId>");
-        assertThat(xml).contains("<version>1.0.0</version>");
+        assertTrue(
+                xml.contains("<name>" + NAME + "</name>"),
+                "Expected " + xml + " to contain " + "<name>" + NAME + "</name>");
+        assertTrue(
+                xml.contains("<groupId>org.example</groupId>"),
+                "Expected " + xml + " to contain " + "<groupId>org.example</groupId>");
+        assertTrue(
+                xml.contains("<artifactId>sample-plugin</artifactId>"),
+                "Expected " + xml + " to contain " + "<artifactId>sample-plugin</artifactId>");
+        assertTrue(
+                xml.contains("<version>1.0.0</version>"),
+                "Expected " + xml + " to contain " + "<version>1.0.0</version>");
     }
 
     @Test
     void staticFromXmlParsesValidXml() {
         PluginDescriptor descriptor = DefaultPluginXmlFactory.fromXml(SAMPLE_PLUGIN_XML);
-        assertThat(descriptor.getName()).isEqualTo(NAME);
-        assertThat(descriptor.getGroupId()).isEqualTo("org.example");
-        assertThat(descriptor.getArtifactId()).isEqualTo("sample-plugin");
-        assertThat(descriptor.getVersion()).isEqualTo("1.0.0");
+        assertEquals(
+                NAME,
+                descriptor.getName(),
+                "Expected descriptor name to be " + NAME + " but was " + descriptor.getName());
+        assertEquals(
+                "org.example",
+                descriptor.getGroupId(),
+                "Expected descriptor groupId to be org.example but was " + descriptor.getGroupId());
+        assertEquals(
+                "sample-plugin",
+                descriptor.getArtifactId(),
+                "Expected descriptor artifactId to be sample-plugin but was " + descriptor.getArtifactId());
+        assertEquals(
+                "1.0.0",
+                descriptor.getVersion(),
+                "Expected descriptor version to be 1.0.0 but was " + descriptor.getVersion());
     }
 
     @Test
@@ -184,19 +227,30 @@ class DefaultPluginXmlFactoryReadWriteTest {
                 .artifactId("sample-plugin")
                 .version("1.0.0")
                 .build());
-        assertThat(xml).contains("<name>" + NAME + "</name>");
-        assertThat(xml).contains("<name>" + NAME + "</name>");
-        assertThat(xml).contains("<groupId>org.example</groupId>");
-        assertThat(xml).contains("<artifactId>sample-plugin</artifactId>");
-        assertThat(xml).contains("<version>1.0.0</version>");
+        assertTrue(
+                xml.contains("<name>" + NAME + "</name>"),
+                "Expected " + xml + " to contain " + "<name>" + NAME + "</name>");
+        assertTrue(
+                xml.contains("<name>" + NAME + "</name>"),
+                "Expected " + xml + " to contain " + "<name>" + NAME + "</name>");
+        assertTrue(
+                xml.contains("<groupId>org.example</groupId>"),
+                "Expected " + xml + " to contain " + "<groupId>org.example</groupId>");
+        assertTrue(
+                xml.contains("<artifactId>sample-plugin</artifactId>"),
+                "Expected " + xml + " to contain " + "<artifactId>sample-plugin</artifactId>");
+        assertTrue(
+                xml.contains("<version>1.0.0</version>"),
+                "Expected " + xml + " to contain " + "<version>1.0.0</version>");
     }
 
     @Test
     void writeWithFailingWriterThrowsXmlWriterException() {
         String unableToWritePlugin = "Unable to write plugin" + randomUUID();
         String ioEx = "ioEx" + randomUUID();
-        XmlWriterException exception = assertThatExceptionOfType(XmlWriterException.class)
-                .isThrownBy(() -> defaultPluginXmlFactory.write(XmlWriterRequest.<PluginDescriptor>builder()
+        XmlWriterException exception = assertThrows(
+                XmlWriterException.class,
+                () -> defaultPluginXmlFactory.write(XmlWriterRequest.<PluginDescriptor>builder()
                         .writer(new Writer() {
                             @Override
                             public void write(char[] cbuf, int off, int len) {
@@ -212,43 +266,45 @@ class DefaultPluginXmlFactoryReadWriteTest {
                         .content(PluginDescriptor.newBuilder()
                                 .name("Failing Plugin")
                                 .build())
-                        .build()))
-                .actual();
-        assertThat(exception.getMessage()).contains(unableToWritePlugin);
-        assertThat(exception.getCause()).isInstanceOf(XmlWriterException.class);
-        assertThat(exception.getCause().getCause().getMessage()).isEqualTo(ioEx);
-        assertThat(exception.getCause().getMessage()).isEqualTo(unableToWritePlugin);
+                        .build()));
+        assertTrue(exception.getMessage().contains(unableToWritePlugin));
+        assertInstanceOf(XmlWriterException.class, exception.getCause());
+        assertEquals(ioEx, exception.getCause().getCause().getMessage());
+        assertEquals(unableToWritePlugin, exception.getCause().getMessage());
     }
 
     @Test
     void writeWithNoTargetThrowsIllegalArgumentException() {
-        assertThat(assertThrows(
-                                IllegalArgumentException.class,
-                                () -> defaultPluginXmlFactory.write(XmlWriterRequest.<PluginDescriptor>builder()
-                                        .content(PluginDescriptor.newBuilder()
-                                                .name("No Output Plugin")
-                                                .build())
-                                        .build()))
-                        .getMessage())
-                .isEqualTo("writer, outputStream or path must be non null");
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> defaultPluginXmlFactory.write(XmlWriterRequest.<PluginDescriptor>builder()
+                        .content(PluginDescriptor.newBuilder()
+                                .name("No Output Plugin")
+                                .build())
+                        .build()));
+        assertEquals(
+                "writer, outputStream or path must be non null",
+                exception.getMessage(),
+                "Expected specific error message but was: " + exception.getMessage());
     }
 
     @Test
     void readMalformedXmlThrowsXmlReaderException() {
-        XmlReaderException exception = assertThatExceptionOfType(XmlReaderException.class)
-                .isThrownBy(() -> defaultPluginXmlFactory.read(XmlReaderRequest.builder()
+        XmlReaderException exception = assertThrows(
+                XmlReaderException.class,
+                () -> defaultPluginXmlFactory.read(XmlReaderRequest.builder()
                         .inputStream(new ByteArrayInputStream("<plugin><name>Broken Plugin".getBytes()))
-                        .build()))
-                .actual();
-        assertThat(exception.getMessage()).contains("Unable to read plugin");
-        assertThat(exception.getCause()).isInstanceOf(WstxEOFException.class);
+                        .build()));
+        assertTrue(exception.getMessage().contains("Unable to read plugin"));
+        assertInstanceOf(WstxEOFException.class, exception.getCause());
     }
 
     @Test
     void locateExistingPomWithFilePathShouldReturnSameFileIfRegularFile() throws IOException {
         Path pomFile = Files.createTempFile(tempDir, "pom", ".xml");
         DefaultModelProcessor processor = new DefaultModelProcessor(mock(ModelXmlFactory.class), List.of());
-        assertThat(processor.locateExistingPom(pomFile)).isEqualTo(pomFile);
+        assertEquals(
+                pomFile, processor.locateExistingPom(pomFile), "Expected locateExistingPom to return the same file");
     }
 
     @Test
@@ -261,10 +317,22 @@ class DefaultPluginXmlFactoryReadWriteTest {
         PluginDescriptor descriptor = defaultPluginXmlFactory.read(XmlReaderRequest.builder()
                 .inputStream(xmlFile.toUri().toURL().openStream())
                 .build());
-        assertThat(descriptor.getName()).isEqualTo(NAME);
-        assertThat(descriptor.getGroupId()).isEqualTo("org.example");
-        assertThat(descriptor.getArtifactId()).isEqualTo("sample-plugin");
-        assertThat(descriptor.getVersion()).isEqualTo("1.0.0");
+        assertEquals(
+                NAME,
+                descriptor.getName(),
+                "Expected descriptor name to be " + NAME + " but was " + descriptor.getName());
+        assertEquals(
+                "org.example",
+                descriptor.getGroupId(),
+                "Expected descriptor groupId to be org.example but was " + descriptor.getGroupId());
+        assertEquals(
+                "sample-plugin",
+                descriptor.getArtifactId(),
+                "Expected descriptor artifactId to be sample-plugin but was " + descriptor.getArtifactId());
+        assertEquals(
+                "1.0.0",
+                descriptor.getVersion(),
+                "Expected descriptor version to be 1.0.0 but was " + descriptor.getVersion());
     }
 
     @Test

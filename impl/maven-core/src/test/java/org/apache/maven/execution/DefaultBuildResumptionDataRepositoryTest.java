@@ -27,10 +27,8 @@ import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.Test;
 
 import static java.util.Collections.singleton;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DefaultBuildResumptionDataRepositoryTest {
     private final DefaultBuildResumptionDataRepository repository = new DefaultBuildResumptionDataRepository();
@@ -43,7 +41,7 @@ class DefaultBuildResumptionDataRepositoryTest {
 
         repository.applyResumptionProperties(request, properties);
 
-        assertThat(request.getProjectActivation().getOptionalActiveProjectSelectors(), is(singleton(":module-a")));
+        assertEquals(singleton(":module-a"), request.getProjectActivation().getOptionalActiveProjectSelectors());
     }
 
     @Test
@@ -55,7 +53,7 @@ class DefaultBuildResumptionDataRepositoryTest {
 
         repository.applyResumptionProperties(request, properties);
 
-        assertThat(request.getResumeFrom(), is(":module-b"));
+        assertEquals(":module-b", request.getResumeFrom());
     }
 
     @Test
@@ -69,9 +67,11 @@ class DefaultBuildResumptionDataRepositoryTest {
 
         repository.applyResumptionProperties(request, properties);
 
-        assertThat(
-                request.getProjectActivation().getOptionalActiveProjectSelectors(),
-                containsInAnyOrder(":module-a", ":module-b", ":module-c"));
+        var selectors = request.getProjectActivation().getOptionalActiveProjectSelectors();
+        assertEquals(3, selectors.size());
+        assertTrue(selectors.contains(":module-a"), "Expected selectors " + selectors + " to contain :module-a");
+        assertTrue(selectors.contains(":module-b"), "Expected selectors " + selectors + " to contain :module-b");
+        assertTrue(selectors.contains(":module-c"), "Expected selectors " + selectors + " to contain :module-c");
     }
 
     @Test
@@ -82,7 +82,9 @@ class DefaultBuildResumptionDataRepositoryTest {
 
         repository.applyResumptionProperties(request, properties);
 
-        assertThat(request.getProjectActivation().getOptionalActiveProjectSelectors(), is(empty()));
+        assertTrue(request.getProjectActivation()
+                .getOptionalActiveProjectSelectors()
+                .isEmpty());
     }
 
     @Test
@@ -95,8 +97,7 @@ class DefaultBuildResumptionDataRepositoryTest {
 
         repository.applyResumptionData(request, rootProject);
 
-        assertThat(
-                request.getProjectActivation().getOptionalActiveProjectSelectors(),
-                containsInAnyOrder("example:module-c"));
+        assertEquals(
+                singleton("example:module-c"), request.getProjectActivation().getOptionalActiveProjectSelectors());
     }
 }

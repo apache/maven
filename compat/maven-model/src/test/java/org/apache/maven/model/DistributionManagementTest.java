@@ -45,7 +45,7 @@ class DistributionManagementTest {
     @Test
     void testEqualsIdentity() {
         DistributionManagement thing = new DistributionManagement();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test

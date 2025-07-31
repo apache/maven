@@ -73,7 +73,7 @@ class RepositorySystemTest extends AbstractRepositoryTestCase {
      */
     private void checkUtSimpleArtifactDependencies(Dependency dep1, Dependency dep2) {
         assertEquals("compile", dep1.getScope());
-        assertFalse(dep1.isOptional());
+        assertFalse(dep1.isOptional(), "Expected " + dep1 + ".isOptional() to return false");
         assertEquals(0, dep1.getExclusions().size());
         Artifact depArtifact = dep1.getArtifact();
         assertEquals("ut.simple", depArtifact.getGroupId());
@@ -81,7 +81,7 @@ class RepositorySystemTest extends AbstractRepositoryTestCase {
         assertEquals("1.0", depArtifact.getVersion());
         assertEquals("1.0", depArtifact.getBaseVersion());
         assertNull(depArtifact.getFile());
-        assertFalse(depArtifact.isSnapshot());
+        assertFalse(depArtifact.isSnapshot(), "Expected " + depArtifact + ".isSnapshot() to return false");
         assertEquals("", depArtifact.getClassifier());
         assertEquals("jar", depArtifact.getExtension());
         assertEquals("java", depArtifact.getProperty("language", null));
@@ -91,7 +91,7 @@ class RepositorySystemTest extends AbstractRepositoryTestCase {
         assertEquals(4, depArtifact.getProperties().size());
 
         assertEquals("compile", dep2.getScope());
-        assertFalse(dep2.isOptional());
+        assertFalse(dep2.isOptional(), "Expected " + dep2 + ".isOptional() to return false");
         assertEquals(0, dep2.getExclusions().size());
         depArtifact = dep2.getArtifact();
         assertEquals("ut.simple", depArtifact.getGroupId());
@@ -99,7 +99,7 @@ class RepositorySystemTest extends AbstractRepositoryTestCase {
         assertEquals("1.0", depArtifact.getVersion());
         assertEquals("1.0", depArtifact.getBaseVersion());
         assertNull(depArtifact.getFile());
-        assertFalse(depArtifact.isSnapshot());
+        assertFalse(depArtifact.isSnapshot(), "Expected " + depArtifact + ".isSnapshot() to return false");
         assertEquals("sources", depArtifact.getClassifier());
         assertEquals("jar", depArtifact.getExtension());
         assertEquals("java", depArtifact.getProperty("language", null));
@@ -152,8 +152,8 @@ class RepositorySystemTest extends AbstractRepositoryTestCase {
     }
 
     private void checkArtifactResult(ArtifactResult result, String filename) {
-        assertFalse(result.isMissing());
-        assertTrue(result.isResolved());
+        assertFalse(result.isMissing(), "Expected " + result + ".isMissing() to return false");
+        assertTrue(result.isResolved(), "Expected " + result + ".isResolved() to return true");
         Artifact artifact = result.getArtifact();
         assertNotNull(artifact.getFile());
         assertEquals(filename, artifact.getFile().getName());

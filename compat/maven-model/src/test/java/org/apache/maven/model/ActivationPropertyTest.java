@@ -45,7 +45,7 @@ class ActivationPropertyTest {
     @Test
     void testEqualsIdentity() {
         ActivationProperty thing = new ActivationProperty();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test

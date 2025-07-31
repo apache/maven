@@ -28,7 +28,7 @@ import org.apache.maven.api.plugin.testing.MojoTest;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -47,7 +47,7 @@ public class HelloMojoTest {
 
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
         verify(componentMock).hello(captor.capture());
-        assertThat(captor.getValue()).isEqualTo("World");
+        assertEquals("World", captor.getValue(), "Expected captured value to be 'World'");
     }
 
     @Singleton

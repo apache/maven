@@ -24,7 +24,8 @@ import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputSource;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class DefaultDependencyManagementImporterTest {
     @Test
@@ -33,7 +34,7 @@ class DefaultDependencyManagementImporterTest {
         final DependencyManagement depMgmt = DependencyManagement.newBuilder().build();
         final Dependency result = DefaultDependencyManagementImporter.updateWithImportedFrom(dependency, depMgmt);
 
-        assertThat(dependency).isEqualTo(result);
+        assertEquals(result, dependency);
     }
 
     @Test
@@ -48,9 +49,13 @@ class DefaultDependencyManagementImporterTest {
 
         final Dependency result = DefaultDependencyManagementImporter.updateWithImportedFrom(dependency, bom);
 
-        assertThat(result).isNotNull();
-        assertThat(result.getImportedFrom().toString())
-                .isEqualTo(bom.getLocation("").toString());
+        assertNotNull(result);
+        String actualImportedFrom = result.getImportedFrom().toString();
+        String expectedImportedFrom = bom.getLocation("").toString();
+        assertEquals(
+                expectedImportedFrom,
+                actualImportedFrom,
+                "Expected importedFrom to be " + expectedImportedFrom + " but was " + actualImportedFrom);
     }
 
     @Test
@@ -69,9 +74,13 @@ class DefaultDependencyManagementImporterTest {
         final Dependency result = DefaultDependencyManagementImporter.updateWithImportedFrom(dependency, bom);
 
         // Assert
-        assertThat(result).isNotNull();
-        assertThat(result.getImportedFrom().toString())
-                .isEqualTo(bom.getLocation("").toString());
+        assertNotNull(result);
+        String actualImportedFrom = result.getImportedFrom().toString();
+        String expectedImportedFrom = bom.getLocation("").toString();
+        assertEquals(
+                expectedImportedFrom,
+                actualImportedFrom,
+                "Expected importedFrom to be " + expectedImportedFrom + " but was " + actualImportedFrom);
     }
 
     @Test
@@ -94,8 +103,12 @@ class DefaultDependencyManagementImporterTest {
         final Dependency result = DefaultDependencyManagementImporter.updateWithImportedFrom(dependency, bom);
 
         // Assert
-        assertThat(result.getImportedFrom().toString())
-                .isEqualTo(bom.getLocation("").toString());
+        String actualImportedFrom = result.getImportedFrom().toString();
+        String expectedImportedFrom = bom.getLocation("").toString();
+        assertEquals(
+                expectedImportedFrom,
+                actualImportedFrom,
+                "Expected importedFrom to be " + expectedImportedFrom + " but was " + actualImportedFrom);
     }
 
     @Test
@@ -118,7 +131,11 @@ class DefaultDependencyManagementImporterTest {
                 DefaultDependencyManagementImporter.updateWithImportedFrom(dependency, differentSource);
 
         // Assert
-        assertThat(result.getImportedFrom().toString())
-                .isEqualTo(differentSource.getLocation("").toString());
+        String actualImportedFrom = result.getImportedFrom().toString();
+        String expectedImportedFrom = differentSource.getLocation("").toString();
+        assertEquals(
+                expectedImportedFrom,
+                actualImportedFrom,
+                "Expected importedFrom to be " + expectedImportedFrom + " but was " + actualImportedFrom);
     }
 }

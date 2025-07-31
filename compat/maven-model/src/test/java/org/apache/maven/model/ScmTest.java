@@ -45,7 +45,7 @@ class ScmTest {
     @Test
     void testEqualsIdentity() {
         Scm thing = new Scm();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test
