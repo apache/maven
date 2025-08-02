@@ -18,7 +18,10 @@
  */
 package org.apache.maven.impl.resolver;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -28,24 +31,37 @@ import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
+import org.apache.maven.api.model.DependencyManagement;
+import org.apache.maven.api.model.DistributionManagement;
+import org.apache.maven.api.model.License;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Prerequisites;
+import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ProblemCollector;
+import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.api.services.Sources;
 import org.apache.maven.api.services.model.ModelResolverException;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.RequestTraceHelper;
 import org.apache.maven.impl.model.ModelProblemUtils;
+import org.apache.maven.impl.resolver.artifact.MavenArtifactProperties;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.RepositoryException;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.ArtifactProperties;
+import org.eclipse.aether.artifact.ArtifactType;
+import org.eclipse.aether.artifact.ArtifactTypeRegistry;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.Exclusion;
 import org.eclipse.aether.impl.ArtifactDescriptorReader;
 import org.eclipse.aether.impl.ArtifactResolver;
 import org.eclipse.aether.impl.RepositoryEventDispatcher;
@@ -77,7 +93,6 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
     private final RepositoryEventDispatcher repositoryEventDispatcher;
     private final ModelBuilder modelBuilder;
     private final Map<String, MavenArtifactRelocationSource> artifactRelocationSources;
-    private final ArtifactDescriptorReaderDelegate delegate;
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Inject
@@ -94,7 +109,6 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                 Objects.requireNonNull(repositoryEventDispatcher, "repositoryEventDispatcher cannot be null");
         this.artifactRelocationSources =
                 Objects.requireNonNull(artifactRelocationSources, "artifactRelocationSources cannot be null");
-        this.delegate = new ArtifactDescriptorReaderDelegate();
     }
 
     @Override
@@ -104,15 +118,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
 
         Model model = loadPom(session, request, result);
         if (model != null) {
-            Map<String, Object> config = session.getConfigProperties();
-            ArtifactDescriptorReaderDelegate delegate =
-                    (ArtifactDescriptorReaderDelegate) config.get(ArtifactDescriptorReaderDelegate.class.getName());
-
-            if (delegate == null) {
-                delegate = this.delegate;
-            }
-
-            delegate.populateResult(InternalSession.from(session), result, model);
+            populateResult(InternalSession.from(session), result, model);
         }
 
         return result;
@@ -330,5 +336,95 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
             return ArtifactDescriptorPolicy.STRICT;
         }
         return policy.getPolicy(session, new ArtifactDescriptorPolicyRequest(a, request.getRequestContext()));
+    }
+
+    private void populateResult(InternalSession session, ArtifactDescriptorResult result, Model model) {
+        ArtifactTypeRegistry stereotypes = session.getSession().getArtifactTypeRegistry();
+
+        for (Repository repository : model.getRepositories()) {
+            result.addRepository(session.toRepository(
+                    session.getService(RepositoryFactory.class).createRemote(repository)));
+        }
+
+        for (org.apache.maven.api.model.Dependency dependency : model.getDependencies()) {
+            result.addDependency(convert(dependency, stereotypes));
+        }
+
+        DependencyManagement dependencyManagement = model.getDependencyManagement();
+        if (dependencyManagement != null) {
+            for (org.apache.maven.api.model.Dependency dependency : dependencyManagement.getDependencies()) {
+                result.addManagedDependency(convert(dependency, stereotypes));
+            }
+        }
+
+        Map<String, Object> properties = new LinkedHashMap<>();
+
+        Prerequisites prerequisites = model.getPrerequisites();
+        if (prerequisites != null) {
+            properties.put("prerequisites.maven", prerequisites.getMaven());
+        }
+
+        List<License> licenses = model.getLicenses();
+        properties.put("license.count", licenses.size());
+        for (int i = 0; i < licenses.size(); i++) {
+            License license = licenses.get(i);
+            properties.put("license." + i + ".name", license.getName());
+            properties.put("license." + i + ".url", license.getUrl());
+            properties.put("license." + i + ".comments", license.getComments());
+            properties.put("license." + i + ".distribution", license.getDistribution());
+        }
+
+        result.setProperties(properties);
+
+        setArtifactProperties(result, model);
+    }
+
+    private Dependency convert(org.apache.maven.api.model.Dependency dependency, ArtifactTypeRegistry stereotypes) {
+        ArtifactType stereotype = stereotypes.get(dependency.getType());
+
+        boolean system = dependency.getSystemPath() != null
+                && !dependency.getSystemPath().isEmpty();
+
+        Map<String, String> properties = null;
+        if (system) {
+            properties = Collections.singletonMap(MavenArtifactProperties.LOCAL_PATH, dependency.getSystemPath());
+        }
+
+        Artifact artifact = new DefaultArtifact(
+                dependency.getGroupId(),
+                dependency.getArtifactId(),
+                dependency.getClassifier(),
+                null,
+                dependency.getVersion(),
+                properties,
+                stereotype);
+
+        List<Exclusion> exclusions = new ArrayList<>(dependency.getExclusions().size());
+        for (org.apache.maven.api.model.Exclusion exclusion : dependency.getExclusions()) {
+            exclusions.add(convert(exclusion));
+        }
+
+        return new Dependency(
+                artifact,
+                dependency.getScope(),
+                dependency.getOptional() != null ? dependency.isOptional() : null,
+                exclusions);
+    }
+
+    private Exclusion convert(org.apache.maven.api.model.Exclusion exclusion) {
+        return new Exclusion(exclusion.getGroupId(), exclusion.getArtifactId(), "*", "*");
+    }
+
+    private void setArtifactProperties(ArtifactDescriptorResult result, Model model) {
+        DistributionManagement distributionManagement = model.getDistributionManagement();
+        if (distributionManagement != null) {
+            String downloadUrl = distributionManagement.getDownloadUrl();
+            if (downloadUrl != null && !downloadUrl.isEmpty()) {
+                Artifact artifact = result.getArtifact();
+                Map<String, String> props = new LinkedHashMap<>(artifact.getProperties());
+                props.put(ArtifactProperties.DOWNLOAD_URL, downloadUrl);
+                result.setArtifact(artifact.setProperties(props));
+            }
+        }
     }
 }
