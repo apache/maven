@@ -515,7 +515,7 @@ public abstract class BaseParser implements Parser {
                     return validateCoreExtensionsDescriptorFromFile(
                             extensionsFile,
                             List.copyOf(new CoreExtensionsStaxReader()
-                                    .read(is, true, new InputSource(extensionsFile.toString()))
+                                    .read(is, true, InputSource.of(extensionsFile.toString()))
                                     .getExtensions()));
                 }
             }

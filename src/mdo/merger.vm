@@ -156,7 +156,7 @@ public class ${className} {
             if (target.get${capField}() == null) {
                 builder.location("${field.name}", source.getLocation("${field.name}"));
             } else if (merged != tgt) {
-                builder.location("${field.name}", new InputLocation(-1, -1));
+                builder.location("${field.name}", InputLocation.of());
             }
         #end
         }
