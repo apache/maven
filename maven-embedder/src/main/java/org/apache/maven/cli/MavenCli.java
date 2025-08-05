@@ -271,6 +271,7 @@ public class MavenCli {
             initialize(cliRequest);
             cli(cliRequest);
             properties(cliRequest);
+            setupGuiceClassLoading();
             logging(cliRequest);
             informativeCommands(cliRequest);
             version(cliRequest);
@@ -473,6 +474,16 @@ public class MavenCli {
             commandLineBuilder.addOption(opt);
         }
         return commandLineBuilder.build();
+    }
+
+    /**
+     * Sets up Guice class loading mode to CHILD, if not already set.
+     * Default Guice class loading mode uses a terminally deprecated JDK memory-access classes.
+     */
+    void setupGuiceClassLoading() {
+        if (System.getProperty("guice_custom_class_loading", "").trim().isEmpty()) {
+            System.setProperty("guice_custom_class_loading", "CHILD");
+        }
     }
 
     /**
