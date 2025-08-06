@@ -60,7 +60,8 @@ public class CompileOnlyExample {
             System.out.println(example.useCompileOnlyDep());
             System.out.println("ERROR: Compile-only dependency should not be available at runtime!");
         } catch (NoClassDefFoundError e) {
-            System.out.println("Runtime classpath verification: PASSED - compile-only dependency not available at runtime");
+            System.out.println(
+                    "Runtime classpath verification: PASSED - compile-only dependency not available at runtime");
         }
     }
 }

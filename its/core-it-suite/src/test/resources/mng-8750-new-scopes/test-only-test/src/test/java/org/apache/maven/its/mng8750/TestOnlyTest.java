@@ -70,7 +70,9 @@ public class TestOnlyTest {
     public void testTestOnlyDependencyAvailableAtTestCompile() {
         // This test verifies that the test-only dependency was available during compilation
         // by checking that this test class itself compiled successfully
-        Assert.assertTrue("Test class compiled successfully, proving test-only dependency was available during test compilation", true);
+        Assert.assertTrue(
+                "Test class compiled successfully, proving test-only dependency was available during test compilation",
+                true);
 
         // We can't actually instantiate the TestOnlyDep here because it won't be available
         // at runtime, but the fact that this class compiled proves it was available during

@@ -87,7 +87,8 @@ public class TestRuntimeTest {
 
         // We can verify this by checking that the class is not directly accessible
         // during compilation (which is why we had to comment out the import)
-        System.out.println("Test compile classpath verification: PASSED - test-runtime dependency not available during compilation");
+        System.out.println(
+                "Test compile classpath verification: PASSED - test-runtime dependency not available during compilation");
     }
 
     /**
