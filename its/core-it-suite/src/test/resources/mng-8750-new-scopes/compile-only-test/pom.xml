@@ -21,13 +21,13 @@
       <groupId>org.apache.maven.its.mng8750</groupId>
       <artifactId>compile-only-dep</artifactId>
     </dependency>
-    
+
     <!-- Regular compile dependency for comparison -->
     <dependency>
       <groupId>org.apache.maven.its.mng8750</groupId>
       <artifactId>compile-dep</artifactId>
     </dependency>
-    
+
     <!-- Test dependency -->
     <dependency>
       <groupId>junit</groupId>
@@ -50,7 +50,7 @@
           </execution>
         </executions>
       </plugin>
-      
+
       <!-- Plugin to verify compile classpath contains compile-only dependency -->
       <plugin>
         <groupId>org.apache.maven.its.plugins</groupId>
@@ -77,7 +77,7 @@
           </execution>
         </executions>
       </plugin>
-      
+
       <!-- Custom plugin to verify scope behavior -->
       <plugin>
         <groupId>org.apache.maven.its.mng8750</groupId>
@@ -106,7 +106,7 @@
           </execution>
         </executions>
       </plugin>
-      
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>

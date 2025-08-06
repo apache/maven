@@ -21,28 +21,28 @@
       <groupId>org.apache.maven.its.mng8750</groupId>
       <artifactId>compile-only-dep</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.maven.its.mng8750</groupId>
       <artifactId>test-only-dep</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.maven.its.mng8750</groupId>
       <artifactId>test-runtime-dep</artifactId>
     </dependency>
-    
+
     <!-- Regular dependencies - these should remain in consumer POM -->
     <dependency>
       <groupId>org.apache.maven.its.mng8750</groupId>
       <artifactId>compile-dep</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.maven.its.mng8750</groupId>
       <artifactId>test-dep</artifactId>
     </dependency>
-    
+
     <!-- JUnit for testing -->
     <dependency>
       <groupId>junit</groupId>
@@ -56,7 +56,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
       </plugin>
-      
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -66,7 +66,7 @@
           </includes>
         </configuration>
       </plugin>
-      
+
       <!-- Install to local repository to generate consumer POM -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -86,7 +86,7 @@
           </execution>
         </executions>
       </plugin>
-      
+
       <!-- Custom plugin to verify consumer POM content -->
       <plugin>
         <groupId>org.apache.maven.its.mng8750</groupId>

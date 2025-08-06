@@ -21,28 +21,28 @@
       <groupId>org.apache.maven.its.mng8750</groupId>
       <artifactId>compile-only-dep</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.maven.its.mng8750</groupId>
       <artifactId>test-only-dep</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.maven.its.mng8750</groupId>
       <artifactId>test-runtime-dep</artifactId>
     </dependency>
-    
+
     <!-- Regular dependencies for comparison -->
     <dependency>
       <groupId>org.apache.maven.its.mng8750</groupId>
       <artifactId>compile-dep</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.maven.its.mng8750</groupId>
       <artifactId>test-dep</artifactId>
     </dependency>
-    
+
     <!-- JUnit for testing -->
     <dependency>
       <groupId>junit</groupId>
@@ -56,7 +56,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
       </plugin>
-      
+
       <!-- Plugin to verify all classpaths -->
       <plugin>
         <groupId>org.apache.maven.its.plugins</groupId>
@@ -99,7 +99,7 @@
           </execution>
         </executions>
       </plugin>
-      
+
       <!-- Custom plugin to verify all scope behaviors -->
       <plugin>
         <groupId>org.apache.maven.its.mng8750</groupId>
@@ -110,27 +110,27 @@
           <runtimeClasspathFile>target/runtime-classpath.txt</runtimeClasspathFile>
           <testCompileClasspathFile>target/test-compile-classpath.txt</testCompileClasspathFile>
           <testRuntimeClasspathFile>target/test-runtime-classpath.txt</testRuntimeClasspathFile>
-          
+
           <!-- Compile-only scope expectations -->
           <compileOnlyDeps>
             <dependency>compile-only-dep-1.0.jar</dependency>
           </compileOnlyDeps>
-          
+
           <!-- Test-only scope expectations -->
           <testOnlyDeps>
             <dependency>test-only-dep-1.0.jar</dependency>
           </testOnlyDeps>
-          
+
           <!-- Test-runtime scope expectations -->
           <testRuntimeDeps>
             <dependency>test-runtime-dep-1.0.jar</dependency>
           </testRuntimeDeps>
-          
+
           <!-- Regular dependencies -->
           <compileDeps>
             <dependency>compile-dep-1.0.jar</dependency>
           </compileDeps>
-          
+
           <testDeps>
             <dependency>test-dep-1.0.jar</dependency>
           </testDeps>
@@ -145,7 +145,7 @@
           </execution>
         </executions>
       </plugin>
-      
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
