@@ -13,7 +13,7 @@
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: mng-8750 :: Comprehensive Test</name>
-  <description>Comprehensive test of all new Maven 4 scopes working together</description>
+  <description>Test all new scopes working together in a single project</description>
 
   <dependencies>
     <!-- All new scope dependencies -->
@@ -55,6 +55,22 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>compile</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>test-compile</id>
+            <phase>test-compile</phase>
+            <goals>
+              <goal>testCompile</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
 
       <!-- Use dependency plugin to analyze all classpaths -->

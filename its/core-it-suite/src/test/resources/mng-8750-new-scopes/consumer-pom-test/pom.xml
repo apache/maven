@@ -54,7 +54,19 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
+        <artifactId>maven-install-plugin</artifactId>
+        <configuration>
+          <localRepositoryPath>${project.build.directory}/project-local-repo</localRepositoryPath>
+        </configuration>
+        <executions>
+          <execution>
+            <id>install-to-local-repo</id>
+            <phase>install</phase>
+            <goals>
+              <goal>install</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
 
       <plugin>
@@ -66,28 +78,6 @@
           </includes>
         </configuration>
       </plugin>
-
-      <!-- Install to local repository to generate consumer POM -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-install-plugin</artifactId>
-        <version>3.1.1</version>
-        <configuration>
-          <createChecksum>true</createChecksum>
-          <localRepositoryPath>${project.build.directory}/project-local-repo</localRepositoryPath>
-        </configuration>
-        <executions>
-          <execution>
-            <id>install-to-local</id>
-            <phase>install</phase>
-            <goals>
-              <goal>install</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-
     </plugins>
   </build>
 </project>
