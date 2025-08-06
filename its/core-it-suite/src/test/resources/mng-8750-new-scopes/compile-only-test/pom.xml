@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.apache.maven.its.mng8750</groupId>
+    <artifactId>new-scopes-parent</artifactId>
+    <version>1.0</version>
+  </parent>
+
+  <artifactId>compile-only-test</artifactId>
+  <packaging>jar</packaging>
+
+  <name>Maven Integration Test :: mng-8750 :: Compile-Only Scope Test</name>
+  <description>Test that compile-only dependencies appear in compile classpath but not runtime classpath</description>
+
+  <dependencies>
+    <!-- Compile-only dependency - should be available during compilation but not at runtime -->
+    <dependency>
+      <groupId>org.apache.maven.its.mng8750</groupId>
+      <artifactId>compile-only-dep</artifactId>
+    </dependency>
+    
+    <!-- Regular compile dependency for comparison -->
+    <dependency>
+      <groupId>org.apache.maven.its.mng8750</groupId>
+      <artifactId>compile-dep</artifactId>
+    </dependency>
+    
+    <!-- Test dependency -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>compile</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <!-- Plugin to verify compile classpath contains compile-only dependency -->
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-dependency-resolution</artifactId>
+        <configuration>
+          <compileClassPath>target/compile-classpath.txt</compileClassPath>
+          <runtimeClassPath>target/runtime-classpath.txt</runtimeClassPath>
+          <significantPathLevels>2</significantPathLevels>
+        </configuration>
+        <executions>
+          <execution>
+            <id>resolve-compile</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>resolve-runtime</id>
+            <phase>process-test-classes</phase>
+            <goals>
+              <goal>runtime</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <!-- Custom plugin to verify scope behavior -->
+      <plugin>
+        <groupId>org.apache.maven.its.mng8750</groupId>
+        <artifactId>scope-verification-plugin</artifactId>
+        <configuration>
+          <compileClasspathFile>target/compile-classpath.txt</compileClasspathFile>
+          <runtimeClasspathFile>target/runtime-classpath.txt</runtimeClasspathFile>
+          <expectedInCompile>
+            <dependency>compile-only-dep-1.0.jar</dependency>
+            <dependency>compile-dep-1.0.jar</dependency>
+          </expectedInCompile>
+          <expectedNotInRuntime>
+            <dependency>compile-only-dep-1.0.jar</dependency>
+          </expectedNotInRuntime>
+          <expectedInRuntime>
+            <dependency>compile-dep-1.0.jar</dependency>
+          </expectedInRuntime>
+        </configuration>
+        <executions>
+          <execution>
+            <id>verify-compile-only-scope</id>
+            <phase>test</phase>
+            <goals>
+              <goal>verify-scope</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/*Test.java</include>
+          </includes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

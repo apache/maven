@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.apache.maven.its.mng8750</groupId>
+    <artifactId>new-scopes-parent</artifactId>
+    <version>1.0</version>
+  </parent>
+
+  <artifactId>comprehensive-test</artifactId>
+  <packaging>jar</packaging>
+
+  <name>Maven Integration Test :: mng-8750 :: Comprehensive Test</name>
+  <description>Comprehensive test of all new Maven 4 scopes working together</description>
+
+  <dependencies>
+    <!-- All new scope dependencies -->
+    <dependency>
+      <groupId>org.apache.maven.its.mng8750</groupId>
+      <artifactId>compile-only-dep</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.apache.maven.its.mng8750</groupId>
+      <artifactId>test-only-dep</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.apache.maven.its.mng8750</groupId>
+      <artifactId>test-runtime-dep</artifactId>
+    </dependency>
+    
+    <!-- Regular dependencies for comparison -->
+    <dependency>
+      <groupId>org.apache.maven.its.mng8750</groupId>
+      <artifactId>compile-dep</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.apache.maven.its.mng8750</groupId>
+      <artifactId>test-dep</artifactId>
+    </dependency>
+    
+    <!-- JUnit for testing -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+      
+      <!-- Plugin to verify all classpaths -->
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-dependency-resolution</artifactId>
+        <configuration>
+          <compileClassPath>target/compile-classpath.txt</compileClassPath>
+          <runtimeClassPath>target/runtime-classpath.txt</runtimeClassPath>
+          <testCompileClassPath>target/test-compile-classpath.txt</testCompileClassPath>
+          <testRuntimeClassPath>target/test-runtime-classpath.txt</testRuntimeClassPath>
+          <significantPathLevels>2</significantPathLevels>
+        </configuration>
+        <executions>
+          <execution>
+            <id>resolve-compile</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>resolve-runtime</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>runtime</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>resolve-test-compile</id>
+            <phase>test-compile</phase>
+            <goals>
+              <goal>test-compile</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>resolve-test-runtime</id>
+            <phase>process-test-classes</phase>
+            <goals>
+              <goal>test-runtime</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <!-- Custom plugin to verify all scope behaviors -->
+      <plugin>
+        <groupId>org.apache.maven.its.mng8750</groupId>
+        <artifactId>comprehensive-scope-verification-plugin</artifactId>
+        <version>1.0</version>
+        <configuration>
+          <compileClasspathFile>target/compile-classpath.txt</compileClasspathFile>
+          <runtimeClasspathFile>target/runtime-classpath.txt</runtimeClasspathFile>
+          <testCompileClasspathFile>target/test-compile-classpath.txt</testCompileClasspathFile>
+          <testRuntimeClasspathFile>target/test-runtime-classpath.txt</testRuntimeClasspathFile>
+          
+          <!-- Compile-only scope expectations -->
+          <compileOnlyDeps>
+            <dependency>compile-only-dep-1.0.jar</dependency>
+          </compileOnlyDeps>
+          
+          <!-- Test-only scope expectations -->
+          <testOnlyDeps>
+            <dependency>test-only-dep-1.0.jar</dependency>
+          </testOnlyDeps>
+          
+          <!-- Test-runtime scope expectations -->
+          <testRuntimeDeps>
+            <dependency>test-runtime-dep-1.0.jar</dependency>
+          </testRuntimeDeps>
+          
+          <!-- Regular dependencies -->
+          <compileDeps>
+            <dependency>compile-dep-1.0.jar</dependency>
+          </compileDeps>
+          
+          <testDeps>
+            <dependency>test-dep-1.0.jar</dependency>
+          </testDeps>
+        </configuration>
+        <executions>
+          <execution>
+            <id>verify-all-scopes</id>
+            <phase>test</phase>
+            <goals>
+              <goal>verify-all-scopes</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/*Test.java</include>
+          </includes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

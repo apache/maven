@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.apache.maven.its.mng8750</groupId>
+    <artifactId>new-scopes-parent</artifactId>
+    <version>1.0</version>
+  </parent>
+
+  <artifactId>test-only-test</artifactId>
+  <packaging>jar</packaging>
+
+  <name>Maven Integration Test :: mng-8750 :: Test-Only Scope Test</name>
+  <description>Test that test-only dependencies appear in test compile classpath but not test runtime classpath</description>
+
+  <dependencies>
+    <!-- Test-only dependency - should be available during test compilation but not at test runtime -->
+    <dependency>
+      <groupId>org.apache.maven.its.mng8750</groupId>
+      <artifactId>test-only-dep</artifactId>
+    </dependency>
+    
+    <!-- Regular test dependency for comparison -->
+    <dependency>
+      <groupId>org.apache.maven.its.mng8750</groupId>
+      <artifactId>test-dep</artifactId>
+    </dependency>
+    
+    <!-- JUnit for testing -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>test-compile</id>
+            <phase>test-compile</phase>
+            <goals>
+              <goal>testCompile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <!-- Plugin to verify test compile and test runtime classpaths -->
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-dependency-resolution</artifactId>
+        <configuration>
+          <testCompileClassPath>target/test-compile-classpath.txt</testCompileClassPath>
+          <testRuntimeClassPath>target/test-runtime-classpath.txt</testRuntimeClassPath>
+          <significantPathLevels>2</significantPathLevels>
+        </configuration>
+        <executions>
+          <execution>
+            <id>resolve-test-compile</id>
+            <phase>test-compile</phase>
+            <goals>
+              <goal>test-compile</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>resolve-test-runtime</id>
+            <phase>process-test-classes</phase>
+            <goals>
+              <goal>test-runtime</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <!-- Custom plugin to verify scope behavior -->
+      <plugin>
+        <groupId>org.apache.maven.its.mng8750</groupId>
+        <artifactId>scope-verification-plugin</artifactId>
+        <configuration>
+          <testCompileClasspathFile>target/test-compile-classpath.txt</testCompileClasspathFile>
+          <testRuntimeClasspathFile>target/test-runtime-classpath.txt</testRuntimeClasspathFile>
+          <expectedInTestCompile>
+            <dependency>test-only-dep-1.0.jar</dependency>
+            <dependency>test-dep-1.0.jar</dependency>
+          </expectedInTestCompile>
+          <expectedNotInTestRuntime>
+            <dependency>test-only-dep-1.0.jar</dependency>
+          </expectedNotInTestRuntime>
+          <expectedInTestRuntime>
+            <dependency>test-dep-1.0.jar</dependency>
+          </expectedInTestRuntime>
+        </configuration>
+        <executions>
+          <execution>
+            <id>verify-test-only-scope</id>
+            <phase>test</phase>
+            <goals>
+              <goal>verify-test-scope</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/*Test.java</include>
+          </includes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

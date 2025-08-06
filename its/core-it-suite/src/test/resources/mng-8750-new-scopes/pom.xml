@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng8750</groupId>
+  <artifactId>new-scopes-parent</artifactId>
+  <version>1.0</version>
+  <packaging>pom</packaging>
+
+  <name>Maven Integration Test :: mng-8750 :: New Scopes Parent</name>
+  <description>Test Maven 4 new dependency scopes: compile-only, test-only, and test-runtime</description>
+
+  <modules>
+    <module>compile-only-test</module>
+    <module>test-only-test</module>
+    <module>test-runtime-test</module>
+    <module>consumer-pom-test</module>
+    <module>comprehensive-test</module>
+  </modules>
+
+  <properties>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- Test dependencies with new scopes -->
+      <dependency>
+        <groupId>org.apache.maven.its.mng8750</groupId>
+        <artifactId>compile-only-dep</artifactId>
+        <version>1.0</version>
+        <scope>compile-only</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.its.mng8750</groupId>
+        <artifactId>test-only-dep</artifactId>
+        <version>1.0</version>
+        <scope>test-only</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.its.mng8750</groupId>
+        <artifactId>test-runtime-dep</artifactId>
+        <version>1.0</version>
+        <scope>test-runtime</scope>
+      </dependency>
+      <!-- Standard dependencies for comparison -->
+      <dependency>
+        <groupId>org.apache.maven.its.mng8750</groupId>
+        <artifactId>compile-dep</artifactId>
+        <version>1.0</version>
+        <scope>compile</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.its.mng8750</groupId>
+        <artifactId>test-dep</artifactId>
+        <version>1.0</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.13.2</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.11.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>3.1.2</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.its.plugins</groupId>
+          <artifactId>maven-it-plugin-dependency-resolution</artifactId>
+          <version>2.1-SNAPSHOT</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.its.mng8750</groupId>
+          <artifactId>scope-verification-plugin</artifactId>
+          <version>1.0</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <repositories>
+    <repository>
+      <id>local-test-repo</id>
+      <url>file://${project.basedir}/repo</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>local-test-repo</id>
+      <url>file://${project.basedir}/repo</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
+</project>
