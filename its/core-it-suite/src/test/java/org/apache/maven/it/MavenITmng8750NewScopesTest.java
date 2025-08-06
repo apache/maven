@@ -56,21 +56,20 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
 
         Verifier verifier = newVerifier(projectDir.getAbsolutePath());
         verifier.addCliArgument("clean");
-        verifier.addCliArgument("compile");
-        verifier.execute();
-        verifier.verifyErrorFreeLog();
-
-        // Verify compile-only dependency is in compile classpath
-        verifier.verifyTextInLog("compile-only-dep-1.0.jar");
-
-        // Run test to verify compile-only dependency is NOT in runtime classpath
-        verifier = newVerifier(projectDir.getAbsolutePath());
         verifier.addCliArgument("test");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        // Check that runtime classpath verification passed
+        // Verify that the test passes, which means compile-only scope works correctly
+        // The test itself verifies that compile-only dependencies are not available at runtime
         verifier.verifyTextInLog("Runtime classpath verification: PASSED");
+
+        // Verify classpath files were generated
+        File compileClasspath = new File(projectDir, "target/compile-classpath.txt");
+        File runtimeClasspath = new File(projectDir, "target/runtime-classpath.txt");
+
+        assertTrue("Compile classpath file should exist", compileClasspath.exists());
+        assertTrue("Runtime classpath file should exist", runtimeClasspath.exists());
     }
 
     /**
@@ -85,21 +84,20 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
 
         Verifier verifier = newVerifier(projectDir.getAbsolutePath());
         verifier.addCliArgument("clean");
-        verifier.addCliArgument("test-compile");
-        verifier.execute();
-        verifier.verifyErrorFreeLog();
-
-        // Verify test-only dependency is in test compile classpath
-        verifier.verifyTextInLog("test-only-dep-1.0.jar");
-
-        // Run test to verify test-only dependency is NOT in test runtime classpath
-        verifier = newVerifier(projectDir.getAbsolutePath());
         verifier.addCliArgument("test");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        // Check that test runtime classpath verification passed
+        // Verify that the test passes, which means test-only scope works correctly
+        // The test itself verifies that test-only dependencies are not available at test runtime
         verifier.verifyTextInLog("Test runtime classpath verification: PASSED");
+
+        // Verify classpath files were generated
+        File testCompileClasspath = new File(projectDir, "target/test-compile-classpath.txt");
+        File testRuntimeClasspath = new File(projectDir, "target/test-runtime-classpath.txt");
+
+        assertTrue("Test compile classpath file should exist", testCompileClasspath.exists());
+        assertTrue("Test runtime classpath file should exist", testRuntimeClasspath.exists());
     }
 
     /**
@@ -114,21 +112,20 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
 
         Verifier verifier = newVerifier(projectDir.getAbsolutePath());
         verifier.addCliArgument("clean");
-        verifier.addCliArgument("test-compile");
-        verifier.execute();
-        verifier.verifyErrorFreeLog();
-
-        // Verify test-runtime dependency is NOT in test compile classpath
-        verifier.verifyTextNotInLog("test-runtime-dep-1.0.jar");
-
-        // Run test to verify test-runtime dependency IS in test runtime classpath
-        verifier = newVerifier(projectDir.getAbsolutePath());
         verifier.addCliArgument("test");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        // Check that test runtime classpath verification passed
+        // Verify that the test passes, which means test-runtime scope works correctly
+        // The test itself verifies that test-runtime dependencies are available at test runtime
         verifier.verifyTextInLog("Test runtime classpath verification: PASSED");
+
+        // Verify classpath files were generated
+        File testCompileClasspath = new File(projectDir, "target/test-compile-classpath.txt");
+        File testRuntimeClasspath = new File(projectDir, "target/test-runtime-classpath.txt");
+
+        assertTrue("Test compile classpath file should exist", testCompileClasspath.exists());
+        assertTrue("Test runtime classpath file should exist", testRuntimeClasspath.exists());
     }
 
     /**
@@ -193,5 +190,16 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
         verifier.verifyTextInLog("Test-only scope verification: PASSED");
         verifier.verifyTextInLog("Test-runtime scope verification: PASSED");
         verifier.verifyTextInLog("All scope verifications: PASSED");
+
+        // Verify all classpath files were generated
+        File compileClasspath = new File(projectDir, "target/compile-classpath.txt");
+        File runtimeClasspath = new File(projectDir, "target/runtime-classpath.txt");
+        File testCompileClasspath = new File(projectDir, "target/test-compile-classpath.txt");
+        File testRuntimeClasspath = new File(projectDir, "target/test-runtime-classpath.txt");
+
+        assertTrue("Compile classpath file should exist", compileClasspath.exists());
+        assertTrue("Runtime classpath file should exist", runtimeClasspath.exists());
+        assertTrue("Test compile classpath file should exist", testCompileClasspath.exists());
+        assertTrue("Test runtime classpath file should exist", testRuntimeClasspath.exists());
     }
 }

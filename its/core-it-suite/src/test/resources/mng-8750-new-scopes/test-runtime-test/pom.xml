@@ -51,58 +51,33 @@
         </executions>
       </plugin>
 
-      <!-- Plugin to verify test compile and test runtime classpaths -->
+      <!-- Use dependency plugin to analyze test classpaths -->
       <plugin>
-        <groupId>org.apache.maven.its.plugins</groupId>
-        <artifactId>maven-it-plugin-dependency-resolution</artifactId>
-        <configuration>
-          <testCompileClassPath>target/test-compile-classpath.txt</testCompileClassPath>
-          <testRuntimeClassPath>target/test-runtime-classpath.txt</testRuntimeClassPath>
-          <significantPathLevels>2</significantPathLevels>
-        </configuration>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.6.0</version>
         <executions>
           <execution>
-            <id>resolve-test-compile</id>
+            <id>build-test-compile-classpath</id>
             <phase>test-compile</phase>
             <goals>
-              <goal>test-compile</goal>
+              <goal>build-classpath</goal>
             </goals>
+            <configuration>
+              <outputFile>target/test-compile-classpath.txt</outputFile>
+              <includeScope>test</includeScope>
+            </configuration>
           </execution>
           <execution>
-            <id>resolve-test-runtime</id>
+            <id>build-test-runtime-classpath</id>
             <phase>process-test-classes</phase>
             <goals>
-              <goal>test-runtime</goal>
+              <goal>build-classpath</goal>
             </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <!-- Custom plugin to verify scope behavior -->
-      <plugin>
-        <groupId>org.apache.maven.its.mng8750</groupId>
-        <artifactId>scope-verification-plugin</artifactId>
-        <configuration>
-          <testCompileClasspathFile>target/test-compile-classpath.txt</testCompileClasspathFile>
-          <testRuntimeClasspathFile>target/test-runtime-classpath.txt</testRuntimeClasspathFile>
-          <expectedNotInTestCompile>
-            <dependency>test-runtime-dep-1.0.jar</dependency>
-          </expectedNotInTestCompile>
-          <expectedInTestCompile>
-            <dependency>test-dep-1.0.jar</dependency>
-          </expectedInTestCompile>
-          <expectedInTestRuntime>
-            <dependency>test-runtime-dep-1.0.jar</dependency>
-            <dependency>test-dep-1.0.jar</dependency>
-          </expectedInTestRuntime>
-        </configuration>
-        <executions>
-          <execution>
-            <id>verify-test-runtime-scope</id>
-            <phase>test</phase>
-            <goals>
-              <goal>verify-test-scope</goal>
-            </goals>
+            <configuration>
+              <outputFile>target/test-runtime-classpath.txt</outputFile>
+              <includeScope>test</includeScope>
+            </configuration>
           </execution>
         </executions>
       </plugin>

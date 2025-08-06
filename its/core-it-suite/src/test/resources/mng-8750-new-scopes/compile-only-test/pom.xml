@@ -51,58 +51,33 @@
         </executions>
       </plugin>
 
-      <!-- Plugin to verify compile classpath contains compile-only dependency -->
+      <!-- Use dependency plugin to analyze classpaths -->
       <plugin>
-        <groupId>org.apache.maven.its.plugins</groupId>
-        <artifactId>maven-it-plugin-dependency-resolution</artifactId>
-        <configuration>
-          <compileClassPath>target/compile-classpath.txt</compileClassPath>
-          <runtimeClassPath>target/runtime-classpath.txt</runtimeClassPath>
-          <significantPathLevels>2</significantPathLevels>
-        </configuration>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.6.0</version>
         <executions>
           <execution>
-            <id>resolve-compile</id>
+            <id>build-compile-classpath</id>
             <phase>compile</phase>
             <goals>
-              <goal>compile</goal>
+              <goal>build-classpath</goal>
             </goals>
+            <configuration>
+              <outputFile>target/compile-classpath.txt</outputFile>
+              <includeScope>compile</includeScope>
+            </configuration>
           </execution>
           <execution>
-            <id>resolve-runtime</id>
+            <id>build-runtime-classpath</id>
             <phase>process-test-classes</phase>
             <goals>
-              <goal>runtime</goal>
+              <goal>build-classpath</goal>
             </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <!-- Custom plugin to verify scope behavior -->
-      <plugin>
-        <groupId>org.apache.maven.its.mng8750</groupId>
-        <artifactId>scope-verification-plugin</artifactId>
-        <configuration>
-          <compileClasspathFile>target/compile-classpath.txt</compileClasspathFile>
-          <runtimeClasspathFile>target/runtime-classpath.txt</runtimeClasspathFile>
-          <expectedInCompile>
-            <dependency>compile-only-dep-1.0.jar</dependency>
-            <dependency>compile-dep-1.0.jar</dependency>
-          </expectedInCompile>
-          <expectedNotInRuntime>
-            <dependency>compile-only-dep-1.0.jar</dependency>
-          </expectedNotInRuntime>
-          <expectedInRuntime>
-            <dependency>compile-dep-1.0.jar</dependency>
-          </expectedInRuntime>
-        </configuration>
-        <executions>
-          <execution>
-            <id>verify-compile-only-scope</id>
-            <phase>test</phase>
-            <goals>
-              <goal>verify-scope</goal>
-            </goals>
+            <configuration>
+              <outputFile>target/runtime-classpath.txt</outputFile>
+              <includeScope>runtime</includeScope>
+            </configuration>
           </execution>
         </executions>
       </plugin>

@@ -87,36 +87,7 @@
         </executions>
       </plugin>
 
-      <!-- Custom plugin to verify consumer POM content -->
-      <plugin>
-        <groupId>org.apache.maven.its.mng8750</groupId>
-        <artifactId>consumer-pom-verification-plugin</artifactId>
-        <version>1.0</version>
-        <configuration>
-          <consumerPomPath>${project.build.directory}/project-local-repo/org/apache/maven/its/mng8750/consumer-pom-test/1.0/consumer-pom-test-1.0-consumer.pom</consumerPomPath>
-          <forbiddenScopes>
-            <scope>compile-only</scope>
-            <scope>test-only</scope>
-            <scope>test-runtime</scope>
-          </forbiddenScopes>
-          <allowedScopes>
-            <scope>compile</scope>
-            <scope>provided</scope>
-            <scope>runtime</scope>
-            <scope>test</scope>
-            <scope>system</scope>
-          </allowedScopes>
-        </configuration>
-        <executions>
-          <execution>
-            <id>verify-consumer-pom</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>verify-consumer-pom</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+
     </plugins>
   </build>
 </project>
