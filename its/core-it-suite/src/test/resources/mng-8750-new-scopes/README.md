@@ -6,13 +6,13 @@ This integration test verifies the correct behavior of the new dependency scopes
 
 ### 1. `compile-only`
 - **Purpose**: Dependencies needed only during compilation, not at runtime
-- **Behavior**: 
+- **Behavior**:
   - Available in compile classpath
   - NOT available in runtime classpath
   - NOT transitive
 - **Use Case**: Annotation processors, code generation tools, compile-time-only libraries
 
-### 2. `test-only` 
+### 2. `test-only`
 - **Purpose**: Dependencies needed only during test compilation, not at test runtime
 - **Behavior**:
   - Available in test compile classpath
@@ -33,7 +33,7 @@ This integration test verifies the correct behavior of the new dependency scopes
 ### Test Modules
 
 1. **compile-only-test**: Tests `compile-only` scope behavior
-2. **test-only-test**: Tests `test-only` scope behavior  
+2. **test-only-test**: Tests `test-only` scope behavior
 3. **test-runtime-test**: Tests `test-runtime` scope behavior
 4. **consumer-pom-test**: Tests consumer POM generation excludes new scopes
 5. **comprehensive-test**: Tests all new scopes working together
