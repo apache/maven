@@ -31,10 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for Maven 4 new dependency scopes: compile-only, test-only, and test-runtime.
- * 
+ *
  * Verifies that:
  * - compile-only dependencies appear in compile classpath but not runtime classpath
- * - test-only dependencies appear in test compile classpath but not test runtime classpath  
+ * - test-only dependencies appear in test compile classpath but not test runtime classpath
  * - test-runtime dependencies appear in test runtime classpath but not test compile classpath
  * - Consumer POMs exclude these new scopes for Maven 3 compatibility
  */
@@ -46,7 +46,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
 
     /**
      * Test that compile-only dependencies work correctly.
-     * 
+     *
      * @throws Exception in case of failure
      */
     @Test
@@ -62,20 +62,20 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
 
         // Verify compile-only dependency is in compile classpath
         verifier.verifyTextInLog("compile-only-dep-1.0.jar");
-        
+
         // Run test to verify compile-only dependency is NOT in runtime classpath
         verifier = newVerifier(projectDir.getAbsolutePath());
         verifier.addCliArgument("test");
         verifier.execute();
         verifier.verifyErrorFreeLog();
-        
+
         // Check that runtime classpath verification passed
         verifier.verifyTextInLog("Runtime classpath verification: PASSED");
     }
 
     /**
      * Test that test-only dependencies work correctly.
-     * 
+     *
      * @throws Exception in case of failure
      */
     @Test
@@ -91,20 +91,20 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
 
         // Verify test-only dependency is in test compile classpath
         verifier.verifyTextInLog("test-only-dep-1.0.jar");
-        
+
         // Run test to verify test-only dependency is NOT in test runtime classpath
         verifier = newVerifier(projectDir.getAbsolutePath());
         verifier.addCliArgument("test");
         verifier.execute();
         verifier.verifyErrorFreeLog();
-        
+
         // Check that test runtime classpath verification passed
         verifier.verifyTextInLog("Test runtime classpath verification: PASSED");
     }
 
     /**
      * Test that test-runtime dependencies work correctly.
-     * 
+     *
      * @throws Exception in case of failure
      */
     @Test
@@ -120,20 +120,20 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
 
         // Verify test-runtime dependency is NOT in test compile classpath
         verifier.verifyTextNotInLog("test-runtime-dep-1.0.jar");
-        
+
         // Run test to verify test-runtime dependency IS in test runtime classpath
         verifier = newVerifier(projectDir.getAbsolutePath());
         verifier.addCliArgument("test");
         verifier.execute();
         verifier.verifyErrorFreeLog();
-        
+
         // Check that test runtime classpath verification passed
         verifier.verifyTextInLog("Test runtime classpath verification: PASSED");
     }
 
     /**
      * Test that consumer POMs exclude new scopes for Maven 3 compatibility.
-     * 
+     *
      * @throws Exception in case of failure
      */
     @Test
@@ -155,26 +155,26 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
                 "consumer-pom-test",
                 "1.0",
                 "consumer-pom-test-1.0-consumer.pom"));
-        
+
         assertTrue(Files.exists(consumerPom), "Consumer POM should exist");
-        
+
         // Verify consumer POM content excludes new scopes
         String consumerPomContent = Files.readString(consumerPom);
-        assertFalse(consumerPomContent.contains("compile-only"), 
+        assertFalse(consumerPomContent.contains("compile-only"),
                 "Consumer POM should not contain compile-only scope");
-        assertFalse(consumerPomContent.contains("test-only"), 
+        assertFalse(consumerPomContent.contains("test-only"),
                 "Consumer POM should not contain test-only scope");
-        assertFalse(consumerPomContent.contains("test-runtime"), 
+        assertFalse(consumerPomContent.contains("test-runtime"),
                 "Consumer POM should not contain test-runtime scope");
-        
+
         // Verify that dependencies with new scopes are either excluded or transformed
-        assertTrue(consumerPomContent.contains("compile") || consumerPomContent.contains("provided"), 
+        assertTrue(consumerPomContent.contains("compile") || consumerPomContent.contains("provided"),
                 "Consumer POM should contain only Maven 3 compatible scopes");
     }
 
     /**
      * Test all new scopes together in a comprehensive scenario.
-     * 
+     *
      * @throws Exception in case of failure
      */
     @Test

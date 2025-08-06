@@ -26,7 +26,7 @@ import org.apache.maven.its.mng8750.deps.CompileDep;
  * This class uses compile-only and regular compile dependencies.
  */
 public class ComprehensiveExample {
-    
+
     /**
      * Method that uses a compile-only dependency.
      */
@@ -34,7 +34,7 @@ public class ComprehensiveExample {
         CompileOnlyDep dep = new CompileOnlyDep();
         return "Used compile-only dependency: " + dep.getMessage();
     }
-    
+
     /**
      * Method that uses a regular compile dependency.
      */
@@ -42,15 +42,15 @@ public class ComprehensiveExample {
         CompileDep dep = new CompileDep();
         return "Used compile dependency: " + dep.getMessage();
     }
-    
+
     /**
      * Main method for comprehensive testing.
      */
     public static void main(String[] args) {
         ComprehensiveExample example = new ComprehensiveExample();
-        
+
         System.out.println("=== Comprehensive Scope Test ===");
-        
+
         // Test regular compile dependency (should work at runtime)
         try {
             System.out.println(example.useCompileDep());
@@ -58,7 +58,7 @@ public class ComprehensiveExample {
         } catch (Exception e) {
             System.out.println("Compile scope verification: FAILED - " + e.getMessage());
         }
-        
+
         // Test compile-only dependency (should fail at runtime)
         try {
             System.out.println(example.useCompileOnlyDep());
@@ -66,7 +66,7 @@ public class ComprehensiveExample {
         } catch (NoClassDefFoundError e) {
             System.out.println("Compile-only scope verification: PASSED - not available at runtime");
         }
-        
+
         System.out.println("=== End Comprehensive Scope Test ===");
     }
 }

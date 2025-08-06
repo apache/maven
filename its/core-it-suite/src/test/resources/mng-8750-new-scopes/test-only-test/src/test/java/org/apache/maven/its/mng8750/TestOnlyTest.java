@@ -31,7 +31,7 @@ import org.apache.maven.its.mng8750.deps.TestDep;
  * that test-only dependencies are available during test compilation but not at test runtime.
  */
 public class TestOnlyTest {
-    
+
     /**
      * Test that regular test dependencies are available at test runtime.
      */
@@ -39,10 +39,10 @@ public class TestOnlyTest {
     public void testTestDependencyAvailableAtTestRuntime() {
         TestDep dep = new TestDep();
         String result = dep.getMessage();
-        Assert.assertTrue("Test dependency should be available", 
+        Assert.assertTrue("Test dependency should be available",
                          result.contains("Test dependency"));
     }
-    
+
     /**
      * Test that test-only dependencies are NOT available at test runtime.
      * This test will compile successfully because test-only dependencies are available
@@ -60,7 +60,7 @@ public class TestOnlyTest {
             System.out.println("Test runtime classpath verification: PASSED");
         }
     }
-    
+
     /**
      * Test that demonstrates test-only dependencies can be used during compilation.
      * This method compiles successfully, proving test-only dependencies are available
@@ -71,12 +71,12 @@ public class TestOnlyTest {
         // This test verifies that the test-only dependency was available during compilation
         // by checking that this test class itself compiled successfully
         Assert.assertTrue("Test class compiled successfully, proving test-only dependency was available during test compilation", true);
-        
+
         // We can't actually instantiate the TestOnlyDep here because it won't be available
         // at runtime, but the fact that this class compiled proves it was available during
         // test compilation
     }
-    
+
     /**
      * Helper method that uses test-only dependency.
      * This method will compile but cannot be safely called at runtime.
@@ -86,7 +86,7 @@ public class TestOnlyTest {
         TestOnlyDep dep = new TestOnlyDep();
         return dep.getMessage();
     }
-    
+
     /**
      * Helper method that uses regular test dependency.
      * This method will compile and can be safely called at runtime.

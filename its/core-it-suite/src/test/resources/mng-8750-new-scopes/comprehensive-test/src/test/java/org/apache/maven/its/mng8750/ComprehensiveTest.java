@@ -29,19 +29,19 @@ import org.apache.maven.its.mng8750.deps.TestDep;
  * Comprehensive test class that verifies all new Maven 4 scopes work correctly together.
  */
 public class ComprehensiveTest {
-    
+
     /**
      * Test compile-only scope behavior.
      */
     @Test
     public void testCompileOnlyScope() {
         ComprehensiveExample example = new ComprehensiveExample();
-        
+
         // Regular compile dependency should work
         String result = example.useCompileDep();
-        Assert.assertTrue("Compile dependency should be available", 
+        Assert.assertTrue("Compile dependency should be available",
                          result.contains("Used compile dependency"));
-        
+
         // Compile-only dependency should fail at runtime
         try {
             example.useCompileOnlyDep();
@@ -51,7 +51,7 @@ public class ComprehensiveTest {
             System.out.println("Compile-only scope verification: PASSED");
         }
     }
-    
+
     /**
      * Test test-only scope behavior.
      */
@@ -61,7 +61,7 @@ public class ComprehensiveTest {
         // (proven by the fact that we can import and use it here)
         TestOnlyDep testOnlyDep = new TestOnlyDep();
         Assert.assertNotNull("Test-only dependency should be available during test compilation", testOnlyDep);
-        
+
         // But it should not be available at test runtime
         try {
             testOnlyDep.getMessage();
@@ -71,7 +71,7 @@ public class ComprehensiveTest {
             System.out.println("Test-only scope verification: PASSED");
         }
     }
-    
+
     /**
      * Test test-runtime scope behavior.
      */
@@ -83,19 +83,19 @@ public class ComprehensiveTest {
             Class<?> testRuntimeDepClass = Class.forName("org.apache.maven.its.mng8750.deps.TestRuntimeDep");
             Object dep = testRuntimeDepClass.getDeclaredConstructor().newInstance();
             String result = (String) testRuntimeDepClass.getMethod("getMessage").invoke(dep);
-            
-            Assert.assertTrue("Test-runtime dependency should be available at test runtime", 
+
+            Assert.assertTrue("Test-runtime dependency should be available at test runtime",
                              result.contains("Test runtime dependency"));
-            
+
             System.out.println("Test-runtime scope verification: PASSED");
-            
+
         } catch (ClassNotFoundException e) {
             Assert.fail("Test-runtime dependency should be available at test runtime: " + e.getMessage());
         } catch (Exception e) {
             Assert.fail("Error accessing test-runtime dependency: " + e.getMessage());
         }
     }
-    
+
     /**
      * Test regular test scope behavior for comparison.
      */
@@ -104,10 +104,10 @@ public class ComprehensiveTest {
         // Regular test dependency should be available during both compilation and runtime
         TestDep testDep = new TestDep();
         String result = testDep.getMessage();
-        Assert.assertTrue("Test dependency should be available", 
+        Assert.assertTrue("Test dependency should be available",
                          result.contains("Test dependency"));
     }
-    
+
     /**
      * Comprehensive test that verifies all scopes work correctly together.
      */
@@ -116,7 +116,7 @@ public class ComprehensiveTest {
         boolean compileOnlyPassed = false;
         boolean testOnlyPassed = false;
         boolean testRuntimePassed = false;
-        
+
         // Test compile-only scope
         try {
             ComprehensiveExample example = new ComprehensiveExample();
@@ -124,7 +124,7 @@ public class ComprehensiveTest {
         } catch (NoClassDefFoundError e) {
             compileOnlyPassed = true;
         }
-        
+
         // Test test-only scope
         try {
             TestOnlyDep testOnlyDep = new TestOnlyDep();
@@ -132,7 +132,7 @@ public class ComprehensiveTest {
         } catch (NoClassDefFoundError e) {
             testOnlyPassed = true;
         }
-        
+
         // Test test-runtime scope
         try {
             Class<?> testRuntimeDepClass = Class.forName("org.apache.maven.its.mng8750.deps.TestRuntimeDep");
@@ -142,11 +142,11 @@ public class ComprehensiveTest {
         } catch (Exception e) {
             // Test-runtime dependency should be available
         }
-        
+
         Assert.assertTrue("Compile-only scope should work correctly", compileOnlyPassed);
         Assert.assertTrue("Test-only scope should work correctly", testOnlyPassed);
         Assert.assertTrue("Test-runtime scope should work correctly", testRuntimePassed);
-        
+
         System.out.println("All scope verifications: PASSED");
     }
 }

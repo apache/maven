@@ -25,7 +25,7 @@ import org.junit.Assert;
  * Test class to verify compile-only scope behavior.
  */
 public class CompileOnlyTest {
-    
+
     /**
      * Test that regular compile dependencies are available at runtime.
      */
@@ -33,17 +33,17 @@ public class CompileOnlyTest {
     public void testCompileDependencyAvailableAtRuntime() {
         CompileOnlyExample example = new CompileOnlyExample();
         String result = example.useCompileDep();
-        Assert.assertTrue("Compile dependency should be available", 
+        Assert.assertTrue("Compile dependency should be available",
                          result.contains("Used compile dependency"));
     }
-    
+
     /**
      * Test that compile-only dependencies are NOT available at runtime.
      */
     @Test
     public void testCompileOnlyDependencyNotAvailableAtRuntime() {
         CompileOnlyExample example = new CompileOnlyExample();
-        
+
         try {
             example.useCompileOnlyDep();
             Assert.fail("Compile-only dependency should not be available at runtime");
@@ -52,7 +52,7 @@ public class CompileOnlyTest {
             System.out.println("Runtime classpath verification: PASSED");
         }
     }
-    
+
     /**
      * Test that verifies the main method behavior.
      */

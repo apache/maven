@@ -26,7 +26,7 @@ import org.apache.maven.its.mng8750.deps.CompileDep;
  * This demonstrates that compile-only dependencies are available during compilation.
  */
 public class CompileOnlyExample {
-    
+
     /**
      * Method that uses a compile-only dependency.
      * This should compile successfully but the dependency won't be available at runtime.
@@ -35,7 +35,7 @@ public class CompileOnlyExample {
         CompileOnlyDep dep = new CompileOnlyDep();
         return "Used compile-only dependency: " + dep.getMessage();
     }
-    
+
     /**
      * Method that uses a regular compile dependency.
      * This should compile successfully and the dependency will be available at runtime.
@@ -44,16 +44,16 @@ public class CompileOnlyExample {
         CompileDep dep = new CompileDep();
         return "Used compile dependency: " + dep.getMessage();
     }
-    
+
     /**
      * Main method for testing.
      */
     public static void main(String[] args) {
         CompileOnlyExample example = new CompileOnlyExample();
-        
+
         // This will work during compilation
         System.out.println(example.useCompileDep());
-        
+
         // This will also work during compilation but fail at runtime
         // if compile-only dependency is not in runtime classpath
         try {

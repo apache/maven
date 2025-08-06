@@ -34,7 +34,7 @@ import org.apache.maven.its.mng8750.deps.TestDep;
  * test compilation but ARE available during test runtime.
  */
 public class TestRuntimeTest {
-    
+
     /**
      * Test that regular test dependencies are available at test runtime.
      */
@@ -42,10 +42,10 @@ public class TestRuntimeTest {
     public void testTestDependencyAvailableAtTestRuntime() {
         TestDep dep = new TestDep();
         String result = dep.getMessage();
-        Assert.assertTrue("Test dependency should be available", 
+        Assert.assertTrue("Test dependency should be available",
                          result.contains("Test dependency"));
     }
-    
+
     /**
      * Test that test-runtime dependencies ARE available at test runtime.
      * We use reflection to access the test-runtime dependency since it's not
@@ -57,22 +57,22 @@ public class TestRuntimeTest {
             // Use reflection to access test-runtime dependency
             Class<?> testRuntimeDepClass = Class.forName("org.apache.maven.its.mng8750.deps.TestRuntimeDep");
             Object dep = testRuntimeDepClass.getDeclaredConstructor().newInstance();
-            
+
             // Call getMessage() method using reflection
             String result = (String) testRuntimeDepClass.getMethod("getMessage").invoke(dep);
-            
-            Assert.assertTrue("Test-runtime dependency should be available at test runtime", 
+
+            Assert.assertTrue("Test-runtime dependency should be available at test runtime",
                              result.contains("Test runtime dependency"));
-            
+
             System.out.println("Test runtime classpath verification: PASSED");
-            
+
         } catch (ClassNotFoundException e) {
             Assert.fail("Test-runtime dependency should be available at test runtime: " + e.getMessage());
         } catch (Exception e) {
             Assert.fail("Error accessing test-runtime dependency: " + e.getMessage());
         }
     }
-    
+
     /**
      * Test that verifies test-runtime dependencies were NOT available during compilation.
      * This is demonstrated by the fact that we cannot directly import or use the
@@ -84,12 +84,12 @@ public class TestRuntimeTest {
         // directly import TestRuntimeDep proves that test-runtime dependencies are
         // not available during test compilation
         Assert.assertTrue("Test class compiled without direct access to test-runtime dependency", true);
-        
+
         // We can verify this by checking that the class is not directly accessible
         // during compilation (which is why we had to comment out the import)
         System.out.println("Test compile classpath verification: PASSED - test-runtime dependency not available during compilation");
     }
-    
+
     /**
      * Test that demonstrates the difference between test and test-runtime scopes.
      */
@@ -98,7 +98,7 @@ public class TestRuntimeTest {
         // Regular test dependency - available during both compilation and runtime
         TestDep testDep = new TestDep();
         Assert.assertNotNull("Test dependency should be available", testDep);
-        
+
         // Test-runtime dependency - only available during runtime (accessed via reflection)
         try {
             Class<?> testRuntimeDepClass = Class.forName("org.apache.maven.its.mng8750.deps.TestRuntimeDep");
