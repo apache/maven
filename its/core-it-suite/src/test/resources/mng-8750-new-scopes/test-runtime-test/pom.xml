@@ -18,7 +18,7 @@ specific language governing permissions and limitations
 under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.1.0</modelVersion>
 
   <parent>
     <groupId>org.apache.maven.its.mng8750</groupId>
@@ -37,18 +37,21 @@ under the License.
     <dependency>
       <groupId>org.apache.maven.its.mng8750</groupId>
       <artifactId>test-runtime-dep</artifactId>
+      <scope>test-runtime</scope>
     </dependency>
 
     <!-- Regular test dependency for comparison -->
     <dependency>
       <groupId>org.apache.maven.its.mng8750</groupId>
       <artifactId>test-dep</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <!-- JUnit for testing -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
