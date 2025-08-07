@@ -24,8 +24,6 @@ import org.jdom2.Namespace;
 
 import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.ModelVersions.MODEL_VERSION_4_0_0;
 import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.ModelVersions.MODEL_VERSION_4_1_0;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.Namespaces.MAVEN_4_0_0_NAMESPACE;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.Namespaces.MAVEN_4_1_0_NAMESPACE;
 import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.SchemaLocations.MAVEN_4_1_0_SCHEMA_LOCATION;
 import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.MODEL_VERSION;
 
@@ -40,7 +38,7 @@ public final class ModelVersionUtils {
 
     /**
      * Detects the model version from a POM document.
-     * Uses both the modelVersion element and namespace URI for detection.
+     * Uses the modelVersion element for detection.
      *
      * @param pomDocument the POM document
      * @return the detected model version
@@ -49,21 +47,13 @@ public final class ModelVersionUtils {
         Element root = pomDocument.getRootElement();
         Namespace namespace = root.getNamespace();
 
-        // First try to get from modelVersion element
+        // Try to get from modelVersion element
         Element modelVersionElement = root.getChild(MODEL_VERSION, namespace);
         if (modelVersionElement != null) {
             String modelVersion = modelVersionElement.getTextTrim();
             if (!modelVersion.isEmpty()) {
                 return modelVersion;
             }
-        }
-
-        // Fallback to namespace URI detection
-        String namespaceUri = namespace.getURI();
-        if (MAVEN_4_1_0_NAMESPACE.equals(namespaceUri)) {
-            return MODEL_VERSION_4_1_0;
-        } else if (MAVEN_4_0_0_NAMESPACE.equals(namespaceUri)) {
-            return MODEL_VERSION_4_0_0;
         }
 
         // Default fallback

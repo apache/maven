@@ -75,7 +75,7 @@ class ModelVersionUtilsTest {
         @DisplayName("should detect 4.1.0 model version")
         void shouldDetect410ModelVersion() throws Exception {
             String pomXml = PomBuilder.create()
-                    .namespace("http://maven.apache.org/POM/4.1.0")
+                    .namespace("http://maven.apache.org/POM/4.0.0")
                     .modelVersion("4.1.0")
                     .groupId("test")
                     .artifactId("test")
@@ -103,24 +103,6 @@ class ModelVersionUtilsTest {
             Document document = saxBuilder.build(new StringReader(pomXml));
             String result = ModelVersionUtils.detectModelVersion(document);
             assertEquals("4.0.0", result); // Default version
-        }
-
-        @Test
-        @DisplayName("should detect version from namespace when model version is missing")
-        void shouldDetectVersionFromNamespaceWhenModelVersionMissing() throws Exception {
-            String pomXml =
-                    """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.1.0">
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                </project>
-                """;
-
-            Document document = saxBuilder.build(new StringReader(pomXml));
-            String result = ModelVersionUtils.detectModelVersion(document);
-            assertEquals("4.1.0", result);
         }
     }
 
@@ -417,7 +399,7 @@ class ModelVersionUtilsTest {
         @ValueSource(
                 strings = {
                     "http://maven.apache.org/POM/4.0.0",
-                    "http://maven.apache.org/POM/4.1.0",
+                    "http://maven.apache.org/POM/4.0.0",
                     "https://maven.apache.org/POM/4.0.0",
                     "https://maven.apache.org/POM/4.1.0"
                 })

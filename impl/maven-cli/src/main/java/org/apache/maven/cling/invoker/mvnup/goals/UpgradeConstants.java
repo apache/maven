@@ -177,11 +177,11 @@ public final class UpgradeConstants {
      * Maven namespace constants.
      */
     public static final class Namespaces {
-        /** Maven 4.0.0 namespace URI */
+        /** Maven namespace URI */
         public static final String MAVEN_4_0_0_NAMESPACE = "http://maven.apache.org/POM/4.0.0";
 
-        /** Maven 4.1.0 namespace URI */
-        public static final String MAVEN_4_1_0_NAMESPACE = "http://maven.apache.org/POM/4.1.0";
+        /** Maven namespace URI */
+        public static final String MAVEN_4_1_0_NAMESPACE = "http://maven.apache.org/POM/4.0.0";
 
         private Namespaces() {
             // Utility class
