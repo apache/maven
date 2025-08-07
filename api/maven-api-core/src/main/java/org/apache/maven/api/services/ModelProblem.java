@@ -66,7 +66,12 @@ public interface ModelProblem extends BuilderProblem {
         /**
          * Validation for Maven 4.1 POM format.
          */
-        V41
+        V41,
+
+        /**
+         * Validation for Maven 4.2 POM format.
+         */
+        V42
     }
 
     /**

@@ -24,9 +24,12 @@ import org.jdom2.Namespace;
 
 import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.ModelVersions.MODEL_VERSION_4_0_0;
 import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.ModelVersions.MODEL_VERSION_4_1_0;
+import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.ModelVersions.MODEL_VERSION_4_2_0;
 import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.Namespaces.MAVEN_4_0_0_NAMESPACE;
 import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.Namespaces.MAVEN_4_1_0_NAMESPACE;
+import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.Namespaces.MAVEN_4_2_0_NAMESPACE;
 import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.SchemaLocations.MAVEN_4_1_0_SCHEMA_LOCATION;
+import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.SchemaLocations.MAVEN_4_2_0_SCHEMA_LOCATION;
 import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.MODEL_VERSION;
 
 /**
@@ -60,7 +63,9 @@ public final class ModelVersionUtils {
 
         // Fallback to namespace URI detection
         String namespaceUri = namespace.getURI();
-        if (MAVEN_4_1_0_NAMESPACE.equals(namespaceUri)) {
+        if (MAVEN_4_2_0_NAMESPACE.equals(namespaceUri)) {
+            return MODEL_VERSION_4_2_0;
+        } else if (MAVEN_4_1_0_NAMESPACE.equals(namespaceUri)) {
             return MODEL_VERSION_4_1_0;
         } else if (MAVEN_4_0_0_NAMESPACE.equals(namespaceUri)) {
             return MODEL_VERSION_4_0_0;
@@ -72,13 +77,15 @@ public final class ModelVersionUtils {
 
     /**
      * Checks if a model version is valid for upgrade operations.
-     * Currently only supports 4.0.0 and 4.1.0.
+     * Currently supports 4.0.0, 4.1.0, and 4.2.0.
      *
      * @param modelVersion the model version to validate
      * @return true if the model version is valid
      */
     public static boolean isValidModelVersion(String modelVersion) {
-        return MODEL_VERSION_4_0_0.equals(modelVersion) || MODEL_VERSION_4_1_0.equals(modelVersion);
+        return MODEL_VERSION_4_0_0.equals(modelVersion)
+                || MODEL_VERSION_4_1_0.equals(modelVersion)
+                || MODEL_VERSION_4_2_0.equals(modelVersion);
     }
 
     /**
@@ -93,8 +100,15 @@ public final class ModelVersionUtils {
             return false;
         }
 
-        // Currently only support 4.0.0 → 4.1.0 upgrade
-        return MODEL_VERSION_4_0_0.equals(fromVersion) && MODEL_VERSION_4_1_0.equals(toVersion);
+        // Support upgrades: 4.0.0 → 4.1.0, 4.0.0 → 4.2.0, 4.1.0 → 4.2.0
+        if (MODEL_VERSION_4_0_0.equals(fromVersion)) {
+            return MODEL_VERSION_4_1_0.equals(toVersion) || MODEL_VERSION_4_2_0.equals(toVersion);
+        }
+        if (MODEL_VERSION_4_1_0.equals(fromVersion)) {
+            return MODEL_VERSION_4_2_0.equals(toVersion);
+        }
+
+        return false;
     }
 
     /**
@@ -105,7 +119,9 @@ public final class ModelVersionUtils {
      * @return true if eligible for inference
      */
     public static boolean isEligibleForInference(String modelVersion) {
-        return MODEL_VERSION_4_0_0.equals(modelVersion) || MODEL_VERSION_4_1_0.equals(modelVersion);
+        return MODEL_VERSION_4_0_0.equals(modelVersion)
+                || MODEL_VERSION_4_1_0.equals(modelVersion)
+                || MODEL_VERSION_4_2_0.equals(modelVersion);
     }
 
     /**
@@ -220,8 +236,13 @@ public final class ModelVersionUtils {
      * @return the schema location
      */
     public static String getSchemaLocationForModelVersion(String modelVersion) {
-        if (MODEL_VERSION_4_1_0.equals(modelVersion) || isNewerThan410(modelVersion)) {
+        if (MODEL_VERSION_4_2_0.equals(modelVersion)) {
+            return MAVEN_4_2_0_SCHEMA_LOCATION;
+        } else if (MODEL_VERSION_4_1_0.equals(modelVersion)) {
             return MAVEN_4_1_0_SCHEMA_LOCATION;
+        } else if (isNewerThan410(modelVersion)) {
+            // For versions newer than 4.1.0 but not specifically 4.2.0, use 4.2.0 schema
+            return MAVEN_4_2_0_SCHEMA_LOCATION;
         }
         return UpgradeConstants.SchemaLocations.MAVEN_4_0_0_SCHEMA_LOCATION;
     }
