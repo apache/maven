@@ -23,10 +23,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.apache.maven.shared.verifier.VerificationException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * This is a test set for Maven 4 new dependency scopes: compile-only, test-only, and test-runtime.
@@ -200,5 +202,59 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
         assertTrue(runtimeClasspath.exists(), "Runtime classpath file should exist");
         assertTrue(testCompileClasspath.exists(), "Test compile classpath file should exist");
         assertTrue(testRuntimeClasspath.exists(), "Test runtime classpath file should exist");
+    }
+
+    /**
+     * Test that new scopes fail validation when using modelVersion 4.0.0.
+     *
+     * @throws Exception in case of failure
+     */
+    @Test
+    public void testValidationFailureWithModelVersion40() throws Exception {
+        File testDir = extractResources("/mng-8750-new-scopes");
+        File projectDir = new File(testDir, "validation-failure-test");
+
+        Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier.addCliArgument("clean");
+        verifier.addCliArgument("validate");
+
+        try {
+            verifier.execute();
+            fail("Expected validation to fail when using new scopes with modelVersion 4.0.0");
+        } catch (VerificationException e) {
+            // Expected - validation should fail
+            verifier.verifyTextInLog("is not supported");
+
+            // Verify that the error mentions the unsupported scopes
+            String log = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+            assertTrue(log.contains("compile-only") || log.contains("scope"),
+                    "Error should mention compile-only scope");
+            assertTrue(log.contains("modelVersion") || log.contains("4.0.0"),
+                    "Error should mention model version");
+        }
+    }
+
+    /**
+     * Test that new scopes work correctly when using modelVersion 4.1.0.
+     *
+     * @throws Exception in case of failure
+     */
+    @Test
+    public void testValidationSuccessWithModelVersion41() throws Exception {
+        File testDir = extractResources("/mng-8750-new-scopes");
+        File projectDir = new File(testDir, "validation-success-test");
+
+        Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier.addCliArgument("clean");
+        verifier.addCliArgument("validate");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+
+        // Verify that validation succeeded - no errors about unsupported scopes
+        String log = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
+        assertFalse(log.contains("is not supported"),
+                "Validation should succeed with modelVersion 4.1.0");
+        assertFalse(log.contains("Unknown scope"),
+                "No unknown scope errors should occur with modelVersion 4.1.0");
     }
 }
