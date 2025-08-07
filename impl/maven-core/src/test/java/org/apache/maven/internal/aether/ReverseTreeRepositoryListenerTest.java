@@ -27,10 +27,10 @@ import org.eclipse.aether.collection.CollectStepData;
 import org.eclipse.aether.repository.LocalRepository;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -51,12 +51,9 @@ class ReverseTreeRepositoryListenerTest {
         Artifact nonLocalReposioryArtifact = mock(Artifact.class);
         when(nonLocalReposioryArtifact.getFile()).thenReturn(new File("something/completely/different"));
 
-        assertThat(
-                ReverseTreeRepositoryListener.isLocalRepositoryArtifactOrMissing(session, localRepositoryArtifact),
-                equalTo(true));
-        assertThat(
-                ReverseTreeRepositoryListener.isLocalRepositoryArtifactOrMissing(session, nonLocalReposioryArtifact),
-                equalTo(false));
+        assertTrue(ReverseTreeRepositoryListener.isLocalRepositoryArtifactOrMissing(session, localRepositoryArtifact));
+        assertFalse(
+                ReverseTreeRepositoryListener.isLocalRepositoryArtifactOrMissing(session, nonLocalReposioryArtifact));
     }
 
     @Test
@@ -69,16 +66,14 @@ class ReverseTreeRepositoryListenerTest {
         Artifact localRepositoryArtifact = mock(Artifact.class);
         when(localRepositoryArtifact.getFile()).thenReturn(null);
 
-        assertThat(
-                ReverseTreeRepositoryListener.isLocalRepositoryArtifactOrMissing(session, localRepositoryArtifact),
-                equalTo(true));
+        assertTrue(ReverseTreeRepositoryListener.isLocalRepositoryArtifactOrMissing(session, localRepositoryArtifact));
     }
 
     @Test
     void lookupCollectStepDataTest() {
         RequestTrace doesNotHaveIt =
                 RequestTrace.newChild(null, "foo").newChild("bar").newChild("baz");
-        assertThat(ReverseTreeRepositoryListener.lookupCollectStepData(doesNotHaveIt), nullValue());
+        assertNull(ReverseTreeRepositoryListener.lookupCollectStepData(doesNotHaveIt));
 
         final CollectStepData data = mock(CollectStepData.class);
 
@@ -86,18 +81,18 @@ class ReverseTreeRepositoryListenerTest {
                 .newChild("foo")
                 .newChild("bar")
                 .newChild("baz");
-        assertThat(ReverseTreeRepositoryListener.lookupCollectStepData(haveItFirst), sameInstance(data));
+        assertSame(data, ReverseTreeRepositoryListener.lookupCollectStepData(haveItFirst));
 
         RequestTrace haveItLast = RequestTrace.newChild(null, "foo")
                 .newChild("bar")
                 .newChild("baz")
                 .newChild(data);
-        assertThat(ReverseTreeRepositoryListener.lookupCollectStepData(haveItLast), sameInstance(data));
+        assertSame(data, ReverseTreeRepositoryListener.lookupCollectStepData(haveItLast));
 
         RequestTrace haveIt = RequestTrace.newChild(null, "foo")
                 .newChild("bar")
                 .newChild(data)
                 .newChild("baz");
-        assertThat(ReverseTreeRepositoryListener.lookupCollectStepData(haveIt), sameInstance(data));
+        assertSame(data, ReverseTreeRepositoryListener.lookupCollectStepData(haveIt));
     }
 }

@@ -45,7 +45,7 @@ class ParentTest {
     @Test
     void testEqualsIdentity() {
         Parent thing = new Parent();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test

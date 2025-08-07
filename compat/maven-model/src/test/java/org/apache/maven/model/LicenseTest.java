@@ -46,7 +46,7 @@ class LicenseTest {
     @Test
     void testEqualsIdentity() {
         License thing = new License();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test

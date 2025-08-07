@@ -213,6 +213,6 @@ class MavenProjectTest extends AbstractMavenProjectTestCase {
     }
 
     private void assertNoNulls(List<String> elements) {
-        assertFalse(elements.contains(null));
+        assertFalse(elements.contains(null), "Expected " + elements + " to not contain " + null);
     }
 }

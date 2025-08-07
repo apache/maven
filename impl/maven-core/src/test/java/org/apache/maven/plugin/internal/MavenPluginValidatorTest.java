@@ -59,7 +59,8 @@ class MavenPluginValidatorTest extends AbstractCoreMavenComponentTestCase {
         descriptor.setVersion("0.1");
         List<String> errors = new ArrayList<>();
         mavenPluginValidator.validate(plugin, descriptor, errors);
-        assertTrue(errors.isEmpty());
+        assertTrue(
+                errors.isEmpty(), "Expected collection to be empty but had " + errors.size() + " elements: " + errors);
     }
 
     @Test
@@ -78,7 +79,7 @@ class MavenPluginValidatorTest extends AbstractCoreMavenComponentTestCase {
         descriptor.setVersion("0.1");
         List<String> errors = new ArrayList<>();
         mavenPluginValidator.validate(plugin, descriptor, errors);
-        assertFalse(errors.isEmpty());
+        assertFalse(errors.isEmpty(), "Expected collection to not be empty but was empty");
     }
 
     @Test
@@ -97,7 +98,7 @@ class MavenPluginValidatorTest extends AbstractCoreMavenComponentTestCase {
         descriptor.setVersion("0.1");
         List<String> errors = new ArrayList<>();
         mavenPluginValidator.validate(plugin, descriptor, errors);
-        assertFalse(errors.isEmpty());
+        assertFalse(errors.isEmpty(), "Expected collection to not be empty but was empty");
     }
 
     @Test
@@ -115,6 +116,6 @@ class MavenPluginValidatorTest extends AbstractCoreMavenComponentTestCase {
         descriptor.setArtifactId("maven-it-plugin");
         List<String> errors = new ArrayList<>();
         mavenPluginValidator.validate(plugin, descriptor, errors);
-        assertFalse(errors.isEmpty());
+        assertFalse(errors.isEmpty(), "Expected collection to not be empty but was empty");
     }
 }

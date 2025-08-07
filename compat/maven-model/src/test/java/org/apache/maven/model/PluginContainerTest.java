@@ -45,7 +45,7 @@ class PluginContainerTest {
     @Test
     void testEqualsIdentity() {
         PluginContainer thing = new PluginContainer();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test

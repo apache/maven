@@ -45,7 +45,7 @@ class RepositoryPolicyTest {
     @Test
     void testEqualsIdentity() {
         RepositoryPolicy thing = new RepositoryPolicy();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test

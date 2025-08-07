@@ -43,21 +43,29 @@ class ProjectDependencyGraphStubTest {
     void testBDependencies() {
         final List<MavenProject> bProjects = stub.getUpstreamProjects(ProjectDependencyGraphStub.B, false);
         assertEquals(1, bProjects.size());
-        assertTrue(bProjects.contains(ProjectDependencyGraphStub.A));
+        assertTrue(
+                bProjects.contains(ProjectDependencyGraphStub.A),
+                "Expected " + bProjects + " to contain " + ProjectDependencyGraphStub.A);
     }
 
     @Test
     void testCDependencies() {
         final List<MavenProject> cProjects = stub.getUpstreamProjects(ProjectDependencyGraphStub.C, false);
         assertEquals(1, cProjects.size());
-        assertTrue(cProjects.contains(ProjectDependencyGraphStub.A));
+        assertTrue(
+                cProjects.contains(ProjectDependencyGraphStub.A),
+                "Expected " + cProjects + " to contain " + ProjectDependencyGraphStub.A);
     }
 
     @Test
     void testXDependencies() {
         final List<MavenProject> cProjects = stub.getUpstreamProjects(ProjectDependencyGraphStub.X, false);
         assertEquals(2, cProjects.size());
-        assertTrue(cProjects.contains(ProjectDependencyGraphStub.C));
-        assertTrue(cProjects.contains(ProjectDependencyGraphStub.B));
+        assertTrue(
+                cProjects.contains(ProjectDependencyGraphStub.C),
+                "Expected " + cProjects + " to contain " + ProjectDependencyGraphStub.C);
+        assertTrue(
+                cProjects.contains(ProjectDependencyGraphStub.B),
+                "Expected " + cProjects + " to contain " + ProjectDependencyGraphStub.B);
     }
 }
