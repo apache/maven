@@ -68,7 +68,8 @@ public class DefaultModelResolver implements ModelResolver {
                         parent.getGroupId(),
                         parent.getArtifactId(),
                         parent.getVersion(),
-                        null),
+                        null,
+                        "pom"),
                 parent.getLocation("version"),
                 "parent");
         if (result.version() != null) {
@@ -93,7 +94,8 @@ public class DefaultModelResolver implements ModelResolver {
                         dependency.getGroupId(),
                         dependency.getArtifactId(),
                         dependency.getVersion(),
-                        dependency.getClassifier()),
+                        dependency.getClassifier(),
+                        "pom"),
                 dependency.getLocation("version"),
                 "dependency");
         if (result.version() != null) {
@@ -122,12 +124,13 @@ public class DefaultModelResolver implements ModelResolver {
         String artifactId = request.artifactId();
         String version = request.version();
         String classifier = request.classifier();
+        String extension = request.extension();
         List<RemoteRepository> repositories = request.repositories();
 
         RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
         try {
             ArtifactCoordinates coords =
-                    session.createArtifactCoordinates(groupId, artifactId, version, classifier, "pom", null);
+                    session.createArtifactCoordinates(groupId, artifactId, version, classifier, extension, null);
             if (coords.getVersionConstraint().getVersionRange() != null
                     && coords.getVersionConstraint().getVersionRange().getUpperBoundary() == null) {
                 // Message below is checked for in the MNG-2199 core IT.
@@ -149,7 +152,7 @@ public class DefaultModelResolver implements ModelResolver {
                             version))
                     .toString();
             String resultVersion = version.equals(newVersion) ? null : newVersion;
-            Path path = getPath(session, repositories, groupId, artifactId, newVersion, classifier);
+            Path path = getPath(session, repositories, groupId, artifactId, newVersion, classifier, extension);
             return new ModelResolverResult(
                     request,
                     Sources.resolvedSource(path, groupId + ":" + artifactId + ":" + newVersion),
@@ -175,9 +178,11 @@ public class DefaultModelResolver implements ModelResolver {
             String groupId,
             String artifactId,
             String version,
-            String classifier) {
+            String classifier,
+            String extension) {
         DownloadedArtifact resolved = session.resolveArtifact(
-                session.createArtifactCoordinates(groupId, artifactId, version, classifier, "pom", null), repositories);
+                session.createArtifactCoordinates(groupId, artifactId, version, classifier, extension, null),
+                repositories);
         return resolved.getPath();
     }
 }
