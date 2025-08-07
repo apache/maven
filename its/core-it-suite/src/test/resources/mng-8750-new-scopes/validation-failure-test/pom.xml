@@ -63,10 +63,10 @@ under the License.
         <executions>
           <execution>
             <id>compile</id>
-            <phase>compile</phase>
             <goals>
               <goal>compile</goal>
             </goals>
+            <phase>compile</phase>
           </execution>
         </executions>
       </plugin>

@@ -227,10 +227,9 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
 
             // Verify that the error mentions the unsupported scopes
             String log = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
-            assertTrue(log.contains("compile-only") || log.contains("scope"),
-                    "Error should mention compile-only scope");
-            assertTrue(log.contains("modelVersion") || log.contains("4.0.0"),
-                    "Error should mention model version");
+            assertTrue(
+                    log.contains("compile-only") || log.contains("scope"), "Error should mention compile-only scope");
+            assertTrue(log.contains("modelVersion") || log.contains("4.0.0"), "Error should mention model version");
         }
     }
 
@@ -252,9 +251,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
 
         // Verify that validation succeeded - no errors about unsupported scopes
         String log = verifier.loadFile(verifier.getBasedir(), verifier.getLogFileName(), false);
-        assertFalse(log.contains("is not supported"),
-                "Validation should succeed with modelVersion 4.1.0");
-        assertFalse(log.contains("Unknown scope"),
-                "No unknown scope errors should occur with modelVersion 4.1.0");
+        assertFalse(log.contains("is not supported"), "Validation should succeed with modelVersion 4.1.0");
+        assertFalse(log.contains("Unknown scope"), "No unknown scope errors should occur with modelVersion 4.1.0");
     }
 }
