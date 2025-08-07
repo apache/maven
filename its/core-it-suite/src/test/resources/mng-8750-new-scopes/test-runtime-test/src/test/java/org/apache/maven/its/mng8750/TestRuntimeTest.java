@@ -18,11 +18,9 @@
  */
 package org.apache.maven.its.mng8750;
 
-import org.junit.Test;
-import org.junit.Assert;
-
-// This import should work during test compilation
 import org.apache.maven.its.mng8750.deps.TestDep;
+import org.junit.Assert;
+import org.junit.Test;
 
 // This import should NOT work during test compilation because test-runtime dependencies
 // are not available during test compilation phase
@@ -42,8 +40,7 @@ public class TestRuntimeTest {
     public void testTestDependencyAvailableAtTestRuntime() {
         TestDep dep = new TestDep();
         String result = dep.getMessage();
-        Assert.assertTrue("Test dependency should be available",
-                         result.contains("Test dependency"));
+        Assert.assertTrue("Test dependency should be available", result.contains("Test dependency"));
     }
 
     /**
@@ -61,8 +58,9 @@ public class TestRuntimeTest {
             // Call getMessage() method using reflection
             String result = (String) testRuntimeDepClass.getMethod("getMessage").invoke(dep);
 
-            Assert.assertTrue("Test-runtime dependency should be available at test runtime",
-                             result.contains("Test runtime dependency"));
+            Assert.assertTrue(
+                    "Test-runtime dependency should be available at test runtime",
+                    result.contains("Test runtime dependency"));
 
             System.out.println("Test runtime classpath verification: PASSED");
 

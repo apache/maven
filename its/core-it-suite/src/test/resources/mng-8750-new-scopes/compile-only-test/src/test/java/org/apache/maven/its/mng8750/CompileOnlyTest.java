@@ -18,8 +18,8 @@
  */
 package org.apache.maven.its.mng8750;
 
-import org.junit.Test;
 import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Test class to verify compile-only scope behavior.
@@ -33,8 +33,7 @@ public class CompileOnlyTest {
     public void testCompileDependencyAvailableAtRuntime() {
         CompileOnlyExample example = new CompileOnlyExample();
         String result = example.useCompileDep();
-        Assert.assertTrue("Compile dependency should be available",
-                         result.contains("Used compile dependency"));
+        Assert.assertTrue("Compile dependency should be available", result.contains("Used compile dependency"));
     }
 
     /**

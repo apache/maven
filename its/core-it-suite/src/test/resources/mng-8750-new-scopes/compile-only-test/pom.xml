@@ -60,10 +60,10 @@ under the License.
         <executions>
           <execution>
             <id>compile</id>
-            <phase>compile</phase>
             <goals>
               <goal>compile</goal>
             </goals>
+            <phase>compile</phase>
           </execution>
         </executions>
       </plugin>
@@ -76,10 +76,10 @@ under the License.
         <executions>
           <execution>
             <id>build-compile-classpath</id>
-            <phase>compile</phase>
             <goals>
               <goal>build-classpath</goal>
             </goals>
+            <phase>compile</phase>
             <configuration>
               <outputFile>target/compile-classpath.txt</outputFile>
               <includeScope>compile</includeScope>
@@ -87,10 +87,10 @@ under the License.
           </execution>
           <execution>
             <id>build-runtime-classpath</id>
-            <phase>process-test-classes</phase>
             <goals>
               <goal>build-classpath</goal>
             </goals>
+            <phase>process-test-classes</phase>
             <configuration>
               <outputFile>target/runtime-classpath.txt</outputFile>
               <includeScope>runtime</includeScope>

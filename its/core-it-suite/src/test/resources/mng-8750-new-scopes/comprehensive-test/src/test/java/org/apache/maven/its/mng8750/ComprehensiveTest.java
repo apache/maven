@@ -18,12 +18,10 @@
  */
 package org.apache.maven.its.mng8750;
 
-import org.junit.Test;
-import org.junit.Assert;
-
-// Imports for dependencies available during test compilation
-import org.apache.maven.its.mng8750.deps.TestOnlyDep;
 import org.apache.maven.its.mng8750.deps.TestDep;
+import org.apache.maven.its.mng8750.deps.TestOnlyDep;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Comprehensive test class that verifies all new Maven 4 scopes work correctly together.
@@ -39,8 +37,7 @@ public class ComprehensiveTest {
 
         // Regular compile dependency should work
         String result = example.useCompileDep();
-        Assert.assertTrue("Compile dependency should be available",
-                         result.contains("Used compile dependency"));
+        Assert.assertTrue("Compile dependency should be available", result.contains("Used compile dependency"));
 
         // Compile-only dependency should fail at runtime
         try {
@@ -84,8 +81,9 @@ public class ComprehensiveTest {
             Object dep = testRuntimeDepClass.getDeclaredConstructor().newInstance();
             String result = (String) testRuntimeDepClass.getMethod("getMessage").invoke(dep);
 
-            Assert.assertTrue("Test-runtime dependency should be available at test runtime",
-                             result.contains("Test runtime dependency"));
+            Assert.assertTrue(
+                    "Test-runtime dependency should be available at test runtime",
+                    result.contains("Test runtime dependency"));
 
             System.out.println("Test-runtime scope verification: PASSED");
 
@@ -104,8 +102,7 @@ public class ComprehensiveTest {
         // Regular test dependency should be available during both compilation and runtime
         TestDep testDep = new TestDep();
         String result = testDep.getMessage();
-        Assert.assertTrue("Test dependency should be available",
-                         result.contains("Test dependency"));
+        Assert.assertTrue("Test dependency should be available", result.contains("Test dependency"));
     }
 
     /**

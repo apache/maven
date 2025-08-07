@@ -85,6 +85,32 @@ under the License.
     </dependencies>
   </dependencyManagement>
 
+  <repositories>
+    <repository>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>local-test-repo</id>
+      <url>file://${project.basedir}/repo</url>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>local-test-repo</id>
+      <url>file://${project.basedir}/repo</url>
+    </pluginRepository>
+  </pluginRepositories>
+
   <build>
     <pluginManagement>
       <plugins>
@@ -106,30 +132,4 @@ under the License.
       </plugins>
     </pluginManagement>
   </build>
-
-  <repositories>
-    <repository>
-      <id>local-test-repo</id>
-      <url>file://${project.basedir}/repo</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-
-  <pluginRepositories>
-    <pluginRepository>
-      <id>local-test-repo</id>
-      <url>file://${project.basedir}/repo</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </pluginRepository>
-  </pluginRepositories>
 </project>

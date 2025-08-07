@@ -75,17 +75,17 @@ under the License.
         <executions>
           <execution>
             <id>compile</id>
-            <phase>compile</phase>
             <goals>
               <goal>compile</goal>
             </goals>
+            <phase>compile</phase>
           </execution>
           <execution>
             <id>test-compile</id>
-            <phase>test-compile</phase>
             <goals>
               <goal>testCompile</goal>
             </goals>
+            <phase>test-compile</phase>
           </execution>
         </executions>
       </plugin>
@@ -98,10 +98,10 @@ under the License.
         <executions>
           <execution>
             <id>build-compile-classpath</id>
-            <phase>compile</phase>
             <goals>
               <goal>build-classpath</goal>
             </goals>
+            <phase>compile</phase>
             <configuration>
               <outputFile>target/compile-classpath.txt</outputFile>
               <includeScope>compile</includeScope>
@@ -109,10 +109,10 @@ under the License.
           </execution>
           <execution>
             <id>build-runtime-classpath</id>
-            <phase>process-classes</phase>
             <goals>
               <goal>build-classpath</goal>
             </goals>
+            <phase>process-classes</phase>
             <configuration>
               <outputFile>target/runtime-classpath.txt</outputFile>
               <includeScope>runtime</includeScope>
@@ -120,10 +120,10 @@ under the License.
           </execution>
           <execution>
             <id>build-test-compile-classpath</id>
-            <phase>test-compile</phase>
             <goals>
               <goal>build-classpath</goal>
             </goals>
+            <phase>test-compile</phase>
             <configuration>
               <outputFile>target/test-compile-classpath.txt</outputFile>
               <includeScope>test</includeScope>
@@ -131,10 +131,10 @@ under the License.
           </execution>
           <execution>
             <id>build-test-runtime-classpath</id>
-            <phase>process-test-classes</phase>
             <goals>
               <goal>build-classpath</goal>
             </goals>
+            <phase>process-test-classes</phase>
             <configuration>
               <outputFile>target/test-runtime-classpath.txt</outputFile>
               <includeScope>test</includeScope>

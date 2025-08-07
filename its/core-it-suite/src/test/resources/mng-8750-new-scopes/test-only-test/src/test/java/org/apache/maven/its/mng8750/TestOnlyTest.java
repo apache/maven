@@ -18,12 +18,10 @@
  */
 package org.apache.maven.its.mng8750;
 
-import org.junit.Test;
-import org.junit.Assert;
-
-// These imports should work during test compilation
-import org.apache.maven.its.mng8750.deps.TestOnlyDep;
 import org.apache.maven.its.mng8750.deps.TestDep;
+import org.apache.maven.its.mng8750.deps.TestOnlyDep;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Test class to verify test-only scope behavior.
@@ -39,8 +37,7 @@ public class TestOnlyTest {
     public void testTestDependencyAvailableAtTestRuntime() {
         TestDep dep = new TestDep();
         String result = dep.getMessage();
-        Assert.assertTrue("Test dependency should be available",
-                         result.contains("Test dependency"));
+        Assert.assertTrue("Test dependency should be available", result.contains("Test dependency"));
     }
 
     /**

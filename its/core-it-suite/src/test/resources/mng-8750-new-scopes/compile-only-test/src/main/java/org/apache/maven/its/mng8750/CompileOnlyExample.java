@@ -18,8 +18,8 @@
  */
 package org.apache.maven.its.mng8750;
 
-import org.apache.maven.its.mng8750.deps.CompileOnlyDep;
 import org.apache.maven.its.mng8750.deps.CompileDep;
+import org.apache.maven.its.mng8750.deps.CompileOnlyDep;
 
 /**
  * Example class that uses both compile-only and regular compile dependencies.

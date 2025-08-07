@@ -67,8 +67,8 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
         File compileClasspath = new File(projectDir, "target/compile-classpath.txt");
         File runtimeClasspath = new File(projectDir, "target/runtime-classpath.txt");
 
-        assertTrue("Compile classpath file should exist", compileClasspath.exists());
-        assertTrue("Runtime classpath file should exist", runtimeClasspath.exists());
+        assertTrue(compileClasspath.exists(), "Compile classpath file should exist");
+        assertTrue(runtimeClasspath.exists(), "Runtime classpath file should exist");
     }
 
     /**
@@ -95,8 +95,8 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
         File testCompileClasspath = new File(projectDir, "target/test-compile-classpath.txt");
         File testRuntimeClasspath = new File(projectDir, "target/test-runtime-classpath.txt");
 
-        assertTrue("Test compile classpath file should exist", testCompileClasspath.exists());
-        assertTrue("Test runtime classpath file should exist", testRuntimeClasspath.exists());
+        assertTrue(testCompileClasspath.exists(), "Test compile classpath file should exist");
+        assertTrue(testRuntimeClasspath.exists(), "Test runtime classpath file should exist");
     }
 
     /**
@@ -123,8 +123,8 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
         File testCompileClasspath = new File(projectDir, "target/test-compile-classpath.txt");
         File testRuntimeClasspath = new File(projectDir, "target/test-runtime-classpath.txt");
 
-        assertTrue("Test compile classpath file should exist", testCompileClasspath.exists());
-        assertTrue("Test runtime classpath file should exist", testRuntimeClasspath.exists());
+        assertTrue(testCompileClasspath.exists(), "Test compile classpath file should exist");
+        assertTrue(testRuntimeClasspath.exists(), "Test runtime classpath file should exist");
     }
 
     /**
@@ -144,27 +144,27 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
         verifier.verifyErrorFreeLog();
 
         // Check that consumer POM was generated
-        Path consumerPom = projectDir.toPath().resolve(Paths.get(
-                "target",
-                "project-local-repo",
-                "org.apache.maven.its.mng8750",
-                "consumer-pom-test",
-                "1.0",
-                "consumer-pom-test-1.0-consumer.pom"));
+        Path consumerPom = projectDir
+                .toPath()
+                .resolve(Paths.get(
+                        "target",
+                        "project-local-repo",
+                        "org.apache.maven.its.mng8750",
+                        "consumer-pom-test",
+                        "1.0",
+                        "consumer-pom-test-1.0-consumer.pom"));
 
         assertTrue(Files.exists(consumerPom), "Consumer POM should exist");
 
         // Verify consumer POM content excludes new scopes
         String consumerPomContent = Files.readString(consumerPom);
-        assertFalse(consumerPomContent.contains("compile-only"),
-                "Consumer POM should not contain compile-only scope");
-        assertFalse(consumerPomContent.contains("test-only"),
-                "Consumer POM should not contain test-only scope");
-        assertFalse(consumerPomContent.contains("test-runtime"),
-                "Consumer POM should not contain test-runtime scope");
+        assertFalse(consumerPomContent.contains("compile-only"), "Consumer POM should not contain compile-only scope");
+        assertFalse(consumerPomContent.contains("test-only"), "Consumer POM should not contain test-only scope");
+        assertFalse(consumerPomContent.contains("test-runtime"), "Consumer POM should not contain test-runtime scope");
 
         // Verify that dependencies with new scopes are either excluded or transformed
-        assertTrue(consumerPomContent.contains("compile") || consumerPomContent.contains("provided"),
+        assertTrue(
+                consumerPomContent.contains("compile") || consumerPomContent.contains("provided"),
                 "Consumer POM should contain only Maven 3 compatible scopes");
     }
 
@@ -196,9 +196,9 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
         File testCompileClasspath = new File(projectDir, "target/test-compile-classpath.txt");
         File testRuntimeClasspath = new File(projectDir, "target/test-runtime-classpath.txt");
 
-        assertTrue("Compile classpath file should exist", compileClasspath.exists());
-        assertTrue("Runtime classpath file should exist", runtimeClasspath.exists());
-        assertTrue("Test compile classpath file should exist", testCompileClasspath.exists());
-        assertTrue("Test runtime classpath file should exist", testRuntimeClasspath.exists());
+        assertTrue(compileClasspath.exists(), "Compile classpath file should exist");
+        assertTrue(runtimeClasspath.exists(), "Runtime classpath file should exist");
+        assertTrue(testCompileClasspath.exists(), "Test compile classpath file should exist");
+        assertTrue(testRuntimeClasspath.exists(), "Test runtime classpath file should exist");
     }
 }

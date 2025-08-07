@@ -78,10 +78,10 @@ under the License.
         <executions>
           <execution>
             <id>install-to-local-repo</id>
-            <phase>install</phase>
             <goals>
               <goal>install</goal>
             </goals>
+            <phase>install</phase>
           </execution>
         </executions>
       </plugin>
