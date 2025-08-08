@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.1.0</modelVersion>
+
+  <parent>
+    <groupId>org.apache.maven.its.mng8750</groupId>
+    <artifactId>new-scopes-parent</artifactId>
+    <version>1.0</version>
+  </parent>
+
+  <artifactId>consumer-pom-test</artifactId>
+  <packaging>jar</packaging>
+
+  <name>Maven Integration Test :: mng-8750 :: Consumer POM Test</name>
+  <description>Test that consumer POMs exclude new scopes for Maven 3 compatibility</description>
+
+  <dependencies>
+    <!-- All new scope dependencies - these should be excluded or transformed in consumer POM -->
+    <dependency>
+      <groupId>org.apache.maven.its.mng8750</groupId>
+      <artifactId>compile-only-dep</artifactId>
+      <scope>compile-only</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.its.mng8750</groupId>
+      <artifactId>test-only-dep</artifactId>
+      <scope>test-only</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.its.mng8750</groupId>
+      <artifactId>test-runtime-dep</artifactId>
+      <scope>test-runtime</scope>
+    </dependency>
+
+    <!-- Regular dependencies - these should remain in consumer POM -->
+    <dependency>
+      <groupId>org.apache.maven.its.mng8750</groupId>
+      <artifactId>compile-dep</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.its.mng8750</groupId>
+      <artifactId>test-dep</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- JUnit for testing -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-install-plugin</artifactId>
+        <configuration>
+          <localRepositoryPath>${project.build.directory}/project-local-repo</localRepositoryPath>
+        </configuration>
+        <executions>
+          <execution>
+            <id>install-to-local-repo</id>
+            <goals>
+              <goal>install</goal>
+            </goals>
+            <phase>install</phase>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/*Test.java</include>
+          </includes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
