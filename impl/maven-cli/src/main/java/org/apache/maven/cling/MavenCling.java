@@ -25,13 +25,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.classworlds.ClassWorld;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.mvn.MavenInvoker;
 import org.apache.maven.cling.invoker.mvn.MavenParser;
-import org.codehaus.plexus.classworlds.ClassWorld;
 
 /**
  * Maven CLI "new-gen".
