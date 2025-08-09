@@ -76,11 +76,8 @@ under the License.
     <exportedPackage>org.eclipse.aether.version</exportedPackage>
     <exportedPackage>org.eclipse.aether.util</exportedPackage>
 
-    <!-- plexus-classworlds -->
+    <!-- maven-classworlds -->
     <exportedPackage>org.codehaus.plexus.classworlds</exportedPackage>
-
-    <!-- classworlds (for legacy code) -->
-    <exportedPackage>org.codehaus.classworlds</exportedPackage>
 
     <!-- plexus-utils (for DOM-type fields in maven-model) -->
     <exportedPackage>org.codehaus.plexus.util.xml.Xpp3Dom</exportedPackage>
@@ -153,7 +150,7 @@ under the License.
     <exportedArtifact>org.apache.maven:maven-api-xml</exportedArtifact>
 
     <exportedArtifact>classworlds:classworlds</exportedArtifact>
-    <exportedArtifact>org.codehaus.plexus:plexus-classworlds</exportedArtifact>
+    <exportedArtifact>org.apache.maven:maven-classworlds</exportedArtifact>
     <exportedArtifact>org.codehaus.plexus:plexus-component-api</exportedArtifact>
     <exportedArtifact>org.codehaus.plexus:plexus-container-default</exportedArtifact>
     <exportedArtifact>plexus:plexus-container-default</exportedArtifact>

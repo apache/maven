@@ -43,6 +43,7 @@ import java.util.stream.Stream;
 
 import org.apache.maven.api.Lifecycle;
 import org.apache.maven.api.MonotonicClock;
+import org.apache.maven.api.classworlds.ClassRealm;
 import org.apache.maven.api.services.LifecycleRegistry;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.xml.XmlNode;
@@ -84,7 +85,6 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1100,7 +1100,7 @@ public class BuildPlanExecutor {
     public static void attachToThread(MavenProject currentProject) {
         ClassRealm projectRealm = currentProject.getClassRealm();
         if (projectRealm != null) {
-            Thread.currentThread().setContextClassLoader(projectRealm);
+            Thread.currentThread().setContextClassLoader(projectRealm.getClassLoader());
         }
     }
 

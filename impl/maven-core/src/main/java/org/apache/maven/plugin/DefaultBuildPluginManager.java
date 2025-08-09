@@ -27,6 +27,7 @@ import java.io.PrintStream;
 import java.util.List;
 
 import org.apache.maven.api.Project;
+import org.apache.maven.api.classworlds.ClassRealm;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.MojoExecutionEvent;
@@ -40,7 +41,6 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.slf4j.LoggerFactory;
@@ -110,7 +110,7 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
         }
 
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader(pluginRealm);
+        Thread.currentThread().setContextClassLoader(pluginRealm.getClassLoader());
 
         MavenSession oldSession = legacySupport.getSession();
 
@@ -164,7 +164,7 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
             PrintStream ps = new PrintStream(os);
             ps.println(
                     "A required class was missing while executing " + mojoDescriptor.getId() + ": " + e.getMessage());
-            pluginRealm.display(ps);
+            ((org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm).display(ps);
             Exception wrapper = new PluginContainerException(mojoDescriptor, pluginRealm, os.toString(), e);
             throw new PluginExecutionException(mojoExecution, project, wrapper);
         } catch (LinkageError e) {
@@ -174,7 +174,7 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
             PrintStream ps = new PrintStream(os);
             ps.println("An API incompatibility was encountered while executing " + mojoDescriptor.getId() + ": "
                     + e.getClass().getName() + ": " + e.getMessage());
-            pluginRealm.display(ps);
+            ((org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm).display(ps);
             Exception wrapper = new PluginContainerException(mojoDescriptor, pluginRealm, os.toString(), e);
             throw new PluginExecutionException(mojoExecution, project, wrapper);
         } catch (ClassCastException e) {
@@ -184,7 +184,7 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
             PrintStream ps = new PrintStream(os);
             ps.println("A type incompatibility occurred while executing " + mojoDescriptor.getId() + ": "
                     + e.getMessage());
-            pluginRealm.display(ps);
+            ((org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm).display(ps);
             throw new PluginExecutionException(mojoExecution, project, os.toString(), e);
         } catch (RuntimeException e) {
             mojoExecutionListener.afterExecutionFailure(

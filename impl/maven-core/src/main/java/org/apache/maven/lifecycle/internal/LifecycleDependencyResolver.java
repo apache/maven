@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.classworlds.ClassRealm;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -112,9 +113,12 @@ public class LifecycleDependencyResolver {
             throws LifecycleExecutionException {
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         try {
-            ClassLoader projectRealm = project.getClassRealm();
-            if (projectRealm != null && projectRealm != tccl) {
-                Thread.currentThread().setContextClassLoader(projectRealm);
+            ClassRealm projectRealm = project.getClassRealm();
+            if (projectRealm != null) {
+                ClassLoader projectClassLoader = projectRealm.getClassLoader();
+                if (projectClassLoader != tccl) {
+                    Thread.currentThread().setContextClassLoader(projectClassLoader);
+                }
             }
 
             if (project.getDependencyArtifacts() == null) {

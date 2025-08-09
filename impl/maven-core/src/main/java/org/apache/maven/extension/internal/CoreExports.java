@@ -23,7 +23,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.apache.maven.api.classworlds.ClassRealm;
 
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.collectingAndThen;
@@ -47,7 +47,8 @@ public class CoreExports {
     public CoreExports(ClassRealm realm, Set<String> exportedArtifacts, Set<String> exportedPackages) {
         this.artifacts = Collections.unmodifiableSet(new HashSet<>(exportedArtifacts));
         this.packages = exportedPackages.stream()
-                .collect(collectingAndThen(toMap(identity(), v -> realm), Collections::unmodifiableMap));
+                .collect(collectingAndThen(
+                        toMap(identity(), v -> realm.getClassLoader()), Collections::unmodifiableMap));
     }
 
     /**

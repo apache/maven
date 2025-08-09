@@ -23,9 +23,9 @@ import java.nio.file.Path;
 import java.util.Properties;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.maven.api.classworlds.ClassWorld;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.codehaus.plexus.classworlds.ClassWorld;
 
 /**
  * CliRequest
