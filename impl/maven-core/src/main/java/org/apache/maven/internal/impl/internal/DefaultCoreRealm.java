@@ -22,9 +22,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.maven.api.classworlds.ClassRealm;
 import org.apache.maven.internal.CoreRealm;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 @Named
 @Singleton

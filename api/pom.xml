@@ -33,6 +33,7 @@
 
   <modules>
     <module>maven-api-annotations</module>
+    <module>maven-api-classworlds</module>
     <module>maven-api-di</module>
     <module>maven-api-xml</module>
     <module>maven-api-model</module>

@@ -24,12 +24,12 @@ import java.util.List;
 
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
+import org.apache.maven.api.classworlds.ClassWorld;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.mvn.MavenInvokerTestSupport;
 import org.apache.maven.cling.invoker.mvn.MavenParser;
-import org.codehaus.plexus.classworlds.ClassWorld;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;

@@ -31,6 +31,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.ProtoSession;
+import org.apache.maven.api.classworlds.ClassRealm;
+import org.apache.maven.api.classworlds.ClassWorld;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.services.MessageBuilderFactory;
@@ -55,8 +57,6 @@ import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.classworlds.ClassWorld;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.slf4j.ILoggerFactory;
 
@@ -98,8 +98,8 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
         ClassRealm containerRealm =
                 setupContainerRealm(context.logger, classWorld, coreRealm, extClassPath, loadedExtensionsEntries);
         ContainerConfiguration cc = new DefaultContainerConfiguration()
-                .setClassWorld(classWorld)
-                .setRealm(containerRealm)
+                .setClassWorld((org.codehaus.plexus.classworlds.ClassWorld) classWorld)
+                .setRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) containerRealm)
                 .setClassPathScanning(PlexusConstants.SCANNING_INDEX)
                 .setAutoWiring(true)
                 .setJSR250Lifecycle(true)
@@ -111,7 +111,7 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
                 containerRealm,
                 collectExportedArtifacts(coreEntry, loadedExtensionsEntries),
                 collectExportedPackages(coreEntry, loadedExtensionsEntries));
-        Thread.currentThread().setContextClassLoader(containerRealm);
+        Thread.currentThread().setContextClassLoader(containerRealm.getClassLoader());
         DefaultPlexusContainer container = new DefaultPlexusContainer(cc, getCustomModule(context, exports));
 
         // NOTE: To avoid inconsistencies, we'll use the TCCL exclusively for lookups
@@ -124,14 +124,18 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
         List<Throwable> failures = new ArrayList<>();
         for (LoadedCoreExtension extension : loadedExtensions) {
             container.discoverComponents(
-                    extension.entry().getClassRealm(),
+                    (org.codehaus.plexus.classworlds.realm.ClassRealm)
+                            extension.entry().getClassRealm(),
                     new AbstractModule() {
                         @Override
                         protected void configure() {
                             try {
                                 container
                                         .lookup(Injector.class)
-                                        .discover(extension.entry().getClassRealm());
+                                        .discover(extension
+                                                .entry()
+                                                .getClassRealm()
+                                                .getClassLoader());
                             } catch (Throwable e) {
                                 failures.add(new IllegalStateException(
                                         "Injection failure in "
@@ -231,7 +235,8 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
         if (!extClassPath.isEmpty() || !extensions.isEmpty()) {
             ClassRealm extRealm = classWorld.newRealm("maven.ext", null);
 
-            extRealm.setParentRealm(coreRealm);
+            ((org.codehaus.plexus.classworlds.realm.ClassRealm) extRealm)
+                    .setParentRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) coreRealm);
 
             logger.debug("Populating class realm '" + extRealm.getId() + "'");
 
@@ -246,11 +251,11 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
                 Set<String> exportedPackages = entry.getExportedPackages();
                 ClassRealm realm = entry.getClassRealm();
                 for (String exportedPackage : exportedPackages) {
-                    extRealm.importFrom(realm, exportedPackage);
+                    extRealm.importFrom(realm.getClassLoader(), exportedPackage);
                 }
                 if (exportedPackages.isEmpty()) {
                     // sisu uses realm imports to establish component visibility
-                    extRealm.importFrom(realm, realm.getId());
+                    extRealm.importFrom(realm.getClassLoader(), realm.getId());
                 }
             }
 
@@ -271,8 +276,8 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
             return List.of();
         }
         ContainerConfiguration cc = new DefaultContainerConfiguration()
-                .setClassWorld(containerRealm.getWorld())
-                .setRealm(containerRealm)
+                .setClassWorld((org.codehaus.plexus.classworlds.ClassWorld) containerRealm.getWorld())
+                .setRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) containerRealm)
                 .setClassPathScanning(PlexusConstants.SCANNING_INDEX)
                 .setAutoWiring(true)
                 .setJSR250Lifecycle(true)

@@ -226,7 +226,7 @@ fi
 if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
   echo "[DEBUG] Final MAVEN_OPTS: $MAVEN_OPTS" >&2
 fi
-LAUNCHER_JAR=`echo "$MAVEN_HOME"/boot/plexus-classworlds-*.jar`
+LAUNCHER_JAR=`echo "$MAVEN_HOME"/boot/maven-classworlds-*.jar`
 LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
 
 # For Cygwin and MinGW, switch paths to Windows format before running java(1) command

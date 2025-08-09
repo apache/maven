@@ -35,15 +35,15 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.classworlds.ClassRealm;
+import org.apache.maven.api.classworlds.ClassWorld;
+import org.apache.maven.api.classworlds.DuplicateRealmException;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.classrealm.ClassRealmRequest.RealmType;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.internal.CoreRealm;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
-import org.codehaus.plexus.classworlds.ClassWorld;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.eclipse.aether.artifact.Artifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,8 +110,8 @@ public class DefaultClassRealmManager implements ClassRealmManager {
                 null /* artifacts */);
 
         Map<String, ClassLoader> apiV4Imports = new HashMap<>();
-        apiV4Imports.put("org.apache.maven.api", containerRealm);
-        apiV4Imports.put("org.slf4j", containerRealm);
+        apiV4Imports.put("org.apache.maven.api", containerRealm.getClassLoader());
+        apiV4Imports.put("org.slf4j", containerRealm.getClassLoader());
         this.maven4ApiRealm = createRealm(API_V4_REALMID, RealmType.Core, null, null, apiV4Imports, null);
 
         this.providedArtifacts = exports.getExportedArtifacts();
@@ -219,7 +219,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
     public ClassRealm createProjectRealm(Model model, List<Artifact> artifacts) {
         Objects.requireNonNull(model, "model cannot be null");
 
-        ClassLoader parent = getMavenApiRealm();
+        ClassLoader parent = getMavenApiRealm().getClassLoader();
 
         return createRealm(getKey(model), RealmType.Project, parent, null, null, artifacts);
     }
@@ -232,7 +232,8 @@ public class DefaultClassRealmManager implements ClassRealmManager {
     public ClassRealm createExtensionRealm(Plugin plugin, List<Artifact> artifacts) {
         Objects.requireNonNull(plugin, "plugin cannot be null");
 
-        Map<String, ClassLoader> foreignImports = Collections.singletonMap("", getMavenApiRealm());
+        Map<String, ClassLoader> foreignImports =
+                Collections.singletonMap("", getMavenApiRealm().getClassLoader());
 
         return createRealm(
                 getKey(plugin, true), RealmType.Extension, PARENT_CLASSLOADER, null, foreignImports, artifacts);
@@ -353,7 +354,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
             for (String imp : parentImports) {
                 logger.debug("  Imported: {} < {}", imp, getId(classRealm.getParentClassLoader()));
 
-                classRealm.importFromParent(imp);
+                ((org.codehaus.plexus.classworlds.realm.ClassRealm) classRealm).importFromParent(imp);
             }
         }
     }
