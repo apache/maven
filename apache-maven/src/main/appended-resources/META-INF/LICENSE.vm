@@ -67,7 +67,7 @@ subject to the terms and conditions of the following licenses:
 #*    *##end
 #*    *###
 #*    *### Classworlds is in boot directory, not in lib
-#*    *##if ( $project.artifact.artifactId == "plexus-classworlds" )
+#*    *##if ( $project.artifact.artifactId == "maven-classworlds" )
 #*      *##set ( $directory = 'boot' )
 #*    *##end
 #*    *###

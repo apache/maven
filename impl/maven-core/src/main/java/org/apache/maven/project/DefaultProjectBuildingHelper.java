@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.classworlds.ClassRealm;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
@@ -49,7 +50,6 @@ import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.util.filter.ExclusionsDependencyFilter;
@@ -239,7 +239,7 @@ public class DefaultProjectBuildingHelper implements ProjectBuildingHelper {
                 }
 
                 for (String export : exports) {
-                    projectRealm.importFrom(extensionRealm, export);
+                    projectRealm.importFrom(extensionRealm.getClassLoader(), export);
                 }
             }
 
@@ -258,13 +258,16 @@ public class DefaultProjectBuildingHelper implements ProjectBuildingHelper {
 
     @Override
     public void selectProjectRealm(MavenProject project) {
-        ClassLoader projectRealm = project.getClassRealm();
+        ClassRealm projectRealm = project.getClassRealm();
 
+        ClassLoader classLoader;
         if (projectRealm == null) {
-            projectRealm = classRealmManager.getCoreRealm();
+            classLoader = classRealmManager.getCoreRealm().getClassLoader();
+        } else {
+            classLoader = projectRealm.getClassLoader();
         }
 
-        Thread.currentThread().setContextClassLoader(projectRealm);
+        Thread.currentThread().setContextClassLoader(classLoader);
     }
 
     private List<org.eclipse.aether.artifact.Artifact> toAetherArtifacts(final List<Artifact> pluginArtifacts) {

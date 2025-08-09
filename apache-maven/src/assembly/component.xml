@@ -23,14 +23,15 @@ under the License.
       <useProjectArtifact>false</useProjectArtifact>
       <outputDirectory>boot</outputDirectory>
       <includes>
-        <include>org.codehaus.plexus:plexus-classworlds</include>
+        <include>org.apache.maven:maven-classworlds</include>
       </includes>
     </dependencySet>
+
     <dependencySet>
       <useProjectArtifact>false</useProjectArtifact>
       <outputDirectory>lib</outputDirectory>
       <excludes>
-        <exclude>org.codehaus.plexus:plexus-classworlds</exclude>
+        <exclude>org.apache.maven:maven-classworlds</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>

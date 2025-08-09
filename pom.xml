@@ -145,7 +145,6 @@ under the License.
     <assertjVersion>3.27.3</assertjVersion>
     <asmVersion>9.8</asmVersion>
     <byteBuddyVersion>1.17.6</byteBuddyVersion>
-    <classWorldsVersion>2.9.0</classWorldsVersion>
     <commonsCliVersion>1.9.0</commonsCliVersion>
     <guiceVersion>5.1.0</guiceVersion>
     <guavaVersion>33.4.8-jre</guavaVersion>
@@ -233,6 +232,11 @@ under the License.
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-api-annotations</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-api-classworlds</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -418,9 +422,9 @@ under the License.
         <version>1</version>
       </dependency>
       <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-classworlds</artifactId>
-        <version>${classWorldsVersion}</version>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-classworlds</artifactId>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>

@@ -152,8 +152,12 @@ under the License.
 
     <!-- Sisu/Eclipse DI -->
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-classworlds</artifactId>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-classworlds</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-classworlds</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.inject</groupId>
@@ -404,6 +408,40 @@ under the License.
               <exclude>org.apache.maven.toolchain.ToolchainManagerPrivate</exclude>
               <exclude>org.apache.maven.toolchain.ToolchainPrivate</exclude>
               <exclude>org.apache.maven.toolchain.ToolchainsBuilder</exclude>
+              <!-- ClassRealm API changes for Maven 4 - return type changes from Plexus ClassRealm to Maven ClassRealm -->
+              <exclude>org.apache.maven.classrealm.ClassRealmManager#createExtensionRealm(org.apache.maven.model.Plugin,java.util.List):METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.classrealm.ClassRealmManager#createPluginRealm(org.apache.maven.model.Plugin,java.lang.ClassLoader,java.util.List,java.util.Map,java.util.List):METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.classrealm.ClassRealmManager#createProjectRealm(org.apache.maven.model.Model,java.util.List):METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.classrealm.ClassRealmManager#getCoreRealm():METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.classrealm.ClassRealmManager#getMavenApiRealm():METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.classrealm.ClassRealmManagerDelegate#setupRealm(org.codehaus.plexus.classworlds.realm.ClassRealm,org.apache.maven.classrealm.ClassRealmRequest):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.classrealm.DefaultClassRealmManager#createExtensionRealm(org.apache.maven.model.Plugin,java.util.List):METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.classrealm.DefaultClassRealmManager#createPluginRealm(org.apache.maven.model.Plugin,java.lang.ClassLoader,java.util.List,java.util.Map,java.util.List):METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.classrealm.DefaultClassRealmManager#createProjectRealm(org.apache.maven.model.Model,java.util.List):METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.classrealm.DefaultClassRealmManager#getCoreRealm():METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.classrealm.DefaultClassRealmManager#getMavenApiRealm():METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.plugin.BuildPluginManager#getPluginRealm(org.apache.maven.execution.MavenSession,org.apache.maven.plugin.descriptor.PluginDescriptor):METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.plugin.DefaultBuildPluginManager#getPluginRealm(org.apache.maven.execution.MavenSession,org.apache.maven.plugin.descriptor.PluginDescriptor):METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.plugin.ExtensionRealmCache#put(org.apache.maven.plugin.ExtensionRealmCache$Key,org.codehaus.plexus.classworlds.realm.ClassRealm,org.apache.maven.project.ExtensionDescriptor,java.util.List):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.ExtensionRealmCache$CacheRecord#getRealm():METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.plugin.PluginContainerException#getPluginRealm():METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.plugin.PluginContainerException#PluginContainerException(org.apache.maven.model.Plugin,org.codehaus.plexus.classworlds.realm.ClassRealm,java.lang.String,org.codehaus.plexus.configuration.PlexusConfigurationException):CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.PluginContainerException#PluginContainerException(org.apache.maven.plugin.descriptor.MojoDescriptor,org.codehaus.plexus.classworlds.realm.ClassRealm,java.lang.String,java.lang.Throwable):CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.PluginContainerException#PluginContainerException(org.apache.maven.model.Plugin,org.codehaus.plexus.classworlds.realm.ClassRealm,java.lang.String,org.codehaus.plexus.component.repository.exception.ComponentRepositoryException):CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.PluginContainerException#PluginContainerException(org.apache.maven.model.Plugin,org.codehaus.plexus.classworlds.realm.ClassRealm,java.lang.String,java.lang.Throwable):CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.PluginContainerException#PluginContainerException(org.apache.maven.plugin.descriptor.MojoDescriptor,org.codehaus.plexus.classworlds.realm.ClassRealm,java.lang.String,org.codehaus.plexus.component.repository.exception.ComponentLookupException):CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.PluginManagerException#PluginManagerException(org.apache.maven.plugin.descriptor.MojoDescriptor,org.apache.maven.project.MavenProject,java.lang.String,org.codehaus.plexus.classworlds.realm.NoSuchRealmException):CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.PluginRealmCache#put(org.apache.maven.plugin.PluginRealmCache$Key,org.codehaus.plexus.classworlds.realm.ClassRealm,java.util.List):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.PluginRealmCache$CacheRecord#getRealm():METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.plugin.PluginRealmCache$CacheRecord#PluginRealmCache$CacheRecord(org.codehaus.plexus.classworlds.realm.ClassRealm,java.util.List):CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.project.MavenProject#getClassRealm():METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.project.MavenProject#setClassRealm(org.codehaus.plexus.classworlds.realm.ClassRealm):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.project.ProjectRealmCache#put(org.apache.maven.project.ProjectRealmCache$Key,org.codehaus.plexus.classworlds.realm.ClassRealm,org.eclipse.aether.graph.DependencyFilter):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.project.ProjectRealmCache$CacheRecord#getRealm():METHOD_RETURN_TYPE_CHANGED</exclude>
+              <!-- Additional cache-related method removals -->
+              <exclude>org.apache.maven.plugin.DefaultExtensionRealmCache#put(org.apache.maven.plugin.ExtensionRealmCache$Key,org.codehaus.plexus.classworlds.realm.ClassRealm,org.apache.maven.project.ExtensionDescriptor,java.util.List):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.DefaultPluginRealmCache#put(org.apache.maven.plugin.PluginRealmCache$Key,org.codehaus.plexus.classworlds.realm.ClassRealm,java.util.List):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.project.DefaultProjectRealmCache#put(org.apache.maven.project.ProjectRealmCache$Key,org.codehaus.plexus.classworlds.realm.ClassRealm,org.eclipse.aether.graph.DependencyFilter):METHOD_REMOVED</exclude>
             </excludes>
           </parameter>
         </configuration>
