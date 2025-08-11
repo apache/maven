@@ -181,16 +181,16 @@ public class MavenCli {
      * Turns “/d/projects/foo” into “D:\\projects\\foo”.
      * Returns the original string if it isn't an MSYS-style path.
      */
-    static String msysToWindowsPath(final String p) {
-        if (p == null) {
+    static String msysToWindowsPath(final String path) {
+        if (path == null) {
             return null;
         }
-        final Matcher m = MSYS_PATH.matcher(p);
-        if (m.matches()) {
-            return Character.toUpperCase(m.group(1).charAt(0)) + ":\\"
-                    + m.group(2).replace('/', '\\');
+        final Matcher matcher = MSYS_PATH.matcher(path);
+        if (matcher.matches()) {
+            return Character.toUpperCase(matcher.group(1).charAt(0)) + ":\\"
+                    + matcher.group(2).replace('/', '\\');
         }
-        return p;
+        return path;
     }
 
     public MavenCli() {
@@ -385,15 +385,15 @@ public class MavenCli {
         if (org.codehaus.plexus.util.Os.isFamily("windows")) {
             System.setProperty("user.home", msysToWindowsPath(System.getProperty("user.home")));
 
-            for (final String k : new String[] {
+            for (final String key : new String[] {
                 Constants.MAVEN_REPO_LOCAL, // -Dmaven.repo.local
                 "user.settings", // -s / --settings
                 "alternateSettings",
                 "user.toolchains"
             }) {
-                final String v = System.getProperty(k);
-                if (v != null) {
-                    System.setProperty(k, msysToWindowsPath(v));
+                final String value = System.getProperty(key);
+                if (value != null) {
+                    System.setProperty(key, msysToWindowsPath(value));
                 }
             }
         }
