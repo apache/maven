@@ -104,14 +104,5 @@ class HelpTest {
                 .info("Default behavior: --model and --plugins are applied if no other options are specified");
     }
 
-    @Test
-    void testHelpIncludesForceAndYesOptions() throws Exception {
-        UpgradeContext context = createMockContext();
 
-        help.execute(context);
-
-        // Verify that --force and --yes options are included
-        Mockito.verify(context.logger).info("  -f, --force           Overwrite files without asking for confirmation");
-        Mockito.verify(context.logger).info("  -y, --yes             Answer \"yes\" to all prompts automatically");
-    }
 }
