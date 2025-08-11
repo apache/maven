@@ -178,8 +178,10 @@ public class MavenCli {
     private static final Pattern MSYS_PATH = Pattern.compile("^/([a-zA-Z])/(.*)$");
 
     /**
-     * Turns “/d/projects/foo” into “D:\\projects\\foo”.
-     * Returns the original string if it isn't an MSYS-style path.
+     * Converts a POSIX-style Windows path (as used by MSYS2/Git Bash/Cygwin),
+     * e.g. "/c/Users/alice/file.txt" or "/cygdrive/c/Users/alice/file.txt",
+     * to a native Windows path "C:\Users\alice\file.txt".
+     * Returns the original string if it is already a native Windows path.
      */
     static String msysToWindowsPath(final String path) {
         if (path == null) {
