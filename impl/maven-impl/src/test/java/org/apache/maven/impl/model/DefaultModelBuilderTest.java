@@ -105,7 +105,8 @@ class DefaultModelBuilderTest {
                         Repository.newBuilder()
                                 .id("third")
                                 .url("${thirdParentRepo}")
-                                .build())).build();
+                                .build()))
+                .build();
 
         state.mergeRepositories(model, false);
 
