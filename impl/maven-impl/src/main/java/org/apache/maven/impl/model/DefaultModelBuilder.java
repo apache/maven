@@ -511,6 +511,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             Model interpolatedModel = interpolateModel(
                     Model.newBuilder()
                             .pomFile(model.getPomFile())
+                            .properties(model.getProperties())
                             .repositories(model.getRepositories())
                             .build(),
                     request,
