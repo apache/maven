@@ -53,6 +53,7 @@ updates:
     labels:
       - "mvn40"
       - "dependencies"
+      - "github_actions"
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -62,3 +63,4 @@ updates:
     labels:
       - "mvn3"
       - "dependencies"
+      - "github_actions"
