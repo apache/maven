@@ -19,20 +19,63 @@
 package ${package};
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
- * Class InputSource.
+ * Represents the source of a model input, such as a POM file.
+ * <p>
+ * This class tracks the origin of model elements, including their location in source files
+ * and relationships between imported models. It's used for error reporting and debugging
+ * to help identify where specific model elements came from.
+ *
+ * @since 4.0.0
  */
 public class InputSource implements Serializable {
 
+#if ( $isMavenModel )
+    private final String modelId;
+#end
     private final String location;
+    private final List<InputSource> inputs;
+    private final InputLocation importedFrom;
+
+#if ( $isMavenModel )
+    public InputSource(String modelId, String location) {
+        this(modelId, location, null);
+    }
+
+    public InputSource(String modelId, String location, InputLocation importedFrom) {
+        this.modelId = modelId;
+        this.location = location;
+        this.inputs = null;
+        this.importedFrom = importedFrom;
+    }
+#end
 
     public InputSource(String location) {
+#if ( $isMavenModel )
+        this.modelId = null;
+#end
         this.location = location;
+        this.inputs = null;
+        this.importedFrom = null;
+    }
+
+    public InputSource(Collection<InputSource> inputs) {
+#if ( $isMavenModel )
+        this.modelId = null;
+#end
+        this.location = null;
+        this.inputs = ImmutableCollections.copy(inputs);
+        this.importedFrom = null;
     }
 
     /**
-     * Get the path/URL of the settings definition or {@code null} if unknown.
+     * Get the path/URL of the POM or {@code null} if unknown.
      *
      * @return the location
      */
@@ -40,8 +83,73 @@ public class InputSource implements Serializable {
         return this.location;
     }
 
+#if ( $isMavenModel )
+    /**
+     * Get the identifier of the POM in the format {@code <groupId>:<artifactId>:<version>}.
+     *
+     * @return the model id
+     */
+    public String getModelId() {
+        return this.modelId;
+    }
+#end
+
+    /**
+     * Gets the parent InputLocation where this InputLocation may have been imported from.
+     * Can return {@code null}.
+     *
+     * @return InputLocation
+     * @since 4.0.0
+     */
+    public InputLocation getImportedFrom() {
+        return importedFrom;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        InputSource that = (InputSource) o;
+#if ( $isMavenModel )
+        return Objects.equals(modelId, that.modelId)
+                && Objects.equals(location, that.location)
+                && Objects.equals(inputs, that.inputs);
+#else
+        return Objects.equals(location, that.location)
+                && Objects.equals(inputs, that.inputs);
+#end
+    }
+
+    @Override
+    public int hashCode() {
+#if ( $isMavenModel )
+        return Objects.hash(modelId, location, inputs);
+#else
+        return Objects.hash(location, inputs);
+#end
+    }
+
+    Stream<InputSource> sources() {
+        return inputs != null ? inputs.stream() : Stream.of(this);
+    }
+
     @Override
     public String toString() {
+        if (inputs != null) {
+            return inputs.stream().map(InputSource::toString).collect(Collectors.joining(", ", "merged[", "]"));
+        }
+#if ( $isMavenModel )
+        return getModelId() != null ? getModelId() + " " + getLocation() : getLocation();
+#else
         return getLocation();
+#end
+    }
+
+    public static InputSource merge(InputSource src1, InputSource src2) {
+        return new InputSource(Stream.concat(src1.sources(), src2.sources()).collect(Collectors.toSet()));
     }
 }
