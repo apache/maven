@@ -158,10 +158,6 @@ jobs:
           echo "MAVEN_HOME=$PWD/maven-local" >> $GITHUB_ENV
           echo "$PWD/maven-local/bin" >> $GITHUB_PATH
 
-      - name: Show IP
-        shell: bash
-        run: curl --silent https://api.ipify.org
-
       - name: Build with downloaded Maven
         shell: bash
         run: mvn verify -Papache-release -Dgpg.skip=true -e -B -V
@@ -240,10 +236,6 @@ jobs:
           fi
           echo "MAVEN_HOME=$PWD/maven-local" >> $GITHUB_ENV
           echo "$PWD/maven-local/bin" >> $GITHUB_PATH
-
-      - name: Show IP
-        shell: bash
-        run: curl --silent https://api.ipify.org
 
       - name: Build Maven and ITs and run them
         shell: bash
