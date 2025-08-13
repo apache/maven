@@ -20,7 +20,7 @@ package org.apache.maven.project;
 
 import java.util.List;
 
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.apache.maven.api.classworlds.ClassRealm;
 import org.eclipse.aether.graph.DependencyFilter;
 
 /**

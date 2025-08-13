@@ -29,10 +29,10 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.apache.maven.api.classworlds.ClassRealm;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.project.ExtensionDescriptor;
 import org.apache.maven.project.ExtensionDescriptorBuilder;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 /**
  * Provides information about artifacts (identified by groupId:artifactId string key) and classpath elements exported by
@@ -107,7 +107,7 @@ public class CoreExtensionEntry {
         Set<String> packages = new LinkedHashSet<>();
 
         try {
-            Enumeration<URL> urls = loader.getResources(BUILDER.getExtensionDescriptorLocation());
+            Enumeration<URL> urls = loader.getClassLoader().getResources(BUILDER.getExtensionDescriptorLocation());
             while (urls.hasMoreElements()) {
 
                 try (InputStream is = urls.nextElement().openStream()) {

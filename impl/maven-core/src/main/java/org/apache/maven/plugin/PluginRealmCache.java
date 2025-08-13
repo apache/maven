@@ -21,10 +21,10 @@ package org.apache.maven.plugin;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.api.classworlds.ClassRealm;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.repository.RemoteRepository;

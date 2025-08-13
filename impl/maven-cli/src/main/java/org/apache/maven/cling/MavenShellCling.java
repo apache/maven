@@ -23,13 +23,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.classworlds.ClassWorld;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.mvnsh.ShellInvoker;
 import org.apache.maven.cling.invoker.mvnsh.ShellParser;
-import org.codehaus.plexus.classworlds.ClassWorld;
 
 /**
  * Maven shell.
