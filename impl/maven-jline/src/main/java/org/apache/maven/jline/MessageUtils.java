@@ -94,6 +94,10 @@ public class MessageUtils {
 
     private static void doSystemUninstall() {
         try {
+            if (terminal instanceof FastTerminal) {
+                // wait for the asynchronous systemInstall call before we uninstall to ensure a consistent state
+                ((FastTerminal) terminal).getTerminal();
+            }
             AnsiConsole.systemUninstall();
         } finally {
             terminal = null;
