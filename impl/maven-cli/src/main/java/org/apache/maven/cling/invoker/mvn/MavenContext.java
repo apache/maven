@@ -22,6 +22,7 @@ import org.apache.maven.Maven;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.cling.invoker.LookupContext;
+import org.apache.maven.cling.transfer.SimplexTransferListener;
 
 @SuppressWarnings("VisibilityModifier")
 public class MavenContext extends LookupContext {
@@ -29,6 +30,7 @@ public class MavenContext extends LookupContext {
         super(invokerRequest, containerCapsuleManaged, mavenOptions);
     }
 
+    public SimplexTransferListener simplexTransferListener;
     public Maven maven;
 
     @Override
