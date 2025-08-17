@@ -158,7 +158,7 @@ under the License.
     <junitVersion>5.13.4</junitVersion>
     <jxpathVersion>1.4.0</jxpathVersion>
     <logbackClassicVersion>1.5.18</logbackClassicVersion>
-    <mockitoVersion>5.18.0</mockitoVersion>
+    <mockitoVersion>5.19.0</mockitoVersion>
     <plexusInteractivityVersion>1.4</plexusInteractivityVersion>
     <plexusInterpolationVersion>1.28</plexusInterpolationVersion>
     <plexusTestingVersion>1.5.0</plexusTestingVersion>
