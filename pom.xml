@@ -161,7 +161,7 @@ under the License.
     <mockitoVersion>5.19.0</mockitoVersion>
     <plexusInteractivityVersion>1.4</plexusInteractivityVersion>
     <plexusInterpolationVersion>1.28</plexusInterpolationVersion>
-    <plexusTestingVersion>1.5.0</plexusTestingVersion>
+    <plexusTestingVersion>1.6.0</plexusTestingVersion>
     <plexusXmlVersion>4.1.0</plexusXmlVersion>
     <resolverVersion>2.0.10</resolverVersion>
     <securityDispatcherVersion>4.1.0</securityDispatcherVersion>
