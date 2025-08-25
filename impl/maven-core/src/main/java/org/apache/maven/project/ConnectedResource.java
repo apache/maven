@@ -41,6 +41,7 @@ class ConnectedResource extends Resource {
                 .includes(sourceRoot.includes())
                 .excludes(sourceRoot.excludes())
                 .filtering(Boolean.toString(sourceRoot.stringFiltering()))
+                .targetPath(sourceRoot.targetPath().map(path -> path.toString()).orElse(null))
                 .build());
         this.originalSourceRoot = sourceRoot;
         this.scope = scope;

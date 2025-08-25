@@ -1225,6 +1225,26 @@ class PomConstructionTest {
         testCompleteModel(pom);
     }
 
+    /*MNG-11062*/
+    @Test
+    void testTargetPathResourceRegression() throws Exception {
+        PomTestWrapper pom = buildPom("target-path-regression");
+
+        // Verify main resources targetPath is preserved
+        assertEquals(1, ((List<?>) pom.getValue("build/resources")).size());
+        assertEquals("custom-classes", pom.getValue("build/resources[1]/targetPath"));
+        assertPathSuffixEquals("src/main/resources", pom.getValue("build/resources[1]/directory"));
+
+        // Verify testResources targetPath with property interpolation is preserved
+        assertEquals(2, ((List<?>) pom.getValue("build/testResources")).size());
+        assertEquals(
+                "${project.build.directory}/test-classes", pom.getValue("build/testResources[1]/targetPath"));
+        assertPathSuffixEquals("src/test/resources", pom.getValue("build/testResources[1]/directory"));
+        assertEquals(
+                "${project.build.directory}/test-run", pom.getValue("build/testResources[2]/targetPath"));
+        assertPathSuffixEquals("src/test/data", pom.getValue("build/testResources[2]/directory"));
+    }
+
     @SuppressWarnings("checkstyle:MethodLength")
     private void testCompleteModel(PomTestWrapper pom) throws Exception {
         assertEquals("4.0.0", pom.getValue("modelVersion"));
