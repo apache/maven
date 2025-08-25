@@ -54,7 +54,7 @@ jobs:
           cp .github/ci-mimir-daemon.properties ~/.mimir/daemon.properties
 
       - name: Handle Mimir caches
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
         with:
           path: ~/.mimir/local
           key: mimir-${{ runner.os }}-initial-${{ hashFiles('**/pom.xml') }}
@@ -123,7 +123,7 @@ jobs:
           cp .github/ci-mimir-daemon.properties ~/.mimir/daemon.properties
 
       - name: Handle Mimir caches
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
         with:
           path: ~/.mimir/local
           key: mimir-${{ runner.os }}-full-${{ hashFiles('**/pom.xml') }}
@@ -202,7 +202,7 @@ jobs:
           cp .github/ci-mimir-daemon.properties ~/.mimir/daemon.properties
 
       - name: Handle Mimir caches
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
         with:
           path: ~/.mimir/local
           key: mimir-${{ runner.os }}-its-${{ hashFiles('**/pom.xml') }}
