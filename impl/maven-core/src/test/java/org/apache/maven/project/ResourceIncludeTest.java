@@ -29,6 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -188,4 +189,89 @@ class ResourceIncludeTest {
         org.apache.maven.api.SourceRoot sourceRoot = sourceRootsList.get(0);
         assertTrue(sourceRoot.includes().contains("*.xml"), "Underlying SourceRoot should contain the include");
     }
+
+    /*MNG-11062*/
+    @Test
+    void testTargetPathPreservedWithConnectedResource() {
+        // Create resource with targetPath using Resource constructor pattern
+        Resource resourceWithTarget = new Resource();
+        resourceWithTarget.setDirectory("src/main/custom");
+        resourceWithTarget.setTargetPath("custom-output");
+
+        // Convert through DefaultSourceRoot to ensure targetPath extraction works
+        DefaultSourceRoot sourceRootFromResource = new DefaultSourceRoot(
+                project.getBaseDirectory().toPath(), ProjectScope.MAIN, resourceWithTarget);
+
+        project.addSourceRoot(sourceRootFromResource);
+
+        // Get resources - this creates ConnectedResource instances
+        List<Resource> resources = project.getResources();
+        assertEquals(2, resources.size(), "Should have two resources now");
+
+        // Find the resource with the custom directory
+        Resource customResource = resources.stream()
+                .filter(r -> r.getDirectory().endsWith("custom"))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Custom resource not found"));
+
+        // Verify targetPath was preserved through conversion chain
+        assertEquals("custom-output", customResource.getTargetPath(), 
+                "targetPath should be preserved in ConnectedResource");
+
+        // Test that includes modification preserves targetPath (tests ConnectedResource functionality)
+        customResource.addInclude("*.properties");
+        assertEquals("custom-output", customResource.getTargetPath(),
+                "targetPath should survive includes modification");
+        assertEquals(1, customResource.getIncludes().size(), "Should have one include");
+
+        // Verify persistence after getting resources again
+        Resource persistedResource = project.getResources().stream()
+                .filter(r -> r.getDirectory().endsWith("custom"))
+                .findFirst()
+                .orElseThrow();
+        assertEquals("custom-output", persistedResource.getTargetPath(),
+                "targetPath should persist after resource retrieval");
+        assertTrue(persistedResource.getIncludes().contains("*.properties"),
+                "Include should persist with targetPath");
+    }
+
+    /*MNG-11062*/
+    @Test
+    void testTargetPathEdgeCases() {
+        // Test null targetPath (should be handled gracefully)
+        Resource nullTargetResource = new Resource();
+        nullTargetResource.setDirectory("src/test/null-target");
+        // targetPath is null by default
+
+        DefaultSourceRoot nullTargetSourceRoot = new DefaultSourceRoot(
+                project.getBaseDirectory().toPath(), ProjectScope.TEST, nullTargetResource);
+        project.addSourceRoot(nullTargetSourceRoot);
+
+        List<Resource> resources = project.getResources();
+        Resource nullTargetResult = resources.stream()
+                .filter(r -> r.getDirectory().endsWith("null-target"))
+                .findFirst()
+                .orElseThrow();
+        
+        // null targetPath should remain null (not cause errors)
+        assertNull(nullTargetResult.getTargetPath(), "Null targetPath should remain null");
+
+        // Test property placeholder in targetPath
+        Resource placeholderResource = new Resource();
+        placeholderResource.setDirectory("src/test/placeholder");
+        placeholderResource.setTargetPath("${project.build.directory}/custom");
+
+        DefaultSourceRoot placeholderSourceRoot = new DefaultSourceRoot(
+                project.getBaseDirectory().toPath(), ProjectScope.TEST, placeholderResource);
+        project.addSourceRoot(placeholderSourceRoot);
+
+        Resource placeholderResult = project.getResources().stream()
+                .filter(r -> r.getDirectory().endsWith("placeholder"))
+                .findFirst()
+                .orElseThrow();
+
+        assertEquals("${project.build.directory}/custom", placeholderResult.getTargetPath(),
+                "Property placeholder in targetPath should be preserved");
+    }
+
 }

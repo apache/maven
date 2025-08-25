@@ -19,11 +19,13 @@
 package org.apache.maven.impl;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 import org.apache.maven.api.Language;
 import org.apache.maven.api.ProjectScope;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.model.Source;
+import org.apache.maven.model.Resource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +35,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.LenientStubber;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 
@@ -115,5 +119,100 @@ public class DefaultSourceRootTest {
         assertEquals(Language.JAVA_FAMILY, source.language());
         assertEquals(Path.of("myproject", "src", "org.foo.bar", "test", "java"), source.directory());
         assertTrue(source.targetVersion().isEmpty());
+    }
+
+    /*MNG-11062*/
+    @Test
+    void testExtractsTargetPathFromResource() {
+        // Test the Resource constructor that was broken in the regression
+        Resource resource = new Resource();
+        resource.setDirectory("src/test/resources");
+        resource.setTargetPath("test-output");
+
+        DefaultSourceRoot sourceRoot = new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource);
+
+        Optional<Path> targetPath = sourceRoot.targetPath();
+        assertTrue(targetPath.isPresent(), "targetPath should be present");
+        assertEquals(Path.of("myproject", "test-output"), targetPath.get());
+        assertEquals(Path.of("myproject", "src", "test", "resources"), sourceRoot.directory());
+        assertEquals(ProjectScope.TEST, sourceRoot.scope());
+        assertEquals(Language.RESOURCES, sourceRoot.language());
+    }
+
+    /*MNG-11062*/
+    @Test
+    void testHandlesNullTargetPathFromResource() {
+        // Test null targetPath handling
+        Resource resource = new Resource();
+        resource.setDirectory("src/test/resources");
+        // targetPath is null by default
+
+        DefaultSourceRoot sourceRoot = new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource);
+
+        Optional<Path> targetPath = sourceRoot.targetPath();
+        assertFalse(targetPath.isPresent(), "targetPath should be empty when null");
+    }
+
+    /*MNG-11062*/
+    @Test
+    void testHandlesEmptyTargetPathFromResource() {
+        // Test empty string targetPath  
+        Resource resource = new Resource();
+        resource.setDirectory("src/test/resources");
+        resource.setTargetPath("");
+
+        DefaultSourceRoot sourceRoot = new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource);
+
+        Optional<Path> targetPath = sourceRoot.targetPath();
+        assertFalse(targetPath.isPresent(), "targetPath should be empty for empty string");
+    }
+
+    /*MNG-11062*/
+    @Test
+    void testHandlesPropertyPlaceholderInTargetPath() {
+        // Test property placeholder preservation  
+        Resource resource = new Resource();
+        resource.setDirectory("src/main/resources");
+        resource.setTargetPath("${project.build.directory}/custom");
+
+        DefaultSourceRoot sourceRoot = new DefaultSourceRoot(Path.of("myproject"), ProjectScope.MAIN, resource);
+
+        Optional<Path> targetPath = sourceRoot.targetPath();
+        assertTrue(targetPath.isPresent(), "Property placeholder targetPath should be present");
+        assertEquals(Path.of("myproject", "${project.build.directory}/custom"), targetPath.get());
+    }
+
+    /*MNG-11062*/
+    @Test
+    void testResourceConstructorRequiresNonNullDirectory() {
+        // Test that null directory throws exception
+        Resource resource = new Resource();
+        // directory is null by default
+
+        assertThrows(IllegalArgumentException.class, () -> 
+            new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource),
+            "Should throw exception for null directory");
+    }
+
+    /*MNG-11062*/
+    @Test
+    void testResourceConstructorPreservesOtherProperties() {
+        // Test that other Resource properties are correctly preserved
+        Resource resource = new Resource();
+        resource.setDirectory("src/test/resources");
+        resource.setTargetPath("test-classes");
+        resource.setFiltering("true");
+        resource.addInclude("*.properties");
+        resource.addExclude("*.tmp");
+
+        DefaultSourceRoot sourceRoot = new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource);
+
+        // Verify all properties are preserved
+        assertEquals(Path.of("myproject", "test-classes"), sourceRoot.targetPath().orElseThrow());
+        assertTrue(sourceRoot.stringFiltering(), "Filtering should be true");
+        assertEquals(1, sourceRoot.includes().size());
+        assertTrue(sourceRoot.includes().contains("*.properties"));
+        assertEquals(1, sourceRoot.excludes().size());
+        assertTrue(sourceRoot.excludes().contains("*.tmp"));
     }
 }
