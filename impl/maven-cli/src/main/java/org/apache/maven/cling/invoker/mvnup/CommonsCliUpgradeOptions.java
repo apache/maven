@@ -46,24 +46,6 @@ public class CommonsCliUpgradeOptions extends CommonsCliOptions implements Upgra
 
     @Override
     @Nonnull
-    public Optional<Boolean> force() {
-        if (commandLine.hasOption(CLIManager.FORCE)) {
-            return Optional.of(Boolean.TRUE);
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    @Nonnull
-    public Optional<Boolean> yes() {
-        if (commandLine.hasOption(CLIManager.YES)) {
-            return Optional.of(Boolean.TRUE);
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    @Nonnull
     public Optional<List<String>> goals() {
         if (!commandLine.getArgList().isEmpty()) {
             return Optional.of(commandLine.getArgList());
@@ -143,8 +125,6 @@ public class CommonsCliUpgradeOptions extends CommonsCliOptions implements Upgra
         printStream.accept("      --plugins         Upgrade plugins known to fail with Maven 4");
         printStream.accept(
                 "  -a, --all             Apply all upgrades (equivalent to --model-version 4.1.0 --infer --model --plugins)");
-        printStream.accept("  -f, --force           Overwrite files without asking for confirmation");
-        printStream.accept("  -y, --yes             Answer \"yes\" to all prompts automatically");
         printStream.accept("");
         printStream.accept("Default behavior: --model and --plugins are applied if no other options are specified");
         printStream.accept("");
@@ -157,8 +137,6 @@ public class CommonsCliUpgradeOptions extends CommonsCliOptions implements Upgra
     }
 
     protected static class CLIManager extends CommonsCliOptions.CLIManager {
-        public static final String FORCE = "f";
-        public static final String YES = "y";
         public static final String MODEL_VERSION = "m";
         public static final String DIRECTORY = "d";
         public static final String INFER = "i";
@@ -169,14 +147,6 @@ public class CommonsCliUpgradeOptions extends CommonsCliOptions implements Upgra
         @Override
         protected void prepareOptions(org.apache.commons.cli.Options options) {
             super.prepareOptions(options);
-            options.addOption(Option.builder(FORCE)
-                    .longOpt("force")
-                    .desc("Should overwrite without asking any configuration?")
-                    .build());
-            options.addOption(Option.builder(YES)
-                    .longOpt("yes")
-                    .desc("Should imply user answered \"yes\" to all incoming questions?")
-                    .build());
             options.addOption(Option.builder(MODEL_VERSION)
                     .longOpt("model-version")
                     .hasArg()
