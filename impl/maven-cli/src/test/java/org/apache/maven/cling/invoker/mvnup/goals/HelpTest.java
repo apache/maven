@@ -103,6 +103,4 @@ class HelpTest {
         Mockito.verify(context.logger)
                 .info("Default behavior: --model and --plugins are applied if no other options are specified");
     }
-
-
 }
