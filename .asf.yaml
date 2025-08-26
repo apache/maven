@@ -21,6 +21,8 @@ github:
     maven-4.0.x: {}
     maven-3.9.x: {}
     maven-3.8.x: {}
+    maven-3.0.x: {}
+    pre-reset-master: {}
   features:
     issues: true
 notifications:
