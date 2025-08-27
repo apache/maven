@@ -156,7 +156,7 @@ public class DefaultSourceRootTest {
     /*MNG-11062*/
     @Test
     void testHandlesEmptyTargetPathFromResource() {
-        // Test empty string targetPath  
+        // Test empty string targetPath
         Resource resource = new Resource();
         resource.setDirectory("src/test/resources");
         resource.setTargetPath("");
@@ -170,7 +170,7 @@ public class DefaultSourceRootTest {
     /*MNG-11062*/
     @Test
     void testHandlesPropertyPlaceholderInTargetPath() {
-        // Test property placeholder preservation  
+        // Test property placeholder preservation
         Resource resource = new Resource();
         resource.setDirectory("src/main/resources");
         resource.setTargetPath("${project.build.directory}/custom");
@@ -189,9 +189,10 @@ public class DefaultSourceRootTest {
         Resource resource = new Resource();
         // directory is null by default
 
-        assertThrows(IllegalArgumentException.class, () -> 
-            new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource),
-            "Should throw exception for null directory");
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource),
+                "Should throw exception for null directory");
     }
 
     /*MNG-11062*/
@@ -208,7 +209,8 @@ public class DefaultSourceRootTest {
         DefaultSourceRoot sourceRoot = new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource);
 
         // Verify all properties are preserved
-        assertEquals(Path.of("myproject", "test-classes"), sourceRoot.targetPath().orElseThrow());
+        assertEquals(
+                Path.of("myproject", "test-classes"), sourceRoot.targetPath().orElseThrow());
         assertTrue(sourceRoot.stringFiltering(), "Filtering should be true");
         assertEquals(1, sourceRoot.includes().size());
         assertTrue(sourceRoot.includes().contains("*.properties"));
