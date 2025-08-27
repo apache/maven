@@ -19,13 +19,14 @@
 package org.apache.maven.impl;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.maven.api.Language;
 import org.apache.maven.api.ProjectScope;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.model.Resource;
 import org.apache.maven.api.model.Source;
-import org.apache.maven.model.Resource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -125,9 +126,10 @@ public class DefaultSourceRootTest {
     @Test
     void testExtractsTargetPathFromResource() {
         // Test the Resource constructor that was broken in the regression
-        Resource resource = new Resource();
-        resource.setDirectory("src/test/resources");
-        resource.setTargetPath("test-output");
+        Resource resource = Resource.newBuilder()
+                .directory("src/test/resources")
+                .targetPath("test-output")
+                .build();
 
         DefaultSourceRoot sourceRoot = new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource);
 
@@ -143,8 +145,8 @@ public class DefaultSourceRootTest {
     @Test
     void testHandlesNullTargetPathFromResource() {
         // Test null targetPath handling
-        Resource resource = new Resource();
-        resource.setDirectory("src/test/resources");
+        Resource resource =
+                Resource.newBuilder().directory("src/test/resources").build();
         // targetPath is null by default
 
         DefaultSourceRoot sourceRoot = new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource);
@@ -157,9 +159,10 @@ public class DefaultSourceRootTest {
     @Test
     void testHandlesEmptyTargetPathFromResource() {
         // Test empty string targetPath
-        Resource resource = new Resource();
-        resource.setDirectory("src/test/resources");
-        resource.setTargetPath("");
+        Resource resource = Resource.newBuilder()
+                .directory("src/test/resources")
+                .targetPath("")
+                .build();
 
         DefaultSourceRoot sourceRoot = new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource);
 
@@ -171,9 +174,10 @@ public class DefaultSourceRootTest {
     @Test
     void testHandlesPropertyPlaceholderInTargetPath() {
         // Test property placeholder preservation
-        Resource resource = new Resource();
-        resource.setDirectory("src/main/resources");
-        resource.setTargetPath("${project.build.directory}/custom");
+        Resource resource = Resource.newBuilder()
+                .directory("src/test/resources")
+                .targetPath("${project.build.directory}/custom")
+                .build();
 
         DefaultSourceRoot sourceRoot = new DefaultSourceRoot(Path.of("myproject"), ProjectScope.MAIN, resource);
 
@@ -186,7 +190,7 @@ public class DefaultSourceRootTest {
     @Test
     void testResourceConstructorRequiresNonNullDirectory() {
         // Test that null directory throws exception
-        Resource resource = new Resource();
+        Resource resource = Resource.newBuilder().build();
         // directory is null by default
 
         assertThrows(
@@ -199,12 +203,13 @@ public class DefaultSourceRootTest {
     @Test
     void testResourceConstructorPreservesOtherProperties() {
         // Test that other Resource properties are correctly preserved
-        Resource resource = new Resource();
-        resource.setDirectory("src/test/resources");
-        resource.setTargetPath("test-classes");
-        resource.setFiltering("true");
-        resource.addInclude("*.properties");
-        resource.addExclude("*.tmp");
+        Resource resource = Resource.newBuilder()
+                .directory("src/test/resources")
+                .targetPath("test-classes")
+                .filtering("true")
+                .includes(List.of("*.properties"))
+                .excludes(List.of("*.tmp"))
+                .build();
 
         DefaultSourceRoot sourceRoot = new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource);
 

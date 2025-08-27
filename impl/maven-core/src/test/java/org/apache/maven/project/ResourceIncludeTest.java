@@ -200,7 +200,7 @@ class ResourceIncludeTest {
 
         // Convert through DefaultSourceRoot to ensure targetPath extraction works
         DefaultSourceRoot sourceRootFromResource =
-                new DefaultSourceRoot(project.getBaseDirectory().toPath(), ProjectScope.MAIN, resourceWithTarget);
+                new DefaultSourceRoot(project.getBaseDirectory(), ProjectScope.MAIN, resourceWithTarget.getDelegate());
 
         project.addSourceRoot(sourceRootFromResource);
 
@@ -245,7 +245,7 @@ class ResourceIncludeTest {
         // targetPath is null by default
 
         DefaultSourceRoot nullTargetSourceRoot =
-                new DefaultSourceRoot(project.getBaseDirectory().toPath(), ProjectScope.TEST, nullTargetResource);
+                new DefaultSourceRoot(project.getBaseDirectory(), ProjectScope.TEST, nullTargetResource.getDelegate());
         project.addSourceRoot(nullTargetSourceRoot);
 
         List<Resource> resources = project.getResources();
@@ -263,7 +263,7 @@ class ResourceIncludeTest {
         placeholderResource.setTargetPath("${project.build.directory}/custom");
 
         DefaultSourceRoot placeholderSourceRoot =
-                new DefaultSourceRoot(project.getBaseDirectory().toPath(), ProjectScope.TEST, placeholderResource);
+                new DefaultSourceRoot(project.getBaseDirectory(), ProjectScope.TEST, placeholderResource.getDelegate());
         project.addSourceRoot(placeholderSourceRoot);
 
         Resource placeholderResult = project.getResources().stream()
