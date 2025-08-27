@@ -18,6 +18,7 @@
  */
 package org.apache.maven.project;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -272,7 +273,7 @@ class ResourceIncludeTest {
                 .orElseThrow();
 
         assertEquals(
-                "${project.build.directory}/custom",
+                "${project.build.directory}" + File.separator + "custom",
                 placeholderResult.getTargetPath(),
                 "Property placeholder in targetPath should be preserved");
     }

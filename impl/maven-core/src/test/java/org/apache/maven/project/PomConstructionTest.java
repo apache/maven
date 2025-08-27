@@ -1237,10 +1237,10 @@ class PomConstructionTest {
 
         // Verify testResources targetPath with property interpolation is preserved
         assertEquals(2, ((List<?>) pom.getValue("build/testResources")).size());
-        Path buildPath = pom.getBasedir().toPath().resolve("target");
-        assertEquals(buildPath.resolve("test-classes").toString(), pom.getValue("build/testResources[1]/targetPath"));
+        String buildPath = pom.getBasedir().toPath().resolve("target").toString();
+        assertEquals(buildPath + "/test-classes", pom.getValue("build/testResources[1]/targetPath"));
         assertPathSuffixEquals("src/test/resources", pom.getValue("build/testResources[1]/directory"));
-        assertEquals(buildPath.resolve("test-run").toString(), pom.getValue("build/testResources[2]/targetPath"));
+        assertEquals(buildPath + "/test-run", pom.getValue("build/testResources[2]/targetPath"));
         assertPathSuffixEquals("src/test/data", pom.getValue("build/testResources[2]/directory"));
     }
 
