@@ -118,7 +118,7 @@ public final class DefaultSourceRoot implements SourceRoot {
         language = Language.RESOURCES;
         targetVersion = null;
         value = nonBlank(resource.getTargetPath());
-        targetPath = (value != null) ? baseDir.resolve(value) : null;
+        targetPath = (value != null) ? baseDir.resolve(value).normalize() : null;
     }
 
     /**
