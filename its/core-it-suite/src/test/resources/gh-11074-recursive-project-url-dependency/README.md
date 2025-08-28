@@ -14,7 +14,7 @@ When a dependency's POM contains `<url>${project.url}</url>`, Maven 4 correctly 
 
 ## Expected Behavior
 
-- **Maven 3**: Build succeeds, recursive reference may not be detected
+- **Maven 3**: Build succeeds, recursive reference not detected/warned about
 - **Maven 4+**: Build succeeds but shows warning:
   ```
   [WARNING] The POM for org.apache.maven.its.gh11074:bad-dependency:jar:1.0 is invalid, transitive dependencies (if any) will not be available: 1 problem was for org.apache.maven.its.gh11074:bad-dependency:jar:1.0

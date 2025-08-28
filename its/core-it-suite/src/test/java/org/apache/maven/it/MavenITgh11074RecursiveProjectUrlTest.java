@@ -27,12 +27,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * This is a test set for <a href="https://github.com/apache/maven/issues/11074">GH-11074</a>.
  *
- * When a pom.xml contains a {@code <url>${project.url}</url>}, it now fails with Maven 4
- * with an error like:
+ * When a pom.xml contains a {@code <url>${project.url}</url>}, both Maven 3 and 4 fail
+ * when trying to build the project directly with an error like:
  * {@code [ERROR] recursive variable reference: project.url}
  *
- * This was not failing in Maven 3, but should fail in Maven 4 to prevent infinite loops
- * during variable resolution.
+ * However, the key difference is in how they handle pre-built artifacts with recursive
+ * references when consumed as dependencies. Maven 4 detects and warns about these issues
+ * in dependency POMs, while Maven 3 may silently ignore them.
  */
 public class MavenITgh11074RecursiveProjectUrlTest extends AbstractMavenIntegrationTestCase {
 
@@ -41,40 +42,36 @@ public class MavenITgh11074RecursiveProjectUrlTest extends AbstractMavenIntegrat
     }
 
     /**
-     * Test that recursive project.url reference fails in Maven 4+ but was tolerated in Maven 3.
+     * Test that recursive project.url reference in a local project fails in both Maven 3 and 4.
+     * This test demonstrates that both versions correctly reject building projects with recursive references.
      *
      * @throws Exception in case of failure
      */
     @Test
-    public void testRecursiveProjectUrl() throws Exception {
+    public void testRecursiveProjectUrlInLocalProject() throws Exception {
         File testDir = extractResources("/gh-11074-recursive-project-url");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.addCliArgument("validate");
 
-        if (matchesVersionRange("[4.0.0-alpha-1,)")) {
-            // Maven 4+ should fail with recursive variable reference error
-            assertThrows(
-                    Exception.class,
-                    () -> {
-                        verifier.execute();
-                        verifier.verifyErrorFreeLog();
-                    },
-                    "Maven 4+ should fail when project.url contains recursive reference");
+        // Both Maven 3 and 4 should fail when trying to build a project with recursive reference
+        assertThrows(
+                Exception.class,
+                () -> {
+                    verifier.execute();
+                    verifier.verifyErrorFreeLog();
+                },
+                "Both Maven 3 and 4 should fail when project.url contains recursive reference");
 
-            // Verify the specific error message is present
-            verifier.verifyTextInLog("recursive variable reference: project.url");
-        } else {
-            // Maven 3 should not fail (though it may produce warnings)
-            verifier.execute();
-            verifier.verifyErrorFreeLog();
-        }
+        // Verify the specific error message is present
+        verifier.verifyTextInLog("recursive variable reference: project.url");
     }
 
     /**
-     * Test that recursive project.url reference in dependency POM produces warning in Maven 4+.
-     * The build succeeds but Maven 4+ correctly identifies and warns about the invalid POM.
+     * Test that recursive project.url reference in dependency POM produces different behavior
+     * between Maven 3 and Maven 4. This simulates the real-world scenario where problematic
+     * artifacts are already published in repositories.
      *
      * @throws Exception in case of failure
      */
@@ -90,18 +87,17 @@ public class MavenITgh11074RecursiveProjectUrlTest extends AbstractMavenIntegrat
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
 
-        if (matchesVersionRange("[4.0.0-alpha-1,)")) {
-            // Maven 4+ should succeed but show warning about invalid dependency POM
-            verifier.execute();
-            verifier.verifyErrorFreeLog();
+        // Both Maven 3 and 4 should succeed when consuming pre-built artifacts with recursive references
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
 
-            // Verify the specific warning message is present
+        if (matchesVersionRange("[4.0.0-alpha-1,)")) {
+            // Maven 4+ should show warning about invalid dependency POM
             verifier.verifyTextInLog("recursive variable reference: project.url");
             verifier.verifyTextInLog("The POM for org.apache.maven.its.gh11074:bad-dependency:jar:1.0 is invalid");
         } else {
-            // Maven 3 should not fail (though it may produce warnings)
-            verifier.execute();
-            verifier.verifyErrorFreeLog();
+            // Maven 3 may not detect or warn about the recursive reference
+            // This is the key difference - Maven 3 silently ignores the issue
         }
     }
 }

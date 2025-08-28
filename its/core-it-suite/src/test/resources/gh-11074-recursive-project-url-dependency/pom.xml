@@ -17,22 +17,18 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  
+
   <groupId>org.apache.maven.its.gh11074</groupId>
   <artifactId>consumer-project</artifactId>
   <version>1.0</version>
   <packaging>pom</packaging>
-  
+
   <name>Test consumer project that depends on artifact with recursive project.url</name>
-  <description>
-    This project depends on an artifact whose POM contains a recursive reference to project.url.
-    This should fail in Maven 4+ when the dependency POM is processed.
-  </description>
-  
+  <description>This project depends on an artifact whose POM contains a recursive reference to project.url.
+    This should fail in Maven 4+ when the dependency POM is processed.</description>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.its.gh11074</groupId>
@@ -50,14 +46,14 @@ under the License.
         <executions>
           <execution>
             <id>resolve-dependencies</id>
-            <phase>validate</phase>
             <goals>
               <goal>resolve</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>
     </plugins>
   </build>
-  
+
 </project>

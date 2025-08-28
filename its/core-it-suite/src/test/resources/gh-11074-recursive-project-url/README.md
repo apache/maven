@@ -24,8 +24,10 @@ This creates a recursive reference where `project.url` tries to resolve to itsel
 
 ## Expected Behavior
 
-- **Maven 3**: Build may succeed (recursive reference not detected)
+- **Maven 3**: Build fails with "recursive variable reference: project.url" error
 - **Maven 4+**: Build fails with "recursive variable reference: project.url" error
+
+Both versions correctly detect and reject recursive references when building projects directly.
 
 ## Real-world Example
 
