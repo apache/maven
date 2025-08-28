@@ -129,12 +129,42 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
     }
 
     private PluginPrefixResult resolveFromProject(PluginPrefixRequest request, List<Plugin> plugins) {
+        // First pass: narrow down to likely candidates based on artifactId to avoid resolving all plugins.
+        List<Plugin> candidates = new ArrayList<>();
+        String wanted = request.getPrefix();
         for (Plugin plugin : plugins) {
+            if (isLikelyPrefixFor(plugin, wanted)) {
+                candidates.add(plugin);
+            }
+        }
+
+        // Try likely candidates first (cheap filter, preserves behavior if match is found).
+        for (Plugin plugin : candidates) {
             try {
                 PluginDescriptor pluginDescriptor =
                         pluginManager.loadPlugin(plugin, request.getRepositories(), request.getRepositorySession());
+                if (wanted.equals(pluginDescriptor.getGoalPrefix())) {
+                    return new DefaultPluginPrefixResult(plugin);
+                }
+            } catch (Exception e) {
+                if (logger.isDebugEnabled()) {
+                    logger.warn("Failed to retrieve plugin descriptor for {}: {}", plugin.getId(), e.getMessage(), e);
+                } else {
+                    logger.warn("Failed to retrieve plugin descriptor for {}: {}", plugin.getId(), e.getMessage());
+                }
+            }
+        }
 
-                if (request.getPrefix().equals(pluginDescriptor.getGoalPrefix())) {
+        // Fallback: full scan (preserves original behavior for custom/non-standard goal prefixes).
+        for (Plugin plugin : plugins) {
+            if (isLikelyPrefixFor(plugin, wanted)) {
+                // already attempted above
+                continue;
+            }
+            try {
+                PluginDescriptor pluginDescriptor =
+                        pluginManager.loadPlugin(plugin, request.getRepositories(), request.getRepositorySession());
+                if (wanted.equals(pluginDescriptor.getGoalPrefix())) {
                     return new DefaultPluginPrefixResult(plugin);
                 }
             } catch (Exception e) {
@@ -147,6 +177,44 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
         }
 
         return null;
+    }
+
+    /**
+     * Heuristic to guess the goal prefix from plugin artifactId without resolving the plugin.
+     * This reduces descriptor loads for obviously non-matching plugins while keeping a full fallback scan.
+     */
+    private boolean isLikelyPrefixFor(Plugin plugin, String wanted) {
+        if (plugin == null || wanted == null) {
+            return false;
+        }
+        String aid = plugin.getArtifactId();
+        if (aid == null) {
+            return false;
+        }
+        // direct quick matches
+        if (aid.equals(wanted)) {
+            return true;
+        }
+        if (aid.equals("maven-" + wanted + "-plugin")) {
+            return true;
+        }
+        if (aid.equals(wanted + "-maven-plugin")) {
+            return true;
+        }
+        if (aid.equals(wanted + "-plugin")) {
+            return true;
+        }
+        // derive conventional prefix: strip leading "maven-" and one trailing "-maven-plugin" or "-plugin"
+        String derived = aid;
+        if (derived.startsWith("maven-")) {
+            derived = derived.substring("maven-".length());
+        }
+        if (derived.endsWith("-maven-plugin")) {
+            derived = derived.substring(0, derived.length() - "-maven-plugin".length());
+        } else if (derived.endsWith("-plugin")) {
+            derived = derived.substring(0, derived.length() - "-plugin".length());
+        }
+        return !derived.isEmpty() && derived.equals(wanted);
     }
 
     private PluginPrefixResult resolveFromRepository(PluginPrefixRequest request) {
