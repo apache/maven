@@ -251,7 +251,7 @@ class DefaultPluginXmlFactoryReadWriteTest {
     }
 
     @Test
-    void readFromUrlParsesPluginDescriptorCorrectly() throws Exception {
+    void readFromInputStreamParsesPluginDescriptorCorrectly() throws Exception {
         Path xmlFile = tempDir.resolve("plugin.xml");
         Files.write(xmlFile, SAMPLE_PLUGIN_XML.getBytes());
         try (InputStream is = xmlFile.toUri().toURL().openStream()) {
