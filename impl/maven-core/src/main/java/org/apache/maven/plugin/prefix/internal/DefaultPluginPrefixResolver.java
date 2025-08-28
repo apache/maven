@@ -26,13 +26,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.MetadataReader;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.prefix.PluginPrefixRequest;
 import org.apache.maven.plugin.prefix.PluginPrefixResolver;
@@ -77,26 +78,37 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
     public PluginPrefixResult resolve(PluginPrefixRequest request) throws NoPluginFoundForPrefixException {
         logger.debug("Resolving plugin prefix {} from {}", request.getPrefix(), request.getPluginGroups());
 
-        LinkedHashSet<String> groupIds = new LinkedHashSet<>();
+        // map of groupId -> Set(artifactId) plugin candidates:
+        // if value is null, keys are coming from settings, and no artifactId filtering is applied
+        // if value is non-null: we allow only plugins that have enlisted artifactId only
+        // ---
+        // end game is: settings enlisted groupIds are obeying order and are "free for all" (artifactId)
+        // while POM enlisted plugins coming from non-enlisted settings groupIds (ie conflict of prefixes)
+        // will prevail/win.
+        LinkedHashMap<String, Set<String>> candidates = new LinkedHashMap<>();
         if (request.getPom() != null) {
             if (request.getPom().getBuild() != null) {
-                groupIds.addAll(request.getPom().getBuild().getPlugins().stream()
-                        .map(Plugin::getGroupId)
-                        .toList());
+                request.getPom().getBuild().getPlugins().stream()
+                        .filter(p -> !request.getPluginGroups().contains(p.getGroupId()))
+                        .forEach(p -> candidates
+                                .computeIfAbsent(p.getGroupId(), g -> new HashSet<>())
+                                .add(p.getArtifactId()));
                 if (request.getPom().getBuild().getPluginManagement() != null) {
-                    groupIds.addAll(request.getPom().getBuild().getPluginManagement().getPlugins().stream()
-                            .map(Plugin::getGroupId)
-                            .toList());
+                    request.getPom().getBuild().getPluginManagement().getPlugins().stream()
+                            .filter(p -> !request.getPluginGroups().contains(p.getGroupId()))
+                            .forEach(p -> candidates
+                                    .computeIfAbsent(p.getGroupId(), g -> new HashSet<>())
+                                    .add(p.getArtifactId()));
                 }
             }
         }
-        groupIds.addAll(request.getPluginGroups());
-        PluginPrefixResult result = resolveFromRepository(request, groupIds);
+        request.getPluginGroups().forEach(g -> candidates.put(g, null));
+        PluginPrefixResult result = resolveFromRepository(request, candidates);
 
         if (result == null) {
             throw new NoPluginFoundForPrefixException(
                     request.getPrefix(),
-                    groupIds.stream().toList(),
+                    new ArrayList<>(candidates.keySet()),
                     request.getRepositorySession().getLocalRepository(),
                     request.getRepositories());
         } else {
@@ -111,12 +123,13 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
         return result;
     }
 
-    private PluginPrefixResult resolveFromRepository(PluginPrefixRequest request, LinkedHashSet<String> pluginGroups) {
+    private PluginPrefixResult resolveFromRepository(
+            PluginPrefixRequest request, LinkedHashMap<String, Set<String>> candidates) {
         RequestTrace trace = RequestTrace.newChild(null, request);
 
         List<MetadataRequest> requests = new ArrayList<>();
 
-        for (String pluginGroup : pluginGroups) {
+        for (String pluginGroup : candidates.keySet()) {
             org.eclipse.aether.metadata.Metadata metadata =
                     new DefaultMetadata(pluginGroup, "maven-metadata.xml", DefaultMetadata.Nature.RELEASE_OR_SNAPSHOT);
 
@@ -132,7 +145,7 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
         List<MetadataResult> results = repositorySystem.resolveMetadata(request.getRepositorySession(), requests);
         requests.clear();
 
-        PluginPrefixResult result = processResults(request, trace, results, requests);
+        PluginPrefixResult result = processResults(request, trace, results, requests, candidates);
 
         if (result != null) {
             return result;
@@ -146,7 +159,7 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
 
             results = repositorySystem.resolveMetadata(session, requests);
 
-            return processResults(request, trace, results, null);
+            return processResults(request, trace, results, null, candidates);
         }
 
         return null;
@@ -156,7 +169,8 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
             PluginPrefixRequest request,
             RequestTrace trace,
             List<MetadataResult> results,
-            List<MetadataRequest> requests) {
+            List<MetadataRequest> requests,
+            LinkedHashMap<String, Set<String>> candidates) {
         for (MetadataResult res : results) {
             org.eclipse.aether.metadata.Metadata metadata = res.getMetadata();
 
@@ -167,7 +181,7 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
                 }
 
                 PluginPrefixResult result =
-                        resolveFromRepository(request, trace, metadata.getGroupId(), metadata, repository);
+                        resolveFromRepository(request, trace, metadata.getGroupId(), metadata, repository, candidates);
 
                 if (result != null) {
                     return result;
@@ -187,7 +201,8 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
             RequestTrace trace,
             String pluginGroup,
             org.eclipse.aether.metadata.Metadata metadata,
-            ArtifactRepository repository) {
+            ArtifactRepository repository,
+            LinkedHashMap<String, Set<String>> candidates) {
         if (metadata != null && metadata.getPath() != null && Files.isRegularFile(metadata.getPath())) {
             try {
                 Map<String, ?> options = Collections.singletonMap(MetadataReader.IS_STRICT, Boolean.FALSE);
@@ -199,7 +214,9 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
 
                 if (plugins != null) {
                     for (org.apache.maven.artifact.repository.metadata.Plugin plugin : plugins) {
-                        if (request.getPrefix().equals(plugin.getPrefix())) {
+                        if (request.getPrefix().equals(plugin.getPrefix())
+                                && (candidates.get(pluginGroup) == null
+                                        || candidates.get(pluginGroup).contains(plugin.getArtifactId()))) {
                             return new DefaultPluginPrefixResult(pluginGroup, plugin.getArtifactId(), repository);
                         }
                     }
