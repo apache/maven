@@ -36,13 +36,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up JDK
-        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4
+        uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5
         with:
           java-version: 17
           distribution: 'temurin'
 
       - name: Checkout maven
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v4
         with:
           persist-credentials: false
 
@@ -54,7 +54,7 @@ jobs:
           cp .github/ci-mimir-daemon.properties ~/.mimir/daemon.properties
 
       - name: Handle Mimir caches
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
         with:
           path: ~/.mimir/local
           key: mimir-${{ runner.os }}-initial-${{ hashFiles('**/pom.xml') }}
@@ -92,7 +92,7 @@ jobs:
         java: ['17', '21', '24']
     steps:
       - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4
+        uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
@@ -110,7 +110,7 @@ jobs:
         run: choco install graphviz
 
       - name: Checkout maven
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v4
         with:
           persist-credentials: false
 
@@ -123,7 +123,7 @@ jobs:
           cp .github/ci-mimir-daemon.properties ~/.mimir/daemon.properties
 
       - name: Handle Mimir caches
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
         with:
           path: ~/.mimir/local
           key: mimir-${{ runner.os }}-full-${{ hashFiles('**/pom.xml') }}
@@ -132,7 +132,7 @@ jobs:
             mimir-${{ runner.os }}-
 
       - name: Download Maven distribution
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v4
         with:
           name: maven-distributions
           path: maven-dist
@@ -183,13 +183,13 @@ jobs:
         java: ['17', '21', '24']
     steps:
       - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4
+        uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
 
       - name: Checkout maven
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v4
         with:
           persist-credentials: false
 
@@ -202,7 +202,7 @@ jobs:
           cp .github/ci-mimir-daemon.properties ~/.mimir/daemon.properties
 
       - name: Handle Mimir caches
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
         with:
           path: ~/.mimir/local
           key: mimir-${{ runner.os }}-its-${{ hashFiles('**/pom.xml') }}
@@ -211,7 +211,7 @@ jobs:
             mimir-${{ runner.os }}-
 
       - name: Download Maven distribution
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v4
         with:
           name: maven-distributions
           path: maven-dist
