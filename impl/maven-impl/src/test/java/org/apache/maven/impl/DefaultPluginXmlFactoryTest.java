@@ -21,6 +21,7 @@ package org.apache.maven.impl;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -37,7 +38,6 @@ import org.apache.maven.api.services.xml.XmlWriterException;
 import org.apache.maven.api.services.xml.XmlWriterRequest;
 import org.apache.maven.impl.model.DefaultModelProcessor;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.io.TempDir;
 
 import static java.util.UUID.randomUUID;
@@ -45,7 +45,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.condition.OS.WINDOWS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -252,19 +251,17 @@ class DefaultPluginXmlFactoryReadWriteTest {
     }
 
     @Test
-    @DisabledOnOs(
-            value = WINDOWS,
-            disabledReason = "windows related issue https://github.com/apache/maven/pull/2312#issuecomment-2876291814")
     void readFromUrlParsesPluginDescriptorCorrectly() throws Exception {
         Path xmlFile = tempDir.resolve("plugin.xml");
         Files.write(xmlFile, SAMPLE_PLUGIN_XML.getBytes());
-        PluginDescriptor descriptor = defaultPluginXmlFactory.read(XmlReaderRequest.builder()
-                .inputStream(xmlFile.toUri().toURL().openStream())
-                .build());
-        assertThat(descriptor.getName()).isEqualTo(NAME);
-        assertThat(descriptor.getGroupId()).isEqualTo("org.example");
-        assertThat(descriptor.getArtifactId()).isEqualTo("sample-plugin");
-        assertThat(descriptor.getVersion()).isEqualTo("1.0.0");
+        try (InputStream is = xmlFile.toUri().toURL().openStream()) {
+            PluginDescriptor descriptor = defaultPluginXmlFactory.read(
+                    XmlReaderRequest.builder().inputStream(is).build());
+            assertThat(descriptor.getName()).isEqualTo(NAME);
+            assertThat(descriptor.getGroupId()).isEqualTo("org.example");
+            assertThat(descriptor.getArtifactId()).isEqualTo("sample-plugin");
+            assertThat(descriptor.getVersion()).isEqualTo("1.0.0");
+        }
     }
 
     @Test
