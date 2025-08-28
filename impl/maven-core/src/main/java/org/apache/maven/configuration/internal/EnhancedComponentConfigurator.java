@@ -52,7 +52,8 @@ public class EnhancedComponentConfigurator extends BasicComponentConfigurator {
         try {
             ClassRealmConverter.pushContextRealm(realm);
 
-            this.configureComponent(component, configuration, evaluator, realm, listener);
+            this.configureComponent(
+                    component, configuration, evaluator, realm != null ? realm.getClassLoader() : null, listener);
         } finally {
             ClassRealmConverter.popContextRealm();
         }
