@@ -23,17 +23,16 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.MetadataReader;
-import org.apache.maven.model.Build;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.BuildPluginManager;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.prefix.PluginPrefixRequest;
 import org.apache.maven.plugin.prefix.PluginPrefixResolver;
@@ -65,14 +64,11 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
     private static final String REPOSITORY_CONTEXT = org.apache.maven.api.services.RequestTrace.CONTEXT_PLUGIN;
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private final BuildPluginManager pluginManager;
     private final RepositorySystem repositorySystem;
     private final MetadataReader metadataReader;
 
     @Inject
-    public DefaultPluginPrefixResolver(
-            BuildPluginManager pluginManager, RepositorySystem repositorySystem, MetadataReader metadataReader) {
-        this.pluginManager = pluginManager;
+    public DefaultPluginPrefixResolver(RepositorySystem repositorySystem, MetadataReader metadataReader) {
         this.repositorySystem = repositorySystem;
         this.metadataReader = metadataReader;
     }
@@ -81,80 +77,46 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
     public PluginPrefixResult resolve(PluginPrefixRequest request) throws NoPluginFoundForPrefixException {
         logger.debug("Resolving plugin prefix {} from {}", request.getPrefix(), request.getPluginGroups());
 
-        PluginPrefixResult result = resolveFromProject(request);
+        LinkedHashSet<String> groupIds = new LinkedHashSet<>();
+        if (request.getPom() != null) {
+            if (request.getPom().getBuild() != null) {
+                groupIds.addAll(request.getPom().getBuild().getPlugins().stream()
+                        .map(Plugin::getGroupId)
+                        .toList());
+                if (request.getPom().getBuild().getPluginManagement() != null) {
+                    groupIds.addAll(request.getPom().getBuild().getPluginManagement().getPlugins().stream()
+                            .map(Plugin::getGroupId)
+                            .toList());
+                }
+            }
+        }
+        groupIds.addAll(request.getPluginGroups());
+        PluginPrefixResult result = resolveFromRepository(request, groupIds);
 
         if (result == null) {
-            result = resolveFromRepository(request);
-
-            if (result == null) {
-                throw new NoPluginFoundForPrefixException(
-                        request.getPrefix(),
-                        request.getPluginGroups(),
-                        request.getRepositorySession().getLocalRepository(),
-                        request.getRepositories());
-            } else {
-                logger.debug(
-                        "Resolved plugin prefix {} to {}:{} from repository {}",
-                        request.getPrefix(),
-                        result.getGroupId(),
-                        result.getArtifactId(),
-                        (result.getRepository() != null ? result.getRepository().getId() : "null"));
-            }
+            throw new NoPluginFoundForPrefixException(
+                    request.getPrefix(),
+                    groupIds.stream().toList(),
+                    request.getRepositorySession().getLocalRepository(),
+                    request.getRepositories());
         } else {
             logger.debug(
-                    "Resolved plugin prefix {} to {}:{} from POM {}",
+                    "Resolved plugin prefix {} to {}:{} from repository {}",
                     request.getPrefix(),
                     result.getGroupId(),
                     result.getArtifactId(),
-                    request.getPom());
+                    (result.getRepository() != null ? result.getRepository().getId() : "null"));
         }
 
         return result;
     }
 
-    private PluginPrefixResult resolveFromProject(PluginPrefixRequest request) {
-        PluginPrefixResult result = null;
-
-        if (request.getPom() != null && request.getPom().getBuild() != null) {
-            Build build = request.getPom().getBuild();
-
-            result = resolveFromProject(request, build.getPlugins());
-
-            if (result == null && build.getPluginManagement() != null) {
-                result = resolveFromProject(request, build.getPluginManagement().getPlugins());
-            }
-        }
-
-        return result;
-    }
-
-    private PluginPrefixResult resolveFromProject(PluginPrefixRequest request, List<Plugin> plugins) {
-        for (Plugin plugin : plugins) {
-            try {
-                PluginDescriptor pluginDescriptor =
-                        pluginManager.loadPlugin(plugin, request.getRepositories(), request.getRepositorySession());
-
-                if (request.getPrefix().equals(pluginDescriptor.getGoalPrefix())) {
-                    return new DefaultPluginPrefixResult(plugin);
-                }
-            } catch (Exception e) {
-                if (logger.isDebugEnabled()) {
-                    logger.warn("Failed to retrieve plugin descriptor for {}: {}", plugin.getId(), e.getMessage(), e);
-                } else {
-                    logger.warn("Failed to retrieve plugin descriptor for {}: {}", plugin.getId(), e.getMessage());
-                }
-            }
-        }
-
-        return null;
-    }
-
-    private PluginPrefixResult resolveFromRepository(PluginPrefixRequest request) {
+    private PluginPrefixResult resolveFromRepository(PluginPrefixRequest request, LinkedHashSet<String> pluginGroups) {
         RequestTrace trace = RequestTrace.newChild(null, request);
 
         List<MetadataRequest> requests = new ArrayList<>();
 
-        for (String pluginGroup : request.getPluginGroups()) {
+        for (String pluginGroup : pluginGroups) {
             org.eclipse.aether.metadata.Metadata metadata =
                     new DefaultMetadata(pluginGroup, "maven-metadata.xml", DefaultMetadata.Nature.RELEASE_OR_SNAPSHOT);
 
@@ -226,11 +188,12 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
             String pluginGroup,
             org.eclipse.aether.metadata.Metadata metadata,
             ArtifactRepository repository) {
-        if (metadata != null && metadata.getFile() != null && metadata.getFile().isFile()) {
+        if (metadata != null && metadata.getPath() != null && Files.isRegularFile(metadata.getPath())) {
             try {
                 Map<String, ?> options = Collections.singletonMap(MetadataReader.IS_STRICT, Boolean.FALSE);
 
-                Metadata pluginGroupMetadata = metadataReader.read(metadata.getFile(), options);
+                Metadata pluginGroupMetadata =
+                        metadataReader.read(metadata.getPath().toFile(), options);
 
                 List<org.apache.maven.artifact.repository.metadata.Plugin> plugins = pluginGroupMetadata.getPlugins();
 
