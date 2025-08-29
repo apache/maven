@@ -37,7 +37,6 @@ import org.apache.maven.api.services.xml.XmlWriterException;
 import org.apache.maven.api.services.xml.XmlWriterRequest;
 import org.apache.maven.impl.model.DefaultModelProcessor;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.io.TempDir;
 
 import static java.util.UUID.randomUUID;
@@ -45,11 +44,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.condition.OS.WINDOWS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class DefaultPluginXmlFactoryReadWriteTest {
+class DefaultPluginXmlFactoryTest {
 
     private static final String NAME = "sample-plugin-" + randomUUID();
     private static final String SAMPLE_PLUGIN_XML =
@@ -252,15 +250,11 @@ class DefaultPluginXmlFactoryReadWriteTest {
     }
 
     @Test
-    @DisabledOnOs(
-            value = WINDOWS,
-            disabledReason = "windows related issue https://github.com/apache/maven/pull/2312#issuecomment-2876291814")
     void readFromUrlParsesPluginDescriptorCorrectly() throws Exception {
         Path xmlFile = tempDir.resolve("plugin.xml");
         Files.write(xmlFile, SAMPLE_PLUGIN_XML.getBytes());
-        PluginDescriptor descriptor = defaultPluginXmlFactory.read(XmlReaderRequest.builder()
-                .inputStream(xmlFile.toUri().toURL().openStream())
-                .build());
+        PluginDescriptor descriptor = defaultPluginXmlFactory.read(
+                XmlReaderRequest.builder().url(xmlFile.toUri().toURL()).build());
         assertThat(descriptor.getName()).isEqualTo(NAME);
         assertThat(descriptor.getGroupId()).isEqualTo("org.example");
         assertThat(descriptor.getArtifactId()).isEqualTo("sample-plugin");
