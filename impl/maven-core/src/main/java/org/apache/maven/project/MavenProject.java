@@ -828,6 +828,7 @@ public class MavenProject implements Cloneable {
                 .includes(sourceRoot.includes())
                 .excludes(sourceRoot.excludes())
                 .filtering(Boolean.toString(sourceRoot.stringFiltering()))
+                .targetPath(sourceRoot.targetPath().map(Path::toString).orElse(null))
                 .build());
     }
 
