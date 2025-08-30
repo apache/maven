@@ -410,6 +410,10 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 0, 2);
 
         assertTrue(result.getWarnings().get(0).contains("groupId='test', artifactId='f'"));
+        // Check that the import scope error message is more helpful
+        assertTrue(result.getWarnings()
+                .get(0)
+                .contains("has scope 'import'. The 'import' scope is only valid in <dependencyManagement> sections"));
 
         assertTrue(result.getWarnings().get(1).contains("groupId='test', artifactId='g'"));
     }
