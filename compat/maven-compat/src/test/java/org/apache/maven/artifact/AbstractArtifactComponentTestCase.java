@@ -69,7 +69,7 @@ import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
 import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
 import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
-import org.eclipse.aether.util.graph.transformer.ConflictResolver;
+import org.eclipse.aether.util.graph.transformer.ClassicConflictResolver;
 import org.eclipse.aether.util.graph.transformer.NearestVersionSelector;
 import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
@@ -322,7 +322,7 @@ public abstract class AbstractArtifactComponentTestCase // extends PlexusTestCas
 
         ScopeManagerImpl scopeManager = new ScopeManagerImpl(Maven4ScopeManagerConfiguration.INSTANCE);
         session.setScopeManager(scopeManager);
-        DependencyGraphTransformer transformer = new ConflictResolver(
+        DependencyGraphTransformer transformer = new ClassicConflictResolver(
                 new NearestVersionSelector(), new ManagedScopeSelector(scopeManager),
                 new SimpleOptionalitySelector(), new ManagedScopeDeriver(scopeManager));
         transformer =
