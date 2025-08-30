@@ -54,8 +54,6 @@ public class Help implements Goal {
         context.info("    --plugins         Upgrade plugins known to fail with Maven 4");
         context.info(
                 "-a, --all             Apply all upgrades (equivalent to --model-version 4.1.0 --infer --model --plugins)");
-        context.info("-f, --force           Overwrite files without asking for confirmation");
-        context.info("-y, --yes             Answer \"yes\" to all prompts automatically");
         context.unindent();
         context.println();
         context.info("Default behavior: --model and --plugins are applied if no other options are specified");
