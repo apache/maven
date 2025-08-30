@@ -109,8 +109,6 @@ public class ${className} {
     private String fileComment = null;
 
 #if ( $locationTracking )
-    private boolean addLocationInformation = true;
-
     /**
      * Field stringFormatter.
      */
@@ -149,13 +147,6 @@ public class ${className} {
     } //-- void setFileComment(String)
 
 #if ( $locationTracking )
-    /**
-     * Method setAddLocationInformation.
-     */
-    public void setAddLocationInformation(boolean addLocationInformation) {
-        this.addLocationInformation = addLocationInformation;
-    } //-- void setAddLocationInformation(String)
-
     /**
      * Method setStringFormatter.
      *
@@ -383,7 +374,7 @@ public class ${className} {
             }
             serializer.writeEndElement();
 #if ( $locationTracking )
-            if (addLocationInformation && dom.inputLocation() instanceof InputLocation inputLocation && dom.children().isEmpty()) {
+            if (stringFormatter != null && dom.inputLocation() instanceof InputLocation inputLocation && dom.children().isEmpty()) {
                 serializer.writeComment(toString(inputLocation));
             }
 #end
@@ -421,7 +412,7 @@ public class ${className} {
      * @throws IOException
      */
     protected void writeLocationTracking(InputLocationTracker locationTracker, Object key, XMLStreamWriter serializer) throws IOException, XMLStreamException {
-        if (addLocationInformation) {
+        if (stringFormatter != null) {
             InputLocation location = (locationTracker == null) ? null : locationTracker.getLocation(key);
             if (location != null) {
                 serializer.writeComment(toString(location));
