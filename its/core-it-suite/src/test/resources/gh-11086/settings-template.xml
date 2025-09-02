@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns='http://maven.apache.org/SETTINGS/1.0.0'>
+  <profiles>
+    <profile>
+      <id>remote-repository</id>
+      <repositories>
+        <repository>
+          <id>testing-repo</id>
+          <url>@baseurl@/repo</url>
+          <releases>
+            <checksumPolicy>ignore</checksumPolicy>
+          </releases>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>testing-repo</id>
+          <url>@baseurl@/repo</url>
+          <releases>
+            <checksumPolicy>ignore</checksumPolicy>
+          </releases>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>remote-repository</activeProfile>
+  </activeProfiles>
+</settings>
+
