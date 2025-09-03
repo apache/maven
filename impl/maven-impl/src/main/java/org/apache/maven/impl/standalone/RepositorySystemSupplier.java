@@ -258,8 +258,11 @@ public class RepositorySystemSupplier {
     @Provides
     @Named(PrefixesRemoteRepositoryFilterSource.NAME)
     static PrefixesRemoteRepositoryFilterSource newPrefixesRemoteRepositoryFilterSource(
-            MetadataResolver metadataResolver, RepositoryLayoutProvider repositoryLayoutProvider) {
-        return new PrefixesRemoteRepositoryFilterSource(() -> metadataResolver, repositoryLayoutProvider);
+            MetadataResolver metadataResolver,
+            RemoteRepositoryManager remoteRepositoryManager,
+            RepositoryLayoutProvider repositoryLayoutProvider) {
+        return new PrefixesRemoteRepositoryFilterSource(
+                () -> metadataResolver, () -> remoteRepositoryManager, repositoryLayoutProvider);
     }
 
     @Provides
