@@ -19,14 +19,18 @@
 package org.apache.maven.impl;
 
 import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.function.Function;
 
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
+import org.apache.maven.api.services.xml.XmlWriterRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -121,5 +125,63 @@ class DefaultModelXmlFactoryTest {
 
         Model model = factory.read(request);
         assertEquals("invalid.version", model.getModelVersion());
+    }
+
+    @Test
+    void testWriteWithoutFormatterDisablesLocationTracking() throws Exception {
+        // minimal valid model we can round-trip
+        String xml =
+                """
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                  <modelVersion>4.0.0</modelVersion>
+                  <groupId>g</groupId>
+                  <artifactId>a</artifactId>
+                  <version>1</version>
+                </project>""";
+
+        Model model = factory.read(XmlReaderRequest.builder()
+                .reader(new StringReader(xml))
+                .strict(true)
+                .build());
+
+        StringWriter out = new StringWriter();
+        factory.write(XmlWriterRequest.<Model>builder()
+                .writer(out)
+                .content(model)
+                // no formatter -> tracking should be OFF
+                .build());
+
+        String result = out.toString();
+        assertFalse(result.contains("LOC_MARK"), "Unexpected marker found in output");
+    }
+
+    @Test
+    void testWriteWithFormatterEnablesLocationTracking() throws Exception {
+        String xml =
+                """
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                  <modelVersion>4.0.0</modelVersion>
+                  <groupId>g</groupId>
+                  <artifactId>a</artifactId>
+                  <version>1</version>
+                </project>""";
+
+        Model model = factory.read(XmlReaderRequest.builder()
+                .reader(new StringReader(xml))
+                .strict(true)
+                .build());
+
+        StringWriter out = new StringWriter();
+        Function<Object, String> formatter = o -> "LOC_MARK";
+
+        factory.write(XmlWriterRequest.<Model>builder()
+                .writer(out)
+                .content(model)
+                .inputLocationFormatter(formatter)
+                .build());
+
+        String result = out.toString();
+        // Presence of our formatter's output proves tracking was enabled and formatter applied
+        assertTrue(result.contains("LOC_MARK"), "Expected formatter marker in output when tracking is enabled");
     }
 }
