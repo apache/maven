@@ -44,7 +44,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.maven.ProjectCycleException;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.Language;
@@ -492,10 +491,14 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                         .findAny()
                         .orElse(null);
                 if (cycle != null) {
-                    throw new RuntimeException(new ProjectCycleException(
+                    final CycleDetectedException cde = (CycleDetectedException) cycle.getException();
+                    throw new ProjectBuildingException(
+                            null,
                             "The projects in the reactor contain a cyclic reference: " + cycle.getMessage(),
-                            (CycleDetectedException) cycle.getException()));
+                            null,
+                            cde);
                 }
+
                 throw new ProjectBuildingException(results);
             }
 
