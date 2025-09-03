@@ -38,7 +38,10 @@ import org.eclipse.aether.RepositorySystemSession;
 /**
  * @author Jason van Zyl
  * @since 3.0-alpha
+ *
+ * @deprecated Use maven-resolver and new DefaultArtifact(...) directly instead.
  */
+@Deprecated
 public interface RepositorySystem {
     String DEFAULT_LOCAL_REPO_ID = "local";
 
