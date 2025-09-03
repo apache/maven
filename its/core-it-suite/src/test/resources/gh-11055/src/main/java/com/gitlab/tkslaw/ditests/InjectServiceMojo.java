@@ -27,20 +27,26 @@ import org.apache.maven.api.services.ToolchainManager;
 
 @Mojo(name = "inject-service")
 public class InjectServiceMojo extends DITestsMojoBase {
-  @Inject protected ArtifactManager artifactManager;
-  @Inject protected DependencyResolver dependencyResolver;
-  @Inject protected ToolchainManager toolchainManager;
-  @Inject protected OsService osService;
+    @Inject
+    protected ArtifactManager artifactManager;
 
-  @Override
-  public void execute() {
-    super.execute();
+    @Inject
+    protected DependencyResolver dependencyResolver;
 
-    log.info("Logging services injected via @Inject");
-    logService("artifactManager", artifactManager);
-    logService("dependencyResolver", dependencyResolver);
-    logService("toolchainManager", toolchainManager);
-    logService("osService", osService);
-  }
+    @Inject
+    protected ToolchainManager toolchainManager;
+
+    @Inject
+    protected OsService osService;
+
+    @Override
+    public void execute() {
+        super.execute();
+
+        log.info("Logging services injected via @Inject");
+        logService("artifactManager", artifactManager);
+        logService("dependencyResolver", dependencyResolver);
+        logService("toolchainManager", toolchainManager);
+        logService("osService", osService);
+    }
 }
-

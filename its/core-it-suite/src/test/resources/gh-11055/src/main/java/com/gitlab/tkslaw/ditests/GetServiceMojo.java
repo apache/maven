@@ -26,25 +26,24 @@ import org.apache.maven.api.services.ToolchainManager;
 
 @Mojo(name = "get-service")
 public class GetServiceMojo extends DITestsMojoBase {
-  protected ArtifactManager artifactManager;
-  protected DependencyResolver dependencyResolver;
-  protected ToolchainManager toolchainManager;
-  protected OsService osService;
+    protected ArtifactManager artifactManager;
+    protected DependencyResolver dependencyResolver;
+    protected ToolchainManager toolchainManager;
+    protected OsService osService;
 
-  @Override
-  public void execute() {
-    super.execute();
+    @Override
+    public void execute() {
+        super.execute();
 
-    artifactManager = session.getService(ArtifactManager.class);
-    dependencyResolver = session.getService(DependencyResolver.class);
-    toolchainManager = session.getService(ToolchainManager.class);
-    osService = session.getService(OsService.class);
+        artifactManager = session.getService(ArtifactManager.class);
+        dependencyResolver = session.getService(DependencyResolver.class);
+        toolchainManager = session.getService(ToolchainManager.class);
+        osService = session.getService(OsService.class);
 
-    log.info("Logging services obtained via Session::getService");
-    logService("artifactManager", artifactManager);
-    logService("dependencyResolver", dependencyResolver);
-    logService("toolchainManager", toolchainManager);
-    logService("osService", osService);
-  }
+        log.info("Logging services obtained via Session::getService");
+        logService("artifactManager", artifactManager);
+        logService("dependencyResolver", dependencyResolver);
+        logService("toolchainManager", toolchainManager);
+        logService("osService", osService);
+    }
 }
-
