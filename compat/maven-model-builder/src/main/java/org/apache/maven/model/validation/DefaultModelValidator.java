@@ -785,10 +785,10 @@ public class DefaultModelValidator implements ModelValidator {
                             prefix, "version", problems, errOn30, Version.V20, d.getVersion(), d.getManagementKey(), d);
 
                     /*
-                     * TODO Extensions like Flex Mojos use custom scopes like "merged", "internal", "external", etc. In
-                     * order to don't break backward-compat with those, only warn but don't error out.
+                     * Extensions like Flex Mojos use custom scopes like "merged", "internal", "external", etc. In
+                     * order to not break backward-compat with those, only warn but don't error out.
                      */
-                    validateEnum(
+                    validateDependencyScope(
                             prefix,
                             "scope",
                             problems,
@@ -797,15 +797,11 @@ public class DefaultModelValidator implements ModelValidator {
                             d.getScope(),
                             d.getManagementKey(),
                             d,
-                            "provided",
-                            "compile",
-                            "runtime",
-                            "test",
-                            "system");
+                            false);
 
                     validateEffectiveModelAgainstDependency(prefix, problems, m, d, request);
                 } else {
-                    validateEnum(
+                    validateDependencyScope(
                             prefix,
                             "scope",
                             problems,
@@ -814,12 +810,7 @@ public class DefaultModelValidator implements ModelValidator {
                             d.getScope(),
                             d.getManagementKey(),
                             d,
-                            "provided",
-                            "compile",
-                            "runtime",
-                            "test",
-                            "system",
-                            "import");
+                            true);
                 }
             }
         }
@@ -1458,6 +1449,58 @@ public class DefaultModelValidator implements ModelValidator {
                 sourceHint,
                 "must be one of " + values + " but is '" + string + "'.",
                 tracker);
+
+        return false;
+    }
+
+    @SuppressWarnings("checkstyle:parameternumber")
+    private boolean validateDependencyScope(
+            String prefix,
+            String fieldName,
+            ModelProblemCollector problems,
+            Severity severity,
+            Version version,
+            String scope,
+            String sourceHint,
+            InputLocationTracker tracker,
+            boolean isDependencyManagement) {
+        if (scope == null || scope.length() <= 0) {
+            return true;
+        }
+
+        String[] validScopes;
+        if (isDependencyManagement) {
+            validScopes = new String[] {"provided", "compile", "runtime", "test", "system", "import"};
+        } else {
+            validScopes = new String[] {"provided", "compile", "runtime", "test", "system"};
+        }
+
+        List<String> values = Arrays.asList(validScopes);
+
+        if (values.contains(scope)) {
+            return true;
+        }
+
+        // Provide a more helpful error message for the 'import' scope
+        if ("import".equals(scope) && !isDependencyManagement) {
+            addViolation(
+                    problems,
+                    severity,
+                    version,
+                    prefix + fieldName,
+                    sourceHint,
+                    "has scope 'import'. The 'import' scope is only valid in <dependencyManagement> sections.",
+                    tracker);
+        } else {
+            addViolation(
+                    problems,
+                    severity,
+                    version,
+                    prefix + fieldName,
+                    sourceHint,
+                    "must be one of " + values + " but is '" + scope + "'.",
+                    tracker);
+        }
 
         return false;
     }

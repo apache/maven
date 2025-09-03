@@ -1238,12 +1238,12 @@ public class DefaultModelValidator implements ModelValidator {
                             d);
 
                     /*
-                     * TODO Extensions like Flex Mojos use custom scopes like "merged", "internal", "external", etc. In
-                     * order to don't break backward-compat with those, only warn but don't error out.
+                     * Extensions like Flex Mojos use custom scopes like "merged", "internal", "external", etc. In
+                     * order to not break backward-compat with those, only warn but don't error out.
                      */
                     ScopeManager scopeManager =
                             InternalSession.from(s).getSession().getScopeManager();
-                    validateEnum(
+                    validateDependencyScope(
                             prefix,
                             "scope",
                             problems,
@@ -1255,7 +1255,8 @@ public class DefaultModelValidator implements ModelValidator {
                             scopeManager.getDependencyScopeUniverse().stream()
                                     .map(DependencyScope::getId)
                                     .distinct()
-                                    .toArray(String[]::new));
+                                    .toArray(String[]::new),
+                            false);
 
                     validateEffectiveModelAgainstDependency(prefix, problems, m, d);
                 } else {
@@ -1265,7 +1266,7 @@ public class DefaultModelValidator implements ModelValidator {
                             .map(DependencyScope::getId)
                             .collect(Collectors.toCollection(HashSet::new));
                     scopes.add("import");
-                    validateEnum(
+                    validateDependencyScope(
                             prefix,
                             "scope",
                             problems,
@@ -1274,7 +1275,8 @@ public class DefaultModelValidator implements ModelValidator {
                             d.getScope(),
                             SourceHint.dependencyManagementKey(d),
                             d,
-                            scopes.toArray(new String[0]));
+                            scopes.toArray(new String[0]),
+                            true);
                 }
             }
         }
@@ -2019,6 +2021,52 @@ public class DefaultModelValidator implements ModelValidator {
                 sourceHint,
                 "must be one of " + values + " but is '" + string + "'.",
                 tracker);
+
+        return false;
+    }
+
+    @SuppressWarnings("checkstyle:parameternumber")
+    private boolean validateDependencyScope(
+            String prefix,
+            String fieldName,
+            ModelProblemCollector problems,
+            Severity severity,
+            Version version,
+            String scope,
+            @Nullable SourceHint sourceHint,
+            InputLocationTracker tracker,
+            String[] validScopes,
+            boolean isDependencyManagement) {
+        if (scope == null || scope.isEmpty()) {
+            return true;
+        }
+
+        List<String> values = Arrays.asList(validScopes);
+
+        if (values.contains(scope)) {
+            return true;
+        }
+
+        // Provide a more helpful error message for the 'import' scope
+        if ("import".equals(scope) && !isDependencyManagement) {
+            addViolation(
+                    problems,
+                    severity,
+                    version,
+                    prefix + fieldName,
+                    sourceHint,
+                    "has scope 'import'. The 'import' scope is only valid in <dependencyManagement> sections.",
+                    tracker);
+        } else {
+            addViolation(
+                    problems,
+                    severity,
+                    version,
+                    prefix + fieldName,
+                    sourceHint,
+                    "must be one of " + values + " but is '" + scope + "'.",
+                    tracker);
+        }
 
         return false;
     }
