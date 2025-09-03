@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+import java.util.regex.Pattern;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.ProtoSession;
@@ -68,6 +69,8 @@ import org.codehaus.plexus.components.secdispatcher.internal.DefaultSecDispatche
 public class DefaultSettingsBuilder implements SettingsBuilder {
 
     private final DefaultSettingsValidator settingsValidator = new DefaultSettingsValidator();
+
+    private static final Pattern V4_TOKEN = Pattern.compile("^\\{\\[(?:[^\\]]*,)?\\s*version=4\\.0\\][^}]*\\}$");
 
     private final SettingsMerger settingsMerger = new SettingsMerger() {
         @Override
@@ -266,9 +269,15 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         SecDispatcher secDispatcher = new DefaultSecDispatcher(dispatchers, getSecuritySettings(request.getSession()));
         final AtomicInteger preMaven4Passwords = new AtomicInteger(0);
         UnaryOperator<String> decryptFunction = str -> {
-            if (str != null && !str.isEmpty() && !str.contains("${") && secDispatcher.isAnyEncryptedString(str)) {
-                if (secDispatcher.isLegacyEncryptedString(str)) {
-                    // add a problem
+            if (str == null || str.isEmpty() || str.contains("${")) {
+                return str;
+            }
+
+            final boolean isV4 = isV4Token(str);
+            final boolean isLegacy = secDispatcher.isLegacyEncryptedString(str);
+
+            if (isV4 || isLegacy) {
+                if (isLegacy) {
                     preMaven4Passwords.incrementAndGet();
                 }
                 try {
@@ -363,5 +372,9 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         public ProblemCollector<BuilderProblem> getProblems() {
             return problems;
         }
+    }
+
+    static boolean isV4Token(final String s) {
+        return s != null && !s.isEmpty() && V4_TOKEN.matcher(s).matches();
     }
 }
