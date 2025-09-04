@@ -128,13 +128,13 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
         }
 
         try {
-            final MavenStaxWriter xmlWriter = new MavenStaxWriter();
+            MavenStaxWriter xmlWriter = new MavenStaxWriter();
             xmlWriter.setAddLocationInformation(false);
 
-            final Function<Object, String> formatter = request.getInputLocationFormatter();
+            Function<Object, String> formatter = request.getInputLocationFormatter();
             if (formatter != null) {
                 xmlWriter.setAddLocationInformation(true);
-                final Function<InputLocation, String> adapter = formatter::apply;
+                Function<InputLocation, String> adapter = formatter::apply;
                 xmlWriter.setStringFormatter(adapter);
             }
 
