@@ -220,4 +220,14 @@ public interface Options {
      * @param printWriter the string consumer to use for output
      */
     void displayHelp(@Nonnull ParserRequest request, @Nonnull Consumer<String> printWriter);
+
+    /**
+     * Indicates whether to list running Maven processes and exit.
+     * Implementations that don't support this option can leave it empty.
+     * @since 4.0.0
+     */
+    @Nonnull
+    default Optional<Boolean> processes() {
+        return Optional.empty();
+    }
 }
