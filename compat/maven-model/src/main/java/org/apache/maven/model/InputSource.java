@@ -58,12 +58,26 @@ public class InputSource implements java.io.Serializable, Cloneable {
      */
     private InputLocation importedFrom;
 
+    /**
+     * Cached hashCode for performance.
+     */
+    private volatile int hashCode = 0;
+
     // ----------------/
     // - Constructors -/
     // ----------------/
 
+    /**
+     * Default constructor for InputSource.
+     */
     public InputSource() {}
 
+    /**
+     * Creates a new InputSource from an API model InputSource.
+     * This constructor is used for converting between the API model and the compat model.
+     *
+     * @param source the API model InputSource to convert from
+     */
     public InputSource(org.apache.maven.api.model.InputSource source) {
         this.modelId = source.getModelId();
         this.location = source.getLocation();
@@ -129,9 +143,10 @@ public class InputSource implements java.io.Serializable, Cloneable {
     } // -- void setModelId( String )
 
     /**
-     * Get the location of the POM from which this POM was
+     * Get the location of the POM from which this POM was imported from.
+     * Can return {@code null} if this POM was not imported.
      *
-     * @return
+     * @return the InputLocation where this POM was imported from, or null if not imported
      */
     public InputLocation getImportedFrom() {
         return importedFrom;
@@ -140,10 +155,34 @@ public class InputSource implements java.io.Serializable, Cloneable {
     /**
      * Set the location of the POM from which this POM was imported from.
      *
-     * @param importedFrom
+     * @param importedFrom the InputLocation where this POM was imported from, or null if not imported
      */
     public void setImportedFrom(InputLocation importedFrom) {
         this.importedFrom = importedFrom;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        InputSource that = (InputSource) o;
+        return java.util.Objects.equals(modelId, that.modelId)
+                && java.util.Objects.equals(location, that.location)
+                && java.util.Objects.equals(importedFrom, that.importedFrom);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = hashCode;
+        if (result == 0) {
+            result = java.util.Objects.hash(modelId, location, importedFrom);
+            hashCode = result;
+        }
+        return result;
     }
 
     @Override
@@ -151,7 +190,13 @@ public class InputSource implements java.io.Serializable, Cloneable {
         return getModelId() + " " + getLocation();
     }
 
+    /**
+     * Converts this compat model InputSource to an API model InputSource.
+     * This method is used for converting between the compat model and the API model.
+     *
+     * @return the equivalent API model InputSource
+     */
     public org.apache.maven.api.model.InputSource toApiSource() {
-        return new org.apache.maven.api.model.InputSource(modelId, location);
+        return org.apache.maven.api.model.InputSource.of(modelId, location);
     }
 }

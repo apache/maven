@@ -92,7 +92,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
             + ":default-lifecycle-bindings";
 
     public static final InputLocation DEFAULT_LIFECYCLE_INPUT_LOCATION =
-            new InputLocation(new InputSource(DEFAULT_LIFECYCLE_MODELID, null));
+            InputLocation.of(InputSource.of(DEFAULT_LIFECYCLE_MODELID, null));
 
     public static final String SCOPE_COMPILE = DependencyScope.COMPILE.id();
     public static final String SCOPE_RUNTIME = DependencyScope.RUNTIME.id();
