@@ -95,6 +95,8 @@ under the License.
 
     <its.forkCount>0.75C</its.forkCount>
     <its.test />
+
+    <version.toolbox>0.7.4</version.toolbox>
   </properties>
 
   <dependencies>
@@ -412,6 +414,9 @@ under the License.
         <configuration>
           <skipInstallation>true</skipInstallation>
           <localRepositoryPath>${preparedUserHome}/.m2/repository</localRepositoryPath>
+          <extraArtifacts>
+            <extraArtifact>eu.maveniverse.maven.plugins:toolbox:${version.toolbox}:maven-plugin</extraArtifact>
+          </extraArtifacts>
         </configuration>
         <executions>
           <execution>
@@ -446,6 +451,7 @@ under the License.
           <useSystemClassLoader>false</useSystemClassLoader>
           <promoteUserPropertiesToSystemProperties>false</promoteUserPropertiesToSystemProperties>
           <systemPropertyVariables>
+            <version.toolbox>${version.toolbox}</version.toolbox>
             <maven.test.user.home>${preparedUserHome}</maven.test.user.home>
             <maven.test.repo.outer>${settings.localRepository}</maven.test.repo.outer>
             <maven.test.repo.local>${preparedUserHome}/.m2/repository</maven.test.repo.local>

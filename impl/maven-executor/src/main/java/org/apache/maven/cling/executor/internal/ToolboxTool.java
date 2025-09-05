@@ -40,12 +40,28 @@ import static java.util.Objects.requireNonNull;
  * @see <a href="https://github.com/maveniverse/toolbox">Maveniverse Toolbox</a>
  */
 public class ToolboxTool implements ExecutorTool {
-    private static final String TOOLBOX = "eu.maveniverse.maven.plugins:toolbox:0.7.4:";
+    private static final String TOOLBOX_PREFIX = "eu.maveniverse.maven.plugins:toolbox:";
 
     private final ExecutorHelper helper;
+    private final String toolboxVersion;
+    private final ExecutorHelper.Mode forceMode;
 
+    /**
+     * @deprecated Better specify required version yourself. This one is "cemented" to 0.7.4
+     */
+    @Deprecated
     public ToolboxTool(ExecutorHelper helper) {
+        this(helper, "0.7.4");
+    }
+
+    public ToolboxTool(ExecutorHelper helper, String toolboxVersion) {
+        this(helper, toolboxVersion, null);
+    }
+
+    public ToolboxTool(ExecutorHelper helper, String toolboxVersion, ExecutorHelper.Mode forceMode) {
         this.helper = requireNonNull(helper);
+        this.toolboxVersion = requireNonNull(toolboxVersion);
+        this.forceMode = forceMode; // nullable
     }
 
     @Override
@@ -119,12 +135,14 @@ public class ToolboxTool implements ExecutorTool {
         if (helper.mavenVersion().startsWith("4.")) {
             builder.argument("--raw-streams");
         }
-        return builder.argument(TOOLBOX + mojo).argument("--quiet").argument("-DforceStdout");
+        return builder.argument(TOOLBOX_PREFIX + toolboxVersion + ":" + mojo)
+                .argument("--quiet")
+                .argument("-DforceStdout");
     }
 
     private void doExecute(ExecutorRequest.Builder builder) {
         ExecutorRequest request = builder.build();
-        int ec = helper.execute(request);
+        int ec = forceMode == null ? helper.execute(request) : helper.execute(forceMode, request);
         if (ec != 0) {
             throw new ExecutorException("Unexpected exit code=" + ec + "; stdout="
                     + request.stdOut().orElse(null) + "; stderr="
