@@ -18,33 +18,35 @@
  */
 package com.gitlab.tkslaw.ditests;
 
+import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.plugin.annotations.Mojo;
 import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.OsService;
 import org.apache.maven.api.services.ToolchainManager;
 
-@Mojo(name = "get-service")
-public class GetServiceMojo extends DITestsMojoBase {
-  protected ArtifactManager artifactManager;
-  protected DependencyResolver dependencyResolver;
-  protected ToolchainManager toolchainManager;
-  protected OsService osService;
+@Mojo(name = "inject-service")
+public class InjectServiceMojo extends DITestsMojoBase {
+    @Inject
+    protected ArtifactManager artifactManager;
 
-  @Override
-  public void execute() {
-    super.execute();
+    @Inject
+    protected DependencyResolver dependencyResolver;
 
-    artifactManager = session.getService(ArtifactManager.class);
-    dependencyResolver = session.getService(DependencyResolver.class);
-    toolchainManager = session.getService(ToolchainManager.class);
-    osService = session.getService(OsService.class);
+    @Inject
+    protected ToolchainManager toolchainManager;
 
-    log.info("Logging services obtained via Session::getService");
-    logService("artifactManager", artifactManager);
-    logService("dependencyResolver", dependencyResolver);
-    logService("toolchainManager", toolchainManager);
-    logService("osService", osService);
-  }
+    @Inject
+    protected OsService osService;
+
+    @Override
+    public void execute() {
+        super.execute();
+
+        log.info("Logging services injected via @Inject");
+        logService("artifactManager", artifactManager);
+        logService("dependencyResolver", dependencyResolver);
+        logService("toolchainManager", toolchainManager);
+        logService("osService", osService);
+    }
 }
-

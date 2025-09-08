@@ -25,19 +25,23 @@ import org.apache.maven.api.plugin.Log;
 import org.apache.maven.api.plugin.Mojo;
 
 public class DITestsMojoBase implements Mojo {
-  @Inject protected Log log;
-  @Inject protected Session session;
-  @Inject protected Project project;
+    @Inject
+    protected Log log;
 
-  @Override
-  public void execute() {
-    log.info(() -> "log = " + log);
-    log.info(() -> "session = " + session);
-    log.info(() -> "project = " + project);
-  }
+    @Inject
+    protected Session session;
 
-  protected void logService(String name, Object service) {
-    log.info(() -> "   | %s = %s".formatted(name, service));
-  }
+    @Inject
+    protected Project project;
+
+    @Override
+    public void execute() {
+        log.info(() -> "log = " + log);
+        log.info(() -> "session = " + session);
+        log.info(() -> "project = " + project);
+    }
+
+    protected void logService(String name, Object service) {
+        log.info(() -> "   | %s = %s".formatted(name, service));
+    }
 }
-

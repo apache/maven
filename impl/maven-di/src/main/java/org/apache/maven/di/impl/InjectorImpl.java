@@ -195,6 +195,10 @@ public class InjectorImpl implements Injector {
         return bindings;
     }
 
+    public <T> Set<Binding<T>> getAllBindings(Class<T> clazz) {
+        return getBindings(Key.of(clazz));
+    }
+
     public <Q> Supplier<Q> getCompiledBinding(Dependency<Q> dep) {
         Key<Q> key = dep.key();
         Supplier<Q> originalSupplier = doGetCompiledBinding(dep);
