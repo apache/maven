@@ -151,7 +151,29 @@ class ReactorReader implements MavenWorkspaceReader {
     @Override
     public Model findModel(Artifact artifact) {
         MavenProject project = getProject(artifact);
-        return project == null ? null : project.getModel().getDelegate();
+        if (project != null) {
+            return project.getModel().getDelegate();
+        }
+
+        // Check if we can find a consumer POM in the project-local repository
+        Artifact pomArtifact = new org.eclipse.aether.artifact.DefaultArtifact(
+                artifact.getGroupId(), artifact.getArtifactId(), "", "pom", artifact.getBaseVersion());
+        File pomFile = findInProjectLocalRepository(pomArtifact);
+        if (pomFile != null && pomFile.exists()) {
+            try {
+                org.apache.maven.api.services.xml.XmlReaderRequest request =
+                        org.apache.maven.api.services.xml.XmlReaderRequest.builder()
+                                .path(pomFile.toPath())
+                                .strict(false)
+                                .build();
+                return new org.apache.maven.impl.DefaultModelXmlFactory().read(request);
+            } catch (Exception e) {
+                // If we can't read the POM, fall back to null
+                return null;
+            }
+        }
+
+        return null;
     }
 
     //
