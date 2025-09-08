@@ -38,6 +38,7 @@ import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
+import org.apache.maven.api.cli.cisupport.CIInfo;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.Lookup;
@@ -85,12 +86,23 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
 
     @Override
     protected MavenContext createContext(InvokerRequest invokerRequest) {
-        return new MavenContext(
-                invokerRequest, true, (MavenOptions) invokerRequest.options().orElse(null));
+        MavenOptions options = (MavenOptions) invokerRequest.options().orElse(null);
+
+        // Apply CI-specific defaults if CI is detected and not overridden by user
+        if (invokerRequest.ciInfo().isPresent() && options != null) {
+            options = new CIAwareMavenOptions(options, invokerRequest.ciInfo().get());
+        }
+
+        return new MavenContext(invokerRequest, true, options);
     }
 
     @Override
     protected int execute(MavenContext context) throws Exception {
+        // Log CI optimizations if applied
+        if (context.options() instanceof CIAwareMavenOptions ciOptions) {
+            logCIOptimizations(context, ciOptions);
+        }
+
         MavenExecutionRequest request = prepareMavenExecutionRequest();
         toolchains(context, request);
         populateRequest(context, context.lookup, request);
@@ -614,6 +626,38 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
 
         for (ExceptionSummary child : summary.getChildren()) {
             logSummary(context, child, references, indent);
+        }
+    }
+
+    /**
+     * Logs information about CI optimizations that have been applied.
+     */
+    private void logCIOptimizations(MavenContext context, CIAwareMavenOptions ciOptions) {
+        CIInfo ciInfo = ciOptions.getCIInfo();
+        MavenOptions delegate = ciOptions.getDelegate();
+
+        // Check which optimizations were applied
+        boolean appliedBatchMode = !delegate.nonInteractive().isPresent()
+                && ciOptions.nonInteractive().orElse(false);
+        boolean appliedShowVersion =
+                !delegate.showVersion().isPresent() && ciOptions.showVersion().orElse(false);
+        boolean appliedShowErrors =
+                !delegate.showErrors().isPresent() && ciOptions.showErrors().orElse(false);
+
+        if (appliedBatchMode || appliedShowVersion || appliedShowErrors) {
+            context.logger.info("Applying CI optimizations for detected CI system: '" + ciInfo.name() + "'");
+
+            if (appliedBatchMode) {
+                context.logger.info("  - Enabled batch mode (non-interactive)");
+            }
+            if (appliedShowVersion) {
+                context.logger.info("  - Enabled show-version for build identification");
+            }
+            if (appliedShowErrors) {
+                context.logger.info("  - Enabled show-errors for better debugging");
+            }
+
+            context.logger.info("To disable CI optimizations, use --force-interactive or set explicit options.");
         }
     }
 }
