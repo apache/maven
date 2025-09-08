@@ -23,10 +23,10 @@
         <executions>
           <execution>
             <id>enforce</id>
-            <phase>validate</phase>
             <goals>
               <goal>enforce</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>
@@ -38,10 +38,10 @@
         <executions>
           <execution>
             <id>inject-service</id>
-            <phase>validate</phase>
             <goals>
               <goal>inject-service</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>
