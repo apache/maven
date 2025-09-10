@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.apache.maven.api.Artifact;
@@ -179,7 +180,7 @@ public class SessionStub implements Session {
 
     @Override
     public <T extends Service> T getService(Class<T> clazz) {
-        return null;
+        throw new NoSuchElementException(clazz.getName());
     }
 
     @Override

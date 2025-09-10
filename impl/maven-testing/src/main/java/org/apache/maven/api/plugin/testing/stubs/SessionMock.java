@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -453,6 +454,60 @@ public class SessionMock {
                 .thenAnswer(iom -> getMockSession(iom.getArgument(0, LocalRepository.class)));
 
         return session;
+    }
+
+    /**
+     * Creates a mock session with enhanced getService behavior that throws NoSuchElementException
+     * for unknown services. This method wraps the standard mock session with a proxy that
+     * intercepts getService calls.
+     *
+     * <p><strong>Note:</strong> The returned session cannot be further mocked with Mockito
+     * because it's wrapped in a proxy. Use this method only when you need the enhanced
+     * NoSuchElementException behavior and don't need to add additional mocks.</p>
+     *
+     * @param localRepo the local repository path
+     * @return a session that throws NoSuchElementException for unknown services
+     */
+    public static InternalSession getMockSessionWithEnhancedServiceBehavior(String localRepo) {
+        LocalRepository localRepository = mock(LocalRepository.class);
+        when(localRepository.getId()).thenReturn("local");
+        when(localRepository.getPath()).thenReturn(Paths.get(localRepo));
+        return getMockSessionWithEnhancedServiceBehavior(localRepository);
+    }
+
+    /**
+     * Creates a mock session with enhanced getService behavior that throws NoSuchElementException
+     * for unknown services. This method wraps the standard mock session with a proxy that
+     * intercepts getService calls.
+     *
+     * <p><strong>Note:</strong> The returned session cannot be further mocked with Mockito
+     * because it's wrapped in a proxy. Use this method only when you need the enhanced
+     * NoSuchElementException behavior and don't need to add additional mocks.</p>
+     *
+     * @param localRepository the local repository
+     * @return a session that throws NoSuchElementException for unknown services
+     */
+    public static InternalSession getMockSessionWithEnhancedServiceBehavior(LocalRepository localRepository) {
+        InternalSession session = getMockSession(localRepository);
+
+        // Wrap the session with a proxy that intercepts getService calls
+        return (InternalSession) java.lang.reflect.Proxy.newProxyInstance(
+                session.getClass().getClassLoader(), new Class<?>[] {InternalSession.class}, (proxy, method, args) -> {
+                    // Call the original method
+                    Object result = method.invoke(session, args);
+
+                    // If this is a getService call and the result is null, throw NoSuchElementException
+                    if ("getService".equals(method.getName())
+                            && args != null
+                            && args.length == 1
+                            && args[0] instanceof Class
+                            && result == null) {
+                        Class<?> serviceClass = (Class<?>) args[0];
+                        throw new NoSuchElementException(serviceClass.getName());
+                    }
+
+                    return result;
+                });
     }
 
     static String getPathForArtifact(Artifact artifact) {
