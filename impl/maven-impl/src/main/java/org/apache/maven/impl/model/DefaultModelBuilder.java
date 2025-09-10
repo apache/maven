@@ -885,140 +885,126 @@ public class DefaultModelBuilder implements ModelBuilder {
         private Model resolveParent(
                 Model childModel, Parent parent, DefaultProfileActivationContext profileActivationContext)
                 throws ModelBuilderException {
-            Model parentModel = null;
-            if (isBuildRequest()) {
-                parentModel = readParentLocally(childModel, parent, profileActivationContext);
-            }
-            if (parentModel == null) {
-                parentModel = resolveAndReadParentExternally(childModel, parent, profileActivationContext);
-            }
-            return parentModel;
-        }
-
-        private Model readParentLocally(
-                Model childModel, Parent parent, DefaultProfileActivationContext profileActivationContext)
-                throws ModelBuilderException {
-
-            // Check for circular parent resolution before attempting to resolve the parent source
-            String currentLocation = request.getSource().getLocation();
-            try {
-                // Try to get the canonical path to handle relative paths correctly
-                java.nio.file.Path path = java.nio.file.Paths.get(currentLocation);
-                if (java.nio.file.Files.exists(path)) {
-                    currentLocation = path.toRealPath().toString();
-                }
-            } catch (Exception e) {
-                // If we can't resolve the path, use the original location
-            }
-
-            // Check if we're already processing this file
-            if (!parentResolutionChain.add(currentLocation)) {
+            // Check for circular parent resolution using model IDs
+            String parentId = parent.getGroupId() + ":" + parent.getArtifactId() + ":" + parent.getVersion();
+            if (!parentResolutionChain.add(parentId)) {
                 StringBuilder message = new StringBuilder("The parents form a cycle: ");
-                for (String location : parentResolutionChain) {
-                    message.append(location).append(" -> ");
+                for (String id : parentResolutionChain) {
+                    message.append(id).append(" -> ");
                 }
-                message.append(currentLocation);
+                message.append(parentId);
 
                 add(Severity.FATAL, Version.BASE, message.toString());
                 throw newModelBuilderException();
             }
 
             try {
-                ModelSource candidateSource;
+                Model parentModel = null;
+                if (isBuildRequest()) {
+                    parentModel = readParentLocally(childModel, parent, profileActivationContext);
+                }
+                if (parentModel == null) {
+                    parentModel = resolveAndReadParentExternally(childModel, parent, profileActivationContext);
+                }
+                return parentModel;
+            } finally {
+                // Remove from chain when done processing this parent
+                parentResolutionChain.remove(parentId);
+            }
+        }
 
-                boolean isParentOrSimpleMixin = !(parent instanceof Mixin)
-                        || (((Mixin) parent).getClassifier() == null && ((Mixin) parent).getExtension() == null);
-                String parentPath = parent.getRelativePath();
-                if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
-                    if (parentPath != null && !parentPath.isEmpty()) {
-                        candidateSource = request.getSource().resolve(modelProcessor::locateExistingPom, parentPath);
-                        if (candidateSource == null) {
-                            wrongParentRelativePath(childModel);
-                            return null;
-                        }
-                    } else if (isParentOrSimpleMixin) {
-                        candidateSource =
-                                resolveReactorModel(parent.getGroupId(), parent.getArtifactId(), parent.getVersion());
-                        if (candidateSource == null && parentPath == null) {
-                            candidateSource = request.getSource().resolve(modelProcessor::locateExistingPom, "..");
-                        }
-                    } else {
-                        candidateSource = null;
+        private Model readParentLocally(
+                Model childModel, Parent parent, DefaultProfileActivationContext profileActivationContext)
+                throws ModelBuilderException {
+            ModelSource candidateSource;
+
+            boolean isParentOrSimpleMixin = !(parent instanceof Mixin)
+                    || (((Mixin) parent).getClassifier() == null && ((Mixin) parent).getExtension() == null);
+            String parentPath = parent.getRelativePath();
+            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
+                if (parentPath != null && !parentPath.isEmpty()) {
+                    candidateSource = request.getSource().resolve(modelProcessor::locateExistingPom, parentPath);
+                    if (candidateSource == null) {
+                        wrongParentRelativePath(childModel);
+                        return null;
                     }
                 } else if (isParentOrSimpleMixin) {
                     candidateSource =
                             resolveReactorModel(parent.getGroupId(), parent.getArtifactId(), parent.getVersion());
-                    if (candidateSource == null) {
-                        if (parentPath == null) {
-                            parentPath = "..";
-                        }
-                        if (!parentPath.isEmpty()) {
-                            candidateSource =
-                                    request.getSource().resolve(modelProcessor::locateExistingPom, parentPath);
-                        }
+                    if (candidateSource == null && parentPath == null) {
+                        candidateSource = request.getSource().resolve(modelProcessor::locateExistingPom, "..");
                     }
                 } else {
                     candidateSource = null;
                 }
-
+            } else if (isParentOrSimpleMixin) {
+                candidateSource = resolveReactorModel(parent.getGroupId(), parent.getArtifactId(), parent.getVersion());
                 if (candidateSource == null) {
-                    return null;
-                }
-
-                ModelBuilderSessionState derived = derive(candidateSource);
-                Model candidateModel = derived.readAsParentModel(profileActivationContext);
-                addActivePomProfiles(derived.result.getActivePomProfiles());
-
-                String groupId = getGroupId(candidateModel);
-                String artifactId = candidateModel.getArtifactId();
-                String version = getVersion(candidateModel);
-
-                // Ensure that relative path and GA match, if both are provided
-                if (parent.getGroupId() != null && (groupId == null || !groupId.equals(parent.getGroupId()))
-                        || parent.getArtifactId() != null
-                                && (artifactId == null || !artifactId.equals(parent.getArtifactId()))) {
-                    mismatchRelativePathAndGA(childModel, parent, groupId, artifactId);
-                    return null;
-                }
-
-                if (version != null && parent.getVersion() != null && !version.equals(parent.getVersion())) {
-                    try {
-                        VersionRange parentRange = versionParser.parseVersionRange(parent.getVersion());
-                        if (!parentRange.contains(versionParser.parseVersion(version))) {
-                            // version skew drop back to resolution from the repository
-                            return null;
-                        }
-
-                        // Validate versions aren't inherited when using parent ranges the same way as when read
-                        // externally.
-                        String rawChildModelVersion = childModel.getVersion();
-
-                        if (rawChildModelVersion == null) {
-                            // Message below is checked for in the MNG-2199 core IT.
-                            add(Severity.FATAL, Version.V31, "Version must be a constant", childModel.getLocation(""));
-
-                        } else {
-                            if (rawChildVersionReferencesParent(rawChildModelVersion)) {
-                                // Message below is checked for in the MNG-2199 core IT.
-                                add(
-                                        Severity.FATAL,
-                                        Version.V31,
-                                        "Version must be a constant",
-                                        childModel.getLocation("version"));
-                            }
-                        }
-
-                        // MNG-2199: What else to check here ?
-                    } catch (VersionParserException e) {
-                        // invalid version range, so drop back to resolution from the repository
-                        return null;
+                    if (parentPath == null) {
+                        parentPath = "..";
+                    }
+                    if (!parentPath.isEmpty()) {
+                        candidateSource = request.getSource().resolve(modelProcessor::locateExistingPom, parentPath);
                     }
                 }
-                return candidateModel;
-            } finally {
-                // Remove from chain when done processing this parent
-                parentResolutionChain.remove(currentLocation);
+            } else {
+                candidateSource = null;
             }
+
+            if (candidateSource == null) {
+                return null;
+            }
+
+            ModelBuilderSessionState derived = derive(candidateSource);
+            Model candidateModel = derived.readAsParentModel(profileActivationContext);
+            addActivePomProfiles(derived.result.getActivePomProfiles());
+
+            String groupId = getGroupId(candidateModel);
+            String artifactId = candidateModel.getArtifactId();
+            String version = getVersion(candidateModel);
+
+            // Ensure that relative path and GA match, if both are provided
+            if (parent.getGroupId() != null && (groupId == null || !groupId.equals(parent.getGroupId()))
+                    || parent.getArtifactId() != null
+                            && (artifactId == null || !artifactId.equals(parent.getArtifactId()))) {
+                mismatchRelativePathAndGA(childModel, parent, groupId, artifactId);
+                return null;
+            }
+
+            if (version != null && parent.getVersion() != null && !version.equals(parent.getVersion())) {
+                try {
+                    VersionRange parentRange = versionParser.parseVersionRange(parent.getVersion());
+                    if (!parentRange.contains(versionParser.parseVersion(version))) {
+                        // version skew drop back to resolution from the repository
+                        return null;
+                    }
+
+                    // Validate versions aren't inherited when using parent ranges the same way as when read
+                    // externally.
+                    String rawChildModelVersion = childModel.getVersion();
+
+                    if (rawChildModelVersion == null) {
+                        // Message below is checked for in the MNG-2199 core IT.
+                        add(Severity.FATAL, Version.V31, "Version must be a constant", childModel.getLocation(""));
+
+                    } else {
+                        if (rawChildVersionReferencesParent(rawChildModelVersion)) {
+                            // Message below is checked for in the MNG-2199 core IT.
+                            add(
+                                    Severity.FATAL,
+                                    Version.V31,
+                                    "Version must be a constant",
+                                    childModel.getLocation("version"));
+                        }
+                    }
+
+                    // MNG-2199: What else to check here ?
+                } catch (VersionParserException e) {
+                    // invalid version range, so drop back to resolution from the repository
+                    return null;
+                }
+            }
+            return candidateModel;
         }
 
         private void mismatchRelativePathAndGA(Model childModel, Parent parent, String groupId, String artifactId) {
@@ -1611,70 +1597,41 @@ public class DefaultModelBuilder implements ModelBuilder {
          * Reads the request source's parent.
          */
         Model readAsParentModel(DefaultProfileActivationContext profileActivationContext) throws ModelBuilderException {
-            // Check for circular parent resolution using the source location
-            // We need to normalize the path to handle relative paths correctly
-            String sourceLocation = request.getSource().getLocation();
-            try {
-                // Try to get the canonical path to handle relative paths and symlinks
-                java.nio.file.Path path = java.nio.file.Paths.get(sourceLocation);
-                if (java.nio.file.Files.exists(path)) {
-                    sourceLocation = path.toRealPath().toString();
-                }
-            } catch (Exception e) {
-                // If we can't resolve the path, use the original location
-            }
+            Map<DefaultProfileActivationContext.Record, ParentModelWithProfiles> parentsPerContext =
+                    cache(request.getSource(), PARENT, ConcurrentHashMap::new);
 
-            if (!parentResolutionChain.add(sourceLocation)) {
-                StringBuilder message = new StringBuilder("The parents form a cycle: ");
-                for (String location : parentResolutionChain) {
-                    message.append(location).append(" -> ");
-                }
-                message.append(sourceLocation);
-
-                add(Severity.FATAL, Version.BASE, message.toString());
-                throw newModelBuilderException();
-            }
-
-            try {
-                Map<DefaultProfileActivationContext.Record, ParentModelWithProfiles> parentsPerContext =
-                        cache(request.getSource(), PARENT, ConcurrentHashMap::new);
-
-                for (Map.Entry<DefaultProfileActivationContext.Record, ParentModelWithProfiles> e :
-                        parentsPerContext.entrySet()) {
-                    if (e.getKey().matches(profileActivationContext)) {
-                        ParentModelWithProfiles cached = e.getValue();
-                        // CRITICAL: On cache hit, we need to replay the cached record's keys into the
-                        // current recording context. The matches() method already re-evaluated the
-                        // conditions and recorded some keys in ctx, but we also need to ensure all
-                        // the keys from the cached record are recorded in the current context.
-                        if (profileActivationContext.record != null) {
-                            replayRecordIntoContext(e.getKey(), profileActivationContext);
-                        }
-                        // Add the activated profiles from cache to the result
-                        addActivePomProfiles(cached.activatedProfiles());
-
-                        return cached.model();
+            for (Map.Entry<DefaultProfileActivationContext.Record, ParentModelWithProfiles> e :
+                    parentsPerContext.entrySet()) {
+                if (e.getKey().matches(profileActivationContext)) {
+                    ParentModelWithProfiles cached = e.getValue();
+                    // CRITICAL: On cache hit, we need to replay the cached record's keys into the
+                    // current recording context. The matches() method already re-evaluated the
+                    // conditions and recorded some keys in ctx, but we also need to ensure all
+                    // the keys from the cached record are recorded in the current context.
+                    if (profileActivationContext.record != null) {
+                        replayRecordIntoContext(e.getKey(), profileActivationContext);
                     }
+                    // Add the activated profiles from cache to the result
+                    addActivePomProfiles(cached.activatedProfiles());
+
+                    return cached.model();
                 }
-
-                // Cache miss: process the parent model
-                // CRITICAL: Use a separate recording context to avoid recording intermediate keys
-                // that aren't essential to the final result. Only replay the final essential keys
-                // into the parent recording context to maintain clean cache keys and avoid
-                // over-recording during parent model processing.
-
-                DefaultProfileActivationContext ctx = profileActivationContext.start();
-                ParentModelWithProfiles modelWithProfiles = doReadAsParentModel(ctx);
-                DefaultProfileActivationContext.Record record = ctx.stop();
-                replayRecordIntoContext(record, profileActivationContext);
-
-                parentsPerContext.put(record, modelWithProfiles);
-                addActivePomProfiles(modelWithProfiles.activatedProfiles());
-                return modelWithProfiles.model();
-            } finally {
-                // Remove from chain when done processing this parent
-                parentResolutionChain.remove(sourceLocation);
             }
+
+            // Cache miss: process the parent model
+            // CRITICAL: Use a separate recording context to avoid recording intermediate keys
+            // that aren't essential to the final result. Only replay the final essential keys
+            // into the parent recording context to maintain clean cache keys and avoid
+            // over-recording during parent model processing.
+
+            DefaultProfileActivationContext ctx = profileActivationContext.start();
+            ParentModelWithProfiles modelWithProfiles = doReadAsParentModel(ctx);
+            DefaultProfileActivationContext.Record record = ctx.stop();
+            replayRecordIntoContext(record, profileActivationContext);
+
+            parentsPerContext.put(record, modelWithProfiles);
+            addActivePomProfiles(modelWithProfiles.activatedProfiles());
+            return modelWithProfiles.model();
         }
 
         private ParentModelWithProfiles doReadAsParentModel(
