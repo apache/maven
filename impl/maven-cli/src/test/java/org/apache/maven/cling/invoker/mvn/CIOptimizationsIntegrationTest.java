@@ -196,12 +196,22 @@ class CIOptimizationsIntegrationTest {
         MavenInvoker invoker = new MavenInvoker(ProtoLookup.builder().build(), null);
         MavenContext context = invoker.createContext(mockRequest);
 
-        // Then: CI optimizations should still be applied (force-interactive affects interactive mode, not these
-        // options)
-        CIAwareMavenOptions ciOptions = (CIAwareMavenOptions) context.options();
-        assertTrue(ciOptions.showVersion().orElse(false), "showVersion should still be enabled in CI");
-        assertTrue(ciOptions.showErrors().orElse(false), "showErrors should still be enabled in CI");
-        assertTrue(ciOptions.nonInteractive().orElse(false), "nonInteractive should still be enabled in CI");
-        assertTrue(ciOptions.forceInteractive().orElse(false), "forceInteractive should be preserved");
+        // Then: CI optimizations should NOT be applied when force-interactive is specified
+        // The context should contain the original options, not the CI-aware wrapper
+        assertFalse(
+                context.options() instanceof CIAwareMavenOptions,
+                "CI optimizations should not be applied when --force-interactive is specified");
+
+        // The original options should be preserved
+        MavenOptions options = context.options();
+        assertFalse(
+                options.showVersion().orElse(false),
+                "showVersion should not be enabled when force-interactive is used");
+        assertFalse(
+                options.showErrors().orElse(false), "showErrors should not be enabled when force-interactive is used");
+        assertFalse(
+                options.nonInteractive().orElse(false),
+                "nonInteractive should not be enabled when force-interactive is used");
+        assertTrue(options.forceInteractive().orElse(false), "forceInteractive should be preserved");
     }
 }
