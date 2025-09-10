@@ -89,7 +89,10 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
         MavenOptions options = (MavenOptions) invokerRequest.options().orElse(null);
 
         // Apply CI-specific defaults if CI is detected and not overridden by user
-        if (invokerRequest.ciInfo().isPresent() && options != null) {
+        // Skip CI optimizations if --force-interactive is specified
+        if (invokerRequest.ciInfo().isPresent()
+                && options != null
+                && !options.forceInteractive().orElse(false)) {
             options = new CIAwareMavenOptions(options, invokerRequest.ciInfo().get());
         }
 
