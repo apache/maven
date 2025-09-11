@@ -169,11 +169,6 @@ under the License.
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
       <groupId>org.jline</groupId>
       <artifactId>jansi-core</artifactId>
     </dependency>
