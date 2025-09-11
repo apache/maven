@@ -70,6 +70,7 @@ import org.mockito.quality.Strictness;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
@@ -121,6 +122,11 @@ import static org.mockito.Mockito.withSettings;
  * behaviors that simulate typical Maven operations. Some services, like
  * {@link ModelXmlFactory} and {@link VersionParser}, use real implementations
  * to ensure correct handling of Maven models and versions.</p>
+ *
+ * <p><strong>Service Behavior:</strong> The {@link Session#getService(Class)} method
+ * throws {@link NoSuchElementException} for unknown services by default, matching
+ * the behavior of the real Session implementation. This ensures consistent behavior
+ * between tests and production code.</p>
  *
  * @see InternalSession
  * @see LocalRepository
@@ -453,61 +459,65 @@ public class SessionMock {
         when(session.withLocalRepository(any()))
                 .thenAnswer(iom -> getMockSession(iom.getArgument(0, LocalRepository.class)));
 
+        // Set up default behavior for getService to throw NoSuchElementException for unknown services
+        // This matches the behavior of the real Session implementation
+        // We use doAnswer to set up a fallback that only applies when no specific stub is found
+        doAnswer(invocation -> {
+                    Class<?> serviceClass = invocation.getArgument(0, Class.class);
+                    throw new NoSuchElementException(serviceClass.getName());
+                })
+                .when(session)
+                .getService(argThat(serviceClass ->
+                        // Only throw for service classes that are NOT explicitly configured above
+                        !serviceClass.equals(RepositoryFactory.class)
+                                && !serviceClass.equals(VersionParser.class)
+                                && !serviceClass.equals(LocalRepositoryManager.class)
+                                && !serviceClass.equals(ArtifactInstaller.class)
+                                && !serviceClass.equals(ArtifactDeployer.class)
+                                && !serviceClass.equals(ArtifactManager.class)
+                                && !serviceClass.equals(ProjectManager.class)
+                                && !serviceClass.equals(ArtifactFactory.class)
+                                && !serviceClass.equals(ProjectBuilder.class)
+                                && !serviceClass.equals(ModelXmlFactory.class)
+                                && !serviceClass.equals(Lookup.class)));
+
         return session;
     }
 
     /**
      * Creates a mock session with enhanced getService behavior that throws NoSuchElementException
-     * for unknown services. This method wraps the standard mock session with a proxy that
-     * intercepts getService calls.
+     * for unknown services.
      *
-     * <p><strong>Note:</strong> The returned session cannot be further mocked with Mockito
-     * because it's wrapped in a proxy. Use this method only when you need the enhanced
-     * NoSuchElementException behavior and don't need to add additional mocks.</p>
+     * <p><strong>Note:</strong> As of Maven 4.0.0, the regular {@link #getMockSession(String)}
+     * method now throws NoSuchElementException by default for unknown services, matching the
+     * behavior of the real Session implementation. This method is now equivalent to
+     * {@link #getMockSession(String)} and is kept for backward compatibility.</p>
      *
      * @param localRepo the local repository path
      * @return a session that throws NoSuchElementException for unknown services
+     * @deprecated Use {@link #getMockSession(String)} instead, which now has the same behavior
      */
+    @Deprecated
     public static InternalSession getMockSessionWithEnhancedServiceBehavior(String localRepo) {
-        LocalRepository localRepository = mock(LocalRepository.class);
-        when(localRepository.getId()).thenReturn("local");
-        when(localRepository.getPath()).thenReturn(Paths.get(localRepo));
-        return getMockSessionWithEnhancedServiceBehavior(localRepository);
+        return getMockSession(localRepo);
     }
 
     /**
      * Creates a mock session with enhanced getService behavior that throws NoSuchElementException
-     * for unknown services. This method wraps the standard mock session with a proxy that
-     * intercepts getService calls.
+     * for unknown services.
      *
-     * <p><strong>Note:</strong> The returned session cannot be further mocked with Mockito
-     * because it's wrapped in a proxy. Use this method only when you need the enhanced
-     * NoSuchElementException behavior and don't need to add additional mocks.</p>
+     * <p><strong>Note:</strong> As of Maven 4.0.0, the regular {@link #getMockSession(LocalRepository)}
+     * method now throws NoSuchElementException by default for unknown services, matching the
+     * behavior of the real Session implementation. This method is now equivalent to
+     * {@link #getMockSession(LocalRepository)} and is kept for backward compatibility.</p>
      *
      * @param localRepository the local repository
      * @return a session that throws NoSuchElementException for unknown services
+     * @deprecated Use {@link #getMockSession(LocalRepository)} instead, which now has the same behavior
      */
+    @Deprecated
     public static InternalSession getMockSessionWithEnhancedServiceBehavior(LocalRepository localRepository) {
-        InternalSession session = getMockSession(localRepository);
-
-        // Wrap the session with a proxy that intercepts getService calls
-        return (InternalSession) java.lang.reflect.Proxy.newProxyInstance(
-                session.getClass().getClassLoader(), new Class<?>[] {InternalSession.class}, (proxy, method, args) -> {
-                    // Call the original method
-                    Object result = method.invoke(session, args);
-
-                    // If this is a getService call and the result is null, throw NoSuchElementException
-                    if ("getService".equals(method.getName())
-                            && args != null
-                            && args.length == 1
-                            && args[0] instanceof Class
-                            && result == null) {
-                        Class<?> serviceClass = (Class<?>) args[0];
-                        throw new NoSuchElementException(serviceClass.getName());
-                    }
-
-                    return result;
-                });
+        return getMockSession(localRepository);
     }
 
     static String getPathForArtifact(Artifact artifact) {

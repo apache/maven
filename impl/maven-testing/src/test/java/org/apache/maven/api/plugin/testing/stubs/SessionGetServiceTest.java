@@ -35,7 +35,6 @@ import org.apache.maven.impl.InternalSession;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
@@ -83,21 +82,27 @@ class SessionGetServiceTest {
     }
 
     /**
-     * Test that regular SessionMock.getService returns null for unknown services.
-     * This is Mockito's default behavior. For the enhanced behavior that throws
-     * NoSuchElementException, use getMockSessionWithEnhancedServiceBehavior().
+     * Test that regular SessionMock.getService throws NoSuchElementException for unknown services.
+     * This matches the behavior of the real Session implementation.
      */
     @Test
-    void testSessionMockGetServiceReturnsNullForUnknownServices() {
+    void testSessionMockGetServiceThrowsNoSuchElementExceptionForUnknownServices() {
         InternalSession session = SessionMock.getMockSession(LOCAL_REPO);
 
         // Test with a service that is not configured in SessionMock
-        Object result = session.getService(OsService.class);
-        assertNull(result, "Regular SessionMock.getService returns null for unknown services");
+        NoSuchElementException exception = assertThrows(
+                NoSuchElementException.class,
+                () -> session.getService(OsService.class),
+                "SessionMock.getService should throw NoSuchElementException for unknown services");
+
+        // Verify the exception message contains the service class name
+        assertNotNull(exception.getMessage());
+        assert exception.getMessage().contains(OsService.class.getName());
     }
 
     /**
      * Test that enhanced SessionMock.getService throws NoSuchElementException for unknown services.
+     * Note: This method is now equivalent to the regular getMockSession() method.
      */
     @Test
     void testEnhancedSessionMockGetServiceThrowsNoSuchElementExceptionForUnknownServices() {
@@ -133,6 +138,7 @@ class SessionGetServiceTest {
 
     /**
      * Test that enhanced SessionMock.getService throws NoSuchElementException for custom service interfaces.
+     * Note: This method is now equivalent to the regular getMockSession() method.
      */
     @Test
     void testEnhancedSessionMockGetServiceThrowsForCustomServices() {
