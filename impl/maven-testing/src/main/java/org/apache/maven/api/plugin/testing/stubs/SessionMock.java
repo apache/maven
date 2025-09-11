@@ -70,7 +70,6 @@ import org.mockito.quality.Strictness;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
@@ -126,7 +125,9 @@ import static org.mockito.Mockito.withSettings;
  * <p><strong>Service Behavior:</strong> The {@link Session#getService(Class)} method
  * throws {@link NoSuchElementException} for unknown services by default, matching
  * the behavior of the real Session implementation. This ensures consistent behavior
- * between tests and production code.</p>
+ * between tests and production code. The implementation uses Mockito's {@code argThat}
+ * matcher to selectively apply the default behavior only to services that are not
+ * explicitly configured, providing a clean and maintainable approach.</p>
  *
  * @see InternalSession
  * @see LocalRepository
@@ -154,7 +155,7 @@ public class SessionMock {
         when(session.createRemoteRepository(anyString(), anyString())).thenAnswer(iom -> {
             String id = iom.getArgument(0, String.class);
             String url = iom.getArgument(1, String.class);
-            return session.getService(RepositoryFactory.class).createRemote(id, url);
+            return repositoryFactory.createRemote(id, url);
         });
         when(session.createRemoteRepository(any()))
                 .thenAnswer(iom -> repositoryFactory.createRemote(iom.getArgument(0, Repository.class)));
@@ -461,27 +462,35 @@ public class SessionMock {
 
         // Set up default behavior for getService to throw NoSuchElementException for unknown services
         // This matches the behavior of the real Session implementation
-        // We use doAnswer to set up a fallback that only applies when no specific stub is found
+        // We use doAnswer with argThat to only apply to services not explicitly configured above
         doAnswer(invocation -> {
                     Class<?> serviceClass = invocation.getArgument(0, Class.class);
                     throw new NoSuchElementException(serviceClass.getName());
                 })
                 .when(session)
-                .getService(argThat(serviceClass ->
+                .getService(ArgumentMatchers.argThat(serviceClass ->
                         // Only throw for service classes that are NOT explicitly configured above
-                        !serviceClass.equals(RepositoryFactory.class)
-                                && !serviceClass.equals(VersionParser.class)
-                                && !serviceClass.equals(LocalRepositoryManager.class)
-                                && !serviceClass.equals(ArtifactInstaller.class)
-                                && !serviceClass.equals(ArtifactDeployer.class)
-                                && !serviceClass.equals(ArtifactManager.class)
-                                && !serviceClass.equals(ProjectManager.class)
-                                && !serviceClass.equals(ArtifactFactory.class)
-                                && !serviceClass.equals(ProjectBuilder.class)
-                                && !serviceClass.equals(ModelXmlFactory.class)
-                                && !serviceClass.equals(Lookup.class)));
+                        !isConfiguredService(serviceClass)));
 
         return session;
+    }
+
+    /**
+     * Checks if a service class is explicitly configured in the mock session.
+     * This method contains the list of all services that have explicit stubs.
+     */
+    private static boolean isConfiguredService(Class<?> serviceClass) {
+        return serviceClass.equals(RepositoryFactory.class)
+                || serviceClass.equals(VersionParser.class)
+                || serviceClass.equals(LocalRepositoryManager.class)
+                || serviceClass.equals(ArtifactInstaller.class)
+                || serviceClass.equals(ArtifactDeployer.class)
+                || serviceClass.equals(ArtifactManager.class)
+                || serviceClass.equals(ProjectManager.class)
+                || serviceClass.equals(ArtifactFactory.class)
+                || serviceClass.equals(ProjectBuilder.class)
+                || serviceClass.equals(ModelXmlFactory.class)
+                || serviceClass.equals(Lookup.class);
     }
 
     /**
