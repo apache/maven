@@ -86,6 +86,7 @@ public class ResidentMavenInvoker extends MavenInvoker {
         shadow.containerCapsule = mavenContext.containerCapsule;
         shadow.lookup = mavenContext.lookup;
         shadow.eventSpyDispatcher = mavenContext.eventSpyDispatcher;
+        shadow.simplexTransferListener = mavenContext.simplexTransferListener;
         shadow.maven = mavenContext.maven;
 
         return shadow;
