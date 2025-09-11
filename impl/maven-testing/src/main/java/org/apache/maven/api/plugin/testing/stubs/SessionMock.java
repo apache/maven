@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -121,6 +122,13 @@ import static org.mockito.Mockito.withSettings;
  * {@link ModelXmlFactory} and {@link VersionParser}, use real implementations
  * to ensure correct handling of Maven models and versions.</p>
  *
+ * <p><strong>Service Behavior:</strong> The {@link Session#getService(Class)} method
+ * throws {@link NoSuchElementException} for unknown services by default, matching
+ * the behavior of the real Session implementation. This ensures consistent behavior
+ * between tests and production code. The implementation uses Mockito's {@code argThat}
+ * matcher to selectively apply the default behavior only to services that are not
+ * explicitly configured, providing a clean and maintainable approach.</p>
+ *
  * @see InternalSession
  * @see LocalRepository
  * @see ProjectManager
@@ -147,7 +155,7 @@ public class SessionMock {
         when(session.createRemoteRepository(anyString(), anyString())).thenAnswer(iom -> {
             String id = iom.getArgument(0, String.class);
             String url = iom.getArgument(1, String.class);
-            return session.getService(RepositoryFactory.class).createRemote(id, url);
+            return repositoryFactory.createRemote(id, url);
         });
         when(session.createRemoteRepository(any()))
                 .thenAnswer(iom -> repositoryFactory.createRemote(iom.getArgument(0, Repository.class)));
@@ -452,7 +460,73 @@ public class SessionMock {
         when(session.withLocalRepository(any()))
                 .thenAnswer(iom -> getMockSession(iom.getArgument(0, LocalRepository.class)));
 
+        // Set up default behavior for getService to throw NoSuchElementException for unknown services
+        // This matches the behavior of the real Session implementation
+        // We use doAnswer with argThat to only apply to services not explicitly configured above
+        doAnswer(invocation -> {
+                    Class<?> serviceClass = invocation.getArgument(0, Class.class);
+                    throw new NoSuchElementException(serviceClass.getName());
+                })
+                .when(session)
+                .getService(ArgumentMatchers.argThat(serviceClass ->
+                        // Only throw for service classes that are NOT explicitly configured above
+                        !isConfiguredService(serviceClass)));
+
         return session;
+    }
+
+    /**
+     * Checks if a service class is explicitly configured in the mock session.
+     * This method contains the list of all services that have explicit stubs.
+     */
+    private static boolean isConfiguredService(Class<?> serviceClass) {
+        return serviceClass.equals(RepositoryFactory.class)
+                || serviceClass.equals(VersionParser.class)
+                || serviceClass.equals(LocalRepositoryManager.class)
+                || serviceClass.equals(ArtifactInstaller.class)
+                || serviceClass.equals(ArtifactDeployer.class)
+                || serviceClass.equals(ArtifactManager.class)
+                || serviceClass.equals(ProjectManager.class)
+                || serviceClass.equals(ArtifactFactory.class)
+                || serviceClass.equals(ProjectBuilder.class)
+                || serviceClass.equals(ModelXmlFactory.class)
+                || serviceClass.equals(Lookup.class);
+    }
+
+    /**
+     * Creates a mock session with enhanced getService behavior that throws NoSuchElementException
+     * for unknown services.
+     *
+     * <p><strong>Note:</strong> As of Maven 4.0.0, the regular {@link #getMockSession(String)}
+     * method now throws NoSuchElementException by default for unknown services, matching the
+     * behavior of the real Session implementation. This method is now equivalent to
+     * {@link #getMockSession(String)} and is kept for backward compatibility.</p>
+     *
+     * @param localRepo the local repository path
+     * @return a session that throws NoSuchElementException for unknown services
+     * @deprecated Use {@link #getMockSession(String)} instead, which now has the same behavior
+     */
+    @Deprecated
+    public static InternalSession getMockSessionWithEnhancedServiceBehavior(String localRepo) {
+        return getMockSession(localRepo);
+    }
+
+    /**
+     * Creates a mock session with enhanced getService behavior that throws NoSuchElementException
+     * for unknown services.
+     *
+     * <p><strong>Note:</strong> As of Maven 4.0.0, the regular {@link #getMockSession(LocalRepository)}
+     * method now throws NoSuchElementException by default for unknown services, matching the
+     * behavior of the real Session implementation. This method is now equivalent to
+     * {@link #getMockSession(LocalRepository)} and is kept for backward compatibility.</p>
+     *
+     * @param localRepository the local repository
+     * @return a session that throws NoSuchElementException for unknown services
+     * @deprecated Use {@link #getMockSession(LocalRepository)} instead, which now has the same behavior
+     */
+    @Deprecated
+    public static InternalSession getMockSessionWithEnhancedServiceBehavior(LocalRepository localRepository) {
+        return getMockSession(localRepository);
     }
 
     static String getPathForArtifact(Artifact artifact) {
