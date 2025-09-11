@@ -22,8 +22,6 @@ import java.io.File;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
 /**
  * This is a test set for GH-11084.
  */
@@ -38,18 +36,16 @@ class MavenITgh11084ReactorReaderPreferConsumerPomTest extends AbstractMavenInte
 
         // First build module a to populate project-local-repo with artifacts including consumer POM
         Verifier v1 = newVerifier(testDir.getAbsolutePath());
-        v1.setAutoclean(false);
-        v1.addCliArguments("compile");
+        v1.addCliArguments("clean", "package", "-X");
+        v1.setLogFileName("log-1.txt");
         v1.execute();
         v1.verifyErrorFreeLog();
 
         // Now build only module b; ReactorReader should pick consumer POM from project-local-repo
         Verifier v2 = newVerifier(testDir.getAbsolutePath());
-        v2.setAutoclean(false);
-        v2.addCliArguments("-f", "b", "compile");
+        v2.setLogFileName("log-2.txt");
+        v2.addCliArguments("clean", "compile", "-f", "b", "-X");
         v2.execute();
         v2.verifyErrorFreeLog();
-        String log = v2.loadLogContent();
-        assertFalse(log.contains("The POM for org.apache.maven.its.gh11084:a:jar:1.0.0-SNAPSHOT is invalid"), log);
     }
 }

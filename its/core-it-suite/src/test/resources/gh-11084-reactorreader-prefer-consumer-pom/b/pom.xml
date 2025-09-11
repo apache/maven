@@ -22,6 +22,7 @@
   <parent />
 
   <artifactId>b</artifactId>
+  <packaging>jar</packaging>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.its.gh11084</groupId>

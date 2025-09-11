@@ -16,10 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package p;
+package a;
+
+import java.io.IOException;
+import java.nio.file.Path;
+
+import org.codehaus.plexus.util.io.CachingOutputStream;
 
 public class A {
-    public static String v() {
-        return "A";
+    public static CachingOutputStream newCachingOutputStream(Path p) throws IOException {
+        return new CachingOutputStream(p);
     }
 }
