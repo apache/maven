@@ -38,7 +38,6 @@ import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.ProjectScope;
 import org.apache.maven.api.RemoteRepository;
-import org.apache.maven.api.Service;
 import org.apache.maven.api.SourceRoot;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.SessionScoped;
@@ -54,7 +53,7 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.maven.internal.impl.CoreUtils.map;
 
 @Named
-@Typed({ProjectManager.class, Service.class})
+@Typed
 @SessionScoped
 public class DefaultProjectManager implements ProjectManager {
 
