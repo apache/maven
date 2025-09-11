@@ -844,7 +844,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             return readParent(childModel, parent, profileActivationContext, new LinkedHashSet<>());
         }
 
-        private Model readParent(
+        Model readParent(
                 Model childModel,
                 Parent parent,
                 DefaultProfileActivationContext profileActivationContext,
@@ -866,7 +866,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
 
                 try {
-                    parentModel = resolveParent(childModel, parent, profileActivationContext);
+                    parentModel = resolveParent(childModel, parent, profileActivationContext, parentChain);
 
                     if (!"pom".equals(parentModel.getPackaging())) {
                         add(
@@ -878,7 +878,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     }
                     result.setParentModel(parentModel);
 
-                    // Recursively read the parent's parent with the same chain to detect cycles
+                    // Recursively read the parent's parent
                     if (parentModel.getParent() != null) {
                         readParent(parentModel, parentModel.getParent(), profileActivationContext, parentChain);
                     }
@@ -903,12 +903,21 @@ public class DefaultModelBuilder implements ModelBuilder {
         private Model resolveParent(
                 Model childModel, Parent parent, DefaultProfileActivationContext profileActivationContext)
                 throws ModelBuilderException {
+            return resolveParent(childModel, parent, profileActivationContext, new LinkedHashSet<>());
+        }
+
+        private Model resolveParent(
+                Model childModel,
+                Parent parent,
+                DefaultProfileActivationContext profileActivationContext,
+                Set<String> parentChain)
+                throws ModelBuilderException {
             Model parentModel = null;
             if (isBuildRequest()) {
                 parentModel = readParentLocally(childModel, parent, profileActivationContext);
             }
             if (parentModel == null) {
-                parentModel = resolveAndReadParentExternally(childModel, parent, profileActivationContext);
+                parentModel = resolveAndReadParentExternally(childModel, parent, profileActivationContext, parentChain);
             }
             return parentModel;
         }
@@ -1040,6 +1049,15 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         Model resolveAndReadParentExternally(
                 Model childModel, Parent parent, DefaultProfileActivationContext profileActivationContext)
+                throws ModelBuilderException {
+            return resolveAndReadParentExternally(childModel, parent, profileActivationContext, new LinkedHashSet<>());
+        }
+
+        Model resolveAndReadParentExternally(
+                Model childModel,
+                Parent parent,
+                DefaultProfileActivationContext profileActivationContext,
+                Set<String> parentChain)
                 throws ModelBuilderException {
             ModelBuilderRequest request = this.request;
             setSource(childModel);
