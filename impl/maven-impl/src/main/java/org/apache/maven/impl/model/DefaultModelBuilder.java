@@ -254,7 +254,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         final DefaultModelBuilderResult result;
         final Graph dag;
         final Map<GAKey, Set<ModelSource>> mappedSources;
-        final Set<String> parentResolutionChain;
 
         String source;
         Model sourceModel;
@@ -271,7 +270,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                     new DefaultModelBuilderResult(request, ProblemCollector.create(request.getSession())),
                     new Graph(),
                     new ConcurrentHashMap<>(64),
-                    new LinkedHashSet<>(),
                     List.of(),
                     repos(request),
                     repos(request));
@@ -291,7 +289,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                 DefaultModelBuilderResult result,
                 Graph dag,
                 Map<GAKey, Set<ModelSource>> mappedSources,
-                Set<String> parentResolutionChain,
                 List<RemoteRepository> pomRepositories,
                 List<RemoteRepository> externalRepositories,
                 List<RemoteRepository> repositories) {
@@ -300,7 +297,6 @@ public class DefaultModelBuilder implements ModelBuilder {
             this.result = result;
             this.dag = dag;
             this.mappedSources = mappedSources;
-            this.parentResolutionChain = parentResolutionChain;
             this.pomRepositories = pomRepositories;
             this.externalRepositories = externalRepositories;
             this.repositories = repositories;
@@ -326,17 +322,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             if (session != request.getSession()) {
                 throw new IllegalArgumentException("Session mismatch");
             }
-            // Share the same parentResolutionChain across all derived sessions to detect cycles
             return new ModelBuilderSessionState(
-                    session,
-                    request,
-                    result,
-                    dag,
-                    mappedSources,
-                    parentResolutionChain,
-                    pomRepositories,
-                    externalRepositories,
-                    repositories);
+                    session, request, result, dag, mappedSources, pomRepositories, externalRepositories, repositories);
         }
 
         @Override
@@ -854,20 +841,51 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         Model readParent(Model childModel, Parent parent, DefaultProfileActivationContext profileActivationContext) {
+            return readParent(childModel, parent, profileActivationContext, new LinkedHashSet<>());
+        }
+
+        private Model readParent(
+                Model childModel,
+                Parent parent,
+                DefaultProfileActivationContext profileActivationContext,
+                Set<String> parentChain) {
             Model parentModel;
 
             if (parent != null) {
-                parentModel = resolveParent(childModel, parent, profileActivationContext);
+                // Check for circular parent resolution using model IDs
+                String parentId = parent.getGroupId() + ":" + parent.getArtifactId() + ":" + parent.getVersion();
+                if (!parentChain.add(parentId)) {
+                    StringBuilder message = new StringBuilder("The parents form a cycle: ");
+                    for (String id : parentChain) {
+                        message.append(id).append(" -> ");
+                    }
+                    message.append(parentId);
 
-                if (!"pom".equals(parentModel.getPackaging())) {
-                    add(
-                            Severity.ERROR,
-                            Version.BASE,
-                            "Invalid packaging for parent POM " + ModelProblemUtils.toSourceHint(parentModel)
-                                    + ", must be \"pom\" but is \"" + parentModel.getPackaging() + "\"",
-                            parentModel.getLocation("packaging"));
+                    add(Severity.FATAL, Version.BASE, message.toString());
+                    throw newModelBuilderException();
                 }
-                result.setParentModel(parentModel);
+
+                try {
+                    parentModel = resolveParent(childModel, parent, profileActivationContext);
+
+                    if (!"pom".equals(parentModel.getPackaging())) {
+                        add(
+                                Severity.ERROR,
+                                Version.BASE,
+                                "Invalid packaging for parent POM " + ModelProblemUtils.toSourceHint(parentModel)
+                                        + ", must be \"pom\" but is \"" + parentModel.getPackaging() + "\"",
+                                parentModel.getLocation("packaging"));
+                    }
+                    result.setParentModel(parentModel);
+
+                    // Recursively read the parent's parent with the same chain to detect cycles
+                    if (parentModel.getParent() != null) {
+                        readParent(parentModel, parentModel.getParent(), profileActivationContext, parentChain);
+                    }
+                } finally {
+                    // Remove from chain when done processing this parent
+                    parentChain.remove(parentId);
+                }
             } else {
                 String superModelVersion = childModel.getModelVersion();
                 if (superModelVersion == null || !KNOWN_MODEL_VERSIONS.contains(superModelVersion)) {
@@ -885,32 +903,14 @@ public class DefaultModelBuilder implements ModelBuilder {
         private Model resolveParent(
                 Model childModel, Parent parent, DefaultProfileActivationContext profileActivationContext)
                 throws ModelBuilderException {
-            // Check for circular parent resolution using model IDs
-            String parentId = parent.getGroupId() + ":" + parent.getArtifactId() + ":" + parent.getVersion();
-            if (!parentResolutionChain.add(parentId)) {
-                StringBuilder message = new StringBuilder("The parents form a cycle: ");
-                for (String id : parentResolutionChain) {
-                    message.append(id).append(" -> ");
-                }
-                message.append(parentId);
-
-                add(Severity.FATAL, Version.BASE, message.toString());
-                throw newModelBuilderException();
+            Model parentModel = null;
+            if (isBuildRequest()) {
+                parentModel = readParentLocally(childModel, parent, profileActivationContext);
             }
-
-            try {
-                Model parentModel = null;
-                if (isBuildRequest()) {
-                    parentModel = readParentLocally(childModel, parent, profileActivationContext);
-                }
-                if (parentModel == null) {
-                    parentModel = resolveAndReadParentExternally(childModel, parent, profileActivationContext);
-                }
-                return parentModel;
-            } finally {
-                // Remove from chain when done processing this parent
-                parentResolutionChain.remove(parentId);
+            if (parentModel == null) {
+                parentModel = resolveAndReadParentExternally(childModel, parent, profileActivationContext);
             }
+            return parentModel;
         }
 
         private Model readParentLocally(
