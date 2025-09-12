@@ -29,8 +29,10 @@ import com.google.common.jimfs.Jimfs;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.Parser;
+import org.apache.maven.cling.invoker.ProcessRuns;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.codehaus.plexus.classworlds.ClassWorld;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -47,6 +49,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @Order(200)
 public class MavenInvokerTest extends MavenInvokerTestSupport {
+
+    @TempDir
+    Path tmpHome;
+
+    private String oldHome;
+
+    @AfterEach
+    void restoreHome() {
+        if (oldHome != null) {
+            System.setProperty("user.home", oldHome);
+        }
+    }
+
     @Override
     protected Invoker createInvoker(ClassWorld classWorld) {
         return new MavenInvoker(
@@ -231,6 +246,36 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
     void jimFs() throws Exception {
         try (FileSystem fs = Jimfs.newFileSystem(Configuration.unix())) {
             invoke(fs.getPath("/cwd"), fs.getPath("/home"), List.of("verify"), List.of());
+        }
+    }
+
+    @Test
+    void listsCurrentPidFromRegistry() {
+        // point user.home to isolated temp dir
+        oldHome = System.getProperty("user.home");
+        System.setProperty("user.home", tmpHome.toString());
+
+        final long pid = ProcessHandle.current().pid();
+        final Path workDir = tmpHome.resolve("work");
+        final Path execRoot = tmpHome.resolve("root");
+
+        try {
+            // write descriptor for THIS alive pid
+            ProcessRuns.install(pid, "TEST", workDir, execRoot);
+
+            // list + format
+            final var runs = ProcessRuns.listAlive();
+            final String table = ProcessRuns.format(runs);
+
+            // assertions
+            assertFalse(
+                    table.startsWith("No running Maven processes."),
+                    "Expected at least one running Maven process to be listed");
+            assertTrue(table.contains(Long.toString(pid)), "Expected table to contain current PID");
+            assertTrue(table.contains("TEST"), "Expected table to contain version label");
+        } finally {
+            // cleanup best-effort
+            ProcessRuns.uninstall(pid);
         }
     }
 }
