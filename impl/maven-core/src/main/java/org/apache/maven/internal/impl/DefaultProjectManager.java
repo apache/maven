@@ -47,13 +47,11 @@ import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.MappedList;
 import org.apache.maven.impl.PropertiesAsMap;
 import org.apache.maven.project.MavenProject;
-import org.eclipse.sisu.Typed;
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.maven.internal.impl.CoreUtils.map;
 
 @Named
-@Typed
 @SessionScoped
 public class DefaultProjectManager implements ProjectManager {
 

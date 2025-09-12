@@ -239,7 +239,7 @@ jobs:
 
       - name: Build Maven and ITs and run them
         shell: bash
-        run: mvn verify -e -B -V -Prun-its,mimir
+        run: mvn install -e -B -V -Prun-its,mimir
 
       - name: Upload test artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

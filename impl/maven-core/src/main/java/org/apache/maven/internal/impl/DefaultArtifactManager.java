@@ -35,12 +35,10 @@ import org.apache.maven.api.di.SessionScoped;
 import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.impl.DefaultArtifact;
 import org.apache.maven.project.MavenProject;
-import org.eclipse.sisu.Typed;
 
 import static java.util.Objects.requireNonNull;
 
 @Named
-@Typed
 @SessionScoped
 public class DefaultArtifactManager implements ArtifactManager {
 
