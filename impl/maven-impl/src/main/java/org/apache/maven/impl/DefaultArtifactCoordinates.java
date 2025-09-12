@@ -84,12 +84,13 @@ public class DefaultArtifactCoordinates implements ArtifactCoordinates {
         return Objects.equals(this.getGroupId(), that.getGroupId())
                 && Objects.equals(this.getArtifactId(), that.getArtifactId())
                 && Objects.equals(this.getVersionConstraint(), that.getVersionConstraint())
+                && Objects.equals(this.getExtension(), that.getExtension())
                 && Objects.equals(this.getClassifier(), that.getClassifier());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getGroupId(), getArtifactId(), getVersionConstraint(), getClassifier());
+        return Objects.hash(getGroupId(), getArtifactId(), getVersionConstraint(), getExtension(), getClassifier());
     }
 
     @Override
