@@ -20,4 +20,13 @@ package ${package};
 
 public interface InputLocationTracker {
     InputLocation getLocation(Object field);
+
+    /**
+     * Gets the parent InputLocation where this InputLocation may have been imported from.
+     * Can return {@code null}.
+     *
+     * @return InputLocation
+     * @since 4.0.0
+     */
+    InputLocation getImportedFrom();
 }

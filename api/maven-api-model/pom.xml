@@ -59,6 +59,8 @@ under the License.
           <params>
             <param>packageModelV4=org.apache.maven.api.model</param>
             <param>isMavenModel=true</param>
+            <param>locationTracking=true</param>
+            <param>generateLocationClasses=true</param>
           </params>
         </configuration>
         <executions>
