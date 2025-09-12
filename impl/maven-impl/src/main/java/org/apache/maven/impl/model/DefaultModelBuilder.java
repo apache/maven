@@ -254,6 +254,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         final DefaultModelBuilderResult result;
         final Graph dag;
         final Map<GAKey, Set<ModelSource>> mappedSources;
+        final Set<String> parentResolutionChain;
 
         String source;
         Model sourceModel;
@@ -270,6 +271,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     new DefaultModelBuilderResult(request, ProblemCollector.create(request.getSession())),
                     new Graph(),
                     new ConcurrentHashMap<>(64),
+                    new LinkedHashSet<>(),
                     List.of(),
                     repos(request),
                     repos(request));
@@ -289,6 +291,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 DefaultModelBuilderResult result,
                 Graph dag,
                 Map<GAKey, Set<ModelSource>> mappedSources,
+                Set<String> parentResolutionChain,
                 List<RemoteRepository> pomRepositories,
                 List<RemoteRepository> externalRepositories,
                 List<RemoteRepository> repositories) {
@@ -297,6 +300,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             this.result = result;
             this.dag = dag;
             this.mappedSources = mappedSources;
+            this.parentResolutionChain = parentResolutionChain;
             this.pomRepositories = pomRepositories;
             this.externalRepositories = externalRepositories;
             this.repositories = repositories;
@@ -322,8 +326,17 @@ public class DefaultModelBuilder implements ModelBuilder {
             if (session != request.getSession()) {
                 throw new IllegalArgumentException("Session mismatch");
             }
+            // Share the same parentResolutionChain across all derived sessions to detect cycles
             return new ModelBuilderSessionState(
-                    session, request, result, dag, mappedSources, pomRepositories, externalRepositories, repositories);
+                    session,
+                    request,
+                    result,
+                    dag,
+                    mappedSources,
+                    parentResolutionChain,
+                    pomRepositories,
+                    externalRepositories,
+                    repositories);
         }
 
         @Override
@@ -872,14 +885,32 @@ public class DefaultModelBuilder implements ModelBuilder {
         private Model resolveParent(
                 Model childModel, Parent parent, DefaultProfileActivationContext profileActivationContext)
                 throws ModelBuilderException {
-            Model parentModel = null;
-            if (isBuildRequest()) {
-                parentModel = readParentLocally(childModel, parent, profileActivationContext);
+            // Check for circular parent resolution using model IDs
+            String parentId = parent.getGroupId() + ":" + parent.getArtifactId() + ":" + parent.getVersion();
+            if (!parentResolutionChain.add(parentId)) {
+                StringBuilder message = new StringBuilder("The parents form a cycle: ");
+                for (String id : parentResolutionChain) {
+                    message.append(id).append(" -> ");
+                }
+                message.append(parentId);
+
+                add(Severity.FATAL, Version.BASE, message.toString());
+                throw newModelBuilderException();
             }
-            if (parentModel == null) {
-                parentModel = resolveAndReadParentExternally(childModel, parent, profileActivationContext);
+
+            try {
+                Model parentModel = null;
+                if (isBuildRequest()) {
+                    parentModel = readParentLocally(childModel, parent, profileActivationContext);
+                }
+                if (parentModel == null) {
+                    parentModel = resolveAndReadParentExternally(childModel, parent, profileActivationContext);
+                }
+                return parentModel;
+            } finally {
+                // Remove from chain when done processing this parent
+                parentResolutionChain.remove(parentId);
             }
-            return parentModel;
         }
 
         private Model readParentLocally(
@@ -948,7 +979,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                         return null;
                     }
 
-                    // Validate versions aren't inherited when using parent ranges the same way as when read externally.
+                    // Validate versions aren't inherited when using parent ranges the same way as when read
+                    // externally.
                     String rawChildModelVersion = childModel.getVersion();
 
                     if (rawChildModelVersion == null) {
@@ -1581,6 +1613,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     }
                     // Add the activated profiles from cache to the result
                     addActivePomProfiles(cached.activatedProfiles());
+
                     return cached.model();
                 }
             }
@@ -1590,6 +1623,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             // that aren't essential to the final result. Only replay the final essential keys
             // into the parent recording context to maintain clean cache keys and avoid
             // over-recording during parent model processing.
+
             DefaultProfileActivationContext ctx = profileActivationContext.start();
             ParentModelWithProfiles modelWithProfiles = doReadAsParentModel(ctx);
             DefaultProfileActivationContext.Record record = ctx.stop();
