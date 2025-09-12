@@ -126,7 +126,7 @@ public class CommonsCliUpgradeOptions extends CommonsCliOptions implements Upgra
         printStream.accept(
                 "  -a, --all             Apply all upgrades (equivalent to --model-version 4.1.0 --infer --model --plugins)");
         printStream.accept("");
-        printStream.accept("Default behavior: --model and --plugins are applied if no other options are specified");
+        printStream.accept("Default behavior: --model --plugins --infer are applied if no other options are specified");
         printStream.accept("");
     }
 

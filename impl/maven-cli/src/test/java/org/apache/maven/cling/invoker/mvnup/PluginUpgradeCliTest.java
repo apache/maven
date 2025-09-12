@@ -18,8 +18,13 @@
  */
 package org.apache.maven.cling.invoker.mvnup;
 
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
+
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.api.cli.mvnup.UpgradeOptions;
+import org.apache.maven.cling.MavenUpCling;
+import org.codehaus.plexus.classworlds.ClassWorld;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -189,5 +194,26 @@ class PluginUpgradeCliTest {
 
         assertTrue(interpolated.plugins().isPresent(), "Interpolated options should preserve --plugins");
         assertTrue(interpolated.plugins().get(), "Interpolated --plugins should be true");
+    }
+
+    @Test
+    void helpMentionsInferInDefault() throws Exception {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ByteArrayOutputStream err = new ByteArrayOutputStream();
+
+        int exit = MavenUpCling.main(
+                new String[] {"--help"},
+                new ClassWorld("plexus.core", Thread.currentThread().getContextClassLoader()),
+                null,
+                out,
+                err);
+
+        String help = out.toString(StandardCharsets.UTF_8);
+        assertEquals(0, exit, "mvnup --help should exit 0");
+        assertTrue(
+                help.contains("Default behavior: --model --plugins --infer"),
+                "Help footer should advertise --infer as part of the defaults");
+        assertFalse(
+                help.contains("Default behavior: --model and --plugins"), "Old/incorrect default text must be gone");
     }
 }
