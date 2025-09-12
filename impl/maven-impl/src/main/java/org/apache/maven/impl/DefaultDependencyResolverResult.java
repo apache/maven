@@ -102,19 +102,27 @@ public class DefaultDependencyResolverResult implements DependencyResolverResult
      * to {@link #addDependency(Node, Dependency, Predicate, Path)}.
      *
      * @param request the corresponding request
-     * @param cache cache of module information about each dependency
      * @param exceptions the exceptions that occurred while building the dependency graph
      * @param root the root node of the dependency graph
      * @param count estimated number of dependencies
      */
     public DefaultDependencyResolverResult(
+            DependencyResolverRequest request, List<Exception> exceptions, Node root, int count) {
+        this(request, new PathModularizationCache(), exceptions, root, count);
+    }
+
+    DefaultDependencyResolverResult(
             DependencyResolverRequest request,
             PathModularizationCache cache,
             List<Exception> exceptions,
             Node root,
             int count) {
         this.request = request;
-        this.cache = cache;
+        if (cache == null) {
+            this.cache = new PathModularizationCache();
+        } else {
+            this.cache = cache;
+        }
         this.exceptions = exceptions;
         this.root = root;
         nodes = new ArrayList<>(count);
