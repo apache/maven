@@ -36,7 +36,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  */
@@ -71,5 +73,26 @@ class DefaultSettingsBuilderFactoryTest {
 
     private Path getSettings(String name) {
         return Paths.get("src/test/resources/" + name + ".xml").toAbsolutePath();
+    }
+
+    @Test
+    void percentCurlyIsNotEncrypted() {
+        assertFalse(DefaultSettingsBuilder.isV4Token("%{foo}.txt"));
+    }
+
+    @Test
+    void dollarCurlyIsNotEncrypted() {
+        assertFalse(DefaultSettingsBuilder.isV4Token("${foo}.txt"));
+    }
+
+    @Test
+    void plainTextIsNotEncrypted() {
+        assertFalse(DefaultSettingsBuilder.isV4Token("hello.txt"));
+    }
+
+    @Test
+    void v4TokenIsRecognized() {
+        String v4 = "{[name=test,source=env:MVN_MASTER,version=4.0]deadbeef}";
+        assertTrue(DefaultSettingsBuilder.isV4Token(v4));
     }
 }
