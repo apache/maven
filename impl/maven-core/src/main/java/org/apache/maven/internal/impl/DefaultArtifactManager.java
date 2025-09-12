@@ -30,18 +30,15 @@ import java.util.stream.Stream;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ProducedArtifact;
-import org.apache.maven.api.Service;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.SessionScoped;
 import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.impl.DefaultArtifact;
 import org.apache.maven.project.MavenProject;
-import org.eclipse.sisu.Typed;
 
 import static java.util.Objects.requireNonNull;
 
 @Named
-@Typed({ArtifactManager.class, Service.class})
 @SessionScoped
 public class DefaultArtifactManager implements ArtifactManager {
 

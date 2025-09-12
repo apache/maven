@@ -128,7 +128,7 @@ public class SisuDiBridgeModule extends AbstractModule {
             } else if (key.getQualifier() instanceof Annotation a) {
                 return (com.google.inject.Key<U>) com.google.inject.Key.get(key.getType(), a);
             } else {
-                return (com.google.inject.Key<U>) com.google.inject.Key.get(key.getType());
+                return (com.google.inject.Key<U>) com.google.inject.Key.get(key.getType(), Named.class);
             }
         }
 
