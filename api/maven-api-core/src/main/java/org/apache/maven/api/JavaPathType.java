@@ -377,6 +377,25 @@ public enum JavaPathType implements PathType {
         }
 
         /**
+         * {@return a hash code value based on the raw type and module name}.
+         */
+        @Override
+        public int hashCode() {
+            return rawType().hashCode() + 17 * moduleName.hashCode();
+        }
+
+        /**
+         * {@return whether the given object represents the same type of path as this object}.
+         */
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof Modular m) {
+                return rawType() == m.rawType() && moduleName.equals(m.moduleName);
+            }
+            return false;
+        }
+
+        /**
          * Returns the programmatic name of this path type, including the module to patch.
          * For example, if this type was created by {@code JavaPathType.patchModule("foo.bar")},
          * then this method returns {@code "PathType[PATCH_MODULE:foo.bar]")}.
