@@ -120,6 +120,8 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                     .collect(Collectors.toMap(n -> getDependencyKey(n.getDependency()), Function.identity()));
             Map<String, Dependency> directDependencies = model.getDependencies().stream()
                     .filter(dependency -> !"import".equals(dependency.getScope()))
+                    .map(this::transformDependencyForConsumerPom)
+                    .filter(dependency -> dependency != null) // Filter out dependencies that should be omitted
                     .collect(Collectors.toMap(
                             DefaultConsumerPomBuilder::getDependencyKey,
                             Function.identity(),
@@ -128,6 +130,8 @@ class DefaultConsumerPomBuilder implements PomBuilder {
             Map<String, Dependency> managedDependencies = model.getDependencyManagement().getDependencies().stream()
                     .filter(dependency ->
                             nodes.containsKey(getDependencyKey(dependency)) && !"import".equals(dependency.getScope()))
+                    .map(this::transformDependencyForConsumerPom)
+                    .filter(dependency -> dependency != null) // Filter out dependencies that should be omitted
                     .collect(Collectors.toMap(
                             DefaultConsumerPomBuilder::getDependencyKey,
                             Function.identity(),
@@ -173,6 +177,45 @@ class DefaultConsumerPomBuilder implements PomBuilder {
 
     private Dependency merge(Dependency dep1, Dependency dep2) {
         throw new IllegalArgumentException("Duplicate dependency: " + dep1);
+    }
+
+    /**
+     * Transforms a dependency for inclusion in a consumer POM.
+     * Handles new Maven 4 scopes that are not compatible with Maven 3.x consumers.
+     *
+     * @param dependency the original dependency
+     * @return the transformed dependency, or null if the dependency should be omitted
+     */
+    Dependency transformDependencyForConsumerPom(Dependency dependency) {
+        if (dependency == null) {
+            return null;
+        }
+
+        String scope = dependency.getScope();
+        if (scope == null) {
+            return dependency;
+        }
+
+        // Handle new Maven 4 scopes when creating consumer POM
+        switch (scope) {
+            case "compile-only":
+                // compile-only dependencies should be omitted from consumer POM
+                // as they are only needed at compile time and not for consumers
+                return null;
+
+            case "test-only":
+                // test-only dependencies should be omitted from consumer POM
+                // as they are only needed for testing and not for consumers
+                return null;
+
+            case "test-runtime":
+                // test-runtime dependencies should be mapped to classic 'test' for consumer POM compatibility
+                return dependency.withScope("test");
+
+            default:
+                // Keep all other scopes as-is
+                return dependency;
+        }
     }
 
     private static String getDependencyKey(org.apache.maven.api.Dependency dependency) {

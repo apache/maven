@@ -19,9 +19,12 @@
 package org.apache.maven.model.v4;
 
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collections;
 
 import org.apache.maven.api.model.Build;
+import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.model.PluginExecution;
@@ -71,5 +74,74 @@ class MavenModelVersionTest {
                         .withExecutions(Collections.singleton(
                                 PluginExecution.newInstance().withPriority(5))))));
         assertEquals("4.0.0", new MavenModelVersion().getModelVersion(m));
+    }
+
+    @Test
+    void testV4ModelWithNewMaven4Scopes() {
+        // Test compile-only scope
+        Dependency compileOnlyDep = Dependency.newBuilder()
+                .groupId("org.example")
+                .artifactId("compile-only-dep")
+                .version("1.0.0")
+                .scope("compile-only")
+                .build();
+
+        Model m1 = model.withDependencies(Arrays.asList(compileOnlyDep));
+        // Should return "4.1.0" because compile-only scope requires Maven 4.1.0+
+        assertEquals("4.1.0", new MavenModelVersion().getModelVersion(m1));
+
+        // Test test-only scope
+        Dependency testOnlyDep = Dependency.newBuilder()
+                .groupId("org.example")
+                .artifactId("test-only-dep")
+                .version("1.0.0")
+                .scope("test-only")
+                .build();
+
+        Model m2 = model.withDependencies(Arrays.asList(testOnlyDep));
+        assertEquals("4.1.0", new MavenModelVersion().getModelVersion(m2));
+
+        // Test test-runtime scope
+        Dependency testRuntimeDep = Dependency.newBuilder()
+                .groupId("org.example")
+                .artifactId("test-runtime-dep")
+                .version("1.0.0")
+                .scope("test-runtime")
+                .build();
+
+        Model m3 = model.withDependencies(Arrays.asList(testRuntimeDep));
+        assertEquals("4.1.0", new MavenModelVersion().getModelVersion(m3));
+
+        // Test new scopes in dependency management
+        DependencyManagement depMgmt = DependencyManagement.newBuilder()
+                .dependencies(Arrays.asList(compileOnlyDep))
+                .build();
+
+        Model m4 = model.withDependencyManagement(depMgmt);
+        assertEquals("4.1.0", new MavenModelVersion().getModelVersion(m4));
+    }
+
+    @Test
+    void testV4ModelWithStandardScopes() {
+        // Test that standard scopes don't require 4.1.0
+        Dependency compileDep = Dependency.newBuilder()
+                .groupId("org.example")
+                .artifactId("compile-dep")
+                .version("1.0.0")
+                .scope("compile")
+                .build();
+
+        Model m1 = model.withDependencies(Arrays.asList(compileDep));
+        assertEquals("4.0.0", new MavenModelVersion().getModelVersion(m1));
+
+        Dependency testDep = Dependency.newBuilder()
+                .groupId("org.example")
+                .artifactId("test-dep")
+                .version("1.0.0")
+                .scope("test")
+                .build();
+
+        Model m2 = model.withDependencies(Arrays.asList(testDep));
+        assertEquals("4.0.0", new MavenModelVersion().getModelVersion(m2));
     }
 }
