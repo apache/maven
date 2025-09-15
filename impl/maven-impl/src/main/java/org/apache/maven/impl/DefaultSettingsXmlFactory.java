@@ -53,7 +53,7 @@ public class DefaultSettingsXmlFactory implements SettingsXmlFactory {
         try {
             InputSource source = null;
             if (request.getModelId() != null || request.getLocation() != null) {
-                source = new InputSource(request.getLocation());
+                source = InputSource.of(request.getLocation());
             }
             SettingsStaxReader xml = request.getTransformer() != null
                     ? new SettingsStaxReader(request.getTransformer()::transform)
