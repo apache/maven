@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng3309</groupId>
+  <artifactId>cascading-profile-activation</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>Maven Integration Test :: MNG-3309</name>
+  <description>
+    Test cascading profile activation where one profile's properties trigger the activation of other profiles.
+  </description>
+
+  <properties>
+    <!-- Default properties -->
+    <test.property>default</test.property>
+    <profile1.activated>false</profile1.activated>
+    <profile2.activated>false</profile2.activated>
+    <profile3.activated>false</profile3.activated>
+  </properties>
+
+  <profiles>
+    <!-- Profile 1: Activated by system property trigger=start -->
+    <profile>
+      <id>profile1</id>
+      <activation>
+        <property>
+          <name>trigger</name>
+          <value>start</value>
+        </property>
+      </activation>
+      <properties>
+        <profile1.activated>true</profile1.activated>
+        <!-- This property should trigger profile2 -->
+        <cascade.level1>activate</cascade.level1>
+        <test.property>profile1</test.property>
+      </properties>
+    </profile>
+
+    <!-- Profile 2: Activated by profile1's cascade.level1 property -->
+    <profile>
+      <id>profile2</id>
+      <activation>
+        <property>
+          <name>cascade.level1</name>
+          <value>activate</value>
+        </property>
+      </activation>
+      <properties>
+        <profile2.activated>true</profile2.activated>
+        <!-- This property should trigger profile3 -->
+        <cascade.level2>activate</cascade.level2>
+        <test.property>profile2</test.property>
+      </properties>
+    </profile>
+
+    <!-- Profile 3: Activated by profile2's cascade.level2 property -->
+    <profile>
+      <id>profile3</id>
+      <activation>
+        <property>
+          <name>cascade.level2</name>
+          <value>activate</value>
+        </property>
+      </activation>
+      <properties>
+        <profile3.activated>true</profile3.activated>
+        <test.property>profile3</test.property>
+      </properties>
+    </profile>
+
+    <!-- Profile 4: Should NOT be activated (no trigger) -->
+    <profile>
+      <id>profile4</id>
+      <activation>
+        <property>
+          <name>never.set</name>
+          <value>never</value>
+        </property>
+      </activation>
+      <properties>
+        <profile4.activated>true</profile4.activated>
+        <test.property>profile4</test.property>
+      </properties>
+    </profile>
+
+    <!-- Profile 5: Circular dependency test - sets trigger=start -->
+    <profile>
+      <id>profile5</id>
+      <activation>
+        <property>
+          <name>circular</name>
+          <value>test</value>
+        </property>
+      </activation>
+      <properties>
+        <profile5.activated>true</profile5.activated>
+        <!-- This creates a circular dependency with profile1 -->
+        <trigger>start</trigger>
+        <test.property>profile5</test.property>
+      </properties>
+    </profile>
+  </profiles>
+
+  <build>
+    <plugins>
+      <!-- Plugin to help verify which profiles are active -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-help-plugin</artifactId>
+        <version>3.4.0</version>
+        <executions>
+          <execution>
+            <id>show-profiles</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>active-profiles</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
