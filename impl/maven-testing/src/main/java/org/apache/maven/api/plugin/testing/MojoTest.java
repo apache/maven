@@ -85,4 +85,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @Retention(RetentionPolicy.RUNTIME)
 @ExtendWith(MojoExtension.class)
 @Target(ElementType.TYPE)
-public @interface MojoTest {}
+public @interface MojoTest {
+    /**
+     * If true, the test harness will provide a real Maven Session created by ApiRunner.createSession(),
+     * instead of the default mock session. Default is false.
+     */
+    boolean realSession() default false;
+}
