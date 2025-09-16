@@ -99,6 +99,7 @@ public class InputLocation implements Serializable, InputLocationTracker {
 
     @Override
     public InputLocation getLocation(Object key) {
+        Objects.requireNonNull(key, "key");
         return locations != null ? locations.get(key) : null;
     }
 
