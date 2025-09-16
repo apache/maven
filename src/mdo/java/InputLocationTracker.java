@@ -18,6 +18,19 @@
  */
 package ${package};
 
+/**
+ * Tracks input locations for model fields.
+ * <p>
+ * Implementations store a mapping from keys (usually field names or indices) to
+ * the corresponding InputLocation in the source. Keys must be non-null.
+ */
 public interface InputLocationTracker {
+    /**
+     * Gets the location of the specified field in the input source.
+     *
+     * @param field the key of the field, must not be {@code null}
+     * @return the location of the field in the input source or {@code null} if unknown
+     * @throws NullPointerException if {@code field} is {@code null}
+     */
     InputLocation getLocation(Object field);
 }

@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Represents the location of an element within a model source file.
@@ -95,6 +96,7 @@ public class InputLocation implements Serializable, InputLocationTracker {
 
     @Override
     public InputLocation getLocation(Object key) {
+        Objects.requireNonNull(key, "key");
         return locations != null ? locations.get(key) : null;
     }
 
