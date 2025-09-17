@@ -185,7 +185,7 @@ class LegacyRepositorySystemTest {
         //
         d.setScope(Artifact.SCOPE_SYSTEM);
         File file = new File(getBasedir(), "src/test/repository-system/maven-core-2.1.0.jar");
-        assertTrue(file.exists());
+        assertTrue(file.exists(), "Expected " + file + ".exists() to return true");
         d.setSystemPath(file.getCanonicalPath());
 
         artifact = repositorySystem.createDependencyArtifact(d);
@@ -208,7 +208,7 @@ class LegacyRepositorySystemTest {
         // Put in a bogus file to make sure missing files cause the resolution to fail.
         //
         file = new File(getBasedir(), "src/test/repository-system/maven-monkey-2.1.0.jar");
-        assertFalse(file.exists());
+        assertFalse(file.exists(), "Expected " + file + ".exists() to return false");
         d.setSystemPath(file.getCanonicalPath());
         artifact = repositorySystem.createDependencyArtifact(d);
 
@@ -226,7 +226,7 @@ class LegacyRepositorySystemTest {
             result = repositorySystem.resolve(request);
             resolutionErrorHandler.throwErrors(request, result);
         } catch (Exception e) {
-            assertTrue(result.hasMissingArtifacts());
+            assertTrue(result.hasMissingArtifacts(), "Expected " + result + ".hasMissingArtifacts() to return true");
         }
     }
 

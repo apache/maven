@@ -32,9 +32,8 @@ import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.Test;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.endsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Deprecated
 class ProjectDependenciesResolverTest extends AbstractCoreMavenComponentTestCase {
@@ -82,6 +81,6 @@ class ProjectDependenciesResolverTest extends AbstractCoreMavenComponentTestCase
         @SuppressWarnings("deprecation")
         List<Artifact> artifacts = project.getCompileArtifacts();
         assertEquals(1, artifacts.size());
-        assertThat(artifacts.get(0).getFile().getName(), endsWith("tools.jar"));
+        assertTrue(artifacts.get(0).getFile().getName().endsWith("tools.jar"));
     }
 }

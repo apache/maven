@@ -86,14 +86,10 @@ under the License.
       <artifactId>junit-jupiter-api</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest</artifactId>
-      <scope>test</scope>
-    </dependency>
+
     <dependency>
       <groupId>org.xmlunit</groupId>
-      <artifactId>xmlunit-matchers</artifactId>
+      <artifactId>xmlunit-core</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

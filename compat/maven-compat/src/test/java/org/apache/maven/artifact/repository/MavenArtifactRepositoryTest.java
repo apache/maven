@@ -47,10 +47,10 @@ class MavenArtifactRepositoryTest {
         assertTrue(r1.hashCode() == r2.hashCode());
         assertFalse(r1.hashCode() == r3.hashCode());
 
-        assertTrue(r1.equals(r2));
-        assertTrue(r2.equals(r1));
+        assertTrue(r1.equals(r2), "Expected " + r1 + " to equal " + r2);
+        assertTrue(r2.equals(r1), "Expected " + r2 + " to equal " + r1);
 
-        assertFalse(r1.equals(r3));
-        assertFalse(r3.equals(r1));
+        assertFalse(r1.equals(r3), "Expected " + r1 + " to not equal " + r3);
+        assertFalse(r3.equals(r1), "Expected " + r3 + " to not equal " + r1);
     }
 }

@@ -78,10 +78,10 @@ public class GraphTest {
 
         Set<String> labels = graph.getVertices().stream().map(Vertex::getLabel).collect(Collectors.toSet());
         assertEquals(4, labels.size());
-        assertTrue(labels.contains("a"));
-        assertTrue(labels.contains("b"));
-        assertTrue(labels.contains("c"));
-        assertTrue(labels.contains("d"));
+        assertTrue(labels.contains("a"), "Expected " + labels + " to contain " + "a");
+        assertTrue(labels.contains("b"), "Expected " + labels + " to contain " + "b");
+        assertTrue(labels.contains("c"), "Expected " + labels + " to contain " + "c");
+        assertTrue(labels.contains("d"), "Expected " + labels + " to contain " + "d");
 
         addEdge(graph, "a", "d");
         assertEquals(2, a.getChildren().size());

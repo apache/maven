@@ -333,7 +333,7 @@ class DefaultArtifactCollectorTest {
 
         ArtifactResolutionResult res = collect(a);
 
-        assertTrue(res.hasVersionRangeViolations());
+        assertTrue(res.hasVersionRangeViolations(), "Expected " + res + ".hasVersionRangeViolations() to return true");
     }
 
     @Test
@@ -346,7 +346,7 @@ class DefaultArtifactCollectorTest {
 
         ArtifactResolutionResult res = collect(a);
 
-        assertTrue(res.hasVersionRangeViolations());
+        assertTrue(res.hasVersionRangeViolations(), "Expected " + res + ".hasVersionRangeViolations() to return true");
     }
 
     @Test
@@ -371,7 +371,7 @@ class DefaultArtifactCollectorTest {
 
         ArtifactResolutionResult res = collect(a);
 
-        assertTrue(res.hasVersionRangeViolations());
+        assertTrue(res.hasVersionRangeViolations(), "Expected " + res + ".hasVersionRangeViolations() to return true");
     }
 
     @Test
@@ -665,7 +665,7 @@ class DefaultArtifactCollectorTest {
 
         ArtifactResolutionResult res = collect(a);
 
-        assertTrue(res.hasVersionRangeViolations());
+        assertTrue(res.hasVersionRangeViolations(), "Expected " + res + ".hasVersionRangeViolations() to return true");
 
         /*
          * try { ArtifactResolutionResult res = collect( a ); fail( "Expected b not to resolve: " + res ); } catch (

@@ -35,13 +35,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -55,7 +53,7 @@ class ProjectSelectorTest {
 
         final File baseDirectoryFromRequest = sut.getBaseDirectoryFromRequest(mavenExecutionRequest);
 
-        assertThat(baseDirectoryFromRequest, nullValue());
+        assertNull(baseDirectoryFromRequest);
     }
 
     @Test
@@ -64,8 +62,8 @@ class ProjectSelectorTest {
 
         final File baseDirectoryFromRequest = sut.getBaseDirectoryFromRequest(mavenExecutionRequest);
 
-        assertThat(baseDirectoryFromRequest, notNullValue());
-        assertThat(baseDirectoryFromRequest.getPath(), is(new File("path/to/file").getPath()));
+        assertNotNull(baseDirectoryFromRequest);
+        assertEquals(new File("path/to/file").getPath(), baseDirectoryFromRequest.getPath());
     }
 
     @ParameterizedTest
@@ -73,14 +71,14 @@ class ProjectSelectorTest {
     @EmptySource
     void isMatchingProjectNoMatchOnSelectorReturnsFalse(String selector) {
         final boolean result = sut.isMatchingProject(createMavenProject("maven-core"), selector, null);
-        assertThat(result, is(false));
+        assertEquals(false, result);
     }
 
     @ParameterizedTest
     @ValueSource(strings = {":maven-core", "org.apache.maven:maven-core"})
     void isMatchingProjectMatchOnSelectorReturnsTrue(String selector) {
         final boolean result = sut.isMatchingProject(createMavenProject("maven-core"), selector, null);
-        assertThat(result, is(true));
+        assertEquals(true, result);
     }
 
     @Test
@@ -93,7 +91,7 @@ class ProjectSelectorTest {
         final boolean result = sut.isMatchingProject(mavenProject, selector, tempFile.getParentFile());
 
         tempFile.delete();
-        assertThat(result, is(true));
+        assertEquals(true, result);
     }
 
     @Test
@@ -107,7 +105,7 @@ class ProjectSelectorTest {
         final boolean result = sut.isMatchingProject(mavenProject, selector, tempDir);
 
         tempProjectDir.delete();
-        assertThat(result, is(true));
+        assertEquals(true, result);
     }
 
     @Test
@@ -122,8 +120,8 @@ class ProjectSelectorTest {
         final Set<MavenProject> optionalProjectsBySelectors =
                 sut.getOptionalProjectsBySelectors(mavenExecutionRequest, listOfProjects, selectors);
 
-        assertThat(optionalProjectsBySelectors.size(), is(1));
-        assertThat(optionalProjectsBySelectors, contains(mavenProject));
+        assertEquals(1, optionalProjectsBySelectors.size());
+        assertEquals(List.of(mavenProject), List.copyOf(optionalProjectsBySelectors));
     }
 
     @Test
@@ -138,8 +136,8 @@ class ProjectSelectorTest {
         final MavenExecutionException exception = assertThrows(
                 MavenExecutionException.class,
                 () -> sut.getRequiredProjectsBySelectors(mavenExecutionRequest, listOfProjects, selectors));
-        assertThat(exception.getMessage(), containsString("Could not find"));
-        assertThat(exception.getMessage(), containsString(":required"));
+        assertTrue(exception.getMessage().contains("Could not find"));
+        assertTrue(exception.getMessage().contains(":required"));
     }
 
     @Test
@@ -153,8 +151,8 @@ class ProjectSelectorTest {
         final Set<MavenProject> requiredProjectsBySelectors =
                 sut.getRequiredProjectsBySelectors(mavenExecutionRequest, listOfProjects, selectors);
 
-        assertThat(requiredProjectsBySelectors.size(), is(1));
-        assertThat(requiredProjectsBySelectors, contains(mavenProject));
+        assertEquals(1, requiredProjectsBySelectors.size());
+        assertEquals(List.of(mavenProject), List.copyOf(requiredProjectsBySelectors));
     }
 
     @Test
@@ -172,8 +170,8 @@ class ProjectSelectorTest {
         final Set<MavenProject> requiredProjectsBySelectors =
                 sut.getRequiredProjectsBySelectors(mavenExecutionRequest, listOfProjects, selectors);
 
-        assertThat(requiredProjectsBySelectors.size(), is(2));
-        assertThat(requiredProjectsBySelectors, contains(mavenProject, child));
+        assertEquals(2, requiredProjectsBySelectors.size());
+        assertEquals(List.of(mavenProject, child), List.copyOf(requiredProjectsBySelectors));
     }
 
     @Test
@@ -191,8 +189,8 @@ class ProjectSelectorTest {
         final Set<MavenProject> optionalProjectsBySelectors =
                 sut.getOptionalProjectsBySelectors(mavenExecutionRequest, listOfProjects, selectors);
 
-        assertThat(optionalProjectsBySelectors.size(), is(2));
-        assertThat(optionalProjectsBySelectors, contains(mavenProject, child));
+        assertEquals(2, optionalProjectsBySelectors.size());
+        assertEquals(List.of(mavenProject, child), List.copyOf(optionalProjectsBySelectors));
     }
 
     private MavenProject createMavenProject(String artifactId) {

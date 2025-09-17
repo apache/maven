@@ -46,7 +46,7 @@ class DependencyManagementTest {
     @Test
     void testEqualsIdentity() {
         DependencyManagement thing = new DependencyManagement();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test

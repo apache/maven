@@ -124,7 +124,7 @@ class EnhancedCompositeBeanHelperTest {
 
         // Second call should be faster (though this is not guaranteed in all environments)
         // We mainly verify that both calls work correctly
-        assertTrue(time2 >= 0); // Just verify it completed
+        assertTrue(time2 >= 0, "Expected " + time2 + " to be >= " + 0); // Just verify it completed
     }
 
     @Test

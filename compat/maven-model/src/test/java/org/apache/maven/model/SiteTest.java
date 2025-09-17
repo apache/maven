@@ -45,7 +45,7 @@ class SiteTest {
     @Test
     void testEqualsIdentity() {
         Site thing = new Site();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test

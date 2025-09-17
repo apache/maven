@@ -46,7 +46,7 @@ class OrganizationTest {
     @Test
     void testEqualsIdentity() {
         Organization thing = new Organization();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test

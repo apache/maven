@@ -120,9 +120,9 @@ public class TestFileManager {
         File file = new File(dir, filename);
 
         if (shouldExist) {
-            assertTrue(file.exists());
+            assertTrue(file.exists(), "Expected " + file + ".exists() to return true");
         } else {
-            assertFalse(file.exists());
+            assertFalse(file.exists(), "Expected " + file + ".exists() to return false");
         }
     }
 

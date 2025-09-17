@@ -45,7 +45,7 @@ class ActivationFileTest {
     @Test
     void testEqualsIdentity() {
         ActivationFile thing = new ActivationFile();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test

@@ -142,7 +142,6 @@ under the License.
     <maven.site.path>ref/4-LATEST</maven.site.path>
     <project.build.outputTimestamp>2025-06-24T20:18:00Z</project.build.outputTimestamp>
     <!-- various versions -->
-    <assertjVersion>3.27.4</assertjVersion>
     <asmVersion>9.8</asmVersion>
     <byteBuddyVersion>1.17.7</byteBuddyVersion>
     <classWorldsVersion>2.9.0</classWorldsVersion>
@@ -150,7 +149,7 @@ under the License.
     <guiceVersion>5.1.0</guiceVersion>
     <guavaVersion>33.4.8-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
-    <hamcrestVersion>3.0</hamcrestVersion>
+
     <jakartaInjectApiVersion>2.0.1</jakartaInjectApiVersion>
     <javaxAnnotationApiVersion>1.3.2</javaxAnnotationApiVersion>
     <jlineVersion>3.30.6</jlineVersion>
@@ -598,12 +597,7 @@ under the License.
         <artifactId>stax2-api</artifactId>
         <version>${stax2ApiVersion}</version>
       </dependency>
-      <dependency>
-        <groupId>org.xmlunit</groupId>
-        <artifactId>xmlunit-assertj</artifactId>
-        <version>${xmlunitVersion}</version>
-        <scope>test</scope>
-      </dependency>
+
       <dependency>
         <groupId>org.xmlunit</groupId>
         <artifactId>xmlunit-core</artifactId>
@@ -622,17 +616,7 @@ under the License.
           </exclusion>
         </exclusions>
       </dependency>
-      <dependency>
-        <groupId>org.hamcrest</groupId>
-        <artifactId>hamcrest</artifactId>
-        <version>${hamcrestVersion}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.assertj</groupId>
-        <artifactId>assertj-core</artifactId>
-        <version>${assertjVersion}</version>
-      </dependency>
+
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-testing</artifactId>

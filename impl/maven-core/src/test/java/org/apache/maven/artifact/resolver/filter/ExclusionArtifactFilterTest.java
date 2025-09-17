@@ -26,8 +26,8 @@ import org.apache.maven.model.Exclusion;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -53,7 +53,7 @@ class ExclusionArtifactFilterTest {
         exclusion.setArtifactId("maven-core");
         ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
 
-        assertThat(filter.include(artifact), is(false));
+        assertFalse(filter.include(artifact), "Artifact should be excluded by exact match");
     }
 
     @Test
@@ -63,7 +63,7 @@ class ExclusionArtifactFilterTest {
         exclusion.setArtifactId("maven-model");
         ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
 
-        assertThat(filter.include(artifact), is(true));
+        assertTrue(filter.include(artifact), "Artifact should not be excluded when no match");
     }
 
     @Test
@@ -73,7 +73,7 @@ class ExclusionArtifactFilterTest {
         exclusion.setArtifactId("maven-core");
         ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
 
-        assertThat(filter.include(artifact), is(false));
+        assertFalse(filter.include(artifact), "Artifact should be excluded by groupId wildcard");
     }
 
     @Test
@@ -83,7 +83,9 @@ class ExclusionArtifactFilterTest {
         exclusion.setArtifactId("maven-compat");
         ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
 
-        assertThat(filter.include(artifact), is(true));
+        assertTrue(
+                filter.include(artifact),
+                "Artifact should not be excluded when groupId wildcard doesn't match artifactId");
     }
 
     @Test
@@ -93,7 +95,7 @@ class ExclusionArtifactFilterTest {
         exclusion.setArtifactId("*");
         ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
 
-        assertThat(filter.include(artifact), is(false));
+        assertFalse(filter.include(artifact), "Artifact should be excluded by artifactId wildcard");
     }
 
     @Test
@@ -103,7 +105,9 @@ class ExclusionArtifactFilterTest {
         exclusion.setArtifactId("*");
         ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
 
-        assertThat(filter.include(artifact), is(true));
+        assertTrue(
+                filter.include(artifact),
+                "Artifact should not be excluded when artifactId wildcard doesn't match groupId");
     }
 
     @Test
@@ -113,7 +117,7 @@ class ExclusionArtifactFilterTest {
         exclusion.setArtifactId("*");
         ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
 
-        assertThat(filter.include(artifact), is(false));
+        assertFalse(filter.include(artifact), "Artifact should be excluded by all wildcard");
     }
 
     @Test
@@ -128,7 +132,7 @@ class ExclusionArtifactFilterTest {
 
         ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Arrays.asList(exclusion1, exclusion2));
 
-        assertThat(filter.include(artifact), is(false));
+        assertFalse(filter.include(artifact), "Artifact should be excluded by multiple exclusions");
     }
 
     @Test
@@ -143,7 +147,8 @@ class ExclusionArtifactFilterTest {
 
         ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Arrays.asList(exclusion1, exclusion2));
 
-        assertThat(filter.include(artifact), is(false));
+        assertFalse(
+                filter.include(artifact), "Artifact should be excluded by multiple exclusions with groupId wildcard");
     }
 
     @Test
@@ -153,8 +158,8 @@ class ExclusionArtifactFilterTest {
         exclusion.setArtifactId("maven-*");
         ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
 
-        assertThat(filter.include(artifact), is(false));
-        assertThat(filter.include(artifact2), is(true));
+        assertFalse(filter.include(artifact), "Maven artifact should be excluded by glob pattern");
+        assertTrue(filter.include(artifact2), "JUnit artifact should not be excluded by maven-* glob pattern");
     }
 
     @Test
@@ -164,7 +169,7 @@ class ExclusionArtifactFilterTest {
         exclusion.setArtifactId("maven-**");
         ExclusionArtifactFilter filter = new ExclusionArtifactFilter(Collections.singletonList(exclusion));
 
-        assertThat(filter.include(artifact), is(false));
-        assertThat(filter.include(artifact2), is(true));
+        assertFalse(filter.include(artifact), "Maven artifact should be excluded by glob star pattern");
+        assertTrue(filter.include(artifact2), "JUnit artifact should not be excluded by maven-** glob star pattern");
     }
 }

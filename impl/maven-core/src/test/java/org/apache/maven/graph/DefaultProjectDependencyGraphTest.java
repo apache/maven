@@ -100,8 +100,8 @@ class DefaultProjectDependencyGraphTest {
         graph = new FilteredProjectDependencyGraph(graph, Arrays.asList(aProject, dProject, eProject));
         final List<MavenProject> downstreamProjects = graph.getDownstreamProjects(aProject, false);
         assertEquals(2, downstreamProjects.size());
-        assertTrue(downstreamProjects.contains(dProject));
-        assertTrue(downstreamProjects.contains(eProject));
+        assertTrue(downstreamProjects.contains(dProject), "Expected " + downstreamProjects + " to contain " + dProject);
+        assertTrue(downstreamProjects.contains(eProject), "Expected " + downstreamProjects + " to contain " + eProject);
     }
 
     @Test
