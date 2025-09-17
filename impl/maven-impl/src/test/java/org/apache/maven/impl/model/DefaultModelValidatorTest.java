@@ -878,10 +878,8 @@ class DefaultModelValidatorTest {
     @Test
     void repositoryWithExpression() throws Exception {
         SimpleProblemCollector result = validateFile("raw-model/repository-with-expression.xml");
-        assertViolations(result, 0, 1, 0);
-        assertEquals(
-                "'repositories.repository.[repo].url' contains an unsupported expression (only expressions starting with 'project.basedir' or 'project.rootDirectory' are supported).",
-                result.getErrors().get(0));
+        // Interpolation in repository URLs is allowed; unresolved placeholders will fail later during resolution
+        assertViolations(result, 0, 0, 0);
     }
 
     @Test
