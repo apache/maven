@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.1.0" root="true">
+  <modelVersion>4.1.0</modelVersion>
+
+  <groupId>com.gitlab.tkslaw</groupId>
+  <artifactId>inject-service</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>3.6.1</version>
+        <configuration>
+          <rules>
+            <requireMavenVersion>
+              <version>@requiredMavenVersion@</version>
+            </requireMavenVersion>
+          </rules>
+        </configuration>
+        <executions>
+          <execution>
+            <id>enforce</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>com.gitlab.tkslaw</groupId>
+        <artifactId>ditests-maven-plugin</artifactId>
+        <version>@project.version@</version>
+        <executions>
+          <execution>
+            <id>inject-service</id>
+            <goals>
+              <goal>inject-service</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

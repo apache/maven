@@ -103,6 +103,7 @@ public class TestSuiteOrdering implements ClassOrderer {
          * the tests are to finishing. Newer tests are also more likely to fail, so this is
          * a fail fast technique as well.
          */
+        suite.addTestSuite(MavenITgh11055DIServiceInjectionTest.class);
         suite.addTestSuite(MavenITgh11084ReactorReaderPreferConsumerPomTest.class);
         suite.addTestSuite(MavenITgh10312TerminallyDeprecatedMethodInGuiceTest.class);
         suite.addTestSuite(MavenITgh10937QuotedPipesInMavenOptsTest.class);
