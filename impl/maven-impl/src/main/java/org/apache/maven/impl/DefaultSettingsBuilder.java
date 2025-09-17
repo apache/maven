@@ -268,18 +268,17 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         UnaryOperator<String> decryptFunction = str -> {
             if (str != null && !str.isEmpty() && !str.contains("${") && secDispatcher.isAnyEncryptedString(str)) {
                 if (secDispatcher.isLegacyEncryptedString(str)) {
-                    // the call above is "too broad", original idea with 2.x sec-dispatcher was to make it possible to
-                    // embed encrypted passwords into fields among other things. Maven 4 is limiting itself to
-                    // decrypting ONLY "simplest" cases of legacy passwords, those having form as documented on page:
-                    // https://maven.apache.org/guides/mini/guide-encryption.html
+                    // the call above return true for too broad types of strings, original idea with 2.x sec-dispatcher
+                    // was to make it possible to embed encrypted passwords into fields among other things. Maven 4 is
+                    // limiting itself to decryption of ONLY "simplest" cases of legacy passwords, those having form as
+                    // documented on page: https://maven.apache.org/guides/mini/guide-encryption.html
                     // Examples:
                     // <password>{COQLCE6DU6GtcS5P=}</password>
-                    // <password>Oleg reset this password on 2009-03-11, expires on 2009-04-11
-                    // {COQLCE6DU6GtcS5P=}</password>
+                    // <password>Oleg reset this password on 2009-03-11 {COQLCE6DU6GtcS5P=}</password>
 
                     // In short, secDispatcher#isLegacyEncryptedString(str) did return true, but we apply more scrutiny
                     // and check does string start with "{" or contains " {" (whitespace before opening curly braces),
-                    // and that it ends with "}" strictly.
+                    // and that it ends with "}" strictly. Otherwise, we refuse it.
                     if ((!str.startsWith("{") && !str.contains(" {")) || !str.endsWith("}")) {
                         // this is not a legacy password
                         return str;
