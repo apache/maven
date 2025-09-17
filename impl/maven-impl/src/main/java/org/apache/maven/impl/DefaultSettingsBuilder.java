@@ -269,10 +269,10 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             if (str != null && !str.isEmpty() && !str.contains("${") && secDispatcher.isAnyEncryptedString(str)) {
                 if (secDispatcher.isLegacyEncryptedString(str)) {
                     // the call above return true for too broad types of strings, original idea with 2.x sec-dispatcher
-                    // was to make it possible to embed encrypted passwords into fields among other things. Maven 4 is
-                    // limiting itself to decryption of ONLY "simplest" cases of legacy passwords, those having form as
+                    // was to make it possible to add "descriptions" to encrypted passwords. Maven 4 is
+                    // limiting itself to decryption of ONLY the simplest cases of legacy passwords, those having form as
                     // documented on page: https://maven.apache.org/guides/mini/guide-encryption.html
-                    // Examples:
+                    // Examples of decrypted legacy passwords:
                     // <password>{COQLCE6DU6GtcS5P=}</password>
                     // <password>Oleg reset this password on 2009-03-11 {COQLCE6DU6GtcS5P=}</password>
 
@@ -280,7 +280,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                     // and check does string start with "{" or contains " {" (whitespace before opening curly braces),
                     // and that it ends with "}" strictly. Otherwise, we refuse it.
                     if ((!str.startsWith("{") && !str.contains(" {")) || !str.endsWith("}")) {
-                        // this is not a legacy password
+                        // this is not a legacy password we care for
                         return str;
                     }
 
