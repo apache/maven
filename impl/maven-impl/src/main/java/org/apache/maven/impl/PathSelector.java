@@ -449,55 +449,27 @@ final class PathSelector implements PathMatcher {
                         pattern = pattern.substring(3);
                     }
                     pattern = pattern.replace("/**/**/", "/**/");
+
+                    // Escape special characters, including braces
+                    // Braces from user input must be literals; we'll inject our own braces for expansion below
                     pattern = pattern.replace("\\", "\\\\")
                             .replace("[", "\\[")
                             .replace("]", "\\]")
                             .replace("{", "\\{")
                             .replace("}", "\\}");
+
+                    // Transform ** patterns to use brace expansion for POSIX behavior
+                    // This replaces the complex addPatternsWithOneDirRemoved logic
+                    // We perform this after escaping so that only these injected braces participate in expansion
+                    pattern = pattern.replace("**/", "{**/,}");
+
                     normalized.add(DEFAULT_SYNTAX + pattern);
-                    /*
-                     * If the pattern starts or ends with "**", Java GLOB expects a directory level at
-                     * that location while Maven seems to consider that "**" can mean "no directory".
-                     * Add another pattern for reproducing this effect.
-                     */
-                    addPatternsWithOneDirRemoved(normalized, pattern, 0);
                 } else {
                     normalized.add(pattern);
                 }
             }
         }
         return simplify(normalized, excludes);
-    }
-
-    /**
-     * Adds all variants of the given pattern with {@code **} removed.
-     * This is used for simulating the Maven behavior where {@code "**} may match zero directory.
-     * Tests suggest that we need an explicit GLOB pattern with no {@code "**"} for matching an absence of directory.
-     *
-     * @param patterns where to add the derived patterns
-     * @param pattern  the pattern for which to add derived forms, without the "glob:" syntax prefix
-     * @param end      should be 0 (reserved for recursive invocations of this method)
-     */
-    private static void addPatternsWithOneDirRemoved(final Set<String> patterns, final String pattern, int end) {
-        final int length = pattern.length();
-        int start;
-        while ((start = pattern.indexOf("**", end)) >= 0) {
-            end = start + 2; // 2 is the length of "**".
-            if (end < length) {
-                if (pattern.charAt(end) != '/') {
-                    continue;
-                }
-                if (start == 0) {
-                    end++; // Ommit the leading slash if there is nothing before it.
-                }
-            }
-            if (start > 0 && pattern.charAt(--start) != '/') {
-                continue;
-            }
-            String reduced = pattern.substring(0, start) + pattern.substring(end);
-            patterns.add(DEFAULT_SYNTAX + reduced);
-            addPatternsWithOneDirRemoved(patterns, reduced, start);
-        }
     }
 
     /**
