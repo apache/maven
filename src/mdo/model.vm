@@ -240,8 +240,13 @@ public class ${class.name}
     #if ( $locationTracking && !$class.superClass )
     /**
      * Gets the location of the specified field in the input source.
+     *
+     * @param key the key of the field, must not be {@code null}
+     * @return the location of the field in the input source or {@code null} if unknown
+     * @throws NullPointerException if {@code key} is {@code null}
      */
     public InputLocation getLocation(Object key) {
+        Objects.requireNonNull(key, "key");
         return locations.get(key);
     }
 
