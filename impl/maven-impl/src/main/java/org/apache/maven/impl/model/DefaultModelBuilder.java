@@ -1374,7 +1374,12 @@ public class DefaultModelBuilder implements ModelBuilder {
             // Mixins
             for (Mixin mixin : model.getMixins()) {
                 Model parent = resolveParent(model, mixin, profileActivationContext, parentChain);
-                model = inheritanceAssembler.assembleModelInheritance(model, parent, request, this);
+                // For mixins, ensure source (mixin) is dominant so its properties override previously inherited ones
+                if (inheritanceAssembler instanceof DefaultInheritanceAssembler dia) {
+                    model = dia.assembleModelInheritance(model, parent, request, this, true);
+                } else {
+                    model = inheritanceAssembler.assembleModelInheritance(model, parent, request, this);
+                }
             }
 
             // model normalization
@@ -1832,7 +1837,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             Model parent = defaultInheritanceAssembler.assembleModelInheritance(raw, parentData, request, this);
             for (Mixin mixin : parent.getMixins()) {
                 Model parentModel = resolveParent(parent, mixin, childProfileActivationContext, parentChain);
-                parent = defaultInheritanceAssembler.assembleModelInheritance(parent, parentModel, request, this);
+                // For mixins applied to parentData when building parent, make mixin dominant
+                parent = defaultInheritanceAssembler.assembleModelInheritance(parent, parentModel, request, this, true);
             }
 
             // Profile injection SHOULD be performed on parent models to ensure
