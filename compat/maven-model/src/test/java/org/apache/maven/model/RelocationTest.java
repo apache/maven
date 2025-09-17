@@ -45,7 +45,7 @@ class RelocationTest {
     @Test
     void testEqualsIdentity() {
         Relocation thing = new Relocation();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test

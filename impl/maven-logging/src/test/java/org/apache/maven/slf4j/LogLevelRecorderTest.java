@@ -31,6 +31,6 @@ class LogLevelRecorderTest {
         logLevelRecorder.setMaxLevelAllowed(LogLevelRecorder.Level.WARN);
         logLevelRecorder.record(Level.ERROR);
 
-        assertTrue(logLevelRecorder.metThreshold());
+        assertTrue(logLevelRecorder.metThreshold(), "Expected " + logLevelRecorder + ".metThreshold() to return true");
     }
 }

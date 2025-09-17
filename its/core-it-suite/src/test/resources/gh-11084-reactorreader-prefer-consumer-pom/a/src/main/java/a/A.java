@@ -16,17 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.model;
+package a;
 
-public interface InputLocationTracker {
-    InputLocation getLocation(Object field);
+import java.io.IOException;
+import java.nio.file.Path;
 
-    /**
-     * Gets the parent InputLocation where this InputLocation may have been imported from.
-     * Can return {@code null}.
-     *
-     * @return InputLocation
-     * @since 4.0.0
-     */
-    InputLocation getImportedFrom();
+import org.codehaus.plexus.util.io.CachingOutputStream;
+
+public class A {
+    public static CachingOutputStream newCachingOutputStream(Path p) throws IOException {
+        return new CachingOutputStream(p);
+    }
 }

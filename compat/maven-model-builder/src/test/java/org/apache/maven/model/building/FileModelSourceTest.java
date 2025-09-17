@@ -43,9 +43,9 @@ class FileModelSourceTest {
         File tempFile = createTempFile("pomTest");
         FileModelSource instance = new FileModelSource(tempFile);
 
-        assertFalse(instance.equals(null));
+        assertFalse(instance.equals(null), "Expected " + instance + " to not equal " + null);
         assertFalse(instance.equals(new Object()));
-        assertTrue(instance.equals(instance));
+        assertTrue(instance.equals(instance), "Expected " + instance + " to equal " + instance);
         assertTrue(instance.equals(new FileModelSource(tempFile)));
     }
 
@@ -60,7 +60,9 @@ class FileModelSourceTest {
         FileModelSource upperCaseFileSource = new FileModelSource(upperCaseFile);
         FileModelSource lowerCaseFileSource = new FileModelSource(lowerCaseFile);
 
-        assertTrue(upperCaseFileSource.equals(lowerCaseFileSource));
+        assertTrue(
+                upperCaseFileSource.equals(lowerCaseFileSource),
+                "Expected " + upperCaseFileSource + " to equal " + lowerCaseFileSource);
     }
 
     private File createTempFile(String name) throws IOException {

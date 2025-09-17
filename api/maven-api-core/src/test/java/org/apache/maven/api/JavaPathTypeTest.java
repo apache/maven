@@ -25,6 +25,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class JavaPathTypeTest {
     /**
@@ -64,5 +65,19 @@ public class JavaPathTypeTest {
         assertEquals(2, formatted.length);
         assertEquals("--patch-module", formatted[0]);
         assertEquals(toPlatformSpecific("my.module=\"src/foo.java:src/bar.java\""), formatted[1]);
+    }
+
+    /**
+     * Tests the {@code equals} and {@code hashCode} methods of options.
+     */
+    @Test
+    public void testEqualsHashCode() {
+        JavaPathType.Modular foo1 = JavaPathType.patchModule("foo");
+        JavaPathType.Modular foo2 = JavaPathType.patchModule("foo");
+        JavaPathType.Modular bar = JavaPathType.patchModule("bar");
+        assertEquals(foo1, foo2);
+        assertEquals(foo1.hashCode(), foo2.hashCode());
+        assertNotEquals(foo1, bar);
+        assertNotEquals(foo1.hashCode(), bar.hashCode());
     }
 }

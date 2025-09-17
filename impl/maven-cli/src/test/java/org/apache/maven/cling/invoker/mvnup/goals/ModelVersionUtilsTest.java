@@ -366,7 +366,7 @@ class ModelVersionUtilsTest {
         void shouldGetSchemaLocationForModelVersion() {
             String schemaLocation410 = ModelVersionUtils.getSchemaLocationForModelVersion("4.1.0");
             assertNotNull(schemaLocation410);
-            assertTrue(schemaLocation410.contains("4.1.0"));
+            assertTrue(schemaLocation410.contains("4.1.0"), "Expected " + schemaLocation410 + " to contain " + "4.1.0");
         }
 
         @Test
@@ -374,7 +374,7 @@ class ModelVersionUtilsTest {
         void shouldGetSchemaLocationFor400() {
             String schemaLocation400 = ModelVersionUtils.getSchemaLocationForModelVersion("4.0.0");
             assertNotNull(schemaLocation400);
-            assertTrue(schemaLocation400.contains("4.0.0"));
+            assertTrue(schemaLocation400.contains("4.0.0"), "Expected " + schemaLocation400 + " to contain " + "4.0.0");
         }
 
         @Test

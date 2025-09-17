@@ -38,9 +38,8 @@ import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.endsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.calls;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -119,7 +118,9 @@ class DefaultClassRealmManagerTest {
         assertEquals(classRealmManager.getMavenApiRealm(), classRealm.getParentClassLoader());
         assertEquals("project>modelGroup1:modelArtifact1:modelVersion1", classRealm.getId());
         assertEquals(1, classRealm.getURLs().length);
-        assertThat(classRealm.getURLs()[0].getPath(), endsWith("local/repository/some/path"));
+        assertTrue(
+                classRealm.getURLs()[0].getPath().endsWith("local/repository/some/path"),
+                "ClassRealm URL should end with local repository path");
 
         verifier.verify(logger, calls(1)).debug("Importing foreign packages into class realm {}", "maven.api");
         verifier.verify(logger, calls(1)).debug("  Imported: {} < {}", "group1:artifact1", "test");
@@ -153,7 +154,9 @@ class DefaultClassRealmManagerTest {
         assertEquals(classRealmManager.getMavenApiRealm(), classRealm.getParentClassLoader());
         assertEquals("project>modelGroup1:modelArtifact1:modelVersion1", classRealm.getId());
         assertEquals(1, classRealm.getURLs().length);
-        assertThat(classRealm.getURLs()[0].getPath(), endsWith("local/repository/some/path"));
+        assertTrue(
+                classRealm.getURLs()[0].getPath().endsWith("local/repository/some/path"),
+                "ClassRealm URL should end with local repository path");
 
         verifier.verify(logger, calls(1)).debug("Importing foreign packages into class realm {}", "maven.api");
         verifier.verify(logger, calls(1)).debug("  Imported: {} < {}", "group1:artifact1", "test");

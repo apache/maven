@@ -45,7 +45,7 @@ class PluginManagementTest {
     @Test
     void testEqualsIdentity() {
         PluginManagement thing = new PluginManagement();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test

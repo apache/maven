@@ -330,6 +330,18 @@ class ReactorReader implements MavenWorkspaceReader {
     }
 
     private File findInProjectLocalRepository(Artifact artifact) {
+        // Prefer the consumer POM when resolving POMs from the project-local repository,
+        // to avoid treating a build POM as a repository (consumer) POM.
+        if ("pom".equals(artifact.getExtension())) {
+            String classifier = artifact.getClassifier();
+            if (classifier == null || classifier.isEmpty()) {
+                Path consumer = getArtifactPath(
+                        artifact.getGroupId(), artifact.getArtifactId(), artifact.getBaseVersion(), "consumer", "pom");
+                if (Files.isRegularFile(consumer)) {
+                    return consumer.toFile();
+                }
+            }
+        }
         Path target = getArtifactPath(artifact);
         return Files.isRegularFile(target) ? target.toFile() : null;
     }

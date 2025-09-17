@@ -1393,7 +1393,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
 
                 // subprojects discovery
-                if (getSubprojects(model).isEmpty()
+                if (!hasSubprojectsDefined(model)
                         // only discover subprojects if POM > 4.0.0
                         && !MODEL_VERSION_4_0_0.equals(model.getModelVersion())
                         // and if packaging is POM (we check type, but the session is not yet available,
@@ -1932,6 +1932,20 @@ public class DefaultModelBuilder implements ModelBuilder {
             subprojects = activated.getModules();
         }
         return subprojects;
+    }
+
+    /**
+     * Checks if subprojects are explicitly defined in the main model.
+     * This method distinguishes between:
+     * 1. No subprojects/modules element present - returns false (should auto-discover)
+     * 2. Empty subprojects/modules element present - returns true (should NOT auto-discover)
+     * 3. Non-empty subprojects/modules - returns true (should NOT auto-discover)
+     */
+    @SuppressWarnings("deprecation")
+    private static boolean hasSubprojectsDefined(Model model) {
+        // Only consider the main model: profiles do not influence auto-discovery
+        // Inline the check for explicit elements using location tracking
+        return model.getLocation("subprojects") != null || model.getLocation("modules") != null;
     }
 
     @Override

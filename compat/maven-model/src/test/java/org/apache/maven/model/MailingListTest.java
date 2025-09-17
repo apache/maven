@@ -46,7 +46,7 @@ class MailingListTest {
     @Test
     void testEqualsIdentity() {
         MailingList thing = new MailingList();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test

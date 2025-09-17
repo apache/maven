@@ -38,7 +38,7 @@ class DefaultRuntimeInformationTest {
     void testGetMavenVersion() {
         String mavenVersion = rtInfo.getMavenVersion();
         assertNotNull(mavenVersion);
-        assertTrue(!mavenVersion.isEmpty());
+        assertTrue(!mavenVersion.isEmpty(), "Expected Maven version to not be empty but was: " + mavenVersion);
     }
 
     @Test

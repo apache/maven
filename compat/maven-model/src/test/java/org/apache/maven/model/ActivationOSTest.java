@@ -45,7 +45,7 @@ class ActivationOSTest {
     @Test
     void testEqualsIdentity() {
         ActivationOS thing = new ActivationOS();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test

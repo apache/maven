@@ -22,22 +22,34 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
- * Class InputLocation.
+ * Represents the location of an element within a model source file.
+ * <p>
+ * This class tracks the line and column numbers of elements in source files like POM files.
+ * It's used for error reporting and debugging to help identify where specific model elements
+ * are defined in the source files.
+ *
+ * @since 4.0.0
  */
 public class InputLocation implements Serializable, InputLocationTracker {
     private final int lineNumber;
     private final int columnNumber;
     private final InputSource source;
     private final Map<Object, InputLocation> locations;
+    private final InputLocation importedFrom;
 
     public InputLocation(InputSource source) {
         this.lineNumber = -1;
         this.columnNumber = -1;
         this.source = source;
         this.locations = Collections.singletonMap(0, this);
+        this.importedFrom = null;
     }
 
     public InputLocation(int lineNumber, int columnNumber) {
@@ -54,6 +66,7 @@ public class InputLocation implements Serializable, InputLocationTracker {
         this.source = source;
         this.locations =
                 selfLocationKey != null ? Collections.singletonMap(selfLocationKey, this) : Collections.emptyMap();
+        this.importedFrom = null;
     }
 
     public InputLocation(int lineNumber, int columnNumber, InputSource source, Map<Object, InputLocation> locations) {
@@ -61,6 +74,15 @@ public class InputLocation implements Serializable, InputLocationTracker {
         this.columnNumber = columnNumber;
         this.source = source;
         this.locations = ImmutableCollections.copy(locations);
+        this.importedFrom = null;
+    }
+
+    public InputLocation(InputLocation original) {
+        this.lineNumber = original.lineNumber;
+        this.columnNumber = original.columnNumber;
+        this.source = original.source;
+        this.locations = original.locations;
+        this.importedFrom = original.importedFrom;
     }
 
     public int getLineNumber() {
@@ -77,11 +99,24 @@ public class InputLocation implements Serializable, InputLocationTracker {
 
     @Override
     public InputLocation getLocation(Object key) {
+        Objects.requireNonNull(key, "key");
         return locations != null ? locations.get(key) : null;
     }
 
     public Map<Object, InputLocation> getLocations() {
         return locations;
+    }
+
+    /**
+     * Gets the parent InputLocation where this InputLocation may have been imported from.
+     * Can return {@code null}.
+     *
+     * @return InputLocation
+     * @since 4.0.0
+     */
+    @Override
+    public InputLocation getImportedFrom() {
+        return importedFrom;
     }
 
     /**
@@ -169,5 +204,10 @@ public class InputLocation implements Serializable, InputLocationTracker {
          * Method toString.
          */
         String toString(InputLocation location);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s @ %d:%d", source != null ? source.getLocation() : "n/a", lineNumber, columnNumber);
     }
 }

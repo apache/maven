@@ -69,8 +69,8 @@ class RequestImplementationTest {
 
         // Test toString
         String toString = request1.toString();
-        assertTrue(toString.contains("coordinates="));
-        assertTrue(toString.contains("repositories="));
+        assertTrue(toString.contains("coordinates="), "Expected " + toString + " to contain " + "coordinates=");
+        assertTrue(toString.contains("repositories="), "Expected " + toString + " to contain " + "repositories=");
     }
 
     @Test
@@ -110,7 +110,7 @@ class RequestImplementationTest {
         assertNotEquals(request1, request3);
 
         String toString = request1.toString();
-        assertTrue(toString.contains("requestType="));
-        assertTrue(toString.contains("pathScope="));
+        assertTrue(toString.contains("requestType="), "Expected " + toString + " to contain " + "requestType=");
+        assertTrue(toString.contains("pathScope="), "Expected " + toString + " to contain " + "pathScope=");
     }
 }
