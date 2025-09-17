@@ -1216,15 +1216,27 @@ public class MavenProject implements Cloneable {
                 return;
             }
 
-            LOGGER.warn("Direct modification of " + collectionName + " through " + method
-                    + "() is deprecated and will not work in Maven 4.0.0. "
-                    + "Please use the add/remove methods instead. If you're using a plugin that causes this warning, "
-                    + "please upgrade to the latest version and report an issue if the warning persists. "
+            String specificMethods = getRecommendedMethods(collectionName);
+            LOGGER.warn("Plugin is modifying " + collectionName + " through " + method
+                    + "(), which will not work in Maven 4.0.0. "
+                    + "Use " + specificMethods + " instead. "
+                    + "If using a plugin, please upgrade to the latest version or report the issue to the plugin maintainer. "
                     + "To disable these warnings, set -D" + DISABLE_WARNINGS_PROPERTY + "=true on the command line, "
                     + "in the .mvn/maven.config file, or in project POM properties.");
             // Log a stack trace to help identify the caller
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Stack trace", new Exception("Stack trace"));
+                LOGGER.debug("Stack trace for deprecated source root modification:", new Exception("Stack trace"));
+            }
+        }
+
+        private String getRecommendedMethods(String collectionName) {
+            switch (collectionName) {
+                case "compileSourceRoots":
+                    return "MavenProject.addCompileSourceRoot()/removeCompileSourceRoot() methods";
+                case "testCompileSourceRoots":
+                    return "MavenProject.addTestCompileSourceRoot()/removeTestCompileSourceRoot() methods";
+                default:
+                    return "appropriate MavenProject add/remove methods";
             }
         }
 
