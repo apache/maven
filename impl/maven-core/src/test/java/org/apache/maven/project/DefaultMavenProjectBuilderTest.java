@@ -545,4 +545,44 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         MavenProject parent = p1.getArtifactId().equals("parent") ? p1 : p2;
         assertEquals(List.of("child"), parent.getModel().getDelegate().getSubprojects());
     }
+
+    @Test
+    public void testEmptySubprojectsElementPreventsDiscovery() throws Exception {
+        File pom = getTestFile("src/test/resources/projects/subprojects-empty/pom.xml");
+        ProjectBuildingRequest configuration = newBuildingRequest();
+        InternalSession internalSession = InternalSession.from(configuration.getRepositorySession());
+        InternalMavenSession mavenSession = InternalMavenSession.from(internalSession);
+        mavenSession
+                .getMavenSession()
+                .getRequest()
+                .setRootDirectory(pom.toPath().getParent());
+
+        List<ProjectBuildingResult> results = projectBuilder.build(List.of(pom), true, configuration);
+        // Should only build the parent project, not discover the child
+        assertEquals(1, results.size());
+        MavenProject parent = results.get(0).getProject();
+        assertEquals("parent", parent.getArtifactId());
+        // The subprojects list should be empty since we explicitly defined an empty <subprojects /> element
+        assertTrue(parent.getModel().getDelegate().getSubprojects().isEmpty());
+    }
+
+    @Test
+    public void testEmptyModulesElementPreventsDiscovery() throws Exception {
+        File pom = getTestFile("src/test/resources/projects/modules-empty/pom.xml");
+        ProjectBuildingRequest configuration = newBuildingRequest();
+        InternalSession internalSession = InternalSession.from(configuration.getRepositorySession());
+        InternalMavenSession mavenSession = InternalMavenSession.from(internalSession);
+        mavenSession
+                .getMavenSession()
+                .getRequest()
+                .setRootDirectory(pom.toPath().getParent());
+
+        List<ProjectBuildingResult> results = projectBuilder.build(List.of(pom), true, configuration);
+        // Should only build the parent project, not discover the child
+        assertEquals(1, results.size());
+        MavenProject parent = results.get(0).getProject();
+        assertEquals("parent", parent.getArtifactId());
+        // The modules list should be empty since we explicitly defined an empty <modules /> element
+        assertTrue(parent.getModel().getDelegate().getModules().isEmpty());
+    }
 }
