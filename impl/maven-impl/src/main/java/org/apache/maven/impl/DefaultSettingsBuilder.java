@@ -270,8 +270,8 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                 if (secDispatcher.isLegacyEncryptedString(str)) {
                     // the call above return true for too broad types of strings, original idea with 2.x sec-dispatcher
                     // was to make it possible to add "descriptions" to encrypted passwords. Maven 4 is
-                    // limiting itself to decryption of ONLY the simplest cases of legacy passwords, those having form as
-                    // documented on page: https://maven.apache.org/guides/mini/guide-encryption.html
+                    // limiting itself to decryption of ONLY the simplest cases of legacy passwords, those having form
+                    // as documented on page: https://maven.apache.org/guides/mini/guide-encryption.html
                     // Examples of decrypted legacy passwords:
                     // <password>{COQLCE6DU6GtcS5P=}</password>
                     // <password>Oleg reset this password on 2009-03-11 {COQLCE6DU6GtcS5P=}</password>
