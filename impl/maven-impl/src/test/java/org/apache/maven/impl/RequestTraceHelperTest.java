@@ -56,7 +56,9 @@ class RequestTraceHelperTest {
 
         String result = RequestTraceHelper.interpretTrace(false, trace);
 
-        assertTrue(result.startsWith("artifact request for "));
+        assertTrue(
+                result.startsWith("artifact request for "),
+                "Expected " + result + " to start with " + "artifact request for ");
     }
 
     @Test

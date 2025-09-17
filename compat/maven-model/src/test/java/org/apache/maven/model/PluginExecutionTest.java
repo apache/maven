@@ -45,7 +45,7 @@ class PluginExecutionTest {
     @Test
     void testEqualsIdentity() {
         PluginExecution thing = new PluginExecution();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test

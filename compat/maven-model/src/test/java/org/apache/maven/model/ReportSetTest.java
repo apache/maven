@@ -45,7 +45,7 @@ class ReportSetTest {
     @Test
     void testEqualsIdentity() {
         ReportSet thing = new ReportSet();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test

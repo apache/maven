@@ -23,17 +23,20 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ArtifactCoordinates;
@@ -96,6 +99,10 @@ import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.VersionRangeResolver;
 import org.apache.maven.api.services.VersionResolver;
 import org.apache.maven.api.services.VersionResolverException;
+import org.apache.maven.di.Injector;
+import org.apache.maven.di.Key;
+import org.apache.maven.di.impl.Binding;
+import org.apache.maven.di.impl.InjectorImpl;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -112,6 +119,7 @@ public abstract class AbstractSession implements InternalSession {
     protected final RepositorySystem repositorySystem;
     protected final List<RemoteRepository> repositories;
     protected final Lookup lookup;
+    protected final Injector injector;
     private final Map<Class<? extends Service>, Service> services = new ConcurrentHashMap<>();
     private final List<Listener> listeners = new CopyOnWriteArrayList<>();
     private final Map<org.eclipse.aether.graph.DependencyNode, Node> allNodes =
@@ -138,6 +146,24 @@ public abstract class AbstractSession implements InternalSession {
         this.repositorySystem = repositorySystem;
         this.repositories = getRepositories(repositories, resolverRepositories);
         this.lookup = lookup;
+        this.injector = lookup != null ? lookup.lookupOptional(Injector.class).orElse(null) : null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Stream<Class<? extends Service>> collectServiceInterfaces(Class<?> clazz) {
+        if (clazz == null) {
+            return Stream.empty();
+        } else if (clazz.isInterface()) {
+            return Stream.concat(
+                            Service.class.isAssignableFrom(clazz) ? Stream.of((Class<Service>) clazz) : Stream.empty(),
+                            Stream.of(clazz.getInterfaces()).flatMap(AbstractSession::collectServiceInterfaces))
+                    .filter(itf -> itf != Service.class);
+        } else {
+            return Stream.concat(
+                            Stream.of(clazz.getInterfaces()).flatMap(AbstractSession::collectServiceInterfaces),
+                            collectServiceInterfaces(clazz.getSuperclass()))
+                    .filter(itf -> itf != Service.class);
+        }
     }
 
     @Override
@@ -368,6 +394,27 @@ public abstract class AbstractSession implements InternalSession {
             throw new NoSuchElementException(clazz.getName());
         }
         return t;
+    }
+
+    @Override
+    public Map<Class<? extends Service>, Supplier<? extends Service>> getAllServices() {
+        Map<Class<? extends Service>, Supplier<? extends Service>> allServices = new HashMap<>(services.size());
+        // In case the injector is known, lazily populate the map to avoid creating all services upfront.
+        if (injector instanceof InjectorImpl injector) {
+            Set<Binding<Service>> bindings = injector.getAllBindings(Service.class);
+            bindings.stream()
+                    .map(Binding::getOriginalKey)
+                    .map(Key::getRawType)
+                    .flatMap(AbstractSession::collectServiceInterfaces)
+                    .distinct()
+                    .forEach(itf -> allServices.put(itf, () -> injector.getInstance(Key.of(itf))));
+        } else {
+            List<Service> services = this.injector.getInstance(new Key<List<Service>>() {});
+            for (Service service : services) {
+                collectServiceInterfaces(service.getClass()).forEach(itf -> allServices.put(itf, () -> service));
+            }
+        }
+        return allServices;
     }
 
     private Service lookup(Class<? extends Service> c) {

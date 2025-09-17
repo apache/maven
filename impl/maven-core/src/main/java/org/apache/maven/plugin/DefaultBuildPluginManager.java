@@ -25,8 +25,11 @@ import javax.inject.Singleton;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
 import org.apache.maven.api.Project;
+import org.apache.maven.api.Service;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.MojoExecutionEvent;
@@ -128,6 +131,10 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
             scope.seed(org.apache.maven.api.MojoExecution.class, new DefaultMojoExecution(sessionV4, mojoExecution));
 
             if (mojoDescriptor.isV4Api()) {
+                // For Maven 4 plugins, register a service so that they can be directly injected into plugins
+                Map<Class<? extends Service>, Supplier<? extends Service>> services = sessionV4.getAllServices();
+                services.forEach((itf, svc) -> scope.seed((Class<Service>) itf, (Supplier<Service>) svc));
+
                 org.apache.maven.api.plugin.Mojo mojoV4 = mavenPluginManager.getConfiguredMojo(
                         org.apache.maven.api.plugin.Mojo.class, session, mojoExecution);
                 mojo = new MojoWrapper(mojoV4);

@@ -45,7 +45,7 @@ class NotifierTest {
     @Test
     void testEqualsIdentity() {
         Notifier thing = new Notifier();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test

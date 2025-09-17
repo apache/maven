@@ -53,6 +53,10 @@ public abstract class Binding<T> {
         return new BindingToInstance<>(instance);
     }
 
+    public static <T> Binding<T> toSupplier(Supplier<T> supplier) {
+        return new BindingToSupplier<>(supplier);
+    }
+
     public static <R> Binding<R> to(Key<R> originalKey, TupleConstructorN<R> constructor, Class<?>[] types) {
         return Binding.to(
                 originalKey,
@@ -165,6 +169,25 @@ public abstract class Binding<T> {
         @Override
         public String toString() {
             return "BindingToInstance[" + instance + "]" + getDependencies();
+        }
+    }
+
+    public static class BindingToSupplier<T> extends Binding<T> {
+        final Supplier<T> supplier;
+
+        public BindingToSupplier(Supplier<T> supplier) {
+            super(null, Collections.emptySet());
+            this.supplier = supplier;
+        }
+
+        @Override
+        public Supplier<T> compile(Function<Dependency<?>, Supplier<?>> compiler) {
+            return supplier;
+        }
+
+        @Override
+        public String toString() {
+            return "BindingToSupplier[" + supplier + "]" + getDependencies();
         }
     }
 

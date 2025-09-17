@@ -37,17 +37,15 @@ package org.apache.its.mng6118;
  * under the License.
  */
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class HelperTest {
     private final Helper helper = new Helper();
 
     @Test
     public void shouldAnswerWithTrue() {
-        assertThat(helper.generateObject(), is(notNullValue()));
+        assertNotNull(helper.generateObject(), "Helper should generate a non-null object");
     }
 }

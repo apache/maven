@@ -108,7 +108,7 @@ class DefaultUpdateCheckManagerTest extends AbstractArtifactComponentTestCase {
 
         assertFalse(updateCheckManager.isUpdateRequired(a, remoteRepository));
 
-        assertFalse(file.exists());
+        assertFalse(file.exists(), "Expected " + file + ".exists() to return false");
         assertNotNull(
                 updateCheckManager.readLastUpdated(touchFile, updateCheckManager.getRepositoryKey(remoteRepository)));
     }
@@ -161,7 +161,7 @@ class DefaultUpdateCheckManagerTest extends AbstractArtifactComponentTestCase {
 
         assertFalse(updateCheckManager.isUpdateRequired(a, remoteRepository));
 
-        assertFalse(file.exists());
+        assertFalse(file.exists(), "Expected " + file + ".exists() to return false");
         assertNotNull(
                 updateCheckManager.readLastUpdated(touchFile, updateCheckManager.getRepositoryKey(remoteRepository)));
     }

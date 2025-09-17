@@ -45,7 +45,7 @@ class RepositoryTest {
     @Test
     void testEqualsIdentity() {
         Repository thing = new Repository();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test
