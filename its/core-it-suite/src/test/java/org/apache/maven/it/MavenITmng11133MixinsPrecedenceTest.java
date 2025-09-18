@@ -18,10 +18,9 @@
  */
 package org.apache.maven.it;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
-import java.util.Properties;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -40,13 +39,14 @@ public class MavenITmng11133MixinsPrecedenceTest extends AbstractMavenIntegratio
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.addCliArgument("install");
+        verifier.addCliArgument("help:effective-pom");
+        verifier.addCliArgument("-Doutput=target/effective-pom.xml");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent("target/model.properties");
-        Properties props = verifier.loadProperties("target/model.properties");
-        assertEquals("21", props.getProperty("project.properties.maven.compiler.release"));
+        verifier.verifyFilePresent("target/effective-pom.xml");
+        String effectivePom = verifier.loadFile("target/effective-pom.xml", false);
+        assertTrue(effectivePom.contains("<maven.compiler.release>21</maven.compiler.release>"));
     }
 }
 
