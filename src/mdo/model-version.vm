@@ -50,12 +50,18 @@ import org.apache.maven.api.xml.XmlNode;
 #foreach ( $class in $model.allClasses )
 import ${packageModelV4}.${class.Name};
 #end
+import ${packageModelV4}.Profile;
 
 @Generated
 public class ${className} {
 
     public String getModelVersion(${root.name} model) {
         Objects.requireNonNull(model, "model cannot be null");
+
+        // Check for new Maven 4 dependency scopes first
+        if (is_4_1_0_custom(model)) {
+            return "4.1.0";
+        }
 
 #set ( $String = $model.getClass().forName("java.lang.String") )
 #set ( $Comparator = $model.getClass().forName("java.util.Comparator") )
@@ -188,6 +194,50 @@ public class ${className} {
 
     private boolean has(XmlNode node) {
         return node != null;
+    }
+
+    /**
+     * Checks if a dependency uses one of the new Maven 4 scopes that require model version 4.1.0+
+     */
+    private boolean hasNewMaven4Scope(Dependency dependency) {
+        if (dependency == null || dependency.getScope() == null) {
+            return false;
+        }
+        String scope = dependency.getScope();
+        return "compile-only".equals(scope) || "test-only".equals(scope) || "test-runtime".equals(scope);
+    }
+
+    /**
+     * Override the generated is_4_1_0 method to add custom logic for new Maven 4 dependency scopes
+     */
+    private boolean is_4_1_0_custom(Model model) {
+        if (model == null) {
+            return false;
+        }
+
+        // Check direct dependencies for new scopes
+        if (model.getDependencies().stream().anyMatch(this::hasNewMaven4Scope)) {
+            return true;
+        }
+
+        // Check dependency management for new scopes
+        if (model.getDependencyManagement() != null &&
+            model.getDependencyManagement().getDependencies().stream().anyMatch(this::hasNewMaven4Scope)) {
+            return true;
+        }
+
+        // Check profiles for new scopes
+        for (Profile profile : model.getProfiles()) {
+            if (profile.getDependencies().stream().anyMatch(this::hasNewMaven4Scope)) {
+                return true;
+            }
+            if (profile.getDependencyManagement() != null &&
+                profile.getDependencyManagement().getDependencies().stream().anyMatch(this::hasNewMaven4Scope)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }
