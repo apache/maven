@@ -20,7 +20,9 @@ package org.apache.maven.impl;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ArtifactCoordinates;
@@ -30,6 +32,7 @@ import org.apache.maven.api.LocalRepository;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Repository;
+import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.WorkspaceRepository;
 import org.apache.maven.api.annotations.Nonnull;
@@ -138,4 +141,12 @@ public interface InternalSession extends Session {
      * @see RequestTraceHelper#enter(Session, Object) For the recommended way to manage traces
      */
     RequestTrace getCurrentTrace();
+
+    /**
+     * Retrieves a map of all services.
+     *
+     * @see #getService(Class)
+     */
+    @Nonnull
+    Map<Class<? extends Service>, Supplier<? extends Service>> getAllServices();
 }

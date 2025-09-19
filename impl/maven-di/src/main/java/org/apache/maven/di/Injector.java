@@ -124,6 +124,21 @@ public interface Injector {
     <T> Injector bindInstance(@Nonnull Class<T> cls, @Nonnull T instance);
 
     /**
+     * Binds a specific instance supplier to a class type.
+     * <p>
+     * This method allows pre-created instances to be used for injection instead of
+     * having the injector create new instances.
+     *
+     * @param <T> the type of the instance
+     * @param cls the class to bind to
+     * @param supplier the supplier to use for injection
+     * @return this injector instance for method chaining
+     * @throws NullPointerException if either parameter is null
+     */
+    @Nonnull
+    <T> Injector bindSupplier(@Nonnull Class<T> cls, @Nonnull Supplier<T> supplier);
+
+    /**
      * Performs field and method injection on an existing instance.
      * <p>
      * This method will inject dependencies into annotated fields and methods of

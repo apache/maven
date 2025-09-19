@@ -38,6 +38,7 @@ import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.ProjectScope;
 import org.apache.maven.api.RemoteRepository;
+import org.apache.maven.api.Service;
 import org.apache.maven.api.SourceRoot;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.SessionScoped;
@@ -52,8 +53,13 @@ import org.eclipse.sisu.Typed;
 import static java.util.Objects.requireNonNull;
 import static org.apache.maven.internal.impl.CoreUtils.map;
 
+/**
+ * This implementation of {@code ProjectManager} is explicitly bound to
+ * both {@code ProjectManager} and {@code Service} interfaces so that it can be retrieved using
+ * {@link InternalSession#getAllServices()}.
+ */
 @Named
-@Typed
+@Typed({ProjectManager.class, Service.class})
 @SessionScoped
 public class DefaultProjectManager implements ProjectManager {
 

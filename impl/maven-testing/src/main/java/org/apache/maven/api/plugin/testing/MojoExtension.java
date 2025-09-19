@@ -444,6 +444,19 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             @Singleton
             @Priority(-10)
             private InternalSession createSession() {
+                MojoTest mojoTest = context.getRequiredTestClass().getAnnotation(MojoTest.class);
+                if (mojoTest != null && mojoTest.realSession()) {
+                    // Try to create a real session using ApiRunner without compile-time dependency
+                    try {
+                        Class<?> apiRunner = Class.forName("org.apache.maven.impl.standalone.ApiRunner");
+                        Object session = apiRunner.getMethod("createSession").invoke(null);
+                        return (InternalSession) session;
+                    } catch (Throwable t) {
+                        // Explicit request: do not fall back; abort the test with details instead of mocking
+                        throw new org.opentest4j.TestAbortedException(
+                                "@MojoTest(realSession=true) requested but could not create a real session.", t);
+                    }
+                }
                 return SessionMock.getMockSession(getBasedir());
             }
 
