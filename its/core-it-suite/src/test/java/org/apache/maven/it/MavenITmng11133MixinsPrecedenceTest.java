@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Files;
 
 import org.junit.jupiter.api.Test;
 
@@ -46,7 +47,7 @@ public class MavenITmng11133MixinsPrecedenceTest extends AbstractMavenIntegratio
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent("target/effective-pom.xml");
-        String effectivePom = verifier.loadFile("target/effective-pom.xml", false);
+        String effectivePom = Files.readString(new File(testDir, "target/effective-pom.xml").toPath());
         assertTrue(effectivePom.contains("<maven.compiler.release>21</maven.compiler.release>"));
     }
 }
