@@ -17,7 +17,6 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
   -->
-
 <project xmlns="http://maven.apache.org/POM/4.1.0" root="true">
   <groupId>org.apache.maven.its.repointerp</groupId>
   <artifactId>repo-interpolation</artifactId>
@@ -26,6 +25,13 @@
 
   <name>Maven Integration Test :: Repository and DistributionManagement URL interpolation</name>
   <description>Verify that repository and distributionManagement URLs are interpolated from env and project properties.</description>
+
+  <distributionManagement>
+    <repository>
+      <id>distRepo</id>
+      <url>${env.IT_DM_BASE}/dist</url>
+    </repository>
+  </distributionManagement>
 
   <properties>
     <!-- Property sourced from env via model interpolation in test class -->
@@ -42,12 +48,4 @@
       <url>${customRepoUrl}</url>
     </repository>
   </repositories>
-
-  <distributionManagement>
-    <repository>
-      <id>distRepo</id>
-      <url>${env.IT_DM_BASE}/dist</url>
-    </repository>
-  </distributionManagement>
 </project>
-

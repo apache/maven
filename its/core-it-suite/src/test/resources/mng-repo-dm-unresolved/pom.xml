@@ -17,7 +17,6 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
   -->
-
 <project xmlns="http://maven.apache.org/POM/4.1.0" root="true">
   <groupId>org.apache.maven.its.repointerp</groupId>
   <artifactId>repo-dm-unresolved</artifactId>
@@ -27,18 +26,17 @@
   <name>Maven Integration Test :: Unresolved placeholders must fail</name>
   <description>Verify that unresolved placeholders in repository/distributionManagement cause failure when used.</description>
 
-  <repositories>
-    <repository>
-      <id>badRepo</id>
-      <url>${env.MISSING_VAR}/repo</url>
-    </repository>
-  </repositories>
-
   <distributionManagement>
     <repository>
       <id>badDist</id>
       <url>${env.MISSING_VAR}/dist</url>
     </repository>
   </distributionManagement>
-</project>
 
+  <repositories>
+    <repository>
+      <id>badRepo</id>
+      <url>${env.MISSING_VAR}/repo</url>
+    </repository>
+  </repositories>
+</project>
