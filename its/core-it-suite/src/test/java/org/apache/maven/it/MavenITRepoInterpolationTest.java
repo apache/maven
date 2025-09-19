@@ -52,12 +52,18 @@ class MavenITRepoInterpolationTest extends AbstractMavenIntegrationTestCase {
 
         List<String> lines = verifier.loadLogLines();
         // Expect resolved file:// URLs, not placeholders
-        assertTrue(lines.stream().anyMatch(s -> s.contains("<id>envRepo</id>") ), "envRepo present");
-        assertTrue(lines.stream().anyMatch(s -> s.contains("<url>" + base.toUri() + "repo</url>") ), "envRepo url resolved");
-        assertTrue(lines.stream().anyMatch(s -> s.contains("<id>propRepo</id>") ), "propRepo present");
-        assertTrue(lines.stream().anyMatch(s -> s.contains("<url>" + base.toUri() + "custom</url>") ), "propRepo url resolved via property");
-        assertTrue(lines.stream().anyMatch(s -> s.contains("<id>distRepo</id>") ), "distRepo present");
-        assertTrue(lines.stream().anyMatch(s -> s.contains("<url>" + base.toUri() + "dist</url>") ), "distRepo url resolved");
+        assertTrue(lines.stream().anyMatch(s -> s.contains("<id>envRepo</id>")), "envRepo present");
+        assertTrue(
+                lines.stream().anyMatch(s -> s.contains("<url>" + base.toUri() + "repo</url>")),
+                "envRepo url resolved");
+        assertTrue(lines.stream().anyMatch(s -> s.contains("<id>propRepo</id>")), "propRepo present");
+        assertTrue(
+                lines.stream().anyMatch(s -> s.contains("<url>" + base.toUri() + "custom</url>")),
+                "propRepo url resolved via property");
+        assertTrue(lines.stream().anyMatch(s -> s.contains("<id>distRepo</id>")), "distRepo present");
+        assertTrue(
+                lines.stream().anyMatch(s -> s.contains("<url>" + base.toUri() + "dist</url>")),
+                "distRepo url resolved");
     }
 
     @Test
