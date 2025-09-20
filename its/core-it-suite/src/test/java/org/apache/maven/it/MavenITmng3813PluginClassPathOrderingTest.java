@@ -68,6 +68,20 @@ public class MavenITmng3813PluginClassPathOrderingTest extends AbstractMavenInte
 
         assertEquals("8", pclProps.getProperty(resName + ".count"));
 
+        // The following dependency section spans this dependency tree:
+        //   dep-a
+        //     dep-aa
+        //     dep-ac
+        //     dep-ab
+        //     dep-ad
+        //   dep-c
+        //   dep-b
+        //   dep-d
+        //
+        // Given this tree, the correct/expected class path using preOrder is:
+        //   dep-a, dep-aa, dep-ac, dep-ab, dep-ad, dep-c, dep-b, dep-d
+        // The correct/expected class path using levelOrder is:
+        //   dep-a, dep-c, dep-b, dep-d, dep-aa, dep-ac, dep-ab, dep-ad
         if (matchesVersionRange("[,4.1.0-SNAPSHOT)")) {
             // preOrder
             assertTrue(pclProps.getProperty(resName + ".0").endsWith("/dep-a-0.1.jar!/" + resName));
