@@ -68,13 +68,26 @@ public class MavenITmng3813PluginClassPathOrderingTest extends AbstractMavenInte
 
         assertEquals("8", pclProps.getProperty(resName + ".count"));
 
-        assertTrue(pclProps.getProperty(resName + ".0").endsWith("/dep-a-0.1.jar!/" + resName));
-        assertTrue(pclProps.getProperty(resName + ".1").endsWith("/dep-aa-0.1.jar!/" + resName));
-        assertTrue(pclProps.getProperty(resName + ".2").endsWith("/dep-ac-0.1.jar!/" + resName));
-        assertTrue(pclProps.getProperty(resName + ".3").endsWith("/dep-ab-0.1.jar!/" + resName));
-        assertTrue(pclProps.getProperty(resName + ".4").endsWith("/dep-ad-0.1.jar!/" + resName));
-        assertTrue(pclProps.getProperty(resName + ".5").endsWith("/dep-c-0.1.jar!/" + resName));
-        assertTrue(pclProps.getProperty(resName + ".6").endsWith("/dep-b-0.1.jar!/" + resName));
-        assertTrue(pclProps.getProperty(resName + ".7").endsWith("/dep-d-0.1.jar!/" + resName));
+        if (matchesVersionRange("[,4.1.0-SNAPSHOT)")) {
+            // preOrder
+            assertTrue(pclProps.getProperty(resName + ".0").endsWith("/dep-a-0.1.jar!/" + resName));
+            assertTrue(pclProps.getProperty(resName + ".1").endsWith("/dep-aa-0.1.jar!/" + resName));
+            assertTrue(pclProps.getProperty(resName + ".2").endsWith("/dep-ac-0.1.jar!/" + resName));
+            assertTrue(pclProps.getProperty(resName + ".3").endsWith("/dep-ab-0.1.jar!/" + resName));
+            assertTrue(pclProps.getProperty(resName + ".4").endsWith("/dep-ad-0.1.jar!/" + resName));
+            assertTrue(pclProps.getProperty(resName + ".5").endsWith("/dep-c-0.1.jar!/" + resName));
+            assertTrue(pclProps.getProperty(resName + ".6").endsWith("/dep-b-0.1.jar!/" + resName));
+            assertTrue(pclProps.getProperty(resName + ".7").endsWith("/dep-d-0.1.jar!/" + resName));
+        } else {
+            // levelOrder
+            assertTrue(pclProps.getProperty(resName + ".0").endsWith("/dep-a-0.1.jar!/" + resName));
+            assertTrue(pclProps.getProperty(resName + ".1").endsWith("/dep-c-0.1.jar!/" + resName));
+            assertTrue(pclProps.getProperty(resName + ".2").endsWith("/dep-b-0.1.jar!/" + resName));
+            assertTrue(pclProps.getProperty(resName + ".3").endsWith("/dep-d-0.1.jar!/" + resName));
+            assertTrue(pclProps.getProperty(resName + ".4").endsWith("/dep-aa-0.1.jar!/" + resName));
+            assertTrue(pclProps.getProperty(resName + ".5").endsWith("/dep-ac-0.1.jar!/" + resName));
+            assertTrue(pclProps.getProperty(resName + ".6").endsWith("/dep-ab-0.1.jar!/" + resName));
+            assertTrue(pclProps.getProperty(resName + ".7").endsWith("/dep-ad-0.1.jar!/" + resName));
+        }
     }
 }
