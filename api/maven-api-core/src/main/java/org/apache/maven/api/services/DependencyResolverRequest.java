@@ -34,6 +34,8 @@ import org.apache.maven.api.PathType;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.SourceRoot;
+import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
@@ -94,6 +96,28 @@ public interface DependencyResolverRequest extends Request<Session> {
      */
     @Nullable
     Predicate<PathType> getPathTypeFilter();
+
+    /**
+     * Returns the version of the platform where the code will be executed.
+     * It should be the highest value of the {@code <targetVersion>} elements
+     * inside the {@code <source>} elements of a <abbr>POM</abbr> file.
+     *
+     * <h4>Application to Java</h4>
+     * In the context of a Java project, this is the value given to the {@code --release} compiler option.
+     * This value can determine whether a dependency will be placed on the class-path or on the module-path.
+     * For example, if the {@code module-info.class} entry of a <abbr>JAR</abbr> file exists only in the
+     * {@code META-INF/versions/17/} sub-directory, then the default location of that dependency will be
+     * the module-path only if the {@code --release} option is equal or greater than 17.
+     *
+     * <p>If this value is not provided, then the default value in the context of Java projects
+     * is the Java version on which Maven is running, as given by {@link Runtime#version()}.</p>
+     *
+     * @return version of the platform where the code will be executed, or {@code null} for default
+     *
+     * @see SourceRoot#targetVersion()
+     */
+    @Nullable
+    Version getTargetVersion();
 
     @Nullable
     List<RemoteRepository> getRepositories();
@@ -181,6 +205,7 @@ public interface DependencyResolverRequest extends Request<Session> {
         boolean verbose;
         PathScope pathScope;
         Predicate<PathType> pathTypeFilter;
+        Version targetVersion;
         List<RemoteRepository> repositories;
 
         DependencyResolverRequestBuilder() {}
@@ -345,6 +370,18 @@ public interface DependencyResolverRequest extends Request<Session> {
             return pathTypeFilter(desiredTypes::contains);
         }
 
+        /**
+         * Sets the version of the platform where the code will be executed.
+         *
+         * @param target version of the platform where the code will be executed, or {@code null} for the default
+         * @return {@code this} for method call chaining
+         */
+        @Nonnull
+        public DependencyResolverRequestBuilder targetVersion(@Nullable Version target) {
+            targetVersion = target;
+            return this;
+        }
+
         @Nonnull
         public DependencyResolverRequestBuilder repositories(@Nonnull List<RemoteRepository> repositories) {
             this.repositories = repositories;
@@ -365,6 +402,7 @@ public interface DependencyResolverRequest extends Request<Session> {
                     verbose,
                     pathScope,
                     pathTypeFilter,
+                    targetVersion,
                     repositories);
         }
 
@@ -404,6 +442,7 @@ public interface DependencyResolverRequest extends Request<Session> {
             private final boolean verbose;
             private final PathScope pathScope;
             private final Predicate<PathType> pathTypeFilter;
+            private final Version targetVersion;
             private final List<RemoteRepository> repositories;
 
             /**
@@ -426,6 +465,7 @@ public interface DependencyResolverRequest extends Request<Session> {
                     boolean verbose,
                     @Nullable PathScope pathScope,
                     @Nullable Predicate<PathType> pathTypeFilter,
+                    @Nullable Version targetVersion,
                     @Nullable List<RemoteRepository> repositories) {
                 super(session, trace);
                 this.requestType = requireNonNull(requestType, "requestType cannot be null");
@@ -438,6 +478,7 @@ public interface DependencyResolverRequest extends Request<Session> {
                 this.verbose = verbose;
                 this.pathScope = requireNonNull(pathScope, "pathScope cannot be null");
                 this.pathTypeFilter = (pathTypeFilter != null) ? pathTypeFilter : DEFAULT_FILTER;
+                this.targetVersion = targetVersion;
                 this.repositories = repositories;
                 if (verbose && requestType != RequestType.COLLECT) {
                     throw new IllegalArgumentException("verbose cannot only be true when collecting dependencies");
@@ -496,6 +537,11 @@ public interface DependencyResolverRequest extends Request<Session> {
             }
 
             @Override
+            public Version getTargetVersion() {
+                return targetVersion;
+            }
+
+            @Override
             public List<RemoteRepository> getRepositories() {
                 return repositories;
             }
@@ -512,6 +558,7 @@ public interface DependencyResolverRequest extends Request<Session> {
                         && Objects.equals(managedDependencies, that.managedDependencies)
                         && Objects.equals(pathScope, that.pathScope)
                         && Objects.equals(pathTypeFilter, that.pathTypeFilter)
+                        && Objects.equals(targetVersion, that.targetVersion)
                         && Objects.equals(repositories, that.repositories);
             }
 
@@ -527,6 +574,7 @@ public interface DependencyResolverRequest extends Request<Session> {
                         verbose,
                         pathScope,
                         pathTypeFilter,
+                        targetVersion,
                         repositories);
             }
 
@@ -541,7 +589,8 @@ public interface DependencyResolverRequest extends Request<Session> {
                         + managedDependencies + ", verbose="
                         + verbose + ", pathScope="
                         + pathScope + ", pathTypeFilter="
-                        + pathTypeFilter + ", repositories="
+                        + pathTypeFilter + ", targetVersion="
+                        + targetVersion + ", repositories="
                         + repositories + ']';
             }
         }
