@@ -403,11 +403,21 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
             org.apache.maven.api.model.Profile profile = activeProfiles.get(0);
             assertEquals("active-by-default", profile.getId());
             InputLocation location = profile.getLocation("");
-            assertNotNull(location);
-            assertTrue(location.getLineNumber() > 0);
-            assertTrue(location.getColumnNumber() > 0);
-            assertNotNull(location.getSource());
-            assertTrue(location.getSource().getLocation().contains("pom-with-profiles/pom.xml"));
+            assertNotNull(location, "Profile location should not be null for profile: " + profile.getId());
+            assertTrue(
+                    location.getLineNumber() > 0,
+                    "Profile location line number should be positive, but was: " + location.getLineNumber()
+                            + " for profile: " + profile.getId());
+            assertTrue(
+                    location.getColumnNumber() > 0,
+                    "Profile location column number should be positive, but was: " + location.getColumnNumber()
+                            + " for profile: " + profile.getId());
+            assertNotNull(
+                    location.getSource(), "Profile location source should not be null for profile: " + profile.getId());
+            assertTrue(
+                    location.getSource().getLocation().contains("pom-with-profiles/pom.xml"),
+                    "Profile location should contain 'pom-with-profiles/pom.xml', but was: "
+                            + location.getSource().getLocation() + " for profile: " + profile.getId());
 
             // This demonstrates the cross-platform path behavior:
             // - On Unix systems, paths use forward slashes (/)
@@ -476,11 +486,21 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
             org.apache.maven.api.model.Profile profile = activeProfiles.get(0);
             assertEquals("active-by-default", profile.getId());
             InputLocation location = profile.getLocation("");
-            assertNotNull(location);
-            assertTrue(location.getLineNumber() > 0);
-            assertTrue(location.getColumnNumber() > 0);
-            assertNotNull(location.getSource());
-            assertTrue(location.getSource().getLocation().contains("pom-with-profiles/pom.xml"));
+            assertNotNull(location, "Profile location should not be null for profile: " + profile.getId());
+            assertTrue(
+                    location.getLineNumber() > 0,
+                    "Profile location line number should be positive, but was: " + location.getLineNumber()
+                            + " for profile: " + profile.getId());
+            assertTrue(
+                    location.getColumnNumber() > 0,
+                    "Profile location column number should be positive, but was: " + location.getColumnNumber()
+                            + " for profile: " + profile.getId());
+            assertNotNull(
+                    location.getSource(), "Profile location source should not be null for profile: " + profile.getId());
+            assertTrue(
+                    location.getSource().getLocation().contains("pom-with-profiles/pom.xml"),
+                    "Profile location should contain 'pom-with-profiles/pom.xml', but was: "
+                            + location.getSource().getLocation() + " for profile: " + profile.getId());
 
             // This demonstrates the cross-platform path behavior for the POM file
             String actualLocation = location.getSource().getLocation();
@@ -500,11 +520,22 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
             profile = activeProfiles.get(1);
             assertEquals("external-profile", profile.getId());
             location = profile.getLocation("");
-            assertNotNull(location);
-            assertTrue(location.getLineNumber() > 0);
-            assertTrue(location.getColumnNumber() > 0);
-            assertNotNull(location.getSource());
-            assertTrue(location.getSource().getLocation().contains("settings.xml"));
+            assertNotNull(location, "External profile location should not be null for profile: " + profile.getId());
+            assertTrue(
+                    location.getLineNumber() > 0,
+                    "External profile location line number should be positive, but was: " + location.getLineNumber()
+                            + " for profile: " + profile.getId());
+            assertTrue(
+                    location.getColumnNumber() > 0,
+                    "External profile location column number should be positive, but was: " + location.getColumnNumber()
+                            + " for profile: " + profile.getId());
+            assertNotNull(
+                    location.getSource(),
+                    "External profile location source should not be null for profile: " + profile.getId());
+            assertTrue(
+                    location.getSource().getLocation().contains("settings.xml"),
+                    "External profile location should contain 'settings.xml', but was: "
+                            + location.getSource().getLocation() + " for profile: " + profile.getId());
         }
     }
 
