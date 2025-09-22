@@ -65,7 +65,6 @@ import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Exclusion;
 import org.apache.maven.api.model.InputLocation;
-import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Mixin;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Parent;
