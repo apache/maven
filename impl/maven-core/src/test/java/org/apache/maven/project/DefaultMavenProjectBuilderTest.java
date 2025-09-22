@@ -49,9 +49,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -407,10 +404,10 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
             assertEquals("active-by-default", profile.getId());
             InputLocation location = profile.getLocation("");
             assertNotNull(location);
-            assertThat(location.getLineNumber(), greaterThan(0));
-            assertThat(location.getColumnNumber(), greaterThan(0));
+            assertTrue(location.getLineNumber() > 0);
+            assertTrue(location.getColumnNumber() > 0);
             assertNotNull(location.getSource());
-            assertThat(location.getSource().getLocation(), containsString("pom-with-profiles/pom.xml"));
+            assertTrue(location.getSource().getLocation().contains("pom-with-profiles/pom.xml"));
 
             // This demonstrates the cross-platform path behavior:
             // - On Unix systems, paths use forward slashes (/)
@@ -420,16 +417,15 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
             String expectedPath = "pom-with-profiles" + separator + "pom.xml";
 
             // The test will pass with File.separator but this shows the platform differences
-            assertThat(
+            assertTrue(
+                    actualLocation.contains("pom-with-profiles/pom.xml"),
                     "Location should contain path with proper separators for " + fsName + " (actual: " + actualLocation
                             + ")\n"
                             + "=== Cross-Platform Path Test [" + fsName + "] ===\n"
                             + "Expected path pattern: " + expectedPath + "\n"
                             + "Actual location: " + actualLocation + "\n"
                             + "Contains expected pattern: " + actualLocation.contains(expectedPath) + "\n"
-                            + "File.separator on this system: '" + File.separator + "'",
-                    actualLocation,
-                    containsString("pom-with-profiles/pom.xml"));
+                            + "File.separator on this system: '" + File.separator + "'");
         }
     }
 
@@ -481,35 +477,34 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
             assertEquals("active-by-default", profile.getId());
             InputLocation location = profile.getLocation("");
             assertNotNull(location);
-            assertThat(location.getLineNumber(), greaterThan(0));
-            assertThat(location.getColumnNumber(), greaterThan(0));
+            assertTrue(location.getLineNumber() > 0);
+            assertTrue(location.getColumnNumber() > 0);
             assertNotNull(location.getSource());
-            assertThat(location.getSource().getLocation(), containsString("pom-with-profiles/pom.xml"));
+            assertTrue(location.getSource().getLocation().contains("pom-with-profiles/pom.xml"));
 
             // This demonstrates the cross-platform path behavior for the POM file
             String actualLocation = location.getSource().getLocation();
             String expectedPath = "pom-with-profiles" + separator + "pom.xml";
 
             // The test will pass with File.separator but this shows the platform differences
-            assertThat(
+            assertTrue(
+                    actualLocation.contains("pom-with-profiles/pom.xml"),
                     "Location should contain path with proper separators for " + fsName + " (actual: " + actualLocation
                             + ")\n"
                             + "=== Cross-Platform Path Test [" + fsName + "] - External Profile ===\n"
                             + "Expected path pattern: " + expectedPath + "\n"
                             + "Actual location: " + actualLocation + "\n"
                             + "Contains expected pattern: " + actualLocation.contains(expectedPath) + "\n"
-                            + "File.separator on this system: '" + File.separator + "'",
-                    actualLocation,
-                    containsString("pom-with-profiles/pom.xml"));
+                            + "File.separator on this system: '" + File.separator + "'");
 
             profile = activeProfiles.get(1);
             assertEquals("external-profile", profile.getId());
             location = profile.getLocation("");
             assertNotNull(location);
-            assertThat(location.getLineNumber(), greaterThan(0));
-            assertThat(location.getColumnNumber(), greaterThan(0));
+            assertTrue(location.getLineNumber() > 0);
+            assertTrue(location.getColumnNumber() > 0);
             assertNotNull(location.getSource());
-            assertThat(location.getSource().getLocation(), containsString("settings.xml"));
+            assertTrue(location.getSource().getLocation().contains("settings.xml"));
         }
     }
 
