@@ -181,7 +181,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
 
     /**
      * Transforms a dependency for inclusion in a consumer POM.
-     * Handles new Maven 4 scopes that are not compatible with Maven 3.x consumers.
+     * Uses centralized mapping of Maven 4 scopes to Maven 3-compatible values.
      *
      * @param dependency the original dependency
      * @return the transformed dependency, or null if the dependency should be omitted
@@ -190,32 +190,19 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         if (dependency == null) {
             return null;
         }
-
-        String scope = dependency.getScope();
-        if (scope == null) {
+        String mapped =
+                org.apache.maven.impl.resolver.scopes.Maven4ScopeManagerConfiguration.mapScopeForMaven3ConsumerPom(
+                        dependency.getScope());
+        if (dependency.getScope() == null) {
             return dependency;
         }
-
-        // Handle new Maven 4 scopes when creating consumer POM
-        switch (scope) {
-            case "compile-only":
-                // compile-only dependencies should be omitted from consumer POM
-                // as they are only needed at compile time and not for consumers
-                return null;
-
-            case "test-only":
-                // test-only dependencies should be omitted from consumer POM
-                // as they are only needed for testing and not for consumers
-                return null;
-
-            case "test-runtime":
-                // test-runtime dependencies should be mapped to classic 'test' for consumer POM compatibility
-                return dependency.withScope("test");
-
-            default:
-                // Keep all other scopes as-is
-                return dependency;
+        if (mapped == null) {
+            return null; // omit
         }
+        if (mapped.equals(dependency.getScope())) {
+            return dependency; // unchanged
+        }
+        return dependency.withScope(mapped);
     }
 
     private static String getDependencyKey(org.apache.maven.api.Dependency dependency) {

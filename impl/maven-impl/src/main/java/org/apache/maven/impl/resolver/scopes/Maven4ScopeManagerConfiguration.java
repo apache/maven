@@ -189,6 +189,42 @@ public final class Maven4ScopeManagerConfiguration implements ScopeManagerConfig
         return result;
     }
 
+    /**
+     * Maps a Maven 4 scope id to a Maven 3-compatible scope id for consumer POMs.
+     *
+     * <ul>
+     *   <li>compile-only -> omitted (returns null)</li>
+     *   <li>test-only -> omitted (returns null)</li>
+     *   <li>test-runtime -> test</li>
+     *   <li>none -> omitted (returns null)</li>
+     *   <li>others -> unchanged</li>
+     * </ul>
+     *
+     * @param scopeId the Maven 4 scope id (may be null)
+     * @return the mapped Maven 3 scope id, or null if the dependency should be omitted
+     */
+    public static String mapScopeForMaven3ConsumerPom(String scopeId) {
+        if (scopeId == null) {
+            return null;
+        }
+        DependencyScope ds = DependencyScope.forId(scopeId);
+        if (ds == null) {
+            // Unknown scope: keep as-is (do not attempt to remap strings we don't know)
+            return scopeId;
+        }
+        switch (ds) {
+            case COMPILE_ONLY:
+            case TEST_ONLY:
+            case NONE:
+                // Not meaningful for consumers of the artifact in Maven 3
+                return null;
+            case TEST_RUNTIME:
+                return DependencyScope.TEST.id();
+            default:
+                return ds.id();
+        }
+    }
+
     // ===
 
     public static void main(String... args) {
