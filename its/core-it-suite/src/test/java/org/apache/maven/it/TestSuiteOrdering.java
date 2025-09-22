@@ -105,6 +105,7 @@ public class TestSuiteOrdering implements ClassOrderer {
          */
         suite.addTestSuite(MavenITgh11055DIServiceInjectionTest.class);
         suite.addTestSuite(MavenITgh11084ReactorReaderPreferConsumerPomTest.class);
+        suite.addTestSuite(MavenITgh10210SettingsXmlDecryptTest.class);
         suite.addTestSuite(MavenITgh10312TerminallyDeprecatedMethodInGuiceTest.class);
         suite.addTestSuite(MavenITgh10937QuotedPipesInMavenOptsTest.class);
         suite.addTestSuite(MavenITgh2532DuplicateDependencyEffectiveModelTest.class);
