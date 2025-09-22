@@ -46,6 +46,7 @@ import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.Sources;
 import org.apache.maven.api.services.model.LifecycleBindingsInjector;
 import org.apache.maven.impl.InternalSession;
+import org.apache.maven.impl.resolver.scopes.Maven4ScopeManagerConfiguration;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystemSession;
@@ -190,12 +191,10 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         if (dependency == null) {
             return null;
         }
-        String mapped =
-                org.apache.maven.impl.resolver.scopes.Maven4ScopeManagerConfiguration.mapScopeForMaven3ConsumerPom(
-                        dependency.getScope());
         if (dependency.getScope() == null) {
             return dependency;
         }
+        String mapped = Maven4ScopeManagerConfiguration.mapScopeForMaven3ConsumerPom(dependency.getScope());
         if (mapped == null) {
             return null; // omit
         }

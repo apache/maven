@@ -212,17 +212,11 @@ public final class Maven4ScopeManagerConfiguration implements ScopeManagerConfig
             // Unknown scope: keep as-is (do not attempt to remap strings we don't know)
             return scopeId;
         }
-        switch (ds) {
-            case COMPILE_ONLY:
-            case TEST_ONLY:
-            case NONE:
-                // Not meaningful for consumers of the artifact in Maven 3
-                return null;
-            case TEST_RUNTIME:
-                return DependencyScope.TEST.id();
-            default:
-                return ds.id();
-        }
+        return switch (ds) {
+            case COMPILE_ONLY, TEST_ONLY, NONE -> null; // Not meaningful for consumers of the artifact in Maven 3
+            case TEST_RUNTIME -> DependencyScope.TEST.id();
+            default -> ds.id();
+        };
     }
 
     // ===
