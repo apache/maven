@@ -54,15 +54,12 @@ jobs:
           cp .github/ci-mimir.properties ~/.mimir/mimir.properties
           cp .github/ci-mimir-daemon.properties ~/.mimir/daemon.properties
 
-      - name: Handle Mimir caches
-        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
+      - name: Restore Mimir caches
+        uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
+        id: restore-cache
         with:
           path: ~/.mimir/local
-          key: mimir-${{ runner.os }}-initial-${{ hashFiles('**/pom.xml') }}-${{ github.sha }}
-          restore-keys: |
-            mimir-${{ runner.os }}-initial-${{ hashFiles('**/pom.xml') }}-
-            mimir-${{ runner.os }}-initial-
-            mimir-${{ runner.os }}-
+          key: mimir-${{ runner.os }}-initial
 
       - name: Set up Maven
         shell: bash
@@ -75,6 +72,13 @@ jobs:
       - name: List contents of target directory
         shell: bash
         run: ls -la apache-maven/target
+
+      - name: Save Mimir caches
+        uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
+        if: ${{ github.event_name != 'pull_request' && !cancelled() && !failure() }}
+        with:
+          path: ~/.mimir/local
+          key: ${{ steps.restore-cache.outputs.cache-primary-key }}
 
       - name: Upload Maven distributions
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -125,15 +129,15 @@ jobs:
           cp .github/ci-mimir.properties ~/.mimir/mimir.properties
           cp .github/ci-mimir-daemon.properties ~/.mimir/daemon.properties
 
-      - name: Handle Mimir caches
-        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
+      - name: Restore Mimir caches
+        uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
+        id: restore-cache
         with:
           path: ~/.mimir/local
-          key: mimir-${{ runner.os }}-full-${{ hashFiles('**/pom.xml') }}-${{ github.sha }}
+          key: mimir-full-${{ matrix.os }}-${{ matrix.java }}
           restore-keys: |
-            mimir-${{ runner.os }}-full-${{ hashFiles('**/pom.xml') }}-
-            mimir-${{ runner.os }}-full-
-            mimir-${{ runner.os }}-
+            mimir-full-${{ matrix.os }}-
+            mimir-full-
 
       - name: Download Maven distribution
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v4
@@ -170,6 +174,13 @@ jobs:
         shell: bash
         run: mvn site -e -B -V -Preporting
 
+      - name: Save Mimir caches
+        uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
+        if: ${{ github.event_name != 'pull_request' && !cancelled() && !failure() }}
+        with:
+          path: ~/.mimir/local
+          key: ${{ steps.restore-cache.outputs.cache-primary-key }}
+
       - name: Upload test artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: failure() || cancelled()
@@ -205,15 +216,15 @@ jobs:
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
           cp .github/ci-mimir-daemon.properties ~/.mimir/daemon.properties
 
-      - name: Handle Mimir caches
-        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
+      - name: Restore Mimir caches
+        uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
+        id: restore-cache
         with:
           path: ~/.mimir/local
-          key: mimir-${{ runner.os }}-its-${{ hashFiles('**/pom.xml') }}-${{ github.sha }}
+          key: mimir-its-${{ matrix.os }}-${{ matrix.java }}
           restore-keys: |
-            mimir-${{ runner.os }}-its-${{ hashFiles('**/pom.xml') }}-
-            mimir-${{ runner.os }}-its-
-            mimir-${{ runner.os }}-
+            mimir-its-${{ matrix.os }}-
+            mimir-its-
 
       - name: Download Maven distribution
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v4
@@ -245,6 +256,13 @@ jobs:
       - name: Build Maven and ITs and run them
         shell: bash
         run: mvn install -e -B -V -Prun-its,mimir
+
+      - name: Save Mimir caches
+        uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
+        if: ${{ github.event_name != 'pull_request' && !cancelled() && !failure() }}
+        with:
+          path: ~/.mimir/local
+          key: ${{ steps.restore-cache.outputs.cache-primary-key }}
 
       - name: Upload test artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
