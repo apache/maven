@@ -48,19 +48,14 @@ public class DefaultRequestCache extends AbstractRequestCache {
     private static final List<CacheStatistics> ALL_STATISTICS = new ArrayList<CacheStatistics>();
 
     // Synchronized method to ensure shutdown hook is registered only once
-    private static synchronized void ensureShutdownHookRegistered(CacheStatistics stats) {
-        synchronized (ALL_STATISTICS) {
-            ALL_STATISTICS.add(stats);
-        }
+    private static synchronized void ensureShutdownHookRegistered() {
         if (!shutdownHookRegistered) {
             Runtime.getRuntime()
                     .addShutdownHook(new Thread(
                             () -> {
                                 // Check if cache stats should be displayed
-                                String statsProperty = System.getProperty(Constants.MAVEN_CACHE_STATS);
-                                boolean showStats = Boolean.parseBoolean(statsProperty);
                                 for (CacheStatistics statistics : ALL_STATISTICS) {
-                                    if (showStats && statistics.getTotalRequests() > 0) {
+                                    if (statistics.getTotalRequests() > 0) {
                                         System.err.println("[INFO] " + formatCacheStatistics(statistics));
                                     }
                                 }
@@ -78,8 +73,9 @@ public class DefaultRequestCache extends AbstractRequestCache {
         statistics.registerCacheSizeSupplier(CacheRetention.SESSION_SCOPED, () -> 0L);
         statistics.registerCacheSizeSupplier(CacheRetention.REQUEST_SCOPED, () -> 0L);
 
-        // Register shutdown hook for conditional statistics display
-        ensureShutdownHookRegistered(statistics);
+        synchronized (ALL_STATISTICS) {
+            ALL_STATISTICS.add(statistics);
+        }
     }
 
     /**
@@ -201,6 +197,12 @@ public class DefaultRequestCache extends AbstractRequestCache {
             // Record as a miss since no caching is performed for non-Session requests
             statistics.recordMiss(req.getClass().getSimpleName(), CacheRetention.DISABLED);
             return new CachingSupplier<>(supplier);
+        }
+
+        // Register shutdown hook for conditional statistics display
+        String showStats = session.getUserProperties().get(Constants.MAVEN_CACHE_STATS);
+        if (Boolean.parseBoolean(showStats)) {
+            ensureShutdownHookRegistered();
         }
 
         CacheConfig config = getCacheConfig(req, session);

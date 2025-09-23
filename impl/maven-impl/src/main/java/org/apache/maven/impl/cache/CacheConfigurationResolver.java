@@ -56,11 +56,7 @@ public class CacheConfigurationResolver {
         }
 
         // Check for separate key/value reference type configuration
-        // Check both user properties (-Dprop=value) and system properties (MAVEN_OPTS)
         String keyValueRefsString = session.getUserProperties().get(Constants.MAVEN_CACHE_KEY_VALUE_REFS);
-        if (keyValueRefsString == null) {
-            keyValueRefsString = session.getSystemProperties().get(Constants.MAVEN_CACHE_KEY_VALUE_REFS);
-        }
         Cache.ReferenceType keyRefType = null;
         Cache.ReferenceType valueRefType = null;
 
