@@ -21,6 +21,12 @@ Maven Core Integration Tests
 
 <https://maven.apache.org/core-its/>
 
+By default, the project just packages the tests in an artifact. To actually run them, activate the run-its profile:
+
+```
+mvn clean test -Prun-its
+```
+
 If you want to run the integration tests against a custom build of Maven use the following command:
 
 ```
