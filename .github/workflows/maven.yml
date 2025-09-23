@@ -196,14 +196,13 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v4
         with:
           persist-credentials: false
-
+      # For ITs we DO use daemon (they run in parallel)
       - name: Prepare Mimir
         shell: bash
         run: |
           mkdir -p ~/.m2
           mkdir -p ~/.mimir
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
-          cp .github/ci-mimir.properties ~/.mimir/mimir.properties
           cp .github/ci-mimir-daemon.properties ~/.mimir/daemon.properties
 
       - name: Handle Mimir caches
