@@ -534,8 +534,8 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
                             && Objects.equals(gav.artifactId(), artifactId)
                             && (version == null || Objects.equals(gav.version(), version));
                 })
-                .map(Map.Entry::getKey)
                 .findFirst()
+                .map(Map.Entry::getKey)
                 .orElse(null);
     }
 

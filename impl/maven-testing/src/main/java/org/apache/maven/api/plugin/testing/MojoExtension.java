@@ -265,8 +265,8 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             XmlNode pluginConfiguration = model.getBuild().getPlugins().stream()
                     .filter(p ->
                             Objects.equals(p.getGroupId(), coord[0]) && Objects.equals(p.getArtifactId(), coord[1]))
-                    .map(ConfigurationContainer::getConfiguration)
                     .findFirst()
+                    .map(ConfigurationContainer::getConfiguration)
                     .orElseGet(() -> XmlNode.newInstance("config"));
             List<XmlNode> children = mojoParameters.stream()
                     .map(mp -> XmlNode.newInstance(mp.name(), mp.value()))

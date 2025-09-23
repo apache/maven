@@ -279,8 +279,8 @@ public class InjectorImpl implements Injector {
         if (binding.getScope() != null) {
             Scope scope = scopes.entrySet().stream()
                     .filter(e -> e.getKey().isInstance(binding.getScope()))
-                    .map(Map.Entry::getValue)
                     .findFirst()
+                    .map(Map.Entry::getValue)
                     .orElseThrow(() -> new DIException("Scope not bound for annotation "
                             + binding.getScope().annotationType()))
                     .get();
