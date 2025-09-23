@@ -37,7 +37,7 @@ public final class MimirInfuser {
         if (Files.isRegularFile(realUserWideExtensions)) {
             String realUserWideExtensionsString = Files.readString(realUserWideExtensions);
             if (realUserWideExtensionsString.contains("<groupId>eu.maveniverse.maven.mimir</groupId>")
-                    && realUserWideExtensionsString.contains("<artifactId>extension</artifactId>")) {
+                    && realUserWideExtensionsString.contains("<artifactId>extension3</artifactId>")) {
                 Path userWideExtensions = userHome.resolve(".m2").resolve("extensions.xml");
                 // some tests do prepare project and user wide extensions; skip those for now
                 if (!Files.isRegularFile(userWideExtensions)) {
