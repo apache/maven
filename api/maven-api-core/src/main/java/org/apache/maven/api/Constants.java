@@ -681,18 +681,22 @@ public final class Constants {
     public static final String MAVEN_CACHE_STATS = "maven.cache.stats";
 
     /**
-     * User property to configure separate reference types for cache keys and values.
-     * Format: "key:value" where key and value can be NONE, SOFT, WEAK, or HARD.
-     * Examples:
-     * - "HARD:SOFT" - Keep keys strongly referenced, allow values to be garbage collected under memory pressure
-     * - "WEAK:WEAK" - Allow both keys and values to be garbage collected aggressively
-     * - "SOFT:HARD" - Allow keys to be GC'd under memory pressure, keep values strongly referenced
-     *
+     * User property to configure separate reference types for cache keys.
      * This enables fine-grained analysis of cache misses caused by key vs value evictions.
+     * Supported values are {@code HARD}, {@code SOFT} and {@code WEAK}.
      *
      * @since 4.1.0
      */
-    public static final String MAVEN_CACHE_KEY_VALUE_REFS = "maven.cache.keyValueRefs";
+    public static final String MAVEN_CACHE_KEY_REFS = "maven.cache.keyValueRefs";
+
+    /**
+     * User property to configure separate reference types for cache values.
+     * This enables fine-grained analysis of cache misses caused by key vs value evictions.
+     * Supported values are {@code HARD}, {@code SOFT} and {@code WEAK}.
+     *
+     * @since 4.1.0
+     */
+    public static final String MAVEN_CACHE_VALUE_REFS = "maven.cache.keyValueRefs";
 
     /**
      * User property key for configuring which object types are pooled by ModelObjectProcessor.

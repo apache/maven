@@ -55,24 +55,26 @@ public class CacheConfigurationResolver {
             legacyRetention = metadata.getCacheRetention();
         }
 
-        // Check for separate key/value reference type configuration
-        String keyValueRefsString = session.getUserProperties().get(Constants.MAVEN_CACHE_KEY_VALUE_REFS);
+        // Check for key reference type configuration
         Cache.ReferenceType keyRefType = null;
-        Cache.ReferenceType valueRefType = null;
+        String keyRefsString = session.getUserProperties().get(Constants.MAVEN_CACHE_KEY_REFS);
+        if (keyRefsString != null && !keyRefsString.trim().isEmpty()) {
+            try {
+                keyRefType = Cache.ReferenceType.valueOf(keyRefsString.trim().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                LOGGER.warn("Invalid key reference types '{}', using defaults", keyRefsString);
+            }
+        }
 
-        if (keyValueRefsString != null && !keyValueRefsString.trim().isEmpty()) {
-            String[] parts = keyValueRefsString.split(":");
-            if (parts.length == 2) {
-                try {
-                    keyRefType = Cache.ReferenceType.valueOf(parts[0].trim().toUpperCase());
-                    valueRefType = Cache.ReferenceType.valueOf(parts[1].trim().toUpperCase());
-                    // LOGGER.info("Using separate key/value reference types: key={}, value={}", keyRefType,
-                    // valueRefType);
-                } catch (IllegalArgumentException e) {
-                    LOGGER.warn("Invalid key/value reference types '{}', using defaults", keyValueRefsString);
-                }
-            } else {
-                LOGGER.warn("Invalid key/value reference types format '{}', expected 'KEY:VALUE'", keyValueRefsString);
+        // Check for value reference type configuration
+        Cache.ReferenceType valueRefType = null;
+        String valueRefsString = session.getUserProperties().get(Constants.MAVEN_CACHE_VALUE_REFS);
+        if (valueRefsString != null && !valueRefsString.trim().isEmpty()) {
+            try {
+                valueRefType =
+                        Cache.ReferenceType.valueOf(valueRefsString.trim().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                LOGGER.warn("Invalid value reference types '{}', using defaults", valueRefsString);
             }
         }
 
