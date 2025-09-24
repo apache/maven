@@ -34,9 +34,7 @@ permissions: {}
 env:
   MIMIR_VERSION: 0.9.0
   MIMIR_BASEDIR: ~/.mimir
-  MIMIR_LOCAL: ${{ env.MIMIR_BASEDIR }}/local
-  MIMIR_SESSION_CONFIG_PATH: ${{ env.GITHUB_WORKSPACE }}/.github/ci-mimir-session.properties
-  MIMIR_DAEMON_CONFIG_PATH: ${{ env.GITHUB_WORKSPACE }}/.github/ci-mimir-daemon.properties
+  MIMIR_LOCAL: ~/.mimir/local
 
 jobs:
   initial-build:
@@ -56,6 +54,9 @@ jobs:
       - name: Prepare Mimir for Maven 3.x
         shell: bash
         run: |
+          mkdir -p ${{ env.MIMIR_BASEDIR }}
+          cp .github/ci-mimir-session.properties ${{ env.MIMIR_BASEDIR }}/session.properties
+          cp .github/ci-mimir-daemon.properties ${{ env.MIMIR_BASEDIR }}/daemon.properties
           cp .github/ci-extensions.xml .mvn/extensions.xml
 
       - name: Restore Mimir caches
@@ -134,6 +135,9 @@ jobs:
       - name: Prepare Mimir for Maven 4.x
         shell: bash
         run: |
+          mkdir -p ${{ env.MIMIR_BASEDIR }}
+          cp .github/ci-mimir-session.properties ${{ env.MIMIR_BASEDIR }}/session.properties
+          cp .github/ci-mimir-daemon.properties ${{ env.MIMIR_BASEDIR }}/daemon.properties
           mkdir -p ~/.m2
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
 
@@ -219,6 +223,9 @@ jobs:
       - name: Prepare Mimir for Maven 4.x
         shell: bash
         run: |
+          mkdir -p ${{ env.MIMIR_BASEDIR }}
+          cp .github/ci-mimir-session.properties ${{ env.MIMIR_BASEDIR }}/session.properties
+          cp .github/ci-mimir-daemon.properties ${{ env.MIMIR_BASEDIR }}/daemon.properties
           mkdir -p ~/.m2
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
 
