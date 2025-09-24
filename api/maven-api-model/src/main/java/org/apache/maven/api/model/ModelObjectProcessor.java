@@ -105,13 +105,9 @@ public interface ModelObjectProcessor {
             }
         }
 
-        try {
-            ServiceLoader<ModelObjectProcessor> loader = ServiceLoader.load(ModelObjectProcessor.class);
-            for (ModelObjectProcessor processor : loader) {
-                return processor;
-            }
-        } catch (Exception e) {
-            // If service loading fails, use no-op processor
+        ServiceLoader<ModelObjectProcessor> loader = ServiceLoader.load(ModelObjectProcessor.class);
+        for (ModelObjectProcessor processor : loader) {
+            return processor;
         }
         return new NoOpProcessor();
     }

@@ -18,8 +18,9 @@
  */
 package org.apache.maven.impl.cache;
 
+import java.util.Map;
 import org.apache.maven.api.cache.CacheRetention;
-import org.junit.jupiter.api.BeforeEach;
+import org.apache.maven.impl.cache.CacheStatistics.ReferenceTypeStatistics;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,12 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ReferenceTypeStatisticsTest {
 
-    private CacheStatistics statistics;
-
-    @BeforeEach
-    void setUp() {
-        statistics = new CacheStatistics();
-    }
+    private final CacheStatistics statistics = new CacheStatistics();
 
     @Test
     void shouldTrackReferenceTypeStatistics() {
@@ -47,13 +43,13 @@ class ReferenceTypeStatisticsTest {
         statistics.recordCacheAccess("SOFT", "WEAK", false); // miss
         statistics.recordCacheAccess("HARD", "SOFT", true); // hit
 
-        var refTypeStats = statistics.getReferenceTypeStatistics();
+        Map<String, ReferenceTypeStatistics> refTypeStats = statistics.getReferenceTypeStatistics();
 
         // Should have two reference type combinations
         assertEquals(2, refTypeStats.size());
 
         // Check SOFT/WEAK statistics
-        var softWeakStats = refTypeStats.get("SOFT/WEAK");
+        ReferenceTypeStatistics softWeakStats = refTypeStats.get("SOFT/WEAK");
         assertNotNull(softWeakStats);
         assertEquals(2, softWeakStats.getCacheCreations());
         assertEquals(1, softWeakStats.getHits());
@@ -62,7 +58,7 @@ class ReferenceTypeStatisticsTest {
         assertEquals(50.0, softWeakStats.getHitRatio(), 0.1);
 
         // Check HARD/SOFT statistics
-        var hardSoftStats = refTypeStats.get("HARD/SOFT");
+        ReferenceTypeStatistics hardSoftStats = refTypeStats.get("HARD/SOFT");
         assertNotNull(hardSoftStats);
         assertEquals(1, hardSoftStats.getCacheCreations());
         assertEquals(1, hardSoftStats.getHits());
@@ -132,9 +128,9 @@ class ReferenceTypeStatisticsTest {
         assertTrue(output.contains("hit ratio"), "Should show hit ratio\n" + output);
 
         // Verify that different hit ratios are shown correctly
-        assertTrue(output.contains("66.7%") || output.contains("66.6%"), "Should show HARD/HARD hit ratio (~66.7%)");
-        assertTrue(output.contains("33.3%"), "Should show SOFT/WEAK hit ratio (33.3%)");
-        assertTrue(output.contains("0.0%"), "Should show WEAK/SOFT hit ratio (0.0%)");
+        assertTrue(output.contains("66.7%") || output.contains("66.6%"), "Should show HARD/HARD hit ratio (~66.7%):\n" + output);
+        assertTrue(output.contains("33.3%"), "Should show SOFT/WEAK hit ratio (33.3%):\n" + output);
+        assertTrue(output.contains("0.0%"), "Should show WEAK/SOFT hit ratio (0.0%):\n" + output);
     }
 
     @Test
@@ -157,11 +153,8 @@ class ReferenceTypeStatisticsTest {
 
         String output = DefaultRequestCache.formatCacheStatistics(statistics);
 
-        System.out.println("=== Memory Pressure Analysis ===");
-        System.out.println(output);
-
         // Should show high usage of hard references
-        assertTrue(output.contains("HARD/HARD:"), "Should show hard reference usage");
-        assertTrue(output.contains("1000 accesses"), "Should show high access count for hard references");
+        assertTrue(output.contains("HARD/HARD:"), "Should show hard reference usage: \n" + output);
+        assertTrue(output.contains("1000 accesses"), "Should show high access count for hard references: \n" + output);
     }
 }

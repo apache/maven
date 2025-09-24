@@ -20,6 +20,7 @@ package org.apache.maven.impl.cache;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,14 +66,8 @@ public class CacheSelectorParser {
 
         Matcher ruleMatcher = RULE_PATTERN.matcher(configString);
         while (ruleMatcher.find()) {
-            try {
-                CacheSelector selector = parseRule(ruleMatcher);
-                if (selector != null) {
-                    selectors.add(selector);
-                }
-            } catch (Exception e) {
-                LOGGER.warn("Failed to parse cache selector rule: {}", ruleMatcher.group(), e);
-            }
+            CacheSelector selector = parseRule(ruleMatcher);
+            selectors.add(selector);
         }
 
         // Sort by specificity (most specific first)
@@ -100,10 +95,6 @@ public class CacheSelectorParser {
 
         // Parse properties
         PartialCacheConfig config = parseProperties(properties);
-        if (config == null) {
-            return null;
-        }
-
         return new CacheSelector(parentType, requestType, config);
     }
 
@@ -119,7 +110,7 @@ public class CacheSelectorParser {
             String key = propMatcher.group(1);
             String value = propMatcher.group(2);
 
-            switch (key.toLowerCase()) {
+            switch (key.toLowerCase(Locale.ENGLISH)) {
                 case "scope":
                     scope = parseScope(value);
                     break;
@@ -140,7 +131,7 @@ public class CacheSelectorParser {
      * Parses a scope string into CacheRetention.
      */
     private static CacheRetention parseScope(String value) {
-        return switch (value.toLowerCase()) {
+        return switch (value.toLowerCase(Locale.ENGLISH)) {
             case "session" -> CacheRetention.SESSION_SCOPED;
             case "request" -> CacheRetention.REQUEST_SCOPED;
             case "persistent" -> CacheRetention.PERSISTENT;
@@ -156,7 +147,7 @@ public class CacheSelectorParser {
      * Parses a reference type string into Cache.ReferenceType.
      */
     private static Cache.ReferenceType parseReferenceType(String value) {
-        return switch (value.toLowerCase()) {
+        return switch (value.toLowerCase(Locale.ENGLISH)) {
             case "soft" -> Cache.ReferenceType.SOFT;
             case "hard" -> Cache.ReferenceType.HARD;
             case "weak" -> Cache.ReferenceType.WEAK;

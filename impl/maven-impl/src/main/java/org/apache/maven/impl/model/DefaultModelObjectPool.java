@@ -25,7 +25,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
-
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.ModelObjectProcessor;
@@ -59,6 +58,16 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultModelObjectPool.class);
 
+    private final Map<?, ?> properties;
+
+    public DefaultModelObjectPool() {
+        this(System.getProperties());
+    }
+
+    DefaultModelObjectPool(Map<?, ?> properties) {
+        this.properties = properties;
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public <T> T process(T object) {
@@ -70,8 +79,7 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
         String simpleClassName = objectType.getSimpleName();
 
         // Check if this object type should be pooled (read configuration dynamically)
-        Set<String> pooledTypes = getPooledTypes();
-        if (!pooledTypes.contains(simpleClassName)) {
+        if (!getPooledTypes(properties).contains(simpleClassName)) {
             return object;
         }
 
@@ -81,11 +89,16 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
         return (T) internObject(object, cache, objectType);
     }
 
+    private String getProperty(String name, String defaultValue) {
+        Object value = properties.get(name);
+        return value instanceof String str ? str : defaultValue;
+    }
+
     /**
      * Gets the set of object types that should be pooled.
      */
-    private static Set<String> getPooledTypes() {
-        String pooledTypesProperty = System.getProperty(Constants.MAVEN_MODEL_PROCESSOR_POOLED_TYPES, "Dependency");
+    private Set<String> getPooledTypes(Map<?, ?> properties) {
+        String pooledTypesProperty = getProperty(Constants.MAVEN_MODEL_PROCESSOR_POOLED_TYPES, "Dependency");
         return Arrays.stream(pooledTypesProperty.split(","))
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
@@ -104,12 +117,12 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
      * Gets the reference type to use for a specific object type.
      * Checks for per-type configuration first, then falls back to default.
      */
-    private static Cache.ReferenceType getReferenceTypeForClass(Class<?> objectType) {
+    private Cache.ReferenceType getReferenceTypeForClass(Class<?> objectType) {
         String className = objectType.getSimpleName();
 
         // Check for per-type configuration first
         String perTypeProperty = Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE_PREFIX + className;
-        String perTypeValue = System.getProperty(perTypeProperty);
+        String perTypeValue = getProperty(perTypeProperty, null);
 
         if (perTypeValue != null) {
             try {
@@ -126,10 +139,10 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
     /**
      * Gets the default reference type from system properties.
      */
-    private static Cache.ReferenceType getDefaultReferenceType() {
+    private Cache.ReferenceType getDefaultReferenceType() {
         try {
             String referenceTypeProperty =
-                    System.getProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE, Cache.ReferenceType.HARD.name());
+                    getProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE, Cache.ReferenceType.HARD.name());
             return Cache.ReferenceType.valueOf(referenceTypeProperty.toUpperCase());
         } catch (IllegalArgumentException e) {
             LOGGER.warn("Unknown default reference type, using HARD");

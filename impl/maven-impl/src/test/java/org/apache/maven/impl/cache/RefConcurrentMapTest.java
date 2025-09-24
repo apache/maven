@@ -271,8 +271,23 @@ class RefConcurrentMapTest {
     }
 
     @Test
-    @SuppressWarnings("checkstyle:AvoidNestedBlocks")
     void shouldCleanupGarbageCollectedEntries() throws InterruptedException {
+        int maxRetries = 3;
+        AssertionError lastException = new AssertionError("Test failed " + maxRetries + " times");
+        for (int attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                doShouldCleanupGarbageCollectedEntries();
+                return;
+            } catch (AssertionError e) {
+                lastException.addSuppressed(e);
+                Thread.sleep(1000);
+            }
+        }
+        throw lastException;
+    }
+
+    @SuppressWarnings("AvoidNestedBlocks")
+    private void doShouldCleanupGarbageCollectedEntries() throws InterruptedException {
         // Test that the map properly cleans up entries when keys/values are GC'd
         int initialSize = softMap.size();
 

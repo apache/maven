@@ -18,8 +18,8 @@
  */
 package org.apache.maven.impl.model;
 
+import java.util.Map;
 import java.util.Objects;
-
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.ModelObjectProcessor;
@@ -160,85 +160,52 @@ class DefaultModelObjectPoolTest {
 
     @Test
     void testConfigurablePooledTypes() {
-        String originalPooledTypes = System.getProperty(Constants.MAVEN_MODEL_PROCESSOR_POOLED_TYPES);
+        // Configure to only pool Dependencies
+        ModelObjectProcessor processor = new DefaultModelObjectPool(Map.of(Constants.MAVEN_MODEL_PROCESSOR_POOLED_TYPES, "Dependency"));
 
-        try {
-            // Configure to only pool Dependencies
-            System.setProperty(Constants.MAVEN_MODEL_PROCESSOR_POOLED_TYPES, "Dependency");
+        // Dependencies should be pooled
+        Dependency dep1 = Dependency.newBuilder()
+                .groupId("test")
+                .artifactId("test")
+                .version("1.0")
+                .build();
 
-            ModelObjectProcessor processor = new DefaultModelObjectPool();
+        Dependency dep2 = Dependency.newBuilder()
+                .groupId("test")
+                .artifactId("test")
+                .version("1.0")
+                .build();
 
-            // Dependencies should be pooled
-            Dependency dep1 = Dependency.newBuilder()
-                    .groupId("test")
-                    .artifactId("test")
-                    .version("1.0")
-                    .build();
+        Dependency result1 = processor.process(dep1);
+        Dependency result2 = processor.process(dep2);
 
-            Dependency dep2 = Dependency.newBuilder()
-                    .groupId("test")
-                    .artifactId("test")
-                    .version("1.0")
-                    .build();
+        // Should be the same instance due to pooling
+        assertSame(result1, result2);
 
-            Dependency result1 = processor.process(dep1);
-            Dependency result2 = processor.process(dep2);
-
-            // Should be the same instance due to pooling
-            assertSame(result1, result2);
-
-            // Non-dependency objects should not be pooled (pass through)
-            String str1 = "test";
-            String str2 = processor.process(str1);
-            assertSame(str1, str2); // Same instance because it's not pooled
-
-        } finally {
-            if (originalPooledTypes != null) {
-                System.setProperty(Constants.MAVEN_MODEL_PROCESSOR_POOLED_TYPES, originalPooledTypes);
-            } else {
-                System.clearProperty(Constants.MAVEN_MODEL_PROCESSOR_POOLED_TYPES);
-            }
-        }
+        // Non-dependency objects should not be pooled (pass through)
+        String str1 = "test";
+        String str2 = processor.process(str1);
+        assertSame(str1, str2); // Same instance because it's not pooled
     }
 
     @Test
     void testPerTypeReferenceType() {
-        String originalDefault = System.getProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE);
-        String originalDependency =
-                System.getProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE_PREFIX + "Dependency");
+        // Set default to WEAK and Dependency-specific to HARD
+        ModelObjectProcessor processor = new DefaultModelObjectPool(Map.of(
+                Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE, "WEAK",
+                Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE_PREFIX + "Dependency", "HARD"
+        ));
 
-        try {
-            // Set default to WEAK and Dependency-specific to HARD
-            System.setProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE, "WEAK");
-            System.setProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE_PREFIX + "Dependency", "HARD");
+        // Test that dependencies still work with per-type configuration
+        Dependency dep = Dependency.newBuilder()
+                .groupId("test")
+                .artifactId("test")
+                .version("1.0")
+                .build();
 
-            ModelObjectProcessor processor = new DefaultModelObjectPool();
-
-            // Test that dependencies still work with per-type configuration
-            Dependency dep = Dependency.newBuilder()
-                    .groupId("test")
-                    .artifactId("test")
-                    .version("1.0")
-                    .build();
-
-            Dependency result = processor.process(dep);
-            assertNotNull(result);
-            assertEquals(dep, result);
-
-        } finally {
-            if (originalDefault != null) {
-                System.setProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE, originalDefault);
-            } else {
-                System.clearProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE);
-            }
-
-            if (originalDependency != null) {
-                System.setProperty(
-                        Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE_PREFIX + "Dependency", originalDependency);
-            } else {
-                System.clearProperty(Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE_PREFIX + "Dependency");
-            }
-        }
+        Dependency result = processor.process(dep);
+        assertNotNull(result);
+        assertEquals(dep, result);
     }
 
     @Test

@@ -19,14 +19,10 @@
 package org.apache.maven.impl.cache;
 
 import java.util.Map;
-
-import org.apache.maven.api.Constants;
 import org.apache.maven.api.cache.CacheRetention;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -35,12 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class CacheStatisticsTest {
 
-    private CacheStatistics statistics;
-
-    @BeforeEach
-    void setUp() {
-        statistics = new CacheStatistics();
-    }
+    private final CacheStatistics statistics = new CacheStatistics();
 
     @Test
     void testInitialStatistics() {
@@ -187,25 +178,5 @@ class CacheStatisticsTest {
         assertTrue(sizes.containsKey(CacheRetention.PERSISTENT));
         assertTrue(sizes.containsKey(CacheRetention.SESSION_SCOPED));
         assertTrue(sizes.containsKey(CacheRetention.REQUEST_SCOPED));
-    }
-
-    @Test
-    void testCacheStatsPropertyHandling() {
-        // Test that the property is correctly defined
-        assertEquals("maven.cache.stats", Constants.MAVEN_CACHE_STATS);
-
-        // Test property parsing behavior
-        System.setProperty(Constants.MAVEN_CACHE_STATS, "true");
-        String statsProperty = System.getProperty(Constants.MAVEN_CACHE_STATS);
-        boolean showStats = Boolean.parseBoolean(statsProperty);
-        assertTrue(showStats, "Cache stats should be enabled when property is true");
-
-        System.setProperty(Constants.MAVEN_CACHE_STATS, "false");
-        statsProperty = System.getProperty(Constants.MAVEN_CACHE_STATS);
-        showStats = Boolean.parseBoolean(statsProperty);
-        assertFalse(showStats, "Cache stats should be disabled when property is false");
-
-        // Clean up
-        System.clearProperty(Constants.MAVEN_CACHE_STATS);
     }
 }

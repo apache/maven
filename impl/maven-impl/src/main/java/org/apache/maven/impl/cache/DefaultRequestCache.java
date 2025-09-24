@@ -20,8 +20,8 @@ package org.apache.maven.impl.cache;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Function;
-
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.SessionData;
@@ -91,7 +91,7 @@ public class DefaultRequestCache extends AbstractRequestCache {
         sb.append("  Cache hits: ").append(stats.getCacheHits()).append("\n");
         sb.append("  Cache misses: ").append(stats.getCacheMisses()).append("\n");
         sb.append("  Hit ratio: ")
-                .append(String.format("%.2f%%", stats.getHitRatio()))
+                .append(String.format(Locale.ENGLISH, "%.2f%%", stats.getHitRatio()))
                 .append("\n");
 
         // Show eviction statistics
@@ -101,12 +101,12 @@ public class DefaultRequestCache extends AbstractRequestCache {
             sb.append("    Key evictions: ")
                     .append(stats.getKeyEvictions())
                     .append(" (")
-                    .append(String.format("%.1f%%", stats.getKeyEvictionRatio()))
+                    .append(String.format(Locale.ENGLISH, "%.1f%%", stats.getKeyEvictionRatio()))
                     .append(")\n");
             sb.append("    Value evictions: ")
                     .append(stats.getValueEvictions())
                     .append(" (")
-                    .append(String.format("%.1f%%", stats.getValueEvictionRatio()))
+                    .append(String.format(Locale.ENGLISH, "%.1f%%", stats.getValueEvictionRatio()))
                     .append(")\n");
             sb.append("    Total evictions: ").append(totalEvictions).append("\n");
         }
@@ -123,7 +123,7 @@ public class DefaultRequestCache extends AbstractRequestCache {
                         .append(" hits, ")
                         .append(retStats.getMisses())
                         .append(" misses (")
-                        .append(String.format("%.1f%%", retStats.getHitRatio()))
+                        .append(String.format(Locale.ENGLISH, "%.1f%%", retStats.getHitRatio()))
                         .append(" hit ratio)");
 
                 // Add eviction info for this retention policy
@@ -156,7 +156,7 @@ public class DefaultRequestCache extends AbstractRequestCache {
                                 .append(" caches, ")
                                 .append(refStats.getTotal())
                                 .append(" accesses (")
-                                .append(String.format("%.1f%%", refStats.getHitRatio()))
+                                .append(String.format(Locale.ENGLISH, "%.1f%%", refStats.getHitRatio()))
                                 .append(" hit ratio)\n");
                     });
         }
@@ -176,7 +176,7 @@ public class DefaultRequestCache extends AbstractRequestCache {
                                 .append(": ")
                                 .append(reqStats.getTotal())
                                 .append(" requests (")
-                                .append(String.format("%.1f%%", reqStats.getHitRatio()))
+                                .append(String.format(Locale.ENGLISH, "%.1f%%", reqStats.getHitRatio()))
                                 .append(" hit ratio)\n");
                     });
         }
@@ -200,8 +200,8 @@ public class DefaultRequestCache extends AbstractRequestCache {
         }
 
         // Register shutdown hook for conditional statistics display
-        String showStats = session.getUserProperties().get(Constants.MAVEN_CACHE_STATS);
-        if (Boolean.parseBoolean(showStats)) {
+        boolean cacheStatsEnabled = isCacheStatsEnabled(session);
+        if (cacheStatsEnabled) {
             ensureShutdownHookRegistered();
         }
 
@@ -429,6 +429,11 @@ public class DefaultRequestCache extends AbstractRequestCache {
             }
             return new CachingSupplier<>(supplier);
         }
+    }
+
+    private static boolean isCacheStatsEnabled(Session session) {
+        String showStats = session.getUserProperties().get(Constants.MAVEN_CACHE_STATS);
+        return Boolean.parseBoolean(showStats);
     }
 
     /**
