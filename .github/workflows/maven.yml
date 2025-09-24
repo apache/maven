@@ -34,9 +34,9 @@ permissions: {}
 env:
   MIMIR_VERSION: 0.9.0
   MIMIR_BASEDIR: ~/.mimir
-  MIMIR_LOCAL: ${MIMIR_BASEDIR}/local
-  MIMIR_SESSION_CONFIG_PATH: ${GITHUB_WORKSPACE}/.github/ci-mimir-session.properties
-  MIMIR_DAEMON_CONFIG_PATH: ${GITHUB_WORKSPACE}/.github/ci-mimir-daemon.properties
+  MIMIR_LOCAL: ${{ env.MIMIR_BASEDIR }}/local
+  MIMIR_SESSION_CONFIG_PATH: ${{ env.GITHUB_WORKSPACE }}/.github/ci-mimir-session.properties
+  MIMIR_DAEMON_CONFIG_PATH: ${{ env.GITHUB_WORKSPACE }}/.github/ci-mimir-daemon.properties
 
 jobs:
   initial-build:
