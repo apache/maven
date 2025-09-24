@@ -19,6 +19,7 @@
 package org.apache.maven.impl.cache;
 
 import java.util.Map;
+
 import org.apache.maven.api.cache.CacheRetention;
 import org.junit.jupiter.api.Test;
 

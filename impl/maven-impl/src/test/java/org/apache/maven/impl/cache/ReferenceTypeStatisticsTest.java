@@ -19,6 +19,7 @@
 package org.apache.maven.impl.cache;
 
 import java.util.Map;
+
 import org.apache.maven.api.cache.CacheRetention;
 import org.apache.maven.impl.cache.CacheStatistics.ReferenceTypeStatistics;
 import org.junit.jupiter.api.Test;
@@ -128,7 +129,9 @@ class ReferenceTypeStatisticsTest {
         assertTrue(output.contains("hit ratio"), "Should show hit ratio\n" + output);
 
         // Verify that different hit ratios are shown correctly
-        assertTrue(output.contains("66.7%") || output.contains("66.6%"), "Should show HARD/HARD hit ratio (~66.7%):\n" + output);
+        assertTrue(
+                output.contains("66.7%") || output.contains("66.6%"),
+                "Should show HARD/HARD hit ratio (~66.7%):\n" + output);
         assertTrue(output.contains("33.3%"), "Should show SOFT/WEAK hit ratio (33.3%):\n" + output);
         assertTrue(output.contains("0.0%"), "Should show WEAK/SOFT hit ratio (0.0%):\n" + output);
     }

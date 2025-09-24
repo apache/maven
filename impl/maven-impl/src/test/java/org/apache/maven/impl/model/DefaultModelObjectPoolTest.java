@@ -20,6 +20,7 @@ package org.apache.maven.impl.model;
 
 import java.util.Map;
 import java.util.Objects;
+
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.ModelObjectProcessor;
@@ -161,7 +162,8 @@ class DefaultModelObjectPoolTest {
     @Test
     void testConfigurablePooledTypes() {
         // Configure to only pool Dependencies
-        ModelObjectProcessor processor = new DefaultModelObjectPool(Map.of(Constants.MAVEN_MODEL_PROCESSOR_POOLED_TYPES, "Dependency"));
+        ModelObjectProcessor processor =
+                new DefaultModelObjectPool(Map.of(Constants.MAVEN_MODEL_PROCESSOR_POOLED_TYPES, "Dependency"));
 
         // Dependencies should be pooled
         Dependency dep1 = Dependency.newBuilder()
@@ -192,9 +194,10 @@ class DefaultModelObjectPoolTest {
     void testPerTypeReferenceType() {
         // Set default to WEAK and Dependency-specific to HARD
         ModelObjectProcessor processor = new DefaultModelObjectPool(Map.of(
-                Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE, "WEAK",
-                Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE_PREFIX + "Dependency", "HARD"
-        ));
+                Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE,
+                "WEAK",
+                Constants.MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE_PREFIX + "Dependency",
+                "HARD"));
 
         // Test that dependencies still work with per-type configuration
         Dependency dep = Dependency.newBuilder()

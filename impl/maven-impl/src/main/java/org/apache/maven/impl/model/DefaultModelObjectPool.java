@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
+
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.ModelObjectProcessor;
