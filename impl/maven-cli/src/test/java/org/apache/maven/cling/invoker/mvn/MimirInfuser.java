@@ -44,10 +44,10 @@ public final class MimirInfuser {
                     Files.createDirectories(userWideExtensions.getParent());
                     Files.copy(realUserWideExtensions, userWideExtensions, StandardCopyOption.REPLACE_EXISTING);
 
-                    Path mimirProperties = userHome.resolve(".mimir").resolve("mimir.properties");
+                    Path mimirProperties = userHome.resolve(".mimir").resolve("session.properties");
                     Files.createDirectories(mimirProperties.getParent());
                     Files.copy(
-                            Path.of("target/test-classes/ut-mimir.properties"),
+                            Path.of("target/test-classes/ut-mimir-session.properties"),
                             mimirProperties,
                             StandardCopyOption.REPLACE_EXISTING);
                 }
