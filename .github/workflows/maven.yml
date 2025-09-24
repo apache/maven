@@ -31,6 +31,13 @@ concurrency:
 # clear all permissions for GITHUB_TOKEN
 permissions: {}
 
+env:
+  MIMIR_VERSION: 0.9.0
+  MIMIR_BASEDIR: ~/.mimir
+  MIMIR_LOCAL: ${MIMIR_BASEDIR}/local
+  MIMIR_SESSION_CONFIG_PATH: ${GITHUB_WORKSPACE}/.github/ci-mimir-session.properties
+  MIMIR_DAEMON_CONFIG_PATH: ${GITHUB_WORKSPACE}/.github/ci-mimir-daemon.properties
+
 jobs:
   initial-build:
     runs-on: ubuntu-latest
@@ -46,23 +53,28 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Prepare Mimir
+      - name: Prepare Mimir for Maven 3.x
         shell: bash
         run: |
-          mkdir -p ~/.mimir
-          cp .github/ci-extensions.xml ~/.m2/extensions.xml
-          cp .github/ci-mimir-daemon.properties ~/.mimir/daemon.properties
+          cp .github/ci-extensions.xml .mvn/extensions.xml
 
       - name: Restore Mimir caches
         uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
         id: restore-cache
         with:
-          path: ~/.mimir/local
+          path: ${{ env.MIMIR_LOCAL }}
           key: mimir-${{ runner.os }}-initial
 
       - name: Set up Maven
         shell: bash
-        run: mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper "-Dmaven=4.0.0-rc-3"
+        run: mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.4:wrapper "-Dmaven=4.0.0-rc-4"
+
+      - name: Prepare Mimir for Maven 4.x
+        shell: bash
+        run: |
+          rm .mvn/extensions.xml
+          mkdir -p ~/.m2
+          cp .github/ci-extensions.xml ~/.m2/extensions.xml
 
       - name: Build Maven distributions
         shell: bash
@@ -76,7 +88,7 @@ jobs:
         uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
         if: ${{ github.event_name != 'pull_request' && !cancelled() && !failure() }}
         with:
-          path: ~/.mimir/local
+          path: ${{ env.MIMIR_LOCAL }}
           key: ${{ steps.restore-cache.outputs.cache-primary-key }}
 
       - name: Upload Maven distributions
@@ -94,7 +106,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        java: ['17', '21', '24']
+        java: ['17', '21', '25']
     steps:
       - name: Set up JDK ${{ matrix.java }}
         uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5
@@ -119,19 +131,17 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Prepare Mimir
+      - name: Prepare Mimir for Maven 4.x
         shell: bash
         run: |
           mkdir -p ~/.m2
-          mkdir -p ~/.mimir
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
-          cp .github/ci-mimir-daemon.properties ~/.mimir/daemon.properties
 
       - name: Restore Mimir caches
         uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
         id: restore-cache
         with:
-          path: ~/.mimir/local
+          path: ${{ env.MIMIR_LOCAL }}
           key: mimir-full-${{ matrix.os }}-${{ matrix.java }}
           restore-keys: |
             mimir-full-${{ matrix.os }}-
@@ -176,7 +186,7 @@ jobs:
         uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
         if: ${{ github.event_name != 'pull_request' && !cancelled() && !failure() }}
         with:
-          path: ~/.mimir/local
+          path: ${{ env.MIMIR_LOCAL }}
           key: ${{ steps.restore-cache.outputs.cache-primary-key }}
 
       - name: Upload test artifacts
@@ -193,7 +203,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        java: ['17', '21', '24']
+        java: ['17', '21', '25']
     steps:
       - name: Set up JDK ${{ matrix.java }}
         uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5
@@ -206,19 +216,17 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Prepare Mimir
+      - name: Prepare Mimir for Maven 4.x
         shell: bash
         run: |
           mkdir -p ~/.m2
-          mkdir -p ~/.mimir
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
-          cp .github/ci-mimir-daemon.properties ~/.mimir/daemon.properties
 
       - name: Restore Mimir caches
         uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
         id: restore-cache
         with:
-          path: ~/.mimir/local
+          path: ${{ env.MIMIR_LOCAL }}
           key: mimir-its-${{ matrix.os }}-${{ matrix.java }}
           restore-keys: |
             mimir-its-${{ matrix.os }}-
@@ -259,7 +267,7 @@ jobs:
         uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
         if: ${{ github.event_name != 'pull_request' && !cancelled() && !failure() }}
         with:
-          path: ~/.mimir/local
+          path: ${{ env.MIMIR_LOCAL }}
           key: ${{ steps.restore-cache.outputs.cache-primary-key }}
 
       - name: Upload test artifacts
