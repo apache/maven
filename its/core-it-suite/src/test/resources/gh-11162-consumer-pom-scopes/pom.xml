@@ -20,7 +20,7 @@ under the License.
 <project xmlns="http://maven.apache.org/POM/4.1.0" root="true">
   <modelVersion>4.1.0</modelVersion>
 
-  <groupId>org.apache.maven.its.mng8750</groupId>
+  <groupId>org.apache.maven.its.gh11162</groupId>
   <artifactId>consumer-pom-scopes-parent</artifactId>
   <version>1.0</version>
   <packaging>pom</packaging>
@@ -39,21 +39,7 @@ under the License.
         <enabled>false</enabled>
       </snapshots>
       <id>local-test-repo</id>
-      <url>file://${project.basedir}/../../mng-8750-new-scopes/repo</url>
+      <url>file://${project.rootDirectory}/repo</url>
     </repository>
   </repositories>
-
-  <pluginRepositories>
-    <pluginRepository>
-      <releases>
-        <enabled>true</enabled>
-        <checksumPolicy>ignore</checksumPolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <id>local-test-repo</id>
-      <url>file://${project.basedir}/../../mng-8750-new-scopes/repo</url>
-    </pluginRepository>
-  </pluginRepositories>
 </project>

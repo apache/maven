@@ -3,7 +3,7 @@
   <modelVersion>4.1.0</modelVersion>
 
   <parent>
-    <groupId>org.apache.maven.its.mng8750</groupId>
+    <groupId>org.apache.maven.its.gh11162</groupId>
     <artifactId>consumer-pom-scopes-parent</artifactId>
     <version>1.0</version>
   </parent>
@@ -16,7 +16,7 @@
   <dependencies>
     <!-- should be kept as compile -->
     <dependency>
-      <groupId>org.apache.maven.its.mng8750</groupId>
+      <groupId>org.apache.maven.its.gh11162</groupId>
       <artifactId>compile-dep</artifactId>
       <version>1.0</version>
       <scope>compile</scope>
@@ -24,7 +24,7 @@
 
     <!-- should be dropped (non-transitive) -->
     <dependency>
-      <groupId>org.apache.maven.its.mng8750</groupId>
+      <groupId>org.apache.maven.its.gh11162</groupId>
       <artifactId>compile-only-dep</artifactId>
       <version>1.0</version>
       <scope>compile-only</scope>
@@ -32,7 +32,7 @@
 
     <!-- should be dropped (non-transitive) -->
     <dependency>
-      <groupId>org.apache.maven.its.mng8750</groupId>
+      <groupId>org.apache.maven.its.gh11162</groupId>
       <artifactId>test-only-dep</artifactId>
       <version>1.0</version>
       <scope>test-only</scope>
@@ -40,15 +40,15 @@
 
     <!-- should be dropped (non-transitive) -->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.13.2</version>
+      <groupId>org.apache.maven.its.gh11162</groupId>
+      <artifactId>test-dep</artifactId>
+      <version>1.0</version>
       <scope>test</scope>
     </dependency>
 
     <!-- should be dropped (non-compile/runtime) -->
     <dependency>
-      <groupId>org.apache.maven.its.mng8750</groupId>
+      <groupId>org.apache.maven.its.gh11162</groupId>
       <artifactId>test-runtime-dep</artifactId>
       <version>1.0</version>
       <scope>test-runtime</scope>
@@ -56,8 +56,8 @@
 
     <!-- should be kept as runtime -->
     <dependency>
-      <groupId>org.apache.maven.its.mng8750</groupId>
-      <artifactId>test-dep</artifactId>
+      <groupId>org.apache.maven.its.gh11162</groupId>
+      <artifactId>runtime-dep</artifactId>
       <version>1.0</version>
       <scope>runtime</scope>
     </dependency>

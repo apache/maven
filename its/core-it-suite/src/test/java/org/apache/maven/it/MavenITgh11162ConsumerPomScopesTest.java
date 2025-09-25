@@ -52,7 +52,7 @@ class MavenITgh11162ConsumerPomScopesTest extends AbstractMavenIntegrationTestCa
         Path consumerPom = basedir.resolve(Paths.get(
                 "target",
                 "project-local-repo",
-                "org.apache.maven.its.mng8750",
+                "org.apache.maven.its.gh11162",
                 "consumer-pom-scopes-app",
                 "1.0",
                 "consumer-pom-scopes-app-1.0-consumer.pom"));
@@ -71,7 +71,7 @@ class MavenITgh11162ConsumerPomScopesTest extends AbstractMavenIntegrationTestCa
         boolean hasCompile = consumerPomModel.getDependencies().stream()
                 .anyMatch(d -> "compile".equals(d.getScope()) && "compile-dep".equals(d.getArtifactId()));
         boolean hasRuntime = consumerPomModel.getDependencies().stream()
-                .anyMatch(d -> "runtime".equals(d.getScope()) && "test-dep".equals(d.getArtifactId()));
+                .anyMatch(d -> "runtime".equals(d.getScope()) && "runtime-dep".equals(d.getArtifactId()));
         assertTrue(hasCompile, "compile dependency should be present");
         assertTrue(hasRuntime, "runtime dependency should be present");
 
