@@ -96,11 +96,11 @@ public class CommonsCliEncryptOptions extends CommonsCliOptions implements Encry
             options.addOption(Option.builder(FORCE)
                     .longOpt("force")
                     .desc("Should overwrite without asking any configuration?")
-                    .build());
+                    .get());
             options.addOption(Option.builder(YES)
                     .longOpt("yes")
                     .desc("Should imply user answered \"yes\" to all incoming questions?")
-                    .build());
+                    .get());
         }
     }
 }
