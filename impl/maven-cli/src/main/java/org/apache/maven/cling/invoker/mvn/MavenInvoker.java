@@ -36,6 +36,7 @@ import org.apache.maven.Maven;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.mvn.MavenOptions;
@@ -51,6 +52,7 @@ import org.apache.maven.cling.event.ExecutionEventLogger;
 import org.apache.maven.cling.invoker.CliUtils;
 import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.LookupInvoker;
+import org.apache.maven.cling.invoker.ProcessRuns;
 import org.apache.maven.cling.transfer.ConsoleMavenTransferListener;
 import org.apache.maven.cling.transfer.QuietMavenTransferListener;
 import org.apache.maven.cling.transfer.SimplexTransferListener;
@@ -614,6 +616,28 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
 
         for (ExceptionSummary child : summary.getChildren()) {
             logSummary(context, child, references, indent);
+        }
+    }
+
+    @Override
+    protected void preCommands(final MavenContext context) throws Exception {
+        super.preCommands(context);
+
+        if (context.options().processes().orElse(false)) {
+            final String out = ProcessRuns.format(ProcessRuns.listAlive());
+            System.out.print(out);
+            throw new InvokerException.ExitException(0);
+        }
+
+        try {
+            final long pid = ProcessHandle.current().pid();
+            final String version = String.valueOf(getClass().getPackage().getImplementationVersion());
+            final Path workDir = context.cwd.get();
+            final Path execRoot = context.invokerRequest.rootDirectory().orElse(context.invokerRequest.topDirectory());
+            ProcessRuns.install(pid, version, workDir, execRoot);
+            context.closeables.add(() -> ProcessRuns.uninstall(pid));
+        } catch (final Throwable ignored) {
+            // best-effort
         }
     }
 }
