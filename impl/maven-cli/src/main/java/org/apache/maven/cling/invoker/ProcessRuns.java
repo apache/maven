@@ -142,7 +142,7 @@ public final class ProcessRuns {
         for (final Run r : runs) {
             sb.append(String.format(
                     "%-10d %-12s %-24s %-48s %-48s%s",
-                    r.pid, r.version, r.started, ell(r.workDir, 48), ell(r.execRoot, 48), nl));
+                    r.pid, r.version, r.started, truncateEnd(r.workDir, 48), truncateEnd(r.execRoot, 48), nl));
         }
         return sb.toString();
     }
@@ -155,7 +155,7 @@ public final class ProcessRuns {
         }
     }
 
-    private static String ell(final String s, final int max) {
+    private static String truncateEnd(final String s, final int max) {
         if (s == null || s.length() <= max) {
             return s == null ? "?" : s;
         }

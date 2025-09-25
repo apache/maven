@@ -91,6 +91,9 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
             commandExecute.put("mvn", new CommandMethods(this::mvn, this::mvnCompleter));
             commandExecute.put("mvnenc", new CommandMethods(this::mvnenc, this::mvnencCompleter));
             commandExecute.put("mvnup", new CommandMethods(this::mvnup, this::mvnupCompleter));
+            // list running Maven builds (same as `mvn --processes`)
+            commandExecute.put("ps", new CommandMethods(this::ps, this::defaultCompleter));
+            commandExecute.put("processes", new CommandMethods(this::ps, this::defaultCompleter));
             registerCommands(commandExecute);
         }
 
@@ -269,6 +272,22 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
                     .lookup
                     .lookupMap(org.apache.maven.cling.invoker.mvnup.Goal.class)
                     .keySet())));
+        }
+
+        /**
+         * mvnsh command: print running Maven processes (delegates to `mvn --processes`).
+         */
+        private void ps(CommandInput input) {
+            try {
+                shellMavenInvoker.invoke(mavenParser.parseInvocation(ParserRequest.mvn(
+                                new String[] {"--processes"}, shellContext.invokerRequest.messageBuilderFactory())
+                        .cwd(shellContext.cwd.get())
+                        .build()));
+            } catch (InvokerException.ExitException e) {
+                shellContext.logger.error("ps command exited with exit code " + e.getExitCode());
+            } catch (Exception e) {
+                saveException(e);
+            }
         }
     }
 
