@@ -38,7 +38,9 @@ public class MavenIT0009GoalConfigurationTest extends AbstractMavenIntegrationTe
      * @throws Exception in case of failure
      */
     @Test
-    @DisabledIf(value = "isWindowsWithJDK25", disabledReason = "JDK-25 - JDK-8354450 files ending with space are not supported on Windows")
+    @DisabledIf(
+            value = "isWindowsWithJDK25",
+            disabledReason = "JDK-25 - JDK-8354450 files ending with space are not supported on Windows")
     public void testit0009() throws Exception {
 
         boolean supportSpaceInXml = matchesVersionRange("[3.1.0,)");
