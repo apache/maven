@@ -54,7 +54,7 @@ jobs:
           cp .github/ci-mimir-daemon.properties ~/.mimir/daemon.properties
 
       - name: Restore Mimir caches
-        uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         id: restore-cache
         with:
           path: ~/.mimir/local
@@ -73,7 +73,7 @@ jobs:
         run: ls -la apache-maven/target
 
       - name: Save Mimir caches
-        uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         if: ${{ github.event_name != 'pull_request' && !cancelled() && !failure() }}
         with:
           path: ~/.mimir/local
@@ -128,7 +128,7 @@ jobs:
           cp .github/ci-mimir-daemon.properties ~/.mimir/daemon.properties
 
       - name: Restore Mimir caches
-        uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         id: restore-cache
         with:
           path: ~/.mimir/local
@@ -177,7 +177,7 @@ jobs:
         run: mvn site -e -B -V -Preporting
 
       - name: Save Mimir caches
-        uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         if: ${{ github.event_name != 'pull_request' && !cancelled() && !failure() }}
         with:
           path: ~/.mimir/local
@@ -219,7 +219,7 @@ jobs:
           cp .github/ci-mimir-daemon.properties ~/.mimir/daemon.properties
 
       - name: Restore Mimir caches
-        uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         id: restore-cache
         with:
           path: ~/.mimir/local
@@ -264,7 +264,7 @@ jobs:
         run: mvn install -e -B -V -Prun-its,mimir
 
       - name: Save Mimir caches
-        uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         if: ${{ github.event_name != 'pull_request' && !cancelled() && !failure() }}
         with:
           path: ~/.mimir/local
