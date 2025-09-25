@@ -24,10 +24,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
+import eu.maveniverse.maven.mimir.testing.MimirInfuser;
 import org.apache.maven.api.cli.ExecutorRequest;
 import org.apache.maven.cling.executor.ExecutorHelper;
 import org.apache.maven.cling.executor.MavenExecutorTestSupport;
-import org.apache.maven.cling.executor.MimirInfuser;
 import org.apache.maven.cling.executor.internal.HelperImpl;
 import org.apache.maven.cling.executor.internal.ToolboxTool;
 import org.junit.jupiter.api.BeforeAll;
