@@ -50,7 +50,7 @@ public class ToolboxToolTest {
 
     @BeforeAll
     static void beforeAll() throws Exception {
-        MimirInfuser.infuse(userHome);
+        MimirInfuser.infuseUW(userHome);
     }
 
     private ExecutorRequest.Builder getExecutorRequest(ExecutorHelper helper) {
