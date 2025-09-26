@@ -39,6 +39,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import org.apache.maven.api.DependencyScope;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Inject;
@@ -77,7 +78,6 @@ import org.apache.maven.api.xml.XmlService;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.model.v4.MavenTransformer;
-import org.eclipse.aether.scope.DependencyScope;
 import org.eclipse.aether.scope.ScopeManager;
 
 /**
@@ -1157,6 +1157,25 @@ public class DefaultModelValidator implements ModelValidator {
                 }
             }
 
+            // MNG-8750: New dependency scopes are only supported starting with modelVersion 4.1.0
+            // When using modelVersion 4.0.0, fail validation if one of the new scopes is present
+            if (!is41OrBeyond) {
+                String scope = dependency.getScope();
+                if (DependencyScope.COMPILE_ONLY.id().equals(scope)
+                        || DependencyScope.TEST_ONLY.id().equals(scope)
+                        || DependencyScope.TEST_RUNTIME.id().equals(scope)) {
+                    addViolation(
+                            problems,
+                            Severity.ERROR,
+                            Version.V20,
+                            prefix + prefix2 + "scope",
+                            SourceHint.dependencyManagementKey(dependency),
+                            "scope '" + scope + "' is not supported with modelVersion 4.0.0; "
+                                    + "use modelVersion 4.1.0 or remove this scope.",
+                            dependency);
+                }
+            }
+
             if (equals("LATEST", dependency.getVersion()) || equals("RELEASE", dependency.getVersion())) {
                 addViolation(
                         problems,
@@ -1272,7 +1291,7 @@ public class DefaultModelValidator implements ModelValidator {
                             SourceHint.dependencyManagementKey(dependency),
                             dependency,
                             scopeManager.getDependencyScopeUniverse().stream()
-                                    .map(DependencyScope::getId)
+                                    .map(org.eclipse.aether.scope.DependencyScope::getId)
                                     .distinct()
                                     .toArray(String[]::new),
                             false);
@@ -1282,7 +1301,7 @@ public class DefaultModelValidator implements ModelValidator {
                     ScopeManager scopeManager =
                             InternalSession.from(session).getSession().getScopeManager();
                     Set<String> scopes = scopeManager.getDependencyScopeUniverse().stream()
-                            .map(DependencyScope::getId)
+                            .map(org.eclipse.aether.scope.DependencyScope::getId)
                             .collect(Collectors.toCollection(HashSet::new));
                     scopes.add("import");
                     validateDependencyScope(
