@@ -37,9 +37,11 @@ package coreit;
  * under the License.
  */
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 
-import org.apache.maven.plugin.*;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * @goal it
