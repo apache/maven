@@ -45,7 +45,6 @@ under the License.
     </menu>
 
     <menu name="User Guide">
-      <item name="Maven Mixins" href="mixins.html"/>
       <item name="Configuring Maven" href="configuring.html"/>
     </menu>
 
