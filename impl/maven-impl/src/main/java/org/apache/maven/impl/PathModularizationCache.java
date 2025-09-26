@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -38,7 +39,7 @@ import org.apache.maven.api.PathType;
  * same dependency is used for different scope. For example a path used for compilation
  * is typically also used for tests.
  */
-class PathModularizationCache {
+final class PathModularizationCache {
     /**
      * Module information for each JAR file or output directories.
      * Cached when first requested to avoid decoding the module descriptors multiple times.
@@ -56,11 +57,20 @@ class PathModularizationCache {
     private final Map<Path, PathType> pathTypes;
 
     /**
-     * Creates an initially empty cache.
+     * The target Java version for which the project is built.
+     * If unknown, it should be {@link Runtime#version()}.
      */
-    PathModularizationCache() {
+    private final Runtime.Version targetVersion;
+
+    /**
+     * Creates an initially empty cache.
+     *
+     * @param target the target Java release for which the project is built
+     */
+    PathModularizationCache(Runtime.Version target) {
         moduleInfo = new HashMap<>();
         pathTypes = new HashMap<>();
+        targetVersion = Objects.requireNonNull(target);
     }
 
     /**
@@ -70,7 +80,7 @@ class PathModularizationCache {
     PathModularization getModuleInfo(Path path) throws IOException {
         PathModularization info = moduleInfo.get(path);
         if (info == null) {
-            info = new PathModularization(path, true);
+            info = new PathModularization(path, targetVersion, true);
             moduleInfo.put(path, info);
             pathTypes.put(path, info.getPathType());
         }
@@ -85,7 +95,7 @@ class PathModularizationCache {
     private PathType getPathType(Path path) throws IOException {
         PathType type = pathTypes.get(path);
         if (type == null) {
-            type = new PathModularization(path, false).getPathType();
+            type = new PathModularization(path, targetVersion, false).getPathType();
             pathTypes.put(path, type);
         }
         return type;

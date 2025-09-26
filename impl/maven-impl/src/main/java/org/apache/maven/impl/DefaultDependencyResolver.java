@@ -21,7 +21,9 @@ package org.apache.maven.impl;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -37,6 +39,7 @@ import org.apache.maven.api.PathType;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Named;
@@ -70,18 +73,41 @@ public class DefaultDependencyResolver implements DependencyResolver {
 
     /**
      * Cache of information about the modules contained in a path element.
+     * Keys are the Java versions targeted by the project.
      *
      * <p><b>TODO:</b> This field should not be in this class, because the cache should be global to the session.
      * This field exists here only temporarily, until clarified where to store session-wide caches.</p>
      */
-    private final PathModularizationCache moduleCache;
+    private final Map<Runtime.Version, PathModularizationCache> moduleCaches;
 
     /**
      * Creates an initially empty resolver.
      */
     public DefaultDependencyResolver() {
         // TODO: the cache should not be instantiated here, but should rather be session-wide.
-        moduleCache = new PathModularizationCache();
+        moduleCaches = new HashMap<>();
+    }
+
+    /**
+     * {@return the cache for the given request}.
+     *
+     * @param  request the request for which to get the target version
+     * @throws IllegalArgumentException if the version string cannot be interpreted as a valid version
+     */
+    private PathModularizationCache moduleCache(DependencyResolverRequest request) {
+        return moduleCaches.computeIfAbsent(getTargetVersion(request), PathModularizationCache::new);
+    }
+
+    /**
+     * Returns the target version of the given request as a Java version object.
+     *
+     * @param  request the request for which to get the target version
+     * @return the target version as a Java object
+     * @throws IllegalArgumentException if the version string cannot be interpreted as a valid version
+     */
+    static Runtime.Version getTargetVersion(DependencyResolverRequest request) {
+        Version target = request.getTargetVersion();
+        return (target != null) ? Runtime.Version.parse(target.toString()) : Runtime.version();
     }
 
     @Nonnull
@@ -143,7 +169,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
                         session.getRepositorySystem().collectDependencies(systemSession, collectRequest);
                 return new DefaultDependencyResolverResult(
                         null,
-                        moduleCache,
+                        moduleCache(request),
                         result.getExceptions(),
                         session.getNode(result.getRoot(), request.getVerbose()),
                         0);
@@ -212,7 +238,11 @@ public class DefaultDependencyResolver implements DependencyResolver {
                         .collect(Collectors.toList());
                 Predicate<PathType> filter = request.getPathTypeFilter();
                 DefaultDependencyResolverResult resolverResult = new DefaultDependencyResolverResult(
-                        null, moduleCache, collectorResult.getExceptions(), collectorResult.getRoot(), nodes.size());
+                        null,
+                        moduleCache(request),
+                        collectorResult.getExceptions(),
+                        collectorResult.getRoot(),
+                        nodes.size());
                 if (request.getRequestType() == DependencyResolverRequest.RequestType.FLATTEN) {
                     for (Node node : nodes) {
                         resolverResult.addNode(node);
