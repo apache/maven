@@ -18,15 +18,10 @@
  */
 package org.apache.maven.api.services;
 
-import java.io.Serial;
-
 import org.apache.maven.api.annotations.Experimental;
 
 @Experimental
 public class ChecksumAlgorithmServiceException extends MavenException {
-
-    @Serial
-    private static final long serialVersionUID = 1201171469179367694L;
 
     public ChecksumAlgorithmServiceException(String message, Throwable cause) {
         super(message, cause);

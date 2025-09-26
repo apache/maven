@@ -18,8 +18,6 @@
  */
 package org.apache.maven.api.services;
 
-import java.io.Serial;
-
 import org.apache.maven.api.annotations.Experimental;
 
 /**
@@ -29,12 +27,6 @@ import org.apache.maven.api.annotations.Experimental;
  */
 @Experimental
 public class ArtifactDeployerException extends MavenException {
-
-    /**
-     *
-     */
-    @Serial
-    private static final long serialVersionUID = 7421964724059077698L;
 
     /**
      * @param message the message of the error
