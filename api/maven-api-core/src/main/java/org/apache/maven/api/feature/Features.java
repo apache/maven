@@ -19,7 +19,6 @@
 package org.apache.maven.api.feature;
 
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.annotations.Nullable;
@@ -53,10 +52,6 @@ public final class Features {
      */
     public static boolean deployBuildPom(@Nullable Map<String, ?> userProperties) {
         return doGet(userProperties, Constants.MAVEN_DEPLOY_BUILD_POM, true);
-    }
-
-    private static boolean doGet(Properties userProperties, String key, boolean def) {
-        return doGet(userProperties != null ? userProperties.get(key) : null, def);
     }
 
     private static boolean doGet(Map<String, ?> userProperties, String key, boolean def) {
