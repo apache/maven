@@ -20,21 +20,16 @@
  * under the License.
  */
 
-import guru.nidi.graphviz.attribute.*;
 import guru.nidi.graphviz.engine.Engine;
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
-import guru.nidi.graphviz.model.*;
 import guru.nidi.graphviz.parse.Parser;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
 import java.util.regex.Pattern;
-
-import static guru.nidi.graphviz.model.Factory.*;
 
 public class ReactorGraph {
     private static final LinkedHashMap<String, Pattern> CLUSTER_PATTERNS = new LinkedHashMap<>();
