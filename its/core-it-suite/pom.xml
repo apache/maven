@@ -567,7 +567,7 @@ under the License.
                   <target>
                     <delete dir="${preparedUserHome}" />
                     <copy file="${sessionRootDirectory}/.github/ci-extensions.xml" toFile="${preparedUserHome}/.m2/extensions.xml" />
-                    <copy file="${project.build.testOutputDirectory}/it-mimir.properties" toFile="${preparedUserHome}/.mimir/mimir.properties" />
+                    <copy file="${project.build.testOutputDirectory}/it-mimir-session.properties" toFile="${preparedUserHome}/.mimir/session.properties" />
                   </target>
                 </configuration>
               </execution>
