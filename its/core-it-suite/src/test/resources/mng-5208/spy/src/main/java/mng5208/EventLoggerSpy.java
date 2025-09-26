@@ -35,7 +35,7 @@ public class EventLoggerSpy extends AbstractEventSpy {
 
             ExecutionEvent executionEvent = (ExecutionEvent) event;
             System.out.println("executionEvent:" + executionEvent.getType() + "/"
-                    + executionEvent.getProject().getId());
+                    + executionEvent.getProjectId());
         }
     }
 }
