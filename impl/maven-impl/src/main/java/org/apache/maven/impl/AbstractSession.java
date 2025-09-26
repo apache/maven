@@ -30,7 +30,6 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
@@ -103,6 +102,7 @@ import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
 import org.apache.maven.di.impl.Binding;
 import org.apache.maven.di.impl.InjectorImpl;
+import org.apache.maven.impl.cache.Cache;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -122,14 +122,14 @@ public abstract class AbstractSession implements InternalSession {
     protected final Injector injector;
     private final Map<Class<? extends Service>, Service> services = new ConcurrentHashMap<>();
     private final List<Listener> listeners = new CopyOnWriteArrayList<>();
-    private final Map<org.eclipse.aether.graph.DependencyNode, Node> allNodes =
-            Collections.synchronizedMap(new WeakHashMap<>());
-    private final Map<Class<? extends Artifact>, Map<org.eclipse.aether.artifact.Artifact, Artifact>> allArtifacts =
+    private final Cache<org.eclipse.aether.graph.DependencyNode, Node> allNodes =
+            Cache.newCache(Cache.ReferenceType.WEAK, "AbstractSession-Nodes");
+    private final Map<Class<? extends Artifact>, Cache<org.eclipse.aether.artifact.Artifact, Artifact>> allArtifacts =
             new ConcurrentHashMap<>();
-    private final Map<org.eclipse.aether.repository.RemoteRepository, RemoteRepository> allRepositories =
-            Collections.synchronizedMap(new WeakHashMap<>());
-    private final Map<org.eclipse.aether.graph.Dependency, Dependency> allDependencies =
-            Collections.synchronizedMap(new WeakHashMap<>());
+    private final Cache<org.eclipse.aether.repository.RemoteRepository, RemoteRepository> allRepositories =
+            Cache.newCache(Cache.ReferenceType.WEAK, "AbstractSession-Repositories");
+    private final Cache<org.eclipse.aether.graph.Dependency, Dependency> allDependencies =
+            Cache.newCache(Cache.ReferenceType.WEAK, "AbstractSession-Dependencies");
     private volatile RequestCache requestCache;
 
     static {
@@ -251,8 +251,8 @@ public abstract class AbstractSession implements InternalSession {
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Artifact> T getArtifact(Class<T> clazz, org.eclipse.aether.artifact.Artifact artifact) {
-        Map<org.eclipse.aether.artifact.Artifact, Artifact> map =
-                allArtifacts.computeIfAbsent(clazz, c -> Collections.synchronizedMap(new WeakHashMap<>()));
+        Cache<org.eclipse.aether.artifact.Artifact, Artifact> map = allArtifacts.computeIfAbsent(
+                clazz, c -> Cache.newCache(Cache.ReferenceType.WEAK, "AbstractSession-Artifacts-" + c.getSimpleName()));
         if (clazz == Artifact.class) {
             return (T) map.computeIfAbsent(artifact, a -> new DefaultArtifact(this, a));
         } else if (clazz == DownloadedArtifact.class) {

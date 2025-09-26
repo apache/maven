@@ -84,13 +84,13 @@ public final class Sources {
      * other sources.
      *
      * @param path the path to the POM file or project directory
-     * @param location optional logical location of the source, used for reporting purposes
+     * @param modelId the modelId (groupId:artifactId:version coordinates)
      * @return a new ModelSource instance configured as a resolved source
      * @throws NullPointerException if path is null
      */
     @Nonnull
-    public static ModelSource resolvedSource(@Nonnull Path path, @Nullable String location) {
-        return new ResolvedPathSource(requireNonNull(path, "path"), location);
+    public static ModelSource resolvedSource(@Nonnull Path path, @Nullable String modelId) {
+        return new ResolvedPathSource(requireNonNull(path, "path"), path.toString(), modelId);
     }
 
     /**
@@ -170,13 +170,23 @@ public final class Sources {
      * from repositories. Does not support resolving related sources.
      */
     static class ResolvedPathSource extends PathSource implements ModelSource {
-        ResolvedPathSource(Path path, String location) {
+        @Nullable
+        private final String modelId;
+
+        ResolvedPathSource(Path path, String location, String modelId) {
             super(path, location);
+            this.modelId = modelId;
         }
 
         @Override
         public Path getPath() {
             return null;
+        }
+
+        @Override
+        @Nullable
+        public String getModelId() {
+            return modelId;
         }
 
         @Override
