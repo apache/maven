@@ -21,6 +21,7 @@ package org.apache.maven.cling.invoker;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.maven.api.cli.CoreExtensions;
@@ -60,7 +61,7 @@ public class PrecedenceCoreExtensionSelector<C extends LookupContext> implements
             for (CoreExtension coreExtension : coreExtensions.coreExtensions()) {
                 String key = coreExtension.getGroupId() + ":" + coreExtension.getArtifactId();
                 CoreExtension conflict = selectedExtensions.putIfAbsent(key, coreExtension);
-                if (conflict != null) {
+                if (conflict != null && !Objects.equals(coreExtension.getVersion(), conflict.getVersion())) {
                     conflicts.add(String.format(
                             "Conflicting extension %s: %s vs %s",
                             key,
