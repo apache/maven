@@ -486,21 +486,21 @@ public abstract class BaseParser implements Parser {
 
         // project
         file = context.cwd.resolve(eff.get(Constants.MAVEN_PROJECT_EXTENSIONS));
-        loaded = readCoreExtensionsDescriptorFromFile(file);
+        loaded = readCoreExtensionsDescriptorFromFile(file, false);
         if (!loaded.isEmpty()) {
             result.add(new CoreExtensions(file, loaded));
         }
 
         // user
         file = context.userHomeDirectory.resolve(eff.get(Constants.MAVEN_USER_EXTENSIONS));
-        loaded = readCoreExtensionsDescriptorFromFile(file);
+        loaded = readCoreExtensionsDescriptorFromFile(file, true);
         if (!loaded.isEmpty()) {
             result.add(new CoreExtensions(file, loaded));
         }
 
         // installation
         file = context.installationDirectory.resolve(eff.get(Constants.MAVEN_INSTALLATION_EXTENSIONS));
-        loaded = readCoreExtensionsDescriptorFromFile(file);
+        loaded = readCoreExtensionsDescriptorFromFile(file, true);
         if (!loaded.isEmpty()) {
             result.add(new CoreExtensions(file, loaded));
         }
@@ -508,7 +508,7 @@ public abstract class BaseParser implements Parser {
         return result.isEmpty() ? null : List.copyOf(result);
     }
 
-    protected List<CoreExtension> readCoreExtensionsDescriptorFromFile(Path extensionsFile) {
+    protected List<CoreExtension> readCoreExtensionsDescriptorFromFile(Path extensionsFile, boolean allowMetaVersions) {
         try {
             if (extensionsFile != null && Files.exists(extensionsFile)) {
                 try (InputStream is = Files.newInputStream(extensionsFile)) {
@@ -516,7 +516,8 @@ public abstract class BaseParser implements Parser {
                             extensionsFile,
                             List.copyOf(new CoreExtensionsStaxReader()
                                     .read(is, true, new InputSource(extensionsFile.toString()))
-                                    .getExtensions()));
+                                    .getExtensions()),
+                            allowMetaVersions);
                 }
             }
             return List.of();
@@ -526,23 +527,37 @@ public abstract class BaseParser implements Parser {
     }
 
     protected List<CoreExtension> validateCoreExtensionsDescriptorFromFile(
-            Path extensionFile, List<CoreExtension> coreExtensions) {
+            Path extensionFile, List<CoreExtension> coreExtensions, boolean allowMetaVersions) {
         Map<String, List<InputLocation>> gasLocations = new HashMap<>();
+        Map<String, List<InputLocation>> metaVersionLocations = new HashMap<>();
         for (CoreExtension coreExtension : coreExtensions) {
             String ga = coreExtension.getGroupId() + ":" + coreExtension.getArtifactId();
             InputLocation location = coreExtension.getLocation("");
             gasLocations.computeIfAbsent(ga, k -> new ArrayList<>()).add(location);
+            // TODO: metaversions could be extensible enum with these two values out of the box
+            if ("LATEST".equals(coreExtension.getVersion()) || "RELEASE".equals(coreExtension.getVersion())) {
+                metaVersionLocations.computeIfAbsent(ga, k -> new ArrayList<>()).add(location);
+            }
         }
-        if (gasLocations.values().stream().noneMatch(l -> l.size() > 1)) {
-            return coreExtensions;
+        if (gasLocations.values().stream().anyMatch(l -> l.size() > 1)) {
+            throw new IllegalStateException("Extension conflicts in file " + extensionFile + ": "
+                    + gasLocations.entrySet().stream()
+                            .map(e -> e.getKey() + " defined on lines "
+                                    + e.getValue().stream()
+                                            .map(l -> String.valueOf(l.getLineNumber()))
+                                            .collect(Collectors.joining(", ")))
+                            .collect(Collectors.joining("; ")));
         }
-        throw new IllegalStateException("Extension conflicts in file " + extensionFile + ": "
-                + gasLocations.entrySet().stream()
-                        .map(e -> e.getKey() + " defined on lines "
-                                + e.getValue().stream()
-                                        .map(l -> String.valueOf(l.getLineNumber()))
-                                        .collect(Collectors.joining(", ")))
-                        .collect(Collectors.joining("; ")));
+        if (!allowMetaVersions && !metaVersionLocations.isEmpty()) {
+            throw new IllegalStateException("Extension illegal version in file " + extensionFile + ": "
+                    + metaVersionLocations.entrySet().stream()
+                            .map(e -> e.getKey() + " defined on lines "
+                                    + e.getValue().stream()
+                                            .map(l -> String.valueOf(l.getLineNumber()))
+                                            .collect(Collectors.joining(", ")))
+                            .collect(Collectors.joining("; ")));
+        }
+        return coreExtensions;
     }
 
     @Nullable
