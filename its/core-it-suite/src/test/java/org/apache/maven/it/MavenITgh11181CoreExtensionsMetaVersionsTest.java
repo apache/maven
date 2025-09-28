@@ -32,6 +32,9 @@ class MavenITgh11181CoreExtensionsMetaVersionsTest extends AbstractMavenIntegrat
         super("[4.1.0-SNAPSHOT,)");
     }
 
+    /**
+     * Project wide extensions: use of meta versions is invalid.
+     */
     @Test
     void pwMetaVersionIsInvalid() throws Exception {
         Path testDir = extractResources("/gh-11181-core-extensions-meta-versions")
@@ -51,6 +54,9 @@ class MavenITgh11181CoreExtensionsMetaVersionsTest extends AbstractMavenIntegrat
         }
     }
 
+    /**
+     * User wide extensions: use of meta versions is valid.
+     */
     @Test
     void uwMetaVersionIsValid() throws Exception {
         Path testDir = extractResources("/gh-11181-core-extensions-meta-versions")
@@ -67,6 +73,9 @@ class MavenITgh11181CoreExtensionsMetaVersionsTest extends AbstractMavenIntegrat
         verifier.verifyErrorFreeLog();
     }
 
+    /**
+     * Same GA different V extensions in project-wide and user-wide: warn for conflict.
+     */
     @Test
     void uwPwDifferentVersionIsConflict() throws Exception {
         Path testDir = extractResources("/gh-11181-core-extensions-meta-versions")
@@ -85,6 +94,9 @@ class MavenITgh11181CoreExtensionsMetaVersionsTest extends AbstractMavenIntegrat
         verifier.verifyTextInLog("Conflicting extension io.takari.maven:takari-smart-builder");
     }
 
+    /**
+     * Same GAV extensions in project-wide and user-wide: do not warn for conflict.
+     */
     @Test
     void uwPwSameVersionIsNotConflict() throws Exception {
         Path testDir = extractResources("/gh-11181-core-extensions-meta-versions")
