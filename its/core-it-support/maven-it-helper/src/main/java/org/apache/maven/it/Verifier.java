@@ -196,8 +196,8 @@ public class Verifier {
 
             String itTail = args.stream()
                     .filter(s -> s.startsWith("-Dmaven.repo.local.tail="))
-                    .map(s -> s.substring(24).trim())
                     .findFirst()
+                    .map(s -> s.substring(24).trim())
                     .orElse("");
             if (!itTail.isEmpty()) {
                 // remove it

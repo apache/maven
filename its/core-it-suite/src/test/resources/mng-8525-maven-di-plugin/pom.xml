@@ -43,14 +43,14 @@ under the License.
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
-        <version>5.11.4</version>
+        <version>5.13.4</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-bom</artifactId>
-        <version>5.15.2</version>
+        <version>5.20.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -151,7 +151,7 @@ under the License.
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-invoker-plugin</artifactId>
-            <version>3.6.1</version>
+            <version>3.9.1</version>
             <configuration>
               <showErrors>true</showErrors>
               <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>

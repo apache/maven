@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import eu.maveniverse.maven.mimir.testing.MimirInfuser;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserRequest;
@@ -98,7 +99,7 @@ public abstract class MavenInvokerTestSupport {
         Files.createDirectories(appJava.getParent());
         Files.writeString(appJava, APP_JAVA_STRING);
 
-        MimirInfuser.infuse(userHome);
+        MimirInfuser.infuseUW(userHome);
 
         HashMap<String, String> logs = new HashMap<>();
         Parser parser = createParser();

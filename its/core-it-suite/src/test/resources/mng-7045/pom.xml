@@ -32,7 +32,7 @@
       <plugin>
         <groupId>org.codehaus.gmavenplus</groupId>
         <artifactId>gmavenplus-plugin</artifactId>
-        <version>1.11.0</version>
+        <version>4.2.1</version>
         <configuration>
           <scripts>
             <script><![CDATA[println("InstanceSource=" + javax.enterprise.inject.Instance.class.getProtectionDomain().getCodeSource())
@@ -43,13 +43,13 @@ javax.enterprise.inject.Instance.class.getDeclaredMethod("stream")]]></script>
           <dependency>
             <groupId>org.apache.groovy</groupId>
             <artifactId>groovy-ant</artifactId>
-            <version>4.0.26</version>
+            <version>4.0.28</version>
             <scope>runtime</scope>
           </dependency>
           <dependency>
             <groupId>org.apache.groovy</groupId>
             <artifactId>groovy</artifactId>
-            <version>4.0.26</version>
+            <version>4.0.28</version>
             <scope>runtime</scope>
           </dependency>
         </dependencies>
