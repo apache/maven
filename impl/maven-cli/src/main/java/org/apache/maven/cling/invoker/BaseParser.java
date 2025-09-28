@@ -549,7 +549,7 @@ public abstract class BaseParser implements Parser {
                             .collect(Collectors.joining("; ")));
         }
         if (!allowMetaVersions && !metaVersionLocations.isEmpty()) {
-            throw new IllegalStateException("Extension illegal version in file " + extensionFile + ": "
+            throw new IllegalStateException("Extension with illegal version in file " + extensionFile + ": "
                     + metaVersionLocations.entrySet().stream()
                             .map(e -> e.getKey() + " defined on lines "
                                     + e.getValue().stream()
