@@ -52,17 +52,19 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
     public Model read(@Nonnull XmlReaderRequest request) throws XmlReaderException {
         requireNonNull(request, "request");
         Model model = doRead(request);
-        if (isModelVersionGreaterThan400(model)
-                && !model.getNamespaceUri().startsWith("http://maven.apache.org/POM/")) {
-            throw new XmlReaderException(
-                    "Invalid namespace '" + model.getNamespaceUri() + "' for model version " + model.getModelVersion(),
-                    null,
-                    null);
+        if (isModelVersionGreaterOrEqualsThan400(model)) {
+            String ns = model.getNamespaceUri();
+            if (ns.length() > 0 && !model.getNamespaceUri().startsWith("http://maven.apache.org/POM/")) {
+                throw new XmlReaderException(
+                        "Invalid namespace '" + model.getNamespaceUri() + "' for model version " + model.getModelVersion(),
+                        null,
+                        null);
+            }
         }
         return model;
     }
 
-    private boolean isModelVersionGreaterThan400(Model model) {
+    private boolean isModelVersionGreaterOrEqualsThan400(Model model) {
         String version = model.getModelVersion();
         if (version == null) {
             return false;
@@ -71,7 +73,7 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
             String[] parts = version.split("\\.");
             int major = Integer.parseInt(parts[0]);
             int minor = parts.length > 1 ? Integer.parseInt(parts[1]) : 0;
-            return major > 4 || (major == 4 && minor > 0);
+            return major > 4 || (major == 4 && minor >= 0);
         } catch (NumberFormatException | IndexOutOfBoundsException e) {
             return false;
         }
