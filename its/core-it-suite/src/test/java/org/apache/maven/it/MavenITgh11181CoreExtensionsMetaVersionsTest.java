@@ -49,7 +49,7 @@ class MavenITgh11181CoreExtensionsMetaVersionsTest extends AbstractMavenIntegrat
             verifier.execute();
             fail("Expected VerificationException");
         } catch (VerificationException e) {
-            // there is no even log; this is very early failure
+            // there is not even a log; this is very early failure
             assertTrue(e.getMessage().contains("Error executing Maven."));
         }
     }
