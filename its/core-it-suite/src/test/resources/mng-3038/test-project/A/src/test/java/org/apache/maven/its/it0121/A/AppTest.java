@@ -18,9 +18,10 @@
  */
 package org.apache.maven.its.it0121.A;
 
-import java.io.*;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
 public class AppTest extends TestCase {
     public void testOutput() {
