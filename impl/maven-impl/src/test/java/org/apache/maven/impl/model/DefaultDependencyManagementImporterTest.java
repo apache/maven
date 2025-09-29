@@ -39,12 +39,12 @@ class DefaultDependencyManagementImporterTest {
 
     @Test
     void testUpdateWithImportedFromDependencyManagementAndDependencyHaveSameSourceDependencyImportedFromSameSource() {
-        final InputSource source = new InputSource("SINGLE_SOURCE", "");
+        final InputSource source = InputSource.of("SINGLE_SOURCE", "");
         final Dependency dependency = Dependency.newBuilder()
-                .location("", new InputLocation(1, 1, source))
+                .location("", InputLocation.of(1, 1, source))
                 .build();
         final DependencyManagement bom = DependencyManagement.newBuilder()
-                .location("", new InputLocation(1, 1, source))
+                .location("", InputLocation.of(1, 1, source))
                 .build();
 
         final Dependency result = DefaultDependencyManagementImporter.updateWithImportedFrom(dependency, bom);
@@ -61,13 +61,13 @@ class DefaultDependencyManagementImporterTest {
     @Test
     public void testUpdateWithImportedFromSingleLevelImportedFromSet() {
         // Arrange
-        final InputSource dependencySource = new InputSource("DEPENDENCY", "DEPENDENCY");
-        final InputSource bomSource = new InputSource("BOM", "BOM");
+        final InputSource dependencySource = InputSource.of("DEPENDENCY", "DEPENDENCY");
+        final InputSource bomSource = InputSource.of("BOM", "BOM");
         final Dependency dependency = Dependency.newBuilder()
-                .location("", new InputLocation(1, 1, dependencySource))
+                .location("", InputLocation.of(1, 1, dependencySource))
                 .build();
         final DependencyManagement bom = DependencyManagement.newBuilder()
-                .location("", new InputLocation(2, 2, bomSource))
+                .location("", InputLocation.of(2, 2, bomSource))
                 .build();
 
         // Act
@@ -86,14 +86,14 @@ class DefaultDependencyManagementImporterTest {
     @Test
     public void testUpdateWithImportedFromMultiLevelImportedFromSetChanged() {
         // Arrange
-        final InputSource bomSource = new InputSource("BOM", "BOM");
+        final InputSource bomSource = InputSource.of("BOM", "BOM");
         final InputSource intermediateSource =
-                new InputSource("INTERMEDIATE", "INTERMEDIATE", new InputLocation(bomSource));
+                InputSource.of("INTERMEDIATE", "INTERMEDIATE", InputLocation.of(bomSource));
         final InputSource dependencySource =
-                new InputSource("DEPENDENCY", "DEPENDENCY", new InputLocation(intermediateSource));
-        final InputLocation bomLocation = new InputLocation(2, 2, bomSource);
+                InputSource.of("DEPENDENCY", "DEPENDENCY", InputLocation.of(intermediateSource));
+        final InputLocation bomLocation = InputLocation.of(2, 2, bomSource);
         final Dependency dependency = Dependency.newBuilder()
-                .location("", new InputLocation(1, 1, dependencySource))
+                .location("", InputLocation.of(1, 1, dependencySource))
                 .importedFrom(bomLocation)
                 .build();
         final DependencyManagement bom =
@@ -114,16 +114,16 @@ class DefaultDependencyManagementImporterTest {
     @Test
     public void testUpdateWithImportedFromMultiLevelAlreadyFoundInDifferentSourceImportedFromSetMaintained() {
         // Arrange
-        final InputSource bomSource = new InputSource("BOM", "BOM");
+        final InputSource bomSource = InputSource.of("BOM", "BOM");
         final InputSource intermediateSource =
-                new InputSource("INTERMEDIATE", "INTERMEDIATE", new InputLocation(bomSource));
+                InputSource.of("INTERMEDIATE", "INTERMEDIATE", InputLocation.of(bomSource));
         final InputSource dependencySource =
-                new InputSource("DEPENDENCY", "DEPENDENCY", new InputLocation(intermediateSource));
+                InputSource.of("DEPENDENCY", "DEPENDENCY", InputLocation.of(intermediateSource));
         final Dependency dependency = Dependency.newBuilder()
-                .location("", new InputLocation(1, 1, dependencySource))
+                .location("", InputLocation.of(1, 1, dependencySource))
                 .build();
         final DependencyManagement differentSource = DependencyManagement.newBuilder()
-                .location("", new InputLocation(2, 2, new InputSource("BOM2", "BOM2")))
+                .location("", InputLocation.of(2, 2, InputSource.of("BOM2", "BOM2")))
                 .build();
 
         // Act
