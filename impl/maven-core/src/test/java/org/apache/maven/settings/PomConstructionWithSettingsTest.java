@@ -131,7 +131,7 @@ class PomConstructionWithSettingsTest {
     private static Settings readSettingsFile(File settingsFile) throws IOException, XMLStreamException {
         try (InputStream is = Files.newInputStream(settingsFile.toPath())) {
             SettingsStaxReader reader = new SettingsStaxReader();
-            InputSource source = new InputSource(settingsFile.toString());
+            InputSource source = InputSource.of(settingsFile.toString());
             return new Settings(reader.read(is, true, source));
         }
     }
