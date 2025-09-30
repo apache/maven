@@ -19,6 +19,11 @@ name: Java CI
 
 on: [push, pull_request]
 
+# allow single build per branch or PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 # clear all permissions for GITHUB_TOKEN
 permissions: {}
 
@@ -36,11 +41,11 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           persist-credentials: false
 
-      - uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5
+      - uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5.0.0
         with:
           java-version: 21
           distribution: 'zulu'
@@ -48,13 +53,13 @@ jobs:
 
       - name: Set up Maven
         run:
-          mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper "-Dmaven=3.9.10"
+          mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.4:wrapper "-Dmaven=3.9.11"
 
       - name: Build with Maven
         run: ./mvnw verify -e -B -V -DdistributionFileName=apache-maven
 
       - name: Upload built Maven
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: ${{ matrix.os == 'ubuntu-latest' }}
         with:
           name: built-maven
@@ -65,7 +70,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
-        java: [8, 11, 17, 21, 24]
+        java: [8, 11, 17, 21, 25]
 
       fail-fast: false
     runs-on: ${{ matrix.os }}
@@ -103,7 +108,7 @@ jobs:
           echo "REPO_USER=$target_user" >> $GITHUB_ENV
 
       - name: Checkout maven-integration-testing
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           repository: ${{ env.REPO_USER }}/maven-integration-testing
           path: maven-integration-testing/
@@ -112,7 +117,7 @@ jobs:
 
 
       - name: Set up cache for ~/.m2/repository
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: ~/.m2/repository
           key: it-m2-repo-${{ matrix.os }}-${{ hashFiles('maven-integration-testing/**/pom.xml') }}
@@ -120,13 +125,13 @@ jobs:
             it-m2-repo-${{ matrix.os }}-
 
       - name: Download built Maven
-        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v4
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: built-maven
           path: built-maven/
 
       - name: Set up JDK
-        uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5
+        uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5.0.0
         with:
           java-version: ${{ matrix.java }}
           distribution: 'zulu'
@@ -134,7 +139,7 @@ jobs:
 
       - name: Set up Maven
         run:
-          mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper "-Dmaven=3.9.10"
+          mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.4:wrapper "-Dmaven=3.9.11"
 
       - name: Running integration tests
         shell: bash
