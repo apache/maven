@@ -29,6 +29,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.ArtifactCoordinates;
+import org.apache.maven.api.DependencyScope;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.PathScope;
 import org.apache.maven.api.SessionData;
@@ -114,7 +115,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
             ArtifactCoordinates artifact = iSession.createArtifactCoordinates(
                     model.getGroupId(), model.getArtifactId(), model.getVersion(), null);
             Node node = iSession.collectDependencies(
-                    iSession.createDependencyCoordinates(artifact), PathScope.TEST_RUNTIME);
+                    iSession.createDependencyCoordinates(artifact), PathScope.MAIN_RUNTIME);
 
             Map<String, Node> nodes = node.stream()
                     .collect(Collectors.toMap(n -> getDependencyKey(n.getDependency()), Function.identity()));
@@ -159,6 +160,8 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                 }
                 return dependency;
             });
+            // Only keep transitive scopes (null/empty => COMPILE)
+            directDependencies.values().removeIf(DefaultConsumerPomBuilder::hasDependencyScope);
             managedDependencies.keySet().removeAll(directDependencies.keySet());
 
             model = model.withDependencyManagement(
@@ -166,13 +169,36 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                                     ? null
                                     : model.getDependencyManagement().withDependencies(managedDependencies.values()))
                     .withDependencies(directDependencies.isEmpty() ? null : directDependencies.values());
+        } else {
+            // Even without dependencyManagement, filter direct dependencies to compile/runtime only
+            Map<String, Dependency> directDependencies = model.getDependencies().stream()
+                    .filter(dependency -> !"import".equals(dependency.getScope()))
+                    .collect(Collectors.toMap(
+                            DefaultConsumerPomBuilder::getDependencyKey,
+                            Function.identity(),
+                            this::merge,
+                            LinkedHashMap::new));
+            // Only keep transitive scopes
+            directDependencies.values().removeIf(DefaultConsumerPomBuilder::hasDependencyScope);
+            model = model.withDependencies(directDependencies.isEmpty() ? null : directDependencies.values());
         }
 
         return model;
     }
 
+    private static boolean hasDependencyScope(Dependency dependency) {
+        String scopeId = dependency.getScope();
+        DependencyScope scope;
+        if (scopeId == null || scopeId.isEmpty()) {
+            scope = DependencyScope.COMPILE;
+        } else {
+            scope = DependencyScope.forId(scopeId);
+        }
+        return scope == null || !scope.isTransitive();
+    }
+
     private Dependency merge(Dependency dep1, Dependency dep2) {
-        throw new IllegalArgumentException("Duplicate dependency: " + dep1);
+        throw new IllegalArgumentException("Duplicate dependency: " + getDependencyKey(dep1));
     }
 
     private static String getDependencyKey(org.apache.maven.api.Dependency dependency) {
@@ -182,7 +208,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
 
     private static String getDependencyKey(Dependency dependency) {
         return dependency.getGroupId() + ":" + dependency.getArtifactId() + ":"
-                + (dependency.getType() != null ? dependency.getType() : "") + ":"
+                + (dependency.getType() != null ? dependency.getType() : "jar") + ":"
                 + (dependency.getClassifier() != null ? dependency.getClassifier() : "");
     }
 

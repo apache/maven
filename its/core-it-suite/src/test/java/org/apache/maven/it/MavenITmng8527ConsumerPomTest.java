@@ -70,11 +70,11 @@ class MavenITmng8527ConsumerPomTest extends AbstractMavenIntegrationTestCase {
                 consumerPomLines.stream().anyMatch(s -> s.contains("<organization>")),
                 "Consumer pom should have an <organization> element");
         assertEquals(
-                2,
+                1,
                 consumerPomLines.stream()
                         .filter(s -> s.contains("<dependency>"))
                         .count(),
-                "Consumer pom should have two dependencies");
+                "Consumer pom should have one dependency");
 
         List<String> buildPomLines;
         try (Stream<String> lines = Files.lines(buildPomPath)) {
