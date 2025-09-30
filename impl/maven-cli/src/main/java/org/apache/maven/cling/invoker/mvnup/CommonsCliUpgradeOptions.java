@@ -126,7 +126,7 @@ public class CommonsCliUpgradeOptions extends CommonsCliOptions implements Upgra
         printStream.accept(
                 "  -a, --all             Apply all upgrades (equivalent to --model-version 4.1.0 --infer --model --plugins)");
         printStream.accept("");
-        printStream.accept("Default behavior: --model and --plugins are applied if no other options are specified");
+        printStream.accept("Default behavior: --model --plugins --infer are applied if no other options are specified");
         printStream.accept("");
     }
 
@@ -152,29 +152,29 @@ public class CommonsCliUpgradeOptions extends CommonsCliOptions implements Upgra
                     .hasArg()
                     .argName("version")
                     .desc("Target POM model version (4.0.0 or 4.1.0)")
-                    .build());
+                    .get());
             options.addOption(Option.builder(DIRECTORY)
                     .longOpt("directory")
                     .hasArg()
                     .argName("path")
                     .desc("Directory to use as starting point for POM discovery")
-                    .build());
+                    .get());
             options.addOption(Option.builder(INFER)
                     .longOpt("infer")
                     .desc("Use inference when upgrading (remove redundant information)")
-                    .build());
+                    .get());
             options.addOption(Option.builder(MODEL)
                     .longOpt("model")
                     .desc("Fix Maven 4 compatibility issues in POM files")
-                    .build());
+                    .get());
             options.addOption(Option.builder(PLUGINS)
                     .longOpt("plugins")
                     .desc("Upgrade plugins known to fail with Maven 4 to their minimum compatible versions")
-                    .build());
+                    .get());
             options.addOption(Option.builder(ALL)
                     .longOpt("all")
                     .desc("Apply all upgrades (equivalent to --model-version 4.1.0 --infer --model --plugins)")
-                    .build());
+                    .get());
         }
     }
 }

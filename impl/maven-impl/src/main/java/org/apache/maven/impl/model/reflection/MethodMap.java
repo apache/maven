@@ -18,7 +18,6 @@
  */
 package org.apache.maven.impl.model.reflection;
 
-import java.io.Serial;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -117,11 +116,7 @@ class MethodMap {
      * simple distinguishable exception, used when
      * we run across ambiguous overloading
      */
-    static class AmbiguousException extends Exception {
-
-        @Serial
-        private static final long serialVersionUID = 751688436639650618L;
-    }
+    static class AmbiguousException extends Exception {}
 
     private static Method getMostSpecific(List<Method> methods, Class<?>... classes) throws AmbiguousException {
         LinkedList<Method> applicables = getApplicables(methods, classes);

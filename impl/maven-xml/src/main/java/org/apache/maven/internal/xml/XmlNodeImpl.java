@@ -19,7 +19,6 @@
 package org.apache.maven.internal.xml;
 
 import java.io.IOException;
-import java.io.Serial;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.List;
@@ -38,8 +37,6 @@ import org.apache.maven.api.xml.XmlService;
 @Deprecated
 @SuppressWarnings("removal")
 public class XmlNodeImpl implements Serializable, XmlNode {
-    @Serial
-    private static final long serialVersionUID = 2567894443061173996L;
 
     @Nonnull
     protected final String prefix;

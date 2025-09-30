@@ -314,8 +314,8 @@ public class DefaultXmlService extends XmlService {
                                                 .filter(n2 -> n2.name().equals(n1))
                                                 .collect(Collectors.toList()))
                                         .filter(l -> !l.isEmpty())
-                                        .map(List::iterator)
                                         .findFirst()
+                                        .map(List::iterator)
                                         .orElse(null));
                         if (it == null) {
                             if (children == null) {

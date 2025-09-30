@@ -26,6 +26,7 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 
+import eu.maveniverse.maven.mimir.testing.MimirInfuser;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Executor;
 import org.apache.maven.api.cli.ExecutorRequest;
@@ -316,7 +317,7 @@ public abstract class MavenExecutorTestSupport {
     protected void execute(@Nullable Path logFile, Collection<ExecutorRequest> requests) throws Exception {
         Executor invoker = createAndMemoizeExecutor();
         for (ExecutorRequest request : requests) {
-            MimirInfuser.infuse(request.userHomeDirectory());
+            MimirInfuser.infuseUW(request.userHomeDirectory());
             int exitCode = invoker.execute(request);
             if (exitCode != 0) {
                 throw new FailedExecution(request, exitCode, logFile == null ? "" : Files.readString(logFile));

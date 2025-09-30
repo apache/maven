@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.maven.api.cli.mvnup.UpgradeOptions;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
 import org.jdom2.Document;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,14 +58,6 @@ class StrategyOrchestratorTest {
 
     private UpgradeContext createMockContext() {
         return TestUtils.createMockContext();
-    }
-
-    private UpgradeContext createMockContext(UpgradeOptions options) {
-        return TestUtils.createMockContext(options);
-    }
-
-    private UpgradeOptions createDefaultOptions() {
-        return TestUtils.createDefaultOptions();
     }
 
     @Nested
