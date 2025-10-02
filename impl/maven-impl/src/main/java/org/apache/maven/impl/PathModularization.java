@@ -43,7 +43,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * or module hierarchy, but not module source hierarchy. The latter is excluded because this class
  * is for path elements of compiled codes.
  */
-class PathModularization {
+final class PathModularization {
     /**
      * A unique constant for all non-modular dependencies.
      */
@@ -132,10 +132,11 @@ class PathModularization {
      * Otherwise builds an empty map.
      *
      * @param path directory or JAR file to test
+     * @param target the target Java release for which the project is built
      * @param resolve whether the module names are requested. If false, null values may be used instead
      * @throws IOException if an error occurred while reading the JAR file or the module descriptor
      */
-    PathModularization(Path path, boolean resolve) throws IOException {
+    PathModularization(Path path, Runtime.Version target, boolean resolve) throws IOException {
         filename = path.getFileName().toString();
         if (Files.isDirectory(path)) {
             /*
@@ -192,7 +193,7 @@ class PathModularization {
              * If no descriptor, the "Automatic-Module-Name" manifest attribute is
              * taken as a fallback.
              */
-            try (JarFile jar = new JarFile(path.toFile())) {
+            try (JarFile jar = new JarFile(path.toFile(), false, JarFile.OPEN_READ, target)) {
                 ZipEntry entry = jar.getEntry(MODULE_INFO);
                 if (entry != null) {
                     ModuleDescriptor descriptor = null;
