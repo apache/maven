@@ -39,6 +39,7 @@ import java.util.function.Function;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
+import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.xml.ModelXmlFactory;
@@ -156,22 +157,29 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
         Path path = request.getPath();
         OutputStream outputStream = request.getOutputStream();
         Writer writer = request.getWriter();
-        Function<Object, String> inputLocationFormatter = request.getInputLocationFormatter();
+
         if (writer == null && outputStream == null && path == null) {
             throw new IllegalArgumentException("writer, outputStream or path must be non null");
         }
+
         try {
-            MavenStaxWriter w = new MavenStaxWriter();
-            if (inputLocationFormatter != null) {
-                w.setStringFormatter((Function) inputLocationFormatter);
+            MavenStaxWriter xmlWriter = new MavenStaxWriter();
+            xmlWriter.setAddLocationInformation(false);
+
+            Function<Object, String> formatter = request.getInputLocationFormatter();
+            if (formatter != null) {
+                xmlWriter.setAddLocationInformation(true);
+                Function<InputLocation, String> adapter = formatter::apply;
+                xmlWriter.setStringFormatter(adapter);
             }
+
             if (writer != null) {
-                w.write(writer, content);
+                xmlWriter.write(writer, content);
             } else if (outputStream != null) {
-                w.write(outputStream, content);
+                xmlWriter.write(outputStream, content);
             } else {
                 try (OutputStream os = Files.newOutputStream(path)) {
-                    w.write(os, content);
+                    xmlWriter.write(os, content);
                 }
             }
         } catch (Exception e) {
