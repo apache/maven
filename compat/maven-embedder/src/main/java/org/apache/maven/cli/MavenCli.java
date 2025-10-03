@@ -174,6 +174,27 @@ public class MavenCli {
 
     private static final Pattern NEXT_LINE = Pattern.compile("\r?\n");
 
+    /** Matches “/d/whatever” or “/C/…”.  */
+    private static final Pattern MSYS_PATH = Pattern.compile("^/([a-zA-Z])/(.*)$");
+
+    /**
+     * Converts a POSIX-style Windows path (as used by MSYS2/Git Bash/Cygwin),
+     * e.g. "/c/Users/alice/file.txt" or "/cygdrive/c/Users/alice/file.txt",
+     * to a native Windows path "C:\Users\alice\file.txt".
+     * Returns the original string if it is already a native Windows path.
+     */
+    static String msysToWindowsPath(final String path) {
+        if (path == null) {
+            return null;
+        }
+        final Matcher matcher = MSYS_PATH.matcher(path);
+        if (matcher.matches()) {
+            return Character.toUpperCase(matcher.group(1).charAt(0)) + ":\\"
+                    + matcher.group(2).replace('/', '\\');
+        }
+        return path;
+    }
+
     public MavenCli() {
         this(null);
     }
@@ -362,6 +383,22 @@ public class MavenCli {
         // Windows paths.
         //
         String mavenHome = System.getProperty(Constants.MAVEN_HOME);
+
+        if (org.codehaus.plexus.util.Os.isFamily("windows")) {
+            System.setProperty("user.home", msysToWindowsPath(System.getProperty("user.home")));
+
+            for (final String key : new String[] {
+                Constants.MAVEN_REPO_LOCAL, // -Dmaven.repo.local
+                "user.settings", // -s / --settings
+                "alternateSettings",
+                "user.toolchains"
+            }) {
+                final String value = System.getProperty(key);
+                if (value != null) {
+                    System.setProperty(key, msysToWindowsPath(value));
+                }
+            }
+        }
 
         if (mavenHome != null) {
             System.setProperty(
