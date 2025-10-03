@@ -1549,26 +1549,9 @@ public class DefaultModelValidator implements ModelValidator {
                     repository.getUrl(),
                     null,
                     repository)) {
-                // only allow ${basedir} and ${project.basedir}
-                Matcher matcher = EXPRESSION_NAME_PATTERN.matcher(repository.getUrl());
-                while (matcher.find()) {
-                    String expr = matcher.group(1);
-                    if (!("basedir".equals(expr)
-                            || "project.basedir".equals(expr)
-                            || expr.startsWith("project.basedir.")
-                            || "project.rootDirectory".equals(expr)
-                            || expr.startsWith("project.rootDirectory."))) {
-                        addViolation(
-                                problems,
-                                Severity.ERROR,
-                                Version.V40,
-                                prefix + prefix2 + "[" + repository.getId() + "].url",
-                                null,
-                                "contains an unsupported expression (only expressions starting with 'project.basedir' or 'project.rootDirectory' are supported).",
-                                repository);
-                        break;
-                    }
-                }
+                // allow interpolation in repository URLs; they will be resolved later during model interpolation
+                // and builds will fail if unresolved placeholders remain (see MavenValidator.validateRemoteRepository).
+                // Previously, Maven 4 rejected any expressions except project.basedir/rootDirectory here.
             }
 
             String key = repository.getId();
