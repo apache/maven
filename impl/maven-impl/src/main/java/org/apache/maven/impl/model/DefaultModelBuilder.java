@@ -851,20 +851,51 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         Model readParent(Model childModel, Parent parent, DefaultProfileActivationContext profileActivationContext) {
+            return readParent(childModel, parent, profileActivationContext, new LinkedHashSet<>());
+        }
+
+        Model readParent(
+                Model childModel,
+                Parent parent,
+                DefaultProfileActivationContext profileActivationContext,
+                Set<String> parentChain) {
             Model parentModel;
 
             if (parent != null) {
-                parentModel = resolveParent(childModel, parent, profileActivationContext);
+                // Check for circular parent resolution using model IDs
+                String parentId = parent.getGroupId() + ":" + parent.getArtifactId() + ":" + parent.getVersion();
+                if (!parentChain.add(parentId)) {
+                    StringBuilder message = new StringBuilder("The parents form a cycle: ");
+                    for (String id : parentChain) {
+                        message.append(id).append(" -> ");
+                    }
+                    message.append(parentId);
 
-                if (!"pom".equals(parentModel.getPackaging())) {
-                    add(
-                            Severity.ERROR,
-                            Version.BASE,
-                            "Invalid packaging for parent POM " + ModelProblemUtils.toSourceHint(parentModel)
-                                    + ", must be \"pom\" but is \"" + parentModel.getPackaging() + "\"",
-                            parentModel.getLocation("packaging"));
+                    add(Severity.FATAL, Version.BASE, message.toString());
+                    throw newModelBuilderException();
                 }
-                result.setParentModel(parentModel);
+
+                try {
+                    parentModel = resolveParent(childModel, parent, profileActivationContext, parentChain);
+
+                    if (!"pom".equals(parentModel.getPackaging())) {
+                        add(
+                                Severity.ERROR,
+                                Version.BASE,
+                                "Invalid packaging for parent POM " + ModelProblemUtils.toSourceHint(parentModel)
+                                        + ", must be \"pom\" but is \"" + parentModel.getPackaging() + "\"",
+                                parentModel.getLocation("packaging"));
+                    }
+                    result.setParentModel(parentModel);
+
+                    // Recursively read the parent's parent
+                    if (parentModel.getParent() != null) {
+                        readParent(parentModel, parentModel.getParent(), profileActivationContext, parentChain);
+                    }
+                } finally {
+                    // Remove from chain when done processing this parent
+                    parentChain.remove(parentId);
+                }
             } else {
                 String superModelVersion = childModel.getModelVersion();
                 if (superModelVersion == null || !KNOWN_MODEL_VERSIONS.contains(superModelVersion)) {
@@ -882,12 +913,21 @@ public class DefaultModelBuilder implements ModelBuilder {
         private Model resolveParent(
                 Model childModel, Parent parent, DefaultProfileActivationContext profileActivationContext)
                 throws ModelBuilderException {
+            return resolveParent(childModel, parent, profileActivationContext, new LinkedHashSet<>());
+        }
+
+        private Model resolveParent(
+                Model childModel,
+                Parent parent,
+                DefaultProfileActivationContext profileActivationContext,
+                Set<String> parentChain)
+                throws ModelBuilderException {
             Model parentModel = null;
             if (isBuildRequest()) {
                 parentModel = readParentLocally(childModel, parent, profileActivationContext);
             }
             if (parentModel == null) {
-                parentModel = resolveAndReadParentExternally(childModel, parent, profileActivationContext);
+                parentModel = resolveAndReadParentExternally(childModel, parent, profileActivationContext, parentChain);
             }
             return parentModel;
         }
@@ -958,7 +998,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                         return null;
                     }
 
-                    // Validate versions aren't inherited when using parent ranges the same way as when read externally.
+                    // Validate versions aren't inherited when using parent ranges the same way as when read
+                    // externally.
                     String rawChildModelVersion = childModel.getVersion();
 
                     if (rawChildModelVersion == null) {
@@ -1018,6 +1059,15 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         Model resolveAndReadParentExternally(
                 Model childModel, Parent parent, DefaultProfileActivationContext profileActivationContext)
+                throws ModelBuilderException {
+            return resolveAndReadParentExternally(childModel, parent, profileActivationContext, new LinkedHashSet<>());
+        }
+
+        Model resolveAndReadParentExternally(
+                Model childModel,
+                Parent parent,
+                DefaultProfileActivationContext profileActivationContext,
+                Set<String> parentChain)
                 throws ModelBuilderException {
             ModelBuilderRequest request = this.request;
             setSource(childModel);
@@ -1580,6 +1630,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     }
                     // Add the activated profiles from cache to the result
                     addActivePomProfiles(cached.activatedProfiles());
+
                     return cached.model();
                 }
             }
@@ -1589,6 +1640,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             // that aren't essential to the final result. Only replay the final essential keys
             // into the parent recording context to maintain clean cache keys and avoid
             // over-recording during parent model processing.
+
             DefaultProfileActivationContext ctx = profileActivationContext.start();
             ParentModelWithProfiles modelWithProfiles = doReadAsParentModel(ctx);
             DefaultProfileActivationContext.Record record = ctx.stop();
