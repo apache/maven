@@ -114,7 +114,12 @@ public class DefaultDependencyResolverResult implements DependencyResolverResult
      */
     public DefaultDependencyResolverResult(
             DependencyResolverRequest request, List<Exception> exceptions, Node root, int count) {
-        this(request, new PathModularizationCache(), exceptions, root, count);
+        this(
+                request,
+                new PathModularizationCache(DefaultDependencyResolver.getTargetVersion(request)),
+                exceptions,
+                root,
+                count);
     }
 
     /**
