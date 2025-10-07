@@ -701,7 +701,7 @@ under the License.
         <plugin>
           <groupId>com.github.siom79.japicmp</groupId>
           <artifactId>japicmp-maven-plugin</artifactId>
-          <version>0.23.1</version>
+          <version>0.24.1</version>
           <executions>
             <execution>
               <goals>
