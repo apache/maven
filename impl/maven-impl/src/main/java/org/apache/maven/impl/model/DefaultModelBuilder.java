@@ -42,6 +42,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
@@ -63,12 +64,15 @@ import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
+import org.apache.maven.api.model.DeploymentRepository;
+import org.apache.maven.api.model.DistributionManagement;
 import org.apache.maven.api.model.Exclusion;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Profile;
+import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.BuilderProblem.Severity;
 import org.apache.maven.api.services.Interpolator;
@@ -1415,6 +1419,29 @@ public class DefaultModelBuilder implements ModelBuilder {
                                                         model.getParent().getVersion()))
                                         : null)
                         .build();
+                // Interpolate repository URLs
+                if (model.getProjectDirectory() != null) {
+                    String basedir = model.getProjectDirectory().toString();
+                    String basedirUri = model.getProjectDirectory().toUri().toString();
+                    properties.put("basedir", basedir);
+                    properties.put("project.basedir", basedir);
+                    properties.put("project.basedir.uri", basedirUri);
+                }
+                try {
+                    String root = request.getSession().getRootDirectory().toString();
+                    String rootUri =
+                            request.getSession().getRootDirectory().toUri().toString();
+                    properties.put("project.rootDirectory", root);
+                    properties.put("project.rootDirectory.uri", rootUri);
+                } catch (IllegalStateException e) {
+                }
+                UnaryOperator<String> callback = properties::get;
+                model = model.with()
+                        .repositories(interpolateRepository(model.getRepositories(), callback))
+                        .pluginRepositories(interpolateRepository(model.getPluginRepositories(), callback))
+                        .profiles(map(model.getProfiles(), this::interpolateRepository, callback))
+                        .distributionManagement(interpolateRepository(model.getDistributionManagement(), callback))
+                        .build();
                 // Override model properties with user properties
                 Map<String, String> newProps = merge(model.getProperties(), session.getUserProperties());
                 if (newProps != null) {
@@ -1443,6 +1470,41 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             return model;
+        }
+
+        private DistributionManagement interpolateRepository(
+                DistributionManagement distributionManagement, UnaryOperator<String> callback) {
+            return distributionManagement == null
+                    ? null
+                    : distributionManagement
+                            .with()
+                            .repository((DeploymentRepository)
+                                    interpolateRepository(distributionManagement.getRepository(), callback))
+                            .snapshotRepository((DeploymentRepository)
+                                    interpolateRepository(distributionManagement.getSnapshotRepository(), callback))
+                            .build();
+        }
+
+        private Profile interpolateRepository(Profile profile, UnaryOperator<String> callback) {
+            return profile == null
+                    ? null
+                    : profile.with()
+                            .repositories(interpolateRepository(profile.getRepositories(), callback))
+                            .pluginRepositories(interpolateRepository(profile.getPluginRepositories(), callback))
+                            .build();
+        }
+
+        private List<Repository> interpolateRepository(List<Repository> repositories, UnaryOperator<String> callback) {
+            return map(repositories, this::interpolateRepository, callback);
+        }
+
+        private Repository interpolateRepository(Repository repository, UnaryOperator<String> callback) {
+            return repository == null
+                    ? null
+                    : repository
+                            .with()
+                            .url(interpolator.interpolate(repository.getUrl(), callback))
+                            .build();
         }
 
         /**
@@ -2249,5 +2311,22 @@ public class DefaultModelBuilder implements ModelBuilder {
         Set<String> getContexts() {
             return contexts;
         }
+    }
+
+    private static <T, A> List<T> map(List<T> resources, BiFunction<T, A, T> mapper, A argument) {
+        List<T> newResources = null;
+        if (resources != null) {
+            for (int i = 0; i < resources.size(); i++) {
+                T resource = resources.get(i);
+                T newResource = mapper.apply(resource, argument);
+                if (newResource != resource) {
+                    if (newResources == null) {
+                        newResources = new ArrayList<>(resources);
+                    }
+                    newResources.set(i, newResource);
+                }
+            }
+        }
+        return newResources;
     }
 }
