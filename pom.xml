@@ -690,6 +690,18 @@ under the License.
       <url>https://repository.apache.org/content/repositories/maven-2330/</url>
     </repository>
   </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>maven-2330</id>
+      <url>https://repository.apache.org/content/repositories/maven-2330/</url>
+    </pluginRepository>
+  </pluginRepositories>
 
   <build>
     <pluginManagement>
