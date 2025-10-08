@@ -35,6 +35,7 @@ env:
   MIMIR_VERSION: 0.9.4
   MIMIR_BASEDIR: ~/.mimir
   MIMIR_LOCAL: ~/.mimir/local
+  MAVEN_OPTS: -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./target/java_heapdump.hprof
 
 jobs:
   initial-build:
@@ -198,7 +199,9 @@ jobs:
         if: failure() || cancelled()
         with:
           name: ${{ github.run_number }}-full-build-artifact-${{ runner.os }}-${{ matrix.java }}
-          path: '**/target/surefire-reports/*'
+          path: |
+            **/target/surefire-reports/*
+            **/target/java_heapdump.hprof
 
   integration-tests:
     needs: initial-build
@@ -282,4 +285,6 @@ jobs:
         if: failure() || cancelled()
         with:
           name: ${{ github.run_number }}-integration-test-artifact-${{ runner.os }}-${{ matrix.java }}
-          path: ./its/core-it-suite/target/test-classes/
+          path: |
+            ./its/core-it-suite/target/test-classes/
+            **/target/java_heapdump.hprof
