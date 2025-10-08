@@ -45,9 +45,6 @@ public class MavenITmng7470ResolverTransportTest extends AbstractMavenIntegratio
     private static final ArtifactVersion JDK_TRANSPORT_IN_MAVEN_SINCE =
             new DefaultArtifactVersion("4.0.0-alpha-9-SNAPSHOT");
 
-    private static final ArtifactVersion JDK_TRANSPORT_DEMOTED_IN_MAVEN_SINCE =
-            new DefaultArtifactVersion("4.1.0-SNAPSHOT");
-
     public MavenITmng7470ResolverTransportTest() {
         super("[3.9.0,)");
     }
@@ -128,28 +125,11 @@ public class MavenITmng7470ResolverTransportTest extends AbstractMavenIntegratio
         return JDK_TRANSPORT_IN_MAVEN_SINCE.compareTo(getMavenVersion()) < 1;
     }
 
-    /**
-     * Returns {@code true} if JDK HttpClient transport is demoted in Maven (since 4.1.0-SNAPSHOT, the Resolver 2.0.12
-     * upgrade).
-     */
-    private boolean isJdkTransportDemoted() {
-        return JDK_TRANSPORT_DEMOTED_IN_MAVEN_SINCE.compareTo(getMavenVersion()) < 1;
-    }
-
     private String defaultLogSnippet() {
-        if (!isJdkTransportPresent()) {
-            return APACHE_LOG_SNIPPET_OLD;
-        } else {
-            if (isJdkTransportUsable()) {
-                if (isJdkTransportDemoted()) {
-                    return APACHE_LOG_SNIPPET;
-                } else {
-                    return JDK_LOG_SNIPPET;
-                }
-            } else {
-                return APACHE_LOG_SNIPPET;
-            }
+        if (isJdkTransportUsable() && isJdkTransportPresent()) {
+            return JDK_LOG_SNIPPET;
         }
+        return isJdkTransportPresent() ? APACHE_LOG_SNIPPET : APACHE_LOG_SNIPPET_OLD;
     }
 
     @Test
