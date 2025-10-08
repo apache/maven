@@ -97,8 +97,8 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
 
     public DependencyManager getDependencyManager(boolean transitive) {
         return transitive
-                ? new TransitiveDependencyManager(this.getScopeManager())
-                : new ClassicDependencyManager(this.scopeManager);
+                ? new TransitiveDependencyManager(getScopeManager())
+                : new ClassicDependencyManager(getScopeManager());
     }
 
     protected DependencySelector getDependencySelector() {
