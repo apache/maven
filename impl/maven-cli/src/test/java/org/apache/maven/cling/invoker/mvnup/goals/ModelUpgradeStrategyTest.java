@@ -325,6 +325,467 @@ class ModelUpgradeStrategyTest {
     }
 
     @Nested
+    @DisplayName("Phase Upgrades")
+    class PhaseUpgradeTests {
+
+        @Test
+        @DisplayName("should upgrade deprecated phases to Maven 4 equivalents in 4.1.0")
+        void shouldUpgradeDeprecatedPhasesIn410() throws Exception {
+            Document document = createDocumentWithDeprecatedPhases();
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            // Create context with --model-version=4.1.0 option to trigger phase upgrade
+            UpgradeOptions options = mock(UpgradeOptions.class);
+            when(options.modelVersion()).thenReturn(Optional.of("4.1.0"));
+            when(options.all()).thenReturn(Optional.empty());
+            UpgradeContext context = createMockContext(options);
+
+            UpgradeResult result = strategy.apply(context, pomMap);
+
+            assertTrue(result.success(), "Model upgrade should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have upgraded phases");
+
+            // Verify phases were upgraded
+            verifyCleanPluginPhases(document);
+            verifyFailsafePluginPhases(document);
+            verifySitePluginPhases(document);
+            verifyPluginManagementPhases(document);
+            verifyProfilePhases(document);
+        }
+
+        private Document createDocumentWithDeprecatedPhases() throws Exception {
+            String pomXml =
+                    """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>com.example</groupId>
+                    <artifactId>test-project</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-clean-plugin</artifactId>
+                                <version>3.2.0</version>
+                                <executions>
+                                    <execution>
+                                        <id>pre-clean-test</id>
+                                        <phase>pre-clean</phase>
+                                        <goals>
+                                            <goal>clean</goal>
+                                        </goals>
+                                    </execution>
+                                    <execution>
+                                        <id>post-clean-test</id>
+                                        <phase>post-clean</phase>
+                                        <goals>
+                                            <goal>clean</goal>
+                                        </goals>
+                                    </execution>
+                                </executions>
+                            </plugin>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-failsafe-plugin</artifactId>
+                                <version>3.0.0-M7</version>
+                                <executions>
+                                    <execution>
+                                        <id>pre-integration-test-setup</id>
+                                        <phase>pre-integration-test</phase>
+                                        <goals>
+                                            <goal>integration-test</goal>
+                                        </goals>
+                                    </execution>
+                                    <execution>
+                                        <id>post-integration-test-cleanup</id>
+                                        <phase>post-integration-test</phase>
+                                        <goals>
+                                            <goal>verify</goal>
+                                        </goals>
+                                    </execution>
+                                </executions>
+                            </plugin>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-site-plugin</artifactId>
+                                <version>3.12.1</version>
+                                <executions>
+                                    <execution>
+                                        <id>pre-site-setup</id>
+                                        <phase>pre-site</phase>
+                                        <goals>
+                                            <goal>site</goal>
+                                        </goals>
+                                    </execution>
+                                    <execution>
+                                        <id>post-site-cleanup</id>
+                                        <phase>post-site</phase>
+                                        <goals>
+                                            <goal>deploy</goal>
+                                        </goals>
+                                    </execution>
+                                </executions>
+                            </plugin>
+                        </plugins>
+                        <pluginManagement>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-compiler-plugin</artifactId>
+                                    <version>3.11.0</version>
+                                    <executions>
+                                        <execution>
+                                            <id>pre-clean-compile</id>
+                                            <phase>pre-clean</phase>
+                                            <goals>
+                                                <goal>compile</goal>
+                                            </goals>
+                                        </execution>
+                                    </executions>
+                                </plugin>
+                            </plugins>
+                        </pluginManagement>
+                    </build>
+                    <profiles>
+                        <profile>
+                            <id>test-profile</id>
+                            <build>
+                                <plugins>
+                                    <plugin>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-antrun-plugin</artifactId>
+                                        <version>3.1.0</version>
+                                        <executions>
+                                            <execution>
+                                                <id>profile-pre-integration-test</id>
+                                                <phase>pre-integration-test</phase>
+                                                <goals>
+                                                    <goal>run</goal>
+                                                </goals>
+                                            </execution>
+                                        </executions>
+                                    </plugin>
+                                </plugins>
+                            </build>
+                        </profile>
+                    </profiles>
+                </project>
+                """;
+
+            return saxBuilder.build(new StringReader(pomXml));
+        }
+
+        private void verifyCleanPluginPhases(Document document) {
+            Element root = document.getRootElement();
+            Namespace namespace = root.getNamespace();
+            Element build = root.getChild("build", namespace);
+            Element plugins = build.getChild("plugins", namespace);
+
+            Element cleanPlugin = plugins.getChildren("plugin", namespace).stream()
+                    .filter(p -> "maven-clean-plugin"
+                            .equals(p.getChild("artifactId", namespace).getText()))
+                    .findFirst()
+                    .orElse(null);
+            assertNotNull(cleanPlugin);
+
+            Element cleanExecutions = cleanPlugin.getChild("executions", namespace);
+            Element preCleanExecution = cleanExecutions.getChildren("execution", namespace).stream()
+                    .filter(e ->
+                            "pre-clean-test".equals(e.getChild("id", namespace).getText()))
+                    .findFirst()
+                    .orElse(null);
+            assertNotNull(preCleanExecution);
+            assertEquals(
+                    "before:clean",
+                    preCleanExecution.getChild("phase", namespace).getText());
+
+            Element postCleanExecution = cleanExecutions.getChildren("execution", namespace).stream()
+                    .filter(e ->
+                            "post-clean-test".equals(e.getChild("id", namespace).getText()))
+                    .findFirst()
+                    .orElse(null);
+            assertNotNull(postCleanExecution);
+            assertEquals(
+                    "after:clean",
+                    postCleanExecution.getChild("phase", namespace).getText());
+        }
+
+        private void verifyFailsafePluginPhases(Document document) {
+            Element root = document.getRootElement();
+            Namespace namespace = root.getNamespace();
+            Element build = root.getChild("build", namespace);
+            Element plugins = build.getChild("plugins", namespace);
+
+            Element failsafePlugin = plugins.getChildren("plugin", namespace).stream()
+                    .filter(p -> "maven-failsafe-plugin"
+                            .equals(p.getChild("artifactId", namespace).getText()))
+                    .findFirst()
+                    .orElse(null);
+            assertNotNull(failsafePlugin);
+
+            Element failsafeExecutions = failsafePlugin.getChild("executions", namespace);
+            Element preIntegrationExecution = failsafeExecutions.getChildren("execution", namespace).stream()
+                    .filter(e -> "pre-integration-test-setup"
+                            .equals(e.getChild("id", namespace).getText()))
+                    .findFirst()
+                    .orElse(null);
+            assertNotNull(preIntegrationExecution);
+            assertEquals(
+                    "before:integration-test",
+                    preIntegrationExecution.getChild("phase", namespace).getText());
+
+            Element postIntegrationExecution = failsafeExecutions.getChildren("execution", namespace).stream()
+                    .filter(e -> "post-integration-test-cleanup"
+                            .equals(e.getChild("id", namespace).getText()))
+                    .findFirst()
+                    .orElse(null);
+            assertNotNull(postIntegrationExecution);
+            assertEquals(
+                    "after:integration-test",
+                    postIntegrationExecution.getChild("phase", namespace).getText());
+        }
+
+        private void verifySitePluginPhases(Document document) {
+            Element root = document.getRootElement();
+            Namespace namespace = root.getNamespace();
+            Element build = root.getChild("build", namespace);
+            Element plugins = build.getChild("plugins", namespace);
+
+            Element sitePlugin = plugins.getChildren("plugin", namespace).stream()
+                    .filter(p -> "maven-site-plugin"
+                            .equals(p.getChild("artifactId", namespace).getText()))
+                    .findFirst()
+                    .orElse(null);
+            assertNotNull(sitePlugin);
+
+            Element siteExecutions = sitePlugin.getChild("executions", namespace);
+            Element preSiteExecution = siteExecutions.getChildren("execution", namespace).stream()
+                    .filter(e ->
+                            "pre-site-setup".equals(e.getChild("id", namespace).getText()))
+                    .findFirst()
+                    .orElse(null);
+            assertNotNull(preSiteExecution);
+            assertEquals(
+                    "before:site", preSiteExecution.getChild("phase", namespace).getText());
+
+            Element postSiteExecution = siteExecutions.getChildren("execution", namespace).stream()
+                    .filter(e -> "post-site-cleanup"
+                            .equals(e.getChild("id", namespace).getText()))
+                    .findFirst()
+                    .orElse(null);
+            assertNotNull(postSiteExecution);
+            assertEquals(
+                    "after:site", postSiteExecution.getChild("phase", namespace).getText());
+        }
+
+        private void verifyPluginManagementPhases(Document document) {
+            Element root = document.getRootElement();
+            Namespace namespace = root.getNamespace();
+            Element build = root.getChild("build", namespace);
+            Element pluginManagement = build.getChild("pluginManagement", namespace);
+            Element managedPlugins = pluginManagement.getChild("plugins", namespace);
+            Element compilerPlugin = managedPlugins.getChildren("plugin", namespace).stream()
+                    .filter(p -> "maven-compiler-plugin"
+                            .equals(p.getChild("artifactId", namespace).getText()))
+                    .findFirst()
+                    .orElse(null);
+            assertNotNull(compilerPlugin);
+
+            Element compilerExecutions = compilerPlugin.getChild("executions", namespace);
+            Element preCleanCompileExecution = compilerExecutions.getChildren("execution", namespace).stream()
+                    .filter(e -> "pre-clean-compile"
+                            .equals(e.getChild("id", namespace).getText()))
+                    .findFirst()
+                    .orElse(null);
+            assertNotNull(preCleanCompileExecution);
+            assertEquals(
+                    "before:clean",
+                    preCleanCompileExecution.getChild("phase", namespace).getText());
+        }
+
+        private void verifyProfilePhases(Document document) {
+            Element root = document.getRootElement();
+            Namespace namespace = root.getNamespace();
+            Element profiles = root.getChild("profiles", namespace);
+            Element profile = profiles.getChild("profile", namespace);
+            Element profileBuild = profile.getChild("build", namespace);
+            Element profilePlugins = profileBuild.getChild("plugins", namespace);
+            Element antrunPlugin = profilePlugins.getChildren("plugin", namespace).stream()
+                    .filter(p -> "maven-antrun-plugin"
+                            .equals(p.getChild("artifactId", namespace).getText()))
+                    .findFirst()
+                    .orElse(null);
+            assertNotNull(antrunPlugin);
+
+            Element antrunExecutions = antrunPlugin.getChild("executions", namespace);
+            Element profilePreIntegrationExecution = antrunExecutions.getChildren("execution", namespace).stream()
+                    .filter(e -> "profile-pre-integration-test"
+                            .equals(e.getChild("id", namespace).getText()))
+                    .findFirst()
+                    .orElse(null);
+            assertNotNull(profilePreIntegrationExecution);
+            assertEquals(
+                    "before:integration-test",
+                    profilePreIntegrationExecution.getChild("phase", namespace).getText());
+        }
+
+        @Test
+        @DisplayName("should not upgrade phases when upgrading to 4.0.0")
+        void shouldNotUpgradePhasesWhenUpgradingTo400() throws Exception {
+            String pomXml =
+                    """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>com.example</groupId>
+                    <artifactId>test-project</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-clean-plugin</artifactId>
+                                <version>3.2.0</version>
+                                <executions>
+                                    <execution>
+                                        <id>pre-clean-test</id>
+                                        <phase>pre-clean</phase>
+                                        <goals>
+                                            <goal>clean</goal>
+                                        </goals>
+                                    </execution>
+                                </executions>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = saxBuilder.build(new StringReader(pomXml));
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            // Create context with --model-version=4.0.0 option (no phase upgrade)
+            UpgradeOptions options = mock(UpgradeOptions.class);
+            when(options.modelVersion()).thenReturn(Optional.of("4.0.0"));
+            when(options.all()).thenReturn(Optional.empty());
+            UpgradeContext context = createMockContext(options);
+
+            UpgradeResult result = strategy.apply(context, pomMap);
+
+            assertTrue(result.success(), "Model upgrade should succeed");
+
+            // Verify phases were NOT upgraded (should remain as pre-clean)
+            Element root = document.getRootElement();
+            Namespace namespace = root.getNamespace();
+            Element build = root.getChild("build", namespace);
+            Element plugins = build.getChild("plugins", namespace);
+            Element cleanPlugin = plugins.getChild("plugin", namespace);
+            Element executions = cleanPlugin.getChild("executions", namespace);
+            Element execution = executions.getChild("execution", namespace);
+            Element phase = execution.getChild("phase", namespace);
+
+            assertEquals("pre-clean", phase.getText(), "Phase should remain as pre-clean for 4.0.0");
+        }
+
+        @Test
+        @DisplayName("should preserve non-deprecated phases")
+        void shouldPreserveNonDeprecatedPhases() throws Exception {
+            String pomXml =
+                    """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>com.example</groupId>
+                    <artifactId>test-project</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-compiler-plugin</artifactId>
+                                <version>3.11.0</version>
+                                <executions>
+                                    <execution>
+                                        <id>compile-test</id>
+                                        <phase>compile</phase>
+                                        <goals>
+                                            <goal>compile</goal>
+                                        </goals>
+                                    </execution>
+                                    <execution>
+                                        <id>test-compile-test</id>
+                                        <phase>test-compile</phase>
+                                        <goals>
+                                            <goal>testCompile</goal>
+                                        </goals>
+                                    </execution>
+                                    <execution>
+                                        <id>package-test</id>
+                                        <phase>package</phase>
+                                        <goals>
+                                            <goal>compile</goal>
+                                        </goals>
+                                    </execution>
+                                </executions>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = saxBuilder.build(new StringReader(pomXml));
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            // Create context with --model-version=4.1.0 option
+            UpgradeOptions options = mock(UpgradeOptions.class);
+            when(options.modelVersion()).thenReturn(Optional.of("4.1.0"));
+            when(options.all()).thenReturn(Optional.empty());
+            UpgradeContext context = createMockContext(options);
+
+            UpgradeResult result = strategy.apply(context, pomMap);
+
+            assertTrue(result.success(), "Model upgrade should succeed");
+
+            // Verify non-deprecated phases were preserved
+            Element root = document.getRootElement();
+            Namespace namespace = root.getNamespace();
+            Element build = root.getChild("build", namespace);
+            Element plugins = build.getChild("plugins", namespace);
+            Element compilerPlugin = plugins.getChild("plugin", namespace);
+            Element executions = compilerPlugin.getChild("executions", namespace);
+
+            Element compileExecution = executions.getChildren("execution", namespace).stream()
+                    .filter(e ->
+                            "compile-test".equals(e.getChild("id", namespace).getText()))
+                    .findFirst()
+                    .orElse(null);
+            assertNotNull(compileExecution);
+            assertEquals(
+                    "compile", compileExecution.getChild("phase", namespace).getText());
+
+            Element testCompileExecution = executions.getChildren("execution", namespace).stream()
+                    .filter(e -> "test-compile-test"
+                            .equals(e.getChild("id", namespace).getText()))
+                    .findFirst()
+                    .orElse(null);
+            assertNotNull(testCompileExecution);
+            assertEquals(
+                    "test-compile",
+                    testCompileExecution.getChild("phase", namespace).getText());
+
+            Element packageExecution = executions.getChildren("execution", namespace).stream()
+                    .filter(e ->
+                            "package-test".equals(e.getChild("id", namespace).getText()))
+                    .findFirst()
+                    .orElse(null);
+            assertNotNull(packageExecution);
+            assertEquals(
+                    "package", packageExecution.getChild("phase", namespace).getText());
+        }
+    }
+
+    @Nested
     @DisplayName("Downgrade Handling")
     class DowngradeHandlingTests {
 

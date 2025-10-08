@@ -74,9 +74,11 @@ public final class UpgradeConstants {
         public static final String TEST_OUTPUT_DIRECTORY = "testOutputDirectory";
         public static final String EXTENSIONS = "extensions";
         public static final String EXECUTIONS = "executions";
+        public static final String EXECUTION = "execution";
         public static final String GOALS = "goals";
         public static final String INHERITED = "inherited";
         public static final String CONFIGURATION = "configuration";
+        public static final String PHASE = "phase";
 
         // Module elements
         public static final String MODULES = "modules";
