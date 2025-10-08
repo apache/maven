@@ -591,6 +591,12 @@ public class DefaultModelBuilder implements ModelBuilder {
                     if (newDep != null) {
                         changed = true;
                     }
+                } else if (dep.getGroupId() == null) {
+                    // Handle missing groupId when version is present
+                    newDep = inferDependencyGroupId(model, dep);
+                    if (newDep != null) {
+                        changed = true;
+                    }
                 }
                 newDeps.add(newDep == null ? dep : newDep);
             }
@@ -619,6 +625,22 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
                 depBuilder.groupId(depGroupId).location("groupId", groupIdLocation);
             }
+            return depBuilder.build();
+        }
+
+        private Dependency inferDependencyGroupId(Model model, Dependency dep) {
+            Model depModel = getRawModel(model.getPomFile(), dep.getGroupId(), dep.getArtifactId());
+            if (depModel == null) {
+                return null;
+            }
+            Dependency.Builder depBuilder = Dependency.newBuilder(dep);
+            String depGroupId = depModel.getGroupId();
+            InputLocation groupIdLocation = depModel.getLocation("groupId");
+            if (depGroupId == null && depModel.getParent() != null) {
+                depGroupId = depModel.getParent().getGroupId();
+                groupIdLocation = depModel.getParent().getLocation("groupId");
+            }
+            depBuilder.groupId(depGroupId).location("groupId", groupIdLocation);
             return depBuilder.build();
         }
 
