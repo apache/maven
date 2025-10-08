@@ -535,7 +535,7 @@ public class CommonsCliOptions implements Options {
         }
 
         protected String commandLineSyntax(String command) {
-            return command + " [options] [goals]";
+            return command + " [options] [<goal|phase> ...]";
         }
     }
 }
