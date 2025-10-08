@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.maven.api.Lifecycle;
 import org.apache.maven.api.cli.mvnup.UpgradeOptions;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Priority;
@@ -299,21 +300,22 @@ public class ModelUpgradeStrategy extends AbstractUpgradeStrategy {
 
     /**
      * Creates the mapping of deprecated phase names to their Maven 4 equivalents.
+     * Uses Maven API constants to ensure consistency with the lifecycle definitions.
      */
     private Map<String, String> createPhaseUpgradeMap() {
         Map<String, String> phaseUpgrades = new HashMap<>();
 
         // Clean lifecycle aliases
-        phaseUpgrades.put("pre-clean", "before:clean");
-        phaseUpgrades.put("post-clean", "after:clean");
+        phaseUpgrades.put("pre-clean", Lifecycle.BEFORE + Lifecycle.Phase.CLEAN);
+        phaseUpgrades.put("post-clean", Lifecycle.AFTER + Lifecycle.Phase.CLEAN);
 
         // Default lifecycle aliases
-        phaseUpgrades.put("pre-integration-test", "before:integration-test");
-        phaseUpgrades.put("post-integration-test", "after:integration-test");
+        phaseUpgrades.put("pre-integration-test", Lifecycle.BEFORE + Lifecycle.Phase.INTEGRATION_TEST);
+        phaseUpgrades.put("post-integration-test", Lifecycle.AFTER + Lifecycle.Phase.INTEGRATION_TEST);
 
         // Site lifecycle aliases
-        phaseUpgrades.put("pre-site", "before:site");
-        phaseUpgrades.put("post-site", "after:site");
+        phaseUpgrades.put("pre-site", Lifecycle.BEFORE + Lifecycle.SITE);
+        phaseUpgrades.put("post-site", Lifecycle.AFTER + Lifecycle.SITE);
 
         return phaseUpgrades;
     }
