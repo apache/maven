@@ -598,6 +598,93 @@ public class DefaultModelBuilder implements ModelBuilder {
             return version != null ? interpolator.interpolate(version, properties::get) : null;
         }
 
+        /**
+         * Get enhanced properties that include profile-aware property resolution.
+         * This method activates profiles to ensure that properties defined in profiles
+         * are available for CI-friendly version processing and repository URL interpolation.
+         * It also includes directory-related properties that may be needed during profile activation.
+         */
+        private Map<String, String> getEnhancedProperties(Model model, Path rootDirectory) {
+            Map<String, String> properties = new HashMap<>();
+
+            // Add directory-specific properties first, as they may be needed for profile activation
+            if (model.getProjectDirectory() != null) {
+                String basedir = model.getProjectDirectory().toString();
+                String basedirUri = model.getProjectDirectory().toUri().toString();
+                properties.put("basedir", basedir);
+                properties.put("project.basedir", basedir);
+                properties.put("project.basedir.uri", basedirUri);
+            }
+            try {
+                String root = rootDirectory.toString();
+                String rootUri = rootDirectory.toUri().toString();
+                properties.put("project.rootDirectory", root);
+                properties.put("project.rootDirectory.uri", rootUri);
+            } catch (IllegalStateException e) {
+                // Root directory not available, continue without it
+            }
+
+            // Handle root vs non-root project properties with profile activation
+            if (!Objects.equals(rootDirectory, model.getProjectDirectory())) {
+                Path rootModelPath = modelProcessor.locateExistingPom(rootDirectory);
+                if (rootModelPath != null) {
+                    Model rootModel = derive(Sources.buildSource(rootModelPath)).readFileModel();
+                    properties.putAll(getPropertiesWithProfiles(rootModel, properties));
+                }
+            } else {
+                properties.putAll(getPropertiesWithProfiles(model, properties));
+            }
+
+            return properties;
+        }
+
+        /**
+         * Get properties from a model including properties from activated profiles.
+         * This performs lightweight profile activation to merge profile properties.
+         *
+         * @param model the model to get properties from
+         * @param baseProperties base properties (including directory properties) to include in profile activation context
+         */
+        private Map<String, String> getPropertiesWithProfiles(Model model, Map<String, String> baseProperties) {
+            Map<String, String> properties = new HashMap<>();
+
+            // Start with base properties (including directory properties)
+            properties.putAll(baseProperties);
+
+            // Add model properties
+            properties.putAll(model.getProperties());
+
+            try {
+                // Create a profile activation context for this model with base properties available
+                DefaultProfileActivationContext profileContext = getProfileActivationContext(request, model);
+
+                // Activate profiles and merge their properties
+                List<Profile> activeProfiles = getActiveProfiles(model.getProfiles(), profileContext);
+
+                for (Profile profile : activeProfiles) {
+                    properties.putAll(profile.getProperties());
+                }
+            } catch (Exception e) {
+                // If profile activation fails, log a warning but continue with base properties
+                // This ensures that CI-friendly versions still work even if profile activation has issues
+                logger.warn("Failed to activate profiles for CI-friendly version processing: {}", e.getMessage());
+                logger.debug("Profile activation failure details", e);
+            }
+
+            // User properties override everything
+            properties.putAll(session.getEffectiveProperties());
+
+            return properties;
+        }
+
+        /**
+         * Convenience method for getting properties with profiles without additional base properties.
+         * This is a backward compatibility method that provides an empty base properties map.
+         */
+        private Map<String, String> getPropertiesWithProfiles(Model model) {
+            return getPropertiesWithProfiles(model, new HashMap<>());
+        }
+
         private void buildBuildPom() throws ModelBuilderException {
             // Retrieve and normalize the source path, ensuring it's non-null and in absolute form
             Path top = request.getSource().getPath();
@@ -1394,21 +1481,11 @@ public class DefaultModelBuilder implements ModelBuilder {
                     }
                 }
 
-                // CI friendly version
-                // All expressions are interpolated using user properties and properties
-                // defined on the root project.
-                Map<String, String> properties = new HashMap<>();
-                if (!Objects.equals(rootDirectory, model.getProjectDirectory())) {
-                    Path rootModelPath = modelProcessor.locateExistingPom(rootDirectory);
-                    if (rootModelPath != null) {
-                        Model rootModel =
-                                derive(Sources.buildSource(rootModelPath)).readFileModel();
-                        properties.putAll(rootModel.getProperties());
-                    }
-                } else {
-                    properties.putAll(model.getProperties());
-                }
-                properties.putAll(session.getEffectiveProperties());
+                // Enhanced property resolution with profile activation for CI-friendly versions and repository URLs
+                // This includes directory properties, profile properties, and user properties
+                Map<String, String> properties = getEnhancedProperties(model, rootDirectory);
+
+                // CI friendly version processing with profile-aware properties
                 model = model.with()
                         .version(replaceCiFriendlyVersion(properties, model.getVersion()))
                         .parent(
@@ -1419,22 +1496,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                                                         model.getParent().getVersion()))
                                         : null)
                         .build();
-                // Interpolate repository URLs
-                if (model.getProjectDirectory() != null) {
-                    String basedir = model.getProjectDirectory().toString();
-                    String basedirUri = model.getProjectDirectory().toUri().toString();
-                    properties.put("basedir", basedir);
-                    properties.put("project.basedir", basedir);
-                    properties.put("project.basedir.uri", basedirUri);
-                }
-                try {
-                    String root = request.getSession().getRootDirectory().toString();
-                    String rootUri =
-                            request.getSession().getRootDirectory().toUri().toString();
-                    properties.put("project.rootDirectory", root);
-                    properties.put("project.rootDirectory.uri", rootUri);
-                } catch (IllegalStateException e) {
-                }
+
+                // Repository URL interpolation with the same profile-aware properties
                 UnaryOperator<String> callback = properties::get;
                 model = model.with()
                         .repositories(interpolateRepository(model.getRepositories(), callback))
