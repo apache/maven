@@ -122,6 +122,94 @@ class DefaultModelBuilderTest {
         assertEquals("central", repositories.get(3).getId()); // default
     }
 
+    @Test
+    public void testCiFriendlyVersionWithProfiles() {
+        // Test case 1: Default profile should set revision to baseVersion+dev
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("ci-friendly-profiles")))
+                .build();
+        ModelBuilderResult result = builder.newSession().build(request);
+        assertNotNull(result);
+        assertEquals("0.2.0+dev", result.getEffectiveModel().getVersion());
+
+        // Test case 2: Release profile should set revision to baseVersion only
+        request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("ci-friendly-profiles")))
+                .activeProfileIds(List.of("releaseBuild"))
+                .build();
+        result = builder.newSession().build(request);
+        assertNotNull(result);
+        assertEquals("0.2.0", result.getEffectiveModel().getVersion());
+    }
+
+    @Test
+    public void testRepositoryUrlInterpolationWithProfiles() {
+        // Test case 1: Default properties should be used
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("repository-url-profiles")))
+                .build();
+        ModelBuilderResult result = builder.newSession().build(request);
+        assertNotNull(result);
+        assertEquals(
+                "http://default.repo.com/repository/maven-public/",
+                result.getEffectiveModel().getRepositories().get(0).getUrl());
+
+        // Test case 2: Development profile should override repository URL
+        request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("repository-url-profiles")))
+                .activeProfileIds(List.of("development"))
+                .build();
+        result = builder.newSession().build(request);
+        assertNotNull(result);
+        assertEquals(
+                "http://dev.repo.com/repository/maven-public/",
+                result.getEffectiveModel().getRepositories().get(0).getUrl());
+
+        // Test case 3: Production profile should override repository URL
+        request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("repository-url-profiles")))
+                .activeProfileIds(List.of("production"))
+                .build();
+        result = builder.newSession().build(request);
+        assertNotNull(result);
+        assertEquals(
+                "http://prod.repo.com/repository/maven-public/",
+                result.getEffectiveModel().getRepositories().get(0).getUrl());
+    }
+
+    @Test
+    public void testDirectoryPropertiesInProfilesAndRepositories() {
+        // Test that directory properties (like ${project.basedir}) are available
+        // during profile activation and repository URL interpolation
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("directory-properties-profiles")))
+                .activeProfileIds(List.of("local-repo"))
+                .build();
+        ModelBuilderResult result = builder.newSession().build(request);
+        assertNotNull(result);
+
+        // Verify CI-friendly version was resolved with profile properties
+        assertEquals("1.0.0-LOCAL", result.getEffectiveModel().getVersion());
+
+        // Verify repository URL was interpolated with directory properties from profile
+        String expectedUrl =
+                "file://" + getPom("directory-properties-profiles").getParent().toString() + "/local-repo";
+        assertEquals(
+                expectedUrl, result.getEffectiveModel().getRepositories().get(0).getUrl());
+    }
+
     private Path getPom(String name) {
         return Paths.get("src/test/resources/poms/factory/" + name + ".xml").toAbsolutePath();
     }
