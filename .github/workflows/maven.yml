@@ -32,7 +32,7 @@ concurrency:
 permissions: {}
 
 env:
-  MIMIR_VERSION: 0.9.3
+  MIMIR_VERSION: 0.9.4
   MIMIR_BASEDIR: ~/.mimir
   MIMIR_LOCAL: ~/.mimir/local
 
@@ -64,7 +64,7 @@ jobs:
         id: restore-cache
         with:
           path: ${{ env.MIMIR_LOCAL }}
-          key: mimir-${{ runner.os }}-initial
+          key: mvn40-${{ runner.os }}-initial
 
       - name: Set up Maven
         shell: bash
@@ -146,10 +146,10 @@ jobs:
         id: restore-cache
         with:
           path: ${{ env.MIMIR_LOCAL }}
-          key: mimir-full-${{ matrix.os }}-${{ matrix.java }}
+          key: mvn40-full-${{ matrix.os }}-${{ matrix.java }}
           restore-keys: |
-            mimir-full-${{ matrix.os }}-
-            mimir-full-
+            mvn40-full-${{ matrix.os }}-
+            mvn40-full-
 
       - name: Download Maven distribution
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v4
@@ -178,10 +178,6 @@ jobs:
           echo "MAVEN_HOME=$PWD/maven-local" >> $GITHUB_ENV
           echo "$PWD/maven-local/bin" >> $GITHUB_PATH
 
-      - name: Show IP
-        shell: bash
-        run: curl --silent https://api.ipify.org
-
       - name: Build with downloaded Maven
         shell: bash
         run: mvn verify -Papache-release -Dgpg.skip=true -e -B -V
@@ -199,7 +195,7 @@ jobs:
 
       - name: Upload test artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        if: failure()
+        if: failure() || cancelled()
         with:
           name: ${{ github.run_number }}-full-build-artifact-${{ runner.os }}-${{ matrix.java }}
           path: '**/target/surefire-reports/*'
@@ -238,10 +234,10 @@ jobs:
         id: restore-cache
         with:
           path: ${{ env.MIMIR_LOCAL }}
-          key: mimir-its-${{ matrix.os }}-${{ matrix.java }}
+          key: mvn40-its-${{ matrix.os }}-${{ matrix.java }}
           restore-keys: |
-            mimir-its-${{ matrix.os }}-
-            mimir-its-
+            mvn40-its-${{ matrix.os }}-
+            mvn40-its-
 
       - name: Download Maven distribution
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v4
@@ -270,10 +266,6 @@ jobs:
           echo "MAVEN_HOME=$PWD/maven-local" >> $GITHUB_ENV
           echo "$PWD/maven-local/bin" >> $GITHUB_PATH
 
-      - name: Show IP
-        shell: bash
-        run: curl --silent https://api.ipify.org
-
       - name: Build Maven and ITs and run them
         shell: bash
         run: mvn install -e -B -V -Prun-its,mimir
@@ -287,7 +279,7 @@ jobs:
 
       - name: Upload test artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        if: failure()
+        if: failure() || cancelled()
         with:
           name: ${{ github.run_number }}-integration-test-artifact-${{ runner.os }}-${{ matrix.java }}
           path: ./its/core-it-suite/target/test-classes/
