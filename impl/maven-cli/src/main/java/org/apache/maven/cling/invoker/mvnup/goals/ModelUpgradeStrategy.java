@@ -19,6 +19,7 @@
 package org.apache.maven.cling.invoker.mvnup.goals;
 
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -44,8 +45,15 @@ import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.Namesp
 import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlAttributes.SCHEMA_LOCATION;
 import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlAttributes.XSI_NAMESPACE_PREFIX;
 import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlAttributes.XSI_NAMESPACE_URI;
+import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.BUILD;
+import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.EXECUTION;
+import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.EXECUTIONS;
 import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.MODULE;
 import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.MODULES;
+import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.PHASE;
+import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.PLUGIN;
+import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.PLUGINS;
+import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.PLUGIN_MANAGEMENT;
 import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.PROFILE;
 import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.PROFILES;
 import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.SUBPROJECT;
@@ -143,6 +151,7 @@ public class ModelUpgradeStrategy extends AbstractUpgradeStrategy {
         // Convert modules to subprojects (for 4.1.0 and higher)
         if (ModelVersionUtils.isVersionGreaterOrEqual(targetModelVersion, MODEL_VERSION_4_1_0)) {
             convertModulesToSubprojects(pomDocument, context);
+            upgradeDeprecatedPhases(pomDocument, context);
         }
 
         // Update modelVersion to target version (perhaps removed later during inference step)
@@ -255,5 +264,116 @@ public class ModelUpgradeStrategy extends AbstractUpgradeStrategy {
         } else {
             return MAVEN_4_0_0_NAMESPACE;
         }
+    }
+
+    /**
+     * Upgrades deprecated Maven 3 phase names to Maven 4 equivalents.
+     * This replaces pre-/post- phases with before:/after: phases.
+     */
+    private void upgradeDeprecatedPhases(Document pomDocument, UpgradeContext context) {
+        // Create mapping of deprecated phases to their Maven 4 equivalents
+        Map<String, String> phaseUpgrades = createPhaseUpgradeMap();
+
+        Element root = pomDocument.getRootElement();
+        Namespace namespace = root.getNamespace();
+
+        int totalUpgrades = 0;
+
+        // Upgrade phases in main build section
+        totalUpgrades += upgradePhaseElements(root.getChild(BUILD, namespace), namespace, phaseUpgrades, context);
+
+        // Upgrade phases in profiles
+        Element profilesElement = root.getChild(PROFILES, namespace);
+        if (profilesElement != null) {
+            List<Element> profileElements = profilesElement.getChildren(PROFILE, namespace);
+            for (Element profileElement : profileElements) {
+                Element profileBuildElement = profileElement.getChild(BUILD, namespace);
+                totalUpgrades += upgradePhaseElements(profileBuildElement, namespace, phaseUpgrades, context);
+            }
+        }
+
+        if (totalUpgrades > 0) {
+            context.detail("Upgraded " + totalUpgrades + " deprecated phase name(s) to Maven 4 equivalents");
+        }
+    }
+
+    /**
+     * Creates the mapping of deprecated phase names to their Maven 4 equivalents.
+     */
+    private Map<String, String> createPhaseUpgradeMap() {
+        Map<String, String> phaseUpgrades = new HashMap<>();
+
+        // Clean lifecycle aliases
+        phaseUpgrades.put("pre-clean", "before:clean");
+        phaseUpgrades.put("post-clean", "after:clean");
+
+        // Default lifecycle aliases
+        phaseUpgrades.put("pre-integration-test", "before:integration-test");
+        phaseUpgrades.put("post-integration-test", "after:integration-test");
+
+        // Site lifecycle aliases
+        phaseUpgrades.put("pre-site", "before:site");
+        phaseUpgrades.put("post-site", "after:site");
+
+        return phaseUpgrades;
+    }
+
+    /**
+     * Upgrades phase elements within a build section.
+     */
+    private int upgradePhaseElements(
+            Element buildElement, Namespace namespace, Map<String, String> phaseUpgrades, UpgradeContext context) {
+        if (buildElement == null) {
+            return 0;
+        }
+
+        int upgrades = 0;
+
+        // Check plugins section
+        Element pluginsElement = buildElement.getChild(PLUGINS, namespace);
+        if (pluginsElement != null) {
+            upgrades += upgradePhaseElementsInPlugins(pluginsElement, namespace, phaseUpgrades, context);
+        }
+
+        // Check pluginManagement section
+        Element pluginManagementElement = buildElement.getChild(PLUGIN_MANAGEMENT, namespace);
+        if (pluginManagementElement != null) {
+            Element managedPluginsElement = pluginManagementElement.getChild(PLUGINS, namespace);
+            if (managedPluginsElement != null) {
+                upgrades += upgradePhaseElementsInPlugins(managedPluginsElement, namespace, phaseUpgrades, context);
+            }
+        }
+
+        return upgrades;
+    }
+
+    /**
+     * Upgrades phase elements within a plugins section.
+     */
+    private int upgradePhaseElementsInPlugins(
+            Element pluginsElement, Namespace namespace, Map<String, String> phaseUpgrades, UpgradeContext context) {
+        int upgrades = 0;
+
+        List<Element> pluginElements = pluginsElement.getChildren(PLUGIN, namespace);
+        for (Element pluginElement : pluginElements) {
+            Element executionsElement = pluginElement.getChild(EXECUTIONS, namespace);
+            if (executionsElement != null) {
+                List<Element> executionElements = executionsElement.getChildren(EXECUTION, namespace);
+                for (Element executionElement : executionElements) {
+                    Element phaseElement = executionElement.getChild(PHASE, namespace);
+                    if (phaseElement != null) {
+                        String currentPhase = phaseElement.getTextTrim();
+                        String newPhase = phaseUpgrades.get(currentPhase);
+                        if (newPhase != null) {
+                            phaseElement.setText(newPhase);
+                            context.detail("Upgraded phase: " + currentPhase + " → " + newPhase);
+                            upgrades++;
+                        }
+                    }
+                }
+            }
+        }
+
+        return upgrades;
     }
 }
