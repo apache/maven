@@ -180,7 +180,7 @@ jobs:
 
       - name: Build with downloaded Maven
         shell: bash
-        run: mvn verify -Papache-release -Dgpg.skip=true -e -B -V
+        run: MAVEN_OPTS=-Xmx8192M mvn verify -Papache-release -Dgpg.skip=true -e -B -V
 
       - name: Build site with downloaded Maven
         shell: bash
