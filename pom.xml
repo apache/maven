@@ -142,7 +142,7 @@ under the License.
     <maven.site.path>ref/4-LATEST</maven.site.path>
     <project.build.outputTimestamp>2025-06-24T20:18:00Z</project.build.outputTimestamp>
     <!-- various versions -->
-    <asmVersion>9.8</asmVersion>
+    <asmVersion>9.9</asmVersion>
     <byteBuddyVersion>1.17.7</byteBuddyVersion>
     <classWorldsVersion>2.9.0</classWorldsVersion>
     <commonsCliVersion>1.10.0</commonsCliVersion>
@@ -156,7 +156,7 @@ under the License.
     <jmhVersion>1.37</jmhVersion>
     <junitVersion>5.13.4</junitVersion>
     <jxpathVersion>1.4.0</jxpathVersion>
-    <logbackClassicVersion>1.5.18</logbackClassicVersion>
+    <logbackClassicVersion>1.5.19</logbackClassicVersion>
     <mockitoVersion>5.20.0</mockitoVersion>
     <plexusInteractivityVersion>1.4</plexusInteractivityVersion>
     <plexusInterpolationVersion>1.28</plexusInterpolationVersion>
@@ -1022,7 +1022,7 @@ under the License.
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
-            <version>3.5.1</version>
+            <version>3.6.1</version>
             <inherited>false</inherited>
             <dependencies>
               <dependency>

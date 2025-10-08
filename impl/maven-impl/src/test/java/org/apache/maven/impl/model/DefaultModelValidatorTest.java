@@ -365,7 +365,7 @@ class DefaultModelValidatorTest {
     @Test
     void testMissingRepositoryId() throws Exception {
         SimpleProblemCollector result =
-                validateFile("missing-repository-id-pom.xml", ModelValidator.VALIDATION_LEVEL_STRICT);
+                validateRaw("missing-repository-id-pom.xml", ModelValidator.VALIDATION_LEVEL_STRICT);
 
         assertViolations(result, 0, 4, 0);
 
@@ -888,16 +888,23 @@ class DefaultModelValidatorTest {
     @Test
     void repositoryWithExpression() throws Exception {
         SimpleProblemCollector result = validateFile("raw-model/repository-with-expression.xml");
-        assertViolations(result, 0, 1, 0);
-        assertEquals(
-                "'repositories.repository.[repo].url' contains an unsupported expression (only expressions starting with 'project.basedir' or 'project.rootDirectory' are supported).",
-                result.getErrors().get(0));
+        // Interpolation in repository URLs is allowed; unresolved placeholders will fail later during resolution
+        assertViolations(result, 0, 0, 0);
     }
 
     @Test
     void repositoryWithBasedirExpression() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/repository-with-basedir-expression.xml");
-        assertViolations(result, 0, 0, 0);
+        // This test runs on raw model without interpolation, so all expressions appear uninterpolated
+        // In the real flow, supported expressions would be interpolated before validation
+        assertViolations(result, 0, 3, 0);
+    }
+
+    @Test
+    void repositoryWithUnsupportedExpression() throws Exception {
+        SimpleProblemCollector result = validateRaw("raw-model/repository-with-unsupported-expression.xml");
+        // Unsupported expressions should cause validation errors
+        assertViolations(result, 0, 1, 0);
     }
 
     @Test
