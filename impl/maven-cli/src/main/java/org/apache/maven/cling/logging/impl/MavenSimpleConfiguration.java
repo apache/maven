@@ -39,14 +39,14 @@ public class MavenSimpleConfiguration extends BaseSlf4jConfiguration {
                 switch (level) {
                     case DEBUG -> "debug";
                     case INFO -> "info";
-                    default -> "error";
+                    case ERROR -> "error";
                 };
 
         String current = System.setProperty(Constants.MAVEN_LOGGER_DEFAULT_LOG_LEVEL, value);
         if (current != null && !value.equalsIgnoreCase(current)) {
             LOGGER.info(
                     "System property '" + Constants.MAVEN_LOGGER_DEFAULT_LOG_LEVEL + "' is already set to '" + current
-                            + "' - ignoring system property and get log level from -X/-e/-q options, log level will be set to"
+                            + "' - ignoring system property and get log level from -X/-e/-q options, log level will be set to "
                             + value);
         }
     }
