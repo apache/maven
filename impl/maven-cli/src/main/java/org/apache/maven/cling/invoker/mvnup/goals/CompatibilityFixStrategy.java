@@ -33,7 +33,6 @@ import org.apache.maven.api.di.Priority;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
 import org.jdom2.Attribute;
-import org.jdom2.Comment;
 import org.jdom2.Content;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -498,25 +497,12 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
             Element urlElement = repository.getChild("url", namespace);
             if (urlElement != null) {
                 String url = urlElement.getTextTrim();
-                if (url.contains("${")
-                        && !url.contains("${project.basedir}")
-                        && !url.contains("${project.rootDirectory}")) {
+                if (url.contains("${")) {
+                    // Allow repository URL interpolation; do not disable.
+                    // Keep a gentle warning to help users notice unresolved placeholders at build time.
                     String repositoryId = getChildText(repository, "id", namespace);
-                    context.warning("Found unsupported expression in " + elementType + " URL (id: " + repositoryId
+                    context.info("Detected interpolated expression in " + elementType + " URL (id: " + repositoryId
                             + "): " + url);
-                    context.warning(
-                            "Maven 4 only supports ${project.basedir} and ${project.rootDirectory} expressions in repository URLs");
-
-                    // Comment out the problematic repository
-                    Comment comment =
-                            new Comment(" Repository disabled due to unsupported expression in URL: " + url + " ");
-                    Element parent = repository.getParentElement();
-                    parent.addContent(parent.indexOf(repository), comment);
-                    removeElementWithFormatting(repository);
-
-                    context.detail("Fixed: " + "Commented out " + elementType + " with unsupported URL expression (id: "
-                            + repositoryId + ")");
-                    fixed = true;
                 }
             }
         }

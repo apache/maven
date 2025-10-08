@@ -494,15 +494,6 @@ public class DefaultModelValidator implements ModelValidator {
                         validationLevel);
             }
 
-            validateRawRepositories(problems, m.getRepositories(), "repositories.repository.", EMPTY, validationLevel);
-
-            validateRawRepositories(
-                    problems,
-                    m.getPluginRepositories(),
-                    "pluginRepositories.pluginRepository.",
-                    EMPTY,
-                    validationLevel);
-
             Build build = m.getBuild();
             if (build != null) {
                 validate20RawPlugins(problems, build.getPlugins(), "build.plugins.plugin.", EMPTY, validationLevel);
@@ -555,16 +546,6 @@ public class DefaultModelValidator implements ModelValidator {
                             isModelVersion41OrMore,
                             validationLevel);
                 }
-
-                validateRawRepositories(
-                        problems, profile.getRepositories(), prefix, "repositories.repository.", validationLevel);
-
-                validateRawRepositories(
-                        problems,
-                        profile.getPluginRepositories(),
-                        prefix,
-                        "pluginRepositories.pluginRepository.",
-                        validationLevel);
 
                 BuildBase buildBase = profile.getBuild();
                 if (buildBase != null) {
@@ -633,6 +614,43 @@ public class DefaultModelValidator implements ModelValidator {
                         null,
                         "is either LATEST or RELEASE (both of them are being deprecated)",
                         parent);
+            }
+        }
+
+        if (validationLevel > VALIDATION_LEVEL_MINIMAL) {
+            validateRawRepositories(problems, m.getRepositories(), "repositories.repository.", EMPTY, validationLevel);
+
+            validateRawRepositories(
+                    problems,
+                    m.getPluginRepositories(),
+                    "pluginRepositories.pluginRepository.",
+                    EMPTY,
+                    validationLevel);
+
+            for (Profile profile : m.getProfiles()) {
+                String prefix = "profiles.profile[" + profile.getId() + "].";
+
+                validateRawRepositories(
+                        problems, profile.getRepositories(), prefix, "repositories.repository.", validationLevel);
+
+                validateRawRepositories(
+                        problems,
+                        profile.getPluginRepositories(),
+                        prefix,
+                        "pluginRepositories.pluginRepository.",
+                        validationLevel);
+            }
+
+            DistributionManagement distMgmt = m.getDistributionManagement();
+            if (distMgmt != null) {
+                validateRawRepository(
+                        problems, distMgmt.getRepository(), "distributionManagement.repository.", "", true);
+                validateRawRepository(
+                        problems,
+                        distMgmt.getSnapshotRepository(),
+                        "distributionManagement.snapshotRepository.",
+                        "",
+                        true);
             }
         }
     }
@@ -1444,40 +1462,7 @@ public class DefaultModelValidator implements ModelValidator {
         Map<String, Repository> index = new HashMap<>();
 
         for (Repository repository : repositories) {
-            validateStringNotEmpty(
-                    prefix, prefix2, "id", problems, Severity.ERROR, Version.V20, repository.getId(), null, repository);
-
-            if (validateStringNotEmpty(
-                    prefix,
-                    prefix2,
-                    "[" + repository.getId() + "].url",
-                    problems,
-                    Severity.ERROR,
-                    Version.V20,
-                    repository.getUrl(),
-                    null,
-                    repository)) {
-                // only allow ${basedir} and ${project.basedir}
-                Matcher m = EXPRESSION_NAME_PATTERN.matcher(repository.getUrl());
-                while (m.find()) {
-                    String expr = m.group(1);
-                    if (!("basedir".equals(expr)
-                            || "project.basedir".equals(expr)
-                            || expr.startsWith("project.basedir.")
-                            || "project.rootDirectory".equals(expr)
-                            || expr.startsWith("project.rootDirectory."))) {
-                        addViolation(
-                                problems,
-                                Severity.ERROR,
-                                Version.V40,
-                                prefix + prefix2 + "[" + repository.getId() + "].url",
-                                null,
-                                "contains an unsupported expression (only expressions starting with 'project.basedir' or 'project.rootDirectory' are supported).",
-                                repository);
-                        break;
-                    }
-                }
-            }
+            validateRawRepository(problems, repository, prefix, prefix2, false);
 
             String key = repository.getId();
 
@@ -1497,6 +1482,44 @@ public class DefaultModelValidator implements ModelValidator {
                         repository);
             } else {
                 index.put(key, repository);
+            }
+        }
+    }
+
+    private void validateRawRepository(
+            ModelProblemCollector problems,
+            Repository repository,
+            String prefix,
+            String prefix2,
+            boolean allowEmptyUrl) {
+        if (repository == null) {
+            return;
+        }
+        validateStringNotEmpty(
+                prefix, prefix2, "id", problems, Severity.ERROR, Version.V20, repository.getId(), null, repository);
+
+        if (!allowEmptyUrl
+                && validateStringNotEmpty(
+                        prefix,
+                        prefix2,
+                        "[" + repository.getId() + "].url",
+                        problems,
+                        Severity.ERROR,
+                        Version.V20,
+                        repository.getUrl(),
+                        null,
+                        repository)) {
+            // Check for uninterpolated expressions - these should have been interpolated by now
+            Matcher matcher = EXPRESSION_NAME_PATTERN.matcher(repository.getUrl());
+            if (matcher.find()) {
+                addViolation(
+                        problems,
+                        Severity.ERROR,
+                        Version.V40,
+                        prefix + prefix2 + "[" + repository.getId() + "].url",
+                        null,
+                        "contains an uninterpolated expression.",
+                        repository);
             }
         }
     }
