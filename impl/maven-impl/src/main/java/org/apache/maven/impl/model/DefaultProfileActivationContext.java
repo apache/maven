@@ -171,6 +171,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
     private Map<String, String> systemProperties = Collections.emptyMap();
     private Map<String, String> userProperties = Collections.emptyMap();
     private Model model;
+    private Map<String, String> cascadingProperties = Collections.emptyMap();
     final Record record;
 
     public DefaultProfileActivationContext(
@@ -328,10 +329,21 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
     @Override
     public String getModelProperty(String key) {
         if (record != null) {
-            return record.usedModelProperties.computeIfAbsent(
-                    key, k -> model.getProperties().get(k));
+            return record.usedModelProperties.computeIfAbsent(key, k -> {
+                // Check cascading properties first, then model properties
+                String value = cascadingProperties.get(k);
+                if (value == null && model.getProperties() != null) {
+                    value = model.getProperties().get(k);
+                }
+                return value;
+            });
         } else {
-            return model.getProperties().get(key);
+            // Check cascading properties first, then model properties
+            String value = cascadingProperties.get(key);
+            if (value == null && model.getProperties() != null) {
+                value = model.getProperties().get(key);
+            }
+            return value;
         }
     }
 
@@ -468,25 +480,20 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     @Override
     public void addProfileProperties(Collection<Profile> activatedProfiles) {
-        // Inject properties from activated profiles into the model
-        // This enables cascading profile activation
-        if (model != null && activatedProfiles != null && !activatedProfiles.isEmpty()) {
-            Map<String, String> modelProperties = new HashMap<>();
-            if (model.getProperties() != null) {
-                modelProperties.putAll(model.getProperties());
-            }
+        // Inject properties from activated profiles into cascading properties
+        // This enables cascading profile activation without modifying the underlying model
+        if (activatedProfiles != null && !activatedProfiles.isEmpty()) {
+            Map<String, String> newCascadingProperties = new HashMap<>(cascadingProperties);
 
             // Add properties from each activated profile
             for (Profile profile : activatedProfiles) {
                 if (profile.getProperties() != null) {
-                    modelProperties.putAll(profile.getProperties());
+                    newCascadingProperties.putAll(profile.getProperties());
                 }
             }
 
-            // Update the model with the new properties if there are changes
-            if (!modelProperties.equals(model.getProperties())) {
-                this.model = model.withProperties(modelProperties);
-            }
+            // Update cascading properties for future profile activation checks
+            this.cascadingProperties = Collections.unmodifiableMap(newCascadingProperties);
         }
     }
 }
