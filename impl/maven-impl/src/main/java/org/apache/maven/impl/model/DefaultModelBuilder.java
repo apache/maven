@@ -266,6 +266,10 @@ public class DefaultModelBuilder implements ModelBuilder {
         List<RemoteRepository> externalRepositories;
         List<RemoteRepository> repositories;
 
+        // Cycle detection chain shared across all derived sessions
+        // Contains both GAV coordinates (groupId:artifactId:version) and file paths
+        final Set<String> parentChain;
+
         ModelBuilderSessionState(ModelBuilderRequest request) {
             this(
                     request.getSession(),
@@ -275,7 +279,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                     new ConcurrentHashMap<>(64),
                     List.of(),
                     repos(request),
-                    repos(request));
+                    repos(request),
+                    new LinkedHashSet<>());
         }
 
         static List<RemoteRepository> repos(ModelBuilderRequest request) {
@@ -294,7 +299,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 Map<GAKey, Set<ModelSource>> mappedSources,
                 List<RemoteRepository> pomRepositories,
                 List<RemoteRepository> externalRepositories,
-                List<RemoteRepository> repositories) {
+                List<RemoteRepository> repositories,
+                Set<String> parentChain) {
             this.session = session;
             this.request = request;
             this.result = result;
@@ -303,6 +309,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             this.pomRepositories = pomRepositories;
             this.externalRepositories = externalRepositories;
             this.repositories = repositories;
+            this.parentChain = parentChain;
             this.result.setSource(this.request.getSource());
         }
 
@@ -325,8 +332,18 @@ public class DefaultModelBuilder implements ModelBuilder {
             if (session != request.getSession()) {
                 throw new IllegalArgumentException("Session mismatch");
             }
+            // Create a new parentChain for each derived session to prevent cycle detection issues
+            // The parentChain now contains both GAV coordinates and file paths
             return new ModelBuilderSessionState(
-                    session, request, result, dag, mappedSources, pomRepositories, externalRepositories, repositories);
+                    session,
+                    request,
+                    result,
+                    dag,
+                    mappedSources,
+                    pomRepositories,
+                    externalRepositories,
+                    repositories,
+                    new LinkedHashSet<>());
         }
 
         @Override
@@ -732,6 +749,13 @@ public class DefaultModelBuilder implements ModelBuilder {
                             mbs.buildEffectiveModel(new LinkedHashSet<>());
                         } catch (ModelBuilderException e) {
                             // gathered with problem collector
+                            // Propagate problems from child session to parent session
+                            for (var problem : e.getResult()
+                                    .getProblemCollector()
+                                    .problems()
+                                    .toList()) {
+                                getProblemCollector().reportProblem(problem);
+                            }
                         } catch (RuntimeException t) {
                             exceptions.add(t);
                         } finally {
@@ -930,22 +954,48 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
 
-        Model readParent(Model childModel, DefaultProfileActivationContext profileActivationContext) {
+        Model readParent(
+                Model childModel,
+                Parent parent,
+                DefaultProfileActivationContext profileActivationContext,
+                Set<String> parentChain) {
             Model parentModel;
 
-            Parent parent = childModel.getParent();
             if (parent != null) {
-                parentModel = resolveParent(childModel, profileActivationContext);
+                // Check for circular parent resolution using model IDs
+                String parentId = parent.getGroupId() + ":" + parent.getArtifactId() + ":" + parent.getVersion();
+                if (!parentChain.add(parentId)) {
+                    StringBuilder message = new StringBuilder("The parents form a cycle: ");
+                    for (String id : parentChain) {
+                        message.append(id).append(" -> ");
+                    }
+                    message.append(parentId);
 
-                if (!"pom".equals(parentModel.getPackaging())) {
-                    add(
-                            Severity.ERROR,
-                            Version.BASE,
-                            "Invalid packaging for parent POM " + ModelProblemUtils.toSourceHint(parentModel)
-                                    + ", must be \"pom\" but is \"" + parentModel.getPackaging() + "\"",
-                            parentModel.getLocation("packaging"));
+                    add(Severity.FATAL, Version.BASE, message.toString());
+                    throw newModelBuilderException();
                 }
-                result.setParentModel(parentModel);
+
+                try {
+                    parentModel = resolveParent(childModel, parent, profileActivationContext, parentChain);
+
+                    if (!"pom".equals(parentModel.getPackaging())) {
+                        add(
+                                Severity.ERROR,
+                                Version.BASE,
+                                "Invalid packaging for parent POM " + ModelProblemUtils.toSourceHint(parentModel)
+                                        + ", must be \"pom\" but is \"" + parentModel.getPackaging() + "\"",
+                                parentModel.getLocation("packaging"));
+                    }
+                    result.setParentModel(parentModel);
+
+                    // Recursively read the parent's parent
+                    if (parentModel.getParent() != null) {
+                        readParent(parentModel, parentModel.getParent(), profileActivationContext, parentChain);
+                    }
+                } finally {
+                    // Remove from chain when done processing this parent
+                    parentChain.remove(parentId);
+                }
             } else {
                 String superModelVersion = childModel.getModelVersion();
                 if (superModelVersion == null || !KNOWN_MODEL_VERSIONS.contains(superModelVersion)) {
@@ -960,23 +1010,29 @@ public class DefaultModelBuilder implements ModelBuilder {
             return parentModel;
         }
 
-        private Model resolveParent(Model childModel, DefaultProfileActivationContext profileActivationContext)
+        private Model resolveParent(
+                Model childModel,
+                Parent parent,
+                DefaultProfileActivationContext profileActivationContext,
+                Set<String> parentChain)
                 throws ModelBuilderException {
             Model parentModel = null;
             if (isBuildRequest()) {
-                parentModel = readParentLocally(childModel, profileActivationContext);
+                parentModel = readParentLocally(childModel, parent, profileActivationContext, parentChain);
             }
             if (parentModel == null) {
-                parentModel = resolveAndReadParentExternally(childModel, profileActivationContext);
+                parentModel = resolveAndReadParentExternally(childModel, parent, profileActivationContext, parentChain);
             }
             return parentModel;
         }
 
-        private Model readParentLocally(Model childModel, DefaultProfileActivationContext profileActivationContext)
+        private Model readParentLocally(
+                Model childModel,
+                Parent parent,
+                DefaultProfileActivationContext profileActivationContext,
+                Set<String> parentChain)
                 throws ModelBuilderException {
             ModelSource candidateSource;
-
-            Parent parent = childModel.getParent();
             String parentPath = parent.getRelativePath();
             if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
                 if (parentPath != null && !parentPath.isEmpty()) {
@@ -1008,56 +1064,77 @@ public class DefaultModelBuilder implements ModelBuilder {
                 return null;
             }
 
-            ModelBuilderSessionState derived = derive(candidateSource);
-            Model candidateModel = derived.readAsParentModel(profileActivationContext);
-            addActivePomProfiles(derived.result.getActivePomProfiles());
+            // Check for circular parent resolution using source locations (file paths)
+            // This must be done BEFORE calling derive() to prevent StackOverflowError
+            String sourceLocation = candidateSource.getLocation();
 
-            String groupId = getGroupId(candidateModel);
-            String artifactId = candidateModel.getArtifactId();
-            String version = getVersion(candidateModel);
+            if (!parentChain.add(sourceLocation)) {
+                StringBuilder message = new StringBuilder("The parents form a cycle: ");
+                for (String location : parentChain) {
+                    message.append(location).append(" -> ");
+                }
+                message.append(sourceLocation);
 
-            // Ensure that relative path and GA match, if both are provided
-            if (groupId == null
-                    || !groupId.equals(parent.getGroupId())
-                    || artifactId == null
-                    || !artifactId.equals(parent.getArtifactId())) {
-                mismatchRelativePathAndGA(childModel, groupId, artifactId);
-                return null;
+                add(Severity.FATAL, Version.BASE, message.toString());
+                throw newModelBuilderException();
             }
 
-            if (version != null && parent.getVersion() != null && !version.equals(parent.getVersion())) {
-                try {
-                    VersionRange parentRange = versionParser.parseVersionRange(parent.getVersion());
-                    if (!parentRange.contains(versionParser.parseVersion(version))) {
-                        // version skew drop back to resolution from the repository
-                        return null;
-                    }
+            try {
+                ModelBuilderSessionState derived = derive(candidateSource);
+                Model candidateModel = derived.readAsParentModel(profileActivationContext, parentChain);
+                addActivePomProfiles(derived.result.getActivePomProfiles());
 
-                    // Validate versions aren't inherited when using parent ranges the same way as when read externally.
-                    String rawChildModelVersion = childModel.getVersion();
+                String groupId = getGroupId(candidateModel);
+                String artifactId = candidateModel.getArtifactId();
+                String version = getVersion(candidateModel);
 
-                    if (rawChildModelVersion == null) {
-                        // Message below is checked for in the MNG-2199 core IT.
-                        add(Severity.FATAL, Version.V31, "Version must be a constant", childModel.getLocation(""));
-
-                    } else {
-                        if (rawChildVersionReferencesParent(rawChildModelVersion)) {
-                            // Message below is checked for in the MNG-2199 core IT.
-                            add(
-                                    Severity.FATAL,
-                                    Version.V31,
-                                    "Version must be a constant",
-                                    childModel.getLocation("version"));
-                        }
-                    }
-
-                    // MNG-2199: What else to check here ?
-                } catch (VersionParserException e) {
-                    // invalid version range, so drop back to resolution from the repository
+                // Ensure that relative path and GA match, if both are provided
+                if (groupId == null
+                        || !groupId.equals(parent.getGroupId())
+                        || artifactId == null
+                        || !artifactId.equals(parent.getArtifactId())) {
+                    mismatchRelativePathAndGA(childModel, groupId, artifactId);
                     return null;
                 }
+
+                if (version != null && parent.getVersion() != null && !version.equals(parent.getVersion())) {
+                    try {
+                        VersionRange parentRange = versionParser.parseVersionRange(parent.getVersion());
+                        if (!parentRange.contains(versionParser.parseVersion(version))) {
+                            // version skew drop back to resolution from the repository
+                            return null;
+                        }
+
+                        // Validate versions aren't inherited when using parent ranges the same way as when read
+                        // externally.
+                        String rawChildModelVersion = childModel.getVersion();
+
+                        if (rawChildModelVersion == null) {
+                            // Message below is checked for in the MNG-2199 core IT.
+                            add(Severity.FATAL, Version.V31, "Version must be a constant", childModel.getLocation(""));
+
+                        } else {
+                            if (rawChildVersionReferencesParent(rawChildModelVersion)) {
+                                // Message below is checked for in the MNG-2199 core IT.
+                                add(
+                                        Severity.FATAL,
+                                        Version.V31,
+                                        "Version must be a constant",
+                                        childModel.getLocation("version"));
+                            }
+                        }
+
+                        // MNG-2199: What else to check here ?
+                    } catch (VersionParserException e) {
+                        // invalid version range, so drop back to resolution from the repository
+                        return null;
+                    }
+                }
+                return candidateModel;
+            } finally {
+                // Remove the source location from the chain when we're done processing this parent
+                parentChain.remove(sourceLocation);
             }
-            return candidateModel;
         }
 
         private void mismatchRelativePathAndGA(Model childModel, String groupId, String artifactId) {
@@ -1092,12 +1169,14 @@ public class DefaultModelBuilder implements ModelBuilder {
             add(Severity.FATAL, Version.BASE, buffer.toString(), parent.getLocation(""));
         }
 
-        Model resolveAndReadParentExternally(Model childModel, DefaultProfileActivationContext profileActivationContext)
+        Model resolveAndReadParentExternally(
+                Model childModel,
+                Parent parent,
+                DefaultProfileActivationContext profileActivationContext,
+                Set<String> parentChain)
                 throws ModelBuilderException {
             ModelBuilderRequest request = this.request;
             setSource(childModel);
-
-            Parent parent = childModel.getParent();
 
             String groupId = parent.getGroupId();
             String artifactId = parent.getArtifactId();
@@ -1151,7 +1230,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     .source(modelSource)
                     .build();
 
-            Model parentModel = derive(lenientRequest).readAsParentModel(profileActivationContext);
+            Model parentModel = derive(lenientRequest).readAsParentModel(profileActivationContext, parentChain);
 
             if (!parent.getVersion().equals(version)) {
                 String rawChildModelVersion = childModel.getVersion();
@@ -1240,7 +1319,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 profileActivationContext.setUserProperties(profileProps);
             }
 
-            Model parentModel = readParent(activatedFileModel, profileActivationContext);
+            Model parentModel = readParent(
+                    activatedFileModel, activatedFileModel.getParent(), profileActivationContext, parentChain);
 
             // Now that we have read the parent, we can set the relative
             // path correctly if it was not set in the input model
@@ -1660,9 +1740,10 @@ public class DefaultModelBuilder implements ModelBuilder {
         private record ParentModelWithProfiles(Model model, List<Profile> activatedProfiles) {}
 
         /**
-         * Reads the request source's parent.
+         * Reads the request source's parent with cycle detection.
          */
-        Model readAsParentModel(DefaultProfileActivationContext profileActivationContext) throws ModelBuilderException {
+        Model readAsParentModel(DefaultProfileActivationContext profileActivationContext, Set<String> parentChain)
+                throws ModelBuilderException {
             Map<DefaultProfileActivationContext.Record, ParentModelWithProfiles> parentsPerContext =
                     cache(request.getSource(), PARENT, ConcurrentHashMap::new);
 
@@ -1689,7 +1770,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             // into the parent recording context to maintain clean cache keys and avoid
             // over-recording during parent model processing.
             DefaultProfileActivationContext ctx = profileActivationContext.start();
-            ParentModelWithProfiles modelWithProfiles = doReadAsParentModel(ctx);
+            ParentModelWithProfiles modelWithProfiles = doReadAsParentModel(ctx, parentChain);
             DefaultProfileActivationContext.Record record = ctx.stop();
             replayRecordIntoContext(record, profileActivationContext);
 
@@ -1699,9 +1780,10 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         private ParentModelWithProfiles doReadAsParentModel(
-                DefaultProfileActivationContext childProfileActivationContext) throws ModelBuilderException {
+                DefaultProfileActivationContext childProfileActivationContext, Set<String> parentChain)
+                throws ModelBuilderException {
             Model raw = readRawModel();
-            Model parentData = readParent(raw, childProfileActivationContext);
+            Model parentData = readParent(raw, raw.getParent(), childProfileActivationContext, parentChain);
             Model parent = new DefaultInheritanceAssembler(new DefaultInheritanceAssembler.InheritanceModelMerger() {
                         @Override
                         protected void mergeModel_Modules(
