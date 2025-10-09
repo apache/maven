@@ -55,7 +55,7 @@ import static java.util.Objects.requireNonNull;
  */
 @Experimental
 @Immutable
-public interface DependencyResolverRequest extends Request<Session> {
+public interface DependencyResolverRequest extends RemoteRepositoryRequest {
 
     enum RequestType {
         COLLECT,
@@ -118,9 +118,6 @@ public interface DependencyResolverRequest extends Request<Session> {
      */
     @Nullable
     Version getTargetVersion();
-
-    @Nullable
-    List<RemoteRepository> getRepositories();
 
     @Nonnull
     static DependencyResolverRequestBuilder builder() {
@@ -479,7 +476,7 @@ public interface DependencyResolverRequest extends Request<Session> {
                 this.pathScope = requireNonNull(pathScope, "pathScope cannot be null");
                 this.pathTypeFilter = (pathTypeFilter != null) ? pathTypeFilter : DEFAULT_FILTER;
                 this.targetVersion = targetVersion;
-                this.repositories = repositories;
+                this.repositories = validate(repositories);
                 if (verbose && requestType != RequestType.COLLECT) {
                     throw new IllegalArgumentException("verbose cannot only be true when collecting dependencies");
                 }

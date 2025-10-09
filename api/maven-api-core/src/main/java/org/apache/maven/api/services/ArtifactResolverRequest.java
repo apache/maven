@@ -40,13 +40,10 @@ import static java.util.Objects.requireNonNull;
  */
 @Experimental
 @Immutable
-public interface ArtifactResolverRequest extends Request<Session> {
+public interface ArtifactResolverRequest extends RemoteRepositoryRequest {
 
     @Nonnull
     Collection<? extends ArtifactCoordinates> getCoordinates();
-
-    @Nullable
-    List<RemoteRepository> getRepositories();
 
     @Nonnull
     static ArtifactResolverRequestBuilder builder() {
@@ -127,7 +124,7 @@ public interface ArtifactResolverRequest extends Request<Session> {
                     @Nonnull List<RemoteRepository> repositories) {
                 super(session, trace);
                 this.coordinates = List.copyOf(requireNonNull(coordinates, "coordinates cannot be null"));
-                this.repositories = repositories;
+                this.repositories = validate(repositories);
             }
 
             @Nonnull

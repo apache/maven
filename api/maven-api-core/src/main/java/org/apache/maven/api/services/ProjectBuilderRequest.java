@@ -43,7 +43,7 @@ import static java.util.Objects.requireNonNull;
  */
 @Experimental
 @Immutable
-public interface ProjectBuilderRequest extends Request<Session> {
+public interface ProjectBuilderRequest extends RemoteRepositoryRequest {
 
     /**
      * Gets the path to the project to build.
@@ -265,7 +265,7 @@ public interface ProjectBuilderRequest extends Request<Session> {
                 this.allowStubModel = allowStubModel;
                 this.recursive = recursive;
                 this.processPlugins = processPlugins;
-                this.repositories = repositories;
+                this.repositories = validate(repositories);
             }
 
             @Nonnull
