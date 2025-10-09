@@ -105,7 +105,8 @@ public interface RepositoryAwareRequest extends Request<Session> {
         if (repositories.size() != set.size()) {
             throw new IllegalArgumentException(
                     "Repository list contains duplicate entries. Each repository must be unique based on its ID and URL. "
-                    + "Found " + repositories.size() + " repositories but only " + set.size() + " unique entries.");
+                            + "Found " + repositories.size() + " repositories but only " + set.size()
+                            + " unique entries.");
         }
         if (repositories.stream().anyMatch(Objects::isNull)) {
             throw new IllegalArgumentException(

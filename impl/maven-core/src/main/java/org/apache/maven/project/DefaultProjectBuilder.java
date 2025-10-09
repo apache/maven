@@ -441,7 +441,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             }
         }
 
-        ProjectBuildingResult build(boolean parent, Artifact artifact, boolean allowStubModel, List<ArtifactRepository> repositories)
+        ProjectBuildingResult build(
+                boolean parent, Artifact artifact, boolean allowStubModel, List<ArtifactRepository> repositories)
                 throws ProjectBuildingException {
             org.eclipse.aether.artifact.Artifact pomArtifact = RepositoryUtils.toArtifact(artifact);
             pomArtifact = ArtifactDescriptorUtils.toPomArtifact(pomArtifact);
@@ -906,7 +907,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     } else {
                         Artifact parentArtifact = project.getParentArtifact();
                         try {
-                            parent = build(true, parentArtifact, false, getEffectiveRepositories(project.getId())).getProject();
+                            parent = build(true, parentArtifact, false, getEffectiveRepositories(project.getId()))
+                                    .getProject();
                         } catch (ProjectBuildingException e) {
                             // MNG-4488 where let invalid parents slide on by
                             if (logger.isDebugEnabled()) {
