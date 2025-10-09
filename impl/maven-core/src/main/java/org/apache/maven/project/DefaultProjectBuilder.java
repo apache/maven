@@ -848,9 +848,14 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     //
                     // At this point the DefaultModelBuildingListener has fired, and it populates the
                     // remote repositories with those found in the pom.xml, along with the existing externally
-                    // defined repositories.
+                    // defined repositories, filtering out duplicates.
                     //
-                    request.getRemoteRepositories().addAll(project.getRemoteArtifactRepositories());
+                    List<ArtifactRepository> repositories = request.getRemoteRepositories();
+                    Set<String> keys =
+                            repositories.stream().map(ArtifactRepository::getId).collect(Collectors.toSet());
+                    project.getRemoteArtifactRepositories().stream()
+                            .filter(r -> !keys.contains(r.getId()))
+                            .forEach(repositories::add);
                     Path parentPomFile = parentModel.getPomFile();
                     if (parentPomFile != null) {
                         project.setParentFile(parentPomFile.toFile());
