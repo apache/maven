@@ -19,7 +19,6 @@
 package org.apache.maven.api.services;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.api.ArtifactCoordinates;
@@ -93,7 +92,6 @@ class RequestImplementationTest {
         DependencyResolverRequest.DependencyResolverRequestBuilder builder = DependencyResolverRequest.builder();
         DependencyResolverRequest request1 = builder.session(session)
                 .requestType(DependencyResolverRequest.RequestType.COLLECT)
-                .repositories(Collections.singletonList(mock(RemoteRepository.class)))
                 .pathScope(PathScope.MAIN_COMPILE)
                 .build();
 
