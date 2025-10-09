@@ -1495,8 +1495,21 @@ public class DefaultModelValidator implements ModelValidator {
         if (repository == null) {
             return;
         }
-        validateStringNotEmpty(
-                prefix, prefix2, "id", problems, Severity.ERROR, Version.V20, repository.getId(), null, repository);
+        if (validateStringNotEmpty(
+                prefix, prefix2, "id", problems, Severity.ERROR, Version.V20, repository.getId(), null, repository)) {
+            // Check for uninterpolated expressions in ID - these should have been interpolated by now
+            Matcher matcher = EXPRESSION_NAME_PATTERN.matcher(repository.getId());
+            if (matcher.find()) {
+                addViolation(
+                        problems,
+                        Severity.ERROR,
+                        Version.V40,
+                        prefix + prefix2 + "[" + repository.getId() + "].id",
+                        null,
+                        "contains an uninterpolated expression.",
+                        repository);
+            }
+        }
 
         if (!allowEmptyUrl
                 && validateStringNotEmpty(
@@ -1509,7 +1522,7 @@ public class DefaultModelValidator implements ModelValidator {
                         repository.getUrl(),
                         null,
                         repository)) {
-            // Check for uninterpolated expressions - these should have been interpolated by now
+            // Check for uninterpolated expressions in URL - these should have been interpolated by now
             Matcher matcher = EXPRESSION_NAME_PATTERN.matcher(repository.getUrl());
             if (matcher.find()) {
                 addViolation(
