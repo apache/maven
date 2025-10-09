@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.1.0">
+  <modelVersion>4.1.0</modelVersion>
+
+  <parent>
+    <groupId>org.apache.maven.its.gh11162</groupId>
+    <artifactId>consumer-pom-scopes-parent</artifactId>
+    <version>1.0</version>
+  </parent>
+
+  <artifactId>consumer-pom-scopes-app</artifactId>
+  <packaging>jar</packaging>
+
+  <name>Maven Integration Test :: mng-8750 :: Consumer POM Scopes App</name>
+
+  <dependencies>
+    <!-- should be kept as compile -->
+    <dependency>
+      <groupId>org.apache.maven.its.gh11162</groupId>
+      <artifactId>compile-dep</artifactId>
+      <version>1.0</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <!-- should be dropped (non-transitive) -->
+    <dependency>
+      <groupId>org.apache.maven.its.gh11162</groupId>
+      <artifactId>compile-only-dep</artifactId>
+      <version>1.0</version>
+      <scope>compile-only</scope>
+    </dependency>
+
+    <!-- should be dropped (non-transitive) -->
+    <dependency>
+      <groupId>org.apache.maven.its.gh11162</groupId>
+      <artifactId>test-only-dep</artifactId>
+      <version>1.0</version>
+      <scope>test-only</scope>
+    </dependency>
+
+    <!-- should be dropped (non-transitive) -->
+    <dependency>
+      <groupId>org.apache.maven.its.gh11162</groupId>
+      <artifactId>test-dep</artifactId>
+      <version>1.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- should be dropped (non-compile/runtime) -->
+    <dependency>
+      <groupId>org.apache.maven.its.gh11162</groupId>
+      <artifactId>test-runtime-dep</artifactId>
+      <version>1.0</version>
+      <scope>test-runtime</scope>
+    </dependency>
+
+    <!-- should be kept as runtime -->
+    <dependency>
+      <groupId>org.apache.maven.its.gh11162</groupId>
+      <artifactId>runtime-dep</artifactId>
+      <version>1.0</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
+</project>
