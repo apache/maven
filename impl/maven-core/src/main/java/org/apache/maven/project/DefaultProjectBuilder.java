@@ -48,7 +48,6 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.Language;
 import org.apache.maven.api.LocalRepository;
-import org.apache.maven.api.Project;
 import org.apache.maven.api.ProjectScope;
 import org.apache.maven.api.SessionData;
 import org.apache.maven.api.annotations.Nonnull;
@@ -864,6 +863,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                             reposes.addAll(project.getRemoteArtifactRepositories());
                             request.setRemoteRepositories(List.copyOf(reposes));
                         }
+                        default -> throw new IllegalArgumentException(
+                                "Unsupported repository merging: " + request.getRepositoryMerging());
                     }
 
                     Path parentPomFile = parentModel.getPomFile();
