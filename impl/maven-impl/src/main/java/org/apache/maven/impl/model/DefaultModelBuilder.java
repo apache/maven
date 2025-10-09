@@ -1695,6 +1695,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     ? null
                     : repository
                             .with()
+                            .id(interpolator.interpolate(repository.getId(), callback))
                             .url(interpolator.interpolate(repository.getUrl(), callback))
                             .build();
         }
