@@ -48,6 +48,7 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.Language;
 import org.apache.maven.api.LocalRepository;
+import org.apache.maven.api.Project;
 import org.apache.maven.api.ProjectScope;
 import org.apache.maven.api.SessionData;
 import org.apache.maven.api.annotations.Nonnull;
@@ -850,11 +851,20 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     // remote repositories with those found in the pom.xml, along with the existing externally
                     // defined repositories.
                     //
-                    // TODO: fishy, fix this
-                    LinkedHashSet<ArtifactRepository> reposes =
-                            new LinkedHashSet<>(project.getRemoteArtifactRepositories());
-                    reposes.addAll(request.getRemoteRepositories());
-                    request.setRemoteRepositories(List.copyOf(reposes));
+                    switch (request.getRepositoryMerging()) {
+                        case POM_DOMINANT -> {
+                            LinkedHashSet<ArtifactRepository> reposes =
+                                    new LinkedHashSet<>(project.getRemoteArtifactRepositories());
+                            reposes.addAll(request.getRemoteRepositories());
+                            request.setRemoteRepositories(List.copyOf(reposes));
+                        }
+                        case REQUEST_DOMINANT -> {
+                            LinkedHashSet<ArtifactRepository> reposes =
+                                    new LinkedHashSet<>(request.getRemoteRepositories());
+                            reposes.addAll(project.getRemoteArtifactRepositories());
+                            request.setRemoteRepositories(List.copyOf(reposes));
+                        }
+                    }
 
                     Path parentPomFile = parentModel.getPomFile();
                     if (parentPomFile != null) {
