@@ -852,8 +852,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     //
                     // TODO: fishy, fix this
                     LinkedHashSet<ArtifactRepository> reposes =
-                            new LinkedHashSet<>(request.getRemoteRepositories());
-                    reposes.addAll(project.getRemoteArtifactRepositories());
+                            new LinkedHashSet<>(project.getRemoteArtifactRepositories());
+                    reposes.addAll(request.getRemoteRepositories());
                     request.setRemoteRepositories(List.copyOf(reposes));
 
                     Path parentPomFile = parentModel.getPomFile();
