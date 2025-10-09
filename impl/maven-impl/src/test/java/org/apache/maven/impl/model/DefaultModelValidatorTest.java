@@ -875,6 +875,24 @@ class DefaultModelValidatorTest {
     }
 
     @Test
+    void repositoryWithUninterpolatedId() throws Exception {
+        SimpleProblemCollector result = validateRaw("raw-model/repository-with-uninterpolated-id.xml");
+        // Uninterpolated expressions in repository IDs should cause validation errors
+        assertViolations(result, 0, 3, 0);
+
+        // Check that all three repository ID validation errors are present
+        assertTrue(result.getErrors().stream()
+                .anyMatch(error -> error.contains("repositories.repository.[${repository.id}].id")
+                        && error.contains("contains an uninterpolated expression")));
+        assertTrue(result.getErrors().stream()
+                .anyMatch(error -> error.contains("pluginRepositories.pluginRepository.[${plugin.repository.id}].id")
+                        && error.contains("contains an uninterpolated expression")));
+        assertTrue(result.getErrors().stream()
+                .anyMatch(error -> error.contains("distributionManagement.repository.[${staging.repository.id}].id")
+                        && error.contains("contains an uninterpolated expression")));
+    }
+
+    @Test
     void profileActivationWithAllowedExpression() throws Exception {
         SimpleProblemCollector result = validateRaw(
                 "raw-model/profile-activation-file-with-allowed-expressions.xml",
