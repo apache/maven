@@ -55,7 +55,7 @@ import static java.util.Objects.requireNonNull;
  */
 @Experimental
 @Immutable
-public interface DependencyResolverRequest extends RemoteRepositoryRequest {
+public interface DependencyResolverRequest extends RepositoryAwareRequest {
 
     enum RequestType {
         COLLECT,

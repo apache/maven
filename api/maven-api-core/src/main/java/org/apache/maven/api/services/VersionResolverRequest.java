@@ -36,7 +36,7 @@ import static java.util.Objects.requireNonNull;
  * @since 4.0.0
  */
 @Experimental
-public interface VersionResolverRequest extends RemoteRepositoryRequest {
+public interface VersionResolverRequest extends RepositoryAwareRequest {
 
     @Nonnull
     ArtifactCoordinates getArtifactCoordinates();

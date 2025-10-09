@@ -43,7 +43,7 @@ import static java.util.Objects.requireNonNull;
  */
 @Experimental
 @Immutable
-public interface ModelBuilderRequest extends RemoteRepositoryRequest {
+public interface ModelBuilderRequest extends RepositoryAwareRequest {
 
     /**
      * The possible request types for building a model.

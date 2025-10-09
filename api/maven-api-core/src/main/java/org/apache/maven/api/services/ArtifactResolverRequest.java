@@ -40,7 +40,7 @@ import static java.util.Objects.requireNonNull;
  */
 @Experimental
 @Immutable
-public interface ArtifactResolverRequest extends RemoteRepositoryRequest {
+public interface ArtifactResolverRequest extends RepositoryAwareRequest {
 
     @Nonnull
     Collection<? extends ArtifactCoordinates> getCoordinates();

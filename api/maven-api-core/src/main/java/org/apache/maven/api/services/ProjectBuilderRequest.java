@@ -43,7 +43,7 @@ import static java.util.Objects.requireNonNull;
  */
 @Experimental
 @Immutable
-public interface ProjectBuilderRequest extends RemoteRepositoryRequest {
+public interface ProjectBuilderRequest extends RepositoryAwareRequest {
 
     /**
      * Gets the path to the project to build.
