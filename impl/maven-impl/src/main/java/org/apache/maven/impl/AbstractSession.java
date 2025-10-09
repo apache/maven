@@ -280,7 +280,8 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     @Override
-    public List<org.eclipse.aether.repository.RemoteRepository> toResolvingRepositories(List<RemoteRepository> repositories) {
+    public List<org.eclipse.aether.repository.RemoteRepository> toResolvingRepositories(
+            List<RemoteRepository> repositories) {
         return getRepositorySystem().newResolutionRepositories(getSession(), toRepositories(repositories));
     }
 
