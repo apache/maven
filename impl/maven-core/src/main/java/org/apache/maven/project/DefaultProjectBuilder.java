@@ -850,7 +850,12 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     // remote repositories with those found in the pom.xml, along with the existing externally
                     // defined repositories.
                     //
-                    request.getRemoteRepositories().addAll(project.getRemoteArtifactRepositories());
+                    // TODO: fishy, fix this
+                    LinkedHashSet<ArtifactRepository> reposes =
+                            new LinkedHashSet<>(project.getRemoteArtifactRepositories());
+                    reposes.addAll(request.getRemoteRepositories());
+                    request.setRemoteRepositories(List.copyOf(reposes));
+
                     Path parentPomFile = parentModel.getPomFile();
                     if (parentPomFile != null) {
                         project.setParentFile(parentPomFile.toFile());

@@ -29,7 +29,7 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nullable;
 
 /**
- * A request for resolving an artifact.
+ * A request reaching to list of remote repositories.
  *
  * @since 4.0.0
  */
@@ -46,10 +46,10 @@ public interface RemoteRepositoryRequest extends Request<Session> {
         }
         HashSet<RemoteRepository> set = new HashSet<>(repositories);
         if (repositories.size() != set.size()) {
-            throw new IllegalArgumentException("Wrong management of repositories");
+            throw new IllegalArgumentException("Wrong repository management: duplicate");
         }
         if (repositories.stream().anyMatch(Objects::isNull)) {
-            throw new IllegalArgumentException("Null repository present");
+            throw new IllegalArgumentException("Wrong repository management: null repository");
         }
         return repositories;
     }
