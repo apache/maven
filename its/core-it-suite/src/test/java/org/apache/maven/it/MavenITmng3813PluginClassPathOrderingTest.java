@@ -82,7 +82,7 @@ public class MavenITmng3813PluginClassPathOrderingTest extends AbstractMavenInte
         //   dep-a, dep-aa, dep-ac, dep-ab, dep-ad, dep-c, dep-b, dep-d
         // The correct/expected class path using levelOrder is:
         //   dep-a, dep-c, dep-b, dep-d, dep-aa, dep-ac, dep-ab, dep-ad
-        if (matchesVersionRange("[,4.1.0-SNAPSHOT)")) {
+        if (matchesVersionRange("[,4.0.0-SNAPSHOT)")) {
             // preOrder
             assertTrue(pclProps.getProperty(resName + ".0").endsWith("/dep-a-0.1.jar!/" + resName));
             assertTrue(pclProps.getProperty(resName + ".1").endsWith("/dep-aa-0.1.jar!/" + resName));
