@@ -101,6 +101,8 @@ public interface InternalSession extends Session {
 
     List<org.eclipse.aether.repository.RemoteRepository> toRepositories(List<RemoteRepository> repositories);
 
+    List<org.eclipse.aether.repository.RemoteRepository> toResolvingRepositories(List<RemoteRepository> repositories);
+
     org.eclipse.aether.repository.RemoteRepository toRepository(RemoteRepository repository);
 
     org.eclipse.aether.repository.LocalRepository toRepository(LocalRepository repository);

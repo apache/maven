@@ -152,7 +152,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
                     .setRoot(root != null ? session.toDependency(root, false) : null)
                     .setDependencies(session.toDependencies(dependencies, false))
                     .setManagedDependencies(session.toDependencies(managedDependencies, true))
-                    .setRepositories(session.toRepositories(remoteRepositories))
+                    .setRepositories(session.toResolvingRepositories(remoteRepositories))
                     .setRequestContext(trace.context())
                     .setTrace(trace.trace());
             collectRequest.setResolutionScope(resolutionScope);

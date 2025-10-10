@@ -91,7 +91,7 @@ public class DefaultArtifactResolver implements ArtifactResolver {
         InternalSession session = InternalSession.from(request.getSession());
         RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
         try {
-            List<RemoteRepository> repositories = session.toRepositories(
+            List<RemoteRepository> repositories = session.toResolvingRepositories(
                     request.getRepositories() != null ? request.getRepositories() : session.getRemoteRepositories());
 
             List<ResolverRequest> requests = new ArrayList<>();

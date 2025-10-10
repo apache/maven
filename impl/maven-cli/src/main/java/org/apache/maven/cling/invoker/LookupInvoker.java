@@ -284,15 +284,17 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         context.loggerFactory = LoggerFactory.getILoggerFactory();
         context.slf4jConfiguration = Slf4jConfigurationFactory.getConfiguration(context.loggerFactory);
 
-        context.loggerLevel = Slf4jConfiguration.Level.INFO;
         if (context.invokerRequest.effectiveVerbose()) {
             context.loggerLevel = Slf4jConfiguration.Level.DEBUG;
+            context.slf4jConfiguration.setRootLoggerLevel(context.loggerLevel);
         } else if (context.options().quiet().orElse(false)) {
             context.loggerLevel = Slf4jConfiguration.Level.ERROR;
+            context.slf4jConfiguration.setRootLoggerLevel(context.loggerLevel);
+        } else {
+            // fall back to default log level specified in conf
+            // see https://issues.apache.org/jira/browse/MNG-2570 and https://github.com/apache/maven/issues/11199
+            context.loggerLevel = Slf4jConfiguration.Level.INFO; // default for display purposes
         }
-        context.slf4jConfiguration.setRootLoggerLevel(context.loggerLevel);
-        // else fall back to default log level specified in conf
-        // see https://issues.apache.org/jira/browse/MNG-2570
     }
 
     protected BuildEventListener determineBuildEventListener(C context) {
