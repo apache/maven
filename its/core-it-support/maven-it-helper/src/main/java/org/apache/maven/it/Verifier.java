@@ -155,7 +155,7 @@ public class Verifier {
                     this.userHomeDirectory,
                     EMBEDDED_MAVEN_EXECUTOR,
                     FORKED_MAVEN_EXECUTOR);
-            this.executorTool = new ToolboxTool(executorHelper, System.getProperty("version.toolbox", "0.7.4"));
+            this.executorTool = new ToolboxTool(executorHelper, System.getProperty("version.toolbox", "0.13.7"));
             this.defaultCliArguments =
                     new ArrayList<>(defaultCliArguments != null ? defaultCliArguments : DEFAULT_CLI_ARGUMENTS);
             this.logFile = this.basedir.resolve(logFileName);
