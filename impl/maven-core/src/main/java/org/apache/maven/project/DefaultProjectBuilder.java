@@ -184,7 +184,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     public ProjectBuildingResult build(Artifact artifact, boolean allowStubModel, ProjectBuildingRequest request)
             throws ProjectBuildingException {
         try (BuildSession bs = new BuildSession(request)) {
-            return bs.build(false, artifact, allowStubModel);
+            return bs.build(false, artifact, allowStubModel, request.getRemoteRepositories());
         }
     }
 
@@ -318,6 +318,18 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         private final ModelBuilder.ModelBuilderSession modelBuilderSession;
         private final Map<String, MavenProject> projectIndex = new ConcurrentHashMap<>(256);
 
+        // Store computed repositories per project to avoid leakage between projects
+        private final Map<String, List<ArtifactRepository>> projectRepositories = new ConcurrentHashMap<>();
+
+        /**
+         * Get the effective repositories for a project. If project-specific repositories
+         * have been computed and stored, use those; otherwise fall back to request repositories.
+         */
+        private List<ArtifactRepository> getEffectiveRepositories(String projectId) {
+            List<ArtifactRepository> stored = projectRepositories.get(projectId);
+            return stored != null ? stored : request.getRemoteRepositories();
+        }
+
         BuildSession(ProjectBuildingRequest request) {
             this.request = request;
             InternalSession session = InternalSession.from(request.getRepositorySession());
@@ -429,7 +441,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             }
         }
 
-        ProjectBuildingResult build(boolean parent, Artifact artifact, boolean allowStubModel)
+        ProjectBuildingResult build(
+                boolean parent, Artifact artifact, boolean allowStubModel, List<ArtifactRepository> repositories)
                 throws ProjectBuildingException {
             org.eclipse.aether.artifact.Artifact pomArtifact = RepositoryUtils.toArtifact(artifact);
             pomArtifact = ArtifactDescriptorUtils.toPomArtifact(pomArtifact);
@@ -438,9 +451,10 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
             try {
                 ArtifactCoordinates coordinates = session.createArtifactCoordinates(session.getArtifact(pomArtifact));
+                // Use provided repositories if available, otherwise fall back to request repositories
                 ArtifactResolverRequest req = ArtifactResolverRequest.builder()
                         .session(session)
-                        .repositories(request.getRemoteRepositories().stream()
+                        .repositories(repositories.stream()
                                 .map(RepositoryUtils::toRepo)
                                 .map(session::getRemoteRepository)
                                 .toList())
@@ -850,7 +864,30 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     // remote repositories with those found in the pom.xml, along with the existing externally
                     // defined repositories.
                     //
-                    request.getRemoteRepositories().addAll(project.getRemoteArtifactRepositories());
+                    // Compute merged repositories for this project and store in session
+                    // instead of mutating the shared request to avoid leakage between projects
+                    List<ArtifactRepository> mergedRepositories;
+                    switch (request.getRepositoryMerging()) {
+                        case POM_DOMINANT -> {
+                            LinkedHashSet<ArtifactRepository> reposes =
+                                    new LinkedHashSet<>(project.getRemoteArtifactRepositories());
+                            reposes.addAll(request.getRemoteRepositories());
+                            mergedRepositories = List.copyOf(reposes);
+                        }
+                        case REQUEST_DOMINANT -> {
+                            LinkedHashSet<ArtifactRepository> reposes =
+                                    new LinkedHashSet<>(request.getRemoteRepositories());
+                            reposes.addAll(project.getRemoteArtifactRepositories());
+                            mergedRepositories = List.copyOf(reposes);
+                        }
+                        default -> throw new IllegalArgumentException(
+                                "Unsupported repository merging: " + request.getRepositoryMerging());
+                    }
+
+                    // Store the computed repositories for this project in BuildSession storage
+                    // to avoid mutating the shared request and causing leakage between projects
+                    projectRepositories.put(project.getId(), mergedRepositories);
+
                     Path parentPomFile = parentModel.getPomFile();
                     if (parentPomFile != null) {
                         project.setParentFile(parentPomFile.toFile());
@@ -870,7 +907,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     } else {
                         Artifact parentArtifact = project.getParentArtifact();
                         try {
-                            parent = build(true, parentArtifact, false).getProject();
+                            parent = build(true, parentArtifact, false, getEffectiveRepositories(project.getId()))
+                                    .getProject();
                         } catch (ProjectBuildingException e) {
                             // MNG-4488 where let invalid parents slide on by
                             if (logger.isDebugEnabled()) {

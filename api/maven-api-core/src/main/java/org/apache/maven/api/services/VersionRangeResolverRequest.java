@@ -36,13 +36,10 @@ import static java.util.Objects.requireNonNull;
  * @since 4.0.0
  */
 @Experimental
-public interface VersionRangeResolverRequest extends Request<Session> {
+public interface VersionRangeResolverRequest extends RepositoryAwareRequest {
 
     @Nonnull
     ArtifactCoordinates getArtifactCoordinates();
-
-    @Nullable
-    List<RemoteRepository> getRepositories();
 
     @Nonnull
     static VersionRangeResolverRequest build(
@@ -111,7 +108,7 @@ public interface VersionRangeResolverRequest extends Request<Session> {
                     @Nullable List<RemoteRepository> repositories) {
                 super(session, trace);
                 this.artifactCoordinates = artifactCoordinates;
-                this.repositories = repositories;
+                this.repositories = validate(repositories);
             }
 
             @Nonnull
