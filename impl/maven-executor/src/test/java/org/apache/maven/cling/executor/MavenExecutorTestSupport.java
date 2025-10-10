@@ -33,7 +33,9 @@ import org.apache.maven.api.cli.ExecutorRequest;
 import org.apache.maven.cling.executor.embedded.EmbeddedMavenExecutor;
 import org.apache.maven.cling.executor.forked.ForkedMavenExecutor;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.io.CleanupMode;
@@ -45,12 +47,26 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.condition.OS.WINDOWS;
 
 public abstract class MavenExecutorTestSupport {
+    @TempDir(cleanup = CleanupMode.NEVER)
+    private static Path tempDir;
+
+    private Path cwd;
+
+    private Path userHome;
+
+    @BeforeEach
+    void beforeEach(TestInfo testInfo) throws Exception {
+        cwd = tempDir.resolve(testInfo.getTestMethod().orElseThrow().getName()).resolve("cwd");
+        Files.createDirectories(cwd);
+        userHome = tempDir.resolve(testInfo.getTestMethod().orElseThrow().getName())
+                .resolve("home");
+        Files.createDirectories(userHome);
+        MimirInfuser.infuseUW(userHome);
+    }
+
     @Timeout(15)
     @Test
-    void mvnenc(
-            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
-            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
-            throws Exception {
+    void mvnenc() throws Exception {
         String logfile = "m4.log";
         execute(
                 cwd.resolve(logfile),
@@ -70,10 +86,7 @@ public abstract class MavenExecutorTestSupport {
             disabledReason = "JUnit on Windows fails to clean up as mvn3 does not close log file properly")
     @Timeout(15)
     @Test
-    void dump3(
-            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
-            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
-            throws Exception {
+    void dump3() throws Exception {
         String logfile = "m3.log";
         execute(
                 cwd.resolve(logfile),
@@ -89,10 +102,7 @@ public abstract class MavenExecutorTestSupport {
 
     @Timeout(15)
     @Test
-    void dump4(
-            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
-            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
-            throws Exception {
+    void dump4() throws Exception {
         String logfile = "m4.log";
         execute(
                 cwd.resolve(logfile),
@@ -108,13 +118,13 @@ public abstract class MavenExecutorTestSupport {
 
     @Timeout(15)
     @Test
-    void defaultFs(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
-        layDownFiles(tempDir);
+    void defaultFs() throws Exception {
+        layDownFiles(cwd);
         String logfile = "m4.log";
         execute(
-                tempDir.resolve(logfile),
+                cwd.resolve(logfile),
                 List.of(mvn4ExecutorRequestBuilder()
-                        .cwd(tempDir)
+                        .cwd(cwd)
                         .argument("-V")
                         .argument("verify")
                         .argument("-l")
@@ -135,13 +145,13 @@ public abstract class MavenExecutorTestSupport {
             disabledReason = "JUnit on Windows fails to clean up as mvn3 does not close log file properly")
     @Timeout(15)
     @Test
-    void defaultFs3x(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
-        layDownFiles(tempDir);
+    void defaultFs3x() throws Exception {
+        layDownFiles(cwd);
         String logfile = "m3.log";
         execute(
-                tempDir.resolve(logfile),
+                cwd.resolve(logfile),
                 List.of(mvn3ExecutorRequestBuilder()
-                        .cwd(tempDir)
+                        .cwd(cwd)
                         .argument("-V")
                         .argument("verify")
                         .argument("-l")
@@ -159,13 +169,13 @@ public abstract class MavenExecutorTestSupport {
 
     @Timeout(15)
     @Test
-    void defaultFsCaptureOutput(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
-        layDownFiles(tempDir);
+    void defaultFsCaptureOutput() throws Exception {
+        layDownFiles(cwd);
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
         execute(
                 null,
                 List.of(mvn4ExecutorRequestBuilder()
-                        .cwd(tempDir)
+                        .cwd(cwd)
                         .argument("-V")
                         .argument("verify")
                         .stdOut(stdout)
@@ -176,14 +186,13 @@ public abstract class MavenExecutorTestSupport {
 
     @Timeout(15)
     @Test
-    void defaultFsCaptureOutputWithForcedColor(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir)
-            throws Exception {
-        layDownFiles(tempDir);
+    void defaultFsCaptureOutputWithForcedColor() throws Exception {
+        layDownFiles(cwd);
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
         execute(
                 null,
                 List.of(mvn4ExecutorRequestBuilder()
-                        .cwd(tempDir)
+                        .cwd(cwd)
                         .argument("-V")
                         .argument("verify")
                         .argument("--color=yes")
@@ -195,14 +204,13 @@ public abstract class MavenExecutorTestSupport {
 
     @Timeout(15)
     @Test
-    void defaultFsCaptureOutputWithForcedOffColor(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir)
-            throws Exception {
-        layDownFiles(tempDir);
+    void defaultFsCaptureOutputWithForcedOffColor() throws Exception {
+        layDownFiles(cwd);
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
         execute(
                 null,
                 List.of(mvn4ExecutorRequestBuilder()
-                        .cwd(tempDir)
+                        .cwd(cwd)
                         .argument("-V")
                         .argument("verify")
                         .argument("--color=no")
@@ -214,13 +222,13 @@ public abstract class MavenExecutorTestSupport {
 
     @Timeout(15)
     @Test
-    void defaultFs3xCaptureOutput(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
-        layDownFiles(tempDir);
+    void defaultFs3xCaptureOutput() throws Exception {
+        layDownFiles(cwd);
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
         execute(
                 null,
                 List.of(mvn3ExecutorRequestBuilder()
-                        .cwd(tempDir)
+                        .cwd(cwd)
                         .argument("-V")
                         .argument("verify")
                         .stdOut(stdout)
@@ -232,14 +240,13 @@ public abstract class MavenExecutorTestSupport {
 
     @Timeout(15)
     @Test
-    void defaultFs3xCaptureOutputWithForcedColor(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir)
-            throws Exception {
-        layDownFiles(tempDir);
+    void defaultFs3xCaptureOutputWithForcedColor() throws Exception {
+        layDownFiles(cwd);
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
         execute(
                 null,
                 List.of(mvn3ExecutorRequestBuilder()
-                        .cwd(tempDir)
+                        .cwd(cwd)
                         .argument("-V")
                         .argument("verify")
                         .argument("--color=yes")
@@ -251,14 +258,13 @@ public abstract class MavenExecutorTestSupport {
 
     @Timeout(15)
     @Test
-    void defaultFs3xCaptureOutputWithForcedOffColor(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir)
-            throws Exception {
-        layDownFiles(tempDir);
+    void defaultFs3xCaptureOutputWithForcedOffColor() throws Exception {
+        layDownFiles(cwd);
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
         execute(
                 null,
                 List.of(mvn3ExecutorRequestBuilder()
-                        .cwd(tempDir)
+                        .cwd(cwd)
                         .argument("-V")
                         .argument("verify")
                         .argument("--color=no")

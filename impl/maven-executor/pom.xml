@@ -34,6 +34,7 @@ under the License.
   <properties>
     <maven3version>3.9.9</maven3version>
     <maven4version>${project.version}</maven4version>
+    <testTmpDir>${project.build.directory}/tmp</testTmpDir>
   </properties>
 
   <dependencies>
@@ -112,6 +113,24 @@ under the License.
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>create-tmp-dir</id>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <phase>process-test-resources</phase>
+            <configuration>
+              <target>
+                <mkdir dir="${testTmpDir}" />
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <promoteUserPropertiesToSystemProperties>false</promoteUserPropertiesToSystemProperties>
@@ -122,6 +141,7 @@ under the License.
             <maven4home>${project.build.directory}/dependency/apache-maven-${maven4version}</maven4home>
             <localRepository>${settings.localRepository}</localRepository>
           </systemPropertyVariables>
+          <argLine>-Xmx256m @{jacocoArgLine} -Djava.io.tmpdir=${testTmpDir}</argLine>
         </configuration>
       </plugin>
     </plugins>

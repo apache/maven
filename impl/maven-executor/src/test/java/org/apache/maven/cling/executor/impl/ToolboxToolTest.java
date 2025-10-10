@@ -30,9 +30,11 @@ import org.apache.maven.cling.executor.ExecutorHelper;
 import org.apache.maven.cling.executor.MavenExecutorTestSupport;
 import org.apache.maven.cling.executor.internal.HelperImpl;
 import org.apache.maven.cling.executor.internal.ToolboxTool;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -45,11 +47,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ToolboxToolTest {
     private static final String VERSION = "0.7.4";
 
-    @TempDir
-    private static Path userHome;
+    @TempDir(cleanup = CleanupMode.NEVER)
+    private static Path tempDir;
 
-    @BeforeAll
-    static void beforeAll() throws Exception {
+    private Path userHome;
+
+    @BeforeEach
+    void beforeEach(TestInfo testInfo) throws Exception {
+        userHome = tempDir.resolve(testInfo.getTestMethod().orElseThrow().getName());
+        Files.createDirectories(userHome);
         MimirInfuser.infuseUW(userHome);
     }
 
