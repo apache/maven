@@ -18,7 +18,6 @@
  */
 package org.apache.maven.api.cli;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
@@ -510,10 +509,6 @@ public interface ExecutorRequest {
     @Nonnull
     static Path getCanonicalPath(Path path) {
         requireNonNull(path, "path");
-        try {
-            return path.toRealPath();
-        } catch (IOException e) {
-            return getCanonicalPath(path.getParent()).resolve(path.getFileName());
-        }
+        return path.toAbsolutePath().normalize();
     }
 }

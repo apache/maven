@@ -18,7 +18,6 @@
  */
 package org.apache.maven.cling.invoker;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -60,11 +59,7 @@ public final class CliUtils {
     @Nonnull
     public static Path getCanonicalPath(Path path) {
         requireNonNull(path, "path");
-        try {
-            return path.toRealPath();
-        } catch (IOException e) {
-            return getCanonicalPath(path.getParent()).resolve(path.getFileName());
-        }
+        return path.toAbsolutePath().normalize();
     }
 
     @Nonnull

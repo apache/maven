@@ -1720,11 +1720,7 @@ public class MavenCli {
     }
 
     private static Path getCanonicalPath(Path path) {
-        try {
-            return path.toRealPath();
-        } catch (IOException e) {
-            return getCanonicalPath(path.getParent()).resolve(path.getFileName());
-        }
+        return path.toAbsolutePath().normalize();
     }
 
     static class ExitException extends Exception {
