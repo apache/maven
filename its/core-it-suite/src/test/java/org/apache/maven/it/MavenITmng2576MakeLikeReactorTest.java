@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng2576MakeLikeReactorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2576MakeLikeReactorTest() {
-        super("[2.1.0,)");
-    }
-
     private void clean(Verifier verifier) throws Exception {
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("sub-a/target");

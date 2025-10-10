@@ -27,12 +27,10 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8594">MNG-8594</a>.
+ * @since 4.0.0-rc-3-SNAPSHOT
+ *
  */
 class MavenITmng8594AtFileTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8594AtFileTest() {
-        super("[4.0.0-rc-3-SNAPSHOT,)");
-    }
 
     /**
      *  Verify Maven picks up params/goals from atFile.

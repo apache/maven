@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4106InterpolationUsesDominantProfileTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4106InterpolationUsesDominantProfileTest() {
-        super("[2.0.5,)");
-    }
-
     /**
      * Test that interpolation uses the property values from the dominant (i.e. last) profile among a group
      * of active profiles that define the same properties. This boils down to the proper order of profile

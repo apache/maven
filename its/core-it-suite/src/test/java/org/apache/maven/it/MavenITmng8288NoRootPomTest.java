@@ -24,12 +24,10 @@ import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8288">MNG-8288</a>.
+ * @since 3.6.3
+ *
  */
 class MavenITmng8288NoRootPomTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8288NoRootPomTest() {
-        super("[3.6.3,)");
-    }
 
     /**
      *  Verify that project without root POM can be loaded up

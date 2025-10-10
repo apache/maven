@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4522FailUponMissingDependencyParentPomTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4522FailUponMissingDependencyParentPomTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-alpha-7,)");
-    }
-
     /**
      * Test that dependency resolution fails/aborts in case a dependency has a POM that inherits from a missing parent.
      *

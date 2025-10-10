@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4402DuplicateChildModuleTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4402DuplicateChildModuleTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Verify that duplicate declarations of child modules cause a model validation error during project building.
      *

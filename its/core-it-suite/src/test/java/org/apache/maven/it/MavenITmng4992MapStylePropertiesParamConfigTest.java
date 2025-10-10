@@ -30,10 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4992MapStylePropertiesParamConfigTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4992MapStylePropertiesParamConfigTest() {
-        super("[3.0.3,)");
-    }
-
     /**
      * Verify that plugin parameters of type java.util.Properties can be configured like any other Map-style parameter.
      *

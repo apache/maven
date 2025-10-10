@@ -48,10 +48,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4554PluginPrefixMappingUpdateTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-alpha-7,)");
-    }
-
     /**
      * Test that the metadata holding the plugin prefix mapping is cached and not redownloaded upon each
      * Maven invocation.

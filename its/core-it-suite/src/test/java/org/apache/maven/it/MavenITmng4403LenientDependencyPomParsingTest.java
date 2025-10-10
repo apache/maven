@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4403LenientDependencyPomParsingTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4403LenientDependencyPomParsingTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-beta-2,)");
-    }
-
     /**
      * Test that dependency POMs are only subject to minimal validation during metadata retrieval, i.e. Maven should
      * ignore most kinds of badness and make a best effort at getting the metadata. Of particular interest is also,

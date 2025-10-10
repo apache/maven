@@ -33,12 +33,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Verify that consumer POM keeps only "compile" and "runtime" scoped dependencies
  * and drops other scopes including the new scopes introduced by Maven 4.
+ * @since 4.0.0-rc-3
+ *
  */
 class MavenITgh11162ConsumerPomScopesTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITgh11162ConsumerPomScopesTest() {
-        super("(4.0.0-rc-3,)");
-    }
 
     @Test
     void testConsumerPomFiltersScopes() throws Exception {

@@ -35,10 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng5102MixinsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5102MixinsTest() {
-        super("(4.0.0-alpha-7,)");
-    }
-
     /**
      * Verify that mixins can be loaded from the file system.
      *

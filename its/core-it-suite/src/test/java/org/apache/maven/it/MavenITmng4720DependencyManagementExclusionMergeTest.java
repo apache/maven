@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4720DependencyManagementExclusionMergeTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4720DependencyManagementExclusionMergeTest() {
-        super("[2.0.6,)");
-    }
-
     /**
      * Verify the effective exclusions applied during transitive dependency resolution when both the regular
      * dependency section and dependency management declare exclusions for a particular dependency.

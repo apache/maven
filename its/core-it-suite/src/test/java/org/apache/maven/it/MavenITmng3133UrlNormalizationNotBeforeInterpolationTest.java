@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3133UrlNormalizationNotBeforeInterpolationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3133UrlNormalizationNotBeforeInterpolationTest() {
-        super("[3.0-beta-1,)");
-    }
-
     /**
      * Verify that URL normalization does not happen before interpolation which would result in invalid
      * inherited URLs for project layouts where the parent resides in a sibling directory of the child

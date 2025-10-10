@@ -30,12 +30,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * It verifies that changes to ${revision} in profiles propagate to the final project version.
  *
  * @author Apache Maven Team
+ * @since 4.0.0-rc-4
+ *
  */
 class MavenITgh11196CIFriendlyProfilesTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITgh11196CIFriendlyProfilesTest() {
-        super("[4.0.0-rc-4,)");
-    }
 
     /**
      * Verify that CI-friendly version resolution works correctly with profile properties.

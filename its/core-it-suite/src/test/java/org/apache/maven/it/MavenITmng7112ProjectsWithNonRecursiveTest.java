@@ -26,10 +26,6 @@ import org.junit.jupiter.api.Test;
 public class MavenITmng7112ProjectsWithNonRecursiveTest extends AbstractMavenIntegrationTestCase {
     private static final String PROJECT_PATH = "/mng-7112-projects-with-non-recursive";
 
-    public MavenITmng7112ProjectsWithNonRecursiveTest() {
-        super("[4.0.0-alpha-1,)");
-    }
-
     @Test
     public void testAggregatesCanBeBuiltNonRecursively() throws IOException, VerificationException {
         final File projectDir = extractResources(PROJECT_PATH);

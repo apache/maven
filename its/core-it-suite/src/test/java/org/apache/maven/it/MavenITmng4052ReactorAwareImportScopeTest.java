@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4052ReactorAwareImportScopeTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4052ReactorAwareImportScopeTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Test that the project builder properly detects and handles inter-model dependencies within a reactor
      * like a POM that imports another POM. To clarify, this is not about the kind of dependency where one

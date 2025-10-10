@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng0461TolerateMissingDependencyPomTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng0461TolerateMissingDependencyPomTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-alpha-2,)");
-    }
-
     /**
      * Verify that dependency resolution only warns in case of missing dependency POMs but does not fail.
      *

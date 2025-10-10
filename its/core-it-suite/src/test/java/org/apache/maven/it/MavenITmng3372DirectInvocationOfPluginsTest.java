@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng3372DirectInvocationOfPluginsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3372DirectInvocationOfPluginsTest() {
-        super("(2.0.5,)");
-    }
-
     @Test
     public void testitMNG3372() throws Exception {
         // The testdir is computed from the location of this

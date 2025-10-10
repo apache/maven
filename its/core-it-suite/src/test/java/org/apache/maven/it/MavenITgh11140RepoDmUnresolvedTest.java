@@ -24,12 +24,10 @@ import org.junit.jupiter.api.Test;
 
 /**
  * IT to assert unresolved placeholders cause failure when used.
+ * @since 4.0.0-rc-3
+ *
  */
 class MavenITgh11140RepoDmUnresolvedTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITgh11140RepoDmUnresolvedTest() {
-        super("(4.0.0-rc-3,)");
-    }
 
     @Test
     void testFailsOnUnresolvedPlaceholders() throws Exception {

@@ -35,10 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  */
 public class MavenITmng2972OverridePluginDependencyTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2972OverridePluginDependencyTest() {
-        super("(2.0.8,)");
-    }
-
     /**
      * Verify that a project-level plugin dependency replaces the original dependency from the plugin POM.
      *

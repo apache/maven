@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenIT0132PomLifecycleTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenIT0132PomLifecycleTest() {
-        super("[2.0.0,)");
-    }
-
     /**
      * Test default binding of goals for "pom" lifecycle.
      *

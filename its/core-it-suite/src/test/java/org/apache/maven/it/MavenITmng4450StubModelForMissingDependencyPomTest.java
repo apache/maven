@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4450StubModelForMissingDependencyPomTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4450StubModelForMissingDependencyPomTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-alpha-5,)");
-    }
-
     /**
      * Verify that building missing POMs for dependencies fails gracefully with a stub model.
      *

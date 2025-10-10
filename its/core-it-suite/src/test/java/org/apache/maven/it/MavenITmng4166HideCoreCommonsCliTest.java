@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 public class MavenITmng4166HideCoreCommonsCliTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4166HideCoreCommonsCliTest() {
-        super("[2.2.0,)");
-    }
-
     /**
      * Verify that plugins can use their own version of commons-cli and are not bound to the version bundled in the
      * core.

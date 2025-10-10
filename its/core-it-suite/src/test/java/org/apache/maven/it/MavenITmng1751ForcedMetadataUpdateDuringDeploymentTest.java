@@ -35,10 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
  */
 public class MavenITmng1751ForcedMetadataUpdateDuringDeploymentTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng1751ForcedMetadataUpdateDuringDeploymentTest() {
-        super("[3.0-beta-1,)");
-    }
-
     /**
      * Verify that deployment always updates the metadata even if its remote timestamp currently refers to
      * the future.

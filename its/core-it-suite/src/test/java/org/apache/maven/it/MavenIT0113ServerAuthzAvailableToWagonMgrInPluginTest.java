@@ -26,9 +26,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MavenIT0113ServerAuthzAvailableToWagonMgrInPluginTest extends AbstractMavenIntegrationTestCase {
-    public MavenIT0113ServerAuthzAvailableToWagonMgrInPluginTest() {
-        super("[2.0,3.0-alpha-1),[3.0-alpha-7,)");
-    }
 
     /**
      * Test that the auth infos given in the settings.xml are pushed into the wagon manager and are available

@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4331DependencyCollectionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4331DependencyCollectionTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Test that @requiresDependencyCollection works for a goal that is bound into a very early lifecycle phase
      * like "validate" where none of the reactor projects have an artifact file. The Enforcer Plugin is the

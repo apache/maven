@@ -58,18 +58,16 @@ public abstract class AbstractMavenIntegrationTestCase {
 
     protected static final String ALL_MAVEN_VERSIONS = "[2.0,)";
 
-    protected AbstractMavenIntegrationTestCase(String versionRangeStr) {
-        this(versionRangeStr, DEFAULT_MATCH_PATTERN);
+    protected AbstractMavenIntegrationTestCase() {
+        this(DEFAULT_MATCH_PATTERN);
     }
 
-    protected AbstractMavenIntegrationTestCase(String versionRangeStr, String matchPattern) {
-        this(versionRangeStr, Pattern.compile(matchPattern));
+    protected AbstractMavenIntegrationTestCase(String matchPattern) {
+        this(Pattern.compile(matchPattern));
     }
 
-    protected AbstractMavenIntegrationTestCase(String versionRangeStr, Pattern matchPattern) {
+    protected AbstractMavenIntegrationTestCase(Pattern matchPattern) {
         this.matchPattern = matchPattern;
-
-        requiresMavenVersion(versionRangeStr);
     }
 
     @BeforeAll

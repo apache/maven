@@ -36,9 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  */
 public class MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest() {
-        super("(2.0.8,)");
-    }
 
     @Test
     public void testitMNG3441() throws Exception {

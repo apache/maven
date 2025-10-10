@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng3775ConflictResolutionBacktrackingTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3775ConflictResolutionBacktrackingTest() {
-        super("[3.0,)");
-    }
-
     @Test
     public void testitABC() throws Exception {
         testit("test-abc");

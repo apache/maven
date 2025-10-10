@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  */
 public class MavenITmng4273RestrictedCoreRealmAccessForPluginTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4273RestrictedCoreRealmAccessForPluginTest() {
-        super("[2.0.6,)");
-    }
-
     /**
      * Verify that internal utility/implementation classes used by the Maven core do not leak into the plugin realm.
      * Otherwise, we risk linkage errors when a plugin creates a custom class loader with parent-first delegation on

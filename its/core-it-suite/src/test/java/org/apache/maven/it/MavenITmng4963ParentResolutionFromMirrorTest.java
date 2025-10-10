@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4963ParentResolutionFromMirrorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4963ParentResolutionFromMirrorTest() {
-        super("[2.0.5,3.0-alpha-1),[3.0.3,)");
-    }
-
     /**
      * Verify that a released parent POM can be resolved when the settings define only a snapshot repository
      * which is subject to mirroring. Technically, this means to properly aggregate the built-in central repo

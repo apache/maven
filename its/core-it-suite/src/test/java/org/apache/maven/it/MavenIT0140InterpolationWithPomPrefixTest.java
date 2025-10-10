@@ -34,9 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Benjamin Bentmann
  */
 public class MavenIT0140InterpolationWithPomPrefixTest extends AbstractMavenIntegrationTestCase {
-    public MavenIT0140InterpolationWithPomPrefixTest() {
-        super("[2.0,4.0.0-alpha-1)");
-    }
 
     /**
      * Test that expressions of the form ${pom.*} resolve correctly to POM values.

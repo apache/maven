@@ -36,13 +36,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * NOTE (cstamas): this IT was written to test that settings.xml is STRICT, while later changes modified
  * this very IT into the opposite: to test that parsing is LENIENT.
+ * @since 2.0.8
+ *
  */
 @Disabled("This is archaic test; we should strive to make settings.xml parsing strict again")
 public class MavenITmng3748BadSettingsXmlTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng3748BadSettingsXmlTest() {
-        super("(2.0.8,)"); // only test in 2.0.9+
-    }
 
     @Test
     public void testit() throws Exception {

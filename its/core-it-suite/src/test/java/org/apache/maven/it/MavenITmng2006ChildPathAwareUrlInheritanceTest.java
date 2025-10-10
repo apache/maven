@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng2006ChildPathAwareUrlInheritanceTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2006ChildPathAwareUrlInheritanceTest() {
-        super("(2.0.2,)");
-    }
-
     /**
      * Test that inheritance of those URLs which automatically append the child's artifact id take the child's
      * relative location to the parent into account.

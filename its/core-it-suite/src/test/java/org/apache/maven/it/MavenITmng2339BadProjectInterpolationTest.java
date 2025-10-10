@@ -26,11 +26,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2339">MNG-2339</a>.
+ * @since 2.0.8
+ *
  */
 public class MavenITmng2339BadProjectInterpolationTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng2339BadProjectInterpolationTest() {
-        super("(2.0.8,)"); // 2.0.9+
-    }
 
     @Test
     public void testitMNG2339a() throws Exception {

@@ -45,10 +45,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4729MirrorProxyAuthUsedByProjectBuilderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4729MirrorProxyAuthUsedByProjectBuilderTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-beta-2,)");
-    }
-
     /**
      * Test that the 2.x project builder obeys the network settings (mirror, proxy, auth) when building remote POMs
      * and discovering additional repositories.

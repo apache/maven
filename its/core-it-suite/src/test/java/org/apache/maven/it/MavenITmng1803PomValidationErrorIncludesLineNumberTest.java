@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng1803PomValidationErrorIncludesLineNumberTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng1803PomValidationErrorIncludesLineNumberTest() {
-        super("[3.0-beta-2,)");
-    }
-
     /**
      * Verify that POM errors indicate the line and column number in the input file.
      *

@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 public class MavenITmng4553CoreArtifactFilterConsidersGroupIdTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4553CoreArtifactFilterConsidersGroupIdTest() {
-        super("[3.0-alpha-7,)");
-    }
-
     /**
      * Verify that the core artifact filter considers both artifact id and group id.
      *

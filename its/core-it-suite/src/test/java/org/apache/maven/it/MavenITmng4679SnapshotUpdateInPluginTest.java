@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4679SnapshotUpdateInPluginTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4679SnapshotUpdateInPluginTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-beta-2,)");
-    }
-
     /**
      * Verify that plugins using the 2.x style artifact resolver/collector directly are subject to the snapshot update
      * mode of the current Maven session.

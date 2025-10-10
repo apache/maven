@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng1701DuplicatePluginTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng1701DuplicatePluginTest() {
-        super("[3.0-beta-1,)");
-    }
-
     /**
      * Verify that duplicate plugin declarations cause a warning.
      *

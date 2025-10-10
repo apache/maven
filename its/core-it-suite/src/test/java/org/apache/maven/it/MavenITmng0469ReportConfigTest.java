@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
  */
 public class MavenITmng0469ReportConfigTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng0469ReportConfigTest() {
-        super("[2.0.0,)");
-    }
-
     /**
      * Test that {@code <build>} configuration dominates {@code <reporting>} configuration for build goals.
      *

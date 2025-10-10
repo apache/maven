@@ -29,9 +29,6 @@ import org.junit.jupiter.api.Test;
  * are available to regular plugins.
  */
 public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng5771CoreExtensionsTest() {
-        super("(3.2.5,)");
-    }
 
     @Test
     public void testCoreExtension() throws Exception {

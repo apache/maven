@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4359LocallyReachableParentOutsideOfReactorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4359LocallyReachableParentOutsideOfReactorTest() {
-        super("[2.0.7,)");
-    }
-
     /**
      * Verify that locally reachable parent POMs of projects in the reactor can be resolved during dependency
      * resolution even if a parent itself is not part of the reactor.

@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4338OptionalMojosTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4338OptionalMojosTest() {
-        super("[3.0,4.0.0-alpha-1)");
-    }
-
     /**
      * Test that the {@code <optional-mojos>} element in custom lifecycle mappings is recognized and does not cause
      * a configuration failure when loading the lifecycle.

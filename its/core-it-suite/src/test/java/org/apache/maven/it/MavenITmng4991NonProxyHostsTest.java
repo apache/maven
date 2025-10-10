@@ -40,10 +40,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4991NonProxyHostsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4991NonProxyHostsTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0.3,)");
-    }
-
     /**
      * Verify that the nonProxyHosts settings is respected.
      *

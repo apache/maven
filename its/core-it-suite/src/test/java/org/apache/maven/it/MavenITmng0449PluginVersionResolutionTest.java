@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng0449PluginVersionResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng0449PluginVersionResolutionTest() {
-        super("[2.0,)");
-    }
-
     /**
      * Verify that versions for plugins are automatically resolved if not given in the POM by checking first LATEST and
      * then RELEASE in the repo metadata when the plugin is invoked from the lifecycle.

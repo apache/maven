@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4791ProjectBuilderResolvesRemotePomArtifactTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4791ProjectBuilderResolvesRemotePomArtifactTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-beta-4,)");
-    }
-
     /**
      * Test that the project builder resolves the input artifact when building remote POMs if the input artifact
      * happens to be of type "pom".

@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng6189SiteReportPluginsWarningTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng6189SiteReportPluginsWarningTest() {
-        super("(3.5-alpha-1,4.0.0-alpha-2]");
-    }
-
     @Test
     public void testit() throws Exception {
         File testDir = extractResources("/mng-6189-site-reportPlugins-warning");

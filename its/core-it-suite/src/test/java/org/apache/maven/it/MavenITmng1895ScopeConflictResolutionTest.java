@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng1895ScopeConflictResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng1895ScopeConflictResolutionTest() {
-        super("[2.0.3,)");
-    }
-
     /**
      * Verify that for a dependency being referenced in two different scopes, the scope given directly in the POM
      * always wins, even if weaker than the scope of the transitive dependency.

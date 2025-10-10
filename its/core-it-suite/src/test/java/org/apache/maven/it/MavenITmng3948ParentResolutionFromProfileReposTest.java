@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng3948ParentResolutionFromProfileReposTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3948ParentResolutionFromProfileReposTest() {
-        super("(2.0.10,2.1.0-M1),(2.1.0-M1,)");
-    }
-
     /**
      * Test that parent POMs can be resolved from remote repositories defined by (active) profiles in the POM.
      *

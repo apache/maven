@@ -31,10 +31,6 @@ public class MavenITmng7310LifecycleActivatedInSpecifiedModuleTest extends Abstr
 
     public static final String BASE_TEST_DIR = "/mng-7310-lifecycle-activated-in-specified-module";
 
-    public MavenITmng7310LifecycleActivatedInSpecifiedModuleTest() {
-        super("[4.0.0-alpha-1,)");
-    }
-
     public void testItShouldNotLoadAnExtensionInASiblingSubmodule() throws Exception {
         File extensionTestDir = extractResources(BASE_TEST_DIR + "/extension");
         File projectTestDir = extractResources(BASE_TEST_DIR + "/project");

@@ -30,10 +30,6 @@ public class MavenITmng6759TransitiveDependencyRepositoriesTest extends Abstract
 
     private final String projectBaseDir = "/mng-6759-transitive-dependency-repositories";
 
-    public MavenITmng6759TransitiveDependencyRepositoriesTest() {
-        super("(,3.6.2),(3.6.2,)");
-    }
-
     /**
      * Verifies that a project with a dependency graph like {@code A -> B -> C},
      * where C is in a non-Central repository should use B's {@literal <repositories>} to resolve C.

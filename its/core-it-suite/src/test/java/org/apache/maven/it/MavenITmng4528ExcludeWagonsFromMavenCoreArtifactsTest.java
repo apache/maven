@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
  */
 public class MavenITmng4528ExcludeWagonsFromMavenCoreArtifactsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4528ExcludeWagonsFromMavenCoreArtifactsTest() {
-        super("[2.0.5,3.0-alpha-1),[3.0-alpha-7,4.0.0-alpha-1)");
-    }
-
     /**
      * Test that wagon providers pulled in via transitive dependencies of Maven core artifacts get excluded from
      * plugin realms (in favor of potentially newer wagons bundled with the core). This requirement is mostly a

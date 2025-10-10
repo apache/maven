@@ -22,10 +22,10 @@ import java.io.File;
 
 import org.junit.jupiter.api.Test;
 
+/**
+ * @since 3.2.1
+ */
 class MavenITmng5530MojoExecutionScopeTest extends AbstractMavenIntegrationTestCase {
-    MavenITmng5530MojoExecutionScopeTest() {
-        super("[3.2.1,)");
-    }
 
     @Test
     public void testCopyfiles() throws Exception {

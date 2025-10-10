@@ -30,9 +30,6 @@ import org.junit.jupiter.api.Test;
  * @author Martin Kanters
  */
 public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng4660ResumeFromTest() {
-        super("[4.0.0-alpha-1,)");
-    }
 
     /**
      * Test that the --resume-from flag resolves dependencies inside the same Maven project

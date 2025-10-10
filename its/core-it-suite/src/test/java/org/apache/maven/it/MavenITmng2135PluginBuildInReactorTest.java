@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng2135PluginBuildInReactorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2135PluginBuildInReactorTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Test that the reactor can handle builds where one module provides a Maven plugin that another module uses.
      *

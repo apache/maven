@@ -27,12 +27,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This is a test set for <a href="https://github.com/apache/maven/issues/10937">gh-10937</a>.
+ * @since 3.0.0
+ *
  */
 class MavenITgh10937QuotedPipesInMavenOptsTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITgh10937QuotedPipesInMavenOptsTest() {
-        super("[3.0.0,)");
-    }
 
     /**
      *  Verify the dependency management of the consumer POM is computed correctly

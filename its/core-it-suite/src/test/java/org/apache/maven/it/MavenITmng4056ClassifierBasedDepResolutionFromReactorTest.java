@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4056ClassifierBasedDepResolutionFromReactorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4056ClassifierBasedDepResolutionFromReactorTest() {
-        super("[2.1.0,)");
-    }
-
     /**
      * Test that attached artifacts can be resolved from the reactor cache even if the dependency declaration
      * in the consumer module does not use the proper artifact type but merely specifies the classifier.

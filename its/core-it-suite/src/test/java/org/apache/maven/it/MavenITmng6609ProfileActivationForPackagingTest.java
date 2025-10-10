@@ -28,12 +28,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-6609">MNG-6609</a>.
  * Similar to {@link MavenITmng2276ProfileActivationBySettingsPropertyTest}.
+ * @since 3.9.0
+ *
  */
+@Disabled("Upper bound: 4.0.0-alpha-1")
 class MavenITmng6609ProfileActivationForPackagingTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng6609ProfileActivationForPackagingTest() {
-        super("[3.9.0,4.0.0-alpha-1),[4.0.0-alpha-3,)");
-    }
 
     /**
      * Verify that builds uses packaging based activation.

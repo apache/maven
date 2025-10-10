@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4684DistMgmtOverriddenByProfileTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4684DistMgmtOverriddenByProfileTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-beta-2,)");
-    }
-
     /**
      * Verify that active profiles can override distribution management settings.
      *

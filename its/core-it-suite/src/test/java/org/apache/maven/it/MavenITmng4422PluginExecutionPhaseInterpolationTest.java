@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4422PluginExecutionPhaseInterpolationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4422PluginExecutionPhaseInterpolationTest() {
-        super("[2.0,2.1.0),[2.2.2,)");
-    }
-
     /**
      * Test that the phase of plugin executions can be interpolated.
      *

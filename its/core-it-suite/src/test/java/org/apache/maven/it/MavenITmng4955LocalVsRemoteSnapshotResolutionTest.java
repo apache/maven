@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4955LocalVsRemoteSnapshotResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4955LocalVsRemoteSnapshotResolutionTest() {
-        super("[2.0.10,2.0.99),[2.1.0,3.0-alpha-1),[3.0.2,)");
-    }
-
     /**
      * Verify that dependency resolution prefers newer local snapshots over outdated remote snapshots that use the new
      * metadata format.

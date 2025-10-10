@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4526MavenProjectArtifactsScopeTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4526MavenProjectArtifactsScopeTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-alpha-7,)");
-    }
-
     /**
      * Test that MavenProject.getArtifacts() only holds artifacts matching the scope requested by a mojo. This
      * must also be the case when previously already artifacts from a wider scope were resolved.

@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng2309ProfileInjectionOrderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2309ProfileInjectionOrderTest() {
-        super("[2.0.5,)");
-    }
-
     /**
      * Test that profiles are injected in declaration order, with the last profile being the most dominant.
      *

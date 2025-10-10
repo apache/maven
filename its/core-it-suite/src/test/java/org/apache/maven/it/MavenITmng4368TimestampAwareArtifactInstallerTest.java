@@ -35,10 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4368TimestampAwareArtifactInstallerTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-alpha-6,4.0.0-alpha-8]");
-    }
-
     /**
      * Verify that the artifact installer copies POMs to the local repo even if they have an older timestamp as the
      * copy in the local repo.

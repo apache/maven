@@ -33,12 +33,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3477">MNG-3477</a>.
  * and extends for <a href="https://issues.apache.org/jira/browse/MNG-7758">MNG-7758</a>
+ * @since 4.0.0-beta-4
+ *
  */
 class MavenITmng3477DependencyResolutionErrorMessageTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng3477DependencyResolutionErrorMessageTest() {
-        super("[4.0.0-beta-4,)");
-    }
 
     /**
      * Tests that dependency resolution errors tell the underlying transport issue.

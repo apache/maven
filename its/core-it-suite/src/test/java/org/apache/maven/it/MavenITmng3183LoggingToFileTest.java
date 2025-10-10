@@ -38,10 +38,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
         "This IT is testing -l, while new Verifier uses same switch to make Maven4 log to file; in short, if that is broken, all ITs would be broken as well")
 public class MavenITmng3183LoggingToFileTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3183LoggingToFileTest() {
-        super("[3.0-alpha-1,)");
-    }
-
     /**
      * Test that the CLI parameter -l can be used to direct logging to a file.
      *

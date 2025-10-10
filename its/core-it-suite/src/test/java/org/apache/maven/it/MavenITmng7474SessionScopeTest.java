@@ -27,9 +27,6 @@ import org.junit.jupiter.api.Test;
  * check that Session scope beans are actually singletons for the session.
  */
 public class MavenITmng7474SessionScopeTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng7474SessionScopeTest() {
-        super("[3.9.0,)");
-    }
 
     @Test
     public void testSessionScope() throws Exception {

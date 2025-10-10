@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4768NearestMatchConflictResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4768NearestMatchConflictResolutionTest() {
-        super("[2.0.9,)");
-    }
-
     // Ideally, all six permutations of the three direct dependencies should yield the same result...
 
     @Test

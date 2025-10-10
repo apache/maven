@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng3680InvalidDependencyPOMTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3680InvalidDependencyPOMTest() {
-        super("(2.0.9,)");
-    }
-
     /**
      * Verify that dependencies with invalid POMs can still be used without failing the build.
      *

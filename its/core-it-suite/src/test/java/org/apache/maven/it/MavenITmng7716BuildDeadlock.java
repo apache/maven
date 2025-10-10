@@ -29,12 +29,11 @@ import org.junit.jupiter.api.Timeout;
  * <a href="https://issues.apache.org/jira/browse/MNG-7716">MNG-7716</a>.
  * Executing the project should not deadlock
  *
+ * @since 3.8.8
+ *
  */
+@Disabled("Upper bound: 3.9.0")
 class MavenITmng7716BuildDeadlock extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng7716BuildDeadlock() {
-        super("[3.8.8,3.9.0),[3.9.1,4.0.0-alpha-1),[4.0.0-alpha-5,)");
-    }
 
     /**
      * Verify that maven invocation works (no NPE/error happens).

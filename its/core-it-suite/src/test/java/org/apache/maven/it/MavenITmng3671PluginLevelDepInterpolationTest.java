@@ -32,11 +32,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author jdcasey
  *
+ * @since 2.0.8
+ *
  */
 public class MavenITmng3671PluginLevelDepInterpolationTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng3671PluginLevelDepInterpolationTest() {
-        super("(2.0.8,)"); // only test in 2.0.9+
-    }
 
     @Test
     public void testitMNG3671() throws Exception {

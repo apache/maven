@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4180PerDependencyExclusionsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4180PerDependencyExclusionsTest() {
-        super("[2.0.5,)");
-    }
-
     /**
      * Test that dependency exclusions are not applied globally but are limited to the subtree that is rooted at the
      * dependency they are declared on.

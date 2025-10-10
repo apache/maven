@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng2926PluginPrefixOrderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2926PluginPrefixOrderTest() {
-        super("(2.0.6,)");
-    }
-
     /**
      * Verify that when resolving plugin prefixes the group org.apache.maven.plugins is searched before
      * org.codehaus.mojo and that custom groups from the settings are searched before these standard ones.

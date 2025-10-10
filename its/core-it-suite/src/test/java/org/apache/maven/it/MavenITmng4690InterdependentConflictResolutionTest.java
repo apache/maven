@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4690InterdependentConflictResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4690InterdependentConflictResolutionTest() {
-        super("[2.0.9,)");
-    }
-
     // Ideally, all six permutations of the three direct dependencies should yield the same result...
 
     @Test

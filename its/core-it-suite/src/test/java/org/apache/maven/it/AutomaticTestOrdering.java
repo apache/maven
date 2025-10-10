@@ -1,0 +1,73 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+package org.apache.maven.it;
+
+import java.util.Comparator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.junit.jupiter.api.ClassDescriptor;
+import org.junit.jupiter.api.ClassOrderer;
+import org.junit.jupiter.api.ClassOrdererContext;
+
+/**
+ * Automatic test ordering that orders tests by prefix (gh-xxx, mng-xxx, it-xxx) in descending order.
+ * This ensures newer tests (higher numbers) are run first, which is useful for fail-fast behavior
+ * since newer tests are more likely to fail.
+ */
+public class AutomaticTestOrdering implements ClassOrderer {
+
+    private static final Pattern GH_PATTERN = Pattern.compile(".*MavenITgh(\\d+).*");
+    private static final Pattern MNG_PATTERN = Pattern.compile(".*MavenITmng(\\d+).*");
+    private static final Pattern IT_PATTERN = Pattern.compile(".*MavenIT(\\d+).*");
+
+    @Override
+    public void orderClasses(ClassOrdererContext context) {
+        context.getClassDescriptors()
+                .sort(Comparator.comparing(this::getOrderKey).reversed());
+    }
+
+    private String getOrderKey(ClassDescriptor classDescriptor) {
+        String className = classDescriptor.getTestClass().getSimpleName();
+
+        // Check for gh- pattern first (highest priority)
+        Matcher ghMatcher = GH_PATTERN.matcher(className);
+        if (ghMatcher.matches()) {
+            int number = Integer.parseInt(ghMatcher.group(1));
+            return String.format("1-%08d", number); // Prefix with 1 for highest priority
+        }
+
+        // Check for mng- pattern (medium priority)
+        Matcher mngMatcher = MNG_PATTERN.matcher(className);
+        if (mngMatcher.matches()) {
+            int number = Integer.parseInt(mngMatcher.group(1));
+            return String.format("2-%08d", number); // Prefix with 2 for medium priority
+        }
+
+        // Check for it- pattern (lowest priority)
+        Matcher itMatcher = IT_PATTERN.matcher(className);
+        if (itMatcher.matches()) {
+            int number = Integer.parseInt(itMatcher.group(1));
+            return String.format("3-%08d", number); // Prefix with 3 for lowest priority
+        }
+
+        // For any other tests, use the class name as-is (will be sorted alphabetically)
+        return "4-" + className;
+    }
+}

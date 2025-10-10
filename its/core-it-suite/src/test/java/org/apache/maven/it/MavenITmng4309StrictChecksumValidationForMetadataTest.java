@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4309StrictChecksumValidationForMetadataTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4309StrictChecksumValidationForMetadataTest() {
-        super("[3.0-beta-3,)");
-    }
-
     /**
      * Verify that strict checksum verification applies to metadata as well and in particular fails the build
      * during deployment when the previous metadata is corrupt.
