@@ -23,6 +23,6 @@ replacers:
   # Strip backport branch prefixes like [maven-4.0.x], [maven-3.x], etc.
   - search: '/^\[maven-[\d\.x-]+\]\s*-?\s*/g'
     replace: ''
-  # Convert JIRA ticket references to links
-  - search: '/\[(.*)-(\d+)\]*\s*-*\s*/g'
+  # Convert JIRA ticket references to links (but not maven branch prefixes)
+  - search: '/\[([A-Z]+)-(\d+)\]\s*-?\s*/g'
     replace: '[[$1-$2]](https://issues.apache.org/jira/browse/$1-$2) - '
