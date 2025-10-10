@@ -435,8 +435,9 @@ public abstract class BaseParser implements Parser {
         // are most dominant.
         // ----------------------------------------------------------------------
 
-        Map<String, String> userSpecifiedProperties =
-                new HashMap<>(context.options.userProperties().orElse(new HashMap<>()));
+        Map<String, String> userSpecifiedProperties = context.options != null
+                ? new HashMap<>(context.options.userProperties().orElse(new HashMap<>()))
+                : new HashMap<>();
         createInterpolator().interpolate(userSpecifiedProperties, paths::get);
 
         // ----------------------------------------------------------------------
