@@ -17,3 +17,12 @@
 
 _extends: maven-gh-actions-shared:.github/release-drafter.yml
 tag-template: maven-$RESOLVED_VERSION
+
+# Override replacers to strip backport branch prefixes and handle JIRA links
+replacers:
+  # Strip backport branch prefixes like [maven-4.0.x], [maven-3.x], etc.
+  - search: '/^\[maven-[\d\.x-]+\]\s*-?\s*/g'
+    replace: ''
+  # Convert JIRA ticket references to links
+  - search: '/\[(.*)-(\d+)\]*\s*-*\s*/g'
+    replace: '[[$1-$2]](https://issues.apache.org/jira/browse/$1-$2) - '
