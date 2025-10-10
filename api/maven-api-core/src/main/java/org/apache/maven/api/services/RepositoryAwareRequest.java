@@ -89,7 +89,7 @@ public interface RepositoryAwareRequest extends Request<Session> {
      *   <li>Ensures no null repository entries exist in the list</li>
      * </ul>
      *
-     * <p>Duplicate detection is based on the {@link RemoteRepository#equals(Object)}
+     * <p>Duplicate detection is based on the {@code RemoteRepository#equals(Object)}
      * method, which typically compares repository IDs and URLs.
      *
      * @param repositories the list of repositories to validate, may be {@code null}
