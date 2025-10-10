@@ -23,9 +23,6 @@ import java.io.File;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng5840ParentVersionRanges extends AbstractMavenIntegrationTestCase {
-    public MavenITmng5840ParentVersionRanges() {
-        super("[3.3,)");
-    }
 
     @Test
     public void testParentRangeRelativePathPointsToWrongVersion() throws Exception {

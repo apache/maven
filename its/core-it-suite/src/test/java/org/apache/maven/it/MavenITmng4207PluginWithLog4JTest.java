@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4207PluginWithLog4JTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4207PluginWithLog4JTest() {
-        super("[2.0.3,)");
-    }
-
     /**
      * Test that a plugin that depends on log4j and employs the artifact resolver does not die when using
      * commons-http to resolve an artifact.

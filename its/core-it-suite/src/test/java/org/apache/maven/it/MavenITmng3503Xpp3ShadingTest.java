@@ -31,9 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * different implementation of the shaded classes is used instead.
  */
 public class MavenITmng3503Xpp3ShadingTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng3503Xpp3ShadingTest() {
-        super("(2.0.9,2.1.0-M1),(2.1.0-M1,)"); // only test in 2.0.10+, and not in 2.1.0-M1
-    }
 
     @Test
     public void testitMNG3503NoLinkageErrors() throws Exception {

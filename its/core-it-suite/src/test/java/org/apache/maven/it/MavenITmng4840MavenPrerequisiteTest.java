@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4840MavenPrerequisiteTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4840MavenPrerequisiteTest() {
-        super("[2.1.0,3.0-alpha-1),[3.0.2,)");
-    }
-
     /**
      * Verify that builds fail straight when the current Maven version doesn't match a plugin's prerequisite.
      *

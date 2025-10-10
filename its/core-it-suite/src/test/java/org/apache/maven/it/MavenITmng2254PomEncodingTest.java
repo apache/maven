@@ -31,12 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author <a href="mailto:herve.boutemy@free.fr">Hervé Boutemy</a>
  *
+ * @since 2.0.7
+ *
  */
 public class MavenITmng2254PomEncodingTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng2254PomEncodingTest() {
-        super("(2.0.7,)"); // 2.0.8+
-    }
 
     /**
      * Verify that the encoding declaration of the POM is respected.

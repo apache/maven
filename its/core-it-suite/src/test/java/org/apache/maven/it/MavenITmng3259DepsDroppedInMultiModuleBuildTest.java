@@ -33,9 +33,6 @@ public class MavenITmng3259DepsDroppedInMultiModuleBuildTest extends AbstractMav
      * TODO: All combinations from the cross product {jdk-1.4.2_16, jdk-1.5.0_14, jdk-1.6.0_07} x {mvn-2.0.7, mvn-2.0.8}
      * passed this test for me (bentmann on WinXP). This makes the test appear very weak.
      */
-    public MavenITmng3259DepsDroppedInMultiModuleBuildTest() {
-        super("(2.0.8,)");
-    }
 
     @Test
     public void testitMNG3259() throws Exception {

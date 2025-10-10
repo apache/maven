@@ -68,10 +68,6 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest extends AbstractMaven
 
     private final RepoHandler repoHandler = new RepoHandler();
 
-    public MavenITmng4235HttpAuthDeploymentChecksumsTest() {
-        super("[2.0.5,2.2.0),(2.2.0,)");
-    }
-
     @BeforeEach
     protected void setUp() throws Exception {
         testDir = extractResources("/mng-4235");

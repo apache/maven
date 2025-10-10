@@ -25,13 +25,9 @@ import org.junit.jupiter.api.Test;
 /**
  *
  * @author Benjamin Bentmann
- *
+ * @since 2.0.0
  */
 public class MavenIT0130CleanLifecycleTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenIT0130CleanLifecycleTest() {
-        super("[2.0.0,)");
-    }
 
     /**
      * Test default binding of goals for "clean" lifecycle.

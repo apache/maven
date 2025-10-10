@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng2820PomCommentsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2820PomCommentsTest() {
-        super("[2.0.5,)");
-    }
-
     /**
      * Verify that installed/deployed POMs retain any XML-comments like license headers.
      *

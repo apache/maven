@@ -36,7 +36,7 @@ public class MavenITmng5895CIFriendlyUsageWithPropertyTest extends AbstractMaven
     public MavenITmng5895CIFriendlyUsageWithPropertyTest() {
         // The first version which contains the fix for the MNG-issue.
         // TODO: Think about it!
-        super("[3.5.0-alpha-2,)");
+        super();
     }
 
     /**

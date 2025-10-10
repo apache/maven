@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4883FailUponOverconstrainedVersionRangesTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4883FailUponOverconstrainedVersionRangesTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0.1,)");
-    }
-
     /**
      * Verify that dependency resolution fails if version ranges with an empty intersection are encountered.
      *

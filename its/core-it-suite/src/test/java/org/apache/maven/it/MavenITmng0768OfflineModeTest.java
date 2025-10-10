@@ -46,10 +46,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng0768OfflineModeTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng0768OfflineModeTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test offline mode.
      *

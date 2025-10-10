@@ -30,10 +30,6 @@ public class MavenITmng6759TransitiveDependencyRepositoriesTest extends Abstract
 
     private final String projectBaseDir = "/mng-6759-transitive-dependency-repositories";
 
-    public MavenITmng6759TransitiveDependencyRepositoriesTest() {
-        super("(,3.6.2),(3.6.2,)");
-    }
-
     /**
      * Verifies that a project with a dependency graph like {@code A -> B -> C},
      * where C is in a non-Central repository should use B's {@literal <repositories>} to resolve C.
@@ -68,11 +64,7 @@ public class MavenITmng6759TransitiveDependencyRepositoriesTest extends Abstract
         Verifier verifier = newVerifier(dependencyCProjectDir.getAbsolutePath());
 
         verifier.deleteDirectory("target");
-        if (getMavenVersion().getMajorVersion() <= 3) {
-            verifier.addCliArgument("-DaltDeploymentRepository=customRepo::default::" + customRepoUri);
-        } else {
-            verifier.addCliArgument("-DaltDeploymentRepository=customRepo::" + customRepoUri);
-        }
+        verifier.addCliArgument("-DaltDeploymentRepository=customRepo::" + customRepoUri);
         verifier.addCliArgument("deploy");
         verifier.execute();
         verifier.verifyErrorFreeLog();

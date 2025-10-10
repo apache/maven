@@ -27,9 +27,6 @@ import org.junit.jupiter.api.Test;
  * check that Maven fails if it cannot load core extensions contributed by <code>.mvn/extensions.xml</code>.
  */
 public class MavenITmng6326CoreExtensionsNotFoundTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng6326CoreExtensionsNotFoundTest() {
-        super("[3.8.5,)");
-    }
 
     @Test
     public void testCoreExtensionsNotFound() throws Exception {

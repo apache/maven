@@ -32,10 +32,6 @@ public class MavenITmng5338FileOptionToDirectory extends AbstractMavenIntegratio
 
     private File testDir;
 
-    public MavenITmng5338FileOptionToDirectory() {
-        super("[3.1-A,)");
-    }
-
     @BeforeEach
     public void setUp() throws Exception {
         testDir = extractResources("/mng-5338");

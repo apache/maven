@@ -27,10 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MavenITmng5742BuildExtensionClassloaderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5742BuildExtensionClassloaderTest() {
-        super("(3.2.5,)");
-    }
-
     @Test
     public void testBuildExtensionClassloader() throws Exception {
         File testDir = extractResources("/mng-5742-build-extension-classloader");

@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  */
 public class MavenITmng4580ProjectLevelPluginDepUsedForCliInvocInReactorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4580ProjectLevelPluginDepUsedForCliInvocInReactorTest() {
-        super("[3.0-beta-1,)");
-    }
-
     /**
      * Verify that project-level plugin dependencies of submodules are still considered when a plugin is invoked
      * directly from command line at the reactor root. In other words, the plugin realm used for a mojo execution

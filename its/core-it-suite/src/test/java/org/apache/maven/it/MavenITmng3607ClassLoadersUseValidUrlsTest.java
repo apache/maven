@@ -35,10 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng3607ClassLoadersUseValidUrlsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3607ClassLoadersUseValidUrlsTest() {
-        super("[3.0-alpha-2,)");
-    }
-
     /**
      * Test that class loaders created by Maven employ valid URLs, e.g. properly encode characters like spaces.
      *

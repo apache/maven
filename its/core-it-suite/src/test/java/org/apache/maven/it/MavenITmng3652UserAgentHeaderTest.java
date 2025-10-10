@@ -40,6 +40,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3652">MNG-3652</a>.
+ * @since 3.0-beta-3
+ *
  */
 @SuppressWarnings("checkstyle:UnusedLocalVariable")
 class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase {
@@ -50,10 +52,6 @@ class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase
     private String userAgent;
 
     private String customHeader;
-
-    MavenITmng3652UserAgentHeaderTest() {
-        super("[3.0-beta-3,)");
-    }
 
     @BeforeEach
     protected void setUp() throws Exception {

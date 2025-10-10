@@ -32,9 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  *
  */
 public class MavenITmng2136ActiveByDefaultProfileTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng2136ActiveByDefaultProfileTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test that &lt;activeByDefault/&gt; calculations for profile activation only
@@ -64,9 +61,8 @@ public class MavenITmng2136ActiveByDefaultProfileTest extends AbstractMavenInteg
         assertNull(props.getProperty("project.properties.it0102.testOutput"));
         assertEquals("Success", props.getProperty("project.properties.testOutput"));
         assertEquals("PASSED", props.getProperty("project.properties.settingsValue"));
-        if (matchesVersionRange("[2.0,3.0-alpha-1)")) {
-            // support for profiles.xml removed from 3.x (see MNG-4060)
-            assertEquals("Present", props.getProperty("project.properties.profilesXmlValue"));
-        }
+        // Inline version check: [2.0,3.0-alpha-1) - current Maven version doesn't match this range
+        // support for profiles.xml removed from 3.x (see MNG-4060)
+        // assertEquals("Present", props.getProperty("project.properties.profilesXmlValue"));
     }
 }

@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3899ExtensionInheritanceTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3899ExtensionInheritanceTest() {
-        super("(2.0.10,2.1.0-M1),(2.1.0-M1,)");
-    }
-
     /**
      * Test that build extensions are properly merged during inheritance.
      *

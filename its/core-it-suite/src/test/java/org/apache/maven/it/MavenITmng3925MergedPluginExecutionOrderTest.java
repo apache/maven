@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3925MergedPluginExecutionOrderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3925MergedPluginExecutionOrderTest() {
-        super("[2.0.5,)");
-    }
-
     /**
      * Test that multiple plugin executions bound to the same phase by child and parent are executed in the proper
      * order when no {@code <pluginManagement>} is involved.

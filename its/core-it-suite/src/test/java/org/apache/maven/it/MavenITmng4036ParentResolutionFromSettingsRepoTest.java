@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4036ParentResolutionFromSettingsRepoTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4036ParentResolutionFromSettingsRepoTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that a parent POM is downloaded from a default-style remote repo defined in the settings.
      *

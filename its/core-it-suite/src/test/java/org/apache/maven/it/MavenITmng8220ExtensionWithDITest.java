@@ -26,9 +26,6 @@ import org.junit.jupiter.api.Test;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8220">MNG-8220</a>.
  */
 public class MavenITmng8220ExtensionWithDITest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng8220ExtensionWithDITest() {
-        super("[4.0.0-beta-4,)");
-    }
 
     /**
      *  Verify that the central url can be overridden by a user property.

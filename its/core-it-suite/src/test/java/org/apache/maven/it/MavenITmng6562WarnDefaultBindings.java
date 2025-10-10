@@ -24,10 +24,6 @@ import org.junit.jupiter.api.Test;
 
 public class MavenITmng6562WarnDefaultBindings extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng6562WarnDefaultBindings() {
-        super("[4.0.0-alpha-1,)");
-    }
-
     @Test
     public void testItShouldNotWarn() throws Exception {
         File testDir = extractResources("/mng-6562-default-bindings");

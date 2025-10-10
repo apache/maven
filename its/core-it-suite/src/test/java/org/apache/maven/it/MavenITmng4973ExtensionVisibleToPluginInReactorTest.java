@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 public class MavenITmng4973ExtensionVisibleToPluginInReactorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4973ExtensionVisibleToPluginInReactorTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0.3,)");
-    }
-
     /**
      * Verify that a given plugin within a reactor build gets run with the proper class loader that is wired to
      * the extensions of the current module. More technically speaking, the plugin class realm cache must be keyed

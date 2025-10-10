@@ -26,12 +26,10 @@ import org.junit.jupiter.api.Test;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-7629">MNG-7629</a>.
  * It checks that building a subtree that consumes an attached artifact works
  *
+ * @since 4.0.0-alpha-4
+ *
  */
 class MavenITmng7629SubtreeBuildTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng7629SubtreeBuildTest() {
-        super("[4.0.0-alpha-4,)");
-    }
 
     /**
      * Verify that dependencies which are managed through imported dependency management work

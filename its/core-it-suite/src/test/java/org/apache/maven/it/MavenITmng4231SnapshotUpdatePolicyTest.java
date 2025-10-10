@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4231SnapshotUpdatePolicyTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4231SnapshotUpdatePolicyTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test the update policy "always" for snapshot dependencies is respected.
      *

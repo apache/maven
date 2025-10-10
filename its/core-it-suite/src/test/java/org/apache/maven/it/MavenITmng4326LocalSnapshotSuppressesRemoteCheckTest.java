@@ -47,10 +47,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest() {
-        super("[3.0-beta-1,)");
-    }
-
     /**
      * Verify that locally built/installed snapshot artifacts suppress remote update checks (as long as the local copy
      * still satisfies the update policy configured for the remote repository).

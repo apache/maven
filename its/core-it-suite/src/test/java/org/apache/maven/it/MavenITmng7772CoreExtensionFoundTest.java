@@ -28,9 +28,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.Assert.assertTrue;
 
 public class MavenITmng7772CoreExtensionFoundTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng7772CoreExtensionFoundTest() {
-        super("(4.0.0-alpha-7,)");
-    }
 
     @Test
     public void testWithExtensionsXmlCoreExtensionsFound() throws Exception {

@@ -31,10 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng5935OptionalLostInTranstiveManagedDependenciesTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5935OptionalLostInTranstiveManagedDependenciesTest() {
-        super("[3.5.1,)");
-    }
-
     @Test
     public void testitMNG5935() throws Exception {
         File testDir = extractResources("/mng-5935-optional-lost-in-transtive-managed-dependencies");

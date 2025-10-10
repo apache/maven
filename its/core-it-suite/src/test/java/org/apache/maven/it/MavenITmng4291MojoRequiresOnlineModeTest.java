@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4291MojoRequiresOnlineModeTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4291MojoRequiresOnlineModeTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that the mojo annotation @requiresOnline is recognized. For a direct mojo invocation, this means to fail
      * when Maven is in offline mode but the mojo requires online model.

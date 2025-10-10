@@ -27,12 +27,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8465">MNG-8465</a>.
+ * @since 4.0.0-rc-3-SNAPSHOT
+ *
  */
 class MavenITmng8465RepositoryWithProjectDirTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8465RepositoryWithProjectDirTest() {
-        super("[4.0.0-rc-3-SNAPSHOT,)");
-    }
 
     /**
      *  Verify various supported repository URLs.

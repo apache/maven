@@ -36,10 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng0187CollectedProjectsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng0187CollectedProjectsTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that MavenProject.getCollectedProjects() provides access to the direct and indirect modules
      * of the current project.

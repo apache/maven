@@ -30,10 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3575HexadecimalOctalPluginParameterConfigTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3575HexadecimalOctalPluginParameterConfigTest() {
-        super("[3.0.3,)");
-    }
-
     /**
      * Verify that numeric plugin parameters can be configured using hexadecimal/octal notation.
      *

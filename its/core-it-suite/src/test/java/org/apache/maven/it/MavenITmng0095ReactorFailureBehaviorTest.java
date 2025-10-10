@@ -29,9 +29,6 @@ import org.junit.jupiter.api.Test;
  *
  */
 public class MavenITmng0095ReactorFailureBehaviorTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng0095ReactorFailureBehaviorTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test fail-fast reactor behavior. Forces an exception to be thrown in

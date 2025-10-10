@@ -33,9 +33,6 @@ import org.junit.jupiter.api.Test;
  * @author jdcasey
  */
 public class MavenITmng3693PomFileBasedirChangeTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng3693PomFileBasedirChangeTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     @Test
     public void testitMNG3693() throws Exception {

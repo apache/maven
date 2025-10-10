@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4960MakeLikeReactorResumeTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4960MakeLikeReactorResumeTest() {
-        super("[2.1.0,3.0-alpha-1),[3.0.2,)");
-    }
-
     /**
      * Verify that the make-like reactor mode doesn't omit the selected projects when building their prerequisites
      * as well and resuming from one of them.

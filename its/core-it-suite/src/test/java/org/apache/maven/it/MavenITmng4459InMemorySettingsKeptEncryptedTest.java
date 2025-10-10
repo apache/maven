@@ -21,6 +21,7 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,11 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author Benjamin Bentmann
  */
+@Disabled("Bounds: [2.1.0,3.0-alpha-1),[3.0-alpha-5,4.0.0-beta-6)")
 public class MavenITmng4459InMemorySettingsKeptEncryptedTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng4459InMemorySettingsKeptEncryptedTest() {
-        super("[2.1.0,3.0-alpha-1),[3.0-alpha-5,4.0.0-beta-6)");
-    }
 
     /**
      * Verify that encrypted passwords in the settings stay encrypted in the settings model visible to

@@ -34,12 +34,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author mikko.koponen@ri.fi
+ * @since 2.0.7
+ *
  */
 public class MavenITmng2045testJarDependenciesBrokenInReactorTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng2045testJarDependenciesBrokenInReactorTest() {
-        super("(2.0.7,)"); // 2.0.8+
-    }
 
     @Test
     public void testitMNG2045() throws Exception {

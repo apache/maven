@@ -31,10 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class MavenITmng6609ProfileActivationForPackagingTest extends AbstractMavenIntegrationTestCase {
 
-    MavenITmng6609ProfileActivationForPackagingTest() {
-        super("[3.9.0,4.0.0-alpha-1),[4.0.0-alpha-3,)");
-    }
-
     /**
      * Verify that builds uses packaging based activation.
      * Each profile writes a Maven property named "packaging" with a different value (containing the actual packaging)

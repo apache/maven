@@ -33,10 +33,6 @@ public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenInteg
 
     private File moduleADir;
 
-    public MavenITmng7390SelectModuleOutsideCwdTest() {
-        super("[4.0.0-alpha-1,)");
-    }
-
     @BeforeEach
     protected void setUp() throws Exception {
         moduleADir = extractResources("/mng-7390-pl-outside-cwd/module-a");

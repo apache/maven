@@ -32,10 +32,6 @@ import org.junit.jupiter.api.Test;
 @Disabled("Disabled for MNG-7977")
 public class MavenITmng1088ReactorPluginResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng1088ReactorPluginResolutionTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that the plugin manager falls back to resolution from the repository if a plugin is part of the reactor
      * (i.e. an active project artifact) but the lifecycle has not been executed far enough to produce a file for

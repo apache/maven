@@ -35,10 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 public class MavenITmng4416PluginOrderAfterProfileInjectionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4416PluginOrderAfterProfileInjectionTest() {
-        super("[2.0.5,)");
-    }
-
     /**
      * Test that merging of plugins during profile injection follows these rules regarding ordering:
      * {@code model:   X ->      A -> B ->      D -> E

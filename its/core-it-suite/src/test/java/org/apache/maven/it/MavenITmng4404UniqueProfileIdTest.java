@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4404UniqueProfileIdTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4404UniqueProfileIdTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Verify that non-unique profile ids cause a model validation error during project building.
      *

@@ -35,10 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3998PluginExecutionConfigTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3998PluginExecutionConfigTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that multiple plugin executions do not lose their configuration when plugin management is used.
      *

@@ -36,13 +36,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * configuring a mojo.
  *
  * @author jdcasey
+ * @since 2.1.0-M1
+ *
  */
 @SuppressWarnings("checkstyle:UnusedLocalVariable")
 class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng2690MojoLoadingErrorsTest() {
-        super("(2.1.0-M1,)");
-    }
 
     @Test
     public void testNoClassDefFromMojoLoad() throws IOException, VerificationException {

@@ -31,9 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  */
 public class MavenITmng1021EqualAttachmentBuildNumberTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng1021EqualAttachmentBuildNumberTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test that source attachments have the same build number and timestamp as the main

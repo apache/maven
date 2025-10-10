@@ -32,9 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  */
 public class MavenITmng0956ComponentInjectionViaProjectLevelPluginDepTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng0956ComponentInjectionViaProjectLevelPluginDepTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test component injection from project-level plugin dependencies.

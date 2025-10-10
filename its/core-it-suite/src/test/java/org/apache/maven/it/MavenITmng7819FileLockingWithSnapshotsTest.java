@@ -40,7 +40,7 @@ class MavenITmng7819FileLockingWithSnapshotsTest extends AbstractMavenIntegratio
 
     protected MavenITmng7819FileLockingWithSnapshotsTest() {
         // broken: maven 3.9.2 and 4.0.0-alpha-5
-        super("[3.9.0,3.9.2),(3.9.2,3.999.999],[4.0.0-alpha-6,)");
+        super();
     }
 
     @BeforeEach

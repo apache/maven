@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4321CliUsesPluginMgmtConfigTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4321CliUsesPluginMgmtConfigTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that configuration from plugin management also applies to goals that are invoked directly from the
      * CLI even when the invoked plugin is neither explicitly present in the build/plugins section nor part of

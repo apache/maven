@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4048VersionRangeReactorResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4048VersionRangeReactorResolutionTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Verify that dependencies using version ranges can be resolved from the reactor.
      *

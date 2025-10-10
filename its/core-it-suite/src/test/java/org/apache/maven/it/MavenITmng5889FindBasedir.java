@@ -30,9 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * check that extensions in <code>.mvn/</code> are found when Maven is run with <code>-f path/to/pom.xml</code>.
  */
 public class MavenITmng5889FindBasedir extends AbstractMavenIntegrationTestCase {
-    public MavenITmng5889FindBasedir() {
-        super("[3.5.0,3.5.1)");
-    }
 
     /**
      * check that <code>path/to/.mvn/</code> is found when path to POM set by <code>--file path/to/pom.xml</code>

@@ -39,10 +39,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3380ManagedRelocatedTransdepsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3380ManagedRelocatedTransdepsTest() {
-        super("(2.0.9,)");
-    }
-
     /**
      * Verify that dependency resolution considers dependency management also for relocated artifacts.
      *

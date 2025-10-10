@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenIT0138PluginLifecycleTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenIT0138PluginLifecycleTest() {
-        super("[2.0.0,)");
-    }
-
     /**
      * Test default binding of goals for "maven-plugin" lifecycle.
      *

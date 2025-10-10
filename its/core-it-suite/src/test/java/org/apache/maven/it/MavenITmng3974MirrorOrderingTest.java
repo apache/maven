@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng3974MirrorOrderingTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3974MirrorOrderingTest() {
-        super("(2.0.9,2.1.0-M1),(2.1.0-M1,3.0-alpha-1),(3.0-alpha-1,)");
-    }
-
     /**
      * Test that mirror definitions are properly evaluated. In particular, the first matching mirror definition
      * from the settings should win, i.e. ordering of mirror definitions matters.

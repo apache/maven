@@ -36,6 +36,7 @@ import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.security.Password;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.jetty.util.security.Constraint.__BASIC_AUTH;
@@ -46,6 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  *
  * @author Benjamin Bentmann
  */
+@Disabled("Bounds: [2.1.0,3.0-alpha-1),[3.0-alpha-3,4.0.0-beta-4]")
 public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenIntegrationTestCase {
 
     private File testDir;
@@ -53,10 +55,6 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
     private Server server;
 
     private int port;
-
-    public MavenITmng0553SettingsAuthzEncryptionTest() {
-        super("[2.1.0,3.0-alpha-1),[3.0-alpha-3,4.0.0-beta-4]");
-    }
 
     @BeforeEach
     protected void setUp() throws Exception {
@@ -179,7 +177,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
      */
     @Test
     public void testitEncryption() throws Exception {
-        requiresMavenVersion("[2.1.0,3.0-alpha-1),[3.0-alpha-7,)");
+        // requiresMavenVersion("[2.1.0,3.0-alpha-1),[3.0-alpha-7,)");
 
         testDir = new File(testDir, "test-3");
 

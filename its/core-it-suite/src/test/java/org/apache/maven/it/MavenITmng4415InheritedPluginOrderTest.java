@@ -35,10 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 public class MavenITmng4415InheritedPluginOrderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4415InheritedPluginOrderTest() {
-        super("[2.0.5,)");
-    }
-
     /**
      * Test that merging of plugins during inheritance follows these rules regarding ordering:
      * {@code parent: X ->      A -> B ->      D -> E

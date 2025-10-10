@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4357LifecycleMappingDiscoveryInReactorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4357LifecycleMappingDiscoveryInReactorTest() {
-        super("[2.1.0,)");
-    }
-
     /**
      * Test that different projects in a reactor build can use different versions of the same extension.
      * This should still hold true if the two versions of the extension provide the same set of components.

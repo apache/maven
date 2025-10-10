@@ -36,6 +36,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author Maarten Mulders
  * @author Martin Kanters
+ * @since 4.0.0-alpha-1
  */
 public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTestCase {
     private final File parentDependentTestDir;
@@ -44,7 +45,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
     private final File fourModulesTestDir;
 
     public MavenITmng5760ResumeFeatureTest() throws IOException {
-        super("[4.0.0-alpha-1,)");
+        super();
         this.parentDependentTestDir = extractResources("/mng-5760-resume-feature/parent-dependent");
         this.parentIndependentTestDir = extractResources("/mng-5760-resume-feature/parent-independent");
         this.noProjectTestDir = extractResources("/mng-5760-resume-feature/no-project");

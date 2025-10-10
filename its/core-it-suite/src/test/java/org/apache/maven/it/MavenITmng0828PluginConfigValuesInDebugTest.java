@@ -36,10 +36,6 @@ public class MavenITmng0828PluginConfigValuesInDebugTest extends AbstractMavenIn
 
     private static final String NL = System.lineSeparator();
 
-    public MavenITmng0828PluginConfigValuesInDebugTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that plain plugin configuration values are listed correctly in debug mode.
      *

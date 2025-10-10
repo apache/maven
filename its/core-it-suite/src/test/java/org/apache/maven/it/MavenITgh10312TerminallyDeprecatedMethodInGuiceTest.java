@@ -30,9 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class MavenITgh10312TerminallyDeprecatedMethodInGuiceTest extends AbstractMavenIntegrationTestCase {
 
-    MavenITgh10312TerminallyDeprecatedMethodInGuiceTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
+    MavenITgh10312TerminallyDeprecatedMethodInGuiceTest() {}
 
     @Test
     void worryingShouldNotBePrinted() throws Exception {

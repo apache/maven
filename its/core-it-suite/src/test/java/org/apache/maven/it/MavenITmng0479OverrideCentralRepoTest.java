@@ -33,9 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  */
 public class MavenITmng0479OverrideCentralRepoTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng0479OverrideCentralRepoTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-beta-3,)");
-    }
 
     /**
      *  Verify that using the same repo id allows to override "central". This test checks the effective model.

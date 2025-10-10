@@ -29,9 +29,6 @@ import org.junit.jupiter.api.Test;
  * available to regular plugins.
  */
 public class MavenITmng6210CoreExtensionsCustomScopesTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng6210CoreExtensionsCustomScopesTest() {
-        super("(3.5.0,)");
-    }
 
     @Test
     public void testCoreExtensionCustomScopes() throws Exception {

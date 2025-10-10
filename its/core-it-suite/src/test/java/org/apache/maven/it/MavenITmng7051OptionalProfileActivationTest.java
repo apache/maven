@@ -25,10 +25,6 @@ import org.junit.jupiter.api.Test;
 public class MavenITmng7051OptionalProfileActivationTest extends AbstractMavenIntegrationTestCase {
     private static final String PROJECT_PATH = "/mng-7051-optional-profile-activation";
 
-    public MavenITmng7051OptionalProfileActivationTest() {
-        super("[4.0.0-alpha-1,)");
-    }
-
     /**
      * This test verifies that activating a non-existing profile breaks the build.
      *

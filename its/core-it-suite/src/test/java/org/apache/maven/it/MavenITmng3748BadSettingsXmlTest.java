@@ -36,13 +36,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * NOTE (cstamas): this IT was written to test that settings.xml is STRICT, while later changes modified
  * this very IT into the opposite: to test that parsing is LENIENT.
+ * @since 2.0.8
+ *
  */
 @Disabled("This is archaic test; we should strive to make settings.xml parsing strict again")
 public class MavenITmng3748BadSettingsXmlTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng3748BadSettingsXmlTest() {
-        super("(2.0.8,)"); // only test in 2.0.9+
-    }
 
     @Test
     public void testit() throws Exception {
@@ -54,35 +52,23 @@ public class MavenITmng3748BadSettingsXmlTest extends AbstractMavenIntegrationTe
         verifier.addCliArgument("settings.xml");
 
         // Maven 3.x will only print warnings (see MNG-4390)
-        if (matchesVersionRange("(,3.0-alpha-3)")) {
-            try {
-                verifier.addCliArgument("validate");
-                verifier.execute();
-                verifier.verifyErrorFreeLog();
+        verifier.addCliArgument("validate");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
 
-                fail("build should fail if settings.xml contains unrecognized elements.");
-            } catch (VerificationException e) {
-                // expected
-            }
-        } else {
-            verifier.addCliArgument("validate");
-            verifier.execute();
-            verifier.verifyErrorFreeLog();
-
-            List<String> lines = verifier.loadLogLines();
-            boolean foundWarning = false;
-            boolean isWarning = false;
-            for (String line : lines) {
-                if (!isWarning) {
-                    isWarning = line.startsWith("[WARNING]");
-                } else {
-                    if (line.matches("(?i).*unrecognised tag.+unknown.+2.*")) {
-                        foundWarning = true;
-                        break;
-                    }
+        List<String> lines = verifier.loadLogLines();
+        boolean foundWarning = false;
+        boolean isWarning = false;
+        for (String line : lines) {
+            if (!isWarning) {
+                isWarning = line.startsWith("[WARNING]");
+            } else {
+                if (line.matches("(?i).*unrecognised tag.+unknown.+2.*")) {
+                    foundWarning = true;
+                    break;
                 }
             }
-            assertTrue(foundWarning);
         }
+        assertTrue(foundWarning);
     }
 }

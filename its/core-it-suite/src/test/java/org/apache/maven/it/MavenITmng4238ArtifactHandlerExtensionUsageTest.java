@@ -40,10 +40,6 @@ public class MavenITmng4238ArtifactHandlerExtensionUsageTest extends AbstractMav
     private static final String TYPE = "jar";
     private static final String BAD_TYPE = "coreit";
 
-    public MavenITmng4238ArtifactHandlerExtensionUsageTest() {
-        super("(2.2.0,)");
-    }
-
     @Test
     public void testProjectPackagingUsage() throws IOException, VerificationException {
         File testDir = extractResources("/mng-4238");

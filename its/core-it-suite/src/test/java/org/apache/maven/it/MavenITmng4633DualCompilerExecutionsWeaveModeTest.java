@@ -51,10 +51,6 @@ import org.junit.jupiter.api.Test;
 @Disabled
 public class MavenITmng4633DualCompilerExecutionsWeaveModeTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4633DualCompilerExecutionsWeaveModeTest() {
-        super("[3.0-beta-2,)");
-    }
-
     /**
      * Submodule2 depends on compiler output from submodule1, but dependency is in generate-resources phase in
      * submodule2. This effectively tests the module-locking of the project artifact.

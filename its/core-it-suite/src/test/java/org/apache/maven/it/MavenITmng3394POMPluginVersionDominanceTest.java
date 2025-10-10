@@ -29,14 +29,12 @@ import org.junit.jupiter.api.Test;
  * bindings can find plugin versions in the pluginManagement section
  * when the build/plugins section is missing that plugin, and that
  * plugin versions in build/plugins override those in build/pluginManagement.
+ * @since 2.0.8
+ *
  */
 public class MavenITmng3394POMPluginVersionDominanceTest extends AbstractMavenIntegrationTestCase {
 
     private static final String BASEDIR_PREFIX = "/mng-3394/";
-
-    public MavenITmng3394POMPluginVersionDominanceTest() {
-        super("(2.0.8,)"); // only test in 2.0.9+
-    }
 
     @Test
     public void testitMNG3394a() throws Exception {

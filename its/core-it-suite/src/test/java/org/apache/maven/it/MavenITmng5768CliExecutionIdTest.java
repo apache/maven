@@ -26,9 +26,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MavenITmng5768CliExecutionIdTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng5768CliExecutionIdTest() {
-        super("(3.2.5,)");
-    }
 
     @Test
     public void testit() throws Exception {

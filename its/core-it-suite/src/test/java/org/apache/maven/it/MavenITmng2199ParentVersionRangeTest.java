@@ -30,10 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2199ParentVersionRangeTest() {
-        super("[3.2.2,)");
-    }
-
     @Test
     public void testValidParentVersionRangeWithInclusiveUpperBound() throws Exception {
         // failingMavenVersions("(3.2.2,3.5.0-alpha-0)");

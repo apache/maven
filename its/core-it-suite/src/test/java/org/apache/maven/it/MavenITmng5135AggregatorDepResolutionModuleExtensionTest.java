@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng5135AggregatorDepResolutionModuleExtensionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5135AggregatorDepResolutionModuleExtensionTest() {
-        super("[2.0.9,3.0-alpha-1),[3.0.4,)");
-    }
-
     /**
      * Verify that dependency resolution for aggregator mojos considers the extensions that apply to a given module.
      *

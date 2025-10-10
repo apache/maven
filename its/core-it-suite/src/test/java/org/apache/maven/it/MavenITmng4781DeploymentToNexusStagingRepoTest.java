@@ -51,10 +51,6 @@ public class MavenITmng4781DeploymentToNexusStagingRepoTest extends AbstractMave
 
     private final Deque<String> deployedUris = new ConcurrentLinkedDeque<>();
 
-    public MavenITmng4781DeploymentToNexusStagingRepoTest() {
-        super("[2.0.3,)");
-    }
-
     @BeforeEach
     public void setUp() throws Exception {
         Handler repoHandler = new AbstractHandler() {

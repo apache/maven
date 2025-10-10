@@ -29,9 +29,6 @@ import org.junit.jupiter.api.Test;
  *
  */
 public class MavenITmng0985NonExecutedPluginMgmtGoalsTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng0985NonExecutedPluginMgmtGoalsTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test that plugins in pluginManagement aren't included in the build

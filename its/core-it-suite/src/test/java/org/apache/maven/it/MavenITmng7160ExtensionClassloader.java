@@ -24,9 +24,6 @@ import java.io.IOException;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng7160ExtensionClassloader extends AbstractMavenIntegrationTestCase {
-    public MavenITmng7160ExtensionClassloader() {
-        super("[3.9.0,)");
-    }
 
     @Test
     public void testVerify() throws IOException, VerificationException {

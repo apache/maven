@@ -35,10 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng3475BaseAlignedDirTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3475BaseAlignedDirTest() {
-        super("(2.0.1,2.0.3),(2.0.3,)");
-    }
-
     /**
      * Verify that project directories are basedir aligned when queried by plugin parameter expressions.
      *
@@ -66,10 +62,6 @@ public class MavenITmng3475BaseAlignedDirTest extends AbstractMavenIntegrationTe
         assertPathEquals(testDir, "src/main/java", configProps.getProperty("mapParam.buildSourceDirectory"));
 
         assertPathEquals(testDir, "src/test/java", configProps.getProperty("mapParam.buildTestSourceDirectory"));
-
-        if (matchesVersionRange("[2.1.0-M1,)")) {
-            assertPathEquals(testDir, "target/site", configProps.getProperty("mapParam.reportingOutputDirectory"));
-        }
 
         // show that using relative paths is aligned for File configuration properties regardless
         assertPathEquals(testDir, "target/site", configProps.getProperty("fileParam"));

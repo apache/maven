@@ -46,10 +46,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4500NoUpdateOfTimestampedSnapshotsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4500NoUpdateOfTimestampedSnapshotsTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-alpha-6,)");
-    }
-
     /**
      * Test that timestamped snapshots are treated as immutable, i.e. Maven should never check for updates of them
      * once downloaded from a remote repo regardless of the update policy.

@@ -24,12 +24,10 @@ import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8383">MNG-8383</a>.
+ * @since 4.0.0-beta-6
+ *
  */
 class MavenITmng8383UnknownTypeDependenciesTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8383UnknownTypeDependenciesTest() {
-        super("[4.0.0-beta-6,)");
-    }
 
     /**
      *  Verify that dependencies of unknown types are not added to classpath

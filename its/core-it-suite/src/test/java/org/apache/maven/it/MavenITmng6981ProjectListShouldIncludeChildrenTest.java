@@ -26,10 +26,6 @@ public class MavenITmng6981ProjectListShouldIncludeChildrenTest extends Abstract
 
     private static final String RESOURCE_PATH = "/mng-6981-pl-should-include-children";
 
-    public MavenITmng6981ProjectListShouldIncludeChildrenTest() {
-        super("[4.0.0-alpha-1,)");
-    }
-
     @Test
     public void testProjectListShouldIncludeChildrenByDefault() throws Exception {
         final File testDir = extractResources(RESOURCE_PATH);

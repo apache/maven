@@ -30,9 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author Benjamin Bentmann
  */
 public class MavenITmng3288SystemScopeDirTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng3288SystemScopeDirTest() {
-        super("[2.0.9,)");
-    }
 
     /**
      * Test the use of a system scoped dependency to a directory instead of a JAR which should fail early.

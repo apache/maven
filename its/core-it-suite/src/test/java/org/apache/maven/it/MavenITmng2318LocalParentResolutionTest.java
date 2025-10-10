@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng2318LocalParentResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2318LocalParentResolutionTest() {
-        super("(2.0.6,)");
-    }
-
     /**
      * When a project has modules and its parent is not preinstalled [MNG-2318]
      *

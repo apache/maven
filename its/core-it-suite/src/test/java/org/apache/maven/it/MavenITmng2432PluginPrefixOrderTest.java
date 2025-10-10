@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng2432PluginPrefixOrderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2432PluginPrefixOrderTest() {
-        super("[2.1.0,)");
-    }
-
     /**
      * Verify that when resolving plugin prefixes the plugins from the POM are searched before the plugin groups
      * from the settings.

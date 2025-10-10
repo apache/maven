@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng2668UsePluginDependenciesForSortingTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2668UsePluginDependenciesForSortingTest() {
-        super("(2.1.0-M1,3.0-alpha-1),[3.0-alpha-3,)"); // 2.1.0-M2+
-    }
-
     @Test
     public void testitMNG2668() throws Exception {
         File testDir = extractResources("/mng-2668");

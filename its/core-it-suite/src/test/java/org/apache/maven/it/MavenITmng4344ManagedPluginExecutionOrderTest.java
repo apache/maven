@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4344ManagedPluginExecutionOrderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4344ManagedPluginExecutionOrderTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that custom executions from managed plugins which are part of the default lifecycle bindings get
      * executed after executions from plugins that are defined in the regular build section and bound to the

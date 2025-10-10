@@ -30,9 +30,6 @@ import org.junit.jupiter.api.Test;
  * @author jdcasey
  */
 public class MavenITmng3694ReactorProjectsDynamismTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng3694ReactorProjectsDynamismTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     @Test
     public void testitMNG3694() throws Exception {

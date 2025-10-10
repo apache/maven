@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4779MultipleDepsWithVersionRangeFromLocalRepoTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4779MultipleDepsWithVersionRangeFromLocalRepoTest() {
-        super("[2.0.3,)");
-    }
-
     /**
      * Test that dependency resolution doesn't error out when a dependency with a range satisfied from the local repo
      * is seen more than once during the collection.

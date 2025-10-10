@@ -31,12 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-7804">MNG-7804</a>.
  * Verifies that plugin execution can be ordered across different plugins.
  *
+ * @since 4.0.0-alpha-6
+ *
  */
 class MavenITmng7804PluginExecutionOrderTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng7804PluginExecutionOrderTest() {
-        super("[4.0.0-alpha-6,)");
-    }
 
     /**
      * Verify that plugin executions are executed in order

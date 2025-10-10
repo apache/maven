@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4400RepositoryOrderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4400RepositoryOrderTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that repositories declared in the settings.xml are accessed in their declaration order.
      *

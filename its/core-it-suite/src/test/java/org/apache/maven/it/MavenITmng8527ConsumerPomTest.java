@@ -31,12 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8527">MNG-8527</a>.
+ * @since 4.0.0-rc-3-SNAPSHOT
+ *
  */
 class MavenITmng8527ConsumerPomTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8527ConsumerPomTest() {
-        super("[4.0.0-rc-3-SNAPSHOT,)");
-    }
 
     /**
      *  Verify project is buildable.

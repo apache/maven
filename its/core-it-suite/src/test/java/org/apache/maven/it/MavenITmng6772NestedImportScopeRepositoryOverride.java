@@ -36,10 +36,6 @@ import org.junit.jupiter.api.Test;
 @Disabled // This IT has been disabled until it is decided how the solution shall look like
 public class MavenITmng6772NestedImportScopeRepositoryOverride extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng6772NestedImportScopeRepositoryOverride() {
-        super("(,4.0.0-alpha-1),[4.0.0-alpha-1,)");
-    }
-
     // This will test the behavior using ProjectModelResolver
     @Test
     public void testitInProject() throws Exception {

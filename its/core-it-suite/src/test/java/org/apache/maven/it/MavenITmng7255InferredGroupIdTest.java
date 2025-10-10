@@ -26,10 +26,6 @@ import org.junit.jupiter.api.Test;
 public class MavenITmng7255InferredGroupIdTest extends AbstractMavenIntegrationTestCase {
     private static final String PROJECT_PATH = "/mng-7255-inferred-groupid";
 
-    public MavenITmng7255InferredGroupIdTest() {
-        super("[4.0.0-alpha-5,)");
-    }
-
     @Test
     public void testInferredGroupId() throws IOException, VerificationException {
         final File projectDir = extractResources(PROJECT_PATH);

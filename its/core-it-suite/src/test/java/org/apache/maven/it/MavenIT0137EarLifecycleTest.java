@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenIT0137EarLifecycleTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenIT0137EarLifecycleTest() {
-        super("[2.0.0,)");
-    }
-
     /**
      * Test default binding of goals for "ear" lifecycle.
      *

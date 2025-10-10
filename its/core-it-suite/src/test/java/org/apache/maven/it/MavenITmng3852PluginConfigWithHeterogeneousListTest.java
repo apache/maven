@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3852PluginConfigWithHeterogeneousListTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3852PluginConfigWithHeterogeneousListTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that list-valued plugin parameters respect the ordering of their elements as given in the POM, even
      * if these elements have different names.

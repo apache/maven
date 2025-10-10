@@ -32,9 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * @author Hervé Boutemy
  */
 public class MavenITmng5716ToolchainsTypeTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng5716ToolchainsTypeTest() {
-        super("(3.2.3,)");
-    }
 
     /**
      *

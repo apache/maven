@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  */
 public class MavenITmng4361ForceDependencySnapshotUpdateTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4361ForceDependencySnapshotUpdateTest() {
-        super("[2.0,3.0-alpha-1),[3.0-alpha-4,)");
-    }
-
     /**
      * Verify that snapshot updates of dependencies can be forced from the command line via "-U". In more detail,
      * this means updating the JAR and its accompanying hierarchy of POMs.

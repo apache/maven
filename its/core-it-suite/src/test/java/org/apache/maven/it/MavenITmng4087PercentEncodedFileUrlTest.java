@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4087PercentEncodedFileUrlTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4087PercentEncodedFileUrlTest() {
-        super("[2.1.0,)");
-    }
-
     /**
      * Test that deployment to a file:// repository decodes percent-encoded characters.
      *

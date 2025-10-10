@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng0848UserPropertyOverridesDefaultValueTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng0848UserPropertyOverridesDefaultValueTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that execution/system properties take precedence over default value of plugin parameters.
      *

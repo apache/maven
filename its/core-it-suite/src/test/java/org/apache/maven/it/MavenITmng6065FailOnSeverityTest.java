@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng6065FailOnSeverityTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng6065FailOnSeverityTest() {
-        super("[4.0.0-alpha-1,)");
-    }
-
     @Test
     public void testItShouldFailOnWarnLogMessages() throws Exception {
         File testDir = extractResources("/mng-6065-fail-on-severity");

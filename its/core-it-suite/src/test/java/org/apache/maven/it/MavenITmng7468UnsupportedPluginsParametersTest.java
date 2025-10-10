@@ -34,9 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Slawomir Jaranowski
  */
 public class MavenITmng7468UnsupportedPluginsParametersTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng7468UnsupportedPluginsParametersTest() {
-        super("[3.9.0,)");
-    }
 
     /**
      * Test that ensures that warning is not printed for empty configuration

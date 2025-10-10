@@ -27,10 +27,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng6972AllowAccessToGraphPackageTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng6972AllowAccessToGraphPackageTest() {
-        super("[3.9.0,)");
-    }
-
     @Test
     public void testit() throws Exception {
 

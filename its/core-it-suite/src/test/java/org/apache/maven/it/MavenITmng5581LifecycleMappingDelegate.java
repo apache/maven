@@ -23,9 +23,6 @@ import java.io.File;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng5581LifecycleMappingDelegate extends AbstractMavenIntegrationTestCase {
-    public MavenITmng5581LifecycleMappingDelegate() {
-        super("[3.2.1,)");
-    }
 
     @Test
     public void testCustomLifecycle() throws Exception {

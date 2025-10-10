@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenIT0144LifecycleExecutionOrderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenIT0144LifecycleExecutionOrderTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that the lifecycle phases execute in proper order.
      *
@@ -71,23 +67,19 @@ public class MavenIT0144LifecycleExecutionOrderTest extends AbstractMavenIntegra
         expected.add("generate-test-resources");
         expected.add("process-test-resources");
         expected.add("test-compile");
-        if (matchesVersionRange("(2.0.4,)")) {
-            // MNG-1508
-            expected.add("process-test-classes");
-        }
+        // Inline version check: (2.0.4,) - current Maven version matches
+        // MNG-1508
+        expected.add("process-test-classes");
         expected.add("test");
-        if (matchesVersionRange("(2.1.0-M1,)")) {
-            // MNG-2097
-            expected.add("prepare-package");
-        }
+        // Inline version check: (2.1.0-M1,) - current Maven version matches
+        // MNG-2097
+        expected.add("prepare-package");
         expected.add("package");
-        if (matchesVersionRange("(2.0.1,)")) {
-            expected.add("pre-integration-test");
-        }
+        // Inline version check: (2.0.1,) - current Maven version matches
+        expected.add("pre-integration-test");
         expected.add("integration-test");
-        if (matchesVersionRange("(2.0.1,)")) {
-            expected.add("post-integration-test");
-        }
+        // Inline version check: (2.0.1,) - current Maven version matches
+        expected.add("post-integration-test");
         expected.add("verify");
         expected.add("install");
         expected.add("deploy");

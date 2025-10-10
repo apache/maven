@@ -23,9 +23,6 @@ import java.io.File;
 import org.junit.jupiter.api.Test;
 
 public class MavenIT0064MojoConfigViaSettersTest extends AbstractMavenIntegrationTestCase {
-    public MavenIT0064MojoConfigViaSettersTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test the use of a mojo that uses setters instead of private fields

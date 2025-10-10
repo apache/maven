@@ -20,6 +20,7 @@ package org.apache.maven.it;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -27,11 +28,8 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
+@Disabled("Bounds: [3.0-alpha-3,4.0.0-alpha-1)")
 public class MavenITmng4262MakeLikeReactorDottedPathTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng4262MakeLikeReactorDottedPathTest() {
-        super("[3.0-alpha-3,4.0.0-alpha-1)");
-    }
 
     private void clean(Verifier verifier) throws Exception {
         verifier.deleteDirectory("target");
