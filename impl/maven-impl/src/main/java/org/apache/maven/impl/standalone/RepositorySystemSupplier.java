@@ -195,12 +195,14 @@ public class RepositorySystemSupplier {
             TransporterProvider transporterProvider,
             RepositoryLayoutProvider layoutProvider,
             ChecksumPolicyProvider checksumPolicyProvider,
+            PathProcessor pathProcessor,
             ChecksumProcessor checksumProcessor,
             Map<String, ProvidedChecksumsSource> providedChecksumsSources) {
         return new BasicRepositoryConnectorFactory(
                 transporterProvider,
                 layoutProvider,
                 checksumPolicyProvider,
+                pathProcessor,
                 checksumProcessor,
                 providedChecksumsSources);
     }
@@ -251,8 +253,8 @@ public class RepositorySystemSupplier {
     @Provides
     @Named(GroupIdRemoteRepositoryFilterSource.NAME)
     static GroupIdRemoteRepositoryFilterSource newGroupIdRemoteRepositoryFilterSource(
-            RepositorySystemLifecycle repositorySystemLifecycle) {
-        return new GroupIdRemoteRepositoryFilterSource(repositorySystemLifecycle);
+            RepositorySystemLifecycle repositorySystemLifecycle, PathProcessor pathProcessor) {
+        return new GroupIdRemoteRepositoryFilterSource(repositorySystemLifecycle, pathProcessor);
     }
 
     @Provides
@@ -566,8 +568,10 @@ public class RepositorySystemSupplier {
     @Provides
     @Named(SummaryFileTrustedChecksumsSource.NAME)
     static SummaryFileTrustedChecksumsSource newSummaryFileTrustedChecksumsSource(
-            LocalPathComposer localPathComposer, RepositorySystemLifecycle repositorySystemLifecycle) {
-        return new SummaryFileTrustedChecksumsSource(localPathComposer, repositorySystemLifecycle);
+            LocalPathComposer localPathComposer,
+            RepositorySystemLifecycle repositorySystemLifecycle,
+            PathProcessor pathProcessor) {
+        return new SummaryFileTrustedChecksumsSource(localPathComposer, repositorySystemLifecycle, pathProcessor);
     }
 
     @Provides
