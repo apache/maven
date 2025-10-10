@@ -61,6 +61,8 @@ public abstract class MavenExecutorTestSupport {
                 .resolve("home");
         Files.createDirectories(userHome);
         MimirInfuser.infuseUW(userHome);
+
+        System.out.println("=== " + testInfo.getTestMethod().orElseThrow().getName());
     }
 
     private static Executor executor;
@@ -147,6 +149,7 @@ public abstract class MavenExecutorTestSupport {
                         .argument("-l")
                         .argument(logfile)
                         .build()));
+        System.out.println(Files.readString(cwd.resolve(logfile)));
     }
 
     @Test
@@ -162,6 +165,7 @@ public abstract class MavenExecutorTestSupport {
                         .argument("-l")
                         .argument(logfile)
                         .build()));
+        System.out.println(Files.readString(cwd.resolve(logfile)));
     }
 
     @Test
@@ -190,6 +194,7 @@ public abstract class MavenExecutorTestSupport {
                         .argument("verify")
                         .stdOut(stdout)
                         .build()));
+        System.out.println(stdout);
         assertFalse(stdout.toString().contains("[\u001B["), "By default no ANSI color codes");
         assertTrue(stdout.toString().contains("INFO"), "No INFO found");
     }
@@ -207,6 +212,7 @@ public abstract class MavenExecutorTestSupport {
                         .argument("--color=yes")
                         .stdOut(stdout)
                         .build()));
+        System.out.println(stdout);
         assertTrue(stdout.toString().contains("[\u001B["), "No ANSI codes present");
         assertTrue(stdout.toString().contains("INFO"), "No INFO found");
     }
@@ -224,6 +230,7 @@ public abstract class MavenExecutorTestSupport {
                         .argument("--color=no")
                         .stdOut(stdout)
                         .build()));
+        System.out.println(stdout);
         assertFalse(stdout.toString().contains("[\u001B["), "No ANSI codes present");
         assertTrue(stdout.toString().contains("INFO"), "No INFO found");
     }
@@ -240,6 +247,7 @@ public abstract class MavenExecutorTestSupport {
                         .argument("verify")
                         .stdOut(stdout)
                         .build()));
+        System.out.println(stdout);
         // Note: we do not validate ANSI as Maven3 is weird in this respect (thinks is color but is not)
         // assertTrue(stdout.toString().contains("[\u001B["), "No ANSI codes present");
         assertTrue(stdout.toString().contains("INFO"), "No INFO found");
@@ -258,6 +266,7 @@ public abstract class MavenExecutorTestSupport {
                         .argument("--color=yes")
                         .stdOut(stdout)
                         .build()));
+        System.out.println(stdout);
         assertTrue(stdout.toString().contains("[\u001B["), "No ANSI codes present");
         assertTrue(stdout.toString().contains("INFO"), "No INFO found");
     }
@@ -275,6 +284,7 @@ public abstract class MavenExecutorTestSupport {
                         .argument("--color=no")
                         .stdOut(stdout)
                         .build()));
+        System.out.println(stdout);
         assertFalse(stdout.toString().contains("[\u001B["), "No ANSI codes present");
         assertTrue(stdout.toString().contains("INFO"), "No INFO found");
     }

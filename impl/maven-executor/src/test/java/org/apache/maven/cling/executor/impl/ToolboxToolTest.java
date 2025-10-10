@@ -33,7 +33,6 @@ import org.apache.maven.cling.executor.forked.ForkedMavenExecutor;
 import org.apache.maven.cling.executor.internal.HelperImpl;
 import org.apache.maven.cling.executor.internal.ToolboxTool;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.io.CleanupMode;
@@ -61,6 +60,8 @@ public class ToolboxToolTest {
         userHome = tempDir.resolve(testInfo.getTestMethod().orElseThrow().getName());
         Files.createDirectories(userHome);
         MimirInfuser.infuseUW(userHome);
+
+        System.out.println("=== " + testInfo.getTestMethod().orElseThrow().getName());
     }
 
     private ExecutorRequest.Builder getExecutorRequest(ExecutorHelper helper) {
@@ -77,6 +78,7 @@ public class ToolboxToolTest {
         ExecutorHelper helper =
                 new HelperImpl(mode, mvn3Home(), userHome, EMBEDDED_MAVEN_EXECUTOR, FORKED_MAVEN_EXECUTOR);
         Map<String, String> dump = new ToolboxTool(helper, VERSION).dump(getExecutorRequest(helper));
+        System.out.println(mode.name() + ": " + dump.toString());
         assertEquals(System.getProperty("maven3version"), dump.get("maven.version"));
     }
 
@@ -86,6 +88,7 @@ public class ToolboxToolTest {
         ExecutorHelper helper =
                 new HelperImpl(mode, mvn4Home(), userHome, EMBEDDED_MAVEN_EXECUTOR, FORKED_MAVEN_EXECUTOR);
         Map<String, String> dump = new ToolboxTool(helper, VERSION).dump(getExecutorRequest(helper));
+        System.out.println(mode.name() + ": " + dump.toString());
         assertEquals(System.getProperty("maven4version"), dump.get("maven.version"));
     }
 
@@ -94,6 +97,7 @@ public class ToolboxToolTest {
     void version3(ExecutorHelper.Mode mode) {
         ExecutorHelper helper =
                 new HelperImpl(mode, mvn3Home(), userHome, EMBEDDED_MAVEN_EXECUTOR, FORKED_MAVEN_EXECUTOR);
+        System.out.println(mode.name() + ": " + helper.mavenVersion());
         assertEquals(System.getProperty("maven3version"), helper.mavenVersion());
     }
 
@@ -102,6 +106,7 @@ public class ToolboxToolTest {
     void version4(ExecutorHelper.Mode mode) {
         ExecutorHelper helper =
                 new HelperImpl(mode, mvn4Home(), userHome, EMBEDDED_MAVEN_EXECUTOR, FORKED_MAVEN_EXECUTOR);
+        System.out.println(mode.name() + ": " + helper.mavenVersion());
         assertEquals(System.getProperty("maven4version"), helper.mavenVersion());
     }
 
@@ -111,17 +116,18 @@ public class ToolboxToolTest {
         ExecutorHelper helper =
                 new HelperImpl(mode, mvn3Home(), userHome, EMBEDDED_MAVEN_EXECUTOR, FORKED_MAVEN_EXECUTOR);
         String localRepository = new ToolboxTool(helper, VERSION).localRepository(getExecutorRequest(helper));
+        System.out.println(mode.name() + ": " + localRepository);
         Path local = Paths.get(localRepository);
         assertTrue(Files.isDirectory(local));
     }
 
     @ParameterizedTest
     @EnumSource(ExecutorHelper.Mode.class)
-    @Disabled("disable temporarily so that we can get the debug statement")
     void localRepository4(ExecutorHelper.Mode mode) {
         ExecutorHelper helper =
                 new HelperImpl(mode, mvn4Home(), userHome, EMBEDDED_MAVEN_EXECUTOR, FORKED_MAVEN_EXECUTOR);
         String localRepository = new ToolboxTool(helper, VERSION).localRepository(getExecutorRequest(helper));
+        System.out.println(mode.name() + ": " + localRepository);
         Path local = Paths.get(localRepository);
         assertTrue(Files.isDirectory(local));
     }
@@ -133,6 +139,7 @@ public class ToolboxToolTest {
                 new HelperImpl(mode, mvn3Home(), userHome, EMBEDDED_MAVEN_EXECUTOR, FORKED_MAVEN_EXECUTOR);
         String path = new ToolboxTool(helper, VERSION)
                 .artifactPath(getExecutorRequest(helper), "aopalliance:aopalliance:1.0", "central");
+        System.out.println(mode.name() + ": " + path);
         // split repository: assert "ends with" as split may introduce prefixes
         assertTrue(
                 path.endsWith("aopalliance" + File.separator + "aopalliance" + File.separator + "1.0" + File.separator
@@ -147,6 +154,7 @@ public class ToolboxToolTest {
                 new HelperImpl(mode, mvn4Home(), userHome, EMBEDDED_MAVEN_EXECUTOR, FORKED_MAVEN_EXECUTOR);
         String path = new ToolboxTool(helper, VERSION)
                 .artifactPath(getExecutorRequest(helper), "aopalliance:aopalliance:1.0", "central");
+        System.out.println(mode.name() + ": " + path);
         // split repository: assert "ends with" as split may introduce prefixes
         assertTrue(
                 path.endsWith("aopalliance" + File.separator + "aopalliance" + File.separator + "1.0" + File.separator
@@ -161,6 +169,7 @@ public class ToolboxToolTest {
                 new HelperImpl(mode, mvn4Home(), userHome, EMBEDDED_MAVEN_EXECUTOR, FORKED_MAVEN_EXECUTOR);
         String path =
                 new ToolboxTool(helper, VERSION).metadataPath(getExecutorRequest(helper), "aopalliance", "someremote");
+        System.out.println(mode.name() + ": " + path);
         // split repository: assert "ends with" as split may introduce prefixes
         assertTrue(path.endsWith("aopalliance" + File.separator + "maven-metadata-someremote.xml"), "path=" + path);
     }
@@ -172,6 +181,7 @@ public class ToolboxToolTest {
                 new HelperImpl(mode, mvn4Home(), userHome, EMBEDDED_MAVEN_EXECUTOR, FORKED_MAVEN_EXECUTOR);
         String path =
                 new ToolboxTool(helper, VERSION).metadataPath(getExecutorRequest(helper), "aopalliance", "someremote");
+        System.out.println(mode.name() + ": " + path);
         // split repository: assert "ends with" as split may introduce prefixes
         assertTrue(path.endsWith("aopalliance" + File.separator + "maven-metadata-someremote.xml"), "path=" + path);
     }
