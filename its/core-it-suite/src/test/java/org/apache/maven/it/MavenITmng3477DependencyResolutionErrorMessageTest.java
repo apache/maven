@@ -93,10 +93,10 @@ class MavenITmng3477DependencyResolutionErrorMessageTest extends AbstractMavenIn
     void connectionProblemsPlugin() throws Exception {
         testit(
                 54312,
-                new String[] {
+                new String[] { // JDK "Connection to..." Apache "Connect to..."
                     ".*The following artifacts could not be resolved: org.apache.maven.its.plugins:maven-it-plugin-not-exists:pom:1.2.3 \\(absent\\): "
                             + "Could not transfer artifact org.apache.maven.its.plugins:maven-it-plugin-not-exists:pom:1.2.3 from/to "
-                            + "central \\(http://localhost:.*/repo\\): Connection to http://localhost:.*2/repo/ refused.*"
+                            + "central \\(http://localhost:.*/repo\\):.*Connect.*refused.*"
                 },
                 "pom-plugin.xml");
     }

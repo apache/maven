@@ -310,7 +310,7 @@ public abstract class AbstractArtifactComponentTestCase // extends PlexusTestCas
         DependencyTraverser depTraverser = new FatArtifactTraverser();
         session.setDependencyTraverser(depTraverser);
 
-        DependencyManager depManager = new ClassicDependencyManager(true, session.getScopeManager());
+        DependencyManager depManager = new ClassicDependencyManager(session.getScopeManager());
         session.setDependencyManager(depManager);
 
         DependencySelector depFilter = new AndDependencySelector(
