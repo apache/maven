@@ -48,7 +48,7 @@ public class ToolboxToolTest {
     private static final Executor EMBEDDED_MAVEN_EXECUTOR = new EmbeddedMavenExecutor();
     private static final Executor FORKED_MAVEN_EXECUTOR = new ForkedMavenExecutor();
 
-    private static final String VERSION = "0.7.4";
+    private static final String VERSION = "0.13.7";
 
     @TempDir(cleanup = CleanupMode.NEVER)
     private static Path tempDir;

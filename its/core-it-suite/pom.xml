@@ -96,7 +96,7 @@ under the License.
     <its.forkCount>0.75C</its.forkCount>
     <its.test />
 
-    <version.toolbox>0.7.4</version.toolbox>
+    <version.toolbox>0.13.7</version.toolbox>
   </properties>
 
   <dependencies>
