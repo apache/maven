@@ -30,8 +30,6 @@ import eu.maveniverse.maven.mimir.testing.MimirInfuser;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Executor;
 import org.apache.maven.api.cli.ExecutorRequest;
-import org.apache.maven.cling.executor.embedded.EmbeddedMavenExecutor;
-import org.apache.maven.cling.executor.forked.ForkedMavenExecutor;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,6 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.condition.OS.WINDOWS;
 
+@Timeout(15)
 public abstract class MavenExecutorTestSupport {
     @TempDir(cleanup = CleanupMode.NEVER)
     private static Path tempDir;
@@ -64,9 +63,27 @@ public abstract class MavenExecutorTestSupport {
         MimirInfuser.infuseUW(userHome);
     }
 
-    @Timeout(15)
+    private static Executor executor;
+
+    protected final Executor createAndMemoizeExecutor() {
+        if (executor == null) {
+            executor = doSelectExecutor();
+        }
+        return executor;
+    }
+
+    @AfterAll
+    static void afterAll() {
+        if (executor != null) {
+            executor.close();
+            executor = null;
+        }
+    }
+
+    protected abstract Executor doSelectExecutor();
+
     @Test
-    void mvnenc() throws Exception {
+    void mvnenc4() throws Exception {
         String logfile = "m4.log";
         execute(
                 cwd.resolve(logfile),
@@ -84,7 +101,6 @@ public abstract class MavenExecutorTestSupport {
     @DisabledOnOs(
             value = WINDOWS,
             disabledReason = "JUnit on Windows fails to clean up as mvn3 does not close log file properly")
-    @Timeout(15)
     @Test
     void dump3() throws Exception {
         String logfile = "m3.log";
@@ -100,7 +116,6 @@ public abstract class MavenExecutorTestSupport {
         System.out.println(Files.readString(cwd.resolve(logfile)));
     }
 
-    @Timeout(15)
     @Test
     void dump4() throws Exception {
         String logfile = "m4.log";
@@ -116,36 +131,11 @@ public abstract class MavenExecutorTestSupport {
         System.out.println(Files.readString(cwd.resolve(logfile)));
     }
 
-    @Timeout(15)
-    @Test
-    void defaultFs() throws Exception {
-        layDownFiles(cwd);
-        String logfile = "m4.log";
-        execute(
-                cwd.resolve(logfile),
-                List.of(mvn4ExecutorRequestBuilder()
-                        .cwd(cwd)
-                        .argument("-V")
-                        .argument("verify")
-                        .argument("-l")
-                        .argument(logfile)
-                        .build()));
-    }
-
-    @Timeout(15)
-    @Test
-    void version() throws Exception {
-        assertEquals(
-                System.getProperty("maven4version"),
-                mavenVersion(mvn4ExecutorRequestBuilder().build()));
-    }
-
     @DisabledOnOs(
             value = WINDOWS,
             disabledReason = "JUnit on Windows fails to clean up as mvn3 does not close log file properly")
-    @Timeout(15)
     @Test
-    void defaultFs3x() throws Exception {
+    void defaultFs3() throws Exception {
         layDownFiles(cwd);
         String logfile = "m3.log";
         execute(
@@ -159,17 +149,37 @@ public abstract class MavenExecutorTestSupport {
                         .build()));
     }
 
-    @Timeout(15)
     @Test
-    void version3x() throws Exception {
+    void defaultFs4() throws Exception {
+        layDownFiles(cwd);
+        String logfile = "m4.log";
+        execute(
+                cwd.resolve(logfile),
+                List.of(mvn4ExecutorRequestBuilder()
+                        .cwd(cwd)
+                        .argument("-V")
+                        .argument("verify")
+                        .argument("-l")
+                        .argument(logfile)
+                        .build()));
+    }
+
+    @Test
+    void version3() throws Exception {
         assertEquals(
                 System.getProperty("maven3version"),
                 mavenVersion(mvn3ExecutorRequestBuilder().build()));
     }
 
-    @Timeout(15)
     @Test
-    void defaultFsCaptureOutput() throws Exception {
+    void version4() throws Exception {
+        assertEquals(
+                System.getProperty("maven4version"),
+                mavenVersion(mvn4ExecutorRequestBuilder().build()));
+    }
+
+    @Test
+    void defaultFs4CaptureOutput() throws Exception {
         layDownFiles(cwd);
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
         execute(
@@ -184,9 +194,8 @@ public abstract class MavenExecutorTestSupport {
         assertTrue(stdout.toString().contains("INFO"), "No INFO found");
     }
 
-    @Timeout(15)
     @Test
-    void defaultFsCaptureOutputWithForcedColor() throws Exception {
+    void defaultFs4CaptureOutputWithForcedColor() throws Exception {
         layDownFiles(cwd);
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
         execute(
@@ -202,9 +211,8 @@ public abstract class MavenExecutorTestSupport {
         assertTrue(stdout.toString().contains("INFO"), "No INFO found");
     }
 
-    @Timeout(15)
     @Test
-    void defaultFsCaptureOutputWithForcedOffColor() throws Exception {
+    void defaultFs4CaptureOutputWithForcedOffColor() throws Exception {
         layDownFiles(cwd);
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
         execute(
@@ -220,9 +228,8 @@ public abstract class MavenExecutorTestSupport {
         assertTrue(stdout.toString().contains("INFO"), "No INFO found");
     }
 
-    @Timeout(15)
     @Test
-    void defaultFs3xCaptureOutput() throws Exception {
+    void defaultFs3CaptureOutput() throws Exception {
         layDownFiles(cwd);
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
         execute(
@@ -238,9 +245,8 @@ public abstract class MavenExecutorTestSupport {
         assertTrue(stdout.toString().contains("INFO"), "No INFO found");
     }
 
-    @Timeout(15)
     @Test
-    void defaultFs3xCaptureOutputWithForcedColor() throws Exception {
+    void defaultFs3CaptureOutputWithForcedColor() throws Exception {
         layDownFiles(cwd);
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
         execute(
@@ -256,9 +262,8 @@ public abstract class MavenExecutorTestSupport {
         assertTrue(stdout.toString().contains("INFO"), "No INFO found");
     }
 
-    @Timeout(15)
     @Test
-    void defaultFs3xCaptureOutputWithForcedOffColor() throws Exception {
+    void defaultFs3CaptureOutputWithForcedOffColor() throws Exception {
         layDownFiles(cwd);
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
         execute(
@@ -322,8 +327,11 @@ public abstract class MavenExecutorTestSupport {
 
     protected void execute(@Nullable Path logFile, Collection<ExecutorRequest> requests) throws Exception {
         Executor invoker = createAndMemoizeExecutor();
+        String mavenVersion = invoker.mavenVersion(requests.iterator().next());
         for (ExecutorRequest request : requests) {
-            MimirInfuser.infuseUW(request.userHomeDirectory());
+            if (mavenVersion.startsWith("4.")) {
+                MimirInfuser.infuseUW(request.userHomeDirectory());
+            }
             int exitCode = invoker.execute(request);
             if (exitCode != 0) {
                 throw new FailedExecution(request, exitCode, logFile == null ? "" : Files.readString(logFile));
@@ -335,15 +343,16 @@ public abstract class MavenExecutorTestSupport {
         return createAndMemoizeExecutor().mavenVersion(request);
     }
 
-    public static ExecutorRequest.Builder mvn3ExecutorRequestBuilder() {
-        return addTailRepo(ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven3home"))));
+    public ExecutorRequest.Builder mvn3ExecutorRequestBuilder() {
+        return customize(ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven3home"))));
     }
 
-    public static ExecutorRequest.Builder mvn4ExecutorRequestBuilder() {
-        return addTailRepo(ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven4home"))));
+    public ExecutorRequest.Builder mvn4ExecutorRequestBuilder() {
+        return customize(ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven4home"))));
     }
 
-    private static ExecutorRequest.Builder addTailRepo(ExecutorRequest.Builder builder) {
+    private ExecutorRequest.Builder customize(ExecutorRequest.Builder builder) {
+        builder = builder.cwd(cwd).userHomeDirectory(userHome);
         if (System.getProperty("localRepository") != null) {
             builder.argument("-Dmaven.repo.local.tail=" + System.getProperty("localRepository"));
         }
@@ -383,28 +392,4 @@ public abstract class MavenExecutorTestSupport {
             return log;
         }
     }
-
-    private static Executor executor;
-
-    protected final Executor createAndMemoizeExecutor() {
-        if (executor == null) {
-            executor = doSelectExecutor();
-        }
-        return executor;
-    }
-
-    @AfterAll
-    static void afterAll() {
-        if (executor != null) {
-            executor = null;
-        }
-    }
-
-    // NOTE: we keep these instances alive to make sure JVM (running tests) loads JAnsi/JLine native library ONLY once
-    // in real life you'd anyway keep these alive as long needed, but here, we repeat a series of tests against same
-    // instance, to prevent them attempting native load more than once.
-    public static final EmbeddedMavenExecutor EMBEDDED_MAVEN_EXECUTOR = new EmbeddedMavenExecutor();
-    public static final ForkedMavenExecutor FORKED_MAVEN_EXECUTOR = new ForkedMavenExecutor();
-
-    protected abstract Executor doSelectExecutor();
 }

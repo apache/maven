@@ -32,7 +32,7 @@ under the License.
   <description>Maven 4 Executor, for executing Maven 3/4.</description>
 
   <properties>
-    <maven3version>3.9.9</maven3version>
+    <maven3version>3.9.11</maven3version>
     <maven4version>${project.version}</maven4version>
     <testTmpDir>${project.build.directory}/tmp</testTmpDir>
   </properties>

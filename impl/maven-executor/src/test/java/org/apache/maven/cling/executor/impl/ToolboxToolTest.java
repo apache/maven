@@ -25,9 +25,11 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 import eu.maveniverse.maven.mimir.testing.MimirInfuser;
+import org.apache.maven.api.cli.Executor;
 import org.apache.maven.api.cli.ExecutorRequest;
 import org.apache.maven.cling.executor.ExecutorHelper;
-import org.apache.maven.cling.executor.MavenExecutorTestSupport;
+import org.apache.maven.cling.executor.embedded.EmbeddedMavenExecutor;
+import org.apache.maven.cling.executor.forked.ForkedMavenExecutor;
 import org.apache.maven.cling.executor.internal.HelperImpl;
 import org.apache.maven.cling.executor.internal.ToolboxTool;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,12 +41,14 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-import static org.apache.maven.cling.executor.MavenExecutorTestSupport.mvn3ExecutorRequestBuilder;
-import static org.apache.maven.cling.executor.MavenExecutorTestSupport.mvn4ExecutorRequestBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Timeout(15)
 public class ToolboxToolTest {
+    private static final Executor EMBEDDED_MAVEN_EXECUTOR = new EmbeddedMavenExecutor();
+    private static final Executor FORKED_MAVEN_EXECUTOR = new ForkedMavenExecutor();
+
     private static final String VERSION = "0.7.4";
 
     @TempDir(cleanup = CleanupMode.NEVER)
@@ -67,101 +71,66 @@ public class ToolboxToolTest {
         return builder;
     }
 
-    @Timeout(15)
     @ParameterizedTest
     @EnumSource(ExecutorHelper.Mode.class)
     void dump3(ExecutorHelper.Mode mode) throws Exception {
-        ExecutorHelper helper = new HelperImpl(
-                mode,
-                mvn3ExecutorRequestBuilder().build().installationDirectory(),
-                userHome,
-                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
-                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
+        ExecutorHelper helper =
+                new HelperImpl(mode, mvn3Home(), userHome, EMBEDDED_MAVEN_EXECUTOR, FORKED_MAVEN_EXECUTOR);
         Map<String, String> dump = new ToolboxTool(helper, VERSION).dump(getExecutorRequest(helper));
         assertEquals(System.getProperty("maven3version"), dump.get("maven.version"));
     }
 
-    @Timeout(15)
     @ParameterizedTest
     @EnumSource(ExecutorHelper.Mode.class)
     void dump4(ExecutorHelper.Mode mode) throws Exception {
-        ExecutorHelper helper = new HelperImpl(
-                mode,
-                mvn4ExecutorRequestBuilder().build().installationDirectory(),
-                userHome,
-                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
-                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
+        ExecutorHelper helper =
+                new HelperImpl(mode, mvn4Home(), userHome, EMBEDDED_MAVEN_EXECUTOR, FORKED_MAVEN_EXECUTOR);
         Map<String, String> dump = new ToolboxTool(helper, VERSION).dump(getExecutorRequest(helper));
         assertEquals(System.getProperty("maven4version"), dump.get("maven.version"));
     }
 
-    @Timeout(15)
     @ParameterizedTest
     @EnumSource(ExecutorHelper.Mode.class)
     void version3(ExecutorHelper.Mode mode) {
-        ExecutorHelper helper = new HelperImpl(
-                mode,
-                mvn3ExecutorRequestBuilder().build().installationDirectory(),
-                userHome,
-                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
-                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
+        ExecutorHelper helper =
+                new HelperImpl(mode, mvn3Home(), userHome, EMBEDDED_MAVEN_EXECUTOR, FORKED_MAVEN_EXECUTOR);
         assertEquals(System.getProperty("maven3version"), helper.mavenVersion());
     }
 
-    @Timeout(15)
     @ParameterizedTest
     @EnumSource(ExecutorHelper.Mode.class)
     void version4(ExecutorHelper.Mode mode) {
-        ExecutorHelper helper = new HelperImpl(
-                mode,
-                mvn4ExecutorRequestBuilder().build().installationDirectory(),
-                userHome,
-                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
-                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
+        ExecutorHelper helper =
+                new HelperImpl(mode, mvn4Home(), userHome, EMBEDDED_MAVEN_EXECUTOR, FORKED_MAVEN_EXECUTOR);
         assertEquals(System.getProperty("maven4version"), helper.mavenVersion());
     }
 
-    @Timeout(15)
     @ParameterizedTest
     @EnumSource(ExecutorHelper.Mode.class)
     void localRepository3(ExecutorHelper.Mode mode) {
-        ExecutorHelper helper = new HelperImpl(
-                mode,
-                mvn3ExecutorRequestBuilder().build().installationDirectory(),
-                userHome,
-                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
-                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
+        ExecutorHelper helper =
+                new HelperImpl(mode, mvn3Home(), userHome, EMBEDDED_MAVEN_EXECUTOR, FORKED_MAVEN_EXECUTOR);
         String localRepository = new ToolboxTool(helper, VERSION).localRepository(getExecutorRequest(helper));
         Path local = Paths.get(localRepository);
         assertTrue(Files.isDirectory(local));
     }
 
-    @Timeout(15)
     @ParameterizedTest
     @EnumSource(ExecutorHelper.Mode.class)
     @Disabled("disable temporarily so that we can get the debug statement")
     void localRepository4(ExecutorHelper.Mode mode) {
-        ExecutorHelper helper = new HelperImpl(
-                mode,
-                mvn4ExecutorRequestBuilder().build().installationDirectory(),
-                userHome,
-                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
-                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
+        ExecutorHelper helper =
+                new HelperImpl(mode, mvn4Home(), userHome, EMBEDDED_MAVEN_EXECUTOR, FORKED_MAVEN_EXECUTOR);
         String localRepository = new ToolboxTool(helper, VERSION).localRepository(getExecutorRequest(helper));
         Path local = Paths.get(localRepository);
         assertTrue(Files.isDirectory(local));
     }
 
-    @Timeout(15)
     @ParameterizedTest
     @EnumSource(ExecutorHelper.Mode.class)
     void artifactPath3(ExecutorHelper.Mode mode) {
-        ExecutorHelper helper = new HelperImpl(
-                mode,
-                mvn3ExecutorRequestBuilder().build().installationDirectory(),
-                userHome,
-                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
-                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
+        ExecutorHelper helper =
+                new HelperImpl(mode, mvn3Home(), userHome, EMBEDDED_MAVEN_EXECUTOR, FORKED_MAVEN_EXECUTOR);
         String path = new ToolboxTool(helper, VERSION)
                 .artifactPath(getExecutorRequest(helper), "aopalliance:aopalliance:1.0", "central");
         // split repository: assert "ends with" as split may introduce prefixes
@@ -171,16 +140,11 @@ public class ToolboxToolTest {
                 "path=" + path);
     }
 
-    @Timeout(15)
     @ParameterizedTest
     @EnumSource(ExecutorHelper.Mode.class)
     void artifactPath4(ExecutorHelper.Mode mode) {
-        ExecutorHelper helper = new HelperImpl(
-                mode,
-                mvn4ExecutorRequestBuilder().build().installationDirectory(),
-                userHome,
-                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
-                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
+        ExecutorHelper helper =
+                new HelperImpl(mode, mvn4Home(), userHome, EMBEDDED_MAVEN_EXECUTOR, FORKED_MAVEN_EXECUTOR);
         String path = new ToolboxTool(helper, VERSION)
                 .artifactPath(getExecutorRequest(helper), "aopalliance:aopalliance:1.0", "central");
         // split repository: assert "ends with" as split may introduce prefixes
@@ -190,35 +154,33 @@ public class ToolboxToolTest {
                 "path=" + path);
     }
 
-    @Timeout(15)
     @ParameterizedTest
     @EnumSource(ExecutorHelper.Mode.class)
     void metadataPath3(ExecutorHelper.Mode mode) {
-        ExecutorHelper helper = new HelperImpl(
-                mode,
-                mvn3ExecutorRequestBuilder().build().installationDirectory(),
-                userHome,
-                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
-                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
+        ExecutorHelper helper =
+                new HelperImpl(mode, mvn4Home(), userHome, EMBEDDED_MAVEN_EXECUTOR, FORKED_MAVEN_EXECUTOR);
         String path =
                 new ToolboxTool(helper, VERSION).metadataPath(getExecutorRequest(helper), "aopalliance", "someremote");
         // split repository: assert "ends with" as split may introduce prefixes
         assertTrue(path.endsWith("aopalliance" + File.separator + "maven-metadata-someremote.xml"), "path=" + path);
     }
 
-    @Timeout(15)
     @ParameterizedTest
     @EnumSource(ExecutorHelper.Mode.class)
     void metadataPath4(ExecutorHelper.Mode mode) {
-        ExecutorHelper helper = new HelperImpl(
-                mode,
-                mvn4ExecutorRequestBuilder().build().installationDirectory(),
-                userHome,
-                MavenExecutorTestSupport.EMBEDDED_MAVEN_EXECUTOR,
-                MavenExecutorTestSupport.FORKED_MAVEN_EXECUTOR);
+        ExecutorHelper helper =
+                new HelperImpl(mode, mvn4Home(), userHome, EMBEDDED_MAVEN_EXECUTOR, FORKED_MAVEN_EXECUTOR);
         String path =
                 new ToolboxTool(helper, VERSION).metadataPath(getExecutorRequest(helper), "aopalliance", "someremote");
         // split repository: assert "ends with" as split may introduce prefixes
         assertTrue(path.endsWith("aopalliance" + File.separator + "maven-metadata-someremote.xml"), "path=" + path);
+    }
+
+    public Path mvn3Home() {
+        return Paths.get(System.getProperty("maven3home"));
+    }
+
+    public Path mvn4Home() {
+        return Paths.get(System.getProperty("maven4home"));
     }
 }
