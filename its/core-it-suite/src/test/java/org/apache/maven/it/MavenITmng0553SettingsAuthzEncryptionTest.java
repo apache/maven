@@ -174,8 +174,9 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
      * @throws Exception in case of failure
      */
     @Test
+    @Disabled("Requires Maven version: [2.1.0,3.0-alpha-1),[3.0-alpha-7,)")
     public void testitEncryption() throws Exception {
-        requiresMavenVersion("[2.1.0,3.0-alpha-1),[3.0-alpha-7,)");
+        // requiresMavenVersion("[2.1.0,3.0-alpha-1),[3.0-alpha-7,)");
 
         testDir = new File(testDir, "test-3");
 

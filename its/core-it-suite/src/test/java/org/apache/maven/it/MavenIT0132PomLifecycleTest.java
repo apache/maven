@@ -43,9 +43,8 @@ public class MavenIT0132PomLifecycleTest extends AbstractMavenIntegrationTestCas
         verifier.setAutoclean(false);
         verifier.addCliArgument("deploy");
         verifier.execute();
-        if (matchesVersionRange("(2.0.1,3.0-alpha-1)")) {
-            verifier.verifyFilePresent("target/site-attach-descriptor.txt");
-        }
+        // Inline version check: (2.0.1,3.0-alpha-1) - current Maven version doesn't match this range
+        // verifier.verifyFilePresent("target/site-attach-descriptor.txt");
         verifier.verifyFilePresent("target/install-install.txt");
         verifier.verifyFilePresent("target/deploy-deploy.txt");
         verifier.verifyErrorFreeLog();

@@ -49,8 +49,9 @@ public class MavenITmng2339BadProjectInterpolationTest extends AbstractMavenInte
 
     // test that -Dversion=1.0 is still available for interpolation.
     @Test
+    @Disabled("Requires Maven version: (2.0.8,4.0.0-alpha-1)")
     public void testitMNG2339b() throws Exception {
-        requiresMavenVersion("(2.0.8,4.0.0-alpha-1)");
+        // requiresMavenVersion("(2.0.8,4.0.0-alpha-1)");
         File testDir = extractResources("/mng-2339/b");
 
         Verifier verifier;
