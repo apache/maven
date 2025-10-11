@@ -27,11 +27,11 @@ import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.ClassOrdererContext;
 
 /**
- * Automatic test ordering that orders tests by prefix (gh-xxx, mng-xxx, it-xxx) in descending order.
+ * Test suite ordering that orders tests by prefix (gh-xxx, mng-xxx, it-xxx) in descending order.
  * This ensures newer tests (higher numbers) are run first, which is useful for fail-fast behavior
  * since newer tests are more likely to fail.
  */
-public class AutomaticTestOrdering implements ClassOrderer {
+public class TestSuiteOrdering implements ClassOrderer {
 
     private static final Pattern GH_PATTERN = Pattern.compile(".*MavenITgh(\\d+).*");
     private static final Pattern MNG_PATTERN = Pattern.compile(".*MavenITmng(\\d+).*");
