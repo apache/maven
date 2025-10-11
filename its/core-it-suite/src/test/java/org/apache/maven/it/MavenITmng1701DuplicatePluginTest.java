@@ -50,12 +50,8 @@ public class MavenITmng1701DuplicatePluginTest extends AbstractMavenIntegrationT
             // expected with Maven 4+
         }
 
-        String logLevel;
-        if (matchesVersionRange("(,4.0.0-alpha-1)")) {
-            logLevel = "WARNING";
-        } else {
-            logLevel = "ERROR";
-        }
+        // Inline version check: (,4.0.0-alpha-1) - current Maven version doesn't match this range
+        String logLevel = "ERROR";
 
         List<String> lines = verifier.loadLogLines();
         boolean foundMessage = false;
