@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng2861RelocationsAndRangesTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2861RelocationsAndRangesTest() {
-        super("(2.0.8,)");
-    }
-
     @Test
     public void testitMNG2861() throws Exception {
         File testDir = extractResources("/mng-2861");

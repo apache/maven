@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4189UniqueVersionSnapshotTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4189UniqueVersionSnapshotTest() {
-        super("[2.2.1,),[3.0-alpha-3,)");
-    }
-
     @Test
     public void testit() throws Exception {
         final File testDir = extractResources("/mng-4189");

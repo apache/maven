@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng11009StackOverflowParentResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng11009StackOverflowParentResolutionTest() {
-        super("[4.0.0-rc-3,)");
-    }
-
     /**
      * Test that circular parent resolution doesn't cause a StackOverflowError during project model building.
      * This reproduces the issue where:

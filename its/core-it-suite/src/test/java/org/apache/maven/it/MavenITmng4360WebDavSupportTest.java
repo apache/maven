@@ -44,10 +44,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4360WebDavSupportTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4360WebDavSupportTest() {
-        super("[2.1.0-M1,)");
-    }
-
     /**
      * Verify that WebDAV works in principle. This test is not actually concerned about proper transfers but more
      * that the Jackrabbit based wagon can be properly loaded and doesn't die due to some class realm issue.

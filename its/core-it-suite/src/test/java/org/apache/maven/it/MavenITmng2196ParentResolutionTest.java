@@ -27,10 +27,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng2196ParentResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2196ParentResolutionTest() {
-        super("[2.0,4.0.0-beta-5)");
-    }
-
     /**
      * Verify that multi-module builds where one project references another as
      * a parent can build, even if that parent is not correctly referenced by

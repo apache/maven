@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng2006ChildPathAwareUrlInheritanceTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2006ChildPathAwareUrlInheritanceTest() {
-        super("(2.0.2,)");
-    }
-
     /**
      * Test that inheritance of those URLs which automatically append the child's artifact id take the child's
      * relative location to the parent into account.
@@ -59,9 +55,8 @@ public class MavenITmng2006ChildPathAwareUrlInheritanceTest extends AbstractMave
         assertEquals("http://viewvc.project.url/child", props.getProperty("project.scm.url"));
         assertEquals("http://scm.project.url/child", props.getProperty("project.scm.connection"));
         assertEquals("https://scm.project.url/child", props.getProperty("project.scm.developerConnection"));
-        if (matchesVersionRange("(2.0.7,)")) {
-            // MNG-3134
-            assertEquals("http://site.project.url/child", props.getProperty("project.distributionManagement.site.url"));
-        }
+        // Inline version check: (2.0.7,) - current Maven version matches
+        // MNG-3134
+        assertEquals("http://site.project.url/child", props.getProperty("project.distributionManagement.site.url"));
     }
 }

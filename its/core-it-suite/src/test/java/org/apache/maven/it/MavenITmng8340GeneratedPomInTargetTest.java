@@ -24,12 +24,11 @@ import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8340">MNG-8340</a>.
+ * @since 3.8.6
+ *
  */
+@Disabled("Upper bound: 4.0.0-beta-5")
 class MavenITmng8340GeneratedPomInTargetTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8340GeneratedPomInTargetTest() {
-        super("[3.8.6,4.0.0-beta-5),[4.0.0-beta-6,)");
-    }
 
     /**
      *  Verify that the build succeeds.

@@ -27,10 +27,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng2234ActiveProfilesFromSettingsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2234ActiveProfilesFromSettingsTest() {
-        super("(2.0.8,)");
-    }
-
     /**
      * Verify that the activeProfile section from the settings.xml can also activate profiles specified in the POM,
      * i.e. outside of the settings.xml.

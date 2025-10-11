@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4262MakeLikeReactorDottedPathTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4262MakeLikeReactorDottedPathTest() {
-        super("[3.0-alpha-3,4.0.0-alpha-1)");
-    }
-
     private void clean(Verifier verifier) throws Exception {
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("../sub-a/target");

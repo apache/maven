@@ -37,10 +37,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 public class MavenITmng7504NotWarnUnsupportedReportPluginsTest extends AbstractMavenIntegrationTestCase {
     private static final String PROJECT_PATH = "/mng-7504-warn-unsupported-report-plugins";
 
-    public MavenITmng7504NotWarnUnsupportedReportPluginsTest() {
-        super("[3.9.0]");
-    }
-
     @Test
     public void testWarnNotPresent() throws IOException, VerificationException {
         File rootDir = extractResources(PROJECT_PATH);

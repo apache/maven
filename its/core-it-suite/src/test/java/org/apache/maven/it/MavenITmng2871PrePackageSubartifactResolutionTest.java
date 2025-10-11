@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng2871PrePackageSubartifactResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2871PrePackageSubartifactResolutionTest() {
-        super("[3.0-alpha-1,)");
-    }
-
     /**
      * Verify that dependencies on not-yet-packaged sub artifacts in build phases prior to package can be satisfied
      * from a module's output directory, i.e. with the loose class files.

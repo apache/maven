@@ -49,10 +49,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng2305MultipleProxiesTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2305MultipleProxiesTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Verify that proxies can be setup for multiple protocols, in this case HTTP and HTTPS. As a nice side effect,
      * this checks HTTPS tunneling over a web proxy.

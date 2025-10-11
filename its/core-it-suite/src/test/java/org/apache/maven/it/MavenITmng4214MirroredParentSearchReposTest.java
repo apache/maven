@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4214MirroredParentSearchReposTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4214MirroredParentSearchReposTest() {
-        super("[2.0.5,)");
-    }
-
     /**
      * Test parent POMs can be resolved from repos with different enabled policies that are matched by a single mirror.
      * In other words, check that the one mirror is properly configured with a merged view of the potentially different

@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  */
 public class MavenITmng4053PluginConfigAttributesTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4053PluginConfigAttributesTest() {
-        super("[2.0.3,)");
-    }
-
     /**
      * Verify that attributes in plugin configuration elements are not erroneously duplicated to other elements when
      * no plugin management is used.

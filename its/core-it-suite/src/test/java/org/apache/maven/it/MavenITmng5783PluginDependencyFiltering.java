@@ -27,10 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MavenITmng5783PluginDependencyFiltering extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5783PluginDependencyFiltering() {
-        super("[3.0,)");
-    }
-
     @Test
     public void testSLF4j() throws Exception {
         File testDir = extractResources("/mng-5783-plugin-dependency-filtering");

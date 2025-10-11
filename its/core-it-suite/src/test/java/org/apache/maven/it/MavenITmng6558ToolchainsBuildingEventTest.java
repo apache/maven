@@ -30,10 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng6558ToolchainsBuildingEventTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng6558ToolchainsBuildingEventTest() {
-        super("[3.6.1,)");
-    }
-
     /**
      * Verify that <code>ToolchainsBuildingRequest</code> and <code>ToolchainsBuildingResult</code> events are sent to event spy.
      *

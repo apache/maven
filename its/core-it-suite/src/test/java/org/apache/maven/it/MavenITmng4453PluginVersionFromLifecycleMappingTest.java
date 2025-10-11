@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4453PluginVersionFromLifecycleMappingTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4453PluginVersionFromLifecycleMappingTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-beta-1,)");
-    }
-
     /**
      * Verify that plugin versions given by the lifecycle mapping are respected, even if those differ from the version
      * defined in the plugin management section inherited from the super POM.

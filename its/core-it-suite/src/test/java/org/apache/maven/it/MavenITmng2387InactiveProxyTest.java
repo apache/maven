@@ -37,7 +37,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Brett Porter
  *
+ * @since 2.0.11
+ *
  */
+@Disabled("Upper bound: 2.1.0-M1")
 public class MavenITmng2387InactiveProxyTest extends AbstractMavenIntegrationTestCase {
     private Server server;
 
@@ -48,10 +51,6 @@ public class MavenITmng2387InactiveProxyTest extends AbstractMavenIntegrationTes
     private int proxyPort;
 
     private File testDir;
-
-    public MavenITmng2387InactiveProxyTest() {
-        super("[2.0.11,2.1.0-M1),[2.1.0,)"); // 2.0.11+, 2.1.0+
-    }
 
     @BeforeEach
     protected void setUp() throws Exception {

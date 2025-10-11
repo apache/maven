@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4625SettingsXmlInterpolationWithXmlMarkupTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4625SettingsXmlInterpolationWithXmlMarkupTest() {
-        super("[3.0-beta-1,)");
-    }
-
     /**
      * Verify that interpolation of the settings.xml doesn't fail if an expression's value contains
      * XML special characters.

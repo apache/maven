@@ -33,10 +33,6 @@ public class MavenITmng7360BuildConsumer extends AbstractMavenIntegrationTestCas
 
     private static final String PROJECT_PATH = "/mng-7360-build-consumer";
 
-    public MavenITmng7360BuildConsumer() {
-        super("[4.0.0-alpha-1,)");
-    }
-
     @Test
     public void testSelectModuleByCoordinate() throws Exception {
         final File projectDir = extractResources(PROJECT_PATH);

@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng2222OutputDirectoryReactorResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2222OutputDirectoryReactorResolutionTest() {
-        super("[3.0-beta-1,)");
-    }
-
     /**
      * Test that dependencies on reactor projects can be satisfied by their output directories even if those do not
      * exist (e.g. due to non-existing sources). This ensures consistent build results for "mvn compile" and

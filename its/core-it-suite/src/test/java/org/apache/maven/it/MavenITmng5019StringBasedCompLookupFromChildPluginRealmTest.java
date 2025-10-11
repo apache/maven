@@ -27,10 +27,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng5019StringBasedCompLookupFromChildPluginRealmTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5019StringBasedCompLookupFromChildPluginRealmTest() {
-        super("[3.0.3,)");
-    }
-
     /**
      * Verify that plugins executed by other plugins (like reports executed by the maven-site-plugin) can successfully
      * look up components via string-based roles from their plugin realm as denoted by the thread context class loader,

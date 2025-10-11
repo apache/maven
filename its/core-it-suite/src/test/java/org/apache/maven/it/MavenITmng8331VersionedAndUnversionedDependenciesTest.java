@@ -30,12 +30,10 @@ import org.junit.jupiter.api.Test;
  * the <pre>DefaultModelBuilder</pre> would enrich the dependencies without a <pre>version</pre> element.
  * The dependencies that did have a <pre>version</pre> element would not be copied over into the new <pre>Model</pre>
  * instance.
+ * @since 4.0.0-beta-5
+ *
  */
 class MavenITmng8331VersionedAndUnversionedDependenciesTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8331VersionedAndUnversionedDependenciesTest() {
-        super("[4.0.0-beta-5,)");
-    }
 
     /**
      * Since the dependency on junit-jupiter-api had a version, it was added to the project. The dependency on module-a

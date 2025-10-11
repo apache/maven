@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng3379ParallelArtifactDownloadsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3379ParallelArtifactDownloadsTest() {
-        super("[2.0.5,3.0-alpha-1),[3.0-alpha-2,)");
-    }
-
     /**
      * Tests that parallel downloads of artifacts from both the same and from different group ids don't corrupt
      * the local repo.

@@ -29,11 +29,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3503">MNG-3503</a>. The first test verifies that
  * a plugin using plexus-utils-1.1 does not cause linkage errors. The second test verifies that a plugin with a
  * different implementation of the shaded classes is used instead.
+ * @since 2.0.9
+ *
  */
+@Disabled("Upper bound: 2.1.0-M1")
 public class MavenITmng3503Xpp3ShadingTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng3503Xpp3ShadingTest() {
-        super("(2.0.9,2.1.0-M1),(2.1.0-M1,)"); // only test in 2.0.10+, and not in 2.1.0-M1
-    }
 
     @Test
     public void testitMNG3503NoLinkageErrors() throws Exception {

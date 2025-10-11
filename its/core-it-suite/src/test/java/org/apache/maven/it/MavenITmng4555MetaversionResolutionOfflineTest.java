@@ -42,10 +42,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4555MetaversionResolutionOfflineTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4555MetaversionResolutionOfflineTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-beta-1,)");
-    }
-
     /**
      * Verify that resolution of the metaversion RELEASE respects offline mode.
      *

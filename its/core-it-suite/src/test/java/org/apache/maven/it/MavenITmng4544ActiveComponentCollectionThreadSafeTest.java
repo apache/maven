@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4544ActiveComponentCollectionThreadSafeTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4544ActiveComponentCollectionThreadSafeTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-alpha-7,)");
-    }
-
     /**
      * Test that concurrent access to active component collections is thread-safe.
      *

@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3621UNCInheritedPathsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3621UNCInheritedPathsTest() {
-        super("[2.0.11,2.1.0-M1),[2.1.0,)");
-    }
-
     /**
      * Verifies that UNC paths are inherited correctly.
      *

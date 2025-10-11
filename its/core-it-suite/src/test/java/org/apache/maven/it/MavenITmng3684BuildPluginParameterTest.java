@@ -30,9 +30,6 @@ import org.junit.jupiter.api.Test;
  * @author jdcasey
  */
 public class MavenITmng3684BuildPluginParameterTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng3684BuildPluginParameterTest() {
-        super("(2.0.9,)");
-    }
 
     @Test
     public void testitMNG3684() throws Exception {

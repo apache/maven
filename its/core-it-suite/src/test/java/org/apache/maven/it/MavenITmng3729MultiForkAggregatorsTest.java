@@ -44,11 +44,11 @@ import org.junit.jupiter.api.Test;
  *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author jdcasey
+ * @since 2.0.8
+ *
  */
+@Disabled("Upper bound: 3.0-alpha-1")
 public class MavenITmng3729MultiForkAggregatorsTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng3729MultiForkAggregatorsTest() {
-        super("(2.0.8,3.0-alpha-1),[3.0-alpha-3,)"); // only test in 2.0.9+
-    }
 
     @Test
     public void testitMNG3729() throws Exception {

@@ -46,10 +46,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng5064SuppressSnapshotUpdatesTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5064SuppressSnapshotUpdatesTest() {
-        super("[3.0.4,)");
-    }
-
     /**
      * Verify that snapshot updates can be completely suppressed via the CLI arg -nsu. The initial retrieval of a
      * missing snapshot should not be suppressed though.

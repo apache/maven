@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4755FetchRemoteMetadataForVersionRangeTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4755FetchRemoteMetadataForVersionRangeTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-beta-3,)");
-    }
-
     /**
      * Verify that locally installed artifacts don't suppress fetching of g:a-level remote metadata which is required
      * to locate alternative version (as required by version ranges).

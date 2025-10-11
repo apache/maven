@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4162ReportingMigrationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4162ReportingMigrationTest() {
-        super("[3.0-beta-1,4.0.0-alpha-2]");
-    }
-
     /**
      * Verify that the legacy reporting section is automatically converted into ordinary plugin configuration of the
      * Maven Site Plugin to ease migration.

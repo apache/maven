@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng7982DependencyManagementTransitivityTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng7982DependencyManagementTransitivityTest() {
-        super("[4.0.0-beta-5,)");
-    }
-
     /**
      * Verify the effective dependency versions determined when using the transitive dependency management (default).
      * <p>

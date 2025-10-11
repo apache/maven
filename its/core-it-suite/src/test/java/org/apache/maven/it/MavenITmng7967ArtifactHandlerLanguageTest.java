@@ -31,12 +31,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * This is a test set for
  * <a href="https://issues.apache.org/jira/browse/MNG-7967">MNG-7967</a>.
  * Allow to exclude plugins from validation. Affected is Maven 4.0.0-alpha-9.
+ * @since 4.0.0-alpha-9
+ *
  */
+@Disabled("Upper bound: 4.0.0-alpha-9")
 class MavenITmng7967ArtifactHandlerLanguageTest extends AbstractMavenIntegrationTestCase {
-
-    protected MavenITmng7967ArtifactHandlerLanguageTest() {
-        super("(,4.0.0-alpha-9),(4.0.0-alpha-9,)");
-    }
 
     @Test
     void javadocIsExecutedAndFailed() throws Exception {

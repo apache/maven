@@ -28,12 +28,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * ITs for repository/distributionManagement URL interpolation.
+ * @since 4.0.0-rc-3
+ *
  */
 class MavenITgh11140RepoInterpolationTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITgh11140RepoInterpolationTest() {
-        super("(4.0.0-rc-3,)");
-    }
 
     @Test
     void testInterpolationFromEnvAndProps() throws Exception {

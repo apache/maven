@@ -32,12 +32,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Maven 3 was not transitive regarding dependency management. Maven4 started to be, but beta-5 discovered a nasty
  * bug where Resolver was applying dependency management onto node itself it contributed (basically overriding
  * same node direct dependencies).
+ * @since 3.9.0
+ *
  */
 class MavenITmng8347TransitiveDependencyManagerTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8347TransitiveDependencyManagerTest() {
-        super("[3.9.0,)"); // since we have chained local repository
-    }
 
     /**
      * We run same command with various Maven versions and based on their version assert (Maven3 was not transitive,

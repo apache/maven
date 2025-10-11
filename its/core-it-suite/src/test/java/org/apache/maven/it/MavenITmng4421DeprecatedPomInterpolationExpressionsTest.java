@@ -38,10 +38,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4421DeprecatedPomInterpolationExpressionsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4421DeprecatedPomInterpolationExpressionsTest() {
-        super("[3.0-alpha-3,4.0.0-alpha-1)");
-    }
-
     /**
      * Test that expressions of the form ${pom.*} and {*} referring to the model cause build warnings.
      *

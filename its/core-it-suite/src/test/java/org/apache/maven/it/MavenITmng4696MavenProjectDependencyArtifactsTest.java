@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4696MavenProjectDependencyArtifactsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4696MavenProjectDependencyArtifactsTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-beta-2,)");
-    }
-
     /**
      * Verify that MavenProject.getDependencyArtifacts() returns all direct dependencies regardless of their scope.
      * In other words, getDependencyArtifacts() is in general not a subset of MavenProject.getArtifacts() as the

@@ -30,11 +30,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * Verifies that property references can be properly escaped in both model properties
  * and plugin configuration using backslash.
+ * @since 4.0.0-beta-5
+ *
  */
 class MavenITmng3558PropertyEscapingTest extends AbstractMavenIntegrationTestCase {
-    MavenITmng3558PropertyEscapingTest() {
-        super("[4.0.0-beta-5,)");
-    }
 
     @Test
     public void testPropertyEscaping() throws Exception {

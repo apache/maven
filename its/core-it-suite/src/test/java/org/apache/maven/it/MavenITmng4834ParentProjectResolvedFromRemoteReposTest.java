@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4834ParentProjectResolvedFromRemoteReposTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4834ParentProjectResolvedFromRemoteReposTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0,)");
-    }
-
     /**
      * Verify that MavenProject.getParent() can (lazily) resolve the parent from repositories contributed by the
      * settings.

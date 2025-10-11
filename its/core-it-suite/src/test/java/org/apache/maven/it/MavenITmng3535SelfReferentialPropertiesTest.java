@@ -29,10 +29,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  */
 public class MavenITmng3535SelfReferentialPropertiesTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3535SelfReferentialPropertiesTest() {
-        super("[2.1.0-M1,3.0-alpha-1),[3.0-alpha-3,)");
-    }
-
     @Test
     public void testitMNG3535ShouldSucceed() throws Exception {
         File testDir = extractResources("/mng-3535/success");

@@ -28,10 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MavenITmng5659ProjectSettingsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5659ProjectSettingsTest() {
-        super("[4.0.0-alpha-6,)");
-    }
-
     @Test
     public void testProjectSettings() throws IOException, VerificationException {
         File testDir = extractResources("/mng-5659-project-settings");

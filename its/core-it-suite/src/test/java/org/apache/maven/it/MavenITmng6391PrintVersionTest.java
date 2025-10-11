@@ -38,10 +38,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng6391PrintVersionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng6391PrintVersionTest() {
-        super("[3.6.0,)");
-    }
-
     /**
      * Check that the resulting output is
      * as expected for the root module and last

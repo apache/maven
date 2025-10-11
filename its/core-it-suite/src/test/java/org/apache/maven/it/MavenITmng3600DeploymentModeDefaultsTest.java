@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  */
 public class MavenITmng3600DeploymentModeDefaultsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3600DeploymentModeDefaultsTest() {
-        super("(2.1.0-M1,3.0-alpha-1),[3.0.1,)");
-    }
-
     @Test
     public void testitMNG3600NoSettings() throws Exception {
         File testDir = extractResources("/mng-3600");

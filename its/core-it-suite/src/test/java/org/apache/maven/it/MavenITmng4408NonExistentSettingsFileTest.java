@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4408NonExistentSettingsFileTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4408NonExistentSettingsFileTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Verify that the build fails when the user specifies a non-existing user settings file on the CLI.
      *

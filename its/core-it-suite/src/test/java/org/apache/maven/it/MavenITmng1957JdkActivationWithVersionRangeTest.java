@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  */
 public class MavenITmng1957JdkActivationWithVersionRangeTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng1957JdkActivationWithVersionRangeTest() {
-        super("[2.1.0,3.0-alpha-1),[3.0-alpha-6,)");
-    }
-
     /**
      * Test that JDK profile activation allows version ranges.
      *

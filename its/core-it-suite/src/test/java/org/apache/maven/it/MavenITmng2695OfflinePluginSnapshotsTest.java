@@ -29,12 +29,11 @@ import org.junit.jupiter.api.Test;
  *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author jdcasey
+ * @since 2.0.9
+ *
  */
+@Disabled("Upper bound: 2.1.0-M1")
 public class MavenITmng2695OfflinePluginSnapshotsTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng2695OfflinePluginSnapshotsTest() {
-        super("(2.0.9,2.1.0-M1),(2.1.0-M1,)"); // only test in 2.0.10+, and not in 2.1.0-M1
-    }
 
     /**
      * Verify that snapshot plugins which are scheduled for an update don't fail the build when in offline mode.

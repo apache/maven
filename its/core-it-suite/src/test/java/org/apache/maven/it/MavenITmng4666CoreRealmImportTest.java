@@ -35,10 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  */
 public class MavenITmng4666CoreRealmImportTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4666CoreRealmImportTest() {
-        super("[2.0.11,2.0.99),[2.1.0,3.0-alpha-1),[3.0-beta-2,)");
-    }
-
     /**
      * Verify that API types from the Maven core realm are shared/imported into the plugin realm despite the plugin
      * declaring conflicting dependencies. For the core artifact filter, this boils down to the filter properly

@@ -29,12 +29,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * [MNG-5600] Dependency management import should support exclusions.
  *
  * @author Christian Schulte
+ * @since 4.0.0-alpha-5
+ *
  */
 class MavenITmng5600DependencyManagementImportExclusionsTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng5600DependencyManagementImportExclusionsTest() {
-        super("[4.0.0-alpha-5,)");
-    }
 
     @Test
     public void testCanExcludeDependenciesFromImport() throws Exception {

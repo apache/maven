@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4465PluginPrefixFromLocalCacheOfDownRepoTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4465PluginPrefixFromLocalCacheOfDownRepoTest() {
-        super("[2.1.0,3.0-alpha-1),[3.0-alpha-6,)");
-    }
-
     /**
      * Verify that locally cached metadata of non-accessible remote repos is still considered when resolving
      * plugin prefixes.

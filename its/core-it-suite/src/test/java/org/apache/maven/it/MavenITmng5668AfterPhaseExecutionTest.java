@@ -27,12 +27,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * This is a test for MNG-5668:
  * Verifies that after:xxx phases are executed even when the build fails
+ * @since 4.0.0-rc-4
+ *
  */
 class MavenITmng5668AfterPhaseExecutionTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng5668AfterPhaseExecutionTest() {
-        super("[4.0.0-rc-4,)"); // test is only relevant for Maven 4.0+
-    }
 
     @Test
     void testAfterPhaseExecutionOnFailure() throws Exception {

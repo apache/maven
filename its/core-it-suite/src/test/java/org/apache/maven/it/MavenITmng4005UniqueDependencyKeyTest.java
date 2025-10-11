@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4005UniqueDependencyKeyTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4005UniqueDependencyKeyTest() {
-        super("[3.0-beta-1,)");
-    }
-
     /**
      * Test that duplicate dependencies cause a validation error during building.
      *

@@ -26,10 +26,6 @@ import org.junit.jupiter.api.Test;
 @Disabled
 public class MavenITmng5208EventSpyParallelTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5208EventSpyParallelTest() {
-        super("[3.0.5,)");
-    }
-
     /**
      * Verify spy signals correct module for failure
      *

@@ -33,12 +33,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8645">MNG-8645</a>.
+ * @since 4.0.0-rc-3
+ *
  */
 class MavenITmng8645ConsumerPomDependencyManagementTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8645ConsumerPomDependencyManagementTest() {
-        super("(4.0.0-rc-3,)");
-    }
 
     /**
      *  Verify the dependency management of the consumer POM is computed correctly

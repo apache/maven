@@ -42,10 +42,6 @@ public class MavenITmng4270ArtifactHandlersFromPluginDepsTest extends AbstractMa
 
     private static final String BAD_TYPE = "coreit";
 
-    public MavenITmng4270ArtifactHandlersFromPluginDepsTest() {
-        super("(2.2.0,)");
-    }
-
     @Test
     public void testProjectPackagingUsage() throws IOException, VerificationException {
         File testDir = extractResources("/" + AID);

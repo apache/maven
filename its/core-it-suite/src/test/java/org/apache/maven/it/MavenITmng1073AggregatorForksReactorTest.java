@@ -39,9 +39,10 @@ public class MavenITmng1073AggregatorForksReactorTest extends AbstractMavenInteg
      * @throws Exception in case of failure
      */
     @Test
+    @Disabled("Requires Maven version: [2.0,2.1.0),[3.0-alpha-3,)")
     public void testitForkLifecycle() throws Exception {
         // excluded 2.1.x and 2.2.x due to MNG-4325
-        requiresMavenVersion("[2.0,2.1.0),[3.0-alpha-3,)");
+        // requiresMavenVersion("[2.0,2.1.0),[3.0-alpha-3,)");
 
         File testDir = extractResources("/mng-1073");
 

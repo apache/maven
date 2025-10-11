@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4172EmptyDependencySetTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4172EmptyDependencySetTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that a project without dependencies is really constructed without dependency artifacts.
      *

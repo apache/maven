@@ -41,15 +41,13 @@ import org.junit.jupiter.api.Test;
  * test correct integration of wagon http: read time out configuration from settings.xml
  *
  *
+ * @since 3.0.4
+ *
  */
 public class MavenITmng5175WagonHttpTest extends AbstractMavenIntegrationTestCase {
     private Server server;
 
     private int port;
-
-    public MavenITmng5175WagonHttpTest() {
-        super("[3.0.4,)"); // 3.0.4+
-    }
 
     @BeforeEach
     protected void setUp() throws Exception {

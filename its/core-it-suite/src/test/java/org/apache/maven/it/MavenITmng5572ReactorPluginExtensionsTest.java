@@ -31,10 +31,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng5572ReactorPluginExtensionsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5572ReactorPluginExtensionsTest() {
-        super("[3.2,)");
-    }
-
     /**
      * Test that Maven warns when one reactor project contains a plugin, and another tries to use it with extensions
      *

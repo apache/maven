@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng5898BuildMultimoduleWithEARFailsToResolveWARTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5898BuildMultimoduleWithEARFailsToResolveWARTest() {
-        super("[3.1,)");
-    }
-
     /**
      *
      * @throws Exception in case of failure

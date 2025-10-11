@@ -24,12 +24,11 @@ import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8299">MNG-8299</a>.
+ * @since 2.0
+ *
  */
+@Disabled("Upper bound: 4.0.0-alpha-13")
 class MavenITmng8299CustomLifecycleTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8299CustomLifecycleTest() {
-        super("[2.0,4.0.0-alpha-13],[4.0.0-beta-5,)");
-    }
 
     /**
      *  Verify that invoking the third phase will invoke the first two

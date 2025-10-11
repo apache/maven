@@ -36,10 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3732ActiveProfilesTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3732ActiveProfilesTest() {
-        super("[2.0,)");
-    }
-
     /**
      * Verify that MavenProject.getActiveProfiles() includes profiles from all sources.
      *

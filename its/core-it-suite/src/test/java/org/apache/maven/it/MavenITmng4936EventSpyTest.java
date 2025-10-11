@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4936EventSpyTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4936EventSpyTest() {
-        super("[3.0.2,)");
-    }
-
     /**
      * Verify that loading of an event spy extension from CLI works.
      *

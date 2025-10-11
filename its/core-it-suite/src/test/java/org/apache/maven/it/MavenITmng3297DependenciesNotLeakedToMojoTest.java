@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3297DependenciesNotLeakedToMojoTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3297DependenciesNotLeakedToMojoTest() {
-        super("[3.0-alpha-7,)");
-    }
-
     /**
      * Test that project dependencies resolved for one mojo are not exposed to another mojo if the latter
      * does not require dependency resolution.

@@ -31,9 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * substituted with the actual project base directory.
  */
 public class MavenITmng8598JvmConfigSubstitutionTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng8598JvmConfigSubstitutionTest() {
-        super("[4.0.0-rc-4,)");
-    }
 
     @Test
     public void testProjectBasedirSubstitution() throws Exception {

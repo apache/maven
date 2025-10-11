@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 public class MavenITmng4274PluginRealmArtifactsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4274PluginRealmArtifactsTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Verify that plugins with an undeclared dependency on plexus-utils that is brought in as a transitive dependency
      * of some Maven core artifact get the proper version of plexus-utils. For clarity, the proper version is the

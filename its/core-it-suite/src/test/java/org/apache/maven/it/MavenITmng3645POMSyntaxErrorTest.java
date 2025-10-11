@@ -33,10 +33,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng3645POMSyntaxErrorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3645POMSyntaxErrorTest() {
-        super("[2.0.10,2.1.0-M1),[2.1.0,3.0-alpha-1),[3.0-alpha-3,)");
-    }
-
     /**
      * Verify that POMs of reactor projects are parsed in strict mode.
      *

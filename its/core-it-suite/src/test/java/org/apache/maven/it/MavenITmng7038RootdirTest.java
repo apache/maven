@@ -28,10 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MavenITmng7038RootdirTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng7038RootdirTest() {
-        super("[4.0.0-alpha-6,)");
-    }
-
     @Test
     public void testRootdir() throws IOException, VerificationException {
         File testDir = extractResources("/mng-7038-rootdir");

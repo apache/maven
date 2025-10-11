@@ -28,9 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8181">MNG-8181</a>.
  */
 public class MavenITmng8181CentralRepoTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng8181CentralRepoTest() {
-        super("[4.0.0-beta-4,)");
-    }
 
     /**
      *  Verify that the central url can be overridden by a user property.

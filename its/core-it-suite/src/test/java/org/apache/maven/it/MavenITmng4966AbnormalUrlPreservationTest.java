@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4966AbnormalUrlPreservationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4966AbnormalUrlPreservationTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0.2,)");
-    }
-
     /**
      * Verify that URLs in the effective model retain successive slashes which are significant in certain domains.
      *

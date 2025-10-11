@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng3470StrictChecksumVerificationOfDependencyPomTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3470StrictChecksumVerificationOfDependencyPomTest() {
-        super("[2.0.3,2.0.4],[3.0-beta-1,)");
-    }
-
     /**
      * Verify that strict checksum verification fails the build in case a dependency POM is corrupt.
      *

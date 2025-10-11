@@ -35,10 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4190MirrorRepoMergingTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4190MirrorRepoMergingTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Test that artifact repositories are merged if they are mirrored by the same repo. If n repos map to one
      * mirror, there is no point in making n trips to the same mirror. However, the effective/merged repo needs

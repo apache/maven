@@ -30,12 +30,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3641">MNG-3641</a>:
  * Profile activation warning test
+ * @since 2.0.11
+ *
  */
+@Disabled("Upper bound: 2.1.0-M1")
 public class MavenITmng3641ProfileActivationWarningTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng3641ProfileActivationWarningTest() {
-        super("[2.0.11,2.1.0-M1),[2.1.0,4.0.0-alpha-1)"); // only test in 2.0.11+, 2.1.0+
-    }
 
     @Test
     public void testitMNG3641() throws Exception {

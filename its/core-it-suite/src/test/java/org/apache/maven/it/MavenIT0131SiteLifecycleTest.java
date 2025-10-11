@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenIT0131SiteLifecycleTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenIT0131SiteLifecycleTest() {
-        super("[2.0.0,)");
-    }
-
     /**
      * Test default binding of goals for "site" lifecycle.
      *

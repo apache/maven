@@ -30,9 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Robert Scholte
  */
 public class MavenITmng6330RelativePath extends AbstractMavenIntegrationTestCase {
-    public MavenITmng6330RelativePath() {
-        super("(,3.5.0),(3.5.2,4.0.0-beta-5)");
-    }
 
     @Test
     public void testRelativePath() throws Exception {

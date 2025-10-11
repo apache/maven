@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4022IdempotentPluginConfigMergingTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4022IdempotentPluginConfigMergingTest() {
-        super("[3.0-beta-1,)");
-    }
-
     /**
      * Test that merging of equal plugin configuration is idempotent. This is especially interesting for lists with
      * empty elements.

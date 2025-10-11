@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4721OptionalPluginDependencyTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4721OptionalPluginDependencyTest() {
-        super("[2.0.3,)");
-    }
-
     /**
      * Verify the handling of direct/transitive optional plugin dependencies.
      *

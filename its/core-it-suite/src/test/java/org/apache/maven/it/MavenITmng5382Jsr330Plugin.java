@@ -32,10 +32,6 @@ public class MavenITmng5382Jsr330Plugin extends AbstractMavenIntegrationTestCase
 
     private File testDir;
 
-    public MavenITmng5382Jsr330Plugin() {
-        super("[3.1-alpha,)");
-    }
-
     @BeforeEach
     public void setUp() throws Exception {
         testDir = extractResources("/mng-5382");
