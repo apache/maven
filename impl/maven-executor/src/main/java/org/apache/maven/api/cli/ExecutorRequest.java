@@ -18,7 +18,6 @@
  */
 package org.apache.maven.api.cli;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
@@ -401,9 +400,13 @@ public interface ExecutorRequest {
                 this.cwd = getCanonicalPath(requireNonNull(cwd));
                 this.installationDirectory = getCanonicalPath(requireNonNull(installationDirectory));
                 this.userHomeDirectory = getCanonicalPath(requireNonNull(userHomeDirectory));
-                this.jvmSystemProperties = jvmSystemProperties != null ? Map.copyOf(jvmSystemProperties) : null;
-                this.environmentVariables = environmentVariables != null ? Map.copyOf(environmentVariables) : null;
-                this.jvmArguments = jvmArguments != null ? List.copyOf(jvmArguments) : null;
+                this.jvmSystemProperties = jvmSystemProperties != null && !jvmSystemProperties.isEmpty()
+                        ? Map.copyOf(jvmSystemProperties)
+                        : null;
+                this.environmentVariables = environmentVariables != null && !environmentVariables.isEmpty()
+                        ? Map.copyOf(environmentVariables)
+                        : null;
+                this.jvmArguments = jvmArguments != null && !jvmArguments.isEmpty() ? List.copyOf(jvmArguments) : null;
                 this.stdIn = stdIn;
                 this.stdOut = stdOut;
                 this.stdErr = stdErr;
@@ -510,10 +513,6 @@ public interface ExecutorRequest {
     @Nonnull
     static Path getCanonicalPath(Path path) {
         requireNonNull(path, "path");
-        try {
-            return path.toRealPath();
-        } catch (IOException e) {
-            return getCanonicalPath(path.getParent()).resolve(path.getFileName());
-        }
+        return path.toAbsolutePath().normalize();
     }
 }

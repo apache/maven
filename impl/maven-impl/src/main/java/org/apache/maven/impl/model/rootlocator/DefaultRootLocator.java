@@ -98,10 +98,6 @@ public class DefaultRootLocator implements RootLocator {
     }
 
     protected Path getCanonicalPath(Path path) {
-        try {
-            return path.toRealPath();
-        } catch (IOException e) {
-            return getCanonicalPath(path.getParent()).resolve(path.getFileName());
-        }
+        return path.toAbsolutePath().normalize();
     }
 }
