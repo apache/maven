@@ -108,7 +108,8 @@ public class Verifier {
 
     private final List<String> jvmArguments = new ArrayList<>();
 
-    private final String toolboxVersion = System.getProperty("version.toolbox");
+    // TestSuiteOrdering creates Verifier in non-forked JVM as well, and there no prop set is set (so use default)
+    private final String toolboxVersion = System.getProperty("version.toolbox", "0.14.0");
 
     private Path userHomeDirectory; // the user home
 
