@@ -52,6 +52,10 @@ public class MavenITmng8181CentralRepoTest extends AbstractMavenIntegrationTestC
         verifier.addCliArgument("validate");
         verifier.setHandleLocalRepoTail(false); // we want isolation to have Maven fail due bad URL
         assertThrows(VerificationException.class, verifier::execute);
-        verifier.verifyTextInLog("from central: https://repo1.maven.org");
+        // error is
+        // PluginResolutionException: Plugin eu.maveniverse.maven.mimir:extension3:XXX or one of its dependencies could
+        // not be resolved:
+        //	 Could not find artifact eu.maveniverse.maven.mimir:extension3:jar:XXX in central (https://repo1.maven.org)
+        verifier.verifyTextInLog("central (https://repo1.maven.org)");
     }
 }
