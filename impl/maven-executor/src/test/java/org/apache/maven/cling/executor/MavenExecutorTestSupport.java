@@ -30,6 +30,7 @@ import eu.maveniverse.maven.mimir.testing.MimirInfuser;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Executor;
 import org.apache.maven.api.cli.ExecutorRequest;
+import org.apache.maven.cling.executor.impl.ToolboxToolTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -111,7 +112,8 @@ public abstract class MavenExecutorTestSupport {
                 List.of(mvn3ExecutorRequestBuilder()
                         .cwd(cwd)
                         .userHomeDirectory(userHome)
-                        .argument("eu.maveniverse.maven.plugins:toolbox:0.13.7:gav-dump")
+                        .argument(
+                                "eu.maveniverse.maven.plugins:toolbox:" + ToolboxToolTest.TOOLBOX_VERSION + ":gav-dump")
                         .argument("-l")
                         .argument(logfile)
                         .build()));
@@ -126,7 +128,8 @@ public abstract class MavenExecutorTestSupport {
                 List.of(mvn4ExecutorRequestBuilder()
                         .cwd(cwd)
                         .userHomeDirectory(userHome)
-                        .argument("eu.maveniverse.maven.plugins:toolbox:0.13.7:gav-dump")
+                        .argument(
+                                "eu.maveniverse.maven.plugins:toolbox:" + ToolboxToolTest.TOOLBOX_VERSION + ":gav-dump")
                         .argument("-l")
                         .argument(logfile)
                         .build()));

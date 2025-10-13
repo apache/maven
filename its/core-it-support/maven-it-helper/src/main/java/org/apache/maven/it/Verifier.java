@@ -108,6 +108,8 @@ public class Verifier {
 
     private final List<String> jvmArguments = new ArrayList<>();
 
+    private final String toolboxVersion = System.getProperty("version.toolbox");
+
     private Path userHomeDirectory; // the user home
 
     private String executable = ExecutorRequest.MVN;
@@ -155,7 +157,7 @@ public class Verifier {
                     this.userHomeDirectory,
                     EMBEDDED_MAVEN_EXECUTOR,
                     FORKED_MAVEN_EXECUTOR);
-            this.executorTool = new ToolboxTool(executorHelper, System.getProperty("version.toolbox", "0.13.7"));
+            this.executorTool = new ToolboxTool(executorHelper, toolboxVersion);
             this.defaultCliArguments =
                     new ArrayList<>(defaultCliArguments != null ? defaultCliArguments : DEFAULT_CLI_ARGUMENTS);
             this.logFile = this.basedir.resolve(logFileName);
@@ -166,6 +168,10 @@ public class Verifier {
 
     public void setUserHomeDirectory(Path userHomeDirectory) {
         this.userHomeDirectory = requireNonNull(userHomeDirectory, "userHomeDirectory");
+    }
+
+    public String getToolboxVersion() {
+        return toolboxVersion;
     }
 
     public String getExecutable() {
