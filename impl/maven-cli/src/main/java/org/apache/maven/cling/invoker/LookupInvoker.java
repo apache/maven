@@ -120,6 +120,17 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         oldProps.putAll(System.getProperties());
         ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
         try (C context = createContext(invokerRequest)) {
+            // Normalize user.home for Git Bash-style paths on Windows
+            if (isWindows()) {
+                String userHome = System.getProperty("user.home");
+                if (userHome != null && userHome.startsWith("/")) {
+                    final String normalizedUserHome = normalizeMsysPath(userHome, context);
+                    if (normalizedUserHome != null) {
+                        System.setProperty("user.home", normalizedUserHome);
+                        context.logger.debug("Normalized user.home '" + userHome + "' to '" + normalizedUserHome + "'");
+                    }
+                }
+            }
             if (contextConsumer != null) {
                 contextConsumer.accept(context);
             }
@@ -749,7 +760,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             }
         }
         if (userDefinedLocalRepo != null) {
-            return context.cwd.resolve(userDefinedLocalRepo);
+            // Normalize MSYS-style paths on Windows
+            final String normalizedPath = normalizeMsysPath(userDefinedLocalRepo, context);
+            return context.cwd.resolve(normalizedPath);
         }
         // settings
         userDefinedLocalRepo = context.effectiveSettings.getLocalRepository();
@@ -930,6 +943,29 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             throw new IllegalArgumentException("Invalid threads value: '" + threadConfiguration
                     + "'. Supported are int and float values ending with C.");
         }
+    }
+    // Helper method to normalize MSYS-style paths on Windows
+    private String normalizeMsysPath(String path, C context) {
+        if (path != null && isWindows() && path.startsWith("/")) {
+            try {
+                // Convert /d/path to D:\path
+                final String drive = path.substring(1, 2).toUpperCase(Locale.ENGLISH);
+                final String rest = path.substring(2).replace("/", "\\");
+                final String normalized = drive + ":" + rest;
+                context.logger.debug("Normalized MSYS path '" + path + "' to '" + normalized + "'");
+                System.out.println("Normalized MSYS path '" + path + "' to '" + normalized + "'");
+                return normalized;
+            } catch (final Exception e) {
+                context.logger.warn("Failed to normalize MSYS path '" + path + "': " + e.getMessage());
+                return path;
+            }
+        }
+        return path;
+    }
+
+    // Helper method to check if running on Windows
+    private boolean isWindows() {
+        return System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("win");
     }
 
     protected abstract int execute(C context) throws Exception;
