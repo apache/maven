@@ -80,7 +80,6 @@ under the License.
     <jetty9Version>9.4.57.v20241219</jetty9Version>
 
     <stubPluginVersion>0.1-stub-SNAPSHOT</stubPluginVersion>
-    <version.toolbox>0.7.4</version.toolbox>
   </properties>
 
   <dependencies>
@@ -520,7 +519,6 @@ under the License.
           <useSystemClassLoader>false</useSystemClassLoader>
           <promoteUserPropertiesToSystemProperties>false</promoteUserPropertiesToSystemProperties>
           <systemPropertyVariables>
-            <version.toolbox>${version.toolbox}</version.toolbox>
             <maven.test.user.home>${preparedUserHome}</maven.test.user.home>
             <maven.test.repo.outer>${settings.localRepository}</maven.test.repo.outer>
             <maven.test.repo.local>${preparedUserHome}/.m2/repository</maven.test.repo.local>
