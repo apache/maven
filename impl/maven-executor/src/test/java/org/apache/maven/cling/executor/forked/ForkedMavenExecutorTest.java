@@ -28,6 +28,6 @@ public class ForkedMavenExecutorTest extends MavenExecutorTestSupport {
 
     @Override
     protected Executor doSelectExecutor() {
-        return FORKED_MAVEN_EXECUTOR;
+        return new ForkedMavenExecutor();
     }
 }
