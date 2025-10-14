@@ -172,6 +172,9 @@ under the License.
     <woodstoxVersion>7.1.1</woodstoxVersion>
     <xmlunitVersion>2.10.4</xmlunitVersion>
     <jacocoArgLine />
+
+    <!-- Set as system property in surefire/failsafe to propagate to tests and IT Verifier -->
+    <toolboxVersion>0.14.0</toolboxVersion>
   </properties>
 
   <!--bootstrap-start-comment-->
@@ -717,6 +720,20 @@ under the License.
           <configuration>
             <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory" />
             <argLine>-Xmx256m @{jacocoArgLine}</argLine>
+            <systemPropertyVariables combine.children="append">
+              <version.toolbox>${toolboxVersion}</version.toolbox>
+            </systemPropertyVariables>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <configuration>
+            <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory" />
+            <argLine>-Xmx256m @{jacocoArgLine}</argLine>
+            <systemPropertyVariables combine.children="append">
+              <version.toolbox>${toolboxVersion}</version.toolbox>
+            </systemPropertyVariables>
           </configuration>
         </plugin>
         <!-- enforce backwards compatibility -->

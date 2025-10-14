@@ -47,11 +47,11 @@ public class ToolboxTool implements ExecutorTool {
     private final ExecutorHelper.Mode forceMode;
 
     /**
-     * @deprecated Better specify required version yourself. This one is "cemented" to 0.7.4
+     * @deprecated Better specify required version yourself. This one is "cemented" to 0.13.7
      */
     @Deprecated
     public ToolboxTool(ExecutorHelper helper) {
-        this(helper, "0.7.4");
+        this(helper, "0.13.7");
     }
 
     public ToolboxTool(ExecutorHelper helper, String toolboxVersion) {

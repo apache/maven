@@ -108,6 +108,9 @@ public class Verifier {
 
     private final List<String> jvmArguments = new ArrayList<>();
 
+    // TestSuiteOrdering creates Verifier in non-forked JVM as well, and there no prop set is set (so use default)
+    private final String toolboxVersion = System.getProperty("version.toolbox", "0.14.0");
+
     private Path userHomeDirectory; // the user home
 
     private String executable = ExecutorRequest.MVN;
@@ -155,7 +158,7 @@ public class Verifier {
                     this.userHomeDirectory,
                     EMBEDDED_MAVEN_EXECUTOR,
                     FORKED_MAVEN_EXECUTOR);
-            this.executorTool = new ToolboxTool(executorHelper, System.getProperty("version.toolbox", "0.7.4"));
+            this.executorTool = new ToolboxTool(executorHelper, toolboxVersion);
             this.defaultCliArguments =
                     new ArrayList<>(defaultCliArguments != null ? defaultCliArguments : DEFAULT_CLI_ARGUMENTS);
             this.logFile = this.basedir.resolve(logFileName);
@@ -166,6 +169,10 @@ public class Verifier {
 
     public void setUserHomeDirectory(Path userHomeDirectory) {
         this.userHomeDirectory = requireNonNull(userHomeDirectory, "userHomeDirectory");
+    }
+
+    public String getToolboxVersion() {
+        return toolboxVersion;
     }
 
     public String getExecutable() {
