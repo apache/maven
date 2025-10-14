@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -384,7 +385,7 @@ public class MavenCli {
             File configFile = new File(cliRequest.multiModuleProjectDirectory, MVN_MAVEN_CONFIG);
 
             if (configFile.isFile()) {
-                try (Stream<String> lines = Files.lines(configFile.toPath(), Charset.defaultCharset())) {
+                try (Stream<String> lines = Files.lines(configFile.toPath(), StandardCharsets.UTF_8)) {
                     String[] args = lines.filter(arg -> !arg.isEmpty() && !arg.startsWith("#"))
                             .toArray(String[]::new);
                     mavenConfig = cliManager.parse(args);
