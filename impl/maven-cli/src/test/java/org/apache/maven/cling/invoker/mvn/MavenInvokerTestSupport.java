@@ -127,6 +127,7 @@ public abstract class MavenInvokerTestSupport {
                                     .build()));
                 } catch (InvokerException.ExitException e) {
                     exitCode = e.getExitCode();
+                    exception = e;
                 } catch (Exception e) {
                     exception = e;
                 }
