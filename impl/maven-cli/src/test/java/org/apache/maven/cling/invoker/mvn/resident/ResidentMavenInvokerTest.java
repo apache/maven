@@ -61,7 +61,7 @@ public class ResidentMavenInvokerTest extends MavenInvokerTestSupport {
         invoke(cwd, userHome, List.of("verify"), List.of());
     }
 
-    @Disabled("Until we move off fully from File")
+    @Disabled("Enable when core moves off fully from FS")
     @Test
     void jimFs() throws Exception {
         try (FileSystem fs = Jimfs.newFileSystem(Configuration.unix())) {

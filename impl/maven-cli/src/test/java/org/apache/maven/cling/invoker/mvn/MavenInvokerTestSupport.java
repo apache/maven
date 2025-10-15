@@ -99,7 +99,9 @@ public abstract class MavenInvokerTestSupport {
         Files.createDirectories(appJava.getParent());
         Files.writeString(appJava, APP_JAVA_STRING);
 
-        MimirInfuser.infuseUW(userHome);
+        if (MimirInfuser.isMimirPresentUW()) {
+            MimirInfuser.doInfuseUW(Environment.MIMIR_VERSION, userHome);
+        }
 
         HashMap<String, String> logs = new HashMap<>();
         Parser parser = createParser();
@@ -109,6 +111,7 @@ public abstract class MavenInvokerTestSupport {
                 ByteArrayOutputStream stdout = new ByteArrayOutputStream();
                 ByteArrayOutputStream stderr = new ByteArrayOutputStream();
                 List<String> mvnArgs = new ArrayList<>(args);
+                mvnArgs.add("-Daether.remoteRepositoryFilter.prefixes=false");
                 mvnArgs.add(goal);
                 int exitCode = -1;
                 Exception exception = null;

@@ -66,6 +66,14 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
         invoke(cwd, userHome, List.of("verify"), List.of());
     }
 
+    @Disabled("Enable when core moves off fully from FS")
+    @Test
+    void jimFs() throws Exception {
+        try (FileSystem fs = Jimfs.newFileSystem(Configuration.unix())) {
+            invoke(fs.getPath("/cwd"), fs.getPath("/home"), List.of("verify"), List.of());
+        }
+    }
+
     /**
      * Same source (user or project extensions.xml) must not contain same GA with different V.
      */
@@ -218,20 +226,11 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
         Map<String, String> logs = invoke(
                 cwd,
                 userHome,
-                List.of("eu.maveniverse.maven.plugins:toolbox:" + System.getProperty("version.toolbox") + ":help"),
+                List.of("eu.maveniverse.maven.plugins:toolbox:" + Environment.TOOLBOX_VERSION + ":help"),
                 List.of("--force-interactive"));
 
-        String log =
-                logs.get("eu.maveniverse.maven.plugins:toolbox:" + System.getProperty("version.toolbox") + ":help");
+        String log = logs.get("eu.maveniverse.maven.plugins:toolbox:" + Environment.TOOLBOX_VERSION + ":help");
         assertTrue(log.contains("https://repo1.maven.org/maven2"), log);
         assertFalse(log.contains("https://repo.maven.apache.org/maven2"), log);
-    }
-
-    @Disabled("Until we move off fully from File")
-    @Test
-    void jimFs() throws Exception {
-        try (FileSystem fs = Jimfs.newFileSystem(Configuration.unix())) {
-            invoke(fs.getPath("/cwd"), fs.getPath("/home"), List.of("verify"), List.of());
-        }
     }
 }
