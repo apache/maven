@@ -30,6 +30,7 @@ import java.util.Map;
 
 import eu.maveniverse.maven.mimir.testing.MimirInfuser;
 import org.apache.maven.api.cli.Invoker;
+import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
@@ -124,6 +125,8 @@ public abstract class MavenInvokerTestSupport {
                                     .stdErr(stderr)
                                     .embedded(true)
                                     .build()));
+                } catch (InvokerException.ExitException e) {
+                    exitCode = e.getExitCode();
                 } catch (Exception e) {
                     exception = e;
                 }

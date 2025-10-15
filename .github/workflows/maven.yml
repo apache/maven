@@ -286,6 +286,7 @@ jobs:
         with:
           name: ${{ github.run_number }}-integration-test-artifact-${{ runner.os }}-${{ matrix.java }}
           path: |
+            **/target/surefire-reports/*
+            **/target/failsafe-reports/*
             ./its/core-it-suite/target/test-classes/**
-            ./its/core-it-suite/target/failsafe-reports/**
             **/target/java_heapdump.hprof
