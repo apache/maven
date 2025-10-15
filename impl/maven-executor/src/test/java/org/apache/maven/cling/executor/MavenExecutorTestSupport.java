@@ -45,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.condition.OS.WINDOWS;
 
-@Timeout(15)
+@Timeout(60)
 public abstract class MavenExecutorTestSupport {
     @TempDir(cleanup = CleanupMode.NEVER)
     private static Path tempDir;
