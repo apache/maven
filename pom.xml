@@ -31,7 +31,7 @@ under the License.
   <version>4.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Apache Maven</name>
+  <name>Code Quality - Staging Gab</name>
   <description>Maven is a software build management and
     comprehension tool. Based on the concept of a project object model:
     builds, dependency management, documentation creation, site
@@ -128,6 +128,12 @@ under the License.
   </distributionManagement>
 
   <properties>
+    <!-- sonar -->
+    <sonar.organization>sonarsource</sonar.organization>
+    <sonar.scanner.sonarcloudUrl>https://sc-staging.io</sonar.scanner.sonarcloudUrl>
+    <sonar.scanner.apiBaseUrl>https://api.sc-staging.io</sonar.scanner.apiBaseUrl>
+    <!-- /sonar -->
+
     <javaVersion>17</javaVersion>
     <maven.compiler.source>${javaVersion}</maven.compiler.source>
     <maven.compiler.target>${javaVersion}</maven.compiler.target>
