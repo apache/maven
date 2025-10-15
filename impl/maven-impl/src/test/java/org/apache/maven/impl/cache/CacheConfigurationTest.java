@@ -116,8 +116,7 @@ class CacheConfigurationTest {
 
     @Test
     void testParseMultipleSelectors() {
-        String configString =
-                """
+        String configString = """
             ModelBuilderRequest { scope: session, ref: soft }
             ArtifactResolutionRequest { scope: request, ref: hard }
             * VersionRangeRequest { ref: weak }
@@ -271,9 +270,7 @@ class CacheConfigurationTest {
 
     @Test
     void testPartialConfigurationMerging() {
-        userProperties.put(
-                Constants.MAVEN_CACHE_CONFIG_PROPERTY,
-                """
+        userProperties.put(Constants.MAVEN_CACHE_CONFIG_PROPERTY, """
             ModelBuilderRequest { scope: session }
             * ModelBuilderRequest { ref: hard }
             """);

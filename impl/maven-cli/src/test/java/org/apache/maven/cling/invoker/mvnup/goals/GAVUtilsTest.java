@@ -87,8 +87,7 @@ class GAVUtilsTest {
         @Test
         @DisplayName("should extract GAV with parent inheritance")
         void shouldExtractGAVWithParentInheritance() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -116,8 +115,7 @@ class GAVUtilsTest {
         @Test
         @DisplayName("should handle partial parent inheritance")
         void shouldHandlePartialParentInheritance() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -182,8 +180,7 @@ class GAVUtilsTest {
         @Test
         @DisplayName("should compute GAVs from multiple POMs")
         void shouldComputeGAVsFromMultiplePOMs() throws Exception {
-            String parentPomXml =
-                    """
+            String parentPomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -194,8 +191,7 @@ class GAVUtilsTest {
                 </project>
                 """;
 
-            String childPomXml =
-                    """
+            String childPomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -239,8 +235,7 @@ class GAVUtilsTest {
         @Test
         @DisplayName("should deduplicate identical GAVs")
         void shouldDeduplicateIdenticalGAVs() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -268,8 +263,7 @@ class GAVUtilsTest {
         @Test
         @DisplayName("should skip POMs with incomplete GAVs")
         void shouldSkipPOMsWithIncompleteGAVs() throws Exception {
-            String validPomXml =
-                    """
+            String validPomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -279,8 +273,7 @@ class GAVUtilsTest {
                 </project>
                 """;
 
-            String invalidPomXml =
-                    """
+            String invalidPomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -330,8 +323,7 @@ class GAVUtilsTest {
         @Test
         @DisplayName("should handle POM with empty elements")
         void shouldHandlePOMWithEmptyElements() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -372,8 +364,7 @@ class GAVUtilsTest {
         @Test
         @DisplayName("should handle deeply nested parent inheritance")
         void shouldHandleDeeplyNestedParentInheritance() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>

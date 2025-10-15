@@ -51,8 +51,7 @@ public class MavenPropertiesTest {
 
     private MavenProperties properties;
 
-    static final String TEST_PROPERTIES =
-            """
+    static final String TEST_PROPERTIES = """
                 #
                 # test.properties
                 # Used in the PropertiesTest

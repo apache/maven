@@ -206,8 +206,7 @@ class ModelUpgradeStrategyTest {
         @Test
         @DisplayName("should update namespace recursively")
         void shouldUpdateNamespaceRecursively() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -257,8 +256,7 @@ class ModelUpgradeStrategyTest {
         @Test
         @DisplayName("should convert modules to subprojects in 4.1.0")
         void shouldConvertModulesToSubprojectsIn410() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -354,8 +352,7 @@ class ModelUpgradeStrategyTest {
         }
 
         private Document createDocumentWithDeprecatedPhases() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -633,8 +630,7 @@ class ModelUpgradeStrategyTest {
         @Test
         @DisplayName("should not upgrade phases when upgrading to 4.0.0")
         void shouldNotUpgradePhasesWhenUpgradingTo400() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -691,8 +687,7 @@ class ModelUpgradeStrategyTest {
         @Test
         @DisplayName("should preserve non-deprecated phases")
         void shouldPreserveNonDeprecatedPhases() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -792,8 +787,7 @@ class ModelUpgradeStrategyTest {
         @Test
         @DisplayName("should fail with error when attempting downgrade from 4.1.0 to 4.0.0")
         void shouldFailWhenAttemptingDowngrade() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.1.0">
                     <modelVersion>4.1.0</modelVersion>
@@ -819,8 +813,7 @@ class ModelUpgradeStrategyTest {
         @Test
         @DisplayName("should succeed when upgrading from 4.0.0 to 4.1.0")
         void shouldSucceedWhenUpgrading() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>

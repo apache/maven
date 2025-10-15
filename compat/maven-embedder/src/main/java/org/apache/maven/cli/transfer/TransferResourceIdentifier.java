@@ -29,7 +29,11 @@ import org.eclipse.aether.transfer.TransferResource;
  * making it not very suitable for usage in collections.
  */
 @Deprecated
-record TransferResourceIdentifier(String repositoryId, String repositoryUrl, String resourceName, @Nullable File file) {
+record TransferResourceIdentifier(
+        String repositoryId,
+        String repositoryUrl,
+        String resourceName,
+        @Nullable File file) {
     TransferResourceIdentifier(TransferResource resource) {
         this(resource.getRepositoryId(), resource.getRepositoryUrl(), resource.getResourceName(), resource.getFile());
     }

@@ -544,9 +544,10 @@ public class MavenCli {
                         switch (logLevelThreshold.toLowerCase(Locale.ENGLISH)) {
                             case "warn", "warning" -> LogLevelRecorder.Level.WARN;
                             case "error" -> LogLevelRecorder.Level.ERROR;
-                            default -> throw new IllegalArgumentException(
-                                    logLevelThreshold
-                                            + " is not a valid log severity threshold. Valid severities are WARN/WARNING and ERROR.");
+                            default ->
+                                throw new IllegalArgumentException(
+                                        logLevelThreshold
+                                                + " is not a valid log severity threshold. Valid severities are WARN/WARNING and ERROR.");
                         };
                 recorder.setMaxLevelAllowed(level);
                 slf4jLogger.info("Enabled to break the build on log level {}.", logLevelThreshold);

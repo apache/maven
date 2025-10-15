@@ -86,8 +86,8 @@ public class ArtifactDescriptorUtils {
             case RepositoryPolicy.CHECKSUM_POLICY_FAIL -> RepositoryPolicy.CHECKSUM_POLICY_FAIL;
             case RepositoryPolicy.CHECKSUM_POLICY_IGNORE -> RepositoryPolicy.CHECKSUM_POLICY_IGNORE;
             case RepositoryPolicy.CHECKSUM_POLICY_WARN -> RepositoryPolicy.CHECKSUM_POLICY_WARN;
-            default -> throw new IllegalArgumentException(
-                    "unknown repository checksum policy: " + artifactRepositoryPolicy);
+            default ->
+                throw new IllegalArgumentException("unknown repository checksum policy: " + artifactRepositoryPolicy);
         };
     }
 }
