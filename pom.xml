@@ -695,6 +695,7 @@ under the License.
             <argLine>-Xmx256m @{jacocoArgLine}</argLine>
             <systemPropertyVariables combine.children="append">
               <version.toolbox>${toolboxVersion}</version.toolbox>
+              <version.mimir>${env.MIMIR_VERSION}</version.mimir>
             </systemPropertyVariables>
           </configuration>
         </plugin>
@@ -706,6 +707,7 @@ under the License.
             <argLine>-Xmx256m @{jacocoArgLine}</argLine>
             <systemPropertyVariables combine.children="append">
               <version.toolbox>${toolboxVersion}</version.toolbox>
+              <version.mimir>${env.MIMIR_VERSION}</version.mimir>
             </systemPropertyVariables>
           </configuration>
         </plugin>
