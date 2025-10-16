@@ -544,6 +544,24 @@ class DefaultModelValidatorTest {
     }
 
     @Test
+    void testInvalidAggregatorPackagingSubprojects() throws Exception {
+        SimpleProblemCollector result = validate("invalid-aggregator-packaging-subprojects-pom.xml");
+
+        assertViolations(result, 0, 1, 0);
+
+        assertTrue(result.getErrors().get(0).contains("Aggregator projects require 'pom' as packaging."));
+    }
+
+    @Test
+    void testEmptySubproject() throws Exception {
+        SimpleProblemCollector result = validate("empty-subproject.xml");
+
+        assertViolations(result, 0, 1, 0);
+
+        assertTrue(result.getErrors().get(0).contains("'subprojects.subproject[0]' has been specified without a path"));
+    }
+
+    @Test
     void testDuplicatePlugin() throws Exception {
         SimpleProblemCollector result = validateFile("duplicate-plugin.xml");
 
