@@ -173,6 +173,9 @@ under the License.
     <xmlunitVersion>2.10.4</xmlunitVersion>
     <jacocoArgLine />
 
+    <version.spotless-maven-plugin>3.0.0</version.spotless-maven-plugin>
+    <version.palantirJavaFormat>2.80.0</version.palantirJavaFormat>
+
     <!-- Set as system property in surefire/failsafe to propagate to tests and IT Verifier -->
     <toolboxVersion>0.14.0</toolboxVersion>
   </properties>
@@ -958,6 +961,10 @@ under the License.
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

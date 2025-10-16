@@ -90,8 +90,7 @@ class ModelVersionUtilsTest {
         @Test
         @DisplayName("should return default version when model version is missing")
         void shouldReturnDefaultVersionWhenModelVersionMissing() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <groupId>test</groupId>
@@ -108,8 +107,7 @@ class ModelVersionUtilsTest {
         @Test
         @DisplayName("should detect version from namespace when model version is missing")
         void shouldDetectVersionFromNamespaceWhenModelVersionMissing() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.1.0">
                     <groupId>test</groupId>
@@ -275,8 +273,7 @@ class ModelVersionUtilsTest {
         @Test
         @DisplayName("should update model version in document")
         void shouldUpdateModelVersionInDocument() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -296,8 +293,7 @@ class ModelVersionUtilsTest {
         @Test
         @DisplayName("should add model version when missing")
         void shouldAddModelVersionWhenMissing() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <groupId>test</groupId>
@@ -317,8 +313,7 @@ class ModelVersionUtilsTest {
         @Test
         @DisplayName("should remove model version from document")
         void shouldRemoveModelVersionFromDocument() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -340,8 +335,7 @@ class ModelVersionUtilsTest {
         @Test
         @DisplayName("should handle missing model version in removal")
         void shouldHandleMissingModelVersionInRemoval() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <groupId>test</groupId>
@@ -396,8 +390,7 @@ class ModelVersionUtilsTest {
         @Test
         @DisplayName("should handle missing modelVersion element")
         void shouldHandleMissingModelVersion() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <groupId>com.example</groupId>
@@ -457,8 +450,7 @@ class ModelVersionUtilsTest {
         @Test
         @DisplayName("should handle modelVersion with whitespace")
         void shouldHandleModelVersionWithWhitespace() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>  4.1.0  </modelVersion>
