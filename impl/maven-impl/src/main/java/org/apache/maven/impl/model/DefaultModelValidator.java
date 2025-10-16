@@ -857,7 +857,7 @@ public class DefaultModelValidator implements ModelValidator {
 
         validateStringNotEmpty("packaging", problems, Severity.ERROR, Version.BASE, m.getPackaging(), m);
 
-        if (!m.getModules().isEmpty()) {
+        if (!m.getModules().isEmpty() || !m.getSubprojects().isEmpty()) {
             if (!"pom".equals(m.getPackaging())) {
                 addViolation(
                         problems,
@@ -891,6 +891,30 @@ public class DefaultModelValidator implements ModelValidator {
                             null,
                             "has been specified without a path to the project directory.",
                             m.getLocation("modules"));
+                }
+            }
+
+            for (int index = 0, size = m.getSubprojects().size(); index < size; index++) {
+                String subproject = m.getSubprojects().get(index);
+
+                boolean isBlankSubproject = true;
+                if (subproject != null) {
+                    for (int charIndex = 0; charIndex < subproject.length(); charIndex++) {
+                        if (!Character.isWhitespace(subproject.charAt(charIndex))) {
+                            isBlankSubproject = false;
+                        }
+                    }
+                }
+
+                if (isBlankSubproject) {
+                    addViolation(
+                            problems,
+                            Severity.ERROR,
+                            Version.BASE,
+                            "subprojects.subproject[" + index + "]",
+                            null,
+                            "has been specified without a path to the project directory.",
+                            m.getLocation("subprojects"));
                 }
             }
         }
