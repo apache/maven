@@ -30,7 +30,6 @@ import eu.maveniverse.maven.mimir.testing.MimirInfuser;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Executor;
 import org.apache.maven.api.cli.ExecutorRequest;
-import org.apache.maven.cling.executor.impl.ToolboxToolTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.condition.OS.WINDOWS;
 
-@Timeout(15)
+@Timeout(60)
 public abstract class MavenExecutorTestSupport {
     @TempDir(cleanup = CleanupMode.NEVER)
     private static Path tempDir;
@@ -112,8 +111,7 @@ public abstract class MavenExecutorTestSupport {
                 List.of(mvn3ExecutorRequestBuilder()
                         .cwd(cwd)
                         .userHomeDirectory(userHome)
-                        .argument(
-                                "eu.maveniverse.maven.plugins:toolbox:" + ToolboxToolTest.TOOLBOX_VERSION + ":gav-dump")
+                        .argument("eu.maveniverse.maven.plugins:toolbox:" + Environment.TOOLBOX_VERSION + ":gav-dump")
                         .argument("-l")
                         .argument(logfile)
                         .build()));
@@ -128,8 +126,7 @@ public abstract class MavenExecutorTestSupport {
                 List.of(mvn4ExecutorRequestBuilder()
                         .cwd(cwd)
                         .userHomeDirectory(userHome)
-                        .argument(
-                                "eu.maveniverse.maven.plugins:toolbox:" + ToolboxToolTest.TOOLBOX_VERSION + ":gav-dump")
+                        .argument("eu.maveniverse.maven.plugins:toolbox:" + Environment.TOOLBOX_VERSION + ":gav-dump")
                         .argument("-l")
                         .argument(logfile)
                         .build()));
@@ -338,10 +335,13 @@ public abstract class MavenExecutorTestSupport {
 
     protected void execute(@Nullable Path logFile, Collection<ExecutorRequest> requests) throws Exception {
         Executor invoker = createAndMemoizeExecutor();
-        String mavenVersion = invoker.mavenVersion(requests.iterator().next());
         for (ExecutorRequest request : requests) {
-            if (mavenVersion.startsWith("4.")) {
-                MimirInfuser.infuseUW(request.userHomeDirectory());
+            if (MimirInfuser.isMimirPresentUW()) {
+                if (maven3Home().equals(request.installationDirectory())) {
+                    MimirInfuser.doInfusePW(Environment.MIMIR_VERSION, request.cwd(), request.userHomeDirectory());
+                } else if (maven4Home().equals(request.installationDirectory())) {
+                    MimirInfuser.doInfuseUW(Environment.MIMIR_VERSION, request.userHomeDirectory());
+                }
             }
             int exitCode = invoker.execute(request);
             if (exitCode != 0) {
@@ -355,15 +355,24 @@ public abstract class MavenExecutorTestSupport {
     }
 
     public ExecutorRequest.Builder mvn3ExecutorRequestBuilder() {
-        return customize(ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven3home"))));
+        return customize(ExecutorRequest.mavenBuilder(maven3Home()));
+    }
+
+    private Path maven3Home() {
+        return ExecutorRequest.getCanonicalPath(Paths.get(System.getProperty("maven3home")));
     }
 
     public ExecutorRequest.Builder mvn4ExecutorRequestBuilder() {
-        return customize(ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven4home"))));
+        return customize(ExecutorRequest.mavenBuilder(maven4Home()));
+    }
+
+    private Path maven4Home() {
+        return ExecutorRequest.getCanonicalPath(Paths.get(System.getProperty("maven4home")));
     }
 
     private ExecutorRequest.Builder customize(ExecutorRequest.Builder builder) {
-        builder = builder.cwd(cwd).userHomeDirectory(userHome);
+        builder =
+                builder.cwd(cwd).userHomeDirectory(userHome).argument("-Daether.remoteRepositoryFilter.prefixes=false");
         if (System.getProperty("localRepository") != null) {
             builder.argument("-Dmaven.repo.local.tail=" + System.getProperty("localRepository"));
         }

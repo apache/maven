@@ -693,7 +693,7 @@ under the License.
       <dependency>
         <groupId>eu.maveniverse.maven.mimir</groupId>
         <artifactId>testing</artifactId>
-        <version>0.9.4</version>
+        <version>0.10.0</version>
       </dependency>
     </dependencies>
     <!--bootstrap-start-comment-->
@@ -725,6 +725,7 @@ under the License.
             <argLine>-Xmx256m @{jacocoArgLine}</argLine>
             <systemPropertyVariables combine.children="append">
               <version.toolbox>${toolboxVersion}</version.toolbox>
+              <version.mimir>${env.MIMIR_VERSION}</version.mimir>
             </systemPropertyVariables>
           </configuration>
         </plugin>
@@ -736,6 +737,7 @@ under the License.
             <argLine>-Xmx256m @{jacocoArgLine}</argLine>
             <systemPropertyVariables combine.children="append">
               <version.toolbox>${toolboxVersion}</version.toolbox>
+              <version.mimir>${env.MIMIR_VERSION}</version.mimir>
             </systemPropertyVariables>
           </configuration>
         </plugin>
