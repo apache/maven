@@ -37,29 +37,4 @@ under the License.
     <module>dep-b</module>
     <module>dep-c</module>
   </modules>
-
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>com.diffplug.spotless</groupId>
-          <artifactId>spotless-maven-plugin</artifactId>
-          <configuration>
-            <java>
-              <includes>
-                <include>src/main/java/**/*.java</include>
-                <include>maven-it-plugin-class-loader/src/main/java/**/*.java</include>
-              </includes>
-            </java>
-            <pom>
-              <includes>
-                <include>pom.xml</include>
-                <include>maven-it-plugin-class-loader/pom.xml</include>
-              </includes>
-            </pom>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
 </project>

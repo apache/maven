@@ -253,11 +253,6 @@ under the License.
         <version>2.0.0-M1</version>
       </dependency>
       <dependency>
-        <groupId>org.junit.jupiter</groupId>
-        <artifactId>junit-jupiter</artifactId>
-        <version>5.13.4</version>
-      </dependency>
-      <dependency>
         <groupId>org.apache.maven.plugin-tools</groupId>
         <artifactId>maven-plugin-tools-java</artifactId>
         <version>${maven-plugin-tools-version}</version>

@@ -100,7 +100,7 @@ under the License.
   <dependencies>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter</artifactId>
+      <artifactId>junit-jupiter-api</artifactId>
       <!-- NOTE: Use compile scope for transitivity. -->
     </dependency>
     <dependency>
