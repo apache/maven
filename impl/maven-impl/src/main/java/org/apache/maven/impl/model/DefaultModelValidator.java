@@ -2446,7 +2446,7 @@ public class DefaultModelValidator implements ModelValidator {
             return () -> {
                 String hint;
                 if (dependency.getClassifier() == null
-                        || dependency.getClassifier().isBlank()) {
+                        || dependency.getClassifier().isEmpty()) {
                     hint = "groupId=" + valueToValueString(dependency.getGroupId())
                             + ", artifactId=" + valueToValueString(dependency.getArtifactId())
                             + ", type=" + valueToValueString(dependency.getType());
