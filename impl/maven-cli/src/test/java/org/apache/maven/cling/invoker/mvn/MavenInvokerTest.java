@@ -66,7 +66,7 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
         invoke(cwd, userHome, List.of("verify"), List.of());
     }
 
-    @Disabled("Enable when core moves off fully from FS")
+    @Disabled("Enable it when fully moved to NIO2 with Path/Filesystem (ie MavenExecutionRequest)")
     @Test
     void jimFs() throws Exception {
         try (FileSystem fs = Jimfs.newFileSystem(Configuration.unix())) {
