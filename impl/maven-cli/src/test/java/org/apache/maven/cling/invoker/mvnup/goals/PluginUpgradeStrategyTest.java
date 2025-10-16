@@ -163,8 +163,7 @@ class PluginUpgradeStrategyTest {
         @Test
         @DisplayName("should not modify plugin when version is already sufficient")
         void shouldNotModifyPluginWhenVersionAlreadySufficient() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -196,8 +195,7 @@ class PluginUpgradeStrategyTest {
         @Test
         @DisplayName("should upgrade plugin in pluginManagement")
         void shouldUpgradePluginInPluginManagement() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -241,8 +239,7 @@ class PluginUpgradeStrategyTest {
         @Test
         @DisplayName("should upgrade plugin with property version")
         void shouldUpgradePluginWithPropertyVersion() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -284,8 +281,7 @@ class PluginUpgradeStrategyTest {
         @Test
         @DisplayName("should not upgrade when version is already higher")
         void shouldNotUpgradeWhenVersionAlreadyHigher() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -325,8 +321,7 @@ class PluginUpgradeStrategyTest {
         @Test
         @DisplayName("should upgrade plugin without explicit groupId")
         void shouldUpgradePluginWithoutExplicitGroupId() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -368,8 +363,7 @@ class PluginUpgradeStrategyTest {
         @Test
         @DisplayName("should not upgrade plugin without version")
         void shouldNotUpgradePluginWithoutVersion() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -401,8 +395,7 @@ class PluginUpgradeStrategyTest {
         @Test
         @DisplayName("should not upgrade when property is not found")
         void shouldNotUpgradeWhenPropertyNotFound() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -439,8 +432,7 @@ class PluginUpgradeStrategyTest {
         @Test
         @DisplayName("should add pluginManagement before existing plugins section")
         void shouldAddPluginManagementBeforeExistingPluginsSection() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -537,8 +529,7 @@ class PluginUpgradeStrategyTest {
         @Test
         @DisplayName("should handle malformed POM gracefully")
         void shouldHandleMalformedPOMGracefully() throws Exception {
-            String malformedPomXml =
-                    """
+            String malformedPomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -589,8 +580,7 @@ class PluginUpgradeStrategyTest {
         @Test
         @DisplayName("should format pluginManagement with proper indentation")
         void shouldFormatPluginManagementWithProperIndentation() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -640,8 +630,7 @@ class PluginUpgradeStrategyTest {
         @DisplayName("should format pluginManagement with proper indentation when added")
         void shouldFormatPluginManagementWithProperIndentationWhenAdded() throws Exception {
             // Use a POM that will trigger pluginManagement addition by having a plugin without version
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>

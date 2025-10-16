@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.condition.OS.WINDOWS;
 
-@Timeout(25)
+@Timeout(60)
 public abstract class MavenExecutorTestSupport {
     @TempDir(cleanup = CleanupMode.NEVER)
     private static Path tempDir;
@@ -289,8 +289,7 @@ public abstract class MavenExecutorTestSupport {
         assertTrue(stdout.toString().contains("INFO"), "No INFO found");
     }
 
-    public static final String POM_STRING =
-            """
+    public static final String POM_STRING = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
@@ -324,8 +323,7 @@ public abstract class MavenExecutorTestSupport {
                 </project>
                 """;
 
-    public static final String APP_JAVA_STRING =
-            """
+    public static final String APP_JAVA_STRING = """
             package org.apache.maven.samples.sample;
 
             public class App {

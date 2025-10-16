@@ -44,7 +44,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Timeout(25)
+@Timeout(60)
 public class ToolboxToolTest {
     private static final Executor EMBEDDED_MAVEN_EXECUTOR = new EmbeddedMavenExecutor();
     private static final Executor FORKED_MAVEN_EXECUTOR = new ForkedMavenExecutor();

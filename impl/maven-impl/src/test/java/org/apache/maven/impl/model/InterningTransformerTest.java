@@ -209,8 +209,7 @@ class InterningTransformerTest {
             return value;
         };
 
-        String pomXml =
-                """
+        String pomXml = """
             <?xml version="1.0" encoding="UTF-8"?>
             <project xmlns="http://maven.apache.org/POM/4.0.0">
                 <modelVersion>4.0.0</modelVersion>
@@ -262,8 +261,7 @@ class InterningTransformerTest {
 
     @Test
     void testInterningTransformerWithRealPomParsing() throws Exception {
-        String pomXml =
-                """
+        String pomXml = """
             <?xml version="1.0" encoding="UTF-8"?>
             <project xmlns="http://maven.apache.org/POM/4.0.0">
                 <modelVersion>4.0.0</modelVersion>

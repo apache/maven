@@ -520,8 +520,9 @@ public interface Cache<K, V> {
                 case SOFT -> SoftComputeReference.computing(valueQueue);
                 case WEAK -> WeakComputeReference.computing(valueQueue);
                 case HARD -> HardComputeReference.computing(valueQueue);
-                case NONE -> throw new IllegalArgumentException(
-                        "NONE reference type should be handled before calling this method");
+                case NONE ->
+                    throw new IllegalArgumentException(
+                            "NONE reference type should be handled before calling this method");
             };
         }
 
@@ -535,8 +536,9 @@ public interface Cache<K, V> {
                 case SOFT -> new SoftComputeReference<>(value, valueQueue);
                 case WEAK -> new WeakComputeReference<>(value, valueQueue);
                 case HARD -> new HardComputeReference<>(value, valueQueue);
-                case NONE -> throw new IllegalArgumentException(
-                        "NONE reference type should be handled before calling this method");
+                case NONE ->
+                    throw new IllegalArgumentException(
+                            "NONE reference type should be handled before calling this method");
             };
         }
 
@@ -550,8 +552,9 @@ public interface Cache<K, V> {
                 case SOFT -> new SoftRefConcurrentReference<>(key, keyQueue);
                 case WEAK -> new WeakRefConcurrentReference<>(key, keyQueue);
                 case HARD -> new HardRefConcurrentReference<>(key, keyQueue);
-                case NONE -> throw new IllegalArgumentException(
-                        "NONE reference type should be handled before calling this method");
+                case NONE ->
+                    throw new IllegalArgumentException(
+                            "NONE reference type should be handled before calling this method");
             };
         }
 

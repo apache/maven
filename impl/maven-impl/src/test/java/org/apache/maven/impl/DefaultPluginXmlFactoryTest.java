@@ -52,8 +52,7 @@ import static org.mockito.Mockito.when;
 class DefaultPluginXmlFactoryTest {
 
     private static final String NAME = "sample-plugin-" + randomUUID();
-    private static final String SAMPLE_PLUGIN_XML =
-            """
+    private static final String SAMPLE_PLUGIN_XML = """
             <?xml version="1.0" encoding="UTF-8"?>
             <plugin>
               <name>%s</name>
@@ -61,8 +60,7 @@ class DefaultPluginXmlFactoryTest {
               <artifactId>sample-plugin</artifactId>
               <version>1.0.0</version>
             </plugin>
-            """
-                    .formatted(NAME);
+            """.formatted(NAME);
 
     private final DefaultPluginXmlFactory defaultPluginXmlFactory = new DefaultPluginXmlFactory();
 

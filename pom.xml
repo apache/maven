@@ -160,7 +160,7 @@ under the License.
     <mockitoVersion>5.20.0</mockitoVersion>
     <plexusInteractivityVersion>1.4</plexusInteractivityVersion>
     <plexusInterpolationVersion>1.28</plexusInterpolationVersion>
-    <plexusTestingVersion>1.6.1</plexusTestingVersion>
+    <plexusTestingVersion>1.7.0</plexusTestingVersion>
     <plexusXmlVersion>4.1.0</plexusXmlVersion>
     <resolverVersion>2.0.13</resolverVersion>
     <securityDispatcherVersion>4.1.0</securityDispatcherVersion>
@@ -171,6 +171,9 @@ under the License.
     <woodstoxVersion>7.1.1</woodstoxVersion>
     <xmlunitVersion>2.10.4</xmlunitVersion>
     <jacocoArgLine />
+
+    <version.spotless-maven-plugin>3.0.0</version.spotless-maven-plugin>
+    <version.palantirJavaFormat>2.80.0</version.palantirJavaFormat>
 
     <!-- Set as system property in surefire/failsafe to propagate to tests and IT Verifier -->
     <toolboxVersion>0.14.0</toolboxVersion>
@@ -712,7 +715,7 @@ under the License.
         <plugin>
           <groupId>com.github.siom79.japicmp</groupId>
           <artifactId>japicmp-maven-plugin</artifactId>
-          <version>0.24.1</version>
+          <version>0.24.2</version>
           <executions>
             <execution>
               <goals>
@@ -761,7 +764,7 @@ under the License.
         <plugin>
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
-          <version>0.8.13</version>
+          <version>0.8.14</version>
           <configuration>
             <excludes>
               <exclude>**/org/apache/maven/it/**</exclude>
@@ -930,6 +933,10 @@ under the License.
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

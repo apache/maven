@@ -82,8 +82,7 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
             throws Exception {
-        String projectExtensionsXml =
-                """
+        String projectExtensionsXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <extensions>
                     <extension>
@@ -103,8 +102,7 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
         Path projectExtensions = dotMvn.resolve("extensions.xml");
         Files.writeString(projectExtensions, projectExtensionsXml);
 
-        String userExtensionsXml =
-                """
+        String userExtensionsXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <extensions>
                     <extension>
@@ -130,8 +128,7 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
             throws Exception {
-        String extensionsXml =
-                """
+        String extensionsXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <extensions>
                     <extension>
@@ -171,8 +168,7 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
             throws Exception {
-        String settingsXml =
-                """
+        String settingsXml = """
 <?xml version="1.0"?>
 <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">

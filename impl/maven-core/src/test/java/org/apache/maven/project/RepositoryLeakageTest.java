@@ -46,9 +46,7 @@ public class RepositoryLeakageTest extends AbstractMavenProjectTestCase {
         try {
             // Create parent POM
             Path parentPom = tempDir.resolve("pom.xml");
-            Files.writeString(
-                    parentPom,
-                    """
+            Files.writeString(parentPom, """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0"
                          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -71,9 +69,7 @@ public class RepositoryLeakageTest extends AbstractMavenProjectTestCase {
             Path child1Dir = tempDir.resolve("child1");
             Files.createDirectories(child1Dir);
             Path child1Pom = child1Dir.resolve("pom.xml");
-            Files.writeString(
-                    child1Pom,
-                    """
+            Files.writeString(child1Pom, """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0"
                          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -100,9 +96,7 @@ public class RepositoryLeakageTest extends AbstractMavenProjectTestCase {
             Path child2Dir = tempDir.resolve("child2");
             Files.createDirectories(child2Dir);
             Path child2Pom = child2Dir.resolve("pom.xml");
-            Files.writeString(
-                    child2Pom,
-                    """
+            Files.writeString(child2Pom, """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0"
                          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
