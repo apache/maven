@@ -32,7 +32,7 @@ concurrency:
 permissions: {}
 
 env:
-  MIMIR_VERSION: 0.9.4
+  MIMIR_VERSION: 0.10.0
   MIMIR_BASEDIR: ~/.mimir
   MIMIR_LOCAL: ~/.mimir/local
 
@@ -282,4 +282,8 @@ jobs:
         if: failure() || cancelled()
         with:
           name: ${{ github.run_number }}-integration-test-artifact-${{ runner.os }}-${{ matrix.java }}
-          path: ./its/core-it-suite/target/test-classes/
+          path: |
+            **/target/surefire-reports/*
+            **/target/failsafe-reports/*
+            ./its/core-it-suite/target/test-classes/**
+            **/target/java_heapdump.hprof
