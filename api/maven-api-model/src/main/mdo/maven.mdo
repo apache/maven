@@ -1367,11 +1367,12 @@
     private volatile String managementKey;
 
     /**
-     * @return the management key as {@code groupId:artifactId:type}
+     * @return the management key as {@code groupId:artifactId:type[:classifier]}
      */
     public String getManagementKey() {
         if (managementKey == null) {
-            managementKey = (getGroupId() + ":" + getArtifactId() + ":" + getType() + (getClassifier() != null ? ":" + getClassifier() : "")).intern();
+            managementKey = (getGroupId() + ":" + getArtifactId() + ":" + getType()
+                    + (getClassifier() != null && !getClassifier().isEmpty() ? ":" + getClassifier() : "")).intern();
         }
         return managementKey;
     }
