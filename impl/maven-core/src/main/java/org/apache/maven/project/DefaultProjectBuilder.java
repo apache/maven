@@ -874,8 +874,9 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                             reposes.addAll(project.getRemoteArtifactRepositories());
                             mergedRepositories = List.copyOf(reposes);
                         }
-                        default -> throw new IllegalArgumentException(
-                                "Unsupported repository merging: " + request.getRepositoryMerging());
+                        default ->
+                            throw new IllegalArgumentException(
+                                    "Unsupported repository merging: " + request.getRepositoryMerging());
                     }
 
                     // Store the computed repositories for this project in BuildSession storage

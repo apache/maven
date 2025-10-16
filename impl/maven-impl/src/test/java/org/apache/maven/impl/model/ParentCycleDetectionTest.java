@@ -59,9 +59,7 @@ class ParentCycleDetectionTest {
         // Create a parent resolution cycle using relativePath: child -> parent -> child
         // This reproduces the same issue as the integration test MavenITmng11009StackOverflowParentResolutionTest
         Path childPom = tempDir.resolve("pom.xml");
-        Files.writeString(
-                childPom,
-                """
+        Files.writeString(childPom, """
             <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
                 <modelVersion>4.0.0</modelVersion>
@@ -78,9 +76,7 @@ class ParentCycleDetectionTest {
 
         Path parentPom = tempDir.resolve("parent").resolve("pom.xml");
         Files.createDirectories(parentPom.getParent());
-        Files.writeString(
-                parentPom,
-                """
+        Files.writeString(parentPom, """
             <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
                 <modelVersion>4.0.0</modelVersion>
@@ -132,9 +128,7 @@ class ParentCycleDetectionTest {
         // Create a direct cycle: A -> B -> A
         Path pomA = tempDir.resolve("a").resolve("pom.xml");
         Files.createDirectories(pomA.getParent());
-        Files.writeString(
-                pomA,
-                """
+        Files.writeString(pomA, """
             <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
                 <modelVersion>4.0.0</modelVersion>
@@ -152,9 +146,7 @@ class ParentCycleDetectionTest {
 
         Path pomB = tempDir.resolve("b").resolve("pom.xml");
         Files.createDirectories(pomB.getParent());
-        Files.writeString(
-                pomB,
-                """
+        Files.writeString(pomB, """
             <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
                 <modelVersion>4.0.0</modelVersion>
@@ -203,9 +195,7 @@ class ParentCycleDetectionTest {
         // Create a scenario like the failing test: multiple modules with the same parent
         Path parentPom = tempDir.resolve("parent").resolve("pom.xml");
         Files.createDirectories(parentPom.getParent());
-        Files.writeString(
-                parentPom,
-                """
+        Files.writeString(parentPom, """
             <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
                 <modelVersion>4.0.0</modelVersion>
@@ -218,9 +208,7 @@ class ParentCycleDetectionTest {
 
         Path moduleA = tempDir.resolve("module-a").resolve("pom.xml");
         Files.createDirectories(moduleA.getParent());
-        Files.writeString(
-                moduleA,
-                """
+        Files.writeString(moduleA, """
             <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
                 <modelVersion>4.0.0</modelVersion>
@@ -236,9 +224,7 @@ class ParentCycleDetectionTest {
 
         Path moduleB = tempDir.resolve("module-b").resolve("pom.xml");
         Files.createDirectories(moduleB.getParent());
-        Files.writeString(
-                moduleB,
-                """
+        Files.writeString(moduleB, """
             <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
                 <modelVersion>4.0.0</modelVersion>

@@ -146,8 +146,7 @@ class InferenceStrategyTest {
                     .artifactId("module-a")
                     .build();
 
-            String moduleBPomXml =
-                    """
+            String moduleBPomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.1.0">
                     <parent>
@@ -199,8 +198,7 @@ class InferenceStrategyTest {
         @Test
         @DisplayName("should keep dependency version for external artifact")
         void shouldKeepDependencyVersionForExternalArtifact() throws Exception {
-            String modulePomXml =
-                    """
+            String modulePomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.1.0">
                     <groupId>com.example</groupId>
@@ -280,8 +278,7 @@ class InferenceStrategyTest {
         @Test
         @DisplayName("should handle plugin dependencies")
         void shouldHandlePluginDependencies() throws Exception {
-            String moduleAPomXml =
-                    """
+            String moduleAPomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.1.0">
                     <groupId>com.example</groupId>
@@ -290,8 +287,7 @@ class InferenceStrategyTest {
                 </project>
                 """;
 
-            String moduleBPomXml =
-                    """
+            String moduleBPomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.1.0">
                     <groupId>com.example</groupId>
@@ -347,8 +343,7 @@ class InferenceStrategyTest {
         @Test
         @DisplayName("should remove parent groupId when child doesn't have explicit groupId")
         void shouldRemoveParentGroupIdWhenChildDoesntHaveExplicitGroupId() throws Exception {
-            String parentPomXml =
-                    """
+            String parentPomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.1.0">
                     <modelVersion>4.1.0</modelVersion>
@@ -358,8 +353,7 @@ class InferenceStrategyTest {
                 </project>
                 """;
 
-            String childPomXml =
-                    """
+            String childPomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.1.0">
                     <modelVersion>4.1.0</modelVersion>
@@ -404,8 +398,7 @@ class InferenceStrategyTest {
         @Test
         @DisplayName("should keep parent groupId when child has explicit groupId")
         void shouldKeepParentGroupIdWhenChildHasExplicitGroupId() throws Exception {
-            String parentPomXml =
-                    """
+            String parentPomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.1.0">
                     <modelVersion>4.1.0</modelVersion>
@@ -415,8 +408,7 @@ class InferenceStrategyTest {
                 </project>
                 """;
 
-            String childPomXml =
-                    """
+            String childPomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.1.0">
                     <modelVersion>4.1.0</modelVersion>
@@ -456,8 +448,7 @@ class InferenceStrategyTest {
         @Test
         @DisplayName("should not trim parent elements when parent is external")
         void shouldNotTrimParentElementsWhenParentIsExternal() throws Exception {
-            String childPomXml =
-                    """
+            String childPomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.1.0">
                     <modelVersion>4.1.0</modelVersion>
@@ -497,8 +488,7 @@ class InferenceStrategyTest {
         @DisplayName("should trim parent elements when parent is in reactor")
         void shouldTrimParentElementsWhenParentIsInReactor() throws Exception {
             // Create parent POM
-            String parentPomXml =
-                    """
+            String parentPomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.1.0">
                     <modelVersion>4.1.0</modelVersion>
@@ -510,8 +500,7 @@ class InferenceStrategyTest {
                 """;
 
             // Create child POM that references the parent
-            String childPomXml =
-                    """
+            String childPomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.1.0">
                     <modelVersion>4.1.0</modelVersion>
@@ -557,8 +546,7 @@ class InferenceStrategyTest {
         @Test
         @DisplayName("should remove child groupId and version when they match parent in 4.0.0")
         void shouldRemoveChildGroupIdAndVersionWhenTheyMatchParentIn400() throws Exception {
-            String parentPomXml =
-                    """
+            String parentPomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -569,8 +557,7 @@ class InferenceStrategyTest {
                 </project>
                 """;
 
-            String childPomXml =
-                    """
+            String childPomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -622,8 +609,7 @@ class InferenceStrategyTest {
         @Test
         @DisplayName("should keep child groupId when it differs from parent in 4.0.0")
         void shouldKeepChildGroupIdWhenItDiffersFromParentIn400() throws Exception {
-            String parentPomXml =
-                    """
+            String parentPomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -634,8 +620,7 @@ class InferenceStrategyTest {
                 </project>
                 """;
 
-            String childPomXml =
-                    """
+            String childPomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -678,8 +663,7 @@ class InferenceStrategyTest {
         @Test
         @DisplayName("should handle partial inheritance in 4.0.0")
         void shouldHandlePartialInheritanceIn400() throws Exception {
-            String parentPomXml =
-                    """
+            String parentPomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -690,8 +674,7 @@ class InferenceStrategyTest {
                 </project>
                 """;
 
-            String childPomXml =
-                    """
+            String childPomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>

@@ -1694,9 +1694,9 @@ public class DefaultModelValidator implements ModelValidator {
 
     private boolean isValidProfileId(String id) {
         return switch (id.charAt(0)) { // avoid first character that has special CLI meaning in "mvn -P xxx"
-                // +: activate
-                // -, !: deactivate
-                // ?: optional
+            // +: activate
+            // -, !: deactivate
+            // ?: optional
             case '+', '-', '!', '?' -> false;
             default -> true;
         };

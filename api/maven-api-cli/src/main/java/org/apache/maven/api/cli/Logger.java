@@ -148,7 +148,10 @@ public interface Logger {
      * @param message The logging message, never {@code null}.
      * @param error The error, if applicable.
      */
-    record Entry(@Nonnull Level level, @Nonnull String message, @Nullable Throwable error) {}
+    record Entry(
+            @Nonnull Level level,
+            @Nonnull String message,
+            @Nullable Throwable error) {}
 
     /**
      * If this is an accumulating log, it will "drain" this instance. It returns the accumulated log entries, and
