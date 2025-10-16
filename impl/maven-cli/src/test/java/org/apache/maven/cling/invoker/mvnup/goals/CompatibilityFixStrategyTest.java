@@ -144,8 +144,7 @@ class CompatibilityFixStrategyTest {
         @Test
         @DisplayName("should remove duplicate dependencies in dependencyManagement")
         void shouldRemoveDuplicateDependenciesInDependencyManagement() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -191,8 +190,7 @@ class CompatibilityFixStrategyTest {
         @Test
         @DisplayName("should remove duplicate dependencies in regular dependencies")
         void shouldRemoveDuplicateDependenciesInRegularDependencies() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -242,8 +240,7 @@ class CompatibilityFixStrategyTest {
         @Test
         @DisplayName("should remove duplicate plugins in pluginManagement")
         void shouldRemoveDuplicatePluginsInPluginManagement() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>

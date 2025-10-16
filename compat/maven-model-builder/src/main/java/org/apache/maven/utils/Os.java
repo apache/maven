@@ -188,9 +188,10 @@ public class Os {
             case FAMILY_DOS -> File.pathSeparatorChar == ';' && !isFamily(FAMILY_NETWARE, actualOsName) && !isWindows;
             case FAMILY_MAC -> actualOsName.contains(FAMILY_MAC) || actualOsName.contains(DARWIN);
             case FAMILY_TANDEM -> actualOsName.contains("nonstop_kernel");
-            case FAMILY_UNIX -> File.pathSeparatorChar == ':'
-                    && !isFamily(FAMILY_OPENVMS, actualOsName)
-                    && (!isFamily(FAMILY_MAC, actualOsName) || actualOsName.endsWith("x"));
+            case FAMILY_UNIX ->
+                File.pathSeparatorChar == ':'
+                        && !isFamily(FAMILY_OPENVMS, actualOsName)
+                        && (!isFamily(FAMILY_MAC, actualOsName) || actualOsName.endsWith("x"));
             case FAMILY_ZOS -> actualOsName.contains(FAMILY_ZOS) || actualOsName.contains(FAMILY_OS390);
             case FAMILY_OS400 -> actualOsName.contains(FAMILY_OS400);
             case FAMILY_OPENVMS -> actualOsName.contains(FAMILY_OPENVMS);

@@ -47,8 +47,7 @@ class JDomUtilsTest {
 
     @Test
     void testDetectTwoSpaceIndentation() throws Exception {
-        String pomXml =
-                """
+        String pomXml = """
             <?xml version="1.0" encoding="UTF-8"?>
             <project xmlns="http://maven.apache.org/POM/4.0.0">
               <modelVersion>4.0.0</modelVersion>
@@ -76,8 +75,7 @@ class JDomUtilsTest {
 
     @Test
     void testDetectFourSpaceIndentation() throws Exception {
-        String pomXml =
-                """
+        String pomXml = """
             <?xml version="1.0" encoding="UTF-8"?>
             <project xmlns="http://maven.apache.org/POM/4.0.0">
                 <modelVersion>4.0.0</modelVersion>
@@ -105,8 +103,7 @@ class JDomUtilsTest {
 
     @Test
     void testDetectTabIndentation() throws Exception {
-        String pomXml =
-                """
+        String pomXml = """
             <?xml version="1.0" encoding="UTF-8"?>
             <project xmlns="http://maven.apache.org/POM/4.0.0">
             \t<modelVersion>4.0.0</modelVersion>
@@ -135,8 +132,7 @@ class JDomUtilsTest {
     @Test
     void testDetectIndentationWithMixedContent() throws Exception {
         // POM with mostly 4-space indentation but some 2-space (should prefer 4-space)
-        String pomXml =
-                """
+        String pomXml = """
             <?xml version="1.0" encoding="UTF-8"?>
             <project xmlns="http://maven.apache.org/POM/4.0.0">
                 <modelVersion>4.0.0</modelVersion>
@@ -173,8 +169,7 @@ class JDomUtilsTest {
 
     @Test
     void testDetectIndentationFromBuildElement() throws Exception {
-        String pomXml =
-                """
+        String pomXml = """
             <?xml version="1.0" encoding="UTF-8"?>
             <project xmlns="http://maven.apache.org/POM/4.0.0">
                 <modelVersion>4.0.0</modelVersion>
@@ -204,8 +199,7 @@ class JDomUtilsTest {
     @Test
     void testDetectIndentationFallbackToDefault() throws Exception {
         // Minimal POM with no clear indentation pattern
-        String pomXml =
-                """
+        String pomXml = """
             <?xml version="1.0" encoding="UTF-8"?>
             <project xmlns="http://maven.apache.org/POM/4.0.0"><modelVersion>4.0.0</modelVersion><groupId>test</groupId><artifactId>test</artifactId><version>1.0.0</version></project>
             """;
@@ -219,8 +213,7 @@ class JDomUtilsTest {
 
     @Test
     void testDetectIndentationConsistency() throws Exception {
-        String pomXml =
-                """
+        String pomXml = """
             <?xml version="1.0" encoding="UTF-8"?>
             <project xmlns="http://maven.apache.org/POM/4.0.0">
                 <modelVersion>4.0.0</modelVersion>
@@ -258,8 +251,7 @@ class JDomUtilsTest {
 
     @Test
     void testAddElementWithCorrectIndentation() throws Exception {
-        String pomXml =
-                """
+        String pomXml = """
             <?xml version="1.0" encoding="UTF-8"?>
             <project xmlns="http://maven.apache.org/POM/4.0.0">
                 <modelVersion>4.0.0</modelVersion>
@@ -299,8 +291,7 @@ class JDomUtilsTest {
     @Test
     void testRealWorldScenarioWithPluginManagementAddition() throws Exception {
         // Real-world POM with 4-space indentation
-        String pomXml =
-                """
+        String pomXml = """
             <?xml version="1.0" encoding="UTF-8"?>
             <project xmlns="http://maven.apache.org/POM/4.0.0"
                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -386,8 +377,7 @@ class JDomUtilsTest {
 
     @Test
     void testProperClosingTagFormattingWithPluginManagement() throws Exception {
-        String pomXml =
-                """
+        String pomXml = """
             <?xml version="1.0" encoding="UTF-8"?>
             <project xmlns="http://maven.apache.org/POM/4.0.0">
                 <modelVersion>4.0.0</modelVersion>

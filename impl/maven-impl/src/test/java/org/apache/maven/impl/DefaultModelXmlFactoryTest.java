@@ -45,8 +45,7 @@ class DefaultModelXmlFactoryTest {
 
     @Test
     void testValidNamespaceWithModelVersion400() throws Exception {
-        String xml =
-                """
+        String xml = """
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                   <modelVersion>4.0.0</modelVersion>
                 </project>""";
@@ -61,8 +60,7 @@ class DefaultModelXmlFactoryTest {
 
     @Test
     void testValidNamespaceWithModelVersion410() throws Exception {
-        String xml =
-                """
+        String xml = """
                 <project xmlns="http://maven.apache.org/POM/4.1.0">
                   <modelVersion>4.1.0</modelVersion>
                 </project>""";
@@ -77,8 +75,7 @@ class DefaultModelXmlFactoryTest {
 
     @Test
     void testInvalidNamespaceWithModelVersion410() {
-        String xml =
-                """
+        String xml = """
                 <project xmlns="http://invalid.namespace/4.1.0">
                   <modelVersion>4.1.0</modelVersion>
                 </project>""";
@@ -93,8 +90,7 @@ class DefaultModelXmlFactoryTest {
 
     @Test
     void testNoNamespaceWithModelVersion400() throws Exception {
-        String xml =
-                """
+        String xml = """
                 <project>
                   <modelVersion>4.0.0</modelVersion>
                 </project>""";
@@ -114,8 +110,7 @@ class DefaultModelXmlFactoryTest {
 
     @Test
     void testMalformedModelVersion() throws Exception {
-        String xml =
-                """
+        String xml = """
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                   <modelVersion>invalid.version</modelVersion>
                 </project>""";
@@ -130,8 +125,7 @@ class DefaultModelXmlFactoryTest {
     @Test
     void testWriteWithoutFormatterDisablesLocationTracking() throws Exception {
         // minimal valid model we can round-trip
-        String xml =
-                """
+        String xml = """
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                   <modelVersion>4.0.0</modelVersion>
                   <groupId>g</groupId>
@@ -157,8 +151,7 @@ class DefaultModelXmlFactoryTest {
 
     @Test
     void testWriteWithFormatterEnablesLocationTracking() throws Exception {
-        String xml =
-                """
+        String xml = """
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                   <modelVersion>4.0.0</modelVersion>
                   <groupId>g</groupId>

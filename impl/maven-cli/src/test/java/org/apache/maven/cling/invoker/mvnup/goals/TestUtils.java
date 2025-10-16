@@ -194,8 +194,7 @@ public final class TestUtils {
      * @return POM XML string
      */
     public static String createSimplePom(String groupId, String artifactId, String version) {
-        return String.format(
-                """
+        return String.format("""
             <?xml version="1.0" encoding="UTF-8"?>
             <project xmlns="http://maven.apache.org/POM/4.0.0">
                 <modelVersion>4.0.0</modelVersion>
@@ -203,8 +202,7 @@ public final class TestUtils {
                 <artifactId>%s</artifactId>
                 <version>%s</version>
             </project>
-            """,
-                groupId, artifactId, version);
+            """, groupId, artifactId, version);
     }
 
     /**
@@ -218,8 +216,7 @@ public final class TestUtils {
      */
     public static String createPomWithParent(
             String parentGroupId, String parentArtifactId, String parentVersion, String artifactId) {
-        return String.format(
-                """
+        return String.format("""
             <?xml version="1.0" encoding="UTF-8"?>
             <project xmlns="http://maven.apache.org/POM/4.0.0">
                 <modelVersion>4.0.0</modelVersion>
@@ -230,7 +227,6 @@ public final class TestUtils {
                 </parent>
                 <artifactId>%s</artifactId>
             </project>
-            """,
-                parentGroupId, parentArtifactId, parentVersion, artifactId);
+            """, parentGroupId, parentArtifactId, parentVersion, artifactId);
     }
 }
