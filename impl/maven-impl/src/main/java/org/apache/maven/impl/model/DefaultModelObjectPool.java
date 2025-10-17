@@ -18,10 +18,8 @@
  */
 package org.apache.maven.impl.model;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -32,6 +30,9 @@ import org.apache.maven.api.model.ModelObjectProcessor;
 import org.apache.maven.impl.cache.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static java.util.Arrays.stream;
+import static org.apache.maven.api.Constants.MAVEN_MODEL_PROCESSOR_POOLED_TYPES;
 
 /**
  * Default implementation of ModelObjectProcessor that provides memory optimization
@@ -80,7 +81,11 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
         String simpleClassName = objectType.getSimpleName();
 
         // Check if this object type should be pooled (read configuration dynamically)
-        if (!getPooledTypes(properties).contains(simpleClassName)) {
+        if (!stream(getProperty(MAVEN_MODEL_PROCESSOR_POOLED_TYPES, "Dependency")
+                        .split(","))
+                .map(String::trim)
+                .collect(Collectors.toSet())
+                .contains(simpleClassName)) {
             return object;
         }
 
@@ -93,17 +98,6 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
     private String getProperty(String name, String defaultValue) {
         Object value = properties.get(name);
         return value instanceof String str ? str : defaultValue;
-    }
-
-    /**
-     * Gets the set of object types that should be pooled.
-     */
-    private Set<String> getPooledTypes(Map<?, ?> properties) {
-        String pooledTypesProperty = getProperty(Constants.MAVEN_MODEL_PROCESSOR_POOLED_TYPES, "Dependency");
-        return Arrays.stream(pooledTypesProperty.split(","))
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .collect(Collectors.toSet());
     }
 
     /**

@@ -200,7 +200,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             return Settings.newInstance();
         }
 
-        settings = interpolate(settings, request, problems);
+        settings = interpolate(settings, request);
         settings = decrypt(settingsSource, settings, request, problems);
 
         settingsValidator.validate(settings, isProjectSettings, problems);
@@ -228,8 +228,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         return settings;
     }
 
-    private Settings interpolate(
-            Settings settings, SettingsBuilderRequest request, ProblemCollector<BuilderProblem> problems) {
+    private Settings interpolate(Settings settings, SettingsBuilderRequest request) {
         UnaryOperator<String> src;
         if (request.getInterpolationSource().isPresent()) {
             src = request.getInterpolationSource().get();
