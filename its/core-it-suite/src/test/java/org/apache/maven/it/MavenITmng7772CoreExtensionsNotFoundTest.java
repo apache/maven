@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng7772CoreExtensionsNotFoundTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng7772CoreExtensionsNotFoundTest() {
-        super("(4.0.0-alpha-7,)");
-    }
-
     @Test
     public void testCoreExtensionsNotFound() throws Exception {
         File testDir = extractResources("/mng-7772-core-extensions-not-found");

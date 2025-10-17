@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 public class MavenITmng4423SessionDataFromPluginParameterExpressionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4423SessionDataFromPluginParameterExpressionTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Test that plugin parameter expressions like ${session.*} work and not only ${session}.
      *

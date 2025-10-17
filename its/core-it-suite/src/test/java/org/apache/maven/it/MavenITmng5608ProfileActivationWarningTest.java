@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -31,14 +32,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5608">MNG-5608</a>:
  * Profile activation warning test when file specification contains <code>${project.basedir}</code>
  * instead of <code>${basedir}</code>
+ *
+ * changed in https://issues.apache.org/jira/browse/MNG-7895
+ * TODO - consider a separate test
  */
+@Disabled("Bounds: (3.2.1,3.9.4]")
 public class MavenITmng5608ProfileActivationWarningTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng5608ProfileActivationWarningTest() {
-        // changed in https://issues.apache.org/jira/browse/MNG-7895
-        // TODO - consider a separate test
-        super("(3.2.1,3.9.4]");
-    }
 
     @Test
     public void testitMNG5608() throws Exception {

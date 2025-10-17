@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4401RepositoryOrderForParentPomTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4401RepositoryOrderForParentPomTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that the implicit default repo (central) is tried after explicitly declared repos during parent POM
      * resolution.

@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3938MergePluginExecutionsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3938MergePluginExecutionsTest() {
-        super("(2.0.4,)");
-    }
-
     /**
      * Test that plugin executions with the same id are merged during inheritance, especially executions using the
      * default id, regardless whether the id is given explicitly by the user or implicitly assumed from defaults, when

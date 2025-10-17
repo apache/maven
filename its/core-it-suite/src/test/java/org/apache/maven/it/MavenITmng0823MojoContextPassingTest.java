@@ -29,9 +29,6 @@ import org.junit.jupiter.api.Test;
  *
  */
 public class MavenITmng0823MojoContextPassingTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng0823MojoContextPassingTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Tests context passing between mojos in the same plugin.

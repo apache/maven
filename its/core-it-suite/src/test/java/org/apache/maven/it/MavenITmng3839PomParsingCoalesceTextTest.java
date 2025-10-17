@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3839PomParsingCoalesceTextTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3839PomParsingCoalesceTextTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that POM parsing properly coalesces text data.
      *

@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng2363BasedirAwareFileActivatorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2363BasedirAwareFileActivatorTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Test that the file-based profile activator resolves relative paths against the current project's base directory
      * and also interpolates ${basedir} if explicitly given, just like usual for other parts of the POM.

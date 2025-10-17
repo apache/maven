@@ -20,16 +20,14 @@ package org.apache.maven.it;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2196">MNG-2196</a>.
  */
+@Disabled("Bounds: [2.0,4.0.0-beta-5)")
 public class MavenITmng2196ParentResolutionTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng2196ParentResolutionTest() {
-        super("[2.0,4.0.0-beta-5)");
-    }
 
     /**
      * Verify that multi-module builds where one project references another as
@@ -46,19 +44,13 @@ public class MavenITmng2196ParentResolutionTest extends AbstractMavenIntegration
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng2196");
 
-        if (matchesVersionRange("(,3.0-alpha-1)")) {
+        try {
             verifier.addCliArgument("validate");
             verifier.execute();
             verifier.verifyErrorFreeLog();
-        } else {
-            try {
-                verifier.addCliArgument("validate");
-                verifier.execute();
-                verifier.verifyErrorFreeLog();
-                fail("Build should have failed due to bad relativePath");
-            } catch (VerificationException e) {
-                // expected
-            }
+            fail("Build should have failed due to bad relativePath");
+        } catch (VerificationException e) {
+            // expected
         }
     }
 }

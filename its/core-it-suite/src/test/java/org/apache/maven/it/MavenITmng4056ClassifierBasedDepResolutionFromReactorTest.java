@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4056ClassifierBasedDepResolutionFromReactorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4056ClassifierBasedDepResolutionFromReactorTest() {
-        super("[2.1.0,)");
-    }
-
     /**
      * Test that attached artifacts can be resolved from the reactor cache even if the dependency declaration
      * in the consumer module does not use the proper artifact type but merely specifies the classifier.
@@ -55,32 +51,12 @@ public class MavenITmng4056ClassifierBasedDepResolutionFromReactorTest extends A
         verifier.verifyErrorFreeLog();
 
         List<String> artifacts = verifier.loadLines("consumer/target/artifacts.txt");
-        if (matchesVersionRange("[3.0-alpha-3,)")) {
-            // artifact type unchanged to match type as declared in dependency
+        // artifact type unchanged to match type as declared in dependency
 
-            assertTrue(artifacts.contains("org.apache.maven.its.mng4056:producer:jar:tests:0.1"), artifacts.toString());
-            assertTrue(
-                    artifacts.contains("org.apache.maven.its.mng4056:producer:jar:sources:0.1"), artifacts.toString());
-            assertTrue(
-                    artifacts.contains("org.apache.maven.its.mng4056:producer:jar:javadoc:0.1"), artifacts.toString());
-            assertTrue(
-                    artifacts.contains("org.apache.maven.its.mng4056:producer:jar:client:0.1"), artifacts.toString());
-        } else {
-            // artifact type updated to match type of active artifact
-
-            assertTrue(
-                    artifacts.contains("org.apache.maven.its.mng4056:producer:test-jar:tests:0.1"),
-                    artifacts.toString());
-            assertTrue(
-                    artifacts.contains("org.apache.maven.its.mng4056:producer:java-source:sources:0.1"),
-                    artifacts.toString());
-            assertTrue(
-                    artifacts.contains("org.apache.maven.its.mng4056:producer:javadoc:javadoc:0.1"),
-                    artifacts.toString());
-            assertTrue(
-                    artifacts.contains("org.apache.maven.its.mng4056:producer:ejb-client:client:0.1"),
-                    artifacts.toString());
-        }
+        assertTrue(artifacts.contains("org.apache.maven.its.mng4056:producer:jar:tests:0.1"), artifacts.toString());
+        assertTrue(artifacts.contains("org.apache.maven.its.mng4056:producer:jar:sources:0.1"), artifacts.toString());
+        assertTrue(artifacts.contains("org.apache.maven.its.mng4056:producer:jar:javadoc:0.1"), artifacts.toString());
+        assertTrue(artifacts.contains("org.apache.maven.its.mng4056:producer:jar:client:0.1"), artifacts.toString());
 
         List<String> classpath = verifier.loadLines("consumer/target/compile.txt");
         assertTrue(classpath.contains("producer/test.jar"), classpath.toString());

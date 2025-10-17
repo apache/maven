@@ -45,10 +45,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng6656BuildConsumer extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng6656BuildConsumer() {
-        super("[4.0.0-alpha-1,)");
-    }
-
     /**
      * Verifies:
      * <ul>

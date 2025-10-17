@@ -23,9 +23,6 @@ import java.io.File;
 import org.junit.jupiter.api.Test;
 
 public class MavenIT0019PluginVersionMgmtBySuperPomTest extends AbstractMavenIntegrationTestCase {
-    public MavenIT0019PluginVersionMgmtBySuperPomTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test that a version is managed by pluginManagement in the super POM

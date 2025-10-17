@@ -36,10 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng2790LastUpdatedMetadataTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2790LastUpdatedMetadataTest() {
-        super("(2.0.4,)");
-    }
-
     /**
      * Verify that the field lastUpdated of existing local repo metadata is updated upon install of new a snapshot.
      *

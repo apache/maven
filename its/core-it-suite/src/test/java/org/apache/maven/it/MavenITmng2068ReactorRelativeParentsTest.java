@@ -31,12 +31,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author jdcasey
  *
+ * @since 2.0.6
+ *
  */
 public class MavenITmng2068ReactorRelativeParentsTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng2068ReactorRelativeParentsTest() {
-        super("(2.0.6,)"); // only test in 2.0.7+
-    }
 
     /**
      * Test successful lineage construction when parent inherits groupId+version from grand-parent.

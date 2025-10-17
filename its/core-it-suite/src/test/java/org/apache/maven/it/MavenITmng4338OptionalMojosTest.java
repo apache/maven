@@ -20,6 +20,7 @@ package org.apache.maven.it;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -27,11 +28,8 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
+@Disabled("Bounds: [3.0,4.0.0-alpha-1)")
 public class MavenITmng4338OptionalMojosTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng4338OptionalMojosTest() {
-        super("[3.0,4.0.0-alpha-1)");
-    }
 
     /**
      * Test that the {@code <optional-mojos>} element in custom lifecycle mappings is recognized and does not cause

@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng6386BaseUriPropertyTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng6386BaseUriPropertyTest() {
-        super("[3.5.4,)");
-    }
-
     @Test
     public void testitMNG6386() throws Exception {
         File testDir = extractResources("/mng-6386").getCanonicalFile();

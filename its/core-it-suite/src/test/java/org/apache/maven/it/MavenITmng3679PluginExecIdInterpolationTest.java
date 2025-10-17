@@ -31,10 +31,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng3679PluginExecIdInterpolationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3679PluginExecIdInterpolationTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     @Test
     public void testitMNG3679() throws Exception {
         File testDir = extractResources("/mng-3679");

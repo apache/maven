@@ -38,9 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class MavenITmng3843PomInheritanceTest extends AbstractMavenIntegrationTestCase {
 
-    MavenITmng3843PomInheritanceTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
+    MavenITmng3843PomInheritanceTest() {}
 
     /**
      * Test various inheritance scenarios.
@@ -81,18 +79,10 @@ class MavenITmng3843PomInheritanceTest extends AbstractMavenIntegrationTestCase 
         assertEquals("", props.getProperty("project.url", ""));
         assertEquals("", props.getProperty("project.inceptionYear", ""));
         assertEquals("", props.getProperty("project.build.defaultGoal", ""));
-        if (matchesVersionRange("[4.0.0-beta-5,)")) {
-            assertEquals("3", props.getProperty("project.properties"));
-            assertEquals("UTF-8", props.getProperty("project.properties.project.build.sourceEncoding"));
-            assertEquals("UTF-8", props.getProperty("project.properties.project.reporting.outputEncoding"));
-            assertEquals("1980-02-01T00:00:00Z", props.getProperty("project.properties.project.build.outputTimestamp"));
-        } else if (matchesVersionRange("[4.0.0-alpha-6,4.0.0-beta-4]")) {
-            assertEquals("2", props.getProperty("project.properties"));
-            assertEquals("UTF-8", props.getProperty("project.properties.project.build.sourceEncoding"));
-            assertEquals("UTF-8", props.getProperty("project.properties.project.reporting.outputEncoding"));
-        } else {
-            assertMissing(props, "project.properties.");
-        }
+        assertEquals("3", props.getProperty("project.properties"));
+        assertEquals("UTF-8", props.getProperty("project.properties.project.build.sourceEncoding"));
+        assertEquals("UTF-8", props.getProperty("project.properties.project.reporting.outputEncoding"));
+        assertEquals("1980-02-01T00:00:00Z", props.getProperty("project.properties.project.build.outputTimestamp"));
         assertMissing(props, "project.prerequisites.");
         assertMissing(props, "project.modules.");
         assertMissing(props, "project.licenses.");
@@ -120,10 +110,6 @@ class MavenITmng3843PomInheritanceTest extends AbstractMavenIntegrationTestCase 
         assertPathEquals(basedir, "target/site", props.getProperty("project.reporting.outputDirectory"));
         assertEquals("false", props.getProperty("project.reporting.excludeDefaults"));
         assertTrue(Integer.parseInt(props.getProperty("project.repositories")) > 0);
-        if (matchesVersionRange("(,3.0-alpha-3)")) {
-            // 3.x will provide the lifecycle bindings in the effective model, don't count these
-            assertEquals("1", props.getProperty("project.build.plugins"));
-        }
         assertMissing(props, "project.dependencies.");
         assertMissing(props, "project.dependencyManagement.");
 
@@ -163,9 +149,7 @@ class MavenITmng3843PomInheritanceTest extends AbstractMavenIntegrationTestCase 
                 "http://parent.url/snaps", props.getProperty("project.distributionManagement.snapshotRepository.url"));
         assertUrlCommon("http://parent.url/site", props.getProperty("project.distributionManagement.site.url"));
         assertUrlCommon("http://parent.url/download", props.getProperty("project.distributionManagement.downloadUrl"));
-        if (matchesVersionRange("(2.0.2,)")) {
-            assertMissing(props, "project.distributionManagement.relocation.");
-        }
+        assertMissing(props, "project.distributionManagement.relocation.");
         assertMissing(props, "project.profiles.");
         assertEquals("child-1-0.1", props.getProperty("project.build.finalName"));
         assertPathEquals(basedir, "src/main", props.getProperty("project.build.sourceDirectory"));
@@ -179,15 +163,9 @@ class MavenITmng3843PomInheritanceTest extends AbstractMavenIntegrationTestCase 
         assertPathEquals(basedir, "out/main", props.getProperty("project.build.outputDirectory"));
         assertPathEquals(basedir, "out/test", props.getProperty("project.build.testOutputDirectory"));
         assertPathEquals(basedir, "site", props.getProperty("project.reporting.outputDirectory"));
-        if (matchesVersionRange("(2.0.9,2.1.0-M1),(2.1.0-M1,)")) {
-            // MNG-1999
-            assertEquals("true", props.getProperty("project.reporting.excludeDefaults"));
-        }
+        // MNG-1999
+        assertEquals("true", props.getProperty("project.reporting.excludeDefaults"));
         assertTrue(Integer.parseInt(props.getProperty("project.repositories")) > 1);
-        if (matchesVersionRange("(,3.0-alpha-3)")) {
-            // 3.x will provide the lifecycle bindings in the effective model, don't count these
-            assertEquals("1", props.getProperty("project.build.plugins"));
-        }
         assertEquals("1", props.getProperty("project.dependencies"));
         assertEquals("parent-dep-b", props.getProperty("project.dependencies.0.artifactId"));
         assertEquals("1", props.getProperty("project.dependencyManagement.dependencies"));
@@ -244,10 +222,6 @@ class MavenITmng3843PomInheritanceTest extends AbstractMavenIntegrationTestCase 
         assertPathEquals(basedir, "docs", props.getProperty("project.reporting.outputDirectory"));
         assertEquals("false", props.getProperty("project.reporting.excludeDefaults"));
         assertTrue(Integer.parseInt(props.getProperty("project.repositories")) > 1);
-        if (matchesVersionRange("(2.0.4,3.0-alpha-3)")) {
-            // 3.x will provide the lifecycle bindings in the effective model, don't count these
-            assertEquals("1", props.getProperty("project.build.plugins"));
-        }
         assertEquals("4", props.getProperty("project.dependencies"));
         Collection<String> actualDeps = new TreeSet<>();
         actualDeps.add(props.getProperty("project.dependencies.0.artifactId"));
@@ -271,8 +245,7 @@ class MavenITmng3843PomInheritanceTest extends AbstractMavenIntegrationTestCase 
 
         basedir = new File(verifier.getBasedir(), "test-3/sub-parent/child-a");
         props = verifier.loadProperties("test-3/sub-parent/child-a/target/pom.properties");
-        String val = matchesVersionRange("(4.0-alpha-7,)") ? ".." : "../pom.xml";
-        assertEquals(val, props.getProperty("project.originalModel.parent.relativePath"));
+        assertEquals("..", props.getProperty("project.originalModel.parent.relativePath"));
     }
 
     private void assertPathEquals(File basedir, String expected, String actual) {

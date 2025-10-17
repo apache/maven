@@ -31,10 +31,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng3944BasedirInterpolationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3944BasedirInterpolationTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that interpolation of ${basedir} works for a POM that is not named "pom.xml"
      *

@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4952MetadataReleaseInfoUpdateTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4952MetadataReleaseInfoUpdateTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0.2,)");
-    }
-
     /**
      * Verify that the metadata's RELEASE field gets updated upon deployment of a new version.
      *

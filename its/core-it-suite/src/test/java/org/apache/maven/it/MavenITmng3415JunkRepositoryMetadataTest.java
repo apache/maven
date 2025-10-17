@@ -42,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3415">MNG-3415</a>.
+ * @since 2.0.8
  */
 public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenIntegrationTestCase {
     private static final String RESOURCE_BASE = "/mng-3415";
@@ -50,7 +51,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
         // we're going to control the test execution according to the maven version present within each test method.
         // all methods should execute as long as we're using maven 2.0.9+, but the specific tests may vary a little
         // depending on which version we're using above 2.0.8.
-        super("(2.0.8,)"); // only test in 2.0.9+
+        super(); // only test in 2.0.9+
     }
 
     /**
@@ -281,14 +282,8 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
         String gid = "org.apache.maven.its.mng3415";
         String aid = "missing";
         String version = "1.0-SNAPSHOT";
-        String name;
-
         // < 3.0 (including snapshots)
-        if (matchesVersionRange("(2.0.8,3.0-alpha-1)")) {
-            name = "maven-metadata-testing-repo.xml";
-        } else {
-            name = "resolver-status.properties";
-        }
+        String name = "resolver-status.properties";
 
         return new File(verifier.getArtifactMetadataPath(gid, aid, version, name));
     }

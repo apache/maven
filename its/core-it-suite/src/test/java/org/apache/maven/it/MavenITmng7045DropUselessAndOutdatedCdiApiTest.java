@@ -25,10 +25,6 @@ import org.junit.jupiter.api.Test;
 
 public class MavenITmng7045DropUselessAndOutdatedCdiApiTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng7045DropUselessAndOutdatedCdiApiTest() {
-        super("[3.8.3,)");
-    }
-
     @Test
     public void testShouldNotLeakCdiApi() throws IOException, VerificationException {
         // in test Groovy 4.x is used which requires JDK 1.8, so simply skip it for older JDKs

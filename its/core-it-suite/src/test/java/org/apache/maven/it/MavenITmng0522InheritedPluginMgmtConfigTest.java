@@ -29,9 +29,6 @@ import org.junit.jupiter.api.Test;
  *
  */
 public class MavenITmng0522InheritedPluginMgmtConfigTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng0522InheritedPluginMgmtConfigTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test for injection of inherited plugin management into plugin configuration.

@@ -27,10 +27,6 @@ import org.junit.jupiter.api.Test;
 public class MavenITmng7244IgnorePomPrefixInExpressions extends AbstractMavenIntegrationTestCase {
     private static final String PROJECT_PATH = "/mng-7244-ignore-pom-prefix-in-expressions";
 
-    public MavenITmng7244IgnorePomPrefixInExpressions() {
-        super("[4.0.0-alpha-1,)");
-    }
-
     @Test
     public void testIgnorePomPrefixInExpressions() throws IOException, VerificationException {
         final File projectDir = extractResources(PROJECT_PATH);

@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng0449PluginVersionResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng0449PluginVersionResolutionTest() {
-        super("[2.0,)");
-    }
-
     /**
      * Verify that versions for plugins are automatically resolved if not given in the POM by checking first LATEST and
      * then RELEASE in the repo metadata when the plugin is invoked from the lifecycle.
@@ -61,13 +57,9 @@ public class MavenITmng0449PluginVersionResolutionTest extends AbstractMavenInte
         verifier.verifyErrorFreeLog();
 
         // Maven 3.x prefers RELEASE over LATEST (see MNG-4206)
-        if (matchesVersionRange("(,3.0-alpha-3)")) {
-            verifier.verifyFileNotPresent("target/touch-release.txt");
-            verifier.verifyFilePresent("target/touch-snapshot.txt");
-        } else {
-            verifier.verifyFilePresent("target/touch-release.txt");
-            verifier.verifyFileNotPresent("target/touch-snapshot.txt");
-        }
+        // Inline version check: (,3.0-alpha-3) - current Maven version doesn't match this range
+        verifier.verifyFilePresent("target/touch-release.txt");
+        verifier.verifyFileNotPresent("target/touch-snapshot.txt");
         verifier.verifyFilePresent("target/package.txt");
     }
 
@@ -98,12 +90,7 @@ public class MavenITmng0449PluginVersionResolutionTest extends AbstractMavenInte
         verifier.verifyErrorFreeLog();
 
         // Maven 3.x prefers RELEASE over LATEST (see MNG-4206)
-        if (matchesVersionRange("(,3.0-alpha-3)")) {
-            verifier.verifyFileNotPresent("target/touch-release.txt");
-            verifier.verifyFilePresent("target/touch-snapshot.txt");
-        } else {
-            verifier.verifyFilePresent("target/touch-release.txt");
-            verifier.verifyFileNotPresent("target/touch-snapshot.txt");
-        }
+        verifier.verifyFilePresent("target/touch-release.txt");
+        verifier.verifyFileNotPresent("target/touch-snapshot.txt");
     }
 }

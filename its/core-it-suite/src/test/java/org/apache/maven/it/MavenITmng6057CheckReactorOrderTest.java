@@ -39,7 +39,7 @@ public class MavenITmng6057CheckReactorOrderTest extends AbstractMavenIntegratio
     public MavenITmng6057CheckReactorOrderTest() {
         // The first version which contains the fix for the MNG-6057 issue.
         // TODO: Think about it!
-        super("[3.5.0-alpha-2,)");
+        super();
     }
 
     /**

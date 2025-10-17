@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng3979ElementJoinTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3979ElementJoinTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that during inheritance the merging/joining of subtrees with equal identifier doesn't crash if the parent
      * POM has a non-empty element and the child POM has an empty element to join.

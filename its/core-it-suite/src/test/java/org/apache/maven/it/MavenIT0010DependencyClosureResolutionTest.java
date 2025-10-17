@@ -26,9 +26,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MavenIT0010DependencyClosureResolutionTest extends AbstractMavenIntegrationTestCase {
-    public MavenIT0010DependencyClosureResolutionTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Since the artifact resolution does not use the project builder, we must

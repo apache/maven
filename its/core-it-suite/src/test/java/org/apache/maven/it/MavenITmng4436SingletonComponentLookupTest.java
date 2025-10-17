@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4436SingletonComponentLookupTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4436SingletonComponentLookupTest() {
-        super("[3.0-alpha-4,)");
-    }
-
     /**
      * Test that lookup of a singleton component works reliably.
      *

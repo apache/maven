@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng3813PluginClassPathOrderingTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3813PluginClassPathOrderingTest() {
-        super("(2.0.8,)");
-    }
-
     /**
      * Verify that the ordering of the plugin class path matches the ordering of the dependencies as given in the POM.
      *
@@ -82,26 +78,14 @@ public class MavenITmng3813PluginClassPathOrderingTest extends AbstractMavenInte
         //   dep-a, dep-aa, dep-ac, dep-ab, dep-ad, dep-c, dep-b, dep-d
         // The correct/expected class path using levelOrder is:
         //   dep-a, dep-c, dep-b, dep-d, dep-aa, dep-ac, dep-ab, dep-ad
-        if (matchesVersionRange("[,4.1.0-SNAPSHOT)")) {
-            // preOrder
-            assertTrue(pclProps.getProperty(resName + ".0").endsWith("/dep-a-0.1.jar!/" + resName));
-            assertTrue(pclProps.getProperty(resName + ".1").endsWith("/dep-aa-0.1.jar!/" + resName));
-            assertTrue(pclProps.getProperty(resName + ".2").endsWith("/dep-ac-0.1.jar!/" + resName));
-            assertTrue(pclProps.getProperty(resName + ".3").endsWith("/dep-ab-0.1.jar!/" + resName));
-            assertTrue(pclProps.getProperty(resName + ".4").endsWith("/dep-ad-0.1.jar!/" + resName));
-            assertTrue(pclProps.getProperty(resName + ".5").endsWith("/dep-c-0.1.jar!/" + resName));
-            assertTrue(pclProps.getProperty(resName + ".6").endsWith("/dep-b-0.1.jar!/" + resName));
-            assertTrue(pclProps.getProperty(resName + ".7").endsWith("/dep-d-0.1.jar!/" + resName));
-        } else {
-            // levelOrder
-            assertTrue(pclProps.getProperty(resName + ".0").endsWith("/dep-a-0.1.jar!/" + resName));
-            assertTrue(pclProps.getProperty(resName + ".1").endsWith("/dep-c-0.1.jar!/" + resName));
-            assertTrue(pclProps.getProperty(resName + ".2").endsWith("/dep-b-0.1.jar!/" + resName));
-            assertTrue(pclProps.getProperty(resName + ".3").endsWith("/dep-d-0.1.jar!/" + resName));
-            assertTrue(pclProps.getProperty(resName + ".4").endsWith("/dep-aa-0.1.jar!/" + resName));
-            assertTrue(pclProps.getProperty(resName + ".5").endsWith("/dep-ac-0.1.jar!/" + resName));
-            assertTrue(pclProps.getProperty(resName + ".6").endsWith("/dep-ab-0.1.jar!/" + resName));
-            assertTrue(pclProps.getProperty(resName + ".7").endsWith("/dep-ad-0.1.jar!/" + resName));
-        }
+        // levelOrder
+        assertTrue(pclProps.getProperty(resName + ".0").endsWith("/dep-a-0.1.jar!/" + resName));
+        assertTrue(pclProps.getProperty(resName + ".1").endsWith("/dep-c-0.1.jar!/" + resName));
+        assertTrue(pclProps.getProperty(resName + ".2").endsWith("/dep-b-0.1.jar!/" + resName));
+        assertTrue(pclProps.getProperty(resName + ".3").endsWith("/dep-d-0.1.jar!/" + resName));
+        assertTrue(pclProps.getProperty(resName + ".4").endsWith("/dep-aa-0.1.jar!/" + resName));
+        assertTrue(pclProps.getProperty(resName + ".5").endsWith("/dep-ac-0.1.jar!/" + resName));
+        assertTrue(pclProps.getProperty(resName + ".6").endsWith("/dep-ab-0.1.jar!/" + resName));
+        assertTrue(pclProps.getProperty(resName + ".7").endsWith("/dep-ad-0.1.jar!/" + resName));
     }
 }

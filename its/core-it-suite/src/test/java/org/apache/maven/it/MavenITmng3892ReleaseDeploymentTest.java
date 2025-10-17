@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3892ReleaseDeploymentTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3892ReleaseDeploymentTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that a bunch of release artifacts can be deployed without the deployer erroneously complaining about
      * already deployed artifacts.

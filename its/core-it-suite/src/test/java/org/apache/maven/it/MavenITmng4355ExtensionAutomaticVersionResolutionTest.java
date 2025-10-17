@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4355ExtensionAutomaticVersionResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4355ExtensionAutomaticVersionResolutionTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that extension declarations in the POM without an explicit version get resolved to the last release
      * version of the extension artifact.

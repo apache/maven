@@ -31,10 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4385LifecycleMappingFromExtensionInReactorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4385LifecycleMappingFromExtensionInReactorTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that custom lifecycle mappings contributed by build extensions of one project do not leak into other
      * projects in the reactor.

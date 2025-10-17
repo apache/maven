@@ -35,7 +35,7 @@ public class MavenITmng3769ExclusionRelocatedTransdepsTest extends AbstractMaven
 
     public MavenITmng3769ExclusionRelocatedTransdepsTest() {
         // also didn't work in 2.0, but did in 2.0.1+ until regressed in 2.1.0-M1
-        super("[2.0.1,2.1.0-M1),(2.1.0-M1,)");
+        super();
     }
 
     /**

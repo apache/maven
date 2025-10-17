@@ -35,7 +35,7 @@ public class MavenITmng6090CIFriendlyTest extends AbstractMavenIntegrationTestCa
     public MavenITmng6090CIFriendlyTest() {
         // The first version which contains the fix for the MNG-issue.
         // TODO: Think about it!
-        super("[3.5.0-alpha-2,)");
+        super();
     }
 
     /**

@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng3810BadProfileActivationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3810BadProfileActivationTest() {
-        super("(2.0.10,2.1.0-M1),(2.1.0-M1,3.0-alpha-1),[3.0-alpha-3,)"); // 2.0.11+, 2.1.0-M2+
-    }
-
     @Test
     public void testitMNG3810Property() throws Exception {
         File testDir = extractResources("/mng-3810/property");

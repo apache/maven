@@ -27,10 +27,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng5009AggregationCycleTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5009AggregationCycleTest() {
-        super("[3.0.3,)");
-    }
-
     /**
      * Verify that aggregators POMs forming a cycle fail gracefully with a proper error message.
      *

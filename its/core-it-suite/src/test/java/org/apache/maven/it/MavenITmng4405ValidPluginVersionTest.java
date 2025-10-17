@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4405ValidPluginVersionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4405ValidPluginVersionTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Test that non-interpolated plugin versions cause a validation error during building.
      *

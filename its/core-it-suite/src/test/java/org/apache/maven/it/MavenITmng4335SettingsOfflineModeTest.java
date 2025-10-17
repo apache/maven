@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4335SettingsOfflineModeTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4335SettingsOfflineModeTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that offline mode is enabled when specified in the settings.xml
      *

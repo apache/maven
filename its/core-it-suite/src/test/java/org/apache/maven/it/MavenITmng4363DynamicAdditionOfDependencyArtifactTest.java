@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4363DynamicAdditionOfDependencyArtifactTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4363DynamicAdditionOfDependencyArtifactTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that plugins can dynamically add dependency artifacts to the project. Those added artifacts need to
      * be resolved and added to the affected class paths for later goal executions.

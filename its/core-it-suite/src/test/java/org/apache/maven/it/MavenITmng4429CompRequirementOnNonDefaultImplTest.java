@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4429CompRequirementOnNonDefaultImplTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4429CompRequirementOnNonDefaultImplTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that a component requirement can be satisfied from an implementation that does not have the "default" hint.
      *

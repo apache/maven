@@ -35,7 +35,7 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
     private final File testDir;
 
     public MavenITmng6511OptionalProjectSelectionTest() throws IOException {
-        super("[4.0.0-alpha-1,)");
+        super();
         testDir = extractResources(RESOURCE_PATH);
     }
 

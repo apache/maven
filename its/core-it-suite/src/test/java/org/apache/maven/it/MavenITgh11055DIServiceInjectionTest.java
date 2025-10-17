@@ -27,12 +27,10 @@ import org.junit.jupiter.api.Test;
  *
  * It reproduces the behavior difference between using Session::getService and field injection via @Inject
  * for some core services.
+ * @since 4.0.0-rc-4
+ *
  */
 class MavenITgh11055DIServiceInjectionTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITgh11055DIServiceInjectionTest() {
-        super("[4.0.0-rc-4,)");
-    }
 
     @Test
     void testGetServiceSucceeds() throws Exception {

@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng3822BasedirAlignedInterpolationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3822BasedirAlignedInterpolationTest() {
-        super("[2.1.0-M1,)");
-    }
-
     /**
      * Verify that POM interpolation uses basedir-aligned build directories.
      *

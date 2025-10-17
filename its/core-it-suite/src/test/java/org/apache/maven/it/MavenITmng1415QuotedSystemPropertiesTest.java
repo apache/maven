@@ -31,9 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  */
 public class MavenITmng1415QuotedSystemPropertiesTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng1415QuotedSystemPropertiesTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test that quoted system properties are processed correctly. [MNG-1415]

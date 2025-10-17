@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4410UsageHelpTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4410UsageHelpTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that "mvn --help" outputs the usage help and stops the execution after that.
      *

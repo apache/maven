@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng1349ChecksumFormatsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng1349ChecksumFormatsTest() {
-        super("(2.0.10,2.1.0-M1),(2.1.0-M1,)");
-    }
-
     /**
      * Tests that different checksum formats are supported.
      *

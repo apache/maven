@@ -28,9 +28,6 @@ import org.junit.jupiter.api.Test;
  * <code>-f "directoryWithClosing)Bracket/pom.xml"</code>.
  */
 public class MavenITmng6256SpecialCharsAlternatePOMLocation extends AbstractMavenIntegrationTestCase {
-    public MavenITmng6256SpecialCharsAlternatePOMLocation() {
-        super("(3.6.0,)");
-    }
 
     /**
      * check script is working when path to POM is set to <code>directory-with- -space</code>

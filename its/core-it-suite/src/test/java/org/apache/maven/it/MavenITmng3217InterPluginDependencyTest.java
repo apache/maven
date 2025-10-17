@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng3217InterPluginDependencyTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3217InterPluginDependencyTest() {
-        super("[2.1.0-M2,)");
-    }
-
     /**
      * Verify that the dependency of plugin A on some plugin B does not influence the build of another module in the
      * reactor that uses a different version of plugin B for normal build tasks.

@@ -54,10 +54,6 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest extends AbstractMavenI
 
     private int port;
 
-    public MavenITmng4343MissingReleaseUpdatePolicyTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     @BeforeEach
     protected void setUp() throws Exception {
         Handler repoHandler = new AbstractHandler() {

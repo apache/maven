@@ -25,7 +25,6 @@ import org.junit.jupiter.api.Test;
 public class MavenITMissingNamespaceTest extends AbstractMavenIntegrationTestCase {
 
     public MavenITMissingNamespaceTest() {
-        super(ALL_MAVEN_VERSIONS);
     }
 
     /**

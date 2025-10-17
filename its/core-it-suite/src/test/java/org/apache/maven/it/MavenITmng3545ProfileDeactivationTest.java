@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng3545ProfileDeactivationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3545ProfileDeactivationTest() {
-        super("(2.0.9,)");
-    }
-
     /**
      * Test build with two active by default profiles
      *

@@ -32,10 +32,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng3314OfflineSnapshotsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3314OfflineSnapshotsTest() {
-        super("(2.0.9,2.1.0-M1),(2.1.0-M1,)"); // only test in 2.0.10+, and not in 2.1.0-M1
-    }
-
     /**
      * Verify that snapshot dependencies which are scheduled for an update don't fail the build when in offline mode.
      *

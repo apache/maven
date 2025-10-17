@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4383ValidDependencyVersionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4383ValidDependencyVersionTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Test that non-interpolated dependency versions cause a validation error during building.
      *

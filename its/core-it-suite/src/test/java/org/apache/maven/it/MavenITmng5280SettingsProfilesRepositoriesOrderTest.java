@@ -49,10 +49,6 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest extends Abstrac
 
     private Server server;
 
-    public MavenITmng5280SettingsProfilesRepositoriesOrderTest() {
-        super("[3.1-A,)");
-    }
-
     @BeforeEach
     protected void setUp() throws Exception {
         testDir = extractResources("/mng-5280");

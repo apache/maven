@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3122ActiveProfilesNoDuplicatesTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3122ActiveProfilesNoDuplicatesTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Verify that MavenProject.getActiveProfiles() reports profiles from the settings.xml with activeByDefault=true
      * only once.

@@ -48,29 +48,9 @@ public abstract class AbstractMavenIntegrationTestCase {
 
     private static ArtifactVersion javaVersion;
 
-    private ArtifactVersion mavenVersion;
-
-    private final Pattern matchPattern;
-
     private String testName;
 
-    private static final Pattern DEFAULT_MATCH_PATTERN = Pattern.compile("(.*?)-(RC[0-9]+|SNAPSHOT|RC[0-9]+-SNAPSHOT)");
-
-    protected static final String ALL_MAVEN_VERSIONS = "[2.0,)";
-
-    protected AbstractMavenIntegrationTestCase(String versionRangeStr) {
-        this(versionRangeStr, DEFAULT_MATCH_PATTERN);
-    }
-
-    protected AbstractMavenIntegrationTestCase(String versionRangeStr, String matchPattern) {
-        this(versionRangeStr, Pattern.compile(matchPattern));
-    }
-
-    protected AbstractMavenIntegrationTestCase(String versionRangeStr, Pattern matchPattern) {
-        this.matchPattern = matchPattern;
-
-        requiresMavenVersion(versionRangeStr);
-    }
+    protected AbstractMavenIntegrationTestCase() {}
 
     @BeforeAll
     static void setupInputStream() {
@@ -108,57 +88,6 @@ public abstract class AbstractMavenIntegrationTestCase {
     }
 
     /**
-     * Gets the Maven version used to run this test.
-     *
-     * @return The Maven version or <code>null</code> if unknown.
-     */
-    protected final ArtifactVersion getMavenVersion() {
-        if (mavenVersion == null) {
-            String version = System.getProperty("maven.version", "");
-
-            if (version.isEmpty() || version.startsWith("${")) {
-                try {
-                    Verifier verifier = new Verifier("");
-                    version = verifier.getMavenVersion();
-                    System.setProperty("maven.version", version);
-                } catch (VerificationException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            // NOTE: If the version looks like "${...}" it has been configured from an undefined expression
-            if (!version.isEmpty() && !version.startsWith("${")) {
-                mavenVersion = new DefaultArtifactVersion(version);
-            }
-        }
-        return mavenVersion;
-    }
-
-    /**
-     * This allows fine-grained control over execution of individual test methods
-     * by allowing tests to adjust to the current Maven version, or else simply avoid
-     * executing altogether if the wrong version is present.
-     */
-    protected boolean matchesVersionRange(String versionRangeStr) {
-        VersionRange versionRange;
-        try {
-            versionRange = VersionRange.createFromVersionSpec(versionRangeStr);
-        } catch (InvalidVersionSpecificationException e) {
-            throw new IllegalArgumentException("Invalid version range: " + versionRangeStr, e);
-        }
-
-        ArtifactVersion version = getMavenVersion();
-        if (version != null) {
-            return versionRange.containsVersion(removePattern(version));
-        } else {
-            out.println("WARNING: " + getName() + ": version range '" + versionRange
-                    + "' supplied but no Maven version found - returning true for match check.");
-
-            return true;
-        }
-    }
-
-    /**
      * Guards the execution of a test case by checking that the current Java version matches the specified version
      * range. If the check fails, an exception will be thrown which aborts the current test and marks it as skipped. One
      * would usually call this method right at the start of a test method.
@@ -180,33 +109,6 @@ public abstract class AbstractMavenIntegrationTestCase {
         }
     }
 
-    /**
-     * Guards the execution of a test case by checking that the current Maven version matches the specified version
-     * range. If the check fails, an exception will be thrown which aborts the current test and marks it as skipped. One
-     * would usually call this method right at the start of a test method.
-     *
-     * @param versionRange The version range that specifies the acceptable Maven versions for the test, must not be
-     *                     <code>null</code>.
-     */
-    protected void requiresMavenVersion(String versionRange) {
-        VersionRange range;
-        try {
-            range = VersionRange.createFromVersionSpec(versionRange);
-        } catch (InvalidVersionSpecificationException e) {
-            throw new IllegalArgumentException("Invalid version range: " + versionRange, e);
-        }
-
-        ArtifactVersion version = getMavenVersion();
-        if (version != null) {
-            if (!range.containsVersion(removePattern(version))) {
-                throw new UnsupportedMavenVersionException(version, range);
-            }
-        } else {
-            out.println("WARNING: " + getName() + ": version range '" + versionRange
-                    + "' supplied but no Maven version found - not skipping test.");
-        }
-    }
-
     private static class NonCloseableInputStream extends FilterInputStream {
         NonCloseableInputStream(InputStream delegate) {
             super(delegate);
@@ -220,23 +122,6 @@ public abstract class AbstractMavenIntegrationTestCase {
         private UnsupportedJavaVersionException(ArtifactVersion javaVersion, VersionRange supportedRange) {
             super("Java version " + javaVersion + " not in range " + supportedRange);
         }
-    }
-
-    private static class UnsupportedMavenVersionException extends TestAbortedException {
-        private UnsupportedMavenVersionException(ArtifactVersion mavenVersion, VersionRange supportedRange) {
-            super("Maven version " + mavenVersion + " not in range " + supportedRange);
-        }
-    }
-
-    ArtifactVersion removePattern(ArtifactVersion version) {
-        String v = version.toString();
-
-        Matcher m = matchPattern.matcher(v);
-
-        if (m.matches()) {
-            return new DefaultArtifactVersion(m.group(1));
-        }
-        return version;
     }
 
     protected File extractResources(String resourcePath) throws IOException {
@@ -296,12 +181,7 @@ public abstract class AbstractMavenIntegrationTestCase {
             }
 
             String path = settingsFile.getAbsolutePath();
-
-            if (matchesVersionRange("[4.0.0-beta-4,)")) {
-                verifier.addCliArgument("--install-settings");
-            } else {
-                verifier.addCliArgument("--global-settings");
-            }
+            verifier.addCliArgument("--install-settings");
             if (path.indexOf(' ') < 0) {
                 verifier.addCliArgument(path);
             } else {

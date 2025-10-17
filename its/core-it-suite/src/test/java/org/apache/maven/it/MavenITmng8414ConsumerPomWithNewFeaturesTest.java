@@ -32,12 +32,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8414">MNG-8414</a>.
+ * @since 4.0.0-rc-2
+ *
  */
 class MavenITmng8414ConsumerPomWithNewFeaturesTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8414ConsumerPomWithNewFeaturesTest() {
-        super("[4.0.0-rc-2,)");
-    }
 
     /**
      *  Verify behavior of the consumer POM when using a feature that require a newer model.

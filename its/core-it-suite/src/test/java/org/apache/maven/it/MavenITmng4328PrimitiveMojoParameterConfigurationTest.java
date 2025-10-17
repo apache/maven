@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4328PrimitiveMojoParameterConfigurationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4328PrimitiveMojoParameterConfigurationTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that plugin parameters that are of primitive types like boolean (not java.lang.Boolean) can be populated
      * from expressions. In other words, the subtle difference between the runtime type of the expression value (which

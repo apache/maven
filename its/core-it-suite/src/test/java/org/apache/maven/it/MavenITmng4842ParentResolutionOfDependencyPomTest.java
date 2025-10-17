@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4842ParentResolutionOfDependencyPomTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4842ParentResolutionOfDependencyPomTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0,)");
-    }
-
     /**
      * Verify that resolution of parent POMs for dependency POMs treats the remote repositories of the current
      * resolution request as dominant when merging with any repositories declared in the dependency POM. This

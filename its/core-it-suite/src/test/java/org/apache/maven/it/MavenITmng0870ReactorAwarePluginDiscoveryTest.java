@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng0870ReactorAwarePluginDiscoveryTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng0870ReactorAwarePluginDiscoveryTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that the reactor can resolve plugins that have just been built by a previous module and are not yet
      * installed to the local repo.

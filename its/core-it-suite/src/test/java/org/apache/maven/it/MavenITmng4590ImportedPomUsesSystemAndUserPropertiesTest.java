@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4590ImportedPomUsesSystemAndUserPropertiesTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4590ImportedPomUsesSystemAndUserPropertiesTest() {
-        super("[2.0.9,3.0-alpha-1),[3.0-beta-1,)");
-    }
-
     /**
      * Verify that imported POMs are processed using the same system/user properties as the importing POM.
      *

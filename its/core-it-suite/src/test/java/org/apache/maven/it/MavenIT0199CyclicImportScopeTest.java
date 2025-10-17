@@ -24,10 +24,6 @@ import org.junit.jupiter.api.Test;
 
 public class MavenIT0199CyclicImportScopeTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenIT0199CyclicImportScopeTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     @Test
     public void testit0199() throws Exception {
         // v1: parent not using BOM; explicit dep from componentB → componentA

@@ -44,10 +44,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4348NoUnnecessaryRepositoryAccessTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4348NoUnnecessaryRepositoryAccessTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that the (remote) repos are not accessed during execution of a mojo that does not require dependency
      * resolution. In detail, Maven should neither touch POMs, JARs nor metadata.

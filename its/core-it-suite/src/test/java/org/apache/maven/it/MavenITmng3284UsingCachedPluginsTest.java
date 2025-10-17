@@ -28,10 +28,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng3284UsingCachedPluginsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3284UsingCachedPluginsTest() {
-        super("[2.1.0-M2,)");
-    }
-
     /**
      * Verify that the effective plugin versions used for a project are not influenced by other instances of this
      * plugin in the reactor, i.e. each module gets exactly the plugin version it declares.

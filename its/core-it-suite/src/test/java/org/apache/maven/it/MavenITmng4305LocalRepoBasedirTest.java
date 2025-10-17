@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4305LocalRepoBasedirTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4305LocalRepoBasedirTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that ${localRepository.basedir} delivers a proper filesystem path. In detail, the path should use the
      * platform-specific file separator and have no trailing separator.

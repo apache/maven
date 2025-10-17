@@ -20,6 +20,7 @@ package org.apache.maven.it;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -29,10 +30,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Robert Scholte
  */
+@Disabled("Bounds: (,3.5.0),(3.5.2,4.0.0-beta-5)")
 public class MavenITmng6330RelativePath extends AbstractMavenIntegrationTestCase {
-    public MavenITmng6330RelativePath() {
-        super("(,3.5.0),(3.5.2,4.0.0-beta-5)");
-    }
 
     @Test
     public void testRelativePath() throws Exception {

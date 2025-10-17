@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4814ReResolutionOfDependenciesDuringReactorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4814ReResolutionOfDependenciesDuringReactorTest() {
-        super("[3.0,)");
-    }
-
     /**
      * Verify that dependency resolution by an aggregator before the build has actually produced any artifacts
      * doesn't prevent later resolution of project artifacts from the reactor if the aggregator originally resolved

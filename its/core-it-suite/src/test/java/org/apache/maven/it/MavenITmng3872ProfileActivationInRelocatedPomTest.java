@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng3872ProfileActivationInRelocatedPomTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3872ProfileActivationInRelocatedPomTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that profiles are activated in relocated POMs.
      *

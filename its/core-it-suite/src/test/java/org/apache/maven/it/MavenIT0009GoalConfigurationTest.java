@@ -27,10 +27,6 @@ import org.junit.jupiter.api.condition.OS;
 
 public class MavenIT0009GoalConfigurationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenIT0009GoalConfigurationTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test plugin configuration and goal configuration that overrides what the
      * mojo has specified.
@@ -43,7 +39,8 @@ public class MavenIT0009GoalConfigurationTest extends AbstractMavenIntegrationTe
             disabledReason = "JDK-25 - JDK-8354450 files ending with space are not supported on Windows")
     public void testit0009() throws Exception {
 
-        boolean supportSpaceInXml = matchesVersionRange("[3.1.0,)");
+        // Inline version check: [3.1.0,) - current Maven version supports space in XML
+        boolean supportSpaceInXml = true;
 
         File testDir = extractResources("/it0009");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());

@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
  */
 public class MavenITmng0469ReportConfigTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng0469ReportConfigTest() {
-        super("[2.0.0,)");
-    }
-
     /**
      * Test that {@code <build>} configuration dominates {@code <reporting>} configuration for build goals.
      *
@@ -69,19 +65,14 @@ public class MavenITmng0469ReportConfigTest extends AbstractMavenIntegrationTest
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.deleteDirectory("target");
         verifier.setAutoclean(false);
-        if (matchesVersionRange("(,3.0-alpha-1)")) {
-            verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-site:2.1-SNAPSHOT:generate");
-            verifier.execute();
-            verifier.verifyFilePresent("target/site/info.properties");
-        } else {
-            verifier.addCliArgument("validate");
-            verifier.execute();
-            Properties props = verifier.loadProperties("target/config.properties");
-            assertEquals("maven-it-plugin-site", props.getProperty("project.reporting.plugins.0.artifactId"));
-            assertNotEquals(
-                    "fail.properties",
-                    props.getProperty("project.reporting.plugins.0.configuration.children.infoFile.0.value"));
-        }
+        // Inline version check: (,3.0-alpha-1) - current Maven version doesn't match this range
+        verifier.addCliArgument("validate");
+        verifier.execute();
+        Properties props = verifier.loadProperties("target/config.properties");
+        assertEquals("maven-it-plugin-site", props.getProperty("project.reporting.plugins.0.artifactId"));
+        assertNotEquals(
+                "fail.properties",
+                props.getProperty("project.reporting.plugins.0.configuration.children.infoFile.0.value"));
         verifier.verifyErrorFreeLog();
     }
 }

@@ -45,10 +45,6 @@ public class MavenITmng7470ResolverTransportTest extends AbstractMavenIntegratio
     private static final ArtifactVersion JDK_TRANSPORT_IN_MAVEN_SINCE =
             new DefaultArtifactVersion("4.0.0-alpha-9-SNAPSHOT");
 
-    public MavenITmng7470ResolverTransportTest() {
-        super("[3.9.0,)");
-    }
-
     @BeforeEach
     protected void setUp() throws Exception {
         File testDir = extractResources("/mng-7470-resolver-transport");
@@ -122,7 +118,7 @@ public class MavenITmng7470ResolverTransportTest extends AbstractMavenIntegratio
      * upgrade).
      */
     private boolean isJdkTransportPresent() {
-        return JDK_TRANSPORT_IN_MAVEN_SINCE.compareTo(getMavenVersion()) < 1;
+        return true;
     }
 
     private String defaultLogSnippet() {

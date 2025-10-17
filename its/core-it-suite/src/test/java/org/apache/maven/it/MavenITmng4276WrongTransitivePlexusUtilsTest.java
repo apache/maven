@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 public class MavenITmng4276WrongTransitivePlexusUtilsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4276WrongTransitivePlexusUtilsTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Verify that plugins that have a *transitive* dependency on plexus-utils:x.y get that version and not a random
      * version injected by the core like 1.1.

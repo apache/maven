@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4000MultiPluginExecutionsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4000MultiPluginExecutionsTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that plugin executions without id are not lost among other plugin executions when no {@code <pluginManagement>}
      * is present.

@@ -23,9 +23,6 @@ import java.io.File;
 import org.junit.jupiter.api.Test;
 
 public class MavenIT0021PomProfileTest extends AbstractMavenIntegrationTestCase {
-    public MavenIT0021PomProfileTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test pom-level profile inclusion (this one is activated by system

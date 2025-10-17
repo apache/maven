@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4106InterpolationUsesDominantProfileTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4106InterpolationUsesDominantProfileTest() {
-        super("[2.0.5,)");
-    }
-
     /**
      * Test that interpolation uses the property values from the dominant (i.e. last) profile among a group
      * of active profiles that define the same properties. This boils down to the proper order of profile
@@ -52,11 +48,7 @@ public class MavenITmng4106InterpolationUsesDominantProfileTest extends Abstract
         verifier.setAutoclean(false);
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
-        if (matchesVersionRange("[4.0.0-alpha-1,)")) {
-            verifier.addCliArgument("-Ppom-a,pom-b,settings-a,settings-b");
-        } else {
-            verifier.addCliArgument("-Ppom-a,pom-b,profiles-a,profiles-b,settings-a,settings-b");
-        }
+        verifier.addCliArgument("-Ppom-a,pom-b,settings-a,settings-b");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -68,11 +60,5 @@ public class MavenITmng4106InterpolationUsesDominantProfileTest extends Abstract
 
         assertEquals("b", props.getProperty("project.properties.settingsProperty"));
         assertEquals("b", props.getProperty("project.properties.settings"));
-
-        if (matchesVersionRange("(,3.0-alpha-1)")) {
-            // MNG-4060, profiles.xml support dropped
-            assertEquals("b", props.getProperty("project.properties.profilesProperty"));
-            assertEquals("b", props.getProperty("project.properties.profiles"));
-        }
     }
 }

@@ -33,11 +33,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author jdcasey
  *
+ * @since 2.0.8
+ *
  */
 public class MavenITmng3723ConcreteParentProjectTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng3723ConcreteParentProjectTest() {
-        super("(2.0.8,)"); // only test in 2.0.9+
-    }
 
     @Test
     public void testitMNG3723() throws Exception {

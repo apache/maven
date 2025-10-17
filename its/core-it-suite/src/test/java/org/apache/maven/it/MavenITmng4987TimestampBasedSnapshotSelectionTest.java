@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4987TimestampBasedSnapshotSelectionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4987TimestampBasedSnapshotSelectionTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0.3,)");
-    }
-
     /**
      * Verify that snapshot version resolution from multiple (3+) repositories properly selects the repo with the
      * newest metadata according to its timestamps, regardless of the declaration order of the repos.

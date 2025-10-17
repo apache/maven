@@ -25,12 +25,10 @@ import org.junit.jupiter.api.Test;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8245">MNG-8245</a>
  *   and <a href="https://issues.apache.org/jira/browse/MNG-8246">MNG-8246</a>.
+ * @since 4.0.0-rc-2
+ *
  */
 class MavenITmng8245BeforePhaseCliTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8245BeforePhaseCliTest() {
-        super("[4.0.0-rc-2,)");
-    }
 
     /**
      *  Verify phase before:clean spits a warning and calls clean

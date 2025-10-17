@@ -28,10 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MavenITmng4112MavenVersionPropertyTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4112MavenVersionPropertyTest() {
-        super("(3.0.3,)");
-    }
-
     /**
      * Test for ${maven.version} and ${maven.build.version} property
      *

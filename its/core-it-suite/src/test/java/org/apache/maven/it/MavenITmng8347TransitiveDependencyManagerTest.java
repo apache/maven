@@ -32,12 +32,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Maven 3 was not transitive regarding dependency management. Maven4 started to be, but beta-5 discovered a nasty
  * bug where Resolver was applying dependency management onto node itself it contributed (basically overriding
  * same node direct dependencies).
+ * @since 3.9.0
+ *
  */
 class MavenITmng8347TransitiveDependencyManagerTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8347TransitiveDependencyManagerTest() {
-        super("[3.9.0,)"); // since we have chained local repository
-    }
 
     /**
      * We run same command with various Maven versions and based on their version assert (Maven3 was not transitive,
@@ -55,34 +53,14 @@ class MavenITmng8347TransitiveDependencyManagerTest extends AbstractMavenIntegra
         verifier.verifyErrorFreeLog();
 
         List<String> l = verifier.loadLogLines();
-        if (matchesVersionRange("[3.9.0,4.0.0-alpha-12)")) {
-            // Maven3 is not transitive
-            a(l, "[INFO] org.apache.maven.it.mresolver614:root:jar:1.0.0");
-            a(l, "[INFO] \\- org.apache.maven.it.mresolver614:level1:jar:1.0.0:compile");
-            a(l, "[INFO]    \\- org.apache.maven.it.mresolver614:level2:jar:1.0.0:compile");
-            a(l, "[INFO]       \\- org.apache.maven.it.mresolver614:level3:jar:1.0.0:compile");
-            a(l, "[INFO]          \\- org.apache.maven.it.mresolver614:level4:jar:1.0.0:compile");
-            a(l, "[INFO]             \\- org.apache.maven.it.mresolver614:level5:jar:1.0.0:compile");
-            a(l, "[INFO]                \\- org.apache.maven.it.mresolver614:level6:jar:1.0.2:compile");
-        } else if (matchesVersionRange("[4.0.0-alpha-12,4.0.0-beta-5]")) {
-            // Maven 4 is transitive (added in 4.0.0-alpha-12, but was broken up to beta-6)
-            a(l, "[INFO] org.apache.maven.it.mresolver614:root:jar:1.0.0");
-            a(l, "[INFO] \\- org.apache.maven.it.mresolver614:level1:jar:1.0.0:compile");
-            a(l, "[INFO]    \\- org.apache.maven.it.mresolver614:level2:jar:1.0.0:compile");
-            a(l, "[INFO]       \\- org.apache.maven.it.mresolver614:level3:jar:1.0.1:compile");
-            a(l, "[INFO]          \\- org.apache.maven.it.mresolver614:level4:jar:1.0.1:compile");
-            a(l, "[INFO]             \\- org.apache.maven.it.mresolver614:level5:jar:1.0.2:compile");
-            a(l, "[INFO]                \\- org.apache.maven.it.mresolver614:level6:jar:1.0.2:compile");
-        } else if (matchesVersionRange("[4.0.0-beta-6,)")) {
-            // Maven 4 is transitive and should produce expected results
-            a(l, "[INFO] org.apache.maven.it.mresolver614:root:jar:1.0.0");
-            a(l, "[INFO] \\- org.apache.maven.it.mresolver614:level1:jar:1.0.0:compile");
-            a(l, "[INFO]    \\- org.apache.maven.it.mresolver614:level2:jar:1.0.0:compile");
-            a(l, "[INFO]       \\- org.apache.maven.it.mresolver614:level3:jar:1.0.0:compile");
-            a(l, "[INFO]          \\- org.apache.maven.it.mresolver614:level4:jar:1.0.1:compile");
-            a(l, "[INFO]             \\- org.apache.maven.it.mresolver614:level5:jar:1.0.2:compile");
-            a(l, "[INFO]                \\- org.apache.maven.it.mresolver614:level6:jar:1.0.2:compile");
-        }
+        // Maven 4 is transitive and should produce expected results
+        a(l, "[INFO] org.apache.maven.it.mresolver614:root:jar:1.0.0");
+        a(l, "[INFO] \\- org.apache.maven.it.mresolver614:level1:jar:1.0.0:compile");
+        a(l, "[INFO]    \\- org.apache.maven.it.mresolver614:level2:jar:1.0.0:compile");
+        a(l, "[INFO]       \\- org.apache.maven.it.mresolver614:level3:jar:1.0.0:compile");
+        a(l, "[INFO]          \\- org.apache.maven.it.mresolver614:level4:jar:1.0.1:compile");
+        a(l, "[INFO]             \\- org.apache.maven.it.mresolver614:level5:jar:1.0.2:compile");
+        a(l, "[INFO]                \\- org.apache.maven.it.mresolver614:level6:jar:1.0.2:compile");
     }
 
     /**
@@ -101,15 +79,9 @@ class MavenITmng8347TransitiveDependencyManagerTest extends AbstractMavenIntegra
         verifier.verifyErrorFreeLog();
 
         List<String> l = verifier.loadLogLines();
-        if (matchesVersionRange("[4.0.0-beta-5]")) {
-            a(l, "[INFO] org.apache.maven.it.mresolver614:root:jar:1.0.0");
-            a(l, "[INFO] \\- org.sonatype.plexus:plexus-build-api:jar:0.0.7:compile");
-            a(l, "[INFO]    \\- org.codehaus.plexus:plexus-utils:jar:1.5.5:compile");
-        } else {
-            a(l, "[INFO] org.apache.maven.it.mresolver614:root:jar:1.0.0");
-            a(l, "[INFO] \\- org.sonatype.plexus:plexus-build-api:jar:0.0.7:compile");
-            a(l, "[INFO]    \\- org.codehaus.plexus:plexus-utils:jar:1.5.8:compile");
-        }
+        a(l, "[INFO] org.apache.maven.it.mresolver614:root:jar:1.0.0");
+        a(l, "[INFO] \\- org.sonatype.plexus:plexus-build-api:jar:0.0.7:compile");
+        a(l, "[INFO]    \\- org.codehaus.plexus:plexus-utils:jar:1.5.8:compile");
     }
 
     /**
@@ -128,11 +100,7 @@ class MavenITmng8347TransitiveDependencyManagerTest extends AbstractMavenIntegra
 
         // this really boils down to "transitive" vs "non-transitive"
         List<String> l = verifier.loadLogLines();
-        if (matchesVersionRange("[,4.0.0-alpha-11)")) {
-            a(l, "[INFO]    |  |  |  \\- com.fasterxml.jackson.core:jackson-core:jar:2.16.1:compile");
-        } else {
-            a(l, "[INFO]    |  |  |  \\- com.fasterxml.jackson.core:jackson-core:jar:2.17.2:compile");
-        }
+        a(l, "[INFO]    |  |  |  \\- com.fasterxml.jackson.core:jackson-core:jar:2.17.2:compile");
     }
 
     /**

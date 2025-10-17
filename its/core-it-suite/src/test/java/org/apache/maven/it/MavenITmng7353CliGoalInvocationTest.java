@@ -27,9 +27,6 @@ import org.junit.jupiter.api.Test;
  * <a href="https://issues.apache.org/jira/browse/MNG-7353">MNG-7353</a>.
  */
 public class MavenITmng7353CliGoalInvocationTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng7353CliGoalInvocationTest() {
-        super("[3.9.0,)");
-    }
 
     private void run(String id, String goal, String expectedInvocation) throws Exception {
         File basedir = extractResources("/mng-7353-cli-goal-invocation");

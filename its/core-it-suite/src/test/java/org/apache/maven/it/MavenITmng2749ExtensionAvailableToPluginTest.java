@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 public class MavenITmng2749ExtensionAvailableToPluginTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2749ExtensionAvailableToPluginTest() {
-        super("(2.0.2,)");
-    }
-
     /**
      * Verify that plugins can load classes/resources from a build extension.
      *

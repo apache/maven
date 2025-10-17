@@ -33,9 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  */
 public class MavenITmng0818WarDepsNotTransitiveTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng0818WarDepsNotTransitiveTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test that depending on a WAR doesn't also get its dependencies transitively.

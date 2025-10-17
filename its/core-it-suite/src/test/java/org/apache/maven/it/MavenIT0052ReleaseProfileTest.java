@@ -23,9 +23,6 @@ import java.io.File;
 import org.junit.jupiter.api.Test;
 
 public class MavenIT0052ReleaseProfileTest extends AbstractMavenIntegrationTestCase {
-    public MavenIT0052ReleaseProfileTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test that source attachment doesn't take place when

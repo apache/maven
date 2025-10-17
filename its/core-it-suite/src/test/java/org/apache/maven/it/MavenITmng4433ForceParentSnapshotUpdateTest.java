@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4433ForceParentSnapshotUpdateTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4433ForceParentSnapshotUpdateTest() {
-        super("[2.0,3.0-alpha-1),[3.0-alpha-4,)");
-    }
-
     /**
      * Verify that snapshot updates of parent POMs can be forced from the command line via "-U".
      *

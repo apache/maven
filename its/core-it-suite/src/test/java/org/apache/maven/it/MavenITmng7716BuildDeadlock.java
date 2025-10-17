@@ -32,10 +32,6 @@ import org.junit.jupiter.api.Timeout;
  */
 class MavenITmng7716BuildDeadlock extends AbstractMavenIntegrationTestCase {
 
-    MavenITmng7716BuildDeadlock() {
-        super("[3.8.8,3.9.0),[3.9.1,4.0.0-alpha-1),[4.0.0-alpha-5,)");
-    }
-
     /**
      * Verify that maven invocation works (no NPE/error happens).
      *

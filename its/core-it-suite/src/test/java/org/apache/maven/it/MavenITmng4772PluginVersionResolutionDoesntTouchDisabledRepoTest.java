@@ -44,10 +44,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4772PluginVersionResolutionDoesntTouchDisabledRepoTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4772PluginVersionResolutionDoesntTouchDisabledRepoTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-beta-3,)");
-    }
-
     /**
      * Verify that repositories which have both releases and snapshots disabled aren't touched when looking for
      * the latest plugin version.

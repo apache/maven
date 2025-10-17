@@ -42,10 +42,6 @@ import org.junit.jupiter.api.Test;
  */
 class MavenITgh11280DuplicateDependencyConsumerPomTest extends AbstractMavenIntegrationTestCase {
 
-    MavenITgh11280DuplicateDependencyConsumerPomTest() {
-        super("[4.0.0-rc-4,)");
-    }
-
     /**
      * Tests that a project using a BOM with dependencies that have both null and empty string
      * classifiers can be built successfully without "Duplicate dependency" errors during

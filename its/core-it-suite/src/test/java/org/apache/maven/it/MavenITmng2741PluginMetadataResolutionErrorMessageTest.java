@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng2741PluginMetadataResolutionErrorMessageTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2741PluginMetadataResolutionErrorMessageTest() {
-        super("[2.1.0,3.0-alpha-1),[3.0-beta-1,)");
-    }
-
     /**
      * Tests that plugin prefix metadata resolution errors tell the underlying transport issue.
      *

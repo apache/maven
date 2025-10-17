@@ -29,10 +29,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MavenITmng7349RelocationWarningTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng7349RelocationWarningTest() {
-        super("[3.8.5,)");
-    }
-
     @Test
     public void testit() throws Exception {
         File testDir = extractResources("/mng-7349-relocation-warning");

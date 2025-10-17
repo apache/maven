@@ -41,7 +41,7 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
     private final File testDir;
 
     public MavenITmng6118SubmoduleInvocation() throws IOException {
-        super("[4.0.0-alpha-1,)");
+        super();
         testDir = extractResources(RESOURCE_PATH);
     }
 

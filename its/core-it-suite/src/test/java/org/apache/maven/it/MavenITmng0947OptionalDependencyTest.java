@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng0947OptionalDependencyTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng0947OptionalDependencyTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that direct optional dependencies are included in the project class paths while transitive optional
      * dependencies are excluded.

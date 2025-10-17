@@ -59,10 +59,6 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test extends AbstractMavenInt
 
     private static final String CONTENT_CHECKSUM_SHA1 = "8c2562233bae8fa8aa40697d6bbd5115f9062a71";
 
-    public MavenITmng3599useHttpProxyForWebDAVMk2Test() {
-        super("[3.3.9,)");
-    }
-
     @BeforeEach
     protected void setUp() throws Exception {
         Handler handler = new AbstractHandler() {

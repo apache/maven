@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng0294MergeGlobalAndUserSettingsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng0294MergeGlobalAndUserSettingsTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test merging of global- and user-level settings.xml files.
      *

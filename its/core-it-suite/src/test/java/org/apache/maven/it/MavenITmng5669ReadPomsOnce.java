@@ -39,10 +39,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng5669ReadPomsOnce extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5669ReadPomsOnce() {
-        super("[4.0.0-alpha-1,)");
-    }
-
     @Test
     public void testWithoutBuildConsumer() throws Exception {
         // prepare JavaAgent

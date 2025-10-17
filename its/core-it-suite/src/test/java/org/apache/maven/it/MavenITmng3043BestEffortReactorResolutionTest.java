@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3043BestEffortReactorResolutionTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Test that dependencies on attached artifacts like a test JAR or an EJB client JAR which have not been built
      * yet, i.e. in build phases prior to "package" like "test", are satisfied from the output directories of the
@@ -162,7 +158,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
      */
     @Test
     public void testitPackagePhasesSlitted() throws Exception {
-        requiresMavenVersion("[4.0.0-beta-4,)");
+        // requiresMavenVersion("[4.0.0-beta-4,)");
 
         File testDir = extractResources("/mng-3043");
 

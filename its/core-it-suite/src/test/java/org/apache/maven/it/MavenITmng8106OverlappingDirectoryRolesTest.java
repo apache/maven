@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class MavenITmng8106OverlappingDirectoryRolesTest extends AbstractMavenIntegrationTestCase {
     public MavenITmng8106OverlappingDirectoryRolesTest() {
         // Broken in: 3.9.0..3.9.6 && 4.0.0-alpha-1..4.0.0-alpha-13
-        super("(3.9.6,3.999.999],[4.0.0-beta-1,)");
+        super();
     }
 
     @Test

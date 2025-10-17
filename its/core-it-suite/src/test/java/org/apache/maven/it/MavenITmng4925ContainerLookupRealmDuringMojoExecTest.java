@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4925ContainerLookupRealmDuringMojoExecTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4925ContainerLookupRealmDuringMojoExecTest() {
-        super("[3.0.2,)");
-    }
-
     /**
      * Verify that the container's lookup realm is set to the plugin realm during a mojo execution as otherwise
      * string-based lookups can fail to load the proper type.

@@ -39,10 +39,6 @@ public class MavenITmng4199CompileMeetsRuntimeScopeTest extends AbstractMavenInt
      * NOTE: Class path ordering is another issue (MNG-1412), so we merely check set containment here.
      */
 
-    public MavenITmng4199CompileMeetsRuntimeScopeTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that the core properly handles goals with different requirements on dependency resolution. In particular
      * verify that the different dependency scopes are not erroneously collapsed/combined into just a single scope.

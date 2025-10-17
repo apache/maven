@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4233ReactorResolutionForManuallyCreatedArtifactTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4233ReactorResolutionForManuallyCreatedArtifactTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Verify that artifact instances created directly by plugins (i.e. via the artifact factory) can be resolved
      * from the reactor. This case is a subtle variation of MNG-2877, namely not using @requiresDependencyResolution
