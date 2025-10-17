@@ -27,6 +27,7 @@ import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +36,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.InterpolatorException;
 import org.apache.maven.api.services.ModelBuilderException;
@@ -169,6 +171,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
     private Map<String, String> systemProperties = Collections.emptyMap();
     private Map<String, String> userProperties = Collections.emptyMap();
     private Model model;
+    private Map<String, String> cascadingProperties = Collections.emptyMap();
     final Record record;
 
     public DefaultProfileActivationContext(
@@ -326,10 +329,21 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
     @Override
     public String getModelProperty(String key) {
         if (record != null) {
-            return record.usedModelProperties.computeIfAbsent(
-                    key, k -> model.getProperties().get(k));
+            return record.usedModelProperties.computeIfAbsent(key, k -> {
+                // Check cascading properties first, then model properties
+                String value = cascadingProperties.get(k);
+                if (value == null && model.getProperties() != null) {
+                    value = model.getProperties().get(k);
+                }
+                return value;
+            });
         } else {
-            return model.getProperties().get(key);
+            // Check cascading properties first, then model properties
+            String value = cascadingProperties.get(key);
+            if (value == null && model.getProperties() != null) {
+                value = model.getProperties().get(key);
+            }
+            return value;
         }
     }
 
@@ -460,5 +474,26 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     private static Map<String, String> unmodifiable(Map<String, String> map) {
         return map != null ? Collections.unmodifiableMap(map) : Collections.emptyMap();
+    }
+
+    // Cascading profile activation methods
+
+    @Override
+    public void addProfileProperties(Collection<Profile> activatedProfiles) {
+        // Inject properties from activated profiles into cascading properties
+        // This enables cascading profile activation without modifying the underlying model
+        if (activatedProfiles != null && !activatedProfiles.isEmpty()) {
+            Map<String, String> newCascadingProperties = new HashMap<>(cascadingProperties);
+
+            // Add properties from each activated profile
+            for (Profile profile : activatedProfiles) {
+                if (profile.getProperties() != null) {
+                    newCascadingProperties.putAll(profile.getProperties());
+                }
+            }
+
+            // Update cascading properties for future profile activation checks
+            this.cascadingProperties = Collections.unmodifiableMap(newCascadingProperties);
+        }
     }
 }
