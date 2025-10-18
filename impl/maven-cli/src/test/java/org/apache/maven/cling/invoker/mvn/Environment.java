@@ -22,6 +22,4 @@ public final class Environment {
     private Environment() {}
 
     public static final String TOOLBOX_VERSION = System.getProperty("version.toolbox", "UNSET version.toolbox");
-
-    public static final String MIMIR_VERSION = System.getProperty("version.mimir", "UNSET version.mimir");
 }

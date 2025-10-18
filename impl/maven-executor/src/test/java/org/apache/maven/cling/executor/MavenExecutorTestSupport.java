@@ -61,6 +61,7 @@ public abstract class MavenExecutorTestSupport {
                 .resolve("home");
         Files.createDirectories(userHome);
         MimirInfuser.infuseUW(userHome);
+        MimirInfuser.preseedItselfIntoInnerUserHome(userHome);
 
         System.out.println("=== " + testInfo.getTestMethod().orElseThrow().getName());
     }
@@ -338,10 +339,11 @@ public abstract class MavenExecutorTestSupport {
         for (ExecutorRequest request : requests) {
             if (MimirInfuser.isMimirPresentUW()) {
                 if (maven3Home().equals(request.installationDirectory())) {
-                    MimirInfuser.doInfusePW(Environment.MIMIR_VERSION, request.cwd(), request.userHomeDirectory());
+                    MimirInfuser.doInfusePW(request.cwd(), request.userHomeDirectory());
                 } else if (maven4Home().equals(request.installationDirectory())) {
-                    MimirInfuser.doInfuseUW(Environment.MIMIR_VERSION, request.userHomeDirectory());
+                    MimirInfuser.doInfuseUW(request.userHomeDirectory());
                 }
+                MimirInfuser.preseedItselfIntoInnerUserHome(request.userHomeDirectory());
             }
             int exitCode = invoker.execute(request);
             if (exitCode != 0) {

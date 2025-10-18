@@ -222,10 +222,10 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
         Map<String, String> logs = invoke(
                 cwd,
                 userHome,
-                List.of("eu.maveniverse.maven.plugins:toolbox:" + Environment.TOOLBOX_VERSION + ":help"),
+                List.of("eu.maveniverse.maven.plugins:toolbox:" + Environment.TOOLBOX_VERSION + ":dump"),
                 List.of("--force-interactive"));
 
-        String log = logs.get("eu.maveniverse.maven.plugins:toolbox:" + Environment.TOOLBOX_VERSION + ":help");
+        String log = logs.get("eu.maveniverse.maven.plugins:toolbox:" + Environment.TOOLBOX_VERSION + ":dump");
         assertTrue(log.contains("https://repo1.maven.org/maven2"), log);
         assertFalse(log.contains("https://repo.maven.apache.org/maven2"), log);
     }

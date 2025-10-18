@@ -64,10 +64,11 @@ public class ToolboxToolTest {
 
         if (MimirInfuser.isMimirPresentUW()) {
             if (testName.contains("3")) {
-                MimirInfuser.doInfusePW(Environment.MIMIR_VERSION, cwd, userHome);
+                MimirInfuser.doInfusePW(cwd, userHome);
             } else {
-                MimirInfuser.doInfuseUW(Environment.MIMIR_VERSION, userHome);
+                MimirInfuser.doInfuseUW(userHome);
             }
+            MimirInfuser.preseedItselfIntoInnerUserHome(userHome);
         }
 
         System.out.println("=== " + testInfo.getTestMethod().orElseThrow().getName());

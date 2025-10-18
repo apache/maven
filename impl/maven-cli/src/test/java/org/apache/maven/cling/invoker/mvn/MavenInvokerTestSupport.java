@@ -99,7 +99,8 @@ public abstract class MavenInvokerTestSupport {
         Files.writeString(appJava, APP_JAVA_STRING);
 
         if (MimirInfuser.isMimirPresentUW()) {
-            MimirInfuser.doInfuseUW(Environment.MIMIR_VERSION, userHome);
+            MimirInfuser.doInfuseUW(userHome);
+            MimirInfuser.preseedItselfIntoInnerUserHome(userHome);
         }
 
         HashMap<String, String> logs = new HashMap<>();
