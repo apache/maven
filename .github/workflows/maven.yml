@@ -106,6 +106,7 @@ jobs:
         if: failure() || cancelled()
         with:
           name: ${{ github.run_number }}-initial
+          include-hidden-files: true
           path: |
             ~/.mimir/*.log
             **/target/surefire-reports/*
@@ -209,7 +210,9 @@ jobs:
         if: failure() || cancelled()
         with:
           name: ${{ github.run_number }}-full-build-artifact-${{ runner.os }}-${{ matrix.java }}
+          include-hidden-files: true
           path: |
+            ~/.mimir/*.log
             **/target/surefire-reports/*
             **/target/java_heapdump.hprof
 
@@ -295,7 +298,9 @@ jobs:
         if: failure() || cancelled()
         with:
           name: ${{ github.run_number }}-integration-test-artifact-${{ runner.os }}-${{ matrix.java }}
+          include-hidden-files: true
           path: |
+            ~/.mimir/*.log
             **/target/surefire-reports/*
             **/target/failsafe-reports/*
             ./its/core-it-suite/target/test-classes/**
