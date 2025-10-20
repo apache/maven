@@ -323,6 +323,11 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             context.terminal = MessageUtils.getTerminal();
             context.closeables.add(MessageUtils::systemUninstall);
             MessageUtils.registerShutdownHook(); // safety belt
+
+            if (context.options().rawStreams().orElse(false)) {
+                // to trigger FastTerminal; with raw-streams we must do this ASAP (to have system in/out/err set up)
+                context.terminal.getName();
+            }
         } else {
             doConfigureWithTerminal(context, context.terminal);
         }
