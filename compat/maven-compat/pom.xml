@@ -150,12 +150,21 @@ under the License.
     <dependency>
       <groupId>javax.inject</groupId>
       <artifactId>javax.inject</artifactId>
-      <scope>provided</scope>
+      <!-- only for backward compatibility otherwhise would be provided -->
+      <scope>compile</scope>
     </dependency>
+    <dependency>
+      <!-- only for backward compatibility -->
+      <groupId>aopalliance</groupId>
+      <artifactId>aopalliance</artifactId>
+      <version>1.0</version>
+    </dependency>
+
     <dependency>
       <groupId>org.eclipse.sisu</groupId>
       <artifactId>org.eclipse.sisu.inject</artifactId>
-      <scope>provided</scope>
+      <!-- only for backward compatibility otherwhise would be provided -->
+      <scope>compile</scope>
     </dependency>
     <!-- ONLY version here; nothing else use or should use this dependency -->
     <dependency>
@@ -166,7 +175,8 @@ under the License.
     <dependency>
       <groupId>org.eclipse.sisu</groupId>
       <artifactId>org.eclipse.sisu.plexus</artifactId>
-      <scope>provided</scope>
+      <!-- only for backward compatibility otherwhise would be provided -->
+      <scope>compile</scope>
     </dependency>
 
     <dependency>
@@ -179,7 +189,8 @@ under the License.
       <groupId>com.google.inject</groupId>
       <artifactId>guice</artifactId>
       <classifier>classes</classifier>
-      <scope>test</scope>
+      <!-- only for backward compatibility otherwhise would be test-->
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
