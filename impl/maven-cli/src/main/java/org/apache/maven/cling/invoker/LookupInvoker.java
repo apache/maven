@@ -325,7 +325,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             MessageUtils.registerShutdownHook(); // safety belt
 
             if (context.options().rawStreams().orElse(false)) {
-                // to trigger FastTerminal; when embedded we want this (and sys in/out/err set up) ASAP; dummy call
+                // to trigger FastTerminal; with raw-streams we must do this ASAP (to have system in/out/err set up)
                 context.terminal.getName();
             }
         } else {
