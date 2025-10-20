@@ -183,10 +183,10 @@ public class EmbeddedMavenExecutor implements Executor {
     @Override
     public String mavenVersion(ExecutorRequest executorRequest) throws ExecutorException {
         requireNonNull(executorRequest);
-        validate(executorRequest);
         if (closed.get()) {
             throw new ExecutorException("Executor is closed");
         }
+        validate(executorRequest);
         return mayCreate(executorRequest).version;
     }
 
