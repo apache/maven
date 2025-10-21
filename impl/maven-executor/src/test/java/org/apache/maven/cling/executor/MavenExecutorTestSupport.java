@@ -60,8 +60,6 @@ public abstract class MavenExecutorTestSupport {
         userHome = tempDir.resolve(testInfo.getTestMethod().orElseThrow().getName())
                 .resolve("home");
         Files.createDirectories(userHome);
-        MimirInfuser.infuseUW(userHome);
-        MimirInfuser.preseedItselfIntoInnerUserHome(userHome);
 
         System.out.println("=== " + testInfo.getTestMethod().orElseThrow().getName());
     }
