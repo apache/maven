@@ -324,7 +324,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             context.closeables.add(MessageUtils::systemUninstall);
             MessageUtils.registerShutdownHook(); // safety belt
 
-            if (context.options().rawStreams().orElse(false)) {
+            // when we use embedded executor AND --raw-streams, we must ENSURE streams are properly set up
+            if (context.invokerRequest.embedded()
+                    && context.options().rawStreams().orElse(false)) {
                 // to trigger FastTerminal; with raw-streams we must do this ASAP (to have system in/out/err set up)
                 context.terminal.getName();
             }
