@@ -176,7 +176,7 @@ under the License.
     <version.palantirJavaFormat>2.80.0</version.palantirJavaFormat>
 
     <!-- Set as system property in surefire/failsafe to propagate to tests and IT Verifier -->
-    <toolboxVersion>0.14.0</toolboxVersion>
+    <toolboxVersion>0.14.1</toolboxVersion>
   </properties>
 
   <!--bootstrap-start-comment-->
@@ -677,7 +677,7 @@ under the License.
       <dependency>
         <groupId>eu.maveniverse.maven.mimir</groupId>
         <artifactId>testing</artifactId>
-        <version>0.10.0</version>
+        <version>0.10.3</version>
       </dependency>
     </dependencies>
     <!--bootstrap-start-comment-->
@@ -695,7 +695,6 @@ under the License.
             <argLine>-Xmx256m @{jacocoArgLine}</argLine>
             <systemPropertyVariables combine.children="append">
               <version.toolbox>${toolboxVersion}</version.toolbox>
-              <version.mimir>${env.MIMIR_VERSION}</version.mimir>
             </systemPropertyVariables>
           </configuration>
         </plugin>
@@ -707,7 +706,6 @@ under the License.
             <argLine>-Xmx256m @{jacocoArgLine}</argLine>
             <systemPropertyVariables combine.children="append">
               <version.toolbox>${toolboxVersion}</version.toolbox>
-              <version.mimir>${env.MIMIR_VERSION}</version.mimir>
             </systemPropertyVariables>
           </configuration>
         </plugin>
