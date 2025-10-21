@@ -71,5 +71,5 @@ public interface Executor extends AutoCloseable {
      * @throws ExecutorException if an error occurs while closing the {@link Executor}
      */
     @Override
-    default void close() throws ExecutorException {}
+    void close() throws ExecutorException;
 }
