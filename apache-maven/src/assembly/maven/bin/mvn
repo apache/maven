@@ -77,7 +77,7 @@ MAVEN_HOME=`cd "$MAVEN_HOME" && pwd`
 
 cd "$saveddir"
 
-CLASSWORLDS_CONF="$MAVEN_HOME/bin/m2.conf"
+CLASSWORLDS_CONF=${CLASSWORLDS_CONF:="$MAVEN_HOME/bin/m2.conf"}
 
 # For Cygwin and MinGW, ensure paths are in Unix format before anything is touched
 if $cygwin || $mingw ; then
