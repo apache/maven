@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng2098VersionRangeSatisfiedFromWrongRepoTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2098VersionRangeSatisfiedFromWrongRepoTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Test that the selected version from a version range can be successfully resolved even if the repository
      * with the newest metadata does not provide the selected version. In particular, the repository with the

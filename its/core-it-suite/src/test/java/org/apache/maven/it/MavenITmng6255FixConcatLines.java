@@ -31,11 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-6255">MNG-6255</a>:
  * Check that the <code>.mvn/jvm.config</code> file contents are concatenated properly, no matter
  * what line endings are used.
+ * @since 3.5.3
+ *
  */
 class MavenITmng6255FixConcatLines extends AbstractMavenIntegrationTestCase {
-    MavenITmng6255FixConcatLines() {
-        super("[3.5.3,)");
-    }
 
     /**
      * Check that <code>CR</code> line endings work.

@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  */
 public class MavenITmng2605BogusProfileActivationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2605BogusProfileActivationTest() {
-        super("(2.0.10,2.1.0-M1),(2.1.0-M1,3.0-alpha-1),(3.0-alpha-1,)");
-    }
-
     /**
      * Test that profiles are not accidentally activated when they have no activation element at all and
      * the user did not request their activation via id.

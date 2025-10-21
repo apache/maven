@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4765LocalPomProjectBuilderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4765LocalPomProjectBuilderTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-beta-3,)");
-    }
-
     /**
      * Test that the 2.x project builder can be invoked directly by plugins and can access the session state.
      *

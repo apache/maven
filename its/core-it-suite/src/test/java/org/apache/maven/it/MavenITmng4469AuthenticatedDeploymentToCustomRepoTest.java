@@ -55,10 +55,6 @@ public class MavenITmng4469AuthenticatedDeploymentToCustomRepoTest extends Abstr
 
     private volatile boolean deployed;
 
-    public MavenITmng4469AuthenticatedDeploymentToCustomRepoTest() {
-        super("[2.0.3,3.0-alpha-3),[3.0-alpha-6,)");
-    }
-
     @BeforeEach
     protected void setUp() throws Exception {
         Handler repoHandler = new AbstractHandler() {

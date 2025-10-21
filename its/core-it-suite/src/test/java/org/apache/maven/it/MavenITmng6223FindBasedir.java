@@ -31,9 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @see MavenITmng5889FindBasedir
  */
 public class MavenITmng6223FindBasedir extends AbstractMavenIntegrationTestCase {
-    public MavenITmng6223FindBasedir() {
-        super("[3.5.1,)");
-    }
 
     /**
      * check that <code>path/to/.mvn/</code> is found when path to POM set by <code>--file path/to/dir</code>

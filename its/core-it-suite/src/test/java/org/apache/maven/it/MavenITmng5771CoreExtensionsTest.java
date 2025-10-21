@@ -29,9 +29,6 @@ import org.junit.jupiter.api.Test;
  * are available to regular plugins.
  */
 public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng5771CoreExtensionsTest() {
-        super("(3.2.5,)");
-    }
 
     @Test
     public void testCoreExtension() throws Exception {
@@ -73,7 +70,7 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
     //
     @Test
     public void testCoreExtensionRetrievedFromAMirrorWithBasicAuthentication() throws Exception {
-        requiresMavenVersion("[3.3.2,)");
+        // requiresMavenVersion("[3.3.2,)");
 
         File testDir = extractResources("/mng-5771-core-extensions");
 
@@ -88,12 +85,7 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         Map<String, String> properties = verifier.newDefaultFilterMap();
         properties.put("@port@", Integer.toString(server.port()));
-        String mirrorOf;
-        if (matchesVersionRange("[4.0.0-alpha-1,)")) {
-            mirrorOf = "*";
-        } else {
-            mirrorOf = "external:*";
-        }
+        String mirrorOf = "*";
         properties.put("@mirrorOf@", mirrorOf);
         verifier.filterFile("settings-template-mirror-auth.xml", "settings.xml", properties);
 
@@ -114,7 +106,7 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
     //
     @Test
     public void testCoreExtensionWithProperties() throws Exception {
-        requiresMavenVersion("[3.8.5,)");
+        // requiresMavenVersion("[3.8.5,)");
 
         File testDir = extractResources("/mng-5771-core-extensions");
 
@@ -137,7 +129,7 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
     //
     @Test
     public void testCoreExtensionWithConfig() throws Exception {
-        requiresMavenVersion("[3.8.5,)");
+        // requiresMavenVersion("[3.8.5,)");
 
         File testDir = extractResources("/mng-5771-core-extensions");
 

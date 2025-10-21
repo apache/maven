@@ -31,9 +31,6 @@ import org.junit.jupiter.api.Test;
  */
 @Disabled
 public class MavenITmng0612NewestConflictResolverTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng0612NewestConflictResolverTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test that ensures the newest-wins conflict resolver is used.

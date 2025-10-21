@@ -27,10 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MavenITmng6127PluginExecutionConfigurationInterferenceTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng6127PluginExecutionConfigurationInterferenceTest() {
-        super("[3.5.1,)");
-    }
-
     @Test
     public void testCustomMojoExecutionConfigurator() throws Exception {
         File testDir = extractResources("/mng-6127-plugin-execution-configuration-interference");

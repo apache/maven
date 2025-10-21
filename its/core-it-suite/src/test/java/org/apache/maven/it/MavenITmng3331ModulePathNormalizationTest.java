@@ -29,9 +29,6 @@ import org.junit.jupiter.api.Test;
  *
  */
 public class MavenITmng3331ModulePathNormalizationTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng3331ModulePathNormalizationTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     @Test
     public void testitMNG3331a() throws Exception {

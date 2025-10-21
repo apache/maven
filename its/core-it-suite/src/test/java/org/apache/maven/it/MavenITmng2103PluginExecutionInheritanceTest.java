@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng2103PluginExecutionInheritanceTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2103PluginExecutionInheritanceTest() {
-        super("[3.0-beta-1,)");
-    }
-
     /**
      * Verify that the plugin-level inherited flag can be overridden by the execution-level flag.
      *

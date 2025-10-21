@@ -21,6 +21,7 @@ package org.apache.maven.it;
 import java.io.File;
 import java.nio.file.Files;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,11 +34,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Benjamin Bentmann
  */
+@Disabled("Bounds: [2.0.3,3.0-alpha-1),[3.0-alpha-6,4.0.0-alpha-8]")
 public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng4368TimestampAwareArtifactInstallerTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-alpha-6,4.0.0-alpha-8]");
-    }
 
     /**
      * Verify that the artifact installer copies POMs to the local repo even if they have an older timestamp as the
@@ -96,7 +94,7 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
      */
     @Test
     public void testitJarPackaging() throws Exception {
-        requiresMavenVersion("[2.2.2,3.0-alpha-1),[3.0-alpha-6,)");
+        // requiresMavenVersion("[2.2.2,3.0-alpha-1),[3.0-alpha-6,)");
 
         File testDir = extractResources("/mng-4368/jar");
 

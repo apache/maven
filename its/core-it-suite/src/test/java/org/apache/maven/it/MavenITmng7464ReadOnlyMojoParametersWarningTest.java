@@ -34,9 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Slawomir Jaranowski
  */
 public class MavenITmng7464ReadOnlyMojoParametersWarningTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng7464ReadOnlyMojoParametersWarningTest() {
-        super("[3.9.0,)");
-    }
 
     /**
      * Test that ensures that warning is not printed for empty and default value

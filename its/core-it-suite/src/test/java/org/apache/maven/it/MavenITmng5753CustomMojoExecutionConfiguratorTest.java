@@ -27,10 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MavenITmng5753CustomMojoExecutionConfiguratorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5753CustomMojoExecutionConfiguratorTest() {
-        super("[3.3.0-alpha,)");
-    }
-
     @Test
     public void testCustomMojoExecutionConfigurator() throws Exception {
         File testDir = extractResources("/mng-5753-custom-mojo-execution-configurator");

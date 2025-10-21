@@ -23,9 +23,6 @@ import java.io.File;
 import org.junit.jupiter.api.Test;
 
 public class MavenIT0030DepPomDepMgmtInheritanceTest extends AbstractMavenIntegrationTestCase {
-    public MavenIT0030DepPomDepMgmtInheritanceTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test for injection of dependencyManagement through parents of

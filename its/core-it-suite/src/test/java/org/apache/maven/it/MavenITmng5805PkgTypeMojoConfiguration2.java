@@ -24,10 +24,6 @@ import org.junit.jupiter.api.Test;
 
 public class MavenITmng5805PkgTypeMojoConfiguration2 extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5805PkgTypeMojoConfiguration2() {
-        super("(3.3.3,)");
-    }
-
     @Test
     public void testPkgTypeMojoConfiguration() throws Exception {
         File testDir = extractResources("/mng-5805-pkg-type-mojo-configuration2");

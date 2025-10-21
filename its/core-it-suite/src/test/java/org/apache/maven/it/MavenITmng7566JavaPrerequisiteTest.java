@@ -26,12 +26,10 @@ import org.junit.jupiter.api.Test;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-7566">MNG-7566</a>.
  * Similar to {@link MavenITmng4840MavenPrerequisiteTest}.
  *
+ * @since 4.0.0-alpha-3
+ *
  */
 class MavenITmng7566JavaPrerequisiteTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng7566JavaPrerequisiteTest() {
-        super("[4.0.0-alpha-3,)");
-    }
 
     /**
      * Verify that builds fail straight when the current Java version doesn't match a plugin's prerequisite.

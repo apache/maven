@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng3701ImplicitProfileIdTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3701ImplicitProfileIdTest() {
-        super("[2.0.11,)");
-    }
-
     /**
      * Verify that profiles without explicit id get a default id and in particular don't cause NPEs when
      * they are active by default.

@@ -39,10 +39,6 @@ public class MavenITmng6754TimestampInMultimoduleProject extends AbstractMavenIn
     private static final String RESOURCE_PATH = "/mng-6754-version-timestamp-in-multimodule-build";
     private static final String VERSION = "1.0-SNAPSHOT";
 
-    public MavenITmng6754TimestampInMultimoduleProject() {
-        super("[3.8.2,)");
-    }
-
     @Test
     @SuppressWarnings("checkstyle:MethodLength")
     public void testArtifactsHaveSameTimestamp() throws Exception {

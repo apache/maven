@@ -32,9 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  */
 public class MavenITmng0680ParentBasedirTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng0680ParentBasedirTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test that the basedir of the parent is set correctly.

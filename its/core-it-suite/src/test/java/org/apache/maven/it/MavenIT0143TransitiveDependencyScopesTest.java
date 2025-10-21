@@ -38,10 +38,6 @@ public class MavenIT0143TransitiveDependencyScopesTest extends AbstractMavenInte
      * NOTE: Class path ordering is another issue (MNG-1412), so we merely check set containment here.
      */
 
-    public MavenIT0143TransitiveDependencyScopesTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that the different scopes of transitive dependencies end up on the right class paths when mediated from
      * a compile-scope dependency.

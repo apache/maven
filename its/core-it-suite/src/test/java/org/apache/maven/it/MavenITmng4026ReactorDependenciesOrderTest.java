@@ -35,7 +35,7 @@ public class MavenITmng4026ReactorDependenciesOrderTest extends AbstractMavenInt
 
     public MavenITmng4026ReactorDependenciesOrderTest() {
         // This feature depends on MNG-1412
-        super("(2.0.8,)");
+        super();
     }
 
     /**

@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4919LifecycleMappingWithSameGoalTwiceTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4919LifecycleMappingWithSameGoalTwiceTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0.2,)");
-    }
-
     /**
      * Verify that lifecycle mappings can bind a goal twice, say in different phases.
      *

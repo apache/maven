@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4102InheritedPropertyInterpolationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4102InheritedPropertyInterpolationTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that the effective value of an inherited property reflects the values of any nested property
      * as defined by the child. This boils down to the order of inheritance and (parent) interpolation.

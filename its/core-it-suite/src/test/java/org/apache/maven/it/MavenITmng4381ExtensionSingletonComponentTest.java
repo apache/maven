@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4381ExtensionSingletonComponentTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4381ExtensionSingletonComponentTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Test that extension plugins can contribute non-core components that can be accessed by other plugins in the same
      * project and in projects with the same extension.

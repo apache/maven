@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng3906MergedPluginClassPathOrderingTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3906MergedPluginClassPathOrderingTest() {
-        super("(2.0.10,2.1.0-M1),(2.1.0-M1,)");
-    }
-
     /**
      * Test that project-level plugin dependencies are properly merged during inheritance.
      *

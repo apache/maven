@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
 public class MavenITmng4586PluginPrefixResolutionFromVersionlessPluginMgmtTest
         extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4586PluginPrefixResolutionFromVersionlessPluginMgmtTest() {
-        super("[3.0-beta-1,)");
-    }
-
     /**
      * Verify that plugin prefixes can be resolved from the POM's plugin management even if the POM
      * does not specify the plugin version.

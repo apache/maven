@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng5137ReactorResolutionInForkedBuildTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5137ReactorResolutionInForkedBuildTest() {
-        super("[3.0.4,)");
-    }
-
     /**
      * Verify that reactor resolution also works within a forked multi-module lifecycle, i.e. a lifecycle fork caused
      * by an aggregator mojo. Here, reactor resolution needs to search the forked project instances for build output,

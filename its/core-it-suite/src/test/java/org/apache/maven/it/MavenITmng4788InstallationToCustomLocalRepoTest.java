@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4788InstallationToCustomLocalRepoTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4788InstallationToCustomLocalRepoTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-beta-4,)");
-    }
-
     /**
      * Verify that plugins can install artifacts to a custom local repo (i.e. custom base dir and custom layout).
      *

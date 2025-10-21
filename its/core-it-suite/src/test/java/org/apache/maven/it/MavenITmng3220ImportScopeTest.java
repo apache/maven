@@ -31,9 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  */
 public class MavenITmng3220ImportScopeTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng3220ImportScopeTest() {
-        super("(2.0.8,3.0-alpha-1),[3.0-alpha-3,)");
-    }
 
     @Test
     public void testitMNG3220a() throws Exception {

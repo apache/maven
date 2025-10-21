@@ -26,9 +26,6 @@ import org.junit.jupiter.api.Test;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2130">MNG-2130</a>.
  */
 public class MavenITmng2130ParentLookupFromReactorCacheTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng2130ParentLookupFromReactorCacheTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test that parent-POMs cached during a build are available as parents

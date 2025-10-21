@@ -30,13 +30,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3092">MNG-3092</a>.
  *
  * @author Benjamin Bentmann
+ * @since 3.0-beta-1
  */
 @Disabled("not fixed yet")
 public class MavenITmng3092SnapshotsExcludedFromVersionRangeTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng3092SnapshotsExcludedFromVersionRangeTest() {
-        super("[3.0-beta-1,)");
-    }
 
     /**
      * Verify that snapshots are not included in version ranges unless explicitly declared as the lower/upper bound

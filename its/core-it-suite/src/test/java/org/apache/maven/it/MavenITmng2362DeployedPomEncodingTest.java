@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng2362DeployedPomEncodingTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2362DeployedPomEncodingTest() {
-        super("[2.0.5,)");
-    }
-
     /**
      * Verify that installed/deployed POMs retain their original file encoding and don't get messed up by some
      * transformation that erroneously uses the platform's default encoding for reading/writing them.

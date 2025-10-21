@@ -29,9 +29,6 @@ import org.junit.jupiter.api.Test;
  *
  */
 public class MavenIT0041ArtifactTypeFromPluginExtensionTest extends AbstractMavenIntegrationTestCase {
-    public MavenIT0041ArtifactTypeFromPluginExtensionTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test the use of a new type from a plugin

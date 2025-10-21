@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4208InterpolationPrefersCliOverProjectPropsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4208InterpolationPrefersCliOverProjectPropsTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that exclusions defined on a dependency apply to its transitive dependencies as well.
      *

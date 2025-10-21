@@ -27,10 +27,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng7529VersionRangeRepositorySelection extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng7529VersionRangeRepositorySelection() {
-        super("(3.8.6,)");
-    }
-
     /**
      * Test dependency resolution from a version range using multiple remote repositories
      * with snapshot or release enabled.

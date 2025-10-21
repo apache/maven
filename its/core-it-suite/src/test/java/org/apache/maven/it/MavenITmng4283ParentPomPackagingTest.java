@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4283ParentPomPackagingTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4283ParentPomPackagingTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that the model builder fails when a parent POM has not "pom" packaging.
      *

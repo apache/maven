@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4387QuietLoggingTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4387QuietLoggingTest() {
-        super("[2.0.5,)");
-    }
-
     /**
      * Test that the CLI flag -q enables quiet logging, i.e. suppresses log levels below ERROR.
      *

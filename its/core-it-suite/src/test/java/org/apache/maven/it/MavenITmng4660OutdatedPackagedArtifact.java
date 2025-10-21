@@ -40,9 +40,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Martin Kanters
  */
 public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegrationTestCase {
-    public MavenITmng4660OutdatedPackagedArtifact() {
-        super("[4.0.0-alpha-1,)");
-    }
 
     /**
      * Test that Maven logs a warning when a packaged artifact is found that is older than the outputDirectory of the

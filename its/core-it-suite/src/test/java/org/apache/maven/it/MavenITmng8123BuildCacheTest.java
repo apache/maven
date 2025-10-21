@@ -23,9 +23,6 @@ import java.io.File;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng8123BuildCacheTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng8123BuildCacheTest() {
-        super("[3,)");
-    }
 
     @Test
     public void testBuildCacheExtension() throws Exception {

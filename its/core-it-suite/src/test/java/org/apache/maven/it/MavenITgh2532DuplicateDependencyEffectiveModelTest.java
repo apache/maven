@@ -33,12 +33,10 @@ import org.junit.jupiter.api.Test;
  * <p>
  * The fix moves the deduplication step to after interpolation, ensuring that dependencies with
  * property placeholders are properly deduplicated after their values are resolved.
+ * @since 4.0.0-rc-3
+ *
  */
 class MavenITgh2532DuplicateDependencyEffectiveModelTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITgh2532DuplicateDependencyEffectiveModelTest() {
-        super("[4.0.0-rc-3,)");
-    }
 
     /**
      * Tests that a project with dependencies using property placeholders in artifact coordinates

@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3955EffectiveSettingsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3955EffectiveSettingsTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that plugin parameter expressions referring to the settings reflect the actual core state, especially
      * if settings have been overridden by CLI parameters.

@@ -27,10 +27,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng5445LegacyStringSearchModelInterpolatorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5445LegacyStringSearchModelInterpolatorTest() {
-        super("[3.1,)");
-    }
-
     /**
      * Verify that the legacy StringSearchModelInterpolator has its PathTranslator injected.
      *

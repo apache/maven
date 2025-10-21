@@ -30,10 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng6558ToolchainsBuildingEventTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng6558ToolchainsBuildingEventTest() {
-        super("[3.6.1,)");
-    }
-
     /**
      * Verify that <code>ToolchainsBuildingRequest</code> and <code>ToolchainsBuildingResult</code> events are sent to event spy.
      *
@@ -58,15 +54,10 @@ public class MavenITmng6558ToolchainsBuildingEventTest extends AbstractMavenInte
         assertTrue(lines.get(lines.size() - 1).startsWith("close"), lines.toString());
         assertTrue(
                 lines.contains(
-                        matchesVersionRange("[4.0.0-beta-5,)")
-                                ? "event: org.apache.maven.api.services.ToolchainsBuilderRequest$ToolchainsBuilderRequestBuilder$DefaultToolchainsBuilderRequest"
-                                : "event: org.apache.maven.toolchain.building.DefaultToolchainsBuildingRequest"),
+                        "event: org.apache.maven.api.services.ToolchainsBuilderRequest$ToolchainsBuilderRequestBuilder$DefaultToolchainsBuilderRequest"),
                 lines.toString());
         assertTrue(
-                lines.contains(
-                        matchesVersionRange("[4.0.0-beta-5,)")
-                                ? "event: org.apache.maven.impl.DefaultToolchainsBuilder$DefaultToolchainsBuilderResult"
-                                : "event: org.apache.maven.toolchain.building.DefaultToolchainsBuildingResult"),
+                lines.contains("event: org.apache.maven.impl.DefaultToolchainsBuilder$DefaultToolchainsBuilderResult"),
                 lines.toString());
     }
 }

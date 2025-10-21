@@ -32,10 +32,6 @@ import org.junit.jupiter.api.Test;
 @Disabled("MNG-7255 provides the default groupId from the parent")
 public class MavenITmng3863AutoPluginGroupIdTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3863AutoPluginGroupIdTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that the group id "org.apache.maven.plugins" is *not* automatically assumed for dependencies.
      *

@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -31,7 +30,7 @@ class MavenITmng7228LeakyModelTest extends AbstractMavenIntegrationTestCase {
 
     protected MavenITmng7228LeakyModelTest() {
         // broken: 4.0.0-alpha-3 - 4.0.0-alpha-6
-        super("[,4.0.0-alpha-3),(4.0.0-alpha-6,]");
+        super();
     }
 
     @Test
@@ -52,10 +51,7 @@ class MavenITmng7228LeakyModelTest extends AbstractMavenIntegrationTestCase {
 
         verifier.verifyErrorFreeLog();
 
-        String classifier = null;
-        if (getMavenVersion().compareTo(new DefaultArtifactVersion("4.0.0-alpha-7")) > 0) {
-            classifier = "build";
-        }
+        String classifier = "build";
         String pom = FileUtils.readFileToString(new File(
                 verifier.getArtifactPath("org.apache.maven.its.mng7228", "test", "1.0.0-SNAPSHOT", "pom", classifier)));
 

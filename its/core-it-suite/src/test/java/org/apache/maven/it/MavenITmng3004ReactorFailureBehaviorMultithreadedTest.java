@@ -29,9 +29,6 @@ import org.junit.jupiter.api.Test;
  *
  */
 public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng3004ReactorFailureBehaviorMultithreadedTest() {
-        super("(3.0-alpha-3,)");
-    }
 
     /**
      * Test fail-fast reactor behavior. Forces an exception to be thrown in

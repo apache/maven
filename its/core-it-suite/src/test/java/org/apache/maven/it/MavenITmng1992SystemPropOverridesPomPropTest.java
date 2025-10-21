@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng1992SystemPropOverridesPomPropTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng1992SystemPropOverridesPomPropTest() {
-        super("(2.1.0-M1,)");
-    }
-
     /**
      * Test that system/execution properties take precedence over the POM's properties section when configuring a
      * plugin parameter that is annotated with @parameter expression="prop". Note that this issue is not about POM

@@ -64,10 +64,6 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest extends AbstractMa
 
     private final Deque<DeployedResource> deployedResources = new ConcurrentLinkedDeque<>();
 
-    public MavenITmng4470AuthenticatedDeploymentToProxyTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-alpha-6,)");
-    }
-
     @BeforeEach
     protected void setUp() throws Exception {
         Handler proxyHandler = new AbstractHandler() {

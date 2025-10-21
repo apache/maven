@@ -35,10 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4750ResolvedMavenProjectDependencyArtifactsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4750ResolvedMavenProjectDependencyArtifactsTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0,)");
-    }
-
     /**
      * Verify that MavenProject.getDependencyArtifacts() returns resolved artifacts (once dependency resolution
      * was requested).

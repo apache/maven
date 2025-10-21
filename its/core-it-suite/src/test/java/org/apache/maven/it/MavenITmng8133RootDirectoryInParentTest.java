@@ -23,9 +23,6 @@ import java.io.File;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng8133RootDirectoryInParentTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng8133RootDirectoryInParentTest() {
-        super("[4.0.0-beta-5,)");
-    }
 
     @Test
     public void testRootDirectoryInParent() throws Exception {

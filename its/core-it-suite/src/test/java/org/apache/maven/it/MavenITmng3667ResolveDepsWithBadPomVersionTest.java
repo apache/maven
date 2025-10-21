@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng3667ResolveDepsWithBadPomVersionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3667ResolveDepsWithBadPomVersionTest() {
-        super("[2.0.3,)");
-    }
-
     /**
      * Verify that dependency resolution gracefully ignores dependency POMs that have coordinates which don't
      * match the deployed artifact.

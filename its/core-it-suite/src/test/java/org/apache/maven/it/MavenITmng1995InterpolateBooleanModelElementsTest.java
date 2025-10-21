@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng1995InterpolateBooleanModelElementsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng1995InterpolateBooleanModelElementsTest() {
-        super("[3.0-alpha-1,)");
-    }
-
     /**
      * Verify that POM fields that are of type boolean can be interpolated with expressions.
      *

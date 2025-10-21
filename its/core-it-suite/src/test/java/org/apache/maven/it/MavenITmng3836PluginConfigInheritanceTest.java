@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3836PluginConfigInheritanceTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3836PluginConfigInheritanceTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that submodules can *override* inherited plugin configuration.
      *

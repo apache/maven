@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng3807PluginConfigExpressionEvaluationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3807PluginConfigExpressionEvaluationTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Verify that plugin configurations are subject to the parameter expression evaluator, in particular composite
      * parameter types.

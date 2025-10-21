@@ -24,10 +24,6 @@ import org.junit.jupiter.api.Test;
 
 public class MavenITmng5958LifecyclePhaseBinaryCompat extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5958LifecyclePhaseBinaryCompat() {
-        super("(3.3.9,)");
-    }
-
     @Test
     public void testGood() throws Exception {
         File testDir = extractResources("/mng-5958-lifecycle-phases");

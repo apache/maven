@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4319PluginExecutionGoalInterpolationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4319PluginExecutionGoalInterpolationTest() {
-        super("[2.0,2.1.0),[2.2.2,)");
-    }
-
     /**
      * Test that goals in plugin executions can be interpolated.
      *

@@ -27,12 +27,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  *
+ * @since 2.0.7
+ *
  */
 public class MavenITmng2277AggregatorAndResolutionPluginsTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng2277AggregatorAndResolutionPluginsTest() {
-        super("(2.0.7,)"); // 2.0.8+
-    }
 
     @Test
     public void testitMNG2277() throws Exception {

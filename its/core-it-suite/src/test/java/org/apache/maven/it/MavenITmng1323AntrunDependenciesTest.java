@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  */
 public class MavenITmng1323AntrunDependenciesTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng1323AntrunDependenciesTest() {
-        super("[3.0-alpha-1,)");
-    }
-
     /**
      * Verify that project-level plugin dependencies actually apply to the current project only and not the entire
      * reactor.

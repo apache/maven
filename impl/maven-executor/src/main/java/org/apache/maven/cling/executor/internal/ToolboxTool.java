@@ -159,9 +159,11 @@ public class ToolboxTool implements ExecutorTool {
             result = result.replace("\n", "").replace("\r", "");
         }
         // sanity checks: stderr has any OR result is empty string (no method should emit empty string)
-        if (stderr.size() > 0 || result.trim().isEmpty()) {
-            System.err.println(
-                    "Unexpected stdout[" + stdout.size() + "]=" + stdout + "; stderr[" + stderr.size() + "]=" + stderr);
+        if (result.trim().isEmpty()) {
+            // see bug https://github.com/apache/maven/pull/11303 Fail in this case
+            // tl;dr We NEVER expect empty string as output from this tool; so fail here instead to chase ghosts
+            throw new IllegalStateException("Empty output from Toolbox; stdout[" + stdout.size() + "]=" + stdout
+                    + "; stderr[" + stderr.size() + "]=" + stderr);
         }
         return result;
     }

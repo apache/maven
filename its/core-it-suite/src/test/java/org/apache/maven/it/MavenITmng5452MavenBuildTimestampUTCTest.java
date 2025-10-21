@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng5452MavenBuildTimestampUTCTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5452MavenBuildTimestampUTCTest() {
-        super("[3.2.2,)");
-    }
-
     @Test
     public void testMavenBuildTimestampIsUsingUTC() throws Exception {
         File testDir = extractResources("/mng-5452-maven-build-timestamp-utc");

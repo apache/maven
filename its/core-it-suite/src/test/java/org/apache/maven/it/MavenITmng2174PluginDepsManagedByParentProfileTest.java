@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 public class MavenITmng2174PluginDepsManagedByParentProfileTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2174PluginDepsManagedByParentProfileTest() {
-        super("[2.0.9,3.0-alpha-1),[3.0-alpha-3,)");
-    }
-
     /**
      * Verify that plugin dependencies defined by plugin management of a parent profile are not lost when the
      * parent's main plugin management section is also present.

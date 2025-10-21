@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 public class MavenITmng2693SitePluginRealmTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2693SitePluginRealmTest() {
-        super("(2.0.2,)");
-    }
-
     /**
      * Verify that a plugin class/resource can be loaded from the plugin realm, also during the site lifecycle.
      *

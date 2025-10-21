@@ -26,9 +26,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MavenIT0011DefaultVersionByDependencyManagementTest extends AbstractMavenIntegrationTestCase {
-    public MavenIT0011DefaultVersionByDependencyManagementTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test specification of dependency versions via &lt;dependencyManagement/&gt;.

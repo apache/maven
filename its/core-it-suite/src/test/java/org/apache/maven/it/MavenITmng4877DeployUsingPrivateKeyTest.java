@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4877DeployUsingPrivateKeyTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4877DeployUsingPrivateKeyTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0.1,)");
-    }
-
     /**
      * Verify that configured private key and passphrase are used for (SSH) deployment.
      *

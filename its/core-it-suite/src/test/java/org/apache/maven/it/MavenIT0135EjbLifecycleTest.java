@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenIT0135EjbLifecycleTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenIT0135EjbLifecycleTest() {
-        super("[2.0.0,)");
-    }
-
     /**
      * Test default binding of goals for "ejb" lifecycle.
      *

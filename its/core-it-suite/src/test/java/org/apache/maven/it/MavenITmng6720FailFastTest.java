@@ -31,12 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * <a href="https://issues.apache.org/jira/browse/MNG-6720">MNG-6720</a>.
  *
+ * @since 3.6.2
+ *
  */
 class MavenITmng6720FailFastTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng6720FailFastTest() {
-        super("[3.6.2,)");
-    }
 
     @Test
     void testItShouldWaitForConcurrentModulesToFinish() throws Exception {

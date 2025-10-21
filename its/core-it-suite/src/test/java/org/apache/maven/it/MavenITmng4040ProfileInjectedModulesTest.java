@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4040ProfileInjectedModulesTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4040ProfileInjectedModulesTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that modules inside profiles are not accidentally inherited by the children.
      *

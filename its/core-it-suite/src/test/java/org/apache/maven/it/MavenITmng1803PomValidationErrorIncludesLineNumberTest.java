@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -32,10 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Benjamin Bentmann
  */
 public class MavenITmng1803PomValidationErrorIncludesLineNumberTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng1803PomValidationErrorIncludesLineNumberTest() {
-        super("[3.0-beta-2,)");
-    }
 
     /**
      * Verify that POM errors indicate the line and column number in the input file.
@@ -60,12 +55,7 @@ public class MavenITmng1803PomValidationErrorIncludesLineNumberTest extends Abst
         List<String> lines = verifier.loadLogLines();
         for (String line : lines) {
             if (line.contains(":bad/id:")) {
-                String location;
-                if (getMavenVersion().compareTo(new DefaultArtifactVersion("4.0.0-alpha-8-SNAPSHOT")) >= 0) {
-                    location = "line 34, column 7";
-                } else {
-                    location = "line 34, column 19";
-                }
+                String location = "line 34, column 7";
                 assertTrue(line.indexOf(location) > 0, "Position not found in: " + line);
                 foundError = true;
                 break;

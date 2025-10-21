@@ -26,12 +26,10 @@ import org.junit.jupiter.api.Test;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3099">MNG-3099</a>.
  *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
+ * @since 2.0.8
+ *
  */
 public class MavenITmng3099SettingsProfilesWithNoPomTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng3099SettingsProfilesWithNoPomTest() {
-        super("(2.0.8,)"); // 2.0.9+
-    }
 
     /**
      * Verify that (active) profiles from the settings are effective even if no POM is in use (e.g. archetype:create).

@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4795DepResolutionInReactorProjectForkedByLifecycleTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4795DepResolutionInReactorProjectForkedByLifecycleTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-beta-4,)");
-    }
-
     /**
      * Test that reactor projects forked by an aggregator mojo bound to a lifecycle phase are subject to dependency
      * resolution as required by their respective build plugins.

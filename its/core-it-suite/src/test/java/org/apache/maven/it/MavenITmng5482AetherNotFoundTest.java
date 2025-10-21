@@ -38,10 +38,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng5482AetherNotFoundTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5482AetherNotFoundTest() {
-        super("[3.1-A,)");
-    }
-
     @Test
     public void testPluginDependency() throws IOException, VerificationException {
         check("plugin-dependency");

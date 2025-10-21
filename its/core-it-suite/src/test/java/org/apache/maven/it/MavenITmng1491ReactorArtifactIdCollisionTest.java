@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng1491ReactorArtifactIdCollisionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng1491ReactorArtifactIdCollisionTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     @Test
     public void testitMNG1491() throws Exception {
         File testDir = extractResources("/mng-1491");

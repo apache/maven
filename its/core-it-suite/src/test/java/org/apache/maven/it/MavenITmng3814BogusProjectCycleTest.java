@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng3814BogusProjectCycleTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3814BogusProjectCycleTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Verify that the reactor's project sorter considers artifact versions when checking for cycles.
      *

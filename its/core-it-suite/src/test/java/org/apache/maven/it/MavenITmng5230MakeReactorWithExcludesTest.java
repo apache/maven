@@ -28,10 +28,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng5230MakeReactorWithExcludesTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5230MakeReactorWithExcludesTest() {
-        super("[3.2,)");
-    }
-
     private void clean(Verifier verifier) throws Exception {
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("mod-a/target");

@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4975ProfileInjectedPluginExecutionOrderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4975ProfileInjectedPluginExecutionOrderTest() {
-        super("[2.0.7,3.0-alpha-1),[3.0.3,)");
-    }
-
     /**
      * Test that plugin executions (in the same phase) are properly ordered after profile injection.
      *

@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4349RelocatedArtifactWithInvalidPomTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4349RelocatedArtifactWithInvalidPomTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that relocation to an artifact with an invalid POM fails gracefully and still uses the relocated JAR
      * (instead of the JAR for the unrelocated artifact).

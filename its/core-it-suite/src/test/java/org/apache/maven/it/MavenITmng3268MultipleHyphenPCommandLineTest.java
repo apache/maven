@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng3268MultipleHyphenPCommandLineTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3268MultipleHyphenPCommandLineTest() {
-        super("(2.0.9,)");
-    }
-
     @Test
     public void testMultipleProfileParams() throws Exception {
         File testDir = extractResources("/mng-3268");

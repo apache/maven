@@ -24,12 +24,10 @@ import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8469">MNG-8469</a>.
+ * @since 4.0.0-rc-3-SNAPSHOT
+ *
  */
 class MavenITmng8469InterpolationPrecendenceTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8469InterpolationPrecendenceTest() {
-        super("[4.0.0-rc-3-SNAPSHOT,)");
-    }
 
     /**
      *  Verify project is buildable.

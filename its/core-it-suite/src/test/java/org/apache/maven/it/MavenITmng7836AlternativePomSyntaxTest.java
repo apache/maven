@@ -33,7 +33,7 @@ class MavenITmng7836AlternativePomSyntaxTest extends AbstractMavenIntegrationTes
 
     protected MavenITmng7836AlternativePomSyntaxTest() {
         // New feature in alpha-8-SNAPSHOT
-        super("(4.0.0-alpha-7,)");
+        super();
     }
 
     @Test

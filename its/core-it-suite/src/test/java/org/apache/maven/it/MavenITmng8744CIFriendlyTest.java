@@ -33,10 +33,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng8744CIFriendlyTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng8744CIFriendlyTest() {
-        super("[4.0.0-rc-4,)");
-    }
-
     /**
      * Check that the resulting run will not fail in case
      * of defining the property via command line and

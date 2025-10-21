@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng2309ProfileInjectionOrderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2309ProfileInjectionOrderTest() {
-        super("[2.0.5,)");
-    }
-
     /**
      * Test that profiles are injected in declaration order, with the last profile being the most dominant.
      *
@@ -50,15 +46,8 @@ public class MavenITmng2309ProfileInjectionOrderTest extends AbstractMavenIntegr
         verifier.setAutoclean(false);
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
-        if (matchesVersionRange("[4.0.0-alpha-1,)")) {
-            verifier.addCliArgument(
-                    "-P" + "pom-a,pom-b,pom-e,pom-c,pom-d" + ",settings-a,settings-b,settings-e,settings-c,settings-d");
-        } else {
-            verifier.addCliArgument("-P"
-                    + "pom-a,pom-b,pom-e,pom-c,pom-d"
-                    + ",profiles-a,profiles-b,profiles-e,profiles-c,profiles-d"
-                    + ",settings-a,settings-b,settings-e,settings-c,settings-d");
-        }
+        verifier.addCliArgument(
+                "-P" + "pom-a,pom-b,pom-e,pom-c,pom-d" + ",settings-a,settings-b,settings-e,settings-c,settings-d");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -66,9 +55,5 @@ public class MavenITmng2309ProfileInjectionOrderTest extends AbstractMavenIntegr
         Properties props = verifier.loadProperties("target/pom.properties");
         assertEquals("e", props.getProperty("project.properties.pomProperty"));
         assertEquals("e", props.getProperty("project.properties.settingsProperty"));
-        if (matchesVersionRange("(,3.0-alpha-1)")) {
-            // MNG-4060, profiles.xml support dropped
-            assertEquals("e", props.getProperty("project.properties.profilesProperty"));
-        }
     }
 }

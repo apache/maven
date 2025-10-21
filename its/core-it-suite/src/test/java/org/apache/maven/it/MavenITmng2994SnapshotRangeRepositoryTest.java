@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng2994SnapshotRangeRepositoryTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2994SnapshotRangeRepositoryTest() {
-        super("[3.0-beta-1,)");
-    }
-
     /**
      * Test that snapshot repositories are checked for ranges with snapshot boundaries.
      *

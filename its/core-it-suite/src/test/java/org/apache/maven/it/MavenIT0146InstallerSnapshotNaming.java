@@ -33,6 +33,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+/**
+ * @since 2.0.2
+ */
 public class MavenIT0146InstallerSnapshotNaming extends AbstractMavenIntegrationTestCase {
     private Server server;
 
@@ -41,7 +44,7 @@ public class MavenIT0146InstallerSnapshotNaming extends AbstractMavenIntegration
     private final File testDir;
 
     public MavenIT0146InstallerSnapshotNaming() throws IOException {
-        super("(2.0.2,)");
+        super();
         testDir = extractResources("/it0146");
     }
 

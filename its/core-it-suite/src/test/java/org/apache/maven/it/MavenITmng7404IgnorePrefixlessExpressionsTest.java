@@ -27,10 +27,6 @@ import org.junit.jupiter.api.Test;
 public class MavenITmng7404IgnorePrefixlessExpressionsTest extends AbstractMavenIntegrationTestCase {
     private static final String PROJECT_PATH = "/mng-7404-ignore-prefixless-expressions";
 
-    public MavenITmng7404IgnorePrefixlessExpressionsTest() {
-        super("[4.0.0-alpha-1,)");
-    }
-
     @Test
     public void testIgnorePrefixlessExpressions() throws IOException, VerificationException {
         final File projectDir = extractResources(PROJECT_PATH);

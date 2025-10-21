@@ -36,10 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng2921ActiveAttachedArtifactsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2921ActiveAttachedArtifactsTest() {
-        super("(2.0.6,)");
-    }
-
     /**
      * Verify that attached project artifacts can be resolved from the reactor as active project artifacts for
      * consumption on other module's class paths. Note the subtle difference of this test compared to the closely

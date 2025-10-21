@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4629NoPomValidationErrorUponMissingSystemDepTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4629NoPomValidationErrorUponMissingSystemDepTest() {
-        super("[2.0.3,)");
-    }
-
     /**
      * Verify that mere POM validation does not fail upon a system-scope dependency that refers to a non-existing
      * file (the error is deferred to actual dependency resolution).

@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng5000ChildPathAwareUrlInheritanceTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5000ChildPathAwareUrlInheritanceTest() {
-        super("[2.0.11,2.0.99),[2.2.0,3.0-alpha-1),[3.0.3,)");
-    }
-
     /**
      * Verify that child path aware URL adjustment still works when the child's artifactId doesn't match the name
      * of its base directory as given in the parent's module section.

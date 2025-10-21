@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 public class MavenITmng4474PerLookupWagonInstantiationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4474PerLookupWagonInstantiationTest() {
-        super("[2.0.5,3.0-alpha-1),[3.0-alpha-6,)");
-    }
-
     /**
      * Verify that the wagon manager does not erroneously cache/reuse wagon instances that use per-lookup instantiation.
      *

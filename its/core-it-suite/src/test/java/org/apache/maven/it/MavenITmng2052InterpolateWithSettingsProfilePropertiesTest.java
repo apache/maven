@@ -28,9 +28,6 @@ import org.junit.jupiter.api.Test;
  *
  */
 public class MavenITmng2052InterpolateWithSettingsProfilePropertiesTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng2052InterpolateWithSettingsProfilePropertiesTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test that properties defined in an active profile in the user's

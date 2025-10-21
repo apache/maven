@@ -24,12 +24,10 @@ import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8379">MNG-8379</a>.
+ * @since 4.0.0-beta-6
+ *
  */
 class MavenITmng8379SettingsDecryptTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8379SettingsDecryptTest() {
-        super("[4.0.0-beta-6,)");
-    }
 
     /**
      *  Verify that all settings are decrypted

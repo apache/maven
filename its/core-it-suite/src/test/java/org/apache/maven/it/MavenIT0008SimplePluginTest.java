@@ -24,10 +24,6 @@ import org.junit.jupiter.api.Test;
 
 public class MavenIT0008SimplePluginTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenIT0008SimplePluginTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Simple goal decoration where a plugin binds to a phase and the plugin must
      * be downloaded from a remote repository before it can be executed. This

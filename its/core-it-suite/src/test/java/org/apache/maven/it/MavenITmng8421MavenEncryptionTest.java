@@ -24,12 +24,10 @@ import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8421">MNG-8421</a>.
+ * @since 4.0.0-rc-2-SNAPSHOT
+ *
  */
 class MavenITmng8421MavenEncryptionTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8421MavenEncryptionTest() {
-        super("[4.0.0-rc-2-SNAPSHOT,)");
-    }
 
     /**
      *  Verify that empty home causes diag output as expected.

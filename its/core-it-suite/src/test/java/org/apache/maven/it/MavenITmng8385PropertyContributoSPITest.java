@@ -24,12 +24,10 @@ import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8385">MNG-8385</a>.
+ * @since 4.0.0-beta-6
+ *
  */
 class MavenITmng8385PropertyContributoSPITest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8385PropertyContributoSPITest() {
-        super("[4.0.0-beta-6,)");
-    }
 
     /**
      *  Verify that PropertyContributorSPI is used and does it's job

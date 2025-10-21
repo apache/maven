@@ -23,9 +23,6 @@ import java.io.File;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng5591WorkspaceReader extends AbstractMavenIntegrationTestCase {
-    public MavenITmng5591WorkspaceReader() {
-        super("[3.1.0,)");
-    }
 
     @Test
     public void testWorkspaceReader() throws Exception {

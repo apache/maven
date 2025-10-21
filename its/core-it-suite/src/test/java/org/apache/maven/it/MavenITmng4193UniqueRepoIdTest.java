@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4193UniqueRepoIdTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4193UniqueRepoIdTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Test that duplicate repository id cause a validation error during building.
      *

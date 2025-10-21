@@ -36,9 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @Disabled("won't fix")
 public class MavenITmng3890TransitiveDependencyScopeUpdateTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng3890TransitiveDependencyScopeUpdateTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test that transitive dependencies whose scope has been updated from "compile" to "provided" by a consumer

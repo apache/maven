@@ -26,9 +26,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MavenIT0063SystemScopeDependencyTest extends AbstractMavenIntegrationTestCase {
-    public MavenIT0063SystemScopeDependencyTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test the use of a system scoped dependency to a (fake) tools.jar.

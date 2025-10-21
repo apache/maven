@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4016PrefixedPropertyInterpolationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4016PrefixedPropertyInterpolationTest() {
-        super("(2.1.0-M1,)");
-    }
-
     /**
      * Test that expressions with the special prefixes "project.", "pom." and "env." can be interpolated from
      * properties that include the prefix.

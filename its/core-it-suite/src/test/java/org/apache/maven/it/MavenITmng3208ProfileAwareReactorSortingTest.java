@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3208ProfileAwareReactorSortingTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3208ProfileAwareReactorSortingTest() {
-        super("[2.0.3,)");
-    }
-
     /**
      * Verify that project sorting considers dependencies injected by profiles.
      *

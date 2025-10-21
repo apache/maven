@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng3482DependencyPomInterpolationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3482DependencyPomInterpolationTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     @Test
     public void testitMNG3482() throws Exception {
         File testDir = extractResources("/mng-3482");

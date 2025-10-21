@@ -41,10 +41,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng8750NewScopesTest() {
-        super("[4.0.0,)");
-    }
-
     @BeforeEach
     void installDependencies() throws VerificationException, IOException {
         File testDir = extractResources("/mng-8750-new-scopes");

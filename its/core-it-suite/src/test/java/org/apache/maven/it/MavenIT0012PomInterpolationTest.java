@@ -23,9 +23,6 @@ import java.io.File;
 import org.junit.jupiter.api.Test;
 
 public class MavenIT0012PomInterpolationTest extends AbstractMavenIntegrationTestCase {
-    public MavenIT0012PomInterpolationTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test simple POM interpolation

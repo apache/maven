@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4320AggregatorAndDependenciesTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4320AggregatorAndDependenciesTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that for aggregator mojos invoked from the CLI that require dependency resolution the dependencies
      * of all projects in the reactor are resolved and not only the dependencies of the top-level project.

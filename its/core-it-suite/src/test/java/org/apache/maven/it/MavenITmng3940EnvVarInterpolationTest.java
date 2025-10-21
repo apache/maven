@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3940EnvVarInterpolationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3940EnvVarInterpolationTest() {
-        super("(2.0.10,2.1.0-M1),(2.1.0-M1,)");
-    }
-
     /**
      * Test that interpolation of environment variables respects the casing rules of the underlying OS (especially
      * Windows).

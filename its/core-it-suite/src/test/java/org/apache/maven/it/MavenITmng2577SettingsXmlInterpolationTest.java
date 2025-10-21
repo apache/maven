@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng2577SettingsXmlInterpolationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2577SettingsXmlInterpolationTest() {
-        super("[2.0.3,)");
-    }
-
     /**
      * Verify that the settings.xml can be interpolated using environment variables.
      *
@@ -67,7 +63,7 @@ public class MavenITmng2577SettingsXmlInterpolationTest extends AbstractMavenInt
      */
     @Test
     public void testitSystemProps() throws Exception {
-        requiresMavenVersion("[3.0-alpha-1,)");
+        // requiresMavenVersion("[3.0-alpha-1,)");
 
         File testDir = extractResources("/mng-2577");
 

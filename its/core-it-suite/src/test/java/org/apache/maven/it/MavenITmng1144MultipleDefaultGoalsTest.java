@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng1144MultipleDefaultGoalsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng1144MultipleDefaultGoalsTest() {
-        super("[3.0-alpha-7,)");
-    }
-
     /**
      * Test that multiple goals can be specified as default goal using whitespace as delimiter.
      *

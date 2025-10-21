@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4600DependencyOptionalFlagManagementTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4600DependencyOptionalFlagManagementTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-beta-1,)");
-    }
-
     /**
      * Verify that a dependency's optional flag is not subject to dependency management. This part of the test checks
      * the effective model.

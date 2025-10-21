@@ -31,9 +31,6 @@ import org.junit.jupiter.api.Test;
  */
 @Disabled
 public class MavenITmng2771PomExtensionComponentOverrideTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng2771PomExtensionComponentOverrideTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test that ensures the POM extensions can override default component implementations.

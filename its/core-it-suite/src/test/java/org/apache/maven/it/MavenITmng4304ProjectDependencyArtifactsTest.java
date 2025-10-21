@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4304ProjectDependencyArtifactsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4304ProjectDependencyArtifactsTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that MavenProject.getDependencyArtifacts() is properly populated with the direct artifacts of the
      * project.

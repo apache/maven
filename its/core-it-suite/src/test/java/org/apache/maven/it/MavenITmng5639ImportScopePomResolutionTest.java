@@ -28,10 +28,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng5639ImportScopePomResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5639ImportScopePomResolutionTest() {
-        super("[3.2.2,)");
-    }
-
     @Test
     public void testitMNG5639() throws Exception {
         File testDir = extractResources("/mng-5639-import-scope-pom-resolution");

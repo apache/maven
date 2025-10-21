@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng3821EqualPluginExecIdsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3821EqualPluginExecIdsTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that using the same id for executions/reportsets of different plugins doesn't blow up the project
      * builder.
