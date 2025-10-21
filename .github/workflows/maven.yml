@@ -32,7 +32,7 @@ concurrency:
 permissions: {}
 
 env:
-  MIMIR_VERSION: 0.10.0
+  MIMIR_VERSION: 0.10.3
   MIMIR_BASEDIR: ~/.mimir
   MIMIR_LOCAL: ~/.mimir/local
 
@@ -99,6 +99,15 @@ jobs:
           path: |
             apache-maven/target/apache-maven*.zip
             apache-maven/target/apache-maven*.tar.gz
+
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: failure() || cancelled()
+        with:
+          name: ${{ github.run_number }}-initial
+          path: |
+            **/target/surefire-reports/*
+            **/target/java_heapdump.hprof
 
   full-build:
     needs: initial-build
