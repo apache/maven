@@ -39,9 +39,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  */
 @Disabled("flaky test, see MNG-3137")
 public class MavenIT0108SnapshotUpdateTest extends AbstractMavenIntegrationTestCase {
-    public MavenIT0108SnapshotUpdateTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     private Verifier verifier;
 

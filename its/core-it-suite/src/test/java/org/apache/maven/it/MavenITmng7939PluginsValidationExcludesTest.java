@@ -30,12 +30,10 @@ import static org.apache.maven.it.Verifier.verifyTextNotInLog;
  * This is a test set for
  * <a href="https://issues.apache.org/jira/browse/MNG-7939">MNG-7939</a>.
  * Allow to exclude plugins from validation
+ * @since 4.0.0-alpha-9
+ *
  */
 class MavenITmng7939PluginsValidationExcludesTest extends AbstractMavenIntegrationTestCase {
-
-    protected MavenITmng7939PluginsValidationExcludesTest() {
-        super("[4.0.0-alpha-9,)");
-    }
 
     @Test
     void warningForPluginValidationIsPresentInProject() throws Exception {

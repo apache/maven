@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 public class MavenIT0086PluginRealmTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenIT0086PluginRealmTest() {
-        super("(2.0.2,)");
-    }
-
     /**
      * Verify that a plugin dependency class/resource can be loaded from both the plugin classloader and the
      * context classloader available to the plugin.

@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng2892HideCorePlexusUtilsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2892HideCorePlexusUtilsTest() {
-        super("(2.0.8,)");
-    }
-
     /**
      * Verify that plugins can use their own version of plexus-utils and are not bound to the version bundled in the
      * core.

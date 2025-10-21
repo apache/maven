@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4070WhitespaceTrimmingTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4070WhitespaceTrimmingTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that whitespace around artifact coordinates does not change artifact identity.
      *

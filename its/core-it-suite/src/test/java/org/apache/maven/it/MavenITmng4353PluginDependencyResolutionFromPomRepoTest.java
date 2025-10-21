@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4353PluginDependencyResolutionFromPomRepoTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4353PluginDependencyResolutionFromPomRepoTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that repos given in a plugin's POM are considered while resolving the plugin dependencies.
      *

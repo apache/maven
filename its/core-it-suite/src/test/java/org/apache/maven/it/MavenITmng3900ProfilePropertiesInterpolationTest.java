@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3900ProfilePropertiesInterpolationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3900ProfilePropertiesInterpolationTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that build properties defined via active profiles are used for interpolation.
      *

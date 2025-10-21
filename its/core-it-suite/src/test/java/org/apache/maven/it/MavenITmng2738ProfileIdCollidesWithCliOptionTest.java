@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng2738ProfileIdCollidesWithCliOptionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2738ProfileIdCollidesWithCliOptionTest() {
-        super("[2.2.0,3.0-alpha-1),[3.0,)");
-    }
-
     /**
      * Verify that the CLI parsing properly handles activation of profiles whose id happens to match a short command
      * line option.

@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4890MakeLikeReactorConsidersVersionsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4890MakeLikeReactorConsidersVersionsTest() {
-        super("[3.0,)");
-    }
-
     /**
      * Verify that the make-like reactor mode considers actual project versions when calculating the inter-module
      * dependencies and the modules which need to be build. This variant checks calculation of upstream modules.

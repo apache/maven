@@ -30,10 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng5012CollectionVsArrayParamCoercionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5012CollectionVsArrayParamCoercionTest() {
-        super("[3.0.3,)");
-    }
-
     /**
      * Verify that plugin parameters of type array/collection can be configured from expressions/defaults that
      * actually resolve to a collection/array.

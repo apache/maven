@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3846PomInheritanceUrlAdjustmentTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3846PomInheritanceUrlAdjustmentTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that inheritance of certain URLs automatically appends the child's artifact id.
      *

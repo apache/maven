@@ -29,9 +29,6 @@ import org.junit.jupiter.api.Test;
  *
  */
 public class MavenIT0038AlternatePomFileDifferentDirTest extends AbstractMavenIntegrationTestCase {
-    public MavenIT0038AlternatePomFileDifferentDirTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test building project from outside the project directory using '-f' option.

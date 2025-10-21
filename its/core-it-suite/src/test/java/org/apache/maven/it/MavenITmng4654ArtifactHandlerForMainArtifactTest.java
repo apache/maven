@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4654ArtifactHandlerForMainArtifactTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4654ArtifactHandlerForMainArtifactTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Test that the artifact handler for the project main artifact is selected via the handler's type/roleHint
      * and not via the handler's packaging (the packaging only applies to the legacy repo layout).

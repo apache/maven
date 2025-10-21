@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng0761MissingSnapshotDistRepoTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng0761MissingSnapshotDistRepoTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that a deployment of a snapshot falls back to a non-snapshot repository if no snapshot repository is
      * specified.

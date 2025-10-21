@@ -31,12 +31,10 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8400">MNG-8400</a>.
+ * @since 4.0.0-rc-1
+ *
  */
 class MavenITmng8400CanonicalMavenHomeTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8400CanonicalMavenHomeTest() {
-        super("[4.0.0-rc-1,)");
-    }
 
     /**
      *  Verify that properties are aligned (all use canonical maven home)

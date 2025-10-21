@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng3970DepResolutionFromProfileReposTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3970DepResolutionFromProfileReposTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that dependencies can be resolved from remote repositories defined by (active) profiles in the POM.
      *
@@ -41,7 +37,7 @@ public class MavenITmng3970DepResolutionFromProfileReposTest extends AbstractMav
      */
     @Test
     public void testitFromPom() throws Exception {
-        requiresMavenVersion("[2.0,3.0-alpha-1),[3.0-beta-1,)");
+        // requiresMavenVersion("[2.0,3.0-alpha-1),[3.0-beta-1,)");
 
         File testDir = extractResources("/mng-3970/test-2");
 

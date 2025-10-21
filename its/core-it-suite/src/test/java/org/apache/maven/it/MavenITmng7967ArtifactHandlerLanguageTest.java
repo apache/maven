@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class MavenITmng7967ArtifactHandlerLanguageTest extends AbstractMavenIntegrationTestCase {
 
-    protected MavenITmng7967ArtifactHandlerLanguageTest() {
-        super("(,4.0.0-alpha-9),(4.0.0-alpha-9,)");
-    }
-
     @Test
     void javadocIsExecutedAndFailed() throws Exception {
         File testDir = extractResources("/mng-7967-artifact-handler-language");

@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4874UpdateLatestPluginVersionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4874UpdateLatestPluginVersionTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0.1,)");
-    }
-
     /**
      * Verify that deployment of a plugin updates the metadata's "latest" field.
      *

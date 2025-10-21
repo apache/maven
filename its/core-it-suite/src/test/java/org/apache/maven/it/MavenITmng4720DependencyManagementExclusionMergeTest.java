@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4720DependencyManagementExclusionMergeTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4720DependencyManagementExclusionMergeTest() {
-        super("[2.0.6,)");
-    }
-
     /**
      * Verify the effective exclusions applied during transitive dependency resolution when both the regular
      * dependency section and dependency management declare exclusions for a particular dependency.
@@ -68,11 +64,7 @@ public class MavenITmng4720DependencyManagementExclusionMergeTest extends Abstra
         assertFalse(classpath.contains("b-0.1.jar"), classpath.toString());
 
         // dependency management in a excludes d
-        if (matchesVersionRange("[4.0.0-beta-5,)")) {
-            assertFalse(classpath.contains("d-0.1.jar"), classpath.toString());
-        } else {
-            assertTrue(classpath.contains("d-0.1.jar"), classpath.toString());
-        }
+        assertFalse(classpath.contains("d-0.1.jar"), classpath.toString());
     }
 
     /**

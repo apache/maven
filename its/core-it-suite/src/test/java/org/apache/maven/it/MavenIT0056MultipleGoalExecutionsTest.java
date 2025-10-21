@@ -23,9 +23,6 @@ import java.io.File;
 import org.junit.jupiter.api.Test;
 
 public class MavenIT0056MultipleGoalExecutionsTest extends AbstractMavenIntegrationTestCase {
-    public MavenIT0056MultipleGoalExecutionsTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test that multiple executions of a goal with different

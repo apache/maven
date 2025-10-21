@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4452ResolutionOfSnapshotWithClassifierTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4452ResolutionOfSnapshotWithClassifierTest() {
-        super("[3.0-beta-4,)");
-    }
-
     /**
      * Test that snapshot artifacts with classifiers can be successfully resolved from remote repos with (unique
      * snapshots) when the last deployment to that repo didn't include that particular classifier. In other words,

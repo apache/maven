@@ -35,12 +35,10 @@ import org.junit.jupiter.api.Test;
  * set of repositories present.
  *
  * @author jdcasey
+ * @since 2.0.9
+ *
  */
 public class MavenITmng3052DepRepoAggregationTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng3052DepRepoAggregationTest() {
-        super("(2.0.9,)"); // only test in 2.0.10+
-    }
 
     @Test
     public void testitMNG3052() throws Exception {

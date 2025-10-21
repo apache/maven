@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4789ScopeInheritanceMeetsConflictTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4789ScopeInheritanceMeetsConflictTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-beta-4,)");
-    }
-
     /**
      * Test that scope inheritance considers the effective scope of parent nodes as enforced by direct dependency
      * declarations.

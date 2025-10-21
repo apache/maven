@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4618AggregatorBuiltAfterModulesTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4618AggregatorBuiltAfterModulesTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-beta-1,)");
-    }
-
     /**
      * Verify that aggregator-only projects (i.e. not used as parent for inheritance) get built after their modules.
      *

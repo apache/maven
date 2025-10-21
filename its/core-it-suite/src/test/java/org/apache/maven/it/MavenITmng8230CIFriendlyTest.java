@@ -28,14 +28,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8230">MNG-8230</a>.
+ * @since 4.0.0-beta-5
+ *
  */
 class MavenITmng8230CIFriendlyTest extends AbstractMavenIntegrationTestCase {
 
     private static final String PROPERTIES = "target/expression.properties";
-
-    MavenITmng8230CIFriendlyTest() {
-        super("[4.0.0-beta-5,)");
-    }
 
     /**
      *  Verify that CI friendly version work when using project properties

@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4895PluginDepWithNonRelocatedMavenApiTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4895PluginDepWithNonRelocatedMavenApiTest() {
-        super("[3.0.1,)");
-    }
-
     /**
      * Verify that the classes constituting the Maven API are always loaded from the Maven core realm even if the plugin
      * realm contains a 3rd party dependency that contains (non-relocated) duplicates of API classes.

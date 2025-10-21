@@ -35,10 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3916PluginExecutionInheritanceTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3916PluginExecutionInheritanceTest() {
-        super("(2.0.4,)");
-    }
-
     /**
      * Test that plugin executions are properly merged during inheritance, even if the child plugin section has no
      * version.

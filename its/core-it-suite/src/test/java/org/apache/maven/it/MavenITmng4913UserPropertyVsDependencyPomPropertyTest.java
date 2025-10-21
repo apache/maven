@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4913UserPropertyVsDependencyPomPropertyTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4913UserPropertyVsDependencyPomPropertyTest() {
-        super("[2.0.9,3.0-alpha-1),[3.0.2,)");
-    }
-
     /**
      * Verify that user properties from the CLI do not override POM properties of transitive dependencies.
      *

@@ -24,12 +24,10 @@ import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8477">MNG-8477</a>.
+ * @since 4.0.0-rc-3-SNAPSHOT
+ *
  */
 class MavenITmng8477MultithreadedFileActivationTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8477MultithreadedFileActivationTest() {
-        super("[4.0.0-rc-3-SNAPSHOT,)");
-    }
 
     /**
      *  Verify project is buildable.

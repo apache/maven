@@ -31,7 +31,7 @@ public class MavenITmng3581PluginUsesWagonDependencyTest extends AbstractMavenIn
 
     public MavenITmng3581PluginUsesWagonDependencyTest() {
         // Not 2.0.9
-        super("(2.0.4,2.0.9),(2.0.9,)");
+        super();
     }
 
     /**

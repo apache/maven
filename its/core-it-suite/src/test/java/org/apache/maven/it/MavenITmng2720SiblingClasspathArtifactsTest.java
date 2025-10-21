@@ -41,10 +41,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng2720SiblingClasspathArtifactsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2720SiblingClasspathArtifactsTest() {
-        super("[2.1.0,)");
-    }
-
     @Test
     public void testIT() throws Exception {
         File testDir = extractResources("/mng-2720");

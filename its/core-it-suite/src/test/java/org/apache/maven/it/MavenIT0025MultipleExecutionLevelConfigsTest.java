@@ -29,9 +29,6 @@ import org.junit.jupiter.api.Test;
  *
  */
 public class MavenIT0025MultipleExecutionLevelConfigsTest extends AbstractMavenIntegrationTestCase {
-    public MavenIT0025MultipleExecutionLevelConfigsTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test multiple goal executions with different execution-level configs.

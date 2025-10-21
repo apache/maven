@@ -27,12 +27,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8653">MNG-8653</a>.
+ * @since 4.0.0-rc-3
+ *
  */
 class MavenITmng8653AfterAndEachPhasesWithConcurrentBuilderTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8653AfterAndEachPhasesWithConcurrentBuilderTest() {
-        super("(4.0.0-rc-3,)");
-    }
 
     /**
      *  Verify the dependency management of the consumer POM is computed correctly

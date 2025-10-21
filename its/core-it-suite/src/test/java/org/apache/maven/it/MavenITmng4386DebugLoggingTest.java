@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4386DebugLoggingTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4386DebugLoggingTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that the CLI flag -X enables debug logging.
      *

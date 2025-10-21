@@ -27,12 +27,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  *
+ * @since 2.0.8
+ *
  */
 public class MavenITmng2744checksumVerificationTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng2744checksumVerificationTest() {
-        super("(2.0.8,)"); // only test in 2.0.9+
-    }
 
     /**
      * Tests that hex digits of checksums are compared without regard to case.

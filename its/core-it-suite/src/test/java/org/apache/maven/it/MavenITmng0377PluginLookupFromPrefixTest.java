@@ -29,9 +29,6 @@ import org.junit.jupiter.api.Test;
  *
  */
 public class MavenITmng0377PluginLookupFromPrefixTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng0377PluginLookupFromPrefixTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test usage of plugins.xml mapping file on the repository to resolve plugin artifactId from its prefix using the

@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3529QuotedCliArgTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3529QuotedCliArgTest() {
-        super("[3.0-beta-1,)");
-    }
-
     /**
      * Verify that the command line processing doesn't choke on things like -Da=" ".
      *

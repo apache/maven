@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenIT0136RarLifecycleTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenIT0136RarLifecycleTest() {
-        super("[2.0.0,)");
-    }
-
     /**
      * Test default binding of goals for "rar" lifecycle.
      *

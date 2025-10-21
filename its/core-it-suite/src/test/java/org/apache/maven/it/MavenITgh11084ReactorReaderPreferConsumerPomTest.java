@@ -24,11 +24,10 @@ import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for GH-11084.
+ * @since 4.0.0-rc-2
+ *
  */
 class MavenITgh11084ReactorReaderPreferConsumerPomTest extends AbstractMavenIntegrationTestCase {
-    MavenITgh11084ReactorReaderPreferConsumerPomTest() {
-        super("[4.0.0-rc-2,)");
-    }
 
     @Test
     void partialReactorShouldResolveUsingConsumerPom() throws Exception {

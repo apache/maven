@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3766ToolchainsFromExtensionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3766ToolchainsFromExtensionTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Test toolchain discovery from build extensions.
      *

@@ -37,10 +37,6 @@ public class MavenITmng4293RequiresCompilePlusRuntimeScopeTest extends AbstractM
      * NOTE: Class path ordering is another issue (MNG-1412), so we merely check set containment here.
      */
 
-    public MavenITmng4293RequiresCompilePlusRuntimeScopeTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Test support of "@requiresDependencyResolution compile+runtime".
      *

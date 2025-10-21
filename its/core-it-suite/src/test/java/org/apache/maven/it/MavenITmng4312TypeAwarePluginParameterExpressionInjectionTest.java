@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4312TypeAwarePluginParameterExpressionInjectionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4312TypeAwarePluginParameterExpressionInjectionTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Verify that plugins that use magic parameter expressions like ${plugin} for ordinary system properties
      * get properly configured and don't crash due to Maven trying to inject a type-incompatible magic value

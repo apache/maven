@@ -21,6 +21,7 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,10 +34,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Benjamin Bentmann
  */
+@Disabled("Bounds: [2.0,4.0.0-alpha-1)")
 public class MavenIT0140InterpolationWithPomPrefixTest extends AbstractMavenIntegrationTestCase {
-    public MavenIT0140InterpolationWithPomPrefixTest() {
-        super("[2.0,4.0.0-alpha-1)");
-    }
 
     /**
      * Test that expressions of the form ${pom.*} resolve correctly to POM values.
@@ -85,9 +84,8 @@ public class MavenIT0140InterpolationWithPomPrefixTest extends AbstractMavenInte
          * NOTE: We intentionally do not check whether the build paths have been basedir aligned, that's another
          * story...
          */
-        if (matchesVersionRange("(2.0.8,)")) {
-            assertTrue(props.getProperty(prefix + "projectBuildOut").endsWith("bin"));
-        }
+        // Inline version check: (2.0.8,) - current Maven version matches
+        assertTrue(props.getProperty(prefix + "projectBuildOut").endsWith("bin"));
         assertTrue(props.getProperty(prefix + "projectSiteOut").endsWith("doc"));
     }
 }

@@ -26,11 +26,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+/**
+ * @since 4.0.0-alpha-7
+ */
 class MavenITmng7891ConfigurationForExtensionsTest extends AbstractMavenIntegrationTestCase {
-
-    protected MavenITmng7891ConfigurationForExtensionsTest() {
-        super("(4.0.0-alpha-7,)");
-    }
 
     @Test
     void testConfigurationForCoreExtension() throws Exception {

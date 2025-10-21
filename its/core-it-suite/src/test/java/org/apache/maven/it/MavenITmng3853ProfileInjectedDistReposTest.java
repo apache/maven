@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3853ProfileInjectedDistReposTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3853ProfileInjectedDistReposTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that distribution management repos injected by profiles are recognized by the MavenProject instance and
      * that the resulting artifact repositories are available to plugins via the corresponding expressions. Note that

@@ -32,9 +32,6 @@ import org.junit.jupiter.api.Test;
  */
 @Disabled("cannot reproduce")
 public class MavenITmng3038TransitiveDepManVersionTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng3038TransitiveDepManVersionTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     @Test
     public void testitMNG3038() throws Exception {

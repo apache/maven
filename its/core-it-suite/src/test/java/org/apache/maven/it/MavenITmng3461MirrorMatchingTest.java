@@ -40,10 +40,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng3461MirrorMatchingTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3461MirrorMatchingTest() {
-        super("(2.0.8,)");
-    }
-
     /**
      * Test that mirror definitions are properly evaluated. In particular, an exact match by id should always
      * win over wildcard matches.

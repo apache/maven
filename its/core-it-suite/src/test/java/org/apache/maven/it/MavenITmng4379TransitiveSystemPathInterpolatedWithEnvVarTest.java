@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4379TransitiveSystemPathInterpolatedWithEnvVarTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4379TransitiveSystemPathInterpolatedWithEnvVarTest() {
-        super("[2.0.3,2.1.0),[3.0-alpha-6,)");
-    }
-
     /**
      * Test that the path of a system-scope dependency gets interpolated using environment variables during
      * transitive dependency resolution.

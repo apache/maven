@@ -52,10 +52,6 @@ public class MavenITmng5868NoDuplicateAttachedArtifacts extends AbstractMavenInt
 
     private int deployedJarArtifactNumber = 0;
 
-    public MavenITmng5868NoDuplicateAttachedArtifacts() {
-        super("[3.8.2,)");
-    }
-
     @BeforeEach
     protected void setUp() throws Exception {
         testDir = extractResources("/mng-5868");

@@ -31,10 +31,6 @@ public class MavenITmng8525MavenDIPlugin extends AbstractMavenIntegrationTestCas
 
     private File testDir;
 
-    public MavenITmng8525MavenDIPlugin() {
-        super("[4.0.0-rc-2,)");
-    }
-
     @BeforeEach
     public void setUp() throws Exception {
         testDir = extractResources("/mng-8525-maven-di-plugin");

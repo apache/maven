@@ -23,9 +23,6 @@ import java.io.File;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng8005IdeWorkspaceReaderUsedTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng8005IdeWorkspaceReaderUsedTest() {
-        super("(3.5.0,)");
-    }
 
     @Test
     public void testWithIdeWorkspaceReaderUsed() throws Exception {

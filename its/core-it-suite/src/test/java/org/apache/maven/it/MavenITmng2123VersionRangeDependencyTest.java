@@ -30,10 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng2123VersionRangeDependencyTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2123VersionRangeDependencyTest() {
-        super("(2.0.8,)");
-    }
-
     @Test
     public void testitMNG2123() throws Exception {
         File testDir = extractResources("/mng-2123");

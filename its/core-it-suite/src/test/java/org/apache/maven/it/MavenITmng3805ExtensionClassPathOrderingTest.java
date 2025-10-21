@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng3805ExtensionClassPathOrderingTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3805ExtensionClassPathOrderingTest() {
-        super("(2.0.9,2.1.0-M1),(2.1.0-M1,)");
-    }
-
     /**
      * Verify that the extension manager respects the ordering of the extension's dependencies when setting up the
      * class realm.

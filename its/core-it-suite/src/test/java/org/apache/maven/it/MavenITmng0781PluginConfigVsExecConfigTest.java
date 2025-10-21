@@ -29,9 +29,6 @@ import org.junit.jupiter.api.Test;
  *
  */
 public class MavenITmng0781PluginConfigVsExecConfigTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng0781PluginConfigVsExecConfigTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test that plugin-level configuration instances are not nullified by

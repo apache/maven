@@ -24,12 +24,10 @@ import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8244">MNG-8244</a>.
+ * @since 4.0.0-rc-2
+ *
  */
 class MavenITmng8244PhaseAllTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8244PhaseAllTest() {
-        super("[4.0.0-rc-2,)");
-    }
 
     /**
      *  Verify phase after:all phase is called

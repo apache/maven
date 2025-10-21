@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4412OfflineModeInPluginTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4412OfflineModeInPluginTest() {
-        super("[2.0,3.0-alpha-1),[3.0-alpha-4,)");
-    }
-
     /**
      * Verify that plugins using the 2.x style artifact resolver directly are subject to the offline mode of the
      * current Maven session.

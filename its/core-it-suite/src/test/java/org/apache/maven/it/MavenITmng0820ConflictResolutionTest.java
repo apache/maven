@@ -34,9 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  */
 public class MavenITmng0820ConflictResolutionTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng0820ConflictResolutionTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Verify that the collector selecting a particular version gets the correct subtree

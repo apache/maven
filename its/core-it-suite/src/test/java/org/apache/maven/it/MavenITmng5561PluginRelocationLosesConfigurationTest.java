@@ -24,10 +24,6 @@ import org.junit.jupiter.api.Test;
 
 public class MavenITmng5561PluginRelocationLosesConfigurationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5561PluginRelocationLosesConfigurationTest() {
-        super("[3.8.5,)");
-    }
-
     @Test
     public void testit() throws Exception {
         File testDir = extractResources("/mng-5561-plugin-relocation-loses-configuration");

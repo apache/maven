@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4318ProjectExecutionRootTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4318ProjectExecutionRootTest() {
-        super("[2.0.4,3.0-alpha-1),[3.0.3,)");
-    }
-
     /**
      * Verify that MavenProject.isExecutionRoot() is properly set within a reactor.
      *

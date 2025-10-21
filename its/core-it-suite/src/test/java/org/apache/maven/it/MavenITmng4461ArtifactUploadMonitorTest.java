@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4461ArtifactUploadMonitorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4461ArtifactUploadMonitorTest() {
-        super("[2.0.3.0,3.0-alpha-1),[3.0-alpha-5,)");
-    }
-
     /**
      * Test that deployment of an artifact gets logged via the transfer monitor.
      *

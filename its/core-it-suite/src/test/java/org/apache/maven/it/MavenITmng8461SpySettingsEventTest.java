@@ -24,12 +24,10 @@ import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8461">MNG-8461</a>.
+ * @since 4.0.0-rc-3-SNAPSHOT
+ *
  */
 class MavenITmng8461SpySettingsEventTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8461SpySettingsEventTest() {
-        super("[4.0.0-rc-3-SNAPSHOT,)");
-    }
 
     /**
      *  Verify that settings building event is emitted.

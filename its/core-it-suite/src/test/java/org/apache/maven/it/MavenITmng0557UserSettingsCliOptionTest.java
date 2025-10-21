@@ -29,9 +29,6 @@ import org.junit.jupiter.api.Test;
  *
  */
 public class MavenITmng0557UserSettingsCliOptionTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng0557UserSettingsCliOptionTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test --settings CLI option

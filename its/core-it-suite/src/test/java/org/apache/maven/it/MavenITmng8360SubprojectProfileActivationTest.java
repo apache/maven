@@ -24,12 +24,10 @@ import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8341">MNG-8341</a>.
+ * @since 4.0.0-beta-6
+ *
  */
 class MavenITmng8360SubprojectProfileActivationTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8360SubprojectProfileActivationTest() {
-        super("[4.0.0-beta-6,)");
-    }
 
     /**
      *  Verify that the build succeeds

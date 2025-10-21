@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng3877BasedirAlignedModelTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3877BasedirAlignedModelTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that project directories are basedir aligned when inspected by plugins via the MavenProject instance.
      *
@@ -80,9 +76,7 @@ public class MavenITmng3877BasedirAlignedModelTest extends AbstractMavenIntegrat
          */
 
         // MNG-3877
-        if (matchesVersionRange("[3.0-alpha-3,)")) {
-            assertPathEquals(testDir, "target/site", modelProps.getProperty("project.reporting.outputDirectory"));
-        }
+        assertPathEquals(testDir, "target/site", modelProps.getProperty("project.reporting.outputDirectory"));
     }
 
     private void assertPathEquals(File basedir, String expected, String actual) throws IOException {

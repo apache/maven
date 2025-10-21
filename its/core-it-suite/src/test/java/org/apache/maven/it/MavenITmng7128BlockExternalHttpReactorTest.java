@@ -25,10 +25,6 @@ import org.junit.jupiter.api.Test;
 public class MavenITmng7128BlockExternalHttpReactorTest extends AbstractMavenIntegrationTestCase {
     private static final String PROJECT_PATH = "/mng-7128-block-external-http-reactor";
 
-    public MavenITmng7128BlockExternalHttpReactorTest() {
-        super("[3.8.1,)");
-    }
-
     /**
      * This test verifies that defining a repository in pom.xml that uses HTTP is blocked.
      *

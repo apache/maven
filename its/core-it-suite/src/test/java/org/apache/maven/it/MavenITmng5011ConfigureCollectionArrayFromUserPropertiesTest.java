@@ -30,10 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng5011ConfigureCollectionArrayFromUserPropertiesTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5011ConfigureCollectionArrayFromUserPropertiesTest() {
-        super("[3.0.3,)");
-    }
-
     /**
      * Verify that plugin parameters of type array/collection can be configured using user properties from the CLI.
      *

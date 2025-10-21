@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4463DependencyManagementImportVersionRanges extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4463DependencyManagementImportVersionRanges() {
-        super("[4.0.0-alpha-1,)");
-    }
-
     @Test
     public void testInclusiveUpperBoundResolvesToHighestVersion() throws Exception {
         final File testDir = extractResources("/mng-4463/inclusive-upper-bound");

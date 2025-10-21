@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng2276ProfileActivationBySettingsPropertyTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2276ProfileActivationBySettingsPropertyTest() {
-        super("[3.0-beta-1,)");
-    }
-
     /**
      * Test that profiles in the POM can be activated by properties declared in active profiles from the settings.
      *

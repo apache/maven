@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4464PlatformIndependentFileSeparatorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4464PlatformIndependentFileSeparatorTest() {
-        super("[3.0-alpha-7,)");
-    }
-
     /**
      * Test that Maven recognizes both the forward and the backward slash as file separators, regardless of the
      * underlying filesystem (i.e. even on Unix).

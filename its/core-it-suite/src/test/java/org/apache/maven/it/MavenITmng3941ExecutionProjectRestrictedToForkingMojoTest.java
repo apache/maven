@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3941ExecutionProjectRestrictedToForkingMojoTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3941ExecutionProjectRestrictedToForkingMojoTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Test that the execution project from a forked lifecycle does not leak into mojos that run after the mojo
      * that forked the lifecycle. While this is rather irrelevant for Maven's core itself, this enforces proper

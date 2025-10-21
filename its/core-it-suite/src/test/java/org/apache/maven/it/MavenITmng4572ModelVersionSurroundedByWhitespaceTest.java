@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4572ModelVersionSurroundedByWhitespaceTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4572ModelVersionSurroundedByWhitespaceTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Test that the model parser doesn't choke when the modelVersion is surrounded by whitespace.
      *

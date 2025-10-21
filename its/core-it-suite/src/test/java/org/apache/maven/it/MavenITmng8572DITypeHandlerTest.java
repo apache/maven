@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng8572DITypeHandlerTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng8572DITypeHandlerTest() {
-        super("[4.0.0-rc-4,)");
-    }
-
     @Test
     public void testCustomTypeHandler() throws Exception {
         // Build the extension first

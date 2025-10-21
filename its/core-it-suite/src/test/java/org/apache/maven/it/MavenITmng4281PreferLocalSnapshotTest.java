@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4281PreferLocalSnapshotTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4281PreferLocalSnapshotTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that remote snapshots are not preferred over snapshots that have just been locally built.
      *

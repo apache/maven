@@ -30,9 +30,6 @@ import org.junit.jupiter.api.Test;
  *
  */
 public class MavenITBootstrapTest extends AbstractMavenIntegrationTestCase {
-    public MavenITBootstrapTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Bootstraps the integration tests by downloading required artifacts from central repository.

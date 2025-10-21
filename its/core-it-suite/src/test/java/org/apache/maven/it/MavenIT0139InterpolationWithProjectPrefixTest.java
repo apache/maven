@@ -32,9 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  */
 public class MavenIT0139InterpolationWithProjectPrefixTest extends AbstractMavenIntegrationTestCase {
-    public MavenIT0139InterpolationWithProjectPrefixTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test that expressions of the form ${project.*} resolve correctly to POM values.
@@ -83,9 +80,8 @@ public class MavenIT0139InterpolationWithProjectPrefixTest extends AbstractMaven
          * NOTE: We intentionally do not check whether the build paths have been basedir aligned, that's another
          * story...
          */
-        if (matchesVersionRange("(2.0.8,)")) {
-            assertTrue(props.getProperty(prefix + "projectBuildOut").endsWith("bin"));
-        }
+        // Inline version check: (2.0.8,) - current Maven version matches
+        assertTrue(props.getProperty(prefix + "projectBuildOut").endsWith("bin"));
         assertTrue(props.getProperty(prefix + "projectSiteOut").endsWith("doc"));
     }
 }

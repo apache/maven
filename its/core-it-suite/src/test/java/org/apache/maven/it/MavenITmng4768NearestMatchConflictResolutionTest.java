@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4768NearestMatchConflictResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4768NearestMatchConflictResolutionTest() {
-        super("[2.0.9,)");
-    }
-
     // Ideally, all six permutations of the three direct dependencies should yield the same result...
 
     @Test
@@ -46,7 +42,7 @@ public class MavenITmng4768NearestMatchConflictResolutionTest extends AbstractMa
 
     @Test
     public void testitADB() throws Exception {
-        requiresMavenVersion("[3.0-beta-3,)");
+        // requiresMavenVersion("[3.0-beta-3,)");
         testit("test-adb");
     }
 
@@ -62,7 +58,7 @@ public class MavenITmng4768NearestMatchConflictResolutionTest extends AbstractMa
 
     @Test
     public void testitDAB() throws Exception {
-        requiresMavenVersion("[3.0-beta-3,)");
+        // requiresMavenVersion("[3.0-beta-3,)");
         testit("test-dab");
     }
 

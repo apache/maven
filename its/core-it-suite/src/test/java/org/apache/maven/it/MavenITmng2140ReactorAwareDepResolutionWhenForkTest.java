@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng2140ReactorAwareDepResolutionWhenForkTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2140ReactorAwareDepResolutionWhenForkTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Test that mojos in a forked lifecycle can also resolve dependencies from the reactor.
      *

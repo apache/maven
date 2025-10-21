@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng2848ProfileActivationByEnvironmentVariableTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2848ProfileActivationByEnvironmentVariableTest() {
-        super("[2.0.9,)");
-    }
-
     /**
      * Test activation of a profile via environment variables.
      *

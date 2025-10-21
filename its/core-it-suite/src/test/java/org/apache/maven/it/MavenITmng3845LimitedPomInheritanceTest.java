@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3845LimitedPomInheritanceTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3845LimitedPomInheritanceTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that inheritance is all-or-nothing for certain subtrees of the POM.
      *

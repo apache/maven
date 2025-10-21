@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4785TransitiveResolutionInForkedThreadTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4785TransitiveResolutionInForkedThreadTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-beta-4,)");
-    }
-
     /**
      * Verify that dependency resolution using the 2.x API in forked threads works (e.g. has access to any required
      * session state).

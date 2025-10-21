@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4350LifecycleMappingExecutionOrderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4350LifecycleMappingExecutionOrderTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that multiple goals bound to the same phase by a lifecycle mapping execute in the order given by
      * the lifecycle mapping. In particular, the order of plugin declarations in the POM should have no influence

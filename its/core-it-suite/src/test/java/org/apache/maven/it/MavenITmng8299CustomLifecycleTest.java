@@ -27,10 +27,6 @@ import org.junit.jupiter.api.Test;
  */
 class MavenITmng8299CustomLifecycleTest extends AbstractMavenIntegrationTestCase {
 
-    MavenITmng8299CustomLifecycleTest() {
-        super("[2.0,4.0.0-alpha-13],[4.0.0-beta-5,)");
-    }
-
     /**
      *  Verify that invoking the third phase will invoke the first two
      */

@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng5096ExclusionAtDependencyWithImpliedClassifierTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5096ExclusionAtDependencyWithImpliedClassifierTest() {
-        super("[2.0.9,3.0-alpha-1),[3.0.4,)");
-    }
-
     /**
      * Verify that exclusions on dependencies whose type implies a classifier are effective. For those dependencies,
      * the versionless management key of the dependency is different from the versionless id of the resulting artifact

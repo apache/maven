@@ -29,9 +29,6 @@ import org.junit.jupiter.api.Test;
  *
  */
 public class MavenIT0037AlternatePomFileSameDirTest extends AbstractMavenIntegrationTestCase {
-    public MavenIT0037AlternatePomFileSameDirTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test building with alternate pom file using '-f'

@@ -31,9 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author gboue
  */
 public class MavenITmng6240PluginExtensionAetherProvider extends AbstractMavenIntegrationTestCase {
-    public MavenITmng6240PluginExtensionAetherProvider() {
-        super("[3.5.1,)");
-    }
 
     /**
      * <p>

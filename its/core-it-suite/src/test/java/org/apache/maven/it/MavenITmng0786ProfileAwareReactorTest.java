@@ -29,9 +29,6 @@ import org.junit.jupiter.api.Test;
  *
  */
 public class MavenITmng0786ProfileAwareReactorTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng0786ProfileAwareReactorTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Verify that direct invocation of a mojo from the command line still

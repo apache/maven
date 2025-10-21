@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4347ImportScopeWithSettingsProfilesTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4347ImportScopeWithSettingsProfilesTest() {
-        super("(2.2.1,]");
-    }
-
     /**
      * Test that profiles from settings.xml will be used to resolve import-scoped dependency POMs.
      * In this case, the settings profile enables snapshot resolution on the central repository, which

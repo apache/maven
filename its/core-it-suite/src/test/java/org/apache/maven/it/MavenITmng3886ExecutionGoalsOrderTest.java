@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3886ExecutionGoalsOrderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3886ExecutionGoalsOrderTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that the goals from a plugin execution are executed in the order given by the POM when no {@code <pluginManagement>}
      * is involved.

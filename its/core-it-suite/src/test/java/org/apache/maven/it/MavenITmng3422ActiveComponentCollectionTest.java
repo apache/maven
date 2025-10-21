@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
  */
 public class MavenITmng3422ActiveComponentCollectionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3422ActiveComponentCollectionTest() {
-        super("[2.0,)");
-    }
-
     /**
      * Verify that active collections of core components are properly injected into plugins.
      *

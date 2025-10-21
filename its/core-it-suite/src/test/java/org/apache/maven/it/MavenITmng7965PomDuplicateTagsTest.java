@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class MavenITmng7965PomDuplicateTagsTest extends AbstractMavenIntegrationTestCase {
 
-    protected MavenITmng7965PomDuplicateTagsTest() {
-        super("(,4.0.0-alpha-8),(4.0.0-alpha-9,)");
-    }
-
     @Test
     void javadocIsExecutedAndFailed() throws Exception {
         File testDir = extractResources("/mng-7965-pom-duplicate-tags");

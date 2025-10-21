@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4488ValidateExternalParenPomLenientTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4488ValidateExternalParenPomLenientTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-alpha-6,)");
-    }
-
     /**
      * Verify that parent POMs get validated in lenient mode when resolved from the repository.
      *

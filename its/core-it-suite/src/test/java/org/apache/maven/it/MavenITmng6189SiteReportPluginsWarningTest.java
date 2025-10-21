@@ -20,6 +20,7 @@ package org.apache.maven.it;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -28,11 +29,8 @@ import org.junit.jupiter.api.Test;
  *
  * @author Hervé Boutemy
  */
+@Disabled("Bounds: (3.5-alpha-1,4.0.0-alpha-2]")
 public class MavenITmng6189SiteReportPluginsWarningTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng6189SiteReportPluginsWarningTest() {
-        super("(3.5-alpha-1,4.0.0-alpha-2]");
-    }
 
     @Test
     public void testit() throws Exception {

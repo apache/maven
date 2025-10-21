@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4367LayoutAwareMirrorSelectionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4367LayoutAwareMirrorSelectionTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Test that mirror selection considers the repo layout if specified for the mirror. If {@code <mirrorOfLayouts>} is
      * unspecified, should match any layout.

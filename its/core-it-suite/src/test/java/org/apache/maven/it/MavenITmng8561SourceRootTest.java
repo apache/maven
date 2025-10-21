@@ -24,12 +24,10 @@ import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8561">MNG-8561</a>.
+ * @since 4.0.0-rc-3-SNAPSHOT
+ *
  */
 class MavenITmng8561SourceRootTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8561SourceRootTest() {
-        super("[4.0.0-rc-3-SNAPSHOT,)");
-    }
 
     /**
      *  Verify project is buildable.

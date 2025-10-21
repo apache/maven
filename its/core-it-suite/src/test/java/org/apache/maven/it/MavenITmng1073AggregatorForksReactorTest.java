@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng1073AggregatorForksReactorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng1073AggregatorForksReactorTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that aggregator mojos invoked from the CLI that fork the lifecycle do so for the entire reactor.
      *
@@ -41,7 +37,7 @@ public class MavenITmng1073AggregatorForksReactorTest extends AbstractMavenInteg
     @Test
     public void testitForkLifecycle() throws Exception {
         // excluded 2.1.x and 2.2.x due to MNG-4325
-        requiresMavenVersion("[2.0,2.1.0),[3.0-alpha-3,)");
+        // requiresMavenVersion("[2.0,2.1.0),[3.0-alpha-3,)");
 
         File testDir = extractResources("/mng-1073");
 

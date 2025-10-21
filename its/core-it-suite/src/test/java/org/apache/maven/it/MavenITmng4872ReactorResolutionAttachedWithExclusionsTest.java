@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4872ReactorResolutionAttachedWithExclusionsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4872ReactorResolutionAttachedWithExclusionsTest() {
-        super("[3.0-beta-1,)");
-    }
-
     /**
      * Test that resolution of (attached) artifacts from the reactor doesn't cause exclusions to be lost.
      *

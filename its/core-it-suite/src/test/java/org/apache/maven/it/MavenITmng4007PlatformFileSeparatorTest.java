@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4007PlatformFileSeparatorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4007PlatformFileSeparatorTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that paths to project directories use the platform-specific file separator.
      *
@@ -78,9 +74,7 @@ public class MavenITmng4007PlatformFileSeparatorTest extends AbstractMavenIntegr
          */
 
         // MNG-3877
-        if (matchesVersionRange("[3.0-alpha-3,)")) {
-            assertPath(modelProps.getProperty("project.reporting.outputDirectory"));
-        }
+        assertPath(modelProps.getProperty("project.reporting.outputDirectory"));
     }
 
     private void assertPath(String actual) {

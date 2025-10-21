@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4776ForkedReactorPluginVersionResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4776ForkedReactorPluginVersionResolutionTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-beta-3,)");
-    }
-
     /**
      * Verify that missing plugin versions in the POM are resolved for all projects on which a forking aggregator mojo
      * will be run and not just the top-level project. This test checks the case of the mojo being invoked from a

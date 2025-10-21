@@ -30,12 +30,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2562">MNG-2562</a>.
+ * @since 3.2.2
+ *
  */
 public class MavenITmng2562Timestamp322Test extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng2562Timestamp322Test() {
-        super("[3.2.2,)"); // 3.2.2+ only as we changed the timestamp format
-    }
 
     @Test
     public void testitDefaultFormat() throws Exception {

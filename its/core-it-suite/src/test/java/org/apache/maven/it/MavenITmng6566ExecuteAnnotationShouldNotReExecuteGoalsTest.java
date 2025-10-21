@@ -32,10 +32,6 @@ public class MavenITmng6566ExecuteAnnotationShouldNotReExecuteGoalsTest extends 
 
     private File testDir;
 
-    public MavenITmng6566ExecuteAnnotationShouldNotReExecuteGoalsTest() {
-        super("[4.0.0-alpha-1,)");
-    }
-
     @BeforeEach
     public void setUp() throws Exception {
         testDir = extractResources(RESOURCE_PATH);

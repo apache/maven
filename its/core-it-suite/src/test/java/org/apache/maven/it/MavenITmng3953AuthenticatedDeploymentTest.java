@@ -55,10 +55,6 @@ public class MavenITmng3953AuthenticatedDeploymentTest extends AbstractMavenInte
 
     private volatile boolean deployed;
 
-    public MavenITmng3953AuthenticatedDeploymentTest() {
-        super("(2.0.1,)");
-    }
-
     @BeforeEach
     protected void setUp() throws Exception {
         Handler repoHandler = new AbstractHandler() {

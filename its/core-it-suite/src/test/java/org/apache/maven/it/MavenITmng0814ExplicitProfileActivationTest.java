@@ -32,9 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  */
 public class MavenITmng0814ExplicitProfileActivationTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng0814ExplicitProfileActivationTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test activation of a profile from the command line.

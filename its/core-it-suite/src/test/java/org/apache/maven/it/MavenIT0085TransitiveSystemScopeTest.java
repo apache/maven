@@ -26,9 +26,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MavenIT0085TransitiveSystemScopeTest extends AbstractMavenIntegrationTestCase {
-    public MavenIT0085TransitiveSystemScopeTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Verify that system-scoped dependencies get resolved with system scope

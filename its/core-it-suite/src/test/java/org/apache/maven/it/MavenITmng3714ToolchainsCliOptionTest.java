@@ -33,9 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  */
 public class MavenITmng3714ToolchainsCliOptionTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng3714ToolchainsCliOptionTest() {
-        super("[2.3.0,)");
-    }
 
     /**
      * Test --toolchains CLI option

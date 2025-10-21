@@ -33,10 +33,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng5663NestedImportScopePomResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5663NestedImportScopePomResolutionTest() {
-        super("[3.0.4,3.2.2),(3.2.2,)");
-    }
-
     @Test
     public void testitMNG5639() throws Exception {
         File testDir = extractResources("/mng-5663-nested-import-scope-pom-resolution");

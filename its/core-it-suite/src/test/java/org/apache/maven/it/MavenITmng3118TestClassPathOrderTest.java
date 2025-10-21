@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3118TestClassPathOrderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3118TestClassPathOrderTest() {
-        super("[2.0.8,)");
-    }
-
     /**
      * Check that test classes appear before main classes on the test class path.
      *
