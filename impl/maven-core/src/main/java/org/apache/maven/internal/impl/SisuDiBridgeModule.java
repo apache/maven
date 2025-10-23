@@ -60,6 +60,7 @@ public class SisuDiBridgeModule extends AbstractModule {
 
     protected final boolean discover;
     protected InjectorImpl injector;
+    protected Provider<BeanLocator> parentLocator;
 
     public SisuDiBridgeModule() {
         this(true);
@@ -73,7 +74,10 @@ public class SisuDiBridgeModule extends AbstractModule {
     protected void configure() {
         Provider<PlexusContainer> containerProvider = getProvider(PlexusContainer.class);
         Provider<BeanLocator> beanLocatorProvider = getProvider(BeanLocator.class);
-        injector = new BridgeInjectorImpl(beanLocatorProvider, binder());
+        // Store the parent container's BeanLocator for later use when looking up beans
+        // that should come from the parent container, not the plugin realm
+        this.parentLocator = beanLocatorProvider;
+        injector = new BridgeInjectorImpl(beanLocatorProvider, binder(), parentLocator);
         bindScope(injector, containerProvider, SessionScoped.class, SessionScope.class);
         bindScope(injector, containerProvider, MojoExecutionScoped.class, MojoExecutionScope.class);
         injector.bindInstance(Injector.class, injector);
@@ -104,11 +108,17 @@ public class SisuDiBridgeModule extends AbstractModule {
 
     static class BridgeInjectorImpl extends InjectorImpl {
         final Provider<BeanLocator> locator;
+        final Provider<BeanLocator> parentLocator;
         final Binder binder;
 
         BridgeInjectorImpl(Provider<BeanLocator> locator, Binder binder) {
+            this(locator, binder, locator);
+        }
+
+        BridgeInjectorImpl(Provider<BeanLocator> locator, Binder binder, Provider<BeanLocator> parentLocator) {
             this.locator = locator;
             this.binder = binder;
+            this.parentLocator = parentLocator;
         }
 
         @Override
@@ -180,10 +190,20 @@ public class SisuDiBridgeModule extends AbstractModule {
             List<Binding<?>> list = new ArrayList<>();
             // Add DI bindings
             list.addAll(getBindings().getOrDefault(key, Set.of()));
-            // Add Plexus bindings
+            // Add Plexus bindings from the plugin realm
             for (var bean : locator.get().locate(toGuiceKey(key))) {
                 if (isPlexusBean(bean)) {
                     list.add(new BindingToBeanEntry<>(key).toBeanEntry(bean).prioritize(bean.getRank()));
+                }
+            }
+            // If not found in plugin realm, try the parent container's BeanLocator
+            // This is important for beans that should come from the parent container,
+            // such as the Injector or other Maven services
+            if (list.isEmpty() && parentLocator != locator) {
+                for (var bean : parentLocator.get().locate(toGuiceKey(key))) {
+                    if (isPlexusBean(bean)) {
+                        list.add(new BindingToBeanEntry<>(key).toBeanEntry(bean).prioritize(bean.getRank()));
+                    }
                 }
             }
             if (!list.isEmpty()) {
@@ -226,10 +246,18 @@ public class SisuDiBridgeModule extends AbstractModule {
                 List<Binding<?>> list = new ArrayList<>();
                 // Add DI bindings
                 list.addAll(getBindings().getOrDefault(elementType, Set.of()));
-                // Add Plexus bindings
+                // Add Plexus bindings from the plugin realm
                 for (var bean : locator.get().locate(toGuiceKey(elementType))) {
                     if (isPlexusBean(bean)) {
                         list.add(new BindingToBeanEntry<>(elementType).toBeanEntry(bean));
+                    }
+                }
+                // If not found in plugin realm, try the parent container's BeanLocator
+                if (list.isEmpty() && parentLocator != locator) {
+                    for (var bean : parentLocator.get().locate(toGuiceKey(elementType))) {
+                        if (isPlexusBean(bean)) {
+                            list.add(new BindingToBeanEntry<>(elementType).toBeanEntry(bean));
+                        }
                     }
                 }
                 //noinspection unchecked
@@ -260,6 +288,18 @@ public class SisuDiBridgeModule extends AbstractModule {
                                 .prioritize(bean.getRank());
                         String name = bean.getKey() instanceof com.google.inject.name.Named n ? n.value() : "";
                         map.compute(name, (n, ob) -> ob == null || ob.getPriority() < b.getPriority() ? b : ob);
+                    }
+                }
+                // If not found in plugin realm, try the parent container's BeanLocator
+                if (map.isEmpty() && parentLocator != locator) {
+                    for (var bean : parentLocator.get().locate(toGuiceKey(valueType))) {
+                        if (isPlexusBean(bean)) {
+                            Binding<?> b = new BindingToBeanEntry<>(valueType)
+                                    .toBeanEntry(bean)
+                                    .prioritize(bean.getRank());
+                            String name = bean.getKey() instanceof com.google.inject.name.Named n ? n.value() : "";
+                            map.compute(name, (n, ob) -> ob == null || ob.getPriority() < b.getPriority() ? b : ob);
+                        }
                     }
                 }
                 //noinspection unchecked

@@ -72,6 +72,51 @@ public class ToolchainManagerFactory {
         return new DefaultToolchainManagerV4();
     }
 
+    /**
+     * Provides a v3 ToolchainFactory bridge for the "jdk" toolchain type.
+     * This wraps the v4 ToolchainFactory implementation and exposes it as a v3 ToolchainFactory.
+     */
+    @Provides
+    @Named("jdk")
+    @Typed(ToolchainFactory.class)
+    ToolchainFactory jdkToolchainFactoryBridge() {
+        return createV3FactoryBridge("jdk");
+    }
+
+    /**
+     * Creates a v3 ToolchainFactory bridge that wraps a v4 ToolchainFactory.
+     */
+    private ToolchainFactory createV3FactoryBridge(String type) {
+        org.apache.maven.api.services.ToolchainFactory v4Factory =
+                lookup.lookup(org.apache.maven.api.services.ToolchainFactory.class, type);
+        if (v4Factory == null) {
+            return null;
+        }
+        return new ToolchainFactory() {
+            @Override
+            public ToolchainPrivate createToolchain(ToolchainModel model) throws MisconfiguredToolchainException {
+                try {
+                    org.apache.maven.api.Toolchain v4Toolchain = v4Factory.createToolchain(model.getDelegate());
+                    return getToolchainV3(v4Toolchain);
+                } catch (ToolchainFactoryException e) {
+                    throw new MisconfiguredToolchainException(e.getMessage(), e);
+                }
+            }
+
+            @Override
+            public ToolchainPrivate createDefaultToolchain() {
+                try {
+                    return v4Factory
+                            .createDefaultToolchain()
+                            .map(ToolchainManagerFactory.this::getToolchainV3)
+                            .orElse(null);
+                } catch (ToolchainFactoryException e) {
+                    return null;
+                }
+            }
+        };
+    }
+
     private org.apache.maven.impl.DefaultToolchainManager getDelegate() {
         return getToolchainManager(lookup, logger);
     }
