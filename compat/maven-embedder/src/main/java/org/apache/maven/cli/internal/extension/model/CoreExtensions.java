@@ -18,6 +18,7 @@
  */
 package org.apache.maven.cli.internal.extension.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,46 +28,82 @@ import java.util.List;
  * @deprecated Use {@link org.apache.maven.api.cli.extensions.CoreExtension} instead
  */
 @Deprecated
-public class CoreExtensions implements java.io.Serializable {
+@SuppressWarnings("all")
+public class CoreExtensions implements Serializable {
 
+    // --------------------------/
+    // - Class/Member Variables -/
+    // --------------------------/
+
+    /**
+     * Field extensions.
+     */
     private List<CoreExtension> extensions;
 
     /**
-     * Gets a set of build extensions to use from this project.
+     * Field modelEncoding.
+     */
+    private String modelEncoding = "UTF-8";
+
+    // -----------/
+    // - Methods -/
+    // -----------/
+
+    /**
+     * Method addExtension.
      *
-     * @return the list of extensions
+     * @param coreExtension a coreExtension object.
+     */
+    public void addExtension(CoreExtension coreExtension) {
+        getExtensions().add(coreExtension);
+    } // -- void addExtension( CoreExtension )
+
+    /**
+     * Method getExtensions.
+     *
+     * @return List
      */
     public List<CoreExtension> getExtensions() {
         if (this.extensions == null) {
-            this.extensions = new ArrayList<>();
+            this.extensions = new ArrayList<CoreExtension>();
         }
+
         return this.extensions;
-    }
+    } // -- List<CoreExtension> getExtensions()
 
     /**
-     * Sets a set of build extensions to use from this project.
+     * Get the modelEncoding field.
      *
-     * @param extensions the list of extensions
+     * @return String
+     */
+    public String getModelEncoding() {
+        return this.modelEncoding;
+    } // -- String getModelEncoding()
+
+    /**
+     * Method removeExtension.
+     *
+     * @param coreExtension a coreExtension object.
+     */
+    public void removeExtension(CoreExtension coreExtension) {
+        getExtensions().remove(coreExtension);
+    } // -- void removeExtension( CoreExtension )
+
+    /**
+     * Set a set of build extensions to use from this project.
+     *
+     * @param extensions a extensions object.
      */
     public void setExtensions(List<CoreExtension> extensions) {
         this.extensions = extensions;
-    }
+    } // -- void setExtensions( List )
 
     /**
-     * Adds an extension to the list.
+     * Set the modelEncoding field.
      *
-     * @param extension the extension to add
+     * @param modelEncoding a modelEncoding object.
      */
-    public void addExtension(CoreExtension extension) {
-        getExtensions().add(extension);
-    }
-
-    /**
-     * Removes an extension from the list.
-     *
-     * @param extension the extension to remove
-     */
-    public void removeExtension(CoreExtension extension) {
-        getExtensions().remove(extension);
-    }
+    public void setModelEncoding(String modelEncoding) {
+        this.modelEncoding = modelEncoding;
+    } // -- void setModelEncoding( String )
 }
