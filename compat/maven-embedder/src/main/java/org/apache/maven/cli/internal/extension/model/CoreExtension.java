@@ -24,95 +24,132 @@ package org.apache.maven.cli.internal.extension.model;
  * @deprecated Use {@link org.apache.maven.api.cli.extensions.CoreExtension} instead
  */
 @Deprecated
+@SuppressWarnings("all")
 public class CoreExtension implements java.io.Serializable {
 
+    // --------------------------/
+    // - Class/Member Variables -/
+    // --------------------------/
+
+    /**
+     * The group ID of the extension's artifact.
+     */
     private String groupId;
 
+    /**
+     * The artifact ID of the extension.
+     */
     private String artifactId;
 
+    /**
+     * The version of the extension.
+     */
     private String version;
 
+    /**
+     * The class loading strategy: 'self-first' (the default),
+     * 'parent-first' (loads classes from the parent, then from the
+     * extension) or 'plugin' (follows the rules from extensions
+     * defined as plugins).
+     */
     private String classLoadingStrategy = "self-first";
 
-    /**
-     * Gets the group ID of the extension's artifact.
-     *
-     * @return the group ID
-     */
-    public String getGroupId() {
-        return this.groupId;
-    }
+    // -----------/
+    // - Methods -/
+    // -----------/
 
     /**
-     * Sets the group ID of the extension's artifact.
+     * Get the artifact ID of the extension.
      *
-     * @param groupId the group ID
-     */
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
-    }
-
-    /**
-     * Gets the artifact ID of the extension.
-     *
-     * @return the artifact ID
+     * @return String
      */
     public String getArtifactId() {
         return this.artifactId;
-    }
+    } // -- String getArtifactId()
 
     /**
-     * Sets the artifact ID of the extension.
+     * Get the class loading strategy: 'self-first' (the default),
+     * 'parent-first' (loads classes from the parent, then from the
+     * extension) or 'plugin' (follows the rules from extensions
+     * defined as plugins).
      *
-     * @param artifactId the artifact ID
-     */
-    public void setArtifactId(String artifactId) {
-        this.artifactId = artifactId;
-    }
-
-    /**
-     * Gets the version of the extension.
-     *
-     * @return the version
-     */
-    public String getVersion() {
-        return this.version;
-    }
-
-    /**
-     * Sets the version of the extension.
-     *
-     * @param version the version
-     */
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    /**
-     * Gets the class loading strategy.
-     *
-     * @return the class loading strategy
+     * @return String
      */
     public String getClassLoadingStrategy() {
         return this.classLoadingStrategy;
-    }
+    } // -- String getClassLoadingStrategy()
 
     /**
-     * Sets the class loading strategy.
+     * Get the group ID of the extension's artifact.
      *
-     * @param classLoadingStrategy the class loading strategy
+     * @return String
+     */
+    public String getGroupId() {
+        return this.groupId;
+    } // -- String getGroupId()
+
+    /**
+     * Get the version of the extension.
+     *
+     * @return String
+     */
+    public String getVersion() {
+        return this.version;
+    } // -- String getVersion()
+
+    /**
+     * Set the artifact ID of the extension.
+     *
+     * @param artifactId a artifactId object.
+     */
+    public void setArtifactId(String artifactId) {
+        this.artifactId = artifactId;
+    } // -- void setArtifactId( String )
+
+    /**
+     * Set the class loading strategy: 'self-first' (the default),
+     * 'parent-first' (loads classes from the parent, then from the
+     * extension) or 'plugin' (follows the rules from extensions
+     * defined as plugins).
+     *
+     * @param classLoadingStrategy a classLoadingStrategy object.
      */
     public void setClassLoadingStrategy(String classLoadingStrategy) {
         this.classLoadingStrategy = classLoadingStrategy;
-    }
+    } // -- void setClassLoadingStrategy( String )
+
+    /**
+     * Set the group ID of the extension's artifact.
+     *
+     * @param groupId a groupId object.
+     */
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    } // -- void setGroupId( String )
+
+    /**
+     * Set the version of the extension.
+     *
+     * @param version a version object.
+     */
+    public void setVersion(String version) {
+        this.version = version;
+    } // -- void setVersion( String )
 
     /**
      * Gets the identifier of the extension.
      *
-     * @return the extension id
+     * @return The extension id in the form {@code <groupId>:<artifactId>:<version>}, never {@code null}.
      */
     public String getId() {
-        return (groupId != null ? groupId : "<null>") + ":" + (artifactId != null ? artifactId : "<null>") + ":"
-                + (version != null ? version : "<null>");
+        StringBuilder id = new StringBuilder(128);
+
+        id.append((getGroupId() == null) ? "[unknown-group-id]" : getGroupId());
+        id.append(":");
+        id.append((getArtifactId() == null) ? "[unknown-artifact-id]" : getArtifactId());
+        id.append(":");
+        id.append((getVersion() == null) ? "[unknown-version]" : getVersion());
+
+        return id.toString();
     }
 }
