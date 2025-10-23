@@ -140,7 +140,31 @@ import static org.apache.maven.api.Constants.MAVEN_INSTALLATION_CONF;
 @Deprecated
 public class MavenCli {
 
+    /**
+     * @deprecated Use {@link org.apache.maven.api.Constants#MAVEN_REPO_LOCAL} instead
+     */
+    @Deprecated
+    public static final String LOCAL_REPO_PROPERTY = "maven.repo.local";
+
     public static final String MULTIMODULE_PROJECT_DIRECTORY = "maven.multiModuleProjectDirectory";
+
+    /**
+     * @deprecated Use {@link System#getProperty(String)} with "user.home" instead
+     */
+    @Deprecated
+    public static final String USER_HOME = System.getProperty("user.home");
+
+    /**
+     * @deprecated Use {@link org.apache.maven.api.Constants#MAVEN_USER_CONF} instead
+     */
+    @Deprecated
+    public static final File USER_MAVEN_CONFIGURATION_HOME = new File(USER_HOME, ".m2");
+
+    /**
+     * @deprecated Use {@link org.apache.maven.api.Constants#MAVEN_STYLE_COLOR_PROPERTY} instead
+     */
+    @Deprecated
+    public static final String STYLE_COLOR_PROPERTY = "style.color";
 
     private static final String MVN_MAVEN_CONFIG = ".mvn/maven.config";
 

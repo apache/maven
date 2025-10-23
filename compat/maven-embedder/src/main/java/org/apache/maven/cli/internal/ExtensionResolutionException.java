@@ -18,7 +18,7 @@
  */
 package org.apache.maven.cli.internal;
 
-import org.apache.maven.api.cli.extensions.CoreExtension;
+import org.apache.maven.cli.internal.extension.model.CoreExtension;
 
 /**
  * Exception occurring trying to resolve a plugin.
@@ -35,6 +35,28 @@ public class ExtensionResolutionException extends Exception {
                         + cause.getMessage(),
                 cause);
         this.extension = extension;
+    }
+
+    /**
+     * Constructor accepting the new API type for internal use.
+     *
+     * @param extension the new API extension
+     * @param cause the cause
+     */
+    public ExtensionResolutionException(org.apache.maven.api.cli.extensions.CoreExtension extension, Throwable cause) {
+        super(
+                "Extension " + extension.getId() + " or one of its dependencies could not be resolved: "
+                        + cause.getMessage(),
+                cause);
+        // Convert to old type
+        CoreExtension oldExtension = new CoreExtension();
+        oldExtension.setGroupId(extension.getGroupId());
+        oldExtension.setArtifactId(extension.getArtifactId());
+        oldExtension.setVersion(extension.getVersion());
+        if (extension.getClassLoadingStrategy() != null) {
+            oldExtension.setClassLoadingStrategy(extension.getClassLoadingStrategy());
+        }
+        this.extension = oldExtension;
     }
 
     public CoreExtension getExtension() {
