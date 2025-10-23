@@ -231,6 +231,10 @@ public class Verifier {
             args.add(0, "-l");
         }
 
+        // TODO: this is just experiment; disable RRF for now
+        args.add("-Daether.remoteRepositoryFilter.groupId=false");
+        args.add("-Daether.remoteRepositoryFilter.prefixes=false");
+
         try {
             ExecutorRequest.Builder builder = executorHelper
                     .executorRequest()
