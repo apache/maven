@@ -51,7 +51,6 @@ public class MavenITmng4276WrongTransitivePlexusUtilsTest extends AbstractMavenI
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
-        verifier.addCliArgument("-X");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
