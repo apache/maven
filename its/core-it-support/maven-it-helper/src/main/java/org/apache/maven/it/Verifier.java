@@ -135,19 +135,31 @@ public class Verifier {
         this(basedir, null);
     }
 
+    public Verifier(String basedir, List<String> defaultCliArguments) throws VerificationException {
+        this(basedir, defaultCliArguments, true);
+    }
+
+    public Verifier(String basedir, boolean createDotMvn) throws VerificationException {
+        this(basedir, null, createDotMvn);
+    }
+
     /**
      * Creates verifier instance using passed in basedir as "cwd" and passed in default CLI arguments (if not null).
      * The discovery of user home and Maven installation directory is performed as well.
      *
      * @param basedir The basedir, cannot be {@code null}
      * @param defaultCliArguments The defaultCliArguments override, may be {@code null}
+     * @param createDotMvn If {@code true}, Verifier will create {@code .mvn} in passed basedir.
      *
      * @see #DEFAULT_CLI_ARGUMENTS
      */
-    public Verifier(String basedir, List<String> defaultCliArguments) throws VerificationException {
+    public Verifier(String basedir, List<String> defaultCliArguments, boolean createDotMvn) throws VerificationException {
         requireNonNull(basedir);
         try {
             this.basedir = Paths.get(basedir).toAbsolutePath();
+            if (createDotMvn) {
+                Files.createDirectories(this.basedir.resolve(".mvn"));
+            }
             this.tempBasedir = Files.createTempDirectory("verifier");
             this.userHomeDirectory = Paths.get(System.getProperty("maven.test.user.home", "user.home"));
             Files.createDirectories(this.userHomeDirectory);
