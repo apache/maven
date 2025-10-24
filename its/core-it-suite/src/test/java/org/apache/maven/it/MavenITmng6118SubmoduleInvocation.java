@@ -60,7 +60,7 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
         verifier.execute();
 
         final File submoduleDirectory = new File(testDir, "app");
-        verifier = newVerifier(submoduleDirectory.getAbsolutePath());
+        verifier = newVerifier(submoduleDirectory.getAbsolutePath(), false);
         verifier.setAutoclean(false);
         verifier.setLogFileName("log-insubmodule.txt");
         verifier.addCliArgument("compile");
