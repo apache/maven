@@ -53,6 +53,7 @@ public class MavenITmng4274PluginRealmArtifactsTest extends AbstractMavenIntegra
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("-X");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
