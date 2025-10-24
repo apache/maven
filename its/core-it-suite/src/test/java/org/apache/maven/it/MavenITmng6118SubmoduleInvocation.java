@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
  *     <li>lib</li>
  * </ul>
  *
- * This test manually manages {@code .mvn} directory, so instructs Verifier to not create them.
+ * This IT manually manages {@code .mvn} directories, so instructs Verifier to NOT create any.
  *
  * @author Maarten Mulders
  * @author Martin Kanters

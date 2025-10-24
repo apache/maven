@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * This test manually manages {@code .mvn} directory, so instructs Verifier to not create them.
+ * This IT manually manages {@code .mvn} directories, so instructs Verifier to NOT create any.
  */
 public class MavenITmng7038RootdirTest extends AbstractMavenIntegrationTestCase {
 
