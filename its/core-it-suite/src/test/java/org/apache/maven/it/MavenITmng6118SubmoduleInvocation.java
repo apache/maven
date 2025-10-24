@@ -33,6 +33,8 @@ import org.junit.jupiter.api.Test;
  *     <li>lib</li>
  * </ul>
  *
+ * This test manually manages {@code .mvn} directory, so instructs Verifier to not create them.
+ *
  * @author Maarten Mulders
  * @author Martin Kanters
  */
@@ -53,7 +55,7 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
     @Test
     public void testInSubModule() throws Exception {
         // Compile the whole project first.
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
         verifier.addCliArgument("package");
         verifier.execute();
 
@@ -73,7 +75,7 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
     @Test
     public void testWithFile() throws Exception {
         // Compile the whole project first.
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
         verifier.addCliArgument("package");
         verifier.execute();
 
@@ -93,7 +95,7 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
      */
     @Test
     public void testWithFileAndAlsoMake() throws Exception {
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
         verifier.addCliArgument("-am");
         verifier.addCliArgument("-f");
         verifier.addCliArgument("app/pom.xml");
@@ -111,7 +113,7 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
     @Test
     public void testInSubModuleWithAlsoMake() throws Exception {
         File submoduleDirectory = new File(testDir, "app");
-        Verifier verifier = newVerifier(submoduleDirectory.getAbsolutePath());
+        Verifier verifier = newVerifier(submoduleDirectory.getAbsolutePath(), false);
         verifier.addCliArgument("-am");
         verifier.setLogFileName("log-insubmodulealsomake.txt");
         verifier.addCliArgument("compile");
