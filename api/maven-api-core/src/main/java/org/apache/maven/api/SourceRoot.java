@@ -35,7 +35,7 @@ import java.util.Optional;
  */
 public interface SourceRoot {
     /**
-     * {@return the root directory where the sources are stored}.
+     * {@return the root directory where the sources are stored}
      * The path is relative to the <abbr>POM</abbr> file.
      *
      * <h4>Default implementation</h4>
@@ -62,7 +62,7 @@ public interface SourceRoot {
     }
 
     /**
-     * {@return the list of patterns for the files to include}.
+     * {@return the list of patterns for the files to include}
      * The path separator is {@code /} on all platforms, including Windows.
      * The prefix before the {@code :} character, if present and longer than 1 character, is the syntax.
      * If no syntax is specified, or if its length is 1 character (interpreted as a Windows drive),
@@ -78,7 +78,7 @@ public interface SourceRoot {
     }
 
     /**
-     * {@return the list of patterns for the files to exclude}.
+     * {@return the list of patterns for the files to exclude}
      * The exclusions are applied after the inclusions.
      * The default implementation returns an empty list.
      */
@@ -87,7 +87,7 @@ public interface SourceRoot {
     }
 
     /**
-     * {@return a matcher combining the include and exclude patterns}.
+     * {@return a matcher combining the include and exclude patterns}
      * If the user did not specify any includes, the given {@code defaultIncludes} are used.
      * These defaults depend on the plugin.
      * For example, the default include of the Java compiler plugin is <code>"**&sol;*.java"</code>.
@@ -103,7 +103,7 @@ public interface SourceRoot {
     PathMatcher matcher(Collection<String> defaultIncludes, boolean useDefaultExcludes);
 
     /**
-     * {@return in which context the source files will be used}.
+     * {@return in which context the source files will be used}
      * Not to be confused with dependency scope.
      * The default value is {@code "main"}.
      *
@@ -114,7 +114,7 @@ public interface SourceRoot {
     }
 
     /**
-     * {@return the language of the source files}.
+     * {@return the language of the source files}
      * The default value is {@code "java"}.
      *
      * @see Language#JAVA_FAMILY
@@ -124,7 +124,7 @@ public interface SourceRoot {
     }
 
     /**
-     * {@return the name of the Java module (or other language-specific module) which is built by the sources}.
+     * {@return the name of the Java module (or other language-specific module) which is built by the sources}
      * The default value is empty.
      */
     default Optional<String> module() {
@@ -132,7 +132,7 @@ public interface SourceRoot {
     }
 
     /**
-     * {@return the version of the platform where the code will be executed}.
+     * {@return the version of the platform where the code will be executed}
      * In a Java environment, this is the value of the {@code --release} compiler option.
      * The default value is empty.
      */
@@ -141,7 +141,7 @@ public interface SourceRoot {
     }
 
     /**
-     * {@return an explicit target path, overriding the default value}.
+     * {@return an explicit target path, overriding the default value}
      * When a target path is explicitly specified, the values of the {@link #module()} and {@link #targetVersion()}
      * elements are not used for inferring the path (they are still used as compiler options however).
      * It means that for scripts and resources, the files below the path specified by {@link #directory()}
@@ -152,7 +152,7 @@ public interface SourceRoot {
     }
 
     /**
-     * {@return whether resources are filtered to replace tokens with parameterized values}.
+     * {@return whether resources are filtered to replace tokens with parameterized values}
      * The default value is {@code false}.
      */
     default boolean stringFiltering() {
@@ -160,7 +160,7 @@ public interface SourceRoot {
     }
 
     /**
-     * {@return whether the directory described by this source element should be included in the build}.
+     * {@return whether the directory described by this source element should be included in the build}
      * The default value is {@code true}.
      */
     default boolean enabled() {
