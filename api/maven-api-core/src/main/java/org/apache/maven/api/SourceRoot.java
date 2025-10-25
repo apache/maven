@@ -24,6 +24,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.maven.api.annotations.Nonnull;
+
 /**
  * A root directory of source files.
  * The sources may be Java main classes, test classes, resources or anything else identified by the scope.
@@ -150,6 +152,27 @@ public interface SourceRoot {
      */
     default Optional<Path> targetPath() {
         return Optional.empty();
+    }
+
+    /**
+     * {@return the explicit target path resolved against the default target path}
+     * Invoking this method is equivalent to getting the default output directory
+     * by a call to {@code project.getOutputDirectory(scope())}, then resolving the
+     * {@linkplain #targetPath() target path} (if present) against that default directory.
+     * Note that if the target path is absolute, the result is that target path unchanged.
+     *
+     * @param project the project to use for getting default directories
+     *
+     * @see Project#getOutputDirectory(ProjectScope)
+     */
+    @Nonnull
+    default Path targetPath(@Nonnull Project project) {
+        Optional<Path> targetPath = targetPath();
+        // The test for `isAbsolute()` is a small optimization for avoiding the call to `getOutputDirectory(…)`.
+        return targetPath.filter(Path::isAbsolute).orElseGet(() -> {
+            Path base = project.getOutputDirectory(scope());
+            return targetPath.map(base::resolve).orElse(base);
+        });
     }
 
     /**
