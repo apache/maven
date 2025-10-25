@@ -654,7 +654,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 boolean hasMain = false;
                 boolean hasTest = false;
                 for (var source : sources) {
-                    var src = new DefaultSourceRoot(session, baseDir, source);
+                    var src = DefaultSourceRoot.fromModel(session, baseDir, source);
                     project.addSourceRoot(src);
                     Language language = src.language();
                     if (Language.JAVA_FAMILY.equals(language)) {
