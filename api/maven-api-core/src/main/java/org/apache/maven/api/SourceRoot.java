@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.model.Build;
 
 /**
  * A root directory of source files.
@@ -156,34 +155,23 @@ public interface SourceRoot {
 
     /**
      * {@return the explicit target path resolved against the default target path}
-     * If the {@linkplain #targetPath() explicit target path} is present and absolute, then it is returned as-is.
-     * If absent, then the one of the following value is returned by default:
-     *
-     * <ul>
-     *   <li>{@link Build#getOutputDirectory()} if the scope is {@link ProjectScope#MAIN},</li>
-     *   <li>{@link Build#getTestOutputDirectory()} if the scope is {@link ProjectScope#TEST},</li>
-     *   <li>{@link Build#getDirectory()} otherwise.</li>
-     * </ul>
-     *
-     * If the {@linkplain #targetPath() explicit target path} is present but relative,
-     * then it is resolved against the above-cited default directory.
+     * Invoking this method is equivalent to getting the default output directory
+     * by a call to {@code project.getOutputDirectory(scope())}, then resolving the
+     * {@linkplain #targetPath() target path} (if present) against that default directory.
+     * Note that if the target path is absolute, the result is that target path unchanged.
      *
      * @param project the project to use for getting default directories
+     *
+     * @see Project#getOutputDirectory(ProjectScope)
      */
     @Nonnull
     default Path targetPath(@Nonnull Project project) {
-        Build build = project.getBuild();
-        ProjectScope scope = scope();
-        String base;
-        if (scope == ProjectScope.MAIN) {
-            base = build.getOutputDirectory();
-        } else if (scope == ProjectScope.TEST) {
-            base = build.getTestOutputDirectory();
-        } else {
-            base = build.getDirectory();
-        }
-        Path dir = project.getBasedir().resolve(base);
-        return targetPath().map(dir::resolve).orElse(dir);
+        Optional<Path> targetPath = targetPath();
+        // The test for `isAbsolute()` is a small optimization for avoiding the call to `getOutputDirectory(…)`.
+        return targetPath.filter(Path::isAbsolute).orElseGet(() -> {
+            Path base = project.getOutputDirectory(scope());
+            return targetPath.map(base::resolve).orElse(base);
+        });
     }
 
     /**
