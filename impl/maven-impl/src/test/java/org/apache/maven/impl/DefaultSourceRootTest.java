@@ -58,7 +58,7 @@ public class DefaultSourceRootTest {
 
     @Test
     void testMainJavaDirectory() {
-        var source = new DefaultSourceRoot(
+        var source = DefaultSourceRoot.fromModel(
                 session, Path.of("myproject"), Source.newBuilder().build());
 
         assertTrue(source.module().isEmpty());
@@ -70,7 +70,7 @@ public class DefaultSourceRootTest {
 
     @Test
     void testTestJavaDirectory() {
-        var source = new DefaultSourceRoot(
+        var source = DefaultSourceRoot.fromModel(
                 session, Path.of("myproject"), Source.newBuilder().scope("test").build());
 
         assertTrue(source.module().isEmpty());
@@ -82,7 +82,7 @@ public class DefaultSourceRootTest {
 
     @Test
     void testTestResourceDirectory() {
-        var source = new DefaultSourceRoot(
+        var source = DefaultSourceRoot.fromModel(
                 session,
                 Path.of("myproject"),
                 Source.newBuilder().scope("test").lang("resources").build());
@@ -96,7 +96,7 @@ public class DefaultSourceRootTest {
 
     @Test
     void testModuleMainDirectory() {
-        var source = new DefaultSourceRoot(
+        var source = DefaultSourceRoot.fromModel(
                 session,
                 Path.of("myproject"),
                 Source.newBuilder().module("org.foo.bar").build());
@@ -110,7 +110,7 @@ public class DefaultSourceRootTest {
 
     @Test
     void testModuleTestDirectory() {
-        var source = new DefaultSourceRoot(
+        var source = DefaultSourceRoot.fromModel(
                 session,
                 Path.of("myproject"),
                 Source.newBuilder().module("org.foo.bar").scope("test").build());
