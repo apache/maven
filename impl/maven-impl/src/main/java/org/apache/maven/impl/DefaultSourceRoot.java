@@ -30,32 +30,86 @@ import org.apache.maven.api.ProjectScope;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.SourceRoot;
 import org.apache.maven.api.Version;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Resource;
 import org.apache.maven.api.model.Source;
 
 /**
  * A default implementation of {@code SourceRoot} built from the model.
+ *
+ * @param scope               in which context the source files will be used (main or test)
+ * @param language            language of the source files
+ * @param moduleName          name of the Java module which is built by the sources
+ * @param targetVersionOrNull version of the platform where the code will be executed
+ * @param directory           root directory where the sources are stored
+ * @param includes            patterns for the files to include, or empty if unspecified
+ * @param excludes            patterns for the files to exclude, or empty if nothing to exclude
+ * @param stringFiltering     whether resources are filtered to replace tokens with parameterized values
+ * @param targetPathOrNull    an explicit target path, overriding the default value
+ * @param enabled             whether the directory described by this source element should be included in the build
  */
-public final class DefaultSourceRoot implements SourceRoot {
-    private final Path directory;
+public record DefaultSourceRoot(
+        @Nonnull ProjectScope scope,
+        @Nonnull Language language,
+        @Nullable String moduleName,
+        @Nullable Version targetVersionOrNull,
+        @Nonnull Path directory,
+        @Nonnull List<String> includes,
+        @Nonnull List<String> excludes,
+        boolean stringFiltering,
+        @Nullable Path targetPathOrNull,
+        boolean enabled)
+        implements SourceRoot {
 
-    private final List<String> includes;
+    /**
+     * Creates a simple instance with no Java module, no target version, and no include or exclude pattern.
+     *
+     * @param scope     in which context the source files will be used (main or test)
+     * @param language  the language of the source files
+     * @param directory the root directory where the sources are stored
+     */
+    public DefaultSourceRoot(ProjectScope scope, Language language, Path directory) {
+        this(scope, language, null, null, directory, null, null, false, null, true);
+    }
 
-    private final List<String> excludes;
-
-    private final ProjectScope scope;
-
-    private final Language language;
-
-    private final String moduleName;
-
-    private final Version targetVersion;
-
-    private final Path targetPath;
-
-    private final boolean stringFiltering;
-
-    private final boolean enabled;
+    /**
+     * Canonical constructor.
+     *
+     * @param scope               in which context the source files will be used (main or test)
+     * @param language            language of the source files
+     * @param moduleName          name of the Java module which is built by the sources
+     * @param targetVersionOrNull version of the platform where the code will be executed
+     * @param directory           root directory where the sources are stored
+     * @param includes            patterns for the files to include, or {@code null} or empty if unspecified
+     * @param excludes            patterns for the files to exclude, or {@code null} or empty if nothing to exclude
+     * @param stringFiltering     whether resources are filtered to replace tokens with parameterized values
+     * @param targetPathOrNull    an explicit target path, overriding the default value
+     * @param enabled             whether the directory described by this source element should be included in the build
+     */
+    @SuppressWarnings("checkstyle:ParameterNumber")
+    public DefaultSourceRoot(
+            @Nonnull ProjectScope scope,
+            @Nonnull Language language,
+            @Nullable String moduleName,
+            @Nullable Version targetVersionOrNull,
+            @Nullable Path directory,
+            @Nullable List<String> includes,
+            @Nullable List<String> excludes,
+            boolean stringFiltering,
+            @Nullable Path targetPathOrNull,
+            boolean enabled) {
+        this.scope = Objects.requireNonNull(scope);
+        this.language = Objects.requireNonNull(language);
+        this.moduleName = nonBlank(moduleName).orElse(null);
+        this.targetVersionOrNull = targetVersionOrNull;
+        this.directory = directory.normalize();
+        this.includes = (includes != null) ? List.copyOf(includes) : List.of();
+        this.excludes = (excludes != null) ? List.copyOf(excludes) : List.of();
+        this.stringFiltering = stringFiltering;
+        this.targetPathOrNull = (targetPathOrNull != null) ? targetPathOrNull.normalize() : null;
+        this.enabled = enabled;
+    }
 
     /**
      * Creates a new instance from the given model.
@@ -64,35 +118,29 @@ public final class DefaultSourceRoot implements SourceRoot {
      * @param baseDir the base directory for resolving relative paths
      * @param source a source element from the model
      */
-    public DefaultSourceRoot(final Session session, final Path baseDir, final Source source) {
-        includes = source.getIncludes();
-        excludes = source.getExcludes();
-        stringFiltering = source.isStringFiltering();
-        enabled = source.isEnabled();
-        moduleName = nonBlank(source.getModule());
-
-        String value = nonBlank(source.getScope());
-        scope = (value != null) ? session.requireProjectScope(value) : ProjectScope.MAIN;
-
-        value = nonBlank(source.getLang());
-        language = (value != null) ? session.requireLanguage(value) : Language.JAVA_FAMILY;
-
-        value = nonBlank(source.getDirectory());
-        if (value != null) {
-            directory = baseDir.resolve(value);
-        } else {
-            Path src = baseDir.resolve("src");
-            if (moduleName != null) {
-                src = src.resolve(moduleName);
-            }
-            directory = src.resolve(scope.id()).resolve(language.id());
-        }
-
-        value = nonBlank(source.getTargetVersion());
-        targetVersion = (value != null) ? session.parseVersion(value) : null;
-
-        value = nonBlank(source.getTargetPath());
-        targetPath = (value != null) ? baseDir.resolve(value) : null;
+    public static DefaultSourceRoot fromModel(final Session session, final Path baseDir, final Source source) {
+        ProjectScope scope =
+                nonBlank(source.getScope()).map(session::requireProjectScope).orElse(ProjectScope.MAIN);
+        Language language =
+                nonBlank(source.getLang()).map(session::requireLanguage).orElse(Language.JAVA_FAMILY);
+        String moduleName = nonBlank(source.getModule()).orElse(null);
+        return new DefaultSourceRoot(
+                scope,
+                language,
+                moduleName,
+                nonBlank(source.getTargetVersion()).map(session::parseVersion).orElse(null),
+                nonBlank(source.getDirectory()).map(baseDir::resolve).orElseGet(() -> {
+                    Path src = baseDir.resolve("src");
+                    if (moduleName != null) {
+                        src = src.resolve(moduleName);
+                    }
+                    return src.resolve(scope.id()).resolve(language.id());
+                }),
+                source.getIncludes(),
+                source.getExcludes(),
+                source.isStringFiltering(),
+                nonBlank(source.getTargetPath()).map(baseDir::resolve).orElse(null),
+                source.isEnabled());
     }
 
     /**
@@ -104,107 +152,32 @@ public final class DefaultSourceRoot implements SourceRoot {
      * @param resource a resource element from the model
      */
     public DefaultSourceRoot(final Path baseDir, ProjectScope scope, Resource resource) {
-        String value = nonBlank(resource.getDirectory());
-        if (value == null) {
-            throw new IllegalArgumentException("Source declaration without directory value.");
-        }
-        directory = baseDir.resolve(value).normalize();
-        includes = resource.getIncludes();
-        excludes = resource.getExcludes();
-        stringFiltering = Boolean.parseBoolean(resource.getFiltering());
-        enabled = true;
-        moduleName = null;
-        this.scope = scope;
-        language = Language.RESOURCES;
-        targetVersion = null;
-        value = nonBlank(resource.getTargetPath());
-        targetPath = (value != null) ? baseDir.resolve(value).normalize() : null;
+        this(
+                scope,
+                Language.RESOURCES,
+                null,
+                null,
+                baseDir.resolve(nonBlank(resource.getDirectory())
+                        .orElseThrow(
+                                () -> new IllegalArgumentException("Source declaration without directory value."))),
+                resource.getIncludes(),
+                resource.getExcludes(),
+                Boolean.parseBoolean(resource.getFiltering()),
+                nonBlank(resource.getTargetPath()).map(baseDir::resolve).orElse(null),
+                true);
     }
 
     /**
-     * Creates a new instance for the given directory and scope.
-     *
-     * @param scope scope of source code (main or test)
-     * @param language language of the source code
-     * @param directory directory of the source code
+     * {@return the given value as a trimmed non-blank string, or empty otherwise}
      */
-    public DefaultSourceRoot(final ProjectScope scope, final Language language, final Path directory) {
-        this.scope = Objects.requireNonNull(scope);
-        this.language = Objects.requireNonNull(language);
-        this.directory = Objects.requireNonNull(directory);
-        includes = List.of();
-        excludes = List.of();
-        moduleName = null;
-        targetVersion = null;
-        targetPath = null;
-        stringFiltering = false;
-        enabled = true;
-    }
-
-    /**
-     * Creates a new instance for the given directory and scope.
-     *
-     * @param scope scope of source code (main or test)
-     * @param language language of the source code
-     * @param directory directory of the source code
-     * @param includes patterns for the files to include, or {@code null} or empty if unspecified
-     * @param excludes patterns for the files to exclude, or {@code null} or empty if nothing to exclude
-     */
-    public DefaultSourceRoot(
-            final ProjectScope scope,
-            final Language language,
-            final Path directory,
-            List<String> includes,
-            List<String> excludes) {
-        this.scope = Objects.requireNonNull(scope);
-        this.language = language;
-        this.directory = Objects.requireNonNull(directory);
-        this.includes = includes != null ? List.copyOf(includes) : List.of();
-        this.excludes = excludes != null ? List.copyOf(excludes) : List.of();
-        moduleName = null;
-        targetVersion = null;
-        targetPath = null;
-        stringFiltering = false;
-        enabled = true;
-    }
-
-    /**
-     * {@return the given value as a trimmed non-blank string, or null otherwise}.
-     */
-    private static String nonBlank(String value) {
+    private static Optional<String> nonBlank(String value) {
         if (value != null) {
             value = value.trim();
-            if (value.isBlank()) {
-                value = null;
+            if (!value.isBlank()) {
+                return Optional.of(value);
             }
         }
-        return value;
-    }
-
-    /**
-     * {@return the root directory where the sources are stored}.
-     */
-    @Override
-    public Path directory() {
-        return directory;
-    }
-
-    /**
-     * {@return the patterns for the files to include}.
-     */
-    @Override
-    @SuppressWarnings("ReturnOfCollectionOrArrayField") // Safe because unmodifiable
-    public List<String> includes() {
-        return includes;
-    }
-
-    /**
-     * {@return the patterns for the files to exclude}.
-     */
-    @Override
-    @SuppressWarnings("ReturnOfCollectionOrArrayField") // Safe because unmodifiable
-    public List<String> excludes() {
-        return excludes;
+        return Optional.empty();
     }
 
     /**
@@ -224,22 +197,6 @@ public final class DefaultSourceRoot implements SourceRoot {
     }
 
     /**
-     * {@return in which context the source files will be used}.
-     */
-    @Override
-    public ProjectScope scope() {
-        return scope;
-    }
-
-    /**
-     * {@return the language of the source files}.
-     */
-    @Override
-    public Language language() {
-        return language;
-    }
-
-    /**
      * {@return the name of the Java module (or other language-specific module) which is built by the sources}
      */
     @Override
@@ -252,7 +209,7 @@ public final class DefaultSourceRoot implements SourceRoot {
      */
     @Override
     public Optional<Version> targetVersion() {
-        return Optional.ofNullable(targetVersion);
+        return Optional.ofNullable(targetVersionOrNull);
     }
 
     /**
@@ -260,64 +217,6 @@ public final class DefaultSourceRoot implements SourceRoot {
      */
     @Override
     public Optional<Path> targetPath() {
-        return Optional.ofNullable(targetPath);
-    }
-
-    /**
-     * {@return whether resources are filtered to replace tokens with parameterized values}.
-     */
-    @Override
-    public boolean stringFiltering() {
-        return stringFiltering;
-    }
-
-    /**
-     * {@return whether the directory described by this source element should be included in the build}.
-     */
-    @Override
-    public boolean enabled() {
-        return enabled;
-    }
-
-    /**
-     * {@return a hash code value computed from all properties}.
-     */
-    @Override
-    public int hashCode() {
-        return Objects.hash(
-                directory,
-                includes,
-                excludes,
-                scope,
-                language,
-                moduleName,
-                targetVersion,
-                targetPath,
-                stringFiltering,
-                enabled);
-    }
-
-    /**
-     * {@return whether the two objects are of the same class with equal property values}.
-     *
-     * @param obj the other object to compare with this object, or {@code null}
-     */
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj instanceof DefaultSourceRoot other) {
-            return directory.equals(other.directory)
-                    && includes.equals(other.includes)
-                    && excludes.equals(other.excludes)
-                    && Objects.equals(scope, other.scope)
-                    && Objects.equals(language, other.language)
-                    && Objects.equals(moduleName, other.moduleName)
-                    && Objects.equals(targetVersion, other.targetVersion)
-                    && stringFiltering == other.stringFiltering
-                    && enabled == other.enabled;
-        }
-        return false;
+        return Optional.ofNullable(targetPathOrNull);
     }
 }
