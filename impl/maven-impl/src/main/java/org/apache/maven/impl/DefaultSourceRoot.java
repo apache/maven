@@ -208,7 +208,7 @@ public final class DefaultSourceRoot implements SourceRoot {
     }
 
     /**
-     * {@return a matcher combining the include and exclude patterns}.
+     * {@return a matcher combining the include and exclude patterns}
      *
      * @param defaultIncludes the default includes if unspecified by the user
      * @param useDefaultExcludes whether to add the default set of patterns to exclude,
@@ -240,7 +240,7 @@ public final class DefaultSourceRoot implements SourceRoot {
     }
 
     /**
-     * {@return the name of the Java module (or other language-specific module) which is built by the sources}.
+     * {@return the name of the Java module (or other language-specific module) which is built by the sources}
      */
     @Override
     public Optional<String> module() {
@@ -248,7 +248,7 @@ public final class DefaultSourceRoot implements SourceRoot {
     }
 
     /**
-     * {@return the version of the platform where the code will be executed}.
+     * {@return the version of the platform where the code will be executed}
      */
     @Override
     public Optional<Version> targetVersion() {
@@ -256,7 +256,7 @@ public final class DefaultSourceRoot implements SourceRoot {
     }
 
     /**
-     * {@return an explicit target path, overriding the default value}.
+     * {@return an explicit target path, overriding the default value}
      */
     @Override
     public Optional<Path> targetPath() {
