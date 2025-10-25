@@ -24,6 +24,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.model.Build;
+
 /**
  * A root directory of source files.
  * The sources may be Java main classes, test classes, resources or anything else identified by the scope.
@@ -149,6 +152,38 @@ public interface SourceRoot {
      */
     default Optional<Path> targetPath() {
         return Optional.empty();
+    }
+
+    /**
+     * {@return the explicit target path resolved against the default target path}
+     * If the {@linkplain #targetPath() explicit target path} is present and absolute, then it is returned as-is.
+     * If absent, then the one of the following value is returned by default:
+     *
+     * <ul>
+     *   <li>{@link Build#getOutputDirectory()} if the scope is {@link ProjectScope#MAIN},</li>
+     *   <li>{@link Build#getTestOutputDirectory()} if the scope is {@link ProjectScope#TEST},</li>
+     *   <li>{@link Build#getDirectory()} otherwise.</li>
+     * </ul>
+     *
+     * If the {@linkplain #targetPath() explicit target path} is present but relative,
+     * then it is resolved against the above-cited default directory.
+     *
+     * @param project the project to use for getting default directories
+     */
+    @Nonnull
+    default Path targetPath(@Nonnull Project project) {
+        Build build = project.getBuild();
+        ProjectScope scope = scope();
+        String base;
+        if (scope == ProjectScope.MAIN) {
+            base = build.getOutputDirectory();
+        } else if (scope == ProjectScope.TEST) {
+            base = build.getTestOutputDirectory();
+        } else {
+            base = build.getDirectory();
+        }
+        Path dir = project.getBasedir().resolve(base);
+        return targetPath().map(dir::resolve).orElse(dir);
     }
 
     /**

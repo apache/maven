@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.apache.maven.api.Language;
 import org.apache.maven.api.ProjectScope;
@@ -114,11 +115,13 @@ public record DefaultSourceRoot(
     /**
      * Creates a new instance from the given model.
      *
-     * @param session the session of resolving extensible enumerations
-     * @param baseDir the base directory for resolving relative paths
-     * @param source a source element from the model
+     * @param session    the session of resolving extensible enumerations
+     * @param baseDir    the base directory for resolving relative paths
+     * @param outputDir  supplier of output directory relative to {@code baseDir}
+     * @param source     a source element from the model
      */
-    public static DefaultSourceRoot fromModel(final Session session, final Path baseDir, final Source source) {
+    public static DefaultSourceRoot fromModel(
+            Session session, Path baseDir, Function<ProjectScope, String> outputDir, Source source) {
         ProjectScope scope =
                 nonBlank(source.getScope()).map(session::requireProjectScope).orElse(ProjectScope.MAIN);
         Language language =
@@ -139,7 +142,10 @@ public record DefaultSourceRoot(
                 source.getIncludes(),
                 source.getExcludes(),
                 source.isStringFiltering(),
-                nonBlank(source.getTargetPath()).map(baseDir::resolve).orElse(null),
+                nonBlank(source.getTargetPath())
+                        .map((targetPath) ->
+                                baseDir.resolve(outputDir.apply(scope)).resolve(targetPath))
+                        .orElse(null),
                 source.isEnabled());
     }
 
