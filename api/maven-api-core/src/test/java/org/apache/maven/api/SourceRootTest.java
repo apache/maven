@@ -27,6 +27,7 @@ import org.apache.maven.api.model.Build;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -78,6 +79,7 @@ public class SourceRootTest implements SourceRoot {
         Project project = mock(Project.class);
         when(project.getBuild()).thenReturn(build);
         when(project.getBasedir()).thenReturn(Path.of("myproject"));
+        when(project.getOutputDirectory(any(ProjectScope.class))).thenCallRealMethod();
 
         assertEquals(Path.of("myproject", "target", "classes"), targetPath(project));
 
