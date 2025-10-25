@@ -21,6 +21,7 @@ package org.apache.maven.impl;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.apache.maven.api.Language;
 import org.apache.maven.api.ProjectScope;
@@ -56,10 +57,28 @@ public class DefaultSourceRootTest {
         stub.when(session.requireLanguage(eq("resources"))).thenReturn(Language.RESOURCES);
     }
 
+    /**
+     * Returns the output directory relative to the base directory.
+     */
+    private static Function<ProjectScope, String> outputDirectory() {
+        return (scope) -> {
+            if (scope == ProjectScope.MAIN) {
+                return "target/classes";
+            } else if (scope == ProjectScope.TEST) {
+                return "target/test-classes";
+            } else {
+                return "target";
+            }
+        };
+    }
+
     @Test
     void testMainJavaDirectory() {
-        var source = new DefaultSourceRoot(
-                session, Path.of("myproject"), Source.newBuilder().build());
+        var source = DefaultSourceRoot.fromModel(
+                session,
+                Path.of("myproject"),
+                outputDirectory(),
+                Source.newBuilder().build());
 
         assertTrue(source.module().isEmpty());
         assertEquals(ProjectScope.MAIN, source.scope());
@@ -70,8 +89,11 @@ public class DefaultSourceRootTest {
 
     @Test
     void testTestJavaDirectory() {
-        var source = new DefaultSourceRoot(
-                session, Path.of("myproject"), Source.newBuilder().scope("test").build());
+        var source = DefaultSourceRoot.fromModel(
+                session,
+                Path.of("myproject"),
+                outputDirectory(),
+                Source.newBuilder().scope("test").build());
 
         assertTrue(source.module().isEmpty());
         assertEquals(ProjectScope.TEST, source.scope());
@@ -82,9 +104,10 @@ public class DefaultSourceRootTest {
 
     @Test
     void testTestResourceDirectory() {
-        var source = new DefaultSourceRoot(
+        var source = DefaultSourceRoot.fromModel(
                 session,
                 Path.of("myproject"),
+                outputDirectory(),
                 Source.newBuilder().scope("test").lang("resources").build());
 
         assertTrue(source.module().isEmpty());
@@ -96,9 +119,10 @@ public class DefaultSourceRootTest {
 
     @Test
     void testModuleMainDirectory() {
-        var source = new DefaultSourceRoot(
+        var source = DefaultSourceRoot.fromModel(
                 session,
                 Path.of("myproject"),
+                outputDirectory(),
                 Source.newBuilder().module("org.foo.bar").build());
 
         assertEquals("org.foo.bar", source.module().orElseThrow());
@@ -110,9 +134,10 @@ public class DefaultSourceRootTest {
 
     @Test
     void testModuleTestDirectory() {
-        var source = new DefaultSourceRoot(
+        var source = DefaultSourceRoot.fromModel(
                 session,
                 Path.of("myproject"),
+                outputDirectory(),
                 Source.newBuilder().module("org.foo.bar").scope("test").build());
 
         assertEquals("org.foo.bar", source.module().orElseThrow());
@@ -120,6 +145,42 @@ public class DefaultSourceRootTest {
         assertEquals(Language.JAVA_FAMILY, source.language());
         assertEquals(Path.of("myproject", "src", "org.foo.bar", "test", "java"), source.directory());
         assertTrue(source.targetVersion().isEmpty());
+    }
+
+    /**
+     * Tests that relative target paths are resolved against the right base directory.
+     */
+    @Test
+    void testRelativeMainTargetPath() {
+        var source = DefaultSourceRoot.fromModel(
+                session,
+                Path.of("myproject"),
+                outputDirectory(),
+                Source.newBuilder().targetPath("user-output").build());
+
+        assertEquals(ProjectScope.MAIN, source.scope());
+        assertEquals(Language.JAVA_FAMILY, source.language());
+        assertEquals(
+                Path.of("myproject", "target", "classes", "user-output"),
+                source.targetPath().orElseThrow());
+    }
+
+    /**
+     * Tests that relative target paths are resolved against the right base directory.
+     */
+    @Test
+    void testRelativeTestTargetPath() {
+        var source = DefaultSourceRoot.fromModel(
+                session,
+                Path.of("myproject"),
+                outputDirectory(),
+                Source.newBuilder().targetPath("user-output").scope("test").build());
+
+        assertEquals(ProjectScope.TEST, source.scope());
+        assertEquals(Language.JAVA_FAMILY, source.language());
+        assertEquals(
+                Path.of("myproject", "target", "test-classes", "user-output"),
+                source.targetPath().orElseThrow());
     }
 
     /*MNG-11062*/
