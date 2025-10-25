@@ -46,6 +46,7 @@ under the License.
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
+      <version>${plexusUtilsVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>

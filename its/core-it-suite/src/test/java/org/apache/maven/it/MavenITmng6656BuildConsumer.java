@@ -60,7 +60,7 @@ public class MavenITmng6656BuildConsumer extends AbstractMavenIntegrationTestCas
     public void testPublishedPoms() throws Exception {
         File testDir = extractResources("/mng-6656-buildconsumer");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.addCliArgument("-Dchangelist=MNG6656");
 

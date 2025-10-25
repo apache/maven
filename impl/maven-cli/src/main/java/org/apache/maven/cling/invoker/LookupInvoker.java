@@ -323,13 +323,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             context.terminal = MessageUtils.getTerminal();
             context.closeables.add(MessageUtils::systemUninstall);
             MessageUtils.registerShutdownHook(); // safety belt
-
-            // when we use embedded executor AND --raw-streams, we must ENSURE streams are properly set up
-            if (context.invokerRequest.embedded()
-                    && context.options().rawStreams().orElse(false)) {
-                // to trigger FastTerminal; with raw-streams we must do this ASAP (to have system in/out/err set up)
-                context.terminal.getName();
-            }
         } else {
             doConfigureWithTerminal(context, context.terminal);
         }
@@ -381,7 +374,15 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     /**
      * Override this method to add some special handling for "raw streams" <em>enabled</em> option.
      */
-    protected void doConfigureWithTerminalWithRawStreamsEnabled(C context) {}
+    protected void doConfigureWithTerminalWithRawStreamsEnabled(C context) {
+        context.invokerRequest.stdIn().ifPresent(System::setIn);
+        context.invokerRequest
+                .stdOut()
+                .ifPresent(out -> System.setOut(out instanceof PrintStream pw ? pw : new PrintStream(out, true)));
+        context.invokerRequest
+                .stdErr()
+                .ifPresent(err -> System.setErr(err instanceof PrintStream pw ? pw : new PrintStream(err, true)));
+    }
 
     /**
      * Override this method to add some special handling for "raw streams" <em>disabled</em> option.

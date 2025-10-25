@@ -38,6 +38,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * Each test method runs a small test project (under src/test/resources/mng-8750-new-scopes)
  * that writes out classpath files and asserts expected inclusion/exclusion behavior.
+ *
+ * This IT manually manages {@code .mvn} directories, so instructs Verifier to NOT create any.
  */
 public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCase {
 
@@ -46,7 +48,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
         File testDir = extractResources("/mng-8750-new-scopes");
 
         File depsDir = new File(testDir, "deps");
-        Verifier deps = newVerifier(depsDir.getAbsolutePath());
+        Verifier deps = newVerifier(depsDir.getAbsolutePath(), false);
         deps.addCliArgument("install");
         deps.execute();
         deps.verifyErrorFreeLog();
@@ -66,7 +68,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
         File testDir = extractResources("/mng-8750-new-scopes");
         File projectDir = new File(testDir, "compile-only-test");
 
-        Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        Verifier verifier = newVerifier(projectDir.getAbsolutePath(), false);
         verifier.addCliArgument("clean");
         verifier.addCliArgument("test");
         verifier.execute();
@@ -97,7 +99,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
         File testDir = extractResources("/mng-8750-new-scopes");
         File projectDir = new File(testDir, "test-only-test");
 
-        Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        Verifier verifier = newVerifier(projectDir.getAbsolutePath(), false);
         verifier.addCliArgument("clean");
         verifier.addCliArgument("test");
         verifier.execute();
@@ -128,7 +130,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
         File testDir = extractResources("/mng-8750-new-scopes");
         File projectDir = new File(testDir, "test-runtime-test");
 
-        Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        Verifier verifier = newVerifier(projectDir.getAbsolutePath(), false);
         verifier.addCliArgument("clean");
         verifier.addCliArgument("test");
         verifier.execute();
@@ -156,7 +158,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
         File testDir = extractResources("/mng-8750-new-scopes");
         File projectDir = new File(testDir, "comprehensive-test");
 
-        Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        Verifier verifier = newVerifier(projectDir.getAbsolutePath(), false);
         verifier.addCliArgument("clean");
         verifier.addCliArgument("test");
         verifier.execute();
@@ -188,7 +190,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
         File testDir = extractResources("/mng-8750-new-scopes");
         File projectDir = new File(testDir, "validation-failure-test");
 
-        Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        Verifier verifier = newVerifier(projectDir.getAbsolutePath(), false);
         verifier.addCliArgument("clean");
         verifier.addCliArgument("validate");
 
@@ -213,7 +215,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
         File testDir = extractResources("/mng-8750-new-scopes");
         File projectDir = new File(testDir, "validation-success-test");
 
-        Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        Verifier verifier = newVerifier(projectDir.getAbsolutePath(), false);
         verifier.addCliArgument("clean");
         verifier.addCliArgument("validate");
         verifier.execute();
