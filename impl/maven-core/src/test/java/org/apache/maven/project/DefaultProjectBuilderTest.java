@@ -118,7 +118,7 @@ class DefaultProjectBuilderTest {
         private final Model rawModel;
         private final Model fileModel;
 
-        public MockModelBuilderResult(Model effectiveModel, Model rawModel, Model fileModel) {
+        MockModelBuilderResult(Model effectiveModel, Model rawModel, Model fileModel) {
             this.effectiveModel = effectiveModel;
             this.rawModel = rawModel;
             this.fileModel = fileModel;
