@@ -18,6 +18,8 @@
  */
 package org.apache.maven.project;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -165,6 +167,11 @@ class DefaultProjectBuilderTest {
                 @Override
                 public String getLocation() {
                     return "test-pom.xml";
+                }
+
+                @Override
+                public InputStream openStream() throws IOException {
+                    return null;
                 }
 
                 @Override
