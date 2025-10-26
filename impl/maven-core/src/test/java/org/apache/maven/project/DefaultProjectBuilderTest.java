@@ -135,12 +135,12 @@ class DefaultProjectBuilderTest {
 
         // Other required methods with minimal implementations
         @Override
-        public ModelSource getSource() { 
+        public ModelSource getSource() {
             return new ModelSource() {
                 @Override
-                public Path getPath() { return Paths.get("test-pom.xml"); }
+                Path getPath() { return Paths.get("test-pom.xml"); }
                 @Override
-                public String getLocation() { return "test-pom.xml"; }
+                String getLocation() { return "test-pom.xml"; }
             };
         }
 
