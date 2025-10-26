@@ -25,10 +25,12 @@ import java.util.List;
 
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Profile;
+import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
+import org.apache.maven.api.services.ModelLocator;
+import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.ProblemCollector;
-import org.apache.maven.api.services.ModelProblem;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -146,18 +148,28 @@ class DefaultProjectBuilderTest {
             return fileModel;
         }
 
+        @Override
+        public ModelBuilderRequest getRequest() {
+            return null;
+        }
+
         // Other required methods with minimal implementations
         @Override
         public ModelSource getSource() {
             return new ModelSource() {
                 @Override
-                Path getPath() {
+                public Path getPath() {
                     return Paths.get("test-pom.xml");
                 }
 
                 @Override
-                String getLocation() {
+                public String getLocation() {
                     return "test-pom.xml";
+                }
+
+                @Override
+                public ModelSource resolve(ModelLocator modelLocator, String relative) {
+                    return null;
                 }
             };
         }
