@@ -24,11 +24,11 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.ProblemCollector;
-import org.apache.maven.api.services.model.ModelProblem;
-import org.apache.maven.api.model.Profile;
+import org.apache.maven.api.services.ModelProblem;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,21 +47,24 @@ class DefaultProjectBuilderTest {
     @Test
     void testExtractProjectIdFallback() throws Exception {
         // Use reflection to access the private extractProjectId method
-        Method extractProjectIdMethod = DefaultProjectBuilder.class.getDeclaredMethod("extractProjectId", ModelBuilderResult.class);
+        Method extractProjectIdMethod =
+                DefaultProjectBuilder.class.getDeclaredMethod("extractProjectId", ModelBuilderResult.class);
         extractProjectIdMethod.setAccessible(true);
 
         // Create a mock ModelBuilderResult with null effectiveModel but available rawModel
         ModelBuilderResult mockResult = new MockModelBuilderResult(
-            null, // effectiveModel is null
-            createMockModel("com.example", "test-project", "1.0.0"), // rawModel is available
-            null  // fileModel is null
-        );
+                null, // effectiveModel is null
+                createMockModel("com.example", "test-project", "1.0.0"), // rawModel is available
+                null // fileModel is null
+                );
 
         String projectId = (String) extractProjectIdMethod.invoke(null, mockResult);
-        
+
         assertNotNull(projectId, "Project ID should not be null");
-        assertEquals("com.example:test-project:jar:1.0.0", projectId, 
-            "Should extract project ID from rawModel when effectiveModel is null");
+        assertEquals(
+                "com.example:test-project:jar:1.0.0",
+                projectId,
+                "Should extract project ID from rawModel when effectiveModel is null");
     }
 
     /**
@@ -69,20 +72,23 @@ class DefaultProjectBuilderTest {
      */
     @Test
     void testExtractProjectIdFileModelFallback() throws Exception {
-        Method extractProjectIdMethod = DefaultProjectBuilder.class.getDeclaredMethod("extractProjectId", ModelBuilderResult.class);
+        Method extractProjectIdMethod =
+                DefaultProjectBuilder.class.getDeclaredMethod("extractProjectId", ModelBuilderResult.class);
         extractProjectIdMethod.setAccessible(true);
 
         ModelBuilderResult mockResult = new MockModelBuilderResult(
-            null, // effectiveModel is null
-            null, // rawModel is null
-            createMockModel("com.example", "test-project", "1.0.0") // fileModel is available
-        );
+                null, // effectiveModel is null
+                null, // rawModel is null
+                createMockModel("com.example", "test-project", "1.0.0") // fileModel is available
+                );
 
         String projectId = (String) extractProjectIdMethod.invoke(null, mockResult);
-        
+
         assertNotNull(projectId, "Project ID should not be null");
-        assertEquals("com.example:test-project:jar:1.0.0", projectId, 
-            "Should extract project ID from fileModel when effectiveModel and rawModel are null");
+        assertEquals(
+                "com.example:test-project:jar:1.0.0",
+                projectId,
+                "Should extract project ID from fileModel when effectiveModel and rawModel are null");
     }
 
     /**
@@ -90,24 +96,25 @@ class DefaultProjectBuilderTest {
      */
     @Test
     void testExtractProjectIdAllModelsNull() throws Exception {
-        Method extractProjectIdMethod = DefaultProjectBuilder.class.getDeclaredMethod("extractProjectId", ModelBuilderResult.class);
+        Method extractProjectIdMethod =
+                DefaultProjectBuilder.class.getDeclaredMethod("extractProjectId", ModelBuilderResult.class);
         extractProjectIdMethod.setAccessible(true);
 
         ModelBuilderResult mockResult = new MockModelBuilderResult(null, null, null);
 
         String projectId = (String) extractProjectIdMethod.invoke(null, mockResult);
-        
+
         assertNotNull(projectId, "Project ID should not be null");
         assertEquals("", projectId, "Should return empty string when all models are null");
     }
 
     private Model createMockModel(String groupId, String artifactId, String version) {
         return Model.newBuilder()
-            .groupId(groupId)
-            .artifactId(artifactId)
-            .version(version)
-            .packaging("jar")
-            .build();
+                .groupId(groupId)
+                .artifactId(artifactId)
+                .version(version)
+                .packaging("jar")
+                .build();
     }
 
     /**
@@ -125,38 +132,59 @@ class DefaultProjectBuilderTest {
         }
 
         @Override
-        public Model getEffectiveModel() { return effectiveModel; }
+        public Model getEffectiveModel() {
+            return effectiveModel;
+        }
 
         @Override
-        public Model getRawModel() { return rawModel; }
+        public Model getRawModel() {
+            return rawModel;
+        }
 
         @Override
-        public Model getFileModel() { return fileModel; }
+        public Model getFileModel() {
+            return fileModel;
+        }
 
         // Other required methods with minimal implementations
         @Override
         public ModelSource getSource() {
             return new ModelSource() {
                 @Override
-                Path getPath() { return Paths.get("test-pom.xml"); }
+                Path getPath() {
+                    return Paths.get("test-pom.xml");
+                }
+
                 @Override
-                String getLocation() { return "test-pom.xml"; }
+                String getLocation() {
+                    return "test-pom.xml";
+                }
             };
         }
 
         @Override
-        public Model getParentModel() { return null; }
+        public Model getParentModel() {
+            return null;
+        }
 
         @Override
-        public List<Profile> getActivePomProfiles() { return List.of(); }
+        public List<Profile> getActivePomProfiles() {
+            return List.of();
+        }
 
         @Override
-        public List<Profile> getActiveExternalProfiles() { return List.of(); }
+        public List<Profile> getActiveExternalProfiles() {
+            return List.of();
+        }
 
         @Override
-        public ProblemCollector<ModelProblem> getProblemCollector() { return null; }
+        public ProblemCollector<ModelProblem> getProblemCollector() {
+            return null;
+        }
 
         @Override
-        public List<? extends ModelBuilderResult> getChildren() { return List.of(); }
+        public List<? extends ModelBuilderResult> getChildren() {
+            return List.of();
+        }
     }
 }
