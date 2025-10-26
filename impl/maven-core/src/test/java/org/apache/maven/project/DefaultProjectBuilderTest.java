@@ -27,10 +27,10 @@ import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
-
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.ProblemCollector;
+import org.apache.maven.api.services.Source;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -165,6 +165,11 @@ class DefaultProjectBuilderTest {
                 @Override
                 public String getLocation() {
                     return "test-pom.xml";
+                }
+
+                @Override
+                public Source resolve(String relative) {
+                    return null;
                 }
 
                 @Override
