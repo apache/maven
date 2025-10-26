@@ -156,7 +156,7 @@ under the License.
     <jmhVersion>1.37</jmhVersion>
     <junitVersion>6.0.0</junitVersion>
     <jxpathVersion>1.4.0</jxpathVersion>
-    <logbackClassicVersion>1.5.19</logbackClassicVersion>
+    <logbackClassicVersion>1.5.20</logbackClassicVersion>
     <mockitoVersion>5.20.0</mockitoVersion>
     <plexusInteractivityVersion>1.4</plexusInteractivityVersion>
     <plexusInterpolationVersion>1.28</plexusInterpolationVersion>
@@ -1038,7 +1038,7 @@ under the License.
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
-            <version>3.6.1</version>
+            <version>3.6.2</version>
             <inherited>false</inherited>
             <dependencies>
               <dependency>
