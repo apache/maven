@@ -27,7 +27,7 @@ import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
-import org.apache.maven.api.services.ModelLocator;
+
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.ProblemCollector;
@@ -168,7 +168,7 @@ class DefaultProjectBuilderTest {
                 }
 
                 @Override
-                public ModelSource resolve(ModelLocator modelLocator, String relative) {
+                public ModelSource resolve(ModelSource.ModelLocator modelLocator, String relative) {
                     return null;
                 }
             };
