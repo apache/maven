@@ -22,6 +22,8 @@ import java.io.File;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 /**
  * This is a test set for <a href="https://github.com/apache/maven/issues/11321">GH-11321</a>.
  * Verify that Maven properly rejects setups where a parent POM is located above the root directory
@@ -54,7 +56,10 @@ public class MavenITgh11321Test extends AbstractMavenIntegrationTestCase {
         verifier.addCliArgument("-f");
         verifier.addCliArgument("deps");
         verifier.addCliArgument("validate");
-        verifier.executeGoal("validate", false);
+        assertThrows(
+                VerificationException.class,
+                verifier::execute,
+                "Expected validation to fail when using invalid project structure");
         verifier.verifyTextInLog("Parent POM");
         verifier.verifyTextInLog("is located above the root directory");
         verifier.verifyTextInLog("This setup is invalid when a .mvn directory exists in a subdirectory");

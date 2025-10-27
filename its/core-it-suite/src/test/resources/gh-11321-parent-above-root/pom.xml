@@ -18,17 +18,17 @@ specific language governing permissions and limitations
 under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.1.0" root="true">
-    <groupId>org.apache.maven.its.gh11321</groupId>
-    <artifactId>parent-above-root</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
+  <groupId>org.apache.maven.its.gh11321</groupId>
+  <artifactId>parent-above-root</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
 
-    <name>Maven Integration Test :: gh-11321 :: Parent Above Root</name>
-    <description>Test that Maven rejects setups where parent POM is above root directory</description>
+  <name>Maven Integration Test :: gh-11321 :: Parent Above Root</name>
+  <description>Test that Maven rejects setups where parent POM is above root directory</description>
 
-    <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+  <properties>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
 </project>

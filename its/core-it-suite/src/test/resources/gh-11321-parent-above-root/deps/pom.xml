@@ -18,10 +18,10 @@ specific language governing permissions and limitations
 under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.1.0">
-    <parent />
-    <artifactId>deps</artifactId>
-    <packaging>pom</packaging>
+  <parent />
+  <artifactId>deps</artifactId>
+  <packaging>pom</packaging>
 
-    <name>Maven Integration Test :: gh-11321 :: Deps Module</name>
-    <description>Module with .mvn directory that uses parent inference</description>
+  <name>Maven Integration Test :: gh-11321 :: Deps Module</name>
+  <description>Module with .mvn directory that uses parent inference</description>
 </project>
