@@ -170,7 +170,7 @@ under the License.
     <stax2ApiVersion>4.2.2</stax2ApiVersion>
     <wagonVersion>3.5.3</wagonVersion>
     <woodstoxVersion>7.1.1</woodstoxVersion>
-    <xmlunitVersion>2.10.4</xmlunitVersion>
+    <xmlunitVersion>2.11.0</xmlunitVersion>
     <jacocoArgLine />
 
     <version.spotless-maven-plugin>3.0.0</version.spotless-maven-plugin>
