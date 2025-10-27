@@ -161,6 +161,17 @@ public class MavenCli {
     public static final File USER_MAVEN_CONFIGURATION_HOME = new File(USER_HOME, ".m2");
 
     /**
+     * @deprecated Use {@link org.apache.maven.api.Constants#MAVEN_USER_TOOLCHAINS} instead
+     */
+    public static final File DEFAULT_USER_TOOLCHAINS_FILE = new File(USER_MAVEN_CONFIGURATION_HOME, "toolchains.xml");
+
+    /**
+     * @deprecated Use {@link org.apache.maven.api.Constants#MAVEN_INSTALLATION_TOOLCHAINS} instead
+     */
+    public static final File DEFAULT_GLOBAL_TOOLCHAINS_FILE =
+            new File(System.getProperty("maven.conf"), "toolchains.xml");
+
+    /**
      * @deprecated Use {@link org.apache.maven.api.Constants#MAVEN_STYLE_COLOR_PROPERTY} instead
      */
     public static final String STYLE_COLOR_PROPERTY = "style.color";
