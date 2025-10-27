@@ -140,7 +140,41 @@ import static org.apache.maven.api.Constants.MAVEN_INSTALLATION_CONF;
 @Deprecated
 public class MavenCli {
 
+    /**
+     * @deprecated Use {@link org.apache.maven.api.Constants#MAVEN_REPO_LOCAL} instead
+     */
+    public static final String LOCAL_REPO_PROPERTY = "maven.repo.local";
+
+    /**
+     * @deprecated Use {@link org.apache.maven.api.Session#getRootDirectory()} instead
+     */
     public static final String MULTIMODULE_PROJECT_DIRECTORY = "maven.multiModuleProjectDirectory";
+
+    /**
+     * @deprecated Use {@link System#getProperty(String)} with "user.home" instead
+     */
+    public static final String USER_HOME = System.getProperty("user.home");
+
+    /**
+     * @deprecated Use {@link org.apache.maven.api.Constants#MAVEN_USER_CONF} instead
+     */
+    public static final File USER_MAVEN_CONFIGURATION_HOME = new File(USER_HOME, ".m2");
+
+    /**
+     * @deprecated Use {@link org.apache.maven.api.Constants#MAVEN_USER_TOOLCHAINS} instead
+     */
+    public static final File DEFAULT_USER_TOOLCHAINS_FILE = new File(USER_MAVEN_CONFIGURATION_HOME, "toolchains.xml");
+
+    /**
+     * @deprecated Use {@link org.apache.maven.api.Constants#MAVEN_INSTALLATION_TOOLCHAINS} instead
+     */
+    public static final File DEFAULT_GLOBAL_TOOLCHAINS_FILE =
+            new File(System.getProperty("maven.conf"), "toolchains.xml");
+
+    /**
+     * @deprecated Use {@link org.apache.maven.api.Constants#MAVEN_STYLE_COLOR_PROPERTY} instead
+     */
+    public static final String STYLE_COLOR_PROPERTY = "style.color";
 
     private static final String MVN_MAVEN_CONFIG = ".mvn/maven.config";
 
