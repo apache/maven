@@ -162,7 +162,7 @@ jobs:
             mvn-full-
 
       - name: Download Maven distribution
-        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v4
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v4
         with:
           name: maven-distributions
           path: maven-dist
@@ -252,7 +252,7 @@ jobs:
             mvn-its-
 
       - name: Download Maven distribution
-        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v4
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v4
         with:
           name: maven-distributions
           path: maven-dist
