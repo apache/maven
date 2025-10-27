@@ -243,7 +243,7 @@ public class Verifier {
             args.add(0, "-l");
         }
 
-        // TODO: this is just experiment; disable RRF for now
+        // TODO: disable RRF for now until https://github.com/apache/maven-resolver/issues/1641 can be fixed
         args.add("-Daether.remoteRepositoryFilter.groupId=false");
         args.add("-Daether.remoteRepositoryFilter.prefixes=false");
 
