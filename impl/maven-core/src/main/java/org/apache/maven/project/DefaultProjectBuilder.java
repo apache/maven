@@ -40,6 +40,7 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -650,11 +651,20 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 Build build = project.getBuild().getDelegate();
                 List<org.apache.maven.api.model.Source> sources = build.getSources();
                 Path baseDir = project.getBaseDirectory();
+                Function<ProjectScope, String> outputDirectory = (scope) -> {
+                    if (scope == ProjectScope.MAIN) {
+                        return build.getOutputDirectory();
+                    } else if (scope == ProjectScope.TEST) {
+                        return build.getTestOutputDirectory();
+                    } else {
+                        return build.getDirectory();
+                    }
+                };
                 boolean hasScript = false;
                 boolean hasMain = false;
                 boolean hasTest = false;
                 for (var source : sources) {
-                    var src = new DefaultSourceRoot(session, baseDir, source);
+                    var src = DefaultSourceRoot.fromModel(session, baseDir, outputDirectory, source);
                     project.addSourceRoot(src);
                     Language language = src.language();
                     if (Language.JAVA_FAMILY.equals(language)) {

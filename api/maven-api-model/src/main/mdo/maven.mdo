@@ -2160,8 +2160,16 @@
           <description>
             <![CDATA[
             Specifies an explicit target path, overriding the default value.
-            The path is relative to the {@code ${project.build.outputDirectory}} directory,
-            which is typically {@code target/classes} in a Java project.
+            If unspecified, then the default value is one of the following:
+
+            <ul>
+              <li>{@code ${project.build.outputDirectory}} (typically {@code target/classes}) if {@code scope} is "main",</li>
+              <li>{@code ${project.build.testOutputDirectory}} (typically {@code target/test-classes}) if {@code scope} is "test",</li>
+              <li>{@code ${project.build.directory}} (typically {@code target}) otherwise.</li>
+            </ul>
+
+            <p>If this property is specified but is a relative path,
+            then the path is resolved against the above-cited default value.</p>
 
             <p>When a target path is explicitly specified, the values of the {@code module} and {@code targetVersion}
             elements are not used for inferring the path (they are still used as compiler options however).
