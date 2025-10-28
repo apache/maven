@@ -21,9 +21,10 @@ under the License.
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.apache.maven</groupId>
-    <artifactId>maven</artifactId>
-    <version>4.0.0-SNAPSHOT</version>
+    <groupId>org.apache</groupId>
+    <artifactId>apache</artifactId>
+    <version>35</version>
+    <relativePath />
   </parent>
 
   <groupId>org.apache.maven.its</groupId>
@@ -73,12 +74,34 @@ under the License.
     <!--    <maven.compiler.source>8</maven.compiler.source>-->
     <!--    <maven.compiler.target>8</maven.compiler.target>-->
 
-    <maven-version>4.0.0-SNAPSHOT</maven-version>
     <maven-plugin-tools-version>3.15.2</maven-plugin-tools-version>
+    <!-- Maven version being tested - must match the parent project version -->
+    <maven-version>4.0.0-SNAPSHOT</maven-version>
+    <!-- Support artifacts version - kept separate from Maven version -->
+    <core-it-support-version>2.1-SNAPSHOT</core-it-support-version>
+
+    <maven.compiler.release>17</maven.compiler.release>
+
+    <wagonVersion>3.5.3</wagonVersion>
+    <asmVersion>9.9</asmVersion>
+    <plexusUtilsVersion>4.0.2</plexusUtilsVersion>
+    <plexusXmlVersion>4.1.0</plexusXmlVersion>
+
+    <!-- Set as system property in surefire/failsafe to propagate to tests and IT Verifier -->
+    <toolboxVersion>0.14.1</toolboxVersion>
+    <jacocoArgLine />
   </properties>
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>6.0.0</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-artifact</artifactId>
@@ -241,6 +264,22 @@ under the License.
       </dependency>
 
       <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>2.0.17</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-xml</artifactId>
+        <version>${plexusXmlVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.inject</groupId>
+        <artifactId>javax.inject</artifactId>
+        <version>1</version>
+      </dependency>
+
+      <dependency>
         <groupId>org.apache.maven.shared</groupId>
         <artifactId>maven-verifier</artifactId>
         <version>2.0.0-M1</version>
@@ -277,13 +316,26 @@ under the License.
     <pluginManagement>
       <plugins>
         <plugin>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-component-metadata</artifactId>
+          <version>2.2.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.eclipse.sisu</groupId>
+          <artifactId>sisu-maven-plugin</artifactId>
+          <version>0.9.0.M4</version>
+        </plugin>
+
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <configuration>
-            <environmentVariables>
-              <JENKINS_MAVEN_AGENT_DISABLED>true</JENKINS_MAVEN_AGENT_DISABLED>
-            </environmentVariables>
-          </configuration>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <dependencies>
+            <dependency>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>extra-enforcer-rules</artifactId>
+              <version>1.10.0</version>
+            </dependency>
+          </dependencies>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -301,7 +353,6 @@ under the License.
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-scm-publish-plugin</artifactId>
-          <version>3.3.0</version>
           <configuration>
             <serverId>apache.releases.https</serverId>
           </configuration>
@@ -334,13 +385,30 @@ under the License.
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-plugin-plugin</artifactId>
-          <version>${maven-plugin-tools-version}</version>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory" />
+            <argLine>-Xmx256m @{jacocoArgLine}</argLine>
+            <systemPropertyVariables combine.children="append">
+              <version.toolbox>${toolboxVersion}</version.toolbox>
+            </systemPropertyVariables>
+          </configuration>
         </plugin>
         <plugin>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-component-metadata</artifactId>
-          <version>2.2.0</version>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <configuration>
+            <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory" />
+            <argLine>-Xmx256m @{jacocoArgLine}</argLine>
+            <systemPropertyVariables combine.children="append">
+              <version.toolbox>${toolboxVersion}</version.toolbox>
+            </systemPropertyVariables>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-plugin-plugin</artifactId>
+          <version>${maven-plugin-tools-version}</version>
         </plugin>
       </plugins>
     </pluginManagement>

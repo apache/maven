@@ -96,6 +96,7 @@ under the License.
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
+      <version>${plexusUtilsVersion}</version>
       <!-- NOTE: Use compile scope for transitivity. -->
     </dependency>
 
@@ -503,6 +504,31 @@ under the License.
       </plugins>
     </pluginManagement>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-invoker-plugin</artifactId>
+        <configuration>
+          <skipInstallation>true</skipInstallation>
+          <localRepositoryPath>${preparedUserHome}/.m2/repository</localRepositoryPath>
+          <extraArtifacts>
+            <extraArtifact>eu.maveniverse.maven.plugins:toolbox:${toolboxVersion}:maven-plugin</extraArtifact>
+            <!--
+            Required by:
+            MavenITmng0449PluginVersionResolutionTest
+            MavenITmng0479OverrideCentralRepoTest
+            -->
+            <extraArtifact>org.apache.maven:maven-plugin-api:3.8.6</extraArtifact>
+          </extraArtifacts>
+        </configuration>
+        <executions>
+          <execution>
+            <id>install</id>
+            <goals>
+              <goal>install</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
