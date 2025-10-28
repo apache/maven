@@ -322,21 +322,18 @@ public final class Constants {
 
     /**
      * User controlled relocations.
-     * This property is a comma separated list of entries with the syntax <code>GAV&gt;GAV</code>.
-     * The first <code>GAV</code> can contain <code>*</code> for any elem (so <code>*:*:*</code> would mean ALL, something
-     * you don't want). The second <code>GAV</code> is either fully specified, or also can contain <code>*</code>,
+     * This property is a comma separated list of entries with the syntax GAV>GAV.
+     * The first GAV can contain * for any elem (so *:*:* would mean ALL, something
+     * you don't want). The second GAV is either fully specified, or also can contain *,
      * then it behaves as "ordinary relocation": the coordinate is preserved from relocated artifact.
-     * Finally, if right hand <code>GAV</code> is absent (line looks like <code>GAV&gt;</code>), the left hand matching
-     * <code>GAV</code> is banned fully (from resolving).
-     * <br/>
-     * Note: the <code>&gt;</code> means project level, while <code>&gt;&gt;</code> means global (whole session level,
+     * Finally, if right hand GAV is absent (line looks like GAV>), the left hand matching
+     * GAV is banned fully (from resolving).
+     * Note: the > means project level, while >> means global (whole session level,
      * so even plugins will get relocated artifacts) relocation.
-     * <br/>
-     * For example,
-     * <pre>maven.relocations.entries = org.foo:*:*>, \\<br/>    org.here:*:*>org.there:*:*, \\<br/>    javax.inject:javax.inject:1>>jakarta.inject:jakarta.inject:1.0.5</pre>
-     * means: 3 entries, ban <code>org.foo group</code> (exactly, so <code>org.foo.bar</code> is allowed),
-     * relocate <code>org.here</code> to <code>org.there</code> and finally globally relocate (see <code>&gt;&gt;</code> above)
-     * <code>javax.inject:javax.inject:1</code> to <code>jakarta.inject:jakarta.inject:1.0.5</code>.
+     * For example: maven.relocations.entries = org.foo:*:*>, org.here:*:*>org.there:*:*, javax.inject:javax.inject:1>>jakarta.inject:jakarta.inject:1.0.5
+     * means: 3 entries, ban org.foo group (exactly, so org.foo.bar is allowed),
+     * relocate org.here to org.there and finally globally relocate (see >> above)
+     * javax.inject:javax.inject:1 to jakarta.inject:jakarta.inject:1.0.5.
      *
      * @since 4.0.0
      */
@@ -409,14 +406,41 @@ public final class Constants {
     public static final String MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE = "maven.repo.local.recordReverseTree";
 
     /**
-     * User property for selecting dependency manager behaviour regarding transitive dependencies and dependency
-     * management entries in their POMs. Maven 3 targeted full backward compatibility with Maven 2. Hence, it ignored
-     * dependency management entries in transitive dependency POMs. Maven 4 enables "transitivity" by default. Hence
-     * unlike Maven 3, it obeys dependency management entries deep in the dependency graph as well.
-     * <br/>
-     * Default: <code>"true"</code>.
+     * User property for selecting dependency manager behavior regarding transitive dependencies and dependency
+     * management entries in their POMs.
+     *
+     * Background: Maven 3 targeted full backward compatibility with Maven 2 and used the
+     * ClassicDependencyManager, which ignored dependency management entries in transitive dependency POMs.
+     * This meant that dependencyManagement sections specified in your project would not apply to
+     * transitive dependencies, forcing developers to explicitly declare transitive dependencies just to control
+     * their versions.
+     *
+     * Maven 4 Behavior: When set to true (the default), Maven uses the
+     * TransitiveDependencyManager which enables "transitivity" by collecting and applying dependency
+     * management entries from the entire dependency graph. This means your project's dependencyManagement
+     * section now properly controls versions of transitive dependencies as well.
+     *
+     * Technical Details: The TransitiveDependencyManager:
+     * - Collects dependency management information at all depths in the dependency tree
+     * - Applies management starting from depth 2 (transitive dependencies)
+     * - Direct dependencies (depth 1) continue to be managed by ModelBuilder for compatibility
+     *
+     * When to set to false: Setting this property to false reverts to the
+     * Maven 2/3 behavior using ClassicDependencyManager. This may be useful for:
+     * - Troubleshooting version resolution issues when migrating from Maven 3
+     * - Maintaining exact Maven 3 behavior temporarily during migration
+     * - Working around edge cases where transitive dependency management causes issues
+     *
+     * Example Impact: If your project depends on library-a:1.0 which transitively
+     * depends on library-b:1.0, and your POM's dependencyManagement specifies
+     * library-b:2.0, then:
+     * - Maven 3 (or Maven 4 with this property = false): Uses library-b:1.0 (ignores your management)
+     * - Maven 4 (default): Uses library-b:2.0 (respects your management)
+     * Default: "true"
      *
      * @since 4.0.0
+     * @see <a href="https://issues.apache.org/jira/browse/MNG-7982">MNG-7982 - Implement transitive dependency manager</a>
+     * @see <a href="https://issues.apache.org/jira/browse/MNG-5761">MNG-5761 - dependencyManagement does not work for transitive dependencies</a>
      */
     @Config(defaultValue = "true")
     public static final String MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY =
@@ -464,6 +488,18 @@ public final class Constants {
     public static final String MAVEN_CONSUMER_POM = "maven.consumer.pom";
 
     /**
+     * User property for controlling consumer POM flattening behavior.
+     * When set to <code>true</code> (default), consumer POMs are flattened by removing
+     * dependency management and keeping only direct dependencies with transitive scopes.
+     * When set to <code>false</code>, consumer POMs preserve dependency management
+     * like parent POMs, allowing dependency management to be inherited by consumers.
+     *
+     * @since 4.1.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "true")
+    public static final String MAVEN_CONSUMER_POM_FLATTEN = "maven.consumer.pom.flatten";
+
+    /**
      * User property for controlling "maven personality". If activated Maven will behave
      * like the previous major version, Maven 3.
      *
@@ -497,11 +533,10 @@ public final class Constants {
 
     /**
      * User property for controlling whether build POMs are deployed alongside consumer POMs.
-     * When set to <code>false</code>, only the consumer POM will be deployed, and the build POM
+     * When set to false, only the consumer POM will be deployed, and the build POM
      * will be excluded from deployment. This is useful to avoid deploying internal build information
      * that is not needed by consumers of the artifact.
-     * <br/>
-     * Default: <code>"true"</code>.
+     * Default: "true".
      *
      * @since 4.1.0
      */

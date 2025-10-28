@@ -33,6 +33,7 @@ import org.apache.maven.api.DependencyScope;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.PathScope;
 import org.apache.maven.api.SessionData;
+import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DistributionManagement;
 import org.apache.maven.api.model.Model;
@@ -72,6 +73,13 @@ class DefaultConsumerPomBuilder implements PomBuilder {
     @Override
     public Model build(RepositorySystemSession session, MavenProject project, Path src) throws ModelBuilderException {
         Model model = project.getModel().getDelegate();
+        // Check if consumer POM flattening is disabled
+        if (!Features.consumerPomFlatten(session.getConfigProperties())) {
+            // When flattening is disabled, treat non-POM projects like parent POMs
+            // Apply only basic transformations without flattening dependency management
+            return buildPom(session, project, src);
+        }
+        // Default behavior: flatten the consumer POM
         String packaging = model.getPackaging();
         String originalPackaging = project.getOriginalModel().getPackaging();
         if (POM_PACKAGING.equals(packaging)) {
