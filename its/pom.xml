@@ -75,7 +75,7 @@ under the License.
     <!--    <maven.compiler.source>8</maven.compiler.source>-->
     <!--    <maven.compiler.target>8</maven.compiler.target>-->
 
-    <maven-plugin-tools-version>3.15.1</maven-plugin-tools-version>
+    <maven-plugin-tools-version>3.15.2</maven-plugin-tools-version>
     <!-- Maven version being tested - must match the parent project version -->
     <maven-version>4.1.0-SNAPSHOT</maven-version>
     <!-- Support artifacts version - kept separate from Maven version -->
