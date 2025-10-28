@@ -575,7 +575,13 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     results.add(new DefaultProjectBuildingResult(
                             project, convert(r.getProblemCollector()), resolutionResult));
                 } else {
-                    results.add(new DefaultProjectBuildingResult(null, convert(r.getProblemCollector()), null));
+                    // Extract project identification even when effective model is null
+                    String projectId = extractProjectId(r);
+                    File sourcePomFile = r.getSource() != null && r.getSource().getPath() != null
+                            ? r.getSource().getPath().toFile()
+                            : null;
+                    results.add(new DefaultProjectBuildingResult(
+                            projectId, sourcePomFile, convert(r.getProblemCollector())));
                 }
             }
             return results;
@@ -1005,6 +1011,27 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 + artifact.getBaseVersion() + "</version>" + "<packaging>"
                 + artifact.getType() + "</packaging>" + "</project>";
         return new StubModelSource(xml, artifact);
+    }
+
+    /**
+     * Extracts project identification from ModelBuilderResult, falling back to rawModel or fileModel
+     * when effectiveModel is null, similar to ModelBuilderException.getModelId().
+     */
+    private static String extractProjectId(ModelBuilderResult result) {
+        Model model = null;
+        if (result.getEffectiveModel() != null) {
+            model = result.getEffectiveModel();
+        } else if (result.getRawModel() != null) {
+            model = result.getRawModel();
+        } else if (result.getFileModel() != null) {
+            model = result.getFileModel();
+        }
+
+        if (model != null) {
+            return model.getId();
+        }
+
+        return "";
     }
 
     static String getGroupId(Model model) {
