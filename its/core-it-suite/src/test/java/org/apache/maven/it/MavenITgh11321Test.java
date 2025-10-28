@@ -33,6 +33,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  */
 public class MavenITgh11321Test extends AbstractMavenIntegrationTestCase {
 
+    public MavenITgh11321Test() {
+        super("[4.0.0,)");
+    }
+
     /**
      * Verify that Maven properly rejects setups where a parent POM is located above the root directory.
      * When Maven is invoked with -f deps/ where deps contains a .mvn directory, and the deps/pom.xml
