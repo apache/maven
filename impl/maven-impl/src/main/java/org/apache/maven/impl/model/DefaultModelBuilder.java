@@ -678,8 +678,14 @@ public class DefaultModelBuilder implements ModelBuilder {
             if (!Objects.equals(rootDirectory, model.getProjectDirectory())) {
                 Path rootModelPath = modelProcessor.locateExistingPom(rootDirectory);
                 if (rootModelPath != null) {
-                    Model rootModel = derive(Sources.buildSource(rootModelPath)).readFileModel();
-                    properties.putAll(getPropertiesWithProfiles(rootModel, properties));
+                    // Check if the root model path is within the root directory to prevent infinite loops
+                    // This can happen when a .mvn directory exists in a subdirectory and parent inference
+                    // tries to read models above the discovered root directory
+                    if (isParentWithinRootDirectory(rootModelPath, rootDirectory)) {
+                        Model rootModel =
+                                derive(Sources.buildSource(rootModelPath)).readFileModel();
+                        properties.putAll(getPropertiesWithProfiles(rootModel, properties));
+                    }
                 }
             } else {
                 properties.putAll(getPropertiesWithProfiles(model, properties));
@@ -1561,6 +1567,18 @@ public class DefaultModelBuilder implements ModelBuilder {
                             pomPath = modelProcessor.locateExistingPom(pomPath);
                         }
                         if (pomPath != null && Files.isRegularFile(pomPath)) {
+                            // Check if parent POM is above the root directory
+                            if (!isParentWithinRootDirectory(pomPath, rootDirectory)) {
+                                add(
+                                        Severity.FATAL,
+                                        Version.BASE,
+                                        "Parent POM " + pomPath + " is located above the root directory "
+                                                + rootDirectory
+                                                + ". This setup is invalid when a .mvn directory exists in a subdirectory.",
+                                        parent.getLocation("relativePath"));
+                                throw newModelBuilderException();
+                            }
+
                             Model parentModel =
                                     derive(Sources.buildSource(pomPath)).readFileModel();
                             String parentGroupId = getGroupId(parentModel);
@@ -2587,5 +2605,30 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
         return newResources;
+    }
+
+    /**
+     * Checks if the parent POM path is within the root directory.
+     * This prevents invalid setups where a parent POM is located above the root directory.
+     *
+     * @param parentPath the path to the parent POM
+     * @param rootDirectory the root directory
+     * @return true if the parent is within the root directory, false otherwise
+     */
+    private static boolean isParentWithinRootDirectory(Path parentPath, Path rootDirectory) {
+        if (parentPath == null || rootDirectory == null) {
+            return true; // Allow if either is null (fallback behavior)
+        }
+
+        try {
+            Path normalizedParent = parentPath.toAbsolutePath().normalize();
+            Path normalizedRoot = rootDirectory.toAbsolutePath().normalize();
+
+            // Check if the parent path starts with the root directory path
+            return normalizedParent.startsWith(normalizedRoot);
+        } catch (Exception e) {
+            // If there's any issue with path resolution, allow it (fallback behavior)
+            return true;
+        }
     }
 }
