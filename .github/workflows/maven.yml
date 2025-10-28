@@ -65,7 +65,7 @@ jobs:
         id: restore-cache
         with:
           path: ${{ env.MIMIR_LOCAL }}
-          key: mvn-${{ runner.os }}-initial
+          key: master-${{ runner.os }}-initial
 
       - name: Set up Maven
         shell: bash
@@ -156,10 +156,10 @@ jobs:
         id: restore-cache
         with:
           path: ${{ env.MIMIR_LOCAL }}
-          key: mvn-full-${{ matrix.os }}-${{ matrix.java }}
+          key: master-full-${{ matrix.os }}-${{ matrix.java }}
           restore-keys: |
-            mvn-full-${{ matrix.os }}-
-            mvn-full-
+            master-full-${{ matrix.os }}-
+            master-full-
 
       - name: Download Maven distribution
         uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v4
@@ -246,10 +246,10 @@ jobs:
         id: restore-cache
         with:
           path: ${{ env.MIMIR_LOCAL }}
-          key: mvn-its-${{ matrix.os }}-${{ matrix.java }}
+          key: master-its-${{ matrix.os }}-${{ matrix.java }}
           restore-keys: |
-            mvn-its-${{ matrix.os }}-
-            mvn-its-
+            master-its-${{ matrix.os }}-
+            master-its-
 
       - name: Download Maven distribution
         uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v4
