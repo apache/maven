@@ -46,6 +46,14 @@ under the License.
 
   <dependencyManagement>
     <dependencies>
+      <!-- WARNING: Do not manage plexus-utils at this level, as we have ITs adding custom versions of it to
+      plugin dependencies, and Maven 4 transitive depMgr would override that!
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-utils</artifactId>
+        <version>${plexusUtilsVersion}</version>
+      </dependency-->
+      <!-- Plugin tools -->
       <dependency>
         <groupId>org.apache.maven.plugin-tools</groupId>
         <artifactId>maven-plugin-annotations</artifactId>

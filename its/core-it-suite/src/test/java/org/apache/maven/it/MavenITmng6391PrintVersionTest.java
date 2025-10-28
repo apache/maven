@@ -54,7 +54,7 @@ public class MavenITmng6391PrintVersionTest extends AbstractMavenIntegrationTest
     public void testitShouldPrintVersionAtTopAndAtBottom() throws Exception {
         File testDir = extractResources("/mng-6391-print-version");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
 
         verifier.setLogFileName("version-log.txt");
@@ -95,7 +95,7 @@ public class MavenITmng6391PrintVersionTest extends AbstractMavenIntegrationTest
     public void testitShouldPrintVersionInAllLines() throws Exception {
         File testDir = extractResources("/mng-6391-print-version-aggregator");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
 
         verifier.setLogFileName("version-log.txt");
