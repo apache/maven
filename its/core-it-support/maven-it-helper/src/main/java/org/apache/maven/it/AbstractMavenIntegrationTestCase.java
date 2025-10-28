@@ -132,19 +132,19 @@ public abstract class AbstractMavenIntegrationTestCase {
     }
 
     protected Verifier newVerifier(String basedir) throws VerificationException {
-        return newVerifier(basedir, false);
+        return newVerifier(basedir, true);
     }
 
     protected Verifier newVerifier(String basedir, String settings) throws VerificationException {
-        return newVerifier(basedir, settings, false);
+        return newVerifier(basedir, settings, true);
     }
 
-    protected Verifier newVerifier(String basedir, boolean debug) throws VerificationException {
-        return newVerifier(basedir, "remote", debug);
+    protected Verifier newVerifier(String basedir, boolean createDotMvn) throws VerificationException {
+        return newVerifier(basedir, "remote", createDotMvn);
     }
 
-    protected Verifier newVerifier(String basedir, String settings, boolean debug) throws VerificationException {
-        Verifier verifier = new Verifier(basedir);
+    protected Verifier newVerifier(String basedir, String settings, boolean createDotMvn) throws VerificationException {
+        Verifier verifier = new Verifier(basedir, createDotMvn);
 
         // try to get jacoco arg from command line if any then use it to start IT to populate jacoco data
         // we use a different file than the main one
