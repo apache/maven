@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -39,8 +40,8 @@ public class MavenITmng1052PluginMgmtConfigTest extends AbstractMavenIntegration
      */
     @Test
     public void testitMNG1052() throws Exception {
-        File testDir = extractResources("/mng-1052");
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Path testDir = extractResourcesAsPath("/mng-1052");
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("process-resources");

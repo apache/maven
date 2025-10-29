@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -40,9 +41,9 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest extends AbstractM
      */
     @Test
     public void testitAllSet() throws Exception {
-        File testDir = extractResources("/mng-4615/test-0");
+        Path testDir = extractResourcesAsPath("/mng-4615/test-0");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
@@ -62,9 +63,9 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest extends AbstractM
      */
     @Test
     public void testitExprMissing() throws Exception {
-        File testDir = extractResources("/mng-4615/test-1");
+        Path testDir = extractResourcesAsPath("/mng-4615/test-1");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.setLogFileName("log-a.txt");
@@ -86,9 +87,9 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest extends AbstractM
      */
     @Test
     public void testitExprSet() throws Exception {
-        File testDir = extractResources("/mng-4615/test-1");
+        Path testDir = extractResourcesAsPath("/mng-4615/test-1");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Dconfig.requiredParam=CLI");
@@ -113,9 +114,9 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest extends AbstractM
         // cf. MNG-4764
         // requiresMavenVersion("[3.0-beta-2,)");
 
-        File testDir = extractResources("/mng-4615/test-2a");
+        Path testDir = extractResourcesAsPath("/mng-4615/test-2a");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         try {
@@ -136,9 +137,9 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest extends AbstractM
      */
     @Test
     public void testitPomValSet() throws Exception {
-        File testDir = extractResources("/mng-4615/test-2b");
+        Path testDir = extractResourcesAsPath("/mng-4615/test-2b");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

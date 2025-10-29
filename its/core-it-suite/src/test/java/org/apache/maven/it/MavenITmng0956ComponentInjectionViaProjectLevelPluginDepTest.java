@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -40,8 +41,8 @@ public class MavenITmng0956ComponentInjectionViaProjectLevelPluginDepTest extend
      */
     @Test
     public void testitMNG0956() throws Exception {
-        File testDir = extractResources("/mng-0956");
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Path testDir = extractResourcesAsPath("/mng-0956");
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng0956");

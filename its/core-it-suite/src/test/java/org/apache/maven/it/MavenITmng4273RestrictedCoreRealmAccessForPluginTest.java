@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -42,9 +43,9 @@ public class MavenITmng4273RestrictedCoreRealmAccessForPluginTest extends Abstra
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4273");
+        Path testDir = extractResourcesAsPath("/mng-4273");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.addCliArgument("validate");
         verifier.execute();

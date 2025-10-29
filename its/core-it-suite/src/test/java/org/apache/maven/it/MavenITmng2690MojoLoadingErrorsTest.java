@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.io.IOException;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -44,16 +45,16 @@ class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegrationTestCa
 
     @Test
     public void testNoClassDefFromMojoLoad() throws IOException, VerificationException {
-        File testDir = extractResources("/mng-2690/noclassdef-mojo");
+        Path testDir = extractResourcesAsPath("/mng-2690/noclassdef-mojo");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
 
         verifier.addCliArgument("validate");
         VerificationException exception =
                 assertThrows(VerificationException.class, verifier::execute, "should throw an error during execution.");
 
-        List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
+        List<String> lines = verifier.loadFile(testDir.resolve("log.txt"), false);
 
         int msg = indexOf(lines, "(?i).*required class is missing.*");
         assertTrue(msg >= 0, "User-friendly message was not found in output.");
@@ -64,16 +65,16 @@ class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegrationTestCa
 
     @Test
     public void testNoClassDefFromMojoConfiguration() throws IOException, VerificationException {
-        File testDir = extractResources("/mng-2690/noclassdef-param");
+        Path testDir = extractResourcesAsPath("/mng-2690/noclassdef-param");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
 
         verifier.addCliArgument("validate");
         VerificationException exception =
                 assertThrows(VerificationException.class, verifier::execute, "should throw an error during execution.");
 
-        List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
+        List<String> lines = verifier.loadFile(testDir.resolve("log.txt"), false);
 
         int msg = indexOf(lines, "(?i).*required class (i|wa)s missing( during (mojo )?configuration)?.*");
         assertTrue(msg >= 0, "User-friendly message was not found in output.");
@@ -84,16 +85,16 @@ class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegrationTestCa
 
     @Test
     public void testMojoComponentLookupException() throws IOException, VerificationException {
-        File testDir = extractResources("/mng-2690/mojo-complookup");
+        Path testDir = extractResourcesAsPath("/mng-2690/mojo-complookup");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
 
         verifier.addCliArgument("validate");
         VerificationException exception =
                 assertThrows(VerificationException.class, verifier::execute, "should throw an error during execution.");
 
-        List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
+        List<String> lines = verifier.loadFile(testDir.resolve("log.txt"), false);
 
         String compLookupMsg = "(?i).*unable to .* mojo 'mojo-component-lookup-exception' .* plugin "
                 + "'org\\.apache\\.maven\\.its\\.plugins:maven-it-plugin-error.*";
@@ -103,16 +104,16 @@ class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegrationTestCa
 
     @Test
     public void testMojoRequirementComponentLookupException() throws IOException, VerificationException {
-        File testDir = extractResources("/mng-2690/requirement-complookup");
+        Path testDir = extractResourcesAsPath("/mng-2690/requirement-complookup");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
 
         verifier.addCliArgument("validate");
         VerificationException exception =
                 assertThrows(VerificationException.class, verifier::execute, "should throw an error during execution.");
 
-        List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
+        List<String> lines = verifier.loadFile(testDir.resolve("log.txt"), false);
 
         String compLookupMsg = "(?i).*unable to .* mojo 'requirement-component-lookup-exception' .* plugin "
                 + "'org\\.apache\\.maven\\.its\\.plugins:maven-it-plugin-error.*";

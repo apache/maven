@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -41,9 +42,9 @@ public class MavenITmng4008MergedFilterOrderTest extends AbstractMavenIntegratio
      */
     @Test
     public void testitMNG4008() throws Exception {
-        File testDir = extractResources("/mng-4008");
+        Path testDir = extractResourcesAsPath("/mng-4008");
 
-        Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("sub").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

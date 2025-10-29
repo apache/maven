@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
@@ -28,8 +29,8 @@ public class MavenITmng7335MissingJarInParallelBuild extends AbstractMavenIntegr
 
     @Test
     public void testMissingJarInParallelBuild() throws IOException, VerificationException {
-        final File projectDir = extractResources(PROJECT_PATH);
-        final Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        final Path projectDir = extractResourcesAsPath(PROJECT_PATH);
+        final Verifier verifier = newVerifier(projectDir.toString());
         verifier.addCliArgument("-T1C");
         verifier.addCliArguments("clean", "package");
         verifier.execute();

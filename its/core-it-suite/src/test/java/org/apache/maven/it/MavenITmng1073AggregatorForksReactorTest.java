@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -39,9 +40,9 @@ public class MavenITmng1073AggregatorForksReactorTest extends AbstractMavenInteg
         // excluded 2.1.x and 2.2.x due to MNG-4325
         // requiresMavenVersion("[2.0,2.1.0),[3.0-alpha-3,)");
 
-        File testDir = extractResources("/mng-1073");
+        Path testDir = extractResourcesAsPath("/mng-1073");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("sub-1/target");
@@ -64,9 +65,9 @@ public class MavenITmng1073AggregatorForksReactorTest extends AbstractMavenInteg
      */
     @Test
     public void testitForkGoal() throws Exception {
-        File testDir = extractResources("/mng-1073");
+        Path testDir = extractResourcesAsPath("/mng-1073");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("sub-1/target");

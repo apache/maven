@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Properties;
@@ -43,17 +44,17 @@ public class MavenITmng1751ForcedMetadataUpdateDuringDeploymentTest extends Abst
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-1751");
+        Path testDir = extractResourcesAsPath("/mng-1751");
 
-        File dir = new File(testDir, "repo/org/apache/maven/its/mng1751/dep/0.1-SNAPSHOT");
-        File templateMetadataFile = new File(dir, "template-metadata.xml");
-        File metadataFile = new File(dir, "maven-metadata.xml");
+        File dir = testDir.resolve("repo/org/apache/maven/its/mng1751/dep/0.1-SNAPSHOT");
+        File templateMetadataFile = dir.resolve("template-metadata.xml");
+        File metadataFile = dir.resolve("maven-metadata.xml");
         Files.copy(templateMetadataFile.toPath(), metadataFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         String checksum = ItUtils.calcHash(metadataFile, "SHA-1");
         Files.writeString(metadataFile.toPath().getParent().resolve(metadataFile.getName() + ".sha1"), checksum);
 
         // phase 1: deploy a new snapshot, this should update the metadata despite its future timestamp
-        Verifier verifier = newVerifier(new File(testDir, "dep").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("dep").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng1751");
         verifier.addCliArgument("validate");
@@ -61,7 +62,7 @@ public class MavenITmng1751ForcedMetadataUpdateDuringDeploymentTest extends Abst
         verifier.verifyErrorFreeLog();
 
         // phase 2: resolve snapshot, if the previous deployment didn't update the metadata, we get the wrong file
-        verifier = newVerifier(new File(testDir, "test").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("test").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng1751");
         verifier.filterFile("settings-template.xml", "settings.xml");

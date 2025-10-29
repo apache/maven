@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -42,10 +43,10 @@ public class MavenITmng4331DependencyCollectionTest extends AbstractMavenIntegra
      */
     @Test
     public void testitEarlyLifecyclePhase() throws Exception {
-        File testDir = extractResources("/mng-4331");
+        Path testDir = extractResourcesAsPath("/mng-4331");
 
         // First, build the test plugin
-        Verifier verifier = newVerifier(new File(testDir, "maven-it-plugin-dependency-collection").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-dependency-collection").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -53,7 +54,7 @@ public class MavenITmng4331DependencyCollectionTest extends AbstractMavenIntegra
         verifier.verifyErrorFreeLog();
 
         // Then, run the test project that uses the plugin
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4331");
         verifier.deleteDirectory("sub-2/target");
@@ -75,10 +76,10 @@ public class MavenITmng4331DependencyCollectionTest extends AbstractMavenIntegra
      */
     @Test
     public void testitCliAggregator() throws Exception {
-        File testDir = extractResources("/mng-4331");
+        Path testDir = extractResourcesAsPath("/mng-4331");
 
         // First, build the test plugin
-        Verifier verifier = newVerifier(new File(testDir, "maven-it-plugin-dependency-collection").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-dependency-collection").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -86,7 +87,7 @@ public class MavenITmng4331DependencyCollectionTest extends AbstractMavenIntegra
         verifier.verifyErrorFreeLog();
 
         // Then, run the test project that uses the plugin
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4331");

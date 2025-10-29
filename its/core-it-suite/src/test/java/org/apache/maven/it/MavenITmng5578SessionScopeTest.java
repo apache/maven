@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -26,20 +27,20 @@ public class MavenITmng5578SessionScopeTest extends AbstractMavenIntegrationTest
 
     @Test
     public void testBasic() throws Exception {
-        File testDir = extractResources("/mng-5578-session-scope");
-        File pluginDir = new File(testDir, "plugin");
-        File projectDir = new File(testDir, "basic");
+        Path testDir = extractResourcesAsPath("/mng-5578-session-scope");
+        File pluginDir = testDir.resolve("plugin");
+        File projectDir = testDir.resolve("basic");
 
         Verifier verifier;
 
         // install the test plugin
-        verifier = newVerifier(pluginDir.getAbsolutePath());
+        verifier = newVerifier(pluginDir.toString());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // build the test project
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir.toString());
         verifier.addCliArgument("-Dit-build-extensions=false");
         verifier.addCliArgument("package");
         verifier.execute();
@@ -48,20 +49,20 @@ public class MavenITmng5578SessionScopeTest extends AbstractMavenIntegrationTest
 
     @Test
     public void testBasicMultithreaded() throws Exception {
-        File testDir = extractResources("/mng-5578-session-scope");
-        File pluginDir = new File(testDir, "plugin");
-        File projectDir = new File(testDir, "basic");
+        Path testDir = extractResourcesAsPath("/mng-5578-session-scope");
+        File pluginDir = testDir.resolve("plugin");
+        File projectDir = testDir.resolve("basic");
 
         Verifier verifier;
 
         // install the test plugin
-        verifier = newVerifier(pluginDir.getAbsolutePath());
+        verifier = newVerifier(pluginDir.toString());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // build the test project
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir.toString());
         verifier.addCliArgument("-Dit-build-extensions=false");
         verifier.addCliArgument("--builder");
         verifier.addCliArgument("multithreaded");
@@ -74,20 +75,20 @@ public class MavenITmng5578SessionScopeTest extends AbstractMavenIntegrationTest
 
     @Test
     public void testBasicBuildExtension() throws Exception {
-        File testDir = extractResources("/mng-5578-session-scope");
-        File pluginDir = new File(testDir, "plugin");
-        File projectDir = new File(testDir, "basic");
+        Path testDir = extractResourcesAsPath("/mng-5578-session-scope");
+        File pluginDir = testDir.resolve("plugin");
+        File projectDir = testDir.resolve("basic");
 
         Verifier verifier;
 
         // install the test plugin
-        verifier = newVerifier(pluginDir.getAbsolutePath());
+        verifier = newVerifier(pluginDir.toString());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // build the test project
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir.toString());
         verifier.addCliArgument("-Dit-build-extensions=true");
         verifier.addCliArgument("package");
         verifier.execute();
@@ -96,28 +97,28 @@ public class MavenITmng5578SessionScopeTest extends AbstractMavenIntegrationTest
 
     @Test
     public void testExtension() throws Exception {
-        File testDir = extractResources("/mng-5578-session-scope");
-        File extensionDir = new File(testDir, "extension");
-        File pluginDir = new File(testDir, "extension-plugin");
-        File projectDir = new File(testDir, "extension-project");
+        Path testDir = extractResourcesAsPath("/mng-5578-session-scope");
+        File extensionDir = testDir.resolve("extension");
+        File pluginDir = testDir.resolve("extension-plugin");
+        File projectDir = testDir.resolve("extension-project");
 
         Verifier verifier;
 
         // install the test extension
-        verifier = newVerifier(extensionDir.getAbsolutePath());
+        verifier = newVerifier(extensionDir.toString());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // install the test plugin
-        verifier = newVerifier(pluginDir.getAbsolutePath());
+        verifier = newVerifier(pluginDir.toString());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // build the test project
-        verifier = newVerifier(projectDir.getAbsolutePath());
-        verifier.addCliArgument("-Dmaven.ext.class.path=" + new File(extensionDir, "target/classes").getAbsolutePath());
+        verifier = newVerifier(projectDir.toString());
+        verifier.addCliArgument("-Dmaven.ext.class.path=" + extensionDir.resolve("target/classes").getAbsolutePath());
         verifier.setForkJvm(true); // verifier does not support custom realms in embedded mode
         verifier.addCliArgument("package");
         verifier.execute();

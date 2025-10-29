@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
 
@@ -41,9 +42,9 @@ public class MavenITmng3297DependenciesNotLeakedToMojoTest extends AbstractMaven
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-3297");
+        Path testDir = extractResourcesAsPath("/mng-3297");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("initialize");

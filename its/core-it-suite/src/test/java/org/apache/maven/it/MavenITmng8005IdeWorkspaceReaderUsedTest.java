@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -26,14 +27,14 @@ public class MavenITmng8005IdeWorkspaceReaderUsedTest extends AbstractMavenInteg
 
     @Test
     public void testWithIdeWorkspaceReaderUsed() throws Exception {
-        File testDir = extractResources("/mng-8005");
+        Path testDir = extractResourcesAsPath("/mng-8005");
 
-        Verifier verifier = newVerifier(new File(testDir, "extension").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("extension").getAbsolutePath());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
 
         verifier.addCliArgument("process-resources");
         verifier.execute();

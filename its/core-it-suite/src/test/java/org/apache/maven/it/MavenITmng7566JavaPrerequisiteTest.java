@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -38,9 +39,9 @@ class MavenITmng7566JavaPrerequisiteTest extends AbstractMavenIntegrationTestCas
      */
     @Test
     void testitMojoExecution() throws Exception {
-        File testDir = extractResources("/mng-7566");
+        Path testDir = extractResourcesAsPath("/mng-7566");
 
-        Verifier verifier = newVerifier(new File(testDir, "test-1").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("test-1").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng7566");
@@ -65,9 +66,9 @@ class MavenITmng7566JavaPrerequisiteTest extends AbstractMavenIntegrationTestCas
      */
     @Test
     void testitPluginVersionResolution() throws Exception {
-        File testDir = extractResources("/mng-7566");
+        Path testDir = extractResourcesAsPath("/mng-7566");
 
-        Verifier verifier = newVerifier(new File(testDir, "test-2").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("test-2").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng7566");

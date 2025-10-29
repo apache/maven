@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -73,9 +74,9 @@ public class MavenITmng4005UniqueDependencyKeyTest extends AbstractMavenIntegrat
     }
 
     private void test(String project) throws Exception {
-        File testDir = extractResources("/mng-4005/" + project);
+        Path testDir = extractResourcesAsPath("/mng-4005/" + project);
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         try {

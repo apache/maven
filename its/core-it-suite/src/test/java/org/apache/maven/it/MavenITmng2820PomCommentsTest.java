@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.nio.file.Files;
 
 import org.junit.jupiter.api.Test;
@@ -39,9 +40,9 @@ public class MavenITmng2820PomCommentsTest extends AbstractMavenIntegrationTestC
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-2820");
+        Path testDir = extractResourcesAsPath("/mng-2820");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng2820");
@@ -52,7 +53,7 @@ public class MavenITmng2820PomCommentsTest extends AbstractMavenIntegrationTestC
         File installed = new File(verifier.getArtifactPath("org.apache.maven.its.mng2820", "test", "0.1", "pom"));
         assertPomComments(installed);
 
-        File deployed = new File(testDir, "target/repo/org/apache/maven/its/mng2820/test/0.1/test-0.1.pom");
+        File deployed = testDir.resolve("target/repo/org/apache/maven/its/mng2820/test/0.1/test-0.1.pom");
         assertPomComments(deployed);
     }
 

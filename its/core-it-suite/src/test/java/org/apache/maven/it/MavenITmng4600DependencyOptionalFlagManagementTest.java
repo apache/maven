@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
 
@@ -42,9 +43,9 @@ public class MavenITmng4600DependencyOptionalFlagManagementTest extends Abstract
      */
     @Test
     public void testitModel() throws Exception {
-        File testDir = extractResources("/mng-4600/model");
+        Path testDir = extractResourcesAsPath("/mng-4600/model");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
@@ -64,9 +65,9 @@ public class MavenITmng4600DependencyOptionalFlagManagementTest extends Abstract
      */
     @Test
     public void testitResolution() throws Exception {
-        File testDir = extractResources("/mng-4600/resolution");
+        Path testDir = extractResourcesAsPath("/mng-4600/resolution");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4600");

@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -40,9 +41,9 @@ public class MavenITmng3645POMSyntaxErrorTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-3645");
+        Path testDir = extractResourcesAsPath("/mng-3645");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
 
         try {

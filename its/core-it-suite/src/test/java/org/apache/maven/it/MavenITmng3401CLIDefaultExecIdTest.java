@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -56,9 +57,9 @@ public class MavenITmng3401CLIDefaultExecIdTest extends AbstractMavenIntegration
     }
 
     private void testit(String project) throws Exception {
-        File testDir = extractResources("/mng-3401/" + project);
+        Path testDir = extractResourcesAsPath("/mng-3401/" + project);
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-configuration:2.1-SNAPSHOT:config");

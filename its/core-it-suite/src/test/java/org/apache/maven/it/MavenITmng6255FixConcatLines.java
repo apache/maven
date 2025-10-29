@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.nio.file.Files;
 import java.util.Properties;
 
@@ -70,15 +71,15 @@ class MavenITmng6255FixConcatLines extends AbstractMavenIntegrationTestCase {
     }
 
     protected void runWithLineEndings(String lineEndings) throws Exception {
-        File baseDir = extractResources("/mng-6255");
-        File mvnDir = new File(baseDir, ".mvn");
+        Path baseDir = extractResourcesAsPath("/mng-6255");
+        File mvnDir = baseDir.resolve(".mvn");
 
-        File jvmConfig = new File(mvnDir, "jvm.config");
+        File jvmConfig = mvnDir.resolve("jvm.config");
         createJvmConfigFile(jvmConfig, lineEndings, "-Djvm.config=ok", "-Xms256m", "-Xmx512m");
 
-        Verifier verifier = newVerifier(baseDir.getAbsolutePath());
+        Verifier verifier = newVerifier(baseDir.toString());
         verifier.addCliArgument(
-                "-Dexpression.outputFile=" + new File(baseDir, "expression.properties").getAbsolutePath());
+                "-Dexpression.outputFile=" + baseDir.resolve("expression.properties").getAbsolutePath());
         verifier.setForkJvm(true); // custom .mvn/jvm.config
         verifier.addCliArgument("validate");
         verifier.execute();

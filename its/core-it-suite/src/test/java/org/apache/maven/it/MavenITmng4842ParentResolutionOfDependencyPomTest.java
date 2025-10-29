@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -41,9 +42,9 @@ public class MavenITmng4842ParentResolutionOfDependencyPomTest extends AbstractM
      */
     @Test
     public void testitCore() throws Exception {
-        File testDir = extractResources("/mng-4842");
+        Path testDir = extractResourcesAsPath("/mng-4842");
 
-        Verifier verifier = newVerifier(new File(testDir, "core").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("core").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4842");
@@ -69,9 +70,9 @@ public class MavenITmng4842ParentResolutionOfDependencyPomTest extends AbstractM
      */
     @Test
     public void testitPlugin() throws Exception {
-        File testDir = extractResources("/mng-4842");
+        Path testDir = extractResourcesAsPath("/mng-4842");
 
-        Verifier verifier = newVerifier(new File(testDir, "plugin").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("plugin").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4842");

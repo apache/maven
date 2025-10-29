@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -42,9 +43,9 @@ public class MavenITmng5000ChildPathAwareUrlInheritanceTest extends AbstractMave
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-5000");
+        Path testDir = extractResourcesAsPath("/mng-5000");
 
-        Verifier verifier = newVerifier(new File(testDir, "different-from-artifactId").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("different-from-artifactId").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

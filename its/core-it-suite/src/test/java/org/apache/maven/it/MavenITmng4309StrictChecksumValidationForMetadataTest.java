@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.Test;
@@ -38,13 +39,13 @@ public class MavenITmng4309StrictChecksumValidationForMetadataTest extends Abstr
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4309");
+        Path testDir = extractResourcesAsPath("/mng-4309");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4309");
-        FileUtils.copyDirectoryStructure(new File(testDir, "repo"), new File(testDir, "target/repo"));
+        FileUtils.copyDirectoryStructure(testDir.resolve("repo"), testDir.resolve("target/repo"));
         verifier.addCliArgument("--strict-checksums");
         try {
             verifier.addCliArgument("validate");

@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -143,9 +144,9 @@ public class MavenITmng7468UnsupportedPluginsParametersTest extends AbstractMave
     }
 
     private List<String> performTest(String project) throws Exception {
-        File testDir = extractResources("/mng-7468-unsupported-params");
+        Path testDir = extractResourcesAsPath("/mng-7468-unsupported-params");
 
-        Verifier verifier = newVerifier(new File(testDir, project).getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve(project).getAbsolutePath());
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

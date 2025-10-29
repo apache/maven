@@ -36,9 +36,9 @@ class MavenITmng7740ConsumerBuildShouldCleanUpOldFilesTest extends AbstractMaven
 
     @Test
     void testConsumerBuildShouldCleanUpOldConsumerFiles() throws Exception {
-        File testDir = extractResources("/mng-7740-consumer-files");
+        Path testDir = extractResourcesAsPath("/mng-7740-consumer-files");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.addCliArgument("validate");
 
         verifier.execute();

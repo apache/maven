@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.io.IOException;
 import java.util.List;
 
@@ -102,16 +103,16 @@ class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase
      */
     @Test
     public void testmng3652UnConfiguredHttp() throws Exception {
-        File testDir = extractResources("/mng-3652");
-        File pluginDir = new File(testDir, "test-plugin");
-        File projectDir = new File(testDir, "test-project");
+        Path testDir = extractResourcesAsPath("/mng-3652");
+        File pluginDir = testDir.resolve("test-plugin");
+        File projectDir = testDir.resolve("test-project");
 
-        Verifier verifier = newVerifier(pluginDir.getAbsolutePath());
+        Verifier verifier = newVerifier(pluginDir.toString());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir.toString());
 
         verifier.addCliArgument("-DtestPort=" + port);
         verifier.addCliArgument("-X");
@@ -124,7 +125,7 @@ class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase
         String userAgent = this.userAgent;
         assertNotNull(userAgent);
 
-        File touchFile = new File(projectDir, "target/touch.txt");
+        File touchFile = projectDir.resolve("target/touch.txt");
         assertTrue(touchFile.exists());
 
         List<String> lines = verifier.loadFile(touchFile, false);
@@ -145,16 +146,16 @@ class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase
 
     @Test
     public void testmng3652UnConfiguredDAV() throws Exception {
-        File testDir = extractResources("/mng-3652");
-        File pluginDir = new File(testDir, "test-plugin");
-        File projectDir = new File(testDir, "test-project");
+        Path testDir = extractResourcesAsPath("/mng-3652");
+        File pluginDir = testDir.resolve("test-plugin");
+        File projectDir = testDir.resolve("test-project");
 
-        Verifier verifier = newVerifier(pluginDir.getAbsolutePath());
+        Verifier verifier = newVerifier(pluginDir.toString());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir.toString());
 
         // test webdav
         verifier.addCliArgument("-DtestPort=" + port);
@@ -166,7 +167,7 @@ class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        File touchFile = new File(projectDir, "target/touch.txt");
+        File touchFile = projectDir.resolve("target/touch.txt");
         assertTrue(touchFile.exists());
 
         List<String> lines = verifier.loadFile(touchFile, false);
@@ -190,16 +191,16 @@ class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase
 
     @Test
     public void testmng3652ConfigurationInSettingsWithoutUserAgent() throws Exception {
-        File testDir = extractResources("/mng-3652");
-        File pluginDir = new File(testDir, "test-plugin");
-        File projectDir = new File(testDir, "test-project");
+        Path testDir = extractResourcesAsPath("/mng-3652");
+        File pluginDir = testDir.resolve("test-plugin");
+        File projectDir = testDir.resolve("test-project");
 
-        Verifier verifier = newVerifier(pluginDir.getAbsolutePath());
+        Verifier verifier = newVerifier(pluginDir.toString());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir.toString());
 
         // test settings with no config
 
@@ -213,7 +214,7 @@ class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        File touchFile = new File(projectDir, "target/touch.txt");
+        File touchFile = projectDir.resolve("target/touch.txt");
         assertTrue(touchFile.exists());
 
         List<String> lines = verifier.loadFile(touchFile, false);
@@ -237,16 +238,16 @@ class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase
 
     @Test
     public void testmng3652UserAgentConfiguredInSettings() throws Exception {
-        File testDir = extractResources("/mng-3652");
-        File pluginDir = new File(testDir, "test-plugin");
-        File projectDir = new File(testDir, "test-project");
+        Path testDir = extractResourcesAsPath("/mng-3652");
+        File pluginDir = testDir.resolve("test-plugin");
+        File projectDir = testDir.resolve("test-project");
 
-        Verifier verifier = newVerifier(pluginDir.getAbsolutePath());
+        Verifier verifier = newVerifier(pluginDir.toString());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir.toString());
 
         // test settings with config
 
@@ -269,16 +270,16 @@ class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase
 
     @Test
     public void testmng3652AdditionnalHttpHeaderConfiguredInSettings() throws Exception {
-        File testDir = extractResources("/mng-3652");
-        File pluginDir = new File(testDir, "test-plugin");
-        File projectDir = new File(testDir, "test-project");
+        Path testDir = extractResourcesAsPath("/mng-3652");
+        File pluginDir = testDir.resolve("test-plugin");
+        File projectDir = testDir.resolve("test-project");
 
-        Verifier verifier = newVerifier(pluginDir.getAbsolutePath());
+        Verifier verifier = newVerifier(pluginDir.toString());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir.toString());
 
         // test settings with config
 

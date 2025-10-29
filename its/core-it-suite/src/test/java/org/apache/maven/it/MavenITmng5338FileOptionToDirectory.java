@@ -39,7 +39,7 @@ public class MavenITmng5338FileOptionToDirectory extends AbstractMavenIntegratio
 
     @Test
     public void testFileOptionToADirectory() throws Exception {
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
 
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

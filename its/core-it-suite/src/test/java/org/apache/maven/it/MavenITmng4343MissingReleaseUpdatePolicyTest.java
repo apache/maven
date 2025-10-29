@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Deque;
@@ -120,9 +121,9 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest extends AbstractMavenI
      */
     @Test
     public void testitAlways() throws Exception {
-        File testDir = extractResources("/mng-4343");
+        Path testDir = extractResourcesAsPath("/mng-4343");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4343");
         verifier.addCliArgument("-s");
@@ -171,9 +172,9 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest extends AbstractMavenI
      */
     @Test
     public void testitNever() throws Exception {
-        File testDir = extractResources("/mng-4343");
+        Path testDir = extractResourcesAsPath("/mng-4343");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4343");
         verifier.addCliArgument("-s");

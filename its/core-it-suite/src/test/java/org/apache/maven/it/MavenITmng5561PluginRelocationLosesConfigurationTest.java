@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -26,24 +27,24 @@ public class MavenITmng5561PluginRelocationLosesConfigurationTest extends Abstra
 
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-5561-plugin-relocation-loses-configuration");
-        File oldPluginWithRelocationDir = new File(testDir, "old-plugin-with-relocation");
-        File newPluginDir = new File(testDir, "new-plugin");
-        File projectDir = new File(testDir, "project");
+        Path testDir = extractResourcesAsPath("/mng-5561-plugin-relocation-loses-configuration");
+        File oldPluginWithRelocationDir = testDir.resolve("old-plugin-with-relocation");
+        File newPluginDir = testDir.resolve("new-plugin");
+        File projectDir = testDir.resolve("project");
 
         Verifier verifier;
 
-        verifier = newVerifier(oldPluginWithRelocationDir.getAbsolutePath());
+        verifier = newVerifier(oldPluginWithRelocationDir.toString());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(newPluginDir.getAbsolutePath());
+        verifier = newVerifier(newPluginDir.toString());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir.toString());
         verifier.addCliArgument("verify");
         verifier.execute();
         verifier.verifyErrorFreeLog();

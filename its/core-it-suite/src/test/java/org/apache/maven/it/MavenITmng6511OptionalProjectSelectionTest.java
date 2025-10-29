@@ -41,11 +41,11 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
 
     @Test
     public void testSelectExistingOptionalProfile() throws VerificationException {
-        Verifier cleaner = newVerifier(testDir.getAbsolutePath());
+        Verifier cleaner = newVerifier(testDir.toString());
         cleaner.addCliArgument("clean");
         cleaner.execute();
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setLogFileName("log-select-existing.txt");
         verifier.addCliArgument("-pl");
         verifier.addCliArgument("?existing-module");
@@ -57,11 +57,11 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
 
     @Test
     public void testSelectExistingOptionalProfileByArtifactId() throws VerificationException {
-        Verifier cleaner = newVerifier(testDir.getAbsolutePath());
+        Verifier cleaner = newVerifier(testDir.toString());
         cleaner.addCliArgument("clean");
         cleaner.execute();
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setLogFileName("log-select-existing-artifact-id.txt");
         verifier.addCliArgument("-pl");
         verifier.addCliArgument("?:existing-module");
@@ -73,11 +73,11 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
 
     @Test
     public void testSelectNonExistingOptionalProfile() throws VerificationException {
-        Verifier cleaner = newVerifier(testDir.getAbsolutePath());
+        Verifier cleaner = newVerifier(testDir.toString());
         cleaner.addCliArgument("clean");
         cleaner.execute();
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setLogFileName("log-select-non-existing.txt");
         verifier.addCliArgument("-pl");
         verifier.addCliArgument("?non-existing-module");
@@ -89,11 +89,11 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
 
     @Test
     public void testDeselectExistingOptionalProfile() throws VerificationException {
-        Verifier cleaner = newVerifier(testDir.getAbsolutePath());
+        Verifier cleaner = newVerifier(testDir.toString());
         cleaner.addCliArgument("clean");
         cleaner.execute();
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setLogFileName("log-deselect-existing.txt");
         verifier.addCliArgument("-pl");
         verifier.addCliArgument("!?existing-module");
@@ -106,11 +106,11 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
 
     @Test
     public void testDeselectNonExistingOptionalProfile() throws VerificationException {
-        Verifier cleaner = newVerifier(testDir.getAbsolutePath());
+        Verifier cleaner = newVerifier(testDir.toString());
         cleaner.addCliArgument("clean");
         cleaner.execute();
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setLogFileName("log-deselect-non-existing.txt");
         verifier.addCliArgument("-pl");
         verifier.addCliArgument("!?non-existing-module");

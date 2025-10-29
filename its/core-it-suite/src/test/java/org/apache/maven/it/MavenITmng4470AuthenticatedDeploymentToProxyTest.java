@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
@@ -190,9 +191,9 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest extends AbstractMa
     }
 
     private void testit(String project) throws Exception {
-        File testDir = extractResources("/mng-4470/" + project);
+        Path testDir = extractResourcesAsPath("/mng-4470/" + project);
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.filterFile(
                 "settings-template.xml",

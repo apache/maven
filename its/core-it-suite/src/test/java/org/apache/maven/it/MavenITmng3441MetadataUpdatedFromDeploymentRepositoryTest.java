@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -39,15 +40,15 @@ public class MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest extends A
 
     @Test
     public void testitMNG3441() throws Exception {
-        File testDir = extractResources("/mng-3441");
+        Path testDir = extractResourcesAsPath("/mng-3441");
 
-        File targetRepository = new File(testDir, "target-repo");
+        File targetRepository = testDir.resolve("target-repo");
         FileUtils.deleteDirectory(targetRepository);
-        FileUtils.copyDirectoryStructure(new File(testDir, "deploy-repo"), targetRepository);
+        FileUtils.copyDirectoryStructure(testDir.resolve("deploy-repo"), targetRepository);
 
         Verifier verifier;
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
 
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");

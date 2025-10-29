@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -31,17 +32,17 @@ class MavenITgh11084ReactorReaderPreferConsumerPomTest extends AbstractMavenInte
 
     @Test
     void partialReactorShouldResolveUsingConsumerPom() throws Exception {
-        File testDir = extractResources("/gh-11084-reactorreader-prefer-consumer-pom");
+        Path testDir = extractResourcesAsPath("/gh-11084-reactorreader-prefer-consumer-pom");
 
         // First build module a to populate project-local-repo with artifacts including consumer POM
-        Verifier v1 = newVerifier(testDir.getAbsolutePath());
+        Verifier v1 = newVerifier(testDir.toString());
         v1.addCliArguments("clean", "package", "-X", "-Dmaven.consumer.pom.flatten=true");
         v1.setLogFileName("log-1.txt");
         v1.execute();
         v1.verifyErrorFreeLog();
 
         // Now build only module b; ReactorReader should pick consumer POM from project-local-repo
-        Verifier v2 = newVerifier(testDir.getAbsolutePath());
+        Verifier v2 = newVerifier(testDir.toString());
         v2.setLogFileName("log-2.txt");
         v2.addCliArguments("clean", "compile", "-f", "b", "-X", "-Dmaven.consumer.pom.flatten=true");
         v2.execute();

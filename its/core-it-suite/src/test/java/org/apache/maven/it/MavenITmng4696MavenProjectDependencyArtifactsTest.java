@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Properties;
 
@@ -43,9 +44,9 @@ public class MavenITmng4696MavenProjectDependencyArtifactsTest extends AbstractM
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4696");
+        Path testDir = extractResourcesAsPath("/mng-4696");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4696");
         verifier.addCliArgument("-s");

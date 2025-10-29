@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Disabled;
@@ -44,8 +45,8 @@ public class MavenIT0140InterpolationWithPomPrefixTest extends AbstractMavenInte
      */
     @Test
     public void testit0140() throws Exception {
-        File testDir = extractResources("/it0140");
-        File child = new File(testDir, "child");
+        Path testDir = extractResourcesAsPath("/it0140");
+        File child = testDir.resolve("child");
 
         Verifier verifier = newVerifier(child.getAbsolutePath());
         verifier.setAutoclean(false);

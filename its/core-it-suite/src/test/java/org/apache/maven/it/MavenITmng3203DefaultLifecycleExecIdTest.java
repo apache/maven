@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -37,9 +38,9 @@ public class MavenITmng3203DefaultLifecycleExecIdTest extends AbstractMavenInteg
     public void testitMNG3203() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        File testDir = extractResources("/mng-3203");
+        Path testDir = extractResourcesAsPath("/mng-3203");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
 
         verifier.addCliArgument("compile");
         verifier.execute();

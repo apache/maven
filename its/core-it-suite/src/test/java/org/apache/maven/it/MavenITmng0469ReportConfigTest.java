@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -41,9 +42,9 @@ public class MavenITmng0469ReportConfigTest extends AbstractMavenIntegrationTest
      */
     @Test
     public void testitBuildConfigDominantDuringBuild() throws Exception {
-        File testDir = extractResources("/mng-0469/test1");
+        Path testDir = extractResourcesAsPath("/mng-0469/test1");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.deleteDirectory("target");
         verifier.setAutoclean(false);
         verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-configuration:2.1-SNAPSHOT:config");
@@ -60,9 +61,9 @@ public class MavenITmng0469ReportConfigTest extends AbstractMavenIntegrationTest
      */
     @Test
     public void testitBuildConfigIrrelevantForReports() throws Exception {
-        File testDir = extractResources("/mng-0469/test2");
+        Path testDir = extractResourcesAsPath("/mng-0469/test2");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.deleteDirectory("target");
         verifier.setAutoclean(false);
         // Inline version check: (,3.0-alpha-1) - current Maven version doesn't match this range

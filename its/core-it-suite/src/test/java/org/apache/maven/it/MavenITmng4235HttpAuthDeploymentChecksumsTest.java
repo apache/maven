@@ -72,7 +72,7 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest extends AbstractMaven
     protected void setUp() throws Exception {
         testDir = extractResources("/mng-4235");
 
-        repoHandler.setResourceBase(testDir.getAbsolutePath());
+        repoHandler.setResourceBase(testDir.toString());
 
         Constraint constraint = new Constraint();
         constraint.setName(Constraint.__BASIC_AUTH);
@@ -129,7 +129,7 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest extends AbstractMaven
         Map<String, String> filterProps = new HashMap<>();
         filterProps.put("@port@", Integer.toString(port));
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.filterFile("pom-template.xml", "pom.xml", filterProps);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4235");

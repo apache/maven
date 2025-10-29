@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -33,10 +34,10 @@ public class MavenITmng3372DirectInvocationOfPluginsTest extends AbstractMavenIn
     public void testitMNG3372() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        File testBaseDir = extractResources("/mng-3372/direct-using-prefix");
-        File plugin = new File(testBaseDir, "plugin");
-        File project = new File(testBaseDir, "project");
-        File settingsFile = new File(testBaseDir, "settings.xml");
+        Path testBaseDir = extractResourcesAsPath("/mng-3372/direct-using-prefix");
+        File plugin = testBaseDir.resolve("plugin");
+        File project = testBaseDir.resolve("project");
+        File settingsFile = testBaseDir.resolve("settings.xml");
 
         Verifier verifier = newVerifier(plugin.getAbsolutePath());
 
@@ -62,9 +63,9 @@ public class MavenITmng3372DirectInvocationOfPluginsTest extends AbstractMavenIn
     public void testDependencyTreeInvocation() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        File testBaseDir = extractResources("/mng-3372/dependency-tree");
+        Path testBaseDir = extractResourcesAsPath("/mng-3372/dependency-tree");
 
-        Verifier verifier = newVerifier(testBaseDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testBaseDir.toString());
 
         verifier.addCliArgument("-U");
 

@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
@@ -57,9 +58,9 @@ public class MavenITmng3887PluginExecutionOrderTest extends AbstractMavenIntegra
     }
 
     private void testitMNG3887(String project) throws Exception {
-        File testDir = extractResources("/mng-3887");
+        Path testDir = extractResourcesAsPath("/mng-3887");
 
-        Verifier verifier = newVerifier(new File(testDir, project).getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve(project).getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

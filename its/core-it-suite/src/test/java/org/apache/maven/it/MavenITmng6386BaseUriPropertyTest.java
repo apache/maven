@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.codehaus.plexus.util.Os;
@@ -34,9 +35,9 @@ public class MavenITmng6386BaseUriPropertyTest extends AbstractMavenIntegrationT
 
     @Test
     public void testitMNG6386() throws Exception {
-        File testDir = extractResources("/mng-6386").getCanonicalFile();
+        Path testDir = extractResourcesAsPath("/mng-6386").getCanonicalFile();
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.setLogFileName("log-basic.txt");
@@ -62,9 +63,9 @@ public class MavenITmng6386BaseUriPropertyTest extends AbstractMavenIntegrationT
         if (Os.isFamily(Os.FAMILY_WINDOWS)
                 || "UTF-8".equalsIgnoreCase(fileEncoding)
                 || "UTF8".equalsIgnoreCase(fileEncoding)) {
-            File testDir = extractResources("/mng-6386-это по-русский").getCanonicalFile();
+            Path testDir = extractResourcesAsPath("/mng-6386-это по-русский").getCanonicalFile();
 
-            Verifier verifier = newVerifier(testDir.getAbsolutePath());
+            Verifier verifier = newVerifier(testDir.toString());
             verifier.setAutoclean(false);
             verifier.deleteDirectory("target");
             verifier.setLogFileName("log-basic.txt");

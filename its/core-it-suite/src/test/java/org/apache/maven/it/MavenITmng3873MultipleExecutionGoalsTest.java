@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -56,9 +57,9 @@ public class MavenITmng3873MultipleExecutionGoalsTest extends AbstractMavenInteg
     }
 
     private void testitMNG3873(String project) throws Exception {
-        File testDir = extractResources("/mng-3873");
+        Path testDir = extractResourcesAsPath("/mng-3873");
 
-        Verifier verifier = newVerifier(new File(testDir, project).getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve(project).getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

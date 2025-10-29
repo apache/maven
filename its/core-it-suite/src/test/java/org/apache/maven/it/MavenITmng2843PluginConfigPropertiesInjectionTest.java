@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -40,10 +41,10 @@ public class MavenITmng2843PluginConfigPropertiesInjectionTest extends AbstractM
      */
     @Test
     public void testitMNG2843() throws Exception {
-        File testDir = extractResources("/mng-2843");
+        Path testDir = extractResourcesAsPath("/mng-2843");
 
         // First, build the test plugin
-        Verifier verifier = newVerifier(new File(testDir, "maven-it-plugin-uses-properties").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-uses-properties").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -51,7 +52,7 @@ public class MavenITmng2843PluginConfigPropertiesInjectionTest extends AbstractM
         verifier.verifyErrorFreeLog();
 
         // Then, run the test project that uses the plugin
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

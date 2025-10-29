@@ -49,11 +49,11 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
      */
     @Test
     public void testShouldWarnWhenPackagedArtifactIsOutdated() throws Exception {
-        final File testDir = extractResources("/mng-4660-outdated-packaged-artifact");
+        final Path testDir = extractResourcesAsPath("/mng-4660-outdated-packaged-artifact");
         Files.createDirectories(testDir.toPath().resolve(".mvn"));
 
         // 1. Package the whole project
-        final Verifier verifier1 = newVerifier(testDir.getAbsolutePath());
+        final Verifier verifier1 = newVerifier(testDir.toString());
         verifier1.deleteDirectory("target");
         verifier1.deleteArtifacts("org.apache.maven.its.mng4660");
 
@@ -73,7 +73,7 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
         }
 
         // 2. Create a properties file with some content and compile only that module (module A).
-        final Verifier verifier2 = newVerifier(testDir.getAbsolutePath());
+        final Verifier verifier2 = newVerifier(testDir.toString());
         final Path resourcesDirectory =
                 Files.createDirectories(Paths.get(testDir.toString(), "module-a", "src", "main", "resources"));
         final Path fileToWrite = resourcesDirectory.resolve("example.properties");
@@ -101,7 +101,7 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
 
         // 3. Resume project build from module B, that depends on module A we just touched. Its packaged artifact
         // is no longer in sync with its compiled artifacts.
-        final Verifier verifier3 = newVerifier(testDir.getAbsolutePath());
+        final Verifier verifier3 = newVerifier(testDir.toString());
         verifier3.setAutoclean(false);
         verifier3.addCliArgument("--resume-from");
         verifier3.addCliArgument(":module-b");

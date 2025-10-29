@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -26,10 +27,10 @@ public class MavenITmng5805PkgTypeMojoConfiguration2 extends AbstractMavenIntegr
 
     @Test
     public void testPkgTypeMojoConfiguration() throws Exception {
-        File testDir = extractResources("/mng-5805-pkg-type-mojo-configuration2");
+        Path testDir = extractResourcesAsPath("/mng-5805-pkg-type-mojo-configuration2");
 
         // First, build the test plugin dependency
-        Verifier verifier = newVerifier(new File(testDir, "mng5805-plugin-dep").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("mng5805-plugin-dep").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -37,7 +38,7 @@ public class MavenITmng5805PkgTypeMojoConfiguration2 extends AbstractMavenIntegr
         verifier.verifyErrorFreeLog();
 
         // Then, build the test extension2
-        verifier = newVerifier(new File(testDir, "mng5805-extension2").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("mng5805-extension2").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -45,7 +46,7 @@ public class MavenITmng5805PkgTypeMojoConfiguration2 extends AbstractMavenIntegr
         verifier.verifyErrorFreeLog();
 
         // Then, build the test plugin
-        verifier = newVerifier(new File(testDir, "mng5805-plugin").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("mng5805-plugin").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -53,7 +54,7 @@ public class MavenITmng5805PkgTypeMojoConfiguration2 extends AbstractMavenIntegr
         verifier.verifyErrorFreeLog();
 
         // Finally, run the test project
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

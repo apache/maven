@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.io.FileReader;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -35,11 +36,11 @@ public class MavenITmng8106OverlappingDirectoryRolesTest extends AbstractMavenIn
 
     @Test
     public void testDirectoryOverlap() throws Exception {
-        File testDir = extractResources("/mng-8106");
-        String repo = new File(testDir, "repo").getAbsolutePath();
+        Path testDir = extractResourcesAsPath("/mng-8106");
+        String repo = testDir.resolve("repo").getAbsolutePath();
         String tailRepo = System.getProperty("user.home") + File.separator + ".m2" + File.separator + "repository";
 
-        Verifier verifier = newVerifier(new File(testDir, "plugin").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("plugin").getAbsolutePath());
         verifier.addCliArgument("-X");
         verifier.addCliArgument("-Dmaven.repo.local=" + repo);
         verifier.addCliArgument("-Dmaven.repo.local.tail=" + tailRepo);
@@ -47,7 +48,7 @@ public class MavenITmng8106OverlappingDirectoryRolesTest extends AbstractMavenIn
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(new File(testDir, "jar").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("jar").getAbsolutePath());
         verifier.addCliArgument("-X");
         verifier.addCliArgument("-Dmaven.repo.local=" + repo);
         verifier.addCliArgument("-Dmaven.repo.local.tail=" + tailRepo);

@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -41,7 +42,7 @@ public class MavenITmng3642DynamicResourcesTest extends AbstractMavenIntegration
     public void testitMNG3642() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        File testDir = extractResources("/mng-3642");
+        Path testDir = extractResourcesAsPath("/mng-3642");
 
         Verifier verifier;
 
@@ -52,7 +53,7 @@ public class MavenITmng3642DynamicResourcesTest extends AbstractMavenIntegration
          * unstable test results. Fortunately, the verifier
          * makes it easy to do this.
          */
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
 
         /*
          * The Command Line Options (CLI) are passed to the
@@ -76,10 +77,10 @@ public class MavenITmng3642DynamicResourcesTest extends AbstractMavenIntegration
          */
         verifier.verifyErrorFreeLog();
 
-        File first = new File(testDir, "target/test-classes/one.txt");
+        File first = testDir.resolve("target/test-classes/one.txt");
         assertTrue(first.exists(), "First resource file was not present: " + first);
 
-        File second = new File(testDir, "target/test-classes/two.txt");
+        File second = testDir.resolve("target/test-classes/two.txt");
         assertTrue(second.exists(), "Second resource file was not present: " + second);
     }
 }

@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -35,11 +36,11 @@ public class MavenITmng3600DeploymentModeDefaultsTest extends AbstractMavenInteg
 
     @Test
     public void testitMNG3600NoSettings() throws Exception {
-        File testDir = extractResources("/mng-3600");
+        Path testDir = extractResourcesAsPath("/mng-3600");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
 
-        new File(testDir, "wagon.properties").delete();
+        testDir.resolve("wagon.properties").delete();
         verifier.setLogFileName("log-no-settings.txt");
         verifier.addCliArgument("validate");
         verifier.execute();
@@ -53,11 +54,11 @@ public class MavenITmng3600DeploymentModeDefaultsTest extends AbstractMavenInteg
 
     @Test
     public void testitMNG3600ServerDefaults() throws Exception {
-        File testDir = extractResources("/mng-3600");
+        Path testDir = extractResourcesAsPath("/mng-3600");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
 
-        new File(testDir, "wagon.properties").delete();
+        testDir.resolve("wagon.properties").delete();
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings-server-defaults.xml");
         verifier.setLogFileName("log-server-defaults.txt");
@@ -73,11 +74,11 @@ public class MavenITmng3600DeploymentModeDefaultsTest extends AbstractMavenInteg
 
     @Test
     public void testitMNG3600ModesSet() throws Exception {
-        File testDir = extractResources("/mng-3600");
+        Path testDir = extractResourcesAsPath("/mng-3600");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
 
-        new File(testDir, "wagon.properties").delete();
+        testDir.resolve("wagon.properties").delete();
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings-modes-set.xml");
         verifier.setLogFileName("log-modes-set.txt");

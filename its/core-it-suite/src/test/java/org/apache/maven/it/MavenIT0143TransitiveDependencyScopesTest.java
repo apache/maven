@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -237,9 +238,9 @@ public class MavenIT0143TransitiveDependencyScopesTest extends AbstractMavenInte
     }
 
     private Verifier run(String scope) throws Exception {
-        File testDir = extractResources("/it0143");
+        Path testDir = extractResourcesAsPath("/it0143");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target-" + scope);
         verifier.deleteArtifacts("org.apache.maven.its.it0143");

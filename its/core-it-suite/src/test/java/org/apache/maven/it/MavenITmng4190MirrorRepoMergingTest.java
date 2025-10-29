@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -44,9 +45,9 @@ public class MavenITmng4190MirrorRepoMergingTest extends AbstractMavenIntegratio
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4190");
+        Path testDir = extractResourcesAsPath("/mng-4190");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4190");

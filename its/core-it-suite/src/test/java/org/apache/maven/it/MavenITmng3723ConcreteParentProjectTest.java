@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -42,19 +43,19 @@ public class MavenITmng3723ConcreteParentProjectTest extends AbstractMavenIntegr
     public void testitMNG3723() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        File testDir = extractResources("/mng-3723");
-        File pluginDir = new File(testDir, "maven-mng3723-plugin");
-        File projectDir = new File(testDir, "projects");
+        Path testDir = extractResourcesAsPath("/mng-3723");
+        File pluginDir = testDir.resolve("maven-mng3723-plugin");
+        File projectDir = testDir.resolve("projects");
 
         Verifier verifier;
 
-        verifier = newVerifier(pluginDir.getAbsolutePath());
+        verifier = newVerifier(pluginDir.toString());
 
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir.toString());
 
         verifier.addCliArgument("validate");
         verifier.execute();

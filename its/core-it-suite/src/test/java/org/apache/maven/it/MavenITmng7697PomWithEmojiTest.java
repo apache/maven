@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -40,9 +41,9 @@ class MavenITmng7697PomWithEmojiTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void testPomRead() throws Exception {
-        File testDir = extractResources("/mng-7697-emoji");
+        Path testDir = extractResourcesAsPath("/mng-7697-emoji");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.addCliArgument("verify");
         verifier.execute();

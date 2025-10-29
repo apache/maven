@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -44,9 +45,9 @@ public class MavenITmng3811ReportingPluginConfigurationInheritanceTest extends A
      */
     @Test
     public void testitMNG3811() throws Exception {
-        File testDir = extractResources("/mng-3811");
+        Path testDir = extractResourcesAsPath("/mng-3811");
 
-        Verifier verifier = newVerifier(new File(testDir, "child").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("child").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

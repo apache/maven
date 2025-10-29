@@ -18,10 +18,9 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
-
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
@@ -33,10 +32,10 @@ class MavenITgh10210SettingsXmlDecryptTest extends AbstractMavenIntegrationTestC
 
     @Test
     void testItPass() throws Exception {
-        File testDir = extractResources("/gh-10210-settings-xml-decrypt");
+        Path testDir = extractResourcesAsPath("/gh-10210-settings-xml-decrypt");
 
-        Verifier verifier = new Verifier(testDir.getAbsolutePath());
-        verifier.setUserHomeDirectory(testDir.toPath().resolve("HOME"));
+        Verifier verifier = new Verifier(testDir);
+        verifier.setUserHomeDirectory(testDir.resolve("HOME"));
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings-passes.xml");
         verifier.addCliArgument("process-resources");
@@ -51,15 +50,15 @@ class MavenITgh10210SettingsXmlDecryptTest extends AbstractMavenIntegrationTestC
                         "prop5=Hello Oleg {L6L/HbmrY+cH+sNkphnq3fguYepTpM04WlIXb8nB1pk=} is this a password?",
                         "prop6=password",
                         "prop7=password"),
-                Files.readAllLines(testDir.toPath().resolve("target/classes/file.properties")));
+                Files.readAllLines(testDir.resolve("target/classes/file.properties")));
     }
 
     @Test
     void testItFail() throws Exception {
-        File testDir = extractResources("/gh-10210-settings-xml-decrypt");
+        Path testDir = extractResourcesAsPath("/gh-10210-settings-xml-decrypt");
 
-        Verifier verifier = new Verifier(testDir.getAbsolutePath());
-        verifier.setUserHomeDirectory(testDir.toPath().resolve("HOME"));
+        Verifier verifier = new Verifier(testDir);
+        verifier.setUserHomeDirectory(testDir.resolve("HOME"));
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings-fails.xml");
         verifier.addCliArgument("process-resources");

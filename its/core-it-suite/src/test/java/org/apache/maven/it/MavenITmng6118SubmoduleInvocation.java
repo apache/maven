@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
@@ -55,12 +56,12 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
     @Test
     public void testInSubModule() throws Exception {
         // Compile the whole project first.
-        Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
+        Verifier verifier = newVerifier(testDir.toString(), false);
         verifier.addCliArgument("package");
         verifier.execute();
 
-        final File submoduleDirectory = new File(testDir, "app");
-        verifier = newVerifier(submoduleDirectory.getAbsolutePath(), false);
+        final Path submoduleDirectory = testDir.resolve("app");
+        verifier = newVerifier(submoduleDirectory.toString(), false);
         verifier.setAutoclean(false);
         verifier.setLogFileName("log-insubmodule.txt");
         verifier.addCliArgument("compile");
@@ -75,11 +76,11 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
     @Test
     public void testWithFile() throws Exception {
         // Compile the whole project first.
-        Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
+        Verifier verifier = newVerifier(testDir.toString(), false);
         verifier.addCliArgument("package");
         verifier.execute();
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.setLogFileName("log-withfile.txt");
         verifier.addCliArgument("-f");
@@ -95,7 +96,7 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
      */
     @Test
     public void testWithFileAndAlsoMake() throws Exception {
-        Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
+        Verifier verifier = newVerifier(testDir.toString(), false);
         verifier.addCliArgument("-am");
         verifier.addCliArgument("-f");
         verifier.addCliArgument("app/pom.xml");
@@ -112,8 +113,8 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
      */
     @Test
     public void testInSubModuleWithAlsoMake() throws Exception {
-        File submoduleDirectory = new File(testDir, "app");
-        Verifier verifier = newVerifier(submoduleDirectory.getAbsolutePath(), false);
+        Path submoduleDirectory = testDir.resolve("app");
+        Verifier verifier = newVerifier(submoduleDirectory.toString(), false);
         verifier.addCliArgument("-am");
         verifier.setLogFileName("log-insubmodulealsomake.txt");
         verifier.addCliArgument("compile");

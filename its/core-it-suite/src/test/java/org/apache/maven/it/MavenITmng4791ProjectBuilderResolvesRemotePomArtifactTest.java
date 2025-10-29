@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -41,9 +42,9 @@ public class MavenITmng4791ProjectBuilderResolvesRemotePomArtifactTest extends A
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4791");
+        Path testDir = extractResourcesAsPath("/mng-4791");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4791");

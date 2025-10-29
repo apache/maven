@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -38,9 +39,9 @@ public class MavenITmng3217InterPluginDependencyTest extends AbstractMavenIntegr
      */
     @Test
     public void testitMNG3217() throws Exception {
-        File testDir = extractResources("/mng-3217");
+        Path testDir = extractResourcesAsPath("/mng-3217");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("sub-1/target");
         verifier.deleteDirectory("sub-2/target");

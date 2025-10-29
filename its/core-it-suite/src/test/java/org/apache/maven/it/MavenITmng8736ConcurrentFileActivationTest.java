@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -43,9 +44,9 @@ class MavenITmng8736ConcurrentFileActivationTest extends AbstractMavenIntegratio
      */
     @Test
     void testConcurrentFileActivation() throws Exception {
-        File testDir = extractResources("/mng-8736");
+        Path testDir = extractResourcesAsPath("/mng-8736");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.addCliArgument("-T");
         verifier.addCliArgument("4");
         verifier.addCliArgument("-Dmaven.modelBuilder.parallelism=4"); // Use 4 threads for concurrent execution
@@ -153,7 +154,7 @@ class MavenITmng8736ConcurrentFileActivationTest extends AbstractMavenIntegratio
         System.out.println("\nFile existence verification:");
         for (int i = 1; i <= 32; i++) {
             String module = "child" + i;
-            File activationFile = new File(testDir, module + "/activate.marker");
+            File activationFile = testDir.resolve(module + "/activate.marker");
             boolean shouldExist = (i % 2 == 1); // Odd-numbered modules should have activation files
             boolean exists = activationFile.exists();
 

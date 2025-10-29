@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -32,8 +33,8 @@ public class MavenITmng7128BlockExternalHttpReactorTest extends AbstractMavenInt
      */
     @Test
     public void testBlockedHttpRepositoryInPom() throws Exception {
-        final File projectDir = extractResources(PROJECT_PATH);
-        final Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        final Path projectDir = extractResourcesAsPath(PROJECT_PATH);
+        final Verifier verifier = newVerifier(projectDir.toString());
         // ITs override global settings that provide blocked mirror: need to define the mirror in dedicated settings
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");

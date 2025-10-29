@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -40,11 +41,11 @@ public class MavenITmng4381ExtensionSingletonComponentTest extends AbstractMaven
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4381");
+        Path testDir = extractResourcesAsPath("/mng-4381");
 
         // First, build the test plugin
         Verifier verifier =
-                newVerifier(new File(testDir, "sub-a/maven-it-plugin-extension-consumer").getAbsolutePath());
+                newVerifier(testDir.resolve("sub-a/maven-it-plugin-extension-consumer").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -52,7 +53,7 @@ public class MavenITmng4381ExtensionSingletonComponentTest extends AbstractMaven
         verifier.verifyErrorFreeLog();
 
         // Then, run the test project that uses the plugin
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("sub-a/target");
         verifier.deleteDirectory("sub-b/target");

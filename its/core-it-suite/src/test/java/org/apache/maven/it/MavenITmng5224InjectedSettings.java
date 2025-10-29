@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,10 +49,10 @@ class MavenITmng5224InjectedSettings extends AbstractMavenIntegrationTestCase {
      */
     @Test
     public void testmng5224ReadSettings() throws Exception {
-        File testDir = extractResources("/mng-5224");
+        Path testDir = extractResourcesAsPath("/mng-5224");
 
         // First, build the test plugin
-        Verifier verifier = newVerifier(new File(testDir, "maven-it-plugin-settings").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-settings").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -59,7 +60,7 @@ class MavenITmng5224InjectedSettings extends AbstractMavenIntegrationTestCase {
         verifier.verifyErrorFreeLog();
 
         // Then, run the test project that uses the plugin
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
 
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

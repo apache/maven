@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -83,11 +84,11 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
     public void testitTransferFailed() throws Exception {
         String methodName = getMethodName();
 
-        File testDir = extractResources(RESOURCE_BASE);
+        Path testDir = extractResourcesAsPath(RESOURCE_BASE);
 
         Verifier verifier;
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng3415");
 
@@ -154,11 +155,11 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
     public void testShouldNotRepeatedlyUpdateOnResourceNotFoundException() throws Exception {
         String methodName = getMethodName();
 
-        File testDir = extractResources(RESOURCE_BASE);
+        Path testDir = extractResourcesAsPath(RESOURCE_BASE);
 
         Verifier verifier;
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng3415");
 
@@ -258,7 +259,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
 
         File pom = new File(verifier.getArtifactPath(gid, aid, version, "pom"));
 
-        File pomSrc = new File(testDir, "dependency-pom.xml");
+        File pomSrc = testDir.resolve("dependency-pom.xml");
 
         System.out.println("Copying dependency POM\nfrom: " + pomSrc + "\nto: " + pom);
         Files.createDirectories(pom.toPath().getParent());

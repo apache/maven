@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -37,9 +38,9 @@ public class MavenITmng6558ToolchainsBuildingEventTest extends AbstractMavenInte
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-6558");
+        Path testDir = extractResourcesAsPath("/mng-6558");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setForkJvm(true); // maven.ext.class.path used
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

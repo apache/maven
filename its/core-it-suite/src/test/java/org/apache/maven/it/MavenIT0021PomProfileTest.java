@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -32,9 +33,9 @@ public class MavenIT0021PomProfileTest extends AbstractMavenIntegrationTestCase 
      */
     @Test
     public void testit0021() throws Exception {
-        File testDir = extractResources("/it0021");
+        Path testDir = extractResourcesAsPath("/it0021");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.it0021");
         verifier.getSystemProperties().setProperty("includeProfile", "true");

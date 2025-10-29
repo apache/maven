@@ -101,7 +101,7 @@ public class MavenITmng5868NoDuplicateAttachedArtifacts extends AbstractMavenInt
 
     @Test
     public void testNoDeployNotDuplicate() throws Exception {
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         Path tmp = Files.createTempFile(testDir.toPath(), "FOO", "txt");
 
         verifier.setAutoclean(false);

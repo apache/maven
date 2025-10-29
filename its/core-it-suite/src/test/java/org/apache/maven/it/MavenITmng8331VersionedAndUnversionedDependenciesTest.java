@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -43,9 +44,9 @@ class MavenITmng8331VersionedAndUnversionedDependenciesTest extends AbstractMave
      */
     @Test
     void allDependenciesArePresentInTheProject() throws Exception {
-        File testDir = extractResources("/mng-8331-versioned-and-unversioned-deps");
+        Path testDir = extractResourcesAsPath("/mng-8331-versioned-and-unversioned-deps");
 
-        Verifier verifier = new Verifier(testDir.getAbsolutePath());
+        Verifier verifier = new Verifier(testDir.toString());
         verifier.setLogFileName("allDependenciesArePresentInTheProject.txt");
         verifier.addCliArgument("test-compile");
         verifier.execute();

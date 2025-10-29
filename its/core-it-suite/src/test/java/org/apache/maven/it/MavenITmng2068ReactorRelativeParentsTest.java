@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -43,10 +44,10 @@ public class MavenITmng2068ReactorRelativeParentsTest extends AbstractMavenInteg
      */
     @Test
     public void testitInheritedIdFields() throws Exception {
-        File testDir = extractResources("/mng-2068/test-1");
-        File projectDir = new File(testDir, "parent");
+        Path testDir = extractResourcesAsPath("/mng-2068/test-1");
+        File projectDir = testDir.resolve("parent");
 
-        Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        Verifier verifier = newVerifier(projectDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng2068");
         verifier.addCliArgument("validate");
@@ -61,10 +62,10 @@ public class MavenITmng2068ReactorRelativeParentsTest extends AbstractMavenInteg
      */
     @Test
     public void testitExplicitIdFields() throws Exception {
-        File testDir = extractResources("/mng-2068/test-2");
-        File projectDir = new File(testDir, "parent");
+        Path testDir = extractResourcesAsPath("/mng-2068/test-2");
+        File projectDir = testDir.resolve("parent");
 
-        Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        Verifier verifier = newVerifier(projectDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng2068");
         verifier.addCliArgument("validate");
@@ -79,10 +80,10 @@ public class MavenITmng2068ReactorRelativeParentsTest extends AbstractMavenInteg
      */
     @Test
     public void testitComplex() throws Exception {
-        File testDir = extractResources("/mng-2068/test-3");
+        Path testDir = extractResourcesAsPath("/mng-2068/test-3");
         File projectDir = testDir;
 
-        Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        Verifier verifier = newVerifier(projectDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng2068");
         verifier.addCliArgument("validate");

@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Disabled;
@@ -44,9 +45,9 @@ public class MavenITmng3748BadSettingsXmlTest extends AbstractMavenIntegrationTe
 
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-3748");
+        Path testDir = extractResourcesAsPath("/mng-3748");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");

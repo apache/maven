@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -71,9 +72,9 @@ public class MavenITmng4690InterdependentConflictResolutionTest extends Abstract
      * levels) when the resolution of one conflict influences another conflict.
      */
     private void testit(String test) throws Exception {
-        File testDir = extractResources("/mng-4690");
+        Path testDir = extractResourcesAsPath("/mng-4690");
 
-        Verifier verifier = newVerifier(new File(testDir, test).getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve(test).getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4690");

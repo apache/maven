@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -41,11 +42,11 @@ public class MavenITmng2486TimestampedDependencyVersionInterpolationTest extends
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-2486");
+        Path testDir = extractResourcesAsPath("/mng-2486");
 
         Verifier verifier;
 
-        verifier = newVerifier(new File(testDir, "dep-a").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("dep-a").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng2486");
@@ -53,21 +54,21 @@ public class MavenITmng2486TimestampedDependencyVersionInterpolationTest extends
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(new File(testDir, "parent").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("parent").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(new File(testDir, "dep-b").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("dep-b").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(new File(testDir, "test").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("test").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         // enforce remote resolution

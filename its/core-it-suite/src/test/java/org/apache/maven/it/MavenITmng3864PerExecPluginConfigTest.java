@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -40,9 +41,9 @@ public class MavenITmng3864PerExecPluginConfigTest extends AbstractMavenIntegrat
      */
     @Test
     public void testitMNG3864() throws Exception {
-        File testDir = extractResources("/mng-3864");
+        Path testDir = extractResourcesAsPath("/mng-3864");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
@@ -51,7 +52,7 @@ public class MavenITmng3864PerExecPluginConfigTest extends AbstractMavenIntegrat
 
         Properties props = verifier.loadProperties("target/plugin-config.properties");
 
-        ItUtils.assertCanonicalFileEquals(new File(testDir, "pom.xml"), new File(props.getProperty("fileParam")));
+        ItUtils.assertCanonicalFileEquals(testDir.resolve("pom.xml"), new File(props.getProperty("fileParam")));
         assertEquals("true", props.getProperty("booleanParam"));
         assertEquals("42", props.getProperty("byteParam"));
         assertEquals("-12345", props.getProperty("shortParam"));

@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Deque;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
@@ -110,9 +111,9 @@ public class MavenITmng4781DeploymentToNexusStagingRepoTest extends AbstractMave
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4781");
+        Path testDir = extractResourcesAsPath("/mng-4781");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.addCliArgument("-DdeploymentPort=" + port);
         verifier.addCliArgument("validate");

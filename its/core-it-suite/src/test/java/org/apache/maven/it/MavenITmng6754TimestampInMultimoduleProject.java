@@ -42,8 +42,8 @@ public class MavenITmng6754TimestampInMultimoduleProject extends AbstractMavenIn
     @Test
     @SuppressWarnings("checkstyle:MethodLength")
     public void testArtifactsHaveSameTimestamp() throws Exception {
-        final File testDir = extractResources(RESOURCE_PATH);
-        final Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        final Path testDir = extractResourcesAsPath(RESOURCE_PATH);
+        final Verifier verifier = newVerifier(testDir.toString());
         final Path localRepoDir = Paths.get(verifier.getLocalRepository());
         final Path remoteRepoDir = Paths.get(verifier.getBasedir(), "repo");
 

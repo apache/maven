@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
@@ -52,12 +53,12 @@ public class MavenIT0108SnapshotUpdateTest extends AbstractMavenIntegrationTestC
 
     @BeforeEach
     protected void setUp() throws Exception {
-        File testDir = extractResources("/it0108");
-        verifier = newVerifier(testDir.getAbsolutePath());
+        Path testDir = extractResourcesAsPath("/it0108");
+        verifier = newVerifier(testDir.toString());
         localRepoFile = getLocalRepoFile(verifier);
         deleteLocalArtifact(verifier, localRepoFile);
 
-        repository = new File(testDir, "repository");
+        repository = testDir.resolve("repository");
         recreateRemoteRepository(repository);
 
         // create artifact in repository (TODO: into verifier)

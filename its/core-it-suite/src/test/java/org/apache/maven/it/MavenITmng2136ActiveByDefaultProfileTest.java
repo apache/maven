@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -41,14 +42,14 @@ public class MavenITmng2136ActiveByDefaultProfileTest extends AbstractMavenInteg
      */
     @Test
     public void testitMNG2136() throws Exception {
-        File testDir = extractResources("/mng-2136");
+        Path testDir = extractResourcesAsPath("/mng-2136");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
 
         verifier.addCliArgument(
-                "-Dexpression.outputFile=" + new File(testDir, "target/expression.properties").getPath());
+                "-Dexpression.outputFile=" + testDir.resolve("target/expression.properties").getPath());
         verifier.addCliArgument("-Dexpression.expressions=project/properties");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

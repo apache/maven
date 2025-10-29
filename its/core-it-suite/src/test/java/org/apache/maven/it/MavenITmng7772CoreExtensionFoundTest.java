@@ -31,16 +31,16 @@ public class MavenITmng7772CoreExtensionFoundTest extends AbstractMavenIntegrati
 
     @Test
     public void testWithExtensionsXmlCoreExtensionsFound() throws Exception {
-        File testDir = extractResources("/mng-7772-core-extensions-found");
+        Path testDir = extractResourcesAsPath("/mng-7772-core-extensions-found");
 
-        Verifier verifier = newVerifier(new File(testDir, "extension").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("extension").getAbsolutePath());
         verifier.setLogFileName("extension-install.txt");
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
         String installedToLocalRepo = verifier.getLocalRepository();
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
         verifier.setUserHomeDirectory(Paths.get(testDir.toPath().toString(), "home-extensions-xml"));
         verifier.addCliArgument("-Dmaven.repo.local=" + installedToLocalRepo);
 
@@ -52,9 +52,9 @@ public class MavenITmng7772CoreExtensionFoundTest extends AbstractMavenIntegrati
 
     @Test
     public void testWithLibExtCoreExtensionsFound() throws Exception {
-        File testDir = extractResources("/mng-7772-core-extensions-found");
+        Path testDir = extractResourcesAsPath("/mng-7772-core-extensions-found");
 
-        Path extensionBasedir = new File(testDir, "extension").getAbsoluteFile().toPath();
+        Path extensionBasedir = testDir.resolve("extension").getAbsoluteFile().toPath();
         Verifier verifier = newVerifier(extensionBasedir.toString());
         verifier.setLogFileName("extension-package.txt");
         verifier.addCliArgument("package");
@@ -65,7 +65,7 @@ public class MavenITmng7772CoreExtensionFoundTest extends AbstractMavenIntegrati
 
         assertTrue("Jar output path was not built", Files.isRegularFile(jarPath));
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
         verifier.setUserHomeDirectory(Paths.get(testDir.toPath().toString(), "home-lib-ext"));
         verifier.addCliArgument("-Dmaven.ext.class.path=" + jarPath);
         verifier.addCliArgument("validate");

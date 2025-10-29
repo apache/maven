@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -33,11 +34,11 @@ public class MavenITmng3331ModulePathNormalizationTest extends AbstractMavenInte
     @Test
     public void testitMNG3331a() throws Exception {
         // testMNG3331ModuleWithSpaces
-        File testDir = extractResources("/mng-3331/with-spaces");
+        Path testDir = extractResourcesAsPath("/mng-3331/with-spaces");
 
         Verifier verifier;
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
 
         verifier.addCliArgument("initialize");
         verifier.execute();
@@ -57,11 +58,11 @@ public class MavenITmng3331ModulePathNormalizationTest extends AbstractMavenInte
     @Test
     public void testitMNG3331b() throws Exception {
         // testMNG3331ModuleWithRelativeParentDirRef
-        File testDir = extractResources("/mng-3331/with-relative-parentDir-ref");
+        Path testDir = extractResourcesAsPath("/mng-3331/with-relative-parentDir-ref");
 
         Verifier verifier;
 
-        verifier = newVerifier(new File(testDir, "parent").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("parent").getAbsolutePath());
 
         verifier.addCliArgument("initialize");
         verifier.execute();

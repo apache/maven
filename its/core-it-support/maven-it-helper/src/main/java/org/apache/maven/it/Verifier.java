@@ -129,14 +129,17 @@ public class Verifier {
 
     private ByteArrayOutputStream stderr;
 
+    @Deprecated
     public Verifier(String basedir) throws VerificationException {
-        this(basedir, null);
+        this(Paths.get(basedir), null);
     }
 
+    @Deprecated
     public Verifier(String basedir, List<String> defaultCliArguments) throws VerificationException {
         this(basedir, defaultCliArguments, true);
     }
 
+    @Deprecated
     public Verifier(String basedir, boolean createDotMvn) throws VerificationException {
         this(basedir, null, createDotMvn);
     }
@@ -151,10 +154,37 @@ public class Verifier {
      *
      * @see #DEFAULT_CLI_ARGUMENTS
      */
+    @Deprecated
     public Verifier(String basedir, List<String> defaultCliArguments, boolean createDotMvn) throws VerificationException {
+        this(Paths.get(requireNonNull(basedir)), defaultCliArguments, createDotMvn);
+    }
+
+    public Verifier(Path basedir) throws VerificationException {
+        this(basedir, null, true);
+    }
+
+    public Verifier(Path basedir, List<String> defaultCliArguments) throws VerificationException {
+        this(basedir, defaultCliArguments, true);
+    }
+
+    public Verifier(Path basedir, boolean createDotMvn) throws VerificationException {
+        this(basedir, null, createDotMvn);
+    }
+
+    /**
+     * Creates verifier instance using passed in basedir as "cwd" and passed in default CLI arguments (if not null).
+     * The discovery of user home and Maven installation directory is performed as well.
+     *
+     * @param basedir The basedir, cannot be {@code null}
+     * @param defaultCliArguments The defaultCliArguments override, may be {@code null}
+     * @param createDotMvn If {@code true}, Verifier will create {@code .mvn} in passed basedir.
+     *
+     * @see #DEFAULT_CLI_ARGUMENTS
+     */
+    public Verifier(Path basedir, List<String> defaultCliArguments, boolean createDotMvn) throws VerificationException {
         requireNonNull(basedir);
         try {
-            this.basedir = Paths.get(basedir).toAbsolutePath();
+            this.basedir = basedir.toAbsolutePath();
             if (createDotMvn) {
                 Files.createDirectories(this.basedir.resolve(".mvn"));
             }

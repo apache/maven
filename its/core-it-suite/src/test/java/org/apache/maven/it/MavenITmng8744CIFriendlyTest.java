@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -43,9 +44,9 @@ public class MavenITmng8744CIFriendlyTest extends AbstractMavenIntegrationTestCa
      */
     @Test
     public void testitShouldResolveTheInstalledDependencies() throws Exception {
-        File testDir = extractResources("/mng-8744-ci-friendly");
+        Path testDir = extractResourcesAsPath("/mng-8744-ci-friendly");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
 
         verifier.addCliArgument("-Drevision=1.2");
@@ -55,13 +56,13 @@ public class MavenITmng8744CIFriendlyTest extends AbstractMavenIntegrationTestCa
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.addCliArgument("clean");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
 
         verifier.addCliArgument("-Drevision=1.2");

@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -37,9 +38,9 @@ public class MavenITmng0294MergeGlobalAndUserSettingsTest extends AbstractMavenI
      */
     @Test
     public void testitMNG294() throws Exception {
-        File testDir = extractResources("/mng-0294");
+        Path testDir = extractResourcesAsPath("/mng-0294");
 
-        Verifier verifier = new Verifier(testDir.getAbsolutePath());
+        Verifier verifier = new Verifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("--settings");

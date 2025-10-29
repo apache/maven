@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -39,9 +40,9 @@ public class MavenITmng3904NestedBuildDirInterpolationTest extends AbstractMaven
      */
     @Test
     public void testitMNG3904() throws Exception {
-        File testDir = extractResources("/mng-3904");
+        Path testDir = extractResourcesAsPath("/mng-3904");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
@@ -50,10 +51,10 @@ public class MavenITmng3904NestedBuildDirInterpolationTest extends AbstractMaven
 
         Properties props = verifier.loadProperties("target/pom.properties");
         ItUtils.assertCanonicalFileEquals(
-                new File(testDir, "target/classes/dir0"), new File(props.getProperty("project.properties.dir0")));
+                testDir.resolve("target/classes/dir0"), new File(props.getProperty("project.properties.dir0")));
         ItUtils.assertCanonicalFileEquals(
-                new File(testDir, "src/test/dir1"), new File(props.getProperty("project.properties.dir1")));
+                testDir.resolve("src/test/dir1"), new File(props.getProperty("project.properties.dir1")));
         ItUtils.assertCanonicalFileEquals(
-                new File(testDir, "target/site/dir2"), new File(props.getProperty("project.properties.dir2")));
+                testDir.resolve("target/site/dir2"), new File(props.getProperty("project.properties.dir2")));
     }
 }

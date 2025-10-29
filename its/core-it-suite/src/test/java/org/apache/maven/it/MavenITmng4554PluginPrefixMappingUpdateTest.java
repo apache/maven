@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,7 +57,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
      */
     @Test
     public void testitCached() throws Exception {
-        File testDir = extractResources("/mng-4554");
+        Path testDir = extractResourcesAsPath("/mng-4554");
 
         String metadataUri = "/repo-1/org/apache/maven/its/mng4554/maven-metadata.xml";
 
@@ -71,7 +72,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
         };
 
         ResourceHandler repoHandler = new ResourceHandler();
-        repoHandler.setResourceBase(testDir.getAbsolutePath());
+        repoHandler.setResourceBase(testDir.toString());
 
         HandlerList handlerList = new HandlerList();
         handlerList.addHandler(logHandler);
@@ -82,7 +83,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
         server.setHandler(handlerList);
         server.start();
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         try {
             if (server.isFailed()) {
                 fail("Couldn't bind the server socket to a free port!");
@@ -135,7 +136,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
      */
     @Test
     public void testitForcedUpdate() throws Exception {
-        File testDir = extractResources("/mng-4554");
+        Path testDir = extractResourcesAsPath("/mng-4554");
 
         String metadataUri = "/repo-1/org/apache/maven/its/mng4554/maven-metadata.xml";
 
@@ -150,7 +151,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
         };
 
         ResourceHandler repoHandler = new ResourceHandler();
-        repoHandler.setResourceBase(testDir.getAbsolutePath());
+        repoHandler.setResourceBase(testDir.toString());
 
         HandlerList handlerList = new HandlerList();
         handlerList.addHandler(logHandler);
@@ -161,7 +162,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
         server.setHandler(handlerList);
         server.start();
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         try {
             if (server.isFailed()) {
                 fail("Couldn't bind the server socket to a free port!");
@@ -217,7 +218,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
     public void testitRefetched() throws Exception {
         // requiresMavenVersion("[3.0-alpha-3,)");
 
-        File testDir = extractResources("/mng-4554");
+        Path testDir = extractResourcesAsPath("/mng-4554");
 
         String metadataUri = "/repo-it/org/apache/maven/its/mng4554/maven-metadata.xml";
 
@@ -232,7 +233,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
         };
 
         ResourceHandler repoHandler = new ResourceHandler();
-        repoHandler.setResourceBase(testDir.getAbsolutePath());
+        repoHandler.setResourceBase(testDir.toString());
 
         HandlerList handlerList = new HandlerList();
         handlerList.addHandler(logHandler);
@@ -243,7 +244,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
         server.setHandler(handlerList);
         server.start();
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         try {
             if (server.isFailed()) {
                 fail("Couldn't bind the server socket to a free port!");
@@ -266,7 +267,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
             verifier.addCliArgument("-s");
             verifier.addCliArgument("settings.xml");
 
-            FileUtils.copyDirectoryStructure(new File(testDir, "repo-1"), new File(testDir, "repo-it"));
+            FileUtils.copyDirectoryStructure(testDir.resolve("repo-1"), testDir.resolve("repo-it"));
 
             verifier.setLogFileName("log-refetched-1.txt");
             verifier.addCliArgument("a:touch");
@@ -279,7 +280,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
             requestedUris.clear();
 
             // simulate deployment of new plugin which updates the prefix mapping in the remote repo
-            FileUtils.copyDirectoryStructure(new File(testDir, "repo-2"), new File(testDir, "repo-it"));
+            FileUtils.copyDirectoryStructure(testDir.resolve("repo-2"), testDir.resolve("repo-it"));
 
             verifier.setLogFileName("log-refetched-2.txt");
             verifier.addCliArgument("b:touch");

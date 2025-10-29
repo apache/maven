@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -41,9 +42,9 @@ public class MavenITmng5608ProfileActivationWarningTest extends AbstractMavenInt
 
     @Test
     public void testitMNG5608() throws Exception {
-        File testDir = extractResources("/mng-5608-profile-activation-warning");
+        Path testDir = extractResourcesAsPath("/mng-5608-profile-activation-warning");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -59,7 +60,7 @@ public class MavenITmng5608ProfileActivationWarningTest extends AbstractMavenInt
     }
 
     private void assertFileExists(File dir, String filename) {
-        File file = new File(dir, filename);
+        File file = dir.resolve(filename);
         assertTrue(file.exists(), "expected file: " + file);
     }
 
