@@ -27,6 +27,7 @@ import java.util.Properties;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -54,13 +55,13 @@ import org.eclipse.aether.repository.LocalRepository;
 
 public abstract class AbstractCoreMavenComponentTestCase extends PlexusTestCase {
     @Requirement
-    protected RepositorySystem repositorySystem;
+    protected MavenRepositorySystem repositorySystem;
 
     @Requirement
     protected org.apache.maven.project.ProjectBuilder projectBuilder;
 
     protected void setUp() throws Exception {
-        repositorySystem = lookup(RepositorySystem.class);
+        repositorySystem = lookup(MavenRepositorySystem.class);
         projectBuilder = lookup(org.apache.maven.project.ProjectBuilder.class);
     }
 
@@ -198,10 +199,10 @@ public abstract class AbstractCoreMavenComponentTestCase extends PlexusTestCase 
         return getRemoteRepositories();
     }
 
-    protected ArtifactRepository getLocalRepository() throws InvalidRepositoryException {
+    protected ArtifactRepository getLocalRepository() throws Exception {
         File repoDir = new File(getBasedir(), "target/local-repo").getAbsoluteFile();
 
-        return repositorySystem.createLocalRepository(repoDir);
+        return repositorySystem.createLocalRepository(null, repoDir);
     }
 
     protected class ProjectBuilder {

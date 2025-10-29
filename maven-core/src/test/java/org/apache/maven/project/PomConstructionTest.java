@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
@@ -59,7 +60,7 @@ public class PomConstructionTest extends PlexusTestCase {
 
     private DefaultProjectBuilder projectBuilder;
 
-    private RepositorySystem repositorySystem;
+    private MavenRepositorySystem repositorySystem;
 
     private File testDirectory;
 
@@ -74,7 +75,7 @@ public class PomConstructionTest extends PlexusTestCase {
         testDirectory = new File(getBasedir(), BASE_POM_DIR);
         new File(getBasedir(), BASE_MIXIN_DIR);
         projectBuilder = (DefaultProjectBuilder) lookup(ProjectBuilder.class);
-        repositorySystem = lookup(RepositorySystem.class);
+        repositorySystem = lookup(MavenRepositorySystem.class);
     }
 
     @Override
