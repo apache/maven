@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.apache.maven.its.gh2576</groupId>
+        <artifactId>parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>dep</artifactId>
+
+    <repositories>
+        <repository>
+            <id>foo</id>
+            <url>file:///${basedir}/../repo</url>
+            <snapshots>
+                <checksumPolicy>ignore</checksumPolicy>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+</project>
