@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -41,9 +42,9 @@ class MavenITmng7679SingleMojoNoPomTest extends AbstractMavenIntegrationTestCase
      */
     @Test
     void testSingleMojoNoPom() throws Exception {
-        File testDir = extractResources("/mng-7679");
+        Path testDir = extractResourcesAsPath("/mng-7679");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.addCliArgument("org.apache.maven.plugins:maven-install-plugin:3.0.1:install-file");
         verifier.addCliArgument("-Dfile=mng-7679.txt");
         verifier.addCliArgument("-DgroupId=org.apache.maven.it.mng7679");

@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -43,9 +44,9 @@ public class MavenITmng5222MojoDeprecatedTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testEmptyConfiguration() throws Exception {
-        File testDir = extractResources("/mng-5222-mojo-deprecated-params");
+        Path testDir = extractResourcesAsPath("/mng-5222-mojo-deprecated-params");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.setLogFileName("log-empty-configuration.txt");
@@ -89,9 +90,9 @@ public class MavenITmng5222MojoDeprecatedTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testDeprecatedProperty() throws Exception {
-        File testDir = extractResources("/mng-5222-mojo-deprecated-params");
+        Path testDir = extractResourcesAsPath("/mng-5222-mojo-deprecated-params");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.addCliArgument("-Dconfig.deprecatedParam2=deprecatedValueInProps");
         verifier.addCliArgument("-Dconfig.deprecatedArray=3,2,4,deprecated");
         verifier.addCliArgument("-Dconfig.deprecatedList=4,5,deprecated");
@@ -162,9 +163,9 @@ public class MavenITmng5222MojoDeprecatedTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testDeprecatedConfig() throws Exception {
-        File testDir = extractResources("/mng-5222-mojo-deprecated-params");
+        Path testDir = extractResourcesAsPath("/mng-5222-mojo-deprecated-params");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.addCliArgument("-Pconfig-values");
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

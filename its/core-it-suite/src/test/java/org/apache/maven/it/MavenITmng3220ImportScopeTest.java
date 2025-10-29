@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -34,11 +35,11 @@ public class MavenITmng3220ImportScopeTest extends AbstractMavenIntegrationTestC
 
     @Test
     public void testitMNG3220a() throws Exception {
-        File testDir = extractResources("/mng-3220");
+        Path testDir = extractResourcesAsPath("/mng-3220");
 
-        testDir = new File(testDir, "imported-pom-depMgmt");
+        testDir = testDir.resolve("imported-pom-depMgmt");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3220");
@@ -52,11 +53,11 @@ public class MavenITmng3220ImportScopeTest extends AbstractMavenIntegrationTestC
 
     @Test
     public void testitMNG3220b() throws Exception {
-        File testDir = extractResources("/mng-3220");
+        Path testDir = extractResourcesAsPath("/mng-3220");
 
-        testDir = new File(testDir, "depMgmt-pom-module-notImported");
+        testDir = testDir.resolve("depMgmt-pom-module-notImported");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3220");
@@ -73,7 +74,7 @@ public class MavenITmng3220ImportScopeTest extends AbstractMavenIntegrationTestC
             // expected
         }
 
-        List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
+        List<String> lines = verifier.loadFile(testDir.resolve("log.txt"), false);
 
         boolean found = false;
         for (String line : lines) {

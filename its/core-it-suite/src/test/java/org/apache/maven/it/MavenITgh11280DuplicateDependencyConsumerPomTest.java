@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -61,9 +62,9 @@ class MavenITgh11280DuplicateDependencyConsumerPomTest extends AbstractMavenInte
      */
     @Test
     void testDuplicateDependencyWithNullAndEmptyClassifier() throws Exception {
-        File testDir = extractResources("/gh-11280-duplicate-dependency-consumer-pom");
+        Path testDir = extractResourcesAsPath("/gh-11280-duplicate-dependency-consumer-pom");
 
-        Verifier verifier = new Verifier(testDir.getAbsolutePath());
+        Verifier verifier = new Verifier(testDir.toString());
         verifier.addCliArgument("install");
         verifier.execute();
 

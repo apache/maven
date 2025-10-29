@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
@@ -38,11 +39,11 @@ public class MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest extends Abstra
      */
     @Test
     public void testitMNG3139() throws Exception {
-        File testDir = extractResources("/mng-3139");
+        Path testDir = extractResourcesAsPath("/mng-3139");
 
         // phase 1: get the metadata into the local repo
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng3139");
 
@@ -56,7 +57,7 @@ public class MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest extends Abstra
 
         // phase 2: trigger blacklisting of repo (by invalid URL) and check previously downloaded metadata is still used
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
 
         verifier.filterFile(

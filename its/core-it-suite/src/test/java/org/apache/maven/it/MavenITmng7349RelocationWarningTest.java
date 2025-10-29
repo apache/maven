@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,18 +32,18 @@ public class MavenITmng7349RelocationWarningTest extends AbstractMavenIntegratio
 
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-7349-relocation-warning");
-        File artifactsDir = new File(testDir, "artifacts");
-        File projectDir = new File(testDir, "project");
+        Path testDir = extractResourcesAsPath("/mng-7349-relocation-warning");
+        File artifactsDir = testDir.resolve("artifacts");
+        File projectDir = testDir.resolve("project");
 
         Verifier verifier;
 
-        verifier = newVerifier(artifactsDir.getAbsolutePath());
+        verifier = newVerifier(artifactsDir.toString());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir.toString());
         verifier.addCliArgument("verify");
         verifier.execute();
         verifier.verifyErrorFreeLog();

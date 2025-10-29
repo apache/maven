@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Map;
@@ -51,7 +52,7 @@ public class MavenIT0146InstallerSnapshotNaming extends AbstractMavenIntegration
     @BeforeEach
     protected void setUp() throws Exception {
         ResourceHandler resourceHandler = new ResourceHandler();
-        resourceHandler.setResourceBase(new File(testDir, "repo").getAbsolutePath());
+        resourceHandler.setResourceBase(testDir.resolve("repo").getAbsolutePath());
         HandlerList handlers = new HandlerList();
         handlers.setHandlers(new Handler[] {resourceHandler, new DefaultHandler()});
 
@@ -75,7 +76,7 @@ public class MavenIT0146InstallerSnapshotNaming extends AbstractMavenIntegration
 
     @Test
     public void testitRemoteDownloadTimestampedName() throws Exception {
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
 
         Map<String, String> properties = verifier.newDefaultFilterMap();
         properties.put("@host@", InetAddress.getLoopbackAddress().getCanonicalHostName());
@@ -101,7 +102,7 @@ public class MavenIT0146InstallerSnapshotNaming extends AbstractMavenIntegration
 
     @Test
     public void testitNonTimestampedNameWithInstalledSNAPSHOT() throws Exception {
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.deleteArtifacts("org.apache.maven.its.it0146");
         verifier.addCliArgument("-f");
         verifier.addCliArgument("project/pom.xml");
@@ -112,7 +113,7 @@ public class MavenIT0146InstallerSnapshotNaming extends AbstractMavenIntegration
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
 
         Map<String, String> properties = verifier.newDefaultFilterMap();
         properties.put("@host@", InetAddress.getLoopbackAddress().getCanonicalHostName());

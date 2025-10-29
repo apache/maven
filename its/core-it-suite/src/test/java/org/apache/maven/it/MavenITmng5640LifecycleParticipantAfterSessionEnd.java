@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -40,19 +41,19 @@ class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractMavenInt
      */
     @Test
     public void testBuildFailureUTFail() throws Exception {
-        File testDir = extractResources("/mng-5640-lifecycleParticipant-afterSession");
-        File extensionDir = new File(testDir, "extension");
-        File projectDir = new File(testDir, "buildfailure-utfail");
+        Path testDir = extractResourcesAsPath("/mng-5640-lifecycleParticipant-afterSession");
+        File extensionDir = testDir.resolve("extension");
+        File projectDir = testDir.resolve("buildfailure-utfail");
         Verifier verifier;
 
         // install the test plugin
-        verifier = newVerifier(extensionDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(extensionDir.toString(), "remote");
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // build the test project
-        verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(projectDir.toString(), "remote");
         verifier.addCliArgument("package");
         assertThrows(VerificationException.class, verifier::execute, "The build should fail");
         verifier.verifyTextInLog("testApp(org.apache.maven.its.mng5640.FailingTest)");
@@ -70,19 +71,19 @@ class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractMavenInt
      */
     @Test
     public void testBuildFailureMissingDependency() throws Exception {
-        File testDir = extractResources("/mng-5640-lifecycleParticipant-afterSession");
-        File extensionDir = new File(testDir, "extension");
-        File projectDir = new File(testDir, "buildfailure-depmissing");
+        Path testDir = extractResourcesAsPath("/mng-5640-lifecycleParticipant-afterSession");
+        File extensionDir = testDir.resolve("extension");
+        File projectDir = testDir.resolve("buildfailure-depmissing");
         Verifier verifier;
 
         // install the test plugin
-        verifier = newVerifier(extensionDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(extensionDir.toString(), "remote");
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // build the test project
-        verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(projectDir.toString(), "remote");
         verifier.addCliArgument("package");
         VerificationException exception =
                 assertThrows(VerificationException.class, verifier::execute, "The build should fail");
@@ -100,26 +101,26 @@ class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractMavenInt
      */
     @Test
     public void testBuildError() throws Exception {
-        File testDir = extractResources("/mng-5640-lifecycleParticipant-afterSession");
-        File extensionDir = new File(testDir, "extension");
-        File pluginDir = new File(testDir, "badplugin");
-        File projectDir = new File(testDir, "builderror-mojoex");
+        Path testDir = extractResourcesAsPath("/mng-5640-lifecycleParticipant-afterSession");
+        File extensionDir = testDir.resolve("extension");
+        File pluginDir = testDir.resolve("badplugin");
+        File projectDir = testDir.resolve("builderror-mojoex");
         Verifier verifier;
 
         // install the test plugin
-        verifier = newVerifier(extensionDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(extensionDir.toString(), "remote");
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // install the bad plugin
-        verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(pluginDir.toString(), "remote");
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // build the test project
-        verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(projectDir.toString(), "remote");
         verifier.addCliArgument("package");
         VerificationException exception =
                 assertThrows(VerificationException.class, verifier::execute, "The build should fail");
@@ -137,26 +138,26 @@ class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractMavenInt
      */
     @Test
     public void testBuildErrorRt() throws Exception {
-        File testDir = extractResources("/mng-5640-lifecycleParticipant-afterSession");
-        File extensionDir = new File(testDir, "extension");
-        File pluginDir = new File(testDir, "badplugin");
-        File projectDir = new File(testDir, "builderror-runtimeex");
+        Path testDir = extractResourcesAsPath("/mng-5640-lifecycleParticipant-afterSession");
+        File extensionDir = testDir.resolve("extension");
+        File pluginDir = testDir.resolve("badplugin");
+        File projectDir = testDir.resolve("builderror-runtimeex");
         Verifier verifier;
 
         // install the test plugin
-        verifier = newVerifier(extensionDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(extensionDir.toString(), "remote");
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // install the bad plugin
-        verifier = newVerifier(pluginDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(pluginDir.toString(), "remote");
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // build the test project
-        verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
+        verifier = newVerifier(projectDir.toString(), "remote");
         verifier.addCliArgument("package");
         VerificationException exception =
                 assertThrows(VerificationException.class, verifier::execute, "The build should fail");

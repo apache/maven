@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -40,9 +41,9 @@ public class MavenITmng11009StackOverflowParentResolutionTest extends AbstractMa
      */
     @Test
     public void testStackOverflowInParentResolution() throws Exception {
-        File testDir = extractResources("/mng-11009-stackoverflow-parent-resolution");
+        Path testDir = extractResourcesAsPath("/mng-11009-stackoverflow-parent-resolution");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng11009");
 

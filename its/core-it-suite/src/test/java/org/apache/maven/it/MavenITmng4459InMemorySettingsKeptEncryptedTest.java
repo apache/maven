@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Disabled;
@@ -42,13 +43,13 @@ public class MavenITmng4459InMemorySettingsKeptEncryptedTest extends AbstractMav
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4459");
+        Path testDir = extractResourcesAsPath("/mng-4459");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.getSystemProperties()
-                .setProperty("settings.security", new File(testDir, "settings-security.xml").getAbsolutePath());
+                .setProperty("settings.security", testDir.resolve("settings-security.xml").getAbsolutePath());
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");

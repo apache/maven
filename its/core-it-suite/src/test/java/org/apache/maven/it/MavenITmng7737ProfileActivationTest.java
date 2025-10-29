@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.codehaus.plexus.util.Os;
 import org.junit.jupiter.api.Test;
@@ -42,9 +43,9 @@ class MavenITmng7737ProfileActivationTest extends AbstractMavenIntegrationTestCa
      */
     @Test
     void testSingleMojoNoPom() throws Exception {
-        File testDir = extractResources("/mng-7737-profiles");
+        Path testDir = extractResourcesAsPath("/mng-7737-profiles");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("org.apache.maven.plugins:maven-help-plugin:3.3.0:active-profiles");

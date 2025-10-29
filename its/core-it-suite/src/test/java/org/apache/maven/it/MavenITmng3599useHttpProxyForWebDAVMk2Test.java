@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.io.IOException;
 import java.nio.file.Files;
 
@@ -128,25 +129,25 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test extends AbstractMavenInt
 
     @Test
     public void testitUseHttpProxyForHttp() throws Exception {
-        File testDir = extractResources("/mng-3599-mk2");
+        Path testDir = extractResourcesAsPath("/mng-3599-mk2");
 
         /*
          * NOTE: Make sure the WebDAV extension required by the test project has been pulled down into the local
          * repo before the actual test installs Jetty as a mirror for everything. Otherwise, we will get garbage
          * for the JAR/POM of the extension and its dependencies when run against a vanilla repo.
          */
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        String settings = Files.readString(new File(testDir, "settings-template.xml").toPath());
+        String settings = Files.readString(testDir.resolve("settings-template.xml").toPath());
         settings = StringUtils.replace(settings, "@port@", Integer.toString(port));
         String newSettings = StringUtils.replace(settings, "@protocol@", "http");
 
-        Files.writeString(new File(testDir, "settings.xml").getAbsoluteFile().toPath(), newSettings);
+        Files.writeString(testDir.resolve("settings.xml").getAbsoluteFile().toPath(), newSettings);
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
 
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
@@ -170,25 +171,25 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test extends AbstractMavenInt
      */
     @Test
     public void testitUseHttpProxyForWebDAV() throws Exception {
-        File testDir = extractResources("/mng-3599-mk2");
+        Path testDir = extractResourcesAsPath("/mng-3599-mk2");
 
         /*
          * NOTE: Make sure the WebDAV extension required by the test project has been pulled down into the local
          * repo before the actual test installs Jetty as a mirror for everything. Otherwise, we will get garbage
          * for the JAR/POM of the extension and its dependencies when run against a vanilla repo.
          */
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        String settings = Files.readString(new File(testDir, "settings-template.xml").toPath());
+        String settings = Files.readString(testDir.resolve("settings-template.xml").toPath());
         settings = StringUtils.replace(settings, "@port@", Integer.toString(port));
         String newSettings = StringUtils.replace(settings, "@protocol@", "dav");
 
-        Files.writeString(new File(testDir, "settings.xml").getAbsoluteFile().toPath(), newSettings);
+        Files.writeString(testDir.resolve("settings.xml").getAbsoluteFile().toPath(), newSettings);
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
 
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

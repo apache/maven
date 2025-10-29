@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -40,8 +41,8 @@ public class MavenITmng1021EqualAttachmentBuildNumberTest extends AbstractMavenI
      */
     @Test
     public void testitMNG1021() throws Exception {
-        File testDir = extractResources("/mng-1021");
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Path testDir = extractResourcesAsPath("/mng-1021");
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("repo");
         verifier.deleteArtifacts("org.apache.maven.its.mng1021");
@@ -54,7 +55,7 @@ public class MavenITmng1021EqualAttachmentBuildNumberTest extends AbstractMavenI
         verifier.verifyArtifactPresent("org.apache.maven.its.mng1021", "test", "1-SNAPSHOT", "jar");
 
         String dir = "repo/org/apache/maven/its/mng1021/test/";
-        String snapshot = getSnapshotVersion(new File(testDir, dir + "1-SNAPSHOT"));
+        String snapshot = getSnapshotVersion(testDir.resolve(dir + "1-SNAPSHOT"));
         assertTrue(snapshot.endsWith("-1"), snapshot);
 
         verifier.verifyFilePresent(dir + "maven-metadata.xml");

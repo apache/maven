@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -57,9 +58,9 @@ class MavenITgh2532DuplicateDependencyEffectiveModelTest extends AbstractMavenIn
      */
     @Test
     void testDuplicateDependencyWithPropertyPlaceholders() throws Exception {
-        File testDir = extractResources("/gh-2532-duplicate-dependency-effective-model");
+        Path testDir = extractResourcesAsPath("/gh-2532-duplicate-dependency-effective-model");
 
-        Verifier verifier = new Verifier(testDir.getAbsolutePath());
+        Verifier verifier = new Verifier(testDir.toString());
         verifier.setLogFileName("testDuplicateDependencyWithPropertyPlaceholders.txt");
         verifier.addCliArgument("package");
         verifier.execute();

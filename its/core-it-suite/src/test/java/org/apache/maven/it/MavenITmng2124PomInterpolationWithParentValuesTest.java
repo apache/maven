@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -37,8 +38,8 @@ public class MavenITmng2124PomInterpolationWithParentValuesTest extends Abstract
      */
     @Test
     public void testitMNG2124() throws Exception {
-        File testDir = extractResources("/mng-2124");
-        File child = new File(testDir, "parent/child");
+        Path testDir = extractResourcesAsPath("/mng-2124");
+        File child = testDir.resolve("parent/child");
 
         Verifier verifier = newVerifier(child.getAbsolutePath());
         verifier.setAutoclean(false);

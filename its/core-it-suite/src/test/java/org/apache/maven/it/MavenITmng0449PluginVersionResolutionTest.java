@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -38,10 +39,10 @@ public class MavenITmng0449PluginVersionResolutionTest extends AbstractMavenInte
      */
     @Test
     public void testitLifecycleInvocation() throws Exception {
-        File testDir = extractResources("/mng-0449");
-        testDir = new File(testDir, "lifecycle");
+        Path testDir = extractResourcesAsPath("/mng-0449");
+        testDir = testDir.resolve("lifecycle");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         try {
@@ -71,10 +72,10 @@ public class MavenITmng0449PluginVersionResolutionTest extends AbstractMavenInte
      */
     @Test
     public void testitCliInvocation() throws Exception {
-        File testDir = extractResources("/mng-0449");
-        testDir = new File(testDir, "direct");
+        Path testDir = extractResourcesAsPath("/mng-0449");
+        testDir = testDir.resolve("direct");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         try {

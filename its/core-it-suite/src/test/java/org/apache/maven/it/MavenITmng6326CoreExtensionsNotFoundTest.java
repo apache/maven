@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -30,9 +31,9 @@ public class MavenITmng6326CoreExtensionsNotFoundTest extends AbstractMavenInteg
 
     @Test
     public void testCoreExtensionsNotFound() throws Exception {
-        File testDir = extractResources("/mng-6326-core-extensions-not-found");
+        Path testDir = extractResourcesAsPath("/mng-6326-core-extensions-not-found");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         try {
             verifier.addCliArgument("validate");
             verifier.execute();

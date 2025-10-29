@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.io.IOException;
 import java.util.Map;
 
@@ -48,9 +49,9 @@ public class MavenITmng3461MirrorMatchingTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testitExactMatchDominatesWildcard() throws Exception {
-        File testDir = extractResources("/mng-3461/test-1");
+        Path testDir = extractResourcesAsPath("/mng-3461/test-1");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng3461");
         verifier.filterFile("settings-template.xml", "settings.xml");
@@ -71,9 +72,9 @@ public class MavenITmng3461MirrorMatchingTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testitExternalWildcard() throws Exception {
-        File testDir = extractResources("/mng-3461/test-2");
+        Path testDir = extractResourcesAsPath("/mng-3461/test-2");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
 
         Handler repoHandler = new AbstractHandler() {
             @Override
@@ -141,9 +142,9 @@ public class MavenITmng3461MirrorMatchingTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testitNonGreedyWildcard() throws Exception {
-        File testDir = extractResources("/mng-3461/test-3");
+        Path testDir = extractResourcesAsPath("/mng-3461/test-3");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng3461");
         verifier.filterFile("settings-template.xml", "settings.xml");

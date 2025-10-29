@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,12 +46,12 @@ class MavenITmng7819FileLockingWithSnapshotsTest extends AbstractMavenIntegratio
 
     @BeforeEach
     protected void setUp() throws Exception {
-        File testDir = extractResources("/mng-7819-file-locking-with-snapshots");
+        Path testDir = extractResourcesAsPath("/mng-7819-file-locking-with-snapshots");
         server = new Server(0);
         ResourceHandler resourceHandler = new ResourceHandler();
         resourceHandler.setWelcomeFiles(new String[] {"index.html"});
         resourceHandler.setDirectoriesListed(true);
-        resourceHandler.setResourceBase(new File(testDir, "repo").getAbsolutePath());
+        resourceHandler.setResourceBase(testDir.resolve("repo").getAbsolutePath());
         HandlerList handlerList = new HandlerList();
         handlerList.setHandlers(new Handler[] {resourceHandler});
         server.setHandler(handlerList);
@@ -72,9 +73,9 @@ class MavenITmng7819FileLockingWithSnapshotsTest extends AbstractMavenIntegratio
 
     @Test
     void testFileLockingAndSnapshots() throws Exception {
-        File testDir = extractResources("/mng-7819-file-locking-with-snapshots");
+        Path testDir = extractResourcesAsPath("/mng-7819-file-locking-with-snapshots");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
 
         // produce required precondition state: local repository must not have any of the org.apache.maven.its.mng7819
         // artifacts
@@ -88,7 +89,7 @@ class MavenITmng7819FileLockingWithSnapshotsTest extends AbstractMavenIntegratio
 
         verifier.addCliArgument("-e");
         verifier.addCliArgument("-s");
-        verifier.addCliArgument(new File(testDir, "settings.xml").getAbsolutePath());
+        verifier.addCliArgument(testDir.resolve("settings.xml").getAbsolutePath());
         verifier.addCliArgument("-Pmaven-core-it-repo");
 
         verifier.addCliArgument("-Daether.syncContext.named.nameMapper=file-gav");

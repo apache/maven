@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -41,9 +42,9 @@ public class MavenITmng0674PluginParameterAliasTest extends AbstractMavenIntegra
      */
     @Test
     public void testitLifecycle() throws Exception {
-        File testDir = extractResources("/mng-0674");
+        Path testDir = extractResourcesAsPath("/mng-0674");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.setLogFileName("log-lifecycle.txt");
@@ -64,9 +65,9 @@ public class MavenITmng0674PluginParameterAliasTest extends AbstractMavenIntegra
      */
     @Test
     public void testitCli() throws Exception {
-        File testDir = extractResources("/mng-0674");
+        Path testDir = extractResourcesAsPath("/mng-0674");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.setLogFileName("log-cli.txt");

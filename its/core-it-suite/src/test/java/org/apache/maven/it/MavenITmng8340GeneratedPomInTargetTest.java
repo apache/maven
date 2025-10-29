@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -32,9 +33,9 @@ class MavenITmng8340GeneratedPomInTargetTest extends AbstractMavenIntegrationTes
      */
     @Test
     void testProjectWithShadePluginAndGeneratedPomUnderTarget() throws Exception {
-        File testDir = extractResources("/mng-8340");
+        Path testDir = extractResourcesAsPath("/mng-8340");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();

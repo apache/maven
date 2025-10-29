@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -41,8 +42,8 @@ public class MavenITmng3831PomInterpolationTest extends AbstractMavenIntegration
      */
     @Test
     public void testitMNG3831() throws Exception {
-        File testDir = extractResources("/mng-3831");
-        File child = new File(testDir, "child");
+        Path testDir = extractResourcesAsPath("/mng-3831");
+        File child = testDir.resolve("child");
 
         Verifier verifier = newVerifier(child.getAbsolutePath());
         verifier.addCliArgument("initialize");

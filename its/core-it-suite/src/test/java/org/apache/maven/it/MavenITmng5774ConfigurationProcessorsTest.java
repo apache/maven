@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Disabled;
@@ -31,16 +32,16 @@ public class MavenITmng5774ConfigurationProcessorsTest extends AbstractMavenInte
 
     @Test
     public void testBehaviourWhereThereIsOneUserSuppliedConfigurationProcessor() throws Exception {
-        File testDir = extractResources("/mng-5774-configuration-processors");
+        Path testDir = extractResourcesAsPath("/mng-5774-configuration-processors");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.filterFile("settings-template.xml", "settings.xml");
 
-        verifier = newVerifier(new File(testDir, "build-with-one-processor-valid").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("build-with-one-processor-valid").getAbsolutePath());
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.it-configuration-processors");
         verifier.addCliArgument("-s");
-        verifier.addCliArgument(new File(testDir, "settings.xml").getAbsolutePath());
+        verifier.addCliArgument(testDir.resolve("settings.xml").getAbsolutePath());
         verifier.addCliArgument("process-resources");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -54,16 +55,16 @@ public class MavenITmng5774ConfigurationProcessorsTest extends AbstractMavenInte
 
     @Test
     public void testBehaviourWhereThereAreTwoUserSuppliedConfigurationProcessor() throws Exception {
-        File testDir = extractResources("/mng-5774-configuration-processors");
+        Path testDir = extractResourcesAsPath("/mng-5774-configuration-processors");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.filterFile("settings-template.xml", "settings.xml");
 
-        verifier = newVerifier(new File(testDir, "build-with-two-processors-invalid").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("build-with-two-processors-invalid").getAbsolutePath());
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.it-configuration-processors");
         verifier.addCliArgument("-s");
-        verifier.addCliArgument(new File(testDir, "settings.xml").getAbsolutePath());
+        verifier.addCliArgument(testDir.resolve("settings.xml").getAbsolutePath());
         try {
             verifier.addCliArgument("process-resources");
             verifier.execute();

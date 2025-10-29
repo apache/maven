@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.nio.file.Files;
 
 import org.junit.jupiter.api.Test;
@@ -29,23 +30,23 @@ public class MavenITmng5753CustomMojoExecutionConfiguratorTest extends AbstractM
 
     @Test
     public void testCustomMojoExecutionConfigurator() throws Exception {
-        File testDir = extractResources("/mng-5753-custom-mojo-execution-configurator");
-        File pluginDir = new File(testDir, "plugin");
-        File projectDir = new File(testDir, "project");
+        Path testDir = extractResourcesAsPath("/mng-5753-custom-mojo-execution-configurator");
+        File pluginDir = testDir.resolve("plugin");
+        File projectDir = testDir.resolve("project");
 
         Verifier verifier;
 
         // install the test plugin
-        verifier = newVerifier(pluginDir.getAbsolutePath());
+        verifier = newVerifier(pluginDir.toString());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        File configurationFile = new File(projectDir, "configuration.txt");
+        File configurationFile = projectDir.resolve("configuration.txt");
         configurationFile.delete();
 
         // build the test project
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir.toString());
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

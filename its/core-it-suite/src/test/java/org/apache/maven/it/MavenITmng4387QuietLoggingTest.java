@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -41,9 +42,9 @@ public class MavenITmng4387QuietLoggingTest extends AbstractMavenIntegrationTest
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4387");
+        Path testDir = extractResourcesAsPath("/mng-4387");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.addCliArgument("-q");
         verifier.setLogFileName("log.txt");

@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -57,16 +58,16 @@ public class MavenITmng2305MultipleProxiesTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-2305");
+        Path testDir = extractResourcesAsPath("/mng-2305");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
 
         // NOTE: trust store cannot be reliably configured for the current JVM
         verifier.setForkJvm(true);
 
         // keytool -genkey -alias https.mngit -keypass key-passwd -keystore keystore -storepass store-passwd \
         //   -validity 4096 -dname "cn=https.mngit, ou=None, L=Seattle, ST=Washington, o=ExampleOrg, c=US" -keyalg RSA
-        String storePath = new File(testDir, "keystore").getAbsolutePath();
+        String storePath = testDir.resolve("keystore").getAbsolutePath();
         String storePwd = "store-passwd";
         String keyPwd = "key-passwd";
 

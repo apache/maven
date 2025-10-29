@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
@@ -27,35 +28,35 @@ public class MavenITmng7160ExtensionClassloader extends AbstractMavenIntegration
 
     @Test
     public void testVerify() throws IOException, VerificationException {
-        final File projectDir = extractResources("/mng-7160-extensionclassloader");
+        final Path projectDir = extractResourcesAsPath("/mng-7160-extensionclassloader");
 
-        final Verifier extensionVerifier = newVerifier(new File(projectDir, "extension").getAbsolutePath());
+        final Verifier extensionVerifier = newVerifier(projectDir.resolve("extension").getAbsolutePath());
         extensionVerifier.addCliArgument("install");
         extensionVerifier.execute();
         extensionVerifier.verifyErrorFreeLog();
 
-        final Verifier verifier1 = newVerifier(new File(projectDir, "project-build").getAbsolutePath());
+        final Verifier verifier1 = newVerifier(projectDir.resolve("project-build").getAbsolutePath());
         verifier1.addCliArgument("install");
         verifier1.execute();
         verifier1.verifyErrorFreeLog();
         verifier1.verifyTextInLog("xpp3 -> mvn");
         verifier1.verifyTextInLog("base64 -> ext");
 
-        final Verifier verifier2 = newVerifier(new File(projectDir, "project-core-parent-first").getAbsolutePath());
+        final Verifier verifier2 = newVerifier(projectDir.resolve("project-core-parent-first").getAbsolutePath());
         verifier2.addCliArgument("install");
         verifier2.execute();
         verifier2.verifyErrorFreeLog();
         verifier2.verifyTextInLog("xpp3 -> mvn");
         verifier2.verifyTextInLog("base64 -> mvn");
 
-        final Verifier verifier3 = newVerifier(new File(projectDir, "project-core-plugin").getAbsolutePath());
+        final Verifier verifier3 = newVerifier(projectDir.resolve("project-core-plugin").getAbsolutePath());
         verifier3.addCliArgument("verify");
         verifier3.execute();
         verifier3.verifyErrorFreeLog();
         verifier3.verifyTextInLog("xpp3 -> mvn");
         verifier3.verifyTextInLog("base64 -> ext");
 
-        final Verifier verifier4 = newVerifier(new File(projectDir, "project-core-self-first").getAbsolutePath());
+        final Verifier verifier4 = newVerifier(projectDir.resolve("project-core-self-first").getAbsolutePath());
         verifier4.addCliArgument("verify");
         verifier4.execute();
         verifier4.verifyErrorFreeLog();

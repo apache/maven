@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.nio.file.Files;
 import java.util.Locale;
 
@@ -42,9 +43,9 @@ public class MavenITmng3892ReleaseDeploymentTest extends AbstractMavenIntegratio
      */
     @Test
     public void testitMNG3892() throws Exception {
-        File testDir = extractResources("/mng-3892");
+        Path testDir = extractResourcesAsPath("/mng-3892");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("repo");
         verifier.deleteArtifacts("org.apache.maven.its.mng3892");
@@ -76,7 +77,7 @@ public class MavenITmng3892ReleaseDeploymentTest extends AbstractMavenIntegratio
     }
 
     private void verify(File testDir, String file, String checksum) throws Exception {
-        assertEquals(checksum, readChecksum(new File(testDir, file)), file);
+        assertEquals(checksum, readChecksum(testDir.resolve(file)), file);
     }
 
     private String readChecksum(File checksumFile) throws Exception {

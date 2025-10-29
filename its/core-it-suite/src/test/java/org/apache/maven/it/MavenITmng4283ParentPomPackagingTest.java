@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -36,9 +37,9 @@ public class MavenITmng4283ParentPomPackagingTest extends AbstractMavenIntegrati
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4283");
+        Path testDir = extractResourcesAsPath("/mng-4283");
 
-        Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("sub").getAbsolutePath());
         verifier.setAutoclean(false);
         try {
             verifier.addCliArgument("validate");

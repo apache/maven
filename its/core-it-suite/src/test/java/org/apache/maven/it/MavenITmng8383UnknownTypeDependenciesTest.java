@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -34,9 +35,9 @@ class MavenITmng8383UnknownTypeDependenciesTest extends AbstractMavenIntegration
      */
     @Test
     void testUnknownTypeDependencies() throws Exception {
-        File testDir = extractResources("/mng-8383-unknown-type-dependencies");
+        Path testDir = extractResourcesAsPath("/mng-8383-unknown-type-dependencies");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.addCliArgument("generate-resources");
         verifier.execute();
         verifier.verifyErrorFreeLog();

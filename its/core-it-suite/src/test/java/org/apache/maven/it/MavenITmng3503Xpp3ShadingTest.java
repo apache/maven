@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.nio.file.Files;
 
 import org.junit.jupiter.api.Test;
@@ -34,10 +35,10 @@ public class MavenITmng3503Xpp3ShadingTest extends AbstractMavenIntegrationTestC
 
     @Test
     public void testitMNG3503NoLinkageErrors() throws Exception {
-        File dir = extractResources("/mng-3503/mng-3503-xpp3Shading-pu11");
+        Path dir = extractResourcesAsPath("/mng-3503/mng-3503-xpp3Shading-pu11");
 
         // First, build the test plugin
-        Verifier verifier = newVerifier(new File(dir, "maven-it-plugin-plexus-utils-11").getAbsolutePath());
+        Verifier verifier = newVerifier(dir.resolve("maven-it-plugin-plexus-utils-11").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -45,22 +46,22 @@ public class MavenITmng3503Xpp3ShadingTest extends AbstractMavenIntegrationTestC
         verifier.verifyErrorFreeLog();
 
         // Then, run the test project that uses the plugin
-        verifier = newVerifier(dir.getAbsolutePath());
+        verifier = newVerifier(dir.toString());
 
         verifier.addCliArgument("validate");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        assertEquals("<root />", Files.readString(new File(dir, "target/serialized.xml").toPath()));
+        assertEquals("<root />", Files.readString(dir.resolve("target/serialized.xml").toPath()));
     }
 
     @Test
     public void testitMNG3503Xpp3Shading() throws Exception {
-        File dir = extractResources("/mng-3503/mng-3503-xpp3Shading-pu-new");
+        Path dir = extractResourcesAsPath("/mng-3503/mng-3503-xpp3Shading-pu-new");
 
         // First, build the test plugin
-        Verifier verifier = newVerifier(new File(dir, "maven-it-plugin-plexus-utils-new").getAbsolutePath());
+        Verifier verifier = newVerifier(dir.resolve("maven-it-plugin-plexus-utils-new").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -68,13 +69,13 @@ public class MavenITmng3503Xpp3ShadingTest extends AbstractMavenIntegrationTestC
         verifier.verifyErrorFreeLog();
 
         // Then, run the test project that uses the plugin
-        verifier = newVerifier(dir.getAbsolutePath());
+        verifier = newVerifier(dir.toString());
 
         verifier.addCliArgument("validate");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        assertEquals("root", Files.readString(new File(dir, "target/serialized.xml").toPath()));
+        assertEquals("root", Files.readString(dir.resolve("target/serialized.xml").toPath()));
     }
 }

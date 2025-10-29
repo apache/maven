@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -43,9 +44,9 @@ public class MavenITmng0828PluginConfigValuesInDebugTest extends AbstractMavenIn
      */
     @Test
     public void testitMNG0828() throws Exception {
-        File testDir = extractResources("/mng-0828");
+        Path testDir = extractResourcesAsPath("/mng-0828");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-X");
@@ -80,7 +81,7 @@ public class MavenITmng0828PluginConfigValuesInDebugTest extends AbstractMavenIn
 
         checkLog(log, "[DEBUG]   (f) doubleParam = -1.5");
         checkLog(log, "[DEBUG]   (f) fieldParam = field");
-        checkLog(log, "[DEBUG]   (f) fileParam = " + new File(testDir, "pom.xml").getCanonicalPath());
+        checkLog(log, "[DEBUG]   (f) fileParam = " + testDir.resolve("pom.xml").getCanonicalPath());
         checkLog(log, "[DEBUG]   (f) floatParam = 0.0");
         checkLog(log, "[DEBUG]   (f) integerParam = 0");
         checkLog(log, "[DEBUG]   (f) listParam = [one, two, three, four]");
@@ -91,7 +92,7 @@ public class MavenITmng0828PluginConfigValuesInDebugTest extends AbstractMavenIn
         checkLog(
                 log,
                 "[DEBUG]   (f) propertiesFile = "
-                        + new File(testDir, "target/plugin-config.properties").getCanonicalPath());
+                        + testDir.resolve("target/plugin-config.properties").getCanonicalPath());
 
         // Properties item order is not guaranteed, so only check begin of params ...
         checkLog(log, "[DEBUG]   (f) propertiesParam = {key");

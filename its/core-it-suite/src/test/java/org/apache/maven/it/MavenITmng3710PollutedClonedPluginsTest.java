@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -40,49 +41,49 @@ public class MavenITmng3710PollutedClonedPluginsTest extends AbstractMavenIntegr
 
     @Test
     public void testitMNG3710POMInheritance() throws Exception {
-        File testDir = extractResources("/mng-3710/pom-inheritance");
-        File pluginDir = new File(testDir, "maven-mng3710-pomInheritance-plugin");
-        File projectsDir = new File(testDir, "projects");
+        Path testDir = extractResourcesAsPath("/mng-3710/pom-inheritance");
+        File pluginDir = testDir.resolve("maven-mng3710-pomInheritance-plugin");
+        File projectsDir = testDir.resolve("projects");
 
         Verifier verifier;
 
-        verifier = newVerifier(pluginDir.getAbsolutePath());
+        verifier = newVerifier(pluginDir.toString());
         verifier.addCliArgument("install");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectsDir.getAbsolutePath());
+        verifier = newVerifier(projectsDir.toString());
         verifier.addCliArgument("validate");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        File topLevelTouchFile = new File(projectsDir, "target/touch.txt");
+        File topLevelTouchFile = projectsDir.resolve("target/touch.txt");
         assertFalse(topLevelTouchFile.exists(), "Top-level touch file should NOT be created in projects tree.");
 
-        File midLevelTouchFile = new File(projectsDir, "middle/target/touch.txt");
+        File midLevelTouchFile = projectsDir.resolve("middle/target/touch.txt");
         assertTrue(midLevelTouchFile.exists(), "Mid-level touch file should have been created in projects tree.");
 
-        File childLevelTouchFile = new File(projectsDir, "middle/child/target/touch.txt");
+        File childLevelTouchFile = projectsDir.resolve("middle/child/target/touch.txt");
         assertTrue(childLevelTouchFile.exists(), "Child-level touch file should have been created in projects tree.");
     }
 
     @Test
     public void testitMNG3710OriginalModel() throws Exception {
-        File testDir = extractResources("/mng-3710/original-model");
-        File pluginsDir = new File(testDir, "plugins");
-        File projectDir = new File(testDir, "project");
+        Path testDir = extractResourcesAsPath("/mng-3710/original-model");
+        File pluginsDir = testDir.resolve("plugins");
+        File projectDir = testDir.resolve("project");
 
         Verifier verifier;
 
-        verifier = newVerifier(pluginsDir.getAbsolutePath());
+        verifier = newVerifier(pluginsDir.toString());
         verifier.addCliArgument("install");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir.toString());
 
         verifier.addCliArguments("org.apache.maven.its.mng3710:mavenit-mng3710-directInvoke-plugin:1:run", "validate");
 

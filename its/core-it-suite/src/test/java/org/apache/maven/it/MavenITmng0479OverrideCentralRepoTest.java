@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -41,10 +42,10 @@ public class MavenITmng0479OverrideCentralRepoTest extends AbstractMavenIntegrat
      */
     @Test
     public void testitModel() throws Exception {
-        File testDir = extractResources("/mng-0479");
+        Path testDir = extractResourcesAsPath("/mng-0479");
 
         // Phase 1: Ensure the test plugin is downloaded before the test cuts off access to central
-        File child1 = new File(testDir, "setup");
+        File child1 = testDir.resolve("setup");
         Verifier verifier = newVerifier(child1.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
@@ -54,7 +55,7 @@ public class MavenITmng0479OverrideCentralRepoTest extends AbstractMavenIntegrat
         verifier.verifyErrorFreeLog();
 
         // Phase 2: Now run the test
-        File child2 = new File(testDir, "test");
+        File child2 = testDir.resolve("test");
         verifier = newVerifier(child2.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
@@ -112,9 +113,9 @@ public class MavenITmng0479OverrideCentralRepoTest extends AbstractMavenIntegrat
      */
     @Test
     public void testitResolution() throws Exception {
-        File testDir = extractResources("/mng-0479");
+        Path testDir = extractResourcesAsPath("/mng-0479");
 
-        Verifier verifier = newVerifier(new File(testDir, "test-1").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("test-1").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng0479");
@@ -133,7 +134,7 @@ public class MavenITmng0479OverrideCentralRepoTest extends AbstractMavenIntegrat
         verifier.verifyArtifactPresent("org.apache.maven.its.mng0479", "b", "0.1-SNAPSHOT", "jar");
         verifier.verifyArtifactPresent("org.apache.maven.its.mng0479", "b", "0.1-SNAPSHOT", "pom");
 
-        verifier = newVerifier(new File(testDir, "test-2").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("test-2").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.filterFile("settings-template.xml", "settings.xml");
@@ -150,7 +151,7 @@ public class MavenITmng0479OverrideCentralRepoTest extends AbstractMavenIntegrat
 
         verifier.verifyArtifactNotPresent("org.apache.maven.its.mng0479", "parent", "0.1", "pom");
 
-        verifier = newVerifier(new File(testDir, "test-3").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("test-3").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.filterFile("settings-template.xml", "settings.xml");
@@ -168,7 +169,7 @@ public class MavenITmng0479OverrideCentralRepoTest extends AbstractMavenIntegrat
         verifier.verifyArtifactNotPresent("org.apache.maven.its.mng0479", "a", "0.1", "jar");
         verifier.verifyArtifactNotPresent("org.apache.maven.its.mng0479", "a", "0.1", "pom");
 
-        verifier = newVerifier(new File(testDir, "test-4").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("test-4").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.filterFile("settings-template.xml", "settings.xml");

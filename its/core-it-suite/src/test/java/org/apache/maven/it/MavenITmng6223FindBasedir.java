@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -77,23 +78,23 @@ public class MavenITmng6223FindBasedir extends AbstractMavenIntegrationTestCase 
     }
 
     protected void runCoreExtensionWithOption(String option, String subdir, boolean pom) throws Exception {
-        File testDir = extractResources("/mng-5889-find.mvn");
+        Path testDir = extractResourcesAsPath("/mng-5889-find.mvn");
 
         File basedir =
-                new File(testDir, "../mng-" + (pom ? "5889" : "6223") + "-find.mvn" + option + (pom ? "Pom" : "Dir"));
+                testDir.resolve("../mng-" + (pom ? "5889" : "6223") + "-find.mvn" + option + (pom ? "Pom" : "Dir"));
         basedir.mkdir();
 
         if (subdir != null) {
-            testDir = new File(testDir, subdir);
-            basedir = new File(basedir, subdir);
+            testDir = testDir.resolve(subdir);
+            basedir = basedir.resolve(subdir);
             basedir.mkdirs();
         }
 
-        Verifier verifier = newVerifier(basedir.getAbsolutePath());
+        Verifier verifier = newVerifier(basedir.toString());
         verifier.addCliArgument(
-                "-Dexpression.outputFile=" + new File(basedir, "expression.properties").getAbsolutePath());
+                "-Dexpression.outputFile=" + basedir.resolve("expression.properties").getAbsolutePath());
         verifier.addCliArgument(option); // -f/--file client/pom.xml
-        verifier.addCliArgument((pom ? new File(testDir, "pom.xml") : testDir).getAbsolutePath());
+        verifier.addCliArgument((pom ? testDir.resolve("pom.xml") : testDir).getAbsolutePath());
         verifier.setForkJvm(true); // force forked JVM since we need the shell script to detect .mvn/ location
         verifier.addCliArgument("validate");
         verifier.execute();

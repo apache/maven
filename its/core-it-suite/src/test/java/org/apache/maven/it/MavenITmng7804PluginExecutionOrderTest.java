@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,9 +44,9 @@ class MavenITmng7804PluginExecutionOrderTest extends AbstractMavenIntegrationTes
      */
     @Test
     void testOrder() throws Exception {
-        File testDir = extractResources("/mng-7804-plugin-execution-order");
+        Path testDir = extractResourcesAsPath("/mng-7804-plugin-execution-order");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.addCliArgument("clean");
         verifier.execute();
         verifier.verifyErrorFreeLog();

@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -37,10 +38,10 @@ public class MavenITmng4291MojoRequiresOnlineModeTest extends AbstractMavenInteg
      */
     @Test
     public void testitDirectInvocation() throws Exception {
-        File testDir = extractResources("/mng-4291");
+        Path testDir = extractResourcesAsPath("/mng-4291");
 
         // First, build the test plugin
-        Verifier verifier = newVerifier(new File(testDir, "maven-it-plugin-online").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-online").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -48,7 +49,7 @@ public class MavenITmng4291MojoRequiresOnlineModeTest extends AbstractMavenInteg
         verifier.verifyErrorFreeLog();
 
         // Then, run the test project that uses the plugin
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.setLogFileName("log-direct.txt");
@@ -71,10 +72,10 @@ public class MavenITmng4291MojoRequiresOnlineModeTest extends AbstractMavenInteg
      */
     @Test
     public void testitLifecycleInvocation() throws Exception {
-        File testDir = extractResources("/mng-4291");
+        Path testDir = extractResourcesAsPath("/mng-4291");
 
         // First, build the test plugin
-        Verifier verifier = newVerifier(new File(testDir, "maven-it-plugin-online").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-online").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -82,7 +83,7 @@ public class MavenITmng4291MojoRequiresOnlineModeTest extends AbstractMavenInteg
         verifier.verifyErrorFreeLog();
 
         // Then, run the test project that uses the plugin
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.setLogFileName("log-lifecycle.txt");

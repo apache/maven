@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -34,8 +35,8 @@ public class MavenIT0008SimplePluginTest extends AbstractMavenIntegrationTestCas
      */
     @Test
     public void testit0008() throws Exception {
-        File testDir = extractResources("/it0008");
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Path testDir = extractResourcesAsPath("/it0008");
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifact("org.apache.maven.its.plugins", "maven-it-plugin-touch", "1.0", "maven-plugin");

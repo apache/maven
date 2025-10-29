@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Map;
 
 import org.eclipse.jetty.security.ConstraintMapping;
@@ -51,7 +52,7 @@ public class MavenITmng4413MirroringOfDependencyRepoTest extends AbstractMavenIn
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4413");
+        Path testDir = extractResourcesAsPath("/mng-4413");
 
         Constraint constraint = new Constraint();
         constraint.setName(Constraint.__BASIC_AUTH);
@@ -74,7 +75,7 @@ public class MavenITmng4413MirroringOfDependencyRepoTest extends AbstractMavenIn
         securityHandler.setConstraintMappings(new ConstraintMapping[] {constraintMapping});
 
         ResourceHandler repoHandler = new ResourceHandler();
-        repoHandler.setResourceBase(new File(testDir, "repo-a").getAbsolutePath());
+        repoHandler.setResourceBase(testDir.resolve("repo-a").getAbsolutePath());
 
         HandlerList handlerList = new HandlerList();
         handlerList.addHandler(securityHandler);
@@ -90,7 +91,7 @@ public class MavenITmng4413MirroringOfDependencyRepoTest extends AbstractMavenIn
             }
             int port = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
             System.out.println("Bound server socket to the port " + port);
-            Verifier verifier = newVerifier(testDir.getAbsolutePath());
+            Verifier verifier = newVerifier(testDir.toString());
             verifier.setAutoclean(false);
             verifier.deleteDirectory("target");
             verifier.deleteArtifacts("org.apache.maven.its.mng4413");

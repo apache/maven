@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -43,14 +44,14 @@ public class MavenITmng2790LastUpdatedMetadataTest extends AbstractMavenIntegrat
      */
     @Test
     public void testitMNG2790() throws Exception {
-        File testDir = extractResources("/mng-2790");
+        Path testDir = extractResourcesAsPath("/mng-2790");
 
         Date now = new Date();
 
         /*
          * Phase 1: Install initial snapshot into local repo.
          */
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.deleteArtifacts("org.apache.maven.its.mng2790");
         verifier.setAutoclean(false);
         verifier.addCliArgument("validate");
@@ -79,7 +80,7 @@ public class MavenITmng2790LastUpdatedMetadataTest extends AbstractMavenIntegrat
         /*
          * Phase 2: Re-install snapshot and check for proper timestamp update in local metadata.
          */
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.addCliArgument("validate");
         verifier.execute();

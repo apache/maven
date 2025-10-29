@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
@@ -41,9 +42,9 @@ public class MavenITmng2362DeployedPomEncodingTest extends AbstractMavenIntegrat
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-2362");
+        Path testDir = extractResourcesAsPath("/mng-2362");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("utf-8/target");
         verifier.deleteDirectory("latin-1/target");
@@ -57,13 +58,13 @@ public class MavenITmng2362DeployedPomEncodingTest extends AbstractMavenIntegrat
         pomFile = new File(verifier.getArtifactPath("org.apache.maven.its.mng2362", "utf-8", "0.1", "pom"));
         assertPomUtf8(pomFile);
 
-        pomFile = new File(testDir, "utf-8/target/repo/org/apache/maven/its/mng2362/utf-8/0.1/utf-8-0.1.pom");
+        pomFile = testDir.resolve("utf-8/target/repo/org/apache/maven/its/mng2362/utf-8/0.1/utf-8-0.1.pom");
         assertPomUtf8(pomFile);
 
         pomFile = new File(verifier.getArtifactPath("org.apache.maven.its.mng2362", "latin-1", "0.1", "pom"));
         assertPomLatin1(pomFile);
 
-        pomFile = new File(testDir, "latin-1/target/repo/org/apache/maven/its/mng2362/latin-1/0.1/latin-1-0.1.pom");
+        pomFile = testDir.resolve("latin-1/target/repo/org/apache/maven/its/mng2362/latin-1/0.1/latin-1-0.1.pom");
         assertPomLatin1(pomFile);
     }
 

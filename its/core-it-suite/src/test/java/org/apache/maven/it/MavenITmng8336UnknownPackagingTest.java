@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -34,9 +35,9 @@ class MavenITmng8336UnknownPackagingTest extends AbstractMavenIntegrationTestCas
      */
     @Test
     void testUnknownPackaging() throws Exception {
-        File testDir = extractResources("/mng-8336-unknown-packaging");
+        Path testDir = extractResourcesAsPath("/mng-8336-unknown-packaging");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath(), "remote");
+        Verifier verifier = newVerifier(testDir.toString(), "remote");
         verifier.addCliArgument("clean");
         verifier.addCliArgument("org.codehaus.mojo:license-maven-plugin:2.4.0:add-third-party");
         verifier.execute();

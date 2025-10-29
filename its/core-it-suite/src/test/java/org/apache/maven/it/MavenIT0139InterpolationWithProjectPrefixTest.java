@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -40,8 +41,8 @@ public class MavenIT0139InterpolationWithProjectPrefixTest extends AbstractMaven
      */
     @Test
     public void testit0139() throws Exception {
-        File testDir = extractResources("/it0139");
-        File child = new File(testDir, "child");
+        Path testDir = extractResourcesAsPath("/it0139");
+        File child = testDir.resolve("child");
 
         Verifier verifier = newVerifier(child.getAbsolutePath());
         verifier.setAutoclean(false);

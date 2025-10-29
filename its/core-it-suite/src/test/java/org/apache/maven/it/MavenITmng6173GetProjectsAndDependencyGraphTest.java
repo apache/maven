@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -39,9 +40,9 @@ public class MavenITmng6173GetProjectsAndDependencyGraphTest extends AbstractMav
     @Test
     public void testitShouldReturnProjectsAndProjectDependencyGraph() throws Exception {
 
-        File testDir = extractResources("/mng-6173-get-projects-and-dependency-graph");
+        Path testDir = extractResourcesAsPath("/mng-6173-get-projects-and-dependency-graph");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("module-1/target");

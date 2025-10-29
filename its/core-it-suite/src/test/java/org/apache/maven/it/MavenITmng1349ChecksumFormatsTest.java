@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -37,9 +38,9 @@ public class MavenITmng1349ChecksumFormatsTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testitMNG1349() throws Exception {
-        File testDir = extractResources("/mng-1349");
+        Path testDir = extractResourcesAsPath("/mng-1349");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng1349");
         verifier.filterFile("settings-template.xml", "settings.xml");

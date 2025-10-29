@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -34,27 +35,27 @@ public class MavenITmng5581LifecycleMappingDelegate extends AbstractMavenIntegra
          * run "test-only" build phase and that it does not run maven-compiler-plugin.
          */
 
-        File testDir = extractResources("/mng-5581-lifecycle-mapping-delegate");
-        File extensionDir = new File(testDir, "extension");
-        File projectDir = new File(testDir, "basic");
+        Path testDir = extractResourcesAsPath("/mng-5581-lifecycle-mapping-delegate");
+        File extensionDir = testDir.resolve("extension");
+        File projectDir = testDir.resolve("basic");
 
         Verifier verifier;
 
         // install the test extension
-        verifier = newVerifier(extensionDir.getAbsolutePath());
+        verifier = newVerifier(extensionDir.toString());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // compile the test project
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir.toString());
         verifier.setLogFileName("compile-log.txt");
         verifier.addCliArgument("compile");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // run custom "test-only" build phase
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir.toString());
         verifier.setLogFileName("test-only-log.txt");
         verifier.setForkJvm(true); // TODO: why?
         verifier.addCliArgument("-X");

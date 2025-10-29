@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -53,7 +54,7 @@ public class MavenITmng0768OfflineModeTest extends AbstractMavenIntegrationTestC
      */
     @Test
     public void testitMNG768() throws Exception {
-        File testDir = extractResources("/mng-0768");
+        Path testDir = extractResourcesAsPath("/mng-0768");
 
         final List<String> requestedUris = Collections.synchronizedList(new ArrayList<>());
 
@@ -99,7 +100,7 @@ public class MavenITmng0768OfflineModeTest extends AbstractMavenIntegrationTestC
             int port = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
 
             // phase 1: run build in online mode to fill local repo
-            Verifier verifier = newVerifier(testDir.getAbsolutePath());
+            Verifier verifier = newVerifier(testDir.toString());
             verifier.setAutoclean(false);
             verifier.deleteDirectory("target");
             verifier.deleteArtifacts("org.apache.maven.its.mng0768");
@@ -117,7 +118,7 @@ public class MavenITmng0768OfflineModeTest extends AbstractMavenIntegrationTestC
             requestedUris.clear();
 
             // phase 2: run build in offline mode to check it still passes, without network accesses
-            verifier = newVerifier(testDir.getAbsolutePath());
+            verifier = newVerifier(testDir.toString());
             verifier.setAutoclean(false);
             verifier.deleteDirectory("target");
             verifier.addCliArgument("-o");
@@ -134,7 +135,7 @@ public class MavenITmng0768OfflineModeTest extends AbstractMavenIntegrationTestC
 
             // phase 3: delete test artifact and run build in offline mode to check it fails now
             // NOTE: Adding the settings again to offer Maven the bad choice of using the remote repo
-            verifier = newVerifier(testDir.getAbsolutePath());
+            verifier = newVerifier(testDir.toString());
             verifier.setAutoclean(false);
             verifier.deleteDirectory("target");
             verifier.deleteArtifacts("org.apache.maven.its.mng0768");

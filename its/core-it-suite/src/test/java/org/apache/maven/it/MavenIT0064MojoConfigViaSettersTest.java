@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -32,10 +33,10 @@ public class MavenIT0064MojoConfigViaSettersTest extends AbstractMavenIntegratio
      */
     @Test
     public void testit0064() throws Exception {
-        File testDir = extractResources("/it0064");
+        Path testDir = extractResourcesAsPath("/it0064");
 
         // First, build the test plugin
-        Verifier verifier = newVerifier(new File(testDir, "maven-it-plugin-setter").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-setter").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -43,7 +44,7 @@ public class MavenIT0064MojoConfigViaSettersTest extends AbstractMavenIntegratio
         verifier.verifyErrorFreeLog();
 
         // Then, run the test project that uses the plugin
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-setter:setter-touch");

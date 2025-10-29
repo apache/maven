@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -40,9 +41,9 @@ public class MavenITmng4955LocalVsRemoteSnapshotResolutionTest extends AbstractM
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4955");
+        Path testDir = extractResourcesAsPath("/mng-4955");
 
-        Verifier verifier = newVerifier(new File(testDir, "dep").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("dep").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4955");
@@ -50,7 +51,7 @@ public class MavenITmng4955LocalVsRemoteSnapshotResolutionTest extends AbstractM
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-s");

@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -42,17 +43,17 @@ public class MavenITgh11321Test extends AbstractMavenIntegrationTestCase {
      */
     @Test
     public void testParentAboveRootDirectoryRejected() throws Exception {
-        File testDir = extractResources("/gh-11321-parent-above-root");
+        Path testDir = extractResourcesAsPath("/gh-11321-parent-above-root");
 
         // First, verify that normal build works from the actual root
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // Now test with -f pointing to the subdirectory that contains .mvn
         // This should fail with a proper error message about parent being above root
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
         verifier.addCliArgument("-f");
         verifier.addCliArgument("deps");
         verifier.addCliArgument("validate");

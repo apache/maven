@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -35,9 +36,9 @@ public class MavenITmng3396DependencyManagementForOverConstrainedRangesTest exte
     @Test
     public void testitMNG3396() throws Exception {
         String baseDir = "/mng-3396";
-        File testDir = extractResources(baseDir + "/dependencies");
+        Path testDir = extractResourcesAsPath(baseDir + "/dependencies");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.deleteArtifact(GROUP_ID, "A", "1.0", "pom");
         verifier.deleteArtifact(GROUP_ID, "A", "1.0", "jar");
         verifier.deleteArtifact(GROUP_ID, "B", "1.0", "pom");
@@ -48,7 +49,7 @@ public class MavenITmng3396DependencyManagementForOverConstrainedRangesTest exte
 
         testDir = extractResources(baseDir + "/plugin");
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
         verifier.deleteArtifact(GROUP_ID, "A", "1.0", "pom");
         verifier.deleteArtifact(GROUP_ID, "A", "1.0", "jar");
         verifier.deleteArtifact(GROUP_ID, "A", "3.0", "pom");
@@ -61,7 +62,7 @@ public class MavenITmng3396DependencyManagementForOverConstrainedRangesTest exte
 
         testDir = extractResources(baseDir + "/pluginuser");
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
         verifier.deleteArtifact(GROUP_ID, "pluginuser", "1.0", "pom");
         verifier.deleteArtifact(GROUP_ID, "pluginuser", "1.0", "jar");
         verifier.addCliArgument("install");

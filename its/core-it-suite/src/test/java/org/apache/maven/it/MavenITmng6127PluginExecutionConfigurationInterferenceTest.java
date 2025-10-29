@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.nio.file.Files;
 
 import org.junit.jupiter.api.Test;
@@ -29,30 +30,30 @@ public class MavenITmng6127PluginExecutionConfigurationInterferenceTest extends 
 
     @Test
     public void testCustomMojoExecutionConfigurator() throws Exception {
-        File testDir = extractResources("/mng-6127-plugin-execution-configuration-interference");
-        File pluginDir = new File(testDir, "plugin");
-        File projectDir = new File(testDir, "project");
-        File modAprojectDir = new File(projectDir, "mod-a");
-        File modBprojectDir = new File(projectDir, "mod-b");
-        File modCprojectDir = new File(projectDir, "mod-c");
+        Path testDir = extractResourcesAsPath("/mng-6127-plugin-execution-configuration-interference");
+        File pluginDir = testDir.resolve("plugin");
+        File projectDir = testDir.resolve("project");
+        File modAprojectDir = projectDir.resolve("mod-a");
+        File modBprojectDir = projectDir.resolve("mod-b");
+        File modCprojectDir = projectDir.resolve("mod-c");
 
         Verifier verifier;
 
         // install the test plugin
-        verifier = newVerifier(pluginDir.getAbsolutePath());
+        verifier = newVerifier(pluginDir.toString());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        File modAconfigurationFile = new File(modAprojectDir, "configuration.txt");
-        File modBconfigurationFile = new File(modBprojectDir, "configuration.txt");
-        File modCconfigurationFile = new File(modCprojectDir, "configuration.txt");
+        File modAconfigurationFile = modAprojectDir.resolve("configuration.txt");
+        File modBconfigurationFile = modBprojectDir.resolve("configuration.txt");
+        File modCconfigurationFile = modCprojectDir.resolve("configuration.txt");
         modAconfigurationFile.delete();
         modBconfigurationFile.delete();
         modCconfigurationFile.delete();
 
         // build the test project
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir.toString());
         verifier.addCliArgument("verify");
         verifier.addCliArgument("-X");
         verifier.execute();

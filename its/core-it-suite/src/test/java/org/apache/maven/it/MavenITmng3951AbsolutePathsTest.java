@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -39,9 +40,9 @@ public class MavenITmng3951AbsolutePathsTest extends AbstractMavenIntegrationTes
      */
     @Test
     public void testitMNG3951() throws Exception {
-        File testDir = extractResources("/mng-3951");
+        Path testDir = extractResourcesAsPath("/mng-3951");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
 
         /*
          * Cut off anything before the first file separator from the local repo path. This is harmless on a Unix-like
@@ -62,7 +63,7 @@ public class MavenITmng3951AbsolutePathsTest extends AbstractMavenIntegrationTes
         Properties props = verifier.loadProperties("target/path.properties");
 
         ItUtils.assertCanonicalFileEquals(
-                new File(testDir, "tmp").getAbsoluteFile(), new File(props.getProperty("fileParams.0")));
+                testDir.resolve("tmp").getAbsoluteFile(), new File(props.getProperty("fileParams.0")));
         ItUtils.assertCanonicalFileEquals(
                 new File(getRoot(testDir), "tmp").getAbsoluteFile(), new File(props.getProperty("fileParams.1")));
         ItUtils.assertCanonicalFileEquals(new File(repoDir), new File(props.getProperty("stringParams.0")));

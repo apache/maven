@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -38,19 +39,19 @@ public class MavenITmng3746POMPropertyOverrideTest extends AbstractMavenIntegrat
     public void testitMNG3746UsingDefaultSystemProperty() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        File testDir = extractResources("/mng-3746");
-        File pluginDir = new File(testDir, "maven-mng3746-plugin");
-        File projectDir = new File(testDir, "project");
+        Path testDir = extractResourcesAsPath("/mng-3746");
+        File pluginDir = testDir.resolve("maven-mng3746-plugin");
+        File projectDir = testDir.resolve("project");
 
         Verifier verifier;
 
-        verifier = newVerifier(pluginDir.getAbsolutePath());
+        verifier = newVerifier(pluginDir.toString());
         verifier.setLogFileName("log-sys.txt");
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir.toString());
         verifier.setLogFileName("log-sys.txt");
         verifier.addCliArgument("validate");
         verifier.execute();
@@ -61,19 +62,19 @@ public class MavenITmng3746POMPropertyOverrideTest extends AbstractMavenIntegrat
     public void testitMNG3746UsingCLIProperty() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        File testDir = extractResources("/mng-3746");
-        File pluginDir = new File(testDir, "maven-mng3746-plugin");
-        File projectDir = new File(testDir, "project");
+        Path testDir = extractResourcesAsPath("/mng-3746");
+        File pluginDir = testDir.resolve("maven-mng3746-plugin");
+        File projectDir = testDir.resolve("project");
 
         Verifier verifier;
 
-        verifier = newVerifier(pluginDir.getAbsolutePath());
+        verifier = newVerifier(pluginDir.toString());
         verifier.setLogFileName("log-cli.txt");
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir.toString());
         verifier.setLogFileName("log-cli.txt");
 
         verifier.addCliArgument("-Dtest.verification=cli");

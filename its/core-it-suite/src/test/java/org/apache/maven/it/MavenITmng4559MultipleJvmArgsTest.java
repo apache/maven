@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.nio.file.Files;
 import java.util.Properties;
 
@@ -35,9 +36,9 @@ public class MavenITmng4559MultipleJvmArgsTest extends AbstractMavenIntegrationT
 
     @Test
     void testMultipleJvmArgs() throws Exception {
-        File testDir = extractResources("/mng-4559-multiple-jvm-args");
-        File mvnDir = new File(testDir, ".mvn");
-        File jvmConfig = new File(mvnDir, "jvm.config");
+        Path testDir = extractResourcesAsPath("/mng-4559-multiple-jvm-args");
+        File mvnDir = testDir.resolve(".mvn");
+        File jvmConfig = mvnDir.resolve("jvm.config");
 
         mvnDir.mkdirs();
         Files.writeString(
@@ -46,7 +47,7 @@ public class MavenITmng4559MultipleJvmArgsTest extends AbstractMavenIntegrationT
                         + "# Another comment\n"
                         + "-Dtest.prop2=\"value 2\"");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setForkJvm(true);
         verifier.addCliArgument("validate");
         verifier.execute();

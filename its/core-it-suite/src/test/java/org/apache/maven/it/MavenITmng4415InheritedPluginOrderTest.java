@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -45,9 +46,9 @@ public class MavenITmng4415InheritedPluginOrderTest extends AbstractMavenIntegra
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4415");
+        Path testDir = extractResourcesAsPath("/mng-4415");
 
-        Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("sub").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

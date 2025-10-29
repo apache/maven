@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,9 +45,9 @@ class MavenITmng3477DependencyResolutionErrorMessageTest extends AbstractMavenIn
      * @throws Exception in case of failure
      */
     void testit(int port, String[] logExpectPatterns, String projectFile) throws Exception {
-        File testDir = extractResources("/mng-3477");
+        Path testDir = extractResourcesAsPath("/mng-3477");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath(), "");
+        Verifier verifier = newVerifier(testDir.toString(), "");
 
         Map<String, String> filterProps = new HashMap<>();
         filterProps.put("@port@", Integer.toString(port));

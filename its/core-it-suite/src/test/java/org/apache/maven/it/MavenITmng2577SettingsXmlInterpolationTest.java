@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -39,9 +40,9 @@ public class MavenITmng2577SettingsXmlInterpolationTest extends AbstractMavenInt
      */
     @Test
     public void testitEnvVars() throws Exception {
-        File testDir = extractResources("/mng-2577");
+        Path testDir = extractResourcesAsPath("/mng-2577");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("--settings");
@@ -65,9 +66,9 @@ public class MavenITmng2577SettingsXmlInterpolationTest extends AbstractMavenInt
     public void testitSystemProps() throws Exception {
         // requiresMavenVersion("[3.0-alpha-1,)");
 
-        File testDir = extractResources("/mng-2577");
+        Path testDir = extractResourcesAsPath("/mng-2577");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("--settings");

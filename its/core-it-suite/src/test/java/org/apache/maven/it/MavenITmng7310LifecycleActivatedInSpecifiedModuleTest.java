@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 /**
  * An integration test which proves that the bug of MNG-7310 is fixed.
@@ -32,14 +33,14 @@ public class MavenITmng7310LifecycleActivatedInSpecifiedModuleTest extends Abstr
     public static final String BASE_TEST_DIR = "/mng-7310-lifecycle-activated-in-specified-module";
 
     public void testItShouldNotLoadAnExtensionInASiblingSubmodule() throws Exception {
-        File extensionTestDir = extractResources(BASE_TEST_DIR + "/extension");
-        File projectTestDir = extractResources(BASE_TEST_DIR + "/project");
+        Path extensionTestDir = extractResourcesAsPath(BASE_TEST_DIR + "/extension");
+        Path projectTestDir = extractResourcesAsPath(BASE_TEST_DIR + "/project");
 
-        Verifier verifier = newVerifier(extensionTestDir.getAbsolutePath());
+        Verifier verifier = newVerifier(extensionTestDir.toString());
         verifier.addCliArgument("install");
         verifier.execute();
 
-        Verifier verifier2 = newVerifier(projectTestDir.getAbsolutePath());
+        Verifier verifier2 = newVerifier(projectTestDir.toString());
         verifier2.addCliArgument("compile");
         verifier2.execute();
     }

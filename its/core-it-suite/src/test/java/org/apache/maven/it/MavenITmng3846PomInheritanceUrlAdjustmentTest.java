@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -40,9 +41,9 @@ public class MavenITmng3846PomInheritanceUrlAdjustmentTest extends AbstractMaven
      */
     @Test
     public void testitOneParent() throws Exception {
-        File testDir = extractResources("/mng-3846");
+        Path testDir = extractResourcesAsPath("/mng-3846");
 
-        Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("sub").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
@@ -73,9 +74,9 @@ public class MavenITmng3846PomInheritanceUrlAdjustmentTest extends AbstractMaven
      */
     @Test
     public void testitTwoParents() throws Exception {
-        File testDir = extractResources("/mng-3846");
+        Path testDir = extractResourcesAsPath("/mng-3846");
 
-        Verifier verifier = newVerifier(new File(testDir, "another-parent/sub").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("another-parent/sub").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.io.IOException;
 import java.util.List;
 
@@ -39,9 +40,9 @@ public class MavenITmng7504NotWarnUnsupportedReportPluginsTest extends AbstractM
 
     @Test
     public void testWarnNotPresent() throws IOException, VerificationException {
-        File rootDir = extractResources(PROJECT_PATH);
+        Path rootDir = extractResourcesAsPath(PROJECT_PATH);
 
-        Verifier verifier = newVerifier(rootDir.getAbsolutePath());
+        Verifier verifier = newVerifier(rootDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("site");

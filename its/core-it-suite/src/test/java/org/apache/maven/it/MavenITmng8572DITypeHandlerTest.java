@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -32,8 +33,8 @@ public class MavenITmng8572DITypeHandlerTest extends AbstractMavenIntegrationTes
     @Test
     public void testCustomTypeHandler() throws Exception {
         // Build the extension first
-        File testDir = extractResources("/mng-8572-di-type-handler");
-        Verifier verifier = newVerifier(new File(testDir, "extension").getAbsolutePath());
+        Path testDir = extractResourcesAsPath("/mng-8572-di-type-handler");
+        Verifier verifier = newVerifier(testDir.resolve("extension").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng8572");
@@ -42,7 +43,7 @@ public class MavenITmng8572DITypeHandlerTest extends AbstractMavenIntegrationTes
         verifier.verifyErrorFreeLog();
 
         // Now use the extension in a test project
-        verifier = newVerifier(new File(testDir, "test").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("test").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArguments(
@@ -54,7 +55,7 @@ public class MavenITmng8572DITypeHandlerTest extends AbstractMavenIntegrationTes
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(new File(testDir, "test").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("test").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.addCliArgument("validate");
         verifier.execute();

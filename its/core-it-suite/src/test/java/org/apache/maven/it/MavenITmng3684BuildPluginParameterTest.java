@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -33,17 +34,17 @@ public class MavenITmng3684BuildPluginParameterTest extends AbstractMavenIntegra
 
     @Test
     public void testitMNG3684() throws Exception {
-        File testDir = extractResources("/mng-3684");
-        File pluginDir = new File(testDir, "maven-mng3684-plugin");
-        File projectDir = new File(testDir, "project");
+        Path testDir = extractResourcesAsPath("/mng-3684");
+        File pluginDir = testDir.resolve("maven-mng3684-plugin");
+        File projectDir = testDir.resolve("project");
 
-        Verifier verifier = newVerifier(pluginDir.getAbsolutePath());
+        Verifier verifier = newVerifier(pluginDir.toString());
         verifier.addCliArgument("install");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir.toString());
         verifier.setLogFileName("log-validate.txt");
         verifier.addCliArgument("validate");
         verifier.execute();

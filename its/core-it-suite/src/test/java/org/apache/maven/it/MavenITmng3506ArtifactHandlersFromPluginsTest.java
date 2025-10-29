@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
@@ -43,10 +44,10 @@ public class MavenITmng3506ArtifactHandlersFromPluginsTest extends AbstractMaven
 
     @Test
     public void testProjectPackagingUsage() throws IOException, VerificationException {
-        File testDir = extractResources("/" + AID);
+        Path testDir = extractResourcesAsPath("/" + AID);
 
         // First, build the test plugin
-        Verifier verifier = newVerifier(new File(testDir, "mng-3506.2/maven-it-plugin-extension2").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("mng-3506.2/maven-it-plugin-extension2").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -54,7 +55,7 @@ public class MavenITmng3506ArtifactHandlersFromPluginsTest extends AbstractMaven
         verifier.verifyErrorFreeLog();
 
         // Then, run the test project that uses the plugin
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.toString());
 
         verifier.deleteArtifacts(GID);
 

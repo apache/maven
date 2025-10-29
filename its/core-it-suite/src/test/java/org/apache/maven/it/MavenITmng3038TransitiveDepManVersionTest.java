@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.io.IOException;
 
 import org.junit.jupiter.api.Disabled;
@@ -35,14 +36,14 @@ public class MavenITmng3038TransitiveDepManVersionTest extends AbstractMavenInte
 
     @Test
     public void testitMNG3038() throws Exception {
-        File testDirBase = extractResources("/mng-3038");
+        Path testDirBase = extractResourcesAsPath("/mng-3038");
 
         compileDDep(testDirBase, "D1", "1.0");
         compileDDep(testDirBase, "D2", "2.0");
 
-        File testProjectDir = new File(testDirBase, "test-project");
+        File testProjectDir = testDirBase.resolve("test-project");
 
-        Verifier verifier = newVerifier(testProjectDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testProjectDir.toString());
         verifier.deleteArtifact("org.apache.maven.its.it0121", "A", "1.0", "pom");
         verifier.deleteArtifact("org.apache.maven.its.it0121", "A", "1.0", "jar");
         verifier.deleteArtifact("org.apache.maven.its.it0121", "B", "1.0", "pom");
@@ -56,8 +57,8 @@ public class MavenITmng3038TransitiveDepManVersionTest extends AbstractMavenInte
 
     private void compileDDep(File testDirBase, String projectDDepDir, String version)
             throws VerificationException, IOException {
-        File testOtherDepDir = new File(testDirBase, "test-other-deps/" + projectDDepDir);
-        Verifier verifierOtherDep = newVerifier(testOtherDepDir.getAbsolutePath());
+        File testOtherDepDir = testDirBase.resolve("test-other-deps/" + projectDDepDir);
+        Verifier verifierOtherDep = newVerifier(testOtherDepDir.toString());
         verifierOtherDep.deleteArtifact("org.apache.maven.its.it0121", "D", version, "jar");
         verifierOtherDep.deleteArtifact("org.apache.maven.its.it0121", "D", version, "pom");
         verifierOtherDep.addCliArgument("install");

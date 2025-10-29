@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -35,9 +36,9 @@ public class MavenITmng6065FailOnSeverityTest extends AbstractMavenIntegrationTe
 
     @Test
     public void testItShouldFailOnWarnLogMessages() throws Exception {
-        File testDir = extractResources("/mng-6065-fail-on-severity");
+        Path testDir = extractResourcesAsPath("/mng-6065-fail-on-severity");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setLogFileName("warn.log");
         verifier.addCliArgument("--fail-on-severity");
         verifier.addCliArgument("WARN");
@@ -58,9 +59,9 @@ public class MavenITmng6065FailOnSeverityTest extends AbstractMavenIntegrationTe
 
     @Test
     public void testItShouldSucceedOnWarnLogMessagesWhenFailLevelIsError() throws Exception {
-        File testDir = extractResources("/mng-6065-fail-on-severity");
+        Path testDir = extractResourcesAsPath("/mng-6065-fail-on-severity");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setLogFileName("error.log");
         verifier.addCliArgument("--fail-on-severity");
         verifier.addCliArgument("ERROR");

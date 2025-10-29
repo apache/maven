@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -36,9 +37,9 @@ public class MavenITmng8181CentralRepoTest extends AbstractMavenIntegrationTestC
      */
     @Test
     public void testitModel() throws Exception {
-        File testDir = extractResources("/mng-8181-central-repo");
+        Path testDir = extractResourcesAsPath("/mng-8181-central-repo");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath(), null);
+        Verifier verifier = newVerifier(testDir.toString(), null);
         verifier.setAutoclean(false);
         verifier.addCliArgument("--install-settings=install-settings.xml");
         verifier.addCliArgument("--settings=settings.xml");

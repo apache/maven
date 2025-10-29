@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -40,13 +41,13 @@ public class MavenITmng0680ParentBasedirTest extends AbstractMavenIntegrationTes
      */
     @Test
     public void testitMNG680() throws Exception {
-        File testDir = extractResources("/mng-0680");
+        Path testDir = extractResourcesAsPath("/mng-0680");
 
         testDir = testDir.getCanonicalFile();
 
-        File subDir = new File(testDir, "subproject");
+        File subDir = testDir.resolve("subproject");
 
-        Verifier verifier = newVerifier(subDir.getAbsolutePath());
+        Verifier verifier = newVerifier(subDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -38,9 +39,9 @@ class MavenITmng7606DependencyImportScopeTest extends AbstractMavenIntegrationTe
      */
     @Test
     void testDependencyResolution() throws Exception {
-        File testDir = extractResources("/mng-7606");
+        Path testDir = extractResourcesAsPath("/mng-7606");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(true);
         verifier.deleteArtifacts("org.apache.maven.its.mng7606");
         verifier.addCliArgument("verify");

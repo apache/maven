@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -40,10 +41,10 @@ public class MavenITmng3808ReportInheritanceOrderingTest extends AbstractMavenIn
      */
     @Test
     public void testitMNG3808() throws Exception {
-        File testDir = extractResources("/mng-3808");
-        testDir = new File(testDir, "child");
+        Path testDir = extractResourcesAsPath("/mng-3808");
+        testDir = testDir.resolve("child");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -42,9 +43,9 @@ public class MavenITmng1895ScopeConflictResolutionTest extends AbstractMavenInte
      */
     @Test
     public void testitDirectVsIndirect() throws Exception {
-        File testDir = extractResources("/mng-1895/direct-vs-indirect");
+        Path testDir = extractResourcesAsPath("/mng-1895/direct-vs-indirect");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng1895");
         verifier.deleteDirectory("target");
@@ -209,9 +210,9 @@ public class MavenITmng1895ScopeConflictResolutionTest extends AbstractMavenInte
     }
 
     private Verifier run(String scopeB, String scopeA) throws Exception {
-        File testDir = extractResources("/mng-1895/strong-vs-weak");
+        Path testDir = extractResourcesAsPath("/mng-1895/strong-vs-weak");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng1895");
         verifier.deleteDirectory("target");

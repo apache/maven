@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -39,8 +40,8 @@ public class MavenITmng2201PluginConfigInterpolationTest extends AbstractMavenIn
      */
     @Test
     public void testitMNG2201() throws Exception {
-        File testDir = extractResources("/mng-2201");
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Path testDir = extractResourcesAsPath("/mng-2201");
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
@@ -48,11 +49,11 @@ public class MavenITmng2201PluginConfigInterpolationTest extends AbstractMavenIn
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties("target/config.properties");
-        ItUtils.assertCanonicalFileEquals(new File(testDir, "target"), new File(props.getProperty("stringParam")));
+        ItUtils.assertCanonicalFileEquals(testDir.resolve("target"), new File(props.getProperty("stringParam")));
         ItUtils.assertCanonicalFileEquals(
-                new File(testDir, "target"), new File(props.getProperty("propertiesParam.buildDir")));
+                testDir.resolve("target"), new File(props.getProperty("propertiesParam.buildDir")));
         ItUtils.assertCanonicalFileEquals(
-                new File(testDir, "target"), new File(props.getProperty("mapParam.buildDir")));
+                testDir.resolve("target"), new File(props.getProperty("mapParam.buildDir")));
         assertEquals("4.0.0", props.getProperty("domParam.children.modelVersion.0.value"));
         assertEquals("org.apache.maven.its.it0104", props.getProperty("domParam.children.groupId.0.value"));
         assertEquals("1.0-SNAPSHOT", props.getProperty("domParam.children.version.0.value"));
@@ -60,10 +61,10 @@ public class MavenITmng2201PluginConfigInterpolationTest extends AbstractMavenIn
         assertEquals("http://maven.apache.org", props.getProperty("domParam.children.url.0.value"));
         assertEquals("Apache", props.getProperty("domParam.children.organization.0.children.name.0.value"));
         ItUtils.assertCanonicalFileEquals(
-                new File(testDir, "target"),
+                testDir.resolve("target"),
                 new File(props.getProperty("domParam.children.build.0.children.directory.0.value")));
         ItUtils.assertCanonicalFileEquals(
-                new File(testDir, "target/classes"),
+                testDir.resolve("target/classes"),
                 new File(props.getProperty("domParam.children.build.0.children.outputDirectory.0.value")));
     }
 }

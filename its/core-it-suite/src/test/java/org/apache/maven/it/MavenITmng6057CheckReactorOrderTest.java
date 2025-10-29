@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -49,9 +50,9 @@ public class MavenITmng6057CheckReactorOrderTest extends AbstractMavenIntegratio
      */
     @Test
     public void testitReactorShouldResultInExpectedOrder() throws Exception {
-        File testDir = extractResources("/mng-6057-check-reactor-order");
+        Path testDir = extractResourcesAsPath("/mng-6057-check-reactor-order");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
 
         verifier.setLogFileName("log-only.txt");

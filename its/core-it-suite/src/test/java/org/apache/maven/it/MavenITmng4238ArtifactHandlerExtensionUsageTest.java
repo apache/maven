@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
@@ -42,9 +43,9 @@ public class MavenITmng4238ArtifactHandlerExtensionUsageTest extends AbstractMav
 
     @Test
     public void testProjectPackagingUsage() throws IOException, VerificationException {
-        File testDir = extractResources("/mng-4238");
+        Path testDir = extractResourcesAsPath("/mng-4238");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
 
         verifier.deleteArtifacts(GID);
 

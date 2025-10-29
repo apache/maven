@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -28,8 +29,8 @@ public class MavenITmng6981ProjectListShouldIncludeChildrenTest extends Abstract
 
     @Test
     public void testProjectListShouldIncludeChildrenByDefault() throws Exception {
-        final File testDir = extractResources(RESOURCE_PATH);
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        final Path testDir = extractResourcesAsPath(RESOURCE_PATH);
+        Verifier verifier = newVerifier(testDir.toString());
 
         verifier.addCliArgument("-pl");
         verifier.addCliArgument(":module-a");
@@ -45,8 +46,8 @@ public class MavenITmng6981ProjectListShouldIncludeChildrenTest extends Abstract
      */
     @Test
     public void testFileSwitchAllowsExcludeOfChildren() throws Exception {
-        final File testDir = extractResources(RESOURCE_PATH);
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        final Path testDir = extractResourcesAsPath(RESOURCE_PATH);
+        Verifier verifier = newVerifier(testDir.toString());
 
         verifier.addCliArgument("-f");
         verifier.addCliArgument("module-a");

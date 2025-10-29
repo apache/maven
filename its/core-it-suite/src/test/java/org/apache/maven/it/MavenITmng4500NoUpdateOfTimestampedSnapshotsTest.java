@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -54,7 +55,7 @@ public class MavenITmng4500NoUpdateOfTimestampedSnapshotsTest extends AbstractMa
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4500");
+        Path testDir = extractResourcesAsPath("/mng-4500");
 
         String pomUri = "/repo/org/apache/maven/its/mng4500/dep/0.1-SNAPSHOT/dep-0.1-20091219.230823-1.pom";
         String jarUri = "/repo/org/apache/maven/its/mng4500/dep/0.1-SNAPSHOT/dep-0.1-20091219.230823-1.jar";
@@ -70,7 +71,7 @@ public class MavenITmng4500NoUpdateOfTimestampedSnapshotsTest extends AbstractMa
         };
 
         ResourceHandler repoHandler = new ResourceHandler();
-        repoHandler.setResourceBase(testDir.getAbsolutePath());
+        repoHandler.setResourceBase(testDir.toString());
 
         HandlerList handlerList = new HandlerList();
         handlerList.addHandler(logHandler);
@@ -80,7 +81,7 @@ public class MavenITmng4500NoUpdateOfTimestampedSnapshotsTest extends AbstractMa
         Server server = new Server(0);
         server.setHandler(handlerList);
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         try {
             server.start();
             if (server.isFailed()) {

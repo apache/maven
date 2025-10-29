@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -48,9 +49,9 @@ public class MavenITmng6391PrintVersionTest extends AbstractMavenIntegrationTest
      */
     @Test
     public void testitShouldPrintVersionAtTopAndAtBottom() throws Exception {
-        File testDir = extractResources("/mng-6391-print-version");
+        Path testDir = extractResourcesAsPath("/mng-6391-print-version");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
 
         verifier.setLogFileName("version-log.txt");
@@ -89,9 +90,9 @@ public class MavenITmng6391PrintVersionTest extends AbstractMavenIntegrationTest
      */
     @Test
     public void testitShouldPrintVersionInAllLines() throws Exception {
-        File testDir = extractResources("/mng-6391-print-version-aggregator");
+        Path testDir = extractResourcesAsPath("/mng-6391-print-version-aggregator");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
 
         verifier.setLogFileName("version-log.txt");

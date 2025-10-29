@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -35,9 +36,9 @@ public class MavenITmng6330RelativePath extends AbstractMavenIntegrationTestCase
 
     @Test
     public void testRelativePath() throws Exception {
-        File testDir = extractResources("/mng-6330-relative-path");
+        Path testDir = extractResourcesAsPath("/mng-6330-relative-path");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.setForkJvm(true); // TODO: why?
 
         try {
