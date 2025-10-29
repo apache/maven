@@ -34,7 +34,7 @@ permissions: {}
 env:
   MIMIR_VERSION: 0.10.4
   MIMIR_BASEDIR: ~/.mimir
-  MIMIR_LOCAL: ~/.mimir/local
+  MIMIR_LOCAL: mimir-local
   MAVEN_OPTS: -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./target/java_heapdump.hprof
 
 jobs:
@@ -59,13 +59,15 @@ jobs:
           cp .github/ci-mimir-session.properties ${{ env.MIMIR_BASEDIR }}/session.properties
           cp .github/ci-mimir-daemon.properties ${{ env.MIMIR_BASEDIR }}/daemon.properties
           cp .github/ci-extensions.xml .mvn/extensions.xml
+          echo "mimir.file.basedir=${{ env.GITHUB_WORKSPACE }}/${{ env.MIMIR_LOCAL }}" >> ${{ env.MIMIR_BASEDIR }}/daemon.properties
 
       - name: Restore Mimir caches
         uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         id: restore-cache
         with:
+          enableCrossOsArchive: true
           path: ${{ env.MIMIR_LOCAL }}
-          key: master-${{ runner.os }}-initial
+          key: master-${{ github.run_id }}
 
       - name: Set up Maven
         shell: bash
@@ -86,12 +88,12 @@ jobs:
         shell: bash
         run: ls -la apache-maven/target
 
-      - name: Save Mimir caches
-        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        if: ${{ github.event_name != 'pull_request' && !cancelled() && !failure() }}
+      - name: Upload Mimir caches
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
+        if: ${{ !cancelled() && !failure() }}
         with:
+          name: cache-initial-build
           path: ${{ env.MIMIR_LOCAL }}
-          key: ${{ steps.restore-cache.outputs.cache-primary-key }}
 
       - name: Upload Maven distributions
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
@@ -103,7 +105,7 @@ jobs:
 
       - name: Upload test artifacts
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
-        if: failure() || cancelled()
+        if: ${{ failure() || cancelled() }}
         with:
           name: ${{ github.run_number }}-initial
           path: |
@@ -148,6 +150,7 @@ jobs:
           mkdir -p ${{ env.MIMIR_BASEDIR }}
           cp .github/ci-mimir-session.properties ${{ env.MIMIR_BASEDIR }}/session.properties
           cp .github/ci-mimir-daemon.properties ${{ env.MIMIR_BASEDIR }}/daemon.properties
+          echo "mimir.file.basedir=${{ env.GITHUB_WORKSPACE }}/${{ env.MIMIR_LOCAL }}" >> ${{ env.MIMIR_BASEDIR }}/daemon.properties
           mkdir -p ~/.m2
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
 
@@ -156,10 +159,10 @@ jobs:
         id: restore-cache
         with:
           path: ${{ env.MIMIR_LOCAL }}
-          key: master-full-${{ matrix.os }}-${{ matrix.java }}
+          key: master-${{ github.run_id }}
+          enableCrossOsArchive: true
           restore-keys: |
-            master-full-${{ matrix.os }}-
-            master-full-
+            master-
 
       - name: Download Maven distribution
         uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v4
@@ -196,12 +199,12 @@ jobs:
         shell: bash
         run: mvn site -e -B -V -Preporting
 
-      - name: Save Mimir caches
-        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        if: ${{ github.event_name != 'pull_request' && !cancelled() && !failure() }}
+      - name: Upload Mimir caches
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
+        if: ${{ !cancelled() && !failure() }}
         with:
+          name: cache-full-build-${{ runner.os }}-${{ matrix.java }}
           path: ${{ env.MIMIR_LOCAL }}
-          key: ${{ steps.restore-cache.outputs.cache-primary-key }}
 
       - name: Upload test artifacts
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
@@ -238,6 +241,7 @@ jobs:
           mkdir -p ${{ env.MIMIR_BASEDIR }}
           cp .github/ci-mimir-session.properties ${{ env.MIMIR_BASEDIR }}/session.properties
           cp .github/ci-mimir-daemon.properties ${{ env.MIMIR_BASEDIR }}/daemon.properties
+          echo "mimir.file.basedir=${{ env.GITHUB_WORKSPACE }}/${{ env.MIMIR_LOCAL }}" >> ${{ env.MIMIR_BASEDIR }}/daemon.properties
           mkdir -p ~/.m2
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
 
@@ -246,10 +250,10 @@ jobs:
         id: restore-cache
         with:
           path: ${{ env.MIMIR_LOCAL }}
-          key: master-its-${{ matrix.os }}-${{ matrix.java }}
+          key: master-${{ github.run_id }}
+          enableCrossOsArchive: true
           restore-keys: |
-            master-its-${{ matrix.os }}-
-            master-its-
+            master-
 
       - name: Download Maven distribution
         uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v4
@@ -282,16 +286,16 @@ jobs:
         shell: bash
         run: mvn install -e -B -V -Prun-its,mimir
 
-      - name: Save Mimir caches
-        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        if: ${{ github.event_name != 'pull_request' && !cancelled() && !failure() }}
+      - name: Upload Mimir caches
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
+        if: ${{ !cancelled() && !failure() }}
         with:
+          name: cache-integration-tests-${{ runner.os }}-${{ matrix.java }}
           path: ${{ env.MIMIR_LOCAL }}
-          key: ${{ steps.restore-cache.outputs.cache-primary-key }}
 
       - name: Upload test artifacts
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
-        if: failure() || cancelled()
+        if: ${{ failure() || cancelled() }}
         with:
           name: ${{ github.run_number }}-integration-test-artifact-${{ runner.os }}-${{ matrix.java }}
           path: |
@@ -299,3 +303,21 @@ jobs:
             **/target/failsafe-reports/*
             ./its/core-it-suite/target/test-classes/**
             **/target/java_heapdump.hprof
+
+  consolidate-caches:
+    runs-on: ubuntu-latest
+    needs:
+      - full-build
+      - integration-tests
+    steps:
+      - name: Download Caches
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v4
+        with:
+          pattern: cache-*
+          path: ${{ env.MIMIR_LOCAL }}
+      - name: Publish cache
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        if: ${{ github.event_name != 'pull_request' && !cancelled() && !failure() }}
+        with:
+          path: ${{ env.MIMIR_LOCAL }}
+          key: master-${{ github.run_id }}
