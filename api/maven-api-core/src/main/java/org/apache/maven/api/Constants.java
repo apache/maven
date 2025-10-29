@@ -406,42 +406,15 @@ public final class Constants {
     public static final String MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE = "maven.repo.local.recordReverseTree";
 
     /**
-     * User property for selecting dependency manager behavior regarding transitive dependencies and dependency
-     * management entries in their POMs.
-     *
-     * Background: Maven 3 targeted full backward compatibility with Maven 2 and used the
-     * ClassicDependencyManager, which ignored dependency management entries in transitive dependency POMs.
-     * This meant that dependencyManagement sections specified in your project would not apply to
-     * transitive dependencies, forcing developers to explicitly declare transitive dependencies just to control
-     * their versions.
-     *
-     * Maven 4 Behavior: When set to true (the default), Maven uses the
-     * TransitiveDependencyManager which enables "transitivity" by collecting and applying dependency
-     * management entries from the entire dependency graph. This means your project's dependencyManagement
-     * section now properly controls versions of transitive dependencies as well.
-     *
-     * Technical Details: The TransitiveDependencyManager:
-     * - Collects dependency management information at all depths in the dependency tree
-     * - Applies management starting from depth 2 (transitive dependencies)
-     * - Direct dependencies (depth 1) continue to be managed by ModelBuilder for compatibility
-     *
-     * When to set to false: Setting this property to false reverts to the
-     * Maven 2/3 behavior using ClassicDependencyManager. This may be useful for:
-     * - Troubleshooting version resolution issues when migrating from Maven 3
-     * - Maintaining exact Maven 3 behavior temporarily during migration
-     * - Working around edge cases where transitive dependency management causes issues
-     *
-     * Example Impact: If your project depends on library-a:1.0 which transitively
-     * depends on library-b:1.0, and your POM's dependencyManagement specifies
-     * library-b:2.0, then:
-     * - Maven 3 (or Maven 4 with this property = false): Uses library-b:1.0 (ignores your management)
-     * - Maven 4 (default): Uses library-b:2.0 (respects your management)
-     * Default: "true"
+     * User property for selecting dependency manager behaviour regarding transitive dependencies and dependency
+     * management entries in their POMs. Maven 3 targeted full backward compatibility with Maven 2. Hence, it ignored
+     * dependency management entries in transitive dependency POMs. Maven 4 enables "transitivity" by default. Hence
+     * unlike Maven 3, it obeys dependency management entries deep in the dependency graph as well.
+     * <br/>
+     * Default: <code>"true"</code>.
      *
      * @since 4.0.0
-     * @see <a href="https://issues.apache.org/jira/browse/MNG-7982">MNG-7982 - Implement transitive dependency manager</a>
-     * @see <a href="https://issues.apache.org/jira/browse/MNG-5761">MNG-5761 - dependencyManagement does not work for transitive dependencies</a>
-     */
+     **/
     @Config(defaultValue = "true")
     public static final String MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY =
             "maven.resolver.dependencyManagerTransitivity";
