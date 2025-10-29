@@ -839,6 +839,7 @@ under the License.
                 <exclude>.asf.yaml</exclude>
                 <exclude>.mvn/**</exclude>
                 <exclude>.jbang/**</exclude>
+                <exclude>mimir-local/**</exclude>
                 <!--
                   ! Excluded the license files itself cause they do not have have a license of themselves.
                 -->
