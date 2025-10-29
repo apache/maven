@@ -496,7 +496,7 @@ public final class Constants {
      *
      * @since 4.1.0
      */
-    @Config(type = "java.lang.Boolean", defaultValue = "true")
+    @Config(type = "java.lang.Boolean", defaultValue = "false")
     public static final String MAVEN_CONSUMER_POM_FLATTEN = "maven.consumer.pom.flatten";
 
     /**

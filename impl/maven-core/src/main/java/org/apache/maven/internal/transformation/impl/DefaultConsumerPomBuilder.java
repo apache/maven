@@ -73,8 +73,10 @@ class DefaultConsumerPomBuilder implements PomBuilder {
     @Override
     public Model build(RepositorySystemSession session, MavenProject project, Path src) throws ModelBuilderException {
         Model model = project.getModel().getDelegate();
+        boolean flattenEnabled = Features.consumerPomFlatten(session.getConfigProperties());
+
         // Check if consumer POM flattening is disabled
-        if (!Features.consumerPomFlatten(session.getConfigProperties())) {
+        if (!flattenEnabled) {
             // When flattening is disabled, treat non-POM projects like parent POMs
             // Apply only basic transformations without flattening dependency management
             return buildPom(session, project, src);
@@ -264,6 +266,11 @@ class DefaultConsumerPomBuilder implements PomBuilder {
             warnNotDowngraded(project);
         }
         model = model.withModelVersion(modelVersion);
+
+        // Add a comment to identify this as a flattened consumer POM
+        model = model.withDescription(
+                (model.getDescription() != null ? model.getDescription() + " " : "") + "[FLATTENED-CONSUMER-POM]");
+
         return model;
     }
 
