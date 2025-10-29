@@ -322,18 +322,21 @@ public final class Constants {
 
     /**
      * User controlled relocations.
-     * This property is a comma separated list of entries with the syntax GAV>GAV.
-     * The first GAV can contain * for any elem (so *:*:* would mean ALL, something
-     * you don't want). The second GAV is either fully specified, or also can contain *,
+     * This property is a comma separated list of entries with the syntax <code>GAV&gt;GAV</code>.
+     * The first <code>GAV</code> can contain <code>*</code> for any elem (so <code>*:*:*</code> would mean ALL, something
+     * you don't want). The second <code>GAV</code> is either fully specified, or also can contain <code>*</code>,
      * then it behaves as "ordinary relocation": the coordinate is preserved from relocated artifact.
-     * Finally, if right hand GAV is absent (line looks like GAV>), the left hand matching
-     * GAV is banned fully (from resolving).
-     * Note: the > means project level, while >> means global (whole session level,
+     * Finally, if right hand <code>GAV</code> is absent (line looks like <code>GAV&gt;</code>), the left hand matching
+     * <code>GAV</code> is banned fully (from resolving).
+     * <br/>
+     * Note: the <code>&gt;</code> means project level, while <code>&gt;&gt;</code> means global (whole session level,
      * so even plugins will get relocated artifacts) relocation.
-     * For example: maven.relocations.entries = org.foo:*:*>, org.here:*:*>org.there:*:*, javax.inject:javax.inject:1>>jakarta.inject:jakarta.inject:1.0.5
-     * means: 3 entries, ban org.foo group (exactly, so org.foo.bar is allowed),
-     * relocate org.here to org.there and finally globally relocate (see >> above)
-     * javax.inject:javax.inject:1 to jakarta.inject:jakarta.inject:1.0.5.
+     * <br/>
+     * For example,
+     * <pre>maven.relocations.entries = org.foo:*:*>, \\<br/>    org.here:*:*>org.there:*:*, \\<br/>    javax.inject:javax.inject:1>>jakarta.inject:jakarta.inject:1.0.5</pre>
+     * means: 3 entries, ban <code>org.foo group</code> (exactly, so <code>org.foo.bar</code> is allowed),
+     * relocate <code>org.here</code> to <code>org.there</code> and finally globally relocate (see <code>&gt;&gt;</code> above)
+     * <code>javax.inject:javax.inject:1</code> to <code>jakarta.inject:jakarta.inject:1.0.5</code>.
      *
      * @since 4.0.0
      */
@@ -414,7 +417,7 @@ public final class Constants {
      * Default: <code>"true"</code>.
      *
      * @since 4.0.0
-     **/
+     */
     @Config(defaultValue = "true")
     public static final String MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY =
             "maven.resolver.dependencyManagerTransitivity";
@@ -506,10 +509,11 @@ public final class Constants {
 
     /**
      * User property for controlling whether build POMs are deployed alongside consumer POMs.
-     * When set to false, only the consumer POM will be deployed, and the build POM
+     * When set to <code>false</code>, only the consumer POM will be deployed, and the build POM
      * will be excluded from deployment. This is useful to avoid deploying internal build information
      * that is not needed by consumers of the artifact.
-     * Default: "true".
+     * <br/>
+     * Default: <code>"true"</code>.
      *
      * @since 4.1.0
      */
