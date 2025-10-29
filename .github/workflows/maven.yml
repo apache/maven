@@ -93,7 +93,7 @@ jobs:
         if: ${{ !cancelled() && !failure() }}
         with:
           name: cache-initial-build
-          path: ${{ env.MIMIR_LOCAL }}
+          path: ${{ github.workspace }}/${{ env.MIMIR_LOCAL }}
 
       - name: Upload Maven distributions
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
@@ -204,7 +204,7 @@ jobs:
         if: ${{ !cancelled() && !failure() }}
         with:
           name: cache-full-build-${{ runner.os }}-${{ matrix.java }}
-          path: ${{ env.MIMIR_LOCAL }}
+          path: ${{ github.workspace }}/${{ env.MIMIR_LOCAL }}
 
       - name: Upload test artifacts
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
@@ -291,7 +291,7 @@ jobs:
         if: ${{ !cancelled() && !failure() }}
         with:
           name: cache-integration-tests-${{ runner.os }}-${{ matrix.java }}
-          path: ${{ env.MIMIR_LOCAL }}
+          path: ${{ github.workspace }}/${{ env.MIMIR_LOCAL }}
 
       - name: Upload test artifacts
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
