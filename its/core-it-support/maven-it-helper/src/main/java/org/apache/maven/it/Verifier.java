@@ -602,10 +602,6 @@ public class Verifier {
         return loadFile(Paths.get(basedir).resolve(filename), hasCommand);
     }
 
-    public List<String> loadFile(File file, boolean hasCommand) throws VerificationException {
-        return loadFile(file.toPath(), hasCommand);
-    }
-
     /**
      * Loads the lines of the specified file.
      *
