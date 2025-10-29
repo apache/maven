@@ -76,17 +76,17 @@ public class NIO2MigrationVerificationTest extends AbstractMavenIntegrationTestC
     }
 
     @Test
-    void testBackwardCompatibilityWithFileAPI() throws IOException {
-        // Verify that the old File-based method still works
-        java.io.File testDir = extractResources("test-resource");
-        
-        assertNotNull(testDir);
-        assertTrue(testDir.isAbsolute());
-        assertTrue(testDir.getPath().endsWith("test-resource"));
-        
-        // Verify both methods return equivalent paths
-        Path pathResult = extractResourcesAsPath("test-resource");
-        assertEquals(pathResult.toFile(), testDir);
+    void testPathToFileConversion() throws IOException {
+        // Verify that Path can be converted to File when needed for legacy APIs
+        Path testDir = extractResourcesAsPath("test-resource");
+        java.io.File fileDir = testDir.toFile();
+
+        assertNotNull(fileDir);
+        assertTrue(fileDir.isAbsolute());
+        assertTrue(fileDir.getPath().endsWith("test-resource"));
+
+        // Verify round-trip conversion
+        assertEquals(testDir, fileDir.toPath());
     }
 
     @Test

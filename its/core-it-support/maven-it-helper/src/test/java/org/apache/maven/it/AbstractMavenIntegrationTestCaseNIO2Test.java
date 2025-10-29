@@ -44,18 +44,18 @@ public class AbstractMavenIntegrationTestCaseNIO2Test extends AbstractMavenInteg
     }
 
     @Test
-    void testExtractResourcesBackwardCompatibility() throws IOException {
+    void testPathToFileConversion() throws IOException {
         String resourcePath = "test-resource";
-        
-        // Test that the old File-based method still works
-        File result = extractResources(resourcePath);
-        
-        assertNotNull(result);
-        assertTrue(result.isAbsolute());
-        assertTrue(result.getPath().endsWith(resourcePath));
-        
-        // Verify that both methods return equivalent paths
+
+        // Test that Path can be converted to File when needed
         Path pathResult = extractResourcesAsPath(resourcePath);
-        assertEquals(pathResult.toFile(), result);
+        File fileResult = pathResult.toFile();
+
+        assertNotNull(fileResult);
+        assertTrue(fileResult.isAbsolute());
+        assertTrue(fileResult.getPath().endsWith(resourcePath));
+
+        // Verify round-trip conversion
+        assertEquals(pathResult, fileResult.toPath());
     }
 }
