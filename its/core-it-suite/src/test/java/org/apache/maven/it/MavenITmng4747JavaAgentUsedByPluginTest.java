@@ -41,8 +41,6 @@ public class MavenITmng4747JavaAgentUsedByPluginTest extends AbstractMavenIntegr
      */
     @Test
     public void testit() throws Exception {
-        requiresJavaVersion("[1.5,)");
-
         File testDir = extractResources("/mng-4747");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());

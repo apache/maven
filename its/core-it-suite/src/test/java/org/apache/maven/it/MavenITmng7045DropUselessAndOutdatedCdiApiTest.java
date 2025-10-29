@@ -27,9 +27,6 @@ public class MavenITmng7045DropUselessAndOutdatedCdiApiTest extends AbstractMave
 
     @Test
     public void testShouldNotLeakCdiApi() throws IOException, VerificationException {
-        // in test Groovy 4.x is used which requires JDK 1.8, so simply skip it for older JDKs
-        requiresJavaVersion("[1.8,)");
-
         File testDir = extractResources("/mng-7045");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
 

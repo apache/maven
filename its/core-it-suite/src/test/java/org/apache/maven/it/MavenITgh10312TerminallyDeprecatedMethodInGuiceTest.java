@@ -21,6 +21,8 @@ package org.apache.maven.it;
 import java.io.File;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -33,8 +35,8 @@ class MavenITgh10312TerminallyDeprecatedMethodInGuiceTest extends AbstractMavenI
     MavenITgh10312TerminallyDeprecatedMethodInGuiceTest() {}
 
     @Test
+    @EnabledForJreRange(min = JRE.JAVA_24)
     void worryingShouldNotBePrinted() throws Exception {
-        requiresJavaVersion("[24,)");
         File testDir = extractResources("/gh-10312-terminally-deprecated-method-in-guice");
 
         Verifier verifier = new Verifier(testDir.getAbsolutePath());
@@ -52,8 +54,8 @@ class MavenITgh10312TerminallyDeprecatedMethodInGuiceTest extends AbstractMavenI
     }
 
     @Test
+    @EnabledForJreRange(min = JRE.JAVA_24, max = JRE.JAVA_25)
     void allowOverwriteByUser() throws Exception {
-        requiresJavaVersion("[24,26)");
         File testDir = extractResources("/gh-10312-terminally-deprecated-method-in-guice");
 
         Verifier verifier = new Verifier(testDir.getAbsolutePath());
