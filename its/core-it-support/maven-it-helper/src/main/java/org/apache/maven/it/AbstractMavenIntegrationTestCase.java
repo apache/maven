@@ -73,10 +73,6 @@ public abstract class AbstractMavenIntegrationTestCase {
 
 
 
-    protected File extractResources(String resourcePath) throws IOException {
-        return extractResourcesAsPath(resourcePath).toFile();
-    }
-
     /**
      * Extracts test resources to a temporary directory.
      *
