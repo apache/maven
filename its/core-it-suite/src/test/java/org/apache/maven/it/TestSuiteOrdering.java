@@ -60,19 +60,16 @@ public class TestSuiteOrdering implements ClassOrderer {
             System.clearProperty("maven.conf");
             System.clearProperty("classworlds.conf");
 
-            Verifier verifier = new Verifier("", false);
-            String mavenVersion = verifier.getMavenVersion();
-            String executable = verifier.getExecutable();
-            ExecutorHelper.Mode defaultMode = verifier.getDefaultMode();
-
-            System.out.println("Running integration tests for Maven " + mavenVersion + System.lineSeparator()
-                    + "\tusing Maven executable: " + executable + System.lineSeparator()
-                    + "\twith verifier.forkMode: " + defaultMode);
-
-            System.setProperty("maven.version", mavenVersion);
+            // Set maven.version system property (needed by some tests)
+            try {
+                Verifier verifier = new Verifier("", false);
+                String mavenVersion = verifier.getMavenVersion();
+                System.setProperty("maven.version", mavenVersion);
+            } catch (Exception e) {
+                // If we can't get the Maven version, continue without setting it
+            }
 
             String basedir = System.getProperty("basedir", ".");
-
             try (PrintStream info = new PrintStream(Files.newOutputStream(Paths.get(basedir, "target/info.txt")))) {
                 infoProperty(info, "maven.version");
                 infoProperty(info, "java.version");
