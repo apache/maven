@@ -59,7 +59,7 @@ jobs:
           cp .github/ci-mimir-session.properties ${{ env.MIMIR_BASEDIR }}/session.properties
           cp .github/ci-mimir-daemon.properties ${{ env.MIMIR_BASEDIR }}/daemon.properties
           cp .github/ci-extensions.xml .mvn/extensions.xml
-          echo "mimir.file.basedir=${{ env.GITHUB_WORKSPACE }}/${{ env.MIMIR_LOCAL }}" >> ${{ env.MIMIR_BASEDIR }}/daemon.properties
+          echo "mimir.file.basedir=${{ github.workspace }}/${{ env.MIMIR_LOCAL }}" >> ${{ env.MIMIR_BASEDIR }}/daemon.properties
 
       - name: Restore Mimir caches
         uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
@@ -150,7 +150,7 @@ jobs:
           mkdir -p ${{ env.MIMIR_BASEDIR }}
           cp .github/ci-mimir-session.properties ${{ env.MIMIR_BASEDIR }}/session.properties
           cp .github/ci-mimir-daemon.properties ${{ env.MIMIR_BASEDIR }}/daemon.properties
-          echo "mimir.file.basedir=${{ env.GITHUB_WORKSPACE }}/${{ env.MIMIR_LOCAL }}" >> ${{ env.MIMIR_BASEDIR }}/daemon.properties
+          echo "mimir.file.basedir=${{ github.workspace }}/${{ env.MIMIR_LOCAL }}" >> ${{ env.MIMIR_BASEDIR }}/daemon.properties
           mkdir -p ~/.m2
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
 
@@ -241,7 +241,7 @@ jobs:
           mkdir -p ${{ env.MIMIR_BASEDIR }}
           cp .github/ci-mimir-session.properties ${{ env.MIMIR_BASEDIR }}/session.properties
           cp .github/ci-mimir-daemon.properties ${{ env.MIMIR_BASEDIR }}/daemon.properties
-          echo "mimir.file.basedir=${{ env.GITHUB_WORKSPACE }}/${{ env.MIMIR_LOCAL }}" >> ${{ env.MIMIR_BASEDIR }}/daemon.properties
+          echo "mimir.file.basedir=${{ github.workspace }}/${{ env.MIMIR_LOCAL }}" >> ${{ env.MIMIR_BASEDIR }}/daemon.properties
           mkdir -p ~/.m2
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
 
