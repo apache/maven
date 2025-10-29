@@ -313,6 +313,7 @@ jobs:
       - name: Download Caches
         uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v4
         with:
+          merge-multiple: true
           pattern: cache-*
           path: ${{ env.MIMIR_LOCAL }}
       - name: Publish cache
