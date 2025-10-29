@@ -267,9 +267,6 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         }
         model = model.withModelVersion(modelVersion);
 
-        // Add a comment to identify this as a flattened consumer POM
-        model = model.withDescription((model.getDescription() != null ? model.getDescription() + " " : ""));
-
         return model;
     }
 
