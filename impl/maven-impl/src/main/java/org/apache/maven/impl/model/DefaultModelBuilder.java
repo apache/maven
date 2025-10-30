@@ -537,6 +537,10 @@ public class DefaultModelBuilder implements ModelBuilder {
                     request,
                     this);
             List<RemoteRepository> repos = interpolatedModel.getRepositories().stream()
+                    // filter out transitive invalid repositories
+                    // this should be safe because invalid repo coming from build POMs
+                    // have been rejected earlier during validation
+                    .filter(repo -> repo.getUrl() != null && !repo.getUrl().contains("${"))
                     .map(session::createRemoteRepository)
                     .toList();
             if (replace) {
