@@ -276,8 +276,7 @@ public class Verifier {
             String commandLineHeader = null;
             if (logFileName != null && !isQuietLogging(args)) {
                 try {
-                    String commandLine = formatCommandLine(request, mode);
-                    commandLineHeader = "# Command line used for this execution:\n" + commandLine + "\n\n";
+                    commandLineHeader = formatCommandLine(request, mode);
                 } catch (Exception e) {
                     // Don't fail the execution if we can't format the command line, just log it
                     System.err.println("Warning: Could not format command line: " + e.getMessage());
@@ -451,6 +450,7 @@ public class Verifier {
     private String formatCommandLine(ExecutorRequest request, ExecutorHelper.Mode mode) {
         StringBuilder cmdLine = new StringBuilder();
 
+        cmdLine.append("# Command line: ");
         // Add the Maven executable path
         Path mavenExecutable = request.installationDirectory()
                 .resolve("bin")
@@ -511,6 +511,7 @@ public class Verifier {
         cmdLine.append("\n# Working directory: ").append(request.cwd().toString());
         cmdLine.append("\n# Execution mode: ").append(mode.toString());
 
+        cmdLine.append("\n");
         return cmdLine.toString();
     }
 
