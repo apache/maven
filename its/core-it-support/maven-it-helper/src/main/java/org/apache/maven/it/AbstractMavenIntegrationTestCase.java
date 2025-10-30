@@ -24,17 +24,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.maven.artifact.versioning.ArtifactVersion;
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.artifact.versioning.VersionRange;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInfo;
-import org.opentest4j.TestAbortedException;
 
 /**
  * @author Jason van Zyl
@@ -45,8 +37,6 @@ public abstract class AbstractMavenIntegrationTestCase {
      * Save System.out for progress reports etc.
      */
     private static PrintStream out = System.out;
-
-    private static ArtifactVersion javaVersion;
 
     private String testName;
 
@@ -68,46 +58,7 @@ public abstract class AbstractMavenIntegrationTestCase {
         return testName;
     }
 
-    /**
-     * Gets the Java version used to run this test.
-     *
-     * @return The Java version, never <code>null</code>.
-     */
-    protected static ArtifactVersion getJavaVersion() {
-        if (javaVersion == null) {
-            String version = System.getProperty("java.version");
-            version = version.replaceAll("[_-]", ".");
-            Matcher matcher =
-                    Pattern.compile("(?s).*?(([0-9]+\\.[0-9]+)(\\.[0-9]+)?).*").matcher(version);
-            if (matcher.matches()) {
-                version = matcher.group(1);
-            }
-            javaVersion = new DefaultArtifactVersion(version);
-        }
-        return javaVersion;
-    }
 
-    /**
-     * Guards the execution of a test case by checking that the current Java version matches the specified version
-     * range. If the check fails, an exception will be thrown which aborts the current test and marks it as skipped. One
-     * would usually call this method right at the start of a test method.
-     *
-     * @param versionRange The version range that specifies the acceptable Java versions for the test, must not be
-     *                     <code>null</code>.
-     */
-    protected void requiresJavaVersion(String versionRange) {
-        VersionRange range;
-        try {
-            range = VersionRange.createFromVersionSpec(versionRange);
-        } catch (InvalidVersionSpecificationException e) {
-            throw new IllegalArgumentException("Invalid version range: " + versionRange, e);
-        }
-
-        ArtifactVersion version = getJavaVersion();
-        if (!range.containsVersion(version)) {
-            throw new UnsupportedJavaVersionException(version, range);
-        }
-    }
 
     private static class NonCloseableInputStream extends FilterInputStream {
         NonCloseableInputStream(InputStream delegate) {
@@ -118,11 +69,7 @@ public abstract class AbstractMavenIntegrationTestCase {
         public void close() throws IOException {}
     }
 
-    private static class UnsupportedJavaVersionException extends TestAbortedException {
-        private UnsupportedJavaVersionException(ArtifactVersion javaVersion, VersionRange supportedRange) {
-            super("Java version " + javaVersion + " not in range " + supportedRange);
-        }
-    }
+
 
     protected File extractResources(String resourcePath) throws IOException {
         return new File(

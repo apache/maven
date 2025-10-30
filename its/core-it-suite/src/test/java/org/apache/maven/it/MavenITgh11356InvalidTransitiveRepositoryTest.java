@@ -19,18 +19,23 @@
 package org.apache.maven.it;
 
 import java.io.File;
-import java.io.IOException;
-
 import org.junit.jupiter.api.Test;
 
-public class MavenITmng7045DropUselessAndOutdatedCdiApiTest extends AbstractMavenIntegrationTestCase {
+/**
+ * This is a test set for <a href="https://github.com/apache/maven/issues/11356">GH-11356</a>.
+ * Verify that Maven properly builds projects with a dependency that defines invalid repositories.
+ *
+ * @since 4.0.0
+ */
+public class MavenITgh11356InvalidTransitiveRepositoryTest extends AbstractMavenIntegrationTestCase {
 
     @Test
-    public void testShouldNotLeakCdiApi() throws IOException, VerificationException {
-        File testDir = extractResources("/mng-7045");
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+    public void testInvalidTransitiveRepository() throws Exception {
+        File testDir = extractResources("/gh-11356-invalid-transitive-repository");
 
-        verifier.addCliArgument("process-classes");
+        // First, verify that normal build works from the actual root
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.addCliArgument("compile");
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }
