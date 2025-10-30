@@ -168,21 +168,32 @@ find_file_argument_basedir() {
 # concatenates all lines of a file and replaces variables
 concat_lines() {
   if [ -f "$1" ]; then
-    # Read file line by line, remove comments and empty lines, then perform variable substitution
-    # This preserves quoted arguments and doesn't split on whitespace within quotes
-    tr '\r' '\n' < "$1" | \
-    sed -e '/^$/d' -e 's/#.*$//' | \
-    while IFS= read -r line; do
-      # Skip empty lines after comment removal
+    # Use a temporary file to avoid subshell issues with variable substitution
+    # First, clean the file: convert CR to LF, remove empty lines and comments
+    _temp_file=$(mktemp)
+    tr '\r' '\n' < "$1" | sed -e '/^$/d' -e 's/#.*$//' > "$_temp_file"
+
+    # Read each line and perform variable substitution, then concatenate with spaces
+    _result=""
+    while IFS= read -r line || [ -n "$line" ]; do
       if [ -n "$line" ]; then
         # Replace variables
         line=$(echo "$line" | sed \
           -e "s@\${MAVEN_PROJECTBASEDIR}@$MAVEN_PROJECTBASEDIR@g" \
           -e "s@\$MAVEN_PROJECTBASEDIR@$MAVEN_PROJECTBASEDIR@g")
-        echo "$line"
+        if [ -z "$_result" ]; then
+          _result="$line"
+        else
+          _result="$_result $line"
+        fi
       fi
-    done | \
-    tr '\n' ' '
+    done < "$_temp_file"
+
+    # Clean up temporary file
+    rm -f "$_temp_file"
+
+    # Output the result
+    echo "$_result"
   fi
 }
 
