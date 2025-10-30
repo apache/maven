@@ -36,7 +36,7 @@ public class MavenITmng7529VersionRangeRepositorySelection extends AbstractMaven
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-7529");
+        Path testDir = extractResources("/mng-7529");
 
         // First, build the test plugin
         Verifier verifier = newVerifier(testDir.resolve("mng7529-plugin").getAbsolutePath());

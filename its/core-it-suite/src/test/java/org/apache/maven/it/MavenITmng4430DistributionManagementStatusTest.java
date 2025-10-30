@@ -38,7 +38,7 @@ public class MavenITmng4430DistributionManagementStatusTest extends AbstractMave
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4430");
+        Path testDir = extractResources("/mng-4430");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

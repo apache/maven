@@ -38,7 +38,7 @@ public class MavenITmng4992MapStylePropertiesParamConfigTest extends AbstractMav
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4992");
+        Path testDir = extractResources("/mng-4992");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

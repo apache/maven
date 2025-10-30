@@ -43,7 +43,7 @@ public class MavenITgh11321Test extends AbstractMavenIntegrationTestCase {
      */
     @Test
     public void testParentAboveRootDirectoryRejected() throws Exception {
-        Path testDir = extractResourcesAsPath("/gh-11321-parent-above-root");
+        Path testDir = extractResources("/gh-11321-parent-above-root");
 
         // First, verify that normal build works from the actual root
         Verifier verifier = newVerifier(testDir.toString());

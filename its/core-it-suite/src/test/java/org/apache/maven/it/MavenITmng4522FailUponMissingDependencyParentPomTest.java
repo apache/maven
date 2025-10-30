@@ -37,7 +37,7 @@ public class MavenITmng4522FailUponMissingDependencyParentPomTest extends Abstra
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4522");
+        Path testDir = extractResources("/mng-4522");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

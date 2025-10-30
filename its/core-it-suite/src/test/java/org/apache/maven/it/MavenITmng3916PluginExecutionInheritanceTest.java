@@ -44,7 +44,7 @@ public class MavenITmng3916PluginExecutionInheritanceTest extends AbstractMavenI
      */
     @Test
     public void testitMNG3916() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3916");
+        Path testDir = extractResources("/mng-3916");
 
         Verifier verifier = newVerifier(testDir.resolve("sub").getAbsolutePath());
         verifier.setAutoclean(false);

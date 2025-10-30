@@ -40,7 +40,7 @@ public class MavenITmng3314OfflineSnapshotsTest extends AbstractMavenIntegration
      */
     @Test
     public void testitMNG3314() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3314");
+        Path testDir = extractResources("/mng-3314");
 
         // phase 1: run build in online mode to fill local repo
         Verifier verifier = newVerifier(testDir.toString());

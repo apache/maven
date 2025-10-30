@@ -42,7 +42,7 @@ public class MavenITmng3906MergedPluginClassPathOrderingTest extends AbstractMav
      */
     @Test
     public void testitMNG3906() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3906");
+        Path testDir = extractResources("/mng-3906");
 
         Verifier verifier = newVerifier(testDir.resolve("sub").getAbsolutePath());
         verifier.setAutoclean(false);

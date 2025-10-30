@@ -37,7 +37,7 @@ public class MavenITmng4072InactiveProfileReposTest extends AbstractMavenIntegra
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4072");
+        Path testDir = extractResources("/mng-4072");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

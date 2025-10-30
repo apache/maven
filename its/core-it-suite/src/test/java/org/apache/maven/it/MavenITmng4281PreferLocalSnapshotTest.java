@@ -42,7 +42,7 @@ public class MavenITmng4281PreferLocalSnapshotTest extends AbstractMavenIntegrat
     public void testit() throws Exception {
         // NOTE: It's crucial to build the two projects in isolation to disable reactor resolution
 
-        Path testDir = extractResourcesAsPath("/mng-4281");
+        Path testDir = extractResources("/mng-4281");
 
         Verifier verifier = newVerifier(testDir.resolve("dependency").getAbsolutePath());
         verifier.setAutoclean(false);

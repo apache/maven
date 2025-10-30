@@ -39,7 +39,7 @@ public class MavenITmng0870ReactorAwarePluginDiscoveryTest extends AbstractMaven
      */
     @Test
     public void testitMNG0870() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-0870");
+        Path testDir = extractResources("/mng-0870");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

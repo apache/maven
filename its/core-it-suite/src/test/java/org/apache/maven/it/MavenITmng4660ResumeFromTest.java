@@ -56,7 +56,7 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
     @Disabled("This test goes against Maven (see javadoc above)")
     @Test
     public void testShouldResolveOutputDirectoryFromEarlierBuild() throws Exception {
-        final Path testDir = extractResourcesAsPath("/mng-4660-resume-from");
+        final Path testDir = extractResources("/mng-4660-resume-from");
 
         final Verifier verifier1 = newVerifier(testDir.toString());
         verifier1.deleteDirectory("target");
@@ -89,7 +89,7 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
      */
     @Test
     public void testShouldResolvePackagedArtifactFromEarlierBuild() throws Exception {
-        final Path testDir = extractResourcesAsPath("/mng-4660-resume-from");
+        final Path testDir = extractResources("/mng-4660-resume-from");
 
         final Verifier verifier1 = newVerifier(testDir.toString());
         verifier1.deleteDirectory("target");

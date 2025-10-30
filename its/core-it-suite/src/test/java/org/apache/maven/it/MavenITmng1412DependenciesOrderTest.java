@@ -39,7 +39,7 @@ public class MavenITmng1412DependenciesOrderTest extends AbstractMavenIntegratio
 
     @Test
     public void testitMNG1412() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-1412");
+        Path testDir = extractResources("/mng-1412");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

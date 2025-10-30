@@ -39,7 +39,7 @@ public class MavenITmng2432PluginPrefixOrderTest extends AbstractMavenIntegratio
      */
     @Test
     public void testitMNG2432() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-2432");
+        Path testDir = extractResources("/mng-2432");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

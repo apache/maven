@@ -60,7 +60,7 @@ public class MavenITmng4102InheritedPropertyInterpolationTest extends AbstractMa
     }
 
     private void testit(String project) throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4102/" + project);
+        Path testDir = extractResources("/mng-4102/" + project);
 
         Verifier verifier = newVerifier(testDir.resolve("sub").getAbsolutePath());
         verifier.setAutoclean(false);

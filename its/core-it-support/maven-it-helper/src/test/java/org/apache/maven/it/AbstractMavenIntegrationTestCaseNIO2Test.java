@@ -36,7 +36,7 @@ public class AbstractMavenIntegrationTestCaseNIO2Test extends AbstractMavenInteg
         String resourcePath = "test-resource";
         
         // Test the new Path-based method
-        Path result = extractResourcesAsPath(resourcePath);
+        Path result = extractResources(resourcePath);
         
         assertNotNull(result);
         assertTrue(result.isAbsolute());
@@ -48,7 +48,7 @@ public class AbstractMavenIntegrationTestCaseNIO2Test extends AbstractMavenInteg
         String resourcePath = "test-resource";
 
         // Test that Path can be converted to File when needed
-        Path pathResult = extractResourcesAsPath(resourcePath);
+        Path pathResult = extractResources(resourcePath);
         File fileResult = pathResult.toFile();
 
         assertNotNull(fileResult);

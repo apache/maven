@@ -41,7 +41,7 @@ class MavenITmng7716BuildDeadlock extends AbstractMavenIntegrationTestCase {
     @Test
     @Timeout(value = 120, unit = TimeUnit.SECONDS)
     void testNoDeadlockAtVersionUpdate() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-7716");
+        Path testDir = extractResources("/mng-7716");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.addCliArgument("-f");

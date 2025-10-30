@@ -35,7 +35,7 @@ class MavenITmng8360SubprojectProfileActivationTest extends AbstractMavenIntegra
      */
     @Test
     void testDeadlock() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-8360");
+        Path testDir = extractResources("/mng-8360");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.addCliArguments("-s", "settings.xml");

@@ -38,7 +38,7 @@ public class MavenITmng4412OfflineModeInPluginTest extends AbstractMavenIntegrat
      */
     @Test
     public void testitResolver() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4412");
+        Path testDir = extractResources("/mng-4412");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
@@ -68,7 +68,7 @@ public class MavenITmng4412OfflineModeInPluginTest extends AbstractMavenIntegrat
      */
     @Test
     public void testitCollector() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4412");
+        Path testDir = extractResources("/mng-4412");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

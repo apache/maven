@@ -38,7 +38,7 @@ public class MavenITmng3814BogusProjectCycleTest extends AbstractMavenIntegratio
      */
     @Test
     public void testitMNG3814() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3814");
+        Path testDir = extractResources("/mng-3814");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

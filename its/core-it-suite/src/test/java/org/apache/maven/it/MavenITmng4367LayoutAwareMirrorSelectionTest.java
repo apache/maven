@@ -39,7 +39,7 @@ public class MavenITmng4367LayoutAwareMirrorSelectionTest extends AbstractMavenI
      */
     @Test
     public void testitNoLayout() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4367");
+        Path testDir = extractResources("/mng-4367");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
@@ -68,7 +68,7 @@ public class MavenITmng4367LayoutAwareMirrorSelectionTest extends AbstractMavenI
      */
     @Test
     public void testitSpecificLayouts() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4367");
+        Path testDir = extractResources("/mng-4367");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
@@ -97,7 +97,7 @@ public class MavenITmng4367LayoutAwareMirrorSelectionTest extends AbstractMavenI
      */
     @Test
     public void testitNonMatchingLayout() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4367");
+        Path testDir = extractResources("/mng-4367");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

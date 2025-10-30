@@ -88,7 +88,7 @@ public class MavenITmng4428FollowHttpRedirectTest extends AbstractMavenIntegrati
     }
 
     private void testit(boolean fromHttp, boolean toHttp, boolean relativeLocation) throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4428");
+        Path testDir = extractResources("/mng-4428");
 
         Verifier verifier = newVerifier(testDir.toString());
 

@@ -39,7 +39,7 @@ public class MavenITmng3944BasedirInterpolationTest extends AbstractMavenIntegra
      */
     @Test
     public void testitMNG3944() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3944");
+        Path testDir = extractResources("/mng-3944");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

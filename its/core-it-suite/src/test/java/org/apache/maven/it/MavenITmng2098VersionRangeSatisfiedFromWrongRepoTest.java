@@ -40,7 +40,7 @@ public class MavenITmng2098VersionRangeSatisfiedFromWrongRepoTest extends Abstra
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-2098");
+        Path testDir = extractResources("/mng-2098");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

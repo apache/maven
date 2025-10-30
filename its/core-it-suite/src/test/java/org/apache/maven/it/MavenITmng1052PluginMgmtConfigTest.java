@@ -40,7 +40,7 @@ public class MavenITmng1052PluginMgmtConfigTest extends AbstractMavenIntegration
      */
     @Test
     public void testitMNG1052() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-1052");
+        Path testDir = extractResources("/mng-1052");
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

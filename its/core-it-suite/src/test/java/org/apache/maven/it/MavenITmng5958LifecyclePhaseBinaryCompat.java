@@ -27,7 +27,7 @@ public class MavenITmng5958LifecyclePhaseBinaryCompat extends AbstractMavenInteg
 
     @Test
     public void testGood() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-5958-lifecycle-phases");
+        Path testDir = extractResources("/mng-5958-lifecycle-phases");
 
         // First, build the test extension
         Verifier verifier = newVerifier(testDir.resolve("mng5958-extension").getAbsolutePath());
@@ -55,7 +55,7 @@ public class MavenITmng5958LifecyclePhaseBinaryCompat extends AbstractMavenInteg
 
     @Test
     public void testBad() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-5958-lifecycle-phases");
+        Path testDir = extractResources("/mng-5958-lifecycle-phases");
 
         // Extension and plugin are already built by testGood, but let's ensure they're available
         // Build the test extension

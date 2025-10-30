@@ -38,7 +38,7 @@ public class MavenITmng3716AggregatorForkingTest extends AbstractMavenIntegratio
 
     @Test
     public void testitMNG3716() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3716");
+        Path testDir = extractResources("/mng-3716");
         File pluginDir = testDir.resolve("maven-mng3716-plugin");
         File projectsDir = testDir.resolve("projects");
 

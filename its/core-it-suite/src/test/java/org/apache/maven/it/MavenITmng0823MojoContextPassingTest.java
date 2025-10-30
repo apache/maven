@@ -38,7 +38,7 @@ public class MavenITmng0823MojoContextPassingTest extends AbstractMavenIntegrati
      */
     @Test
     public void testitMNG0823() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-0823");
+        Path testDir = extractResources("/mng-0823");
 
         // First, build the test plugin
         Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-context-passing").getAbsolutePath());

@@ -38,7 +38,7 @@ class MavenITgh10312TerminallyDeprecatedMethodInGuiceTest extends AbstractMavenI
     @Test
     @EnabledForJreRange(min = JRE.JAVA_24)
     void worryingShouldNotBePrinted() throws Exception {
-        Path testDir = extractResourcesAsPath("/gh-10312-terminally-deprecated-method-in-guice");
+        Path testDir = extractResources("/gh-10312-terminally-deprecated-method-in-guice");
 
         Verifier verifier = new Verifier(testDir.toString());
         verifier.setForkJvm(true);
@@ -57,7 +57,7 @@ class MavenITgh10312TerminallyDeprecatedMethodInGuiceTest extends AbstractMavenI
     @Test
     @EnabledForJreRange(min = JRE.JAVA_24, max = JRE.JAVA_25)
     void allowOverwriteByUser() throws Exception {
-        Path testDir = extractResourcesAsPath("/gh-10312-terminally-deprecated-method-in-guice");
+        Path testDir = extractResources("/gh-10312-terminally-deprecated-method-in-guice");
 
         Verifier verifier = new Verifier(testDir.toString());
         verifier.setForkJvm(true);

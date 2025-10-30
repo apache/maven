@@ -58,7 +58,7 @@ class MavenITgh2532DuplicateDependencyEffectiveModelTest extends AbstractMavenIn
      */
     @Test
     void testDuplicateDependencyWithPropertyPlaceholders() throws Exception {
-        Path testDir = extractResourcesAsPath("/gh-2532-duplicate-dependency-effective-model");
+        Path testDir = extractResources("/gh-2532-duplicate-dependency-effective-model");
 
         Verifier verifier = new Verifier(testDir.toString());
         verifier.setLogFileName("testDuplicateDependencyWithPropertyPlaceholders.txt");

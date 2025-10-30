@@ -35,7 +35,7 @@ public class MavenITmng5452MavenBuildTimestampUTCTest extends AbstractMavenInteg
 
     @Test
     public void testMavenBuildTimestampIsUsingUTC() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-5452-maven-build-timestamp-utc");
+        Path testDir = extractResources("/mng-5452-maven-build-timestamp-utc");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.addCliArgument("process-resources");

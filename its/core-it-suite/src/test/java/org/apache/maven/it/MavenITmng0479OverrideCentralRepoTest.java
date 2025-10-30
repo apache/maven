@@ -42,7 +42,7 @@ public class MavenITmng0479OverrideCentralRepoTest extends AbstractMavenIntegrat
      */
     @Test
     public void testitModel() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-0479");
+        Path testDir = extractResources("/mng-0479");
 
         // Phase 1: Ensure the test plugin is downloaded before the test cuts off access to central
         File child1 = testDir.resolve("setup");
@@ -113,7 +113,7 @@ public class MavenITmng0479OverrideCentralRepoTest extends AbstractMavenIntegrat
      */
     @Test
     public void testitResolution() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-0479");
+        Path testDir = extractResources("/mng-0479");
 
         Verifier verifier = newVerifier(testDir.resolve("test-1").getAbsolutePath());
         verifier.setAutoclean(false);

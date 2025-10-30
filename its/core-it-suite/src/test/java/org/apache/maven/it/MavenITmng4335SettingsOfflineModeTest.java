@@ -37,7 +37,7 @@ public class MavenITmng4335SettingsOfflineModeTest extends AbstractMavenIntegrat
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4335");
+        Path testDir = extractResources("/mng-4335");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

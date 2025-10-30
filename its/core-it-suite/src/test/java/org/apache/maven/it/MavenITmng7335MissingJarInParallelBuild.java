@@ -29,7 +29,7 @@ public class MavenITmng7335MissingJarInParallelBuild extends AbstractMavenIntegr
 
     @Test
     public void testMissingJarInParallelBuild() throws IOException, VerificationException {
-        final Path projectDir = extractResourcesAsPath(PROJECT_PATH);
+        final Path projectDir = extractResources(PROJECT_PATH);
         final Verifier verifier = newVerifier(projectDir.toString());
         verifier.addCliArgument("-T1C");
         verifier.addCliArguments("clean", "package");

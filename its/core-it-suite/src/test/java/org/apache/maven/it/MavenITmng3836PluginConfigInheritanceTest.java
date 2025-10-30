@@ -41,7 +41,7 @@ public class MavenITmng3836PluginConfigInheritanceTest extends AbstractMavenInte
      */
     @Test
     public void testitMNG3836() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3836");
+        Path testDir = extractResources("/mng-3836");
 
         Verifier verifier = newVerifier(testDir.resolve("child").getAbsolutePath());
         verifier.setAutoclean(false);

@@ -41,7 +41,7 @@ public class MavenITmng1021EqualAttachmentBuildNumberTest extends AbstractMavenI
      */
     @Test
     public void testitMNG1021() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-1021");
+        Path testDir = extractResources("/mng-1021");
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("repo");

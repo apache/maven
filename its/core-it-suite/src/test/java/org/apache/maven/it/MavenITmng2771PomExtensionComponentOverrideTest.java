@@ -40,7 +40,7 @@ public class MavenITmng2771PomExtensionComponentOverrideTest extends AbstractMav
      */
     @Test
     public void testitMNG2771() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-2771/extension");
+        Path testDir = extractResources("/mng-2771/extension");
         Verifier verifier = newVerifier(testDir.toString());
         verifier.addCliArgument("install");
         verifier.execute();

@@ -41,7 +41,7 @@ public class MavenITmng4436SingletonComponentLookupTest extends AbstractMavenInt
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4436");
+        Path testDir = extractResources("/mng-4436");
 
         // First, build the test plugin
         Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-singleton-component").getAbsolutePath());

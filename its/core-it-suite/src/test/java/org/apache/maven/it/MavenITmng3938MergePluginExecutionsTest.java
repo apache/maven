@@ -60,7 +60,7 @@ public class MavenITmng3938MergePluginExecutionsTest extends AbstractMavenIntegr
     }
 
     private void testitMNG3938(String project) throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3938/" + project);
+        Path testDir = extractResources("/mng-3938/" + project);
 
         Verifier verifier = newVerifier(testDir.resolve("sub").getAbsolutePath());
         verifier.setAutoclean(false);

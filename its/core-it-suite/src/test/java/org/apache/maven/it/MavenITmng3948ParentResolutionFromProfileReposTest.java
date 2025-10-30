@@ -40,7 +40,7 @@ public class MavenITmng3948ParentResolutionFromProfileReposTest extends Abstract
     public void testitFromPom() throws Exception {
         // requiresMavenVersion("[2.0,3.0-alpha-1),[3.0-beta-1,)");
 
-        Path testDir = extractResourcesAsPath("/mng-3948/test-2");
+        Path testDir = extractResources("/mng-3948/test-2");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

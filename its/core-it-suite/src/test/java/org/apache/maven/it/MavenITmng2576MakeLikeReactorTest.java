@@ -45,7 +45,7 @@ public class MavenITmng2576MakeLikeReactorTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testitMakeOnlyList() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-2576");
+        Path testDir = extractResources("/mng-2576");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
@@ -71,7 +71,7 @@ public class MavenITmng2576MakeLikeReactorTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testitMakeUpstream() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-2576");
+        Path testDir = extractResources("/mng-2576");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
@@ -98,7 +98,7 @@ public class MavenITmng2576MakeLikeReactorTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testitMakeDownstream() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-2576");
+        Path testDir = extractResources("/mng-2576");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
@@ -125,7 +125,7 @@ public class MavenITmng2576MakeLikeReactorTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testitMakeBoth() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-2576");
+        Path testDir = extractResources("/mng-2576");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
@@ -153,7 +153,7 @@ public class MavenITmng2576MakeLikeReactorTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testitMatchesByBasedir() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-2576");
+        Path testDir = extractResources("/mng-2576");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
@@ -183,7 +183,7 @@ public class MavenITmng2576MakeLikeReactorTest extends AbstractMavenIntegrationT
         // as per MNG-5230
         // requiresMavenVersion("[3.2,)");
 
-        Path testDir = extractResourcesAsPath("/mng-2576");
+        Path testDir = extractResources("/mng-2576");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
@@ -209,7 +209,7 @@ public class MavenITmng2576MakeLikeReactorTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testitMatchesById() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-2576");
+        Path testDir = extractResources("/mng-2576");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
@@ -238,7 +238,7 @@ public class MavenITmng2576MakeLikeReactorTest extends AbstractMavenIntegrationT
         // as per MNG-4244
         // requiresMavenVersion("[3.0-alpha-3,)");
 
-        Path testDir = extractResourcesAsPath("/mng-2576");
+        Path testDir = extractResources("/mng-2576");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
@@ -264,7 +264,7 @@ public class MavenITmng2576MakeLikeReactorTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testitResumeFrom() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-2576");
+        Path testDir = extractResources("/mng-2576");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

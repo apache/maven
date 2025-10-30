@@ -33,7 +33,7 @@ public class MavenITmng6210CoreExtensionsCustomScopesTest extends AbstractMavenI
 
     @Test
     public void testCoreExtensionCustomScopes() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-6210-core-extensions-scopes");
+        Path testDir = extractResources("/mng-6210-core-extensions-scopes");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.filterFile("settings-template.xml", "settings.xml");

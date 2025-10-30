@@ -41,7 +41,7 @@ public class MavenITmng3872ProfileActivationInRelocatedPomTest extends AbstractM
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3872");
+        Path testDir = extractResources("/mng-3872");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

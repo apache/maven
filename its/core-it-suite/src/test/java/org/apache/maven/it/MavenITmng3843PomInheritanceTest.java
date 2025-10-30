@@ -49,7 +49,7 @@ class MavenITmng3843PomInheritanceTest extends AbstractMavenIntegrationTestCase 
     @Test
     @SuppressWarnings("checkstyle:MethodLength")
     public void testitMNG3843() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3843");
+        Path testDir = extractResources("/mng-3843");
 
         testDir = testDir.getCanonicalFile();
 

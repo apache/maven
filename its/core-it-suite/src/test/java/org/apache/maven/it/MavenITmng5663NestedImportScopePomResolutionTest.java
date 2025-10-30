@@ -36,7 +36,7 @@ public class MavenITmng5663NestedImportScopePomResolutionTest extends AbstractMa
 
     @Test
     public void testitMNG5639() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-5663-nested-import-scope-pom-resolution");
+        Path testDir = extractResources("/mng-5663-nested-import-scope-pom-resolution");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.deleteArtifacts("org.apache.maven.its.mng5663");

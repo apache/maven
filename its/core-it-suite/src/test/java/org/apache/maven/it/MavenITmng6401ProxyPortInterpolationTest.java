@@ -38,7 +38,7 @@ class MavenITmng6401ProxyPortInterpolationTest extends AbstractMavenIntegrationT
 
     @Test
     public void testitEnvVars() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-6401-proxy-port-interpolation");
+        Path testDir = extractResources("/mng-6401-proxy-port-interpolation");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

@@ -40,7 +40,7 @@ public class MavenITmng5716ToolchainsTypeTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testitMNG5716() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-5716-toolchains-type");
+        Path testDir = extractResources("/mng-5716-toolchains-type");
 
         File javaHome = testDir.resolve("javaHome");
         javaHome.mkdirs();

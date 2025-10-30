@@ -44,7 +44,7 @@ public class MavenITmng2068ReactorRelativeParentsTest extends AbstractMavenInteg
      */
     @Test
     public void testitInheritedIdFields() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-2068/test-1");
+        Path testDir = extractResources("/mng-2068/test-1");
         File projectDir = testDir.resolve("parent");
 
         Verifier verifier = newVerifier(projectDir.toString());
@@ -62,7 +62,7 @@ public class MavenITmng2068ReactorRelativeParentsTest extends AbstractMavenInteg
      */
     @Test
     public void testitExplicitIdFields() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-2068/test-2");
+        Path testDir = extractResources("/mng-2068/test-2");
         File projectDir = testDir.resolve("parent");
 
         Verifier verifier = newVerifier(projectDir.toString());
@@ -80,7 +80,7 @@ public class MavenITmng2068ReactorRelativeParentsTest extends AbstractMavenInteg
      */
     @Test
     public void testitComplex() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-2068/test-3");
+        Path testDir = extractResources("/mng-2068/test-3");
         File projectDir = testDir;
 
         Verifier verifier = newVerifier(projectDir.toString());

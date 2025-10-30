@@ -44,7 +44,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
      */
     @Test
     public void testitTestPhase() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3043");
+        Path testDir = extractResources("/mng-3043");
         Files.createDirectories(testDir.toPath().resolve(".mvn"));
 
         Verifier verifier = newVerifier(testDir.toString());
@@ -101,7 +101,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
      */
     @Test
     public void testitPackagePhase() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3043");
+        Path testDir = extractResources("/mng-3043");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
@@ -161,7 +161,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
     public void testitPackagePhasesSlitted() throws Exception {
         // requiresMavenVersion("[4.0.0-beta-4,)");
 
-        Path testDir = extractResourcesAsPath("/mng-3043");
+        Path testDir = extractResources("/mng-3043");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

@@ -41,7 +41,7 @@ public class MavenITmng4379TransitiveSystemPathInterpolatedWithEnvVarTest extend
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4379");
+        Path testDir = extractResources("/mng-4379");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

@@ -43,7 +43,7 @@ class MavenITmng7737ProfileActivationTest extends AbstractMavenIntegrationTestCa
      */
     @Test
     void testSingleMojoNoPom() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-7737-profiles");
+        Path testDir = extractResources("/mng-7737-profiles");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.addCliArgument("-s");

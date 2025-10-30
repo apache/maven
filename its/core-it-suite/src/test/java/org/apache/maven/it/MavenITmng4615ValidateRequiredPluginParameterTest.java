@@ -41,7 +41,7 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest extends AbstractM
      */
     @Test
     public void testitAllSet() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4615/test-0");
+        Path testDir = extractResources("/mng-4615/test-0");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
@@ -63,7 +63,7 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest extends AbstractM
      */
     @Test
     public void testitExprMissing() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4615/test-1");
+        Path testDir = extractResources("/mng-4615/test-1");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
@@ -87,7 +87,7 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest extends AbstractM
      */
     @Test
     public void testitExprSet() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4615/test-1");
+        Path testDir = extractResources("/mng-4615/test-1");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
@@ -114,7 +114,7 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest extends AbstractM
         // cf. MNG-4764
         // requiresMavenVersion("[3.0-beta-2,)");
 
-        Path testDir = extractResourcesAsPath("/mng-4615/test-2a");
+        Path testDir = extractResources("/mng-4615/test-2a");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
@@ -137,7 +137,7 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest extends AbstractM
      */
     @Test
     public void testitPomValSet() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4615/test-2b");
+        Path testDir = extractResources("/mng-4615/test-2b");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

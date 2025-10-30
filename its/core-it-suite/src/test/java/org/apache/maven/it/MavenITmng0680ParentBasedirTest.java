@@ -41,7 +41,7 @@ public class MavenITmng0680ParentBasedirTest extends AbstractMavenIntegrationTes
      */
     @Test
     public void testitMNG680() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-0680");
+        Path testDir = extractResources("/mng-0680");
 
         testDir = testDir.getCanonicalFile();
 

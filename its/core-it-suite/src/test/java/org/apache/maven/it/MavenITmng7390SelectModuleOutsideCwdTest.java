@@ -111,7 +111,7 @@ public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenInteg
     @Test
     public void testSelectModulesOutsideCwdDoesNotWorkWhenDotMvnIsNotPresent() throws Exception {
         final String noDotMvnPath = "/mng-7390-pl-outside-cwd-no-dotmvn/module-a";
-        final Path noDotMvnDir = extractResourcesAsPath(noDotMvnPath);
+        final Path noDotMvnDir = extractResources(noDotMvnPath);
         final Verifier verifier = newVerifier(noDotMvnDir.toString(), false);
 
         verifier.addCliArgument("-pl");

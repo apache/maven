@@ -45,7 +45,7 @@ public class MavenITmng0187CollectedProjectsTest extends AbstractMavenIntegratio
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-0187");
+        Path testDir = extractResources("/mng-0187");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

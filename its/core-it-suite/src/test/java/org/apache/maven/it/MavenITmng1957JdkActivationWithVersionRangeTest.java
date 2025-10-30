@@ -42,7 +42,7 @@ public class MavenITmng1957JdkActivationWithVersionRangeTest extends AbstractMav
      */
     @Test
     public void testitMNG1957() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-1957");
+        Path testDir = extractResources("/mng-1957");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

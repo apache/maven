@@ -33,7 +33,7 @@ class MavenITmng8299CustomLifecycleTest extends AbstractMavenIntegrationTestCase
      */
     @Test
     void testPhaseOrdering() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-8299-custom-lifecycle");
+        Path testDir = extractResources("/mng-8299-custom-lifecycle");
 
         Verifier verifier = newVerifier(testDir.resolve("CustomLifecyclePlugin").getAbsolutePath());
         verifier.addCliArgument("install");

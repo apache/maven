@@ -42,7 +42,7 @@ public class MavenITmng3671PluginLevelDepInterpolationTest extends AbstractMaven
     public void testitMNG3671() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        Path testDir = extractResourcesAsPath("/mng-3671");
+        Path testDir = extractResources("/mng-3671");
 
         Verifier verifier = newVerifier(testDir.toString());
 

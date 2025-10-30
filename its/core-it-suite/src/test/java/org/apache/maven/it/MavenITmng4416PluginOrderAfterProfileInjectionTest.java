@@ -46,7 +46,7 @@ public class MavenITmng4416PluginOrderAfterProfileInjectionTest extends Abstract
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4416");
+        Path testDir = extractResources("/mng-4416");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

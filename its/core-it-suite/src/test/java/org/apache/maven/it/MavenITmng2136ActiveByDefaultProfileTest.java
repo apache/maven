@@ -42,7 +42,7 @@ public class MavenITmng2136ActiveByDefaultProfileTest extends AbstractMavenInteg
      */
     @Test
     public void testitMNG2136() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-2136");
+        Path testDir = extractResources("/mng-2136");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

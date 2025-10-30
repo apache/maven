@@ -39,7 +39,7 @@ public class MavenITmng0761MissingSnapshotDistRepoTest extends AbstractMavenInte
      */
     @Test
     public void testitMNG761() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-0761");
+        Path testDir = extractResources("/mng-0761");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

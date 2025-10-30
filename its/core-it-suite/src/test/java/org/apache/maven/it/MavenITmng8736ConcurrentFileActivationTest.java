@@ -44,7 +44,7 @@ class MavenITmng8736ConcurrentFileActivationTest extends AbstractMavenIntegratio
      */
     @Test
     void testConcurrentFileActivation() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-8736");
+        Path testDir = extractResources("/mng-8736");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.addCliArgument("-T");

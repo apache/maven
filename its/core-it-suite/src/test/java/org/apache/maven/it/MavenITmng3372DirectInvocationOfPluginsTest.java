@@ -34,7 +34,7 @@ public class MavenITmng3372DirectInvocationOfPluginsTest extends AbstractMavenIn
     public void testitMNG3372() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        Path testBaseDir = extractResourcesAsPath("/mng-3372/direct-using-prefix");
+        Path testBaseDir = extractResources("/mng-3372/direct-using-prefix");
         File plugin = testBaseDir.resolve("plugin");
         File project = testBaseDir.resolve("project");
         File settingsFile = testBaseDir.resolve("settings.xml");
@@ -63,7 +63,7 @@ public class MavenITmng3372DirectInvocationOfPluginsTest extends AbstractMavenIn
     public void testDependencyTreeInvocation() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        Path testBaseDir = extractResourcesAsPath("/mng-3372/dependency-tree");
+        Path testBaseDir = extractResources("/mng-3372/dependency-tree");
 
         Verifier verifier = newVerifier(testBaseDir.toString());
 

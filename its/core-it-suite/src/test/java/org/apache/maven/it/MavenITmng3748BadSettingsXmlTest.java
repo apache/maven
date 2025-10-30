@@ -45,7 +45,7 @@ public class MavenITmng3748BadSettingsXmlTest extends AbstractMavenIntegrationTe
 
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3748");
+        Path testDir = extractResources("/mng-3748");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

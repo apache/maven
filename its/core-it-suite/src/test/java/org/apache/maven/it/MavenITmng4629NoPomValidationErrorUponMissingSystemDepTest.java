@@ -38,7 +38,7 @@ public class MavenITmng4629NoPomValidationErrorUponMissingSystemDepTest extends 
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4629");
+        Path testDir = extractResources("/mng-4629");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

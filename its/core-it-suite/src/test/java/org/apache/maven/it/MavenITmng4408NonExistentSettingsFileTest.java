@@ -37,7 +37,7 @@ public class MavenITmng4408NonExistentSettingsFileTest extends AbstractMavenInte
      */
     @Test
     public void testitUserSettings() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4408");
+        Path testDir = extractResources("/mng-4408");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
@@ -61,7 +61,7 @@ public class MavenITmng4408NonExistentSettingsFileTest extends AbstractMavenInte
      */
     @Test
     public void testitGlobalSettings() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4408");
+        Path testDir = extractResources("/mng-4408");
 
         Verifier verifier = new Verifier(testDir.toString());
         verifier.setAutoclean(false);

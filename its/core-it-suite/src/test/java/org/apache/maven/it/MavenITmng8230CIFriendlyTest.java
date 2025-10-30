@@ -43,7 +43,7 @@ class MavenITmng8230CIFriendlyTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void testitCiFriendlyWithProjectProperties() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-8230-ci-friendly-and-gav");
+        Path testDir = extractResources("/mng-8230-ci-friendly-and-gav");
 
         File basedir = testDir.resolve("cif-with-project-props");
         Verifier verifier = newVerifier(basedir.toString());
@@ -64,7 +64,7 @@ class MavenITmng8230CIFriendlyTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void testitCiFriendlyWithProjectPropertiesOverride() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-8230-ci-friendly-and-gav");
+        Path testDir = extractResources("/mng-8230-ci-friendly-and-gav");
 
         File basedir = testDir.resolve("cif-with-project-props");
         Verifier verifier = newVerifier(basedir.toString());
@@ -86,7 +86,7 @@ class MavenITmng8230CIFriendlyTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void testitCiFriendlyWithUserProperties() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-8230-ci-friendly-and-gav");
+        Path testDir = extractResources("/mng-8230-ci-friendly-and-gav");
 
         File basedir = testDir.resolve("cif-with-user-props");
         Verifier verifier = newVerifier(basedir.toString());
@@ -109,7 +109,7 @@ class MavenITmng8230CIFriendlyTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void testitCiFriendlyWithUserPropertiesNotGiven() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-8230-ci-friendly-and-gav");
+        Path testDir = extractResources("/mng-8230-ci-friendly-and-gav");
 
         File basedir = testDir.resolve("cif-with-user-props");
         Verifier verifier = newVerifier(basedir.toString());
@@ -130,7 +130,7 @@ class MavenITmng8230CIFriendlyTest extends AbstractMavenIntegrationTestCase {
 
     @Test
     void testitExpressionInGroupId() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-8230-ci-friendly-and-gav");
+        Path testDir = extractResources("/mng-8230-ci-friendly-and-gav");
 
         File basedir = testDir.resolve("exp-in-groupid");
         Verifier verifier = newVerifier(basedir.toString());
@@ -151,7 +151,7 @@ class MavenITmng8230CIFriendlyTest extends AbstractMavenIntegrationTestCase {
 
     @Test
     void testitExpressionInArtifactId() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-8230-ci-friendly-and-gav");
+        Path testDir = extractResources("/mng-8230-ci-friendly-and-gav");
 
         File basedir = testDir.resolve("exp-in-artifactid");
         Verifier verifier = newVerifier(basedir.toString());

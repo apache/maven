@@ -37,7 +37,7 @@ public class MavenIT0138PluginLifecycleTest extends AbstractMavenIntegrationTest
      */
     @Test
     public void testit0138() throws Exception {
-        Path testDir = extractResourcesAsPath("/it0138");
+        Path testDir = extractResources("/it0138");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.deleteDirectory("target");

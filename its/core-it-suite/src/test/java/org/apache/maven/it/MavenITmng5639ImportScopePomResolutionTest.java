@@ -31,7 +31,7 @@ public class MavenITmng5639ImportScopePomResolutionTest extends AbstractMavenInt
 
     @Test
     public void testitMNG5639() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-5639-import-scope-pom-resolution");
+        Path testDir = extractResources("/mng-5639-import-scope-pom-resolution");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.deleteArtifacts("org.apache.maven.its.mng5639");

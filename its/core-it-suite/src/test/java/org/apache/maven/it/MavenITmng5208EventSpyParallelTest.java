@@ -34,7 +34,7 @@ public class MavenITmng5208EventSpyParallelTest extends AbstractMavenIntegration
      */
     @Test
     public void testCorrectModuleFails() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-5208");
+        Path testDir = extractResources("/mng-5208");
 
         Verifier spy = newVerifier(testDir.toString() + "/spy");
         spy.addCliArgument("install");

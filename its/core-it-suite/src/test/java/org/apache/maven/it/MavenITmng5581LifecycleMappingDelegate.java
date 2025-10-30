@@ -35,7 +35,7 @@ public class MavenITmng5581LifecycleMappingDelegate extends AbstractMavenIntegra
          * run "test-only" build phase and that it does not run maven-compiler-plugin.
          */
 
-        Path testDir = extractResourcesAsPath("/mng-5581-lifecycle-mapping-delegate");
+        Path testDir = extractResources("/mng-5581-lifecycle-mapping-delegate");
         File extensionDir = testDir.resolve("extension");
         File projectDir = testDir.resolve("basic");
 

@@ -42,7 +42,7 @@ public class MavenITmng4973ExtensionVisibleToPluginInReactorTest extends Abstrac
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4973");
+        Path testDir = extractResources("/mng-4973");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

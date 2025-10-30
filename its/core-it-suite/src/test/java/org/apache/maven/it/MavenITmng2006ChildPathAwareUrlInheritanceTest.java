@@ -42,7 +42,7 @@ public class MavenITmng2006ChildPathAwareUrlInheritanceTest extends AbstractMave
      */
     @Test
     public void testitMNG2006() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-2006");
+        Path testDir = extractResources("/mng-2006");
 
         Verifier verifier = newVerifier(testDir.resolve("child").getAbsolutePath());
         verifier.setAutoclean(false);

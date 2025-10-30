@@ -35,7 +35,7 @@ public class MavenITmng8598JvmConfigSubstitutionTest extends AbstractMavenIntegr
 
     @Test
     public void testProjectBasedirSubstitution() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-8598");
+        Path testDir = extractResources("/mng-8598");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.addCliArgument(

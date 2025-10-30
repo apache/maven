@@ -42,7 +42,7 @@ public class MavenITmng3297DependenciesNotLeakedToMojoTest extends AbstractMaven
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3297");
+        Path testDir = extractResources("/mng-3297");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

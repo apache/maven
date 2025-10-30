@@ -44,7 +44,7 @@ public class MavenITmng0947OptionalDependencyTest extends AbstractMavenIntegrati
     public void testit() throws Exception {
         // failingMavenVersions("(,3.1.0-alpha-1)");
 
-        Path testDir = extractResourcesAsPath("/mng-0947");
+        Path testDir = extractResources("/mng-0947");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

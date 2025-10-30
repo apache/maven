@@ -58,7 +58,7 @@ public class MavenITmng2305MultipleProxiesTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-2305");
+        Path testDir = extractResources("/mng-2305");
 
         Verifier verifier = newVerifier(testDir.toString());
 

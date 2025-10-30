@@ -39,8 +39,8 @@ public class NIO2MigrationVerificationTest extends AbstractMavenIntegrationTestC
 
     @Test
     void testExtractResourcesAsPathPattern() throws IOException {
-        // Simulate the pattern: Path testDir = extractResourcesAsPath("/some-test")
-        Path testDir = extractResourcesAsPath("test-resource");
+        // Simulate the pattern: Path testDir = extractResources("/some-test")
+        Path testDir = extractResources("test-resource");
         
         assertNotNull(testDir);
         assertTrue(testDir.isAbsolute());
@@ -50,7 +50,7 @@ public class NIO2MigrationVerificationTest extends AbstractMavenIntegrationTestC
     @Test
     void testPathResolvePattern() throws IOException {
         // Simulate the pattern: Path subDir = testDir.resolve("subdir")
-        Path testDir = extractResourcesAsPath("test-resource");
+        Path testDir = extractResources("test-resource");
         Path subDir = testDir.resolve("subdir");
         Path fileInSubDir = testDir.resolve("subdir/file.txt");
         
@@ -63,7 +63,7 @@ public class NIO2MigrationVerificationTest extends AbstractMavenIntegrationTestC
     @Test
     void testPathToStringPattern() throws IOException {
         // Simulate the pattern: newVerifier(testDir.toString())
-        Path testDir = extractResourcesAsPath("test-resource");
+        Path testDir = extractResources("test-resource");
         String testDirString = testDir.toString();
         
         assertNotNull(testDirString);
@@ -78,7 +78,7 @@ public class NIO2MigrationVerificationTest extends AbstractMavenIntegrationTestC
     @Test
     void testPathToFileConversion() throws IOException {
         // Verify that Path can be converted to File when needed for legacy APIs
-        Path testDir = extractResourcesAsPath("test-resource");
+        Path testDir = extractResources("test-resource");
         java.io.File fileDir = testDir.toFile();
 
         assertNotNull(fileDir);
@@ -92,7 +92,7 @@ public class NIO2MigrationVerificationTest extends AbstractMavenIntegrationTestC
     @Test
     void testNewVerifierWithPathString() throws IOException {
         // Test the common pattern of creating a verifier with Path.toString()
-        Path testDir = extractResourcesAsPath("test-resource");
+        Path testDir = extractResources("test-resource");
         
         // This simulates: Verifier verifier = newVerifier(testDir.toString());
         String basedir = testDir.toString();
@@ -108,7 +108,7 @@ public class NIO2MigrationVerificationTest extends AbstractMavenIntegrationTestC
     @Test
     void testComplexPathOperations() throws IOException {
         // Test more complex path operations that might be used in integration tests
-        Path testDir = extractResourcesAsPath("test-resource");
+        Path testDir = extractResources("test-resource");
         Path projectDir = testDir.resolve("project");
         Path pomFile = projectDir.resolve("pom.xml");
         Path targetDir = projectDir.resolve("target");

@@ -41,7 +41,7 @@ public class MavenITmng3710PollutedClonedPluginsTest extends AbstractMavenIntegr
 
     @Test
     public void testitMNG3710POMInheritance() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3710/pom-inheritance");
+        Path testDir = extractResources("/mng-3710/pom-inheritance");
         File pluginDir = testDir.resolve("maven-mng3710-pomInheritance-plugin");
         File projectsDir = testDir.resolve("projects");
 
@@ -71,7 +71,7 @@ public class MavenITmng3710PollutedClonedPluginsTest extends AbstractMavenIntegr
 
     @Test
     public void testitMNG3710OriginalModel() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3710/original-model");
+        Path testDir = extractResources("/mng-3710/original-model");
         File pluginsDir = testDir.resolve("plugins");
         File projectDir = testDir.resolve("project");
 

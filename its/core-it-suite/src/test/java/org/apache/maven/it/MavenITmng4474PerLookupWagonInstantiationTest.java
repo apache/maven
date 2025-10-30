@@ -41,7 +41,7 @@ public class MavenITmng4474PerLookupWagonInstantiationTest extends AbstractMaven
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4474");
+        Path testDir = extractResources("/mng-4474");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

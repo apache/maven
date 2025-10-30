@@ -40,7 +40,7 @@ public class MavenITmng6772NestedImportScopeRepositoryOverride extends AbstractM
     // This will test the behavior using ProjectModelResolver
     @Test
     public void testitInProject() throws Exception {
-        final Path testDir = extractResourcesAsPath("/mng-6772-override-in-project");
+        final Path testDir = extractResources("/mng-6772-override-in-project");
 
         final Verifier verifier = newVerifier(testDir.toString(), null);
         overrideGlobalSettings(testDir, verifier);
@@ -56,7 +56,7 @@ public class MavenITmng6772NestedImportScopeRepositoryOverride extends AbstractM
     // This will test the behavior using DefaultModelResolver
     @Test
     public void testitInDependency() throws Exception {
-        final Path testDir = extractResourcesAsPath("/mng-6772-override-in-dependency");
+        final Path testDir = extractResources("/mng-6772-override-in-dependency");
 
         final Verifier verifier = newVerifier(testDir.toString(), null);
         overrideGlobalSettings(testDir, verifier);

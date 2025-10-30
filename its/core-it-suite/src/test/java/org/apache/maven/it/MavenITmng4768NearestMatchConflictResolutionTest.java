@@ -74,7 +74,7 @@ public class MavenITmng4768NearestMatchConflictResolutionTest extends AbstractMa
      * order.
      */
     private void testit(String test) throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4768");
+        Path testDir = extractResources("/mng-4768");
 
         Verifier verifier = newVerifier(testDir.resolve(test).getAbsolutePath());
         verifier.setAutoclean(false);

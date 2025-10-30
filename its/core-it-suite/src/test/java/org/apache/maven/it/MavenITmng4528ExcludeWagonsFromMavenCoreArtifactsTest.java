@@ -46,7 +46,7 @@ public class MavenITmng4528ExcludeWagonsFromMavenCoreArtifactsTest extends Abstr
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4528");
+        Path testDir = extractResources("/mng-4528");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

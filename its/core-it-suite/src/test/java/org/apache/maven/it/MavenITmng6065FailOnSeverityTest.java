@@ -36,7 +36,7 @@ public class MavenITmng6065FailOnSeverityTest extends AbstractMavenIntegrationTe
 
     @Test
     public void testItShouldFailOnWarnLogMessages() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-6065-fail-on-severity");
+        Path testDir = extractResources("/mng-6065-fail-on-severity");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setLogFileName("warn.log");
@@ -59,7 +59,7 @@ public class MavenITmng6065FailOnSeverityTest extends AbstractMavenIntegrationTe
 
     @Test
     public void testItShouldSucceedOnWarnLogMessagesWhenFailLevelIsError() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-6065-fail-on-severity");
+        Path testDir = extractResources("/mng-6065-fail-on-severity");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setLogFileName("error.log");

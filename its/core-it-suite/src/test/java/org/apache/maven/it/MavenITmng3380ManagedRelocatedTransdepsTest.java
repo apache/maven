@@ -47,7 +47,7 @@ public class MavenITmng3380ManagedRelocatedTransdepsTest extends AbstractMavenIn
      */
     @Test
     public void testitMNG3380() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3380");
+        Path testDir = extractResources("/mng-3380");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

@@ -40,7 +40,7 @@ public class MavenITmng3766ToolchainsFromExtensionTest extends AbstractMavenInte
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3766");
+        Path testDir = extractResources("/mng-3766");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
