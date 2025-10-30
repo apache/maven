@@ -24,8 +24,6 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.maven.cling.executor.ExecutorHelper;
 import org.junit.jupiter.api.ClassDescriptor;
 import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.ClassOrdererContext;
@@ -61,13 +59,9 @@ public class TestSuiteOrdering implements ClassOrderer {
             System.clearProperty("classworlds.conf");
 
             // Set maven.version system property (needed by some tests)
-            try {
-                Verifier verifier = new Verifier("", false);
-                String mavenVersion = verifier.getMavenVersion();
-                System.setProperty("maven.version", mavenVersion);
-            } catch (Exception e) {
-                // If we can't get the Maven version, continue without setting it
-            }
+            Verifier verifier = new Verifier("", false);
+            String mavenVersion = verifier.getMavenVersion();
+            System.setProperty("maven.version", mavenVersion);
 
             String basedir = System.getProperty("basedir", ".");
             try (PrintStream info = new PrintStream(Files.newOutputStream(Paths.get(basedir, "target/info.txt")))) {
