@@ -272,8 +272,9 @@ public class Verifier {
             ExecutorRequest request = builder.stdOut(stdout).stdErr(stderr).build();
 
             // Store the command line to prepend to log file after execution
+            // Skip adding command line info if quiet logging is enabled (respects -q flag)
             String commandLineHeader = null;
-            if (logFileName != null) {
+            if (logFileName != null && !isQuietLogging(args)) {
                 try {
                     String commandLine = formatCommandLine(request, mode);
                     commandLineHeader = "# Command line used for this execution:\n" + commandLine + "\n\n";
@@ -511,6 +512,13 @@ public class Verifier {
         cmdLine.append("\n# Execution mode: ").append(mode.toString());
 
         return cmdLine.toString();
+    }
+
+    /**
+     * Checks if quiet logging is enabled by looking for the -q or --quiet flag in the arguments.
+     */
+    private boolean isQuietLogging(List<String> args) {
+        return args.contains("-q") || args.contains("--quiet");
     }
 
     public String getLogFileName() {
