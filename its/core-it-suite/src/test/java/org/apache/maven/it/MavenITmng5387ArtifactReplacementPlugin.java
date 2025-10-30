@@ -37,7 +37,7 @@ public class MavenITmng5387ArtifactReplacementPlugin extends AbstractMavenIntegr
 
     @Test
     public void testArtifactReplacementExecution() throws Exception {
-        Verifier v0 = newVerifier(testDir.getAbsolutePath());
+        Verifier v0 = newVerifier(testDir.toString());
         v0.setAutoclean(false);
         v0.deleteDirectory("target");
         v0.deleteArtifacts("org.apache.maven.its.mng5387");

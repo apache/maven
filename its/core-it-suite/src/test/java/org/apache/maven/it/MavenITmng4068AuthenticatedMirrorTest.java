@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -78,7 +79,7 @@ public class MavenITmng4068AuthenticatedMirrorTest extends AbstractMavenIntegrat
         securityHandler.setConstraintMappings(new ConstraintMapping[] {constraintMapping});
 
         ResourceHandler repoHandler = new ResourceHandler();
-        repoHandler.setResourceBase(new File(testDir, "repo").getAbsolutePath());
+        repoHandler.setResourceBase(testDir.resolve("repo").getAbsolutePath());
 
         HandlerList handlerList = new HandlerList();
         handlerList.addHandler(securityHandler);
@@ -113,7 +114,7 @@ public class MavenITmng4068AuthenticatedMirrorTest extends AbstractMavenIntegrat
         Map<String, String> filterProps = new HashMap<>();
         filterProps.put("@mirrorPort@", Integer.toString(port));
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
         verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4068");

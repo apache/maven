@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -79,7 +80,7 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest extends Abstrac
         int httpPort = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
         System.out.println("Bound server socket to the port " + httpPort);
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
 
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
@@ -114,7 +115,7 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest extends Abstrac
         int httpPort = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
         System.out.println("Bound server socket to the port " + httpPort);
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toString());
 
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
@@ -187,13 +188,13 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest extends Abstrac
                 OutputStream outStream = response.getOutputStream();
 
                 if (uri.endsWith(".pom")) {
-                    File pluginPom = new File(testDir, "fake-maven-plugin/fake-maven-plugin-1.0.pom");
+                    Path pluginPom = testDir.resolve("fake-maven-plugin/fake-maven-plugin-1.0.pom");
                     InputStream inStream = new FileInputStream(pluginPom);
                     copy(inStream, outStream);
 
                     response.setStatus(HttpServletResponse.SC_OK);
                 } else if (uri.endsWith(".jar")) {
-                    File pluginJar = new File(testDir, "fake-maven-plugin/fake-maven-plugin-1.0.jar");
+                    Path pluginJar = testDir.resolve("fake-maven-plugin/fake-maven-plugin-1.0.jar");
                     InputStream inStream = new FileInputStream(pluginJar);
                     copy(inStream, outStream);
 

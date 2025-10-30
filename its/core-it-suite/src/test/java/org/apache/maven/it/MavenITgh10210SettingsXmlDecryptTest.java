@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.nio.file.Files;
 import java.util.Arrays;
 
@@ -33,9 +34,9 @@ class MavenITgh10210SettingsXmlDecryptTest extends AbstractMavenIntegrationTestC
 
     @Test
     void testItPass() throws Exception {
-        File testDir = extractResources("/gh-10210-settings-xml-decrypt");
+        Path testDir = extractResources("/gh-10210-settings-xml-decrypt");
 
-        Verifier verifier = new Verifier(testDir.getAbsolutePath());
+        Verifier verifier = new Verifier(testDir.toString());
         verifier.setUserHomeDirectory(testDir.toPath().resolve("HOME"));
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings-passes.xml");
@@ -56,9 +57,9 @@ class MavenITgh10210SettingsXmlDecryptTest extends AbstractMavenIntegrationTestC
 
     @Test
     void testItFail() throws Exception {
-        File testDir = extractResources("/gh-10210-settings-xml-decrypt");
+        Path testDir = extractResources("/gh-10210-settings-xml-decrypt");
 
-        Verifier verifier = new Verifier(testDir.getAbsolutePath());
+        Verifier verifier = new Verifier(testDir.toString());
         verifier.setUserHomeDirectory(testDir.toPath().resolve("HOME"));
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings-fails.xml");

@@ -41,7 +41,7 @@ public class MavenITmng8525MavenDIPlugin extends AbstractMavenIntegrationTestCas
         //
         // Build a plugin that uses a Maven DI plugin
         //
-        Verifier v0 = newVerifier(testDir.getAbsolutePath());
+        Verifier v0 = newVerifier(testDir.toString());
         v0.setAutoclean(false);
         v0.deleteDirectory("target");
         v0.deleteArtifacts("org.apache.maven.its.mng8525");
@@ -52,7 +52,7 @@ public class MavenITmng8525MavenDIPlugin extends AbstractMavenIntegrationTestCas
         //
         // Execute the Maven DI plugin
         //
-        Verifier v1 = newVerifier(testDir.getAbsolutePath());
+        Verifier v1 = newVerifier(testDir.toString());
         v1.setAutoclean(false);
         v1.addCliArgument("org.apache.maven.its.mng8525:mavendi-maven-plugin:0.0.1-SNAPSHOT:hello");
         v1.addCliArgument("-Dname=World");

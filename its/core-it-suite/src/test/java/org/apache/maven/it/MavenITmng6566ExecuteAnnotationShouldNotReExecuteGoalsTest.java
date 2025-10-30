@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.io.IOException;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -36,8 +37,8 @@ public class MavenITmng6566ExecuteAnnotationShouldNotReExecuteGoalsTest extends 
     public void setUp() throws Exception {
         testDir = extractResources(RESOURCE_PATH);
 
-        File pluginDir = new File(testDir, "plugin");
-        Verifier verifier = newVerifier(pluginDir.getAbsolutePath());
+        Path pluginDir = testDir.resolve("plugin");
+        Verifier verifier = newVerifier(pluginDir.toString());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -45,9 +46,9 @@ public class MavenITmng6566ExecuteAnnotationShouldNotReExecuteGoalsTest extends 
 
     @Test
     public void testRunsCompileGoalOnceWithDirectPluginInvocation() throws Exception {
-        File consumerDir = new File(testDir, "consumer");
+        Path consumerDir = testDir.resolve("consumer");
 
-        Verifier verifier = newVerifier(consumerDir.getAbsolutePath());
+        Verifier verifier = newVerifier(consumerDir.toString());
         verifier.setLogFileName("log-direct-plugin-invocation.txt");
         verifier.addCliArgument(PLUGIN_KEY + ":require-compile-phase");
         verifier.execute();
@@ -64,9 +65,9 @@ public class MavenITmng6566ExecuteAnnotationShouldNotReExecuteGoalsTest extends 
      */
     @Test
     public void testRunsCompileGoalOnceWithPhaseExecution() throws Exception {
-        File consumerDir = new File(testDir, "consumer");
+        Path consumerDir = testDir.resolve("consumer");
 
-        Verifier verifier = newVerifier(consumerDir.getAbsolutePath());
+        Verifier verifier = newVerifier(consumerDir.toString());
         verifier.setLogFileName("log-phase-execution.txt");
         verifier.addCliArgument("compile");
         verifier.execute();
