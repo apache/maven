@@ -32,6 +32,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  */
 class MavenITgh2576ItrNotHonoredTest extends AbstractMavenIntegrationTestCase {
 
+    MavenITgh2576ItrNotHonoredTest() {
+        super("[4.0.0,)");
+    }
+
     @Test
     void testItrNotHonored() throws Exception {
         File testDir = extractResources("/gh-2576-itr-not-honored").getAbsoluteFile();
