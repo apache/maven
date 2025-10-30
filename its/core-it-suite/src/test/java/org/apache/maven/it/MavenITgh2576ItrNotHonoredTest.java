@@ -21,6 +21,8 @@ package org.apache.maven.it;
 import java.io.File;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 /**
  * This is a test set for <a href="https://github.com/apache/maven/issues/2576">GH-2576</a>.
  * <p>
@@ -50,7 +52,6 @@ class MavenITgh2576ItrNotHonoredTest extends AbstractMavenIntegrationTestCase {
 
         verifier = new Verifier(new File(testDir, "consumer").toString());
         verifier.addCliArguments("install", "-itr");
-        verifier.execute();
-        verifier.verifyErrorFreeLog();
+        assertThrows(VerificationException.class, verifier::execute);
     }
 }
