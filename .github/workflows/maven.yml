@@ -68,6 +68,8 @@ jobs:
           enableCrossOsArchive: true
           path: ${{ env.MIMIR_LOCAL }}
           key: master-${{ github.run_id }}
+          restore-keys: |
+            master-
 
       - name: Set up Maven
         shell: bash
@@ -93,8 +95,8 @@ jobs:
         if: ${{ !cancelled() && !failure() }}
         with:
           name: cache-initial-build
-          path: ./${{ env.MIMIR_LOCAL }}/
           retention-days: 1
+          path: ./${{ env.MIMIR_LOCAL }}/
 
       - name: Upload Maven distributions
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
@@ -109,6 +111,7 @@ jobs:
         if: ${{ failure() || cancelled() }}
         with:
           name: ${{ github.run_number }}-initial
+          retention-days: 1
           path: |
             **/target/surefire-reports/*
             **/target/java_heapdump.hprof
@@ -119,6 +122,7 @@ jobs:
         with:
           name: ${{ github.run_number }}-initial-mimir-logs
           include-hidden-files: true
+          retention-days: 1
           path: |
             ~/.mimir/*.log
 
@@ -214,14 +218,15 @@ jobs:
         if: ${{ !cancelled() && !failure() }}
         with:
           name: cache-full-build-${{ runner.os }}-${{ matrix.java }}
-          path: ./${{ env.MIMIR_LOCAL }}/
           retention-days: 1
+          path: ./${{ env.MIMIR_LOCAL }}/
 
       - name: Upload test artifacts
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
         if: failure() || cancelled()
         with:
           name: ${{ github.run_number }}-full-build-artifact-${{ runner.os }}-${{ matrix.java }}
+          retention-days: 1
           path: |
             **/target/surefire-reports/*
             **/target/java_heapdump.hprof
@@ -232,6 +237,7 @@ jobs:
         with:
           name: ${{ github.run_number }}-full-build-mimir-logs-${{ runner.os }}-${{ matrix.java }}
           include-hidden-files: true
+          retention-days: 1
           path: |
             ~/.mimir/*.log
 
@@ -311,14 +317,15 @@ jobs:
         if: ${{ !cancelled() && !failure() }}
         with:
           name: cache-integration-tests-${{ runner.os }}-${{ matrix.java }}
-          path: ./${{ env.MIMIR_LOCAL }}/
           retention-days: 1
+          path: ./${{ env.MIMIR_LOCAL }}/
 
       - name: Upload test artifacts
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
         if: ${{ failure() || cancelled() }}
         with:
           name: ${{ github.run_number }}-integration-test-artifact-${{ runner.os }}-${{ matrix.java }}
+          retention-days: 1
           path: |
             **/target/surefire-reports/*
             **/target/failsafe-reports/*
@@ -331,6 +338,7 @@ jobs:
         with:
           name: ${{ github.run_number }}-integration-test-mimir-logs-${{ runner.os }}-${{ matrix.java }}
           include-hidden-files: true
+          retention-days: 1
           path: |
             ~/.mimir/*.log
 
