@@ -29,6 +29,10 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITgh11356InvalidTransitiveRepositoryTest extends AbstractMavenIntegrationTestCase {
 
+    MavenITgh11356InvalidTransitiveRepositoryTest() {
+        super("[4.0.0,)");
+    }
+
     @Test
     public void testInvalidTransitiveRepository() throws Exception {
         File testDir = extractResources("/gh-11356-invalid-transitive-repository");
