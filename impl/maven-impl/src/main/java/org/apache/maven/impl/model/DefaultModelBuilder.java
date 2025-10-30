@@ -524,7 +524,8 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         public void mergeRepositories(Model model, boolean replace) {
-            if (model.getRepositories().isEmpty()) {
+            if (model.getRepositories().isEmpty()
+                    || InternalSession.from(session).getSession().isIgnoreArtifactDescriptorRepositories()) {
                 return;
             }
             // We need to interpolate the repositories before we can use them
