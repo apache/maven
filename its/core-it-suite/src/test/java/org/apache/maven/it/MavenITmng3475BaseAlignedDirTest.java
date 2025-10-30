@@ -43,7 +43,7 @@ public class MavenITmng3475BaseAlignedDirTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testitMNG3475() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3475");
+        Path testDir = extractResources("/mng-3475");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

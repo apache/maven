@@ -41,7 +41,7 @@ public class MavenITmng4987TimestampBasedSnapshotSelectionTest extends AbstractM
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4987");
+        Path testDir = extractResources("/mng-4987");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

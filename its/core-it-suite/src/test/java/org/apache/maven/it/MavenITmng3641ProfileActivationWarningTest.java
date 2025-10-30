@@ -39,7 +39,7 @@ public class MavenITmng3641ProfileActivationWarningTest extends AbstractMavenInt
     @Test
     public void testitMNG3641() throws Exception {
         // (0) Initialize.
-        Path testDir = extractResourcesAsPath("/mng-3641");
+        Path testDir = extractResources("/mng-3641");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

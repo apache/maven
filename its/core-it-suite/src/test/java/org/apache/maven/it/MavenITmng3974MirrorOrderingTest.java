@@ -39,7 +39,7 @@ public class MavenITmng3974MirrorOrderingTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testitFirstMatchWins() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3974");
+        Path testDir = extractResources("/mng-3974");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

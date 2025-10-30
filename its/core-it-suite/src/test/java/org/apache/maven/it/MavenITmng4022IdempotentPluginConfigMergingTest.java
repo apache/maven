@@ -41,7 +41,7 @@ public class MavenITmng4022IdempotentPluginConfigMergingTest extends AbstractMav
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4022");
+        Path testDir = extractResources("/mng-4022");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

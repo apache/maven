@@ -41,7 +41,7 @@ public class MavenITmng4952MetadataReleaseInfoUpdateTest extends AbstractMavenIn
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4952");
+        Path testDir = extractResources("/mng-4952");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

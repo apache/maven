@@ -40,7 +40,7 @@ public class MavenITmng3863AutoPluginGroupIdTest extends AbstractMavenIntegratio
      */
     @Test
     public void testitMNG3853() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3863");
+        Path testDir = extractResources("/mng-3863");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

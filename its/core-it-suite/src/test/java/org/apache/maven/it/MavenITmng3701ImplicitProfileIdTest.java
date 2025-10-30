@@ -39,7 +39,7 @@ public class MavenITmng3701ImplicitProfileIdTest extends AbstractMavenIntegratio
      */
     @Test
     public void testitMNG3701() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3701");
+        Path testDir = extractResources("/mng-3701");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

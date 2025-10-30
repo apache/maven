@@ -34,7 +34,7 @@ public class MavenITmng3694ReactorProjectsDynamismTest extends AbstractMavenInte
 
     @Test
     public void testitMNG3694() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3694");
+        Path testDir = extractResources("/mng-3694");
 
         File pluginDir = testDir.resolve("maven-mng3694-plugin");
         File projectDir = testDir.resolve("projects");

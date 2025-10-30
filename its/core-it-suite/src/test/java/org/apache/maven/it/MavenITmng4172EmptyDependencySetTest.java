@@ -41,7 +41,7 @@ public class MavenITmng4172EmptyDependencySetTest extends AbstractMavenIntegrati
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4172");
+        Path testDir = extractResources("/mng-4172");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

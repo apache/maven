@@ -44,7 +44,7 @@ public class MavenITmng1751ForcedMetadataUpdateDuringDeploymentTest extends Abst
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-1751");
+        Path testDir = extractResources("/mng-1751");
 
         File dir = testDir.resolve("repo/org/apache/maven/its/mng1751/dep/0.1-SNAPSHOT");
         File templateMetadataFile = dir.resolve("template-metadata.xml");

@@ -68,7 +68,7 @@ public class MavenITmng4053PluginConfigAttributesTest extends AbstractMavenInteg
     }
 
     private void testit(String test) throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4053/" + test);
+        Path testDir = extractResources("/mng-4053/" + test);
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

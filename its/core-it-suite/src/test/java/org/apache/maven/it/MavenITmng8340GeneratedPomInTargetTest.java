@@ -33,7 +33,7 @@ class MavenITmng8340GeneratedPomInTargetTest extends AbstractMavenIntegrationTes
      */
     @Test
     void testProjectWithShadePluginAndGeneratedPomUnderTarget() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-8340");
+        Path testDir = extractResources("/mng-8340");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.addCliArgument("install");

@@ -36,7 +36,7 @@ public class MavenITmng6071GetResourceWithCustomPom extends AbstractMavenIntegra
      */
     @Test
     public void testRunCustomPomWithDot() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-6071");
+        Path testDir = extractResources("/mng-6071");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.addCliArgument("-f");

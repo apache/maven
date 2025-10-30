@@ -191,7 +191,7 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest extends AbstractMa
     }
 
     private void testit(String project) throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4470/" + project);
+        Path testDir = extractResources("/mng-4470/" + project);
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

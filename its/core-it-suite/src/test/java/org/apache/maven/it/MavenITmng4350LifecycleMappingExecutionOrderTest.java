@@ -43,7 +43,7 @@ public class MavenITmng4350LifecycleMappingExecutionOrderTest extends AbstractMa
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4350");
+        Path testDir = extractResources("/mng-4350");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

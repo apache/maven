@@ -40,7 +40,7 @@ public class MavenITmng3529QuotedCliArgTest extends AbstractMavenIntegrationTest
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3529");
+        Path testDir = extractResources("/mng-3529");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setForkJvm(true); // NOTE: We want to go through the launcher script

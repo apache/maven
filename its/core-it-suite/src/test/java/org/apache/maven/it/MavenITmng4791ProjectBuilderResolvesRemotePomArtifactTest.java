@@ -42,7 +42,7 @@ public class MavenITmng4791ProjectBuilderResolvesRemotePomArtifactTest extends A
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4791");
+        Path testDir = extractResources("/mng-4791");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

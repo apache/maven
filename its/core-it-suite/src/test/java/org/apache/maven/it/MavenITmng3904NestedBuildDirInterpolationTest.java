@@ -40,7 +40,7 @@ public class MavenITmng3904NestedBuildDirInterpolationTest extends AbstractMaven
      */
     @Test
     public void testitMNG3904() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3904");
+        Path testDir = extractResources("/mng-3904");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

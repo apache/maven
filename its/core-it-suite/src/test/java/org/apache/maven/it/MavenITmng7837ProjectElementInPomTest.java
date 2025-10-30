@@ -32,7 +32,7 @@ class MavenITmng7837ProjectElementInPomTest extends AbstractMavenIntegrationTest
 
     @Test
     void testProjectElementInPom() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-7837-project-element-in-pom");
+        Path testDir = extractResources("/mng-7837-project-element-in-pom");
 
         final Verifier pluginVerifier = newVerifier(testDir.getPath());
         pluginVerifier.addCliArgument("validate");

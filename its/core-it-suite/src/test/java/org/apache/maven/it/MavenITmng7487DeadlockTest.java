@@ -29,7 +29,7 @@ public class MavenITmng7487DeadlockTest extends AbstractMavenIntegrationTestCase
 
     @Test
     public void testDeadlock() throws IOException, VerificationException {
-        final Path rootDir = extractResourcesAsPath(PROJECT_PATH);
+        final Path rootDir = extractResources(PROJECT_PATH);
 
         final File pluginDir = rootDir.resolve("plugin");
         final Verifier pluginVerifier = newVerifier(pluginDir.toString());

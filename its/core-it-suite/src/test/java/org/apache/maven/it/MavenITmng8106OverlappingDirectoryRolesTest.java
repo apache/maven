@@ -36,7 +36,7 @@ public class MavenITmng8106OverlappingDirectoryRolesTest extends AbstractMavenIn
 
     @Test
     public void testDirectoryOverlap() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-8106");
+        Path testDir = extractResources("/mng-8106");
         String repo = testDir.resolve("repo").getAbsolutePath();
         String tailRepo = System.getProperty("user.home") + File.separator + ".m2" + File.separator + "repository";
 

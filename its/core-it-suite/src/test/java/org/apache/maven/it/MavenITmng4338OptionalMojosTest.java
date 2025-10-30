@@ -40,7 +40,7 @@ public class MavenITmng4338OptionalMojosTest extends AbstractMavenIntegrationTes
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4338");
+        Path testDir = extractResources("/mng-4338");
 
         // First, build the test plugin
         Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-optional-mojos").getAbsolutePath());

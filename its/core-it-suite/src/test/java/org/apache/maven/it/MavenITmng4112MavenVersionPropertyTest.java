@@ -36,7 +36,7 @@ public class MavenITmng4112MavenVersionPropertyTest extends AbstractMavenIntegra
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4112");
+        Path testDir = extractResources("/mng-4112");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

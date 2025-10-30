@@ -43,7 +43,7 @@ public class MavenITmng4600DependencyOptionalFlagManagementTest extends Abstract
      */
     @Test
     public void testitModel() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4600/model");
+        Path testDir = extractResources("/mng-4600/model");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
@@ -65,7 +65,7 @@ public class MavenITmng4600DependencyOptionalFlagManagementTest extends Abstract
      */
     @Test
     public void testitResolution() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4600/resolution");
+        Path testDir = extractResources("/mng-4600/resolution");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

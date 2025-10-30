@@ -47,7 +47,7 @@ public class MavenITmng4026ReactorDependenciesOrderTest extends AbstractMavenInt
      */
     @Test
     public void testitMNG4026() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4026");
+        Path testDir = extractResources("/mng-4026");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

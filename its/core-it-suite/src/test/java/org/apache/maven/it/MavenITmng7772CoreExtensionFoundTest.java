@@ -31,7 +31,7 @@ public class MavenITmng7772CoreExtensionFoundTest extends AbstractMavenIntegrati
 
     @Test
     public void testWithExtensionsXmlCoreExtensionsFound() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-7772-core-extensions-found");
+        Path testDir = extractResources("/mng-7772-core-extensions-found");
 
         Verifier verifier = newVerifier(testDir.resolve("extension").getAbsolutePath());
         verifier.setLogFileName("extension-install.txt");
@@ -52,7 +52,7 @@ public class MavenITmng7772CoreExtensionFoundTest extends AbstractMavenIntegrati
 
     @Test
     public void testWithLibExtCoreExtensionsFound() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-7772-core-extensions-found");
+        Path testDir = extractResources("/mng-7772-core-extensions-found");
 
         Path extensionBasedir = testDir.resolve("extension").getAbsoluteFile().toPath();
         Verifier verifier = newVerifier(extensionBasedir.toString());

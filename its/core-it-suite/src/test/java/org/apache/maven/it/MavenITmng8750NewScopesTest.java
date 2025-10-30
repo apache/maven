@@ -46,7 +46,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
 
     @BeforeEach
     void installDependencies() throws VerificationException, IOException {
-        Path testDir = extractResourcesAsPath("/mng-8750-new-scopes");
+        Path testDir = extractResources("/mng-8750-new-scopes");
 
         File depsDir = testDir.resolve("deps");
         Verifier deps = newVerifier(depsDir.toString(), false);
@@ -67,7 +67,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
      */
     @Test
     public void testCompileOnlyScope() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-8750-new-scopes");
+        Path testDir = extractResources("/mng-8750-new-scopes");
         File projectDir = testDir.resolve("compile-only-test");
 
         Verifier verifier = newVerifier(projectDir.toString(), false);
@@ -99,7 +99,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
      */
     @Test
     public void testTestOnlyScope() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-8750-new-scopes");
+        Path testDir = extractResources("/mng-8750-new-scopes");
         File projectDir = testDir.resolve("test-only-test");
 
         Verifier verifier = newVerifier(projectDir.toString(), false);
@@ -131,7 +131,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
      */
     @Test
     public void testTestRuntimeScope() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-8750-new-scopes");
+        Path testDir = extractResources("/mng-8750-new-scopes");
         File projectDir = testDir.resolve("test-runtime-test");
 
         Verifier verifier = newVerifier(projectDir.toString(), false);
@@ -160,7 +160,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
      */
     @Test
     public void testAllNewScopesTogether() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-8750-new-scopes");
+        Path testDir = extractResources("/mng-8750-new-scopes");
         File projectDir = testDir.resolve("comprehensive-test");
 
         Verifier verifier = newVerifier(projectDir.toString(), false);
@@ -193,7 +193,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
      */
     @Test
     public void testValidationFailureWithModelVersion40() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-8750-new-scopes");
+        Path testDir = extractResources("/mng-8750-new-scopes");
         File projectDir = testDir.resolve("validation-failure-test");
 
         Verifier verifier = newVerifier(projectDir.toString(), false);
@@ -219,7 +219,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
      */
     @Test
     public void testValidationSuccessWithModelVersion41() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-8750-new-scopes");
+        Path testDir = extractResources("/mng-8750-new-scopes");
         File projectDir = testDir.resolve("validation-success-test");
 
         Verifier verifier = newVerifier(projectDir.toString(), false);

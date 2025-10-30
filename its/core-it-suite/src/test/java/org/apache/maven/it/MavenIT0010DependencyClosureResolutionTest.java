@@ -37,7 +37,7 @@ public class MavenIT0010DependencyClosureResolutionTest extends AbstractMavenInt
      */
     @Test
     public void testit0010() throws Exception {
-        Path testDir = extractResourcesAsPath("/it0010");
+        Path testDir = extractResources("/it0010");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

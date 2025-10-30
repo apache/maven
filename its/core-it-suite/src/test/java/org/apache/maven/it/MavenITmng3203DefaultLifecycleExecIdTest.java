@@ -38,7 +38,7 @@ public class MavenITmng3203DefaultLifecycleExecIdTest extends AbstractMavenInteg
     public void testitMNG3203() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        Path testDir = extractResourcesAsPath("/mng-3203");
+        Path testDir = extractResources("/mng-3203");
 
         Verifier verifier = newVerifier(testDir.toString());
 

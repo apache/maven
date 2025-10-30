@@ -42,7 +42,7 @@ public class MavenITmng3831PomInterpolationTest extends AbstractMavenIntegration
      */
     @Test
     public void testitMNG3831() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3831");
+        Path testDir = extractResources("/mng-3831");
         File child = testDir.resolve("child");
 
         Verifier verifier = newVerifier(child.getAbsolutePath());

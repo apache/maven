@@ -43,7 +43,7 @@ public class MavenITmng4361ForceDependencySnapshotUpdateTest extends AbstractMav
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4361");
+        Path testDir = extractResources("/mng-4361");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

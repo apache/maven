@@ -33,7 +33,7 @@ public class MavenITmng7051OptionalProfileActivationTest extends AbstractMavenIn
      */
     @Test
     public void testActivatingNonExistingProfileBreaks() throws Exception {
-        final Path projectDir = extractResourcesAsPath(PROJECT_PATH);
+        final Path projectDir = extractResources(PROJECT_PATH);
         final Verifier verifier = newVerifier(projectDir.toString());
 
         verifier.addCliArgument("-P");
@@ -58,7 +58,7 @@ public class MavenITmng7051OptionalProfileActivationTest extends AbstractMavenIn
      */
     @Test
     public void testActivatingNonExistingProfileWithQuestionMarkDoesNotBreak() throws Exception {
-        final Path projectDir = extractResourcesAsPath(PROJECT_PATH);
+        final Path projectDir = extractResources(PROJECT_PATH);
         final Verifier verifier = newVerifier(projectDir.toString());
 
         verifier.addCliArgument("-P");
@@ -79,7 +79,7 @@ public class MavenITmng7051OptionalProfileActivationTest extends AbstractMavenIn
      */
     @Test
     public void testActivatingExistingAndNonExistingProfiles() throws Exception {
-        final Path projectDir = extractResourcesAsPath(PROJECT_PATH);
+        final Path projectDir = extractResources(PROJECT_PATH);
         final Verifier verifier = newVerifier(projectDir.toString());
 
         verifier.addCliArgument("-P");
@@ -100,7 +100,7 @@ public class MavenITmng7051OptionalProfileActivationTest extends AbstractMavenIn
      */
     @Test
     public void testDeactivatingNonExistingProfileWithQuestionMarkDoesNotBreak() throws Exception {
-        final Path projectDir = extractResourcesAsPath(PROJECT_PATH);
+        final Path projectDir = extractResources(PROJECT_PATH);
         final Verifier verifier = newVerifier(projectDir.toString());
 
         verifier.addCliArgument("-P");
@@ -121,7 +121,7 @@ public class MavenITmng7051OptionalProfileActivationTest extends AbstractMavenIn
      */
     @Test
     public void testDeactivatingExistingAndNonExistingProfiles() throws Exception {
-        final Path projectDir = extractResourcesAsPath(PROJECT_PATH);
+        final Path projectDir = extractResources(PROJECT_PATH);
         final Verifier verifier = newVerifier(projectDir.toString());
 
         verifier.addCliArgument("-P");

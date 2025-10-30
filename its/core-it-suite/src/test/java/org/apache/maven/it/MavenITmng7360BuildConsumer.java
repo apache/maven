@@ -36,7 +36,7 @@ public class MavenITmng7360BuildConsumer extends AbstractMavenIntegrationTestCas
 
     @Test
     public void testSelectModuleByCoordinate() throws Exception {
-        final Path projectDir = extractResourcesAsPath(PROJECT_PATH);
+        final Path projectDir = extractResources(PROJECT_PATH);
         final Verifier verifier = newVerifier(projectDir.toString());
         verifier.addCliArgument("validate");
         verifier.execute();

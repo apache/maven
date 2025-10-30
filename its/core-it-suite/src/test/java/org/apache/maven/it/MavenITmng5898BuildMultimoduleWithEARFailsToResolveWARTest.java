@@ -36,7 +36,7 @@ public class MavenITmng5898BuildMultimoduleWithEARFailsToResolveWARTest extends 
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-5898");
+        Path testDir = extractResources("/mng-5898");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

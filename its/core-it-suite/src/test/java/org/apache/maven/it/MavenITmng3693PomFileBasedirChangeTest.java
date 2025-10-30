@@ -37,7 +37,7 @@ public class MavenITmng3693PomFileBasedirChangeTest extends AbstractMavenIntegra
 
     @Test
     public void testitMNG3693() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3693");
+        Path testDir = extractResources("/mng-3693");
 
         File pluginDir = testDir.resolve("maven-mng3693-plugin");
         File projectsDir = testDir.resolve("projects");

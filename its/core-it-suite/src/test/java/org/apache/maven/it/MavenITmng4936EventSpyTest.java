@@ -40,7 +40,7 @@ public class MavenITmng4936EventSpyTest extends AbstractMavenIntegrationTestCase
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4936");
+        Path testDir = extractResources("/mng-4936");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setForkJvm(true); // maven.ext.class.path is not unloaded

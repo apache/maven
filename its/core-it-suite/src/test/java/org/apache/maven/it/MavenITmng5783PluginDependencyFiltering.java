@@ -30,7 +30,7 @@ public class MavenITmng5783PluginDependencyFiltering extends AbstractMavenIntegr
 
     @Test
     public void testSLF4j() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-5783-plugin-dependency-filtering");
+        Path testDir = extractResources("/mng-5783-plugin-dependency-filtering");
         Verifier verifier = newVerifier(testDir.resolve("plugin").getAbsolutePath());
         verifier.addCliArgument("install");
         verifier.execute();

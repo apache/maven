@@ -41,7 +41,7 @@ public class MavenITmng3845LimitedPomInheritanceTest extends AbstractMavenIntegr
      */
     @Test
     public void testitMNG3845() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3845");
+        Path testDir = extractResources("/mng-3845");
 
         Verifier verifier = newVerifier(testDir.resolve("child").getAbsolutePath());
         verifier.setAutoclean(false);

@@ -40,7 +40,7 @@ public class MavenITmng2201PluginConfigInterpolationTest extends AbstractMavenIn
      */
     @Test
     public void testitMNG2201() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-2201");
+        Path testDir = extractResources("/mng-2201");
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

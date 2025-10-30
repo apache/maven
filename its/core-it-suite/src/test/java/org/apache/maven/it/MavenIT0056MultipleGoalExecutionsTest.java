@@ -33,7 +33,7 @@ public class MavenIT0056MultipleGoalExecutionsTest extends AbstractMavenIntegrat
      */
     @Test
     public void testit0056() throws Exception {
-        Path testDir = extractResourcesAsPath("/it0056");
+        Path testDir = extractResources("/it0056");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

@@ -31,7 +31,7 @@ public class MavenITmng7443ConsistencyOfOptionalProjectsAndProfilesTest extends 
 
     @Test
     public void testConsistentLoggingOfOptionalProfilesAndProjects() throws IOException, VerificationException {
-        Path testDir = extractResourcesAsPath("/mng-7443-consistency-of-optional-profiles-and-projects");
+        Path testDir = extractResources("/mng-7443-consistency-of-optional-profiles-and-projects");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.addCliArgument("-pl");

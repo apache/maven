@@ -80,7 +80,7 @@ public abstract class AbstractMavenIntegrationTestCase {
      * @throws IOException If the resources could not be extracted.
      * @since 4.0.0
      */
-    protected Path extractResourcesAsPath(String resourcePath) throws IOException {
+    protected Path extractResources(String resourcePath) throws IOException {
         return Paths.get(System.getProperty("maven.test.tmpdir", System.getProperty("java.io.tmpdir")))
                 .resolve(resourcePath)
                 .toAbsolutePath();

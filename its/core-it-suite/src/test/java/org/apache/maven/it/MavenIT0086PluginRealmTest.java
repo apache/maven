@@ -43,7 +43,7 @@ public class MavenIT0086PluginRealmTest extends AbstractMavenIntegrationTestCase
      */
     @Test
     public void testit0086() throws Exception {
-        Path testDir = extractResourcesAsPath("/it0086");
+        Path testDir = extractResources("/it0086");
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

@@ -64,7 +64,7 @@ public class MavenITmng6256SpecialCharsAlternatePOMLocation extends AbstractMave
     }
 
     private void runCoreExtensionWithOption(String option, String subDir) throws Exception {
-        Path resourceDir = extractResourcesAsPath("/mng-6256-special-chars-alternate-pom-location");
+        Path resourceDir = extractResources("/mng-6256-special-chars-alternate-pom-location");
 
         Path testDir = resourceDir.resolve("../mng-6256-" + subDir);
         Files.createDirectories(testDir);

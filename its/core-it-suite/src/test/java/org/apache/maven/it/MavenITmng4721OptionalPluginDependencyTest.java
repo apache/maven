@@ -40,7 +40,7 @@ public class MavenITmng4721OptionalPluginDependencyTest extends AbstractMavenInt
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4721");
+        Path testDir = extractResources("/mng-4721");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

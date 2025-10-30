@@ -42,7 +42,7 @@ public class MavenITmng4482ForcePluginSnapshotUpdateTest extends AbstractMavenIn
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4482");
+        Path testDir = extractResources("/mng-4482");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

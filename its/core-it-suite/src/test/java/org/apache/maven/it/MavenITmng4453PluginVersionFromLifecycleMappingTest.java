@@ -38,7 +38,7 @@ public class MavenITmng4453PluginVersionFromLifecycleMappingTest extends Abstrac
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4453");
+        Path testDir = extractResources("/mng-4453");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

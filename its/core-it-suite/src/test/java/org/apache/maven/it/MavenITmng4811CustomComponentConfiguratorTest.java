@@ -38,7 +38,7 @@ public class MavenITmng4811CustomComponentConfiguratorTest extends AbstractMaven
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4811");
+        Path testDir = extractResources("/mng-4811");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

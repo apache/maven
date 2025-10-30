@@ -38,7 +38,7 @@ public class MavenITmng0282NonReactorExecWhenProjectIndependentTest extends Abst
      */
     @Test
     public void testitMNG282() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-0282");
+        Path testDir = extractResources("/mng-0282");
 
         // First, build the test plugin
         Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-no-project").getAbsolutePath());

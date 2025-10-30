@@ -27,7 +27,7 @@ public class MavenITmng5805PkgTypeMojoConfiguration2 extends AbstractMavenIntegr
 
     @Test
     public void testPkgTypeMojoConfiguration() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-5805-pkg-type-mojo-configuration2");
+        Path testDir = extractResources("/mng-5805-pkg-type-mojo-configuration2");
 
         // First, build the test plugin dependency
         Verifier verifier = newVerifier(testDir.resolve("mng5805-plugin-dep").getAbsolutePath());

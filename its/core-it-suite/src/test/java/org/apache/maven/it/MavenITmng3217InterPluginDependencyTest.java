@@ -39,7 +39,7 @@ public class MavenITmng3217InterPluginDependencyTest extends AbstractMavenIntegr
      */
     @Test
     public void testitMNG3217() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3217");
+        Path testDir = extractResources("/mng-3217");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

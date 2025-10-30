@@ -43,7 +43,7 @@ public class MavenITmng5006VersionRangeDependencyParentResolutionTest extends Ab
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-5006");
+        Path testDir = extractResources("/mng-5006");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

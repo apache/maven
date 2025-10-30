@@ -37,7 +37,7 @@ public class MavenITmng4488ValidateExternalParenPomLenientTest extends AbstractM
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4488");
+        Path testDir = extractResources("/mng-4488");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

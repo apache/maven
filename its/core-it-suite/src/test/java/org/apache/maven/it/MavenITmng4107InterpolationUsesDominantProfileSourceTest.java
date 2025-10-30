@@ -43,7 +43,7 @@ public class MavenITmng4107InterpolationUsesDominantProfileSourceTest extends Ab
      */
     @Test
     public void testitMNG4107() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4107");
+        Path testDir = extractResources("/mng-4107");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

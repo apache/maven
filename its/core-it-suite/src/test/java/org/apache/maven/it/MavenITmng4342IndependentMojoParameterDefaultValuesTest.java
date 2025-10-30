@@ -41,7 +41,7 @@ public class MavenITmng4342IndependentMojoParameterDefaultValuesTest extends Abs
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4342");
+        Path testDir = extractResources("/mng-4342");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

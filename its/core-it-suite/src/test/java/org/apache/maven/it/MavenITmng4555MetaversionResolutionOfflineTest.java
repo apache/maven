@@ -50,7 +50,7 @@ public class MavenITmng4555MetaversionResolutionOfflineTest extends AbstractMave
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4555");
+        Path testDir = extractResources("/mng-4555");
 
         final Deque<String> uris = new ConcurrentLinkedDeque<>();
 

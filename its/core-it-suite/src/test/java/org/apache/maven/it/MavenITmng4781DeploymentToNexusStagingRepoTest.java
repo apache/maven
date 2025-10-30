@@ -111,7 +111,7 @@ public class MavenITmng4781DeploymentToNexusStagingRepoTest extends AbstractMave
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4781");
+        Path testDir = extractResources("/mng-4781");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

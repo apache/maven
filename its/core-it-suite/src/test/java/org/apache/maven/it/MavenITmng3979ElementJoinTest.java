@@ -39,7 +39,7 @@ public class MavenITmng3979ElementJoinTest extends AbstractMavenIntegrationTestC
      */
     @Test
     public void testitMNG3979() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3979");
+        Path testDir = extractResources("/mng-3979");
 
         testDir = testDir.resolve("sub");
 

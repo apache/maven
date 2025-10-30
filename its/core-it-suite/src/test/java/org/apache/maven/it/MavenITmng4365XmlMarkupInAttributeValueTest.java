@@ -37,7 +37,7 @@ public class MavenITmng4365XmlMarkupInAttributeValueTest extends AbstractMavenIn
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4365");
+        Path testDir = extractResources("/mng-4365");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

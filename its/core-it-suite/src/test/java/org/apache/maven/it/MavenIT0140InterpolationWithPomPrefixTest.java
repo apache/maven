@@ -45,7 +45,7 @@ public class MavenIT0140InterpolationWithPomPrefixTest extends AbstractMavenInte
      */
     @Test
     public void testit0140() throws Exception {
-        Path testDir = extractResourcesAsPath("/it0140");
+        Path testDir = extractResources("/it0140");
         File child = testDir.resolve("child");
 
         Verifier verifier = newVerifier(child.getAbsolutePath());

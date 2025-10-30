@@ -39,7 +39,7 @@ public class MavenITmng0449PluginVersionResolutionTest extends AbstractMavenInte
      */
     @Test
     public void testitLifecycleInvocation() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-0449");
+        Path testDir = extractResources("/mng-0449");
         testDir = testDir.resolve("lifecycle");
 
         Verifier verifier = newVerifier(testDir.toString());
@@ -72,7 +72,7 @@ public class MavenITmng0449PluginVersionResolutionTest extends AbstractMavenInte
      */
     @Test
     public void testitCliInvocation() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-0449");
+        Path testDir = extractResources("/mng-0449");
         testDir = testDir.resolve("direct");
 
         Verifier verifier = newVerifier(testDir.toString());

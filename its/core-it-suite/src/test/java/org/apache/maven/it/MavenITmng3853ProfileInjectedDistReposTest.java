@@ -45,7 +45,7 @@ public class MavenITmng3853ProfileInjectedDistReposTest extends AbstractMavenInt
      */
     @Test
     public void testitMNG3853() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3853");
+        Path testDir = extractResources("/mng-3853");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

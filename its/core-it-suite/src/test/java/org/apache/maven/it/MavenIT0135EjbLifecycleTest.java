@@ -37,7 +37,7 @@ public class MavenIT0135EjbLifecycleTest extends AbstractMavenIntegrationTestCas
      */
     @Test
     public void testit0135() throws Exception {
-        Path testDir = extractResourcesAsPath("/it0135");
+        Path testDir = extractResources("/it0135");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.deleteDirectory("target");

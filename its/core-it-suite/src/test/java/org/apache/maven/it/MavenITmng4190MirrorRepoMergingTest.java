@@ -45,7 +45,7 @@ public class MavenITmng4190MirrorRepoMergingTest extends AbstractMavenIntegratio
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4190");
+        Path testDir = extractResources("/mng-4190");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

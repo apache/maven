@@ -42,7 +42,7 @@ public class MavenITmng2892HideCorePlexusUtilsTest extends AbstractMavenIntegrat
      */
     @Test
     public void testitMNG2892() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-2892");
+        Path testDir = extractResources("/mng-2892");
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

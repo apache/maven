@@ -41,7 +41,7 @@ public class MavenITmng4779MultipleDepsWithVersionRangeFromLocalRepoTest extends
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4779");
+        Path testDir = extractResources("/mng-4779");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

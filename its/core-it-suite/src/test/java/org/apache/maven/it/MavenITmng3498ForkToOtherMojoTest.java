@@ -38,7 +38,7 @@ public class MavenITmng3498ForkToOtherMojoTest extends AbstractMavenIntegrationT
     public void testitMNG3498() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        Path testDir = extractResourcesAsPath("/mng-3498");
+        Path testDir = extractResources("/mng-3498");
 
         File pluginDir = testDir.resolve("maven-mng3498-plugin");
         File projectDir = testDir.resolve("mng-3498-project");

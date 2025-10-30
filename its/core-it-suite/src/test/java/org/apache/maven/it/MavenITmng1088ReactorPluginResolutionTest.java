@@ -42,7 +42,7 @@ public class MavenITmng1088ReactorPluginResolutionTest extends AbstractMavenInte
      */
     @Test
     public void testitMNG1088() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-1088");
+        Path testDir = extractResources("/mng-1088");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

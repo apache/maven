@@ -33,7 +33,7 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
 
     @Test
     public void testCoreExtension() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-5771-core-extensions");
+        Path testDir = extractResources("/mng-5771-core-extensions");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.filterFile("settings-template.xml", "settings.xml");
@@ -50,7 +50,7 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
 
     @Test
     public void testCoreExtensionNoDescriptor() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-5771-core-extensions");
+        Path testDir = extractResources("/mng-5771-core-extensions");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.filterFile("settings-template.xml", "settings.xml");
@@ -73,7 +73,7 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
     public void testCoreExtensionRetrievedFromAMirrorWithBasicAuthentication() throws Exception {
         // requiresMavenVersion("[3.3.2,)");
 
-        Path testDir = extractResourcesAsPath("/mng-5771-core-extensions");
+        Path testDir = extractResources("/mng-5771-core-extensions");
 
         HttpServer server = HttpServer.builder() //
                 .port(0) //
@@ -109,7 +109,7 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
     public void testCoreExtensionWithProperties() throws Exception {
         // requiresMavenVersion("[3.8.5,)");
 
-        Path testDir = extractResourcesAsPath("/mng-5771-core-extensions");
+        Path testDir = extractResources("/mng-5771-core-extensions");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.filterFile("settings-template.xml", "settings.xml");
@@ -132,7 +132,7 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
     public void testCoreExtensionWithConfig() throws Exception {
         // requiresMavenVersion("[3.8.5,)");
 
-        Path testDir = extractResourcesAsPath("/mng-5771-core-extensions");
+        Path testDir = extractResources("/mng-5771-core-extensions");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.filterFile("settings-template.xml", "settings.xml");

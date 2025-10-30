@@ -38,7 +38,7 @@ class MavenITmng7836AlternativePomSyntaxTest extends AbstractMavenIntegrationTes
 
     @Test
     void testAlternativeSyntax() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-7836-alternative-pom-syntax");
+        Path testDir = extractResources("/mng-7836-alternative-pom-syntax");
 
         final Verifier pluginVerifier = newVerifier(testDir.resolve("maven-hocon-extension").getPath());
         pluginVerifier.addCliArgument("clean");

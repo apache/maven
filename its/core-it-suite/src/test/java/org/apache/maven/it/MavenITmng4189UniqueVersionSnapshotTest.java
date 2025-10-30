@@ -36,7 +36,7 @@ public class MavenITmng4189UniqueVersionSnapshotTest extends AbstractMavenIntegr
 
     @Test
     public void testit() throws Exception {
-        final Path testDir = extractResourcesAsPath("/mng-4189");
+        final Path testDir = extractResources("/mng-4189");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.deleteArtifacts("org.apache.maven.its.mng4189");

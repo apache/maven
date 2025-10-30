@@ -49,7 +49,7 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
      */
     @Test
     public void testShouldWarnWhenPackagedArtifactIsOutdated() throws Exception {
-        final Path testDir = extractResourcesAsPath("/mng-4660-outdated-packaged-artifact");
+        final Path testDir = extractResources("/mng-4660-outdated-packaged-artifact");
         Files.createDirectories(testDir.toPath().resolve(".mvn"));
 
         // 1. Package the whole project

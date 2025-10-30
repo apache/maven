@@ -39,7 +39,7 @@ public class MavenITmng0496IgnoreUnknownPluginParametersTest extends AbstractMav
      */
     @Test
     public void testitMNG496() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-0496");
+        Path testDir = extractResources("/mng-0496");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

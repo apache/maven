@@ -41,7 +41,7 @@ public class MavenITmng4305LocalRepoBasedirTest extends AbstractMavenIntegration
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4305");
+        Path testDir = extractResources("/mng-4305");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

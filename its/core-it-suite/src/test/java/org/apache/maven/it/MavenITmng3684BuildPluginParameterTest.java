@@ -34,7 +34,7 @@ public class MavenITmng3684BuildPluginParameterTest extends AbstractMavenIntegra
 
     @Test
     public void testitMNG3684() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3684");
+        Path testDir = extractResources("/mng-3684");
         File pluginDir = testDir.resolve("maven-mng3684-plugin");
         File projectDir = testDir.resolve("project");
 

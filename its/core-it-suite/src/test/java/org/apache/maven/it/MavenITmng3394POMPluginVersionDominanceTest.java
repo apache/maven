@@ -40,7 +40,7 @@ public class MavenITmng3394POMPluginVersionDominanceTest extends AbstractMavenIn
     @Test
     public void testitMNG3394a() throws Exception {
         // testShouldUsePluginVersionFromPluginMgmtForLifecycleMojoWhenNotInBuildPlugins
-        Path testDir = extractResourcesAsPath(BASEDIR_PREFIX + "lifecycleMojoVersionInPluginMgmt");
+        Path testDir = extractResources(BASEDIR_PREFIX + "lifecycleMojoVersionInPluginMgmt");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
@@ -55,7 +55,7 @@ public class MavenITmng3394POMPluginVersionDominanceTest extends AbstractMavenIn
     @Test
     public void testitMNG3394b() throws Exception {
         // testShouldPreferPluginVersionFromBuildPluginsOverThatInPluginMgmt
-        Path testDir = extractResourcesAsPath(BASEDIR_PREFIX + "preferBuildPluginOverPluginMgmt");
+        Path testDir = extractResources(BASEDIR_PREFIX + "preferBuildPluginOverPluginMgmt");
 
         Verifier verifier = newVerifier(testDir.toString());
 

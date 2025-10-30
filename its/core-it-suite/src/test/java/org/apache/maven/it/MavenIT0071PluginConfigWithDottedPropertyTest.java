@@ -39,7 +39,7 @@ public class MavenIT0071PluginConfigWithDottedPropertyTest extends AbstractMaven
      */
     @Test
     public void testit0071() throws Exception {
-        Path testDir = extractResourcesAsPath("/it0071");
+        Path testDir = extractResources("/it0071");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

@@ -36,7 +36,7 @@ public class MavenITmng3396DependencyManagementForOverConstrainedRangesTest exte
     @Test
     public void testitMNG3396() throws Exception {
         String baseDir = "/mng-3396";
-        Path testDir = extractResourcesAsPath(baseDir + "/dependencies");
+        Path testDir = extractResources(baseDir + "/dependencies");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.deleteArtifact(GROUP_ID, "A", "1.0", "pom");

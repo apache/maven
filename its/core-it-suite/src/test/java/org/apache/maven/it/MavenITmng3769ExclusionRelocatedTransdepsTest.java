@@ -46,7 +46,7 @@ public class MavenITmng3769ExclusionRelocatedTransdepsTest extends AbstractMaven
      */
     @Test
     public void testitMNG3769() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3769");
+        Path testDir = extractResources("/mng-3769");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

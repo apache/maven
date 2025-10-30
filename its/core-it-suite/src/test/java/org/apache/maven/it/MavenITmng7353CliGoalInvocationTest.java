@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 public class MavenITmng7353CliGoalInvocationTest extends AbstractMavenIntegrationTestCase {
 
     private void run(String id, String goal, String expectedInvocation) throws Exception {
-        Path basedir = extractResourcesAsPath("/mng-7353-cli-goal-invocation");
+        Path basedir = extractResources("/mng-7353-cli-goal-invocation");
         Verifier verifier = newVerifier(basedir.toString());
         verifier.setLogFileName(id + ".txt");
         verifier.addCliArgument(goal);

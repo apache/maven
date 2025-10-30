@@ -40,7 +40,7 @@ public class MavenITmng2140ReactorAwareDepResolutionWhenForkTest extends Abstrac
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-2140");
+        Path testDir = extractResources("/mng-2140");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

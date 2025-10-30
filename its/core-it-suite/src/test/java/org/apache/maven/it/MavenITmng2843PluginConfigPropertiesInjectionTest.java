@@ -41,7 +41,7 @@ public class MavenITmng2843PluginConfigPropertiesInjectionTest extends AbstractM
      */
     @Test
     public void testitMNG2843() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-2843");
+        Path testDir = extractResources("/mng-2843");
 
         // First, build the test plugin
         Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-uses-properties").getAbsolutePath());

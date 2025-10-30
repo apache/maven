@@ -38,7 +38,7 @@ public class MavenIT0041ArtifactTypeFromPluginExtensionTest extends AbstractMave
      */
     @Test
     public void testit0041() throws Exception {
-        Path testDir = extractResourcesAsPath("/it0041");
+        Path testDir = extractResources("/it0041");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

@@ -32,7 +32,7 @@ public class MavenITmng3268MultipleHyphenPCommandLineTest extends AbstractMavenI
 
     @Test
     public void testMultipleProfileParams() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3268");
+        Path testDir = extractResources("/mng-3268");
 
         Verifier verifier;
 

@@ -42,7 +42,7 @@ public class MavenITmng4016PrefixedPropertyInterpolationTest extends AbstractMav
      */
     @Test
     public void testitMNG4016() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4016");
+        Path testDir = extractResources("/mng-4016");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

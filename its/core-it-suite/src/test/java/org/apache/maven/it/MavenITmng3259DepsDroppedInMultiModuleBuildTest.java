@@ -37,7 +37,7 @@ public class MavenITmng3259DepsDroppedInMultiModuleBuildTest extends AbstractMav
 
     @Test
     public void testitMNG3259() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3259");
+        Path testDir = extractResources("/mng-3259");
 
         Verifier verifier;
 

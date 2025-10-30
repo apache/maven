@@ -43,7 +43,7 @@ public class MavenITmng4196ExclusionOnPluginDepTest extends AbstractMavenIntegra
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4196");
+        Path testDir = extractResources("/mng-4196");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

@@ -40,7 +40,7 @@ public class MavenITmng6759TransitiveDependencyRepositoriesTest extends Abstract
     @Test
     public void testTransitiveDependenciesAccountForRepositoriesListedByDependencyTrailPredecessor() throws Exception {
         installDependencyCInCustomRepo();
-        Path testDir = extractResourcesAsPath(projectBaseDir);
+        Path testDir = extractResources(projectBaseDir);
 
         // First, build the test plugin
         Verifier verifier =
@@ -60,7 +60,7 @@ public class MavenITmng6759TransitiveDependencyRepositoriesTest extends Abstract
     }
 
     private void installDependencyCInCustomRepo() throws Exception {
-        Path dependencyCProjectDir = extractResourcesAsPath(projectBaseDir + "/dependency-in-custom-repo");
+        Path dependencyCProjectDir = extractResources(projectBaseDir + "/dependency-in-custom-repo");
         URI customRepoUri = new File(dependencyCProjectDir.resolve("target"), "repo").toURI();
         Verifier verifier = newVerifier(dependencyCProjectDir.toString());
 

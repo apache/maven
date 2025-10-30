@@ -44,7 +44,7 @@ public class MavenITmng5222MojoDeprecatedTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testEmptyConfiguration() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-5222-mojo-deprecated-params");
+        Path testDir = extractResources("/mng-5222-mojo-deprecated-params");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
@@ -90,7 +90,7 @@ public class MavenITmng5222MojoDeprecatedTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testDeprecatedProperty() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-5222-mojo-deprecated-params");
+        Path testDir = extractResources("/mng-5222-mojo-deprecated-params");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.addCliArgument("-Dconfig.deprecatedParam2=deprecatedValueInProps");
@@ -163,7 +163,7 @@ public class MavenITmng5222MojoDeprecatedTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testDeprecatedConfig() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-5222-mojo-deprecated-params");
+        Path testDir = extractResources("/mng-5222-mojo-deprecated-params");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.addCliArgument("-Pconfig-values");

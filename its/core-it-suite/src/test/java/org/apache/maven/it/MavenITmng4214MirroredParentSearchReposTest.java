@@ -39,7 +39,7 @@ public class MavenITmng4214MirroredParentSearchReposTest extends AbstractMavenIn
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4214");
+        Path testDir = extractResources("/mng-4214");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

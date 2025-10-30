@@ -38,7 +38,7 @@ public class MavenITmng4091BadPluginDescriptorTest extends AbstractMavenIntegrat
 
     @Test
     public void testitMNG4091InvalidDescriptor() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4091/invalid");
+        Path testDir = extractResources("/mng-4091/invalid");
 
         // First, build the test plugin
         Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-invalid-descriptor").getAbsolutePath());
@@ -72,7 +72,7 @@ public class MavenITmng4091BadPluginDescriptorTest extends AbstractMavenIntegrat
 
     @Test
     public void testitMNG4091PluginDependency() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-4091/plugin-dependency");
+        Path testDir = extractResources("/mng-4091/plugin-dependency");
 
         // First, build the test plugin
         Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-plugin-dependency").getAbsolutePath());

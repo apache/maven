@@ -33,8 +33,8 @@ public class MavenITmng7310LifecycleActivatedInSpecifiedModuleTest extends Abstr
     public static final String BASE_TEST_DIR = "/mng-7310-lifecycle-activated-in-specified-module";
 
     public void testItShouldNotLoadAnExtensionInASiblingSubmodule() throws Exception {
-        Path extensionTestDir = extractResourcesAsPath(BASE_TEST_DIR + "/extension");
-        Path projectTestDir = extractResourcesAsPath(BASE_TEST_DIR + "/project");
+        Path extensionTestDir = extractResources(BASE_TEST_DIR + "/extension");
+        Path projectTestDir = extractResources(BASE_TEST_DIR + "/project");
 
         Verifier verifier = newVerifier(extensionTestDir.toString());
         verifier.addCliArgument("install");

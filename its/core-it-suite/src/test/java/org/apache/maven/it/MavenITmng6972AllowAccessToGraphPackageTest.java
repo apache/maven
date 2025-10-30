@@ -32,7 +32,7 @@ public class MavenITmng6972AllowAccessToGraphPackageTest extends AbstractMavenIn
     public void testit() throws Exception {
 
         // The testdir is computed from the location of this file.
-        final Path testDir = extractResourcesAsPath("/mng-6972-allow-access-to-graph-package");
+        final Path testDir = extractResources("/mng-6972-allow-access-to-graph-package");
 
         Verifier verifier;
 

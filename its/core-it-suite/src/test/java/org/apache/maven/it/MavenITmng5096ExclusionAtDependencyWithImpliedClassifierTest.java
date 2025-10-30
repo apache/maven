@@ -43,7 +43,7 @@ public class MavenITmng5096ExclusionAtDependencyWithImpliedClassifierTest extend
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-5096");
+        Path testDir = extractResources("/mng-5096");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

@@ -987,12 +987,12 @@ public class Verifier {
         }
     }
 
-    public File filterFile(String srcPath, String dstPath) throws IOException {
-        return filterFile(basedir.resolve(srcPath), basedir.resolve(dstPath), null, newDefaultFilterMap()).toFile();
+    public Path filterFile(String srcPath, String dstPath) throws IOException {
+        return filterFile(basedir.resolve(srcPath), basedir.resolve(dstPath), null, newDefaultFilterMap());
     }
 
-    public File filterFile(String srcPath, String dstPath, Map<String, String> filterMap) throws IOException {
-        return filterFile(basedir.resolve(srcPath), basedir.resolve(dstPath), null, filterMap).toFile();
+    public Path filterFile(String srcPath, String dstPath, Map<String, String> filterMap) throws IOException {
+        return filterFile(basedir.resolve(srcPath), basedir.resolve(dstPath), null, filterMap);
     }
 
     /**
@@ -1013,8 +1013,8 @@ public class Verifier {
      * @throws IOException If the file could not be filtered.
      * @since 2.0
      */
-    public File filterFile(String srcPath, String dstPath, String fileEncoding) throws IOException {
-        return filterFile(basedir.resolve(srcPath), basedir.resolve(dstPath), fileEncoding, newDefaultFilterMap()).toFile();
+    public Path filterFile(String srcPath, String dstPath, String fileEncoding) throws IOException {
+        return filterFile(basedir.resolve(srcPath), basedir.resolve(dstPath), fileEncoding, newDefaultFilterMap());
     }
 
     /**
@@ -1031,9 +1031,9 @@ public class Verifier {
      * @throws IOException If the file could not be filtered.
      * @since 1.2
      */
-    public File filterFile(String srcPath, String dstPath, String fileEncoding, Map<String, String> filterMap)
+    public Path filterFile(String srcPath, String dstPath, String fileEncoding, Map<String, String> filterMap)
             throws IOException {
-        return filterFile(basedir.resolve(srcPath), basedir.resolve(dstPath), fileEncoding, filterMap).toFile();
+        return filterFile(basedir.resolve(srcPath), basedir.resolve(dstPath), fileEncoding, filterMap);
     }
 
     /**

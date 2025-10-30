@@ -40,7 +40,7 @@ public class MavenITmng3951AbsolutePathsTest extends AbstractMavenIntegrationTes
      */
     @Test
     public void testitMNG3951() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3951");
+        Path testDir = extractResources("/mng-3951");
 
         Verifier verifier = newVerifier(testDir.toString());
 

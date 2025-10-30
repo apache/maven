@@ -40,7 +40,7 @@ public class MavenITmng2276ProfileActivationBySettingsPropertyTest extends Abstr
      */
     @Test
     public void testitActivation() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-2276");
+        Path testDir = extractResources("/mng-2276");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);
@@ -64,7 +64,7 @@ public class MavenITmng2276ProfileActivationBySettingsPropertyTest extends Abstr
      */
     @Test
     public void testitCliWins() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-2276");
+        Path testDir = extractResources("/mng-2276");
 
         Verifier verifier = newVerifier(testDir.toString());
         verifier.setAutoclean(false);

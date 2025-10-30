@@ -38,7 +38,7 @@ public class MavenITmng0294MergeGlobalAndUserSettingsTest extends AbstractMavenI
      */
     @Test
     public void testitMNG294() throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-0294");
+        Path testDir = extractResources("/mng-0294");
 
         Verifier verifier = new Verifier(testDir.toString());
         verifier.setAutoclean(false);

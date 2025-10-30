@@ -58,7 +58,7 @@ public class MavenITmng3925MergedPluginExecutionOrderTest extends AbstractMavenI
     }
 
     private void testitMNG3925(String project) throws Exception {
-        Path testDir = extractResourcesAsPath("/mng-3925");
+        Path testDir = extractResources("/mng-3925");
 
         Verifier verifier = newVerifier(new File(testDir.resolve(project), "sub").getAbsolutePath());
         verifier.setAutoclean(false);
