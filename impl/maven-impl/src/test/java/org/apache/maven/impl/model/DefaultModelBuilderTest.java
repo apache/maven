@@ -114,14 +114,12 @@ class DefaultModelBuilderTest {
 
         // after merge
         repositories = (List<RemoteRepository>) repositoriesField.get(state);
-        assertEquals(4, repositories.size());
+        assertEquals(3, repositories.size());
         assertEquals("first", repositories.get(0).getId());
         assertEquals("https://some.repo", repositories.get(0).getUrl()); // interpolated (user properties)
-        assertEquals("second", repositories.get(1).getId());
-        assertEquals("${secondParentRepo}", repositories.get(1).getUrl()); // un-interpolated (no source)
-        assertEquals("third", repositories.get(2).getId());
-        assertEquals("https://third.repo", repositories.get(2).getUrl()); // interpolated (own model properties)
-        assertEquals("central", repositories.get(3).getId()); // default
+        assertEquals("third", repositories.get(1).getId());
+        assertEquals("https://third.repo", repositories.get(1).getUrl()); // interpolated (own model properties)
+        assertEquals("central", repositories.get(2).getId()); // default
     }
 
     @Test
