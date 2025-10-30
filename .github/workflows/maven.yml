@@ -112,6 +112,14 @@ jobs:
             **/target/surefire-reports/*
             **/target/java_heapdump.hprof
 
+      - name: Upload Mimir logs
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ${{ github.run_number }}-initial-mimir-logs
+          include-hidden-files: true
+          path: |
+            ~/.mimir/*.log
+
   full-build:
     needs: initial-build
     runs-on: ${{ matrix.os }}
@@ -215,6 +223,14 @@ jobs:
             **/target/surefire-reports/*
             **/target/java_heapdump.hprof
 
+      - name: Upload Mimir logs
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ${{ github.run_number }}-full-build-mimir-logs
+          include-hidden-files: true
+          path: |
+            ~/.mimir/*.log
+
   integration-tests:
     needs: initial-build
     runs-on: ${{ matrix.os }}
@@ -303,6 +319,14 @@ jobs:
             **/target/failsafe-reports/*
             ./its/core-it-suite/target/test-classes/**
             **/target/java_heapdump.hprof
+
+      - name: Upload Mimir logs
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ${{ github.run_number }}-integration-test-mimir-logs
+          include-hidden-files: true
+          path: |
+            ~/.mimir/*.log
 
   consolidate-caches:
     runs-on: ubuntu-latest
