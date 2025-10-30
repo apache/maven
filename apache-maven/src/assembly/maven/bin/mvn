@@ -168,21 +168,19 @@ find_file_argument_basedir() {
 # concatenates all lines of a file and replaces variables
 concat_lines() {
   if [ -f "$1" ]; then
-    # First convert all CR to LF using tr
+    # Read file line by line, remove comments and empty lines, then perform variable substitution
+    # This preserves quoted arguments and doesn't split on whitespace within quotes
     tr '\r' '\n' < "$1" | \
     sed -e '/^$/d' -e 's/#.*$//' | \
-    # Replace LF with NUL for xargs
-    tr '\n' '\0' | \
-    # Split into words and process each argument
-    # Use -0 with NUL to avoid special behaviour on quotes
-    xargs -n 1 -0 | \
-    while read -r arg; do
-      # Replace variables first
-      arg=$(echo "$arg" | sed \
-        -e "s@\${MAVEN_PROJECTBASEDIR}@$MAVEN_PROJECTBASEDIR@g" \
-        -e "s@\$MAVEN_PROJECTBASEDIR@$MAVEN_PROJECTBASEDIR@g")
-
-      echo "$arg"
+    while IFS= read -r line; do
+      # Skip empty lines after comment removal
+      if [ -n "$line" ]; then
+        # Replace variables
+        line=$(echo "$line" | sed \
+          -e "s@\${MAVEN_PROJECTBASEDIR}@$MAVEN_PROJECTBASEDIR@g" \
+          -e "s@\$MAVEN_PROJECTBASEDIR@$MAVEN_PROJECTBASEDIR@g")
+        echo "$line"
+      fi
     done | \
     tr '\n' ' '
   fi
