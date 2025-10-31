@@ -46,7 +46,7 @@ class MavenITmng8523ModelPropertiesTest extends AbstractMavenIntegrationTestCase
                 extractResources("/mng-8523-model-properties").getAbsoluteFile().toPath();
 
         Verifier verifier = newVerifier(basedir.toString());
-        verifier.addCliArguments("install", "-DmavenVersion=4.0.0-rc-2");
+        verifier.addCliArguments("install", "-DmavenVersion=4.0.0-rc-2", "-Dmaven.consumer.pom.flatten=true");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
