@@ -32,9 +32,6 @@ public class MavenITMissingNamespaceTest extends AbstractMavenIntegrationTestCas
      */
     @Test
     public void testMissingNamespace() throws Exception {
-
-        boolean supportSpaceInXml = matchesVersionRange("[3.1.0,)");
-
         File testDir = extractResources("/missing-namespace");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
