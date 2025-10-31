@@ -64,7 +64,7 @@ public class MavenITmng6656BuildConsumer extends AbstractMavenIntegrationTestCas
         verifier.setAutoclean(false);
         verifier.addCliArgument("-Dchangelist=MNG6656");
 
-        verifier.addCliArgument("install");
+        verifier.addCliArguments("install", "-Dmaven.consumer.pom.flatten=true");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 

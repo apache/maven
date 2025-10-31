@@ -44,6 +44,7 @@ class MavenITgh11162ConsumerPomScopesTest extends AbstractMavenIntegrationTestCa
 
         Verifier verifier = newVerifier(basedir.toString());
         verifier.addCliArgument("install");
+        verifier.addCliArgument("-Dmaven.consumer.pom.flatten=true");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 

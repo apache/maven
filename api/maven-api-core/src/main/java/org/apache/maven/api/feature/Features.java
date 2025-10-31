@@ -48,6 +48,13 @@ public final class Features {
     }
 
     /**
+     * Check if consumer POM flattening is enabled.
+     */
+    public static boolean consumerPomFlatten(@Nullable Map<String, ?> userProperties) {
+        return doGet(userProperties, Constants.MAVEN_CONSUMER_POM_FLATTEN, false);
+    }
+
+    /**
      * Check if build POM deployment is enabled.
      */
     public static boolean deployBuildPom(@Nullable Map<String, ?> userProperties) {

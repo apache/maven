@@ -62,7 +62,7 @@ public class MavenITmng6957BuildConsumer extends AbstractMavenIntegrationTestCas
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
-        verifier.addCliArgument("-Dchangelist=MNG6957");
+        verifier.addCliArguments("-Dchangelist=MNG6957", "-Dmaven.consumer.pom.flatten=true");
 
         verifier.addCliArgument("install");
         verifier.execute();
