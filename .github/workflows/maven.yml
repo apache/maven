@@ -92,7 +92,7 @@ jobs:
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
         if: ${{ !cancelled() && !failure() }}
         with:
-          name: cache-initial-build
+          name: cache-initial-${{ runner.os }}
           retention-days: 1
           path: ${{ env.MIMIR_LOCAL }}
 
@@ -351,7 +351,7 @@ jobs:
         uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v4
         with:
           merge-multiple: true
-          pattern: 'cache-*-${{ runner.os }}-*'
+          pattern: 'cache-*-${{ runner.os }}*'
           path: ${{ env.MIMIR_LOCAL }}
       - name: Publish cache
         uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
