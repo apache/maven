@@ -29,12 +29,14 @@ import org.junit.jupiter.api.Test;
  * implementations. Specifically tests the case where a plugin needs to inject ToolchainFactory
  * with a named qualifier.
  *
+ * This IT manually manages {@code .mvn} directories, so instructs Verifier to NOT create any.
+ *
  * @see <a href="https://github.com/apache/maven-toolchains-plugin/issues/128">maven-toolchains-plugin#128</a>
  */
 public class MavenITgh11314PluginInjectionTest extends AbstractMavenIntegrationTestCase {
 
     MavenITgh11314PluginInjectionTest() {
-        super("[4.0.0,)");
+        super("(3.0,)");
     }
 
     /**
@@ -48,6 +50,13 @@ public class MavenITgh11314PluginInjectionTest extends AbstractMavenIntegrationT
     @Test
     public void testV3MojoWithMavenContainerInjection() throws Exception {
         File testDir = extractResources("/gh-11314-v3-mojo-injection");
+
+        // Before, build and install the parent POM
+        Verifier parentVerifier = newVerifier(testDir.getAbsolutePath(), false);
+        parentVerifier.addCliArgument("-N");
+        parentVerifier.addCliArgument("install");
+        parentVerifier.execute();
+        parentVerifier.verifyErrorFreeLog();
 
         // First, build and install the test plugin
         File pluginDir = new File(testDir, "plugin");
