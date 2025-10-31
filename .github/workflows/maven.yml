@@ -312,7 +312,7 @@ jobs:
         with:
           name: cache-integration-tests-${{ runner.os }}-${{ matrix.java }}
           retention-days: 1
-          path: ./${{ env.MIMIR_LOCAL }}/
+          path: ${{ env.MIMIR_LOCAL }}
 
       - name: Upload test artifacts
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
