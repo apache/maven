@@ -29,6 +29,7 @@ import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -52,11 +53,11 @@ import org.codehaus.plexus.util.dag.CycleDetectedException;
 public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentTestCase {
     private static final String FS = File.separator;
 
-    private RepositorySystem factory;
+    private MavenRepositorySystem factory;
 
     public void setUp() throws Exception {
         super.setUp();
-        factory = lookup(RepositorySystem.class);
+        factory = lookup(MavenRepositorySystem.class);
     }
 
     @Override
@@ -388,7 +389,7 @@ public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenCom
 
     private ExpressionEvaluator createExpressionEvaluator(
             MavenProject project, PluginDescriptor pluginDescriptor, Properties executionProperties) throws Exception {
-        ArtifactRepository repo = factory.createDefaultLocalRepository();
+        ArtifactRepository repo = factory.createLocalRepository(null, RepositorySystem.defaultUserLocalRepository);
 
         MutablePlexusContainer container = (MutablePlexusContainer) getContainer();
         MavenSession session = createSession(container, repo, executionProperties);
