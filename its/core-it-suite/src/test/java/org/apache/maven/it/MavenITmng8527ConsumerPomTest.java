@@ -47,7 +47,7 @@ class MavenITmng8527ConsumerPomTest extends AbstractMavenIntegrationTestCase {
                 extractResources("/mng-8527-consumer-pom").getAbsoluteFile().toPath();
 
         Verifier verifier = newVerifier(basedir.toString());
-        verifier.addCliArgument("install");
+        verifier.addCliArguments("install", "-Dmaven.consumer.pom.flatten=true");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 

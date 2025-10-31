@@ -48,7 +48,7 @@ class MavenITmng8414ConsumerPomWithNewFeaturesTest extends AbstractMavenIntegrat
                 extractResources("/mng-8414-consumer-pom-with-new-features").toPath();
 
         Verifier verifier = newVerifier(basedir.toString(), null);
-        verifier.addCliArguments("package");
+        verifier.addCliArguments("package", "-Dmaven.consumer.pom.flatten=true");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
@@ -80,7 +80,7 @@ class MavenITmng8414ConsumerPomWithNewFeaturesTest extends AbstractMavenIntegrat
 
         Verifier verifier = newVerifier(basedir.toString(), null);
         verifier.setLogFileName("log-preserving.txt");
-        verifier.addCliArguments("-f", "pom-preserving.xml", "package");
+        verifier.addCliArguments("-f", "pom-preserving.xml", "package", "-Dmaven.consumer.pom.flatten=true");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 

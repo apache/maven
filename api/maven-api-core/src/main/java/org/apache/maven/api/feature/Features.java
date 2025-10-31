@@ -48,6 +48,13 @@ public final class Features {
         return doGet(userProperties, Constants.MAVEN_CONSUMER_POM, !mavenMaven3Personality(userProperties));
     }
 
+    /**
+     * Check if consumer POM flattening is enabled.
+     */
+    public static boolean consumerPomFlatten(@Nullable Map<String, ?> userProperties) {
+        return doGet(userProperties, Constants.MAVEN_CONSUMER_POM_FLATTEN, false);
+    }
+
     private static boolean doGet(Properties userProperties, String key, boolean def) {
         return doGet(userProperties != null ? userProperties.get(key) : null, def);
     }
