@@ -199,6 +199,9 @@ for /F "usebackq tokens=* delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.conf
         set "trimmed=!trimmed:${MAVEN_PROJECTBASEDIR}=%MAVEN_PROJECTBASEDIR%!"
         set "trimmed=!trimmed:$MAVEN_PROJECTBASEDIR=%MAVEN_PROJECTBASEDIR%!"
 
+        rem Escape pipe symbols that are not within quotes to prevent command separation
+        call :escapePipes "!trimmed!" trimmed
+
         if not "!trimmed!"=="" (
             if "!JVM_CONFIG_MAVEN_OPTS!"=="" (
                 set "JVM_CONFIG_MAVEN_OPTS=!trimmed!"
@@ -287,3 +290,39 @@ if exist "%USERPROFILE%\mavenrc_post.cmd" call "%USERPROFILE%\mavenrc_post.cmd"
 if "%MAVEN_BATCH_PAUSE%"=="on" pause
 
 exit /b %ERROR_CODE%
+
+rem Subroutine to escape pipe symbols that are not within quotes
+:escapePipes
+setlocal EnableDelayedExpansion
+set "input=%~1"
+set "output="
+set "inQuotes=0"
+set "i=0"
+
+:escapeLoop
+set "char=!input:~%i%,1!"
+if "!char!"=="" goto escapeEnd
+
+if "!char!"=="^"" (
+    if "!inQuotes!"=="0" (
+        set "inQuotes=1"
+    ) else (
+        set "inQuotes=0"
+    )
+    set "output=!output!!char!"
+) else if "!char!"=="|" (
+    if "!inQuotes!"=="0" (
+        set "output=!output!^^^|"
+    ) else (
+        set "output=!output!!char!"
+    )
+) else (
+    set "output=!output!!char!"
+)
+
+set /a "i+=1"
+goto escapeLoop
+
+:escapeEnd
+endlocal & set "%~2=%output%"
+goto :eof
