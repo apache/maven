@@ -48,7 +48,7 @@ public class MavenITgh11314PluginInjectionTest extends AbstractMavenIntegrationT
         File testDir = extractResources("/gh-11314-v3-mojo-injection");
 
         // Before, build and install the parent POM
-        Verifier parentVerifier = newVerifier(testDir.getAbsolutePath());
+        Verifier parentVerifier = newVerifier(testDir.getAbsolutePath(), false);
         parentVerifier.addCliArgument("-N");
         parentVerifier.addCliArgument("install");
         parentVerifier.execute();
