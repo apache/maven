@@ -48,7 +48,7 @@ public class MavenITmng5102MixinsTest extends AbstractMavenIntegrationTestCase {
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng5102");
-        verifier.addCliArgument("install");
+        verifier.addCliArguments("install", "-Dmaven.consumer.pom.flatten=true");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 

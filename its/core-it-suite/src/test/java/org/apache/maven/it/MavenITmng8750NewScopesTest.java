@@ -50,6 +50,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
         File depsDir = new File(testDir, "deps");
         Verifier deps = newVerifier(depsDir.getAbsolutePath(), false);
         deps.addCliArgument("install");
+        deps.addCliArgument("-Dmaven.consumer.pom.flatten=true");
         deps.execute();
         deps.verifyErrorFreeLog();
     }
@@ -71,6 +72,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
         Verifier verifier = newVerifier(projectDir.getAbsolutePath(), false);
         verifier.addCliArgument("clean");
         verifier.addCliArgument("test");
+        verifier.addCliArgument("-Dmaven.consumer.pom.flatten=true");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
@@ -102,6 +104,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
         Verifier verifier = newVerifier(projectDir.getAbsolutePath(), false);
         verifier.addCliArgument("clean");
         verifier.addCliArgument("test");
+        verifier.addCliArgument("-Dmaven.consumer.pom.flatten=true");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
@@ -133,6 +136,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
         Verifier verifier = newVerifier(projectDir.getAbsolutePath(), false);
         verifier.addCliArgument("clean");
         verifier.addCliArgument("test");
+        verifier.addCliArgument("-Dmaven.consumer.pom.flatten=true");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
@@ -161,6 +165,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
         Verifier verifier = newVerifier(projectDir.getAbsolutePath(), false);
         verifier.addCliArgument("clean");
         verifier.addCliArgument("test");
+        verifier.addCliArgument("-Dmaven.consumer.pom.flatten=true");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
@@ -193,6 +198,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
         Verifier verifier = newVerifier(projectDir.getAbsolutePath(), false);
         verifier.addCliArgument("clean");
         verifier.addCliArgument("validate");
+        verifier.addCliArgument("-Dmaven.consumer.pom.flatten=true");
 
         assertThrows(
                 VerificationException.class,
@@ -218,6 +224,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
         Verifier verifier = newVerifier(projectDir.getAbsolutePath(), false);
         verifier.addCliArgument("clean");
         verifier.addCliArgument("validate");
+        verifier.addCliArgument("-Dmaven.consumer.pom.flatten=true");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 

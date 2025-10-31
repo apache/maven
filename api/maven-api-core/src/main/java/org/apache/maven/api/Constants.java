@@ -464,6 +464,18 @@ public final class Constants {
     public static final String MAVEN_CONSUMER_POM = "maven.consumer.pom";
 
     /**
+     * User property for controlling consumer POM flattening behavior.
+     * When set to <code>true</code> (default), consumer POMs are flattened by removing
+     * dependency management and keeping only direct dependencies with transitive scopes.
+     * When set to <code>false</code>, consumer POMs preserve dependency management
+     * like parent POMs, allowing dependency management to be inherited by consumers.
+     *
+     * @since 4.1.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "false")
+    public static final String MAVEN_CONSUMER_POM_FLATTEN = "maven.consumer.pom.flatten";
+
+    /**
      * User property for controlling "maven personality". If activated Maven will behave
      * like the previous major version, Maven 3.
      *
