@@ -181,10 +181,29 @@ concat_lines() {
         line=$(echo "$line" | sed \
           -e "s@\${MAVEN_PROJECTBASEDIR}@$MAVEN_PROJECTBASEDIR@g" \
           -e "s@\$MAVEN_PROJECTBASEDIR@$MAVEN_PROJECTBASEDIR@g")
+        # Escape pipe symbols that are not within quotes to prevent shell interpretation
+        processed_line=$(printf '%s' "$line" | awk '
+        {
+          result = ""
+          in_quotes = 0
+          for (i = 1; i <= length($0); i++) {
+            char = substr($0, i, 1)
+            if (char == "\"") {
+              in_quotes = !in_quotes
+              result = result char
+            } else if (char == "|" && !in_quotes) {
+              result = result "\\|"
+            } else {
+              result = result char
+            }
+          }
+          print result
+        }')
+
         if [ -z "$_result" ]; then
-          _result="$line"
+          _result="$processed_line"
         else
-          _result="$_result $line"
+          _result="$_result $processed_line"
         fi
       fi
     done < "$_temp_file"
@@ -198,7 +217,15 @@ concat_lines() {
 }
 
 MAVEN_PROJECTBASEDIR="`find_maven_basedir "$@"`"
-MAVEN_OPTS="$MAVEN_OPTS `concat_lines "$MAVEN_PROJECTBASEDIR/.mvn/jvm.config"`"
+# Read JVM config and append to MAVEN_OPTS, preserving special characters
+_jvm_config="`concat_lines "$MAVEN_PROJECTBASEDIR/.mvn/jvm.config"`"
+if [ -n "$_jvm_config" ]; then
+  if [ -n "$MAVEN_OPTS" ]; then
+    MAVEN_OPTS="$MAVEN_OPTS $_jvm_config"
+  else
+    MAVEN_OPTS="$_jvm_config"
+  fi
+fi
 LAUNCHER_JAR=`echo "$MAVEN_HOME"/boot/plexus-classworlds-*.jar`
 LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
 
@@ -245,28 +272,43 @@ handle_args() {
   done
 }
 
+
+
 handle_args "$@"
 MAVEN_MAIN_CLASS=${MAVEN_MAIN_CLASS:=org.apache.maven.cling.MavenCling}
 
-cmd="\"$JAVACMD\" \
-  $MAVEN_OPTS \
-  $MAVEN_DEBUG_OPTS \
-  --enable-native-access=ALL-UNNAMED \
-  -classpath \"$LAUNCHER_JAR\" \
-  \"-Dclassworlds.conf=$CLASSWORLDS_CONF\" \
-  \"-Dmaven.home=$MAVEN_HOME\" \
-  \"-Dmaven.mainClass=$MAVEN_MAIN_CLASS\" \
-  \"-Dlibrary.jline.path=${MAVEN_HOME}/lib/jline-native\" \
-  \"-Dmaven.multiModuleProjectDirectory=$MAVEN_PROJECTBASEDIR\" \
-  $LAUNCHER_CLASS \
-  $MAVEN_ARGS"
-# Add remaining arguments with proper quoting
+# Build the command with proper quoting for pipe symbols
+cmd="exec \"$JAVACMD\""
+
+# Add MAVEN_OPTS if present
+if [ -n "$MAVEN_OPTS" ]; then
+  cmd="$cmd $MAVEN_OPTS"
+fi
+
+# Add MAVEN_DEBUG_OPTS if present
+if [ -n "$MAVEN_DEBUG_OPTS" ]; then
+  cmd="$cmd $MAVEN_DEBUG_OPTS"
+fi
+
+# Add fixed arguments
+cmd="$cmd --enable-native-access=ALL-UNNAMED"
+cmd="$cmd -classpath \"$LAUNCHER_JAR\""
+cmd="$cmd \"-Dclassworlds.conf=$CLASSWORLDS_CONF\""
+cmd="$cmd \"-Dmaven.home=$MAVEN_HOME\""
+cmd="$cmd \"-Dmaven.mainClass=$MAVEN_MAIN_CLASS\""
+cmd="$cmd \"-Dlibrary.jline.path=${MAVEN_HOME}/lib/jline-native\""
+cmd="$cmd \"-Dmaven.multiModuleProjectDirectory=$MAVEN_PROJECTBASEDIR\""
+cmd="$cmd $LAUNCHER_CLASS"
+
+# Add MAVEN_ARGS if present
+if [ -n "$MAVEN_ARGS" ]; then
+  cmd="$cmd $MAVEN_ARGS"
+fi
+
+# Add remaining command line arguments
 for arg in "$@"; do
-    cmd="$cmd \"$arg\""
+  cmd="$cmd \"$arg\""
 done
 
-# Debug: print the command that will be executed
-#echo "About to execute:"
-#echo "$cmd"
-
-eval exec "$cmd"
+# Execute the command using eval to properly handle quoted arguments
+eval "$cmd"

@@ -26,17 +26,17 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-11363">MNG-11363</a>:
+ * This is a test set for <a href="https://github.com/apache/maven/issues/11363">gh-11363</a>:
  * Verify that pipe symbols in .mvn/jvm.config are properly handled and don't cause shell command parsing errors.
  */
-public class MavenITmng11363PipeSymbolsInJvmConfigTest extends AbstractMavenIntegrationTestCase {
+public class MavenITgh11363PipeSymbolsInJvmConfigTest extends AbstractMavenIntegrationTestCase {
 
     /**
      * Verify that pipe symbols in .mvn/jvm.config are properly handled
      */
     @Test
     void testPipeSymbolsInJvmConfig() throws Exception {
-        Path basedir = extractResources("/mng-11363-pipe-symbols-jvm-config")
+        Path basedir = extractResources("/gh-11363-pipe-symbols-jvm-config")
                 .getAbsoluteFile()
                 .toPath();
 
