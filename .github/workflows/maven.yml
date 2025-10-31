@@ -342,7 +342,6 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        java: ['21']
     needs:
       - full-build
       - integration-tests
