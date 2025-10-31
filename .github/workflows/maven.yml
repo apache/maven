@@ -59,7 +59,7 @@ jobs:
           cp .github/ci-mimir-session.properties ${{ env.MIMIR_BASEDIR }}/session.properties
           cp .github/ci-mimir-daemon.properties ${{ env.MIMIR_BASEDIR }}/daemon.properties
           cp .github/ci-extensions.xml .mvn/extensions.xml
-          echo mimir.file.basedir=$GITHUB_WORKSPACE/${{ env.MIMIR_LOCAL }} >> ${{ env.MIMIR_BASEDIR }}/daemon.properties
+          echo "mimir.file.basedir=$PWD/${{ env.MIMIR_LOCAL }}" >> ${{ env.MIMIR_BASEDIR }}/daemon.properties
 
       - name: Restore Mimir caches
         uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
@@ -110,7 +110,7 @@ jobs:
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
         if: ${{ failure() || cancelled() }}
         with:
-          name: ${{ github.run_number }}-initial
+          name: initial-logs
           retention-days: 1
           path: |
             **/target/surefire-reports/*
@@ -120,7 +120,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
-          name: ${{ github.run_number }}-initial-mimir-logs
+          name: initial-mimir-logs
           include-hidden-files: true
           retention-days: 1
           path: |
@@ -164,7 +164,7 @@ jobs:
           mkdir -p ${{ env.MIMIR_BASEDIR }}
           cp .github/ci-mimir-session.properties ${{ env.MIMIR_BASEDIR }}/session.properties
           cp .github/ci-mimir-daemon.properties ${{ env.MIMIR_BASEDIR }}/daemon.properties
-          echo mimir.file.basedir=$GITHUB_WORKSPACE/${{ env.MIMIR_LOCAL }} >> ${{ env.MIMIR_BASEDIR }}/daemon.properties
+          echo "mimir.file.basedir=$PWD/${{ env.MIMIR_LOCAL }}" >> ${{ env.MIMIR_BASEDIR }}/daemon.properties
           mkdir -p ~/.m2
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
 
@@ -225,7 +225,7 @@ jobs:
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
         if: failure() || cancelled()
         with:
-          name: ${{ github.run_number }}-full-build-artifact-${{ runner.os }}-${{ matrix.java }}
+          name: full-build-logs-${{ runner.os }}-${{ matrix.java }}
           retention-days: 1
           path: |
             **/target/surefire-reports/*
@@ -235,7 +235,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
-          name: ${{ github.run_number }}-full-build-mimir-logs-${{ runner.os }}-${{ matrix.java }}
+          name: full-build-mimir-logs-${{ runner.os }}-${{ matrix.java }}
           include-hidden-files: true
           retention-days: 1
           path: |
@@ -267,7 +267,7 @@ jobs:
           mkdir -p ${{ env.MIMIR_BASEDIR }}
           cp .github/ci-mimir-session.properties ${{ env.MIMIR_BASEDIR }}/session.properties
           cp .github/ci-mimir-daemon.properties ${{ env.MIMIR_BASEDIR }}/daemon.properties
-          echo mimir.file.basedir=$GITHUB_WORKSPACE/${{ env.MIMIR_LOCAL }} >> ${{ env.MIMIR_BASEDIR }}/daemon.properties
+          echo "mimir.file.basedir=$PWD/${{ env.MIMIR_LOCAL }}" >> ${{ env.MIMIR_BASEDIR }}/daemon.properties
           mkdir -p ~/.m2
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
 
@@ -324,7 +324,7 @@ jobs:
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
         if: ${{ failure() || cancelled() }}
         with:
-          name: ${{ github.run_number }}-integration-test-artifact-${{ runner.os }}-${{ matrix.java }}
+          name: integration-test-logs-${{ runner.os }}-${{ matrix.java }}
           retention-days: 1
           path: |
             **/target/surefire-reports/*
@@ -336,7 +336,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
-          name: ${{ github.run_number }}-integration-test-mimir-logs-${{ runner.os }}-${{ matrix.java }}
+          name: integration-test-mimir-logs-${{ runner.os }}-${{ matrix.java }}
           include-hidden-files: true
           retention-days: 1
           path: |
