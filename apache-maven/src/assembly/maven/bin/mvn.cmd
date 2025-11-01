@@ -291,19 +291,17 @@ if "%MAVEN_BATCH_PAUSE%"=="on" pause
 
 exit /b %ERROR_CODE%
 
-rem Subroutine to quote arguments that contain pipe symbols outside of quotes
+rem Subroutine to escape pipe symbols that are not within quotes
 :escapePipes
 setlocal EnableDelayedExpansion
 set "input=%~1"
 set "output="
 set "inQuotes=0"
-set "hasPipe=0"
 set "i=0"
 
-rem First pass: check if there are unquoted pipes
-:checkLoop
+:escapeLoop
 set "char=!input:~%i%,1!"
-if "!char!"=="" goto checkEnd
+if "!char!"=="" goto escapeEnd
 
 if "!char!"=="^"" (
     if "!inQuotes!"=="0" (
@@ -311,22 +309,21 @@ if "!char!"=="^"" (
     ) else (
         set "inQuotes=0"
     )
+    set "output=!output!!char!"
 ) else if "!char!"=="|" (
     if "!inQuotes!"=="0" (
-        set "hasPipe=1"
+        rem Escape pipe with 7 carets to survive endlocal and command line parsing
+        set "output=!output!^^^^^^^|"
+    ) else (
+        set "output=!output!!char!"
     )
+) else (
+    set "output=!output!!char!"
 )
 
 set /a "i+=1"
-goto checkLoop
+goto escapeLoop
 
-:checkEnd
-rem If there are unquoted pipes, quote the entire argument
-if "!hasPipe!"=="1" (
-    set "output="!input!""
-) else (
-    set "output=!input!"
-)
-
+:escapeEnd
 endlocal & set "%~2=%output%"
 goto :eof
