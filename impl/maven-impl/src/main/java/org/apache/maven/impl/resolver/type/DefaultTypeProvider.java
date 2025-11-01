@@ -18,8 +18,10 @@
  */
 package org.apache.maven.impl.resolver.type;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiFunction;
 
 import org.apache.maven.api.JavaPathType;
 import org.apache.maven.api.Language;
@@ -29,23 +31,33 @@ import org.apache.maven.api.spi.TypeProvider;
 
 @Named
 public class DefaultTypeProvider implements TypeProvider {
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    @Override
-    public Collection<Type> provides() {
-        return (Collection) types();
-    }
+    private final Map<String, DefaultType> providedTypes;
 
-    public Collection<DefaultType> types() {
-        return Arrays.asList(
-                // Maven types
-                new DefaultType(Type.POM, Language.NONE, "pom", null, false),
-                new DefaultType(Type.BOM, Language.NONE, "pom", null, false),
-                new DefaultType(Type.MAVEN_PLUGIN, Language.JAVA_FAMILY, "jar", null, false, JavaPathType.CLASSES),
-                // Java types
+    public DefaultTypeProvider() {
+        HashMap<String, DefaultType> types = new HashMap<>();
+        // Maven types
+        types.put(Type.POM, new DefaultType(Type.POM, Language.NONE, "pom", null, false));
+        types.put(Type.BOM, new DefaultType(Type.BOM, Language.NONE, "pom", null, false));
+        types.put(
+                Type.MAVEN_PLUGIN,
+                new DefaultType(Type.MAVEN_PLUGIN, Language.JAVA_FAMILY, "jar", null, false, JavaPathType.CLASSES));
+        // Java types
+        types.put(
+                Type.JAR,
                 new DefaultType(
-                        Type.JAR, Language.JAVA_FAMILY, "jar", null, false, JavaPathType.CLASSES, JavaPathType.MODULES),
-                new DefaultType(Type.JAVADOC, Language.JAVA_FAMILY, "jar", "javadoc", false, JavaPathType.CLASSES),
-                new DefaultType(Type.JAVA_SOURCE, Language.JAVA_FAMILY, "jar", "sources", false),
+                        Type.JAR,
+                        Language.JAVA_FAMILY,
+                        "jar",
+                        null,
+                        false,
+                        JavaPathType.CLASSES,
+                        JavaPathType.MODULES));
+        types.put(
+                Type.JAVADOC,
+                new DefaultType(Type.JAVADOC, Language.JAVA_FAMILY, "jar", "javadoc", false, JavaPathType.CLASSES));
+        types.put(Type.JAVA_SOURCE, new DefaultType(Type.JAVA_SOURCE, Language.JAVA_FAMILY, "jar", "sources", false));
+        types.put(
+                Type.TEST_JAR,
                 new DefaultType(
                         Type.TEST_JAR,
                         Language.JAVA_FAMILY,
@@ -53,38 +65,90 @@ public class DefaultTypeProvider implements TypeProvider {
                         "tests",
                         false,
                         JavaPathType.CLASSES,
-                        JavaPathType.PATCH_MODULE),
-                new DefaultType(Type.TEST_JAVA_SOURCE, Language.JAVA_FAMILY, "jar", "test-sources", false),
-                new DefaultType(Type.MODULAR_JAR, Language.JAVA_FAMILY, "jar", null, false, JavaPathType.MODULES),
-                new DefaultType(Type.CLASSPATH_JAR, Language.JAVA_FAMILY, "jar", null, false, JavaPathType.CLASSES),
+                        JavaPathType.PATCH_MODULE));
+        types.put(
+                Type.TEST_JAVA_SOURCE,
+                new DefaultType(Type.TEST_JAVA_SOURCE, Language.JAVA_FAMILY, "jar", "test-sources", false));
+        types.put(
+                Type.MODULAR_JAR,
+                new DefaultType(Type.MODULAR_JAR, Language.JAVA_FAMILY, "jar", null, false, JavaPathType.MODULES));
+        types.put(
+                Type.CLASSPATH_JAR,
+                new DefaultType(Type.CLASSPATH_JAR, Language.JAVA_FAMILY, "jar", null, false, JavaPathType.CLASSES));
+        types.put(
+                Type.PROCESSOR,
                 new DefaultType(
                         Type.PROCESSOR,
                         Language.JAVA_FAMILY,
                         "jar",
                         null,
                         false,
+                        true,
+                        deriveMapping(),
                         JavaPathType.PROCESSOR_CLASSES,
-                        JavaPathType.PROCESSOR_MODULES),
+                        JavaPathType.PROCESSOR_MODULES));
+        types.put(
+                Type.CLASSPATH_PROCESSOR,
                 new DefaultType(
                         Type.CLASSPATH_PROCESSOR,
                         Language.JAVA_FAMILY,
                         "jar",
                         null,
                         false,
-                        JavaPathType.PROCESSOR_CLASSES),
+                        true,
+                        deriveMapping(),
+                        JavaPathType.PROCESSOR_CLASSES));
+        types.put(
+                Type.MODULAR_PROCESSOR,
                 new DefaultType(
                         Type.MODULAR_PROCESSOR,
                         Language.JAVA_FAMILY,
                         "jar",
                         null,
                         false,
-                        JavaPathType.PROCESSOR_MODULES),
-                // j2ee types
-                new DefaultType("ejb", Language.JAVA_FAMILY, "jar", null, false, JavaPathType.CLASSES),
-                new DefaultType("ejb-client", Language.JAVA_FAMILY, "jar", "client", false, JavaPathType.CLASSES),
-                new DefaultType("war", Language.JAVA_FAMILY, "war", null, true),
-                new DefaultType("ear", Language.JAVA_FAMILY, "ear", null, true),
-                new DefaultType("rar", Language.JAVA_FAMILY, "rar", null, true),
-                new DefaultType("par", Language.JAVA_FAMILY, "par", null, true));
+                        true,
+                        deriveMapping(),
+                        JavaPathType.PROCESSOR_MODULES));
+        // j2ee types
+        types.put("ejb", new DefaultType("ejb", Language.JAVA_FAMILY, "jar", null, false, JavaPathType.CLASSES));
+        types.put(
+                "ejb-client",
+                new DefaultType("ejb-client", Language.JAVA_FAMILY, "jar", "client", false, JavaPathType.CLASSES));
+        types.put("war", new DefaultType("war", Language.JAVA_FAMILY, "war", null, true));
+        types.put("ear", new DefaultType("ear", Language.JAVA_FAMILY, "ear", null, true));
+        types.put("rar", new DefaultType("rar", Language.JAVA_FAMILY, "rar", null, true));
+        types.put("par", new DefaultType("par", Language.JAVA_FAMILY, "par", null, true));
+
+        this.providedTypes = Map.copyOf(types);
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    @Override
+    public Collection<Type> provides() {
+        return (Collection) types();
+    }
+
+    public Collection<DefaultType> types() {
+        return providedTypes.values();
+    }
+
+    /**
+     * Performs mapping: accepts "starting" type, "current" node  type, and should return mapped type.
+     */
+    @SuppressWarnings("MissingSwitchDefault")
+    private BiFunction<Type, Type, Type> deriveMapping() {
+        // TODO: impl this
+        return (t1, t2) -> {
+            if (t1.needsDerive()) {
+                if (t1.id().equals(Type.PROCESSOR)) {
+                    switch (t2.id()) {
+                        case Type.JAR -> providedTypes.get(Type.PROCESSOR);
+                        case Type.MODULAR_JAR -> providedTypes.get(Type.MODULAR_PROCESSOR);
+                        case Type.CLASSPATH_JAR -> providedTypes.get(Type.CLASSPATH_PROCESSOR);
+                    }
+                }
+            }
+            return t2;
+        };
     }
 }
