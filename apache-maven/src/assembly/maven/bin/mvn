@@ -168,12 +168,13 @@ find_file_argument_basedir() {
 # concatenates all lines of a file and replaces variables
 concat_lines() {
   if [ -f "$1" ]; then
-    # First pass: clean the file (convert CR to LF, remove empty lines and comments)
-    # and perform variable substitution using sed
-    tr '\r' '\n' < "$1" | sed -e '/^$/d' -e 's/#.*$//' | sed \
+    # Convert CR to LF, remove empty lines and comments, perform variable substitution,
+    # and escape pipe symbols for eval
+    tr '\r' '\n' < "$1" | \
+    sed -e '/^$/d' -e 's/#.*$//' | \
+    sed \
       -e "s@\${MAVEN_PROJECTBASEDIR}@$MAVEN_PROJECTBASEDIR@g" \
       -e "s@\$MAVEN_PROJECTBASEDIR@$MAVEN_PROJECTBASEDIR@g" | \
-    # Second pass: escape unquoted pipe symbols using awk
     awk '
     {
       result = ""
@@ -182,17 +183,19 @@ concat_lines() {
         char = substr($0, i, 1)
         if (char == "\"") {
           in_quotes = !in_quotes
+          result = result char
         } else if (char == "|" && !in_quotes) {
-          char = "\\|"
+          # Escape unquoted pipes for eval
+          result = result "\\|"
+        } else {
+          result = result char
         }
-        result = result char
       }
-
       # Accumulate lines with space separator
       if (NR > 1) printf " "
       printf "%s", result
     }
-    END { print "" }
+    END { if (NR > 0) print "" }
     '
   fi
 }
@@ -258,38 +261,23 @@ handle_args() {
 handle_args "$@"
 MAVEN_MAIN_CLASS=${MAVEN_MAIN_CLASS:=org.apache.maven.cling.MavenCling}
 
-# Build the command with proper quoting for pipe symbols
-cmd="exec \"$JAVACMD\""
+# Build command string for eval
+cmd="\"$JAVACMD\" \
+  $MAVEN_OPTS \
+  $MAVEN_DEBUG_OPTS \
+  --enable-native-access=ALL-UNNAMED \
+  -classpath \"$LAUNCHER_JAR\" \
+  \"-Dclassworlds.conf=$CLASSWORLDS_CONF\" \
+  \"-Dmaven.home=$MAVEN_HOME\" \
+  \"-Dmaven.mainClass=$MAVEN_MAIN_CLASS\" \
+  \"-Dlibrary.jline.path=${MAVEN_HOME}/lib/jline-native\" \
+  \"-Dmaven.multiModuleProjectDirectory=$MAVEN_PROJECTBASEDIR\" \
+  $LAUNCHER_CLASS \
+  $MAVEN_ARGS"
 
-# Add MAVEN_OPTS if present
-if [ -n "$MAVEN_OPTS" ]; then
-  cmd="$cmd $MAVEN_OPTS"
-fi
-
-# Add MAVEN_DEBUG_OPTS if present
-if [ -n "$MAVEN_DEBUG_OPTS" ]; then
-  cmd="$cmd $MAVEN_DEBUG_OPTS"
-fi
-
-# Add fixed arguments
-cmd="$cmd --enable-native-access=ALL-UNNAMED"
-cmd="$cmd -classpath \"$LAUNCHER_JAR\""
-cmd="$cmd \"-Dclassworlds.conf=$CLASSWORLDS_CONF\""
-cmd="$cmd \"-Dmaven.home=$MAVEN_HOME\""
-cmd="$cmd \"-Dmaven.mainClass=$MAVEN_MAIN_CLASS\""
-cmd="$cmd \"-Dlibrary.jline.path=${MAVEN_HOME}/lib/jline-native\""
-cmd="$cmd \"-Dmaven.multiModuleProjectDirectory=$MAVEN_PROJECTBASEDIR\""
-cmd="$cmd $LAUNCHER_CLASS"
-
-# Add MAVEN_ARGS if present
-if [ -n "$MAVEN_ARGS" ]; then
-  cmd="$cmd $MAVEN_ARGS"
-fi
-
-# Add remaining command line arguments
+# Add remaining arguments with proper quoting
 for arg in "$@"; do
-  cmd="$cmd \"$arg\""
+    cmd="$cmd \"$arg\""
 done
 
-# Execute the command using eval to properly handle quoted arguments
-eval "$cmd"
+eval exec "$cmd"
