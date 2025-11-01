@@ -161,9 +161,11 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         Map<String, String> mergedProps = createMergedProperties(request);
 
         boolean mavenMaven3Personality = Features.mavenMaven3Personality(mergedProps);
-        MavenSessionBuilderSupplier supplier = new MavenSessionBuilderSupplier(repoSystem, mavenMaven3Personality);
+        TypeRegistryAdapter typeRegistryAdapter = new TypeRegistryAdapter(typeRegistry);
+        MavenSessionBuilderSupplier supplier =
+                new MavenSessionBuilderSupplier(repoSystem, mavenMaven3Personality, typeRegistry);
         SessionBuilder sessionBuilder = supplier.get();
-        sessionBuilder.setArtifactTypeRegistry(new TypeRegistryAdapter(typeRegistry)); // dynamic
+        sessionBuilder.setArtifactTypeRegistry(typeRegistryAdapter); // dynamic
         sessionBuilder.setCache(request.getRepositoryCache());
 
         // configProps map is kept "pristine", is written ONLY, the mandatory resolver config

@@ -186,4 +186,12 @@ public interface Type extends ExtensibleEnum {
      */
     @Nonnull
     Set<PathType> getPathTypes();
+
+    default boolean needsDerive() {
+        return false;
+    }
+
+    default Type derive(Type type) {
+        return type;
+    }
 }

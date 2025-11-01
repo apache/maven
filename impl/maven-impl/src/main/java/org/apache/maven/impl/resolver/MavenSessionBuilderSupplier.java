@@ -22,10 +22,12 @@ import java.util.Arrays;
 import java.util.function.Supplier;
 
 import org.apache.maven.api.DependencyScope;
+import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.impl.resolver.artifact.FatArtifactTraverser;
 import org.apache.maven.impl.resolver.scopes.Maven3ScopeManagerConfiguration;
 import org.apache.maven.impl.resolver.scopes.Maven4ScopeManagerConfiguration;
 import org.apache.maven.impl.resolver.type.DefaultTypeProvider;
+import org.apache.maven.impl.resolver.type.TypeDeriver;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession.CloseableSession;
 import org.eclipse.aether.RepositorySystemSession.SessionBuilder;
@@ -67,11 +69,14 @@ import static java.util.Objects.requireNonNull;
 public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
     protected final RepositorySystem repositorySystem;
     protected final boolean mavenMaven3Personality;
+    protected final TypeRegistry typeRegistry;
     protected final InternalScopeManager scopeManager;
 
-    public MavenSessionBuilderSupplier(RepositorySystem repositorySystem, boolean mavenMaven3Personality) {
+    public MavenSessionBuilderSupplier(
+            RepositorySystem repositorySystem, boolean mavenMaven3Personality, TypeRegistry typeRegistry) {
         this.repositorySystem = requireNonNull(repositorySystem);
         this.mavenMaven3Personality = mavenMaven3Personality;
+        this.typeRegistry = typeRegistry;
         this.scopeManager = new ScopeManagerImpl(
                 mavenMaven3Personality
                         ? Maven3ScopeManagerConfiguration.INSTANCE
@@ -110,7 +115,8 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
                 new ConflictResolver(
                         new ConfigurableVersionSelector(), new ManagedScopeSelector(getScopeManager()),
                         new SimpleOptionalitySelector(), new ManagedScopeDeriver(getScopeManager())),
-                new ManagedDependencyContextRefiner(getScopeManager()));
+                new ManagedDependencyContextRefiner(getScopeManager()),
+                new TypeDeriver(typeRegistry));
     }
 
     /**

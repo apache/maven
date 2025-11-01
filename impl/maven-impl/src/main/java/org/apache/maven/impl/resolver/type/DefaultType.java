@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiFunction;
 
 import org.apache.maven.api.JavaPathType;
 import org.apache.maven.api.Language;
@@ -46,6 +47,8 @@ public class DefaultType implements Type, ArtifactType {
     private final String extension;
     private final String classifier;
     private final boolean includesDependencies;
+    private final boolean needsDerive;
+    private final BiFunction<Type, Type, Type> deriveFunction;
     private final Set<PathType> pathTypes;
     private final Map<String, String> properties;
 
@@ -56,12 +59,27 @@ public class DefaultType implements Type, ArtifactType {
             String classifier,
             boolean includesDependencies,
             PathType... pathTypes) {
+        this(id, language, extension, classifier, includesDependencies, false, (t1, t2) -> t2, pathTypes);
+    }
+
+    @SuppressWarnings("ParameterNumber")
+    public DefaultType(
+            String id,
+            Language language,
+            String extension,
+            String classifier,
+            boolean includesDependencies,
+            boolean needsDerive,
+            BiFunction<Type, Type, Type> deriveFunction,
+            PathType... pathTypes) {
         this.id = requireNonNull(id, "id");
         this.language = requireNonNull(language, "language");
         this.extension = requireNonNull(extension, "extension");
         this.classifier = classifier;
         this.includesDependencies = includesDependencies;
         this.pathTypes = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(pathTypes)));
+        this.needsDerive = needsDerive;
+        this.deriveFunction = requireNonNull(deriveFunction);
 
         Map<String, String> properties = new HashMap<>();
         properties.put(ArtifactProperties.TYPE, id);
@@ -101,6 +119,16 @@ public class DefaultType implements Type, ArtifactType {
     @Override
     public boolean isIncludesDependencies() {
         return this.includesDependencies;
+    }
+
+    @Override
+    public boolean needsDerive() {
+        return needsDerive;
+    }
+
+    @Override
+    public Type derive(Type type) {
+        return deriveFunction.apply(this, type);
     }
 
     @Override
