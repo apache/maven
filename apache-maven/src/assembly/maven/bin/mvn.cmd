@@ -187,18 +187,18 @@ for /F "usebackq tokens=* delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.conf
     rem Skip empty lines and full-line comments
     echo !line! | findstr /b /r /c:"[ ]*#" >nul
     if errorlevel 1 (
-        rem Handle end-of-line comments by taking everything before #
-        for /f "tokens=1* delims=#" %%i in ("!line!") do set "line=%%i"
-
+        rem Remove end-of-line comments by taking everything before #
+        set "line=!line:*#=!"
         rem Trim leading/trailing spaces while preserving spaces in quotes
         set "trimmed=!line!"
+        rem Trim leading spaces
         for /f "tokens=* delims= " %%i in ("!trimmed!") do set "trimmed=%%i"
+        rem Trim trailing spaces
         for /l %%i in (1,1,100) do if "!trimmed:~-1!"==" " set "trimmed=!trimmed:~0,-1!"
 
         rem Replace MAVEN_PROJECTBASEDIR placeholders
         set "trimmed=!trimmed:${MAVEN_PROJECTBASEDIR}=%MAVEN_PROJECTBASEDIR%!"
         set "trimmed=!trimmed:$MAVEN_PROJECTBASEDIR=%MAVEN_PROJECTBASEDIR%!"
-
         if not "!trimmed!"=="" (
             if "!JVM_CONFIG_MAVEN_OPTS!"=="" (
                 set "JVM_CONFIG_MAVEN_OPTS=!trimmed!"
@@ -287,3 +287,40 @@ if exist "%USERPROFILE%\mavenrc_post.cmd" call "%USERPROFILE%\mavenrc_post.cmd"
 if "%MAVEN_BATCH_PAUSE%"=="on" pause
 
 exit /b %ERROR_CODE%
+
+rem Subroutine to escape pipe symbols that are not within quotes
+:escapePipes
+setlocal EnableDelayedExpansion
+set "input=%~1"
+set "output="
+set "inQuotes=0"
+set "i=0"
+
+:escapeLoop
+set "char=!input:~%i%,1!"
+if "!char!"=="" goto escapeEnd
+
+if "!char!"=="^"" (
+    if "!inQuotes!"=="0" (
+        set "inQuotes=1"
+    ) else (
+        set "inQuotes=0"
+    )
+    set "output=!output!!char!"
+) else if "!char!"=="|" (
+    if "!inQuotes!"=="0" (
+        rem Escape pipe with 7 carets to survive endlocal and command line parsing
+        set "output=!output!^^^^^^^|"
+    ) else (
+        set "output=!output!!char!"
+    )
+) else (
+    set "output=!output!!char!"
+)
+
+set /a "i+=1"
+goto escapeLoop
+
+:escapeEnd
+endlocal & set "%~2=%output%"
+goto :eof
