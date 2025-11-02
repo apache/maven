@@ -142,9 +142,15 @@ public class DefaultTypeProvider implements TypeProvider {
             if (t1.needsDerive()) {
                 if (t1.id().equals(Type.PROCESSOR)) {
                     switch (t2.id()) {
-                        case Type.JAR -> providedTypes.get(Type.PROCESSOR);
-                        case Type.MODULAR_JAR -> providedTypes.get(Type.MODULAR_PROCESSOR);
-                        case Type.CLASSPATH_JAR -> providedTypes.get(Type.CLASSPATH_PROCESSOR);
+                        case Type.JAR:
+                            t2 = providedTypes.get(Type.PROCESSOR);
+                            break;
+                        case Type.MODULAR_JAR:
+                            t2 = providedTypes.get(Type.MODULAR_PROCESSOR);
+                            break;
+                        case Type.CLASSPATH_JAR:
+                            t2 = providedTypes.get(Type.CLASSPATH_PROCESSOR);
+                            break;
                     }
                 }
             }

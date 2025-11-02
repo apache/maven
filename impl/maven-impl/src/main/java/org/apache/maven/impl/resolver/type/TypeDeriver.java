@@ -25,13 +25,13 @@ import java.util.Optional;
 
 import org.apache.maven.api.Type;
 import org.apache.maven.api.services.TypeRegistry;
-import org.eclipse.aether.RepositoryException;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.ArtifactProperties;
 import org.eclipse.aether.artifact.ArtifactType;
 import org.eclipse.aether.collection.DependencyGraphTransformationContext;
 import org.eclipse.aether.collection.DependencyGraphTransformer;
 import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.graph.DependencyVisitor;
 
 /**
  * Default implementation of {@link Type} and Resolver {@link ArtifactType}.
@@ -46,37 +46,54 @@ public class TypeDeriver implements DependencyGraphTransformer {
     }
 
     @Override
-    public DependencyNode transformGraph(DependencyNode root, DependencyGraphTransformationContext context)
-            throws RepositoryException {
+    public DependencyNode transformGraph(DependencyNode root, DependencyGraphTransformationContext context) {
         if (typeRegistry == null) {
             return root;
         }
-        if (root.getArtifact() == null) {
-            return root;
-        }
-        Optional<Type> rt = typeRegistry.lookup(root.getArtifact().getProperty(ArtifactProperties.TYPE, ""));
-        if (rt.isEmpty() || !rt.orElseThrow().needsDerive()) {
-            return root;
+        root.accept(new TypeDeriverVisitor(typeRegistry));
+        return root;
+    }
+
+    private static class TypeDeriverVisitor implements DependencyVisitor {
+        private final TypeRegistry registry;
+        private final ArrayDeque<Type> stack;
+
+        private TypeDeriverVisitor(TypeRegistry registry) {
+            this.registry = registry;
+            this.stack = new ArrayDeque<>();
         }
 
-        Type type = rt.orElseThrow();
-        ArrayDeque<DependencyNode> stack = new ArrayDeque<>();
-        root.getChildren().forEach(stack::push);
-        while (!stack.isEmpty()) {
-            DependencyNode node = stack.pop();
+        @Override
+        public boolean visitEnter(DependencyNode node) {
+            Type currentType = null;
             if (node.getArtifact() != null) {
                 Artifact artifact = node.getArtifact();
-                Map<String, String> props = new HashMap<>(artifact.getProperties());
-                Optional<Type> nt = typeRegistry.lookup(props.getOrDefault(ArtifactProperties.TYPE, ""));
+                Optional<Type> nt =
+                        registry.lookup(artifact.getProperty(ArtifactProperties.TYPE, artifact.getExtension()));
                 if (nt.isPresent()) {
-                    Type derived = type.derive(nt.orElseThrow());
-                    props.put(ArtifactProperties.TYPE, derived.id());
-                    node.setArtifact(artifact.setProperties(props));
+                    currentType = nt.orElseThrow();
                 }
             }
-            node.getChildren().forEach(stack::push);
+            if (!stack.isEmpty()) {
+                Type parentType = stack.peek();
+                if (parentType.needsDerive() && node.getArtifact() != null) {
+                    Artifact artifact = node.getArtifact();
+                    Map<String, String> props = new HashMap<>(artifact.getProperties());
+                    if (currentType != null) {
+                        Type derived = parentType.derive(currentType);
+                        props.put(ArtifactProperties.TYPE, derived.id());
+                        node.setArtifact(artifact.setProperties(props));
+                    }
+                }
+            }
+            stack.push(currentType);
+            return true;
         }
 
-        return root;
+        @Override
+        public boolean visitLeave(DependencyNode node) {
+            stack.pop();
+            return true;
+        }
     }
 }
