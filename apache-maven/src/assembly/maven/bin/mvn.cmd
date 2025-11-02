@@ -187,21 +187,18 @@ for /F "usebackq tokens=* delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.conf
     rem Skip empty lines and full-line comments
     echo !line! | findstr /b /r /c:"[ ]*#" >nul
     if errorlevel 1 (
-        rem Handle end-of-line comments by taking everything before #
-        for /f "tokens=1* delims=#" %%i in ("!line!") do set "line=%%i"
-
+        rem Remove end-of-line comments by taking everything before #
+        set "line=!line:*#=!"
         rem Trim leading/trailing spaces while preserving spaces in quotes
         set "trimmed=!line!"
+        rem Trim leading spaces
         for /f "tokens=* delims= " %%i in ("!trimmed!") do set "trimmed=%%i"
+        rem Trim trailing spaces
         for /l %%i in (1,1,100) do if "!trimmed:~-1!"==" " set "trimmed=!trimmed:~0,-1!"
 
         rem Replace MAVEN_PROJECTBASEDIR placeholders
         set "trimmed=!trimmed:${MAVEN_PROJECTBASEDIR}=%MAVEN_PROJECTBASEDIR%!"
         set "trimmed=!trimmed:$MAVEN_PROJECTBASEDIR=%MAVEN_PROJECTBASEDIR%!"
-
-        rem Escape pipe symbols that are not within quotes to prevent command separation
-        call :escapePipes "!trimmed!" trimmed
-
         if not "!trimmed!"=="" (
             if "!JVM_CONFIG_MAVEN_OPTS!"=="" (
                 set "JVM_CONFIG_MAVEN_OPTS=!trimmed!"
