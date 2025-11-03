@@ -27,6 +27,9 @@ import org.apache.maven.api.Type;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.spi.TypeProvider;
 
+/**
+ * Maven 4 default {@link TypeProvider} implementation.
+ */
 @Named
 public class DefaultTypeProvider implements TypeProvider {
     @SuppressWarnings({"rawtypes", "unchecked"})

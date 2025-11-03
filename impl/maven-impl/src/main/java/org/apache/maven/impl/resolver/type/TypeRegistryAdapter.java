@@ -16,21 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.aether;
+package org.apache.maven.impl.resolver.type;
 
 import org.apache.maven.api.PathType;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.services.TypeRegistry;
-import org.apache.maven.impl.resolver.type.DefaultType;
 import org.eclipse.aether.artifact.ArtifactType;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 
 import static java.util.Objects.requireNonNull;
 
-class TypeRegistryAdapter implements ArtifactTypeRegistry {
+/**
+ * Adapter between Maven {@link TypeRegistry} and Resolver {@link ArtifactTypeRegistry}.
+ */
+public class TypeRegistryAdapter implements ArtifactTypeRegistry {
     private final TypeRegistry typeRegistry;
 
-    TypeRegistryAdapter(TypeRegistry typeRegistry) {
+    public TypeRegistryAdapter(TypeRegistry typeRegistry) {
         this.typeRegistry = requireNonNull(typeRegistry, "typeRegistry");
     }
 
@@ -41,11 +43,12 @@ class TypeRegistryAdapter implements ArtifactTypeRegistry {
             return artifactType;
         }
         return new DefaultType(
-                type.id(),
-                type.getLanguage(),
-                type.getExtension(),
-                type.getClassifier(),
-                type.isIncludesDependencies(),
-                type.getPathTypes().toArray(new PathType[0]));
+                        type.id(),
+                        type.getLanguage(),
+                        type.getExtension(),
+                        type.getClassifier(),
+                        type.isIncludesDependencies(),
+                        type.getPathTypes().toArray(new PathType[0]))
+                .toArtifactType();
     }
 }
