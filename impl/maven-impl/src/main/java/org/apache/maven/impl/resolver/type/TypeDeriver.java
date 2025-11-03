@@ -65,7 +65,7 @@ public class TypeDeriver implements DependencyGraphTransformer {
 
         @Override
         public boolean visitEnter(DependencyNode node) {
-            Type currentType = null;
+            Type currentType = registry.require(Type.JAR);
             if (node.getArtifact() != null) {
                 Artifact artifact = node.getArtifact();
                 Optional<Type> nt =
@@ -79,11 +79,9 @@ public class TypeDeriver implements DependencyGraphTransformer {
                 if (parentType.needsDerive() && node.getArtifact() != null) {
                     Artifact artifact = node.getArtifact();
                     Map<String, String> props = new HashMap<>(artifact.getProperties());
-                    if (currentType != null) {
-                        Type derived = parentType.derive(currentType);
-                        props.put(ArtifactProperties.TYPE, derived.id());
-                        node.setArtifact(artifact.setProperties(props));
-                    }
+                    Type derived = parentType.derive(currentType);
+                    props.put(ArtifactProperties.TYPE, derived.id());
+                    node.setArtifact(artifact.setProperties(props));
                 }
             }
             stack.push(currentType);
