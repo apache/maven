@@ -35,6 +35,7 @@ env:
   MIMIR_VERSION: 0.10.4
   MIMIR_BASEDIR: ~/.mimir
   MIMIR_LOCAL: ~/.mimir/local
+  MAVEN_OPTS: -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./target/java_heapdump.hprof
 
 jobs:
   initial-build:
@@ -61,10 +62,12 @@ jobs:
 
       - name: Restore Mimir caches
         uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        id: restore-cache
         with:
           path: ${{ env.MIMIR_LOCAL }}
-          key: mvn40-${{ runner.os }}-initial
+          key: mvn40-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            mvn40-${{ runner.os }}-
+            mvn40-
 
       - name: Set up Maven
         shell: bash
@@ -85,12 +88,13 @@ jobs:
         shell: bash
         run: ls -la apache-maven/target
 
-      - name: Save Mimir caches
-        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        if: ${{ github.event_name != 'pull_request' && !cancelled() && !failure() }}
+      - name: Upload Mimir caches
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
+        if: ${{ !cancelled() && !failure() }}
         with:
+          name: cache-${{ runner.os }}-initial
+          retention-days: 1
           path: ${{ env.MIMIR_LOCAL }}
-          key: ${{ steps.restore-cache.outputs.cache-primary-key }}
 
       - name: Upload Maven distributions
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
@@ -102,12 +106,23 @@ jobs:
 
       - name: Upload test artifacts
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
-        if: failure() || cancelled()
+        if: ${{ failure() || cancelled() }}
         with:
-          name: ${{ github.run_number }}-initial
+          name: initial-logs
+          retention-days: 1
           path: |
             **/target/surefire-reports/*
             **/target/java_heapdump.hprof
+
+      - name: Upload Mimir logs
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: initial-mimir-logs
+          include-hidden-files: true
+          retention-days: 1
+          path: |
+            ~/.mimir/*.log
 
   full-build:
     needs: initial-build
@@ -152,13 +167,12 @@ jobs:
 
       - name: Restore Mimir caches
         uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        id: restore-cache
         with:
           path: ${{ env.MIMIR_LOCAL }}
-          key: mvn40-full-${{ matrix.os }}-${{ matrix.java }}
+          key: mvn40-${{ runner.os }}-${{ github.run_id }}
           restore-keys: |
-            mvn40-full-${{ matrix.os }}-
-            mvn40-full-
+            mvn40-${{ runner.os }}-
+            mvn40-
 
       - name: Download Maven distribution
         uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v4
@@ -195,19 +209,33 @@ jobs:
         shell: bash
         run: mvn site -e -B -V -Preporting
 
-      - name: Save Mimir caches
-        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        if: ${{ github.event_name != 'pull_request' && !cancelled() && !failure() }}
+      - name: Upload Mimir caches
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
+        if: ${{ !cancelled() && !failure() }}
         with:
+          name: cache-${{ runner.os }}-full-build-${{ matrix.java }}
+          retention-days: 1
           path: ${{ env.MIMIR_LOCAL }}
-          key: ${{ steps.restore-cache.outputs.cache-primary-key }}
 
       - name: Upload test artifacts
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
         if: failure() || cancelled()
         with:
-          name: ${{ github.run_number }}-full-build-artifact-${{ runner.os }}-${{ matrix.java }}
-          path: '**/target/surefire-reports/*'
+          name: full-build-logs-${{ runner.os }}-${{ matrix.java }}
+          retention-days: 1
+          path: |
+            **/target/surefire-reports/*
+            **/target/java_heapdump.hprof
+
+      - name: Upload Mimir logs
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: full-build-mimir-logs-${{ runner.os }}-${{ matrix.java }}
+          include-hidden-files: true
+          retention-days: 1
+          path: |
+            ~/.mimir/*.log
 
   integration-tests:
     needs: initial-build
@@ -240,13 +268,12 @@ jobs:
 
       - name: Restore Mimir caches
         uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        id: restore-cache
         with:
           path: ${{ env.MIMIR_LOCAL }}
-          key: mvn40-its-${{ matrix.os }}-${{ matrix.java }}
+          key: mvn40-${{ runner.os }}-${{ github.run_id }}
           restore-keys: |
-            mvn40-its-${{ matrix.os }}-
-            mvn40-its-
+            mvn40-${{ runner.os }}-
+            mvn40-
 
       - name: Download Maven distribution
         uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v4
@@ -279,20 +306,55 @@ jobs:
         shell: bash
         run: mvn install -e -B -V -Prun-its,mimir
 
-      - name: Save Mimir caches
-        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        if: ${{ github.event_name != 'pull_request' && !cancelled() && !failure() }}
+      - name: Upload Mimir caches
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
+        if: ${{ !cancelled() && !failure() }}
         with:
+          name: cache-${{ runner.os }}-integration-tests-${{ matrix.java }}
+          retention-days: 1
           path: ${{ env.MIMIR_LOCAL }}
-          key: ${{ steps.restore-cache.outputs.cache-primary-key }}
 
       - name: Upload test artifacts
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
-        if: failure() || cancelled()
+        if: ${{ failure() || cancelled() }}
         with:
-          name: ${{ github.run_number }}-integration-test-artifact-${{ runner.os }}-${{ matrix.java }}
+          name: integration-test-logs-${{ runner.os }}-${{ matrix.java }}
+          retention-days: 1
           path: |
             **/target/surefire-reports/*
             **/target/failsafe-reports/*
             ./its/core-it-suite/target/test-classes/**
             **/target/java_heapdump.hprof
+
+      - name: Upload Mimir logs
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: integration-test-mimir-logs-${{ runner.os }}-${{ matrix.java }}
+          include-hidden-files: true
+          retention-days: 1
+          path: |
+            ~/.mimir/*.log
+
+  consolidate-caches:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    needs:
+      - full-build
+      - integration-tests
+    steps:
+      - name: Download Caches
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v4
+        with:
+          merge-multiple: true
+          pattern: 'cache-${{ runner.os }}*'
+          path: ${{ env.MIMIR_LOCAL }}
+      - name: Publish cache
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        if: ${{ github.event_name != 'pull_request' && !cancelled() && !failure() }}
+        with:
+          path: ${{ env.MIMIR_LOCAL }}
+          key: mvn40-${{ runner.os }}-${{ github.run_id }}
