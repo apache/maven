@@ -27,12 +27,10 @@ import org.junit.jupiter.api.Test;
  *
  * Verifies that ${project.url} can refer to a property named "project.url" without causing
  * a recursive variable reference error. This pattern is used by slack-sdk-parent.
+ *
+ * @since 4.0.0-rc-4
  */
 class MavenITgh11384RecursiveVariableReferenceTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITgh11384RecursiveVariableReferenceTest() {
-        super("[4.0.0-rc-4,)");
-    }
 
     /**
      * Verify that ${project.url} in the url field can reference a property named project.url
