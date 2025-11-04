@@ -20,6 +20,7 @@ package org.apache.maven.impl.resolver.type;
 
 import java.util.ArrayDeque;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,6 +33,9 @@ import org.eclipse.aether.collection.DependencyGraphTransformationContext;
 import org.eclipse.aether.collection.DependencyGraphTransformer;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.graph.DependencyVisitor;
+import org.eclipse.aether.util.graph.visitor.DependencyGraphDumper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.requireNonNull;
 
@@ -42,9 +46,27 @@ import static java.util.Objects.requireNonNull;
  * @since 4.0.0
  */
 public class TypeDeriver implements DependencyGraphTransformer {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Override
     public DependencyNode transformGraph(DependencyNode root, DependencyGraphTransformationContext context) {
+        if (logger.isDebugEnabled()) {
+            StringBuilder sb = new StringBuilder();
+            root.accept(new DependencyGraphDumper(
+                    l -> sb.append(l).append("\n"),
+                    DependencyGraphDumper.defaultsWith(
+                            List.of(DependencyGraphDumper.artifactProperties(List.of(ArtifactProperties.TYPE))))));
+            logger.debug("TYPES: Before transform:\n {}", sb);
+        }
         root.accept(new TypeDeriverVisitor(context.getSession().getArtifactTypeRegistry()));
+        if (logger.isDebugEnabled()) {
+            StringBuilder sb = new StringBuilder();
+            root.accept(new DependencyGraphDumper(
+                    l -> sb.append(l).append("\n"),
+                    DependencyGraphDumper.defaultsWith(
+                            List.of(DependencyGraphDumper.artifactProperties(List.of(ArtifactProperties.TYPE))))));
+            logger.debug("TYPES: After transform:\n {}", sb);
+        }
         return root;
     }
 
@@ -57,7 +79,6 @@ public class TypeDeriver implements DependencyGraphTransformer {
         private final ArtifactType classpathProcessor;
         private final ArtifactType modularProcessor;
         private final Set<String> needsDerive;
-
         private final ArrayDeque<ArtifactType> stack;
 
         private TypeDeriverVisitor(ArtifactTypeRegistry registry) {
