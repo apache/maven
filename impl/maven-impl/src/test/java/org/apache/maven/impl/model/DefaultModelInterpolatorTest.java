@@ -592,4 +592,21 @@ class DefaultModelInterpolatorTest {
             }
         };
     }
+
+    @Test
+    public void testProjectUrlPropertyDoesNotCauseRecursion() throws Exception {
+        final Map<String, String> props = new HashMap<>();
+        props.put("project.url", "https://github.com/slackapi/java-slack-sdk");
+
+        final Model model =
+                Model.newBuilder().url("${project.url}").properties(props).build();
+
+        final SimpleProblemCollector collector = new SimpleProblemCollector();
+        final Model out = interpolator.interpolateModel(
+                model, Paths.get("."), createModelBuildingRequest(context).build(), collector);
+
+        // No recursion error and the value is resolved from model properties.
+        assertCollectorState(0, 0, 0, collector);
+        assertEquals("https://github.com/slackapi/java-slack-sdk", out.getUrl());
+    }
 }
