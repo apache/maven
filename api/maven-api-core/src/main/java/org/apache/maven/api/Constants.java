@@ -660,5 +660,11 @@ public final class Constants {
      */
     public static final String MAVEN_LOGGER_LOG_PREFIX = MAVEN_LOGGER_PREFIX + "log.";
 
+    /**
+     * System property to keep temp material for diagnostics.
+     *
+     */
+    public static final String KEEP_PROP = "maven.tempfile.keep";
+
     private Constants() {}
 }
