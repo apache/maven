@@ -32,6 +32,10 @@ import org.junit.jupiter.api.Test;
  */
 class MavenITgh11384RecursiveVariableReferenceTest extends AbstractMavenIntegrationTestCase {
 
+    MavenITgh11384RecursiveVariableReferenceTest() {
+        super("(4.0.0-rc-4,)");
+    }
+
     /**
      * Verify that ${project.url} in the url field can reference a property named project.url
      * without causing a recursive variable reference error.
