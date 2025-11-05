@@ -60,7 +60,7 @@ public class ToolboxToolTest {
         String testName = testInfo.getTestMethod().orElseThrow().getName();
         userHome = tempDir.resolve(testName);
         cwd = userHome.resolve("cwd");
-        Files.createDirectories(cwd);
+        Files.createDirectories(cwd.resolve(".mvn"));
 
         if (MimirInfuser.isMimirPresentUW()) {
             if (testName.contains("3")) {
