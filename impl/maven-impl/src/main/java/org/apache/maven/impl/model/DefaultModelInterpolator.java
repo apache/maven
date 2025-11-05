@@ -179,21 +179,23 @@ public class DefaultModelInterpolator implements ModelInterpolator {
             return new MavenBuildTimestamp(request.getSession().getStartTime(), model.getProperties())
                     .formattedTimestamp();
         }
-        // prefixed model reflection
-        for (String prefix : getProjectPrefixes(request)) {
-            if (expression.startsWith(prefix)) {
-                String subExpr = expression.substring(prefix.length());
-                String v = projectProperty(model, projectDir, subExpr, true);
-                if (v != null) {
-                    return v;
-                }
-            }
-        }
         // user properties
         String value = request.getUserProperties().get(expression);
-        // model properties
+        // model properties (check before prefixed model reflection to avoid recursion)
         if (value == null) {
             value = model.getProperties().get(expression);
+        }
+        // prefixed model reflection
+        if (value == null) {
+            for (String prefix : getProjectPrefixes(request)) {
+                if (expression.startsWith(prefix)) {
+                    String subExpr = expression.substring(prefix.length());
+                    value = projectProperty(model, projectDir, subExpr, true);
+                    if (value != null) {
+                        return value;
+                    }
+                }
+            }
         }
         // system properties
         if (value == null) {

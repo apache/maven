@@ -56,7 +56,7 @@ public abstract class MavenExecutorTestSupport {
     @BeforeEach
     void beforeEach(TestInfo testInfo) throws Exception {
         cwd = tempDir.resolve(testInfo.getTestMethod().orElseThrow().getName()).resolve("cwd");
-        Files.createDirectories(cwd);
+        Files.createDirectories(cwd.resolve(".mvn"));
         userHome = tempDir.resolve(testInfo.getTestMethod().orElseThrow().getName())
                 .resolve("home");
         Files.createDirectories(userHome);
@@ -380,7 +380,6 @@ public abstract class MavenExecutorTestSupport {
     }
 
     protected void layDownFiles(Path cwd) throws IOException {
-        Files.createDirectory(cwd.resolve(".mvn"));
         Path pom = cwd.resolve("pom.xml").toAbsolutePath();
         Files.writeString(pom, POM_STRING);
         Path appJava = cwd.resolve("src/main/java/org/apache/maven/samples/sample/App.java");
