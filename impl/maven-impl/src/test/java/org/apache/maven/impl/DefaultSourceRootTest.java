@@ -183,26 +183,31 @@ public class DefaultSourceRootTest {
                 source.targetPath().orElseThrow());
     }
 
-    /*MNG-11062*/
+    /*GH-11381*/
     @Test
     void testExtractsTargetPathFromResource() {
-        // Test the Resource constructor that was broken in the regression
+        // Test the Resource constructor with relative targetPath
+        // Relative targetPath should be resolved relative to output directory
         Resource resource = Resource.newBuilder()
                 .directory("src/test/resources")
                 .targetPath("test-output")
                 .build();
 
-        DefaultSourceRoot sourceRoot = new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource);
+        DefaultSourceRoot sourceRoot =
+                new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource, "target/test-classes");
 
         Optional<Path> targetPath = sourceRoot.targetPath();
         assertTrue(targetPath.isPresent(), "targetPath should be present");
-        assertEquals(Path.of("myproject", "test-output"), targetPath.get());
+        assertEquals(
+                Path.of("myproject", "target", "test-classes", "test-output"),
+                targetPath.get(),
+                "Relative targetPath should be resolved relative to output directory");
         assertEquals(Path.of("myproject", "src", "test", "resources"), sourceRoot.directory());
         assertEquals(ProjectScope.TEST, sourceRoot.scope());
         assertEquals(Language.RESOURCES, sourceRoot.language());
     }
 
-    /*MNG-11062*/
+    /*GH-11381*/
     @Test
     void testHandlesNullTargetPathFromResource() {
         // Test null targetPath handling
@@ -210,13 +215,14 @@ public class DefaultSourceRootTest {
                 Resource.newBuilder().directory("src/test/resources").build();
         // targetPath is null by default
 
-        DefaultSourceRoot sourceRoot = new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource);
+        DefaultSourceRoot sourceRoot =
+                new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource, "target/test-classes");
 
         Optional<Path> targetPath = sourceRoot.targetPath();
         assertFalse(targetPath.isPresent(), "targetPath should be empty when null");
     }
 
-    /*MNG-11062*/
+    /*GH-11381*/
     @Test
     void testHandlesEmptyTargetPathFromResource() {
         // Test empty string targetPath
@@ -225,13 +231,14 @@ public class DefaultSourceRootTest {
                 .targetPath("")
                 .build();
 
-        DefaultSourceRoot sourceRoot = new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource);
+        DefaultSourceRoot sourceRoot =
+                new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource, "target/test-classes");
 
         Optional<Path> targetPath = sourceRoot.targetPath();
         assertFalse(targetPath.isPresent(), "targetPath should be empty for empty string");
     }
 
-    /*MNG-11062*/
+    /*GH-11381*/
     @Test
     void testHandlesPropertyPlaceholderInTargetPath() {
         // Test property placeholder preservation
@@ -240,14 +247,18 @@ public class DefaultSourceRootTest {
                 .targetPath("${project.build.directory}/custom")
                 .build();
 
-        DefaultSourceRoot sourceRoot = new DefaultSourceRoot(Path.of("myproject"), ProjectScope.MAIN, resource);
+        DefaultSourceRoot sourceRoot =
+                new DefaultSourceRoot(Path.of("myproject"), ProjectScope.MAIN, resource, "target/classes");
 
         Optional<Path> targetPath = sourceRoot.targetPath();
         assertTrue(targetPath.isPresent(), "Property placeholder targetPath should be present");
-        assertEquals(Path.of("myproject", "${project.build.directory}/custom"), targetPath.get());
+        assertEquals(
+                Path.of("myproject", "target", "classes", "${project.build.directory}/custom"),
+                targetPath.get(),
+                "Property placeholder should be preserved but resolved relative to output directory");
     }
 
-    /*MNG-11062*/
+    /*GH-11381*/
     @Test
     void testResourceConstructorRequiresNonNullDirectory() {
         // Test that null directory throws exception
@@ -256,11 +267,11 @@ public class DefaultSourceRootTest {
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource),
+                () -> new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource, "target/test-classes"),
                 "Should throw exception for null directory");
     }
 
-    /*MNG-11062*/
+    /*GH-11381*/
     @Test
     void testResourceConstructorPreservesOtherProperties() {
         // Test that other Resource properties are correctly preserved
@@ -272,11 +283,14 @@ public class DefaultSourceRootTest {
                 .excludes(List.of("*.tmp"))
                 .build();
 
-        DefaultSourceRoot sourceRoot = new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource);
+        DefaultSourceRoot sourceRoot =
+                new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource, "target/test-classes");
 
         // Verify all properties are preserved
         assertEquals(
-                Path.of("myproject", "test-classes"), sourceRoot.targetPath().orElseThrow());
+                Path.of("myproject", "target", "test-classes", "test-classes"),
+                sourceRoot.targetPath().orElseThrow(),
+                "targetPath should be resolved relative to output directory");
         assertTrue(sourceRoot.stringFiltering(), "Filtering should be true");
         assertEquals(1, sourceRoot.includes().size());
         assertTrue(sourceRoot.includes().contains("*.properties"));

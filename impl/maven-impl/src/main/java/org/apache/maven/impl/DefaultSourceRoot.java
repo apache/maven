@@ -156,7 +156,37 @@ public record DefaultSourceRoot(
      * @param baseDir the base directory for resolving relative paths
      * @param scope the scope of the resource (main or test)
      * @param resource a resource element from the model
+     * @param outputDir the output directory for the given scope
      */
+    public DefaultSourceRoot(final Path baseDir, ProjectScope scope, Resource resource, String outputDir) {
+        this(
+                scope,
+                Language.RESOURCES,
+                null,
+                null,
+                baseDir.resolve(nonBlank(resource.getDirectory())
+                        .orElseThrow(
+                                () -> new IllegalArgumentException("Source declaration without directory value."))),
+                resource.getIncludes(),
+                resource.getExcludes(),
+                Boolean.parseBoolean(resource.getFiltering()),
+                nonBlank(resource.getTargetPath())
+                        .map((targetPath) -> baseDir.resolve(outputDir).resolve(targetPath))
+                        .orElse(null),
+                true);
+    }
+
+    /**
+     * Creates a new instance from the given resource.
+     * This is used for migration from the previous way of declaring resources.
+     * This constructor is deprecated and resolves targetPath relative to baseDir instead of outputDir.
+     *
+     * @param baseDir the base directory for resolving relative paths
+     * @param scope the scope of the resource (main or test)
+     * @param resource a resource element from the model
+     * @deprecated Use {@link #DefaultSourceRoot(Path, ProjectScope, Resource, String)} instead
+     */
+    @Deprecated
     public DefaultSourceRoot(final Path baseDir, ProjectScope scope, Resource resource) {
         this(
                 scope,

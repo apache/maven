@@ -701,10 +701,12 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     project.addTestCompileSourceRoot(build.getTestSourceDirectory());
                 }
                 for (Resource resource : project.getBuild().getDelegate().getResources()) {
-                    project.addSourceRoot(new DefaultSourceRoot(baseDir, ProjectScope.MAIN, resource));
+                    project.addSourceRoot(
+                            new DefaultSourceRoot(baseDir, ProjectScope.MAIN, resource, build.getOutputDirectory()));
                 }
                 for (Resource resource : project.getBuild().getDelegate().getTestResources()) {
-                    project.addSourceRoot(new DefaultSourceRoot(baseDir, ProjectScope.TEST, resource));
+                    project.addSourceRoot(new DefaultSourceRoot(
+                            baseDir, ProjectScope.TEST, resource, build.getTestOutputDirectory()));
                 }
             }
 

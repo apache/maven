@@ -121,7 +121,11 @@ class ConnectedResource extends Resource {
 
         if (index >= 0) {
             // Replace the SourceRoot at the same position
-            SourceRoot newSourceRoot = new DefaultSourceRoot(project.getBaseDirectory(), scope, this.getDelegate());
+            String outputDir = scope == ProjectScope.MAIN
+                    ? project.getBuild().getOutputDirectory()
+                    : project.getBuild().getTestOutputDirectory();
+            SourceRoot newSourceRoot =
+                    new DefaultSourceRoot(project.getBaseDirectory(), scope, this.getDelegate(), outputDir);
             sourcesList.set(index, newSourceRoot);
 
             // Update the project's sources, preserving order
