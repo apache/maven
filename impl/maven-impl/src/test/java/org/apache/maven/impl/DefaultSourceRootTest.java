@@ -42,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 
+@SuppressWarnings("deprecation")
 @ExtendWith(MockitoExtension.class)
 public class DefaultSourceRootTest {
 
@@ -179,7 +180,7 @@ public class DefaultSourceRootTest {
         assertEquals(Path.of("user-output"), source.targetPath().orElseThrow());
     }
 
-    /*GH-11381*/
+    /*MNG-11062*/
     @Test
     void testExtractsTargetPathFromResource() {
         // Test the Resource constructor with relative targetPath
@@ -199,7 +200,7 @@ public class DefaultSourceRootTest {
         assertEquals(Language.RESOURCES, sourceRoot.language());
     }
 
-    /*GH-11381*/
+    /*MNG-11062*/
     @Test
     void testHandlesNullTargetPathFromResource() {
         // Test null targetPath handling
@@ -213,7 +214,7 @@ public class DefaultSourceRootTest {
         assertFalse(targetPath.isPresent(), "targetPath should be empty when null");
     }
 
-    /*GH-11381*/
+    /*MNG-11062*/
     @Test
     void testHandlesEmptyTargetPathFromResource() {
         // Test empty string targetPath
@@ -228,7 +229,7 @@ public class DefaultSourceRootTest {
         assertFalse(targetPath.isPresent(), "targetPath should be empty for empty string");
     }
 
-    /*GH-11381*/
+    /*MNG-11062*/
     @Test
     void testHandlesPropertyPlaceholderInTargetPath() {
         // Test property placeholder preservation
@@ -247,7 +248,7 @@ public class DefaultSourceRootTest {
                 "Property placeholder should be kept as-is (relative path)");
     }
 
-    /*GH-11381*/
+    /*MNG-11062*/
     @Test
     void testResourceConstructorRequiresNonNullDirectory() {
         // Test that null directory throws exception
@@ -260,7 +261,7 @@ public class DefaultSourceRootTest {
                 "Should throw exception for null directory");
     }
 
-    /*GH-11381*/
+    /*MNG-11062*/
     @Test
     void testResourceConstructorPreservesOtherProperties() {
         // Test that other Resource properties are correctly preserved

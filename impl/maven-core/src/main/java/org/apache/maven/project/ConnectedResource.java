@@ -31,6 +31,7 @@ import org.apache.maven.model.Resource;
  * A Resource wrapper that maintains a connection to the underlying project model.
  * When includes/excludes are modified, the changes are propagated back to the project's SourceRoots.
  */
+@SuppressWarnings("deprecation")
 class ConnectedResource extends Resource {
     private final SourceRoot originalSourceRoot;
     private final ProjectScope scope;
@@ -42,21 +43,11 @@ class ConnectedResource extends Resource {
                 .includes(sourceRoot.includes())
                 .excludes(sourceRoot.excludes())
                 .filtering(Boolean.toString(sourceRoot.stringFiltering()))
-                .targetPath(computeRelativeTargetPath(sourceRoot, scope, project))
+                .targetPath(sourceRoot.targetPath().map(Path::toString).orElse(null))
                 .build());
         this.originalSourceRoot = sourceRoot;
         this.scope = scope;
         this.project = project;
-    }
-
-    /**
-     * Computes the targetPath relative to the output directory.
-     * In Maven 3 API, Resource.getTargetPath() is expected to be relative to the output directory.
-     * SourceRoot.targetPath() now also returns a relative path (relative to the output directory),
-     * so we can simply return it as-is.
-     */
-    private static String computeRelativeTargetPath(SourceRoot sourceRoot, ProjectScope scope, MavenProject project) {
-        return sourceRoot.targetPath().map(Path::toString).orElse(null);
     }
 
     @Override
