@@ -194,6 +194,10 @@ rem Debug output
 echo DEBUG: JVM_CONFIG_MAVEN_OPTS=%JVM_CONFIG_MAVEN_OPTS% >&2
 echo DEBUG: MAVEN_OPTS=%MAVEN_OPTS% >&2
 
+rem Debug output to file for IT verification
+echo JVM_CONFIG_MAVEN_OPTS=%JVM_CONFIG_MAVEN_OPTS% > "%MAVEN_PROJECTBASEDIR%\mvn-debug.txt"
+echo MAVEN_OPTS=%MAVEN_OPTS% >> "%MAVEN_PROJECTBASEDIR%\mvn-debug.txt"
+
 :endReadJvmConfig
 
 @REM do not let MAVEN_PROJECTBASEDIR end with a single backslash which would escape the double quote. This happens when .mvn at drive root.
