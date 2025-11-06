@@ -32,11 +32,7 @@ import org.junit.jupiter.api.Test;
  *
  * @see <a href="https://github.com/mojohaus/flatten-maven-plugin">flatten-maven-plugin</a>
  */
-public class MavenITgh11399FlattenPluginParentCycleTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITgh11399FlattenPluginParentCycleTest() {
-        super("(4.0.0-rc-3,)");
-    }
+class MavenITgh11399FlattenPluginParentCycleTest extends AbstractMavenIntegrationTestCase {
 
     /**
      * Verify that flatten-maven-plugin with updatePomFile=true and parent expansion
@@ -48,7 +44,7 @@ public class MavenITgh11399FlattenPluginParentCycleTest extends AbstractMavenInt
      * @throws Exception in case of failure
      */
     @Test
-    public void testFlattenPluginWithParentExpansionDoesNotCauseCycle() throws Exception {
+    void testFlattenPluginWithParentExpansionDoesNotCauseCycle() throws Exception {
         File testDir = extractResources("/gh-11399-flatten-plugin-parent-cycle");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
