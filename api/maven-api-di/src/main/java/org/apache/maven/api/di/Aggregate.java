@@ -170,7 +170,7 @@ import java.lang.annotation.Target;
  * Map<String, LifecycleProvider> allLifecycles; // Contains contributions from all modules
  * }</pre>
  *
- * @since 4.0.0
+ * @since 4.1.0
  * @see Provides
  * @see Named
  * @see Inject
