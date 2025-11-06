@@ -177,6 +177,9 @@ cd /d "%EXEC_DIR%"
 
 :endDetectBaseDir
 
+rem Initialize JVM_CONFIG_MAVEN_OPTS to empty to avoid inheriting from environment
+set JVM_CONFIG_MAVEN_OPTS=
+
 if not exist "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" goto endReadJvmConfig
 
 rem Use Java to parse jvm.config to avoid batch script parsing issues with special characters
@@ -186,6 +189,10 @@ set "JVM_CONFIG_TEMP=%TEMP%\mvn-jvm-config-%RANDOM%.txt"
 rem Read the single line from temp file
 set /p JVM_CONFIG_MAVEN_OPTS=<"%JVM_CONFIG_TEMP%"
 del "%JVM_CONFIG_TEMP%" 2>nul
+
+rem Debug output
+echo DEBUG: JVM_CONFIG_MAVEN_OPTS=%JVM_CONFIG_MAVEN_OPTS% >&2
+echo DEBUG: MAVEN_OPTS=%MAVEN_OPTS% >&2
 
 :endReadJvmConfig
 
