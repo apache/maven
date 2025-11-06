@@ -108,7 +108,7 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
 
         MavenProject project = new MavenProject(orgModel);
         project.setOriginalModel(new org.apache.maven.model.Model(orgModel));
-        Model model = builder.build(session, project, file);
+        Model model = builder.build(session, project, Sources.buildSource(file));
 
         assertNotNull(model);
     }
@@ -135,7 +135,7 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         MavenProject project = new MavenProject(orgModel);
         project.setOriginalModel(new org.apache.maven.model.Model(orgModel));
         request.setRootDirectory(Paths.get("src/test/resources/consumer/simple"));
-        Model model = builder.build(session, project, file);
+        Model model = builder.build(session, project, Sources.buildSource(file));
 
         assertNotNull(model);
         assertTrue(model.getProfiles().isEmpty());
