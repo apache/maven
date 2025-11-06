@@ -21,7 +21,6 @@ package org.apache.maven.internal.transformation.impl;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +44,7 @@ import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
-import org.apache.maven.api.services.Sources;
+import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.model.LifecycleBindingsInjector;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.model.v4.MavenModelVersion;
@@ -71,7 +70,8 @@ class DefaultConsumerPomBuilder implements PomBuilder {
     }
 
     @Override
-    public Model build(RepositorySystemSession session, MavenProject project, Path src) throws ModelBuilderException {
+    public Model build(RepositorySystemSession session, MavenProject project, ModelSource src)
+            throws ModelBuilderException {
         Model model = project.getModel().getDelegate();
         boolean flattenEnabled = Features.consumerPomFlatten(session.getConfigProperties());
 
@@ -95,27 +95,27 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         }
     }
 
-    protected Model buildPom(RepositorySystemSession session, MavenProject project, Path src)
+    protected Model buildPom(RepositorySystemSession session, MavenProject project, ModelSource src)
             throws ModelBuilderException {
         ModelBuilderResult result = buildModel(session, src);
         Model model = result.getRawModel();
         return transformPom(model, project);
     }
 
-    protected Model buildBom(RepositorySystemSession session, MavenProject project, Path src)
+    protected Model buildBom(RepositorySystemSession session, MavenProject project, ModelSource src)
             throws ModelBuilderException {
         ModelBuilderResult result = buildModel(session, src);
         Model model = result.getEffectiveModel();
         return transformBom(model, project);
     }
 
-    protected Model buildNonPom(RepositorySystemSession session, MavenProject project, Path src)
+    protected Model buildNonPom(RepositorySystemSession session, MavenProject project, ModelSource src)
             throws ModelBuilderException {
         Model model = buildEffectiveModel(session, src);
         return transformNonPom(model, project);
     }
 
-    private Model buildEffectiveModel(RepositorySystemSession session, Path src) throws ModelBuilderException {
+    private Model buildEffectiveModel(RepositorySystemSession session, ModelSource src) throws ModelBuilderException {
         InternalSession iSession = InternalSession.from(session);
         ModelBuilderResult result = buildModel(session, src);
         Model model = result.getEffectiveModel();
@@ -222,12 +222,13 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                 + (dependency.getClassifier() != null ? dependency.getClassifier() : "");
     }
 
-    private ModelBuilderResult buildModel(RepositorySystemSession session, Path src) throws ModelBuilderException {
+    private ModelBuilderResult buildModel(RepositorySystemSession session, ModelSource src)
+            throws ModelBuilderException {
         InternalSession iSession = InternalSession.from(session);
         ModelBuilderRequest.ModelBuilderRequestBuilder request = ModelBuilderRequest.builder();
         request.requestType(ModelBuilderRequest.RequestType.BUILD_CONSUMER);
         request.session(iSession);
-        request.source(Sources.buildSource(src));
+        request.source(src);
         request.locationTracking(false);
         request.systemProperties(session.getSystemProperties());
         request.userProperties(session.getUserProperties());
