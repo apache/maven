@@ -23,7 +23,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.xml.stream.XMLStreamException;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -36,6 +38,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.ModelBuilderException;
+import org.apache.maven.api.services.ModelSource;
+import org.apache.maven.api.services.Source;
+import org.apache.maven.api.services.Sources;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
 import org.eclipse.aether.RepositorySystemSession;
@@ -93,19 +98,53 @@ class ConsumerPomArtifactTransformer extends TransformerSupport {
 
     TransformedArtifact createConsumerPomArtifact(
             MavenProject project, Path consumer, RepositorySystemSession session) {
+        Path actual = project.getFile().toPath();
+        Path parent = project.getBaseDirectory();
+        ModelSource source = new ModelSource() {
+            @Override
+            public Path getPath() {
+                return actual;
+            }
+
+            @Override
+            public InputStream openStream() throws IOException {
+                return Files.newInputStream(actual);
+            }
+
+            @Override
+            public String getLocation() {
+                return actual.toString();
+            }
+
+            @Override
+            public Source resolve(String relative) {
+                return Sources.buildSource(actual.resolve(relative));
+            }
+
+            @Override
+            public ModelSource resolve(ModelLocator modelLocator, String relative) {
+                String norm = relative.replace('\\', File.separatorChar).replace('/', File.separatorChar);
+                Path path = parent.resolve(norm);
+                Path relatedPom = modelLocator.locateExistingPom(path);
+                if (relatedPom != null) {
+                    return Sources.buildSource(relatedPom);
+                }
+                return null;
+            }
+        };
         return new TransformedArtifact(
                 this,
                 project,
                 consumer,
                 session,
                 new ProjectArtifact(project),
-                () -> project.getFile().toPath(),
+                () -> source,
                 CONSUMER_POM_CLASSIFIER,
                 "pom");
     }
 
     @Override
-    public void transform(MavenProject project, RepositorySystemSession session, Path src, Path tgt)
+    public void transform(MavenProject project, RepositorySystemSession session, ModelSource src, Path tgt)
             throws ModelBuilderException, XMLStreamException, IOException {
         Model model = builder.build(session, project, src);
         write(model, tgt);

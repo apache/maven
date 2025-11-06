@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import org.apache.maven.api.services.ModelBuilderException;
+import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.internal.transformation.PomArtifactTransformer;
 import org.apache.maven.internal.transformation.TransformationFailedException;
@@ -48,7 +49,7 @@ class TransformedArtifact extends DefaultArtifact {
     private static final int SHA1_BUFFER_SIZE = 8192;
     private final PomArtifactTransformer pomArtifactTransformer;
     private final MavenProject project;
-    private final Supplier<Path> sourcePathProvider;
+    private final Supplier<ModelSource> sourcePathProvider;
     private final Path target;
     private final RepositorySystemSession session;
     private final AtomicReference<String> sourceState;
@@ -60,7 +61,7 @@ class TransformedArtifact extends DefaultArtifact {
             Path target,
             RepositorySystemSession session,
             org.apache.maven.artifact.Artifact source,
-            Supplier<Path> sourcePathProvider,
+            Supplier<ModelSource> sourcePathProvider,
             String classifier,
             String extension) {
         super(
@@ -105,20 +106,21 @@ class TransformedArtifact extends DefaultArtifact {
 
     private String mayUpdate() throws IOException, XMLStreamException, ModelBuilderException {
         String result;
-        Path src = sourcePathProvider.get();
+        ModelSource src = sourcePathProvider.get();
         if (src == null) {
             Files.deleteIfExists(target);
             result = null;
-        } else if (!Files.exists(src)) {
+        } else if (!Files.exists(src.getPath())) {
             Files.deleteIfExists(target);
             result = "";
         } else {
-            String current = ChecksumAlgorithmHelper.calculate(src, List.of(new Sha1ChecksumAlgorithmFactory()))
+            String current = ChecksumAlgorithmHelper.calculate(
+                            src.getPath(), List.of(new Sha1ChecksumAlgorithmFactory()))
                     .get(Sha1ChecksumAlgorithmFactory.NAME);
             String existing = sourceState.get();
             if (!Files.exists(target) || !Objects.equals(current, existing)) {
                 pomArtifactTransformer.transform(project, session, src, target);
-                Files.setLastModifiedTime(target, Files.getLastModifiedTime(src));
+                Files.setLastModifiedTime(target, Files.getLastModifiedTime(src.getPath()));
             }
             result = current;
         }
