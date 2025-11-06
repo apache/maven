@@ -144,24 +144,49 @@ public interface SourceRoot {
 
     /**
      * {@return an explicit target path, overriding the default value}
+     * <p>
+     * The returned path is typically <strong>relative to the output directory</strong>
+     * (e.g., {@code "custom-dir"} or {@code "META-INF/resources"}), but may be absolute
+     * if explicitly specified as such in the project configuration.
+     * </p>
+     * <p>
      * When a target path is explicitly specified, the values of the {@link #module()} and {@link #targetVersion()}
      * elements are not used for inferring the path (they are still used as compiler options however).
      * It means that for scripts and resources, the files below the path specified by {@link #directory()}
      * are copied to the path specified by {@code targetPath()} with the exact same directory structure.
+     * </p>
+     * <p>
+     * To obtain the fully resolved absolute path, use {@link #targetPath(Project)} instead.
+     * </p>
+     *
+     * @see #targetPath(Project)
      */
     default Optional<Path> targetPath() {
         return Optional.empty();
     }
 
     /**
-     * {@return the explicit target path resolved against the default target path}
+     * {@return the fully resolved absolute target path}
+     * <p>
+     * This method returns the absolute path where files from {@link #directory()} should be copied.
      * Invoking this method is equivalent to getting the default output directory
      * by a call to {@code project.getOutputDirectory(scope())}, then resolving the
      * {@linkplain #targetPath() target path} (if present) against that default directory.
-     * Note that if the target path is absolute, the result is that target path unchanged.
+     * </p>
+     * <p>
+     * If {@link #targetPath()} returns:
+     * </p>
+     * <ul>
+     *   <li>An empty {@code Optional}: returns the default output directory
+     *       (e.g., {@code /path/to/project/target/classes})</li>
+     *   <li>A relative path (e.g., {@code "custom-dir"}): returns the path resolved against
+     *       the output directory (e.g., {@code /path/to/project/target/classes/custom-dir})</li>
+     *   <li>An absolute path: returns that absolute path unchanged</li>
+     * </ul>
      *
      * @param project the project to use for getting default directories
      *
+     * @see #targetPath()
      * @see Project#getOutputDirectory(ProjectScope)
      */
     @Nonnull
