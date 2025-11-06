@@ -42,57 +42,11 @@ class ConnectedResource extends Resource {
                 .includes(sourceRoot.includes())
                 .excludes(sourceRoot.excludes())
                 .filtering(Boolean.toString(sourceRoot.stringFiltering()))
-                .targetPath(computeRelativeTargetPath(sourceRoot, scope, project))
+                .targetPath(sourceRoot.targetPath().map(Path::toString).orElse(null))
                 .build());
         this.originalSourceRoot = sourceRoot;
         this.scope = scope;
         this.project = project;
-    }
-
-    /**
-     * Computes the relative targetPath from the resolved targetPath in the SourceRoot.
-     * The SourceRoot stores the targetPath as an absolute or base-dir-relative path,
-     * but the Resource model expects it to be relative to the output directory.
-     */
-    private static String computeRelativeTargetPath(SourceRoot sourceRoot, ProjectScope scope, MavenProject project) {
-        return sourceRoot
-                .targetPath()
-                .map(resolvedPath -> {
-                    // Get the output directory path
-                    String outputDir;
-                    if (scope == ProjectScope.MAIN) {
-                        outputDir = project.getBuild().getOutputDirectory();
-                        if (outputDir == null) {
-                            outputDir = "target/classes";
-                        }
-                    } else {
-                        outputDir = project.getBuild().getTestOutputDirectory();
-                        if (outputDir == null) {
-                            outputDir = "target/test-classes";
-                        }
-                    }
-
-                    // Compute the full output directory path and normalize
-                    Path fullOutputDir =
-                            project.getBaseDirectory().resolve(outputDir).normalize();
-                    Path normalizedResolvedPath = resolvedPath.normalize();
-
-                    // If the resolved path starts with the output directory, make it relative
-                    if (normalizedResolvedPath.startsWith(fullOutputDir)) {
-                        return fullOutputDir.relativize(normalizedResolvedPath).toString();
-                    }
-
-                    // Otherwise, return the resolved path as-is (might be absolute or relative to baseDir)
-                    // Try to make it relative to baseDir
-                    Path baseDir = project.getBaseDirectory().normalize();
-                    if (normalizedResolvedPath.startsWith(baseDir)) {
-                        return baseDir.relativize(normalizedResolvedPath).toString();
-                    }
-
-                    // If all else fails, return as string
-                    return normalizedResolvedPath.toString();
-                })
-                .orElse(null);
     }
 
     @Override
@@ -167,21 +121,7 @@ class ConnectedResource extends Resource {
 
         if (index >= 0) {
             // Replace the SourceRoot at the same position
-            // Get output directory, using defaults if not set
-            String outputDir;
-            if (scope == ProjectScope.MAIN) {
-                outputDir = project.getBuild().getOutputDirectory();
-                if (outputDir == null) {
-                    outputDir = "target/classes";
-                }
-            } else {
-                outputDir = project.getBuild().getTestOutputDirectory();
-                if (outputDir == null) {
-                    outputDir = "target/test-classes";
-                }
-            }
-            SourceRoot newSourceRoot =
-                    new DefaultSourceRoot(project.getBaseDirectory(), scope, this.getDelegate(), outputDir);
+            SourceRoot newSourceRoot = new DefaultSourceRoot(project.getBaseDirectory(), scope, this.getDelegate());
             sourcesList.set(index, newSourceRoot);
 
             // Update the project's sources, preserving order

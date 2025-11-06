@@ -187,21 +187,17 @@ public class DefaultSourceRootTest {
     @Test
     void testExtractsTargetPathFromResource() {
         // Test the Resource constructor with relative targetPath
-        // Relative targetPath should be resolved relative to output directory
+        // targetPath should be kept as relative path
         Resource resource = Resource.newBuilder()
                 .directory("src/test/resources")
                 .targetPath("test-output")
                 .build();
 
-        DefaultSourceRoot sourceRoot =
-                new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource, "target/test-classes");
+        DefaultSourceRoot sourceRoot = new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource);
 
         Optional<Path> targetPath = sourceRoot.targetPath();
         assertTrue(targetPath.isPresent(), "targetPath should be present");
-        assertEquals(
-                Path.of("myproject", "target", "test-classes", "test-output"),
-                targetPath.get(),
-                "Relative targetPath should be resolved relative to output directory");
+        assertEquals(Path.of("test-output"), targetPath.get(), "targetPath should be kept as relative path");
         assertEquals(Path.of("myproject", "src", "test", "resources"), sourceRoot.directory());
         assertEquals(ProjectScope.TEST, sourceRoot.scope());
         assertEquals(Language.RESOURCES, sourceRoot.language());
@@ -215,8 +211,7 @@ public class DefaultSourceRootTest {
                 Resource.newBuilder().directory("src/test/resources").build();
         // targetPath is null by default
 
-        DefaultSourceRoot sourceRoot =
-                new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource, "target/test-classes");
+        DefaultSourceRoot sourceRoot = new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource);
 
         Optional<Path> targetPath = sourceRoot.targetPath();
         assertFalse(targetPath.isPresent(), "targetPath should be empty when null");
@@ -231,8 +226,7 @@ public class DefaultSourceRootTest {
                 .targetPath("")
                 .build();
 
-        DefaultSourceRoot sourceRoot =
-                new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource, "target/test-classes");
+        DefaultSourceRoot sourceRoot = new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource);
 
         Optional<Path> targetPath = sourceRoot.targetPath();
         assertFalse(targetPath.isPresent(), "targetPath should be empty for empty string");
@@ -247,15 +241,14 @@ public class DefaultSourceRootTest {
                 .targetPath("${project.build.directory}/custom")
                 .build();
 
-        DefaultSourceRoot sourceRoot =
-                new DefaultSourceRoot(Path.of("myproject"), ProjectScope.MAIN, resource, "target/classes");
+        DefaultSourceRoot sourceRoot = new DefaultSourceRoot(Path.of("myproject"), ProjectScope.MAIN, resource);
 
         Optional<Path> targetPath = sourceRoot.targetPath();
         assertTrue(targetPath.isPresent(), "Property placeholder targetPath should be present");
         assertEquals(
-                Path.of("myproject", "target", "classes", "${project.build.directory}/custom"),
+                Path.of("${project.build.directory}/custom"),
                 targetPath.get(),
-                "Property placeholder should be preserved but resolved relative to output directory");
+                "Property placeholder should be preserved as relative path");
     }
 
     /*GH-11381*/
@@ -267,7 +260,7 @@ public class DefaultSourceRootTest {
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource, "target/test-classes"),
+                () -> new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource),
                 "Should throw exception for null directory");
     }
 
@@ -283,14 +276,13 @@ public class DefaultSourceRootTest {
                 .excludes(List.of("*.tmp"))
                 .build();
 
-        DefaultSourceRoot sourceRoot =
-                new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource, "target/test-classes");
+        DefaultSourceRoot sourceRoot = new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource);
 
         // Verify all properties are preserved
         assertEquals(
-                Path.of("myproject", "target", "test-classes", "test-classes"),
+                Path.of("test-classes"),
                 sourceRoot.targetPath().orElseThrow(),
-                "targetPath should be resolved relative to output directory");
+                "targetPath should be kept as relative path");
         assertTrue(sourceRoot.stringFiltering(), "Filtering should be true");
         assertEquals(1, sourceRoot.includes().size());
         assertTrue(sourceRoot.includes().contains("*.properties"));

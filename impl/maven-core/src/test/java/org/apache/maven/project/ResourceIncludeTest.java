@@ -203,13 +203,9 @@ class ResourceIncludeTest {
         resourceWithTarget.setDirectory("src/main/custom");
         resourceWithTarget.setTargetPath("custom-output");
 
-        // Convert through DefaultSourceRoot to ensure targetPath extraction works
-        // Use the new constructor with output directory to properly resolve targetPath
-        DefaultSourceRoot sourceRootFromResource = new DefaultSourceRoot(
-                project.getBaseDirectory(),
-                ProjectScope.MAIN,
-                resourceWithTarget.getDelegate(),
-                project.getBuild().getOutputDirectory());
+        // Convert through DefaultSourceRoot to ensure targetPath is preserved
+        DefaultSourceRoot sourceRootFromResource =
+                new DefaultSourceRoot(project.getBaseDirectory(), ProjectScope.MAIN, resourceWithTarget.getDelegate());
 
         project.addSourceRoot(sourceRootFromResource);
 
