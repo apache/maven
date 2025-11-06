@@ -197,7 +197,8 @@ public class DefaultSourceRootTest {
 
         Optional<Path> targetPath = sourceRoot.targetPath();
         assertTrue(targetPath.isPresent(), "targetPath should be present");
-        assertEquals(Path.of("test-output"), targetPath.get(), "targetPath should be kept as relative path");
+        assertEquals(
+                Path.of("myproject/test-output"), targetPath.get(), "targetPath should be resolved against baseDir");
         assertEquals(Path.of("myproject", "src", "test", "resources"), sourceRoot.directory());
         assertEquals(ProjectScope.TEST, sourceRoot.scope());
         assertEquals(Language.RESOURCES, sourceRoot.language());
@@ -246,9 +247,9 @@ public class DefaultSourceRootTest {
         Optional<Path> targetPath = sourceRoot.targetPath();
         assertTrue(targetPath.isPresent(), "Property placeholder targetPath should be present");
         assertEquals(
-                Path.of("${project.build.directory}/custom"),
+                Path.of("myproject/${project.build.directory}/custom"),
                 targetPath.get(),
-                "Property placeholder should be preserved as relative path");
+                "Property placeholder should be resolved against baseDir");
     }
 
     /*GH-11381*/
@@ -280,9 +281,9 @@ public class DefaultSourceRootTest {
 
         // Verify all properties are preserved
         assertEquals(
-                Path.of("test-classes"),
+                Path.of("myproject/test-classes"),
                 sourceRoot.targetPath().orElseThrow(),
-                "targetPath should be kept as relative path");
+                "targetPath should be resolved against baseDir");
         assertTrue(sourceRoot.stringFiltering(), "Filtering should be true");
         assertEquals(1, sourceRoot.includes().size());
         assertTrue(sourceRoot.includes().contains("*.properties"));

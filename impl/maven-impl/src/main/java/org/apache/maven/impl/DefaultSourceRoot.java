@@ -169,7 +169,7 @@ public record DefaultSourceRoot(
                 resource.getIncludes(),
                 resource.getExcludes(),
                 Boolean.parseBoolean(resource.getFiltering()),
-                nonBlank(resource.getTargetPath()).map(Path::of).orElse(null),
+                nonBlank(resource.getTargetPath()).map(baseDir::resolve).orElse(null),
                 true);
     }
 
