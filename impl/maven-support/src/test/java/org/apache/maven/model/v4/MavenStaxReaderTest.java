@@ -161,7 +161,7 @@ class MavenStaxReaderTest {
 
         MavenStaxReader reader = new MavenStaxReader();
         reader.setAddLocationInformation(true);
-        Model model = reader.read(new StringReader(xml), true, InputSource.of("test.xml"));
+        Model model = reader.read(new StringReader(xml), true, new InputSource("test.xml", null));
 
         // Check root element location - should point to <project> tag on line 1, column 1
         InputLocation projectLocation = model.getLocation("");
@@ -215,7 +215,7 @@ class MavenStaxReaderTest {
 
         MavenStaxReader reader = new MavenStaxReader();
         reader.setAddLocationInformation(true);
-        Model model = reader.read(new StringReader(xml), true, InputSource.of("test.xml"));
+        Model model = reader.read(new StringReader(xml), true, new InputSource("test.xml", null));
 
         // Check project root attribute - attributes get the location of their containing element
         // since XMLStreamReader doesn't provide individual attribute positions
@@ -256,7 +256,7 @@ class MavenStaxReaderTest {
 
         MavenStaxReader reader = new MavenStaxReader();
         reader.setAddLocationInformation(true);
-        Model model = reader.read(new StringReader(xml), true, InputSource.of("test.xml"));
+        Model model = reader.read(new StringReader(xml), true, new InputSource("test.xml", null));
 
         // Check modules location - should point to <modules> tag on line 3, column 3
         InputLocation modulesLocation = model.getLocation("modules");
