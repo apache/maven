@@ -51,42 +51,12 @@ class ConnectedResource extends Resource {
 
     /**
      * Computes the targetPath relative to the output directory.
-     * In Maven 3 API, Resource.getTargetPath() is expected to be relative to the output directory
-     * (e.g., "custom-output"), while SourceRoot.targetPath() is relative to the project basedir
-     * (e.g., "target/classes/custom-output").
+     * In Maven 3 API, Resource.getTargetPath() is expected to be relative to the output directory.
+     * SourceRoot.targetPath() now also returns a relative path (relative to the output directory),
+     * so we can simply return it as-is.
      */
     private static String computeRelativeTargetPath(SourceRoot sourceRoot, ProjectScope scope, MavenProject project) {
-        return sourceRoot
-                .targetPath()
-                .map(targetPath -> {
-                    // Get the output directory for this scope
-                    String outputDir = scope == ProjectScope.MAIN
-                            ? project.getBuild().getOutputDirectory()
-                            : project.getBuild().getTestOutputDirectory();
-                    Path outputDirPath = Path.of(outputDir);
-
-                    // If targetPath is absolute, try to make it relative to the output directory
-                    if (targetPath.isAbsolute()) {
-                        if (targetPath.startsWith(outputDirPath)) {
-                            return outputDirPath.relativize(targetPath).toString();
-                        }
-                        return targetPath.toString();
-                    }
-
-                    // If targetPath is relative, check if it starts with the output directory
-                    // (e.g., "target/classes/custom-output" should become "custom-output")
-                    Path baseDir = project.getBaseDirectory();
-                    Path resolvedTargetPath = baseDir.resolve(targetPath);
-                    Path resolvedOutputDir = baseDir.resolve(outputDirPath);
-
-                    if (resolvedTargetPath.startsWith(resolvedOutputDir)) {
-                        return resolvedOutputDir.relativize(resolvedTargetPath).toString();
-                    }
-
-                    // Otherwise, return as-is
-                    return targetPath.toString();
-                })
-                .orElse(null);
+        return sourceRoot.targetPath().map(Path::toString).orElse(null);
     }
 
     @Override

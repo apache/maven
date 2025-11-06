@@ -148,7 +148,7 @@ public class DefaultSourceRootTest {
     }
 
     /**
-     * Tests that relative target paths are resolved against the right base directory.
+     * Tests that relative target paths are stored as relative paths.
      */
     @Test
     void testRelativeMainTargetPath() {
@@ -160,13 +160,11 @@ public class DefaultSourceRootTest {
 
         assertEquals(ProjectScope.MAIN, source.scope());
         assertEquals(Language.JAVA_FAMILY, source.language());
-        assertEquals(
-                Path.of("myproject", "target", "classes", "user-output"),
-                source.targetPath().orElseThrow());
+        assertEquals(Path.of("user-output"), source.targetPath().orElseThrow());
     }
 
     /**
-     * Tests that relative target paths are resolved against the right base directory.
+     * Tests that relative target paths are stored as relative paths.
      */
     @Test
     void testRelativeTestTargetPath() {
@@ -178,9 +176,7 @@ public class DefaultSourceRootTest {
 
         assertEquals(ProjectScope.TEST, source.scope());
         assertEquals(Language.JAVA_FAMILY, source.language());
-        assertEquals(
-                Path.of("myproject", "target", "test-classes", "user-output"),
-                source.targetPath().orElseThrow());
+        assertEquals(Path.of("user-output"), source.targetPath().orElseThrow());
     }
 
     /*GH-11381*/
@@ -197,8 +193,7 @@ public class DefaultSourceRootTest {
 
         Optional<Path> targetPath = sourceRoot.targetPath();
         assertTrue(targetPath.isPresent(), "targetPath should be present");
-        assertEquals(
-                Path.of("myproject/test-output"), targetPath.get(), "targetPath should be resolved against baseDir");
+        assertEquals(Path.of("test-output"), targetPath.get(), "targetPath should be relative to output directory");
         assertEquals(Path.of("myproject", "src", "test", "resources"), sourceRoot.directory());
         assertEquals(ProjectScope.TEST, sourceRoot.scope());
         assertEquals(Language.RESOURCES, sourceRoot.language());
@@ -247,9 +242,9 @@ public class DefaultSourceRootTest {
         Optional<Path> targetPath = sourceRoot.targetPath();
         assertTrue(targetPath.isPresent(), "Property placeholder targetPath should be present");
         assertEquals(
-                Path.of("myproject/${project.build.directory}/custom"),
+                Path.of("${project.build.directory}/custom"),
                 targetPath.get(),
-                "Property placeholder should be resolved against baseDir");
+                "Property placeholder should be kept as-is (relative path)");
     }
 
     /*GH-11381*/
@@ -281,9 +276,9 @@ public class DefaultSourceRootTest {
 
         // Verify all properties are preserved
         assertEquals(
-                Path.of("myproject/test-classes"),
+                Path.of("test-classes"),
                 sourceRoot.targetPath().orElseThrow(),
-                "targetPath should be resolved against baseDir");
+                "targetPath should be relative to output directory");
         assertTrue(sourceRoot.stringFiltering(), "Filtering should be true");
         assertEquals(1, sourceRoot.includes().size());
         assertTrue(sourceRoot.includes().contains("*.properties"));

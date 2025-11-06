@@ -142,10 +142,7 @@ public record DefaultSourceRoot(
                 source.getIncludes(),
                 source.getExcludes(),
                 source.isStringFiltering(),
-                nonBlank(source.getTargetPath())
-                        .map((targetPath) ->
-                                baseDir.resolve(outputDir.apply(scope)).resolve(targetPath))
-                        .orElse(null),
+                nonBlank(source.getTargetPath()).map(Path::of).orElse(null),
                 source.isEnabled());
     }
 
@@ -169,7 +166,7 @@ public record DefaultSourceRoot(
                 resource.getIncludes(),
                 resource.getExcludes(),
                 Boolean.parseBoolean(resource.getFiltering()),
-                nonBlank(resource.getTargetPath()).map(baseDir::resolve).orElse(null),
+                nonBlank(resource.getTargetPath()).map(Path::of).orElse(null),
                 true);
     }
 
