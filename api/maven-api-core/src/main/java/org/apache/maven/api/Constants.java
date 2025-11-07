@@ -868,5 +868,11 @@ public final class Constants {
     @Config(type = "java.lang.Boolean", defaultValue = "false")
     public static final String MAVEN_MODEL_DEPENDENCY_INTERPOLATION_FULL = "maven.model.dependencyInterpolation.full";
 
+    /**
+     * System property to keep temp material for diagnostics.
+     *
+     */
+    public static final String KEEP_PROP = "maven.tempfile.keep";
+
     private Constants() {}
 }
