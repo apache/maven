@@ -46,6 +46,10 @@ class ResourceIncludeTest {
         // Set a dummy pom file to establish the base directory
         project.setFile(new java.io.File("./pom.xml"));
 
+        // Set build output directories
+        project.getBuild().setOutputDirectory("target/classes");
+        project.getBuild().setTestOutputDirectory("target/test-classes");
+
         // Add a resource source root to the project
         project.addSourceRoot(
                 new DefaultSourceRoot(ProjectScope.MAIN, Language.RESOURCES, Path.of("src/main/resources")));
@@ -199,7 +203,7 @@ class ResourceIncludeTest {
         resourceWithTarget.setDirectory("src/main/custom");
         resourceWithTarget.setTargetPath("custom-output");
 
-        // Convert through DefaultSourceRoot to ensure targetPath extraction works
+        // Convert through DefaultSourceRoot to ensure targetPath is preserved
         DefaultSourceRoot sourceRootFromResource =
                 new DefaultSourceRoot(project.getBaseDirectory(), ProjectScope.MAIN, resourceWithTarget.getDelegate());
 
