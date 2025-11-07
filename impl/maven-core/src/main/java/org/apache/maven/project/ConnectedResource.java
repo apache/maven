@@ -31,6 +31,7 @@ import org.apache.maven.model.Resource;
  * A Resource wrapper that maintains a connection to the underlying project model.
  * When includes/excludes are modified, the changes are propagated back to the project's SourceRoots.
  */
+@SuppressWarnings("deprecation")
 class ConnectedResource extends Resource {
     private final SourceRoot originalSourceRoot;
     private final ProjectScope scope;
