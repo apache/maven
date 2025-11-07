@@ -149,8 +149,15 @@ public record DefaultSourceRoot(
     /**
      * Creates a new instance from the given resource.
      * This is used for migration from the previous way of declaring resources.
+     * <p>
+     * <strong>Important:</strong> The {@code targetPath} from the resource is stored as-is
+     * (converted to a {@link Path} but not resolved against any directory). This preserves
+     * the Maven 3.x behavior where {@code targetPath} is relative to the output directory,
+     * not the project base directory. The actual resolution happens later via
+     * {@link SourceRoot#targetPath(Project)}.
+     * </p>
      *
-     * @param baseDir the base directory for resolving relative paths
+     * @param baseDir the base directory for resolving relative paths (used only for the source directory)
      * @param scope the scope of the resource (main or test)
      * @param resource a resource element from the model
      */
@@ -217,6 +224,11 @@ public record DefaultSourceRoot(
 
     /**
      * {@return an explicit target path, overriding the default value}
+     * <p>
+     * The returned path, if present, is stored as provided in the configuration and is typically
+     * relative to the output directory. Use {@link #targetPath(Project)} to get the fully
+     * resolved absolute path.
+     * </p>
      */
     @Override
     public Optional<Path> targetPath() {

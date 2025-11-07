@@ -145,9 +145,20 @@ public interface SourceRoot {
     /**
      * {@return an explicit target path, overriding the default value}
      * <p>
-     * The returned path is typically <strong>relative to the output directory</strong>
-     * (e.g., {@code "custom-dir"} or {@code "META-INF/resources"}), but may be absolute
-     * if explicitly specified as such in the project configuration.
+     * <strong>Path Resolution Semantics:</strong>
+     * </p>
+     * <ul>
+     *   <li><strong>Relative paths</strong> (e.g., {@code "custom-dir"}, {@code "META-INF/resources"})
+     *       are resolved <strong>relative to the output directory</strong> for the given {@link #scope()}.
+     *       For {@link ProjectScope#MAIN}, this is typically {@code target/classes}.
+     *       For {@link ProjectScope#TEST}, this is typically {@code target/test-classes}.</li>
+     *   <li><strong>Absolute paths</strong> are used as-is without any resolution.</li>
+     *   <li><strong>Empty/null</strong> means files are copied directly to the output directory root.</li>
+     * </ul>
+     * <p>
+     * <strong>Maven 3 Compatibility:</strong> This behavior maintains compatibility with Maven 3.x,
+     * where resource {@code targetPath} elements were always resolved relative to the output directory,
+     * not the project base directory.
      * </p>
      * <p>
      * When a target path is explicitly specified, the values of the {@link #module()} and {@link #targetVersion()}
@@ -160,6 +171,7 @@ public interface SourceRoot {
      * </p>
      *
      * @see #targetPath(Project)
+     * @see Project#getOutputDirectory(ProjectScope)
      */
     default Optional<Path> targetPath() {
         return Optional.empty();
@@ -174,14 +186,25 @@ public interface SourceRoot {
      * {@linkplain #targetPath() target path} (if present) against that default directory.
      * </p>
      * <p>
-     * If {@link #targetPath()} returns:
+     * <strong>Resolution Algorithm:</strong>
+     * </p>
+     * <ol>
+     *   <li>Get the output directory for this source root's {@link #scope()} from the project</li>
+     *   <li>If {@link #targetPath()} returns an empty {@code Optional}:
+     *       return the output directory (e.g., {@code /path/to/project/target/classes})</li>
+     *   <li>If {@link #targetPath()} returns a relative path (e.g., {@code "custom-dir"}):
+     *       resolve it against the output directory (e.g., {@code /path/to/project/target/classes/custom-dir})</li>
+     *   <li>If {@link #targetPath()} returns an absolute path: return that path unchanged</li>
+     * </ol>
+     * <p>
+     * <strong>Examples:</strong>
      * </p>
      * <ul>
-     *   <li>An empty {@code Optional}: returns the default output directory
-     *       (e.g., {@code /path/to/project/target/classes})</li>
-     *   <li>A relative path (e.g., {@code "custom-dir"}): returns the path resolved against
-     *       the output directory (e.g., {@code /path/to/project/target/classes/custom-dir})</li>
-     *   <li>An absolute path: returns that absolute path unchanged</li>
+     *   <li>Project base: {@code /home/user/myproject}</li>
+     *   <li>Output directory (MAIN): {@code /home/user/myproject/target/classes}</li>
+     *   <li>targetPath() = {@code Optional.empty()} → Result: {@code /home/user/myproject/target/classes}</li>
+     *   <li>targetPath() = {@code Optional.of(Path.of("META-INF"))} → Result: {@code /home/user/myproject/target/classes/META-INF}</li>
+     *   <li>targetPath() = {@code Optional.of(Path.of("/tmp/custom"))} → Result: {@code /tmp/custom}</li>
      * </ul>
      *
      * @param project the project to use for getting default directories
