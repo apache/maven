@@ -55,6 +55,10 @@ under the License.
           <name>param2</name>
           <type>java.lang.String</type>
         </parameter>
+        <parameter>
+          <name>strings</name>
+          <type>java.lang.List&lt;java.lang.String&gt;</type>
+        </parameter>
         <!--
         <parameter>
           <name>plain</name>
