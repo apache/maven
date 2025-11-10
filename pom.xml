@@ -160,7 +160,7 @@ under the License.
     <logbackClassicVersion>1.5.20</logbackClassicVersion>
     <mockitoVersion>5.20.0</mockitoVersion>
     <plexusInteractivityVersion>1.4</plexusInteractivityVersion>
-    <plexusInterpolationVersion>1.28</plexusInterpolationVersion>
+    <plexusInterpolationVersion>1.29</plexusInterpolationVersion>
     <plexusTestingVersion>2.0.1</plexusTestingVersion>
     <plexusXmlVersion>4.1.0</plexusXmlVersion>
     <resolverVersion>2.0.13</resolverVersion>
