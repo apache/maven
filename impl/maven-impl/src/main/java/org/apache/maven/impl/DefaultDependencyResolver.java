@@ -21,11 +21,11 @@ package org.apache.maven.impl;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -85,7 +85,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
      */
     public DefaultDependencyResolver() {
         // TODO: the cache should not be instantiated here, but should rather be session-wide.
-        moduleCaches = new HashMap<>();
+        moduleCaches = new ConcurrentHashMap<>();
     }
 
     /**
