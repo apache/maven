@@ -74,18 +74,26 @@ class DefaultConsumerPomBuilder implements PomBuilder {
             throws ModelBuilderException {
         Model model = project.getModel().getDelegate();
         boolean flattenEnabled = Features.consumerPomFlatten(session.getConfigProperties());
+        String packaging = model.getPackaging();
+        String originalPackaging = project.getOriginalModel().getPackaging();
+
+        // Check if this is a BOM (original packaging is "bom")
+        boolean isBom = BOM_PACKAGING.equals(originalPackaging);
 
         // Check if consumer POM flattening is disabled
         if (!flattenEnabled) {
             // When flattening is disabled, treat non-POM projects like parent POMs
             // Apply only basic transformations without flattening dependency management
-            return buildPom(session, project, src);
+            // However, BOMs still need special handling to transform packaging from "bom" to "pom"
+            if (isBom) {
+                return buildBomWithoutFlatten(session, project, src);
+            } else {
+                return buildPom(session, project, src);
+            }
         }
         // Default behavior: flatten the consumer POM
-        String packaging = model.getPackaging();
-        String originalPackaging = project.getOriginalModel().getPackaging();
         if (POM_PACKAGING.equals(packaging)) {
-            if (BOM_PACKAGING.equals(originalPackaging)) {
+            if (isBom) {
                 return buildBom(session, project, src);
             } else {
                 return buildPom(session, project, src);
@@ -100,6 +108,15 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         ModelBuilderResult result = buildModel(session, src);
         Model model = result.getRawModel();
         return transformPom(model, project);
+    }
+
+    protected Model buildBomWithoutFlatten(RepositorySystemSession session, MavenProject project, ModelSource src)
+            throws ModelBuilderException {
+        ModelBuilderResult result = buildModel(session, src);
+        Model model = result.getRawModel();
+        // For BOMs without flattening, we just need to transform the packaging from "bom" to "pom"
+        // but keep everything else from the raw model (including unresolved versions)
+        return transformBom(model, project);
     }
 
     protected Model buildBom(RepositorySystemSession session, MavenProject project, ModelSource src)
