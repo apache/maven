@@ -301,17 +301,10 @@ public final class EnhancedCompositeBeanHelper {
      * Set field value with cached accessibility.
      */
     private void setFieldValue(Object bean, Field field, Object value) throws IllegalAccessException {
-        boolean wasAccessible = field.canAccess(bean);
-        if (!wasAccessible) {
+        if (!field.canAccess(bean)) {
             field.setAccessible(true);
         }
-        try {
-            field.set(bean, value);
-        } finally {
-            if (!wasAccessible) {
-                field.setAccessible(false);
-            }
-        }
+        field.set(bean, value);
     }
 
     /**
