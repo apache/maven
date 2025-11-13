@@ -55,6 +55,34 @@ under the License.
           <name>param2</name>
           <type>java.lang.String</type>
         </parameter>
+        <parameter>
+          <name>strings</name>
+          <type>java.util.List</type>
+        </parameter>
+        <parameter>
+          <name>stringArray</name>
+          <type>[Ljava.lang.String;</type>
+        </parameter>
+        <parameter>
+          <name>mapParam</name>
+          <type>java.util.Map</type>
+        </parameter>
+        <parameter>
+          <name>propertiesParam</name>
+          <type>java.util.Properties</type>
+        </parameter>
+        <parameter>
+          <name>beanParam</name>
+          <type>org.apache.maven.api.plugin.testing.ExpressionEvaluatorTest$TestBean</type>
+        </parameter>
+        <parameter>
+          <name>intValue</name>
+          <type>int</type>
+        </parameter>
+        <parameter>
+          <name>boolValue</name>
+          <type>boolean</type>
+        </parameter>
         <!--
         <parameter>
           <name>plain</name>
