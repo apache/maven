@@ -52,9 +52,6 @@ public final class EnhancedCompositeBeanHelper {
     // Cache for field lookups: Class -> FieldName -> Field
     private static final ConcurrentMap<Class<?>, Map<String, Field>> FIELD_CACHE = new ConcurrentHashMap<>();
 
-    // Cache for accessible fields to avoid repeated setAccessible calls
-    private static final ConcurrentMap<Field, Boolean> ACCESSIBLE_FIELD_CACHE = new ConcurrentHashMap<>();
-
     private final ConverterLookup lookup;
     private final ClassLoader loader;
     private final ExpressionEvaluator evaluator;
@@ -304,19 +301,9 @@ public final class EnhancedCompositeBeanHelper {
      * Set field value with cached accessibility.
      */
     private void setFieldValue(Object bean, Field field, Object value) throws IllegalAccessException {
-        Boolean isAccessible = ACCESSIBLE_FIELD_CACHE.get(field);
-        if (isAccessible == null) {
-            isAccessible = field.canAccess(bean);
-            if (!isAccessible) {
-                field.setAccessible(true);
-                isAccessible = true;
-            }
-            ACCESSIBLE_FIELD_CACHE.put(field, isAccessible);
-        } else if (!isAccessible) {
+        if (!field.canAccess(bean)) {
             field.setAccessible(true);
-            ACCESSIBLE_FIELD_CACHE.put(field, true);
         }
-
         field.set(bean, value);
     }
 
@@ -326,6 +313,5 @@ public final class EnhancedCompositeBeanHelper {
     public static void clearCaches() {
         METHOD_CACHE.clear();
         FIELD_CACHE.clear();
-        ACCESSIBLE_FIELD_CACHE.clear();
     }
 }
