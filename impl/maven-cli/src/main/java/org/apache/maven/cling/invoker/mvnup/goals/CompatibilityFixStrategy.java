@@ -19,54 +19,47 @@
 package org.apache.maven.cling.invoker.mvnup.goals;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Stream;
 
+import eu.maveniverse.domtrip.Document;
+import eu.maveniverse.domtrip.Element;
+import eu.maveniverse.domtrip.maven.Coordinates;
+import eu.maveniverse.domtrip.maven.MavenPomElements;
 import org.apache.maven.api.cli.mvnup.UpgradeOptions;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Priority;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
-import org.jdom2.Attribute;
-import org.jdom2.Content;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
-import org.jdom2.Text;
 
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.Files.DEFAULT_PARENT_RELATIVE_PATH;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.Plugins.DEFAULT_MAVEN_PLUGIN_GROUP_ID;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.Plugins.MAVEN_PLUGIN_PREFIX;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlAttributes.COMBINE_APPEND;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlAttributes.COMBINE_CHILDREN;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlAttributes.COMBINE_MERGE;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlAttributes.COMBINE_OVERRIDE;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlAttributes.COMBINE_SELF;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.ARTIFACT_ID;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.BUILD;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.CLASSIFIER;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.DEPENDENCIES;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.DEPENDENCY;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.DEPENDENCY_MANAGEMENT;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.GROUP_ID;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.PARENT;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.PLUGIN;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.PLUGINS;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.PLUGIN_MANAGEMENT;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.PLUGIN_REPOSITORIES;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.PLUGIN_REPOSITORY;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.PROFILE;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.PROFILES;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.RELATIVE_PATH;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.REPOSITORIES;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.REPOSITORY;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.TYPE;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.VERSION;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Attributes.COMBINE_APPEND;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Attributes.COMBINE_CHILDREN;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Attributes.COMBINE_MERGE;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Attributes.COMBINE_OVERRIDE;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Attributes.COMBINE_SELF;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.BUILD;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.DEPENDENCIES;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.DEPENDENCY;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.DEPENDENCY_MANAGEMENT;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PARENT;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PLUGIN;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PLUGINS;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PLUGIN_MANAGEMENT;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PLUGIN_REPOSITORIES;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PLUGIN_REPOSITORY;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PROFILE;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PROFILES;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.RELATIVE_PATH;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.REPOSITORIES;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.REPOSITORY;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Files.DEFAULT_PARENT_RELATIVE_PATH;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Plugins.DEFAULT_MAVEN_PLUGIN_GROUP_ID;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Plugins.MAVEN_PLUGIN_PREFIX;
 
 /**
  * Strategy for applying Maven 4 compatibility fixes to POM files.
@@ -166,16 +159,17 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
      */
     private boolean fixUnsupportedCombineChildrenAttributes(Document pomDocument, UpgradeContext context) {
         boolean fixed = false;
-        Element root = pomDocument.getRootElement();
+        Element root = pomDocument.root();
 
         // Find all elements with combine.children="override" and change to "merge"
-        List<Element> elementsWithCombineChildren = findElementsWithAttribute(root, COMBINE_CHILDREN, COMBINE_OVERRIDE);
-        for (Element element : elementsWithCombineChildren) {
-            element.getAttribute(COMBINE_CHILDREN).setValue(COMBINE_MERGE);
-            context.detail("Fixed: " + COMBINE_CHILDREN + "='" + COMBINE_OVERRIDE + "' → '" + COMBINE_MERGE + "' in "
-                    + element.getName());
-            fixed = true;
-        }
+        long fixedCombineChildrenCount = findElementsWithAttribute(root, COMBINE_CHILDREN, COMBINE_OVERRIDE)
+                .peek(element -> {
+                    element.attributeObject(COMBINE_CHILDREN).value(COMBINE_MERGE);
+                    context.detail("Fixed: " + COMBINE_CHILDREN + "='" + COMBINE_OVERRIDE + "' → '" + COMBINE_MERGE
+                            + "' in " + element.name());
+                })
+                .count();
+        fixed |= fixedCombineChildrenCount > 0;
 
         return fixed;
     }
@@ -186,16 +180,17 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
      */
     private boolean fixUnsupportedCombineSelfAttributes(Document pomDocument, UpgradeContext context) {
         boolean fixed = false;
-        Element root = pomDocument.getRootElement();
+        Element root = pomDocument.root();
 
         // Find all elements with combine.self="append" and change to "merge"
-        List<Element> elementsWithCombineSelf = findElementsWithAttribute(root, COMBINE_SELF, COMBINE_APPEND);
-        for (Element element : elementsWithCombineSelf) {
-            element.getAttribute(COMBINE_SELF).setValue(COMBINE_MERGE);
-            context.detail("Fixed: " + COMBINE_SELF + "='" + COMBINE_APPEND + "' → '" + COMBINE_MERGE + "' in "
-                    + element.getName());
-            fixed = true;
-        }
+        long fixedCombineSelfCount = findElementsWithAttribute(root, COMBINE_SELF, COMBINE_APPEND)
+                .peek(element -> {
+                    element.attributeObject(COMBINE_SELF).value(COMBINE_MERGE);
+                    context.detail("Fixed: " + COMBINE_SELF + "='" + COMBINE_APPEND + "' → '" + COMBINE_MERGE + "' in "
+                            + element.name());
+                })
+                .count();
+        fixed |= fixedCombineSelfCount > 0;
 
         return fixed;
     }
@@ -204,105 +199,103 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
      * Fixes duplicate dependencies in dependencies and dependencyManagement sections.
      */
     private boolean fixDuplicateDependencies(Document pomDocument, UpgradeContext context) {
-        Element root = pomDocument.getRootElement();
-        Namespace namespace = root.getNamespace();
-        boolean fixed = false;
+        Element root = pomDocument.root();
 
-        // Fix main dependencies
-        Element dependenciesElement = root.getChild(DEPENDENCIES, namespace);
-        if (dependenciesElement != null) {
-            fixed |= fixDuplicateDependenciesInSection(dependenciesElement, namespace, context, DEPENDENCIES);
+        // Collect all dependency containers to process
+        Stream<DependencyContainer> dependencyContainers = Stream.concat(
+                // Root level dependencies
+                Stream.of(
+                                new DependencyContainer(root.child(DEPENDENCIES).orElse(null), DEPENDENCIES),
+                                new DependencyContainer(
+                                        root.child(DEPENDENCY_MANAGEMENT)
+                                                .flatMap(dm -> dm.child(DEPENDENCIES))
+                                                .orElse(null),
+                                        DEPENDENCY_MANAGEMENT))
+                        .filter(container -> container.element != null),
+                // Profile dependencies
+                root.child(PROFILES).stream()
+                        .flatMap(profiles -> profiles.children(PROFILE))
+                        .flatMap(profile -> Stream.of(
+                                        new DependencyContainer(
+                                                profile.child(DEPENDENCIES).orElse(null), "profile dependencies"),
+                                        new DependencyContainer(
+                                                profile.child(DEPENDENCY_MANAGEMENT)
+                                                        .flatMap(dm -> dm.child(DEPENDENCIES))
+                                                        .orElse(null),
+                                                "profile dependencyManagement"))
+                                .filter(container -> container.element != null)));
+
+        return dependencyContainers
+                .map(container -> fixDuplicateDependenciesInSection(container.element, context, container.sectionName))
+                .reduce(false, Boolean::logicalOr);
+    }
+
+    private static class DependencyContainer {
+        final Element element;
+        final String sectionName;
+
+        DependencyContainer(Element element, String sectionName) {
+            this.element = element;
+            this.sectionName = sectionName;
         }
-
-        // Fix dependencyManagement
-        Element dependencyManagementElement = root.getChild(DEPENDENCY_MANAGEMENT, namespace);
-        if (dependencyManagementElement != null) {
-            Element managedDependenciesElement = dependencyManagementElement.getChild(DEPENDENCIES, namespace);
-            if (managedDependenciesElement != null) {
-                fixed |= fixDuplicateDependenciesInSection(
-                        managedDependenciesElement, namespace, context, DEPENDENCY_MANAGEMENT);
-            }
-        }
-
-        // Fix profile dependencies
-        Element profilesElement = root.getChild(PROFILES, namespace);
-        if (profilesElement != null) {
-            List<Element> profileElements = profilesElement.getChildren(PROFILE, namespace);
-            for (Element profileElement : profileElements) {
-                Element profileDependencies = profileElement.getChild(DEPENDENCIES, namespace);
-                if (profileDependencies != null) {
-                    fixed |= fixDuplicateDependenciesInSection(
-                            profileDependencies, namespace, context, "profile dependencies");
-                }
-
-                Element profileDepMgmt = profileElement.getChild(DEPENDENCY_MANAGEMENT, namespace);
-                if (profileDepMgmt != null) {
-                    Element profileManagedDeps = profileDepMgmt.getChild(DEPENDENCIES, namespace);
-                    if (profileManagedDeps != null) {
-                        fixed |= fixDuplicateDependenciesInSection(
-                                profileManagedDeps, namespace, context, "profile dependencyManagement");
-                    }
-                }
-            }
-        }
-
-        return fixed;
     }
 
     /**
      * Fixes duplicate plugins in plugins and pluginManagement sections.
      */
     private boolean fixDuplicatePlugins(Document pomDocument, UpgradeContext context) {
-        Element root = pomDocument.getRootElement();
-        Namespace namespace = root.getNamespace();
-        boolean fixed = false;
+        Element root = pomDocument.root();
 
-        // Fix build plugins
-        Element buildElement = root.getChild(BUILD, namespace);
-        if (buildElement != null) {
-            fixed |= fixPluginsInBuildElement(buildElement, namespace, context, BUILD);
+        // Collect all build elements to process
+        Stream<BuildContainer> buildContainers = Stream.concat(
+                // Root level build
+                Stream.of(new BuildContainer(root.child(BUILD).orElse(null), BUILD))
+                        .filter(container -> container.element != null),
+                // Profile builds
+                root.child(PROFILES).stream()
+                        .flatMap(profiles -> profiles.children(PROFILE))
+                        .map(profile -> new BuildContainer(profile.child(BUILD).orElse(null), "profile build"))
+                        .filter(container -> container.element != null));
+
+        return buildContainers
+                .map(container -> fixPluginsInBuildElement(container.element, context, container.sectionName))
+                .reduce(false, Boolean::logicalOr);
+    }
+
+    private static class BuildContainer {
+        final Element element;
+        final String sectionName;
+
+        BuildContainer(Element element, String sectionName) {
+            this.element = element;
+            this.sectionName = sectionName;
         }
-
-        // Fix profile plugins
-        Element profilesElement = root.getChild(PROFILES, namespace);
-        if (profilesElement != null) {
-            for (Element profileElement : profilesElement.getChildren(PROFILE, namespace)) {
-                Element profileBuildElement = profileElement.getChild(BUILD, namespace);
-                if (profileBuildElement != null) {
-                    fixed |= fixPluginsInBuildElement(profileBuildElement, namespace, context, "profile build");
-                }
-            }
-        }
-
-        return fixed;
     }
 
     /**
      * Fixes unsupported repository URL expressions.
      */
     private boolean fixUnsupportedRepositoryExpressions(Document pomDocument, UpgradeContext context) {
-        Element root = pomDocument.getRootElement();
-        Namespace namespace = root.getNamespace();
-        boolean fixed = false;
+        Element root = pomDocument.root();
 
-        // Fix repositories
-        fixed |= fixRepositoryExpressions(root.getChild(REPOSITORIES, namespace), namespace, context);
+        // Collect all repository containers to process
+        Stream<Element> repositoryContainers = Stream.concat(
+                // Root level repositories
+                Stream.of(
+                                root.child(REPOSITORIES).orElse(null),
+                                root.child(PLUGIN_REPOSITORIES).orElse(null))
+                        .filter(Objects::nonNull),
+                // Profile repositories
+                root.child(PROFILES).stream()
+                        .flatMap(profiles -> profiles.children(PROFILE))
+                        .flatMap(profile -> Stream.of(
+                                        profile.child(REPOSITORIES).orElse(null),
+                                        profile.child(PLUGIN_REPOSITORIES).orElse(null))
+                                .filter(Objects::nonNull)));
 
-        // Fix pluginRepositories
-        fixed |= fixRepositoryExpressions(root.getChild(PLUGIN_REPOSITORIES, namespace), namespace, context);
-
-        // Fix repositories and pluginRepositories in profiles
-        Element profilesElement = root.getChild(PROFILES, namespace);
-        if (profilesElement != null) {
-            List<Element> profileElements = profilesElement.getChildren(PROFILE, namespace);
-            for (Element profileElement : profileElements) {
-                fixed |= fixRepositoryExpressions(profileElement.getChild(REPOSITORIES, namespace), namespace, context);
-                fixed |= fixRepositoryExpressions(
-                        profileElement.getChild(PLUGIN_REPOSITORIES, namespace), namespace, context);
-            }
-        }
-
-        return fixed;
+        return repositoryContainers
+                .map(container -> fixRepositoryExpressions(container, pomDocument, context))
+                .reduce(false, Boolean::logicalOr);
     }
 
     /**
@@ -310,22 +303,21 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
      */
     private boolean fixIncorrectParentRelativePaths(
             Document pomDocument, Path pomPath, Map<Path, Document> pomMap, UpgradeContext context) {
-        Element root = pomDocument.getRootElement();
-        Namespace namespace = root.getNamespace();
+        Element root = pomDocument.root();
 
-        Element parentElement = root.getChild(PARENT, namespace);
+        Element parentElement = root.child(PARENT).orElse(null);
         if (parentElement == null) {
             return false; // No parent to fix
         }
 
-        Element relativePathElement = parentElement.getChild(RELATIVE_PATH, namespace);
+        Element relativePathElement = parentElement.child(RELATIVE_PATH).orElse(null);
         String currentRelativePath =
-                relativePathElement != null ? relativePathElement.getTextTrim() : DEFAULT_PARENT_RELATIVE_PATH;
+                relativePathElement != null ? relativePathElement.textContent().trim() : DEFAULT_PARENT_RELATIVE_PATH;
 
         // Try to find the correct parent POM
-        String parentGroupId = getChildText(parentElement, GROUP_ID, namespace);
-        String parentArtifactId = getChildText(parentElement, ARTIFACT_ID, namespace);
-        String parentVersion = getChildText(parentElement, VERSION, namespace);
+        String parentGroupId = parentElement.childText(MavenPomElements.Elements.GROUP_ID);
+        String parentArtifactId = parentElement.childText(MavenPomElements.Elements.ARTIFACT_ID);
+        String parentVersion = parentElement.childText(MavenPomElements.Elements.VERSION);
 
         Path correctParentPath = findParentPomInMap(context, parentGroupId, parentArtifactId, parentVersion, pomMap);
         if (correctParentPath != null) {
@@ -334,20 +326,8 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
                 String correctRelativePathStr = correctRelativePath.toString().replace('\\', '/');
 
                 if (!correctRelativePathStr.equals(currentRelativePath)) {
-                    // Update relativePath element
-                    if (relativePathElement == null) {
-                        relativePathElement = new Element(RELATIVE_PATH, namespace);
-                        Element insertAfter = parentElement.getChild(VERSION, namespace);
-                        if (insertAfter == null) {
-                            insertAfter = parentElement.getChild(ARTIFACT_ID, namespace);
-                        }
-                        if (insertAfter != null) {
-                            parentElement.addContent(parentElement.indexOf(insertAfter) + 1, relativePathElement);
-                        } else {
-                            parentElement.addContent(relativePathElement);
-                        }
-                    }
-                    relativePathElement.setText(correctRelativePathStr);
+                    // Update or create relativePath element using DomUtils convenience method
+                    DomUtils.updateOrCreateChildElement(parentElement, RELATIVE_PATH, correctRelativePathStr);
                     context.detail("Fixed: " + "relativePath corrected from '" + currentRelativePath + "' to '"
                             + correctRelativePathStr + "'");
                     return true;
@@ -363,79 +343,69 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
     /**
      * Recursively finds all elements with a specific attribute value.
      */
-    private List<Element> findElementsWithAttribute(Element element, String attributeName, String attributeValue) {
-        List<Element> result = new ArrayList<>();
-
-        // Check current element
-        Attribute attr = element.getAttribute(attributeName);
-        if (attr != null && attributeValue.equals(attr.getValue())) {
-            result.add(element);
-        }
-
-        // Recursively check children
-        for (Element child : element.getChildren()) {
-            result.addAll(findElementsWithAttribute(child, attributeName, attributeValue));
-        }
-
-        return result;
+    private Stream<Element> findElementsWithAttribute(Element element, String attributeName, String attributeValue) {
+        return Stream.concat(
+                // Check current element
+                Stream.of(element).filter(e -> {
+                    String attr = e.attribute(attributeName);
+                    return attr != null && attributeValue.equals(attr);
+                }),
+                // Recursively check children
+                element.children().flatMap(child -> findElementsWithAttribute(child, attributeName, attributeValue)));
     }
 
     /**
      * Helper methods extracted from BaseUpgradeGoal for compatibility fixes.
      */
     private boolean fixDuplicateDependenciesInSection(
-            Element dependenciesElement, Namespace namespace, UpgradeContext context, String sectionName) {
-        boolean fixed = false;
-        List<Element> dependencies = dependenciesElement.getChildren(DEPENDENCY, namespace);
+            Element dependenciesElement, UpgradeContext context, String sectionName) {
+        List<Element> dependencies = dependenciesElement.children(DEPENDENCY).toList();
         Map<String, Element> seenDependencies = new HashMap<>();
-        List<Element> toRemove = new ArrayList<>();
 
-        for (Element dependency : dependencies) {
-            String groupId = getChildText(dependency, GROUP_ID, namespace);
-            String artifactId = getChildText(dependency, ARTIFACT_ID, namespace);
-            String type = getChildText(dependency, TYPE, namespace);
-            String classifier = getChildText(dependency, CLASSIFIER, namespace);
-
-            // Create a key for uniqueness check
-            String key = groupId + ":" + artifactId + ":" + (type != null ? type : "jar") + ":"
-                    + (classifier != null ? classifier : "");
-
-            if (seenDependencies.containsKey(key)) {
-                // Found duplicate - remove it
-                toRemove.add(dependency);
-                context.detail("Fixed: " + "Removed duplicate dependency: " + key + " in " + sectionName);
-                fixed = true;
-            } else {
-                seenDependencies.put(key, dependency);
-            }
-        }
+        List<Element> duplicates = dependencies.stream()
+                .filter(dependency -> {
+                    String key = createDependencyKey(dependency);
+                    if (seenDependencies.containsKey(key)) {
+                        context.detail("Fixed: Removed duplicate dependency: " + key + " in " + sectionName);
+                        return true; // This is a duplicate
+                    } else {
+                        seenDependencies.put(key, dependency);
+                        return false; // This is the first occurrence
+                    }
+                })
+                .toList();
 
         // Remove duplicates while preserving formatting
-        for (Element duplicate : toRemove) {
-            removeElementWithFormatting(duplicate);
-        }
+        duplicates.forEach(DomUtils::removeElement);
 
-        return fixed;
+        return !duplicates.isEmpty();
     }
 
-    private boolean fixPluginsInBuildElement(
-            Element buildElement, Namespace namespace, UpgradeContext context, String sectionName) {
+    private String createDependencyKey(Element dependency) {
+        String groupId = dependency.childText(MavenPomElements.Elements.GROUP_ID);
+        String artifactId = dependency.childText(MavenPomElements.Elements.ARTIFACT_ID);
+        String type = dependency.childText(MavenPomElements.Elements.TYPE);
+        String classifier = dependency.childText(MavenPomElements.Elements.CLASSIFIER);
+
+        return groupId + ":" + artifactId + ":" + (type != null ? type : "jar") + ":"
+                + (classifier != null ? classifier : "");
+    }
+
+    private boolean fixPluginsInBuildElement(Element buildElement, UpgradeContext context, String sectionName) {
         boolean fixed = false;
 
-        Element pluginsElement = buildElement.getChild(PLUGINS, namespace);
+        Element pluginsElement = buildElement.child(PLUGINS).orElse(null);
         if (pluginsElement != null) {
-            fixed |= fixDuplicatePluginsInSection(pluginsElement, namespace, context, sectionName + "/" + PLUGINS);
+            fixed |= fixDuplicatePluginsInSection(pluginsElement, context, sectionName + "/" + PLUGINS);
         }
 
-        Element pluginManagementElement = buildElement.getChild(PLUGIN_MANAGEMENT, namespace);
+        Element pluginManagementElement = buildElement.child(PLUGIN_MANAGEMENT).orElse(null);
         if (pluginManagementElement != null) {
-            Element managedPluginsElement = pluginManagementElement.getChild(PLUGINS, namespace);
+            Element managedPluginsElement =
+                    pluginManagementElement.child(PLUGINS).orElse(null);
             if (managedPluginsElement != null) {
                 fixed |= fixDuplicatePluginsInSection(
-                        managedPluginsElement,
-                        namespace,
-                        context,
-                        sectionName + "/" + PLUGIN_MANAGEMENT + "/" + PLUGINS);
+                        managedPluginsElement, context, sectionName + "/" + PLUGIN_MANAGEMENT + "/" + PLUGINS);
             }
         }
 
@@ -445,62 +415,61 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
     /**
      * Fixes duplicate plugins within a specific plugins section.
      */
-    private boolean fixDuplicatePluginsInSection(
-            Element pluginsElement, Namespace namespace, UpgradeContext context, String sectionName) {
-        boolean fixed = false;
-        List<Element> plugins = pluginsElement.getChildren(PLUGIN, namespace);
+    private boolean fixDuplicatePluginsInSection(Element pluginsElement, UpgradeContext context, String sectionName) {
+        List<Element> plugins = pluginsElement.children(PLUGIN).toList();
         Map<String, Element> seenPlugins = new HashMap<>();
-        List<Element> toRemove = new ArrayList<>();
 
-        for (Element plugin : plugins) {
-            String groupId = getChildText(plugin, GROUP_ID, namespace);
-            String artifactId = getChildText(plugin, ARTIFACT_ID, namespace);
-
-            // Default groupId for Maven plugins
-            if (groupId == null && artifactId != null && artifactId.startsWith(MAVEN_PLUGIN_PREFIX)) {
-                groupId = DEFAULT_MAVEN_PLUGIN_GROUP_ID;
-            }
-
-            if (groupId != null && artifactId != null) {
-                // Create a key for uniqueness check (groupId:artifactId)
-                String key = groupId + ":" + artifactId;
-
-                if (seenPlugins.containsKey(key)) {
-                    // Found duplicate - remove it
-                    toRemove.add(plugin);
-                    context.detail("Fixed: " + "Removed duplicate plugin: " + key + " in " + sectionName);
-                    fixed = true;
-                } else {
-                    seenPlugins.put(key, plugin);
-                }
-            }
-        }
+        List<Element> duplicates = plugins.stream()
+                .filter(plugin -> {
+                    String key = createPluginKey(plugin);
+                    if (key != null) {
+                        if (seenPlugins.containsKey(key)) {
+                            context.detail("Fixed: Removed duplicate plugin: " + key + " in " + sectionName);
+                            return true; // This is a duplicate
+                        } else {
+                            seenPlugins.put(key, plugin);
+                        }
+                    }
+                    return false; // This is the first occurrence or invalid plugin
+                })
+                .toList();
 
         // Remove duplicates while preserving formatting
-        for (Element duplicate : toRemove) {
-            removeElementWithFormatting(duplicate);
-        }
+        duplicates.forEach(DomUtils::removeElement);
 
-        return fixed;
+        return !duplicates.isEmpty();
     }
 
-    private boolean fixRepositoryExpressions(Element repositoriesElement, Namespace namespace, UpgradeContext context) {
+    private String createPluginKey(Element plugin) {
+        String groupId = plugin.childText(MavenPomElements.Elements.GROUP_ID);
+        String artifactId = plugin.childText(MavenPomElements.Elements.ARTIFACT_ID);
+
+        // Default groupId for Maven plugins
+        if (groupId == null && artifactId != null && artifactId.startsWith(MAVEN_PLUGIN_PREFIX)) {
+            groupId = DEFAULT_MAVEN_PLUGIN_GROUP_ID;
+        }
+
+        return (groupId != null && artifactId != null) ? groupId + ":" + artifactId : null;
+    }
+
+    private boolean fixRepositoryExpressions(
+            Element repositoriesElement, Document pomDocument, UpgradeContext context) {
         if (repositoriesElement == null) {
             return false;
         }
 
         boolean fixed = false;
-        String elementType = repositoriesElement.getName().equals(REPOSITORIES) ? REPOSITORY : PLUGIN_REPOSITORY;
-        List<Element> repositories = repositoriesElement.getChildren(elementType, namespace);
+        String elementType = repositoriesElement.name().equals(REPOSITORIES) ? REPOSITORY : PLUGIN_REPOSITORY;
+        List<Element> repositories = repositoriesElement.children(elementType).toList();
 
         for (Element repository : repositories) {
-            Element urlElement = repository.getChild("url", namespace);
+            Element urlElement = repository.child("url").orElse(null);
             if (urlElement != null) {
-                String url = urlElement.getTextTrim();
+                String url = urlElement.textContent().trim();
                 if (url.contains("${")) {
                     // Allow repository URL interpolation; do not disable.
                     // Keep a gentle warning to help users notice unresolved placeholders at build time.
-                    String repositoryId = getChildText(repository, "id", namespace);
+                    String repositoryId = repository.childText("id");
                     context.info("Detected interpolated expression in " + elementType + " URL (id: " + repositoryId
                             + "): " + url);
                 }
@@ -514,7 +483,8 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
             UpgradeContext context, String groupId, String artifactId, String version, Map<Path, Document> pomMap) {
         return pomMap.entrySet().stream()
                 .filter(entry -> {
-                    GAV gav = GAVUtils.extractGAVWithParentResolution(context, entry.getValue());
+                    Coordinates gav = AbstractUpgradeStrategy.extractArtifactCoordinatesWithParentResolution(
+                            context, entry.getValue());
                     return gav != null
                             && Objects.equals(gav.groupId(), groupId)
                             && Objects.equals(gav.artifactId(), artifactId)
@@ -523,35 +493,5 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
                 .findFirst()
                 .map(Map.Entry::getKey)
                 .orElse(null);
-    }
-
-    private String getChildText(Element parent, String elementName, Namespace namespace) {
-        Element element = parent.getChild(elementName, namespace);
-        return element != null ? element.getTextTrim() : null;
-    }
-
-    /**
-     * Removes an element while preserving formatting by also removing preceding whitespace.
-     */
-    private void removeElementWithFormatting(Element element) {
-        Element parent = element.getParentElement();
-        if (parent != null) {
-            int index = parent.indexOf(element);
-
-            // Remove the element
-            parent.removeContent(element);
-
-            // Try to remove preceding whitespace/newline
-            if (index > 0) {
-                Content prevContent = parent.getContent(index - 1);
-                if (prevContent instanceof Text textContent) {
-                    String text = textContent.getText();
-                    // If it's just whitespace and newlines, remove it
-                    if (text.trim().isEmpty() && text.contains("\n")) {
-                        parent.removeContent(prevContent);
-                    }
-                }
-            }
-        }
     }
 }

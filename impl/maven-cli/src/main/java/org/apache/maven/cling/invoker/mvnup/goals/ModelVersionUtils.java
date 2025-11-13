@@ -18,22 +18,26 @@
  */
 package org.apache.maven.cling.invoker.mvnup.goals;
 
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
+import eu.maveniverse.domtrip.Document;
+import eu.maveniverse.domtrip.Editor;
+import eu.maveniverse.domtrip.Element;
 
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.ModelVersions.MODEL_VERSION_4_0_0;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.ModelVersions.MODEL_VERSION_4_1_0;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.ModelVersions.MODEL_VERSION_4_2_0;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.Namespaces.MAVEN_4_0_0_NAMESPACE;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.Namespaces.MAVEN_4_1_0_NAMESPACE;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.Namespaces.MAVEN_4_2_0_NAMESPACE;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.SchemaLocations.MAVEN_4_1_0_SCHEMA_LOCATION;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.SchemaLocations.MAVEN_4_2_0_SCHEMA_LOCATION;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.MODEL_VERSION;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.MODEL_VERSION;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.ModelVersions.MODEL_VERSION_4_0_0;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.ModelVersions.MODEL_VERSION_4_1_0;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.ModelVersions.MODEL_VERSION_4_2_0;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Namespaces.MAVEN_4_0_0_NAMESPACE;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Namespaces.MAVEN_4_1_0_NAMESPACE;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Namespaces.MAVEN_4_2_0_NAMESPACE;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.SchemaLocations.MAVEN_4_0_0_SCHEMA_LOCATION;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.SchemaLocations.MAVEN_4_1_0_SCHEMA_LOCATION;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.SchemaLocations.MAVEN_4_2_0_SCHEMA_LOCATION;
 
 /**
  * Utility class for handling Maven model version operations during upgrades.
+ *
+ * <p>This class uses domtrip internally for superior formatting preservation
+ * and simplified API while maintaining the same external interface.
  */
 public final class ModelVersionUtils {
 
@@ -45,24 +49,27 @@ public final class ModelVersionUtils {
      * Detects the model version from a POM document.
      * Uses both the modelVersion element and namespace URI for detection.
      *
-     * @param pomDocument the POM document
+     * @param pomDocument the POM document (domtrip Document)
      * @return the detected model version
      */
     public static String detectModelVersion(Document pomDocument) {
-        Element root = pomDocument.getRootElement();
-        Namespace namespace = root.getNamespace();
+        Editor editor = new Editor(pomDocument);
+        Element root = editor.root();
+        if (root == null) {
+            return MODEL_VERSION_4_0_0;
+        }
 
         // First try to get from modelVersion element
-        Element modelVersionElement = root.getChild(MODEL_VERSION, namespace);
+        Element modelVersionElement = root.child(MODEL_VERSION).orElse(null);
         if (modelVersionElement != null) {
-            String modelVersion = modelVersionElement.getTextTrim();
+            String modelVersion = modelVersionElement.textContentTrimmed();
             if (!modelVersion.isEmpty()) {
                 return modelVersion;
             }
         }
 
         // Fallback to namespace URI detection
-        String namespaceUri = namespace.getURI();
+        String namespaceUri = root.namespaceDeclaration(null);
         if (MAVEN_4_2_0_NAMESPACE.equals(namespaceUri)) {
             return MODEL_VERSION_4_2_0;
         } else if (MAVEN_4_1_0_NAMESPACE.equals(namespaceUri)) {
@@ -181,7 +188,7 @@ public final class ModelVersionUtils {
 
         // For now, handle the specific cases we need
         if (MODEL_VERSION_4_1_0.equals(targetVersion)) {
-            return MODEL_VERSION_4_1_0.equals(modelVersion) || isNewerThan410(modelVersion);
+            return isNewerThan410(modelVersion);
         }
 
         // Default to false for unknown comparisons
@@ -191,40 +198,42 @@ public final class ModelVersionUtils {
     /**
      * Updates the model version element in a POM document.
      *
-     * @param pomDocument the POM document
+     * @param pomDocument the POM document (domtrip Document)
      * @param newVersion the new model version
      */
     public static void updateModelVersion(Document pomDocument, String newVersion) {
-        Element root = pomDocument.getRootElement();
-        Namespace namespace = root.getNamespace();
+        Editor editor = new Editor(pomDocument);
+        Element root = editor.root();
+        if (root == null) {
+            return;
+        }
 
-        Element modelVersionElement = root.getChild(MODEL_VERSION, namespace);
+        Element modelVersionElement = root.child(MODEL_VERSION).orElse(null);
         if (modelVersionElement != null) {
-            modelVersionElement.setText(newVersion);
+            editor.setTextContent(modelVersionElement, newVersion);
         } else {
             // Create new modelVersion element if it doesn't exist
-            Element newModelVersionElement = new Element(MODEL_VERSION, namespace);
-            newModelVersionElement.setText(newVersion);
-
-            // Insert at the beginning of the document
-            root.addContent(0, newModelVersionElement);
+            // domtrip will automatically handle proper positioning and formatting
+            DomUtils.insertContentElement(root, MODEL_VERSION, newVersion);
         }
     }
 
     /**
-     * Removes the model version element from a POM document.
+     * Removes the model version element from a POM editor.
      * This is used during inference when the model version can be inferred.
      *
-     * @param pomDocument the POM document
+     * @param document the XML document
      * @return true if the element was removed, false if it didn't exist
      */
-    public static boolean removeModelVersion(Document pomDocument) {
-        Element root = pomDocument.getRootElement();
-        Namespace namespace = root.getNamespace();
+    public static boolean removeModelVersion(Document document) {
+        Element root = document.root();
+        if (root == null) {
+            return false;
+        }
 
-        Element modelVersionElement = root.getChild(MODEL_VERSION, namespace);
+        Element modelVersionElement = root.child(MODEL_VERSION).orElse(null);
         if (modelVersionElement != null) {
-            return root.removeContent(modelVersionElement);
+            return root.removeNode(modelVersionElement);
         }
         return false;
     }
@@ -244,6 +253,6 @@ public final class ModelVersionUtils {
             // For versions newer than 4.1.0 but not specifically 4.2.0, use 4.2.0 schema
             return MAVEN_4_2_0_SCHEMA_LOCATION;
         }
-        return UpgradeConstants.SchemaLocations.MAVEN_4_0_0_SCHEMA_LOCATION;
+        return MAVEN_4_0_0_SCHEMA_LOCATION;
     }
 }

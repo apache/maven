@@ -29,6 +29,8 @@ import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.mvnup.UpgradeOptions;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -93,6 +95,15 @@ public final class TestUtils {
         // Mock parserRequest and logger
         ParserRequest parserRequest = mock(ParserRequest.class);
         Logger logger = mock(Logger.class);
+
+        // Capture error messages for debugging
+        doAnswer(invocation -> {
+                    System.err.println("[ERROR] " + invocation.getArgument(0));
+                    return null;
+                })
+                .when(logger)
+                .error(anyString());
+
         when(request.parserRequest()).thenReturn(parserRequest);
         when(parserRequest.logger()).thenReturn(logger);
 

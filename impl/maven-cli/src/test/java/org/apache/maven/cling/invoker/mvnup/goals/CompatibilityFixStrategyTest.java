@@ -18,17 +18,16 @@
  */
 package org.apache.maven.cling.invoker.mvnup.goals;
 
-import java.io.StringReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
 
+import eu.maveniverse.domtrip.Document;
+import eu.maveniverse.domtrip.Editor;
+import eu.maveniverse.domtrip.Element;
 import org.apache.maven.api.cli.mvnup.UpgradeOptions;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.input.SAXBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -49,12 +48,10 @@ import static org.mockito.Mockito.when;
 class CompatibilityFixStrategyTest {
 
     private CompatibilityFixStrategy strategy;
-    private SAXBuilder saxBuilder;
 
     @BeforeEach
     void setUp() {
         strategy = new CompatibilityFixStrategy();
-        saxBuilder = new SAXBuilder();
     }
 
     private UpgradeContext createMockContext() {
@@ -168,23 +165,22 @@ class CompatibilityFixStrategyTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
 
             UpgradeContext context = createMockContext();
-            UpgradeResult result = strategy.apply(context, pomMap);
+            UpgradeResult result = strategy.doApply(context, pomMap);
 
             assertTrue(result.success(), "Compatibility fix should succeed");
             assertTrue(result.modifiedCount() > 0, "Should have removed duplicate dependency");
 
             // Verify only one dependency remains
-            Element root = document.getRootElement();
-            Element dependencyManagement = root.getChild("dependencyManagement", root.getNamespace());
-            Element dependencies = dependencyManagement.getChild("dependencies", root.getNamespace());
-            assertEquals(
-                    1,
-                    dependencies.getChildren("dependency", root.getNamespace()).size(),
-                    "Should have only one dependency after duplicate removal");
+            Editor editor = new Editor(document);
+            Element root = editor.root();
+            Element dependencyManagement = DomUtils.findChildElement(root, "dependencyManagement");
+            Element dependencies = DomUtils.findChildElement(dependencyManagement, "dependencies");
+            var dependencyElements = dependencies.children("dependency").toList();
+            assertEquals(1, dependencyElements.size(), "Should have only one dependency after duplicate removal");
         }
 
         @Test
@@ -214,22 +210,21 @@ class CompatibilityFixStrategyTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
 
             UpgradeContext context = createMockContext();
-            UpgradeResult result = strategy.apply(context, pomMap);
+            UpgradeResult result = strategy.doApply(context, pomMap);
 
             assertTrue(result.success(), "Compatibility fix should succeed");
             assertTrue(result.modifiedCount() > 0, "Should have removed duplicate dependency");
 
             // Verify only one dependency remains
-            Element root = document.getRootElement();
-            Element dependencies = root.getChild("dependencies", root.getNamespace());
-            assertEquals(
-                    1,
-                    dependencies.getChildren("dependency", root.getNamespace()).size(),
-                    "Should have only one dependency after duplicate removal");
+            Editor editor = new Editor(document);
+            Element root = editor.root();
+            Element dependencies = DomUtils.findChildElement(root, "dependencies");
+            var dependencyElements = dependencies.children("dependency").toList();
+            assertEquals(1, dependencyElements.size(), "Should have only one dependency after duplicate removal");
         }
     }
 
@@ -266,24 +261,23 @@ class CompatibilityFixStrategyTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
 
             UpgradeContext context = createMockContext();
-            UpgradeResult result = strategy.apply(context, pomMap);
+            UpgradeResult result = strategy.doApply(context, pomMap);
 
             assertTrue(result.success(), "Compatibility fix should succeed");
             assertTrue(result.modifiedCount() > 0, "Should have removed duplicate plugin");
 
             // Verify only one plugin remains
-            Element root = document.getRootElement();
-            Element build = root.getChild("build", root.getNamespace());
-            Element pluginManagement = build.getChild("pluginManagement", root.getNamespace());
-            Element plugins = pluginManagement.getChild("plugins", root.getNamespace());
-            assertEquals(
-                    1,
-                    plugins.getChildren("plugin", root.getNamespace()).size(),
-                    "Should have only one plugin after duplicate removal");
+            Editor editor = new Editor(document);
+            Element root = editor.root();
+            Element build = DomUtils.findChildElement(root, "build");
+            Element pluginManagement = DomUtils.findChildElement(build, "pluginManagement");
+            Element plugins = DomUtils.findChildElement(pluginManagement, "plugins");
+            var pluginElements = plugins.children("plugin").toList();
+            assertEquals(1, pluginElements.size(), "Should have only one plugin after duplicate removal");
         }
     }
 
