@@ -53,7 +53,7 @@ public class JavaPathTypeTest {
         String[] formatted = JavaPathType.MODULES.option(paths());
         assertEquals(2, formatted.length);
         assertEquals("--module-path", formatted[0]);
-        assertEquals(toPlatformSpecific("\"src/foo.java:src/bar.java\""), formatted[1]);
+        assertEquals(toPlatformSpecific("src/foo.java:src/bar.java"), formatted[1]);
     }
 
     /**
@@ -64,7 +64,7 @@ public class JavaPathTypeTest {
         String[] formatted = JavaPathType.patchModule("my.module").option(paths());
         assertEquals(2, formatted.length);
         assertEquals("--patch-module", formatted[0]);
-        assertEquals(toPlatformSpecific("my.module=\"src/foo.java:src/bar.java\""), formatted[1]);
+        assertEquals(toPlatformSpecific("my.module=src/foo.java:src/bar.java"), formatted[1]);
     }
 
     /**
