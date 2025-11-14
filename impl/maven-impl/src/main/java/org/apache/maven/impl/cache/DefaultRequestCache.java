@@ -40,7 +40,7 @@ public class DefaultRequestCache extends AbstractRequestCache {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultRequestCache.class);
 
     protected static final SessionData.Key<Cache> KEY = SessionData.key(Cache.class, CacheMetadata.class);
-    protected static final Object ROOT = new Object();
+    protected static final Object ROOT = "ROOT";
 
     // Comprehensive cache statistics
     private final CacheStatistics statistics = new CacheStatistics();
