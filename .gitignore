@@ -3,6 +3,7 @@
 .classpath
 .settings/
 .svn/
+.jbang/
 
 # Intellij
 *.ipr
