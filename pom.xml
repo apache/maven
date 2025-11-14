@@ -159,7 +159,7 @@ under the License.
     <jxpathVersion>1.4.0</jxpathVersion>
     <logbackClassicVersion>1.5.20</logbackClassicVersion>
     <mockitoVersion>5.20.0</mockitoVersion>
-    <plexusInteractivityVersion>1.4</plexusInteractivityVersion>
+    <plexusInteractivityVersion>1.5.1</plexusInteractivityVersion>
     <plexusInterpolationVersion>1.29</plexusInterpolationVersion>
     <plexusTestingVersion>2.0.1</plexusTestingVersion>
     <plexusXmlVersion>4.1.0</plexusXmlVersion>
