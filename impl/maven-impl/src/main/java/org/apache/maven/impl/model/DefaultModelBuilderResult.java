@@ -44,7 +44,6 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
     private Model rawModel;
     private Model parentModel;
     private Model effectiveModel;
-    private List<Profile> activePomProfiles;
     private Map<String, List<Profile>> activePomProfilesByModel = new LinkedHashMap<>();
     private List<Profile> activeExternalProfiles;
     private final ProblemCollector<ModelProblem> problemCollector;
@@ -107,11 +106,11 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
 
     @Override
     public List<Profile> getActivePomProfiles() {
-        return activePomProfiles;
-    }
-
-    public void setActivePomProfiles(List<Profile> activeProfiles) {
-        this.activePomProfiles = activeProfiles;
+        // Return all profiles from all models combined
+        if (activePomProfilesByModel.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return activePomProfilesByModel.values().stream().flatMap(List::stream).collect(Collectors.toList());
     }
 
     @Override

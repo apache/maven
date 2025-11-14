@@ -1468,13 +1468,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         private void addActivePomProfiles(String modelId, List<Profile> activePomProfiles) {
             if (activePomProfiles != null && !activePomProfiles.isEmpty()) {
-                // Add to the flat list for backward compatibility
-                if (result.getActivePomProfiles() == null) {
-                    result.setActivePomProfiles(new ArrayList<>());
-                }
-                result.getActivePomProfiles().addAll(activePomProfiles);
-
-                // Also track by model ID
+                // Track profiles by model ID
                 result.setActivePomProfiles(modelId, activePomProfiles);
             }
         }
