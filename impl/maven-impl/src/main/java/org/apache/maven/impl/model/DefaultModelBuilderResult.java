@@ -19,7 +19,10 @@
 package org.apache.maven.impl.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -42,6 +45,7 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
     private Model parentModel;
     private Model effectiveModel;
     private List<Profile> activePomProfiles;
+    private Map<String, List<Profile>> activePomProfilesByModel = new LinkedHashMap<>();
     private List<Profile> activeExternalProfiles;
     private final ProblemCollector<ModelProblem> problemCollector;
     private final List<DefaultModelBuilderResult> children = new ArrayList<>();
@@ -108,6 +112,25 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
 
     public void setActivePomProfiles(List<Profile> activeProfiles) {
         this.activePomProfiles = activeProfiles;
+    }
+
+    @Override
+    public List<Profile> getActivePomProfiles(String modelId) {
+        List<Profile> profiles = activePomProfilesByModel.get(modelId);
+        return profiles != null ? profiles : Collections.emptyList();
+    }
+
+    @Override
+    public Map<String, List<Profile>> getActivePomProfilesByModel() {
+        return Collections.unmodifiableMap(activePomProfilesByModel);
+    }
+
+    public void setActivePomProfiles(String modelId, List<Profile> activeProfiles) {
+        if (activeProfiles != null) {
+            this.activePomProfilesByModel.put(modelId, new ArrayList<>(activeProfiles));
+        } else {
+            this.activePomProfilesByModel.remove(modelId);
+        }
     }
 
     @Override

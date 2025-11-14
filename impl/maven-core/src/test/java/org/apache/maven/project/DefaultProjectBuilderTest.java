@@ -197,6 +197,16 @@ class DefaultProjectBuilderTest {
         }
 
         @Override
+        public List<Profile> getActivePomProfiles(String modelId) {
+            return List.of();
+        }
+
+        @Override
+        public java.util.Map<String, List<Profile>> getActivePomProfilesByModel() {
+            return java.util.Map.of();
+        }
+
+        @Override
         public List<Profile> getActiveExternalProfiles() {
             return List.of();
         }
