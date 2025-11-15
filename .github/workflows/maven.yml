@@ -210,7 +210,7 @@ jobs:
         run: mvn site -e -B -V -Preporting
 
       - name: Upload Mimir caches
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
         if: ${{ !cancelled() && !failure() }}
         with:
           name: cache-${{ runner.os }}-full-build-${{ matrix.java }}
@@ -218,7 +218,7 @@ jobs:
           path: ${{ env.MIMIR_LOCAL }}
 
       - name: Upload test artifacts
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
         if: failure() || cancelled()
         with:
           name: full-build-logs-${{ runner.os }}-${{ matrix.java }}
@@ -228,7 +228,7 @@ jobs:
             **/target/java_heapdump.hprof
 
       - name: Upload Mimir logs
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
         if: always()
         with:
           name: full-build-mimir-logs-${{ runner.os }}-${{ matrix.java }}
