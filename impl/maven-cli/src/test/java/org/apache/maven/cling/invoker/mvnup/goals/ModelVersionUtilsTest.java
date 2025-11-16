@@ -403,6 +403,7 @@ class ModelVersionUtilsTest {
             assertEquals("4.0.0", version, "Should default to 4.0.0 when modelVersion is missing");
         }
 
+        @ParameterizedTest
         @ValueSource(
                 strings = {
                     "http://maven.apache.org/POM/4.0.0",
