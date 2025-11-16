@@ -1139,8 +1139,12 @@ under the License.
               </tags>
               <groups>
                 <group>
+                  <title>Maven 4 API - CLI</title>
+                  <packages>org.apache.maven.api.cli*</packages>
+                </group>
+                <group>
                   <title>Maven 4 API - Core</title>
-                  <packages>org.apache.maven.api*</packages>
+                  <packages>org.apache.maven.api:org.apache.maven.api.cache:org.apache.maven.api.feature:org.apache.maven.api.plugin:org.apache.maven.api.plugin.annotations:org.apache.maven.api.services:org.apache.maven.api.services.xml</packages>
                 </group>
                 <group>
                   <title>Maven 4 API - Plugin</title>
@@ -1159,12 +1163,12 @@ under the License.
                   <packages>org.apache.maven.api.toolchain</packages>
                 </group>
                 <group>
-                  <title>Maven 4 API - Meta</title>
+                  <title>Maven 4 API - Annotations</title>
                   <packages>org.apache.maven.api.annotations</packages>
                 </group>
                 <group>
                   <title>Maven 4 API - DI</title>
-                  <packages>org.apache.maven.api.di</packages>
+                  <packages>org.apache.maven.api.di:org.apache.maven.di.tool</packages>
                 </group>
                 <group>
                   <title>Maven 4 API - Metadata</title>
