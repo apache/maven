@@ -196,8 +196,8 @@ public class ReactorGraph {
                         String prefix = null;
                         switch (clusterName) {
                             case "MavenAPI": prefix = "../api/"; break;
-                            case "MavenImplementation": prefix = "../maven-impl-modules/"; break;
-                            case "MavenCompatibility": prefix = "../maven-compat-modules/"; break;
+                            case "MavenImplementation": prefix = "../impl/"; break;
+                            case "MavenCompatibility": prefix = "../compat/"; break;
                             case "MavenResolver": prefix = "https://maven.apache.org/resolver/"; break;
                         }
                         if (prefix != null) {
