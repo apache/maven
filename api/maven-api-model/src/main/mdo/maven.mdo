@@ -54,8 +54,8 @@
     <p>This is a reference for the Maven project descriptor used in Maven.</p>
     <p>An XSD is available at:</p>
     <ul>
-      <li><a href="https://maven.apache.org/xsd/maven-4.0.0.xsd">https://maven.apache.org/xsd/maven-4.0.0.xsd</a> for Maven 3.0.</li>
-      <li><a href="https://maven.apache.org/xsd/maven-4.1.0.xsd">https://maven.apache.org/xsd/maven-4.1.0.xsd</a> for Maven 4.0.</li>
+      <li><a href="https://maven.apache.org/xsd/maven-4.0.0.xsd">https://maven.apache.org/xsd/maven-4.0.0.xsd</a> for Maven 3.</li>
+      <li><a href="https://maven.apache.org/xsd/maven-4.1.0.xsd">https://maven.apache.org/xsd/maven-4.1.0.xsd</a> for Maven 4.</li>
     </ul>
     ]]>
   </description>
