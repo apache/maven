@@ -45,4 +45,9 @@ under the License.
     <module>maven-toolchain-model</module>
     <module>maven-toolchain-builder</module>
   </modules>
+
+  <properties>
+    <project.directory>compat</project.directory>
+  </properties>
+
 </project>
