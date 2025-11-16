@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -124,7 +125,7 @@ class ApplyTest {
             // This test verifies that Apply inherits the model version logic from AbstractUpgradeGoal
             // The actual logic is tested in AbstractUpgradeGoalTest
             // Here we just verify that Apply is properly configured as a subclass
-            assertTrue(applyGoal instanceof AbstractUpgradeGoal, "Apply should extend AbstractUpgradeGoal");
+            assertInstanceOf(AbstractUpgradeGoal.class, applyGoal, "Apply should extend AbstractUpgradeGoal");
             assertTrue(applyGoal.shouldSaveModifications(), "Apply should save modifications unlike Check goal");
         }
     }
