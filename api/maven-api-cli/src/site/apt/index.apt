@@ -16,20 +16,26 @@
 ~~ under the License.
 
  -----
- About
+ Introduction
  -----
  Hervé Boutemy
  -----
- 2023-06-19
+ 2025-11-16
  -----
 
-Maven SLF4J Provider
+Maven 4 API - CLI
 
- An extension to {{{https://www.slf4j.org/api/org/slf4j/simple/SimpleLogger.html}SLF4J Simple}} to add enhanced color support.
+ This is the {{{./apidocs/org/apache/maven/api/cli/package-summary.html}API}} for Maven's command-line interface and
+ tools:
 
- Color is managed by <<<MavenSimpleLogger>>>, created by <<<MavenSimpleLoggerFactory>>>, and injected by <<<StaticLoggerBinder>>>: everything else is
- copied at build time from {{{https://www.slf4j.org/api/org/slf4j/simple/SimpleLogger.html}SLF4J Simple}}
+   * <<<{{{./apidocs/org/apache/maven/api/cli/mvn/package-summary.html}mvn}}>>>, the Maven build tool,
 
-* See Also
+   * <<<{{{./apidocs/org/apache/maven/api/cli/mvnenc/package-summary.html}mvnenc}}>>>, the Maven Password Encryption tool,
 
- * {{{../../compat/maven-embedder/logging.html}Maven Logging}}
+   * <<<{{{./apidocs/org/apache/maven/api/cli/mvnsh/package-summary.html}mvnsh}}>>>, the Maven Shell tool,
+
+   * <<<{{{./apidocs/org/apache/maven/api/cli/mvnup/package-summary.html}mvnup}}>>>, the Maven Upgrade tool.
+
+ This API also defines {{{./core-extensions.html}Core Extensions model}} for <<<.mvn/extensions.xml>>>.
+
+ See also associated {{{../../impl/maven-cli/index.html}implementation}}.

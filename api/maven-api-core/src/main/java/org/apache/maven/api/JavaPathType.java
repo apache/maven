@@ -244,6 +244,7 @@ public enum JavaPathType implements PathType {
      * Returns the option followed by a string representation of the given path elements.
      * For example, if this type is {@link #MODULES}, then the option is {@code "--module-path"}
      * followed by the specified path elements.
+     * The paths are <em>not</em> quoted.
      *
      * @param paths the path to format as a tool option
      * @return the option associated to this path type followed by the given path elements,
@@ -263,8 +264,8 @@ public enum JavaPathType implements PathType {
         if (option == null) {
             throw new IllegalStateException("No option is associated to this path type.");
         }
-        String prefix = (moduleName == null) ? "\"" : (moduleName + "=\"");
-        StringJoiner joiner = new StringJoiner(File.pathSeparator, prefix, "\"");
+        String prefix = (moduleName == null) ? "" : (moduleName + '=');
+        StringJoiner joiner = new StringJoiner(File.pathSeparator, prefix, "");
         joiner.setEmptyValue("");
         for (Path p : paths) {
             joiner.add(p.toString());
@@ -365,6 +366,7 @@ public enum JavaPathType implements PathType {
          * Returns the option followed by a string representation of the given path elements.
          * The path elements are separated by an option-specific or platform-specific separator.
          * If the given {@code paths} argument contains no element, then this method returns an empty string.
+         * The paths are <em>not</em> quoted.
          *
          * @param paths the path to format as a string
          * @return the option associated to this path type followed by the given path elements,
