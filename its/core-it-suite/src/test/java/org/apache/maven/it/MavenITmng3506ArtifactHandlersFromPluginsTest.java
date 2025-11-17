@@ -47,7 +47,7 @@ public class MavenITmng3506ArtifactHandlersFromPluginsTest extends AbstractMaven
         Path testDir = extractResources("/" + AID);
 
         // First, build the test plugin
-        Verifier verifier = newVerifier(testDir.resolve("mng-3506.2/maven-it-plugin-extension2").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("mng-3506.2/maven-it-plugin-extension2"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -55,7 +55,7 @@ public class MavenITmng3506ArtifactHandlersFromPluginsTest extends AbstractMaven
         verifier.verifyErrorFreeLog();
 
         // Then, run the test project that uses the plugin
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
 
         verifier.deleteArtifacts(GID);
 

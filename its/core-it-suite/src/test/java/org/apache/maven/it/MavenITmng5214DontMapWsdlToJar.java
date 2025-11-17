@@ -39,7 +39,7 @@ public class MavenITmng5214DontMapWsdlToJar extends AbstractMavenIntegrationTest
     public void testitTestPhase() throws Exception {
         Path setupDir = extractResources("/mng-5214/dependency");
 
-        Verifier setupVerifier = newVerifier(setupDir.toString());
+        Verifier setupVerifier = newVerifier(setupDir);
         setupVerifier.setAutoclean(false);
         setupVerifier.addCliArgument("-X");
         setupVerifier.deleteDirectory("target");
@@ -51,7 +51,7 @@ public class MavenITmng5214DontMapWsdlToJar extends AbstractMavenIntegrationTest
 
         Path testDir = extractResources("/mng-5214");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("consumer/target");
         verifier.deleteDirectory("dependency/target");

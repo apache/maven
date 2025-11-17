@@ -28,19 +28,19 @@ public class MavenITmng5389LifecycleParticipantAfterSessionEnd extends AbstractM
     @Test
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-5389-lifecycleParticipant-afterSession");
-        File extensionDir = testDir.resolve("extension");
-        File projectDir = testDir.resolve("basic");
+        Path extensionDir = testDir.resolve("extension");
+        Path projectDir = testDir.resolve("basic");
 
         Verifier verifier;
 
         // install the test plugin
-        verifier = newVerifier(extensionDir.toString());
+        verifier = newVerifier(extensionDir);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // build the test project
-        verifier = newVerifier(projectDir.toString());
+        verifier = newVerifier(projectDir);
         verifier.addCliArgument("package");
         verifier.execute();
         verifier.verifyErrorFreeLog();

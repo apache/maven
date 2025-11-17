@@ -46,7 +46,7 @@ public class MavenITmng8744CIFriendlyTest extends AbstractMavenIntegrationTestCa
     public void testitShouldResolveTheInstalledDependencies() throws Exception {
         Path testDir = extractResources("/mng-8744-ci-friendly");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
 
         verifier.addCliArgument("-Drevision=1.2");
@@ -56,13 +56,13 @@ public class MavenITmng8744CIFriendlyTest extends AbstractMavenIntegrationTestCa
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.addCliArgument("clean");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
 
         verifier.addCliArgument("-Drevision=1.2");

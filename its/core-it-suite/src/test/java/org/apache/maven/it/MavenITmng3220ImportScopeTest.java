@@ -39,7 +39,7 @@ public class MavenITmng3220ImportScopeTest extends AbstractMavenIntegrationTestC
 
         testDir = testDir.resolve("imported-pom-depMgmt");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3220");
@@ -57,7 +57,7 @@ public class MavenITmng3220ImportScopeTest extends AbstractMavenIntegrationTestC
 
         testDir = testDir.resolve("depMgmt-pom-module-notImported");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3220");

@@ -45,7 +45,7 @@ public class VerifierNIO2Test {
 
     @BeforeEach
     void setUp() throws VerificationException {
-        verifier = new Verifier(tempDir.toString());
+        verifier = new Verifier(Paths.get(tempDir.toString()), null);
     }
 
     @Test

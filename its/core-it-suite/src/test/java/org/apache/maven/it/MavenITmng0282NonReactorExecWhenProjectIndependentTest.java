@@ -41,7 +41,7 @@ public class MavenITmng0282NonReactorExecWhenProjectIndependentTest extends Abst
         Path testDir = extractResources("/mng-0282");
 
         // First, build the test plugin
-        Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-no-project").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-no-project"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -49,7 +49,7 @@ public class MavenITmng0282NonReactorExecWhenProjectIndependentTest extends Abst
         verifier.verifyErrorFreeLog();
 
         // Then, run the test project that uses the plugin
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("subproject/target");

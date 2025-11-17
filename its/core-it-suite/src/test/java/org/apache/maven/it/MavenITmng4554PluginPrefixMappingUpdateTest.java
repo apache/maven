@@ -83,7 +83,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
         server.setHandler(handlerList);
         server.start();
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         try {
             if (server.isFailed()) {
                 fail("Couldn't bind the server socket to a free port!");
@@ -162,7 +162,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
         server.setHandler(handlerList);
         server.start();
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         try {
             if (server.isFailed()) {
                 fail("Couldn't bind the server socket to a free port!");
@@ -244,7 +244,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
         server.setHandler(handlerList);
         server.start();
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         try {
             if (server.isFailed()) {
                 fail("Couldn't bind the server socket to a free port!");
@@ -267,7 +267,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
             verifier.addCliArgument("-s");
             verifier.addCliArgument("settings.xml");
 
-            FileUtils.copyDirectoryStructure(testDir.resolve("repo-1"), testDir.resolve("repo-it"));
+            FileUtils.copyDirectoryStructure(testDir.resolve("repo-1").toFile(), testDir.resolve("repo-it").toFile());
 
             verifier.setLogFileName("log-refetched-1.txt");
             verifier.addCliArgument("a:touch");
@@ -280,7 +280,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
             requestedUris.clear();
 
             // simulate deployment of new plugin which updates the prefix mapping in the remote repo
-            FileUtils.copyDirectoryStructure(testDir.resolve("repo-2"), testDir.resolve("repo-it"));
+            FileUtils.copyDirectoryStructure(testDir.resolve("repo-2").toFile(), testDir.resolve("repo-it").toFile());
 
             verifier.setLogFileName("log-refetched-2.txt");
             verifier.addCliArgument("b:touch");

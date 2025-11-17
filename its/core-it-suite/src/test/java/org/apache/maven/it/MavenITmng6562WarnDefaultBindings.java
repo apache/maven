@@ -30,7 +30,7 @@ public class MavenITmng6562WarnDefaultBindings extends AbstractMavenIntegrationT
         Path testDir = extractResources("/mng-6562-default-bindings");
 
         String phase = "validate";
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.setLogFileName(phase + ".txt");
         verifier.addCliArgument("-fos");
@@ -46,7 +46,7 @@ public class MavenITmng6562WarnDefaultBindings extends AbstractMavenIntegrationT
         Path testDir = extractResources("/mng-6562-default-bindings");
 
         String phase = "process-resources";
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.setLogFileName(phase + ".txt");
         verifier.addCliArgument("-fos");
@@ -62,7 +62,7 @@ public class MavenITmng6562WarnDefaultBindings extends AbstractMavenIntegrationT
         Path testDir = extractResources("/mng-6562-default-bindings");
 
         String phase = "compile";
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.setLogFileName(phase + ".txt");
         verifier.addCliArgument(phase);
@@ -77,7 +77,7 @@ public class MavenITmng6562WarnDefaultBindings extends AbstractMavenIntegrationT
         Path testDir = extractResources("/mng-6562-default-bindings");
 
         String phase = "process-test-resources";
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.setLogFileName(phase + ".txt");
         verifier.addCliArgument(phase);
@@ -93,7 +93,7 @@ public class MavenITmng6562WarnDefaultBindings extends AbstractMavenIntegrationT
         Path testDir = extractResources("/mng-6562-default-bindings");
 
         String phase = "test-compile";
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.setLogFileName(phase + ".txt");
         verifier.addCliArgument(phase);
@@ -109,7 +109,7 @@ public class MavenITmng6562WarnDefaultBindings extends AbstractMavenIntegrationT
         Path testDir = extractResources("/mng-6562-default-bindings");
 
         String phase = "test";
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.setLogFileName(phase + ".txt");
         verifier.addCliArgument(phase);

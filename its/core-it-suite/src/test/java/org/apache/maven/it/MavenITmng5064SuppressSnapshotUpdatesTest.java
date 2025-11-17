@@ -83,7 +83,7 @@ public class MavenITmng5064SuppressSnapshotUpdatesTest extends AbstractMavenInte
         server.setHandler(handlerList);
         server.start();
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         try {
             if (server.isFailed()) {
                 fail("Couldn't bind the server socket to a free port!");

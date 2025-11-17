@@ -42,7 +42,7 @@ public class MavenITmng2577SettingsXmlInterpolationTest extends AbstractMavenInt
     public void testitEnvVars() throws Exception {
         Path testDir = extractResources("/mng-2577");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("--settings");
@@ -68,7 +68,7 @@ public class MavenITmng2577SettingsXmlInterpolationTest extends AbstractMavenInt
 
         Path testDir = extractResources("/mng-2577");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("--settings");

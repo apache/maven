@@ -40,7 +40,7 @@ public class MavenITmng2363BasedirAwareFileActivatorTest extends AbstractMavenIn
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-2363");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("sub-a/target");

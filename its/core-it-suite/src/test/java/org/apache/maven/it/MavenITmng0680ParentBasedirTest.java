@@ -43,11 +43,9 @@ public class MavenITmng0680ParentBasedirTest extends AbstractMavenIntegrationTes
     public void testitMNG680() throws Exception {
         Path testDir = extractResources("/mng-0680");
 
-        testDir = testDir.getCanonicalFile();
+        Path subDir = testDir.resolve("subproject");
 
-        File subDir = testDir.resolve("subproject");
-
-        Verifier verifier = newVerifier(subDir.toString());
+        Verifier verifier = newVerifier(subDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

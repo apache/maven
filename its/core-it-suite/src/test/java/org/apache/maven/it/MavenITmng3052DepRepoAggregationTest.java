@@ -18,9 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
-
 import org.junit.jupiter.api.Test;
 
 /**
@@ -43,9 +41,9 @@ public class MavenITmng3052DepRepoAggregationTest extends AbstractMavenIntegrati
 
     @Test
     public void testitMNG3052() throws Exception {
-        Path testDir = extractResources("/mng-3052").getCanonicalFile();
+        Path testDir = extractResources("/mng-3052");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3052");

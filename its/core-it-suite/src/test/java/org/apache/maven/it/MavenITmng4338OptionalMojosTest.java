@@ -43,7 +43,7 @@ public class MavenITmng4338OptionalMojosTest extends AbstractMavenIntegrationTes
         Path testDir = extractResources("/mng-4338");
 
         // First, build the test plugin
-        Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-optional-mojos").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-optional-mojos"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -51,7 +51,7 @@ public class MavenITmng4338OptionalMojosTest extends AbstractMavenIntegrationTes
         verifier.verifyErrorFreeLog();
 
         // Then, run the test project that uses the plugin
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

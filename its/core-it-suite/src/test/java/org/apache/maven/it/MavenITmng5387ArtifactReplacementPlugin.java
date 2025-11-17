@@ -21,6 +21,7 @@ package org.apache.maven.it;
 import java.io.File;
 import java.nio.file.Files;
 
+import java.nio.file.Path;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MavenITmng5387ArtifactReplacementPlugin extends AbstractMavenIntegrationTestCase {
 
-    private File testDir;
+    private Path testDir;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -37,7 +38,7 @@ public class MavenITmng5387ArtifactReplacementPlugin extends AbstractMavenIntegr
 
     @Test
     public void testArtifactReplacementExecution() throws Exception {
-        Verifier v0 = newVerifier(testDir.toString());
+        Verifier v0 = newVerifier(testDir);
         v0.setAutoclean(false);
         v0.deleteDirectory("target");
         v0.deleteArtifacts("org.apache.maven.its.mng5387");

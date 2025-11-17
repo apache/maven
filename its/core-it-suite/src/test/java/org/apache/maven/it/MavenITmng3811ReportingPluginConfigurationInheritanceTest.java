@@ -47,7 +47,7 @@ public class MavenITmng3811ReportingPluginConfigurationInheritanceTest extends A
     public void testitMNG3811() throws Exception {
         Path testDir = extractResources("/mng-3811");
 
-        Verifier verifier = newVerifier(testDir.resolve("child").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("child"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

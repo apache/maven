@@ -59,7 +59,7 @@ public class MavenITmng3873MultipleExecutionGoalsTest extends AbstractMavenInteg
     private void testitMNG3873(String project) throws Exception {
         Path testDir = extractResources("/mng-3873");
 
-        Verifier verifier = newVerifier(testDir.resolve(project).getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve(project));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

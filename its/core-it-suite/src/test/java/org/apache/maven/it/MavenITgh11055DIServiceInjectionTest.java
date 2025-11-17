@@ -37,7 +37,7 @@ class MavenITgh11055DIServiceInjectionTest extends AbstractMavenIntegrationTestC
     void testGetServiceSucceeds() throws Exception {
         Path testDir = extractResources("/gh-11055-di-service-injection");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument("verify");
         verifier.execute();
         verifier.verifyErrorFreeLog();

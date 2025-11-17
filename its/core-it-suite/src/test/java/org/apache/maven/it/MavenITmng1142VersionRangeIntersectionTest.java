@@ -60,7 +60,7 @@ public class MavenITmng1142VersionRangeIntersectionTest extends AbstractMavenInt
     private void testit(String project) throws Exception {
         Path testDir = extractResources("/mng-1142");
 
-        Verifier verifier = newVerifier(testDir.resolve(project).getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve(project));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng1142");

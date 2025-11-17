@@ -43,7 +43,7 @@ public class MavenITmng2926PluginPrefixOrderTest extends AbstractMavenIntegratio
 
         Verifier verifier;
 
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.deleteArtifacts("org.apache.maven.its.mng2926");
         verifier.deleteArtifacts("org.apache.maven.plugins", "mng-2926", "0.1");
         verifier.deleteArtifacts("org.apache.maven.plugins", "mng-2926", "0.1");
@@ -59,7 +59,7 @@ public class MavenITmng2926PluginPrefixOrderTest extends AbstractMavenIntegratio
         new File(verifier.getArtifactMetadataPath("org.codehaus.mojo", null, null, "resolver-status.properties"))
                 .delete();
 
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.setLogFileName("log-default.txt");
         verifier.filterFile("settings-default-template.xml", "settings-default.xml");
@@ -69,7 +69,7 @@ public class MavenITmng2926PluginPrefixOrderTest extends AbstractMavenIntegratio
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.setLogFileName("log-custom.txt");
         verifier.filterFile("settings-custom-template.xml", "settings-custom.xml");

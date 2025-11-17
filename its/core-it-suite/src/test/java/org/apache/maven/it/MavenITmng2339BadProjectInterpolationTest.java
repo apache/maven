@@ -18,9 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
-
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -39,7 +38,7 @@ public class MavenITmng2339BadProjectInterpolationTest extends AbstractMavenInte
 
         Verifier verifier;
 
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
 
         verifier.addCliArgument("-Dversion=foo");
@@ -58,7 +57,7 @@ public class MavenITmng2339BadProjectInterpolationTest extends AbstractMavenInte
 
         Verifier verifier;
 
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
 
@@ -67,12 +66,12 @@ public class MavenITmng2339BadProjectInterpolationTest extends AbstractMavenInte
         verifier.execute();
 
         assertTrue(
-                testDir.resolve("target/touch-1.txt").exists(),
+                Files.exists(testDir.resolve("target/touch-1.txt")),
                 "Touchfile using ${project.version} for ${version} does not exist.");
 
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
 
@@ -84,7 +83,7 @@ public class MavenITmng2339BadProjectInterpolationTest extends AbstractMavenInte
         verifier.verifyErrorFreeLog();
 
         assertTrue(
-                testDir.resolve("target/touch-2.txt").exists(),
+                Files.exists(testDir.resolve("target/touch-2.txt")),
                 "Touchfile using CLI-specified ${version} does not exist.");
     }
 }

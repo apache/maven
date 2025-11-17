@@ -52,7 +52,7 @@ public class MavenITmng4800NearestWinsVsScopeWideningTest extends AbstractMavenI
     private void testit(String test) throws Exception {
         Path testDir = extractResources("/mng-4800");
 
-        Verifier verifier = newVerifier(testDir.resolve(test).getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve(test));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4800");

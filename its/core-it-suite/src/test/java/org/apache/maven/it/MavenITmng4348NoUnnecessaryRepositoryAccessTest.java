@@ -55,7 +55,7 @@ public class MavenITmng4348NoUnnecessaryRepositoryAccessTest extends AbstractMav
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-4348");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
 
         final List<String> requestedUris = Collections.synchronizedList(new ArrayList<>());
 

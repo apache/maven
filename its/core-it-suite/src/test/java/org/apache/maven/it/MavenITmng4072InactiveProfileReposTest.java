@@ -39,7 +39,7 @@ public class MavenITmng4072InactiveProfileReposTest extends AbstractMavenIntegra
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-4072");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4072");
         verifier.filterFile("pom-template.xml", "pom.xml");

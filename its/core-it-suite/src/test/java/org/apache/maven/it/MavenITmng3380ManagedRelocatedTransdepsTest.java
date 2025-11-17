@@ -49,7 +49,7 @@ public class MavenITmng3380ManagedRelocatedTransdepsTest extends AbstractMavenIn
     public void testitMNG3380() throws Exception {
         Path testDir = extractResources("/mng-3380");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3380");

@@ -18,10 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.io.IOException;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng7487DeadlockTest extends AbstractMavenIntegrationTestCase {
@@ -31,13 +29,13 @@ public class MavenITmng7487DeadlockTest extends AbstractMavenIntegrationTestCase
     public void testDeadlock() throws IOException, VerificationException {
         final Path rootDir = extractResources(PROJECT_PATH);
 
-        final File pluginDir = rootDir.resolve("plugin");
-        final Verifier pluginVerifier = newVerifier(pluginDir.toString());
+        final Path pluginDir = rootDir.resolve("plugin");
+        final Verifier pluginVerifier = newVerifier(pluginDir);
         pluginVerifier.addCliArgument("install");
         pluginVerifier.execute();
 
-        final File consumerDir = rootDir.resolve("consumer");
-        final Verifier consumerVerifier = newVerifier(consumerDir.toString());
+        final Path consumerDir = rootDir.resolve("consumer");
+        final Verifier consumerVerifier = newVerifier(consumerDir);
         consumerVerifier.setForkJvm(true); // TODO: why?
 
         consumerVerifier.addCliArgument("-T2");

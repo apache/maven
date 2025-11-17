@@ -45,7 +45,7 @@ public class MavenITmng3940EnvVarInterpolationTest extends AbstractMavenIntegrat
     public void testitMNG3940() throws Exception {
         Path testDir = extractResources("/mng-3940");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         /*
          * NOTE: The POM is using MAVEN_MNG_3940 to reference the var (just as one would refer to PATH). On Windows,
          * this must resolve case-insensitively so we use different character casing for the variable here.

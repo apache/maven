@@ -18,11 +18,9 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Properties;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,9 +39,9 @@ public class MavenITmng4353PluginDependencyResolutionFromPomRepoTest extends Abs
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4353").getCanonicalFile();
+        Path testDir = extractResources("/mng-4353");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4353");

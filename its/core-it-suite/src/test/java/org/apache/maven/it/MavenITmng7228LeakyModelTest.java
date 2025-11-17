@@ -38,15 +38,10 @@ class MavenITmng7228LeakyModelTest extends AbstractMavenIntegrationTestCase {
     void testLeakyModel() throws Exception {
         Path testDir = extractResources("/mng-7228-leaky-model");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setForkJvm(true); // TODO: why?
 
-        verifier.addCliArgument("-e");
-        verifier.addCliArgument("-s");
-        verifier.addCliArgument(testDir.resolve("settings.xml").getAbsolutePath());
-        verifier.addCliArgument("-Pmanual-profile");
-
-        verifier.addCliArgument("install");
+        verifier.addCliArguments("-e", "-s", testDir.resolve("settings.xml").toString(), "-Pmanual-profile", "install");
 
         verifier.execute();
 

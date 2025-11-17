@@ -18,10 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.Properties;
-
 import org.codehaus.plexus.util.Os;
 import org.junit.jupiter.api.Test;
 
@@ -35,9 +33,9 @@ public class MavenITmng6386BaseUriPropertyTest extends AbstractMavenIntegrationT
 
     @Test
     public void testitMNG6386() throws Exception {
-        Path testDir = extractResources("/mng-6386").getCanonicalFile();
+        Path testDir = extractResources("/mng-6386");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.setLogFileName("log-basic.txt");
@@ -48,7 +46,7 @@ public class MavenITmng6386BaseUriPropertyTest extends AbstractMavenIntegrationT
         Properties props = verifier.loadProperties("target/profile.properties");
         String pomProperty = props.getProperty("project.properties.pomProperty");
         // set via project
-        assertEquals(testDir.toPath().toUri().toASCIIString(), pomProperty);
+        assertEquals(testDir.toUri().toASCIIString(), pomProperty);
         // check that baseUri begins with file:///
         assertTrue(pomProperty.startsWith("file:///"));
     }
@@ -63,9 +61,9 @@ public class MavenITmng6386BaseUriPropertyTest extends AbstractMavenIntegrationT
         if (Os.isFamily(Os.FAMILY_WINDOWS)
                 || "UTF-8".equalsIgnoreCase(fileEncoding)
                 || "UTF8".equalsIgnoreCase(fileEncoding)) {
-            Path testDir = extractResources("/mng-6386-это по-русский").getCanonicalFile();
+            Path testDir = extractResources("/mng-6386-это по-русский");
 
-            Verifier verifier = newVerifier(testDir.toString());
+            Verifier verifier = newVerifier(testDir);
             verifier.setAutoclean(false);
             verifier.deleteDirectory("target");
             verifier.setLogFileName("log-basic.txt");
@@ -76,7 +74,7 @@ public class MavenITmng6386BaseUriPropertyTest extends AbstractMavenIntegrationT
             Properties props = verifier.loadProperties("target/profile.properties");
             String pomProperty = props.getProperty("project.properties.pomProperty");
             // set via project
-            assertEquals(testDir.toPath().toUri().toASCIIString(), pomProperty);
+            assertEquals(testDir.toUri().toASCIIString(), pomProperty);
             // check that baseUri begins with file:///
             assertTrue(pomProperty.startsWith("file:///"));
             // check that baseUri ends with "это по-русский/", but properly URI-encoded

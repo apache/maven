@@ -44,7 +44,7 @@ public class MavenITmng2605BogusProfileActivationTest extends AbstractMavenInteg
     public void testitMNG2605() throws Exception {
         Path testDir = extractResources("/mng-2605");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("--settings");

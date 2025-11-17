@@ -34,11 +34,11 @@ class MavenITmng8421MavenEncryptionTest extends AbstractMavenIntegrationTestCase
      */
     @Test
     void testEmptyHome() throws Exception {
-        Path basedir = extractResources("/mng-8421").getAbsoluteFile().toPath();
+        Path basedir = extractResources("/mng-8421");
 
         Path home = basedir.resolve("home1");
 
-        Verifier verifier = newVerifier(basedir.toString());
+        Verifier verifier = newVerifier(basedir);
         verifier.setLogFileName("home1.txt");
         verifier.setUserHomeDirectory(home);
         verifier.setExecutable("mvnenc");
@@ -54,11 +54,11 @@ class MavenITmng8421MavenEncryptionTest extends AbstractMavenIntegrationTestCase
      */
     @Test
     void testSetupHome() throws Exception {
-        Path basedir = extractResources("/mng-8421").getAbsoluteFile().toPath();
+        Path basedir = extractResources("/mng-8421");
 
         Path home = basedir.resolve("home2");
 
-        Verifier verifier = newVerifier(basedir.toString());
+        Verifier verifier = newVerifier(basedir);
         verifier.setLogFileName("home2.txt");
         verifier.setUserHomeDirectory(home);
         verifier.setExecutable("mvnenc");

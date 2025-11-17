@@ -18,11 +18,9 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -45,9 +43,9 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
     @Test
     public void testitTestPhase() throws Exception {
         Path testDir = extractResources("/mng-3043");
-        Files.createDirectories(testDir.toPath().resolve(".mvn"));
+        Files.createDirectories(testDir.resolve(".mvn"));
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("consumer-a/target");
@@ -103,7 +101,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
     public void testitPackagePhase() throws Exception {
         Path testDir = extractResources("/mng-3043");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("consumer-a/target");
@@ -163,7 +161,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
 
         Path testDir = extractResources("/mng-3043");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("consumer-a/target");
@@ -175,7 +173,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.setLogFileName("log-package-pre.txt");
         verifier.addCliArguments("--projects", ":consumer-a,:consumer-b,:consumer-c", "package");

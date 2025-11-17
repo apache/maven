@@ -42,7 +42,7 @@ public class MavenITmng3983PluginResolutionFromProfileReposTest extends Abstract
 
         Path testDir = extractResources("/mng-3983/test-1");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setForkJvm(true); // Don't lock up plugin files in class loader within current JVM
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
@@ -64,7 +64,7 @@ public class MavenITmng3983PluginResolutionFromProfileReposTest extends Abstract
     public void testitFromSettings() throws Exception {
         Path testDir = extractResources("/mng-3983/test-3");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setForkJvm(true); // Don't lock up plugin files in class loader within current JVM
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

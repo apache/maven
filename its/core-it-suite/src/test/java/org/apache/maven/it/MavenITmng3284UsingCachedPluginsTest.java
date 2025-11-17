@@ -45,7 +45,7 @@ public class MavenITmng3284UsingCachedPluginsTest extends AbstractMavenIntegrati
          * reloading of the plugin container by the DefaultPluginManager in Maven 2.x, thereby hiding the bug we want
          * to expose here.
          */
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng3284");
         verifier.filterFile("settings-template.xml", "settings.xml");
@@ -58,7 +58,7 @@ public class MavenITmng3284UsingCachedPluginsTest extends AbstractMavenIntegrati
         /*
          * Phase 2: Now that the plugin versions have been downloaded to the local repo, run the actual test.
          */
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("mod-a/target");
         verifier.deleteDirectory("mod-b/target");

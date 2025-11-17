@@ -41,7 +41,7 @@ public class MavenITmng4347ImportScopeWithSettingsProfilesTest extends AbstractM
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-4347");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
 
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4347");

@@ -18,10 +18,9 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.io.IOException;
-
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -48,7 +47,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
     void installDependencies() throws VerificationException, IOException {
         Path testDir = extractResources("/mng-8750-new-scopes");
 
-        File depsDir = testDir.resolve("deps");
+        Path depsDir = testDir.resolve("deps");
         Verifier deps = newVerifier(depsDir.toString(), false);
         deps.addCliArgument("install");
         deps.addCliArgument("-Dmaven.consumer.pom.flatten=true");
@@ -68,7 +67,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
     @Test
     public void testCompileOnlyScope() throws Exception {
         Path testDir = extractResources("/mng-8750-new-scopes");
-        File projectDir = testDir.resolve("compile-only-test");
+        Path projectDir = testDir.resolve("compile-only-test");
 
         Verifier verifier = newVerifier(projectDir.toString(), false);
         verifier.addCliArgument("clean");
@@ -81,11 +80,11 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
         verifier.verifyErrorFreeLog();
 
         // Verify classpath files were generated
-        File compileClasspath = projectDir.resolve("target/compile-classpath.txt");
-        File runtimeClasspath = projectDir.resolve("target/runtime-classpath.txt");
+        Path compileClasspath = projectDir.resolve("target/compile-classpath.txt");
+        Path runtimeClasspath = projectDir.resolve("target/runtime-classpath.txt");
 
-        assertTrue(compileClasspath.exists(), "Compile classpath file should exist");
-        assertTrue(runtimeClasspath.exists(), "Runtime classpath file should exist");
+        assertTrue(Files.exists(compileClasspath), "Compile classpath file should exist");
+        assertTrue(Files.exists(runtimeClasspath), "Runtime classpath file should exist");
     }
 
     /**
@@ -100,7 +99,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
     @Test
     public void testTestOnlyScope() throws Exception {
         Path testDir = extractResources("/mng-8750-new-scopes");
-        File projectDir = testDir.resolve("test-only-test");
+        Path projectDir = testDir.resolve("test-only-test");
 
         Verifier verifier = newVerifier(projectDir.toString(), false);
         verifier.addCliArgument("clean");
@@ -113,11 +112,11 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
         verifier.verifyErrorFreeLog();
 
         // Verify classpath files were generated
-        File testCompileClasspath = projectDir.resolve("target/test-compile-classpath.txt");
-        File testRuntimeClasspath = projectDir.resolve("target/test-runtime-classpath.txt");
+        Path testCompileClasspath = projectDir.resolve("target/test-compile-classpath.txt");
+        Path testRuntimeClasspath = projectDir.resolve("target/test-runtime-classpath.txt");
 
-        assertTrue(testCompileClasspath.exists(), "Test compile classpath file should exist");
-        assertTrue(testRuntimeClasspath.exists(), "Test runtime classpath file should exist");
+        assertTrue(Files.exists(testCompileClasspath), "Test compile classpath file should exist");
+        assertTrue(Files.exists(testRuntimeClasspath), "Test runtime classpath file should exist");
     }
 
     /**
@@ -132,7 +131,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
     @Test
     public void testTestRuntimeScope() throws Exception {
         Path testDir = extractResources("/mng-8750-new-scopes");
-        File projectDir = testDir.resolve("test-runtime-test");
+        Path projectDir = testDir.resolve("test-runtime-test");
 
         Verifier verifier = newVerifier(projectDir.toString(), false);
         verifier.addCliArgument("clean");
@@ -145,11 +144,11 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
         verifier.verifyErrorFreeLog();
 
         // Verify classpath files were generated
-        File testCompileClasspath = projectDir.resolve("target/test-compile-classpath.txt");
-        File testRuntimeClasspath = projectDir.resolve("target/test-runtime-classpath.txt");
+        Path testCompileClasspath = projectDir.resolve("target/test-compile-classpath.txt");
+        Path testRuntimeClasspath = projectDir.resolve("target/test-runtime-classpath.txt");
 
-        assertTrue(testCompileClasspath.exists(), "Test compile classpath file should exist");
-        assertTrue(testRuntimeClasspath.exists(), "Test runtime classpath file should exist");
+        assertTrue(Files.exists(testCompileClasspath), "Test compile classpath file should exist");
+        assertTrue(Files.exists(testRuntimeClasspath), "Test runtime classpath file should exist");
     }
 
     /**
@@ -161,7 +160,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
     @Test
     public void testAllNewScopesTogether() throws Exception {
         Path testDir = extractResources("/mng-8750-new-scopes");
-        File projectDir = testDir.resolve("comprehensive-test");
+        Path projectDir = testDir.resolve("comprehensive-test");
 
         Verifier verifier = newVerifier(projectDir.toString(), false);
         verifier.addCliArgument("clean");
@@ -174,15 +173,15 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
         verifier.verifyErrorFreeLog();
 
         // Verify all classpath files were generated
-        File compileClasspath = projectDir.resolve("target/compile-classpath.txt");
-        File runtimeClasspath = projectDir.resolve("target/runtime-classpath.txt");
-        File testCompileClasspath = projectDir.resolve("target/test-compile-classpath.txt");
-        File testRuntimeClasspath = projectDir.resolve("target/test-runtime-classpath.txt");
+        Path compileClasspath = projectDir.resolve("target/compile-classpath.txt");
+        Path runtimeClasspath = projectDir.resolve("target/runtime-classpath.txt");
+        Path testCompileClasspath = projectDir.resolve("target/test-compile-classpath.txt");
+        Path testRuntimeClasspath = projectDir.resolve("target/test-runtime-classpath.txt");
 
-        assertTrue(compileClasspath.exists(), "Compile classpath file should exist");
-        assertTrue(runtimeClasspath.exists(), "Runtime classpath file should exist");
-        assertTrue(testCompileClasspath.exists(), "Test compile classpath file should exist");
-        assertTrue(testRuntimeClasspath.exists(), "Test runtime classpath file should exist");
+        assertTrue(Files.exists(compileClasspath), "Compile classpath file should exist");
+        assertTrue(Files.exists(runtimeClasspath), "Runtime classpath file should exist");
+        assertTrue(Files.exists(testCompileClasspath), "Test compile classpath file should exist");
+        assertTrue(Files.exists(testRuntimeClasspath), "Test runtime classpath file should exist");
     }
 
     /**
@@ -194,7 +193,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
     @Test
     public void testValidationFailureWithModelVersion40() throws Exception {
         Path testDir = extractResources("/mng-8750-new-scopes");
-        File projectDir = testDir.resolve("validation-failure-test");
+        Path projectDir = testDir.resolve("validation-failure-test");
 
         Verifier verifier = newVerifier(projectDir.toString(), false);
         verifier.addCliArgument("clean");
@@ -220,7 +219,7 @@ public class MavenITmng8750NewScopesTest extends AbstractMavenIntegrationTestCas
     @Test
     public void testValidationSuccessWithModelVersion41() throws Exception {
         Path testDir = extractResources("/mng-8750-new-scopes");
-        File projectDir = testDir.resolve("validation-success-test");
+        Path projectDir = testDir.resolve("validation-success-test");
 
         Verifier verifier = newVerifier(projectDir.toString(), false);
         verifier.addCliArgument("clean");

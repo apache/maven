@@ -40,7 +40,7 @@ public class MavenITmng3814BogusProjectCycleTest extends AbstractMavenIntegratio
     public void testitMNG3814() throws Exception {
         Path testDir = extractResources("/mng-3814");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng3814");
         verifier.filterFile("settings-template.xml", "settings.xml");

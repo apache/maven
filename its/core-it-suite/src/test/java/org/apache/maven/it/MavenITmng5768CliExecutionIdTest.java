@@ -32,7 +32,7 @@ public class MavenITmng5768CliExecutionIdTest extends AbstractMavenIntegrationTe
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-5768-cli-execution-id");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-configuration:config@test-execution-id");
         verifier.execute();

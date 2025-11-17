@@ -44,7 +44,7 @@ public class MavenITmng3852PluginConfigWithHeterogeneousListTest extends Abstrac
     public void testitMNG3852() throws Exception {
         Path testDir = extractResources("/mng-3852");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

@@ -40,7 +40,7 @@ public class MavenITmng1349ChecksumFormatsTest extends AbstractMavenIntegrationT
     public void testitMNG1349() throws Exception {
         Path testDir = extractResources("/mng-1349");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng1349");
         verifier.filterFile("settings-template.xml", "settings.xml");

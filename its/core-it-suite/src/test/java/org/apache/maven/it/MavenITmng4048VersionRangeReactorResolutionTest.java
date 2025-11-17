@@ -42,7 +42,7 @@ public class MavenITmng4048VersionRangeReactorResolutionTest extends AbstractMav
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-4048");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("sub-2/target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4048");

@@ -43,7 +43,7 @@ public class MavenITmng4070WhitespaceTrimmingTest extends AbstractMavenIntegrati
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-4070");
 
-        Verifier verifier = newVerifier(testDir.resolve("sub").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("sub"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4070");

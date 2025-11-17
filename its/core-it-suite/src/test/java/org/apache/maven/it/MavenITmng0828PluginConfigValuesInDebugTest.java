@@ -18,12 +18,10 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -46,7 +44,7 @@ public class MavenITmng0828PluginConfigValuesInDebugTest extends AbstractMavenIn
     public void testitMNG0828() throws Exception {
         Path testDir = extractResources("/mng-0828");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-X");
@@ -57,7 +55,7 @@ public class MavenITmng0828PluginConfigValuesInDebugTest extends AbstractMavenIn
         String log = verifier.loadLogContent();
 
         checkLog(log, "[DEBUG]   (f) aliasDefaultExpressionParam = test");
-        checkLog(log, "[DEBUG]   (f) basedir = " + testDir.getCanonicalPath());
+        checkLog(log, "[DEBUG]   (f) basedir = " + testDir);
         checkLog(
                 log,
                 "[DEBUG]   (f) beanParam = org.apache.maven.plugin.coreit.Bean[fieldParam=field, setterParam=setter, setterCalled=true]");
@@ -81,7 +79,7 @@ public class MavenITmng0828PluginConfigValuesInDebugTest extends AbstractMavenIn
 
         checkLog(log, "[DEBUG]   (f) doubleParam = -1.5");
         checkLog(log, "[DEBUG]   (f) fieldParam = field");
-        checkLog(log, "[DEBUG]   (f) fileParam = " + testDir.resolve("pom.xml").getCanonicalPath());
+        checkLog(log, "[DEBUG]   (f) fileParam = " + testDir.resolve("pom.xml"));
         checkLog(log, "[DEBUG]   (f) floatParam = 0.0");
         checkLog(log, "[DEBUG]   (f) integerParam = 0");
         checkLog(log, "[DEBUG]   (f) listParam = [one, two, three, four]");
@@ -92,7 +90,7 @@ public class MavenITmng0828PluginConfigValuesInDebugTest extends AbstractMavenIn
         checkLog(
                 log,
                 "[DEBUG]   (f) propertiesFile = "
-                        + testDir.resolve("target/plugin-config.properties").getCanonicalPath());
+                        + testDir.resolve("target/plugin-config.properties"));
 
         // Properties item order is not guaranteed, so only check begin of params ...
         checkLog(log, "[DEBUG]   (f) propertiesParam = {key");

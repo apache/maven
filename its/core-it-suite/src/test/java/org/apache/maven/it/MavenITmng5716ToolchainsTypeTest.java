@@ -18,11 +18,10 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Properties;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -42,15 +41,15 @@ public class MavenITmng5716ToolchainsTypeTest extends AbstractMavenIntegrationTe
     public void testitMNG5716() throws Exception {
         Path testDir = extractResources("/mng-5716-toolchains-type");
 
-        File javaHome = testDir.resolve("javaHome");
-        javaHome.mkdirs();
-        new File(javaHome, "bin").mkdirs();
-        new File(javaHome, "bin/javac").createNewFile();
-        new File(javaHome, "bin/javac.exe").createNewFile();
+        Path javaHome = testDir.resolve("javaHome");
+        Path bin = javaHome.resolve("bin");
+        Files.createDirectories(bin);
+        Files.createFile(bin.resolve("javac"));
+        Files.createFile(bin.resolve("javac.exe"));
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         Map<String, String> properties = verifier.newDefaultFilterMap();
-        properties.put("@javaHome@", javaHome.getAbsolutePath());
+        properties.put("@javaHome@", javaHome.toAbsolutePath().toString());
 
         verifier.filterFile("toolchains.xml", "toolchains.xml", properties);
 

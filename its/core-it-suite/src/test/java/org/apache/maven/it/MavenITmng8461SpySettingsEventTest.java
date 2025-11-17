@@ -34,18 +34,18 @@ class MavenITmng8461SpySettingsEventTest extends AbstractMavenIntegrationTestCas
      */
     @Test
     void testIt() throws Exception {
-        Path basedir = extractResources("/mng-8461").getAbsoluteFile().toPath();
+        Path basedir = extractResources("/mng-8461");
         Verifier verifier;
 
         Path extension = basedir.resolve("extension");
-        verifier = newVerifier(extension.toString());
+        verifier = newVerifier(extension);
         verifier.setAutoclean(false);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Path project = basedir.resolve("project");
-        verifier = newVerifier(project.toString());
+        verifier = newVerifier(project);
         verifier.setAutoclean(false);
         verifier.setForkJvm(true);
         verifier.addCliArgument("-X");

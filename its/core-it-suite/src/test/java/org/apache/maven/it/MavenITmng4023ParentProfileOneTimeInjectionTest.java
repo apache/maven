@@ -46,7 +46,7 @@ public class MavenITmng4023ParentProfileOneTimeInjectionTest extends AbstractMav
     public void testitMNG4023() throws Exception {
         Path testDir = extractResources("/mng-4023");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("sub/target");
         verifier.addCliArgument("validate");

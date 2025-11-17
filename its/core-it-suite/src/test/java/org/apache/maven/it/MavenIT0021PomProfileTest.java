@@ -35,7 +35,7 @@ public class MavenIT0021PomProfileTest extends AbstractMavenIntegrationTestCase 
     public void testit0021() throws Exception {
         Path testDir = extractResources("/it0021");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.it0021");
         verifier.getSystemProperties().setProperty("includeProfile", "true");

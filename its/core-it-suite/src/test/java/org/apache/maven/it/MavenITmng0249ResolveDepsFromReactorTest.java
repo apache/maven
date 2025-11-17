@@ -43,7 +43,7 @@ public class MavenITmng0249ResolveDepsFromReactorTest extends AbstractMavenInteg
     public void testitMNG0249() throws Exception {
         Path testDir = extractResources("/mng-0249");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.addCliArgument("validate");
         verifier.execute();

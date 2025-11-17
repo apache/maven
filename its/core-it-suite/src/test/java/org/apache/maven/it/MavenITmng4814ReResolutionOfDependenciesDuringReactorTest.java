@@ -45,7 +45,7 @@ public class MavenITmng4814ReResolutionOfDependenciesDuringReactorTest extends A
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-4814");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("consumer/target");

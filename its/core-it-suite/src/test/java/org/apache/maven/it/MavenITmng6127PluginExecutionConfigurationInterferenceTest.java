@@ -18,10 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.nio.file.Files;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,44 +29,44 @@ public class MavenITmng6127PluginExecutionConfigurationInterferenceTest extends 
     @Test
     public void testCustomMojoExecutionConfigurator() throws Exception {
         Path testDir = extractResources("/mng-6127-plugin-execution-configuration-interference");
-        File pluginDir = testDir.resolve("plugin");
-        File projectDir = testDir.resolve("project");
-        File modAprojectDir = projectDir.resolve("mod-a");
-        File modBprojectDir = projectDir.resolve("mod-b");
-        File modCprojectDir = projectDir.resolve("mod-c");
+        Path pluginDir = testDir.resolve("plugin");
+        Path projectDir = testDir.resolve("project");
+        Path modAprojectDir = projectDir.resolve("mod-a");
+        Path modBprojectDir = projectDir.resolve("mod-b");
+        Path modCprojectDir = projectDir.resolve("mod-c");
 
         Verifier verifier;
 
         // install the test plugin
-        verifier = newVerifier(pluginDir.toString());
+        verifier = newVerifier(pluginDir);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        File modAconfigurationFile = modAprojectDir.resolve("configuration.txt");
-        File modBconfigurationFile = modBprojectDir.resolve("configuration.txt");
-        File modCconfigurationFile = modCprojectDir.resolve("configuration.txt");
-        modAconfigurationFile.delete();
-        modBconfigurationFile.delete();
-        modCconfigurationFile.delete();
+        Path modAconfigurationFile = modAprojectDir.resolve("configuration.txt");
+        Path modBconfigurationFile = modBprojectDir.resolve("configuration.txt");
+        Path modCconfigurationFile = modCprojectDir.resolve("configuration.txt");
+        Files.delete(modAconfigurationFile);
+        Files.delete(modBconfigurationFile);
+        Files.delete(modCconfigurationFile);
 
         // build the test project
-        verifier = newVerifier(projectDir.toString());
+        verifier = newVerifier(projectDir);
         verifier.addCliArgument("verify");
         verifier.addCliArgument("-X");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent(modAconfigurationFile.getCanonicalPath());
-        String modAactual = Files.readString(modAconfigurationFile.toPath());
+        verifier.verifyFilePresent(modAconfigurationFile.toString());
+        String modAactual = Files.readString(modAconfigurationFile);
         assertEquals("name=mod-a, secondName=second from components.xml", modAactual);
 
-        verifier.verifyFilePresent(modBconfigurationFile.getCanonicalPath());
-        String modBactual = Files.readString(modBconfigurationFile.toPath());
+        verifier.verifyFilePresent(modBconfigurationFile.toString());
+        String modBactual = Files.readString(modBconfigurationFile);
         assertEquals("name=mod-b, secondName=second from components.xml", modBactual);
 
-        verifier.verifyFilePresent(modCconfigurationFile.getCanonicalPath());
-        String modCactual = Files.readString(modCconfigurationFile.toPath());
+        verifier.verifyFilePresent(modCconfigurationFile.toString());
+        String modCactual = Files.readString(modCconfigurationFile);
         assertEquals("secondName=second from components.xml", modCactual);
     }
 }

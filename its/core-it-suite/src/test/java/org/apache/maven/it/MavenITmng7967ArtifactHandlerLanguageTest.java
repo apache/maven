@@ -39,7 +39,7 @@ class MavenITmng7967ArtifactHandlerLanguageTest extends AbstractMavenIntegration
     void javadocIsExecutedAndFailed() throws Exception {
         Path testDir = extractResources("/mng-7967-artifact-handler-language");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("org.apache.maven.plugins:maven-javadoc-plugin:3.6.3:jar");
 

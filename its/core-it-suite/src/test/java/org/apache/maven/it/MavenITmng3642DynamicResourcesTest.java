@@ -18,9 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -53,7 +52,7 @@ public class MavenITmng3642DynamicResourcesTest extends AbstractMavenIntegration
          * unstable test results. Fortunately, the verifier
          * makes it easy to do this.
          */
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
 
         /*
          * The Command Line Options (CLI) are passed to the
@@ -77,10 +76,10 @@ public class MavenITmng3642DynamicResourcesTest extends AbstractMavenIntegration
          */
         verifier.verifyErrorFreeLog();
 
-        File first = testDir.resolve("target/test-classes/one.txt");
-        assertTrue(first.exists(), "First resource file was not present: " + first);
+        Path first = testDir.resolve("target/test-classes/one.txt");
+        assertTrue(Files.exists(first), "First resource file was not present: " + first);
 
-        File second = testDir.resolve("target/test-classes/two.txt");
-        assertTrue(second.exists(), "Second resource file was not present: " + second);
+        Path second = testDir.resolve("target/test-classes/two.txt");
+        assertTrue(Files.exists(second), "Second resource file was not present: " + second);
     }
 }

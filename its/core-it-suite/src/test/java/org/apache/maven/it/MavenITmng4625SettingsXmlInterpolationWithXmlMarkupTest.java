@@ -44,7 +44,7 @@ public class MavenITmng4625SettingsXmlInterpolationWithXmlMarkupTest extends Abs
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-4625");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
 

@@ -36,7 +36,7 @@ public class MavenITmng3485OverrideWagonExtensionTest extends AbstractMavenInteg
 
         Verifier verifier;
 
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
 
         verifier.addCliArgument("deploy");
         verifier.execute();

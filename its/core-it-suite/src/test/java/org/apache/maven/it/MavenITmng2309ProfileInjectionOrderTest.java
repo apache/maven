@@ -43,7 +43,7 @@ public class MavenITmng2309ProfileInjectionOrderTest extends AbstractMavenIntegr
     public void testitMNG2309() throws Exception {
         Path testDir = extractResources("/mng-2309");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

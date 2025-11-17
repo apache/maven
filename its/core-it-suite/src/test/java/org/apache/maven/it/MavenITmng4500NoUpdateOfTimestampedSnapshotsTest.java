@@ -81,7 +81,7 @@ public class MavenITmng4500NoUpdateOfTimestampedSnapshotsTest extends AbstractMa
         Server server = new Server(0);
         server.setHandler(handlerList);
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         try {
             server.start();
             if (server.isFailed()) {

@@ -18,10 +18,9 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -53,7 +52,7 @@ public class MavenITmng3023ReactorDependencyResolutionTest extends AbstractMaven
         Path testDir = extractResources("/mng-3023");
 
         // First pass. Make sure the dependency cannot be resolved.
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.setLogFileName("log-a.txt");
 
@@ -81,11 +80,11 @@ public class MavenITmng3023ReactorDependencyResolutionTest extends AbstractMaven
     public void testitMNG3023B() throws Exception {
         Path testDir = extractResources("/mng-3023");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.setLogFileName("log-b.txt");
         // The IT doesn't actually run the compiler but merely mimics its effect, i.e. the creation of the output dir
-        testDir.resolve("dependency/dependency-classes").mkdirs();
+        Files.createDirectories(testDir.resolve("dependency/dependency-classes"));
         verifier.deleteDirectory("consumer/target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3023");
 
@@ -116,7 +115,7 @@ public class MavenITmng3023ReactorDependencyResolutionTest extends AbstractMaven
     public void testitMNG3023C() throws Exception {
         Path testDir = extractResources("/mng-3023");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
 
         verifier.deleteArtifacts("org.apache.maven.its.mng3023");

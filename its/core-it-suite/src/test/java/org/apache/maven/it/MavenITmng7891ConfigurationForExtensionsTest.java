@@ -36,12 +36,12 @@ class MavenITmng7891ConfigurationForExtensionsTest extends AbstractMavenIntegrat
     void testConfigurationForCoreExtension() throws Exception {
         Path testDir = extractResources("/mng-7891-extension-configuration");
 
-        Verifier verifier = newVerifier(testDir.resolve("extension").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("extension"));
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.resolve("core-extension").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("core-extension"));
         verifier.addCliArgument("install");
         verifier.addCliArgument("-DuserValue=the-value");
         verifier.execute();
@@ -60,12 +60,12 @@ class MavenITmng7891ConfigurationForExtensionsTest extends AbstractMavenIntegrat
     void testConfigurationForBuildExtension() throws Exception {
         Path testDir = extractResources("/mng-7891-extension-configuration");
 
-        Verifier verifier = newVerifier(testDir.resolve("extension").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("extension"));
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.resolve("build-extension").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("build-extension"));
         verifier.addCliArgument("install");
         verifier.addCliArgument("-DuserValue=the-value");
         verifier.execute();

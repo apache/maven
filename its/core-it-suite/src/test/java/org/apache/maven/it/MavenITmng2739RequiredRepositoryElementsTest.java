@@ -43,7 +43,7 @@ public class MavenITmng2739RequiredRepositoryElementsTest extends AbstractMavenI
 
         Verifier verifier;
 
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
 
         try {
@@ -75,7 +75,7 @@ public class MavenITmng2739RequiredRepositoryElementsTest extends AbstractMavenI
 
         Verifier verifier;
 
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
 
         try {

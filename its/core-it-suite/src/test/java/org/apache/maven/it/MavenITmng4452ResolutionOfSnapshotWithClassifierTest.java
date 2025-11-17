@@ -18,10 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -45,7 +43,7 @@ public class MavenITmng4452ResolutionOfSnapshotWithClassifierTest extends Abstra
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-4452");
 
-        Verifier verifier = newVerifier(testDir.resolve("producer").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("producer"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4452");
@@ -68,7 +66,7 @@ public class MavenITmng4452ResolutionOfSnapshotWithClassifierTest extends Abstra
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.resolve("consumer").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("consumer"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4452");

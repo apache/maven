@@ -39,7 +39,7 @@ public class MavenITmng4572ModelVersionSurroundedByWhitespaceTest extends Abstra
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-4572");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.addCliArgument("validate");
         verifier.execute();

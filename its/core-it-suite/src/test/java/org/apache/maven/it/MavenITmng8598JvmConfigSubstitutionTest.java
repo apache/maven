@@ -18,10 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.Properties;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,9 +35,9 @@ public class MavenITmng8598JvmConfigSubstitutionTest extends AbstractMavenIntegr
     public void testProjectBasedirSubstitution() throws Exception {
         Path testDir = extractResources("/mng-8598");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument(
-                "-Dexpression.outputFile=" + testDir.resolve("target/pom.properties").getAbsolutePath());
+                "-Dexpression.outputFile=" + testDir.resolve("target/pom.properties"));
         verifier.setForkJvm(true); // custom .mvn/jvm.config
         verifier.addCliArgument("validate");
         verifier.execute();

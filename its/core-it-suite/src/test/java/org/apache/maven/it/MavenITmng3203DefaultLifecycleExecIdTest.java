@@ -40,7 +40,7 @@ public class MavenITmng3203DefaultLifecycleExecIdTest extends AbstractMavenInteg
         // file.
         Path testDir = extractResources("/mng-3203");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
 
         verifier.addCliArgument("compile");
         verifier.execute();

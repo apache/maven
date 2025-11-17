@@ -37,7 +37,7 @@ class MavenITmng8288NoRootPomTest extends AbstractMavenIntegrationTestCase {
     void testitNoRootPomCanBeLoaded() throws Exception {
         Path testDir = extractResources("/mng-8288-no-root-pom");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument("-f");
         verifier.addCliArgument("project");
         verifier.addCliArgument("validate");

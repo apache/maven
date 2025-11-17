@@ -72,7 +72,7 @@ public class MavenITmng4360WebDavSupportTest extends AbstractMavenIntegrationTes
 
         testDir = testDir.resolve(project);
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
 
         Handler repoHandler = new AbstractHandler() {
             @Override

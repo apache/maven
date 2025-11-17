@@ -44,7 +44,7 @@ public class MavenIT0072InterpolationWithDottedPropertyTest extends AbstractMave
     public void testit0072() throws Exception {
         Path testDir = extractResources("/it0072");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

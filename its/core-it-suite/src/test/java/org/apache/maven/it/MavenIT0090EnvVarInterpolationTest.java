@@ -38,7 +38,7 @@ public class MavenIT0090EnvVarInterpolationTest extends AbstractMavenIntegration
     public void testit0090() throws Exception {
         Path testDir = extractResources("/it0090");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.setEnvironmentVariable("MAVEN_TEST_ENVAR", "MAVEN_TEST_ENVAR_VALUE");

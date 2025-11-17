@@ -39,7 +39,7 @@ public class MavenIT0131SiteLifecycleTest extends AbstractMavenIntegrationTestCa
     public void testit0131() throws Exception {
         Path testDir = extractResources("/it0131");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.deleteDirectory("target");
         verifier.setAutoclean(false);
         verifier.addCliArgument("site-deploy");

@@ -47,7 +47,7 @@ public class MavenITmng3991ValidDependencyScopeTest extends AbstractMavenIntegra
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-3991");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         try {

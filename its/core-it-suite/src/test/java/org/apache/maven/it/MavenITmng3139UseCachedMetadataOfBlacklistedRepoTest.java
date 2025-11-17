@@ -43,7 +43,7 @@ public class MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest extends Abstra
 
         // phase 1: get the metadata into the local repo
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng3139");
 
@@ -57,7 +57,7 @@ public class MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest extends Abstra
 
         // phase 2: trigger blacklisting of repo (by invalid URL) and check previously downloaded metadata is still used
 
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
 
         verifier.filterFile(

@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,10 +31,10 @@ public class MavenITgh11356InvalidTransitiveRepositoryTest extends AbstractMaven
 
     @Test
     public void testInvalidTransitiveRepository() throws Exception {
-        File testDir = extractResources("/gh-11356-invalid-transitive-repository");
+        Path testDir = extractResources("/gh-11356-invalid-transitive-repository");
 
         // First, verify that normal build works from the actual root
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument("compile");
         verifier.execute();
         verifier.verifyErrorFreeLog();

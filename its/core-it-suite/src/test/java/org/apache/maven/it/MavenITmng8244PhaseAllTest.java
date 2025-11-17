@@ -37,7 +37,7 @@ class MavenITmng8244PhaseAllTest extends AbstractMavenIntegrationTestCase {
     void testPhaseAllWihConcurrentBuilder() throws Exception {
         Path testDir = extractResources("/mng-8244-phase-all");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setLogFileName("build-concurrent.txt");
         verifier.addCliArguments("-b", "concurrent", "build");
         verifier.execute();
@@ -53,7 +53,7 @@ class MavenITmng8244PhaseAllTest extends AbstractMavenIntegrationTestCase {
     void testPhaseAllWithLegacyBuilder() throws Exception {
         Path testDir = extractResources("/mng-8244-phase-all");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setLogFileName("build-legacy.txt");
         verifier.addCliArguments("build");
         verifier.execute();

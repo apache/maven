@@ -40,7 +40,7 @@ public class MavenITmng3838EqualPluginDepsTest extends AbstractMavenIntegrationT
     public void testitMNG3838() throws Exception {
         Path testDir = extractResources("/mng-3838");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.addCliArgument("validate");
         verifier.execute();

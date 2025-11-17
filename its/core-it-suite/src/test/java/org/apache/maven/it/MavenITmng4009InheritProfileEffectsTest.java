@@ -43,7 +43,7 @@ public class MavenITmng4009InheritProfileEffectsTest extends AbstractMavenIntegr
     public void testitMNG4009() throws Exception {
         Path testDir = extractResources("/mng-4009");
 
-        Verifier verifier = newVerifier(testDir.resolve("sub").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("sub"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Pparent-profile");

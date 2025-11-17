@@ -42,7 +42,7 @@ public class MavenITmng4275RelocationWarningTest extends AbstractMavenIntegratio
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-4275");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4275");

@@ -39,7 +39,7 @@ public class MavenIT0051ReleaseProfileTest extends AbstractMavenIntegrationTestC
     public void testit0051() throws Exception {
         Path testDir = extractResources("/it0051");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-DperformRelease=true");

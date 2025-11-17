@@ -46,7 +46,7 @@ public class MavenITmng2486TimestampedDependencyVersionInterpolationTest extends
 
         Verifier verifier;
 
-        verifier = newVerifier(testDir.resolve("dep-a").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("dep-a"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng2486");
@@ -54,21 +54,21 @@ public class MavenITmng2486TimestampedDependencyVersionInterpolationTest extends
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.resolve("parent").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("parent"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.resolve("dep-b").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("dep-b"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.resolve("test").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("test"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         // enforce remote resolution

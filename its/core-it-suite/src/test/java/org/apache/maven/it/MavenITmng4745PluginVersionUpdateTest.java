@@ -18,12 +18,10 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.Properties;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,7 +42,7 @@ public class MavenITmng4745PluginVersionUpdateTest extends AbstractMavenIntegrat
     public void testitRepoPolicyAlways() throws Exception {
         Path testDir = extractResources("/mng-4745");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.setForkJvm(true); // TODO: why?
         verifier.deleteArtifacts("org.apache.maven.its.mng4745");
@@ -79,7 +77,7 @@ public class MavenITmng4745PluginVersionUpdateTest extends AbstractMavenIntegrat
     public void testitRepoPolicyNever() throws Exception {
         Path testDir = extractResources("/mng-4745");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.setForkJvm(true); // TODO: why?
         verifier.deleteArtifacts("org.apache.maven.its.mng4745");
@@ -114,7 +112,7 @@ public class MavenITmng4745PluginVersionUpdateTest extends AbstractMavenIntegrat
     public void testitForceUpdate() throws Exception {
         Path testDir = extractResources("/mng-4745");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.setForkJvm(true); // TODO: why?
         verifier.deleteArtifacts("org.apache.maven.its.mng4745");
@@ -141,7 +139,7 @@ public class MavenITmng4745PluginVersionUpdateTest extends AbstractMavenIntegrat
         assertEquals("1.1", props.get("plugin.version"));
     }
 
-    private static void writeMetadata(File testdir, String version, String timestamp) throws Exception {
+    private static void writeMetadata(Path testDir, String version, String timestamp) throws Exception {
         StringBuilder content = new StringBuilder(1024);
         content.append("<?xml version=\"1.0\"?>\n");
         content.append("<metadata>\n");
@@ -157,8 +155,8 @@ public class MavenITmng4745PluginVersionUpdateTest extends AbstractMavenIntegrat
         content.append("  </versioning>\n");
         content.append("</metadata>\n");
 
-        File metadata = testdir.resolve("repo/org/apache/maven/its/mng4745/maven-it-plugin/maven-metadata.xml");
-        metadata.getParentFile().mkdirs();
-        Files.writeString(metadata.getAbsoluteFile().toPath(), content.toString());
+        Path metadata = testDir.resolve("repo/org/apache/maven/its/mng4745/maven-it-plugin/maven-metadata.xml");
+        Files.createDirectories(metadata.getParent());
+        Files.writeString(metadata, content.toString());
     }
 }

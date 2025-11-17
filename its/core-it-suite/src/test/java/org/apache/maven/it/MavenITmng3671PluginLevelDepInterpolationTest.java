@@ -44,7 +44,7 @@ public class MavenITmng3671PluginLevelDepInterpolationTest extends AbstractMaven
         // file.
         Path testDir = extractResources("/mng-3671");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
 
         verifier.addCliArgument("compile");
         verifier.execute();

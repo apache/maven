@@ -40,7 +40,7 @@ public class MavenITmng5013ConfigureParamBeanFromScalarValueTest extends Abstrac
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-5013");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

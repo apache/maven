@@ -18,10 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.Map;
-
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
@@ -75,7 +73,7 @@ public class MavenITmng4413MirroringOfDependencyRepoTest extends AbstractMavenIn
         securityHandler.setConstraintMappings(new ConstraintMapping[] {constraintMapping});
 
         ResourceHandler repoHandler = new ResourceHandler();
-        repoHandler.setResourceBase(testDir.resolve("repo-a").getAbsolutePath());
+        repoHandler.setResourceBase(testDir.resolve("repo-a").toString());
 
         HandlerList handlerList = new HandlerList();
         handlerList.addHandler(securityHandler);
@@ -91,7 +89,7 @@ public class MavenITmng4413MirroringOfDependencyRepoTest extends AbstractMavenIn
             }
             int port = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
             System.out.println("Bound server socket to the port " + port);
-            Verifier verifier = newVerifier(testDir.toString());
+            Verifier verifier = newVerifier(testDir);
             verifier.setAutoclean(false);
             verifier.deleteDirectory("target");
             verifier.deleteArtifacts("org.apache.maven.its.mng4413");

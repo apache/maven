@@ -42,7 +42,7 @@ public class MavenITmng5572ReactorPluginExtensionsTest extends AbstractMavenInte
         Path testDir = extractResources("/mng-5572-reactor-plugin-extensions");
 
         // plugin must be available in local repo, otherwise the project couldn't be built
-        Verifier setup = newVerifier(testDir.toString());
+        Verifier setup = newVerifier(testDir);
         setup.setAutoclean(true);
         setup.addCliArgument("-f");
         setup.addCliArgument("plugin/pom.xml");
@@ -50,7 +50,7 @@ public class MavenITmng5572ReactorPluginExtensionsTest extends AbstractMavenInte
         setup.execute();
         setup.verifyErrorFreeLog();
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setLogFileName("log2.txt");
         verifier.setAutoclean(false);
         verifier.addCliArgument("validate");

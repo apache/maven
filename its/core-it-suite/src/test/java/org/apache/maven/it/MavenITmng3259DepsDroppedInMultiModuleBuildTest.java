@@ -41,14 +41,14 @@ public class MavenITmng3259DepsDroppedInMultiModuleBuildTest extends AbstractMav
 
         Verifier verifier;
 
-        verifier = newVerifier(testDir.resolve("parent").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("parent"));
 
         verifier.addCliArgument("install");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
 
         verifier.addCliArgument("install");
         verifier.execute();

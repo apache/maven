@@ -41,7 +41,7 @@ public class MavenITmng4291MojoRequiresOnlineModeTest extends AbstractMavenInteg
         Path testDir = extractResources("/mng-4291");
 
         // First, build the test plugin
-        Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-online").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-online"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -49,7 +49,7 @@ public class MavenITmng4291MojoRequiresOnlineModeTest extends AbstractMavenInteg
         verifier.verifyErrorFreeLog();
 
         // Then, run the test project that uses the plugin
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.setLogFileName("log-direct.txt");
@@ -75,7 +75,7 @@ public class MavenITmng4291MojoRequiresOnlineModeTest extends AbstractMavenInteg
         Path testDir = extractResources("/mng-4291");
 
         // First, build the test plugin
-        Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-online").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-online"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -83,7 +83,7 @@ public class MavenITmng4291MojoRequiresOnlineModeTest extends AbstractMavenInteg
         verifier.verifyErrorFreeLog();
 
         // Then, run the test project that uses the plugin
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.setLogFileName("log-lifecycle.txt");

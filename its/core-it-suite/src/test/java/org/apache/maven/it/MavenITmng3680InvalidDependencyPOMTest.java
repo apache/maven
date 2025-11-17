@@ -42,7 +42,7 @@ public class MavenITmng3680InvalidDependencyPOMTest extends AbstractMavenIntegra
     public void testitMNG3680() throws Exception {
         Path testDir = extractResources("/mng-3680");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3680");

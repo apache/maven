@@ -47,7 +47,7 @@ public class MavenITmng3719PomExecutionOrderingTest extends AbstractMavenIntegra
     public void testitMNG3719() throws Exception {
         Path testDir = extractResources("/mng-3719");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

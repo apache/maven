@@ -18,12 +18,10 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Properties;
 import java.util.TreeSet;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -51,9 +49,7 @@ class MavenITmng3843PomInheritanceTest extends AbstractMavenIntegrationTestCase 
     public void testitMNG3843() throws Exception {
         Path testDir = extractResources("/mng-3843");
 
-        testDir = testDir.getCanonicalFile();
-
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("test-1/target");
         verifier.deleteDirectory("test-2/target");
@@ -67,9 +63,9 @@ class MavenITmng3843PomInheritanceTest extends AbstractMavenIntegrationTestCase 
         verifier.verifyErrorFreeLog();
 
         Properties props;
-        File basedir;
+        Path basedir;
 
-        basedir = new File(verifier.getBasedir(), "test-1");
+        basedir = verifier.getBasedir().resolve( "test-1");
         props = verifier.loadProperties("test-1/target/pom.properties");
         assertEquals("org.apache.maven.its.mng3843", props.getProperty("project.groupId"));
         assertEquals("test-1", props.getProperty("project.artifactId"));
@@ -114,10 +110,10 @@ class MavenITmng3843PomInheritanceTest extends AbstractMavenIntegrationTestCase 
         assertMissing(props, "project.dependencies.");
         assertMissing(props, "project.dependencyManagement.");
 
-        basedir = new File(verifier.getBasedir(), "test-2");
+        basedir = verifier.getBasedir().resolve("test-2");
         props = verifier.loadProperties("test-2/target/pom.properties");
 
-        basedir = new File(verifier.getBasedir(), "test-2/child-1");
+        basedir = verifier.getBasedir().resolve("test-2/child-1");
         props = verifier.loadProperties("test-2/child-1/target/pom.properties");
         assertEquals("org.apache.maven.its.mng3843", props.getProperty("project.groupId"));
         assertEquals("child-1", props.getProperty("project.artifactId"));
@@ -172,7 +168,7 @@ class MavenITmng3843PomInheritanceTest extends AbstractMavenIntegrationTestCase 
         assertEquals("1", props.getProperty("project.dependencyManagement.dependencies"));
         assertEquals("parent-dep-a", props.getProperty("project.dependencyManagement.dependencies.0.artifactId"));
 
-        basedir = new File(verifier.getBasedir(), "test-2/child-2");
+        basedir = verifier.getBasedir().resolve("test-2/child-2");
         props = verifier.loadProperties("test-2/child-2/target/pom.properties");
         assertEquals("org.apache.maven.its.mng3843.child", props.getProperty("project.groupId"));
         assertEquals("child-2", props.getProperty("project.artifactId"));
@@ -244,18 +240,18 @@ class MavenITmng3843PomInheritanceTest extends AbstractMavenIntegrationTestCase 
         expectedMngtDeps.add("child-dep-a");
         assertEquals(expectedMngtDeps, actualMngtDeps);
 
-        basedir = new File(verifier.getBasedir(), "test-3/sub-parent/child-a");
+        basedir = verifier.getBasedir().resolve("test-3/sub-parent/child-a");
         props = verifier.loadProperties("test-3/sub-parent/child-a/target/pom.properties");
         assertEquals("..", props.getProperty("project.originalModel.parent.relativePath"));
     }
 
-    private void assertPathEquals(File basedir, String expected, String actual) {
+    private void assertPathEquals(Path basedir, String expected, String actual) {
         // NOTE: Basedir alignment is another issue, so don't test this here
-        File actualFile = new File(actual);
+        Path actualFile = Path.of(actual);
         if (actualFile.isAbsolute()) {
             assertEquals(basedir.resolve(expected), actualFile);
         } else {
-            assertEquals(new File(expected), actualFile);
+            assertEquals(Path.of(expected), actualFile);
         }
     }
 

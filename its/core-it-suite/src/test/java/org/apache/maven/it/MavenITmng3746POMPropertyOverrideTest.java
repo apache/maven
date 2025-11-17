@@ -40,18 +40,18 @@ public class MavenITmng3746POMPropertyOverrideTest extends AbstractMavenIntegrat
         // The testdir is computed from the location of this
         // file.
         Path testDir = extractResources("/mng-3746");
-        File pluginDir = testDir.resolve("maven-mng3746-plugin");
-        File projectDir = testDir.resolve("project");
+        Path pluginDir = testDir.resolve("maven-mng3746-plugin");
+        Path projectDir = testDir.resolve("project");
 
         Verifier verifier;
 
-        verifier = newVerifier(pluginDir.toString());
+        verifier = newVerifier(pluginDir);
         verifier.setLogFileName("log-sys.txt");
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.toString());
+        verifier = newVerifier(projectDir);
         verifier.setLogFileName("log-sys.txt");
         verifier.addCliArgument("validate");
         verifier.execute();
@@ -63,18 +63,18 @@ public class MavenITmng3746POMPropertyOverrideTest extends AbstractMavenIntegrat
         // The testdir is computed from the location of this
         // file.
         Path testDir = extractResources("/mng-3746");
-        File pluginDir = testDir.resolve("maven-mng3746-plugin");
-        File projectDir = testDir.resolve("project");
+        Path pluginDir = testDir.resolve("maven-mng3746-plugin");
+        Path projectDir = testDir.resolve("project");
 
         Verifier verifier;
 
-        verifier = newVerifier(pluginDir.toString());
+        verifier = newVerifier(pluginDir);
         verifier.setLogFileName("log-cli.txt");
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.toString());
+        verifier = newVerifier(projectDir);
         verifier.setLogFileName("log-cli.txt");
 
         verifier.addCliArgument("-Dtest.verification=cli");

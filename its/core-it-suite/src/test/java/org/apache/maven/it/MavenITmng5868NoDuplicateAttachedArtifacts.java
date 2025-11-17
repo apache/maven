@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng5868NoDuplicateAttachedArtifacts extends AbstractMavenIntegrationTestCase {
 
-    private File testDir;
+    private Path testDir;
 
     private Server server;
 
@@ -101,8 +101,8 @@ public class MavenITmng5868NoDuplicateAttachedArtifacts extends AbstractMavenInt
 
     @Test
     public void testNoDeployNotDuplicate() throws Exception {
-        Verifier verifier = newVerifier(testDir.toString());
-        Path tmp = Files.createTempFile(testDir.toPath(), "FOO", "txt");
+        Verifier verifier = newVerifier(testDir);
+        Path tmp = Files.createTempFile(testDir, "FOO", "txt");
 
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

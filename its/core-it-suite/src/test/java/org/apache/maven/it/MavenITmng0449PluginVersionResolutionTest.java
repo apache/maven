@@ -42,7 +42,7 @@ public class MavenITmng0449PluginVersionResolutionTest extends AbstractMavenInte
         Path testDir = extractResources("/mng-0449");
         testDir = testDir.resolve("lifecycle");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         try {
@@ -75,7 +75,7 @@ public class MavenITmng0449PluginVersionResolutionTest extends AbstractMavenInte
         Path testDir = extractResources("/mng-0449");
         testDir = testDir.resolve("direct");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         try {

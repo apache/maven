@@ -34,7 +34,7 @@ public class MavenITmng7128BlockExternalHttpReactorTest extends AbstractMavenInt
     @Test
     public void testBlockedHttpRepositoryInPom() throws Exception {
         final Path projectDir = extractResources(PROJECT_PATH);
-        final Verifier verifier = newVerifier(projectDir.toString());
+        final Verifier verifier = newVerifier(projectDir);
         // ITs override global settings that provide blocked mirror: need to define the mirror in dedicated settings
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");

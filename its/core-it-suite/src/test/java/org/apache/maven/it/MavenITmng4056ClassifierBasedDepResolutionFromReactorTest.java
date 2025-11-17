@@ -43,7 +43,7 @@ public class MavenITmng4056ClassifierBasedDepResolutionFromReactorTest extends A
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-4056");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("consumer/target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4056");

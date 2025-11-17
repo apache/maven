@@ -40,7 +40,7 @@ public class MavenITmng2562Timestamp322Test extends AbstractMavenIntegrationTest
     public void testitDefaultFormat() throws Exception {
         Path testDir = extractResources("/mng-2562/default");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
@@ -64,7 +64,7 @@ public class MavenITmng2562Timestamp322Test extends AbstractMavenIntegrationTest
     public void testitCustomFormat() throws Exception {
         Path testDir = extractResources("/mng-2562/custom");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
@@ -84,7 +84,7 @@ public class MavenITmng2562Timestamp322Test extends AbstractMavenIntegrationTest
     public void testitSameValueAcrossModules() throws Exception {
         Path testDir = extractResources("/mng-2562/reactor");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("child-1/target");

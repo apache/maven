@@ -29,12 +29,12 @@ public class MavenITmng5840ParentVersionRanges extends AbstractMavenIntegrationT
     public void testParentRangeRelativePathPointsToWrongVersion() throws Exception {
         Path testDir = extractResources("/mng-5840-relative-path-range-negative");
 
-        Verifier verifier = newVerifier(testDir.resolve("parent-1").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("parent-1"));
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.resolve("child").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("child"));
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -44,12 +44,12 @@ public class MavenITmng5840ParentVersionRanges extends AbstractMavenIntegrationT
     public void testParentRangeRelativePathPointsToCorrectVersion() throws Exception {
         Path testDir = extractResources("/mng-5840-relative-path-range-positive");
 
-        Verifier verifier = newVerifier(testDir.resolve("parent-1").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("parent-1"));
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.resolve("child").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("child"));
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

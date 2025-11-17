@@ -18,9 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
-
 import org.junit.jupiter.api.Test;
 
 /**
@@ -38,16 +36,16 @@ class MavenITmng7587Jsr330 extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void test() throws Exception {
-        Path testDir = extractResources("/mng-7587-jsr330").getAbsoluteFile();
+        Path testDir = extractResources("/mng-7587-jsr330");
 
-        final Verifier pluginVerifier = newVerifier(testDir.resolve("plugin").getPath());
+        final Verifier pluginVerifier = newVerifier(testDir.resolve("plugin"));
         pluginVerifier.addCliArgument("clean");
         pluginVerifier.addCliArgument("install");
         pluginVerifier.addCliArgument("-V");
         pluginVerifier.execute();
         pluginVerifier.verifyErrorFreeLog();
 
-        final Verifier consumerVerifier = newVerifier(testDir.resolve("consumer").getPath());
+        final Verifier consumerVerifier = newVerifier(testDir.resolve("consumer"));
         consumerVerifier.addCliArgument("clean");
         consumerVerifier.addCliArgument("verify");
         consumerVerifier.addCliArgument("-V");

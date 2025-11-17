@@ -42,7 +42,7 @@ public class MavenITmng2054PluginExecutionInheritanceTest extends AbstractMavenI
     @Test
     public void testitMNG2054() throws Exception {
         Path testDir = extractResources("/mng-2054");
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("project/project-level2/project-level3/project-jar/target");
         verifier.addCliArgument("validate");

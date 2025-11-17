@@ -45,7 +45,7 @@ public class MavenITmng4600DependencyOptionalFlagManagementTest extends Abstract
     public void testitModel() throws Exception {
         Path testDir = extractResources("/mng-4600/model");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
@@ -67,7 +67,7 @@ public class MavenITmng4600DependencyOptionalFlagManagementTest extends Abstract
     public void testitResolution() throws Exception {
         Path testDir = extractResources("/mng-4600/resolution");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4600");

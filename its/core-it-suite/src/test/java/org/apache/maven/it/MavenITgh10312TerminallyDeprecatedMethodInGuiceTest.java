@@ -18,9 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledForJreRange;
 import org.junit.jupiter.api.condition.JRE;
@@ -40,7 +38,7 @@ class MavenITgh10312TerminallyDeprecatedMethodInGuiceTest extends AbstractMavenI
     void worryingShouldNotBePrinted() throws Exception {
         Path testDir = extractResources("/gh-10312-terminally-deprecated-method-in-guice");
 
-        Verifier verifier = new Verifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir, null);
         verifier.setForkJvm(true);
         verifier.addCliArgument("validate");
         verifier.execute();
@@ -59,7 +57,7 @@ class MavenITgh10312TerminallyDeprecatedMethodInGuiceTest extends AbstractMavenI
     void allowOverwriteByUser() throws Exception {
         Path testDir = extractResources("/gh-10312-terminally-deprecated-method-in-guice");
 
-        Verifier verifier = new Verifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir, null);
         verifier.setForkJvm(true);
         verifier.addCliArgument("validate");
         verifier.addCliArgument("-Dguice_custom_class_loading=BRIDGE");

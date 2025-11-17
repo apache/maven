@@ -41,7 +41,7 @@ public class MavenITmng0870ReactorAwarePluginDiscoveryTest extends AbstractMaven
     public void testitMNG0870() throws Exception {
         Path testDir = extractResources("/mng-0870");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("project/target");
         verifier.deleteArtifacts("org.apache.maven.its.mng0870");

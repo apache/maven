@@ -46,7 +46,7 @@ class MavenITmng7804PluginExecutionOrderTest extends AbstractMavenIntegrationTes
     void testOrder() throws Exception {
         Path testDir = extractResources("/mng-7804-plugin-execution-order");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument("clean");
         verifier.execute();
         verifier.verifyErrorFreeLog();

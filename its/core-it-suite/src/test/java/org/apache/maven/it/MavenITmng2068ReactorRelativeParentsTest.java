@@ -18,9 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
-
 import org.junit.jupiter.api.Test;
 
 /**
@@ -45,9 +43,9 @@ public class MavenITmng2068ReactorRelativeParentsTest extends AbstractMavenInteg
     @Test
     public void testitInheritedIdFields() throws Exception {
         Path testDir = extractResources("/mng-2068/test-1");
-        File projectDir = testDir.resolve("parent");
+        Path projectDir = testDir.resolve("parent");
 
-        Verifier verifier = newVerifier(projectDir.toString());
+        Verifier verifier = newVerifier(projectDir);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng2068");
         verifier.addCliArgument("validate");
@@ -63,9 +61,9 @@ public class MavenITmng2068ReactorRelativeParentsTest extends AbstractMavenInteg
     @Test
     public void testitExplicitIdFields() throws Exception {
         Path testDir = extractResources("/mng-2068/test-2");
-        File projectDir = testDir.resolve("parent");
+        Path projectDir = testDir.resolve("parent");
 
-        Verifier verifier = newVerifier(projectDir.toString());
+        Verifier verifier = newVerifier(projectDir);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng2068");
         verifier.addCliArgument("validate");
@@ -81,9 +79,9 @@ public class MavenITmng2068ReactorRelativeParentsTest extends AbstractMavenInteg
     @Test
     public void testitComplex() throws Exception {
         Path testDir = extractResources("/mng-2068/test-3");
-        File projectDir = testDir;
+        Path projectDir = testDir;
 
-        Verifier verifier = newVerifier(projectDir.toString());
+        Verifier verifier = newVerifier(projectDir);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng2068");
         verifier.addCliArgument("validate");

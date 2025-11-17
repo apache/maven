@@ -42,7 +42,7 @@ class MavenITgh11162ConsumerPomScopesTest extends AbstractMavenIntegrationTestCa
     void testConsumerPomFiltersScopes() throws Exception {
         Path basedir = extractResources("/gh-11162-consumer-pom-scopes");
 
-        Verifier verifier = newVerifier(basedir.toString());
+        Verifier verifier = newVerifier(basedir);
         verifier.addCliArgument("install");
         verifier.addCliArgument("-Dmaven.consumer.pom.flatten=true");
         verifier.execute();

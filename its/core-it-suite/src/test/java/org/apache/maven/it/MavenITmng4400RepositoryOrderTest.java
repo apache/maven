@@ -42,7 +42,7 @@ public class MavenITmng4400RepositoryOrderTest extends AbstractMavenIntegrationT
     public void testitSettingsRepos() throws Exception {
         Path testDir = extractResources("/mng-4400");
 
-        Verifier verifier = newVerifier(testDir.resolve("settings").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("settings"));
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4400");
         verifier.filterFile("settings-template.xml", "settings.xml");
@@ -65,7 +65,7 @@ public class MavenITmng4400RepositoryOrderTest extends AbstractMavenIntegrationT
     public void testitPomRepos() throws Exception {
         Path testDir = extractResources("/mng-4400");
 
-        Verifier verifier = newVerifier(testDir.resolve("pom").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("pom"));
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4400");
         verifier.filterFile("pom-template.xml", "pom.xml");

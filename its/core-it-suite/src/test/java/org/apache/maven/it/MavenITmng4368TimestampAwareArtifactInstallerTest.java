@@ -48,15 +48,15 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
     public void testitPomPackaging() throws Exception {
         Path testDir = extractResources("/mng-4368/pom");
 
-        File aDir = testDir.resolve("branch-a");
-        File aPom = aDir.resolve("pom.xml");
-        File bDir = testDir.resolve("branch-b");
-        File bPom = bDir.resolve("pom.xml");
+        Path aDir = testDir.resolve("branch-a");
+        File aPom = aDir.resolve("pom.xml").toFile();
+        Path bDir = testDir.resolve("branch-b");
+        File bPom = bDir.resolve("pom.xml").toFile();
 
         aPom.setLastModified(System.currentTimeMillis());
         bPom.setLastModified(aPom.lastModified() - 1000 * 60);
 
-        Verifier verifier = newVerifier(aDir.toString());
+        Verifier verifier = newVerifier(aDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4368");
@@ -75,7 +75,7 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
         assertTrue(aPom.lastModified() > bPom.lastModified());
         assertTrue(installedPom.lastModified() > bPom.lastModified());
 
-        verifier = newVerifier(bDir.toString());
+        verifier = newVerifier(bDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("initialize");
@@ -99,17 +99,17 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
 
         Path testDir = extractResources("/mng-4368/jar");
 
-        File aDir = testDir.resolve("branch-a");
-        File aArtifact = aDir.resolve("artifact.jar");
-        File bDir = testDir.resolve("branch-b");
-        File bArtifact = bDir.resolve("artifact.jar");
+        Path aDir = testDir.resolve("branch-a");
+        File aArtifact = aDir.resolve("artifact.jar").toFile();
+        Path bDir = testDir.resolve("branch-b");
+        File bArtifact = bDir.resolve("artifact.jar").toFile();
 
         Files.writeString(aArtifact.toPath(), "from Branch-A");
         aArtifact.setLastModified(System.currentTimeMillis());
         Files.writeString(bArtifact.toPath(), "from Branch-B");
         bArtifact.setLastModified(aArtifact.lastModified() - 1000 * 60);
 
-        Verifier verifier = newVerifier(aDir.toString());
+        Verifier verifier = newVerifier(aDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4368");
@@ -128,7 +128,7 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
         assertTrue(aArtifact.lastModified() > bArtifact.lastModified());
         assertTrue(installedArtifact.lastModified() > bArtifact.lastModified());
 
-        verifier = newVerifier(bDir.toString());
+        verifier = newVerifier(bDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("initialize");
@@ -143,7 +143,7 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
         Files.writeString(installedArtifact.toPath(), "from Branch-C");
         installedArtifact.setLastModified(lastModified);
 
-        verifier = newVerifier(bDir.toString());
+        verifier = newVerifier(bDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.setLogFileName("log-b.txt");

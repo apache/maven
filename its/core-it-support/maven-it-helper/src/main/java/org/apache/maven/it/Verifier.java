@@ -129,46 +129,12 @@ public class Verifier {
 
     private ByteArrayOutputStream stderr;
 
-    @Deprecated
-    public Verifier(String basedir) throws VerificationException {
-        this(Paths.get(basedir), null);
-    }
-
-    @Deprecated
-    public Verifier(String basedir, List<String> defaultCliArguments) throws VerificationException {
-        this(basedir, defaultCliArguments, true);
-    }
-
-    @Deprecated
-    public Verifier(String basedir, boolean createDotMvn) throws VerificationException {
-        this(basedir, null, createDotMvn);
-    }
-
-    /**
-     * Creates verifier instance using passed in basedir as "cwd" and passed in default CLI arguments (if not null).
-     * The discovery of user home and Maven installation directory is performed as well.
-     *
-     * @param basedir The basedir, cannot be {@code null}
-     * @param defaultCliArguments The defaultCliArguments override, may be {@code null}
-     * @param createDotMvn If {@code true}, Verifier will create {@code .mvn} in passed basedir.
-     *
-     * @see #DEFAULT_CLI_ARGUMENTS
-     */
-    @Deprecated
-    public Verifier(String basedir, List<String> defaultCliArguments, boolean createDotMvn) throws VerificationException {
-        this(Paths.get(requireNonNull(basedir)), defaultCliArguments, createDotMvn);
-    }
-
     public Verifier(Path basedir) throws VerificationException {
         this(basedir, null, true);
     }
 
     public Verifier(Path basedir, List<String> defaultCliArguments) throws VerificationException {
         this(basedir, defaultCliArguments, true);
-    }
-
-    public Verifier(Path basedir, boolean createDotMvn) throws VerificationException {
-        this(basedir, null, createDotMvn);
     }
 
     /**
@@ -227,10 +193,15 @@ public class Verifier {
         return executorHelper.getDefaultMode();
     }
 
+    public void  execute(String... args) throws VerificationException {
+        addCliArguments(args);
+        execute();
+    }
+
     public void execute() throws VerificationException {
         List<String> args = new ArrayList<>(defaultCliArguments);
         for (String cliArgument : cliArguments) {
-            args.add(cliArgument.replace("${basedir}", getBasedir()));
+            args.add(cliArgument.replace("${basedir}", getBasedir().toString()));
         }
 
         if (handleLocalRepoTail) {
@@ -379,8 +350,8 @@ public class Verifier {
         }
     }
 
-    public String getBasedir() {
-        return basedir.toString();
+    public Path getBasedir() {
+        return basedir;
     }
 
     public void setLogFileName(String logFileName) {
@@ -1073,7 +1044,7 @@ public class Verifier {
     public Map<String, String> newDefaultFilterMap() {
         Map<String, String> filterMap = new HashMap<>();
 
-        Path basedir = Paths.get(getBasedir()).toAbsolutePath();
+        Path basedir = getBasedir();
         filterMap.put("@basedir@", basedir.toString());
         filterMap.put("@baseurl@", basedir.toUri().toASCIIString());
 
@@ -1091,6 +1062,16 @@ public class Verifier {
     }
 
     /**
+     * Verifies that the given file exists.
+     *
+     * @param file the path of the file to check
+     * @throws VerificationException in case the given file does not exist
+     */
+    public void verifyFilePresent(Path file) throws VerificationException {
+        verifyFilePresence(file.toString(), true);
+    }
+
+    /**
      * Verifies that the given file does not exist.
      *
      * @param file the path of the file to check
@@ -1098,6 +1079,16 @@ public class Verifier {
      */
     public void verifyFileNotPresent(String file) throws VerificationException {
         verifyFilePresence(file, false);
+    }
+
+    /**
+     * Verifies that the given file does not exist.
+     *
+     * @param file the path of the file to check
+     * @throws VerificationException if the given file exists
+     */
+    public void verifyFileNotPresent(Path file) throws VerificationException {
+        verifyFilePresence(file.toString(), false);
     }
 
     private void verifyArtifactPresence(boolean wanted, String groupId, String artifactId, String version, String ext)

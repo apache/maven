@@ -31,7 +31,7 @@ public class MavenITmng7353CliGoalInvocationTest extends AbstractMavenIntegratio
 
     private void run(String id, String goal, String expectedInvocation) throws Exception {
         Path basedir = extractResources("/mng-7353-cli-goal-invocation");
-        Verifier verifier = newVerifier(basedir.toString());
+        Verifier verifier = newVerifier(basedir);
         verifier.setLogFileName(id + ".txt");
         verifier.addCliArgument(goal);
         verifier.execute();

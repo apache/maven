@@ -18,12 +18,10 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Properties;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,15 +44,15 @@ public class MavenITmng1751ForcedMetadataUpdateDuringDeploymentTest extends Abst
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-1751");
 
-        File dir = testDir.resolve("repo/org/apache/maven/its/mng1751/dep/0.1-SNAPSHOT");
-        File templateMetadataFile = dir.resolve("template-metadata.xml");
-        File metadataFile = dir.resolve("maven-metadata.xml");
-        Files.copy(templateMetadataFile.toPath(), metadataFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        Path dir = testDir.resolve("repo/org/apache/maven/its/mng1751/dep/0.1-SNAPSHOT");
+        Path templateMetadataFile = dir.resolve("template-metadata.xml");
+        Path metadataFile = dir.resolve("maven-metadata.xml");
+        Files.copy(templateMetadataFile, metadataFile, StandardCopyOption.REPLACE_EXISTING);
         String checksum = ItUtils.calcHash(metadataFile, "SHA-1");
-        Files.writeString(metadataFile.toPath().getParent().resolve(metadataFile.getName() + ".sha1"), checksum);
+        Files.writeString(metadataFile.getParent().resolve(metadataFile.getFileName() + ".sha1"), checksum);
 
         // phase 1: deploy a new snapshot, this should update the metadata despite its future timestamp
-        Verifier verifier = newVerifier(testDir.resolve("dep").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("dep"));
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng1751");
         verifier.addCliArgument("validate");
@@ -62,7 +60,7 @@ public class MavenITmng1751ForcedMetadataUpdateDuringDeploymentTest extends Abst
         verifier.verifyErrorFreeLog();
 
         // phase 2: resolve snapshot, if the previous deployment didn't update the metadata, we get the wrong file
-        verifier = newVerifier(testDir.resolve("test").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("test"));
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng1751");
         verifier.filterFile("settings-template.xml", "settings.xml");

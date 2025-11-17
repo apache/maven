@@ -40,7 +40,7 @@ public class MavenITmng2738ProfileIdCollidesWithCliOptionTest extends AbstractMa
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-2738");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Pe");

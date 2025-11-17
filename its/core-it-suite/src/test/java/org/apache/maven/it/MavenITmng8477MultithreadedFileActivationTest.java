@@ -34,9 +34,9 @@ class MavenITmng8477MultithreadedFileActivationTest extends AbstractMavenIntegra
      */
     @Test
     void testIt() throws Exception {
-        Path basedir = extractResources("/mng-8477").getAbsoluteFile().toPath();
+        Path basedir = extractResources("/mng-8477");
 
-        Verifier verifier = newVerifier(basedir.toString());
+        Verifier verifier = newVerifier(basedir);
         verifier.addCliArguments("help:active-profiles", "-Dmaven.modelBuilder.parallelism=1");
         verifier.execute();
         verifier.verifyErrorFreeLog();

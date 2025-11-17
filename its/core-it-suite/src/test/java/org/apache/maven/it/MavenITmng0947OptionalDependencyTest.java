@@ -46,7 +46,7 @@ public class MavenITmng0947OptionalDependencyTest extends AbstractMavenIntegrati
 
         Path testDir = extractResources("/mng-0947");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng0947");

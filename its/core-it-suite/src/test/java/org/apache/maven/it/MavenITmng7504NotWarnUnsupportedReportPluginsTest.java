@@ -42,7 +42,7 @@ public class MavenITmng7504NotWarnUnsupportedReportPluginsTest extends AbstractM
     public void testWarnNotPresent() throws IOException, VerificationException {
         Path rootDir = extractResources(PROJECT_PATH);
 
-        Verifier verifier = newVerifier(rootDir.toString());
+        Verifier verifier = newVerifier(rootDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("site");

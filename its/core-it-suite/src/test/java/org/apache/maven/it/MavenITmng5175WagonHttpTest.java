@@ -100,7 +100,7 @@ public class MavenITmng5175WagonHttpTest extends AbstractMavenIntegrationTestCas
     public void testmng5175ReadTimeOutFromSettings() throws Exception {
         Path testDir = extractResources("/mng-5175");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
 
         Map<String, String> filterProps = new HashMap<>();
         filterProps.put("@port@", Integer.toString(port));

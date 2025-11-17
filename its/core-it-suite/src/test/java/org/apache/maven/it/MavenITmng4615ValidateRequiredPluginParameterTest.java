@@ -43,7 +43,7 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest extends AbstractM
     public void testitAllSet() throws Exception {
         Path testDir = extractResources("/mng-4615/test-0");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
@@ -65,7 +65,7 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest extends AbstractM
     public void testitExprMissing() throws Exception {
         Path testDir = extractResources("/mng-4615/test-1");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.setLogFileName("log-a.txt");
@@ -89,7 +89,7 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest extends AbstractM
     public void testitExprSet() throws Exception {
         Path testDir = extractResources("/mng-4615/test-1");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Dconfig.requiredParam=CLI");
@@ -116,7 +116,7 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest extends AbstractM
 
         Path testDir = extractResources("/mng-4615/test-2a");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         try {
@@ -139,7 +139,7 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest extends AbstractM
     public void testitPomValSet() throws Exception {
         Path testDir = extractResources("/mng-4615/test-2b");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

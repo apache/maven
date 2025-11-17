@@ -18,9 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -37,7 +36,7 @@ class MavenITmng5668AfterPhaseExecutionTest extends AbstractMavenIntegrationTest
     void testAfterPhaseExecutionOnFailure() throws Exception {
         Path testDir = extractResources("/mng-5668-after-phase-execution");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
 
@@ -57,9 +56,9 @@ class MavenITmng5668AfterPhaseExecutionTest extends AbstractMavenIntegrationTest
         verifier.verifyFilePresent("target/after-verify.txt");
 
         // Verify the execution order through timestamps
-        long beforeTime = testDir.resolve("target/before-verify.txt").lastModified();
-        long failTime = testDir.resolve("target/verify-failed.txt").lastModified();
-        long afterTime = testDir.resolve("target/after-verify.txt").lastModified();
+        long beforeTime = Files.getLastModifiedTime(testDir.resolve("target/before-verify.txt")).toMillis();
+        long failTime = Files.getLastModifiedTime(testDir.resolve("target/verify-failed.txt")).toMillis();
+        long afterTime = Files.getLastModifiedTime(testDir.resolve("target/after-verify.txt")).toMillis();
 
         assertTrue(beforeTime <= failTime);
         assertTrue(failTime <= afterTime);

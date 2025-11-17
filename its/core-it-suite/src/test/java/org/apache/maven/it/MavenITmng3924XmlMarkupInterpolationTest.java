@@ -44,7 +44,7 @@ public class MavenITmng3924XmlMarkupInterpolationTest extends AbstractMavenInteg
     public void testitMNG3924() throws Exception {
         Path testDir = extractResources("/mng-3924");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

@@ -44,7 +44,7 @@ public class MavenITmng4349RelocatedArtifactWithInvalidPomTest extends AbstractM
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-4349");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4349");
         verifier.deleteDirectory("target");

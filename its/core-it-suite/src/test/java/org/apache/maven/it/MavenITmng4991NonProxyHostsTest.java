@@ -51,7 +51,7 @@ public class MavenITmng4991NonProxyHostsTest extends AbstractMavenIntegrationTes
         Path testDir = extractResources("/mng-4991");
 
         ResourceHandler resourceHandler = new ResourceHandler();
-        resourceHandler.setResourceBase(testDir.resolve("repo").getAbsolutePath());
+        resourceHandler.setResourceBase(testDir.resolve("repo").toString());
 
         HandlerList handlers = new HandlerList();
         handlers.setHandlers(new Handler[] {resourceHandler, new DefaultHandler()});
@@ -66,7 +66,7 @@ public class MavenITmng4991NonProxyHostsTest extends AbstractMavenIntegrationTes
         Server proxy = new Server(0);
         proxy.setHandler(new DefaultHandler());
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         try {
             server.start();
             if (server.isFailed()) {

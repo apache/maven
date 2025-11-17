@@ -44,7 +44,7 @@ public class MavenITmng3955EffectiveSettingsTest extends AbstractMavenIntegratio
     public void testitMNG3955() throws Exception {
         Path testDir = extractResources("/mng-3955");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         String localRepo = verifier.getLocalRepository();
         verifier.setAutoclean(false);
         verifier.addCliArgument("-Dmaven.repo.local.tail=" + localRepo);

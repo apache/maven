@@ -47,7 +47,7 @@ public class MavenITmng4720DependencyManagementExclusionMergeTest extends Abstra
     public void testitWithTransitiveDependencyManager() throws Exception {
         Path testDir = extractResources("/mng-4720");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4720");
         verifier.addCliArgument("-s");
@@ -80,7 +80,7 @@ public class MavenITmng4720DependencyManagementExclusionMergeTest extends Abstra
     public void testitWithTransitiveDependencyManagerDisabled() throws Exception {
         Path testDir = extractResources("/mng-4720");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4720");
         verifier.addCliArgument("-s");

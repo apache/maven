@@ -18,8 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +28,7 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng8525MavenDIPlugin extends AbstractMavenIntegrationTestCase {
 
-    private File testDir;
+    private Path testDir;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -41,7 +40,7 @@ public class MavenITmng8525MavenDIPlugin extends AbstractMavenIntegrationTestCas
         //
         // Build a plugin that uses a Maven DI plugin
         //
-        Verifier v0 = newVerifier(testDir.toString());
+        Verifier v0 = newVerifier(testDir);
         v0.setAutoclean(false);
         v0.deleteDirectory("target");
         v0.deleteArtifacts("org.apache.maven.its.mng8525");
@@ -52,7 +51,7 @@ public class MavenITmng8525MavenDIPlugin extends AbstractMavenIntegrationTestCas
         //
         // Execute the Maven DI plugin
         //
-        Verifier v1 = newVerifier(testDir.toString());
+        Verifier v1 = newVerifier(testDir);
         v1.setAutoclean(false);
         v1.addCliArgument("org.apache.maven.its.mng8525:mavendi-maven-plugin:0.0.1-SNAPSHOT:hello");
         v1.addCliArgument("-Dname=World");

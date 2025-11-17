@@ -45,7 +45,7 @@ public class MavenITmng3998PluginExecutionConfigTest extends AbstractMavenIntegr
     public void testitMNG3998() throws Exception {
         Path testDir = extractResources("/mng-3998");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

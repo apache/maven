@@ -46,7 +46,7 @@ class MavenITgh11196CIFriendlyProfilesTest extends AbstractMavenIntegrationTestC
     void testCiFriendlyVersionWithoutProfile() throws Exception {
         Path testDir = extractResources("/gh-11196-ci-friendly-profiles");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.addCliArgument("validate");
         verifier.execute();
@@ -68,7 +68,7 @@ class MavenITgh11196CIFriendlyProfilesTest extends AbstractMavenIntegrationTestC
     void testCiFriendlyVersionWithReleaseProfile() throws Exception {
         Path testDir = extractResources("/gh-11196-ci-friendly-profiles");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.addCliArgument("-PreleaseBuild");
         verifier.addCliArgument("validate");

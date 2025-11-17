@@ -18,10 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.io.IOException;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -41,7 +39,7 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationTestCase {
     private static final String RESOURCE_PATH = "/mng-6118-submodule-invocation-full-reactor";
-    private final File testDir;
+    private final Path testDir;
 
     public MavenITmng6118SubmoduleInvocation() throws IOException {
         super();
@@ -80,7 +78,7 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
         verifier.addCliArgument("package");
         verifier.execute();
 
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.setLogFileName("log-withfile.txt");
         verifier.addCliArgument("-f");
@@ -114,7 +112,7 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
     @Test
     public void testInSubModuleWithAlsoMake() throws Exception {
         Path submoduleDirectory = testDir.resolve("app");
-        Verifier verifier = newVerifier(submoduleDirectory.toString(), false);
+        Verifier verifier = newVerifier(submoduleDirectory, false);
         verifier.addCliArgument("-am");
         verifier.setLogFileName("log-insubmodulealsomake.txt");
         verifier.addCliArgument("compile");

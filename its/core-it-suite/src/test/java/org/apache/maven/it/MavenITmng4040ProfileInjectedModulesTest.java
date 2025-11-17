@@ -39,7 +39,7 @@ public class MavenITmng4040ProfileInjectedModulesTest extends AbstractMavenInteg
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-4040");
 
-        Verifier verifier = newVerifier(testDir.resolve("sub").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("sub"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

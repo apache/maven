@@ -41,7 +41,7 @@ public class MavenITmng4207PluginWithLog4JTest extends AbstractMavenIntegrationT
         Path testDir = extractResources("/mng-4207");
 
         // First, build the test plugin
-        Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-log4j").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-log4j"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -49,7 +49,7 @@ public class MavenITmng4207PluginWithLog4JTest extends AbstractMavenIntegrationT
         verifier.verifyErrorFreeLog();
 
         // Then, run the test project that uses the plugin
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4207");
         verifier.addCliArgument("-s");

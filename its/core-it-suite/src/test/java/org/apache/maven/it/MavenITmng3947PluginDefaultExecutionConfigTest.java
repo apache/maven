@@ -41,7 +41,7 @@ public class MavenITmng3947PluginDefaultExecutionConfigTest extends AbstractMave
     public void testitMNG3947() throws Exception {
         Path testDir = extractResources("/mng-3947");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("org.apache.maven.plugins:maven-resources-plugin:resources");

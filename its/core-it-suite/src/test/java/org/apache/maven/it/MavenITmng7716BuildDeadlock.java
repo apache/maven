@@ -43,7 +43,7 @@ class MavenITmng7716BuildDeadlock extends AbstractMavenIntegrationTestCase {
     void testNoDeadlockAtVersionUpdate() throws Exception {
         Path testDir = extractResources("/mng-7716");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument("-f");
         verifier.addCliArgument("settings");
         verifier.addCliArgument("install");
@@ -51,7 +51,7 @@ class MavenITmng7716BuildDeadlock extends AbstractMavenIntegrationTestCase {
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.addCliArgument("-T1C");
         verifier.addCliArgument("org.codehaus.mojo:versions-maven-plugin:2.15.0:set");
         verifier.addCliArgument("-DnewVersion=1.2.3");

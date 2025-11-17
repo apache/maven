@@ -45,7 +45,7 @@ public class MavenITmng5102MixinsTest extends AbstractMavenIntegrationTestCase {
     public void testWithPath() throws Exception {
         Path testDir = extractResources("/mng-5102-mixins/path");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng5102");
@@ -79,7 +79,7 @@ public class MavenITmng5102MixinsTest extends AbstractMavenIntegrationTestCase {
     public void testWithGav() throws Exception {
         Path testDir = extractResources("/mng-5102-mixins/gav");
 
-        Verifier verifier = newVerifier(testDir.resolve("mixin-2").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("mixin-2"));
 
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
@@ -88,7 +88,7 @@ public class MavenITmng5102MixinsTest extends AbstractMavenIntegrationTestCase {
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.resolve("project").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("project"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -115,7 +115,7 @@ public class MavenITmng5102MixinsTest extends AbstractMavenIntegrationTestCase {
     public void testWithClassifier() throws Exception {
         Path testDir = extractResources("/mng-5102-mixins/classifier");
 
-        Verifier verifier = newVerifier(testDir.resolve("mixin-4").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("mixin-4"));
 
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
@@ -124,7 +124,7 @@ public class MavenITmng5102MixinsTest extends AbstractMavenIntegrationTestCase {
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.resolve("project").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("project"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");

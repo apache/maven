@@ -74,7 +74,7 @@ public class MavenITmng2865MirrorWildcardTest extends AbstractMavenIntegrationTe
     private void testit(String project) throws Exception {
         Path testDir = extractResources("/mng-2865");
 
-        Verifier verifier = newVerifier(testDir.resolve(project).getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve(project));
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng2865");
         verifier.filterFile("settings-template.xml", "settings.xml");

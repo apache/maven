@@ -18,12 +18,11 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -36,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  * @author Benjamin Bentmann
  */
 @Disabled(
-        "This IT is testing -l, while new Verifier uses same switch to make Maven4 log to file; in short, if that is broken, all ITs would be broken as well")
+        "This IT is testing -l, while newVerifier uses same switch to make Maven4 log to file; in short, if that is broken, all ITs would be broken as well")
 public class MavenITmng3183LoggingToFileTest extends AbstractMavenIntegrationTestCase {
 
     /**
@@ -48,13 +47,13 @@ public class MavenITmng3183LoggingToFileTest extends AbstractMavenIntegrationTes
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-3183");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.addCliArgument("-l");
         verifier.addCliArgument("maven.log");
         verifier.setLogFileName("stdout.txt");
-        testDir.resolve("stdout.txt").delete();
-        testDir.resolve("maven.log").delete();
+        Files.deleteIfExists(testDir.resolve("stdout.txt"));
+        Files.deleteIfExists(testDir.resolve("maven.log"));
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

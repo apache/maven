@@ -42,7 +42,7 @@ public class MavenITmng1021EqualAttachmentBuildNumberTest extends AbstractMavenI
     @Test
     public void testitMNG1021() throws Exception {
         Path testDir = extractResources("/mng-1021");
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("repo");
         verifier.deleteArtifacts("org.apache.maven.its.mng1021");
@@ -75,8 +75,8 @@ public class MavenITmng1021EqualAttachmentBuildNumberTest extends AbstractMavenI
         verifier.verifyFilePresent(dir + "1-SNAPSHOT/test-" + snapshot + "-it.jar.sha1");
     }
 
-    private String getSnapshotVersion(File artifactDir) {
-        File[] files = artifactDir.listFiles();
+    private String getSnapshotVersion(Path artifactDir) {
+        File[] files = artifactDir.toFile().listFiles();
         for (File file : files) {
             String name = file.getName();
             if (name.endsWith(".pom")) {

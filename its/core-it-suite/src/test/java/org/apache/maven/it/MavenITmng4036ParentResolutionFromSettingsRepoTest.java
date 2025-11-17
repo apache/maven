@@ -39,7 +39,7 @@ public class MavenITmng4036ParentResolutionFromSettingsRepoTest extends Abstract
     public void testitDefaultLayout() throws Exception {
         Path testDir = extractResources("/mng-4036/default");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.filterFile("settings.xml", "settings.xml");
         verifier.deleteArtifacts("org.apache.maven.its.mng4036");

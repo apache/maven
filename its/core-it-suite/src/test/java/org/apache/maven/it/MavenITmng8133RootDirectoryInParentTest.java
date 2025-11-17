@@ -29,12 +29,12 @@ public class MavenITmng8133RootDirectoryInParentTest extends AbstractMavenIntegr
     public void testRootDirectoryInParent() throws Exception {
         Path testDir = extractResources("/mng-8133-root-directory-in-parent");
 
-        Verifier verifier = newVerifier(testDir.resolve("parent").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("parent"));
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.resolve("child").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("child"));
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();

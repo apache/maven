@@ -18,13 +18,11 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Properties;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,28 +34,28 @@ public class MavenITmng7110ExtensionClassloader extends AbstractMavenIntegration
     public void testVerifyResourceOfExtensionAndDependency() throws IOException, VerificationException {
         final Path projectDir = extractResources("/mng-7110-extensionclassloader");
 
-        final Verifier extensionVerifier = newVerifier(projectDir.resolve("extension").getAbsolutePath());
+        final Verifier extensionVerifier = newVerifier(projectDir.resolve("extension"));
         extensionVerifier.addCliArgument("install");
         extensionVerifier.execute();
         extensionVerifier.verifyErrorFreeLog();
 
-        final Verifier libVerifier = newVerifier(projectDir.resolve("lib").getAbsolutePath());
+        final Verifier libVerifier = newVerifier(projectDir.resolve("lib"));
         libVerifier.addCliArgument("install");
         libVerifier.execute();
         libVerifier.verifyErrorFreeLog();
 
-        final Verifier bomVerifier = newVerifier(projectDir.resolve("bom").getAbsolutePath());
+        final Verifier bomVerifier = newVerifier(projectDir.resolve("bom"));
         bomVerifier.addCliArgument("install");
         bomVerifier.execute();
         bomVerifier.verifyErrorFreeLog();
 
-        final Verifier projectVerifier = newVerifier(projectDir.resolve("module").getAbsolutePath());
+        final Verifier projectVerifier = newVerifier(projectDir.resolve("module"));
         projectVerifier.addCliArgument("verify");
         projectVerifier.execute();
         projectVerifier.verifyErrorFreeLog();
 
         Properties properties = new Properties();
-        Reader fileReader = new FileReader(projectDir.resolve("module/out.txt"));
+        Reader fileReader = Files.newBufferedReader(projectDir.resolve("module/out.txt"));
         properties.load(fileReader);
 
         assertEquals("1", properties.getProperty("extension.txt.count", "-1"));

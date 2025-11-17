@@ -31,32 +31,32 @@ public class MavenITmng5753CustomMojoExecutionConfiguratorTest extends AbstractM
     @Test
     public void testCustomMojoExecutionConfigurator() throws Exception {
         Path testDir = extractResources("/mng-5753-custom-mojo-execution-configurator");
-        File pluginDir = testDir.resolve("plugin");
-        File projectDir = testDir.resolve("project");
+        Path pluginDir = testDir.resolve("plugin");
+        Path projectDir = testDir.resolve("project");
 
         Verifier verifier;
 
         // install the test plugin
-        verifier = newVerifier(pluginDir.toString());
+        verifier = newVerifier(pluginDir);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        File configurationFile = projectDir.resolve("configuration.txt");
-        configurationFile.delete();
+        Path configurationFile = projectDir.resolve("configuration.txt");
+        Files.deleteIfExists(configurationFile);
 
         // build the test project
-        verifier = newVerifier(projectDir.toString());
+        verifier = newVerifier(projectDir);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent(configurationFile.getCanonicalPath());
+        verifier.verifyFilePresent(configurationFile);
         //
         // The <name/> element in the original configuration is "ORIGINAL". We want to assert that our
         // custom MojoExecutionConfigurator made the transformation of the element from "ORIGINAL" to "TRANSFORMED"
         //
-        String actual = Files.readString(configurationFile.toPath());
+        String actual = Files.readString(configurationFile);
         assertEquals("TRANSFORMED", actual);
     }
 }

@@ -42,7 +42,7 @@ public class MavenITmng1803PomValidationErrorIncludesLineNumberTest extends Abst
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-1803");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         try {
             verifier.addCliArgument("validate");

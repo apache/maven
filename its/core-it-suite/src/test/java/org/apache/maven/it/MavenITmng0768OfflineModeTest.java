@@ -100,7 +100,7 @@ public class MavenITmng0768OfflineModeTest extends AbstractMavenIntegrationTestC
             int port = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
 
             // phase 1: run build in online mode to fill local repo
-            Verifier verifier = newVerifier(testDir.toString());
+            Verifier verifier = newVerifier(testDir);
             verifier.setAutoclean(false);
             verifier.deleteDirectory("target");
             verifier.deleteArtifacts("org.apache.maven.its.mng0768");
@@ -118,7 +118,7 @@ public class MavenITmng0768OfflineModeTest extends AbstractMavenIntegrationTestC
             requestedUris.clear();
 
             // phase 2: run build in offline mode to check it still passes, without network accesses
-            verifier = newVerifier(testDir.toString());
+            verifier = newVerifier(testDir);
             verifier.setAutoclean(false);
             verifier.deleteDirectory("target");
             verifier.addCliArgument("-o");
@@ -135,7 +135,7 @@ public class MavenITmng0768OfflineModeTest extends AbstractMavenIntegrationTestC
 
             // phase 3: delete test artifact and run build in offline mode to check it fails now
             // NOTE: Adding the settings again to offer Maven the bad choice of using the remote repo
-            verifier = newVerifier(testDir.toString());
+            verifier = newVerifier(testDir);
             verifier.setAutoclean(false);
             verifier.deleteDirectory("target");
             verifier.deleteArtifacts("org.apache.maven.its.mng0768");

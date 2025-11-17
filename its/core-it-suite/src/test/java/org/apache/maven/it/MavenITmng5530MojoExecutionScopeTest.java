@@ -18,9 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
-
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,19 +29,19 @@ class MavenITmng5530MojoExecutionScopeTest extends AbstractMavenIntegrationTestC
     @Test
     public void testCopyfiles() throws Exception {
         Path testDir = extractResources("/mng-5530-mojo-execution-scope");
-        File pluginDir = testDir.resolve("plugin");
-        File projectDir = testDir.resolve("basic");
+        Path pluginDir = testDir.resolve("plugin");
+        Path projectDir = testDir.resolve("basic");
 
         Verifier verifier;
 
         // install the test plugin
-        verifier = newVerifier(pluginDir.toString());
+        verifier = newVerifier(pluginDir);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // build the test project
-        verifier = newVerifier(projectDir.toString());
+        verifier = newVerifier(projectDir);
         verifier.addCliArgument("package");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -56,19 +54,19 @@ class MavenITmng5530MojoExecutionScopeTest extends AbstractMavenIntegrationTestC
     @Test
     public void testCopyfilesMultithreaded() throws Exception {
         Path testDir = extractResources("/mng-5530-mojo-execution-scope");
-        File pluginDir = testDir.resolve("plugin");
-        File projectDir = testDir.resolve("basic");
+        Path pluginDir = testDir.resolve("plugin");
+        Path projectDir = testDir.resolve("basic");
 
         Verifier verifier;
 
         // install the test plugin
-        verifier = newVerifier(pluginDir.toString());
+        verifier = newVerifier(pluginDir);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // build the test project
-        verifier = newVerifier(projectDir.toString());
+        verifier = newVerifier(projectDir);
         verifier.addCliArgument("--builder");
         verifier.addCliArgument("multithreaded");
         verifier.addCliArgument("-T");
@@ -85,27 +83,27 @@ class MavenITmng5530MojoExecutionScopeTest extends AbstractMavenIntegrationTestC
     @Test
     public void testExtension() throws Exception {
         Path testDir = extractResources("/mng-5530-mojo-execution-scope");
-        File extensionDir = testDir.resolve("extension");
-        File pluginDir = testDir.resolve("extension-plugin");
-        File projectDir = testDir.resolve("extension-project");
+        Path extensionDir = testDir.resolve("extension");
+        Path pluginDir = testDir.resolve("extension-plugin");
+        Path projectDir = testDir.resolve("extension-project");
 
         Verifier verifier;
 
         // install the test extension
-        verifier = newVerifier(extensionDir.toString());
+        verifier = newVerifier(extensionDir);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // install the test plugin
-        verifier = newVerifier(pluginDir.toString());
+        verifier = newVerifier(pluginDir);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // build the test project
-        verifier = newVerifier(projectDir.toString());
-        verifier.addCliArgument("-Dmaven.ext.class.path=" + extensionDir.resolve("target/classes").getAbsolutePath());
+        verifier = newVerifier(projectDir);
+        verifier.addCliArgument("-Dmaven.ext.class.path=" + extensionDir.resolve("target/classes"));
         verifier.setForkJvm(true); // verifier does not support custom realms in embedded mode
         verifier.addCliArgument("package");
         verifier.execute();

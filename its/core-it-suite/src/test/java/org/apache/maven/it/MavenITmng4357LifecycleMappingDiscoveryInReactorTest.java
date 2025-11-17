@@ -40,7 +40,7 @@ public class MavenITmng4357LifecycleMappingDiscoveryInReactorTest extends Abstra
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-4357");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("mod-a/target");

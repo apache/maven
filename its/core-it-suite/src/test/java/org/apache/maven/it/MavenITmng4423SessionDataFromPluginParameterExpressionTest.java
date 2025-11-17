@@ -43,7 +43,7 @@ public class MavenITmng4423SessionDataFromPluginParameterExpressionTest extends 
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-4423");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.getSystemProperties().setProperty("mng4423", "PASSED");

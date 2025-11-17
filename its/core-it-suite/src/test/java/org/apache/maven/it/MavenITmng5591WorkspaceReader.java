@@ -18,9 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
-
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng5591WorkspaceReader extends AbstractMavenIntegrationTestCase {
@@ -36,21 +34,21 @@ public class MavenITmng5591WorkspaceReader extends AbstractMavenIntegrationTestC
          */
 
         Path testDir = extractResources("/mng-5591-workspace-reader");
-        File extensionDir = testDir.resolve("extension");
-        File projectDir = testDir.resolve("basic");
+        Path extensionDir = testDir.resolve("extension");
+        Path projectDir = testDir.resolve("basic");
 
         Verifier verifier;
 
         // install the test extension
-        verifier = newVerifier(extensionDir.toString());
+        verifier = newVerifier(extensionDir);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // compile the test project
-        verifier = newVerifier(projectDir.toString());
+        verifier = newVerifier(projectDir);
         verifier.addCliArgument("-Dmaven.ext.class.path="
-                + extensionDir.resolve("target/mng-5591-workspace-reader-extension-0.1.jar").getCanonicalPath());
+                + extensionDir.resolve("target/mng-5591-workspace-reader-extension-0.1.jar"));
         verifier.addCliArgument("compile");
         verifier.execute();
         verifier.verifyErrorFreeLog();

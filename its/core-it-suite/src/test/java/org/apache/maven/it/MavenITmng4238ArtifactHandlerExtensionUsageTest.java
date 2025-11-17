@@ -45,7 +45,7 @@ public class MavenITmng4238ArtifactHandlerExtensionUsageTest extends AbstractMav
     public void testProjectPackagingUsage() throws IOException, VerificationException {
         Path testDir = extractResources("/mng-4238");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
 
         verifier.deleteArtifacts(GID);
 

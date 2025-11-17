@@ -38,7 +38,7 @@ public class MavenITmng5445LegacyStringSearchModelInterpolatorTest extends Abstr
         Path testDir = extractResources("/mng-5445");
 
         // First, build the test plugin
-        Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-model-interpolation").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-model-interpolation"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -46,7 +46,7 @@ public class MavenITmng5445LegacyStringSearchModelInterpolatorTest extends Abstr
         verifier.verifyErrorFreeLog();
 
         // Then, run the test project that uses the plugin
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

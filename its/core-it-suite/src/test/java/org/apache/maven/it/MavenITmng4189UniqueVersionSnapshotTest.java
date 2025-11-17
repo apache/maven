@@ -38,12 +38,12 @@ public class MavenITmng4189UniqueVersionSnapshotTest extends AbstractMavenIntegr
     public void testit() throws Exception {
         final Path testDir = extractResources("/mng-4189");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.deleteArtifacts("org.apache.maven.its.mng4189");
         verifier.filterFile("settings-template.xml", "settings.xml");
 
         // depend on org.apache.maven.its.mng4189:dep:1.0-20090608.090416-1:jar
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("--settings");
@@ -57,7 +57,7 @@ public class MavenITmng4189UniqueVersionSnapshotTest extends AbstractMavenIntegr
         assertEquals("da2e54f69a9ba120f9211c476029f049967d840c", checksums.getProperty("dep-1.0-SNAPSHOT.jar"));
 
         // depend on org.apache.maven.its.mng4189:dep:1.0-20090608.090416-2:jar
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("--settings");
@@ -73,7 +73,7 @@ public class MavenITmng4189UniqueVersionSnapshotTest extends AbstractMavenIntegr
         assertEquals("835979c28041014c5fd55daa15302d92976924a7", checksums.getProperty("dep-1.0-SNAPSHOT.jar"));
 
         // revert back to org.apache.maven.its.mng4189:dep:1.0-20090608.090416-1:jar
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("--settings");

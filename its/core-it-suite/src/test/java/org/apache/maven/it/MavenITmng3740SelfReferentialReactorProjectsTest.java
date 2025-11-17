@@ -41,17 +41,17 @@ public class MavenITmng3740SelfReferentialReactorProjectsTest extends AbstractMa
     @Test
     public void testitMNG3740() throws Exception {
         Path testDir = extractResources("/mng-3740");
-        File v1 = testDir.resolve("projects.v1");
-        File v2 = testDir.resolve("projects.v2");
+        Path v1 = testDir.resolve("projects.v1");
+        Path v2 = testDir.resolve("projects.v2");
 
         Verifier verifier;
 
-        verifier = newVerifier(v1.getAbsolutePath());
+        verifier = newVerifier(v1);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(v2.getAbsolutePath());
+        verifier = newVerifier(v2);
         verifier.addCliArgument("package");
         verifier.execute();
         verifier.verifyErrorFreeLog();

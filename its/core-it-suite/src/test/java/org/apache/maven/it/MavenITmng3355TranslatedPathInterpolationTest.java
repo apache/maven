@@ -38,7 +38,7 @@ public class MavenITmng3355TranslatedPathInterpolationTest extends AbstractMaven
 
         Verifier verifier;
 
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
 
         verifier.addCliArgument("-Dversion=foo");
         verifier.addCliArgument("validate");

@@ -46,14 +46,14 @@ public class MavenITgh11321Test extends AbstractMavenIntegrationTestCase {
         Path testDir = extractResources("/gh-11321-parent-above-root");
 
         // First, verify that normal build works from the actual root
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // Now test with -f pointing to the subdirectory that contains .mvn
         // This should fail with a proper error message about parent being above root
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.addCliArgument("-f");
         verifier.addCliArgument("deps");
         verifier.addCliArgument("validate");

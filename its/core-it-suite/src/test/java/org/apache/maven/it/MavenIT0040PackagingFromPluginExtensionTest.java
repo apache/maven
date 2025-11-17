@@ -40,7 +40,7 @@ public class MavenIT0040PackagingFromPluginExtensionTest extends AbstractMavenIn
     public void testit0040() throws Exception {
         Path testDir = extractResources("/it0040");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("package");

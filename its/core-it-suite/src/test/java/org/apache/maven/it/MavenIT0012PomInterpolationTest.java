@@ -33,7 +33,7 @@ public class MavenIT0012PomInterpolationTest extends AbstractMavenIntegrationTes
     @Test
     public void testit0012() throws Exception {
         Path testDir = extractResources("/it0012");
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("child-project/target");

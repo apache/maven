@@ -36,26 +36,26 @@ public class MavenITmng5581LifecycleMappingDelegate extends AbstractMavenIntegra
          */
 
         Path testDir = extractResources("/mng-5581-lifecycle-mapping-delegate");
-        File extensionDir = testDir.resolve("extension");
-        File projectDir = testDir.resolve("basic");
+        Path extensionDir = testDir.resolve("extension");
+        Path projectDir = testDir.resolve("basic");
 
         Verifier verifier;
 
         // install the test extension
-        verifier = newVerifier(extensionDir.toString());
+        verifier = newVerifier(extensionDir);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // compile the test project
-        verifier = newVerifier(projectDir.toString());
+        verifier = newVerifier(projectDir);
         verifier.setLogFileName("compile-log.txt");
         verifier.addCliArgument("compile");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // run custom "test-only" build phase
-        verifier = newVerifier(projectDir.toString());
+        verifier = newVerifier(projectDir);
         verifier.setLogFileName("test-only-log.txt");
         verifier.setForkJvm(true); // TODO: why?
         verifier.addCliArgument("-X");

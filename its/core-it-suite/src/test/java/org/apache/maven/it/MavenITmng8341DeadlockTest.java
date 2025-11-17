@@ -39,7 +39,7 @@ class MavenITmng8341DeadlockTest extends AbstractMavenIntegrationTestCase {
     void testDeadlock() throws Exception {
         Path testDir = extractResources("/mng-8341-deadlock");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

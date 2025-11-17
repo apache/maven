@@ -32,6 +32,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class ItUtils {
 
+    public static String calcHash(Path file, String algo) throws Exception {
+        return ItUtils.calcHash(file.toFile(), algo);
+    }
+
     public static String calcHash(File file, String algo) throws Exception {
         MessageDigest digester = MessageDigest.getInstance(algo);
 
@@ -79,6 +83,10 @@ class ItUtils {
 
     public static void assertCanonicalFileEquals(File expected, File actual) throws IOException {
         assertEquals(expected.getCanonicalFile(), actual.getCanonicalFile());
+    }
+
+    public static void assertCanonicalFileEquals(Path expected, Path actual) throws IOException {
+        assertEquals(expected.toFile().getCanonicalFile(), actual.toFile().getCanonicalFile());
     }
 
     public static void assertCanonicalFileEquals(String expected, String actual, String message) throws IOException {

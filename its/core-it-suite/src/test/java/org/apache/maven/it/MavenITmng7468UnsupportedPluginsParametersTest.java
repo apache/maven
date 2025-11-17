@@ -146,7 +146,7 @@ public class MavenITmng7468UnsupportedPluginsParametersTest extends AbstractMave
     private List<String> performTest(String project) throws Exception {
         Path testDir = extractResources("/mng-7468-unsupported-params");
 
-        Verifier verifier = newVerifier(testDir.resolve(project).getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve(project));
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

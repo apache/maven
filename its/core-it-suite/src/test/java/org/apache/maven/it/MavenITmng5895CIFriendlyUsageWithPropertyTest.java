@@ -51,7 +51,7 @@ public class MavenITmng5895CIFriendlyUsageWithPropertyTest extends AbstractMaven
     public void testitShouldResolveTheDependenciesWithoutBuildConsumer() throws Exception {
         Path testDir = extractResources("/mng-5895-ci-friendly-usage-with-property");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
 
         // verifier.setLogFileName( "log-only.txt" );
@@ -68,7 +68,7 @@ public class MavenITmng5895CIFriendlyUsageWithPropertyTest extends AbstractMaven
     public void testitShouldResolveTheDependenciesWithBuildConsumer() throws Exception {
         Path testDir = extractResources("/mng-5895-ci-friendly-usage-with-property");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
 
         verifier.setLogFileName("log-bc.txt");

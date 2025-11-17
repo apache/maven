@@ -18,6 +18,7 @@
  */
 package org.apache.maven.it;
 
+import java.nio.file.Path;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -60,7 +61,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  */
 public class MavenITmng4235HttpAuthDeploymentChecksumsTest extends AbstractMavenIntegrationTestCase {
-    private File testDir;
+    private Path testDir;
 
     private Server server;
 
@@ -129,7 +130,7 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest extends AbstractMaven
         Map<String, String> filterProps = new HashMap<>();
         filterProps.put("@port@", Integer.toString(port));
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.filterFile("pom-template.xml", "pom.xml", filterProps);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4235");
@@ -158,7 +159,7 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest extends AbstractMaven
     }
 
     private void assertHash(Verifier verifier, String dataFile, String hashExt, String algo) throws Exception {
-        String actualHash = ItUtils.calcHash(new File(verifier.getBasedir(), dataFile), algo);
+        String actualHash = ItUtils.calcHash(verifier.getBasedir().resolve( dataFile), algo);
 
         String expectedHash = verifier.loadLines(dataFile + hashExt).get(0).trim();
 

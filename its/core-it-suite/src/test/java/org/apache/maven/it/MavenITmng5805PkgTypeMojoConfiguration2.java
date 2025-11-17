@@ -30,7 +30,7 @@ public class MavenITmng5805PkgTypeMojoConfiguration2 extends AbstractMavenIntegr
         Path testDir = extractResources("/mng-5805-pkg-type-mojo-configuration2");
 
         // First, build the test plugin dependency
-        Verifier verifier = newVerifier(testDir.resolve("mng5805-plugin-dep").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("mng5805-plugin-dep"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -38,7 +38,7 @@ public class MavenITmng5805PkgTypeMojoConfiguration2 extends AbstractMavenIntegr
         verifier.verifyErrorFreeLog();
 
         // Then, build the test extension2
-        verifier = newVerifier(testDir.resolve("mng5805-extension2").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("mng5805-extension2"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -46,7 +46,7 @@ public class MavenITmng5805PkgTypeMojoConfiguration2 extends AbstractMavenIntegr
         verifier.verifyErrorFreeLog();
 
         // Then, build the test plugin
-        verifier = newVerifier(testDir.resolve("mng5805-plugin").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("mng5805-plugin"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -54,7 +54,7 @@ public class MavenITmng5805PkgTypeMojoConfiguration2 extends AbstractMavenIntegr
         verifier.verifyErrorFreeLog();
 
         // Finally, run the test project
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

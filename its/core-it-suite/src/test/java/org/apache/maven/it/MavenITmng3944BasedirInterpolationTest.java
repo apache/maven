@@ -18,10 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.Properties;
-
 import org.junit.jupiter.api.Test;
 
 /**
@@ -41,7 +39,7 @@ public class MavenITmng3944BasedirInterpolationTest extends AbstractMavenIntegra
     public void testitMNG3944() throws Exception {
         Path testDir = extractResources("/mng-3944");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-f");
@@ -52,7 +50,7 @@ public class MavenITmng3944BasedirInterpolationTest extends AbstractMavenIntegra
 
         verifier.verifyFilePresent("target/basedir.properties");
         Properties props = verifier.loadProperties("target/basedir.properties");
-        ItUtils.assertCanonicalFileEquals(testDir, new File(props.getProperty("project.properties.prop0")));
-        ItUtils.assertCanonicalFileEquals(testDir, new File(props.getProperty("project.properties.prop1")));
+        ItUtils.assertCanonicalFileEquals(testDir, Path.of(props.getProperty("project.properties.prop0")));
+        ItUtils.assertCanonicalFileEquals(testDir, Path.of(props.getProperty("project.properties.prop1")));
     }
 }

@@ -46,7 +46,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest extends AbstractMavenInte
     public void testitMakeWithExclude() throws Exception {
         Path testDir = extractResources("/mng-5230-make-reactor-with-excludes");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument("-X");
         verifier.setAutoclean(false);
         clean(verifier);
@@ -73,7 +73,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest extends AbstractMavenInte
     public void testitMakeUpstreamExclude() throws Exception {
         Path testDir = extractResources("/mng-5230-make-reactor-with-excludes");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         clean(verifier);
         verifier.addCliArgument("-pl");
@@ -100,7 +100,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest extends AbstractMavenInte
     public void testitMakeDownstreamExclude() throws Exception {
         Path testDir = extractResources("/mng-5230-make-reactor-with-excludes");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         clean(verifier);
         verifier.addCliArgument("-pl");
@@ -127,7 +127,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest extends AbstractMavenInte
     public void testitMakeBothExclude() throws Exception {
         Path testDir = extractResources("/mng-5230-make-reactor-with-excludes");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         clean(verifier);
         verifier.addCliArgument("-pl");
@@ -155,7 +155,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest extends AbstractMavenInte
     public void testitMatchesByBasedirExclamationExclude() throws Exception {
         Path testDir = extractResources("/mng-5230-make-reactor-with-excludes");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         clean(verifier);
         verifier.verifyFileNotPresent("mod-d/pom.xml");
@@ -182,7 +182,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest extends AbstractMavenInte
     public void testitMatchesByBasedirMinusExclude() throws Exception {
         Path testDir = extractResources("/mng-5230-make-reactor-with-excludes");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         clean(verifier);
         verifier.verifyFileNotPresent("mod-d/pom.xml");
@@ -209,7 +209,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest extends AbstractMavenInte
     public void testitMatchesByIdExclude() throws Exception {
         Path testDir = extractResources("/mng-5230-make-reactor-with-excludes");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         clean(verifier);
         verifier.addCliArgument("-pl");
@@ -235,7 +235,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest extends AbstractMavenInte
     public void testitMatchesByArtifactIdExclude() throws Exception {
         Path testDir = extractResources("/mng-5230-make-reactor-with-excludes");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         clean(verifier);
         verifier.addCliArgument("-pl");
@@ -261,7 +261,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest extends AbstractMavenInte
     public void testitResumeFromExclude() throws Exception {
         Path testDir = extractResources("/mng-5230-make-reactor-with-excludes");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         clean(verifier);
         verifier.addCliArgument("-rf");

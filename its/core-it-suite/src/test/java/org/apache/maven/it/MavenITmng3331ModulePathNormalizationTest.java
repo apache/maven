@@ -38,7 +38,7 @@ public class MavenITmng3331ModulePathNormalizationTest extends AbstractMavenInte
 
         Verifier verifier;
 
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
 
         verifier.addCliArgument("initialize");
         verifier.execute();
@@ -62,7 +62,7 @@ public class MavenITmng3331ModulePathNormalizationTest extends AbstractMavenInte
 
         Verifier verifier;
 
-        verifier = newVerifier(testDir.resolve("parent").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("parent"));
 
         verifier.addCliArgument("initialize");
         verifier.execute();

@@ -42,7 +42,7 @@ class MavenITmng6609ProfileActivationForPackagingTest extends AbstractMavenInteg
     void testitMojoExecution() throws Exception {
         Path testDir = extractResources("/mng-6609");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

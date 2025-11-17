@@ -42,7 +42,7 @@ public class MavenITmng2744checksumVerificationTest extends AbstractMavenIntegra
     public void testitMNG2744() throws Exception {
         Path testDir = extractResources("/mng-2744");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng2744");
         verifier.filterFile("settings-template.xml", "settings.xml");

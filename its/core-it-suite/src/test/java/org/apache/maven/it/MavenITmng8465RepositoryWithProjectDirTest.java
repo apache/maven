@@ -37,9 +37,9 @@ class MavenITmng8465RepositoryWithProjectDirTest extends AbstractMavenIntegratio
      */
     @Test
     void testProjectDir() throws Exception {
-        Path basedir = extractResources("/mng-8465").getAbsoluteFile().toPath();
+        Path basedir = extractResources("/mng-8465");
 
-        Verifier verifier = newVerifier(basedir.toString());
+        Verifier verifier = newVerifier(basedir);
         verifier.addCliArgument("help:effective-pom");
         verifier.execute();
         List<String> urls = verifier.loadLogLines().stream()

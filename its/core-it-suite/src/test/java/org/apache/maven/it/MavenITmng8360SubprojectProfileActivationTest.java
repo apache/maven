@@ -37,7 +37,7 @@ class MavenITmng8360SubprojectProfileActivationTest extends AbstractMavenIntegra
     void testDeadlock() throws Exception {
         Path testDir = extractResources("/mng-8360");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArguments("-s", "settings.xml");
         verifier.addCliArguments("-f", "module1");
         verifier.addCliArgument("org.apache.maven.plugins:maven-help-plugin:3.3.0:active-profiles");

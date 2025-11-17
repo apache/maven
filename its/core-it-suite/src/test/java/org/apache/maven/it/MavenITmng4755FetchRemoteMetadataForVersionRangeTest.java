@@ -44,7 +44,7 @@ public class MavenITmng4755FetchRemoteMetadataForVersionRangeTest extends Abstra
         Path testDir = extractResources("/mng-4755");
 
         // setup: install a local version
-        Verifier verifier = newVerifier(testDir.resolve("dependency").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("dependency"));
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4755");
         verifier.deleteDirectory("target");
@@ -53,7 +53,7 @@ public class MavenITmng4755FetchRemoteMetadataForVersionRangeTest extends Abstra
         verifier.verifyErrorFreeLog();
 
         // test: resolve remote version
-        verifier = newVerifier(testDir.resolve("test").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("test"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-s");

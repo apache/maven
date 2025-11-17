@@ -41,7 +41,7 @@ public class MavenITmng0095ReactorFailureBehaviorTest extends AbstractMavenInteg
     public void testitFailFast() throws Exception {
         Path testDir = extractResources("/mng-0095");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("subproject1/target");
@@ -73,7 +73,7 @@ public class MavenITmng0095ReactorFailureBehaviorTest extends AbstractMavenInteg
     public void testitFailNever() throws Exception {
         Path testDir = extractResources("/mng-0095");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("subproject1/target");
@@ -101,7 +101,7 @@ public class MavenITmng0095ReactorFailureBehaviorTest extends AbstractMavenInteg
     public void testitFailAtEnd() throws Exception {
         Path testDir = extractResources("/mng-0095");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("subproject1/target");

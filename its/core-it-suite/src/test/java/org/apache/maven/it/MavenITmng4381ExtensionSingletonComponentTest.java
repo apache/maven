@@ -45,7 +45,7 @@ public class MavenITmng4381ExtensionSingletonComponentTest extends AbstractMaven
 
         // First, build the test plugin
         Verifier verifier =
-                newVerifier(testDir.resolve("sub-a/maven-it-plugin-extension-consumer").getAbsolutePath());
+                newVerifier(testDir.resolve("sub-a/maven-it-plugin-extension-consumer"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -53,7 +53,7 @@ public class MavenITmng4381ExtensionSingletonComponentTest extends AbstractMaven
         verifier.verifyErrorFreeLog();
 
         // Then, run the test project that uses the plugin
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("sub-a/target");
         verifier.deleteDirectory("sub-b/target");

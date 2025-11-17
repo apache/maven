@@ -43,7 +43,7 @@ public class MavenITmng3839PomParsingCoalesceTextTest extends AbstractMavenInteg
     public void testitMNG3839() throws Exception {
         Path testDir = extractResources("/mng-3839");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

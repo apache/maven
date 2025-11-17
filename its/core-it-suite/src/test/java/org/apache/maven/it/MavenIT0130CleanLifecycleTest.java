@@ -39,7 +39,7 @@ public class MavenIT0130CleanLifecycleTest extends AbstractMavenIntegrationTestC
     public void testit0130() throws Exception {
         Path testDir = extractResources("/it0130");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.deleteDirectory("target");
         verifier.setAutoclean(false);
         verifier.addCliArgument("clean");

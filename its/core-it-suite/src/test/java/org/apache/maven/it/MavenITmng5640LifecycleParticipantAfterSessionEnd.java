@@ -42,8 +42,8 @@ class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractMavenInt
     @Test
     public void testBuildFailureUTFail() throws Exception {
         Path testDir = extractResources("/mng-5640-lifecycleParticipant-afterSession");
-        File extensionDir = testDir.resolve("extension");
-        File projectDir = testDir.resolve("buildfailure-utfail");
+        Path extensionDir = testDir.resolve("extension");
+        Path projectDir = testDir.resolve("buildfailure-utfail");
         Verifier verifier;
 
         // install the test plugin
@@ -72,8 +72,8 @@ class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractMavenInt
     @Test
     public void testBuildFailureMissingDependency() throws Exception {
         Path testDir = extractResources("/mng-5640-lifecycleParticipant-afterSession");
-        File extensionDir = testDir.resolve("extension");
-        File projectDir = testDir.resolve("buildfailure-depmissing");
+        Path extensionDir = testDir.resolve("extension");
+        Path projectDir = testDir.resolve("buildfailure-depmissing");
         Verifier verifier;
 
         // install the test plugin
@@ -102,9 +102,9 @@ class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractMavenInt
     @Test
     public void testBuildError() throws Exception {
         Path testDir = extractResources("/mng-5640-lifecycleParticipant-afterSession");
-        File extensionDir = testDir.resolve("extension");
-        File pluginDir = testDir.resolve("badplugin");
-        File projectDir = testDir.resolve("builderror-mojoex");
+        Path extensionDir = testDir.resolve("extension");
+        Path pluginDir = testDir.resolve("badplugin");
+        Path projectDir = testDir.resolve("builderror-mojoex");
         Verifier verifier;
 
         // install the test plugin
@@ -139,9 +139,9 @@ class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractMavenInt
     @Test
     public void testBuildErrorRt() throws Exception {
         Path testDir = extractResources("/mng-5640-lifecycleParticipant-afterSession");
-        File extensionDir = testDir.resolve("extension");
-        File pluginDir = testDir.resolve("badplugin");
-        File projectDir = testDir.resolve("builderror-runtimeex");
+        Path extensionDir = testDir.resolve("extension");
+        Path pluginDir = testDir.resolve("badplugin");
+        Path projectDir = testDir.resolve("builderror-runtimeex");
         Verifier verifier;
 
         // install the test plugin

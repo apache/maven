@@ -18,9 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
-
 import org.junit.jupiter.api.Test;
 
 /**
@@ -35,11 +33,11 @@ public class MavenITmng3372DirectInvocationOfPluginsTest extends AbstractMavenIn
         // The testdir is computed from the location of this
         // file.
         Path testBaseDir = extractResources("/mng-3372/direct-using-prefix");
-        File plugin = testBaseDir.resolve("plugin");
-        File project = testBaseDir.resolve("project");
-        File settingsFile = testBaseDir.resolve("settings.xml");
+        Path plugin = testBaseDir.resolve("plugin");
+        Path project = testBaseDir.resolve("project");
+        Path settingsFile = testBaseDir.resolve("settings.xml");
 
-        Verifier verifier = newVerifier(plugin.getAbsolutePath());
+        Verifier verifier = newVerifier(plugin);
 
         verifier.deleteArtifacts("org.apache.maven.its.mng3372");
 
@@ -48,10 +46,10 @@ public class MavenITmng3372DirectInvocationOfPluginsTest extends AbstractMavenIn
         verifier.addCliArguments("clean", "install");
         verifier.execute();
 
-        verifier = newVerifier(project.getAbsolutePath());
+        verifier = newVerifier(project);
 
         verifier.addCliArgument("-s");
-        verifier.addCliArgument("\"" + settingsFile.getAbsolutePath() + "\"");
+        verifier.addCliArgument("\"" + settingsFile + "\"");
 
         verifier.addCliArgument("mng3372:test");
         verifier.execute();
@@ -65,7 +63,7 @@ public class MavenITmng3372DirectInvocationOfPluginsTest extends AbstractMavenIn
         // file.
         Path testBaseDir = extractResources("/mng-3372/dependency-tree");
 
-        Verifier verifier = newVerifier(testBaseDir.toString());
+        Verifier verifier = newVerifier(testBaseDir);
 
         verifier.addCliArgument("-U");
 

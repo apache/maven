@@ -47,7 +47,7 @@ class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegrationTestCa
     public void testNoClassDefFromMojoLoad() throws IOException, VerificationException {
         Path testDir = extractResources("/mng-2690/noclassdef-mojo");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
 
         verifier.addCliArgument("validate");
@@ -67,7 +67,7 @@ class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegrationTestCa
     public void testNoClassDefFromMojoConfiguration() throws IOException, VerificationException {
         Path testDir = extractResources("/mng-2690/noclassdef-param");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
 
         verifier.addCliArgument("validate");
@@ -87,7 +87,7 @@ class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegrationTestCa
     public void testMojoComponentLookupException() throws IOException, VerificationException {
         Path testDir = extractResources("/mng-2690/mojo-complookup");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
 
         verifier.addCliArgument("validate");
@@ -106,7 +106,7 @@ class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegrationTestCa
     public void testMojoRequirementComponentLookupException() throws IOException, VerificationException {
         Path testDir = extractResources("/mng-2690/requirement-complookup");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
 
         verifier.addCliArgument("validate");

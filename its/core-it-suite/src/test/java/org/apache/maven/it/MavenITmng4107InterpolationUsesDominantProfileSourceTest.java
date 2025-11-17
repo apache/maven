@@ -45,7 +45,7 @@ public class MavenITmng4107InterpolationUsesDominantProfileSourceTest extends Ab
     public void testitMNG4107() throws Exception {
         Path testDir = extractResources("/mng-4107");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

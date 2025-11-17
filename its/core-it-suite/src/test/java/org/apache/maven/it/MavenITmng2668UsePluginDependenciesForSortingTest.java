@@ -34,7 +34,7 @@ public class MavenITmng2668UsePluginDependenciesForSortingTest extends AbstractM
     public void testitMNG2668() throws Exception {
         Path testDir = extractResources("/mng-2668");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng2668");
         verifier.addCliArgument("validate");

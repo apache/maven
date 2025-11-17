@@ -34,7 +34,7 @@ public class MavenITmng3535SelfReferentialPropertiesTest extends AbstractMavenIn
     public void testitMNG3535ShouldSucceed() throws Exception {
         Path testDir = extractResources("/mng-3535/success");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
 
         verifier.addCliArgument("-X");
 
@@ -54,7 +54,7 @@ public class MavenITmng3535SelfReferentialPropertiesTest extends AbstractMavenIn
     public void testitMNG3535ShouldFail() throws Exception {
         Path testDir = extractResources("/mng-3535/failure");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.addCliArgument("-X");
         verifier.addCliArgument("verify");

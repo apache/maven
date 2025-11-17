@@ -18,9 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
-
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -70,9 +68,9 @@ public class MavenITmng6772NestedImportScopeRepositoryOverride extends AbstractM
     }
 
     // central must not be defined in any settings.xml or super POM will never be in play.
-    private void overrideGlobalSettings(final File testDir, final Verifier verifier) {
-        final File settingsFile = testDir.resolve("settings-override.xml");
-        final String path = settingsFile.getAbsolutePath();
+    private void overrideGlobalSettings(final Path testDir, final Verifier verifier) {
+        final Path settingsFile = testDir.resolve("settings-override.xml");
+        final String path = settingsFile.toString();
         verifier.addCliArgument("--global-settings");
         if (path.indexOf(' ') < 0) {
             verifier.addCliArgument(path);

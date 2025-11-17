@@ -35,16 +35,16 @@ public class MavenITmng3684BuildPluginParameterTest extends AbstractMavenIntegra
     @Test
     public void testitMNG3684() throws Exception {
         Path testDir = extractResources("/mng-3684");
-        File pluginDir = testDir.resolve("maven-mng3684-plugin");
-        File projectDir = testDir.resolve("project");
+        Path pluginDir = testDir.resolve("maven-mng3684-plugin");
+        Path projectDir = testDir.resolve("project");
 
-        Verifier verifier = newVerifier(pluginDir.toString());
+        Verifier verifier = newVerifier(pluginDir);
         verifier.addCliArgument("install");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.toString());
+        verifier = newVerifier(projectDir);
         verifier.setLogFileName("log-validate.txt");
         verifier.addCliArgument("validate");
         verifier.execute();

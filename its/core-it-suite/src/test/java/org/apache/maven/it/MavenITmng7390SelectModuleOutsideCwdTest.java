@@ -18,9 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +32,7 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenIntegrationTestCase {
 
-    private File moduleADir;
+    private Path moduleADir;
 
     @BeforeEach
     protected void setUp() throws Exception {

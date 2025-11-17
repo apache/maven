@@ -41,19 +41,19 @@ public class MavenITmng0612NewestConflictResolverTest extends AbstractMavenInteg
     @Test
     public void testitMNG612() throws Exception {
         Path testDir = extractResources("/mng-0612/dependency");
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         testDir = extractResources("/mng-0612/plugin");
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         testDir = extractResources("/mng-0612/project");
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.addCliArgument("verify");
         verifier.execute();
         verifier.verifyErrorFreeLog();

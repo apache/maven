@@ -41,7 +41,7 @@ public class MavenITmng3641ProfileActivationWarningTest extends AbstractMavenInt
         // (0) Initialize.
         Path testDir = extractResources("/mng-3641");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
 
         // Delete this artifact. Just in case.
@@ -59,7 +59,7 @@ public class MavenITmng3641ProfileActivationWarningTest extends AbstractMavenInt
         assertNull(findWarning(logFile, "mng-3641-it-provided-profile"));
 
         // (2) make sure the profile was not found and a warning was printed.
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.addCliArgument("-P");
         verifier.addCliArgument("mng-3641-TWlzdGVyIFQgd2FzIGhlcmUuICheX14p");
         verifier.setLogFileName("log-2.txt");
@@ -72,7 +72,7 @@ public class MavenITmng3641ProfileActivationWarningTest extends AbstractMavenInt
 
         // (3) make sure the first profile is found while the other is not and a warning was printed
         // accordingly.
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.addCliArgument("-P");
         verifier.addCliArgument("mng-3641-it-provided-profile,mng-3641-TWlzdGVyIFQgd2FzIGhlcmUuICheX14p");
         verifier.setLogFileName("log-3.txt");
@@ -85,7 +85,7 @@ public class MavenITmng3641ProfileActivationWarningTest extends AbstractMavenInt
         assertNotNull(findWarning(logFile, "mng-3641-TWlzdGVyIFQgd2FzIGhlcmUuICheX14p"));
 
         // (4) make sure the warning is only printed when the profile is missing in all projects
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.addCliArgument("-P");
         verifier.addCliArgument("mng-3641-it-provided-profile-child");
         verifier.setLogFileName("log-4.txt");
@@ -97,7 +97,7 @@ public class MavenITmng3641ProfileActivationWarningTest extends AbstractMavenInt
         assertNull(findWarning(logFile, "mng-3641-it-provided-profile-child"));
 
         // (5) make sure the profile is found in subproject. Must not contain a warning.
-        verifier = newVerifier(testDir.resolve("child1").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("child1"));
         verifier.addCliArgument("-P");
         verifier.addCliArgument("mng-3641-it-provided-profile-child");
         verifier.setLogFileName("log-5.txt");
@@ -109,7 +109,7 @@ public class MavenITmng3641ProfileActivationWarningTest extends AbstractMavenInt
         assertNull(findWarning(logFile, "mng-3641-it-provided-profile-child"));
 
         // (6) make sure the profile is found from parent in subproject. Must not contain a warning.
-        verifier = newVerifier(testDir.resolve("child1").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("child1"));
         verifier.addCliArgument("-P");
         verifier.addCliArgument("mng-3641-it-provided-profile");
         verifier.setLogFileName("log-6.txt");

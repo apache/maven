@@ -58,7 +58,7 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
     public void testShouldResolveOutputDirectoryFromEarlierBuild() throws Exception {
         final Path testDir = extractResources("/mng-4660-resume-from");
 
-        final Verifier verifier1 = newVerifier(testDir.toString());
+        final Verifier verifier1 = newVerifier(testDir);
         verifier1.deleteDirectory("target");
         verifier1.deleteArtifacts("org.apache.maven.its.mng4660");
 
@@ -70,7 +70,7 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
             verifier1.verifyTextInLog("Deliberately fail test case");
         }
 
-        final Verifier verifier2 = newVerifier(testDir.toString());
+        final Verifier verifier2 = newVerifier(testDir);
         verifier2.setAutoclean(false);
         verifier2.addCliArgument("--resume-from");
         verifier2.addCliArgument(":module-b");
@@ -91,7 +91,7 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
     public void testShouldResolvePackagedArtifactFromEarlierBuild() throws Exception {
         final Path testDir = extractResources("/mng-4660-resume-from");
 
-        final Verifier verifier1 = newVerifier(testDir.toString());
+        final Verifier verifier1 = newVerifier(testDir);
         verifier1.deleteDirectory("target");
         verifier1.deleteArtifacts("org.apache.maven.its.mng4660");
 
@@ -103,7 +103,7 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
             verifier1.verifyTextInLog("Deliberately fail test case");
         }
 
-        final Verifier verifier2 = newVerifier(testDir.toString());
+        final Verifier verifier2 = newVerifier(testDir);
         verifier2.setAutoclean(false);
         verifier2.addCliArgument("--resume-from");
         verifier2.addCliArgument(":module-b");

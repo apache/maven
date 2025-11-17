@@ -29,12 +29,12 @@ public class MavenITmng8005IdeWorkspaceReaderUsedTest extends AbstractMavenInteg
     public void testWithIdeWorkspaceReaderUsed() throws Exception {
         Path testDir = extractResources("/mng-8005");
 
-        Verifier verifier = newVerifier(testDir.resolve("extension").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("extension"));
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
 
         verifier.addCliArgument("process-resources");
         verifier.execute();

@@ -41,7 +41,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest extends Abstr
     public void testitFailFastSingleThread() throws Exception {
         Path testDir = extractResources("/mng-0095");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("subproject1/target");
@@ -75,7 +75,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest extends Abstr
     public void testitFailNeverSingleThread() throws Exception {
         Path testDir = extractResources("/mng-0095");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("subproject1/target");
@@ -104,7 +104,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest extends Abstr
     public void testitFailAtEndSingleThread() throws Exception {
         Path testDir = extractResources("/mng-0095");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("subproject1/target");
@@ -137,7 +137,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest extends Abstr
     public void testitFailNeverTwoThreads() throws Exception {
         Path testDir = extractResources("/mng-0095");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("subproject1/target");
@@ -166,7 +166,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest extends Abstr
     public void testitFailAtEndTwoThreads() throws Exception {
         Path testDir = extractResources("/mng-0095");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("subproject1/target");

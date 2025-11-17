@@ -42,7 +42,7 @@ public class MavenITmng6173GetProjectsAndDependencyGraphTest extends AbstractMav
 
         Path testDir = extractResources("/mng-6173-get-projects-and-dependency-graph");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("module-1/target");

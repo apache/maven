@@ -36,7 +36,7 @@ public class MavenITmng3268MultipleHyphenPCommandLineTest extends AbstractMavenI
 
         Verifier verifier;
 
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
 
         verifier.addCliArgument("-Pprofile1,profile2");
         verifier.addCliArgument("-Pprofile3");

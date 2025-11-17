@@ -39,7 +39,7 @@ public class MavenITmng4410UsageHelpTest extends AbstractMavenIntegrationTestCas
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-4410");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.addCliArgument("--help");
         verifier.execute();

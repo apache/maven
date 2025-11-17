@@ -38,19 +38,19 @@ public class MavenITmng3703ExecutionProjectWithRelativePathsTest extends Abstrac
     @Test
     public void testForkFromMojo() throws Exception {
         Path testDir = extractResources("/mng-3703");
-        File pluginDir = testDir.resolve("maven-mng3703-plugin");
-        File projectDir = testDir.resolve("project");
+        Path pluginDir = testDir.resolve("maven-mng3703-plugin");
+        Path projectDir = testDir.resolve("project");
 
         Verifier verifier;
 
-        verifier = newVerifier(pluginDir.toString());
+        verifier = newVerifier(pluginDir);
 
         verifier.addCliArgument("install");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.toString());
+        verifier = newVerifier(projectDir);
         verifier.setLogFileName("log-mojo.txt");
 
         verifier.addCliArgument("package");
@@ -62,19 +62,19 @@ public class MavenITmng3703ExecutionProjectWithRelativePathsTest extends Abstrac
     @Test
     public void testForkFromReport() throws Exception {
         Path testDir = extractResources("/mng-3703");
-        File pluginDir = testDir.resolve("maven-mng3703-plugin");
-        File projectDir = testDir.resolve("project");
+        Path pluginDir = testDir.resolve("maven-mng3703-plugin");
+        Path projectDir = testDir.resolve("project");
 
         Verifier verifier;
 
-        verifier = newVerifier(pluginDir.toString());
+        verifier = newVerifier(pluginDir);
 
         verifier.addCliArgument("install");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.toString());
+        verifier = newVerifier(projectDir);
         verifier.setLogFileName("log-report.txt");
 
         verifier.addCliArgument("site");

@@ -44,7 +44,7 @@ public class MavenITmng4274PluginRealmArtifactsTest extends AbstractMavenIntegra
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-4274");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifact("org.apache.maven", "maven-core", "2.0.4274", "jar");

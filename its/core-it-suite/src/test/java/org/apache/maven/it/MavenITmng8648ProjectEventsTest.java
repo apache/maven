@@ -29,14 +29,14 @@ public class MavenITmng8648ProjectEventsTest extends AbstractMavenIntegrationTes
     public void test() throws Exception {
         Path extensionDir = extractResources("/mng-8648/extension");
 
-        Verifier verifier = newVerifier(extensionDir.toString());
+        Verifier verifier = newVerifier(extensionDir);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Path projectDir = extractResources("/mng-8648/project");
 
-        verifier = newVerifier(projectDir.toString());
+        verifier = newVerifier(projectDir);
         verifier.addCliArguments("compile", "-b", "concurrent", "-T5");
         try {
             verifier.execute();

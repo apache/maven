@@ -41,7 +41,7 @@ public class MavenIT0071PluginConfigWithDottedPropertyTest extends AbstractMaven
     public void testit0071() throws Exception {
         Path testDir = extractResources("/it0071");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-touch:touch");

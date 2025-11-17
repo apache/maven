@@ -18,8 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -28,9 +27,9 @@ import org.junit.jupiter.api.Test;
  *
  * @author Jason van Zyl
  */
-public class MavenITmng5382Jsr330Plugin extends AbstractMavenIntegrationTestCase {
+class MavenITmng5382Jsr330Plugin extends AbstractMavenIntegrationTestCase {
 
-    private File testDir;
+    private Path testDir;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -42,7 +41,7 @@ public class MavenITmng5382Jsr330Plugin extends AbstractMavenIntegrationTestCase
         //
         // Build a plugin that uses a JSR330 plugin
         //
-        Verifier v0 = newVerifier(testDir.toString());
+        Verifier v0 = newVerifier(testDir);
         v0.setAutoclean(false);
         v0.deleteDirectory("target");
         v0.deleteArtifacts("org.apache.maven.its.mng5382");
@@ -53,7 +52,7 @@ public class MavenITmng5382Jsr330Plugin extends AbstractMavenIntegrationTestCase
         //
         // Execute the JSR330 plugin
         //
-        Verifier v1 = newVerifier(testDir.toString());
+        Verifier v1 = newVerifier(testDir);
         v1.setAutoclean(false);
         v1.addCliArgument("org.apache.maven.its.mng5382:jsr330-maven-plugin:0.0.1-SNAPSHOT:hello");
         v1.execute();

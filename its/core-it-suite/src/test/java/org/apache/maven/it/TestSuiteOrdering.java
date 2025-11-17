@@ -60,7 +60,7 @@ public class TestSuiteOrdering implements ClassOrderer {
             System.clearProperty("maven.conf");
             System.clearProperty("classworlds.conf");
 
-            Verifier verifier = new Verifier("", false);
+            Verifier verifier = new Verifier(Paths.get(""), null, false);
             String mavenVersion = verifier.getMavenVersion();
             String executable = verifier.getExecutable();
             ExecutorHelper.Mode defaultMode = verifier.getDefaultMode();

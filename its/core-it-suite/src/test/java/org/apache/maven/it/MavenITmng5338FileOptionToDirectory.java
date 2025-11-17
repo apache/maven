@@ -18,8 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +29,7 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng5338FileOptionToDirectory extends AbstractMavenIntegrationTestCase {
 
-    private File testDir;
+    private Path testDir;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -39,7 +38,7 @@ public class MavenITmng5338FileOptionToDirectory extends AbstractMavenIntegratio
 
     @Test
     public void testFileOptionToADirectory() throws Exception {
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
 
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

@@ -44,18 +44,18 @@ public class MavenITmng3723ConcreteParentProjectTest extends AbstractMavenIntegr
         // The testdir is computed from the location of this
         // file.
         Path testDir = extractResources("/mng-3723");
-        File pluginDir = testDir.resolve("maven-mng3723-plugin");
-        File projectDir = testDir.resolve("projects");
+        Path pluginDir = testDir.resolve("maven-mng3723-plugin");
+        Path projectDir = testDir.resolve("projects");
 
         Verifier verifier;
 
-        verifier = newVerifier(pluginDir.toString());
+        verifier = newVerifier(pluginDir);
 
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.toString());
+        verifier = newVerifier(projectDir);
 
         verifier.addCliArgument("validate");
         verifier.execute();

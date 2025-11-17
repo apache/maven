@@ -18,10 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.nio.file.Files;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,19 +35,19 @@ public class MavenITmng5742BuildExtensionClassloaderTest extends AbstractMavenIn
         Verifier verifier;
 
         // install the test plugin
-        verifier = newVerifier(pluginDir.toString());
+        verifier = newVerifier(pluginDir);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // build the test project
-        verifier = newVerifier(projectDir.toString());
+        verifier = newVerifier(projectDir);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
         verifier.verifyFilePresent("target/execution-success.txt");
 
-        String actual = Files.readString(projectDir.resolve("target/execution-success.txt").toPath());
+        String actual = Files.readString(projectDir.resolve("target/execution-success.txt"));
         assertEquals("executed", actual);
     }
 }

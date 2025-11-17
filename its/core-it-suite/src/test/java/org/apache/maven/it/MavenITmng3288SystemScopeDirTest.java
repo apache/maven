@@ -41,7 +41,7 @@ public class MavenITmng3288SystemScopeDirTest extends AbstractMavenIntegrationTe
     public void testitMNG3288() throws Exception {
         Path testDir = extractResources("/mng-3288");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.addCliArgument("validate");
         assertThrows(

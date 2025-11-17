@@ -47,7 +47,7 @@ public class MavenITmng4270ArtifactHandlersFromPluginDepsTest extends AbstractMa
     public void testProjectPackagingUsage() throws IOException, VerificationException {
         Path testDir = extractResources("/" + AID);
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
 
         verifier.deleteArtifacts(GID);
 

@@ -44,7 +44,7 @@ public class MavenITmng3813PluginClassPathOrderingTest extends AbstractMavenInte
     public void testitMNG3813() throws Exception {
         Path testDir = extractResources("/mng-3813");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3813");

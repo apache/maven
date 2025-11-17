@@ -41,7 +41,7 @@ class MavenITmng7606DependencyImportScopeTest extends AbstractMavenIntegrationTe
     void testDependencyResolution() throws Exception {
         Path testDir = extractResources("/mng-7606");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(true);
         verifier.deleteArtifacts("org.apache.maven.its.mng7606");
         verifier.addCliArgument("verify");

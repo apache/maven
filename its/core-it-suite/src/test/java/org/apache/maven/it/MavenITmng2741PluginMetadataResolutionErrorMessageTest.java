@@ -56,7 +56,7 @@ public class MavenITmng2741PluginMetadataResolutionErrorMessageTest extends Abst
     private void testit(String test, String goal) throws Exception {
         Path testDir = extractResources("/mng-2741");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.setLogFileName("log-" + test + ".txt");
         verifier.addCliArgument("--settings");

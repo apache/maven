@@ -72,7 +72,7 @@ public class MavenITmng4771PluginPrefixResolutionDoesntTouchDisabledRepoTest ext
         server.setHandler(handlerList);
         server.start();
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         try {
             if (server.isFailed()) {
                 fail("Couldn't bind the server socket to a free port!");

@@ -46,7 +46,7 @@ public class MavenITmng4750ResolvedMavenProjectDependencyArtifactsTest extends A
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-4750");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4750");
         verifier.addCliArgument("-s");

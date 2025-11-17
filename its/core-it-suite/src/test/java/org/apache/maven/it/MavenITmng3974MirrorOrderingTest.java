@@ -41,7 +41,7 @@ public class MavenITmng3974MirrorOrderingTest extends AbstractMavenIntegrationTe
     public void testitFirstMatchWins() throws Exception {
         Path testDir = extractResources("/mng-3974");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng3974");
         verifier.filterFile("settings-template.xml", "settings.xml");

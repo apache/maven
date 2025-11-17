@@ -44,7 +44,7 @@ public class MavenITmng0469ReportConfigTest extends AbstractMavenIntegrationTest
     public void testitBuildConfigDominantDuringBuild() throws Exception {
         Path testDir = extractResources("/mng-0469/test1");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.deleteDirectory("target");
         verifier.setAutoclean(false);
         verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-configuration:2.1-SNAPSHOT:config");
@@ -63,7 +63,7 @@ public class MavenITmng0469ReportConfigTest extends AbstractMavenIntegrationTest
     public void testitBuildConfigIrrelevantForReports() throws Exception {
         Path testDir = extractResources("/mng-0469/test2");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.deleteDirectory("target");
         verifier.setAutoclean(false);
         // Inline version check: (,3.0-alpha-1) - current Maven version doesn't match this range

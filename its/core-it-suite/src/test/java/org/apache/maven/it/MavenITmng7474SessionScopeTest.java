@@ -33,12 +33,12 @@ public class MavenITmng7474SessionScopeTest extends AbstractMavenIntegrationTest
     public void testSessionScope() throws Exception {
         Path testDir = extractResources("/mng-7474-session-scope");
 
-        Verifier verifier = newVerifier(testDir.resolve("plugin").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("plugin"));
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.resolve("project").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("project"));
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

@@ -44,7 +44,7 @@ public class MavenITmng0674PluginParameterAliasTest extends AbstractMavenIntegra
     public void testitLifecycle() throws Exception {
         Path testDir = extractResources("/mng-0674");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.setLogFileName("log-lifecycle.txt");
@@ -67,7 +67,7 @@ public class MavenITmng0674PluginParameterAliasTest extends AbstractMavenIntegra
     public void testitCli() throws Exception {
         Path testDir = extractResources("/mng-0674");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.setLogFileName("log-cli.txt");

@@ -43,7 +43,7 @@ public class MavenITmng3979ElementJoinTest extends AbstractMavenIntegrationTestC
 
         testDir = testDir.resolve("sub");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.addCliArgument("validate");
         verifier.execute();

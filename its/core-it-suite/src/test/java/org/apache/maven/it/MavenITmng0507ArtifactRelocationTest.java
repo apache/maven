@@ -43,7 +43,7 @@ public class MavenITmng0507ArtifactRelocationTest extends AbstractMavenIntegrati
     public void testitMNG507() throws Exception {
         Path testDir = extractResources("/mng-0507");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven", "maven-core-it-support", "1.1");

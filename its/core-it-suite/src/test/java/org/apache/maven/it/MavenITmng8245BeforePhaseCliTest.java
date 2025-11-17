@@ -38,7 +38,7 @@ class MavenITmng8245BeforePhaseCliTest extends AbstractMavenIntegrationTestCase 
     void testPhaseBeforeCleanAllWihConcurrentBuilder() throws Exception {
         Path testDir = extractResources("/mng-8245-before-after-phase-all");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setLogFileName("before-clean-concurrent.txt");
         verifier.addCliArguments("-b", "concurrent", "before:clean");
         verifier.execute();
@@ -55,7 +55,7 @@ class MavenITmng8245BeforePhaseCliTest extends AbstractMavenIntegrationTestCase 
     void testPhaseBeforeCleanAllWithLegacyBuilder() throws Exception {
         Path testDir = extractResources("/mng-8245-before-after-phase-all");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setLogFileName("before-clean-legacy.txt");
         verifier.addCliArguments("before:clean");
         verifier.execute();
@@ -72,7 +72,7 @@ class MavenITmng8245BeforePhaseCliTest extends AbstractMavenIntegrationTestCase 
     void testPhaseAfterCleanAllWihConcurrentBuilder() throws Exception {
         Path testDir = extractResources("/mng-8245-before-after-phase-all");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setLogFileName("after-clean-concurrent.txt");
         verifier.addCliArguments("-b", "concurrent", "after:clean");
         verifier.execute();
@@ -89,7 +89,7 @@ class MavenITmng8245BeforePhaseCliTest extends AbstractMavenIntegrationTestCase 
     void testPhaseAfterCleanAllWithLegacyBuilder() throws Exception {
         Path testDir = extractResources("/mng-8245-before-after-phase-all");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setLogFileName("after-clean-legacy.txt");
         verifier.addCliArguments("after:clean");
         verifier.execute();

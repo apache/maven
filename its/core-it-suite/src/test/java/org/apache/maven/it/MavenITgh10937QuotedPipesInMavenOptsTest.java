@@ -38,9 +38,9 @@ class MavenITgh10937QuotedPipesInMavenOptsTest extends AbstractMavenIntegrationT
     @Test
     void testIt() throws Exception {
         Path basedir =
-                extractResources("/gh-10937-pipes-maven-opts").getAbsoluteFile().toPath();
+                extractResources("/gh-10937-pipes-maven-opts");
 
-        Verifier verifier = newVerifier(basedir.toString());
+        Verifier verifier = newVerifier(basedir);
         verifier.setEnvironmentVariable("MAVEN_OPTS", "-Dprop.maven-opts=\"foo|bar\"");
         verifier.addCliArguments("validate");
         verifier.execute();

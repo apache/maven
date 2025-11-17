@@ -18,18 +18,15 @@
  */
 package org.apache.maven.it;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.io.File;
-import java.nio.file.Path;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
-
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
@@ -46,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Anders Hammar
  */
 public class MavenITmng5280SettingsProfilesRepositoriesOrderTest extends AbstractMavenIntegrationTestCase {
-    private File testDir;
+    private Path testDir;
 
     private Server server;
 
@@ -80,7 +77,7 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest extends Abstrac
         int httpPort = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
         System.out.println("Bound server socket to the port " + httpPort);
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
 
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
@@ -115,7 +112,7 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest extends Abstrac
         int httpPort = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
         System.out.println("Bound server socket to the port " + httpPort);
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
 
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
@@ -189,13 +186,13 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest extends Abstrac
 
                 if (uri.endsWith(".pom")) {
                     Path pluginPom = testDir.resolve("fake-maven-plugin/fake-maven-plugin-1.0.pom");
-                    InputStream inStream = new FileInputStream(pluginPom);
+                    InputStream inStream = Files.newInputStream(pluginPom);
                     copy(inStream, outStream);
 
                     response.setStatus(HttpServletResponse.SC_OK);
                 } else if (uri.endsWith(".jar")) {
                     Path pluginJar = testDir.resolve("fake-maven-plugin/fake-maven-plugin-1.0.jar");
-                    InputStream inStream = new FileInputStream(pluginJar);
+                    InputStream inStream = Files.newInputStream(pluginJar);
                     copy(inStream, outStream);
 
                     response.setStatus(HttpServletResponse.SC_OK);

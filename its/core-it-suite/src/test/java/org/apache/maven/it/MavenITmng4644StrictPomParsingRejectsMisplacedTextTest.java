@@ -39,7 +39,7 @@ public class MavenITmng4644StrictPomParsingRejectsMisplacedTextTest extends Abst
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-4644");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         try {
             verifier.addCliArgument("validate");

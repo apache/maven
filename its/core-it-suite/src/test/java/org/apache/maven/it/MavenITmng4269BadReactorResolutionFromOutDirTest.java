@@ -18,9 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
-
 import org.junit.jupiter.api.Test;
 
 /**
@@ -43,10 +42,10 @@ public class MavenITmng4269BadReactorResolutionFromOutDirTest extends AbstractMa
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-4269");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         // NOTE: It's a crucial prerequisite to create the output directory, i.e. the bad choice
-        testDir.resolve("target/classes").mkdirs();
+        Files.createDirectories(testDir.resolve("target/classes"));
         verifier.deleteArtifacts("org.apache.maven.its.mng4269");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("-s");

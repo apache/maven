@@ -18,14 +18,11 @@
  */
 package org.apache.maven.it;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.io.File;
-import java.nio.file.Path;
 import java.io.IOException;
 import java.nio.file.Files;
-
+import java.nio.file.Path;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
@@ -136,18 +133,18 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test extends AbstractMavenInt
          * repo before the actual test installs Jetty as a mirror for everything. Otherwise, we will get garbage
          * for the JAR/POM of the extension and its dependencies when run against a vanilla repo.
          */
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        String settings = Files.readString(testDir.resolve("settings-template.xml").toPath());
+        String settings = Files.readString(testDir.resolve("settings-template.xml"));
         settings = StringUtils.replace(settings, "@port@", Integer.toString(port));
         String newSettings = StringUtils.replace(settings, "@protocol@", "http");
 
-        Files.writeString(testDir.resolve("settings.xml").getAbsoluteFile().toPath(), newSettings);
+        Files.writeString(testDir.resolve("settings.xml"), newSettings);
 
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
 
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
@@ -178,18 +175,18 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test extends AbstractMavenInt
          * repo before the actual test installs Jetty as a mirror for everything. Otherwise, we will get garbage
          * for the JAR/POM of the extension and its dependencies when run against a vanilla repo.
          */
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        String settings = Files.readString(testDir.resolve("settings-template.xml").toPath());
+        String settings = Files.readString(testDir.resolve("settings-template.xml"));
         settings = StringUtils.replace(settings, "@port@", Integer.toString(port));
         String newSettings = StringUtils.replace(settings, "@protocol@", "dav");
 
-        Files.writeString(testDir.resolve("settings.xml").getAbsoluteFile().toPath(), newSettings);
+        Files.writeString(testDir.resolve("settings.xml"), newSettings);
 
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
 
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

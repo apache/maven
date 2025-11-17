@@ -36,11 +36,11 @@ public class MavenITmng7310LifecycleActivatedInSpecifiedModuleTest extends Abstr
         Path extensionTestDir = extractResources(BASE_TEST_DIR + "/extension");
         Path projectTestDir = extractResources(BASE_TEST_DIR + "/project");
 
-        Verifier verifier = newVerifier(extensionTestDir.toString());
+        Verifier verifier = newVerifier(extensionTestDir);
         verifier.addCliArgument("install");
         verifier.execute();
 
-        Verifier verifier2 = newVerifier(projectTestDir.toString());
+        Verifier verifier2 = newVerifier(projectTestDir);
         verifier2.addCliArgument("compile");
         verifier2.execute();
     }

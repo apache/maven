@@ -41,7 +41,7 @@ public class MavenITmng0823MojoContextPassingTest extends AbstractMavenIntegrati
         Path testDir = extractResources("/mng-0823");
 
         // First, build the test plugin
-        Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-context-passing").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-context-passing"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -49,7 +49,7 @@ public class MavenITmng0823MojoContextPassingTest extends AbstractMavenIntegrati
         verifier.verifyErrorFreeLog();
 
         // Then, run the test project that uses the plugin
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArguments(

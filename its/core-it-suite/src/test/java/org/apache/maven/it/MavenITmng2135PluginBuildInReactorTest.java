@@ -39,7 +39,7 @@ public class MavenITmng2135PluginBuildInReactorTest extends AbstractMavenIntegra
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-2135");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("plugin/target");
         verifier.deleteDirectory("project/target");

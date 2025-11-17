@@ -40,7 +40,7 @@ public class MavenITmng3575HexadecimalOctalPluginParameterConfigTest extends Abs
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-3575");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

@@ -41,7 +41,7 @@ class MavenITmng6720FailFastTest extends AbstractMavenIntegrationTestCase {
     void testItShouldWaitForConcurrentModulesToFinish() throws Exception {
         Path testDir = extractResources("/mng-6720-fail-fast");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.addCliArguments("-T", "2");
         verifier.addCliArgument("-Dmaven.test.redirectTestOutputToFile=true");

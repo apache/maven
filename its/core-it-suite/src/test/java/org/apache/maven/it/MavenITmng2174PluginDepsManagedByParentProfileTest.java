@@ -45,7 +45,7 @@ public class MavenITmng2174PluginDepsManagedByParentProfileTest extends Abstract
     public void testitMNG2174() throws Exception {
         Path testDir = extractResources("/mng-2174");
 
-        Verifier verifier = newVerifier(testDir.resolve("sub").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("sub"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng2174");

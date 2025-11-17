@@ -42,7 +42,7 @@ public class MavenITmng4765LocalPomProjectBuilderTest extends AbstractMavenInteg
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-4765");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Duser.prop=OK");

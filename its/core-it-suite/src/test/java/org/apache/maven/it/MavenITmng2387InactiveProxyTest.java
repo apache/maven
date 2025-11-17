@@ -18,11 +18,9 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.net.InetAddress;
+import java.nio.file.Path;
 import java.util.Map;
-
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Server;
@@ -48,14 +46,14 @@ public class MavenITmng2387InactiveProxyTest extends AbstractMavenIntegrationTes
 
     private int proxyPort;
 
-    private File testDir;
+    private Path testDir;
 
     @BeforeEach
     protected void setUp() throws Exception {
         testDir = extractResources("/mng-2387");
 
         ResourceHandler resourceHandler = new ResourceHandler();
-        resourceHandler.setResourceBase(testDir.resolve("repo").getAbsolutePath());
+        resourceHandler.setResourceBase(testDir.resolve("repo").toAbsolutePath().toString());
 
         HandlerList handlers = new HandlerList();
         handlers.setHandlers(new Handler[] {resourceHandler, new DefaultHandler()});
@@ -70,7 +68,7 @@ public class MavenITmng2387InactiveProxyTest extends AbstractMavenIntegrationTes
         System.out.println("Bound server socket to the HTTP port " + port);
 
         resourceHandler = new ResourceHandler();
-        resourceHandler.setResourceBase(testDir.resolve("proxy").getAbsolutePath());
+        resourceHandler.setResourceBase(testDir.resolve("proxy").toAbsolutePath().toString());
 
         handlers = new HandlerList();
         handlers.setHandlers(new Handler[] {resourceHandler, new DefaultHandler()});
@@ -104,7 +102,7 @@ public class MavenITmng2387InactiveProxyTest extends AbstractMavenIntegrationTes
      */
     @Test
     public void testit() throws Exception {
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
 
         Map<String, String> properties = verifier.newDefaultFilterMap();
         properties.put("@host@", InetAddress.getLoopbackAddress().getCanonicalHostName());

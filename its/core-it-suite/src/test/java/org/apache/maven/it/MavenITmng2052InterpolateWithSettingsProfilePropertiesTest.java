@@ -41,7 +41,7 @@ public class MavenITmng2052InterpolateWithSettingsProfilePropertiesTest extends 
     public void testitMNG2052() throws Exception {
         Path testDir = extractResources("/mng-2052");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

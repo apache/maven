@@ -34,7 +34,7 @@ class MavenITgh10210SettingsXmlDecryptTest extends AbstractMavenIntegrationTestC
     void testItPass() throws Exception {
         Path testDir = extractResources("/gh-10210-settings-xml-decrypt");
 
-        Verifier verifier = new Verifier(testDir);
+        Verifier verifier = newVerifier(testDir);
         verifier.setUserHomeDirectory(testDir.resolve("HOME"));
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings-passes.xml");
@@ -57,7 +57,7 @@ class MavenITgh10210SettingsXmlDecryptTest extends AbstractMavenIntegrationTestC
     void testItFail() throws Exception {
         Path testDir = extractResources("/gh-10210-settings-xml-decrypt");
 
-        Verifier verifier = new Verifier(testDir);
+        Verifier verifier = newVerifier(testDir);
         verifier.setUserHomeDirectory(testDir.resolve("HOME"));
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings-fails.xml");

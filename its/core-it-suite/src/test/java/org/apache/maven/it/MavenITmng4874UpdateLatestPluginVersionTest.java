@@ -18,10 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.nio.file.Files;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -42,7 +40,7 @@ public class MavenITmng4874UpdateLatestPluginVersionTest extends AbstractMavenIn
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-4874");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4874");
@@ -50,8 +48,8 @@ public class MavenITmng4874UpdateLatestPluginVersionTest extends AbstractMavenIn
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        File metadataFile = testDir.resolve("target/repo/org/apache/maven/its/mng4874/test/maven-metadata.xml");
-        String xml = Files.readString(metadataFile.toPath());
+        Path metadataFile = testDir.resolve("target/repo/org/apache/maven/its/mng4874/test/maven-metadata.xml");
+        String xml = Files.readString(metadataFile);
         assertTrue(xml.matches("(?s).*<latest>0\\.1-SNAPSHOT</latest>.*"), xml);
     }
 }

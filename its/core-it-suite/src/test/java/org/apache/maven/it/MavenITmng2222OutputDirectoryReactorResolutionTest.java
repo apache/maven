@@ -44,7 +44,7 @@ public class MavenITmng2222OutputDirectoryReactorResolutionTest extends Abstract
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-2222");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("mod-a/target");
         verifier.deleteDirectory("mod-b/target");

@@ -30,7 +30,7 @@ public class MavenITmng7255InferredGroupIdTest extends AbstractMavenIntegrationT
     @Test
     public void testInferredGroupId() throws IOException, VerificationException {
         final Path projectDir = extractResources(PROJECT_PATH);
-        final Verifier verifier = newVerifier(projectDir.toString());
+        final Verifier verifier = newVerifier(projectDir);
 
         verifier.addCliArgument("validate");
         verifier.execute();

@@ -18,13 +18,11 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -40,14 +38,14 @@ class MavenITmng7836AlternativePomSyntaxTest extends AbstractMavenIntegrationTes
     void testAlternativeSyntax() throws Exception {
         Path testDir = extractResources("/mng-7836-alternative-pom-syntax");
 
-        final Verifier pluginVerifier = newVerifier(testDir.resolve("maven-hocon-extension").getPath());
+        final Verifier pluginVerifier = newVerifier(testDir.resolve("maven-hocon-extension"));
         pluginVerifier.addCliArgument("clean");
         pluginVerifier.addCliArgument("install");
         pluginVerifier.addCliArgument("-V");
         pluginVerifier.execute();
         pluginVerifier.verifyErrorFreeLog();
 
-        final Verifier consumerVerifier = newVerifier(testDir.resolve("simple").getPath());
+        final Verifier consumerVerifier = newVerifier(testDir.resolve("simple"));
         consumerVerifier.addCliArgument("clean");
         consumerVerifier.addCliArgument("install");
         consumerVerifier.addCliArgument("-Drat.skip=true");

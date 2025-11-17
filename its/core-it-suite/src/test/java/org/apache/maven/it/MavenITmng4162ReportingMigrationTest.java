@@ -46,7 +46,7 @@ public class MavenITmng4162ReportingMigrationTest extends AbstractMavenIntegrati
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-4162");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

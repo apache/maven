@@ -37,9 +37,9 @@ class MavenITmng8594AtFileTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void testIt() throws Exception {
-        Path basedir = extractResources("/mng-8594").getAbsoluteFile().toPath();
+        Path basedir = extractResources("/mng-8594");
 
-        Verifier verifier = newVerifier(basedir.toString());
+        Verifier verifier = newVerifier(basedir);
         verifier.addCliArgument("-af");
         verifier.addCliArgument("cmd.txt");
         verifier.addCliArgument("-Dcolor1=green");

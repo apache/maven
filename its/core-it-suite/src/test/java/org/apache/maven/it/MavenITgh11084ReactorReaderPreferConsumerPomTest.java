@@ -35,14 +35,14 @@ class MavenITgh11084ReactorReaderPreferConsumerPomTest extends AbstractMavenInte
         Path testDir = extractResources("/gh-11084-reactorreader-prefer-consumer-pom");
 
         // First build module a to populate project-local-repo with artifacts including consumer POM
-        Verifier v1 = newVerifier(testDir.toString());
+        Verifier v1 = newVerifier(testDir);
         v1.addCliArguments("clean", "package", "-X", "-Dmaven.consumer.pom.flatten=true");
         v1.setLogFileName("log-1.txt");
         v1.execute();
         v1.verifyErrorFreeLog();
 
         // Now build only module b; ReactorReader should pick consumer POM from project-local-repo
-        Verifier v2 = newVerifier(testDir.toString());
+        Verifier v2 = newVerifier(testDir);
         v2.setLogFileName("log-2.txt");
         v2.addCliArguments("clean", "compile", "-f", "b", "-X", "-Dmaven.consumer.pom.flatten=true");
         v2.execute();

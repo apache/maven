@@ -18,10 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -43,7 +41,7 @@ public class MavenITmng2871PrePackageSubartifactResolutionTest extends AbstractM
     @Test
     public void testitMNG2871() throws Exception {
         Path testDir = extractResources("/mng-2871");
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("consumer/target");
         verifier.addCliArgument("compile");
@@ -52,8 +50,8 @@ public class MavenITmng2871PrePackageSubartifactResolutionTest extends AbstractM
 
         List<String> compileClassPath = verifier.loadLines("consumer/target/compile.txt");
         assertEquals(2, compileClassPath.size());
-        assertEquals(
-                testDir.resolve("ejbs/target/classes").getCanonicalFile(),
-                new File(compileClassPath.get(1).toString()).getCanonicalFile());
+        ItUtils.assertCanonicalFileEquals(
+                testDir.resolve("ejbs/target/classes"),
+                Path.of(compileClassPath.get(1)));
     }
 }

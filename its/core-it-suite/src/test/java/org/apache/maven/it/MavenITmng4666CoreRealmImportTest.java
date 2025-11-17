@@ -47,7 +47,7 @@ public class MavenITmng4666CoreRealmImportTest extends AbstractMavenIntegrationT
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-4666");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven", "maven-model", "0.1-stub");

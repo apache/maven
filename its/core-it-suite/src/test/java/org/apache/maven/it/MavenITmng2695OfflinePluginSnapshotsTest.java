@@ -44,7 +44,7 @@ public class MavenITmng2695OfflinePluginSnapshotsTest extends AbstractMavenInteg
         Verifier verifier;
 
         // phase 1: run build in online mode to fill local repo
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng2695");
         verifier.setAutoclean(false);
@@ -59,7 +59,7 @@ public class MavenITmng2695OfflinePluginSnapshotsTest extends AbstractMavenInteg
         verifier.verifyErrorFreeLog();
 
         // phase 2: run build in offline mode to check it still passes
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.deleteDirectory("target");
         verifier.setAutoclean(false);
         verifier.setLogFileName("log2.txt");

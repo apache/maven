@@ -38,7 +38,7 @@ public class MavenITmng2234ActiveProfilesFromSettingsTest extends AbstractMavenI
     public void testitMNG2234() throws Exception {
         Path testDir = extractResources("/mng-2234");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
 

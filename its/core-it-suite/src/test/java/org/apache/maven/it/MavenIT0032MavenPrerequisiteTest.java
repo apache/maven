@@ -34,7 +34,7 @@ public class MavenIT0032MavenPrerequisiteTest extends AbstractMavenIntegrationTe
     public void testit0032() throws Exception {
         Path testDir = extractResources("/it0032");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.addCliArgument("initialize");
         verifier.execute();

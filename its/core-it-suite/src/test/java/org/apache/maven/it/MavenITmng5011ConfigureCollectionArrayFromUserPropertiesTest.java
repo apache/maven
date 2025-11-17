@@ -18,10 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.Properties;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,7 +38,7 @@ public class MavenITmng5011ConfigureCollectionArrayFromUserPropertiesTest extend
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-5011");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Dconfig.stringParams=");
@@ -55,12 +53,12 @@ public class MavenITmng5011ConfigureCollectionArrayFromUserPropertiesTest extend
         assertEquals("0", props.getProperty("stringParams"));
 
         assertEquals("2", props.getProperty("fileParams"));
+        ItUtils.assertCanonicalFileEquals(
+                testDir.resolve("foo"),
+                Path.of(props.getProperty("fileParams.0")));
         assertEquals(
-                testDir.resolve("foo").getCanonicalFile(),
-                new File(props.getProperty("fileParams.0")).getCanonicalFile());
-        assertEquals(
-                testDir.resolve("bar").getCanonicalFile(),
-                new File(props.getProperty("fileParams.1")).getCanonicalFile());
+                testDir.resolve("bar"),
+                Path.of(props.getProperty("fileParams.1")));
 
         assertEquals("5", props.getProperty("listParam"));
         assertEquals("", props.getProperty("listParam.0", ""));

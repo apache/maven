@@ -46,7 +46,7 @@ public class MavenITmng6173GetAllProjectsInReactorTest extends AbstractMavenInte
 
         Path testDir = extractResources("/mng-6173-get-all-projects-in-reactor");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("module-1/target");

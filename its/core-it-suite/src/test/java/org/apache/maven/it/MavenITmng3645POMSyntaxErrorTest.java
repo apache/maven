@@ -43,7 +43,7 @@ public class MavenITmng3645POMSyntaxErrorTest extends AbstractMavenIntegrationTe
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-3645");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
 
         try {

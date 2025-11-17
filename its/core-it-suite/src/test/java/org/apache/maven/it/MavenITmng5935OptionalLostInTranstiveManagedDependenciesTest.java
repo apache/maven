@@ -36,7 +36,7 @@ public class MavenITmng5935OptionalLostInTranstiveManagedDependenciesTest extend
     public void testitMNG5935() throws Exception {
         Path testDir = extractResources("/mng-5935-optional-lost-in-transtive-managed-dependencies");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

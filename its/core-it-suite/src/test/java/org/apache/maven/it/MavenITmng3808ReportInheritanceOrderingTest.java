@@ -44,7 +44,7 @@ public class MavenITmng3808ReportInheritanceOrderingTest extends AbstractMavenIn
         Path testDir = extractResources("/mng-3808");
         testDir = testDir.resolve("child");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

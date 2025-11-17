@@ -76,7 +76,7 @@ public class MavenITmng4005UniqueDependencyKeyTest extends AbstractMavenIntegrat
     private void test(String project) throws Exception {
         Path testDir = extractResources("/mng-4005/" + project);
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         try {

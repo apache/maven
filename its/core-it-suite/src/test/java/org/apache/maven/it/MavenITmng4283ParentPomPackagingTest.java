@@ -39,7 +39,7 @@ public class MavenITmng4283ParentPomPackagingTest extends AbstractMavenIntegrati
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-4283");
 
-        Verifier verifier = newVerifier(testDir.resolve("sub").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("sub"));
         verifier.setAutoclean(false);
         try {
             verifier.addCliArgument("validate");

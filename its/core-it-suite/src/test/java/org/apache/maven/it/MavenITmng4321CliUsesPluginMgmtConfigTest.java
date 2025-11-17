@@ -41,7 +41,7 @@ public class MavenITmng4321CliUsesPluginMgmtConfigTest extends AbstractMavenInte
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-4321");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-log-file:2.1-SNAPSHOT:reset");

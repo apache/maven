@@ -44,7 +44,7 @@ public class MavenITmng3833PomInterpolationDataFlowChainTest extends AbstractMav
     public void testitMNG3833() throws Exception {
         Path testDir = extractResources("/mng-3833");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

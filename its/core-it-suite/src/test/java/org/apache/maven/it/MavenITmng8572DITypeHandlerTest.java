@@ -34,7 +34,7 @@ public class MavenITmng8572DITypeHandlerTest extends AbstractMavenIntegrationTes
     public void testCustomTypeHandler() throws Exception {
         // Build the extension first
         Path testDir = extractResources("/mng-8572-di-type-handler");
-        Verifier verifier = newVerifier(testDir.resolve("extension").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("extension"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng8572");
@@ -43,7 +43,7 @@ public class MavenITmng8572DITypeHandlerTest extends AbstractMavenIntegrationTes
         verifier.verifyErrorFreeLog();
 
         // Now use the extension in a test project
-        verifier = newVerifier(testDir.resolve("test").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("test"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArguments(
@@ -55,7 +55,7 @@ public class MavenITmng8572DITypeHandlerTest extends AbstractMavenIntegrationTes
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.resolve("test").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("test"));
         verifier.setAutoclean(false);
         verifier.addCliArgument("validate");
         verifier.execute();

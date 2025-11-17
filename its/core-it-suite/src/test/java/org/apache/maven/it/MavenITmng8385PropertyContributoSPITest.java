@@ -38,12 +38,12 @@ class MavenITmng8385PropertyContributoSPITest extends AbstractMavenIntegrationTe
         Path testDir = extractResources("/mng-8385");
         Verifier verifier;
 
-        verifier = newVerifier(testDir.resolve("spi-extension").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("spi-extension"));
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.resolve("spi-consumer").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("spi-consumer"));
         verifier.addCliArgument("validate");
         verifier.addCliArgument("-X");
         verifier.execute();

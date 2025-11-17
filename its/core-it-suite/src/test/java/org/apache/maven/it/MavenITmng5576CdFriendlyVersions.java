@@ -45,7 +45,7 @@ public class MavenITmng5576CdFriendlyVersions extends AbstractMavenIntegrationTe
     public void testContinuousDeliveryFriendlyVersionsAreWarningFreeWithoutBuildConsumer() throws Exception {
         Path testDir = extractResources("/mng-5576-cd-friendly-versions");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Dchangelist=changelist");
@@ -77,7 +77,7 @@ public class MavenITmng5576CdFriendlyVersions extends AbstractMavenIntegrationTe
     public void testContinuousDeliveryFriendlyVersionsAreWarningFreeWithBuildConsumer() throws Exception {
         Path testDir = extractResources("/mng-5576-cd-friendly-versions");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setLogFileName("log-bc.txt");
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

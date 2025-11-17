@@ -30,11 +30,11 @@ public class MavenITmng7112ProjectsWithNonRecursiveTest extends AbstractMavenInt
     @Test
     public void testAggregatesCanBeBuiltNonRecursively() throws IOException, VerificationException {
         final Path projectDir = extractResources(PROJECT_PATH);
-        Verifier cleaner = newVerifier(projectDir.toString());
+        Verifier cleaner = newVerifier(projectDir);
         cleaner.addCliArgument("clean");
         cleaner.execute();
 
-        final Verifier verifier = newVerifier(projectDir.toString());
+        final Verifier verifier = newVerifier(projectDir);
 
         verifier.addCliArgument("-pl");
         verifier.addCliArgument(":aggregator-a,:aggregator-b");
@@ -53,11 +53,11 @@ public class MavenITmng7112ProjectsWithNonRecursiveTest extends AbstractMavenInt
     @Test
     public void testAggregatesCanBeDeselectedNonRecursively() throws IOException, VerificationException {
         final Path projectDir = extractResources(PROJECT_PATH);
-        Verifier cleaner = newVerifier(projectDir.toString());
+        Verifier cleaner = newVerifier(projectDir);
         cleaner.addCliArgument("clean");
         cleaner.execute();
 
-        final Verifier verifier = newVerifier(projectDir.toString());
+        final Verifier verifier = newVerifier(projectDir);
 
         verifier.addCliArgument("-pl");
         verifier.addCliArgument("!:aggregator-a,!:aggregator-b");

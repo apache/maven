@@ -43,7 +43,7 @@ public class MavenITmng4429CompRequirementOnNonDefaultImplTest extends AbstractM
         Path testDir = extractResources("/mng-4429");
 
         // First, build the test plugin
-        Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-no-default-comp").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-no-default-comp"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -51,7 +51,7 @@ public class MavenITmng4429CompRequirementOnNonDefaultImplTest extends AbstractM
         verifier.verifyErrorFreeLog();
 
         // Then, run the test project that uses the plugin
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

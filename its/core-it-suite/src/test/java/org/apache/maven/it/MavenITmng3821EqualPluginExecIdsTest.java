@@ -41,7 +41,7 @@ public class MavenITmng3821EqualPluginExecIdsTest extends AbstractMavenIntegrati
     public void testitMNG3821() throws Exception {
         Path testDir = extractResources("/mng-3821");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

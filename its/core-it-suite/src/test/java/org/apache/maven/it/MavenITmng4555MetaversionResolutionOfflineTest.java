@@ -73,7 +73,7 @@ public class MavenITmng4555MetaversionResolutionOfflineTest extends AbstractMave
         server.setHandler(repoHandler);
         server.start();
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4555");

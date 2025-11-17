@@ -43,7 +43,7 @@ public class MavenITmng4363DynamicAdditionOfDependencyArtifactTest extends Abstr
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-4363");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4363");

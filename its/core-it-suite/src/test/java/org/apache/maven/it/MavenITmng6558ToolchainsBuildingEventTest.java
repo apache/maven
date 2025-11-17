@@ -40,7 +40,7 @@ public class MavenITmng6558ToolchainsBuildingEventTest extends AbstractMavenInte
     public void testit() throws Exception {
         Path testDir = extractResources("/mng-6558");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setForkJvm(true); // maven.ext.class.path used
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

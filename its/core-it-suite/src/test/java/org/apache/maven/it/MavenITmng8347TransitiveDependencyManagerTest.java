@@ -18,8 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -46,7 +46,7 @@ class MavenITmng8347TransitiveDependencyManagerTest extends AbstractMavenIntegra
     void transitiveDependencyManager() throws Exception {
         Path testDir = extractResources("/mng-8347-transitive-dependency-manager");
 
-        Verifier verifier = new Verifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir, null);
         verifier.addCliArgument("-V");
         verifier.addCliArgument("dependency:3.8.0:tree");
         verifier.addCliArgument("-Dmaven.repo.local.tail=" + testDir + "/local-repo");
@@ -72,7 +72,7 @@ class MavenITmng8347TransitiveDependencyManagerTest extends AbstractMavenIntegra
     void useCaseBndPlugin() throws Exception {
         Path testDir = extractResources("/mng-8347-bnd-plugin");
 
-        Verifier verifier = new Verifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir, null);
         verifier.addCliArgument("-V");
         verifier.addCliArgument("dependency:3.8.0:tree");
         verifier.addCliArgument("-Dmaven.repo.local.tail=" + testDir + "/local-repo");
@@ -92,7 +92,7 @@ class MavenITmng8347TransitiveDependencyManagerTest extends AbstractMavenIntegra
     void useCaseQuarkusTlsRegistry() throws Exception {
         Path testDir = extractResources("/mng-8347-quarkus-tls-registry");
 
-        Verifier verifier = new Verifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir, null);
         verifier.addCliArgument("-V");
         verifier.addCliArgument("dependency:3.8.0:tree");
         verifier.addCliArgument("-Dmaven.repo.local.tail=" + testDir + "/local-repo");

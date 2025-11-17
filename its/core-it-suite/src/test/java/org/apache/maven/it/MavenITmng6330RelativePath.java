@@ -38,7 +38,7 @@ public class MavenITmng6330RelativePath extends AbstractMavenIntegrationTestCase
     public void testRelativePath() throws Exception {
         Path testDir = extractResources("/mng-6330-relative-path");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setForkJvm(true); // TODO: why?
 
         try {

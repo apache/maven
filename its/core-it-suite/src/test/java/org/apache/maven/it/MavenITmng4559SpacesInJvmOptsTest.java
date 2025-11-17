@@ -38,9 +38,9 @@ class MavenITmng4559SpacesInJvmOptsTest extends AbstractMavenIntegrationTestCase
     @Test
     void testIt() throws Exception {
         Path basedir =
-                extractResources("/mng-4559-spaces-jvm-opts").getAbsoluteFile().toPath();
+                extractResources("/mng-4559-spaces-jvm-opts");
 
-        Verifier verifier = newVerifier(basedir.toString());
+        Verifier verifier = newVerifier(basedir);
         verifier.setEnvironmentVariable("MAVEN_OPTS", "-Dprop.maven-opts=\"foo bar\"");
         verifier.addCliArguments("validate");
         verifier.execute();

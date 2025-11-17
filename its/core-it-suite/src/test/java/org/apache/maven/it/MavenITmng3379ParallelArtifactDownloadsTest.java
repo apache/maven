@@ -44,7 +44,7 @@ public class MavenITmng3379ParallelArtifactDownloadsTest extends AbstractMavenIn
     public void testitMNG3379() throws Exception {
         Path testDir = extractResources("/mng-3379");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng3379.a");
         verifier.deleteArtifacts("org.apache.maven.its.mng3379.b");

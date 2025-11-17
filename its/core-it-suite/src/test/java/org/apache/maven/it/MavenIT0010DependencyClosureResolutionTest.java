@@ -39,7 +39,7 @@ public class MavenIT0010DependencyClosureResolutionTest extends AbstractMavenInt
     public void testit0010() throws Exception {
         Path testDir = extractResources("/it0010");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.it0010");

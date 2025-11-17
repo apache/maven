@@ -51,7 +51,7 @@ class MavenITmng7819FileLockingWithSnapshotsTest extends AbstractMavenIntegratio
         ResourceHandler resourceHandler = new ResourceHandler();
         resourceHandler.setWelcomeFiles(new String[] {"index.html"});
         resourceHandler.setDirectoriesListed(true);
-        resourceHandler.setResourceBase(testDir.resolve("repo").getAbsolutePath());
+        resourceHandler.setResourceBase(testDir.resolve("repo").toString());
         HandlerList handlerList = new HandlerList();
         handlerList.setHandlers(new Handler[] {resourceHandler});
         server.setHandler(handlerList);
@@ -75,7 +75,7 @@ class MavenITmng7819FileLockingWithSnapshotsTest extends AbstractMavenIntegratio
     void testFileLockingAndSnapshots() throws Exception {
         Path testDir = extractResources("/mng-7819-file-locking-with-snapshots");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
 
         // produce required precondition state: local repository must not have any of the org.apache.maven.its.mng7819
         // artifacts
@@ -89,7 +89,7 @@ class MavenITmng7819FileLockingWithSnapshotsTest extends AbstractMavenIntegratio
 
         verifier.addCliArgument("-e");
         verifier.addCliArgument("-s");
-        verifier.addCliArgument(testDir.resolve("settings.xml").getAbsolutePath());
+        verifier.addCliArgument(testDir.resolve("settings.xml").toString());
         verifier.addCliArgument("-Pmaven-core-it-repo");
 
         verifier.addCliArgument("-Daether.syncContext.named.nameMapper=file-gav");

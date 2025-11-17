@@ -42,7 +42,7 @@ public class MavenITmng1073AggregatorForksReactorTest extends AbstractMavenInteg
 
         Path testDir = extractResources("/mng-1073");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("sub-1/target");
@@ -67,7 +67,7 @@ public class MavenITmng1073AggregatorForksReactorTest extends AbstractMavenInteg
     public void testitForkGoal() throws Exception {
         Path testDir = extractResources("/mng-1073");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("sub-1/target");

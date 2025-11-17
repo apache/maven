@@ -43,7 +43,7 @@ public class MavenITmng3314OfflineSnapshotsTest extends AbstractMavenIntegration
         Path testDir = extractResources("/mng-3314");
 
         // phase 1: run build in online mode to fill local repo
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.deleteArtifacts("org.apache.maven.its.mng3314");
         verifier.setLogFileName("log1.txt");
         verifier.filterFile("settings-template.xml", "settings.xml");
@@ -55,7 +55,7 @@ public class MavenITmng3314OfflineSnapshotsTest extends AbstractMavenIntegration
         verifier.verifyErrorFreeLog();
 
         // phase 2: run build in offline mode to check it still passes
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.setLogFileName("log2.txt");
         verifier.addCliArgument("-o");
         verifier.addCliArgument("--settings");

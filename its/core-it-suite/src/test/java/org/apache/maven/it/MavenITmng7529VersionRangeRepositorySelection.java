@@ -39,7 +39,7 @@ public class MavenITmng7529VersionRangeRepositorySelection extends AbstractMaven
         Path testDir = extractResources("/mng-7529");
 
         // First, build the test plugin
-        Verifier verifier = newVerifier(testDir.resolve("mng7529-plugin").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("mng7529-plugin"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -47,7 +47,7 @@ public class MavenITmng7529VersionRangeRepositorySelection extends AbstractMaven
         verifier.verifyErrorFreeLog();
 
         // Then, run the test project that uses the plugin
-        verifier = newVerifier(testDir.toString());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng7529");

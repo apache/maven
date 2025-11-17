@@ -39,10 +39,10 @@ public class MavenITmng3693PomFileBasedirChangeTest extends AbstractMavenIntegra
     public void testitMNG3693() throws Exception {
         Path testDir = extractResources("/mng-3693");
 
-        File pluginDir = testDir.resolve("maven-mng3693-plugin");
-        File projectsDir = testDir.resolve("projects");
+        Path pluginDir = testDir.resolve("maven-mng3693-plugin");
+        Path projectsDir = testDir.resolve("projects");
 
-        Verifier verifier = newVerifier(pluginDir.toString());
+        Verifier verifier = newVerifier(pluginDir);
 
         verifier.addCliArgument("install");
         verifier.execute();
@@ -57,7 +57,7 @@ public class MavenITmng3693PomFileBasedirChangeTest extends AbstractMavenIntegra
         // remove the dependency from the local repository.
         FileUtils.deleteDirectory(dep);
 
-        verifier = newVerifier(projectsDir.toString());
+        verifier = newVerifier(projectsDir);
 
         verifier.addCliArgument("package");
         verifier.execute();
