@@ -41,6 +41,6 @@ class MavenITmng8477MultithreadedFileActivationTest extends AbstractMavenIntegra
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyTextInLog("- xxx (source: test:m2:jar:1)");
+        verifier.verifyTextInLog("- xxx (source: test:project:1)");
     }
 }
