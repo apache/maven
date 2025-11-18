@@ -35,7 +35,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
     public void testValidParentVersionRangeWithInclusiveUpperBound() throws Exception {
         // failingMavenVersions("(3.2.2,3.5.0-alpha-0)");
         Verifier verifier = null;
-        Path testDir = extractResources("/mng-2199-parent-version-range/valid-inclusive-upper-bound");
+        Path testDir = extractResources("mng-2199-parent-version-range/valid-inclusive-upper-bound");
 
         verifier = newVerifier(testDir);
         verifier.addCliArgument("-U");
@@ -55,7 +55,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
     public void testValidParentVersionRangeWithExclusiveUpperBound() throws Exception {
         // failingMavenVersions("(3.2.2,3.5.0-alpha-0)");
         Verifier verifier = null;
-        Path testDir = extractResources("/mng-2199-parent-version-range/valid-exclusive-upper-bound");
+        Path testDir = extractResources("mng-2199-parent-version-range/valid-exclusive-upper-bound");
 
         verifier = newVerifier(testDir);
         verifier.addCliArgument("-U");
@@ -74,7 +74,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
     @Test
     public void testInvalidParentVersionRangeWithoutUpperBound() throws Exception {
         Verifier verifier = null;
-        Path testDir = extractResources("/mng-2199-parent-version-range/invalid");
+        Path testDir = extractResources("mng-2199-parent-version-range/invalid");
 
         try {
             verifier = newVerifier(testDir);
@@ -95,7 +95,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
     @Test
     public void testValidParentVersionRangeInvalidVersionExpression() throws Exception {
         Verifier verifier = null;
-        Path testDir = extractResources("/mng-2199-parent-version-range/expression");
+        Path testDir = extractResources("mng-2199-parent-version-range/expression");
 
         try {
             verifier = newVerifier(testDir);
@@ -115,7 +115,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
     @Test
     public void testValidParentVersionRangeInvalidVersionInheritance() throws Exception {
         Verifier verifier = null;
-        Path testDir = extractResources("/mng-2199-parent-version-range/inherited");
+        Path testDir = extractResources("mng-2199-parent-version-range/inherited");
 
         try {
             verifier = newVerifier(testDir);
@@ -136,7 +136,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
     public void testValidLocalParentVersionRange() throws Exception {
         // failingMavenVersions("(,3.3.0),(3.3.9,3.5.0-alpha-0)");
         Verifier verifier = null;
-        Path testDir = extractResources("/mng-2199-parent-version-range/valid-local/child");
+        Path testDir = extractResources("mng-2199-parent-version-range/valid-local/child");
 
         verifier = newVerifier(testDir);
         verifier.addCliArgument("verify");
@@ -157,7 +157,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
         // failingMavenVersions("[3.3.0,3.3.9)");
         // Fallback to remote resolution not tested here. Remote parent expected to not be available anywhere.
         Verifier verifier = null;
-        Path testDir = extractResources("/mng-2199-parent-version-range/invalid-local/child");
+        Path testDir = extractResources("mng-2199-parent-version-range/invalid-local/child");
 
         try {
             verifier = newVerifier(testDir);
@@ -177,7 +177,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
     public void testInvalidLocalParentVersionRangeFallingBackToRemote() throws Exception {
         // failingMavenVersions("[3.3.9]");
         Verifier verifier = null;
-        Path testDir = extractResources("/mng-2199-parent-version-range/local-fallback-to-remote/child");
+        Path testDir = extractResources("mng-2199-parent-version-range/local-fallback-to-remote/child");
 
         verifier = newVerifier(testDir);
         verifier.addCliArgument("verify");
@@ -197,7 +197,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
     public void testValidLocalParentVersionRangeInvalidVersionExpression() throws Exception {
         // failingMavenVersions("(,3.5.0-alpha-0)");
         Verifier verifier = null;
-        Path testDir = extractResources("/mng-2199-parent-version-range/expression-local/child");
+        Path testDir = extractResources("mng-2199-parent-version-range/expression-local/child");
 
         try {
             verifier = newVerifier(testDir);
@@ -216,7 +216,7 @@ public class MavenITmng2199ParentVersionRangeTest extends AbstractMavenIntegrati
     public void testValidLocalParentVersionRangeInvalidVersionInheritance() throws Exception {
         // failingMavenVersions("(,3.5.0-alpha-0)");
         Verifier verifier = null;
-        Path testDir = extractResources("/mng-2199-parent-version-range/inherited-local/child");
+        Path testDir = extractResources("mng-2199-parent-version-range/inherited-local/child");
 
         try {
             verifier = newVerifier(testDir);

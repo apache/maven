@@ -41,7 +41,7 @@ public class MavenITmng4755FetchRemoteMetadataForVersionRangeTest extends Abstra
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4755");
+        Path testDir = extractResources("mng-4755");
 
         // setup: install a local version
         Verifier verifier = newVerifier(testDir.resolve("dependency"));

@@ -57,7 +57,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
      */
     @Test
     public void testitCached() throws Exception {
-        Path testDir = extractResources("/mng-4554");
+        Path testDir = extractResources("mng-4554");
 
         String metadataUri = "/repo-1/org/apache/maven/its/mng4554/maven-metadata.xml";
 
@@ -136,7 +136,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
      */
     @Test
     public void testitForcedUpdate() throws Exception {
-        Path testDir = extractResources("/mng-4554");
+        Path testDir = extractResources("mng-4554");
 
         String metadataUri = "/repo-1/org/apache/maven/its/mng4554/maven-metadata.xml";
 
@@ -218,7 +218,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
     public void testitRefetched() throws Exception {
         // requiresMavenVersion("[3.0-alpha-3,)");
 
-        Path testDir = extractResources("/mng-4554");
+        Path testDir = extractResources("mng-4554");
 
         String metadataUri = "/repo-it/org/apache/maven/its/mng4554/maven-metadata.xml";
 

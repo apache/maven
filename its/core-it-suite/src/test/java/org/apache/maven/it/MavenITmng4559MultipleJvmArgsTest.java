@@ -34,7 +34,7 @@ public class MavenITmng4559MultipleJvmArgsTest extends AbstractMavenIntegrationT
 
     @Test
     void testMultipleJvmArgs() throws Exception {
-        Path testDir = extractResources("/mng-4559-multiple-jvm-args");
+        Path testDir = extractResources("mng-4559-multiple-jvm-args");
         Path mvnDir = testDir.resolve(".mvn");
         Path jvmConfig = mvnDir.resolve("jvm.config");
 

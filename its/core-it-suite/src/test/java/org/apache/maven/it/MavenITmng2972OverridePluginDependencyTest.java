@@ -43,7 +43,7 @@ public class MavenITmng2972OverridePluginDependencyTest extends AbstractMavenInt
      */
     @Test
     public void testitLifecycleInvocation() throws Exception {
-        Path testDir = extractResources("/mng-2972/test1");
+        Path testDir = extractResources("mng-2972/test1");
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
@@ -73,7 +73,7 @@ public class MavenITmng2972OverridePluginDependencyTest extends AbstractMavenInt
      */
     @Test
     public void testitCommandLineInvocation() throws Exception {
-        Path testDir = extractResources("/mng-2972/test2");
+        Path testDir = extractResources("mng-2972/test2");
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

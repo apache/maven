@@ -41,7 +41,7 @@ public class MavenITmng3099SettingsProfilesWithNoPomTest extends AbstractMavenIn
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-3099");
+        Path testDir = extractResources("mng-3099");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

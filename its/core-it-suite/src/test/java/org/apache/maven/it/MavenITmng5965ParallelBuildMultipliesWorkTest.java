@@ -36,7 +36,7 @@ public class MavenITmng5965ParallelBuildMultipliesWorkTest extends AbstractMaven
 
     @Test
     public void testItShouldOnlyRunEachTaskOnce() throws Exception {
-        Path testDir = extractResources("/mng-5965-parallel-build-multiplies-work");
+        Path testDir = extractResources("mng-5965-parallel-build-multiplies-work");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

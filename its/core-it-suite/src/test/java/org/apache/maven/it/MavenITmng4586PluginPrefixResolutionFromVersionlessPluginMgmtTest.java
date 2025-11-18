@@ -39,7 +39,7 @@ public class MavenITmng4586PluginPrefixResolutionFromVersionlessPluginMgmtTest
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4586");
+        Path testDir = extractResources("mng-4586");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

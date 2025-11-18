@@ -43,7 +43,7 @@ public class MavenITmng4331DependencyCollectionTest extends AbstractMavenIntegra
      */
     @Test
     public void testitEarlyLifecyclePhase() throws Exception {
-        Path testDir = extractResources("/mng-4331");
+        Path testDir = extractResources("mng-4331");
 
         // First, build the test plugin
         Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-dependency-collection"));
@@ -76,7 +76,7 @@ public class MavenITmng4331DependencyCollectionTest extends AbstractMavenIntegra
      */
     @Test
     public void testitCliAggregator() throws Exception {
-        Path testDir = extractResources("/mng-4331");
+        Path testDir = extractResources("mng-4331");
 
         // First, build the test plugin
         Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-dependency-collection"));

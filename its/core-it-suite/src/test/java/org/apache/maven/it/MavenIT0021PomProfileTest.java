@@ -33,7 +33,7 @@ public class MavenIT0021PomProfileTest extends AbstractMavenIntegrationTestCase 
      */
     @Test
     public void testit0021() throws Exception {
-        Path testDir = extractResources("/it0021");
+        Path testDir = extractResources("it0021");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

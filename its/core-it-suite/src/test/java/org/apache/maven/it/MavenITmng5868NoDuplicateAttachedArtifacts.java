@@ -54,7 +54,7 @@ public class MavenITmng5868NoDuplicateAttachedArtifacts extends AbstractMavenInt
 
     @BeforeEach
     protected void setUp() throws Exception {
-        testDir = extractResources("/mng-5868");
+        testDir = extractResources("mng-5868");
 
         Handler repoHandler = new AbstractHandler() {
             @Override

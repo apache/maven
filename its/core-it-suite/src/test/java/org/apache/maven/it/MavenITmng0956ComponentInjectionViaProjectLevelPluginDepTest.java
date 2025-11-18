@@ -41,7 +41,7 @@ public class MavenITmng0956ComponentInjectionViaProjectLevelPluginDepTest extend
      */
     @Test
     public void testitMNG0956() throws Exception {
-        Path testDir = extractResources("/mng-0956");
+        Path testDir = extractResources("mng-0956");
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

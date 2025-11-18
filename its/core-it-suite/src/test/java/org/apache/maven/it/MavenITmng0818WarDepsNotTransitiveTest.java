@@ -42,7 +42,7 @@ public class MavenITmng0818WarDepsNotTransitiveTest extends AbstractMavenIntegra
      */
     @Test
     public void testitMNG0818() throws Exception {
-        Path testDir = extractResources("/mng-0818");
+        Path testDir = extractResources("mng-0818");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

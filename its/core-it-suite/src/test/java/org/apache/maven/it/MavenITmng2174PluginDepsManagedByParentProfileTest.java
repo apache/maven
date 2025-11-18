@@ -43,7 +43,7 @@ public class MavenITmng2174PluginDepsManagedByParentProfileTest extends Abstract
      */
     @Test
     public void testitMNG2174() throws Exception {
-        Path testDir = extractResources("/mng-2174");
+        Path testDir = extractResources("mng-2174");
 
         Verifier verifier = newVerifier(testDir.resolve("sub"));
         verifier.setAutoclean(false);

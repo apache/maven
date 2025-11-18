@@ -44,7 +44,7 @@ public class MavenITmng6173GetAllProjectsInReactorTest extends AbstractMavenInte
     @Test
     public void testitShouldReturnAllProjectsInReactor() throws Exception {
 
-        Path testDir = extractResources("/mng-6173-get-all-projects-in-reactor");
+        Path testDir = extractResources("mng-6173-get-all-projects-in-reactor");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

@@ -18,11 +18,9 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -31,14 +29,14 @@ public class MavenITmng7772CoreExtensionFoundTest extends AbstractMavenIntegrati
 
     @Test
     public void testWithExtensionsXmlCoreExtensionsFound() throws Exception {
-        Path testDir = extractResources("/mng-7772-core-extensions-found");
+        Path testDir = extractResources("mng-7772-core-extensions-found");
 
         Verifier verifier = newVerifier(testDir.resolve("extension"));
         verifier.setLogFileName("extension-install.txt");
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
-        String installedToLocalRepo = verifier.getLocalRepository();
+        Path installedToLocalRepo = verifier.getLocalRepository();
 
         verifier = newVerifier(testDir);
         verifier.setUserHomeDirectory(testDir.resolve("home-extensions-xml"));
@@ -52,7 +50,7 @@ public class MavenITmng7772CoreExtensionFoundTest extends AbstractMavenIntegrati
 
     @Test
     public void testWithLibExtCoreExtensionsFound() throws Exception {
-        Path testDir = extractResources("/mng-7772-core-extensions-found");
+        Path testDir = extractResources("mng-7772-core-extensions-found");
 
         Path extensionBasedir = testDir.resolve("extension");
         Verifier verifier = newVerifier(extensionBasedir);

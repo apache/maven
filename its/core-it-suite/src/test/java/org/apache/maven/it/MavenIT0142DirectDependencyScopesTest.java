@@ -45,7 +45,7 @@ public class MavenIT0142DirectDependencyScopesTest extends AbstractMavenIntegrat
      */
     @Test
     public void testit0142() throws Exception {
-        Path testDir = extractResources("/it0142");
+        Path testDir = extractResources("it0142");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

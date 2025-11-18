@@ -34,7 +34,7 @@ class MavenITmng8421MavenEncryptionTest extends AbstractMavenIntegrationTestCase
      */
     @Test
     void testEmptyHome() throws Exception {
-        Path basedir = extractResources("/mng-8421");
+        Path basedir = extractResources("mng-8421");
 
         Path home = basedir.resolve("home1");
 
@@ -54,7 +54,7 @@ class MavenITmng8421MavenEncryptionTest extends AbstractMavenIntegrationTestCase
      */
     @Test
     void testSetupHome() throws Exception {
-        Path basedir = extractResources("/mng-8421");
+        Path basedir = extractResources("mng-8421");
 
         Path home = basedir.resolve("home2");
 

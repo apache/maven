@@ -43,7 +43,7 @@ public class MavenITmng4332DefaultPluginExecutionOrderTest extends AbstractMaven
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4332");
+        Path testDir = extractResources("mng-4332");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

@@ -35,7 +35,7 @@ class MavenITmng8293BomImportFromReactor extends AbstractMavenIntegrationTestCas
      */
     @Test
     void testitNoRootPomCanBeLoaded() throws Exception {
-        Path testDir = extractResources("/mng-8293-bom-import-from-reactor");
+        Path testDir = extractResources("mng-8293-bom-import-from-reactor");
 
         Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument("validate");

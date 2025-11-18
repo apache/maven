@@ -39,7 +39,7 @@ public class MavenITmng2739RequiredRepositoryElementsTest extends AbstractMavenI
 
     @Test
     public void testitMNG2739RepositoryId() throws Exception {
-        Path testDir = extractResources("/mng-2739/repo-id");
+        Path testDir = extractResources("mng-2739/repo-id");
 
         Verifier verifier;
 
@@ -71,7 +71,7 @@ public class MavenITmng2739RequiredRepositoryElementsTest extends AbstractMavenI
     public void testitMNG2739RepositoryUrl() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        Path testDir = extractResources("/mng-2739/repo-url");
+        Path testDir = extractResources("mng-2739/repo-url");
 
         Verifier verifier;
 

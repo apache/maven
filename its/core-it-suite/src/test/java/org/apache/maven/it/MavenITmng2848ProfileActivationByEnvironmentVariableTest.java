@@ -40,7 +40,7 @@ public class MavenITmng2848ProfileActivationByEnvironmentVariableTest extends Ab
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-2848");
+        Path testDir = extractResources("mng-2848");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

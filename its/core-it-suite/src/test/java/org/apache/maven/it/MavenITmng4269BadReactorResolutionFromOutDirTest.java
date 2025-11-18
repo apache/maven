@@ -40,7 +40,7 @@ public class MavenITmng4269BadReactorResolutionFromOutDirTest extends AbstractMa
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4269");
+        Path testDir = extractResources("mng-4269");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

@@ -42,7 +42,7 @@ public class MavenITmng2045testJarDependenciesBrokenInReactorTest extends Abstra
 
     @Test
     public void testitMNG2045() throws Exception {
-        Path testDir = extractResources("/mng-2045");
+        Path testDir = extractResources("mng-2045");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

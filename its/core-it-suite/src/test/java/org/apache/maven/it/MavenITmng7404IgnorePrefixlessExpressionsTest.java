@@ -26,7 +26,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng7404IgnorePrefixlessExpressionsTest extends AbstractMavenIntegrationTestCase {
-    private static final String PROJECT_PATH = "/mng-7404-ignore-prefixless-expressions";
+    private static final String PROJECT_PATH = "mng-7404-ignore-prefixless-expressions";
 
     @Test
     public void testIgnorePrefixlessExpressions() throws IOException, VerificationException {

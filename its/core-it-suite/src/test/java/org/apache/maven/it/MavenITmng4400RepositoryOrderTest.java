@@ -40,7 +40,7 @@ public class MavenITmng4400RepositoryOrderTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testitSettingsRepos() throws Exception {
-        Path testDir = extractResources("/mng-4400");
+        Path testDir = extractResources("mng-4400");
 
         Verifier verifier = newVerifier(testDir.resolve("settings"));
         verifier.setAutoclean(false);
@@ -63,7 +63,7 @@ public class MavenITmng4400RepositoryOrderTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testitPomRepos() throws Exception {
-        Path testDir = extractResources("/mng-4400");
+        Path testDir = extractResources("mng-4400");
 
         Verifier verifier = newVerifier(testDir.resolve("pom"));
         verifier.setAutoclean(false);

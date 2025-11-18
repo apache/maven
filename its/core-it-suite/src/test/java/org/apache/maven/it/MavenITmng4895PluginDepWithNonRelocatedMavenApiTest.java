@@ -38,7 +38,7 @@ public class MavenITmng4895PluginDepWithNonRelocatedMavenApiTest extends Abstrac
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4895");
+        Path testDir = extractResources("mng-4895");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

@@ -34,7 +34,7 @@ public class MavenITmng2339BadProjectInterpolationTest extends AbstractMavenInte
 
     @Test
     public void testitMNG2339a() throws Exception {
-        Path testDir = extractResources("/mng-2339/a");
+        Path testDir = extractResources("mng-2339/a");
 
         Verifier verifier;
 
@@ -53,7 +53,7 @@ public class MavenITmng2339BadProjectInterpolationTest extends AbstractMavenInte
     @Disabled("Requires Maven version: (2.0.8,4.0.0-alpha-1)")
     public void testitMNG2339b() throws Exception {
         // requiresMavenVersion("(2.0.8,4.0.0-alpha-1)");
-        Path testDir = extractResources("/mng-2339/b");
+        Path testDir = extractResources("mng-2339/b");
 
         Verifier verifier;
 

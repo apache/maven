@@ -35,7 +35,7 @@ public class MavenITmng2861RelocationsAndRangesTest extends AbstractMavenIntegra
 
     @Test
     public void testitMNG2861() throws Exception {
-        Path testDir = extractResources("/mng-2861");
+        Path testDir = extractResources("mng-2861");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

@@ -52,7 +52,7 @@ public class MavenITmng4489MirroringOfExtensionRepoTest extends AbstractMavenInt
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4489");
+        Path testDir = extractResources("mng-4489");
 
         Constraint constraint = new Constraint();
         constraint.setName(Constraint.__BASIC_AUTH);

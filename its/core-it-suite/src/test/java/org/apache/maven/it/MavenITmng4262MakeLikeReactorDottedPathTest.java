@@ -44,7 +44,7 @@ public class MavenITmng4262MakeLikeReactorDottedPathTest extends AbstractMavenIn
      */
     @Test
     public void testitMakeRoot() throws Exception {
-        Path testDir = extractResources("/mng-4262");
+        Path testDir = extractResources("mng-4262");
 
         Verifier verifier = newVerifier(testDir.resolve("parent"));
         verifier.setAutoclean(false);
@@ -67,7 +67,7 @@ public class MavenITmng4262MakeLikeReactorDottedPathTest extends AbstractMavenIn
      */
     @Test
     public void testitMakeModule() throws Exception {
-        Path testDir = extractResources("/mng-4262");
+        Path testDir = extractResources("mng-4262");
 
         Verifier verifier = newVerifier(testDir.resolve("parent"));
         verifier.setAutoclean(false);

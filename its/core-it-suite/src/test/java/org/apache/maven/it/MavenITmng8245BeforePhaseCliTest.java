@@ -36,7 +36,7 @@ class MavenITmng8245BeforePhaseCliTest extends AbstractMavenIntegrationTestCase 
      */
     @Test
     void testPhaseBeforeCleanAllWihConcurrentBuilder() throws Exception {
-        Path testDir = extractResources("/mng-8245-before-after-phase-all");
+        Path testDir = extractResources("mng-8245-before-after-phase-all");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setLogFileName("before-clean-concurrent.txt");
@@ -53,7 +53,7 @@ class MavenITmng8245BeforePhaseCliTest extends AbstractMavenIntegrationTestCase 
      */
     @Test
     void testPhaseBeforeCleanAllWithLegacyBuilder() throws Exception {
-        Path testDir = extractResources("/mng-8245-before-after-phase-all");
+        Path testDir = extractResources("mng-8245-before-after-phase-all");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setLogFileName("before-clean-legacy.txt");
@@ -70,7 +70,7 @@ class MavenITmng8245BeforePhaseCliTest extends AbstractMavenIntegrationTestCase 
      */
     @Test
     void testPhaseAfterCleanAllWihConcurrentBuilder() throws Exception {
-        Path testDir = extractResources("/mng-8245-before-after-phase-all");
+        Path testDir = extractResources("mng-8245-before-after-phase-all");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setLogFileName("after-clean-concurrent.txt");
@@ -87,7 +87,7 @@ class MavenITmng8245BeforePhaseCliTest extends AbstractMavenIntegrationTestCase 
      */
     @Test
     void testPhaseAfterCleanAllWithLegacyBuilder() throws Exception {
-        Path testDir = extractResources("/mng-8245-before-after-phase-all");
+        Path testDir = extractResources("mng-8245-before-after-phase-all");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setLogFileName("after-clean-legacy.txt");

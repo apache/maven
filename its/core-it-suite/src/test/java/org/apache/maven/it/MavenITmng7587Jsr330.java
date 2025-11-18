@@ -36,7 +36,7 @@ class MavenITmng7587Jsr330 extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void test() throws Exception {
-        Path testDir = extractResources("/mng-7587-jsr330");
+        Path testDir = extractResources("mng-7587-jsr330");
 
         final Verifier pluginVerifier = newVerifier(testDir.resolve("plugin"));
         pluginVerifier.addCliArgument("clean");

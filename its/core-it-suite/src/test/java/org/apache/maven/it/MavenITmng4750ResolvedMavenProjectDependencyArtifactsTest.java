@@ -44,7 +44,7 @@ public class MavenITmng4750ResolvedMavenProjectDependencyArtifactsTest extends A
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4750");
+        Path testDir = extractResources("mng-4750");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

@@ -27,7 +27,7 @@ public class MavenITmng6506PackageAnnotationTest extends AbstractMavenIntegratio
 
     @Test
     public void testGetPackageAnnotation() throws Exception {
-        Path testDir = extractResources("/mng-6506-package-annotation");
+        Path testDir = extractResources("mng-6506-package-annotation");
         Path pluginDir = testDir.resolve("plugin");
         Path projectDir = testDir.resolve("project");
 

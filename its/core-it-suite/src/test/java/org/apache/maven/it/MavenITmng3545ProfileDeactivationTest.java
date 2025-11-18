@@ -37,7 +37,7 @@ public class MavenITmng3545ProfileDeactivationTest extends AbstractMavenIntegrat
      */
     @Test
     public void testBasicBuildWithDefaultProfiles() throws Exception {
-        Path testDir = extractResources("/mng-3545");
+        Path testDir = extractResources("mng-3545");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
@@ -63,7 +63,7 @@ public class MavenITmng3545ProfileDeactivationTest extends AbstractMavenIntegrat
      */
     @Test
     public void testDeactivateDefaultProfilesHyphen() throws Exception {
-        Path testDir = extractResources("/mng-3545");
+        Path testDir = extractResources("mng-3545");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
@@ -85,7 +85,7 @@ public class MavenITmng3545ProfileDeactivationTest extends AbstractMavenIntegrat
 
     @Test
     public void testDeactivateDefaultProfilesExclamation() throws Exception {
-        Path testDir = extractResources("/mng-3545");
+        Path testDir = extractResources("mng-3545");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
@@ -113,7 +113,7 @@ public class MavenITmng3545ProfileDeactivationTest extends AbstractMavenIntegrat
      */
     @Test
     public void testDeactivateActivatedByProp() throws Exception {
-        Path testDir = extractResources("/mng-3545");
+        Path testDir = extractResources("mng-3545");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
@@ -143,7 +143,7 @@ public class MavenITmng3545ProfileDeactivationTest extends AbstractMavenIntegrat
      */
     @Test
     public void testActivateThenDeactivate() throws Exception {
-        Path testDir = extractResources("/mng-3545");
+        Path testDir = extractResources("mng-3545");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
@@ -173,7 +173,7 @@ public class MavenITmng3545ProfileDeactivationTest extends AbstractMavenIntegrat
      */
     @Test
     public void testDefaultProfileAutoDeactivation() throws Exception {
-        Path testDir = extractResources("/mng-3545");
+        Path testDir = extractResources("mng-3545");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

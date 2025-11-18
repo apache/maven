@@ -37,7 +37,7 @@ public class MavenITmng4840MavenPrerequisiteTest extends AbstractMavenIntegratio
      */
     @Test
     public void testitMojoExecution() throws Exception {
-        Path testDir = extractResources("/mng-4840");
+        Path testDir = extractResources("mng-4840");
 
         Verifier verifier = newVerifier(testDir.resolve("test-1"));
         verifier.setAutoclean(false);
@@ -64,7 +64,7 @@ public class MavenITmng4840MavenPrerequisiteTest extends AbstractMavenIntegratio
      */
     @Test
     public void testitPluginVersionResolution() throws Exception {
-        Path testDir = extractResources("/mng-4840");
+        Path testDir = extractResources("mng-4840");
 
         Verifier verifier = newVerifier(testDir.resolve("test-2"));
         verifier.setAutoclean(false);

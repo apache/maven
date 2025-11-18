@@ -39,7 +39,7 @@ class MavenITmng7566JavaPrerequisiteTest extends AbstractMavenIntegrationTestCas
      */
     @Test
     void testitMojoExecution() throws Exception {
-        Path testDir = extractResources("/mng-7566");
+        Path testDir = extractResources("mng-7566");
 
         Verifier verifier = newVerifier(testDir.resolve("test-1"));
         verifier.setAutoclean(false);
@@ -66,7 +66,7 @@ class MavenITmng7566JavaPrerequisiteTest extends AbstractMavenIntegrationTestCas
      */
     @Test
     void testitPluginVersionResolution() throws Exception {
-        Path testDir = extractResources("/mng-7566");
+        Path testDir = extractResources("mng-7566");
 
         Verifier verifier = newVerifier(testDir.resolve("test-2"));
         verifier.setAutoclean(false);

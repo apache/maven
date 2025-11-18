@@ -35,7 +35,7 @@ class MavenITmng8383UnknownTypeDependenciesTest extends AbstractMavenIntegration
      */
     @Test
     void testUnknownTypeDependencies() throws Exception {
-        Path testDir = extractResources("/mng-8383-unknown-type-dependencies");
+        Path testDir = extractResources("mng-8383-unknown-type-dependencies");
 
         Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument("generate-resources");

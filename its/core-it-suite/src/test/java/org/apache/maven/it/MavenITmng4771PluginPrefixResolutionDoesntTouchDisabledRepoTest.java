@@ -52,7 +52,7 @@ public class MavenITmng4771PluginPrefixResolutionDoesntTouchDisabledRepoTest ext
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4771");
+        Path testDir = extractResources("mng-4771");
 
         final Deque<String> requestedUris = new ConcurrentLinkedDeque<>();
 

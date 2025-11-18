@@ -41,7 +41,7 @@ public class MavenITmng4231SnapshotUpdatePolicyTest extends AbstractMavenIntegra
      */
     @Test
     public void testitAlways() throws Exception {
-        Path testDir = extractResources("/mng-4231");
+        Path testDir = extractResources("mng-4231");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
@@ -79,7 +79,7 @@ public class MavenITmng4231SnapshotUpdatePolicyTest extends AbstractMavenIntegra
      */
     @Test
     public void testitNever() throws Exception {
-        Path testDir = extractResources("/mng-4231");
+        Path testDir = extractResources("mng-4231");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

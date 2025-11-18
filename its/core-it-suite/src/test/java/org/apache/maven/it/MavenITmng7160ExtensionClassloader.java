@@ -26,7 +26,7 @@ public class MavenITmng7160ExtensionClassloader extends AbstractMavenIntegration
 
     @Test
     public void testVerify() throws IOException, VerificationException {
-        final Path projectDir = extractResources("/mng-7160-extensionclassloader");
+        final Path projectDir = extractResources("mng-7160-extensionclassloader");
 
         final Verifier extensionVerifier = newVerifier(projectDir.resolve("extension"));
         extensionVerifier.addCliArgument("install");

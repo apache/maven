@@ -34,7 +34,7 @@ class MavenITmng8469InterpolationPrecendenceTest extends AbstractMavenIntegratio
      */
     @Test
     void testIt() throws Exception {
-        Path basedir = extractResources("/mng-8469");
+        Path basedir = extractResources("mng-8469");
 
         Verifier verifier = newVerifier(basedir);
         verifier.addCliArgument("help:effective-pom");

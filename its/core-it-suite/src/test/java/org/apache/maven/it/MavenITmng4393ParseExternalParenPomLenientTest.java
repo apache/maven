@@ -37,7 +37,7 @@ public class MavenITmng4393ParseExternalParenPomLenientTest extends AbstractMave
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4393");
+        Path testDir = extractResources("mng-4393");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

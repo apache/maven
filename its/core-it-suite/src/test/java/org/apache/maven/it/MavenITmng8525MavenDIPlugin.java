@@ -32,7 +32,7 @@ public class MavenITmng8525MavenDIPlugin extends AbstractMavenIntegrationTestCas
 
     @BeforeEach
     public void setUp() throws Exception {
-        testDir = extractResources("/mng-8525-maven-di-plugin");
+        testDir = extractResources("mng-8525-maven-di-plugin");
     }
 
     @Test

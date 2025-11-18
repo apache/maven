@@ -33,7 +33,7 @@ public class MavenIT0011DefaultVersionByDependencyManagementTest extends Abstrac
      */
     @Test
     public void testit0011() throws Exception {
-        Path testDir = extractResources("/it0011");
+        Path testDir = extractResources("it0011");
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

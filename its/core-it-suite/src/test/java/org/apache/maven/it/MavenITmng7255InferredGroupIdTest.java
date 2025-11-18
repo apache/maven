@@ -25,7 +25,7 @@ import java.io.IOException;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng7255InferredGroupIdTest extends AbstractMavenIntegrationTestCase {
-    private static final String PROJECT_PATH = "/mng-7255-inferred-groupid";
+    private static final String PROJECT_PATH = "mng-7255-inferred-groupid";
 
     @Test
     public void testInferredGroupId() throws IOException, VerificationException {

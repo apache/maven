@@ -38,7 +38,7 @@ public class MavenITmng4355ExtensionAutomaticVersionResolutionTest extends Abstr
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4355");
+        Path testDir = extractResources("mng-4355");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

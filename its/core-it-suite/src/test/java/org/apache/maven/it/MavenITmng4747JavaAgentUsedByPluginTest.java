@@ -42,7 +42,7 @@ public class MavenITmng4747JavaAgentUsedByPluginTest extends AbstractMavenIntegr
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4747");
+        Path testDir = extractResources("mng-4747");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

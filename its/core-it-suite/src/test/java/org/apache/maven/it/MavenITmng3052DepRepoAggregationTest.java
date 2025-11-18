@@ -41,7 +41,7 @@ public class MavenITmng3052DepRepoAggregationTest extends AbstractMavenIntegrati
 
     @Test
     public void testitMNG3052() throws Exception {
-        Path testDir = extractResources("/mng-3052");
+        Path testDir = extractResources("mng-3052");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

@@ -49,7 +49,7 @@ public class MavenITmng3461MirrorMatchingTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testitExactMatchDominatesWildcard() throws Exception {
-        Path testDir = extractResources("/mng-3461/test-1");
+        Path testDir = extractResources("mng-3461/test-1");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
@@ -72,7 +72,7 @@ public class MavenITmng3461MirrorMatchingTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testitExternalWildcard() throws Exception {
-        Path testDir = extractResources("/mng-3461/test-2");
+        Path testDir = extractResources("mng-3461/test-2");
 
         Verifier verifier = newVerifier(testDir);
 
@@ -142,7 +142,7 @@ public class MavenITmng3461MirrorMatchingTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testitNonGreedyWildcard() throws Exception {
-        Path testDir = extractResources("/mng-3461/test-3");
+        Path testDir = extractResources("mng-3461/test-3");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

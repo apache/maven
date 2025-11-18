@@ -43,7 +43,7 @@ public class MavenITmng4180PerDependencyExclusionsTest extends AbstractMavenInte
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4180");
+        Path testDir = extractResources("mng-4180");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

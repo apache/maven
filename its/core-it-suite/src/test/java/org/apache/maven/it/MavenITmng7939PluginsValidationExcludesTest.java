@@ -38,7 +38,7 @@ class MavenITmng7939PluginsValidationExcludesTest extends AbstractMavenIntegrati
 
     @Test
     void warningForPluginValidationIsPresentInProject() throws Exception {
-        Path testDir = extractResources("/mng-7939-plugins-validation-excludes");
+        Path testDir = extractResources("mng-7939-plugins-validation-excludes");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
@@ -64,7 +64,7 @@ class MavenITmng7939PluginsValidationExcludesTest extends AbstractMavenIntegrati
 
     @Test
     void excludePluginFromValidation() throws Exception {
-        Path testDir = extractResources("/mng-7939-plugins-validation-excludes");
+        Path testDir = extractResources("mng-7939-plugins-validation-excludes");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

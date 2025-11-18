@@ -18,9 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
-
 import org.junit.jupiter.api.Test;
 
 /**
@@ -35,7 +33,7 @@ public class MavenITmng3396DependencyManagementForOverConstrainedRangesTest exte
 
     @Test
     public void testitMNG3396() throws Exception {
-        String baseDir = "/mng-3396";
+        String baseDir = "mng-3396";
         Path testDir = extractResources(baseDir + "/dependencies");
 
         Verifier verifier = newVerifier(testDir);

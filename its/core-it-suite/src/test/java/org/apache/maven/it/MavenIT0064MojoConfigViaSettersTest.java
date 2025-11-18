@@ -33,7 +33,7 @@ public class MavenIT0064MojoConfigViaSettersTest extends AbstractMavenIntegratio
      */
     @Test
     public void testit0064() throws Exception {
-        Path testDir = extractResources("/it0064");
+        Path testDir = extractResources("it0064");
 
         // First, build the test plugin
         Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-setter"));

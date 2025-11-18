@@ -34,7 +34,7 @@ class MavenITgh2576ItrNotHonoredTest extends AbstractMavenIntegrationTestCase {
 
     @Test
     void testItrNotHonored() throws Exception {
-        Path testDir = extractResources("/gh-2576-itr-not-honored");
+        Path testDir = extractResources("gh-2576-itr-not-honored");
 
         Verifier verifier = newVerifier(testDir);
         verifier.deleteArtifacts("org.apache.maven.its.gh2576");

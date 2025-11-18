@@ -34,7 +34,7 @@ class MavenITmng8461SpySettingsEventTest extends AbstractMavenIntegrationTestCas
      */
     @Test
     void testIt() throws Exception {
-        Path basedir = extractResources("/mng-8461");
+        Path basedir = extractResources("mng-8461");
         Verifier verifier;
 
         Path extension = basedir.resolve("extension");

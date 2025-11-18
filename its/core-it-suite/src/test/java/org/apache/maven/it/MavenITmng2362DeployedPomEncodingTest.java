@@ -40,7 +40,7 @@ public class MavenITmng2362DeployedPomEncodingTest extends AbstractMavenIntegrat
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-2362");
+        Path testDir = extractResources("mng-2362");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

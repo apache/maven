@@ -41,7 +41,7 @@ public class MavenITmng4834ParentProjectResolvedFromRemoteReposTest extends Abst
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4834");
+        Path testDir = extractResources("mng-4834");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

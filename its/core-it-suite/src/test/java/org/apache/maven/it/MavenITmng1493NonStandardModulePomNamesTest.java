@@ -32,7 +32,7 @@ public class MavenITmng1493NonStandardModulePomNamesTest extends AbstractMavenIn
 
     @Test
     public void testitMNG1493() throws Exception {
-        Path testDir = extractResources("/mng-1493");
+        Path testDir = extractResources("mng-1493");
 
         Verifier verifier;
 

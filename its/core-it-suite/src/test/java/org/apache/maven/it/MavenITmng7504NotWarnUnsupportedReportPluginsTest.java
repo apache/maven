@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  * @author Slawomir Jaranowski
  */
 public class MavenITmng7504NotWarnUnsupportedReportPluginsTest extends AbstractMavenIntegrationTestCase {
-    private static final String PROJECT_PATH = "/mng-7504-warn-unsupported-report-plugins";
+    private static final String PROJECT_PATH = "mng-7504-warn-unsupported-report-plugins";
 
     @Test
     public void testWarnNotPresent() throws IOException, VerificationException {

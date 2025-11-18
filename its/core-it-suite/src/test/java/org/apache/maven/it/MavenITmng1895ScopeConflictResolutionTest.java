@@ -43,7 +43,7 @@ public class MavenITmng1895ScopeConflictResolutionTest extends AbstractMavenInte
      */
     @Test
     public void testitDirectVsIndirect() throws Exception {
-        Path testDir = extractResources("/mng-1895/direct-vs-indirect");
+        Path testDir = extractResources("mng-1895/direct-vs-indirect");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
@@ -210,7 +210,7 @@ public class MavenITmng1895ScopeConflictResolutionTest extends AbstractMavenInte
     }
 
     private Verifier run(String scopeB, String scopeA) throws Exception {
-        Path testDir = extractResources("/mng-1895/strong-vs-weak");
+        Path testDir = extractResources("mng-1895/strong-vs-weak");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

@@ -49,7 +49,7 @@ public class MavenITmng4199CompileMeetsRuntimeScopeTest extends AbstractMavenInt
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4199");
+        Path testDir = extractResources("mng-4199");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

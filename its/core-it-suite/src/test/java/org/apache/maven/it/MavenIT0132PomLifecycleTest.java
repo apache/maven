@@ -37,7 +37,7 @@ public class MavenIT0132PomLifecycleTest extends AbstractMavenIntegrationTestCas
      */
     @Test
     public void testit0132() throws Exception {
-        Path testDir = extractResources("/it0132");
+        Path testDir = extractResources("it0132");
 
         Verifier verifier = newVerifier(testDir);
         verifier.deleteDirectory("target");

@@ -32,7 +32,7 @@ class MavenITgh11084ReactorReaderPreferConsumerPomTest extends AbstractMavenInte
 
     @Test
     void partialReactorShouldResolveUsingConsumerPom() throws Exception {
-        Path testDir = extractResources("/gh-11084-reactorreader-prefer-consumer-pom");
+        Path testDir = extractResources("gh-11084-reactorreader-prefer-consumer-pom");
 
         // First build module a to populate project-local-repo with artifacts including consumer POM
         Verifier v1 = newVerifier(testDir);

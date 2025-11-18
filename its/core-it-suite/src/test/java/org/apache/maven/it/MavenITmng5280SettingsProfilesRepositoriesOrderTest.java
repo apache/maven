@@ -49,7 +49,7 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest extends Abstrac
 
     @BeforeEach
     protected void setUp() throws Exception {
-        testDir = extractResources("/mng-5280");
+        testDir = extractResources("mng-5280");
         server = new Server(0);
     }
 

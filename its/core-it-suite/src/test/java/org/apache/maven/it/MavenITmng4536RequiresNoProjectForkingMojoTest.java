@@ -39,7 +39,7 @@ public class MavenITmng4536RequiresNoProjectForkingMojoTest extends AbstractMave
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4536");
+        Path testDir = extractResources("mng-4536");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

@@ -41,7 +41,7 @@ public class MavenITmng3118TestClassPathOrderTest extends AbstractMavenIntegrati
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-3118");
+        Path testDir = extractResources("mng-3118");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

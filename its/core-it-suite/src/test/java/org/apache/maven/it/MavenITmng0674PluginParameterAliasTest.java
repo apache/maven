@@ -42,7 +42,7 @@ public class MavenITmng0674PluginParameterAliasTest extends AbstractMavenIntegra
      */
     @Test
     public void testitLifecycle() throws Exception {
-        Path testDir = extractResources("/mng-0674");
+        Path testDir = extractResources("mng-0674");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
@@ -65,7 +65,7 @@ public class MavenITmng0674PluginParameterAliasTest extends AbstractMavenIntegra
      */
     @Test
     public void testitCli() throws Exception {
-        Path testDir = extractResources("/mng-0674");
+        Path testDir = extractResources("mng-0674");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

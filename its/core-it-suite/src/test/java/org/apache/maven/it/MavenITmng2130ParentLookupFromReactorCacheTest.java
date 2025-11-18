@@ -36,7 +36,7 @@ public class MavenITmng2130ParentLookupFromReactorCacheTest extends AbstractMave
      */
     @Test
     public void testitMNG2130() throws Exception {
-        Path testDir = extractResources("/mng-2130");
+        Path testDir = extractResources("mng-2130");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

@@ -32,7 +32,7 @@ public class MavenITmng1491ReactorArtifactIdCollisionTest extends AbstractMavenI
 
     @Test
     public void testitMNG1491() throws Exception {
-        Path testDir = extractResources("/mng-1491");
+        Path testDir = extractResources("mng-1491");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

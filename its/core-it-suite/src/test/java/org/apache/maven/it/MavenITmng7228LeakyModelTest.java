@@ -36,7 +36,7 @@ class MavenITmng7228LeakyModelTest extends AbstractMavenIntegrationTestCase {
 
     @Test
     void testLeakyModel() throws Exception {
-        Path testDir = extractResources("/mng-7228-leaky-model");
+        Path testDir = extractResources("mng-7228-leaky-model");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setForkJvm(true); // TODO: why?

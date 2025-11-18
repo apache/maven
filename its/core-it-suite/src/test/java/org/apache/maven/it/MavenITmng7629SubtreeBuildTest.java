@@ -39,7 +39,7 @@ class MavenITmng7629SubtreeBuildTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void testBuildSubtree() throws Exception {
-        Path testDir = extractResources("/mng-7629");
+        Path testDir = extractResources("mng-7629");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(true);

@@ -38,7 +38,7 @@ public class MavenITmng2124PomInterpolationWithParentValuesTest extends Abstract
      */
     @Test
     public void testitMNG2124() throws Exception {
-        Path testDir = extractResources("/mng-2124");
+        Path testDir = extractResources("mng-2124");
         Path child = testDir.resolve("parent/child");
 
         Verifier verifier = newVerifier(child);

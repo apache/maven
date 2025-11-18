@@ -28,7 +28,7 @@ public class MavenITmng6127PluginExecutionConfigurationInterferenceTest extends 
 
     @Test
     public void testCustomMojoExecutionConfigurator() throws Exception {
-        Path testDir = extractResources("/mng-6127-plugin-execution-configuration-interference");
+        Path testDir = extractResources("mng-6127-plugin-execution-configuration-interference");
         Path pluginDir = testDir.resolve("plugin");
         Path projectDir = testDir.resolve("project");
         Path modAprojectDir = projectDir.resolve("mod-a");

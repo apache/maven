@@ -40,7 +40,7 @@ public class MavenITmng3877BasedirAlignedModelTest extends AbstractMavenIntegrat
      */
     @Test
     public void testitMNG3877() throws Exception {
-        Path testDir = extractResources("/mng-3877");
+        Path testDir = extractResources("mng-3877");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

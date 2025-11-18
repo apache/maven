@@ -121,7 +121,7 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest extends AbstractMavenI
      */
     @Test
     public void testitAlways() throws Exception {
-        Path testDir = extractResources("/mng-4343");
+        Path testDir = extractResources("mng-4343");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
@@ -172,7 +172,7 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest extends AbstractMavenI
      */
     @Test
     public void testitNever() throws Exception {
-        Path testDir = extractResources("/mng-4343");
+        Path testDir = extractResources("mng-4343");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

@@ -39,7 +39,7 @@ public class MavenITmng2926PluginPrefixOrderTest extends AbstractMavenIntegratio
      */
     @Test
     public void testitMNG2926() throws Exception {
-        Path testDir = extractResources("/mng-2926");
+        Path testDir = extractResources("mng-2926");
 
         Verifier verifier;
 

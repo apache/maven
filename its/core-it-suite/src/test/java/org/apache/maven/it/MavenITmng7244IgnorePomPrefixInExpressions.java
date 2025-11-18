@@ -26,7 +26,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng7244IgnorePomPrefixInExpressions extends AbstractMavenIntegrationTestCase {
-    private static final String PROJECT_PATH = "/mng-7244-ignore-pom-prefix-in-expressions";
+    private static final String PROJECT_PATH = "mng-7244-ignore-pom-prefix-in-expressions";
 
     @Test
     public void testIgnorePomPrefixInExpressions() throws IOException, VerificationException {

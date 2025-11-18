@@ -42,7 +42,7 @@ public class MavenITmng4320AggregatorAndDependenciesTest extends AbstractMavenIn
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4320");
+        Path testDir = extractResources("mng-4320");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

@@ -124,7 +124,7 @@ public class MavenITmng4469AuthenticatedDeploymentToCustomRepoTest extends Abstr
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4469");
+        Path testDir = extractResources("mng-4469");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

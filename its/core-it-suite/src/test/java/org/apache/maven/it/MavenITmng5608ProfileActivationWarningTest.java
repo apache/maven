@@ -41,7 +41,7 @@ public class MavenITmng5608ProfileActivationWarningTest extends AbstractMavenInt
 
     @Test
     public void testitMNG5608() throws Exception {
-        Path testDir = extractResources("/mng-5608-profile-activation-warning");
+        Path testDir = extractResources("mng-5608-profile-activation-warning");
 
         Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument("validate");

@@ -28,7 +28,7 @@ public class MavenITmng7045DropUselessAndOutdatedCdiApiTest extends AbstractMave
 
     @Test
     public void testShouldNotLeakCdiApi() throws IOException, VerificationException {
-        Path testDir = extractResources("/mng-7045");
+        Path testDir = extractResources("mng-7045");
         Verifier verifier = newVerifier(testDir);
 
         verifier.addCliArgument("process-classes");

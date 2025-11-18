@@ -42,7 +42,7 @@ public class MavenITmng2228ComponentInjectionTest extends AbstractMavenIntegrati
      */
     @Test
     public void testitMNG2228() throws Exception {
-        Path testDir = extractResources("/mng-2228");
+        Path testDir = extractResources("mng-2228");
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

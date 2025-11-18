@@ -43,7 +43,7 @@ public class MavenIT0009GoalConfigurationTest extends AbstractMavenIntegrationTe
         // Inline version check: [3.1.0,) - current Maven version supports space in XML
         boolean supportSpaceInXml = true;
 
-        Path testDir = extractResources("/it0009");
+        Path testDir = extractResources("it0009");
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

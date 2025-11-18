@@ -36,7 +36,7 @@ public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenInteg
 
     @BeforeEach
     protected void setUp() throws Exception {
-        moduleADir = extractResources("/mng-7390-pl-outside-cwd/module-a");
+        moduleADir = extractResources("mng-7390-pl-outside-cwd/module-a");
 
         // Clean up target files from earlier runs (verifier.setAutoClean does not work, as we are reducing the reactor)
         final Verifier verifier = newVerifier(moduleADir.toString(), false);

@@ -41,13 +41,13 @@ public class MavenITmng3714ToolchainsCliOptionTest extends AbstractMavenIntegrat
      */
     @Test
     public void testitMNG3714() throws Exception {
-        Path testDir = extractResources("/mng-3714");
+        Path testDir = extractResources("mng-3714");
 
         Path javaHome = testDir.resolve("javaHome");
         Path binDir = testDir.resolve("bin");
         Files.createDirectories(binDir);
-        Files.createFile(binDir.resolve("javac"));
-        Files.createFile(binDir.resolve("javac.exe"));
+        ItUtils.createFile(binDir.resolve("javac"));
+        ItUtils.createFile(binDir.resolve("javac.exe"));
 
         Verifier verifier = newVerifier(testDir);
         Map<String, String> properties = verifier.newDefaultFilterMap();
@@ -69,7 +69,7 @@ public class MavenITmng3714ToolchainsCliOptionTest extends AbstractMavenIntegrat
         if (tool.endsWith(".exe")) {
             tool = tool.substring(0, tool.length() - 4);
         }
-        assertEquals(javaHome.resolve( "bin/javac"), tool);
+        assertEquals(javaHome.resolve( "bin/javac"), Path.of(tool));
 
         verifier.verifyFilePresent("target/tool.properties");
         Properties toolProps = verifier.loadProperties("target/tool.properties");

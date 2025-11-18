@@ -39,7 +39,7 @@ public class MavenITmng4347ImportScopeWithSettingsProfilesTest extends AbstractM
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4347");
+        Path testDir = extractResources("mng-4347");
 
         Verifier verifier = newVerifier(testDir);
 

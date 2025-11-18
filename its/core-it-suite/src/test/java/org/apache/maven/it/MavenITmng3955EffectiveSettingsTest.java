@@ -18,10 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.Properties;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,10 +40,10 @@ public class MavenITmng3955EffectiveSettingsTest extends AbstractMavenIntegratio
      */
     @Test
     public void testitMNG3955() throws Exception {
-        Path testDir = extractResources("/mng-3955");
+        Path testDir = extractResources("mng-3955");
 
         Verifier verifier = newVerifier(testDir);
-        String localRepo = verifier.getLocalRepository();
+        Path localRepo = verifier.getLocalRepository();
         verifier.setAutoclean(false);
         verifier.addCliArgument("-Dmaven.repo.local.tail=" + localRepo);
         verifier.addCliArgument("--settings");
@@ -60,7 +58,7 @@ public class MavenITmng3955EffectiveSettingsTest extends AbstractMavenIntegratio
         assertEquals("true", props.getProperty("settings.offline"));
         assertEquals("false", props.getProperty("settings.interactiveMode"));
         assertEquals(
-                new File(verifier.getLocalRepositoryWithSettings("settings.xml")).getAbsoluteFile(),
-                new File(props.getProperty("settings.localRepository")).getAbsoluteFile());
+                verifier.getLocalRepositoryWithSettings("settings.xml"),
+                Path.of(props.getProperty("settings.localRepository")).toAbsolutePath());
     }
 }

@@ -33,7 +33,7 @@ public class MavenITmng3503Xpp3ShadingTest extends AbstractMavenIntegrationTestC
 
     @Test
     public void testitMNG3503NoLinkageErrors() throws Exception {
-        Path dir = extractResources("/mng-3503/mng-3503-xpp3Shading-pu11");
+        Path dir = extractResources("mng-3503/mng-3503-xpp3Shading-pu11");
 
         // First, build the test plugin
         Verifier verifier = newVerifier(dir.resolve("maven-it-plugin-plexus-utils-11"));
@@ -56,7 +56,7 @@ public class MavenITmng3503Xpp3ShadingTest extends AbstractMavenIntegrationTestC
 
     @Test
     public void testitMNG3503Xpp3Shading() throws Exception {
-        Path dir = extractResources("/mng-3503/mng-3503-xpp3Shading-pu-new");
+        Path dir = extractResources("mng-3503/mng-3503-xpp3Shading-pu-new");
 
         // First, build the test plugin
         Verifier verifier = newVerifier(dir.resolve("maven-it-plugin-plexus-utils-new"));

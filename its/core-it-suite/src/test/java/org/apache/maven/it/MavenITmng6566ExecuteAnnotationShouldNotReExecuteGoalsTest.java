@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MavenITmng6566ExecuteAnnotationShouldNotReExecuteGoalsTest extends AbstractMavenIntegrationTestCase {
-    private static final String RESOURCE_PATH = "/mng-6566-execute-annotation-should-not-re-execute-goals";
+    private static final String RESOURCE_PATH = "mng-6566-execute-annotation-should-not-re-execute-goals";
     private static final String PLUGIN_KEY = "org.apache.maven.its.mng6566:plugin:1.0-SNAPSHOT";
 
     private Path testDir;

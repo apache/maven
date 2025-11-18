@@ -378,11 +378,15 @@ public class Verifier {
         this.handleLocalRepoTail = handleLocalRepoTail;
     }
 
-    public String getLocalRepository() {
+    public Path getLocalRepository() {
         return getLocalRepositoryWithSettings(null);
     }
 
-    public String getLocalRepositoryWithSettings(String settingsXml) {
+    public Path getLocalRepositoryWithSettings(String settingsXml) {
+        return Path.of(doGetLocalRepositoryWithSettings(settingsXml)).toAbsolutePath();
+    }
+
+    private String doGetLocalRepositoryWithSettings(String settingsXml) {
         if (settingsXml != null) {
             // when invoked with settings.xml, the file must be resolved from basedir (as Maven does)
             // but we should not use basedir, as it may contain extensions.xml or a project, that Maven will eagerly
@@ -902,7 +906,7 @@ public class Verifier {
      */
     public void deleteArtifacts(String gid) throws IOException {
         String mdPath = executorTool.metadataPath(executorHelper.executorRequest(), gid, null);
-        Path dir = Paths.get(getLocalRepository()).resolve(mdPath).getParent();
+        Path dir = getLocalRepository().resolve(mdPath).getParent();
         deleteDirectoryRecursively(dir);
     }
 
@@ -922,7 +926,7 @@ public class Verifier {
 
         String mdPath =
                 executorTool.metadataPath(executorHelper.executorRequest(), gid + ":" + aid + ":" + version, null);
-        Path dir = Paths.get(getLocalRepository()).resolve(mdPath).getParent();
+        Path dir = getLocalRepository().resolve(mdPath).getParent();
         deleteDirectoryRecursively(dir);
     }
 

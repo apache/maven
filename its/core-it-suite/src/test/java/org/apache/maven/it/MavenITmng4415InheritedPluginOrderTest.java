@@ -46,7 +46,7 @@ public class MavenITmng4415InheritedPluginOrderTest extends AbstractMavenIntegra
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4415");
+        Path testDir = extractResources("mng-4415");
 
         Verifier verifier = newVerifier(testDir.resolve("sub"));
         verifier.setAutoclean(false);

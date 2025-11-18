@@ -39,7 +39,7 @@ public class MavenIT0139InterpolationWithProjectPrefixTest extends AbstractMaven
      */
     @Test
     public void testit0139() throws Exception {
-        Path testDir = extractResources("/it0139");
+        Path testDir = extractResources("it0139");
         Path child = testDir.resolve("child");
 
         Verifier verifier = newVerifier(child);

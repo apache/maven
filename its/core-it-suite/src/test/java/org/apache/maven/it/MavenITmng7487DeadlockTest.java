@@ -23,7 +23,7 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng7487DeadlockTest extends AbstractMavenIntegrationTestCase {
-    private static final String PROJECT_PATH = "/mng-7487-deadlock";
+    private static final String PROJECT_PATH = "mng-7487-deadlock";
 
     @Test
     public void testDeadlock() throws IOException, VerificationException {

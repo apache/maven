@@ -45,10 +45,10 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
 
     public MavenITmng5760ResumeFeatureTest() throws IOException {
         super();
-        this.parentDependentTestDir = extractResources("/mng-5760-resume-feature/parent-dependent");
-        this.parentIndependentTestDir = extractResources("/mng-5760-resume-feature/parent-independent");
-        this.noProjectTestDir = extractResources("/mng-5760-resume-feature/no-project");
-        this.fourModulesTestDir = extractResources("/mng-5760-resume-feature/four-modules");
+        this.parentDependentTestDir = extractResources("mng-5760-resume-feature/parent-dependent");
+        this.parentIndependentTestDir = extractResources("mng-5760-resume-feature/parent-independent");
+        this.noProjectTestDir = extractResources("mng-5760-resume-feature/no-project");
+        this.fourModulesTestDir = extractResources("mng-5760-resume-feature/four-modules");
     }
 
     /**

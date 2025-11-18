@@ -37,7 +37,7 @@ public class MavenITmng3470StrictChecksumVerificationOfDependencyPomTest extends
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-3470");
+        Path testDir = extractResources("mng-3470");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

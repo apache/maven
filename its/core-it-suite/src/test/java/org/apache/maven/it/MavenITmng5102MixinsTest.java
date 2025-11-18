@@ -43,7 +43,7 @@ public class MavenITmng5102MixinsTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     public void testWithPath() throws Exception {
-        Path testDir = extractResources("/mng-5102-mixins/path");
+        Path testDir = extractResources("mng-5102-mixins/path");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
@@ -77,7 +77,7 @@ public class MavenITmng5102MixinsTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     public void testWithGav() throws Exception {
-        Path testDir = extractResources("/mng-5102-mixins/gav");
+        Path testDir = extractResources("mng-5102-mixins/gav");
 
         Verifier verifier = newVerifier(testDir.resolve("mixin-2"));
 
@@ -113,7 +113,7 @@ public class MavenITmng5102MixinsTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     public void testWithClassifier() throws Exception {
-        Path testDir = extractResources("/mng-5102-mixins/classifier");
+        Path testDir = extractResources("mng-5102-mixins/classifier");
 
         Verifier verifier = newVerifier(testDir.resolve("mixin-4"));
 

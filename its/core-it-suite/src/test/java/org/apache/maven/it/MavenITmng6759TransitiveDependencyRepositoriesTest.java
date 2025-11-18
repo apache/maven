@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng6759TransitiveDependencyRepositoriesTest extends AbstractMavenIntegrationTestCase {
 
-    private final String projectBaseDir = "/mng-6759-transitive-dependency-repositories";
+    private static final String RESOURCE_PATH = "mng-6759-transitive-dependency-repositories";
 
     /**
      * Verifies that a project with a dependency graph like {@code A -> B -> C},
@@ -38,7 +38,7 @@ public class MavenITmng6759TransitiveDependencyRepositoriesTest extends Abstract
     @Test
     public void testTransitiveDependenciesAccountForRepositoriesListedByDependencyTrailPredecessor() throws Exception {
         installDependencyCInCustomRepo();
-        Path testDir = extractResources(projectBaseDir);
+        Path testDir = extractResources(RESOURCE_PATH);
 
         // First, build the test plugin
         Verifier verifier =
@@ -58,7 +58,7 @@ public class MavenITmng6759TransitiveDependencyRepositoriesTest extends Abstract
     }
 
     private void installDependencyCInCustomRepo() throws Exception {
-        Path dependencyCProjectDir = extractResources(projectBaseDir + "/dependency-in-custom-repo");
+        Path dependencyCProjectDir = extractResources(RESOURCE_PATH + "/dependency-in-custom-repo");
         URI customRepoUri = dependencyCProjectDir.resolve("target").resolve("repo").toUri();
         Verifier verifier = newVerifier(dependencyCProjectDir);
 

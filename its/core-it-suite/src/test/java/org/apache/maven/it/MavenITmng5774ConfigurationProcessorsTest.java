@@ -30,7 +30,7 @@ public class MavenITmng5774ConfigurationProcessorsTest extends AbstractMavenInte
 
     @Test
     public void testBehaviourWhereThereIsOneUserSuppliedConfigurationProcessor() throws Exception {
-        Path testDir = extractResources("/mng-5774-configuration-processors");
+        Path testDir = extractResources("mng-5774-configuration-processors");
 
         Verifier verifier = newVerifier(testDir);
         verifier.filterFile("settings-template.xml", "settings.xml");
@@ -53,7 +53,7 @@ public class MavenITmng5774ConfigurationProcessorsTest extends AbstractMavenInte
 
     @Test
     public void testBehaviourWhereThereAreTwoUserSuppliedConfigurationProcessor() throws Exception {
-        Path testDir = extractResources("/mng-5774-configuration-processors");
+        Path testDir = extractResources("mng-5774-configuration-processors");
 
         Verifier verifier = newVerifier(testDir);
         verifier.filterFile("settings-template.xml", "settings.xml");

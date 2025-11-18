@@ -45,7 +45,7 @@ class MavenITmng3477DependencyResolutionErrorMessageTest extends AbstractMavenIn
      * @throws Exception in case of failure
      */
     void testit(int port, String[] logExpectPatterns, String projectFile) throws Exception {
-        Path testDir = extractResources("/mng-3477");
+        Path testDir = extractResources("mng-3477");
 
         Verifier verifier = newVerifier(testDir.toString(), "");
 

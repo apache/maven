@@ -40,7 +40,7 @@ public class MavenITmng4429CompRequirementOnNonDefaultImplTest extends AbstractM
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4429");
+        Path testDir = extractResources("mng-4429");
 
         // First, build the test plugin
         Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-no-default-comp"));

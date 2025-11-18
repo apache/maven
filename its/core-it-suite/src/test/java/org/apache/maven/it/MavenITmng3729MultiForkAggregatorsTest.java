@@ -50,7 +50,7 @@ public class MavenITmng3729MultiForkAggregatorsTest extends AbstractMavenIntegra
 
     @Test
     public void testitMNG3729() throws Exception {
-        Path testDir = extractResources("/mng-3729");
+        Path testDir = extractResources("mng-3729");
         Path pluginDir = testDir.resolve("maven-mng3729-plugin");
         Path projectDir = testDir.resolve("projects");
 

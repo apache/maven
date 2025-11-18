@@ -69,7 +69,7 @@ class MavenITmng6255FixConcatLines extends AbstractMavenIntegrationTestCase {
     }
 
     protected void runWithLineEndings(String lineEndings) throws Exception {
-        Path baseDir = extractResources("/mng-6255");
+        Path baseDir = extractResources("mng-6255");
         Path mvnDir = baseDir.resolve(".mvn");
 
         Path jvmConfig = mvnDir.resolve("jvm.config");

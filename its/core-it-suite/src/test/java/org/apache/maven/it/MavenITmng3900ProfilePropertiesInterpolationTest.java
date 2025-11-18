@@ -41,7 +41,7 @@ public class MavenITmng3900ProfilePropertiesInterpolationTest extends AbstractMa
      */
     @Test
     public void testitMNG3900() throws Exception {
-        Path testDir = extractResources("/mng-3900");
+        Path testDir = extractResources("mng-3900");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

@@ -21,7 +21,9 @@ package org.apache.maven.it;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 
@@ -95,5 +97,9 @@ class ItUtils {
 
     public static void assertCanonicalFileEquals(String expected, String actual) throws IOException {
         assertEquals(new File(expected).getCanonicalFile(), new File(actual).getCanonicalFile());
+    }
+
+    public static void createFile(Path path) throws IOException {
+        Files.newInputStream(path, StandardOpenOption.CREATE).close();
     }
 }

@@ -43,7 +43,7 @@ public class MavenITmng4129PluginExecutionInheritanceTest extends AbstractMavenI
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4129");
+        Path testDir = extractResources("mng-4129");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

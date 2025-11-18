@@ -42,7 +42,7 @@ class MavenITmng7679SingleMojoNoPomTest extends AbstractMavenIntegrationTestCase
      */
     @Test
     void testSingleMojoNoPom() throws Exception {
-        Path testDir = extractResources("/mng-7679");
+        Path testDir = extractResources("mng-7679");
 
         Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument("org.apache.maven.plugins:maven-install-plugin:3.0.1:install-file");

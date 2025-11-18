@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MavenITmng6754TimestampInMultimoduleProject extends AbstractMavenIntegrationTestCase {
-    private static final String RESOURCE_PATH = "/mng-6754-version-timestamp-in-multimodule-build";
+    private static final String RESOURCE_PATH = "mng-6754-version-timestamp-in-multimodule-build";
     private static final String VERSION = "1.0-SNAPSHOT";
 
     @Test
@@ -41,7 +41,7 @@ public class MavenITmng6754TimestampInMultimoduleProject extends AbstractMavenIn
     public void testArtifactsHaveSameTimestamp() throws Exception {
         final Path testDir = extractResources(RESOURCE_PATH);
         final Verifier verifier = newVerifier(testDir);
-        final Path localRepoDir = Paths.get(verifier.getLocalRepository());
+        final Path localRepoDir = verifier.getLocalRepository();
         final Path remoteRepoDir = verifier.getBasedir().resolve("repo");
 
         verifier.deleteDirectory("repo");

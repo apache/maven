@@ -38,7 +38,7 @@ public class MavenITmng2820PomCommentsTest extends AbstractMavenIntegrationTestC
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-2820");
+        Path testDir = extractResources("mng-2820");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

@@ -39,7 +39,7 @@ public class MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest extends A
 
     @Test
     public void testitMNG3441() throws Exception {
-        Path testDir = extractResources("/mng-3441");
+        Path testDir = extractResources("mng-3441");
 
         Path targetRepository = testDir.resolve("target-repo");
         FileUtils.deleteDirectory(targetRepository.toFile());

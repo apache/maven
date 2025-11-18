@@ -38,7 +38,7 @@ class MavenITmng3558PropertyEscapingTest extends AbstractMavenIntegrationTestCas
 
     @Test
     public void testPropertyEscaping() throws Exception {
-        Path testDir = extractResources("/mng-3558-property-escaping");
+        Path testDir = extractResources("mng-3558-property-escaping");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

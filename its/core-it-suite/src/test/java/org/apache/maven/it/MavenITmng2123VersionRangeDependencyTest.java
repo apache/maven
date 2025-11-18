@@ -33,7 +33,7 @@ public class MavenITmng2123VersionRangeDependencyTest extends AbstractMavenInteg
 
     @Test
     public void testitMNG2123() throws Exception {
-        Path testDir = extractResources("/mng-2123");
+        Path testDir = extractResources("mng-2123");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

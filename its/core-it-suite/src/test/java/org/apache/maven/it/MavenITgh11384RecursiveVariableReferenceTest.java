@@ -38,7 +38,7 @@ class MavenITgh11384RecursiveVariableReferenceTest extends AbstractMavenIntegrat
      */
     @Test
     void testIt() throws Exception {
-        Path basedir = extractResources("/gh-11384");
+        Path basedir = extractResources("gh-11384");
 
         Verifier verifier = newVerifier(basedir);
         verifier.addCliArgument("help:effective-pom");

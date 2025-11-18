@@ -46,7 +46,7 @@ public class MavenITmng0505VersionRangeTest extends AbstractMavenIntegrationTest
      */
     @Test
     public void testitMNG505() throws Exception {
-        Path testDir = extractResources("/mng-0505");
+        Path testDir = extractResources("mng-0505");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

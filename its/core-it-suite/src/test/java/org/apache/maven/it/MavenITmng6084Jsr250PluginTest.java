@@ -31,7 +31,7 @@ public class MavenITmng6084Jsr250PluginTest extends AbstractMavenIntegrationTest
 
     @BeforeEach
     public void setUp() throws Exception {
-        testDir = extractResources("/mng-6084-jsr250-support");
+        testDir = extractResources("mng-6084-jsr250-support");
     }
 
     @Test

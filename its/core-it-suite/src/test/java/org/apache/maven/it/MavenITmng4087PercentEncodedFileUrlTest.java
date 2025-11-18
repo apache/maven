@@ -37,7 +37,7 @@ public class MavenITmng4087PercentEncodedFileUrlTest extends AbstractMavenIntegr
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4087");
+        Path testDir = extractResources("mng-4087");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

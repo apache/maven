@@ -35,7 +35,7 @@ public class MavenITmng3600DeploymentModeDefaultsTest extends AbstractMavenInteg
 
     @Test
     public void testitMNG3600NoSettings() throws Exception {
-        Path testDir = extractResources("/mng-3600");
+        Path testDir = extractResources("mng-3600");
 
         Verifier verifier = newVerifier(testDir);
 
@@ -53,7 +53,7 @@ public class MavenITmng3600DeploymentModeDefaultsTest extends AbstractMavenInteg
 
     @Test
     public void testitMNG3600ServerDefaults() throws Exception {
-        Path testDir = extractResources("/mng-3600");
+        Path testDir = extractResources("mng-3600");
 
         Verifier verifier = newVerifier(testDir);
 
@@ -73,7 +73,7 @@ public class MavenITmng3600DeploymentModeDefaultsTest extends AbstractMavenInteg
 
     @Test
     public void testitMNG3600ModesSet() throws Exception {
-        Path testDir = extractResources("/mng-3600");
+        Path testDir = extractResources("mng-3600");
 
         Verifier verifier = newVerifier(testDir);
 

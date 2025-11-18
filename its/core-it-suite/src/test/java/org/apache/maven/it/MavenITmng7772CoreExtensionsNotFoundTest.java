@@ -29,7 +29,7 @@ public class MavenITmng7772CoreExtensionsNotFoundTest extends AbstractMavenInteg
 
     @Test
     public void testCoreExtensionsNotFound() throws Exception {
-        Path testDir = extractResources("/mng-7772-core-extensions-not-found");
+        Path testDir = extractResources("mng-7772-core-extensions-not-found");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setUserHomeDirectory(testDir.resolve("home"));

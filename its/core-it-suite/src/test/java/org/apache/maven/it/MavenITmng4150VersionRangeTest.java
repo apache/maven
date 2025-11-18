@@ -42,7 +42,7 @@ public class MavenITmng4150VersionRangeTest extends AbstractMavenIntegrationTest
      */
     @Test
     public void testitMNG4150() throws Exception {
-        Path testDir = extractResources("/mng-4150");
+        Path testDir = extractResources("mng-4150");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

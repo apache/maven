@@ -37,7 +37,7 @@ public class MavenITmng4883FailUponOverconstrainedVersionRangesTest extends Abst
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4883");
+        Path testDir = extractResources("mng-4883");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

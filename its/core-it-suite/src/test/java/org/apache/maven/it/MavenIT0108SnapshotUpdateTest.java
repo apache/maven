@@ -53,7 +53,7 @@ public class MavenIT0108SnapshotUpdateTest extends AbstractMavenIntegrationTestC
 
     @BeforeEach
     protected void setUp() throws Exception {
-        Path testDir = extractResources("/it0108");
+        Path testDir = extractResources("it0108");
         verifier = newVerifier(testDir);
         localRepoFile = getLocalRepoFile(verifier);
         deleteLocalArtifact(verifier, localRepoFile);

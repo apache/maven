@@ -33,7 +33,7 @@ public class MavenITmng6386BaseUriPropertyTest extends AbstractMavenIntegrationT
 
     @Test
     public void testitMNG6386() throws Exception {
-        Path testDir = extractResources("/mng-6386");
+        Path testDir = extractResources("mng-6386");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
@@ -61,7 +61,7 @@ public class MavenITmng6386BaseUriPropertyTest extends AbstractMavenIntegrationT
         if (Os.isFamily(Os.FAMILY_WINDOWS)
                 || "UTF-8".equalsIgnoreCase(fileEncoding)
                 || "UTF8".equalsIgnoreCase(fileEncoding)) {
-            Path testDir = extractResources("/mng-6386-это по-русский");
+            Path testDir = extractResources("mng-6386-это по-русский");
 
             Verifier verifier = newVerifier(testDir);
             verifier.setAutoclean(false);

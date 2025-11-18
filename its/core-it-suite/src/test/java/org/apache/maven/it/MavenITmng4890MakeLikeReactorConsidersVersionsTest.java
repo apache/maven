@@ -38,7 +38,7 @@ public class MavenITmng4890MakeLikeReactorConsidersVersionsTest extends Abstract
      */
     @Test
     public void testitAM() throws Exception {
-        Path testDir = extractResources("/mng-4890");
+        Path testDir = extractResources("mng-4890");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
@@ -66,7 +66,7 @@ public class MavenITmng4890MakeLikeReactorConsidersVersionsTest extends Abstract
      */
     @Test
     public void testitAMD() throws Exception {
-        Path testDir = extractResources("/mng-4890");
+        Path testDir = extractResources("mng-4890");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

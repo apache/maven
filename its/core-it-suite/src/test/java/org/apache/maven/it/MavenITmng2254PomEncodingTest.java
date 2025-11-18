@@ -44,7 +44,7 @@ public class MavenITmng2254PomEncodingTest extends AbstractMavenIntegrationTestC
      */
     @Test
     public void testitMNG2254() throws Exception {
-        Path testDir = extractResources("/mng-2254");
+        Path testDir = extractResources("mng-2254");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

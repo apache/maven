@@ -46,7 +46,7 @@ class MavenITmng7819FileLockingWithSnapshotsTest extends AbstractMavenIntegratio
 
     @BeforeEach
     protected void setUp() throws Exception {
-        Path testDir = extractResources("/mng-7819-file-locking-with-snapshots");
+        Path testDir = extractResources("mng-7819-file-locking-with-snapshots");
         server = new Server(0);
         ResourceHandler resourceHandler = new ResourceHandler();
         resourceHandler.setWelcomeFiles(new String[] {"index.html"});
@@ -73,7 +73,7 @@ class MavenITmng7819FileLockingWithSnapshotsTest extends AbstractMavenIntegratio
 
     @Test
     void testFileLockingAndSnapshots() throws Exception {
-        Path testDir = extractResources("/mng-7819-file-locking-with-snapshots");
+        Path testDir = extractResources("mng-7819-file-locking-with-snapshots");
 
         Verifier verifier = newVerifier(testDir);
 

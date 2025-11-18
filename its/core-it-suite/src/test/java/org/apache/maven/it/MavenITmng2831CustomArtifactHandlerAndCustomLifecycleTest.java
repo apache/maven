@@ -37,7 +37,7 @@ public class MavenITmng2831CustomArtifactHandlerAndCustomLifecycleTest extends A
      */
     @Test
     public void testitMNG2831() throws Exception {
-        Path testDir = extractResources("/mng-2831");
+        Path testDir = extractResources("mng-2831");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

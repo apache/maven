@@ -38,7 +38,7 @@ public class MavenITmng3724ExecutionProjectSyncTest extends AbstractMavenIntegra
 
     @Test
     public void testitMNG3724() throws Exception {
-        Path testDir = extractResources("/mng-3724");
+        Path testDir = extractResources("mng-3724");
         Path pluginDir = testDir.resolve("maven-mng3724-plugin");
         Path projectDir = testDir.resolve("project");
 

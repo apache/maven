@@ -38,7 +38,7 @@ public class MavenIT0025MultipleExecutionLevelConfigsTest extends AbstractMavenI
      */
     @Test
     public void testit0025() throws Exception {
-        Path testDir = extractResources("/it0025");
+        Path testDir = extractResources("it0025");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

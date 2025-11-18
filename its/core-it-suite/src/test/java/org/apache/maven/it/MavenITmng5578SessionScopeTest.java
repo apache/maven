@@ -25,7 +25,7 @@ public class MavenITmng5578SessionScopeTest extends AbstractMavenIntegrationTest
 
     @Test
     public void testBasic() throws Exception {
-        Path testDir = extractResources("/mng-5578-session-scope");
+        Path testDir = extractResources("mng-5578-session-scope");
         Path pluginDir = testDir.resolve("plugin");
         Path projectDir = testDir.resolve("basic");
 
@@ -47,7 +47,7 @@ public class MavenITmng5578SessionScopeTest extends AbstractMavenIntegrationTest
 
     @Test
     public void testBasicMultithreaded() throws Exception {
-        Path testDir = extractResources("/mng-5578-session-scope");
+        Path testDir = extractResources("mng-5578-session-scope");
         Path pluginDir = testDir.resolve("plugin");
         Path projectDir = testDir.resolve("basic");
 
@@ -73,7 +73,7 @@ public class MavenITmng5578SessionScopeTest extends AbstractMavenIntegrationTest
 
     @Test
     public void testBasicBuildExtension() throws Exception {
-        Path testDir = extractResources("/mng-5578-session-scope");
+        Path testDir = extractResources("mng-5578-session-scope");
         Path pluginDir = testDir.resolve("plugin");
         Path projectDir = testDir.resolve("basic");
 
@@ -95,7 +95,7 @@ public class MavenITmng5578SessionScopeTest extends AbstractMavenIntegrationTest
 
     @Test
     public void testExtension() throws Exception {
-        Path testDir = extractResources("/mng-5578-session-scope");
+        Path testDir = extractResources("mng-5578-session-scope");
         Path extensionDir = testDir.resolve("extension");
         Path pluginDir = testDir.resolve("extension-plugin");
         Path projectDir = testDir.resolve("extension-project");

@@ -40,7 +40,7 @@ public class MavenITmng3740SelfReferentialReactorProjectsTest extends AbstractMa
 
     @Test
     public void testitMNG3740() throws Exception {
-        Path testDir = extractResources("/mng-3740");
+        Path testDir = extractResources("mng-3740");
         Path v1 = testDir.resolve("projects.v1");
         Path v2 = testDir.resolve("projects.v2");
 

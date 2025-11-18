@@ -38,7 +38,7 @@ public class MavenITmng4433ForceParentSnapshotUpdateTest extends AbstractMavenIn
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4433");
+        Path testDir = extractResources("mng-4433");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

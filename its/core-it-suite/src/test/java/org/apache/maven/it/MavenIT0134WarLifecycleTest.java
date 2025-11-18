@@ -37,7 +37,7 @@ public class MavenIT0134WarLifecycleTest extends AbstractMavenIntegrationTestCas
      */
     @Test
     public void testit0134() throws Exception {
-        Path testDir = extractResources("/it0134");
+        Path testDir = extractResources("it0134");
 
         Verifier verifier = newVerifier(testDir);
         verifier.deleteDirectory("target");

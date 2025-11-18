@@ -42,7 +42,7 @@ public class MavenITmng2486TimestampedDependencyVersionInterpolationTest extends
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-2486");
+        Path testDir = extractResources("mng-2486");
 
         Verifier verifier;
 

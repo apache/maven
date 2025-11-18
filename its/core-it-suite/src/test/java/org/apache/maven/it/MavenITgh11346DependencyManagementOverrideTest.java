@@ -56,7 +56,7 @@ public class MavenITgh11346DependencyManagementOverrideTest extends AbstractMave
      */
     @Test
     public void testDependencyManagementOverride() throws Exception {
-        Path testDir = extractResources("/gh-11346-dependency-management-override");
+        Path testDir = extractResources("gh-11346-dependency-management-override");
 
         Verifier verifier = newVerifier(testDir);
         verifier.deleteArtifacts("org.apache.maven.its.mng.depman");
@@ -88,7 +88,7 @@ public class MavenITgh11346DependencyManagementOverrideTest extends AbstractMave
 
     @Test
     public void testDependencyManagementOverrideNoTransitive() throws Exception {
-        Path testDir = extractResources("/gh-11346-dependency-management-override");
+        Path testDir = extractResources("gh-11346-dependency-management-override");
 
         Verifier verifier = newVerifier(testDir);
         verifier.deleteArtifacts("org.apache.maven.its.mng.depman");

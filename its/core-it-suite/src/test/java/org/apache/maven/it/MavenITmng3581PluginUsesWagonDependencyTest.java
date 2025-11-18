@@ -42,7 +42,7 @@ public class MavenITmng3581PluginUsesWagonDependencyTest extends AbstractMavenIn
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-3581");
+        Path testDir = extractResources("mng-3581");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

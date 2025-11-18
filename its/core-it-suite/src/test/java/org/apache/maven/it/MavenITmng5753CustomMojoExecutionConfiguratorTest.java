@@ -30,7 +30,7 @@ public class MavenITmng5753CustomMojoExecutionConfiguratorTest extends AbstractM
 
     @Test
     public void testCustomMojoExecutionConfigurator() throws Exception {
-        Path testDir = extractResources("/mng-5753-custom-mojo-execution-configurator");
+        Path testDir = extractResources("mng-5753-custom-mojo-execution-configurator");
         Path pluginDir = testDir.resolve("plugin");
         Path projectDir = testDir.resolve("project");
 

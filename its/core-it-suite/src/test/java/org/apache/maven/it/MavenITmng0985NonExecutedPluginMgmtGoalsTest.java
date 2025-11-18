@@ -40,7 +40,7 @@ public class MavenITmng0985NonExecutedPluginMgmtGoalsTest extends AbstractMavenI
      */
     @Test
     public void testitMNG0985() throws Exception {
-        Path testDir = extractResources("/mng-0985");
+        Path testDir = extractResources("mng-0985");
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

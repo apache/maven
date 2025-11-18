@@ -35,7 +35,7 @@ public class MavenITmng8220ExtensionWithDITest extends AbstractMavenIntegrationT
      */
     @Test
     public void testitModel() throws Exception {
-        Path testDir = extractResources("/mng-8220-extension-with-di");
+        Path testDir = extractResources("mng-8220-extension-with-di");
 
         Verifier verifier = newVerifier(testDir.resolve("extensions"));
         verifier.addCliArgument("install");

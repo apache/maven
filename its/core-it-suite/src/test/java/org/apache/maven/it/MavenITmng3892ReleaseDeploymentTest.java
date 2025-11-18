@@ -41,7 +41,7 @@ public class MavenITmng3892ReleaseDeploymentTest extends AbstractMavenIntegratio
      */
     @Test
     public void testitMNG3892() throws Exception {
-        Path testDir = extractResources("/mng-3892");
+        Path testDir = extractResources("mng-3892");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

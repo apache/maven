@@ -57,7 +57,7 @@ public class MavenITmng3401CLIDefaultExecIdTest extends AbstractMavenIntegration
     }
 
     private void testit(String project) throws Exception {
-        Path testDir = extractResources("/mng-3401/" + project);
+        Path testDir = extractResources("mng-3401/" + project);
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

@@ -37,7 +37,7 @@ class MavenITmng8594AtFileTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void testIt() throws Exception {
-        Path basedir = extractResources("/mng-8594");
+        Path basedir = extractResources("mng-8594");
 
         Verifier verifier = newVerifier(basedir);
         verifier.addCliArgument("-af");

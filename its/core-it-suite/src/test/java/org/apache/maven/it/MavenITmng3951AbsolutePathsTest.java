@@ -38,7 +38,7 @@ public class MavenITmng3951AbsolutePathsTest extends AbstractMavenIntegrationTes
      */
     @Test
     public void testitMNG3951() throws Exception {
-        Path testDir = extractResources("/mng-3951");
+        Path testDir = extractResources("mng-3951");
 
         Verifier verifier = newVerifier(testDir);
 
@@ -46,7 +46,7 @@ public class MavenITmng3951AbsolutePathsTest extends AbstractMavenIntegrationTes
          * Cut off anything before the first file separator from the local repo path. This is harmless on a Unix-like
          * filesystem but will make the path drive-relative on Windows so we can check how Maven handles it.
          */
-        Path repoDir = Path.of(verifier.getLocalRepository());
+        Path repoDir = verifier.getLocalRepository();
         if (getRoot(repoDir).equals(getRoot(testDir))) {
             verifier.addCliArgument("-Dmaven.repo.local=" + repoDir.subpath(1, repoDir.getNameCount()));
         }

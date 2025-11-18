@@ -42,7 +42,7 @@ public class MavenITmng3813PluginClassPathOrderingTest extends AbstractMavenInte
      */
     @Test
     public void testitMNG3813() throws Exception {
-        Path testDir = extractResources("/mng-3813");
+        Path testDir = extractResources("mng-3813");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

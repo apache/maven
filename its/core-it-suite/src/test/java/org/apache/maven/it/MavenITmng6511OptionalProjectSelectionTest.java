@@ -30,12 +30,11 @@ import org.junit.jupiter.api.Test;
  * @author Martin Kanters
  */
 public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenIntegrationTestCase {
-    private static final String RESOURCE_PATH = "/mng-6511-optional-project-selection";
     private final Path testDir;
 
     public MavenITmng6511OptionalProjectSelectionTest() throws IOException {
         super();
-        testDir = extractResources(RESOURCE_PATH);
+        testDir = extractResources("mng-6511-optional-project-selection");
     }
 
     @Test

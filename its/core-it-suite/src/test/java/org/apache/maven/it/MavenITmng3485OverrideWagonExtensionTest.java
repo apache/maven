@@ -32,7 +32,7 @@ public class MavenITmng3485OverrideWagonExtensionTest extends AbstractMavenInteg
 
     @Test
     public void testitMNG3485() throws Exception {
-        Path testDir = extractResources("/mng-3485");
+        Path testDir = extractResources("mng-3485");
 
         Verifier verifier;
 

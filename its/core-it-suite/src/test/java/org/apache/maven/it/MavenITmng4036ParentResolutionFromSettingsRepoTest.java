@@ -37,7 +37,7 @@ public class MavenITmng4036ParentResolutionFromSettingsRepoTest extends Abstract
      */
     @Test
     public void testitDefaultLayout() throws Exception {
-        Path testDir = extractResources("/mng-4036/default");
+        Path testDir = extractResources("mng-4036/default");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

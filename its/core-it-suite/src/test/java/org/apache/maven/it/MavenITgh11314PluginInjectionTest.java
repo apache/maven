@@ -44,7 +44,7 @@ public class MavenITgh11314PluginInjectionTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testV3MojoWithMavenContainerInjection() throws Exception {
-        Path testDir = extractResources("/gh-11314-v3-mojo-injection");
+        Path testDir = extractResources("gh-11314-v3-mojo-injection");
 
         // Before, build and install the parent POM
         Verifier parentVerifier = newVerifier(testDir, false);

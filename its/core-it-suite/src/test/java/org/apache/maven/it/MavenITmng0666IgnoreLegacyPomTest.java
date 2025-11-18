@@ -42,7 +42,7 @@ public class MavenITmng0666IgnoreLegacyPomTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testitMNG666() throws Exception {
-        Path testDir = extractResources("/mng-0666");
+        Path testDir = extractResources("mng-0666");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

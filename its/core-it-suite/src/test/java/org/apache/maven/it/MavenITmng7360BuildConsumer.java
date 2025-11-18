@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng7360BuildConsumer extends AbstractMavenIntegrationTestCase {
 
-    private static final String PROJECT_PATH = "/mng-7360-build-consumer";
+    private static final String PROJECT_PATH = "mng-7360-build-consumer";
 
     @Test
     public void testSelectModuleByCoordinate() throws Exception {

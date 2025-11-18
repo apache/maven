@@ -50,7 +50,7 @@ public class MavenITmng2387InactiveProxyTest extends AbstractMavenIntegrationTes
 
     @BeforeEach
     protected void setUp() throws Exception {
-        testDir = extractResources("/mng-2387");
+        testDir = extractResources("mng-2387");
 
         ResourceHandler resourceHandler = new ResourceHandler();
         resourceHandler.setResourceBase(testDir.resolve("repo").toAbsolutePath().toString());

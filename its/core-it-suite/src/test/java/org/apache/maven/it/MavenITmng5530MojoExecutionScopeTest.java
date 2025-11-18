@@ -28,7 +28,7 @@ class MavenITmng5530MojoExecutionScopeTest extends AbstractMavenIntegrationTestC
 
     @Test
     public void testCopyfiles() throws Exception {
-        Path testDir = extractResources("/mng-5530-mojo-execution-scope");
+        Path testDir = extractResources("mng-5530-mojo-execution-scope");
         Path pluginDir = testDir.resolve("plugin");
         Path projectDir = testDir.resolve("basic");
 
@@ -53,7 +53,7 @@ class MavenITmng5530MojoExecutionScopeTest extends AbstractMavenIntegrationTestC
 
     @Test
     public void testCopyfilesMultithreaded() throws Exception {
-        Path testDir = extractResources("/mng-5530-mojo-execution-scope");
+        Path testDir = extractResources("mng-5530-mojo-execution-scope");
         Path pluginDir = testDir.resolve("plugin");
         Path projectDir = testDir.resolve("basic");
 
@@ -82,7 +82,7 @@ class MavenITmng5530MojoExecutionScopeTest extends AbstractMavenIntegrationTestC
 
     @Test
     public void testExtension() throws Exception {
-        Path testDir = extractResources("/mng-5530-mojo-execution-scope");
+        Path testDir = extractResources("mng-5530-mojo-execution-scope");
         Path extensionDir = testDir.resolve("extension");
         Path pluginDir = testDir.resolve("extension-plugin");
         Path projectDir = testDir.resolve("extension-project");

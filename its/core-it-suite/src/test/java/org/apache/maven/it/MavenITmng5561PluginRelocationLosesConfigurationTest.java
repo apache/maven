@@ -27,7 +27,7 @@ public class MavenITmng5561PluginRelocationLosesConfigurationTest extends Abstra
 
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-5561-plugin-relocation-loses-configuration");
+        Path testDir = extractResources("mng-5561-plugin-relocation-loses-configuration");
         Path oldPluginWithRelocationDir = testDir.resolve("old-plugin-with-relocation");
         Path newPluginDir = testDir.resolve("new-plugin");
         Path projectDir = testDir.resolve("project");

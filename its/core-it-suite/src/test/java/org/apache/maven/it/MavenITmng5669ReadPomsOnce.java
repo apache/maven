@@ -43,7 +43,7 @@ public class MavenITmng5669ReadPomsOnce extends AbstractMavenIntegrationTestCase
     @Test
     public void testWithoutBuildConsumer() throws Exception {
         // prepare JavaAgent
-        Path testDir = extractResources("/mng-5669-read-poms-once");
+        Path testDir = extractResources("mng-5669-read-poms-once");
         Verifier verifier = newVerifier(testDir);
         Map<String, String> filterProperties = Collections.singletonMap(
                 "${javaAgentJar}",
@@ -78,7 +78,7 @@ public class MavenITmng5669ReadPomsOnce extends AbstractMavenIntegrationTestCase
     @Test
     public void testWithBuildConsumer() throws Exception {
         // prepare JavaAgent
-        Path testDir = extractResources("/mng-5669-read-poms-once");
+        Path testDir = extractResources("mng-5669-read-poms-once");
         Verifier verifier = newVerifier(testDir);
         Map<String, String> filterProperties = Collections.singletonMap(
                 "${javaAgentJar}",

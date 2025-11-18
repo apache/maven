@@ -60,7 +60,7 @@ public class MavenITmng4633DualCompilerExecutionsWeaveModeTest extends AbstractM
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4633");
+        Path testDir = extractResources("mng-4633");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

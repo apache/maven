@@ -101,7 +101,7 @@ class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase
      */
     @Test
     public void testmng3652UnConfiguredHttp() throws Exception {
-        Path testDir = extractResources("/mng-3652");
+        Path testDir = extractResources("mng-3652");
         Path pluginDir = testDir.resolve("test-plugin");
         Path projectDir = testDir.resolve("test-project");
 
@@ -144,7 +144,7 @@ class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase
 
     @Test
     public void testmng3652UnConfiguredDAV() throws Exception {
-        Path testDir = extractResources("/mng-3652");
+        Path testDir = extractResources("mng-3652");
         Path pluginDir = testDir.resolve("test-plugin");
         Path projectDir = testDir.resolve("test-project");
 
@@ -189,7 +189,7 @@ class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase
 
     @Test
     public void testmng3652ConfigurationInSettingsWithoutUserAgent() throws Exception {
-        Path testDir = extractResources("/mng-3652");
+        Path testDir = extractResources("mng-3652");
         Path pluginDir = testDir.resolve("test-plugin");
         Path projectDir = testDir.resolve("test-project");
 
@@ -236,7 +236,7 @@ class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase
 
     @Test
     public void testmng3652UserAgentConfiguredInSettings() throws Exception {
-        Path testDir = extractResources("/mng-3652");
+        Path testDir = extractResources("mng-3652");
         Path pluginDir = testDir.resolve("test-plugin");
         Path projectDir = testDir.resolve("test-project");
 
@@ -268,7 +268,7 @@ class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase
 
     @Test
     public void testmng3652AdditionnalHttpHeaderConfiguredInSettings() throws Exception {
-        Path testDir = extractResources("/mng-3652");
+        Path testDir = extractResources("mng-3652");
         Path pluginDir = testDir.resolve("test-plugin");
         Path projectDir = testDir.resolve("test-project");
 

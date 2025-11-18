@@ -68,7 +68,7 @@ public class MavenITmng4360WebDavSupportTest extends AbstractMavenIntegrationTes
     }
 
     private void test(String project) throws Exception {
-        Path testDir = extractResources("/mng-4360");
+        Path testDir = extractResources("mng-4360");
 
         testDir = testDir.resolve(project);
 

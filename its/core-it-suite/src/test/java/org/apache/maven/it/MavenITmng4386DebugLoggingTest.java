@@ -40,7 +40,7 @@ public class MavenITmng4386DebugLoggingTest extends AbstractMavenIntegrationTest
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4386");
+        Path testDir = extractResources("mng-4386");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

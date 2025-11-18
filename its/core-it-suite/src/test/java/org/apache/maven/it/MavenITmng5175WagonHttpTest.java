@@ -98,7 +98,7 @@ public class MavenITmng5175WagonHttpTest extends AbstractMavenIntegrationTestCas
      */
     @Test
     public void testmng5175ReadTimeOutFromSettings() throws Exception {
-        Path testDir = extractResources("/mng-5175");
+        Path testDir = extractResources("mng-5175");
 
         Verifier verifier = newVerifier(testDir);
 

@@ -33,7 +33,7 @@ public class MavenITmng8572DITypeHandlerTest extends AbstractMavenIntegrationTes
     @Test
     public void testCustomTypeHandler() throws Exception {
         // Build the extension first
-        Path testDir = extractResources("/mng-8572-di-type-handler");
+        Path testDir = extractResources("mng-8572-di-type-handler");
         Verifier verifier = newVerifier(testDir.resolve("extension"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

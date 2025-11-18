@@ -49,7 +49,7 @@ public class MavenITmng6090CIFriendlyTest extends AbstractMavenIntegrationTestCa
      */
     @Test
     public void testitShouldResolveTheDependenciesWithoutBuildConsumer() throws Exception {
-        Path testDir = extractResources("/mng-6090-ci-friendly");
+        Path testDir = extractResources("mng-6090-ci-friendly");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
@@ -74,7 +74,7 @@ public class MavenITmng6090CIFriendlyTest extends AbstractMavenIntegrationTestCa
 
     @Test
     public void testitShouldResolveTheDependenciesWithBuildConsumer() throws Exception {
-        Path testDir = extractResources("/mng-6090-ci-friendly");
+        Path testDir = extractResources("mng-6090-ci-friendly");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

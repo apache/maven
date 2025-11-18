@@ -37,7 +37,7 @@ public class MavenITmng4411VersionInfoTest extends AbstractMavenIntegrationTestC
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4411");
+        Path testDir = extractResources("mng-4411");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

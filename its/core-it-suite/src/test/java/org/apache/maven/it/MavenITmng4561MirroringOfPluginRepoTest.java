@@ -52,7 +52,7 @@ public class MavenITmng4561MirroringOfPluginRepoTest extends AbstractMavenIntegr
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4561");
+        Path testDir = extractResources("mng-4561");
 
         Constraint constraint = new Constraint();
         constraint.setName(Constraint.__BASIC_AUTH);

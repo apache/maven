@@ -40,7 +40,7 @@ public class MavenITmng4544ActiveComponentCollectionThreadSafeTest extends Abstr
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4544");
+        Path testDir = extractResources("mng-4544");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

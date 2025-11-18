@@ -41,7 +41,7 @@ public class MavenITmng4359LocallyReachableParentOutsideOfReactorTest extends Ab
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4359");
+        Path testDir = extractResources("mng-4359");
         testDir = testDir.resolve("reactor-parent");
 
         Verifier verifier = newVerifier(testDir);

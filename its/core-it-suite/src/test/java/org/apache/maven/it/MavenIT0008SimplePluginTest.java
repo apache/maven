@@ -35,7 +35,7 @@ public class MavenIT0008SimplePluginTest extends AbstractMavenIntegrationTestCas
      */
     @Test
     public void testit0008() throws Exception {
-        Path testDir = extractResources("/it0008");
+        Path testDir = extractResources("it0008");
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

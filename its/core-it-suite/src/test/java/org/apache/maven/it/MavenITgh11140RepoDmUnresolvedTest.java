@@ -32,7 +32,7 @@ class MavenITgh11140RepoDmUnresolvedTest extends AbstractMavenIntegrationTestCas
 
     @Test
     void testFailsOnUnresolvedPlaceholders() throws Exception {
-        Path testDir = extractResources("/gh-11140-repo-dm-unresolved");
+        Path testDir = extractResources("gh-11140-repo-dm-unresolved");
         Verifier verifier = newVerifier(testDir);
 
         try {

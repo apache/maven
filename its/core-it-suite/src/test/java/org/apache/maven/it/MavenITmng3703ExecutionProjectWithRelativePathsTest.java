@@ -37,7 +37,7 @@ public class MavenITmng3703ExecutionProjectWithRelativePathsTest extends Abstrac
 
     @Test
     public void testForkFromMojo() throws Exception {
-        Path testDir = extractResources("/mng-3703");
+        Path testDir = extractResources("mng-3703");
         Path pluginDir = testDir.resolve("maven-mng3703-plugin");
         Path projectDir = testDir.resolve("project");
 
@@ -61,7 +61,7 @@ public class MavenITmng3703ExecutionProjectWithRelativePathsTest extends Abstrac
 
     @Test
     public void testForkFromReport() throws Exception {
-        Path testDir = extractResources("/mng-3703");
+        Path testDir = extractResources("mng-3703");
         Path pluginDir = testDir.resolve("maven-mng3703-plugin");
         Path projectDir = testDir.resolve("project");
 

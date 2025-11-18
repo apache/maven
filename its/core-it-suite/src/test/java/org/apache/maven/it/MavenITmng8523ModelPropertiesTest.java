@@ -41,7 +41,7 @@ class MavenITmng8523ModelPropertiesTest extends AbstractMavenIntegrationTestCase
     @Test
     void testIt() throws Exception {
         Path basedir =
-                extractResources("/mng-8523-model-properties");
+                extractResources("mng-8523-model-properties");
 
         Verifier verifier = newVerifier(basedir);
         verifier.addCliArguments("install", "-DmavenVersion=4.0.0-rc-2", "-Dmaven.consumer.pom.flatten=true");

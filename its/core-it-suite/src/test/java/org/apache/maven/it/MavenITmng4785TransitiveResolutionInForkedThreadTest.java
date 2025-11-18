@@ -41,7 +41,7 @@ public class MavenITmng4785TransitiveResolutionInForkedThreadTest extends Abstra
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4785");
+        Path testDir = extractResources("mng-4785");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

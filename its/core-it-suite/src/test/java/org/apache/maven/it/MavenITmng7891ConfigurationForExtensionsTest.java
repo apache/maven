@@ -34,7 +34,7 @@ class MavenITmng7891ConfigurationForExtensionsTest extends AbstractMavenIntegrat
 
     @Test
     void testConfigurationForCoreExtension() throws Exception {
-        Path testDir = extractResources("/mng-7891-extension-configuration");
+        Path testDir = extractResources("mng-7891-extension-configuration");
 
         Verifier verifier = newVerifier(testDir.resolve("extension"));
         verifier.addCliArgument("install");
@@ -58,7 +58,7 @@ class MavenITmng7891ConfigurationForExtensionsTest extends AbstractMavenIntegrat
 
     @Test
     void testConfigurationForBuildExtension() throws Exception {
-        Path testDir = extractResources("/mng-7891-extension-configuration");
+        Path testDir = extractResources("mng-7891-extension-configuration");
 
         Verifier verifier = newVerifier(testDir.resolve("extension"));
         verifier.addCliArgument("install");

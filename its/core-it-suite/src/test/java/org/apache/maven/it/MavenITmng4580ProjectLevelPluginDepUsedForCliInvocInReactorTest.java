@@ -43,7 +43,7 @@ public class MavenITmng4580ProjectLevelPluginDepUsedForCliInvocInReactorTest ext
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4580");
+        Path testDir = extractResources("mng-4580");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

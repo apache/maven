@@ -32,7 +32,7 @@ public class MavenITmng7038RootdirTest extends AbstractMavenIntegrationTestCase 
 
     @Test
     public void testRootdir() throws IOException, VerificationException {
-        Path testDir = extractResources("/mng-7038-rootdir");
+        Path testDir = extractResources("mng-7038-rootdir");
         Verifier verifier = newVerifier(testDir.toString(), false);
 
         verifier.addCliArgument("validate");
@@ -120,7 +120,7 @@ public class MavenITmng7038RootdirTest extends AbstractMavenIntegrationTestCase 
 
     @Test
     public void testRootdirWithTopdirAndRoot() throws IOException, VerificationException {
-        Path testDir = extractResources("/mng-7038-rootdir");
+        Path testDir = extractResources("mng-7038-rootdir");
         Verifier verifier = newVerifier(testDir.resolve("module-a"), false);
 
         verifier.addCliArgument("validate");
@@ -133,7 +133,7 @@ public class MavenITmng7038RootdirTest extends AbstractMavenIntegrationTestCase 
         props = verifier.loadProperties("target/pom.properties");
         assertEquals(
                 testDir.resolve("module-a"),
-                props.getProperty("project.properties.rootdir"),
+                Path.of(props.getProperty("project.properties.rootdir")),
                 "project.properties.rootdir");
         assertEquals(
                 testDir.resolve("module-a"),
@@ -178,7 +178,7 @@ public class MavenITmng7038RootdirTest extends AbstractMavenIntegrationTestCase 
 
     @Test
     public void testRootdirWithTopdirAndNoRoot() throws IOException, VerificationException {
-        Path testDir = extractResources("/mng-7038-rootdir");
+        Path testDir = extractResources("mng-7038-rootdir");
         Verifier verifier = newVerifier(testDir.resolve("module-b"), false);
 
         verifier.addCliArgument("validate");

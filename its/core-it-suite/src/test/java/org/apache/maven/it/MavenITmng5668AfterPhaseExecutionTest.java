@@ -34,7 +34,7 @@ class MavenITmng5668AfterPhaseExecutionTest extends AbstractMavenIntegrationTest
 
     @Test
     void testAfterPhaseExecutionOnFailure() throws Exception {
-        Path testDir = extractResources("/mng-5668-after-phase-execution");
+        Path testDir = extractResources("mng-5668-after-phase-execution");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

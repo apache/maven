@@ -41,7 +41,7 @@ public class MavenITmng4795DepResolutionInReactorProjectForkedByLifecycleTest ex
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4795");
+        Path testDir = extractResources("mng-4795");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

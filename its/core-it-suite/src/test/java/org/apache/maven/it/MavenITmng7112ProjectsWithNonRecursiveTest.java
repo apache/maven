@@ -18,14 +18,12 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.io.IOException;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng7112ProjectsWithNonRecursiveTest extends AbstractMavenIntegrationTestCase {
-    private static final String PROJECT_PATH = "/mng-7112-projects-with-non-recursive";
+    private static final String PROJECT_PATH = "mng-7112-projects-with-non-recursive";
 
     @Test
     public void testAggregatesCanBeBuiltNonRecursively() throws IOException, VerificationException {

@@ -54,7 +54,7 @@ public class MavenITmng4729MirrorProxyAuthUsedByProjectBuilderTest extends Abstr
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4729");
+        Path testDir = extractResources("mng-4729");
 
         Constraint constraint = new Constraint();
         constraint.setName(Constraint.__BASIC_AUTH);

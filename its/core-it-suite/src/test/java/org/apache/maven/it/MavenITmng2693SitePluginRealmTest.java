@@ -41,7 +41,7 @@ public class MavenITmng2693SitePluginRealmTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-2693");
+        Path testDir = extractResources("mng-2693");
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

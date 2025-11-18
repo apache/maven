@@ -42,7 +42,7 @@ public class MavenITmng5137ReactorResolutionInForkedBuildTest extends AbstractMa
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-5137");
+        Path testDir = extractResources("mng-5137");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

@@ -38,7 +38,7 @@ public class MavenITmng4590ImportedPomUsesSystemAndUserPropertiesTest extends Ab
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4590");
+        Path testDir = extractResources("mng-4590");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

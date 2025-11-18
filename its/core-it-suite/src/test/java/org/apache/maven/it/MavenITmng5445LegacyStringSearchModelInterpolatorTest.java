@@ -35,7 +35,7 @@ public class MavenITmng5445LegacyStringSearchModelInterpolatorTest extends Abstr
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-5445");
+        Path testDir = extractResources("mng-5445");
 
         // First, build the test plugin
         Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-model-interpolation"));

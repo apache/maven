@@ -43,7 +43,7 @@ public class MavenITmng3723ConcreteParentProjectTest extends AbstractMavenIntegr
     public void testitMNG3723() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        Path testDir = extractResources("/mng-3723");
+        Path testDir = extractResources("mng-3723");
         Path pluginDir = testDir.resolve("maven-mng3723-plugin");
         Path projectDir = testDir.resolve("projects");
 

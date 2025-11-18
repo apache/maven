@@ -38,7 +38,7 @@ import org.junit.jupiter.api.Test;
  * @author Martin Kanters
  */
 public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationTestCase {
-    private static final String RESOURCE_PATH = "/mng-6118-submodule-invocation-full-reactor";
+    private static final String RESOURCE_PATH = "mng-6118-submodule-invocation-full-reactor";
     private final Path testDir;
 
     public MavenITmng6118SubmoduleInvocation() throws IOException {

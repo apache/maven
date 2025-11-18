@@ -60,7 +60,7 @@ class MavenITgh11280DuplicateDependencyConsumerPomTest extends AbstractMavenInte
      */
     @Test
     void testDuplicateDependencyWithNullAndEmptyClassifier() throws Exception {
-        Path testDir = extractResources("/gh-11280-duplicate-dependency-consumer-pom");
+        Path testDir = extractResources("gh-11280-duplicate-dependency-consumer-pom");
 
         Verifier verifier = newVerifier(testDir, null);
         verifier.addCliArgument("install");

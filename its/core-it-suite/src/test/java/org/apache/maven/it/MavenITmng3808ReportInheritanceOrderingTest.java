@@ -41,7 +41,7 @@ public class MavenITmng3808ReportInheritanceOrderingTest extends AbstractMavenIn
      */
     @Test
     public void testitMNG3808() throws Exception {
-        Path testDir = extractResources("/mng-3808");
+        Path testDir = extractResources("mng-3808");
         testDir = testDir.resolve("child");
 
         Verifier verifier = newVerifier(testDir);

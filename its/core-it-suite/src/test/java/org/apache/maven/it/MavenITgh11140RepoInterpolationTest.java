@@ -33,7 +33,7 @@ class MavenITgh11140RepoInterpolationTest extends AbstractMavenIntegrationTestCa
 
     @Test
     void testInterpolationFromEnvAndProps() throws Exception {
-        Path testDir = extractResources("/gh-11140-repo-interpolation");
+        Path testDir = extractResources("gh-11140-repo-interpolation");
         Verifier verifier = newVerifier(testDir);
 
         // Provide env vars consumed by POM via ${env.*}
@@ -69,7 +69,7 @@ class MavenITgh11140RepoInterpolationTest extends AbstractMavenIntegrationTestCa
 
     @Test
     void testUnresolvedPlaceholderFailsResolution() throws Exception {
-        Path testDir = extractResources("/gh-11140-repo-interpolation");
+        Path testDir = extractResources("gh-11140-repo-interpolation");
         Verifier verifier = newVerifier(testDir);
 
         // Do NOT set env vars, so placeholders stay

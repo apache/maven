@@ -31,7 +31,7 @@ public class MavenITMissingNamespaceTest extends AbstractMavenIntegrationTestCas
      */
     @Test
     public void testMissingNamespace() throws Exception {
-        Path testDir = extractResources("/missing-namespace");
+        Path testDir = extractResources("missing-namespace");
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

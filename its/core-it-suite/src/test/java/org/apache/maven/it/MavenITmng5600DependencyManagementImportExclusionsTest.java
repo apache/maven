@@ -37,7 +37,7 @@ class MavenITmng5600DependencyManagementImportExclusionsTest extends AbstractMav
 
     @Test
     public void testCanExcludeDependenciesFromImport() throws Exception {
-        final Path testDir = extractResources("/mng-5600/exclusions");
+        final Path testDir = extractResources("mng-5600/exclusions");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

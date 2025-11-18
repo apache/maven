@@ -42,7 +42,7 @@ public class MavenITmng2222OutputDirectoryReactorResolutionTest extends Abstract
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-2222");
+        Path testDir = extractResources("mng-2222");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

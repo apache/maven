@@ -40,7 +40,7 @@ public class MavenITmng4385LifecycleMappingFromExtensionInReactorTest extends Ab
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4385");
+        Path testDir = extractResources("mng-4385");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

@@ -37,7 +37,7 @@ public class MavenITmng4383ValidDependencyVersionTest extends AbstractMavenInteg
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4383");
+        Path testDir = extractResources("mng-4383");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

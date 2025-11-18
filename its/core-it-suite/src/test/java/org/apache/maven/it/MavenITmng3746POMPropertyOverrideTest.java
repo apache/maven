@@ -39,7 +39,7 @@ public class MavenITmng3746POMPropertyOverrideTest extends AbstractMavenIntegrat
     public void testitMNG3746UsingDefaultSystemProperty() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        Path testDir = extractResources("/mng-3746");
+        Path testDir = extractResources("mng-3746");
         Path pluginDir = testDir.resolve("maven-mng3746-plugin");
         Path projectDir = testDir.resolve("project");
 
@@ -62,7 +62,7 @@ public class MavenITmng3746POMPropertyOverrideTest extends AbstractMavenIntegrat
     public void testitMNG3746UsingCLIProperty() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        Path testDir = extractResources("/mng-3746");
+        Path testDir = extractResources("mng-3746");
         Path pluginDir = testDir.resolve("maven-mng3746-plugin");
         Path projectDir = testDir.resolve("project");
 

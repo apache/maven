@@ -38,7 +38,7 @@ public class MavenITmng0557UserSettingsCliOptionTest extends AbstractMavenIntegr
      */
     @Test
     public void testitMNG557() throws Exception {
-        Path testDir = extractResources("/mng-0557");
+        Path testDir = extractResources("mng-0557");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

@@ -39,7 +39,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest extends Abstr
      */
     @Test
     public void testitFailFastSingleThread() throws Exception {
-        Path testDir = extractResources("/mng-0095");
+        Path testDir = extractResources("mng-0095");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
@@ -73,7 +73,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest extends Abstr
      */
     @Test
     public void testitFailNeverSingleThread() throws Exception {
-        Path testDir = extractResources("/mng-0095");
+        Path testDir = extractResources("mng-0095");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
@@ -102,7 +102,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest extends Abstr
      */
     @Test
     public void testitFailAtEndSingleThread() throws Exception {
-        Path testDir = extractResources("/mng-0095");
+        Path testDir = extractResources("mng-0095");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
@@ -135,7 +135,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest extends Abstr
      */
     @Test
     public void testitFailNeverTwoThreads() throws Exception {
-        Path testDir = extractResources("/mng-0095");
+        Path testDir = extractResources("mng-0095");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
@@ -164,7 +164,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest extends Abstr
      */
     @Test
     public void testitFailAtEndTwoThreads() throws Exception {
-        Path testDir = extractResources("/mng-0095");
+        Path testDir = extractResources("mng-0095");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

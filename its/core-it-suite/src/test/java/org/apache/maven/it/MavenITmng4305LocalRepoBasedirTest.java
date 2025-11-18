@@ -18,10 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.Properties;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,7 +39,7 @@ public class MavenITmng4305LocalRepoBasedirTest extends AbstractMavenIntegration
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4305");
+        Path testDir = extractResources("mng-4305");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
@@ -54,6 +52,6 @@ public class MavenITmng4305LocalRepoBasedirTest extends AbstractMavenIntegration
 
         // NOTE: This deliberately compares the paths on the String level, not via File.equals()
         assertEquals(
-                new File(verifier.getLocalRepository()).getAbsolutePath(), props.getProperty("localRepositoryBasedir"));
+                verifier.getLocalRepository().toString(), props.getProperty("localRepositoryBasedir"));
     }
 }

@@ -41,7 +41,7 @@ public class MavenITmng4955LocalVsRemoteSnapshotResolutionTest extends AbstractM
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4955");
+        Path testDir = extractResources("mng-4955");
 
         Verifier verifier = newVerifier(testDir.resolve("dep"));
         verifier.setAutoclean(false);

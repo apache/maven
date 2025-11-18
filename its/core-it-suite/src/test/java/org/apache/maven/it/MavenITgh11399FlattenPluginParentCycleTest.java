@@ -44,7 +44,7 @@ class MavenITgh11399FlattenPluginParentCycleTest extends AbstractMavenIntegratio
      */
     @Test
     void testFlattenPluginWithParentExpansionDoesNotCauseCycle() throws Exception {
-        Path testDir = extractResources("/gh-11399-flatten-plugin-parent-cycle");
+        Path testDir = extractResources("gh-11399-flatten-plugin-parent-cycle");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

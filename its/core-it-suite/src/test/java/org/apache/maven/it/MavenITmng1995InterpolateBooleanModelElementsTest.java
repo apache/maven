@@ -42,7 +42,7 @@ public class MavenITmng1995InterpolateBooleanModelElementsTest extends AbstractM
      */
     @Test
     public void testitMNG1995() throws Exception {
-        Path testDir = extractResources("/mng-1995");
+        Path testDir = extractResources("mng-1995");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

@@ -41,7 +41,7 @@ public class MavenITmng4464PlatformIndependentFileSeparatorTest extends Abstract
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4464");
+        Path testDir = extractResources("mng-4464");
 
         Verifier verifier = newVerifier(testDir.resolve("aggregator"));
         verifier.setAutoclean(false);

@@ -40,7 +40,7 @@ public class MavenITmng4450StubModelForMissingDependencyPomTest extends Abstract
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4450");
+        Path testDir = extractResources("mng-4450");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

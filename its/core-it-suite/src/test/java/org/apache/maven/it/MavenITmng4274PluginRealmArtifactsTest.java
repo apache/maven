@@ -42,7 +42,7 @@ public class MavenITmng4274PluginRealmArtifactsTest extends AbstractMavenIntegra
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4274");
+        Path testDir = extractResources("mng-4274");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

@@ -39,7 +39,7 @@ public class MavenITmng4353PluginDependencyResolutionFromPomRepoTest extends Abs
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4353");
+        Path testDir = extractResources("mng-4353");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

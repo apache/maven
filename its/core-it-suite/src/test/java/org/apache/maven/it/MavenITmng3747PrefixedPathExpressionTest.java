@@ -41,7 +41,7 @@ public class MavenITmng3747PrefixedPathExpressionTest extends AbstractMavenInteg
 
     @Test
     public void testitMNG3747() throws Exception {
-        Path testDir = extractResources("/mng-3747");
+        Path testDir = extractResources("mng-3747");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

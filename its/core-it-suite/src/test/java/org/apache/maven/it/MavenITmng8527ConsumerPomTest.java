@@ -42,7 +42,7 @@ class MavenITmng8527ConsumerPomTest extends AbstractMavenIntegrationTestCase {
     @Test
     void testIt() throws Exception {
         Path basedir =
-                extractResources("/mng-8527-consumer-pom");
+                extractResources("mng-8527-consumer-pom");
 
         Verifier verifier = newVerifier(basedir);
         verifier.addCliArguments("install", "-Dmaven.consumer.pom.flatten=true");

@@ -41,7 +41,7 @@ class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractMavenInt
      */
     @Test
     public void testBuildFailureUTFail() throws Exception {
-        Path testDir = extractResources("/mng-5640-lifecycleParticipant-afterSession");
+        Path testDir = extractResources("mng-5640-lifecycleParticipant-afterSession");
         Path extensionDir = testDir.resolve("extension");
         Path projectDir = testDir.resolve("buildfailure-utfail");
         Verifier verifier;
@@ -71,7 +71,7 @@ class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractMavenInt
      */
     @Test
     public void testBuildFailureMissingDependency() throws Exception {
-        Path testDir = extractResources("/mng-5640-lifecycleParticipant-afterSession");
+        Path testDir = extractResources("mng-5640-lifecycleParticipant-afterSession");
         Path extensionDir = testDir.resolve("extension");
         Path projectDir = testDir.resolve("buildfailure-depmissing");
         Verifier verifier;
@@ -101,7 +101,7 @@ class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractMavenInt
      */
     @Test
     public void testBuildError() throws Exception {
-        Path testDir = extractResources("/mng-5640-lifecycleParticipant-afterSession");
+        Path testDir = extractResources("mng-5640-lifecycleParticipant-afterSession");
         Path extensionDir = testDir.resolve("extension");
         Path pluginDir = testDir.resolve("badplugin");
         Path projectDir = testDir.resolve("builderror-mojoex");
@@ -138,7 +138,7 @@ class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractMavenInt
      */
     @Test
     public void testBuildErrorRt() throws Exception {
-        Path testDir = extractResources("/mng-5640-lifecycleParticipant-afterSession");
+        Path testDir = extractResources("mng-5640-lifecycleParticipant-afterSession");
         Path extensionDir = testDir.resolve("extension");
         Path pluginDir = testDir.resolve("badplugin");
         Path projectDir = testDir.resolve("builderror-runtimeex");

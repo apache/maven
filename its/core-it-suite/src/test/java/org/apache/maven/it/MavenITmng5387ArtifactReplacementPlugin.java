@@ -33,7 +33,7 @@ public class MavenITmng5387ArtifactReplacementPlugin extends AbstractMavenIntegr
 
     @BeforeEach
     public void setUp() throws Exception {
-        testDir = extractResources("/mng-5387");
+        testDir = extractResources("mng-5387");
     }
 
     @Test

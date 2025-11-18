@@ -41,7 +41,7 @@ public class MavenITmng11009StackOverflowParentResolutionTest extends AbstractMa
      */
     @Test
     public void testStackOverflowInParentResolution() throws Exception {
-        Path testDir = extractResources("/mng-11009-stackoverflow-parent-resolution");
+        Path testDir = extractResources("mng-11009-stackoverflow-parent-resolution");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

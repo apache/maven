@@ -37,7 +37,7 @@ public class MavenITmng4314DirectInvocationOfAggregatorTest extends AbstractMave
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4314");
+        Path testDir = extractResources("mng-4314");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

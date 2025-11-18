@@ -35,7 +35,7 @@ class MavenITmng8385PropertyContributoSPITest extends AbstractMavenIntegrationTe
      */
     @Test
     void testIt() throws Exception {
-        Path testDir = extractResources("/mng-8385");
+        Path testDir = extractResources("mng-8385");
         Verifier verifier;
 
         verifier = newVerifier(testDir.resolve("spi-extension"));

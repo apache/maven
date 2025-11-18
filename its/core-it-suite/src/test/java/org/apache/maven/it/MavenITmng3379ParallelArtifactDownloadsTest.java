@@ -42,7 +42,7 @@ public class MavenITmng3379ParallelArtifactDownloadsTest extends AbstractMavenIn
      */
     @Test
     public void testitMNG3379() throws Exception {
-        Path testDir = extractResources("/mng-3379");
+        Path testDir = extractResources("mng-3379");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

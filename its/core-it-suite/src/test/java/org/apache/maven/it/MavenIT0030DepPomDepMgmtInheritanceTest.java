@@ -33,7 +33,7 @@ public class MavenIT0030DepPomDepMgmtInheritanceTest extends AbstractMavenIntegr
      */
     @Test
     public void testit0030() throws Exception {
-        Path testDir = extractResources("/it0030");
+        Path testDir = extractResources("it0030");
         Verifier verifier = newVerifier(testDir);
         verifier.deleteArtifact("org.apache.maven.it", "maven-it-it0030", "1.0-SNAPSHOT", "jar");
         verifier.deleteArtifact("org.apache.maven.it", "maven-it-it0030-child-hierarchy", "1.0-SNAPSHOT", "jar");

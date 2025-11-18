@@ -48,7 +48,7 @@ class MavenITmng5224InjectedSettings extends AbstractMavenIntegrationTestCase {
      */
     @Test
     public void testmng5224ReadSettings() throws Exception {
-        Path testDir = extractResources("/mng-5224");
+        Path testDir = extractResources("mng-5224");
 
         // First, build the test plugin
         Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-settings"));

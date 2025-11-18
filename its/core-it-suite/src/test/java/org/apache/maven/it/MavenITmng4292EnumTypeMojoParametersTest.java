@@ -40,7 +40,7 @@ public class MavenITmng4292EnumTypeMojoParametersTest extends AbstractMavenInteg
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-4292");
+        Path testDir = extractResources("mng-4292");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

@@ -67,7 +67,7 @@ public class MavenITmng3775ConflictResolutionBacktrackingTest extends AbstractMa
      * be revised.
      */
     private void testit(String project) throws Exception {
-        Path testDir = extractResources("/mng-3775");
+        Path testDir = extractResources("mng-3775");
 
         Verifier verifier = newVerifier(testDir.resolve(project));
         verifier.setAutoclean(false);

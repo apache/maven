@@ -49,7 +49,7 @@ public class MavenITmng3023ReactorDependencyResolutionTest extends AbstractMaven
      */
     @Test
     public void testitMNG3023A() throws Exception {
-        Path testDir = extractResources("/mng-3023");
+        Path testDir = extractResources("mng-3023");
 
         // First pass. Make sure the dependency cannot be resolved.
         Verifier verifier = newVerifier(testDir);
@@ -78,7 +78,7 @@ public class MavenITmng3023ReactorDependencyResolutionTest extends AbstractMaven
      */
     @Test
     public void testitMNG3023B() throws Exception {
-        Path testDir = extractResources("/mng-3023");
+        Path testDir = extractResources("mng-3023");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
@@ -113,7 +113,7 @@ public class MavenITmng3023ReactorDependencyResolutionTest extends AbstractMaven
      */
     @Test
     public void testitMNG3023C() throws Exception {
-        Path testDir = extractResources("/mng-3023");
+        Path testDir = extractResources("mng-3023");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

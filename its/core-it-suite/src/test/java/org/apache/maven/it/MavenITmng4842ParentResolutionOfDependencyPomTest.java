@@ -42,7 +42,7 @@ public class MavenITmng4842ParentResolutionOfDependencyPomTest extends AbstractM
      */
     @Test
     public void testitCore() throws Exception {
-        Path testDir = extractResources("/mng-4842");
+        Path testDir = extractResources("mng-4842");
 
         Verifier verifier = newVerifier(testDir.resolve("core"));
         verifier.setAutoclean(false);
@@ -70,7 +70,7 @@ public class MavenITmng4842ParentResolutionOfDependencyPomTest extends AbstractM
      */
     @Test
     public void testitPlugin() throws Exception {
-        Path testDir = extractResources("/mng-4842");
+        Path testDir = extractResources("mng-4842");
 
         Verifier verifier = newVerifier(testDir.resolve("plugin"));
         verifier.setAutoclean(false);

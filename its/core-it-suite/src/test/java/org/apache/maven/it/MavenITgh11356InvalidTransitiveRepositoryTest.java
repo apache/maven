@@ -31,7 +31,7 @@ public class MavenITgh11356InvalidTransitiveRepositoryTest extends AbstractMaven
 
     @Test
     public void testInvalidTransitiveRepository() throws Exception {
-        Path testDir = extractResources("/gh-11356-invalid-transitive-repository");
+        Path testDir = extractResources("gh-11356-invalid-transitive-repository");
 
         // First, verify that normal build works from the actual root
         Verifier verifier = newVerifier(testDir);

@@ -39,7 +39,7 @@ class MavenITgh11381ResourceTargetPathTest extends AbstractMavenIntegrationTestC
      */
     @Test
     void testRelativeTargetPathInResources() throws Exception {
-        Path testDir = extractResources("/gh-11381");
+        Path testDir = extractResources("gh-11381");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

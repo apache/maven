@@ -39,13 +39,13 @@ public class MavenITmng5716ToolchainsTypeTest extends AbstractMavenIntegrationTe
      */
     @Test
     public void testitMNG5716() throws Exception {
-        Path testDir = extractResources("/mng-5716-toolchains-type");
+        Path testDir = extractResources("mng-5716-toolchains-type");
 
         Path javaHome = testDir.resolve("javaHome");
         Path bin = javaHome.resolve("bin");
         Files.createDirectories(bin);
-        Files.createFile(bin.resolve("javac"));
-        Files.createFile(bin.resolve("javac.exe"));
+        ItUtils.createFile(bin.resolve("javac"));
+        ItUtils.createFile(bin.resolve("javac.exe"));
 
         Verifier verifier = newVerifier(testDir);
         Map<String, String> properties = verifier.newDefaultFilterMap();

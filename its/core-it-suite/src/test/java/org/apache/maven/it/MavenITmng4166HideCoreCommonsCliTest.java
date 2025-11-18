@@ -42,7 +42,7 @@ public class MavenITmng4166HideCoreCommonsCliTest extends AbstractMavenIntegrati
      */
     @Test
     public void testitMNG4166() throws Exception {
-        Path testDir = extractResources("/mng-4166");
+        Path testDir = extractResources("mng-4166");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

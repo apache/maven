@@ -49,7 +49,7 @@ public class MavenITmng2921ActiveAttachedArtifactsTest extends AbstractMavenInte
      */
     @Test
     public void testitMNG2921() throws Exception {
-        Path testDir = extractResources("/mng-2921");
+        Path testDir = extractResources("mng-2921");
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("consumer/target");

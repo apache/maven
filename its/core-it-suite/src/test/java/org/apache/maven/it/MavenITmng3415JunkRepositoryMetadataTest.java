@@ -46,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 2.0.8
  */
 public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenIntegrationTestCase {
-    private static final String RESOURCE_BASE = "/mng-3415";
+    private static final String RESOURCE_BASE = "mng-3415";
 
     public MavenITmng3415JunkRepositoryMetadataTest() {
         // we're going to control the test execution according to the maven version present within each test method.

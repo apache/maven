@@ -42,7 +42,7 @@ public class MavenITmng3941ExecutionProjectRestrictedToForkingMojoTest extends A
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-3941");
+        Path testDir = extractResources("mng-3941");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

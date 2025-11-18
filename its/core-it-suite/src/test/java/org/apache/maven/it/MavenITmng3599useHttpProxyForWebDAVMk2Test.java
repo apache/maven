@@ -126,7 +126,7 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test extends AbstractMavenInt
 
     @Test
     public void testitUseHttpProxyForHttp() throws Exception {
-        Path testDir = extractResources("/mng-3599-mk2");
+        Path testDir = extractResources("mng-3599-mk2");
 
         /*
          * NOTE: Make sure the WebDAV extension required by the test project has been pulled down into the local
@@ -168,7 +168,7 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test extends AbstractMavenInt
      */
     @Test
     public void testitUseHttpProxyForWebDAV() throws Exception {
-        Path testDir = extractResources("/mng-3599-mk2");
+        Path testDir = extractResources("mng-3599-mk2");
 
         /*
          * NOTE: Make sure the WebDAV extension required by the test project has been pulled down into the local

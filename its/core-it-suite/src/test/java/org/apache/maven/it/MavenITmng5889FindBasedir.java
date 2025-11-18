@@ -76,7 +76,7 @@ public class MavenITmng5889FindBasedir extends AbstractMavenIntegrationTestCase 
     }
 
     protected void runCoreExtensionWithOption(String option, String subdir, boolean pom) throws Exception {
-        Path testDir = extractResources("/mng-5889-find.mvn");
+        Path testDir = extractResources("mng-5889-find.mvn");
 
         Path basedir =
                 testDir.resolve("../mng-" + (pom ? "5889" : "6223") + "-find.mvn" + option + (pom ? "Pom" : "Dir"));

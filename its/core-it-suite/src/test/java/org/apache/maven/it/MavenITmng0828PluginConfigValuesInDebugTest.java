@@ -42,7 +42,7 @@ public class MavenITmng0828PluginConfigValuesInDebugTest extends AbstractMavenIn
      */
     @Test
     public void testitMNG0828() throws Exception {
-        Path testDir = extractResources("/mng-0828");
+        Path testDir = extractResources("mng-0828");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

@@ -38,7 +38,7 @@ public class MavenITmng4291MojoRequiresOnlineModeTest extends AbstractMavenInteg
      */
     @Test
     public void testitDirectInvocation() throws Exception {
-        Path testDir = extractResources("/mng-4291");
+        Path testDir = extractResources("mng-4291");
 
         // First, build the test plugin
         Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-online"));
@@ -72,7 +72,7 @@ public class MavenITmng4291MojoRequiresOnlineModeTest extends AbstractMavenInteg
      */
     @Test
     public void testitLifecycleInvocation() throws Exception {
-        Path testDir = extractResources("/mng-4291");
+        Path testDir = extractResources("mng-4291");
 
         // First, build the test plugin
         Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-online"));

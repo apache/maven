@@ -40,7 +40,7 @@ public class MavenITmng2695OfflinePluginSnapshotsTest extends AbstractMavenInteg
      */
     @Test
     public void testitMNG2695() throws Exception {
-        Path testDir = extractResources("/mng-2695");
+        Path testDir = extractResources("mng-2695");
         Verifier verifier;
 
         // phase 1: run build in online mode to fill local repo

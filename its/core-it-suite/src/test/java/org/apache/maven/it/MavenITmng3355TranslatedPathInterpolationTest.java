@@ -34,7 +34,7 @@ public class MavenITmng3355TranslatedPathInterpolationTest extends AbstractMaven
 
     @Test
     public void testitMNG3355() throws Exception {
-        Path testDir = extractResources("/mng-3355");
+        Path testDir = extractResources("mng-3355");
 
         Verifier verifier;
 

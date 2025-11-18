@@ -55,7 +55,7 @@ public class MavenITmng5064SuppressSnapshotUpdatesTest extends AbstractMavenInte
      */
     @Test
     public void testit() throws Exception {
-        Path testDir = extractResources("/mng-5064");
+        Path testDir = extractResources("mng-5064");
 
         String metadataUri = "org/apache/maven/its/mng5064/dep/0.1-SNAPSHOT/maven-metadata.xml";
 

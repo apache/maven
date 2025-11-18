@@ -40,7 +40,7 @@ public class MavenITmng3710PollutedClonedPluginsTest extends AbstractMavenIntegr
 
     @Test
     public void testitMNG3710POMInheritance() throws Exception {
-        Path testDir = extractResources("/mng-3710/pom-inheritance");
+        Path testDir = extractResources("mng-3710/pom-inheritance");
         Path pluginDir = testDir.resolve("maven-mng3710-pomInheritance-plugin");
         Path projectsDir = testDir.resolve("projects");
 
@@ -70,7 +70,7 @@ public class MavenITmng3710PollutedClonedPluginsTest extends AbstractMavenIntegr
 
     @Test
     public void testitMNG3710OriginalModel() throws Exception {
-        Path testDir = extractResources("/mng-3710/original-model");
+        Path testDir = extractResources("mng-3710/original-model");
         Path pluginsDir = testDir.resolve("plugins");
         Path projectDir = testDir.resolve("project");
 
@@ -79,15 +79,11 @@ public class MavenITmng3710PollutedClonedPluginsTest extends AbstractMavenIntegr
         verifier = newVerifier(pluginsDir);
         verifier.addCliArgument("install");
         verifier.execute();
-
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier(projectDir);
-
         verifier.addCliArguments("org.apache.maven.its.mng3710:mavenit-mng3710-directInvoke-plugin:1:run", "validate");
-
         verifier.execute();
-
         verifier.verifyErrorFreeLog();
     }
 }
