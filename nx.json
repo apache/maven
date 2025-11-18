@@ -1,0 +1,15 @@
+{
+  "installation": {
+    "version": "22.0.4",
+    "plugins": {
+      "@nx/maven": "22.0.4"
+    }
+  },
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "defaultBase": "master",
+  "plugins": [
+    "@nx/maven"
+  ],
+  "nxCloudUrl": "https://snapshot.nx.app",
+  "nxCloudId": "691cc324f38e74203c2ea4b9"
+}

@@ -24,7 +24,7 @@ under the License.
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
     <version>45</version>
-    <relativePath />
+    <relativePath/>
   </parent>
 
   <artifactId>maven</artifactId>
@@ -171,7 +171,7 @@ under the License.
     <wagonVersion>3.5.3</wagonVersion>
     <woodstoxVersion>7.1.1</woodstoxVersion>
     <xmlunitVersion>2.11.0</xmlunitVersion>
-    <jacocoArgLine />
+    <jacocoArgLine/>
 
     <version.spotless-maven-plugin>3.0.0</version.spotless-maven-plugin>
     <version.palantirJavaFormat>2.80.0</version.palantirJavaFormat>
@@ -698,7 +698,7 @@ under the License.
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
-            <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory" />
+            <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory"/>
             <argLine>-Xmx256m @{jacocoArgLine}</argLine>
             <systemPropertyVariables combine.children="append">
               <version.toolbox>${toolboxVersion}</version.toolbox>
@@ -709,7 +709,7 @@ under the License.
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
           <configuration>
-            <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory" />
+            <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory"/>
             <argLine>-Xmx256m @{jacocoArgLine}</argLine>
             <systemPropertyVariables combine.children="append">
               <version.toolbox>${toolboxVersion}</version.toolbox>
@@ -804,7 +804,13 @@ under the License.
             </dependency>
           </dependencies>
         </plugin>
-      </plugins>
+      
+      <plugin>
+        <groupId>dev.nx.maven</groupId>
+        <artifactId>nx-maven-plugin</artifactId>
+        <version>0.0.10</version>
+      </plugin>
+    </plugins>
     </pluginManagement>
     <plugins>
       <plugin>
@@ -1035,8 +1041,8 @@ under the License.
                   <target>
                     <!-- directory should be created by org.eclipse.aether.tools.CollectConfiguration -->
                     <!-- TODO: remove with next version of resolver-tools -->
-                    <mkdir dir="${project.build.directory}/generated-site/markdown" />
-                    <mkdir dir="${project.build.directory}/generated-site/resources" />
+                    <mkdir dir="${project.build.directory}/generated-site/markdown"/>
+                    <mkdir dir="${project.build.directory}/generated-site/resources"/>
                   </target>
                 </configuration>
               </execution>
