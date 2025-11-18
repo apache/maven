@@ -21,11 +21,13 @@ jobs:
       - name: Checkout maven
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
+          filter: tree:0
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Set up Maven
         shell: bash
-        run: mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper "-Dmaven=4.0.0-rc-3"
+        run: ./mvnw --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper "-Dmaven=4.0.0-rc-3"
 
       - name: Start CI run
         run: ./nx start-ci-run --distribute-on="5 linux-large" --stop-agents-after="verify-ci"
