@@ -20,39 +20,41 @@ package org.apache.maven.cling.invoker.mvnup.goals;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import eu.maveniverse.domtrip.Document;
+import eu.maveniverse.domtrip.Element;
+import eu.maveniverse.domtrip.maven.Coordinates;
+import eu.maveniverse.domtrip.maven.MavenPomElements;
 import org.apache.maven.api.cli.mvnup.UpgradeOptions;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Priority;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
-import org.jdom2.Content;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
-import org.jdom2.Text;
 
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.Files.DEFAULT_PARENT_RELATIVE_PATH;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.Files.POM_XML;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.ModelVersions.MODEL_VERSION_4_1_0;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.ARTIFACT_ID;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.BUILD;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.DEPENDENCY;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.GROUP_ID;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.PARENT;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.PLUGIN;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.PLUGINS;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.RELATIVE_PATH;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.SUBPROJECT;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.SUBPROJECTS;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.VERSION;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.ARTIFACT_ID;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.BUILD;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.DEPENDENCIES;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.DEPENDENCY;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.DEPENDENCY_MANAGEMENT;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.GROUP_ID;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PARENT;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PLUGIN;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PLUGINS;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PROFILE;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PROFILES;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.SUBPROJECT;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.SUBPROJECTS;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.VERSION;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Files.DEFAULT_PARENT_RELATIVE_PATH;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Files.POM_XML;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.ModelVersions.MODEL_VERSION_4_1_0;
 
 /**
  * Strategy for applying Maven inference optimizations.
@@ -103,7 +105,7 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
         Set<Path> errorPoms = new HashSet<>();
 
         // Compute all GAVs for inference
-        Set<GAV> allGAVs = GAVUtils.computeAllGAVs(context, pomMap);
+        Set<Coordinates> allGAVs = computeAllArtifactCoordinates(context, pomMap);
 
         for (Map.Entry<Path, Document> entry : pomMap.entrySet()) {
             Path pomPath = entry.getKey();
@@ -162,17 +164,16 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
      * Removes redundant child groupId/version that can be inferred from parent.
      */
     private boolean applyLimitedParentInference(UpgradeContext context, Document pomDocument) {
-        Element root = pomDocument.getRootElement();
-        Namespace namespace = root.getNamespace();
+        Element root = pomDocument.root();
 
         // Check if this POM has a parent
-        Element parentElement = root.getChild(PARENT, namespace);
+        Element parentElement = root.child(PARENT).orElse(null);
         if (parentElement == null) {
             return false;
         }
 
         // Apply limited inference (child groupId/version removal only)
-        return trimParentElementLimited(context, root, parentElement, namespace);
+        return trimParentElementLimited(context, root, parentElement);
     }
 
     /**
@@ -180,53 +181,47 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
      * Removes redundant parent elements that can be inferred from relativePath.
      */
     private boolean applyFullParentInference(UpgradeContext context, Map<Path, Document> pomMap, Document pomDocument) {
-        Element root = pomDocument.getRootElement();
-        Namespace namespace = root.getNamespace();
+        Element root = pomDocument.root();
 
         // Check if this POM has a parent
-        Element parentElement = root.getChild(PARENT, namespace);
+        Element parentElement = root.child(PARENT).orElse(null);
         if (parentElement == null) {
             return false;
         }
 
         // Apply full inference (parent element trimming based on relativePath)
-        return trimParentElementFull(context, root, parentElement, namespace, pomMap);
+        return trimParentElementFull(context, root, parentElement, pomMap);
     }
 
     /**
      * Applies dependency-related inference optimizations.
      * Removes managed dependencies that point to project artifacts.
      */
-    private boolean applyDependencyInference(UpgradeContext context, Set<GAV> allGAVs, Document pomDocument) {
+    private boolean applyDependencyInference(UpgradeContext context, Set<Coordinates> allGAVs, Document pomDocument) {
         boolean hasChanges = false;
-        Element root = pomDocument.getRootElement();
-        Namespace namespace = root.getNamespace();
+        Element root = pomDocument.root();
 
         // Check dependencyManagement section
-        Element dependencyManagement = root.getChild("dependencyManagement", namespace);
+        Element dependencyManagement = root.child(DEPENDENCY_MANAGEMENT).orElse(null);
         if (dependencyManagement != null) {
-            Element dependencies = dependencyManagement.getChild("dependencies", namespace);
+            Element dependencies = dependencyManagement.child(DEPENDENCIES).orElse(null);
             if (dependencies != null) {
-                hasChanges |= removeManagedDependenciesFromSection(
-                        context, dependencies, namespace, allGAVs, "dependencyManagement");
+                hasChanges |=
+                        removeManagedDependenciesFromSection(context, dependencies, allGAVs, DEPENDENCY_MANAGEMENT);
             }
         }
 
         // Check profiles for dependencyManagement
-        Element profilesElement = root.getChild("profiles", namespace);
-        if (profilesElement != null) {
-            List<Element> profileElements = profilesElement.getChildren("profile", namespace);
-            for (Element profileElement : profileElements) {
-                Element profileDependencyManagement = profileElement.getChild("dependencyManagement", namespace);
-                if (profileDependencyManagement != null) {
-                    Element profileDependencies = profileDependencyManagement.getChild("dependencies", namespace);
-                    if (profileDependencies != null) {
-                        hasChanges |= removeManagedDependenciesFromSection(
-                                context, profileDependencies, namespace, allGAVs, "profile dependencyManagement");
-                    }
-                }
-            }
-        }
+        boolean profileChanges = root.child(PROFILES).stream()
+                .flatMap(profiles -> profiles.children(PROFILE))
+                .map(profile -> profile.child(DEPENDENCY_MANAGEMENT)
+                        .flatMap(dm -> dm.child(DEPENDENCIES))
+                        .map(deps -> removeManagedDependenciesFromSection(
+                                context, deps, allGAVs, "profile dependencyManagement"))
+                        .orElse(false))
+                .reduce(false, Boolean::logicalOr);
+
+        hasChanges |= profileChanges;
 
         return hasChanges;
     }
@@ -237,45 +232,35 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
      */
     private boolean applyDependencyInferenceRedundancy(
             UpgradeContext context, Map<Path, Document> pomMap, Document pomDocument) {
-        Element root = pomDocument.getRootElement();
-        Namespace namespace = root.getNamespace();
+        Element root = pomDocument.root();
         boolean hasChanges = false;
 
         // Process main dependencies
-        Element dependenciesElement = root.getChild("dependencies", namespace);
+        Element dependenciesElement = root.child(DEPENDENCIES).orElse(null);
         if (dependenciesElement != null) {
-            hasChanges |= removeDependencyInferenceFromSection(
-                    context, dependenciesElement, namespace, pomMap, "dependencies");
+            hasChanges |= removeDependencyInferenceFromSection(context, dependenciesElement, pomMap, DEPENDENCIES);
         }
 
         // Process profile dependencies
-        Element profilesElement = root.getChild("profiles", namespace);
-        if (profilesElement != null) {
-            List<Element> profileElements = profilesElement.getChildren("profile", namespace);
-            for (Element profileElement : profileElements) {
-                Element profileDependencies = profileElement.getChild("dependencies", namespace);
-                if (profileDependencies != null) {
-                    hasChanges |= removeDependencyInferenceFromSection(
-                            context, profileDependencies, namespace, pomMap, "profile dependencies");
-                }
-            }
-        }
+        boolean profileDependencyChanges = root.child(PROFILES).stream()
+                .flatMap(profiles -> profiles.children(PROFILE))
+                .map(profile -> profile.child(DEPENDENCIES)
+                        .map(deps ->
+                                removeDependencyInferenceFromSection(context, deps, pomMap, "profile dependencies"))
+                        .orElse(false))
+                .reduce(false, Boolean::logicalOr);
+
+        hasChanges |= profileDependencyChanges;
 
         // Process build plugin dependencies
-        Element buildElement = root.getChild(BUILD, namespace);
-        if (buildElement != null) {
-            Element pluginsElement = buildElement.getChild(PLUGINS, namespace);
-            if (pluginsElement != null) {
-                List<Element> pluginElements = pluginsElement.getChildren(PLUGIN, namespace);
-                for (Element pluginElement : pluginElements) {
-                    Element pluginDependencies = pluginElement.getChild("dependencies", namespace);
-                    if (pluginDependencies != null) {
-                        hasChanges |= removeDependencyInferenceFromSection(
-                                context, pluginDependencies, namespace, pomMap, "plugin dependencies");
-                    }
-                }
-            }
-        }
+        boolean pluginDependencyChanges = root.child(BUILD).flatMap(build -> build.child(PLUGINS)).stream()
+                .flatMap(plugins -> plugins.children(PLUGIN))
+                .map(plugin -> plugin.child(DEPENDENCIES)
+                        .map(deps -> removeDependencyInferenceFromSection(context, deps, pomMap, "plugin dependencies"))
+                        .orElse(false))
+                .reduce(false, Boolean::logicalOr);
+
+        hasChanges |= pluginDependencyChanges;
 
         return hasChanges;
     }
@@ -286,34 +271,33 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
      */
     private boolean applySubprojectsInference(UpgradeContext context, Document pomDocument, Path pomPath) {
         boolean hasChanges = false;
-        Element root = pomDocument.getRootElement();
-        Namespace namespace = root.getNamespace();
+        Element root = pomDocument.root();
 
         // Check main subprojects
-        Element subprojectsElement = root.getChild(SUBPROJECTS, namespace);
+        Element subprojectsElement = root.child(SUBPROJECTS).orElse(null);
         if (subprojectsElement != null) {
-            if (isSubprojectsListRedundant(subprojectsElement, namespace, pomPath)) {
-                removeElementWithFormatting(subprojectsElement);
+            if (isSubprojectsListRedundant(subprojectsElement, pomPath)) {
+                DomUtils.removeElement(subprojectsElement);
                 context.detail("Removed: redundant subprojects list (matches direct children)");
                 hasChanges = true;
             }
         }
 
         // Check profiles for subprojects
-        Element profilesElement = root.getChild("profiles", namespace);
-        if (profilesElement != null) {
-            List<Element> profileElements = profilesElement.getChildren("profile", namespace);
-            for (Element profileElement : profileElements) {
-                Element profileSubprojects = profileElement.getChild(SUBPROJECTS, namespace);
-                if (profileSubprojects != null) {
-                    if (isSubprojectsListRedundant(profileSubprojects, namespace, pomPath)) {
-                        removeElementWithFormatting(profileSubprojects);
-                        context.detail("Removed: redundant subprojects list from profile (matches direct children)");
-                        hasChanges = true;
-                    }
-                }
-            }
-        }
+        boolean profileSubprojectsChanges = root.child(PROFILES).stream()
+                .flatMap(profiles -> profiles.children(PROFILE))
+                .map(profile -> profile.child(SUBPROJECTS)
+                        .filter(subprojects -> isSubprojectsListRedundant(subprojects, pomPath))
+                        .map(subprojects -> {
+                            DomUtils.removeElement(subprojects);
+                            context.detail(
+                                    "Removed: redundant subprojects list from profile (matches direct children)");
+                            return true;
+                        })
+                        .orElse(false))
+                .reduce(false, Boolean::logicalOr);
+
+        hasChanges |= profileSubprojectsChanges;
 
         return hasChanges;
     }
@@ -341,23 +325,22 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
      * Applies limited parent inference for 4.0.0 models.
      * Only removes child groupId/version when they match parent.
      */
-    private boolean trimParentElementLimited(
-            UpgradeContext context, Element root, Element parentElement, Namespace namespace) {
+    private boolean trimParentElementLimited(UpgradeContext context, Element root, Element parentElement) {
         boolean hasChanges = false;
 
         // Get parent GAV
-        String parentGroupId = getChildText(parentElement, "groupId", namespace);
-        String parentVersion = getChildText(parentElement, "version", namespace);
+        String parentGroupId = parentElement.childText(MavenPomElements.Elements.GROUP_ID);
+        String parentVersion = parentElement.childText(MavenPomElements.Elements.VERSION);
 
         // Get child GAV
-        String childGroupId = getChildText(root, "groupId", namespace);
-        String childVersion = getChildText(root, "version", namespace);
+        String childGroupId = root.childText(MavenPomElements.Elements.GROUP_ID);
+        String childVersion = root.childText(MavenPomElements.Elements.VERSION);
 
         // Remove child groupId if it matches parent groupId
         if (childGroupId != null && Objects.equals(childGroupId, parentGroupId)) {
-            Element childGroupIdElement = root.getChild("groupId", namespace);
+            Element childGroupIdElement = root.child(GROUP_ID).orElse(null);
             if (childGroupIdElement != null) {
-                removeElementWithFormatting(childGroupIdElement);
+                DomUtils.removeElement(childGroupIdElement);
                 context.detail("Removed: child groupId (matches parent)");
                 hasChanges = true;
             }
@@ -365,9 +348,9 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
 
         // Remove child version if it matches parent version
         if (childVersion != null && Objects.equals(childVersion, parentVersion)) {
-            Element childVersionElement = root.getChild("version", namespace);
+            Element childVersionElement = root.child("version").orElse(null);
             if (childVersionElement != null) {
-                removeElementWithFormatting(childVersionElement);
+                DomUtils.removeElement(childVersionElement);
                 context.detail("Removed: child version (matches parent)");
                 hasChanges = true;
             }
@@ -381,27 +364,23 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
      * Removes parent groupId/version/artifactId when they can be inferred.
      */
     private boolean trimParentElementFull(
-            UpgradeContext context,
-            Element root,
-            Element parentElement,
-            Namespace namespace,
-            Map<Path, Document> pomMap) {
+            UpgradeContext context, Element root, Element parentElement, Map<Path, Document> pomMap) {
         boolean hasChanges = false;
 
         // Get child GAV before applying any changes
-        String childGroupId = getChildText(root, GROUP_ID, namespace);
-        String childVersion = getChildText(root, VERSION, namespace);
+        String childGroupId = root.childText(MavenPomElements.Elements.GROUP_ID);
+        String childVersion = root.childText(MavenPomElements.Elements.VERSION);
 
         // First apply limited inference (child elements) - this removes matching child groupId/version
-        hasChanges |= trimParentElementLimited(context, root, parentElement, namespace);
+        hasChanges |= trimParentElementLimited(context, root, parentElement);
 
         // Only remove parent elements if the parent is in the same reactor (not external)
-        if (isParentInReactor(parentElement, namespace, pomMap, context)) {
+        if (isParentInReactor(parentElement, pomMap, context)) {
             // Remove parent groupId if child has no explicit groupId
             if (childGroupId == null) {
-                Element parentGroupIdElement = parentElement.getChild(GROUP_ID, namespace);
+                Element parentGroupIdElement = parentElement.child(GROUP_ID).orElse(null);
                 if (parentGroupIdElement != null) {
-                    removeElementWithFormatting(parentGroupIdElement);
+                    DomUtils.removeElement(parentGroupIdElement);
                     context.detail("Removed: parent groupId (child has no explicit groupId)");
                     hasChanges = true;
                 }
@@ -409,19 +388,20 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
 
             // Remove parent version if child has no explicit version
             if (childVersion == null) {
-                Element parentVersionElement = parentElement.getChild(VERSION, namespace);
+                Element parentVersionElement = parentElement.child(VERSION).orElse(null);
                 if (parentVersionElement != null) {
-                    removeElementWithFormatting(parentVersionElement);
+                    DomUtils.removeElement(parentVersionElement);
                     context.detail("Removed: parent version (child has no explicit version)");
                     hasChanges = true;
                 }
             }
 
             // Remove parent artifactId if it can be inferred from relativePath
-            if (canInferParentArtifactId(parentElement, namespace, pomMap)) {
-                Element parentArtifactIdElement = parentElement.getChild(ARTIFACT_ID, namespace);
+            if (canInferParentArtifactId(parentElement, pomMap)) {
+                Element parentArtifactIdElement =
+                        parentElement.child(ARTIFACT_ID).orElse(null);
                 if (parentArtifactIdElement != null) {
-                    removeElementWithFormatting(parentArtifactIdElement);
+                    DomUtils.removeElement(parentArtifactIdElement);
                     context.detail("Removed: parent artifactId (can be inferred from relativePath)");
                     hasChanges = true;
                 }
@@ -435,29 +415,29 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
      * Determines if the parent is part of the same reactor (multi-module project)
      * vs. an external parent POM by checking if the parent exists in the pomMap.
      */
-    private boolean isParentInReactor(
-            Element parentElement, Namespace namespace, Map<Path, Document> pomMap, UpgradeContext context) {
+    private boolean isParentInReactor(Element parentElement, Map<Path, Document> pomMap, UpgradeContext context) {
         // If relativePath is explicitly set to empty, parent is definitely external
-        String relativePath = getChildText(parentElement, RELATIVE_PATH, namespace);
+        String relativePath = parentElement.childText(MavenPomElements.Elements.RELATIVE_PATH);
         if (relativePath != null && relativePath.trim().isEmpty()) {
             return false;
         }
 
         // Extract parent GAV
-        String parentGroupId = getChildText(parentElement, GROUP_ID, namespace);
-        String parentArtifactId = getChildText(parentElement, ARTIFACT_ID, namespace);
-        String parentVersion = getChildText(parentElement, VERSION, namespace);
+        String parentGroupId = parentElement.childText(MavenPomElements.Elements.GROUP_ID);
+        String parentArtifactId = parentElement.childText(MavenPomElements.Elements.ARTIFACT_ID);
+        String parentVersion = parentElement.childText(MavenPomElements.Elements.VERSION);
 
         if (parentGroupId == null || parentArtifactId == null || parentVersion == null) {
             // Cannot determine parent GAV, assume external
             return false;
         }
 
-        GAV parentGAV = new GAV(parentGroupId, parentArtifactId, parentVersion);
+        Coordinates parentGAV = Coordinates.of(parentGroupId, parentArtifactId, parentVersion);
 
         // Check if any POM in our reactor matches the parent GAV using GAVUtils
         for (Document pomDocument : pomMap.values()) {
-            GAV pomGAV = GAVUtils.extractGAVWithParentResolution(context, pomDocument);
+            Coordinates pomGAV =
+                    AbstractUpgradeStrategy.extractArtifactCoordinatesWithParentResolution(context, pomDocument);
             if (pomGAV != null && pomGAV.equals(parentGAV)) {
                 return true;
             }
@@ -470,9 +450,9 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
     /**
      * Determines if parent artifactId can be inferred from relativePath.
      */
-    private boolean canInferParentArtifactId(Element parentElement, Namespace namespace, Map<Path, Document> pomMap) {
+    private boolean canInferParentArtifactId(Element parentElement, Map<Path, Document> pomMap) {
         // Get relativePath (default is "../pom.xml" if not specified)
-        String relativePath = getChildText(parentElement, RELATIVE_PATH, namespace);
+        String relativePath = parentElement.childText(MavenPomElements.Elements.RELATIVE_PATH);
         if (relativePath == null || relativePath.trim().isEmpty()) {
             relativePath = DEFAULT_PARENT_RELATIVE_PATH; // Maven default
         }
@@ -485,8 +465,9 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
     /**
      * Checks if a subprojects list is redundant (matches direct child directories with pom.xml).
      */
-    private boolean isSubprojectsListRedundant(Element subprojectsElement, Namespace namespace, Path pomPath) {
-        List<Element> subprojectElements = subprojectsElement.getChildren(SUBPROJECT, namespace);
+    private boolean isSubprojectsListRedundant(Element subprojectsElement, Path pomPath) {
+        List<Element> subprojectElements =
+                subprojectsElement.children(SUBPROJECT).toList();
         if (subprojectElements.isEmpty()) {
             return true; // Empty list is redundant
         }
@@ -498,13 +479,10 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
         }
 
         // Get declared subprojects
-        Set<String> declaredSubprojects = new HashSet<>();
-        for (Element subprojectElement : subprojectElements) {
-            String subprojectName = subprojectElement.getTextTrim();
-            if (subprojectName != null && !subprojectName.isEmpty()) {
-                declaredSubprojects.add(subprojectName);
-            }
-        }
+        Set<String> declaredSubprojects = subprojectElements.stream()
+                .map(Element::textContentTrimmed)
+                .filter(name -> !name.isEmpty())
+                .collect(Collectors.toSet());
 
         // Get list of actual direct child directories with pom.xml
         Set<String> actualSubprojects = new HashSet<>();
@@ -530,52 +508,47 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
      * Helper method to remove managed dependencies from a specific dependencies section.
      */
     private boolean removeManagedDependenciesFromSection(
-            UpgradeContext context, Element dependencies, Namespace namespace, Set<GAV> allGAVs, String sectionName) {
-        List<Element> dependencyElements = dependencies.getChildren(DEPENDENCY, namespace);
-        List<Element> toRemove = new ArrayList<>();
+            UpgradeContext context, Element dependencies, Set<Coordinates> allGAVs, String sectionName) {
+        List<Element> dependencyElements = dependencies.children(DEPENDENCY).toList();
 
-        for (Element dependency : dependencyElements) {
-            String groupId = getChildText(dependency, GROUP_ID, namespace);
-            String artifactId = getChildText(dependency, ARTIFACT_ID, namespace);
+        List<Element> projectArtifacts = dependencyElements.stream()
+                .filter(dependency -> {
+                    String groupId = dependency.childText(MavenPomElements.Elements.GROUP_ID);
+                    String artifactId = dependency.childText(MavenPomElements.Elements.ARTIFACT_ID);
 
-            if (groupId != null && artifactId != null) {
-                // Check if this dependency matches any project artifact
-                boolean isProjectArtifact = allGAVs.stream()
-                        .anyMatch(gav ->
-                                Objects.equals(gav.groupId(), groupId) && Objects.equals(gav.artifactId(), artifactId));
+                    if (groupId != null && artifactId != null) {
+                        boolean isProjectArtifact = allGAVs.stream()
+                                .anyMatch(gav -> Objects.equals(gav.groupId(), groupId)
+                                        && Objects.equals(gav.artifactId(), artifactId));
 
-                if (isProjectArtifact) {
-                    toRemove.add(dependency);
-                    context.detail("Removed: " + "managed dependency " + groupId + ":" + artifactId + " from "
-                            + sectionName + " (project artifact)");
-                }
-            }
-        }
+                        if (isProjectArtifact) {
+                            context.detail("Removed: managed dependency " + groupId + ":" + artifactId + " from "
+                                    + sectionName + " (project artifact)");
+                            return true;
+                        }
+                    }
+                    return false;
+                })
+                .toList();
 
         // Remove project artifacts while preserving formatting
-        for (Element dependency : toRemove) {
-            removeElementWithFormatting(dependency);
-        }
+        projectArtifacts.forEach(DomUtils::removeElement);
 
-        return !toRemove.isEmpty();
+        return !projectArtifacts.isEmpty();
     }
 
     /**
      * Helper method to remove dependency inference redundancy from a specific dependencies section.
      */
     private boolean removeDependencyInferenceFromSection(
-            UpgradeContext context,
-            Element dependencies,
-            Namespace namespace,
-            Map<Path, Document> pomMap,
-            String sectionName) {
-        List<Element> dependencyElements = dependencies.getChildren(DEPENDENCY, namespace);
+            UpgradeContext context, Element dependencies, Map<Path, Document> pomMap, String sectionName) {
+        List<Element> dependencyElements = dependencies.children(DEPENDENCY).toList();
         boolean hasChanges = false;
 
         for (Element dependency : dependencyElements) {
-            String groupId = getChildText(dependency, GROUP_ID, namespace);
-            String artifactId = getChildText(dependency, ARTIFACT_ID, namespace);
-            String version = getChildText(dependency, VERSION, namespace);
+            String groupId = dependency.childText(MavenPomElements.Elements.GROUP_ID);
+            String artifactId = dependency.childText(MavenPomElements.Elements.ARTIFACT_ID);
+            String version = dependency.childText(MavenPomElements.Elements.VERSION);
 
             if (artifactId != null) {
                 // Try to find the dependency POM in our pomMap
@@ -583,9 +556,9 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
                 if (dependencyPom != null) {
                     // Check if we can infer groupId
                     if (groupId != null && canInferDependencyGroupId(context, dependencyPom, groupId)) {
-                        Element groupIdElement = dependency.getChild(GROUP_ID, namespace);
+                        Element groupIdElement = dependency.child(GROUP_ID).orElse(null);
                         if (groupIdElement != null) {
-                            removeElementWithFormatting(groupIdElement);
+                            DomUtils.removeElement(groupIdElement);
                             context.detail("Removed: " + "dependency groupId " + groupId + " from " + sectionName
                                     + " (can be inferred from project)");
                             hasChanges = true;
@@ -594,9 +567,9 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
 
                     // Check if we can infer version
                     if (version != null && canInferDependencyVersion(context, dependencyPom, version)) {
-                        Element versionElement = dependency.getChild(VERSION, namespace);
+                        Element versionElement = dependency.child(VERSION).orElse(null);
                         if (versionElement != null) {
-                            removeElementWithFormatting(versionElement);
+                            DomUtils.removeElement(versionElement);
                             context.detail("Removed: " + "dependency version " + version + " from " + sectionName
                                     + " (can be inferred from project)");
                             hasChanges = true;
@@ -614,20 +587,24 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
      */
     private Document findDependencyPom(
             UpgradeContext context, Map<Path, Document> pomMap, String groupId, String artifactId) {
-        for (Document pomDocument : pomMap.values()) {
-            GAV gav = GAVUtils.extractGAVWithParentResolution(context, pomDocument);
-            if (gav != null && Objects.equals(gav.groupId(), groupId) && Objects.equals(gav.artifactId(), artifactId)) {
-                return pomDocument;
-            }
-        }
-        return null;
+        return pomMap.values().stream()
+                .filter(pomDocument -> {
+                    Coordinates gav = AbstractUpgradeStrategy.extractArtifactCoordinatesWithParentResolution(
+                            context, pomDocument);
+                    return gav != null
+                            && Objects.equals(gav.groupId(), groupId)
+                            && Objects.equals(gav.artifactId(), artifactId);
+                })
+                .findFirst()
+                .orElse(null);
     }
 
     /**
      * Determines if a dependency version can be inferred from the project artifact.
      */
     private boolean canInferDependencyVersion(UpgradeContext context, Document dependencyPom, String declaredVersion) {
-        GAV projectGav = GAVUtils.extractGAVWithParentResolution(context, dependencyPom);
+        Coordinates projectGav =
+                AbstractUpgradeStrategy.extractArtifactCoordinatesWithParentResolution(context, dependencyPom);
         if (projectGav == null || projectGav.version() == null) {
             return false;
         }
@@ -640,39 +617,13 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
      * Determines if a dependency groupId can be inferred from the project artifact.
      */
     private boolean canInferDependencyGroupId(UpgradeContext context, Document dependencyPom, String declaredGroupId) {
-        GAV projectGav = GAVUtils.extractGAVWithParentResolution(context, dependencyPom);
+        Coordinates projectGav =
+                AbstractUpgradeStrategy.extractArtifactCoordinatesWithParentResolution(context, dependencyPom);
         if (projectGav == null || projectGav.groupId() == null) {
             return false;
         }
 
         // We can infer the groupId if the declared groupId matches the project groupId
         return Objects.equals(declaredGroupId, projectGav.groupId());
-    }
-
-    /**
-     * Helper method to get child text content.
-     */
-    private String getChildText(Element parent, String childName, Namespace namespace) {
-        Element child = parent.getChild(childName, namespace);
-        return child != null ? child.getTextTrim() : null;
-    }
-
-    /**
-     * Removes an element while preserving surrounding formatting.
-     */
-    private void removeElementWithFormatting(Element element) {
-        Element parent = element.getParentElement();
-        if (parent != null) {
-            int index = parent.indexOf(element);
-            parent.removeContent(element);
-
-            // Remove preceding whitespace if it exists
-            if (index > 0) {
-                Content prevContent = parent.getContent(index - 1);
-                if (prevContent instanceof Text text && text.getTextTrim().isEmpty()) {
-                    parent.removeContent(prevContent);
-                }
-            }
-        }
     }
 }

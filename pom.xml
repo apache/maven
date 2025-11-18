@@ -146,6 +146,7 @@ under the License.
     <byteBuddyVersion>1.18.1</byteBuddyVersion>
     <classWorldsVersion>2.9.0</classWorldsVersion>
     <commonsCliVersion>1.11.0</commonsCliVersion>
+    <domtripVersion>0.4.0</domtripVersion>
     <guiceVersion>5.1.0</guiceVersion>
     <guavaVersion>33.5.0-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
@@ -488,6 +489,16 @@ under the License.
         <version>${jlineVersion}</version>
       </dependency>
       <dependency>
+        <groupId>eu.maveniverse.maven.domtrip</groupId>
+        <artifactId>domtrip-core</artifactId>
+        <version>${domtripVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>eu.maveniverse.maven.domtrip</groupId>
+        <artifactId>domtrip-maven</artifactId>
+        <version>${domtripVersion}</version>
+      </dependency>
+      <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
         <version>${slf4jVersion}</version>
@@ -659,11 +670,7 @@ under the License.
         <artifactId>jimfs</artifactId>
         <version>1.3.1</version>
       </dependency>
-      <dependency>
-        <groupId>org.jdom</groupId>
-        <artifactId>jdom2</artifactId>
-        <version>2.0.6.1</version>
-      </dependency>
+
       <dependency>
         <groupId>org.openjdk.jmh</groupId>
         <artifactId>jmh-core</artifactId>

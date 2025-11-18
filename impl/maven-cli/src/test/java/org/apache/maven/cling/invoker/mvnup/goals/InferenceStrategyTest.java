@@ -18,18 +18,17 @@
  */
 package org.apache.maven.cling.invoker.mvnup.goals;
 
-import java.io.StringReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import eu.maveniverse.domtrip.Document;
+import eu.maveniverse.domtrip.Editor;
+import eu.maveniverse.domtrip.Element;
 import org.apache.maven.api.cli.mvnup.UpgradeOptions;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.input.SAXBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -50,12 +49,10 @@ import static org.mockito.Mockito.when;
 class InferenceStrategyTest {
 
     private InferenceStrategy strategy;
-    private SAXBuilder saxBuilder;
 
     @BeforeEach
     void setUp() {
         strategy = new InferenceStrategy();
-        saxBuilder = new SAXBuilder();
     }
 
     private UpgradeContext createMockContext() {
@@ -165,34 +162,35 @@ class InferenceStrategyTest {
                 </project>
                 """;
 
-            Document parentDoc = saxBuilder.build(new StringReader(parentPomXml));
-            Document moduleADoc = saxBuilder.build(new StringReader(moduleAPomXml));
-            Document moduleBDoc = saxBuilder.build(new StringReader(moduleBPomXml));
+            Document parentDoc = Document.of(parentPomXml);
+            Document moduleADoc = Document.of(moduleAPomXml);
+            Document moduleBDoc = Document.of(moduleBPomXml);
 
             Map<Path, Document> pomMap = new HashMap<>();
             pomMap.put(Paths.get("project", "pom.xml"), parentDoc);
             pomMap.put(Paths.get("project", "module-a", "pom.xml"), moduleADoc);
             pomMap.put(Paths.get("project", "module-b", "pom.xml"), moduleBDoc);
 
-            Element moduleBRoot = moduleBDoc.getRootElement();
-            Element dependencies = moduleBRoot.getChild("dependencies", moduleBRoot.getNamespace());
-            Element dependency = dependencies.getChild("dependency", moduleBRoot.getNamespace());
+            Editor editor = new Editor(moduleBDoc);
+            Element moduleBRoot = editor.root();
+            Element dependencies = DomUtils.findChildElement(moduleBRoot, "dependencies");
+            Element dependency = DomUtils.findChildElement(dependencies, "dependency");
 
             // Verify dependency elements exist before inference
-            assertNotNull(dependency.getChild("groupId", moduleBRoot.getNamespace()));
-            assertNotNull(dependency.getChild("artifactId", moduleBRoot.getNamespace()));
-            assertNotNull(dependency.getChild("version", moduleBRoot.getNamespace()));
+            assertNotNull(DomUtils.findChildElement(dependency, "groupId"));
+            assertNotNull(DomUtils.findChildElement(dependency, "artifactId"));
+            assertNotNull(DomUtils.findChildElement(dependency, "version"));
 
             // Apply dependency inference
             UpgradeContext context = createMockContext();
-            strategy.apply(context, pomMap);
+            strategy.doApply(context, pomMap);
 
             // Verify version was removed (can be inferred from project)
-            assertNull(dependency.getChild("version", moduleBRoot.getNamespace()));
+            assertNull(DomUtils.findChildElement(dependency, "version"));
             // groupId should also be removed (can be inferred from project)
-            assertNull(dependency.getChild("groupId", moduleBRoot.getNamespace()));
+            assertNull(DomUtils.findChildElement(dependency, "groupId"));
             // artifactId should remain (always required)
-            assertNotNull(dependency.getChild("artifactId", moduleBRoot.getNamespace()));
+            assertNotNull(DomUtils.findChildElement(dependency, "artifactId"));
         }
 
         @Test
@@ -214,21 +212,22 @@ class InferenceStrategyTest {
                 </project>
                 """;
 
-            Document moduleDoc = saxBuilder.build(new StringReader(modulePomXml));
+            Document moduleDoc = Document.of(modulePomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("project", "pom.xml"), moduleDoc);
 
-            Element moduleRoot = moduleDoc.getRootElement();
-            Element dependencies = moduleRoot.getChild("dependencies", moduleRoot.getNamespace());
-            Element dependency = dependencies.getChild("dependency", moduleRoot.getNamespace());
+            Editor editor = new Editor(moduleDoc);
+            Element moduleRoot = editor.root();
+            Element dependencies = DomUtils.findChildElement(moduleRoot, "dependencies");
+            Element dependency = DomUtils.findChildElement(dependencies, "dependency");
 
             // Apply dependency inference
             UpgradeContext context = createMockContext();
-            strategy.apply(context, pomMap);
+            strategy.doApply(context, pomMap);
 
             // Verify all dependency elements remain (external dependency)
-            assertNotNull(dependency.getChild("groupId", moduleRoot.getNamespace()));
-            assertNotNull(dependency.getChild("artifactId", moduleRoot.getNamespace()));
-            assertNotNull(dependency.getChild("version", moduleRoot.getNamespace()));
+            assertNotNull(DomUtils.findChildElement(dependency, "groupId"));
+            assertNotNull(DomUtils.findChildElement(dependency, "artifactId"));
+            assertNotNull(DomUtils.findChildElement(dependency, "version"));
         }
 
         @Test
@@ -251,28 +250,29 @@ class InferenceStrategyTest {
                     .dependency("com.example", "module-a", "0.9.0")
                     .build();
 
-            Document moduleADoc = saxBuilder.build(new StringReader(moduleAPomXml));
-            Document moduleBDoc = saxBuilder.build(new StringReader(moduleBPomXml));
+            Document moduleADoc = Document.of(moduleAPomXml);
+            Document moduleBDoc = Document.of(moduleBPomXml);
 
             Map<Path, Document> pomMap = new HashMap<>();
             pomMap.put(Paths.get("project", "module-a", "pom.xml"), moduleADoc);
             pomMap.put(Paths.get("project", "module-b", "pom.xml"), moduleBDoc);
 
-            Element moduleBRoot = moduleBDoc.getRootElement();
-            Element dependencies = moduleBRoot.getChild("dependencies", moduleBRoot.getNamespace());
-            Element dependency = dependencies.getChild("dependency", moduleBRoot.getNamespace());
+            Editor editor = new Editor(moduleBDoc);
+            Element moduleBRoot = editor.root();
+            Element dependencies = DomUtils.findChildElement(moduleBRoot, "dependencies");
+            Element dependency = DomUtils.findChildElement(dependencies, "dependency");
 
             // Apply dependency inference
             UpgradeContext context = createMockContext();
-            strategy.apply(context, pomMap);
+            strategy.doApply(context, pomMap);
 
             // Verify correct behavior when version doesn't match:
             // - groupId should be removed (can be inferred from project regardless of version)
             // - version should remain (doesn't match project version, so can't be inferred)
             // - artifactId should remain (always required)
-            assertNull(dependency.getChild("groupId", moduleBRoot.getNamespace()));
-            assertNotNull(dependency.getChild("artifactId", moduleBRoot.getNamespace()));
-            assertNotNull(dependency.getChild("version", moduleBRoot.getNamespace()));
+            assertNull(DomUtils.findChildElement(dependency, "groupId"));
+            assertNotNull(DomUtils.findChildElement(dependency, "artifactId"));
+            assertNotNull(DomUtils.findChildElement(dependency, "version"));
         }
 
         @Test
@@ -311,28 +311,28 @@ class InferenceStrategyTest {
                 </project>
                 """;
 
-            Document moduleADoc = saxBuilder.build(new StringReader(moduleAPomXml));
-            Document moduleBDoc = saxBuilder.build(new StringReader(moduleBPomXml));
+            Document moduleADoc = Document.of(moduleAPomXml);
+            Document moduleBDoc = Document.of(moduleBPomXml);
 
             Map<Path, Document> pomMap = new HashMap<>();
             pomMap.put(Paths.get("project", "module-a", "pom.xml"), moduleADoc);
             pomMap.put(Paths.get("project", "module-b", "pom.xml"), moduleBDoc);
 
-            Element moduleBRoot = moduleBDoc.getRootElement();
-            Element build = moduleBRoot.getChild("build", moduleBRoot.getNamespace());
-            Element plugins = build.getChild("plugins", moduleBRoot.getNamespace());
-            Element plugin = plugins.getChild("plugin", moduleBRoot.getNamespace());
-            Element dependencies = plugin.getChild("dependencies", moduleBRoot.getNamespace());
-            Element dependency = dependencies.getChild("dependency", moduleBRoot.getNamespace());
+            Element moduleBRoot = moduleBDoc.root();
+            Element build = moduleBRoot.child("build").orElse(null);
+            Element plugins = build.child("plugins").orElse(null);
+            Element plugin = plugins.child("plugin").orElse(null);
+            Element dependencies = plugin.child("dependencies").orElse(null);
+            Element dependency = dependencies.child("dependency").orElse(null);
 
             // Apply dependency inference
             UpgradeContext context = createMockContext();
             strategy.apply(context, pomMap);
 
             // Verify version and groupId were removed from plugin dependency
-            assertNull(dependency.getChild("version", moduleBRoot.getNamespace()));
-            assertNull(dependency.getChild("groupId", moduleBRoot.getNamespace()));
-            assertNotNull(dependency.getChild("artifactId", moduleBRoot.getNamespace()));
+            assertNull(dependency.child("version").orElse(null));
+            assertNull(dependency.child("groupId").orElse(null));
+            assertNotNull(dependency.child("artifactId").orElse(null));
         }
     }
 
@@ -369,30 +369,31 @@ class InferenceStrategyTest {
                 </project>
                 """;
 
-            Document parentDoc = saxBuilder.build(new StringReader(parentPomXml));
-            Document childDoc = saxBuilder.build(new StringReader(childPomXml));
+            Document parentDoc = Document.of(parentPomXml);
+            Document childDoc = Document.of(childPomXml);
 
             Map<Path, Document> pomMap = new HashMap<>();
             pomMap.put(Paths.get("project", "pom.xml"), parentDoc);
             pomMap.put(Paths.get("project", "child", "pom.xml"), childDoc);
 
-            Element childRoot = childDoc.getRootElement();
-            Element parentElement = childRoot.getChild("parent", childRoot.getNamespace());
+            Editor editor = new Editor(childDoc);
+            Element childRoot = editor.root();
+            Element parentElement = DomUtils.findChildElement(childRoot, "parent");
 
             // Verify parent elements exist before inference
-            assertNotNull(parentElement.getChild("groupId", childRoot.getNamespace()));
-            assertNotNull(parentElement.getChild("artifactId", childRoot.getNamespace()));
-            assertNotNull(parentElement.getChild("version", childRoot.getNamespace()));
+            assertNotNull(DomUtils.findChildElement(parentElement, "groupId"));
+            assertNotNull(DomUtils.findChildElement(parentElement, "artifactId"));
+            assertNotNull(DomUtils.findChildElement(parentElement, "version"));
 
             // Apply inference
             UpgradeContext context = createMockContext();
             strategy.apply(context, pomMap);
 
             // Verify parent groupId and version were removed (since child doesn't have explicit ones)
-            assertNull(parentElement.getChild("groupId", childRoot.getNamespace()));
-            assertNull(parentElement.getChild("version", childRoot.getNamespace()));
+            assertNull(parentElement.child("groupId").orElse(null));
+            assertNull(parentElement.child("version").orElse(null));
             // artifactId should also be removed since parent POM is in pomMap
-            assertNull(parentElement.getChild("artifactId", childRoot.getNamespace()));
+            assertNull(parentElement.child("artifactId").orElse(null));
         }
 
         @Test
@@ -424,25 +425,26 @@ class InferenceStrategyTest {
                 </project>
                 """;
 
-            Document parentDoc = saxBuilder.build(new StringReader(parentPomXml));
-            Document childDoc = saxBuilder.build(new StringReader(childPomXml));
+            Document parentDoc = Document.of(parentPomXml);
+            Document childDoc = Document.of(childPomXml);
 
             Map<Path, Document> pomMap = new HashMap<>();
             pomMap.put(Paths.get("project", "pom.xml"), parentDoc);
             pomMap.put(Paths.get("project", "child", "pom.xml"), childDoc);
 
-            Element childRoot = childDoc.getRootElement();
-            Element parentElement = childRoot.getChild("parent", childRoot.getNamespace());
+            Editor editor = new Editor(childDoc);
+            Element childRoot = editor.root();
+            Element parentElement = DomUtils.findChildElement(childRoot, "parent");
 
             // Apply inference
             UpgradeContext context = createMockContext();
             strategy.apply(context, pomMap);
 
             // Verify parent elements are kept (since child has explicit values)
-            assertNotNull(parentElement.getChild("groupId", childRoot.getNamespace()));
-            assertNotNull(parentElement.getChild("version", childRoot.getNamespace()));
+            assertNotNull(parentElement.child("groupId").orElse(null));
+            assertNotNull(parentElement.child("version").orElse(null));
             // artifactId should still be removed since parent POM is in pomMap
-            assertNull(parentElement.getChild("artifactId", childRoot.getNamespace()));
+            assertNull(parentElement.child("artifactId").orElse(null));
         }
 
         @Test
@@ -463,12 +465,13 @@ class InferenceStrategyTest {
                 </project>
                 """;
 
-            Document childDoc = saxBuilder.build(new StringReader(childPomXml));
+            Document childDoc = Document.of(childPomXml);
 
             Map<Path, Document> pomMap = Map.of(Paths.get("project", "pom.xml"), childDoc);
 
-            Element childRoot = childDoc.getRootElement();
-            Element parentElement = childRoot.getChild("parent", childRoot.getNamespace());
+            Editor editor = new Editor(childDoc);
+            Element childRoot = editor.root();
+            Element parentElement = DomUtils.findChildElement(childRoot, "parent");
 
             // Apply inference
             UpgradeContext context = createMockContext();
@@ -479,9 +482,9 @@ class InferenceStrategyTest {
             // - artifactId should NOT be removed (external parents need artifactId to be located)
             // - version should NOT be removed (external parents need version to be located)
             // This prevents the "parent.groupId is missing" error reported in issue #7934
-            assertNotNull(parentElement.getChild("groupId", childRoot.getNamespace()));
-            assertNotNull(parentElement.getChild("artifactId", childRoot.getNamespace()));
-            assertNotNull(parentElement.getChild("version", childRoot.getNamespace()));
+            assertNotNull(parentElement.child("groupId").orElse(null));
+            assertNotNull(parentElement.child("artifactId").orElse(null));
+            assertNotNull(parentElement.child("version").orElse(null));
         }
 
         @Test
@@ -514,16 +517,16 @@ class InferenceStrategyTest {
                 </project>
                 """;
 
-            Document parentDoc = saxBuilder.build(new StringReader(parentPomXml));
-            Document childDoc = saxBuilder.build(new StringReader(childPomXml));
+            Document parentDoc = Document.of(parentPomXml);
+            Document childDoc = Document.of(childPomXml);
 
             // Both POMs are in the reactor
             Map<Path, Document> pomMap = Map.of(
                     Paths.get("pom.xml"), parentDoc,
                     Paths.get("child", "pom.xml"), childDoc);
 
-            Element childRoot = childDoc.getRootElement();
-            Element parentElement = childRoot.getChild("parent", childRoot.getNamespace());
+            Element childRoot = childDoc.root();
+            Element parentElement = childRoot.child("parent").orElse(null);
 
             // Apply inference
             UpgradeContext context = createMockContext();
@@ -533,9 +536,9 @@ class InferenceStrategyTest {
             // - groupId should be removed (child has no explicit groupId, parent is in reactor)
             // - artifactId should be removed (can be inferred from relativePath)
             // - version should be removed (child has no explicit version, parent is in reactor)
-            assertNull(parentElement.getChild("groupId", childRoot.getNamespace()));
-            assertNull(parentElement.getChild("artifactId", childRoot.getNamespace()));
-            assertNull(parentElement.getChild("version", childRoot.getNamespace()));
+            assertNull(parentElement.child("groupId").orElse(null));
+            assertNull(parentElement.child("artifactId").orElse(null));
+            assertNull(parentElement.child("version").orElse(null));
         }
     }
 
@@ -574,36 +577,37 @@ class InferenceStrategyTest {
                 </project>
                 """;
 
-            Document parentDoc = saxBuilder.build(new StringReader(parentPomXml));
-            Document childDoc = saxBuilder.build(new StringReader(childPomXml));
+            Document parentDoc = Document.of(parentPomXml);
+            Document childDoc = Document.of(childPomXml);
 
             Map<Path, Document> pomMap = new HashMap<>();
             pomMap.put(Paths.get("project", "pom.xml"), parentDoc);
             pomMap.put(Paths.get("project", "child", "pom.xml"), childDoc);
 
-            Element childRoot = childDoc.getRootElement();
-            Element parentElement = childRoot.getChild("parent", childRoot.getNamespace());
+            Editor editor = new Editor(childDoc);
+            Element childRoot = editor.root();
+            Element parentElement = DomUtils.findChildElement(childRoot, "parent");
 
             // Verify child and parent elements exist before inference
-            assertNotNull(childRoot.getChild("groupId", childRoot.getNamespace()));
-            assertNotNull(childRoot.getChild("version", childRoot.getNamespace()));
-            assertNotNull(parentElement.getChild("groupId", childRoot.getNamespace()));
-            assertNotNull(parentElement.getChild("artifactId", childRoot.getNamespace()));
-            assertNotNull(parentElement.getChild("version", childRoot.getNamespace()));
+            assertNotNull(childRoot.child("groupId").orElse(null));
+            assertNotNull(childRoot.child("version").orElse(null));
+            assertNotNull(parentElement.child("groupId").orElse(null));
+            assertNotNull(parentElement.child("artifactId").orElse(null));
+            assertNotNull(parentElement.child("version").orElse(null));
 
             // Apply inference
             UpgradeContext context = createMockContext();
             strategy.apply(context, pomMap);
 
             // Verify child groupId and version were removed (Maven 4.0.0 can infer these from parent)
-            assertNull(childRoot.getChild("groupId", childRoot.getNamespace()));
-            assertNull(childRoot.getChild("version", childRoot.getNamespace()));
+            assertNull(childRoot.child("groupId").orElse(null));
+            assertNull(childRoot.child("version").orElse(null));
             // Child artifactId should remain (always required)
-            assertNotNull(childRoot.getChild("artifactId", childRoot.getNamespace()));
+            assertNotNull(childRoot.child("artifactId").orElse(null));
             // Parent elements should all remain (no relativePath inference in 4.0.0)
-            assertNotNull(parentElement.getChild("groupId", childRoot.getNamespace()));
-            assertNotNull(parentElement.getChild("artifactId", childRoot.getNamespace()));
-            assertNotNull(parentElement.getChild("version", childRoot.getNamespace()));
+            assertNotNull(parentElement.child("groupId").orElse(null));
+            assertNotNull(parentElement.child("artifactId").orElse(null));
+            assertNotNull(parentElement.child("version").orElse(null));
         }
 
         @Test
@@ -636,28 +640,29 @@ class InferenceStrategyTest {
                 </project>
                 """;
 
-            Document parentDoc = saxBuilder.build(new StringReader(parentPomXml));
-            Document childDoc = saxBuilder.build(new StringReader(childPomXml));
+            Document parentDoc = Document.of(parentPomXml);
+            Document childDoc = Document.of(childPomXml);
 
             Map<Path, Document> pomMap = new HashMap<>();
             pomMap.put(Paths.get("project", "pom.xml"), parentDoc);
             pomMap.put(Paths.get("project", "child", "pom.xml"), childDoc);
 
-            Element childRoot = childDoc.getRootElement();
-            Element parentElement = childRoot.getChild("parent", childRoot.getNamespace());
+            Editor editor = new Editor(childDoc);
+            Element childRoot = editor.root();
+            Element parentElement = childRoot.child("parent").orElse(null);
 
             // Apply inference
             UpgradeContext context = createMockContext();
             strategy.apply(context, pomMap);
 
             // Verify child elements are kept (since they differ from parent)
-            assertNotNull(childRoot.getChild("groupId", childRoot.getNamespace()));
-            assertNotNull(childRoot.getChild("version", childRoot.getNamespace()));
-            assertNotNull(childRoot.getChild("artifactId", childRoot.getNamespace()));
+            assertNotNull(childRoot.child("groupId").orElse(null));
+            assertNotNull(childRoot.child("version").orElse(null));
+            assertNotNull(childRoot.child("artifactId").orElse(null));
             // Parent elements should all remain (no relativePath inference in 4.0.0)
-            assertNotNull(parentElement.getChild("groupId", childRoot.getNamespace()));
-            assertNotNull(parentElement.getChild("artifactId", childRoot.getNamespace()));
-            assertNotNull(parentElement.getChild("version", childRoot.getNamespace()));
+            assertNotNull(parentElement.child("groupId").orElse(null));
+            assertNotNull(parentElement.child("artifactId").orElse(null));
+            assertNotNull(parentElement.child("version").orElse(null));
         }
 
         @Test
@@ -691,30 +696,31 @@ class InferenceStrategyTest {
                 </project>
                 """;
 
-            Document parentDoc = saxBuilder.build(new StringReader(parentPomXml));
-            Document childDoc = saxBuilder.build(new StringReader(childPomXml));
+            Document parentDoc = Document.of(parentPomXml);
+            Document childDoc = Document.of(childPomXml);
 
             Map<Path, Document> pomMap = new HashMap<>();
             pomMap.put(Paths.get("project", "pom.xml"), parentDoc);
             pomMap.put(Paths.get("project", "child", "pom.xml"), childDoc);
 
-            Element childRoot = childDoc.getRootElement();
-            Element parentElement = childRoot.getChild("parent", childRoot.getNamespace());
+            Editor editor = new Editor(childDoc);
+            Element childRoot = editor.root();
+            Element parentElement = DomUtils.findChildElement(childRoot, "parent");
 
             // Apply inference
             UpgradeContext context = createMockContext();
             strategy.apply(context, pomMap);
 
             // Verify child groupId was removed (matches parent, can be inferred)
-            assertNull(childRoot.getChild("groupId", childRoot.getNamespace()));
+            assertNull(childRoot.child("groupId").orElse(null));
             // Verify child version was kept (differs from parent, cannot be inferred)
-            assertNotNull(childRoot.getChild("version", childRoot.getNamespace()));
+            assertNotNull(childRoot.child("version").orElse(null));
             // Verify child artifactId was kept (always required)
-            assertNotNull(childRoot.getChild("artifactId", childRoot.getNamespace()));
+            assertNotNull(childRoot.child("artifactId").orElse(null));
             // Parent elements should all remain (no relativePath inference in 4.0.0)
-            assertNotNull(parentElement.getChild("groupId", childRoot.getNamespace()));
-            assertNotNull(parentElement.getChild("artifactId", childRoot.getNamespace()));
-            assertNotNull(parentElement.getChild("version", childRoot.getNamespace()));
+            assertNotNull(parentElement.child("groupId").orElse(null));
+            assertNotNull(parentElement.child("artifactId").orElse(null));
+            assertNotNull(parentElement.child("version").orElse(null));
         }
 
         @Test
@@ -737,32 +743,35 @@ class InferenceStrategyTest {
                     .dependency("com.example", "module-a", "1.0.0")
                     .build();
 
-            Document moduleADoc = saxBuilder.build(new StringReader(moduleAPomXml));
-            Document moduleBDoc = saxBuilder.build(new StringReader(moduleBPomXml));
+            Document moduleADoc = Document.of(moduleAPomXml);
+            Document moduleBDoc = Document.of(moduleBPomXml);
 
             Map<Path, Document> pomMap = new HashMap<>();
             pomMap.put(Paths.get("project", "module-a", "pom.xml"), moduleADoc);
             pomMap.put(Paths.get("project", "module-b", "pom.xml"), moduleBDoc);
 
-            Element moduleBRoot = moduleBDoc.getRootElement();
+            Editor editor = new Editor(moduleBDoc);
+            Element moduleBRoot = editor.root();
             Element dependency = moduleBRoot
-                    .getChild("dependencies", moduleBRoot.getNamespace())
-                    .getChildren("dependency", moduleBRoot.getNamespace())
-                    .get(0);
+                    .child("dependencies")
+                    .orElse(null)
+                    .children("dependency")
+                    .findFirst()
+                    .orElse(null);
 
             // Verify dependency elements exist before inference
-            assertNotNull(dependency.getChild("groupId", moduleBRoot.getNamespace()));
-            assertNotNull(dependency.getChild("artifactId", moduleBRoot.getNamespace()));
-            assertNotNull(dependency.getChild("version", moduleBRoot.getNamespace()));
+            assertNotNull(dependency.child("groupId").orElse(null));
+            assertNotNull(dependency.child("artifactId").orElse(null));
+            assertNotNull(dependency.child("version").orElse(null));
 
             // Apply inference
             UpgradeContext context = createMockContext();
             strategy.apply(context, pomMap);
 
             // Verify dependency inference was NOT applied (all elements should remain for 4.0.0)
-            assertNotNull(dependency.getChild("groupId", moduleBRoot.getNamespace()));
-            assertNotNull(dependency.getChild("artifactId", moduleBRoot.getNamespace()));
-            assertNotNull(dependency.getChild("version", moduleBRoot.getNamespace()));
+            assertNotNull(dependency.child("groupId").orElse(null));
+            assertNotNull(dependency.child("artifactId").orElse(null));
+            assertNotNull(dependency.child("version").orElse(null));
         }
     }
 
