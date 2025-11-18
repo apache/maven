@@ -31,6 +31,10 @@ import org.junit.jupiter.api.Test;
  */
 class MavenITgh11409ProfileSourceTest extends AbstractMavenIntegrationTestCase {
 
+    MavenITgh11409ProfileSourceTest() {
+        super("[4.0.0-rc-4,)");
+    }
+
     /**
      * Verify that help:active-profiles reports correct source for profiles activated in parent POM.
      *
