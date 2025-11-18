@@ -71,12 +71,13 @@ class ModelVersionUtilsTest {
             assertEquals("4.0.0", result);
         }
 
-        @Test
-        @DisplayName("should detect 4.1.0 model version")
-        void shouldDetect410ModelVersion() throws Exception {
+        @ParameterizedTest(name = "for {0}")
+        @ValueSource(strings = {"4.0.0", "4.1.0", "4.2.0"})
+        @DisplayName("should detect model version")
+        void shouldDetectModelVersionFromNamespace(String targetVersion) throws Exception {
             String pomXml = PomBuilder.create()
-                    .namespace("http://maven.apache.org/POM/4.1.0")
-                    .modelVersion("4.1.0")
+                    .namespace("http://maven.apache.org/POM/" + targetVersion)
+                    .modelVersion(targetVersion)
                     .groupId("test")
                     .artifactId("test")
                     .version("1.0.0")
@@ -84,7 +85,7 @@ class ModelVersionUtilsTest {
 
             Document document = saxBuilder.build(new StringReader(pomXml));
             String result = ModelVersionUtils.detectModelVersion(document);
-            assertEquals("4.1.0", result);
+            assertEquals(targetVersion, result);
         }
 
         @Test
@@ -167,45 +168,60 @@ class ModelVersionUtilsTest {
     @DisplayName("Upgrade Path Validation")
     class UpgradePathValidationTests {
 
-        @Test
-        @DisplayName("should validate upgrade path from 4.0.0 to 4.1.0")
-        void shouldValidateUpgradePathFrom400To410() {
-            assertTrue(ModelVersionUtils.canUpgrade("4.0.0", "4.1.0"));
+        @ParameterizedTest(name = "from {0} to {1}")
+        @MethodSource("provideValidPathUpgradeVersions")
+        @DisplayName("should validate upgrade path")
+        void shouldValidateUpgradePath(String from, String to) {
+            assertTrue(ModelVersionUtils.canUpgrade(from, to));
         }
 
-        @Test
-        @DisplayName("should reject downgrade from 4.1.0 to 4.0.0")
-        void shouldRejectDowngradeFrom410To400() {
-            assertFalse(ModelVersionUtils.canUpgrade("4.1.0", "4.0.0"));
+        private static Stream<Arguments> provideValidPathUpgradeVersions() {
+            return Stream.of(
+                    Arguments.of("4.0.0", "4.1.0"), Arguments.of("4.1.0", "4.2.0"), Arguments.of("4.0.0", "4.2.0"));
         }
 
-        @Test
+        @ParameterizedTest(name = "from {0} to {1}")
+        @MethodSource("provideInvalidPathUpgradeVersions")
+        @DisplayName("should reject downgrade")
+        void shouldRejectDowngrade(String from, String to) {
+            assertFalse(ModelVersionUtils.canUpgrade(from, to));
+        }
+
+        private static Stream<Arguments> provideInvalidPathUpgradeVersions() {
+            return Stream.of(
+                    Arguments.of("4.1.0", "4.0.0"), Arguments.of("4.2.0", "4.1.0"), Arguments.of("4.2.0", "4.0.0"));
+        }
+
+        @ParameterizedTest(name = "from {0} to {0}")
+        @ValueSource(strings = {"4.0.0", "4.1.0", "4.2.0"})
         @DisplayName("should reject upgrade to same version")
-        void shouldRejectUpgradeToSameVersion() {
-            assertFalse(ModelVersionUtils.canUpgrade("4.0.0", "4.0.0"));
-            assertFalse(ModelVersionUtils.canUpgrade("4.1.0", "4.1.0"));
+        void shouldRejectUpgradeToSameVersion(String version) {
+            assertFalse(ModelVersionUtils.canUpgrade(version, version));
         }
 
-        @Test
+        @ParameterizedTest(name = "from {0}")
+        @ValueSource(strings = {"3.0.0", "5.0.0"})
         @DisplayName("should reject upgrade from unsupported version")
-        void shouldRejectUpgradeFromUnsupportedVersion() {
-            assertFalse(ModelVersionUtils.canUpgrade("3.0.0", "4.1.0"));
-            assertFalse(ModelVersionUtils.canUpgrade("5.0.0", "4.1.0"));
+        void shouldRejectUpgradeFromUnsupportedVersion(String unsupportedVersion) {
+            assertFalse(ModelVersionUtils.canUpgrade(unsupportedVersion, "4.1.0"));
         }
 
-        @Test
+        @ParameterizedTest(name = "to {0}")
+        @ValueSource(strings = {"3.0.0", "5.0.0"})
         @DisplayName("should reject upgrade to unsupported version")
-        void shouldRejectUpgradeToUnsupportedVersion() {
-            assertFalse(ModelVersionUtils.canUpgrade("4.0.0", "3.0.0"));
-            assertFalse(ModelVersionUtils.canUpgrade("4.0.0", "5.0.0"));
+        void shouldRejectUpgradeToUnsupportedVersion(String unsupportedVersion) {
+            assertFalse(ModelVersionUtils.canUpgrade("4.0.0", unsupportedVersion));
         }
 
-        @Test
+        @ParameterizedTest(name = "from {0} to {1}")
+        @MethodSource("provideNullVersionsInUpgradePairs")
         @DisplayName("should handle null versions in upgrade validation")
-        void shouldHandleNullVersionsInUpgradeValidation() {
-            assertFalse(ModelVersionUtils.canUpgrade(null, "4.1.0"));
-            assertFalse(ModelVersionUtils.canUpgrade("4.0.0", null));
-            assertFalse(ModelVersionUtils.canUpgrade(null, null));
+        void shouldHandleNullVersionsInUpgradeValidation(String from, String to) {
+            assertFalse(ModelVersionUtils.canUpgrade(from, to));
+        }
+
+        private static Stream<Arguments> provideNullVersionsInUpgradePairs() {
+            return Stream.of(Arguments.of(null, "4.1.0"), Arguments.of("4.0.0", null), Arguments.of(null, null));
         }
     }
 
@@ -245,18 +261,18 @@ class ModelVersionUtilsTest {
     @DisplayName("Inference Eligibility")
     class InferenceEligibilityTests {
 
-        @Test
+        @ParameterizedTest(name = "for model version {0}")
+        @ValueSource(strings = {"4.0.0", "4.1.0"})
         @DisplayName("should determine inference eligibility correctly")
-        void shouldDetermineInferenceEligibilityCorrectly() {
-            assertTrue(ModelVersionUtils.isEligibleForInference("4.0.0"));
-            assertTrue(ModelVersionUtils.isEligibleForInference("4.1.0"));
+        void shouldDetermineInferenceEligibilityCorrectly(String modelVersion) {
+            assertTrue(ModelVersionUtils.isEligibleForInference(modelVersion));
         }
 
-        @Test
-        @DisplayName("should reject inference for unsupported versions")
-        void shouldRejectInferenceForUnsupportedVersions() {
-            assertFalse(ModelVersionUtils.isEligibleForInference("3.0.0"));
-            assertFalse(ModelVersionUtils.isEligibleForInference("5.0.0"));
+        @ParameterizedTest(name = "{0}")
+        @ValueSource(strings = {"3.0.0", "5.0.0"})
+        @DisplayName("should reject inference for unsupported version")
+        void shouldRejectInferenceForUnsupportedVersions(String modelVersion) {
+            assertFalse(ModelVersionUtils.isEligibleForInference(modelVersion));
         }
 
         @Test
@@ -270,9 +286,10 @@ class ModelVersionUtilsTest {
     @DisplayName("Model Version Updates")
     class ModelVersionUpdateTests {
 
-        @Test
+        @ParameterizedTest(name = "for model version {0}")
+        @ValueSource(strings = {"4.1.0", "4.2.0"})
         @DisplayName("should update model version in document")
-        void shouldUpdateModelVersionInDocument() throws Exception {
+        void shouldUpdateModelVersionInDocument(String targetVersion) throws Exception {
             String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
@@ -284,15 +301,16 @@ class ModelVersionUtilsTest {
                 """;
 
             Document document = saxBuilder.build(new StringReader(pomXml));
-            ModelVersionUtils.updateModelVersion(document, "4.1.0");
+            ModelVersionUtils.updateModelVersion(document, targetVersion);
             Element root = document.getRootElement();
             Element modelVersionElement = root.getChild("modelVersion", root.getNamespace());
-            assertEquals("4.1.0", modelVersionElement.getTextTrim());
+            assertEquals(targetVersion, modelVersionElement.getTextTrim());
         }
 
-        @Test
+        @ParameterizedTest(name = "to target version {0}")
+        @ValueSource(strings = {"4.1.0", "4.2.0"})
         @DisplayName("should add model version when missing")
-        void shouldAddModelVersionWhenMissing() throws Exception {
+        void shouldAddModelVersionWhenMissing(String targetVersion) throws Exception {
             String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
@@ -303,11 +321,11 @@ class ModelVersionUtilsTest {
                 """;
 
             Document document = saxBuilder.build(new StringReader(pomXml));
-            ModelVersionUtils.updateModelVersion(document, "4.1.0");
+            ModelVersionUtils.updateModelVersion(document, targetVersion);
             Element root = document.getRootElement();
             Element modelVersionElement = root.getChild("modelVersion", root.getNamespace());
             assertNotNull(modelVersionElement);
-            assertEquals("4.1.0", modelVersionElement.getTextTrim());
+            assertEquals(targetVersion, modelVersionElement.getTextTrim());
         }
 
         @Test
@@ -355,20 +373,15 @@ class ModelVersionUtilsTest {
     @DisplayName("Schema Location Operations")
     class SchemaLocationOperationTests {
 
-        @Test
+        @ParameterizedTest
+        @ValueSource(strings = {"4.0.0", "4.1.0", "4.2.0"})
         @DisplayName("should get schema location for model version")
-        void shouldGetSchemaLocationForModelVersion() {
-            String schemaLocation410 = ModelVersionUtils.getSchemaLocationForModelVersion("4.1.0");
-            assertNotNull(schemaLocation410);
-            assertTrue(schemaLocation410.contains("4.1.0"), "Expected " + schemaLocation410 + " to contain " + "4.1.0");
-        }
-
-        @Test
-        @DisplayName("should get schema location for 4.0.0")
-        void shouldGetSchemaLocationFor400() {
-            String schemaLocation400 = ModelVersionUtils.getSchemaLocationForModelVersion("4.0.0");
-            assertNotNull(schemaLocation400);
-            assertTrue(schemaLocation400.contains("4.0.0"), "Expected " + schemaLocation400 + " to contain " + "4.0.0");
+        void shouldGetSchemaLocationForModelVersion(String targetVersion) {
+            String schemaLocation = ModelVersionUtils.getSchemaLocationForModelVersion(targetVersion);
+            assertNotNull(schemaLocation);
+            assertTrue(
+                    schemaLocation.contains(targetVersion),
+                    "Expected " + schemaLocation + " to contain " + targetVersion);
         }
 
         @Test

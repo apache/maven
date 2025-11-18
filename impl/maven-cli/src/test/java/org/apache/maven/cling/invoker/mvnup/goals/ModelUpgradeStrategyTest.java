@@ -99,7 +99,9 @@ class ModelUpgradeStrategyTest {
                     Arguments.of(null, null, false, "Should not be applicable by default"),
                     Arguments.of(false, null, false, "Should not be applicable when --all=false"),
                     Arguments.of(null, "4.0.0", false, "Should not be applicable for same version (4.0.0)"),
-                    Arguments.of(false, "4.1.0", true, "Should be applicable for model upgrade even when --all=false"));
+                    Arguments.of(false, "4.1.0", true, "Should be applicable for model upgrade even when --all=false"),
+                    Arguments.of(false, "4.2.0", true, "Should be applicable for model upgrade even when --all=false"),
+                    Arguments.of(null, "4.2.0", true, "Should be applicable when --model=4.2.0 is specified"));
         }
 
         @Test
