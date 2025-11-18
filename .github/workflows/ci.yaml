@@ -42,3 +42,8 @@ jobs:
 
       - name: Start CI run
         run: ./nx start-ci-run --distribute-on="5 linux-large" --stop-agents-after="verify-ci"
+
+      - name: Build Maven distributions
+        shell: bash
+        run: ./nx run-many -t verify-ci --verbose
+
