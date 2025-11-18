@@ -358,12 +358,12 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
 
         MavenProject project = projectBuilder.build(testPom, request).getProject();
 
-        assertTrue(project.getInjectedProfileIds().keySet().containsAll(List.of("external", project.getId())));
+        String id = project.getGroupId() + ":" + project.getArtifactId() + ":" + project.getVersion();
+        assertTrue(project.getInjectedProfileIds().keySet().containsAll(List.of("external", id)));
         assertTrue(project.getInjectedProfileIds().get("external").isEmpty());
-        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().anyMatch("profile1"::equals));
-        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().noneMatch("profile2"::equals));
-        assertTrue(
-                project.getInjectedProfileIds().get(project.getId()).stream().noneMatch("active-by-default"::equals));
+        assertTrue(project.getInjectedProfileIds().get(id).stream().anyMatch("profile1"::equals));
+        assertTrue(project.getInjectedProfileIds().get(id).stream().noneMatch("profile2"::equals));
+        assertTrue(project.getInjectedProfileIds().get(id).stream().noneMatch("active-by-default"::equals));
     }
 
     /**
@@ -387,14 +387,12 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
 
             MavenProject project = projectBuilder.build(source, request).getProject();
 
-            assertTrue(project.getInjectedProfileIds().keySet().containsAll(List.of("external", project.getId())));
+            String id = project.getGroupId() + ":" + project.getArtifactId() + ":" + project.getVersion();
+            assertTrue(project.getInjectedProfileIds().keySet().containsAll(List.of("external", id)));
             assertTrue(project.getInjectedProfileIds().get("external").isEmpty());
-            assertTrue(project.getInjectedProfileIds().get(project.getId()).stream()
-                    .noneMatch("profile1"::equals));
-            assertTrue(project.getInjectedProfileIds().get(project.getId()).stream()
-                    .noneMatch("profile2"::equals));
-            assertTrue(project.getInjectedProfileIds().get(project.getId()).stream()
-                    .anyMatch("active-by-default"::equals));
+            assertTrue(project.getInjectedProfileIds().get(id).stream().noneMatch("profile1"::equals));
+            assertTrue(project.getInjectedProfileIds().get(id).stream().noneMatch("profile2"::equals));
+            assertTrue(project.getInjectedProfileIds().get(id).stream().anyMatch("active-by-default"::equals));
 
             InternalMavenSession session = Mockito.mock(InternalMavenSession.class);
             List<org.apache.maven.api.model.Profile> activeProfiles =
@@ -470,14 +468,12 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
 
             MavenProject project = projectBuilder.build(source, request).getProject();
 
-            assertTrue(project.getInjectedProfileIds().keySet().containsAll(List.of("external", project.getId())));
+            String id = project.getGroupId() + ":" + project.getArtifactId() + ":" + project.getVersion();
+            assertTrue(project.getInjectedProfileIds().keySet().containsAll(List.of("external", id)));
             assertTrue(project.getInjectedProfileIds().get("external").stream().anyMatch("external-profile"::equals));
-            assertTrue(project.getInjectedProfileIds().get(project.getId()).stream()
-                    .noneMatch("profile1"::equals));
-            assertTrue(project.getInjectedProfileIds().get(project.getId()).stream()
-                    .noneMatch("profile2"::equals));
-            assertTrue(project.getInjectedProfileIds().get(project.getId()).stream()
-                    .anyMatch("active-by-default"::equals));
+            assertTrue(project.getInjectedProfileIds().get(id).stream().noneMatch("profile1"::equals));
+            assertTrue(project.getInjectedProfileIds().get(id).stream().noneMatch("profile2"::equals));
+            assertTrue(project.getInjectedProfileIds().get(id).stream().anyMatch("active-by-default"::equals));
 
             InternalMavenSession session = Mockito.mock(InternalMavenSession.class);
             List<org.apache.maven.api.model.Profile> activeProfiles =
