@@ -1,0 +1,44 @@
+name: Nx Java CI
+
+env:
+  NX_BATCH_MODE: true
+
+on:
+  push:
+
+# allow single build per branch or PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# clear all permissions for GITHUB_TOKEN
+permissions: {}
+
+jobs:
+  initial-build:
+    runs-on: ubuntu-latest
+    env:
+      NX_CI_EXECUTION_ENV: 'initial-build'
+    steps:
+      - name: Set up JDK
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4
+        with:
+          java-version: 21
+          distribution: 'temurin'
+
+      - name: Checkout maven
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Maven
+        shell: bash
+        run: mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper "-Dmaven=4.0.0-rc-3"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@0a44ba7841725637a19e28fa30b79a866c81b0a6 # v4
+        with:
+          node-version: '24'
+
+      - name: Start CI run
+        run: ./nx start-ci-run --distribute-on="5 linux-large" --stop-agents-after="verify-ci"
