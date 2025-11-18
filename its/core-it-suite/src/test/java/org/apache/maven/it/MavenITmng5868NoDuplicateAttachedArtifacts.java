@@ -106,7 +106,7 @@ public class MavenITmng5868NoDuplicateAttachedArtifacts extends AbstractMavenInt
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng5868");
-        verifier.addCliArgument("-Dartifact.attachedFile=" + tmp.toFile().getCanonicalPath());
+        verifier.addCliArgument("-Dartifact.attachedFile=" + ItUtils.canonicalPath(tmp));
         verifier.addCliArgument("-DdeploymentPort=" + port);
         verifier.addCliArguments("org.apache.maven.its.plugins:maven-it-plugin-artifact:2.1-SNAPSHOT:attach", "deploy");
         verifier.execute();

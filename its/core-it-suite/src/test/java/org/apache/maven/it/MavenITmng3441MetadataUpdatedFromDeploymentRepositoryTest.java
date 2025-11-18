@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -43,7 +42,7 @@ public class MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest extends A
 
         Path targetRepository = testDir.resolve("target-repo");
         ItUtils.deleteDirectory(targetRepository);
-        FileUtils.copyDirectoryStructure(testDir.resolve("deploy-repo").toFile(), targetRepository.toFile());
+        ItUtils.copyDirectoryStructure(testDir.resolve("deploy-repo"), targetRepository);
 
         Verifier verifier;
 

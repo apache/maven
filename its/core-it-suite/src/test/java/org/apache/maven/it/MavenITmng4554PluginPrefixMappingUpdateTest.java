@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
@@ -262,7 +261,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
             verifier.addCliArgument("-s");
             verifier.addCliArgument("settings.xml");
 
-            FileUtils.copyDirectoryStructure(testDir.resolve("repo-1").toFile(), testDir.resolve("repo-it").toFile());
+            ItUtils.copyDirectoryStructure(testDir.resolve("repo-1"), testDir.resolve("repo-it"));
 
             verifier.setLogFileName("log-refetched-1.txt");
             verifier.addCliArgument("a:touch");
@@ -275,7 +274,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
             requestedUris.clear();
 
             // simulate deployment of new plugin which updates the prefix mapping in the remote repo
-            FileUtils.copyDirectoryStructure(testDir.resolve("repo-2").toFile(), testDir.resolve("repo-it").toFile());
+            ItUtils.copyDirectoryStructure(testDir.resolve("repo-2"), testDir.resolve("repo-it"));
 
             verifier.setLogFileName("log-refetched-2.txt");
             verifier.addCliArgument("b:touch");

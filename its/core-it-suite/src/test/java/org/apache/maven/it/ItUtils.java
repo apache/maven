@@ -59,7 +59,7 @@ class ItUtils {
     }
 
     public static void assertCanonicalFileEquals(Path expected, Path actual) throws IOException {
-        assertEquals(expected.toFile().getCanonicalFile(), actual.toFile().getCanonicalFile());
+        assertEquals(canonicalPath(expected), canonicalPath(actual));
     }
 
     public static void createFile(Path path) throws IOException {
@@ -76,5 +76,13 @@ class ItUtils {
 
     public static void deleteDirectory(Path path) throws IOException {
         FileUtils.deleteDirectory(path.toFile());
+    }
+
+    public static void copyDirectoryStructure(Path src, Path dest) throws IOException {
+        FileUtils.copyDirectory(src.toFile(), dest.toFile());
+    }
+
+    public static String canonicalPath(Path path) throws IOException {
+        return path.toFile().getCanonicalPath();
     }
 }
