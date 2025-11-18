@@ -146,7 +146,7 @@ under the License.
     <asmVersion>9.9</asmVersion>
     <byteBuddyVersion>1.17.8</byteBuddyVersion>
     <classWorldsVersion>2.9.0</classWorldsVersion>
-    <commonsCliVersion>1.10.0</commonsCliVersion>
+    <commonsCliVersion>1.11.0</commonsCliVersion>
     <guiceVersion>5.1.0</guiceVersion>
     <guavaVersion>33.5.0-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
