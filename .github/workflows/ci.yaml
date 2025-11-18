@@ -5,6 +5,8 @@ env:
 
 on:
   push:
+    - master
+  pull_request:
 
 jobs:
   initial-build:

@@ -1,4 +1,5 @@
 {
+  "bust": 1,
   "installation": {
     "version": "22.0.4",
     "plugins": {
