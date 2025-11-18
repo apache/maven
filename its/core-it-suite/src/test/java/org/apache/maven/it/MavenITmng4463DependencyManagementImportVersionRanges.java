@@ -18,7 +18,6 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -74,7 +73,7 @@ public class MavenITmng4463DependencyManagementImportVersionRanges extends Abstr
             verifier.execute();
             fail("Expected 'VerificationException' not thrown.");
         } catch (final VerificationException e) {
-            final List<String> lines = verifier.loadFile(testDir.resolve("log.txt"), false);
+            final List<String> lines = verifier.loadFile(testDir.resolve("log.txt"));
             assertTrue(
                     indexOf(lines, ".*dependency version range.*does not specify an upper bound.*") >= 0,
                     "Expected error message not found.");

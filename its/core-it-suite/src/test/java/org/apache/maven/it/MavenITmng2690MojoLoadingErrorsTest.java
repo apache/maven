@@ -18,7 +18,6 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.io.IOException;
 import java.util.List;
@@ -54,7 +53,7 @@ class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegrationTestCa
         VerificationException exception =
                 assertThrows(VerificationException.class, verifier::execute, "should throw an error during execution.");
 
-        List<String> lines = verifier.loadFile(testDir.resolve("log.txt"), false);
+        List<String> lines = verifier.loadFile(testDir.resolve("log.txt"));
 
         int msg = indexOf(lines, "(?i).*required class is missing.*");
         assertTrue(msg >= 0, "User-friendly message was not found in output.");
@@ -74,12 +73,12 @@ class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegrationTestCa
         VerificationException exception =
                 assertThrows(VerificationException.class, verifier::execute, "should throw an error during execution.");
 
-        List<String> lines = verifier.loadFile(testDir.resolve("log.txt"), false);
+        List<String> lines = verifier.loadFile(testDir.resolve("log.txt"));
 
         int msg = indexOf(lines, "(?i).*required class (i|wa)s missing( during (mojo )?configuration)?.*");
         assertTrue(msg >= 0, "User-friendly message was not found in output.");
 
-        int cls = lines.get(msg).toString().replace('/', '.').indexOf("junit.framework.TestCase");
+        int cls = lines.get(msg).replace('/', '.').indexOf("junit.framework.TestCase");
         assertTrue(cls >= 0, "Missing class name was not found in output.");
     }
 
@@ -94,7 +93,7 @@ class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegrationTestCa
         VerificationException exception =
                 assertThrows(VerificationException.class, verifier::execute, "should throw an error during execution.");
 
-        List<String> lines = verifier.loadFile(testDir.resolve("log.txt"), false);
+        List<String> lines = verifier.loadFile(testDir.resolve("log.txt"));
 
         String compLookupMsg = "(?i).*unable to .* mojo 'mojo-component-lookup-exception' .* plugin "
                 + "'org\\.apache\\.maven\\.its\\.plugins:maven-it-plugin-error.*";
@@ -113,7 +112,7 @@ class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegrationTestCa
         VerificationException exception =
                 assertThrows(VerificationException.class, verifier::execute, "should throw an error during execution.");
 
-        List<String> lines = verifier.loadFile(testDir.resolve("log.txt"), false);
+        List<String> lines = verifier.loadFile(testDir.resolve("log.txt"));
 
         String compLookupMsg = "(?i).*unable to .* mojo 'requirement-component-lookup-exception' .* plugin "
                 + "'org\\.apache\\.maven\\.its\\.plugins:maven-it-plugin-error.*";

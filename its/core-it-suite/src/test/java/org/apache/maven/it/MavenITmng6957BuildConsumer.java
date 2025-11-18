@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -70,63 +69,63 @@ public class MavenITmng6957BuildConsumer extends AbstractMavenIntegrationTestCas
 
         assertTextEquals(
                 testDir.resolve("expected/parent.pom"),
-                Paths.get(verifier.getArtifactPath(
-                        "org.sonatype.mavenbook.multi", "parent", "0.9-MNG6957-SNAPSHOT", "pom")));
+                verifier.getArtifactPath(
+                        "org.sonatype.mavenbook.multi", "parent", "0.9-MNG6957-SNAPSHOT", "pom"));
 
         assertTextEquals(
                 testDir.resolve("expected/parent-build.pom"),
-                Paths.get(verifier.getArtifactPath(
-                        "org.sonatype.mavenbook.multi", "parent", "0.9-MNG6957-SNAPSHOT", "pom", "build")));
+                verifier.getArtifactPath(
+                        "org.sonatype.mavenbook.multi", "parent", "0.9-MNG6957-SNAPSHOT", "pom", "build"));
 
         assertTextEquals(
                 testDir.resolve("expected/simple-parent.pom"),
-                Paths.get(verifier.getArtifactPath(
-                        "org.sonatype.mavenbook.multi", "simple-parent", "0.9-MNG6957-SNAPSHOT", "pom")));
+                verifier.getArtifactPath(
+                        "org.sonatype.mavenbook.multi", "simple-parent", "0.9-MNG6957-SNAPSHOT", "pom"));
 
         assertTextEquals(
                 testDir.resolve("expected/simple-parent-build.pom"),
-                Paths.get(verifier.getArtifactPath(
-                        "org.sonatype.mavenbook.multi", "simple-parent", "0.9-MNG6957-SNAPSHOT", "pom", "build")));
+                verifier.getArtifactPath(
+                        "org.sonatype.mavenbook.multi", "simple-parent", "0.9-MNG6957-SNAPSHOT", "pom", "build"));
 
         assertTextEquals(
                 testDir.resolve("expected/simple-weather.pom"),
-                Paths.get(verifier.getArtifactPath(
-                        "org.sonatype.mavenbook.multi", "simple-weather", "0.9-MNG6957-SNAPSHOT", "pom")));
+                verifier.getArtifactPath(
+                        "org.sonatype.mavenbook.multi", "simple-weather", "0.9-MNG6957-SNAPSHOT", "pom"));
 
         assertTextEquals(
                 testDir.resolve("expected/simple-weather-build.pom"),
-                Paths.get(verifier.getArtifactPath(
-                        "org.sonatype.mavenbook.multi", "simple-weather", "0.9-MNG6957-SNAPSHOT", "pom", "build")));
+                verifier.getArtifactPath(
+                        "org.sonatype.mavenbook.multi", "simple-weather", "0.9-MNG6957-SNAPSHOT", "pom", "build"));
 
         assertTextEquals(
                 testDir.resolve("expected/simple-webapp.pom"),
-                Paths.get(verifier.getArtifactPath(
-                        "org.sonatype.mavenbook.multi", "simple-webapp", "0.9-MNG6957-SNAPSHOT", "pom")));
+                verifier.getArtifactPath(
+                        "org.sonatype.mavenbook.multi", "simple-webapp", "0.9-MNG6957-SNAPSHOT", "pom"));
 
         assertTextEquals(
                 testDir.resolve("expected/simple-webapp-build.pom"),
-                Paths.get(verifier.getArtifactPath(
-                        "org.sonatype.mavenbook.multi", "simple-webapp", "0.9-MNG6957-SNAPSHOT", "pom", "build")));
+                verifier.getArtifactPath(
+                        "org.sonatype.mavenbook.multi", "simple-webapp", "0.9-MNG6957-SNAPSHOT", "pom", "build"));
 
         assertTextEquals(
                 testDir.resolve("expected/simple-testutils.pom"),
-                Paths.get(verifier.getArtifactPath(
-                        "org.sonatype.mavenbook.multi", "simple-testutils", "0.9-MNG6957-SNAPSHOT", "pom")));
+                verifier.getArtifactPath(
+                        "org.sonatype.mavenbook.multi", "simple-testutils", "0.9-MNG6957-SNAPSHOT", "pom"));
 
         assertTextEquals(
                 testDir.resolve("expected/simple-testutils-build.pom"),
-                Paths.get(verifier.getArtifactPath(
-                        "org.sonatype.mavenbook.multi", "simple-testutils", "0.9-MNG6957-SNAPSHOT", "pom", "build")));
+                verifier.getArtifactPath(
+                        "org.sonatype.mavenbook.multi", "simple-testutils", "0.9-MNG6957-SNAPSHOT", "pom", "build"));
 
         assertTextEquals(
                 testDir.resolve("expected/utils-parent.pom"),
-                Paths.get(verifier.getArtifactPath(
-                        "org.sonatype.mavenbook.multi", "utils-parent", "0.9-MNG6957-SNAPSHOT", "pom")));
+                verifier.getArtifactPath(
+                        "org.sonatype.mavenbook.multi", "utils-parent", "0.9-MNG6957-SNAPSHOT", "pom"));
 
         assertTextEquals(
                 testDir.resolve("expected/utils-parent-build.pom"),
-                Paths.get(verifier.getArtifactPath(
-                        "org.sonatype.mavenbook.multi", "utils-parent", "0.9-MNG6957-SNAPSHOT", "pom", "build")));
+                verifier.getArtifactPath(
+                        "org.sonatype.mavenbook.multi", "utils-parent", "0.9-MNG6957-SNAPSHOT", "pom", "build"));
     }
 
     static void assertTextEquals(Path file1, Path file2) throws IOException {

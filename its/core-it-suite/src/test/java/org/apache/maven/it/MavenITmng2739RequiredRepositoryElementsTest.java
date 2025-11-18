@@ -18,7 +18,6 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -55,7 +54,7 @@ public class MavenITmng2739RequiredRepositoryElementsTest extends AbstractMavenI
             // expected
         }
 
-        List<String> listing = verifier.loadFile(testDir.resolve("log.txt"), false);
+        List<String> listing = verifier.loadFile(testDir.resolve("log.txt"));
         boolean foundNpe = false;
         for (String line : listing) {
             if (line.contains("NullPointerException")) {
@@ -87,7 +86,7 @@ public class MavenITmng2739RequiredRepositoryElementsTest extends AbstractMavenI
             // expected
         }
 
-        List<String> listing = verifier.loadFile(testDir.resolve("log.txt"), false);
+        List<String> listing = verifier.loadFile(testDir.resolve("log.txt"));
         boolean foundNpe = false;
         for (String line : listing) {
             if (line.contains("NullPointerException")) {

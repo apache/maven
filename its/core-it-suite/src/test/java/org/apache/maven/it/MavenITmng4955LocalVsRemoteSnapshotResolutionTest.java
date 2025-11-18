@@ -18,7 +18,6 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -63,7 +62,7 @@ public class MavenITmng4955LocalVsRemoteSnapshotResolutionTest extends AbstractM
 
         List<String> classpath = verifier.loadLines("target/classpath.txt");
 
-        File jarFile = new File(classpath.get(1).toString());
+        Path jarFile = Path.of(classpath.get(1));
         assertEquals("eeff09b1b80e823eeb2a615b1d4b09e003e86fd3", ItUtils.calcHash(jarFile, "SHA-1"));
     }
 }

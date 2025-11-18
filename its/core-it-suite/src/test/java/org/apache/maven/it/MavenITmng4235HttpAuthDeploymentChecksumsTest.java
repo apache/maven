@@ -23,7 +23,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Deque;
@@ -178,9 +177,9 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest extends AbstractMaven
                 Resource resource = getResource(request.getPathInfo());
 
                 // NOTE: This can get called concurrently but File.mkdirs() isn't thread-safe in all JREs
-                File dir = resource.getFile().getParentFile();
-                for (int i = 0; i < 10 && !dir.exists(); i++) {
-                    dir.mkdirs();
+                Path dir = resource.getFile().toPath().getParent();
+                for (int i = 0; i < 10 && !Files.exists(dir); i++) {
+                    Files.createDirectories(dir);
                 }
 
                 Files.copy(request.getInputStream(), resource.getFile().toPath(), REPLACE_EXISTING);

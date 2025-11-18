@@ -48,7 +48,7 @@ public class MavenITmng2820PomCommentsTest extends AbstractMavenIntegrationTestC
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Path installed = Path.of(verifier.getArtifactPath("org.apache.maven.its.mng2820", "test", "0.1", "pom"));
+        Path installed = verifier.getArtifactPath("org.apache.maven.its.mng2820", "test", "0.1", "pom");
         assertPomComments(installed);
 
         Path deployed = testDir.resolve("target/repo/org/apache/maven/its/mng2820/test/0.1/test-0.1.pom");

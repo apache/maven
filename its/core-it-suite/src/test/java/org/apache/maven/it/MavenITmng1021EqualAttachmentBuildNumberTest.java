@@ -18,9 +18,9 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -75,14 +75,15 @@ public class MavenITmng1021EqualAttachmentBuildNumberTest extends AbstractMavenI
         verifier.verifyFilePresent(dir + "1-SNAPSHOT/test-" + snapshot + "-it.jar.sha1");
     }
 
-    private String getSnapshotVersion(Path artifactDir) {
-        File[] files = artifactDir.toFile().listFiles();
-        for (File file : files) {
-            String name = file.getName();
-            if (name.endsWith(".pom")) {
-                return name.substring("test-".length(), name.length() - ".pom".length());
-            }
+    private String getSnapshotVersion(Path artifactDir) throws IOException {
+        try (var stream = Files.list(artifactDir)) {
+            return stream
+                    .filter(Files::isRegularFile)
+                    .map(Path::getFileName)
+                    .map(Path::toString)
+                    .filter(name -> name.endsWith(".pom"))
+                    .findFirst()
+                    .map(pomName -> pomName.substring("test-".length(), pomName.length() - ".pom".length()))
+                    .orElseThrow(() -> new IllegalStateException("POM not found in " + artifactDir));
         }
-        throw new IllegalStateException("POM not found in " + artifactDir);
-    }
-}
+    }}

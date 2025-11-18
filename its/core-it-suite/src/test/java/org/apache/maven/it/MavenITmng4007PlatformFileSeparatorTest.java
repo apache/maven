@@ -18,7 +18,6 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.Properties;
 
@@ -83,6 +82,6 @@ public class MavenITmng4007PlatformFileSeparatorTest extends AbstractMavenIntegr
          * NOTE: Whether the path is absolute is another issue (MNG-3877), we are only interested in the proper
          * file separator here.
          */
-        assertEquals(new File(actual).getPath(), actual);
+        assertEquals(Path.of(actual).toString(), actual);
     }
 }

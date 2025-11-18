@@ -18,17 +18,15 @@
  */
 package org.apache.maven.it;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.io.File;
-import java.nio.file.Path;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -94,9 +92,8 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
                 verifier.deleteArtifacts("org.apache.maven.its.mng4554");
             } catch (IOException e) {
                 // expected when running test on Windows using embedded Maven (JAR files locked by plugin class realm)
-                assertFalse(new File(verifier.getArtifactMetadataPath(
-                                "org.apache.maven.its.mng4554", null, null, "maven-metadata-mng4554.xml"))
-                        .exists());
+                assertFalse(Files.exists(verifier.getArtifactMetadataPath(
+                                "org.apache.maven.its.mng4554", null, null, "maven-metadata-mng4554.xml")));
             }
             Map<String, String> filterProps = verifier.newDefaultFilterMap();
             NetworkConnector connector = (NetworkConnector) server.getConnectors()[0];
@@ -173,9 +170,8 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
                 verifier.deleteArtifacts("org.apache.maven.its.mng4554");
             } catch (IOException e) {
                 // expected when running test on Windows using embedded Maven (JAR files locked by plugin class realm)
-                assertFalse(new File(verifier.getArtifactMetadataPath(
-                                "org.apache.maven.its.mng4554", null, null, "maven-metadata-mng4554.xml"))
-                        .exists());
+                assertFalse(Files.exists(verifier.getArtifactMetadataPath(
+                                "org.apache.maven.its.mng4554", null, null, "maven-metadata-mng4554.xml")));
             }
             Map<String, String> filterProps = verifier.newDefaultFilterMap();
             NetworkConnector connector = (NetworkConnector) server.getConnectors()[0];
@@ -255,9 +251,8 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
                 verifier.deleteArtifacts("org.apache.maven.its.mng4554");
             } catch (IOException e) {
                 // expected when running test on Windows using embedded Maven (JAR files locked by plugin class realm)
-                assertFalse(new File(verifier.getArtifactMetadataPath(
-                                "org.apache.maven.its.mng4554", null, null, "maven-metadata-mng4554.xml"))
-                        .exists());
+                assertFalse(Files.exists(verifier.getArtifactMetadataPath(
+                                "org.apache.maven.its.mng4554", null, null, "maven-metadata-mng4554.xml")));
             }
             Map<String, String> filterProps = verifier.newDefaultFilterMap();
             NetworkConnector connector = (NetworkConnector) server.getConnectors()[0];

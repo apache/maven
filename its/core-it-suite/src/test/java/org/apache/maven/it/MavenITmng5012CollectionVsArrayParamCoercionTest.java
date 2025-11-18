@@ -47,7 +47,7 @@ public class MavenITmng5012CollectionVsArrayParamCoercionTest extends AbstractMa
 
         Properties props = verifier.loadProperties("target/config.properties");
         ItUtils.assertCanonicalFileEquals(
-                testDir.resolve("src/main/java").toFile(),
-                Paths.get(props.getProperty("stringParams.0")).toFile());
+                testDir.resolve("src/main/java"),
+                Paths.get(props.getProperty("stringParams.0")));
     }
 }

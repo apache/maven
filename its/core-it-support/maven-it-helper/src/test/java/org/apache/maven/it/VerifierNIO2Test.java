@@ -67,7 +67,7 @@ public class VerifierNIO2Test {
         Files.writeString(testFile, "line1\nline2\n# comment\nline3\n");
 
         // Test the new Path-based method
-        List<String> lines = verifier.loadFile(testFile, false);
+        List<String> lines = verifier.loadFile(testFile);
         assertEquals(3, lines.size());
         assertEquals("line1", lines.get(0));
         assertEquals("line2", lines.get(1));

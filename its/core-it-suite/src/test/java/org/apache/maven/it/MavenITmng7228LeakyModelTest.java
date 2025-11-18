@@ -18,10 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
-
-import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -48,8 +46,8 @@ class MavenITmng7228LeakyModelTest extends AbstractMavenIntegrationTestCase {
         verifier.verifyErrorFreeLog();
 
         String classifier = "build";
-        String pom = FileUtils.readFileToString(new File(
-                verifier.getArtifactPath("org.apache.maven.its.mng7228", "test", "1.0.0-SNAPSHOT", "pom", classifier)));
+        String pom = Files.readString(
+                verifier.getArtifactPath("org.apache.maven.its.mng7228", "test", "1.0.0-SNAPSHOT", "pom", classifier));
 
         assertTrue(pom.contains("projectProperty"));
         assertFalse(pom.contains("activeProperty"), "POM should not contain activeProperty but was: " + pom);

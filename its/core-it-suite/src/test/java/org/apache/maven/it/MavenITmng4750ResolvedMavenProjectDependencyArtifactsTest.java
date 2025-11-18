@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
 
@@ -61,7 +61,7 @@ public class MavenITmng4750ResolvedMavenProjectDependencyArtifactsTest extends A
 
         String path = props.getProperty("project.dependencyArtifacts.0.file");
         assertNotNull(path);
-        assertTrue(new File(path).isFile(), path);
+        assertTrue(Files.isRegularFile(Path.of(path)), path);
 
         String version = props.getProperty("project.dependencyArtifacts.0.version");
         assertEquals("0.1", version);

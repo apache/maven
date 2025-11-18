@@ -53,13 +53,13 @@ public class MavenITmng2362DeployedPomEncodingTest extends AbstractMavenIntegrat
 
         Path pomFile;
 
-        pomFile = Path.of(verifier.getArtifactPath("org.apache.maven.its.mng2362", "utf-8", "0.1", "pom"));
+        pomFile = verifier.getArtifactPath("org.apache.maven.its.mng2362", "utf-8", "0.1", "pom");
         assertPomUtf8(pomFile);
 
         pomFile = testDir.resolve("utf-8/target/repo/org/apache/maven/its/mng2362/utf-8/0.1/utf-8-0.1.pom");
         assertPomUtf8(pomFile);
 
-        pomFile = Path.of(verifier.getArtifactPath("org.apache.maven.its.mng2362", "latin-1", "0.1", "pom"));
+        pomFile = verifier.getArtifactPath("org.apache.maven.its.mng2362", "latin-1", "0.1", "pom");
         assertPomLatin1(pomFile);
 
         pomFile = testDir.resolve("latin-1/target/repo/org/apache/maven/its/mng2362/latin-1/0.1/latin-1-0.1.pom");

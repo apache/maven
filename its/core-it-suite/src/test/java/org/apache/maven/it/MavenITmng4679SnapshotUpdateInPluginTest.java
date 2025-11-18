@@ -18,10 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.Map;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -75,8 +73,8 @@ public class MavenITmng4679SnapshotUpdateInPluginTest extends AbstractMavenInteg
     }
 
     private void assertChecksum(Verifier verifier, String ext, String checksum) throws Exception {
-        String path = verifier.getArtifactPath("org.apache.maven.its.mng4679", "dep", "0.1-SNAPSHOT", ext);
-        String actual = ItUtils.calcHash(new File(path), "SHA-1");
+        Path path = verifier.getArtifactPath("org.apache.maven.its.mng4679", "dep", "0.1-SNAPSHOT", ext);
+        String actual = ItUtils.calcHash(path, "SHA-1");
         assertEquals(checksum, actual);
     }
 }

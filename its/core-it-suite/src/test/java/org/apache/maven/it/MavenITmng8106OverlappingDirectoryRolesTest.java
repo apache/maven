@@ -19,9 +19,8 @@
 package org.apache.maven.it;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.io.FileReader;
-
+import java.nio.file.Path;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.junit.jupiter.api.Test;

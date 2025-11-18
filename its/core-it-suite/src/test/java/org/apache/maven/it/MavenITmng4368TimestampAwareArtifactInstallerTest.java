@@ -18,10 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.nio.file.Files;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -49,12 +47,12 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
         Path testDir = extractResources("mng-4368/pom");
 
         Path aDir = testDir.resolve("branch-a");
-        File aPom = aDir.resolve("pom.xml").toFile();
+        Path aPom = aDir.resolve("pom.xml");
         Path bDir = testDir.resolve("branch-b");
-        File bPom = bDir.resolve("pom.xml").toFile();
+        Path bPom = bDir.resolve("pom.xml");
 
-        aPom.setLastModified(System.currentTimeMillis());
-        bPom.setLastModified(aPom.lastModified() - 1000 * 60);
+        ItUtils.lastModified(aPom, System.currentTimeMillis());
+        ItUtils.lastModified(bPom, ItUtils.lastModified(aPom) - 1000 * 60);
 
         Verifier verifier = newVerifier(aDir);
         verifier.setAutoclean(false);
@@ -64,16 +62,16 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        File installedPom =
-                new File(verifier.getArtifactPath("org.apache.maven.its.mng4368", "test", "0.1-SNAPSHOT", "pom"));
+        Path installedPom =
+                verifier.getArtifactPath("org.apache.maven.its.mng4368", "test", "0.1-SNAPSHOT", "pom");
 
-        String pom = Files.readString(installedPom.toPath());
+        String pom = Files.readString(installedPom);
         assertTrue(pom.indexOf("Branch-A") > 0);
         assertFalse(pom.contains("Branch-B"));
 
-        assertEquals(aPom.length(), bPom.length());
-        assertTrue(aPom.lastModified() > bPom.lastModified());
-        assertTrue(installedPom.lastModified() > bPom.lastModified());
+        assertEquals(Files.size(aPom), Files.size(bPom));
+        assertTrue(ItUtils.lastModified(aPom) > ItUtils.lastModified(bPom));
+        assertTrue(ItUtils.lastModified(installedPom) > ItUtils.lastModified(bPom));
 
         verifier = newVerifier(bDir);
         verifier.setAutoclean(false);
@@ -82,7 +80,7 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        pom = Files.readString(installedPom.toPath());
+        pom = Files.readString(installedPom);
         assertFalse(pom.contains("Branch-A"));
         assertTrue(pom.indexOf("Branch-B") > 0);
     }
@@ -100,14 +98,14 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
         Path testDir = extractResources("mng-4368/jar");
 
         Path aDir = testDir.resolve("branch-a");
-        File aArtifact = aDir.resolve("artifact.jar").toFile();
+        Path aArtifact = aDir.resolve("artifact.jar");
         Path bDir = testDir.resolve("branch-b");
-        File bArtifact = bDir.resolve("artifact.jar").toFile();
+        Path bArtifact = bDir.resolve("artifact.jar");
 
-        Files.writeString(aArtifact.toPath(), "from Branch-A");
-        aArtifact.setLastModified(System.currentTimeMillis());
-        Files.writeString(bArtifact.toPath(), "from Branch-B");
-        bArtifact.setLastModified(aArtifact.lastModified() - 1000 * 60);
+        Files.writeString(aArtifact, "from Branch-A");
+        ItUtils.lastModified(aArtifact, System.currentTimeMillis());
+        Files.writeString(bArtifact, "from Branch-B");
+        ItUtils.lastModified(bArtifact, ItUtils.lastModified(aArtifact) - 1000 * 60);
 
         Verifier verifier = newVerifier(aDir);
         verifier.setAutoclean(false);
@@ -117,16 +115,16 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        File installedArtifact =
-                new File(verifier.getArtifactPath("org.apache.maven.its.mng4368", "test", "0.1-SNAPSHOT", "jar"));
+        Path installedArtifact =
+                verifier.getArtifactPath("org.apache.maven.its.mng4368", "test", "0.1-SNAPSHOT", "jar");
 
-        String data = Files.readString(installedArtifact.toPath());
+        String data = Files.readString(installedArtifact);
         assertTrue(data.indexOf("Branch-A") > 0);
         assertFalse(data.contains("Branch-B"));
 
-        assertEquals(aArtifact.length(), bArtifact.length());
-        assertTrue(aArtifact.lastModified() > bArtifact.lastModified());
-        assertTrue(installedArtifact.lastModified() > bArtifact.lastModified());
+        assertEquals(Files.size(aArtifact), Files.size(bArtifact));
+        assertTrue(ItUtils.lastModified(aArtifact) > ItUtils.lastModified(bArtifact));
+        assertTrue(ItUtils.lastModified(installedArtifact) > ItUtils.lastModified(bArtifact));
 
         verifier = newVerifier(bDir);
         verifier.setAutoclean(false);
@@ -135,13 +133,13 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        data = Files.readString(installedArtifact.toPath());
+        data = Files.readString(installedArtifact);
         assertFalse(data.contains("Branch-A"));
         assertTrue(data.indexOf("Branch-B") > 0);
 
-        long lastModified = installedArtifact.lastModified();
-        Files.writeString(installedArtifact.toPath(), "from Branch-C");
-        installedArtifact.setLastModified(lastModified);
+        long lastModified = ItUtils.lastModified(installedArtifact);
+        Files.writeString(installedArtifact, "from Branch-C");
+        ItUtils.lastModified(installedArtifact, lastModified);
 
         verifier = newVerifier(bDir);
         verifier.setAutoclean(false);
@@ -151,7 +149,7 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        data = Files.readString(installedArtifact.toPath());
+        data = Files.readString(installedArtifact);
         assertFalse(data.contains("Branch-B"));
         assertTrue(data.indexOf("Branch-C") > 0);
     }

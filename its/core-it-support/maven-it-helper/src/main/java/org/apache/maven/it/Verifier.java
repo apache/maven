@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -430,7 +429,7 @@ public class Verifier {
     }
 
     public void verifyErrorFreeLog() throws VerificationException {
-        List<String> lines = loadFile(logFile, false);
+        List<String> lines = loadFile(logFile);
 
         for (String line : lines) {
             // A hack to keep stupid velocity resource loader errors from triggering failure
@@ -488,7 +487,7 @@ public class Verifier {
      * @throws VerificationException if text is not found in log
      */
     public void verifyTextInLog(String text) throws VerificationException {
-        List<String> lines = loadFile(logFile, false);
+        List<String> lines = loadFile(logFile);
 
         boolean result = false;
         for (String line : lines) {
@@ -573,34 +572,27 @@ public class Verifier {
         }
     }
 
-    public List<String> loadFile(String basedir, String filename, boolean hasCommand) throws VerificationException {
-        return loadFile(Paths.get(basedir).resolve(filename), hasCommand);
+    public List<String> loadFile(String basedir, String filename) throws VerificationException {
+        return loadFile(Paths.get(basedir).resolve(filename));
     }
 
     /**
      * Loads the lines of the specified file.
      *
      * @param filePath The path to the file to load, must not be <code>null</code>.
-     * @param hasCommand Whether the lines contain commands that need artifact replacement.
      * @return The list of lines from the file, can be empty but never <code>null</code>.
      * @throws VerificationException If the file could not be loaded.
      * @since 4.0.0
      */
-    public List<String> loadFile(Path filePath, boolean hasCommand) throws VerificationException {
+    public List<String> loadFile(Path filePath) throws VerificationException {
         List<String> lines = new ArrayList<>();
 
         if (Files.exists(filePath)) {
-            try (BufferedReader reader = Files.newBufferedReader(filePath)) {
-                String line = reader.readLine();
-
-                while (line != null) {
-                    line = line.trim();
-
-                    if (!line.startsWith("#") && !line.isEmpty()) {
-                        lines.addAll(replaceArtifacts(line, hasCommand));
-                    }
-                    line = reader.readLine();
-                }
+            try (Stream<String> stream = Files.lines(filePath)) {
+                return stream
+                        .map(String::trim)
+                        .filter(line -> !line.startsWith("#") && !line.isEmpty())
+                        .toList();
             } catch (IOException e) {
                 throw new VerificationException("Verifier loadFile failure", e);
             }
@@ -621,62 +613,13 @@ public class Verifier {
         return loadLines(filename, null);
     }
 
-    private static final String MARKER = "${artifact:";
-
-    private List<String> replaceArtifacts(String line, boolean hasCommand) {
-        int index = line.indexOf(MARKER);
-        if (index >= 0) {
-            String newLine = line.substring(0, index);
-            index = line.indexOf("}", index);
-            if (index < 0) {
-                throw new IllegalArgumentException("line does not contain ending artifact marker: '" + line + "'");
-            }
-            String artifact = line.substring(newLine.length() + MARKER.length(), index);
-
-            newLine += getArtifactPath(artifact);
-            newLine += line.substring(index + 1);
-
-            List<String> l = new ArrayList<>();
-            l.add(newLine);
-
-            int endIndex = newLine.lastIndexOf('/');
-
-            String command = null;
-            String filespec;
-            if (hasCommand) {
-                int startIndex = newLine.indexOf(' ');
-
-                command = newLine.substring(0, startIndex);
-
-                filespec = newLine.substring(startIndex + 1, endIndex);
-            } else {
-                filespec = newLine;
-            }
-
-            Path dir = Paths.get(filespec);
-            addMetadataToList(dir, hasCommand, l, command);
-            Path parent = dir.getParent();
-            if (parent != null) {
-                addMetadataToList(parent, hasCommand, l, command);
-            }
-
-            return l;
-        } else {
-            return Collections.singletonList(line);
-        }
-    }
-
-    private static void addMetadataToList(Path dir, boolean hasCommand, List<String> l, String command) {
+    private static void addMetadataToList(Path dir, List<Path> l) {
         if (Files.exists(dir) && Files.isDirectory(dir)) {
             try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir, "maven-metadata*.xml")) {
                 for (Path file : stream) {
                     String fileName = file.getFileName().toString();
                     if (fileName.startsWith("maven-metadata") && fileName.endsWith(".xml")) {
-                        if (hasCommand) {
-                            l.add(command + " " + file.toString());
-                        } else {
-                            l.add(file.toString());
-                        }
+                        l.add(file);
                     }
                 }
             } catch (IOException e) {
@@ -685,7 +628,7 @@ public class Verifier {
         }
     }
 
-    private String getArtifactPath(String artifact) {
+    private Path getArtifactPath(String artifact) {
         StringTokenizer tok = new StringTokenizer(artifact, ":");
         if (tok.countTokens() != 4) {
             throw new IllegalArgumentException("Artifact must have 4 tokens: '" + artifact + "'");
@@ -703,7 +646,7 @@ public class Verifier {
         return getArtifactPath(groupId, artifactId, version, ext);
     }
 
-    public String getArtifactPath(String groupId, String artifactId, String version, String ext) {
+    public Path getArtifactPath(String groupId, String artifactId, String version, String ext) {
         return getArtifactPath(groupId, artifactId, version, ext, null);
     }
 
@@ -718,7 +661,7 @@ public class Verifier {
      * @return the absolute path to the artifact denoted by groupId, artifactId, version, extension and classifier,
      *         never null.
      */
-    public String getArtifactPath(String gid, String aid, String version, String ext, String classifier) {
+    public Path getArtifactPath(String gid, String aid, String version, String ext, String classifier) {
         if (classifier != null && classifier.isEmpty()) {
             classifier = null;
         }
@@ -738,12 +681,10 @@ public class Verifier {
         } else {
             gav = gid + ":" + aid + ":" + ext + ":" + version;
         }
-        return getLocalRepository()
-                + File.separator
-                + executorTool.artifactPath(executorHelper.executorRequest(), gav, null);
+        return getLocalRepository().resolve(executorTool.artifactPath(executorHelper.executorRequest(), gav, null));
     }
 
-    private String getSupportArtifactPath(String artifact) {
+    private Path getSupportArtifactPath(String artifact) {
         StringTokenizer tok = new StringTokenizer(artifact, ":");
         if (tok.countTokens() != 4) {
             throw new IllegalArgumentException("Artifact must have 4 tokens: '" + artifact + "'");
@@ -761,7 +702,7 @@ public class Verifier {
         return getSupportArtifactPath(groupId, artifactId, version, ext);
     }
 
-    public String getSupportArtifactPath(String groupId, String artifactId, String version, String ext) {
+    public Path getSupportArtifactPath(String groupId, String artifactId, String version, String ext) {
         return getSupportArtifactPath(groupId, artifactId, version, ext, null);
     }
 
@@ -776,7 +717,7 @@ public class Verifier {
      * @return the absolute path to the artifact denoted by groupId, artifactId, version, extension and classifier,
      *         never null.
      */
-    public String getSupportArtifactPath(String gid, String aid, String version, String ext, String classifier) {
+    public Path getSupportArtifactPath(String gid, String aid, String version, String ext, String classifier) {
         if (classifier != null && classifier.isEmpty()) {
             classifier = null;
         }
@@ -800,19 +741,17 @@ public class Verifier {
                 .resolve(executorTool.artifactPath(
                         executorHelper.executorRequest().argument("-Dmaven.repo.local=" + outerLocalRepository),
                         gav,
-                        null))
-                .toString();
+                        null));
     }
 
-    public List<String> getArtifactFileNameList(String org, String name, String version, String ext) {
-        List<String> files = new ArrayList<>();
-        String artifactPath = getArtifactPath(org, name, version, ext);
-        Path dir = Paths.get(artifactPath);
+    public List<Path> getArtifactFileNameList(String org, String name, String version, String ext) {
+        List<Path> files = new ArrayList<>();
+        Path artifactPath = getArtifactPath(org, name, version, ext);
         files.add(artifactPath);
-        addMetadataToList(dir, false, files, null);
-        Path parent = dir.getParent();
+        addMetadataToList(artifactPath, files);
+        Path parent = artifactPath.getParent();
         if (parent != null) {
-            addMetadataToList(parent, false, files, null);
+            addMetadataToList(parent, files);
         }
         return files;
     }
@@ -826,7 +765,7 @@ public class Verifier {
      * @param version The artifact version, may be <code>null</code>.
      * @return The (absolute) path to the local artifact metadata, never <code>null</code>.
      */
-    public String getArtifactMetadataPath(String gid, String aid, String version) {
+    public Path getArtifactMetadataPath(String gid, String aid, String version) {
         return getArtifactMetadataPath(gid, aid, version, "maven-metadata.xml");
     }
 
@@ -840,7 +779,7 @@ public class Verifier {
      * @param filename The filename to use, must not be <code>null</code>.
      * @return The (absolute) path to the local artifact metadata, never <code>null</code>.
      */
-    public String getArtifactMetadataPath(String gid, String aid, String version, String filename) {
+    public Path getArtifactMetadataPath(String gid, String aid, String version, String filename) {
         return getArtifactMetadataPath(gid, aid, version, filename, null);
     }
 
@@ -855,7 +794,7 @@ public class Verifier {
      * @param repoId   The remote repository ID from where metadata originate, may be <code>null</code>.
      * @return The (absolute) path to the local artifact metadata, never <code>null</code>.
      */
-    public String getArtifactMetadataPath(String gid, String aid, String version, String filename, String repoId) {
+    public Path getArtifactMetadataPath(String gid, String aid, String version, String filename, String repoId) {
         String gav;
         if (gid != null) {
             gav = gid + ":";
@@ -873,9 +812,7 @@ public class Verifier {
             gav += ":";
         }
         gav += filename;
-        return getLocalRepository()
-                + File.separator
-                + executorTool.metadataPath(executorHelper.executorRequest(), gav, repoId);
+        return getLocalRepository().resolve(executorTool.metadataPath(executorHelper.executorRequest(), gav, repoId));
     }
 
     /**
@@ -886,14 +823,14 @@ public class Verifier {
      * @param aid The artifact id, must not be <code>null</code>.
      * @return The (absolute) path to the local artifact metadata, never <code>null</code>.
      */
-    public String getArtifactMetadataPath(String gid, String aid) {
+    public Path getArtifactMetadataPath(String gid, String aid) {
         return getArtifactMetadataPath(gid, aid, null);
     }
 
     public void deleteArtifact(String org, String name, String version, String ext) throws IOException {
-        List<String> files = getArtifactFileNameList(org, name, version, ext);
-        for (String fileName : files) {
-            Files.deleteIfExists(Paths.get(fileName));
+        List<Path> files = getArtifactFileNameList(org, name, version, ext);
+        for (Path fileName : files) {
+            Files.deleteIfExists(fileName);
         }
     }
 
@@ -1097,9 +1034,9 @@ public class Verifier {
 
     private void verifyArtifactPresence(boolean wanted, String groupId, String artifactId, String version, String ext)
             throws VerificationException {
-        List<String> files = getArtifactFileNameList(groupId, artifactId, version, ext);
-        for (String fileName : files) {
-            verifyFilePresence(fileName, wanted);
+        List<Path> files = getArtifactFileNameList(groupId, artifactId, version, ext);
+        for (Path fileName : files) {
+            verifyFilePresence(fileName.toString(), wanted);
         }
     }
 
@@ -1231,8 +1168,8 @@ public class Verifier {
      */
     public void verifyArtifactContent(String groupId, String artifactId, String version, String ext, String content)
             throws IOException, VerificationException {
-        String fileName = getArtifactPath(groupId, artifactId, version, ext);
-        String actualContent = Files.readString(Paths.get(fileName));
+        Path fileName = getArtifactPath(groupId, artifactId, version, ext);
+        String actualContent = Files.readString(fileName);
         if (!content.equals(actualContent)) {
             throw new VerificationException("Content of " + fileName + " does not equal " + content);
         }

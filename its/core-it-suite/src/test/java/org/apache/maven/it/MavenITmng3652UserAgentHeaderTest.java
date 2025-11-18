@@ -126,7 +126,7 @@ class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase
         Path touchFile = projectDir.resolve("target/touch.txt");
         assertTrue(Files.exists(touchFile));
 
-        List<String> lines = verifier.loadFile(touchFile, false);
+        List<String> lines = verifier.loadFile(touchFile);
 
         // NOTE: system property for maven.version may not exist if you use -Dtest
         // surefire parameter to run this single test. Therefore, the plugin writes
@@ -168,7 +168,7 @@ class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase
         Path touchFile = projectDir.resolve("target/touch.txt");
         assertTrue(Files.exists(touchFile));
 
-        List<String> lines = verifier.loadFile(touchFile, false);
+        List<String> lines = verifier.loadFile(touchFile);
 
         // NOTE: system property for maven.version may not exist if you use -Dtest
         // surefire parameter to run this single test. Therefore, the plugin writes
@@ -215,7 +215,7 @@ class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase
         Path touchFile = projectDir.resolve("target/touch.txt");
         assertTrue(Files.exists(touchFile));
 
-        List<String> lines = verifier.loadFile(touchFile, false);
+        List<String> lines = verifier.loadFile(touchFile);
 
         // NOTE: system property for maven.version may not exist if you use -Dtest
         // surefire parameter to run this single test. Therefore, the plugin writes

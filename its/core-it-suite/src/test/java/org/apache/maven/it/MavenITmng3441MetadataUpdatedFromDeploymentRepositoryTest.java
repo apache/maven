@@ -42,7 +42,7 @@ public class MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest extends A
         Path testDir = extractResources("mng-3441");
 
         Path targetRepository = testDir.resolve("target-repo");
-        FileUtils.deleteDirectory(targetRepository.toFile());
+        ItUtils.deleteDirectory(targetRepository);
         FileUtils.copyDirectoryStructure(testDir.resolve("deploy-repo").toFile(), targetRepository.toFile());
 
         Verifier verifier;

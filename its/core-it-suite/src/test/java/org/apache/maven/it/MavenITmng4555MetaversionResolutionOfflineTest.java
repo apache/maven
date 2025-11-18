@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.Deque;
 import java.util.Map;

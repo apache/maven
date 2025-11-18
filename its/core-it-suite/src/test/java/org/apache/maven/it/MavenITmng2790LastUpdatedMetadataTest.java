@@ -18,13 +18,11 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -58,10 +56,10 @@ public class MavenITmng2790LastUpdatedMetadataTest extends AbstractMavenIntegrat
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        File metadataArtifactVersionFile =
-                new File(verifier.getArtifactMetadataPath("org.apache.maven.its.mng2790", "project", "1.0-SNAPSHOT"));
-        File metadataArtifactFile =
-                new File(verifier.getArtifactMetadataPath("org.apache.maven.its.mng2790", "project"));
+        Path metadataArtifactVersionFile =
+                verifier.getArtifactMetadataPath("org.apache.maven.its.mng2790", "project", "1.0-SNAPSHOT");
+        Path metadataArtifactFile =
+                verifier.getArtifactMetadataPath("org.apache.maven.its.mng2790", "project");
 
         Date artifactVersionLastUpdated1 = getLastUpdated(metadataArtifactVersionFile);
         Date artifactLastUpdated1 = getLastUpdated(metadataArtifactFile);
@@ -97,8 +95,8 @@ public class MavenITmng2790LastUpdatedMetadataTest extends AbstractMavenIntegrat
                 artifactLastUpdated2.after(artifactLastUpdated1), artifactLastUpdated1 + " < " + artifactLastUpdated2);
     }
 
-    private Date getLastUpdated(File metadataFile) throws Exception {
-        String xml = Files.readString(metadataFile.toPath());
+    private Date getLastUpdated(Path metadataFile) throws Exception {
+        String xml = Files.readString(metadataFile);
         String timestamp = xml.replaceAll("(?s)\\A.*<lastUpdated>\\s*([0-9]++)\\s*</lastUpdated>.*\\z", "$1");
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
         format.setTimeZone(TimeZone.getTimeZone("UTC"));

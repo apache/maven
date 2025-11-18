@@ -21,13 +21,11 @@ package org.apache.maven.it;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -123,7 +121,7 @@ public class MavenIT0108SnapshotUpdateTest extends AbstractMavenIntegrationTestC
     public void testSnapshotUpdatedWithLocalMetadata() throws Exception {
         Path localMetadata = getMetadataFile("org/apache/maven", "maven-core-it-support", "1.0-SNAPSHOT");
 
-        FileUtils.deleteDirectory(localMetadata.getParent().toFile());
+        ItUtils.deleteDirectory(localMetadata.getParent());
         assertFalse(Files.exists(localMetadata.getParent()));
         Files.createDirectories(localMetadata.getParent());
 
@@ -200,7 +198,7 @@ public class MavenIT0108SnapshotUpdateTest extends AbstractMavenIntegrationTestC
     }
 
     private Path getMetadataFile(String groupId, String artifactId, String version) {
-        return Paths.get(verifier.getArtifactMetadataPath(groupId, artifactId, version, "maven-metadata-local.xml"));
+        return verifier.getArtifactMetadataPath(groupId, artifactId, version, "maven-metadata-local.xml");
     }
 
     private void verifyArtifactContent(String s) throws IOException, VerificationException {
@@ -211,17 +209,17 @@ public class MavenIT0108SnapshotUpdateTest extends AbstractMavenIntegrationTestC
     private static Path deleteLocalArtifact(Verifier verifier, Path localRepoFile) throws IOException {
         verifier.deleteArtifact("org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar");
         // this is to delete metadata - TODO: incorporate into deleteArtifact in verifier
-        FileUtils.deleteDirectory(localRepoFile.getParent().toFile());
+        ItUtils.deleteDirectory(localRepoFile.getParent());
         return localRepoFile;
     }
 
     private static Path getLocalRepoFile(Verifier verifier) {
-        return Paths.get(verifier.getArtifactPath("org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar"));
+        return verifier.getArtifactPath("org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar");
     }
 
     private static void recreateRemoteRepository(Path repository) throws IOException {
         // create a repository (TODO: into verifier)
-        FileUtils.deleteDirectory(repository.toFile());
+        ItUtils.deleteDirectory(repository);
         assertFalse(Files.exists(repository));
         Files.createDirectories(repository);
     }

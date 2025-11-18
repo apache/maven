@@ -18,10 +18,9 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.io.IOException;
-
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -57,13 +56,13 @@ public class MavenITmng4238ArtifactHandlerExtensionUsageTest extends AbstractMav
         // Now, if everything worked, we have a .pom and a .jar in the local repo.
         // IF IT DIDN'T, we have a .pom and a .coreit in the local repo...
 
-        String path = verifier.getArtifactPath(GID, AID, VERSION, TYPE);
-        assertTrue(new File(path).exists(), path + " should have been installed.");
+        Path path = verifier.getArtifactPath(GID, AID, VERSION, TYPE);
+        assertTrue(Files.exists(path), path + " should have been installed.");
 
         path = verifier.getArtifactPath(GID, AID, VERSION, "pom");
-        assertTrue(new File(path).exists(), path + " should have been installed.");
+        assertTrue(Files.exists(path), path + " should have been installed.");
 
         path = verifier.getArtifactPath(GID, AID, VERSION, BAD_TYPE);
-        assertFalse(new File(path).exists(), path + " should NOT have been installed.");
+        assertFalse(Files.exists(path), path + " should NOT have been installed.");
     }
 }

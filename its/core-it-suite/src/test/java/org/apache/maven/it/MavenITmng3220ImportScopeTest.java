@@ -18,7 +18,6 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -74,7 +73,7 @@ public class MavenITmng3220ImportScopeTest extends AbstractMavenIntegrationTestC
             // expected
         }
 
-        List<String> lines = verifier.loadFile(testDir.resolve("log.txt"), false);
+        List<String> lines = verifier.loadFile(testDir.resolve("log.txt"));
 
         boolean found = false;
         for (String line : lines) {

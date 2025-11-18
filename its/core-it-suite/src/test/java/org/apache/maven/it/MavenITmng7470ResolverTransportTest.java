@@ -41,7 +41,7 @@ public class MavenITmng7470ResolverTransportTest extends AbstractMavenIntegratio
         Path testDir = extractResources("mng-7470-resolver-transport");
         projectDir = testDir.resolve("project");
 
-        server = HttpServer.builder().port(0).source(testDir.resolve("repo").toFile()).build();
+        server = HttpServer.builder().port(0).source(testDir.resolve("repo")).build();
         server.start();
         if (server.isFailed()) {
             fail("Couldn't bind the server socket to a free port!");

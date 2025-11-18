@@ -21,7 +21,6 @@ package org.apache.maven.it;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -51,10 +50,10 @@ class MavenITmng7836AlternativePomSyntaxTest extends AbstractMavenIntegrationTes
         consumerVerifier.addCliArgument("-Drat.skip=true");
         consumerVerifier.addCliArgument("-V");
 
-        Path consumerPom = Paths.get(consumerVerifier.getArtifactPath(
-                "org.apache.maven.its.mng-7836", "hocon-simple", "1.0.0-SNAPSHOT", "pom", ""));
-        Path buildPom = Paths.get(consumerVerifier.getArtifactPath(
-                "org.apache.maven.its.mng-7836", "hocon-simple", "1.0.0-SNAPSHOT", "pom", "build"));
+        Path consumerPom = consumerVerifier.getArtifactPath(
+                "org.apache.maven.its.mng-7836", "hocon-simple", "1.0.0-SNAPSHOT", "pom", "");
+        Path buildPom = consumerVerifier.getArtifactPath(
+                "org.apache.maven.its.mng-7836", "hocon-simple", "1.0.0-SNAPSHOT", "pom", "build");
         consumerVerifier.deleteArtifacts("org.apache.maven.its.mng-7836", "hocon-simple", "1.0.0-SNAPSHOT");
 
         consumerVerifier.execute();
