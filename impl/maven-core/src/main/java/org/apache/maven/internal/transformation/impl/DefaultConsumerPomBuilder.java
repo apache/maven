@@ -40,6 +40,7 @@ import org.apache.maven.api.model.ModelBase;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.model.Scm;
+import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
@@ -74,6 +75,16 @@ class DefaultConsumerPomBuilder implements PomBuilder {
             throws ModelBuilderException {
         Model model = project.getModel().getDelegate();
         boolean flattenEnabled = Features.consumerPomFlatten(session.getConfigProperties());
+
+        // Check if mixins are present without flattening enabled
+        if (!flattenEnabled && !model.getMixins().isEmpty()) {
+            throw new MavenException("The consumer POM for "
+                    + project.getId()
+                    + " cannot be created because the POM contains mixins, which require flattening to be enabled. "
+                    + "Mixins cannot be part of the consumer POM and must be removed during transformation. "
+                    + "Please enable flattening by setting the property 'maven.consumer.pom.flatten=true' "
+                    + "or remove the mixins from your POM.");
+        }
 
         // Check if consumer POM flattening is disabled
         if (!flattenEnabled) {

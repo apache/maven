@@ -90,7 +90,7 @@ public class MavenITmng5102MixinsTest extends AbstractMavenIntegrationTestCase {
         verifier = newVerifier(new File(testDir, "project").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.addCliArgument("install");
+        verifier.addCliArguments("install", "-Dmaven.consumer.pom.flatten");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
@@ -126,7 +126,7 @@ public class MavenITmng5102MixinsTest extends AbstractMavenIntegrationTestCase {
         verifier = newVerifier(new File(testDir, "project").getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.addCliArgument("install");
+        verifier.addCliArguments("install", "-Dmaven.consumer.pom.flatten");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
