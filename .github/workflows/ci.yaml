@@ -6,14 +6,6 @@ env:
 on:
   push:
 
-# allow single build per branch or PR
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
-# clear all permissions for GITHUB_TOKEN
-permissions: {}
-
 jobs:
   initial-build:
     runs-on: ubuntu-latest
@@ -34,11 +26,6 @@ jobs:
       - name: Set up Maven
         shell: bash
         run: mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper "-Dmaven=4.0.0-rc-3"
-
-      - name: Setup Node.js
-        uses: actions/setup-node@0a44ba7841725637a19e28fa30b79a866c81b0a6 # v4
-        with:
-          node-version: '24'
 
       - name: Start CI run
         run: ./nx start-ci-run --distribute-on="5 linux-large" --stop-agents-after="verify-ci"
