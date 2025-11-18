@@ -273,24 +273,20 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                     .orElseGet(() -> XmlNode.newInstance("config"));
             List<XmlNode> children = mojoParameters.stream()
                     .map(mp -> {
-                        String s;
-                        if (mp.xml()) {
-                            // Parse as XML - value contains XML elements
-                            s = "<" + mp.name() + ">" + mp.value() + "</" + mp.name() + ">";
-                        } else {
+                        String value = mp.value();
+                        if (!mp.xml()) {
                             // Treat as plain text - escape XML special characters
-                            String escapedValue = mp.value()
-                                    .replace("&", "&amp;")
+                            value = value.replace("&", "&amp;")
                                     .replace("<", "&lt;")
                                     .replace(">", "&gt;")
                                     .replace("\"", "&quot;")
                                     .replace("'", "&apos;");
-                            s = "<" + mp.name() + ">" + escapedValue + "</" + mp.name() + ">";
                         }
+                        String s = '<' + mp.name() + '>' + value + "</" + mp.name() + '>';
                         try {
                             return XmlService.read(new StringReader(s));
                         } catch (XMLStreamException e) {
-                            throw new MavenException("Unable to parse xml: " + e.toString() + "\n" + s, e);
+                            throw new MavenException("Unable to parse xml: " + e + "\n" + s, e);
                         }
                     })
                     .collect(Collectors.toList());
