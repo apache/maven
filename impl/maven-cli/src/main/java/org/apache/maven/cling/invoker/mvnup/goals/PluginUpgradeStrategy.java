@@ -19,7 +19,6 @@
 package org.apache.maven.cling.invoker.mvnup.goals;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
@@ -30,6 +29,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import eu.maveniverse.domtrip.Document;
+import eu.maveniverse.domtrip.Editor;
+import eu.maveniverse.domtrip.Element;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.cli.mvnup.UpgradeOptions;
@@ -60,22 +62,21 @@ import org.eclipse.aether.spi.connector.transport.http.ChecksumExtractor;
 import org.eclipse.aether.spi.io.PathProcessor;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.eclipse.aether.transport.jdk.JdkTransporterFactory;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
-import org.jdom2.output.XMLOutputter;
 
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.Plugins.DEFAULT_MAVEN_PLUGIN_GROUP_ID;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.Plugins.MAVEN_4_COMPATIBILITY_REASON;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.Plugins.MAVEN_PLUGIN_PREFIX;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.ARTIFACT_ID;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.BUILD;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.GROUP_ID;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.PARENT;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.PLUGIN;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.PLUGINS;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.PLUGIN_MANAGEMENT;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.VERSION;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.ARTIFACT_ID;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.BUILD;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.DEPENDENCIES;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.DEPENDENCY;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.GROUP_ID;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PARENT;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PLUGIN;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PLUGINS;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PLUGIN_MANAGEMENT;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PROPERTIES;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.VERSION;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Plugins.DEFAULT_MAVEN_PLUGIN_GROUP_ID;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Plugins.MAVEN_4_COMPATIBILITY_REASON;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Plugins.MAVEN_PLUGIN_PREFIX;
 
 /**
  * Strategy for upgrading Maven plugins to recommended versions.
@@ -196,30 +197,30 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
      * Only processes plugins explicitly defined in the current POM document.
      */
     private boolean upgradePluginsInDocument(Document pomDocument, UpgradeContext context) {
-        Element root = pomDocument.getRootElement();
-        Namespace namespace = root.getNamespace();
+        Element root = pomDocument.root();
         boolean hasUpgrades = false;
 
         // Define the plugins that need to be upgraded for Maven 4 compatibility
         Map<String, PluginUpgradeInfo> pluginUpgrades = getPluginUpgradesMap();
 
         // Check build/plugins
-        Element buildElement = root.getChild(UpgradeConstants.XmlElements.BUILD, namespace);
+        Element buildElement = root.child(BUILD).orElse(null);
         if (buildElement != null) {
-            Element pluginsElement = buildElement.getChild(PLUGINS, namespace);
+            Element pluginsElement = buildElement.child(PLUGINS).orElse(null);
             if (pluginsElement != null) {
                 hasUpgrades |= upgradePluginsInSection(
-                        pluginsElement, namespace, pluginUpgrades, pomDocument, BUILD + "/" + PLUGINS, context);
+                        pluginsElement, pluginUpgrades, pomDocument, BUILD + "/" + PLUGINS, context);
             }
 
             // Check build/pluginManagement/plugins
-            Element pluginManagementElement = buildElement.getChild(PLUGIN_MANAGEMENT, namespace);
+            Element pluginManagementElement =
+                    buildElement.child(PLUGIN_MANAGEMENT).orElse(null);
             if (pluginManagementElement != null) {
-                Element managedPluginsElement = pluginManagementElement.getChild(PLUGINS, namespace);
+                Element managedPluginsElement =
+                        pluginManagementElement.child(PLUGINS).orElse(null);
                 if (managedPluginsElement != null) {
                     hasUpgrades |= upgradePluginsInSection(
                             managedPluginsElement,
-                            namespace,
                             pluginUpgrades,
                             pomDocument,
                             BUILD + "/" + PLUGIN_MANAGEMENT + "/" + PLUGINS,
@@ -262,38 +263,35 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
      */
     private boolean upgradePluginsInSection(
             Element pluginsElement,
-            Namespace namespace,
             Map<String, PluginUpgradeInfo> pluginUpgrades,
             Document pomDocument,
             String sectionName,
             UpgradeContext context) {
-        boolean hasUpgrades = false;
-        List<Element> pluginElements = pluginsElement.getChildren(PLUGIN, namespace);
 
-        for (Element pluginElement : pluginElements) {
-            String groupId = getChildText(pluginElement, GROUP_ID, namespace);
-            String artifactId = getChildText(pluginElement, ARTIFACT_ID, namespace);
+        return pluginsElement
+                .children(PLUGIN)
+                .map(pluginElement -> {
+                    boolean upgraded = false;
+                    String groupId = getChildText(pluginElement, GROUP_ID);
+                    String artifactId = getChildText(pluginElement, ARTIFACT_ID);
 
-            // Default groupId for Maven plugins
-            if (groupId == null && artifactId != null && artifactId.startsWith(MAVEN_PLUGIN_PREFIX)) {
-                groupId = DEFAULT_MAVEN_PLUGIN_GROUP_ID;
-            }
-
-            if (groupId != null && artifactId != null) {
-                String pluginKey = groupId + ":" + artifactId;
-                PluginUpgradeInfo upgrade = pluginUpgrades.get(pluginKey);
-
-                if (upgrade != null) {
-                    if (upgradePluginVersion(pluginElement, namespace, upgrade, pomDocument, sectionName, context)) {
-                        hasUpgrades = true;
+                    // Default groupId for Maven plugins
+                    if (groupId == null && artifactId != null && artifactId.startsWith(MAVEN_PLUGIN_PREFIX)) {
+                        groupId = DEFAULT_MAVEN_PLUGIN_GROUP_ID;
                     }
-                }
-            }
 
-            hasUpgrades |= upgradePluginDependencies(pluginElement, namespace, pomDocument, sectionName, context);
-        }
+                    if (groupId != null && artifactId != null) {
+                        String pluginKey = groupId + ":" + artifactId;
+                        PluginUpgradeInfo upgrade = pluginUpgrades.get(pluginKey);
 
-        return hasUpgrades;
+                        if (upgrade != null) {
+                            upgraded = upgradePluginVersion(pluginElement, upgrade, pomDocument, sectionName, context);
+                        }
+                    }
+                    upgraded |= upgradePluginDependencies(pluginElement, pomDocument, sectionName, context);
+                    return upgraded;
+                })
+                .reduce(false, Boolean::logicalOr);
     }
 
     /**
@@ -301,18 +299,17 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
      */
     private boolean upgradePluginVersion(
             Element pluginElement,
-            Namespace namespace,
             PluginUpgradeInfo upgrade,
             Document pomDocument,
             String sectionName,
             UpgradeContext context) {
-        Element versionElement = pluginElement.getChild(VERSION, namespace);
+        Element versionElement = pluginElement.child(VERSION).orElse(null);
         String currentVersion;
         boolean isProperty = false;
         String propertyName = null;
 
         if (versionElement != null) {
-            currentVersion = versionElement.getTextTrim();
+            currentVersion = versionElement.textContentTrimmed();
             // Check if version is a property reference
             if (currentVersion.startsWith("${") && currentVersion.endsWith("}")) {
                 isProperty = true;
@@ -331,7 +328,8 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         } else {
             // Direct version comparison and upgrade
             if (isVersionBelow(currentVersion, upgrade.minVersion)) {
-                versionElement.setText(upgrade.minVersion);
+                Editor editor = new Editor(pomDocument);
+                editor.setTextContent(versionElement, upgrade.minVersion);
                 context.detail("Upgraded " + upgrade.groupId + ":" + upgrade.artifactId + " from " + currentVersion
                         + " to " + upgrade.minVersion + " in " + sectionName);
                 return true;
@@ -353,16 +351,16 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             PluginUpgradeInfo upgrade,
             String sectionName,
             UpgradeContext context) {
-        Element root = pomDocument.getRootElement();
-        Namespace namespace = root.getNamespace();
-        Element propertiesElement = root.getChild(UpgradeConstants.XmlElements.PROPERTIES, namespace);
+        Editor editor = new Editor(pomDocument);
+        Element root = editor.root();
+        Element propertiesElement = root.child(PROPERTIES).orElse(null);
 
         if (propertiesElement != null) {
-            Element propertyElement = propertiesElement.getChild(propertyName, namespace);
+            Element propertyElement = propertiesElement.child(propertyName).orElse(null);
             if (propertyElement != null) {
-                String currentVersion = propertyElement.getTextTrim();
+                String currentVersion = propertyElement.textContentTrimmed();
                 if (isVersionBelow(currentVersion, upgrade.minVersion)) {
-                    propertyElement.setText(upgrade.minVersion);
+                    editor.setTextContent(propertyElement, upgrade.minVersion);
                     context.detail("Upgraded property " + propertyName + " (for " + upgrade.groupId
                             + ":"
                             + upgrade.artifactId + ") from " + currentVersion + " to " + upgrade.minVersion
@@ -387,43 +385,32 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
      * Upgrades plugin dependencies (e.g., extra-enforcer-rules inside maven-enforcer-plugin).
      */
     private boolean upgradePluginDependencies(
-            Element pluginElement,
-            Namespace namespace,
-            Document pomDocument,
-            String sectionName,
-            UpgradeContext context) {
-        Element dependenciesElement = pluginElement.getChild("dependencies", namespace);
+            Element pluginElement, Document pomDocument, String sectionName, UpgradeContext context) {
+        Element dependenciesElement = pluginElement.child(DEPENDENCIES).orElse(null);
         if (dependenciesElement == null) {
             return false;
         }
 
         Map<String, PluginUpgradeInfo> depUpgrades = getPluginDependencyUpgradesMap();
-        boolean hasUpgrades = false;
 
-        List<Element> depElements = dependenciesElement.getChildren("dependency", namespace);
-        for (Element depElement : depElements) {
-            String groupId = getChildText(depElement, GROUP_ID, namespace);
-            String artifactId = getChildText(depElement, ARTIFACT_ID, namespace);
+        return dependenciesElement
+                .children(DEPENDENCY)
+                .map(depElement -> {
+                    String groupId = getChildText(depElement, GROUP_ID);
+                    String artifactId = getChildText(depElement, ARTIFACT_ID);
 
-            if (groupId != null && artifactId != null) {
-                String depKey = groupId + ":" + artifactId;
-                PluginUpgradeInfo upgrade = depUpgrades.get(depKey);
+                    if (groupId != null && artifactId != null) {
+                        String depKey = groupId + ":" + artifactId;
+                        PluginUpgradeInfo upgrade = depUpgrades.get(depKey);
 
-                if (upgrade != null) {
-                    if (upgradePluginVersion(
-                            depElement,
-                            namespace,
-                            upgrade,
-                            pomDocument,
-                            sectionName + "/plugin/dependencies",
-                            context)) {
-                        hasUpgrades = true;
+                        if (upgrade != null) {
+                            return upgradePluginVersion(
+                                    depElement, upgrade, pomDocument, sectionName + "/plugin/dependencies", context);
+                        }
                     }
-                }
-            }
-        }
-
-        return hasUpgrades;
+                    return false;
+                })
+                .reduce(false, Boolean::logicalOr);
     }
 
     private Map<String, PluginUpgradeInfo> getPluginDependencyUpgradesMap() {
@@ -448,9 +435,9 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
     /**
      * Helper method to get child element text.
      */
-    private String getChildText(Element parent, String childName, Namespace namespace) {
-        Element child = parent.getChild(childName, namespace);
-        return child != null ? child.getTextTrim() : null;
+    private String getChildText(Element parent, String childName) {
+        Element child = parent.child(childName).orElse(null);
+        return child != null ? child.textContentTrimmed() : null;
     }
 
     /**
@@ -552,13 +539,10 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
     }
 
     /**
-     * Writes a JDOM Document to a file using the same format as the existing codebase.
+     * Writes a Document to a file using the same format as the existing codebase.
      */
     private void writePomToFile(Document document, Path filePath) throws Exception {
-        try (FileWriter writer = new FileWriter(filePath.toFile())) {
-            XMLOutputter outputter = new XMLOutputter();
-            outputter.output(document, writer);
-        }
+        Files.writeString(filePath, document.toXml());
     }
 
     /**
@@ -609,12 +593,9 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
      * Converts PluginUpgradeInfo map to PluginUpgrade map for compatibility.
      */
     private Map<String, PluginUpgrade> getPluginUpgradesAsMap() {
-        Map<String, PluginUpgrade> result = new HashMap<>();
-        for (PluginUpgrade upgrade : PLUGIN_UPGRADES) {
-            String key = upgrade.groupId() + ":" + upgrade.artifactId();
-            result.put(key, upgrade);
-        }
-        return result;
+        return PLUGIN_UPGRADES.stream()
+                .collect(Collectors.toMap(
+                        upgrade -> upgrade.groupId() + ":" + upgrade.artifactId(), upgrade -> upgrade));
     }
 
     /**
@@ -772,22 +753,21 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
 
         for (Map.Entry<Path, Document> entry : pomMap.entrySet()) {
             Document doc = entry.getValue();
-            Element root = doc.getRootElement();
-            Namespace namespace = root.getNamespace();
+            Element root = doc.root();
 
             // Extract GAV from this POM
-            String groupId = getChildText(root, GROUP_ID, namespace);
-            String artifactId = getChildText(root, ARTIFACT_ID, namespace);
-            String version = getChildText(root, VERSION, namespace);
+            String groupId = getChildText(root, GROUP_ID);
+            String artifactId = getChildText(root, ARTIFACT_ID);
+            String version = getChildText(root, VERSION);
 
             // Handle inheritance from parent
-            Element parentElement = root.getChild(PARENT, namespace);
+            Element parentElement = root.child(PARENT).orElse(null);
             if (parentElement != null) {
                 if (groupId == null) {
-                    groupId = getChildText(parentElement, GROUP_ID, namespace);
+                    groupId = getChildText(parentElement, GROUP_ID);
                 }
                 if (version == null) {
-                    version = getChildText(parentElement, VERSION, namespace);
+                    version = getChildText(parentElement, VERSION);
                 }
             }
 
@@ -809,23 +789,22 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         Map<String, PluginUpgrade> pluginUpgrades = getPluginUpgradesAsMap();
         boolean hasUpgrades = false;
 
-        Element root = pomDocument.getRootElement();
-        Namespace namespace = root.getNamespace();
+        Element root = pomDocument.root();
 
         // Ensure build/pluginManagement/plugins structure exists
-        Element buildElement = root.getChild(BUILD, namespace);
+        Element buildElement = root.child(BUILD).orElse(null);
         if (buildElement == null) {
-            buildElement = JDomUtils.insertNewElement(BUILD, root);
+            buildElement = DomUtils.insertNewElement(BUILD, root);
         }
 
-        Element pluginManagementElement = buildElement.getChild(PLUGIN_MANAGEMENT, namespace);
+        Element pluginManagementElement = buildElement.child(PLUGIN_MANAGEMENT).orElse(null);
         if (pluginManagementElement == null) {
-            pluginManagementElement = JDomUtils.insertNewElement(PLUGIN_MANAGEMENT, buildElement);
+            pluginManagementElement = DomUtils.insertNewElement(PLUGIN_MANAGEMENT, buildElement);
         }
 
-        Element managedPluginsElement = pluginManagementElement.getChild(PLUGINS, namespace);
+        Element managedPluginsElement = pluginManagementElement.child(PLUGINS).orElse(null);
         if (managedPluginsElement == null) {
-            managedPluginsElement = JDomUtils.insertNewElement(PLUGINS, pluginManagementElement);
+            managedPluginsElement = DomUtils.insertNewElement(PLUGINS, pluginManagementElement);
         }
 
         // Add plugin management entries for each plugin
@@ -833,7 +812,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             PluginUpgrade upgrade = pluginUpgrades.get(pluginKey);
             if (upgrade != null) {
                 // Check if plugin is already managed
-                if (!isPluginAlreadyManagedInElement(managedPluginsElement, namespace, upgrade)) {
+                if (!isPluginAlreadyManagedInElement(managedPluginsElement, upgrade)) {
                     addPluginManagementEntryFromUpgrade(managedPluginsElement, upgrade, context);
                     hasUpgrades = true;
                 }
@@ -846,12 +825,11 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
     /**
      * Checks if a plugin is already managed in the given plugins element.
      */
-    private boolean isPluginAlreadyManagedInElement(
-            Element pluginsElement, Namespace namespace, PluginUpgrade upgrade) {
-        List<Element> pluginElements = pluginsElement.getChildren(PLUGIN, namespace);
+    private boolean isPluginAlreadyManagedInElement(Element pluginsElement, PluginUpgrade upgrade) {
+        List<Element> pluginElements = pluginsElement.children(PLUGIN).toList();
         for (Element pluginElement : pluginElements) {
-            String groupId = getChildText(pluginElement, GROUP_ID, namespace);
-            String artifactId = getChildText(pluginElement, ARTIFACT_ID, namespace);
+            String groupId = getChildText(pluginElement, GROUP_ID);
+            String artifactId = getChildText(pluginElement, ARTIFACT_ID);
 
             // Default groupId for Maven plugins
             if (groupId == null && artifactId != null && artifactId.startsWith(MAVEN_PLUGIN_PREFIX)) {
@@ -870,13 +848,8 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
      */
     private void addPluginManagementEntryFromUpgrade(
             Element managedPluginsElement, PluginUpgrade upgrade, UpgradeContext context) {
-        // Create plugin element using JDomUtils for proper formatting
-        Element pluginElement = JDomUtils.insertNewElement(PLUGIN, managedPluginsElement);
-
-        // Add child elements using JDomUtils for proper formatting
-        JDomUtils.insertContentElement(pluginElement, GROUP_ID, upgrade.groupId());
-        JDomUtils.insertContentElement(pluginElement, ARTIFACT_ID, upgrade.artifactId());
-        JDomUtils.insertContentElement(pluginElement, VERSION, upgrade.minVersion());
+        // Create plugin element using DomUtils convenience method for proper formatting
+        DomUtils.createPlugin(managedPluginsElement, upgrade.groupId(), upgrade.artifactId(), upgrade.minVersion());
 
         context.detail("Added plugin management for " + upgrade.groupId() + ":" + upgrade.artifactId() + " version "
                 + upgrade.minVersion() + " (found through effective model analysis)");
