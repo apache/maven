@@ -19,6 +19,7 @@
 package org.apache.maven.api.services;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -80,6 +81,27 @@ public interface ModelBuilderResult extends Result<ModelBuilderRequest> {
      */
     @Nonnull
     List<Profile> getActivePomProfiles();
+
+    /**
+     * Gets the profiles that were active during model building for a specific model in the hierarchy.
+     * This allows tracking which profiles came from which model (parent vs child).
+     *
+     * @param modelId The identifier of the model (groupId:artifactId:version) or empty string for the super POM.
+     * @return The active profiles for the specified model or an empty list if the model has no active profiles.
+     * @since 4.0.0
+     */
+    @Nonnull
+    List<Profile> getActivePomProfiles(String modelId);
+
+    /**
+     * Gets a map of all active POM profiles organized by model ID.
+     * The map keys are model IDs (groupId:artifactId:version) and values are lists of active profiles for each model.
+     *
+     * @return A map of model IDs to their active profiles, never {@code null}.
+     * @since 4.0.0
+     */
+    @Nonnull
+    Map<String, List<Profile>> getActivePomProfilesByModel();
 
     /**
      * Gets the external profiles that were active during model building. External profiles are those that were
