@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.apache.maven.api.services.Sources;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.v4.MavenStaxReader;
 import org.apache.maven.project.MavenProject;
@@ -55,12 +56,12 @@ class ConsumerPomArtifactTransformerTest {
             MavenProject project = new MavenProject(model);
             project.setOriginalModel(model);
             ConsumerPomArtifactTransformer t = new ConsumerPomArtifactTransformer((s, p, f) -> {
-                try (InputStream is = Files.newInputStream(f)) {
+                try (InputStream is = f.openStream()) {
                     return DefaultConsumerPomBuilder.transformPom(new MavenStaxReader().read(is), project);
                 }
             });
 
-            t.transform(project, systemSessionMock, beforePomFile, tempFile);
+            t.transform(project, systemSessionMock, Sources.buildSource(beforePomFile), tempFile);
         }
         XmlAssert.assertThat(tempFile.toFile()).and(afterPomFile.toFile()).areIdentical();
     }
@@ -82,12 +83,12 @@ class ConsumerPomArtifactTransformerTest {
             MavenProject project = new MavenProject(model);
             project.setOriginalModel(model);
             ConsumerPomArtifactTransformer t = new ConsumerPomArtifactTransformer((s, p, f) -> {
-                try (InputStream is = Files.newInputStream(f)) {
+                try (InputStream is = f.openStream()) {
                     return DefaultConsumerPomBuilder.transformNonPom(new MavenStaxReader().read(is), project);
                 }
             });
 
-            t.transform(project, systemSessionMock, beforePomFile, tempFile);
+            t.transform(project, systemSessionMock, Sources.buildSource(beforePomFile), tempFile);
         }
         XmlAssert.assertThat(afterPomFile.toFile()).and(tempFile.toFile()).areIdentical();
     }

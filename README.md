@@ -18,11 +18,12 @@ Apache Maven
 ============
 
 [![Apache License, Version 2.0, January 2004](https://img.shields.io/github/license/apache/maven.svg?label=License)][license]
-[![Maven Central](https://img.shields.io/maven-central/v/org.apache.maven/apache-maven.svg?label=Maven%20Central&versionPrefix=3.)](https://search.maven.org/artifact/org.apache.maven/apache-maven)
-[![Maven Central](https://img.shields.io/maven-central/v/org.apache.maven/apache-maven.svg?label=Maven%20Central)](https://search.maven.org/artifact/org.apache.maven/apache-maven)
 [![Reproducible Builds](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jvm-repo-rebuild/reproducible-central/master/content/org/apache/maven/maven/badge.json)](https://github.com/jvm-repo-rebuild/reproducible-central/blob/master/content/org/apache/maven/maven/README.md)
-[![Jenkins Status](https://img.shields.io/jenkins/s/https/ci-maven.apache.org/job/Maven/job/maven-box/job/maven/job/master.svg?)][build]
-[![Jenkins tests](https://img.shields.io/jenkins/t/https/ci-maven.apache.org/job/Maven/job/maven-box/job/maven/job/master.svg?)][test-results]
+- [master](https://github.com/apache/maven) = 4.1.x: [![Maven Central](https://img.shields.io/maven-central/v/org.apache.maven/apache-maven.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/org.apache.maven/apache-maven)
+- [4.0.x](https://github.com/apache/maven/tree/maven-4.0.x): [![Maven Central](https://img.shields.io/maven-central/v/org.apache.maven/apache-maven.svg?label=Maven%20Central&versionPrefix=4.0)](https://central.sonatype.com/artifact/org.apache.maven/apache-maven)
+[![Jenkins Status](https://img.shields.io/jenkins/s/https/ci-maven.apache.org/job/Maven/job/maven-box/job/maven/job/maven-4.0.x.svg?)][build]
+[![Jenkins tests](https://img.shields.io/jenkins/t/https/ci-maven.apache.org/job/Maven/job/maven-box/job/maven/job/maven-4.0.x.svg?)][test-results]
+- [3.9.x](https://github.com/apache/maven/tree/maven-3.9.x): [![Maven Central](https://img.shields.io/maven-central/v/org.apache.maven/apache-maven.svg?label=Maven%20Central&versionPrefix=3.)](https://central.sonatype.com/artifact/org.apache.maven/apache-maven)
 
 
 Apache Maven is a software project management and comprehension tool. Based on
@@ -75,10 +76,10 @@ If you want to bootstrap Maven, you'll need:
 
 [home]: https://maven.apache.org/
 [license]: https://www.apache.org/licenses/LICENSE-2.0
-[build]: https://ci-maven.apache.org/job/Maven/job/maven-box/job/maven/job/master/
-[test-results]: https://ci-maven.apache.org/job/Maven/job/maven-box/job/maven/job/master/lastCompletedBuild/testReport/
-[build-status]: https://img.shields.io/jenkins/s/https/ci-maven.apache.org/job/Maven/job/maven-box/job/maven/job/master.svg?
-[build-tests]: https://img.shields.io/jenkins/t/https/ci-maven.apache.org/job/Maven/job/maven-box/job/maven/job/master.svg?
+[build]: https://ci-maven.apache.org/job/Maven/job/maven-box/job/maven/job/maven-4.0.x/
+[test-results]: https://ci-maven.apache.org/job/Maven/job/maven-box/job/maven/job/maven-4.0.x/lastCompletedBuild/testReport/
+[build-status]: https://img.shields.io/jenkins/s/https/ci-maven.apache.org/job/Maven/job/maven-box/job/maven/job/maven-4.0.x.svg?
+[build-tests]: https://img.shields.io/jenkins/t/https/ci-maven.apache.org/job/Maven/job/maven-box/job/maven/job/maven-4.0.x.svg?
 [maven-home]: https://maven.apache.org/
 [maven-download]: https://maven.apache.org/download.cgi
 [users-list]: https://maven.apache.org/mailing-lists.html

@@ -1,0 +1,4 @@
+# Another test YAML file for GH-11381
+another:
+  test: data
+

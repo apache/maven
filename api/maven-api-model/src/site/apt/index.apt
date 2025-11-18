@@ -33,4 +33,4 @@ Maven 4 API - Immutable Maven Model
 
    * {{{./apidocs/index.html}Java sources}} with <<<Builder>>> inner classes for immutable instances creation.
 
- See also corresponding {{{../../maven-model/index.html}Maven classical POM model documentation}}.
+ See also corresponding {{{../../compat/maven-model/index.html}Maven classical POM model documentation}}.

@@ -108,7 +108,7 @@ under the License.
   <scm>
     <connection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</connection>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</developerConnection>
-    <tag>maven-4.0.0-rc-1</tag>
+    <tag>master</tag>
     <url>https://github.com/apache/maven/tree/${project.scm.tag}</url>
   </scm>
   <issueManagement>
@@ -140,13 +140,13 @@ under the License.
     <distributionShortName>Maven</distributionShortName>
     <distributionName>Apache Maven</distributionName>
     <maven.site.path>ref/4-LATEST</maven.site.path>
-    <project.build.outputTimestamp>2025-06-18T10:29:55Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2025-11-07T22:54:23Z</project.build.outputTimestamp>
     <!-- various versions -->
     <assertjVersion>3.27.6</assertjVersion>
     <asmVersion>9.9</asmVersion>
-    <byteBuddyVersion>1.17.8</byteBuddyVersion>
+    <byteBuddyVersion>1.18.1</byteBuddyVersion>
     <classWorldsVersion>2.9.0</classWorldsVersion>
-    <commonsCliVersion>1.10.0</commonsCliVersion>
+    <commonsCliVersion>1.11.0</commonsCliVersion>
     <guiceVersion>5.1.0</guiceVersion>
     <guavaVersion>33.5.0-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
@@ -157,10 +157,10 @@ under the License.
     <jmhVersion>1.37</jmhVersion>
     <junitVersion>5.13.4</junitVersion>
     <jxpathVersion>1.4.0</jxpathVersion>
-    <logbackClassicVersion>1.5.20</logbackClassicVersion>
+    <logbackClassicVersion>1.5.21</logbackClassicVersion>
     <mockitoVersion>5.20.0</mockitoVersion>
-    <plexusInteractivityVersion>1.4</plexusInteractivityVersion>
-    <plexusInterpolationVersion>1.28</plexusInterpolationVersion>
+    <plexusInteractivityVersion>1.5.1</plexusInteractivityVersion>
+    <plexusInterpolationVersion>1.29</plexusInterpolationVersion>
     <plexusTestingVersion>2.0.1</plexusTestingVersion>
     <plexusXmlVersion>4.1.0</plexusXmlVersion>
     <resolverVersion>2.0.13</resolverVersion>
@@ -1169,8 +1169,12 @@ under the License.
               </tags>
               <groups>
                 <group>
+                  <title>Maven 4 API - CLI</title>
+                  <packages>org.apache.maven.api.cli*</packages>
+                </group>
+                <group>
                   <title>Maven 4 API - Core</title>
-                  <packages>org.apache.maven.api*</packages>
+                  <packages>org.apache.maven.api:org.apache.maven.api.cache:org.apache.maven.api.feature:org.apache.maven.api.plugin:org.apache.maven.api.plugin.annotations:org.apache.maven.api.services:org.apache.maven.api.services.xml</packages>
                 </group>
                 <group>
                   <title>Maven 4 API - Plugin</title>
@@ -1189,12 +1193,12 @@ under the License.
                   <packages>org.apache.maven.api.toolchain</packages>
                 </group>
                 <group>
-                  <title>Maven 4 API - Meta</title>
+                  <title>Maven 4 API - Annotations</title>
                   <packages>org.apache.maven.api.annotations</packages>
                 </group>
                 <group>
                   <title>Maven 4 API - DI</title>
-                  <packages>org.apache.maven.api.di</packages>
+                  <packages>org.apache.maven.api.di:org.apache.maven.di.tool</packages>
                 </group>
                 <group>
                   <title>Maven 4 API - Metadata</title>
