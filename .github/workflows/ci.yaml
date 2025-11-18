@@ -25,6 +25,9 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      - name: Print SHA
+        run: echo "${{ github.sha }}"
+
       - name: Set up Maven
         shell: bash
         run: ./mvnw --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper "-Dmaven=4.0.0-rc-3"
