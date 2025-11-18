@@ -38,6 +38,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 4.0.0
  */
 class MavenITgh11427BomConsumerPomTest extends AbstractMavenIntegrationTestCase {
+    MavenITgh11427BomConsumerPomTest() {
+        super("[4.0.0-rc-4,)");
+    }
 
     /**
      * Verify BOM consumer POM without flattening has correct packaging.
