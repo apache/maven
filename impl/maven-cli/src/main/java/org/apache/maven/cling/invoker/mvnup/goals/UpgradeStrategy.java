@@ -22,13 +22,21 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
 
+import eu.maveniverse.domtrip.Document;
 import org.apache.maven.api.cli.mvnup.UpgradeOptions;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
-import org.jdom2.Document;
 
 /**
  * Strategy interface for different types of upgrade operations.
  * Each strategy handles a specific aspect of the Maven upgrade process.
+ *
+ * <p>Strategies work with domtrip Documents for perfect formatting preservation.
+ * Individual strategies can create domtrip Editors from Documents as needed:
+ * <pre>
+ * Editor editor = new Editor(document);
+ * // ... perform domtrip operations ...
+ * // Document is automatically updated
+ * </pre>
  */
 public interface UpgradeStrategy {
 
@@ -36,7 +44,7 @@ public interface UpgradeStrategy {
      * Applies the upgrade strategy to all eligible POMs.
      *
      * @param context the upgrade context
-     * @param pomMap map of all POM files in the project
+     * @param pomMap map of all POM files in the project (domtrip Documents)
      * @return the result of the upgrade operation
      */
     UpgradeResult apply(UpgradeContext context, Map<Path, Document> pomMap);

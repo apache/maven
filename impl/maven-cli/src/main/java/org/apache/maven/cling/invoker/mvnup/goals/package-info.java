@@ -46,7 +46,7 @@
  * <ul>
  *   <li>{@link org.apache.maven.cling.invoker.mvnup.goals.StrategyOrchestrator} - Coordinates strategy execution</li>
  *   <li>{@link org.apache.maven.cling.invoker.mvnup.goals.PomDiscovery} - Discovers POM files in multi-module projects</li>
- *   <li>{@link org.apache.maven.cling.invoker.mvnup.goals.JDomUtils} - XML manipulation utilities</li>
+ *   <li>{@link org.apache.maven.cling.invoker.mvnup.goals.DomUtils} - XML manipulation utilities</li>
  * </ul>
  *
  * <h2>Usage Examples</h2>

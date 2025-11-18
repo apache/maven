@@ -18,12 +18,11 @@
  */
 package org.apache.maven.cling.invoker.mvnup.goals;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jdom2.Document;
-import org.jdom2.input.SAXBuilder;
+import eu.maveniverse.domtrip.Document;
+import eu.maveniverse.domtrip.Editor;
 
 /**
  * Builder for creating test POM documents with fluent API.
@@ -182,8 +181,9 @@ public class PomBuilder {
 
     public Document buildDocument() {
         try {
-            SAXBuilder saxBuilder = new SAXBuilder();
-            return saxBuilder.build(new StringReader(build()));
+            String xmlContent = build();
+            Editor editor = new Editor(Document.of(xmlContent));
+            return editor.document();
         } catch (Exception e) {
             throw new RuntimeException("Failed to build POM document", e);
         }
