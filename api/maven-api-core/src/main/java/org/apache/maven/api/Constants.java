@@ -545,7 +545,10 @@ public final class Constants {
      *     <li>"release" - query only release repositories to discover versions</li>
      *     <li>"snapshot" - query only snapshot repositories to discover versions</li>
      * </ul>
-     * Default (when unset) is existing Maven behaviour: "release_or_snapshots".
+     * Default (when unset) is using request carried nature. Hence, this configuration really makes sense with value
+     * {@code "auto"}, while ideally callers needs update and use newly added method on version range request to
+     * express preference.
+     *
      * @since 4.0.0
      */
     @Config(defaultValue = "release_or_snapshot")
