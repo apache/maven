@@ -42,6 +42,7 @@ import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 
 /**
  * A stub dependency graph that is custom made for testing concurrent build graph evaluations.
@@ -201,7 +202,8 @@ public class ProjectDependencyGraphStub implements ProjectDependencyGraph {
         mavenExecutionRequest.setExecutionListener(new AbstractExecutionListener());
         mavenExecutionRequest.setGoals(Arrays.asList("clean", "aggr", "install"));
         mavenExecutionRequest.setDegreeOfConcurrency(1);
-        final MavenSession session = new MavenSession(null, null, mavenExecutionRequest, defaultMavenExecutionResult);
+        final MavenSession session = new MavenSession(
+                null, MavenRepositorySystemUtils.newSession(), mavenExecutionRequest, defaultMavenExecutionResult);
         final ProjectDependencyGraphStub dependencyGraphStub = new ProjectDependencyGraphStub();
         session.setProjectDependencyGraph(dependencyGraphStub);
         session.setProjects(dependencyGraphStub.getSortedProjects());
