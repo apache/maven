@@ -96,7 +96,8 @@ public class ArtifactDescriptorReaderDelegate {
     private Dependency convert(org.apache.maven.model.Dependency dependency, ArtifactTypeRegistry stereotypes) {
         ArtifactType stereotype = stereotypes.get(dependency.getType());
         if (stereotype == null) {
-            stereotype = new DefaultType(dependency.getType(), Language.NONE, dependency.getType(), null, false);
+            stereotype = new DefaultType(dependency.getType(), Language.NONE, dependency.getType(), null, false)
+                    .toArtifactType();
         }
 
         boolean system = dependency.getSystemPath() != null
