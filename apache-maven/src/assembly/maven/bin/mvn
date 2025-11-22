@@ -168,28 +168,48 @@ find_file_argument_basedir() {
 # concatenates all lines of a file and replaces variables
 concat_lines() {
   if [ -f "$1" ]; then
-    # First convert all CR to LF using tr
+    # Convert CR to LF, remove empty lines and comments, perform variable substitution,
+    # and escape pipe symbols for eval
     tr '\r' '\n' < "$1" | \
     sed -e '/^$/d' -e 's/#.*$//' | \
-    # Replace LF with NUL for xargs
-    tr '\n' '\0' | \
-    # Split into words and process each argument
-    # Use -0 with NUL to avoid special behaviour on quotes
-    xargs -n 1 -0 | \
-    while read -r arg; do
-      # Replace variables first
-      arg=$(echo "$arg" | sed \
-        -e "s@\${MAVEN_PROJECTBASEDIR}@$MAVEN_PROJECTBASEDIR@g" \
-        -e "s@\$MAVEN_PROJECTBASEDIR@$MAVEN_PROJECTBASEDIR@g")
-
-      echo "$arg"
-    done | \
-    tr '\n' ' '
+    sed \
+      -e "s@\${MAVEN_PROJECTBASEDIR}@$MAVEN_PROJECTBASEDIR@g" \
+      -e "s@\$MAVEN_PROJECTBASEDIR@$MAVEN_PROJECTBASEDIR@g" | \
+    awk '
+    {
+      result = ""
+      in_quotes = 0
+      for (i = 1; i <= length($0); i++) {
+        char = substr($0, i, 1)
+        if (char == "\"") {
+          in_quotes = !in_quotes
+          result = result char
+        } else if (char == "|" && !in_quotes) {
+          # Escape unquoted pipes for eval
+          result = result "\\|"
+        } else {
+          result = result char
+        }
+      }
+      # Accumulate lines with space separator
+      if (NR > 1) printf " "
+      printf "%s", result
+    }
+    END { if (NR > 0) print "" }
+    '
   fi
 }
 
 MAVEN_PROJECTBASEDIR="`find_maven_basedir "$@"`"
-MAVEN_OPTS="$MAVEN_OPTS `concat_lines "$MAVEN_PROJECTBASEDIR/.mvn/jvm.config"`"
+# Read JVM config and append to MAVEN_OPTS, preserving special characters
+_jvm_config="`concat_lines "$MAVEN_PROJECTBASEDIR/.mvn/jvm.config"`"
+if [ -n "$_jvm_config" ]; then
+  if [ -n "$MAVEN_OPTS" ]; then
+    MAVEN_OPTS="$MAVEN_OPTS $_jvm_config"
+  else
+    MAVEN_OPTS="$_jvm_config"
+  fi
+fi
 LAUNCHER_JAR=`echo "$MAVEN_HOME"/boot/plexus-classworlds-*.jar`
 LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
 
@@ -239,6 +259,7 @@ handle_args() {
 handle_args "$@"
 MAVEN_MAIN_CLASS=${MAVEN_MAIN_CLASS:=org.apache.maven.cling.MavenCling}
 
+# Build command string for eval
 cmd="\"$JAVACMD\" \
   $MAVEN_OPTS \
   $MAVEN_DEBUG_OPTS \
@@ -251,13 +272,10 @@ cmd="\"$JAVACMD\" \
   \"-Dmaven.multiModuleProjectDirectory=$MAVEN_PROJECTBASEDIR\" \
   $LAUNCHER_CLASS \
   $MAVEN_ARGS"
+
 # Add remaining arguments with proper quoting
 for arg in "$@"; do
     cmd="$cmd \"$arg\""
 done
-
-# Debug: print the command that will be executed
-#echo "About to execute:"
-#echo "$cmd"
 
 eval exec "$cmd"
