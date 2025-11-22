@@ -23,11 +23,12 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Properties;
 
 /**
  * <p>
@@ -41,20 +42,21 @@ import java.util.Properties;
  *     <code>1.0alpha1 =&gt; [1, [alpha, 1]]</code></li>
  * <li>Unlimited number of version components,</li>
  * <li>Version components in the text can be digits or strings,</li>
- * <li>Strings are checked for well-known qualifiers, and the qualifier ordering is used for version ordering.
- *     Well-known qualifiers (case-insensitive) are, in order from least to greatest:<ol>
- *     <li><code>alpha</code> or <code>a</code></li>
- *     <li><code>beta</code> or <code>b</code></li>
- *     <li><code>milestone</code> or <code>m</code></li>
- *     <li><code>rc</code> or <code>cr</code></li>
- *     <li><code>snapshot</code></li>
- *     <li><code>ga</code> or <code>final</code></li>
- *     <li><code>sp</code></li>
- *     </ol>
- *     Unknown qualifiers are considered after known qualifiers,
- *     with lexical order (case-insensitive in the English locale).
- *     <code>ga</code> and <code>final</code> sort the same as not having a qualifier.
- *   </li>
+ * <li>
+ *   Following semver rules is encouraged, and some qualifiers are discouraged (case insensitive):
+ *   <ul>
+ *     <li> The usage of 'CR' qualifier is discouraged. Use 'RC' instead. </li>
+ *     <li> The usage of 'Final', 'GA', and 'Release' qualifiers is discouraged. Use no qualifier instead. </li>
+ *     <li> The usage of 'SP' qualifier is discouraged. Increment the patch version instead. </li>
+ *   </ul>
+ *   String qualifiers are ordered lexically (case insensitive in the English locale), with the following exceptions:
+ *   <ul>
+ *     <li><code> alpha = a &lt; beta = b &lt; milestone = m &lt; rc = cr
+ *         &lt; snapshot &lt; '' = final = ga = release &lt; sp </code></li>
+ *     <li>Other qualifiers are ordered lexically (case insensitive in the English locale),
+ *         and considered less than Snapshot and Release.</li>
+ *   </ul>
+ * </li>
  * <li>A hyphen usually precedes a qualifier, and is always less important than digits/number. For example
  *   {@code 1.0.RC2 < 1.0-RC3 < 1.0.1}; but prefer {@code 1.0.0-RC2} over {@code 1.0.0.RC2}, and more
  *   generally: {@code 1.0.X2 < 1.0-X3 < 1.0.1} for any string {@code X}; but prefer {@code 1.0.0-X1}
@@ -295,41 +297,37 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
      * Represents a string in the version item list, usually a qualifier.
      */
     private static class StringItem implements Item {
-        private static final List<String> QUALIFIERS =
-                Arrays.asList("alpha", "beta", "milestone", "rc", "snapshot", "", "sp");
-        private static final List<String> RELEASE_QUALIFIERS = Arrays.asList("ga", "final", "release");
+        private static final List<String> QUALIFIERS = Arrays.asList("snapshot", "", "sp");
+        private static final List<String> RELEASE_QUALIFIERS = Arrays.asList("final", "ga", "release");
 
-        private static final Properties ALIASES = new Properties();
+        private static final Map<String, String> ALIASES = new HashMap<>(4);
 
         static {
             ALIASES.put("cr", "rc");
+            ALIASES.put("final", "");
+            ALIASES.put("ga", "");
+            ALIASES.put("release", "");
         }
 
         /**
-         * A comparable value for the empty-string qualifier. This one is used to determine if a given qualifier makes
+         * An index value for the empty-string qualifier. This one is used to determine if a given qualifier makes
          * the version older than one without a qualifier, or more recent.
          */
-        private static final String RELEASE_VERSION_INDEX = String.valueOf(QUALIFIERS.indexOf(""));
+        private static final int RELEASE_VERSION_INDEX = QUALIFIERS.indexOf("");
 
         private final String value;
 
         StringItem(String value, boolean followedByDigit) {
             if (followedByDigit && value.length() == 1) {
                 // a1 = alpha-1, b1 = beta-1, m1 = milestone-1
-                switch (value.charAt(0)) {
-                    case 'a':
-                        value = "alpha";
-                        break;
-                    case 'b':
-                        value = "beta";
-                        break;
-                    case 'm':
-                        value = "milestone";
-                        break;
-                    default:
-                }
+                value = switch (value.charAt(0)) {
+                    case 'a' -> "alpha";
+                    case 'b' -> "beta";
+                    case 'm' -> "milestone";
+                    default -> value;
+                };
             }
-            this.value = ALIASES.getProperty(value, value);
+            this.value = ALIASES.getOrDefault(value, value);
         }
 
         @Override
@@ -351,27 +349,55 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
          *
          * @param qualifier
          * @return an equivalent value that can be used with lexical comparison
+         * @deprecated Use {@link #compareQualifiers(String, String)} instead
          */
+        @Deprecated
         public static String comparableQualifier(String qualifier) {
+            // Just returning an Integer with the index here is faster, but requires a lot of if/then/else to check for
+            // -1 or QUALIFIERS.size and then resort to lexical ordering. Most comparisons are decided by the first
+            // character, so this is still fast. If more characters are needed then it requires a lexical sort anyway.
+
             if (RELEASE_QUALIFIERS.contains(qualifier)) {
-                return String.valueOf(QUALIFIERS.indexOf(""));
+                qualifier = "";
             }
 
-            int i = QUALIFIERS.indexOf(qualifier);
+            int index = QUALIFIERS.indexOf(qualifier) + 1;
 
-            // Just returning an Integer with the index here is faster, but requires a lot of if/then/else to check for
-            // -1
-            //  or QUALIFIERS.size and then resort to lexical ordering. Most comparisons are decided by the first
-            // character,
-            // so this is still fast. If more characters are needed then it requires a lexical sort anyway.
-            return i == -1 ? (QUALIFIERS.size() + "-" + qualifier) : String.valueOf(i);
+            return index == 0 ? ("0-" + qualifier) : String.valueOf(index);
+        }
+
+        /**
+         * Compare the qualifiers of two artifact versions.
+         *
+         * @param qualifier1 qualifier of first artifact
+         * @param qualifier2 qualifier of second artifact
+         * @return a negative integer, zero, or a positive integer as the first argument is less than, equal to, or
+         * greater than the second
+         */
+        public static int compareQualifiers(String qualifier1, String qualifier2) {
+            if (RELEASE_QUALIFIERS.contains(qualifier1)) {
+                qualifier1 = "";
+            }
+            if (RELEASE_QUALIFIERS.contains(qualifier2)) {
+                qualifier2 = "";
+            }
+            int i1 = QUALIFIERS.indexOf(qualifier1);
+            int i2 = QUALIFIERS.indexOf(qualifier2);
+
+            // if both pre-release, then use natural lexical ordering
+            if (i1 == -1 && i2 == -1) {
+                return qualifier1.compareTo(qualifier2);
+            }
+
+            // 'other qualifier' < 'snapshot' < '' < 'sp'
+            return Integer.compare(i1, i2);
         }
 
         @Override
         public int compareTo(Item item) {
             if (item == null) {
                 // 1-rc < 1, 1-ga > 1
-                return comparableQualifier(value).compareTo(RELEASE_VERSION_INDEX);
+                return Integer.compare(QUALIFIERS.indexOf(value), RELEASE_VERSION_INDEX);
             }
             switch (item.getType()) {
                 case INT_ITEM:
@@ -380,7 +406,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                     return -1; // 1.any < 1.1 ?
 
                 case STRING_ITEM:
-                    return comparableQualifier(value).compareTo(comparableQualifier(((StringItem) item).value));
+                    return compareQualifiers(value, ((StringItem) item).value);
 
                 case COMBINATION_ITEM:
                     int result = this.compareTo(((CombinationItem) item).getStringPart());
