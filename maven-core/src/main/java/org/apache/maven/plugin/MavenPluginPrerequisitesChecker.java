@@ -18,18 +18,22 @@
  */
 package org.apache.maven.plugin;
 
-import org.apache.maven.model.Plugin;
+import java.util.function.Consumer;
+
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 
 /**
- * Signals a plugin which is not compatible with the current Maven runtime.
+ * Service responsible for checking if plugin's prerequisites are met.
+ *
+ * @since 3.9.12
  */
-public class PluginIncompatibleException extends PluginManagerException {
-
-    public PluginIncompatibleException(Plugin plugin, String message) {
-        this(plugin, message, null);
-    }
-
-    public PluginIncompatibleException(Plugin plugin, String message, Throwable cause) {
-        super(plugin, message, cause);
-    }
+@FunctionalInterface
+public interface MavenPluginPrerequisitesChecker extends Consumer<PluginDescriptor> {
+    /**
+     *
+     * @param pluginDescriptor
+     * @throws IllegalStateException in case the checked prerequisites are not met
+     */
+    @Override
+    void accept(PluginDescriptor pluginDescriptor);
 }
