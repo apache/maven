@@ -18,10 +18,9 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Properties;
-
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -70,15 +69,15 @@ class MavenITmng6255FixConcatLines extends AbstractMavenIntegrationTestCase {
     }
 
     protected void runWithLineEndings(String lineEndings) throws Exception {
-        File baseDir = extractResources("/mng-6255");
-        File mvnDir = new File(baseDir, ".mvn");
+        Path baseDir = extractResources("mng-6255");
+        Path mvnDir = baseDir.resolve(".mvn");
 
-        File jvmConfig = new File(mvnDir, "jvm.config");
+        Path jvmConfig = mvnDir.resolve("jvm.config");
         createJvmConfigFile(jvmConfig, lineEndings, "-Djvm.config=ok", "-Xms256m", "-Xmx512m");
 
-        Verifier verifier = newVerifier(baseDir.getAbsolutePath());
+        Verifier verifier = newVerifier(baseDir);
         verifier.addCliArgument(
-                "-Dexpression.outputFile=" + new File(baseDir, "expression.properties").getAbsolutePath());
+                "-Dexpression.outputFile=" + baseDir.resolve("expression.properties"));
         verifier.setForkJvm(true); // custom .mvn/jvm.config
         verifier.addCliArgument("validate");
         verifier.execute();
@@ -88,8 +87,8 @@ class MavenITmng6255FixConcatLines extends AbstractMavenIntegrationTestCase {
         assertEquals("ok", props.getProperty("project.properties.jvm-config"));
     }
 
-    protected void createJvmConfigFile(File jvmConfig, String lineEndings, String... lines) throws Exception {
+    protected void createJvmConfigFile(Path jvmConfig, String lineEndings, String... lines) throws Exception {
         String content = String.join(lineEndings, lines);
-        Files.writeString(jvmConfig.toPath(), content);
+        Files.writeString(jvmConfig, content);
     }
 }

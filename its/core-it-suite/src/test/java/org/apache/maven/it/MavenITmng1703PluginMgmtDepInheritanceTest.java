@@ -18,9 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,9 +41,9 @@ public class MavenITmng1703PluginMgmtDepInheritanceTest extends AbstractMavenInt
      */
     @Test
     public void testitMNG1703() throws Exception {
-        File testDir = extractResources("/mng-1703");
+        Path testDir = extractResources("mng-1703");
 
-        Verifier verifier = newVerifier(new File(testDir, "child").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("child"));
         verifier.setAutoclean(false);
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");

@@ -21,7 +21,7 @@ package org.apache.maven.it;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Deque;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -49,7 +49,7 @@ public class MavenITmng4555MetaversionResolutionOfflineTest extends AbstractMave
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4555");
+        Path testDir = extractResources("mng-4555");
 
         final Deque<String> uris = new ConcurrentLinkedDeque<>();
 
@@ -72,7 +72,7 @@ public class MavenITmng4555MetaversionResolutionOfflineTest extends AbstractMave
         server.setHandler(repoHandler);
         server.start();
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4555");

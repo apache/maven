@@ -18,8 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -45,25 +44,25 @@ public class MavenITgh11314PluginInjectionTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testV3MojoWithMavenContainerInjection() throws Exception {
-        File testDir = extractResources("/gh-11314-v3-mojo-injection");
+        Path testDir = extractResources("gh-11314-v3-mojo-injection");
 
         // Before, build and install the parent POM
-        Verifier parentVerifier = newVerifier(testDir.getAbsolutePath(), false);
+        Verifier parentVerifier = newVerifier(testDir, false);
         parentVerifier.addCliArgument("-N");
         parentVerifier.addCliArgument("install");
         parentVerifier.execute();
         parentVerifier.verifyErrorFreeLog();
 
         // First, build and install the test plugin
-        File pluginDir = new File(testDir, "plugin");
-        Verifier pluginVerifier = newVerifier(pluginDir.getAbsolutePath(), false);
+        Path pluginDir = testDir.resolve("plugin");
+        Verifier pluginVerifier = newVerifier(pluginDir, false);
         pluginVerifier.addCliArgument("install");
         pluginVerifier.execute();
         pluginVerifier.verifyErrorFreeLog();
 
         // Now run the test project that uses the plugin
-        File consumerDir = new File(testDir, "consumer");
-        Verifier verifier = newVerifier(consumerDir.getAbsolutePath(), false);
+        Path consumerDir = testDir.resolve("consumer");
+        Verifier verifier = newVerifier(consumerDir, false);
         verifier.addCliArguments("test:test-goal");
         verifier.execute();
         verifier.verifyErrorFreeLog();

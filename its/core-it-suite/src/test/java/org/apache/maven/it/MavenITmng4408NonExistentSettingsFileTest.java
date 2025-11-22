@@ -18,8 +18,9 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
+import java.nio.file.Paths;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -36,9 +37,9 @@ public class MavenITmng4408NonExistentSettingsFileTest extends AbstractMavenInte
      */
     @Test
     public void testitUserSettings() throws Exception {
-        File testDir = extractResources("/mng-4408");
+        Path testDir = extractResources("mng-4408");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.setLogFileName("log-user.txt");
         verifier.addCliArgument("--settings");
@@ -60,9 +61,9 @@ public class MavenITmng4408NonExistentSettingsFileTest extends AbstractMavenInte
      */
     @Test
     public void testitGlobalSettings() throws Exception {
-        File testDir = extractResources("/mng-4408");
+        Path testDir = extractResources("mng-4408");
 
-        Verifier verifier = new Verifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir, null);
         verifier.setAutoclean(false);
         verifier.setLogFileName("log-global.txt");
         verifier.addCliArgument("--global-settings");
