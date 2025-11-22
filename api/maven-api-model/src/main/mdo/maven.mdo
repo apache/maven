@@ -2403,12 +2403,12 @@
       <superClass>Repository</superClass>
       <version>4.0.0+</version>
       <description>Deployment repository contains the information needed for deploying to the remote
-        repository, which adds uniqueVersion property to usual repositories for download.</description>
+        repository, which adds {@code uniqueVersion} property to usual repository information for download.</description>
       <fields>
         <field>
           <name>uniqueVersion</name>
           <description>Whether to assign snapshots a unique version comprised of the timestamp and
-            build number, or to use the same version each time</description>
+            build number, or to use the same version each time, when deploying to repository</description>
           <type>boolean</type>
           <defaultValue>true</defaultValue>
           <version>4.0.0+</version>
@@ -2419,7 +2419,7 @@
     <class>
       <name>RepositoryPolicy</name>
       <version>4.0.0+</version>
-      <description>Download policy.</description>
+      <description>Repository download policy.</description>
       <fields>
         <field>
           <name>enabled</name>
