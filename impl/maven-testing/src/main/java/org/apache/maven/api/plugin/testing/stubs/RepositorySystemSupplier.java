@@ -376,9 +376,12 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
         HashMap<String, NameMapper> result = new HashMap<>();
         result.put(NameMappers.STATIC_NAME, NameMappers.staticNameMapper());
         result.put(NameMappers.GAV_NAME, NameMappers.gavNameMapper());
+        result.put(NameMappers.GAECV_NAME, NameMappers.gaecvNameMapper());
         result.put(NameMappers.DISCRIMINATING_NAME, NameMappers.discriminatingNameMapper());
         result.put(NameMappers.FILE_GAV_NAME, NameMappers.fileGavNameMapper());
+        result.put(NameMappers.FILE_GAECV_NAME, NameMappers.fileGaecvNameMapper());
         result.put(NameMappers.FILE_HGAV_NAME, NameMappers.fileHashingGavNameMapper());
+        result.put(NameMappers.FILE_HGAECV_NAME, NameMappers.fileHashingGaecvNameMapper());
         return result;
     }
 

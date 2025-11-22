@@ -163,7 +163,7 @@ under the License.
     <plexusInterpolationVersion>1.29</plexusInterpolationVersion>
     <plexusTestingVersion>2.0.1</plexusTestingVersion>
     <plexusXmlVersion>4.1.0</plexusXmlVersion>
-    <resolverVersion>2.0.13</resolverVersion>
+    <resolverVersion>2.0.14-SNAPSHOT</resolverVersion>
     <securityDispatcherVersion>4.1.0</securityDispatcherVersion>
     <sisuVersion>0.9.0.M4</sisuVersion>
     <slf4jVersion>2.0.17</slf4jVersion>

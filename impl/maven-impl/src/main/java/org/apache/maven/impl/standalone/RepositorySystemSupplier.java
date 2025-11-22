@@ -371,6 +371,12 @@ public class RepositorySystemSupplier {
     }
 
     @Provides
+    @Named(NameMappers.GAECV_NAME)
+    static NameMapper gaecvNameMapper() {
+        return NameMappers.gaecvNameMapper();
+    }
+
+    @Provides
     @Named(NameMappers.DISCRIMINATING_NAME)
     static NameMapper discriminatingNameMapper() {
         return NameMappers.discriminatingNameMapper();
@@ -383,9 +389,21 @@ public class RepositorySystemSupplier {
     }
 
     @Provides
+    @Named(NameMappers.FILE_GAECV_NAME)
+    static NameMapper fileGaecvNameMapper() {
+        return NameMappers.fileGaecvNameMapper();
+    }
+
+    @Provides
     @Named(NameMappers.FILE_HGAV_NAME)
     static NameMapper fileHashingGavNameMapper() {
         return NameMappers.fileHashingGavNameMapper();
+    }
+
+    @Provides
+    @Named(NameMappers.FILE_HGAECV_NAME)
+    static NameMapper fileHashingGaecvNameMapper() {
+        return NameMappers.fileHashingGaecvNameMapper();
     }
 
     @Provides
