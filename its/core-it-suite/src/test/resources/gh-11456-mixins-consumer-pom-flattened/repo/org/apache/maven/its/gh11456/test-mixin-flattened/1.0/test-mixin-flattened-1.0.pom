@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.2.0">
+  <modelVersion>4.2.0</modelVersion>
+  <groupId>org.apache.maven.its.gh11456</groupId>
+  <artifactId>test-mixin-flattened</artifactId>
+  <version>1.0</version>
+  <packaging>pom</packaging>
+
+  <properties>
+    <test.property>from-mixin-flattened</test.property>
+  </properties>
+</project>
+
