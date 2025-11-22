@@ -273,7 +273,7 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
         }
 
         try {
-            pluginManager.checkRequiredMavenVersion(pluginDescriptor);
+            pluginManager.checkPrerequisites(pluginDescriptor);
         } catch (PluginIncompatibleException e) {
             if (logger.isDebugEnabled()) {
                 logger.warn("Ignoring incompatible plugin version " + version, e);

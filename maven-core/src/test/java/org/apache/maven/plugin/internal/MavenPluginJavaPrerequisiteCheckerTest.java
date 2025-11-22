@@ -16,20 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.plugin;
+package org.apache.maven.plugin.internal;
 
-import org.apache.maven.model.Plugin;
+import org.junit.Test;
 
-/**
- * Signals a plugin which is not compatible with the current Maven runtime.
- */
-public class PluginIncompatibleException extends PluginManagerException {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
-    public PluginIncompatibleException(Plugin plugin, String message) {
-        this(plugin, message, null);
-    }
+public class MavenPluginJavaPrerequisiteCheckerTest {
 
-    public PluginIncompatibleException(Plugin plugin, String message, Throwable cause) {
-        super(plugin, message, cause);
+    @Test
+    public void testMatchesVersion() {
+        MavenPluginJavaPrerequisiteChecker checker = new MavenPluginJavaPrerequisiteChecker();
+        assertTrue(checker.matchesVersion("1.0", "1.8"));
+        assertTrue(checker.matchesVersion("1.8", "9.0.1+11"));
+        assertFalse(checker.matchesVersion("[1.0,2],[3,4]", "2.1"));
+        assertTrue(checker.matchesVersion("[1.0,2],[3,4]", "3.1"));
+        assertThrows(IllegalArgumentException.class, () -> checker.matchesVersion("(1.0,0)", "11"));
     }
 }

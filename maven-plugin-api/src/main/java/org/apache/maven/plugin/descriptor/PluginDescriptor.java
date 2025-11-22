@@ -80,6 +80,8 @@ public class PluginDescriptor extends ComponentSetDescriptor implements Cloneabl
     // MNG-4840: set from plugin's pom.xml, not plugin.xml
     private String requiredMavenVersion;
 
+    private String requiredJavaVersion;
+
     private Plugin plugin;
 
     private Artifact pluginArtifact;
@@ -316,6 +318,14 @@ public class PluginDescriptor extends ComponentSetDescriptor implements Cloneabl
      */
     public String getRequiredMavenVersion() {
         return requiredMavenVersion;
+    }
+
+    public void setRequiredJavaVersion(String requiredJavaVersion) {
+        this.requiredJavaVersion = requiredJavaVersion;
+    }
+
+    public String getRequiredJavaVersion() {
+        return requiredJavaVersion;
     }
 
     public void setPlugin(Plugin plugin) {

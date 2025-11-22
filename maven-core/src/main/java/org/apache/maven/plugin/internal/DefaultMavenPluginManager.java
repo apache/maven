@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.jar.JarFile;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
 import org.apache.maven.RepositoryUtils;
@@ -49,6 +50,7 @@ import org.apache.maven.plugin.DebugConfigurationListener;
 import org.apache.maven.plugin.ExtensionRealmCache;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MavenPluginManager;
+import org.apache.maven.plugin.MavenPluginPrerequisitesChecker;
 import org.apache.maven.plugin.MavenPluginValidator;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecution;
@@ -169,6 +171,9 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
     @Requirement
     private PluginValidationManager pluginValidationManager;
 
+    @Requirement
+    private List<MavenPluginPrerequisitesChecker> prerequisitesCheckers;
+
     private ExtensionDescriptorBuilder extensionDescriptorBuilder = new ExtensionDescriptorBuilder();
 
     private PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
@@ -279,20 +284,35 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         return mojoDescriptor;
     }
 
-    public void checkRequiredMavenVersion(PluginDescriptor pluginDescriptor) throws PluginIncompatibleException {
-        String requiredMavenVersion = pluginDescriptor.getRequiredMavenVersion();
-        if (StringUtils.isNotBlank(requiredMavenVersion)) {
+    @Override
+    public void checkPrerequisites(PluginDescriptor pluginDescriptor) throws PluginIncompatibleException {
+        List<IllegalStateException> prerequisiteExceptions = new ArrayList<>();
+        prerequisitesCheckers.forEach(c -> {
             try {
-                if (!runtimeInformation.isMavenVersion(requiredMavenVersion)) {
-                    throw new PluginIncompatibleException(
-                            pluginDescriptor.getPlugin(),
-                            "The plugin " + pluginDescriptor.getId() + " requires Maven version "
-                                    + requiredMavenVersion);
-                }
-            } catch (RuntimeException e) {
-                logger.warn("Could not verify plugin's Maven prerequisite: " + e.getMessage());
+                c.accept(pluginDescriptor);
+            } catch (IllegalStateException e) {
+                prerequisiteExceptions.add(e);
             }
+        });
+        // aggregate all exceptions
+        if (!prerequisiteExceptions.isEmpty()) {
+            String messages = prerequisiteExceptions.stream()
+                    .map(IllegalStateException::getMessage)
+                    .collect(Collectors.joining(", "));
+            PluginIncompatibleException pie = new PluginIncompatibleException(
+                    pluginDescriptor.getPlugin(),
+                    "The plugin " + pluginDescriptor.getId() + " has unmet prerequisites: " + messages,
+                    prerequisiteExceptions.get(0));
+            // the first exception is added as cause, all other ones as suppressed exceptions
+            prerequisiteExceptions.stream().skip(1).forEach(pie::addSuppressed);
+            throw pie;
         }
+    }
+
+    @Override
+    @Deprecated
+    public void checkRequiredMavenVersion(PluginDescriptor pluginDescriptor) throws PluginIncompatibleException {
+        checkPrerequisites(pluginDescriptor);
     }
 
     public void setupPluginRealm(

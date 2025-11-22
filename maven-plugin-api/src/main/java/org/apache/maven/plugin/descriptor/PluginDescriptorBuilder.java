@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.codehaus.plexus.component.repository.ComponentDependency;
 import org.codehaus.plexus.component.repository.ComponentRequirement;
@@ -103,6 +104,8 @@ public class PluginDescriptorBuilder {
         }
 
         pluginDescriptor.setDependencies(dependencies);
+
+        pluginDescriptor.setRequiredJavaVersion(extractRequiredJavaVersion(c).orElse(null));
 
         return pluginDescriptor;
     }
@@ -318,5 +321,9 @@ public class PluginDescriptorBuilder {
         } catch (IOException | XmlPullParserException e) {
             throw new PlexusConfigurationException(e.getMessage(), e);
         }
+    }
+
+    private Optional<String> extractRequiredJavaVersion(PlexusConfiguration c) {
+        return Optional.ofNullable(c.getChild("requiredJavaVersion")).map(PlexusConfiguration::getValue);
     }
 }
