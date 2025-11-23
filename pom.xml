@@ -1022,27 +1022,6 @@ under the License.
             </executions>
           </plugin>
           <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <inherited>false</inherited>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <phase>pre-site</phase>
-                <configuration>
-                  <target>
-                    <!-- directory should be created by org.eclipse.aether.tools.CollectConfiguration -->
-                    <!-- TODO: remove with next version of resolver-tools -->
-                    <mkdir dir="${project.build.directory}/generated-site/markdown" />
-                    <mkdir dir="${project.build.directory}/generated-site/resources" />
-                  </target>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
             <version>3.6.2</version>
