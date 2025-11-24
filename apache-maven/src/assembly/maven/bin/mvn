@@ -168,23 +168,39 @@ find_file_argument_basedir() {
 # concatenates all lines of a file and replaces variables
 concat_lines() {
   if [ -f "$1" ]; then
-    # First convert all CR to LF using tr
-    tr '\r' '\n' < "$1" | \
-    sed -e '/^$/d' -e 's/#.*$//' | \
-    # Replace LF with NUL for xargs
-    tr '\n' '\0' | \
-    # Split into words and process each argument
-    # Use -0 with NUL to avoid special behaviour on quotes
-    xargs -n 1 -0 | \
-    while read -r arg; do
-      # Replace variables first
-      arg=$(echo "$arg" | sed \
-        -e "s@\${MAVEN_PROJECTBASEDIR}@$MAVEN_PROJECTBASEDIR@g" \
-        -e "s@\$MAVEN_PROJECTBASEDIR@$MAVEN_PROJECTBASEDIR@g")
+    result=""
+    # Read the file line by line
+    while IFS= read -r line || [ -n "$line" ]; do
+      # Convert CR to LF
+      line=$(echo "$line" | tr '\r' '\n')
+      # Remove comments
+      line=$(echo "$line" | sed 's/#.*$//')
+      # Skip empty lines
+      [ -z "$(echo "$line" | tr -d ' \t')" ] && continue
 
-      echo "$arg"
-    done | \
-    tr '\n' ' '
+      # Process each argument in the line using eval to handle quotes
+      eval "set -- $line"
+      for arg in "$@"; do
+        # Replace variables
+        arg=$(echo "$arg" | sed \
+          -e "s@\${MAVEN_PROJECTBASEDIR}@$MAVEN_PROJECTBASEDIR@g" \
+          -e "s@\$MAVEN_PROJECTBASEDIR@$MAVEN_PROJECTBASEDIR@g")
+
+        # Quote the argument if it contains spaces or special shell characters
+        case "$arg" in
+          *[\ \|\&\;\<\>\(\)\$\`\\\"\'\~\*\?\[\]\#\~\=]*)
+            arg="\"$arg\""
+            ;;
+        esac
+
+        if [ -n "$result" ]; then
+          result="$result $arg"
+        else
+          result="$arg"
+        fi
+      done
+    done < "$1"
+    echo "$result"
   fi
 }
 
