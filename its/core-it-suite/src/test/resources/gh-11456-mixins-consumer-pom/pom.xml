@@ -27,10 +27,6 @@ under the License.
   <name>Maven Integration Test :: GH-11456 :: Mixins with Consumer POM</name>
   <description>Test that Maven fails when mixins are used without flattening enabled.</description>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-
   <mixins>
     <mixin>
       <groupId>org.apache.maven.its.gh11456</groupId>
