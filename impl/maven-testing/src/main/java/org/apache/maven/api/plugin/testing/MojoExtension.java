@@ -286,7 +286,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                         try {
                             return XmlService.read(new StringReader(s));
                         } catch (XMLStreamException e) {
-                            throw new MavenException("Unable to parse xml: " + e + "\n" + s, e);
+                            throw new MavenException("Unable to parse xml: " + e + System.lineSeparator() + s, e);
                         }
                     })
                     .collect(Collectors.toList());
