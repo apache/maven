@@ -20,17 +20,17 @@ under the License.
 <project xmlns="http://maven.apache.org/POM/4.2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" root="true" xsi:schemaLocation="http://maven.apache.org/POM/4.2.0 http://maven.apache.org/xsd/maven-4.2.0.xsd">
   <modelVersion>4.2.0</modelVersion>
   <groupId>org.apache.maven.its.gh11456</groupId>
-  <artifactId>mixins-consumer-pom</artifactId>
+  <artifactId>flattened</artifactId>
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: GH-11456 :: Mixins with Consumer POM</name>
-  <description>Test that Maven fails when mixins are used without flattening enabled.</description>
+  <name>Maven Integration Test :: GH-11456 :: Mixins with Consumer POM Flattened</name>
+  <description>Test that Maven succeeds when mixins are used with flattening enabled.</description>
 
   <mixins>
     <mixin>
       <groupId>org.apache.maven.its.gh11456</groupId>
-      <artifactId>test-mixin</artifactId>
+      <artifactId>test-mixin-flattened</artifactId>
       <version>1.0</version>
     </mixin>
   </mixins>

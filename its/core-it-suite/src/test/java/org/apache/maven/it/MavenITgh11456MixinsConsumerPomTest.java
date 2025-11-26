@@ -27,6 +27,7 @@ import org.apache.maven.api.model.Model;
 import org.apache.maven.model.v4.MavenStaxReader;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -40,12 +41,11 @@ class MavenITgh11456MixinsConsumerPomTest extends AbstractMavenIntegrationTestCa
      */
     @Test
     void testMixinsWithoutFlattening() throws Exception {
-        Path basedir = extractResources("/gh-11456-mixins-consumer-pom").toPath();
+        Path basedir = extractResources("/gh-11456-mixins-consumer-pom/non-flattened").toPath();
 
         Verifier verifier = newVerifier(basedir.toString());
-        verifier.addCliArgument("-Dmaven.repo.local=" + basedir.resolve("repo").toString());
+        verifier.addCliArgument("-Dmaven.repo.local=" + basedir.resolve("repo"));
         verifier.addCliArgument("package");
-        verifier.setLogFileName("log-without-flattening.txt");
         try {
             verifier.execute();
         } catch (VerificationException e) {
@@ -61,13 +61,11 @@ class MavenITgh11456MixinsConsumerPomTest extends AbstractMavenIntegrationTestCa
      */
     @Test
     void testMixinsWithFlattening() throws Exception {
-        Path basedir = extractResources("/gh-11456-mixins-consumer-pom-flattened").toPath();
+        Path basedir = extractResources("/gh-11456-mixins-consumer-pom/flattened").toPath();
 
         Verifier verifier = newVerifier(basedir.toString());
         verifier.addCliArgument("-Dmaven.repo.local=" + basedir.resolve("repo").toString());
-        verifier.addCliArgument("-Dmaven.consumer.pom.flatten=true");
         verifier.addCliArgument("package");
-        verifier.setLogFileName("log-with-flattening.txt");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
@@ -76,9 +74,9 @@ class MavenITgh11456MixinsConsumerPomTest extends AbstractMavenIntegrationTestCa
                 "target",
                 "project-local-repo",
                 "org.apache.maven.its.gh11456",
-                "mixins-consumer-pom-flattened",
+                "flattened",
                 "1.0",
-                "mixins-consumer-pom-flattened-1.0-consumer.pom"));
+                "flattened-1.0-consumer.pom"));
         assertTrue(Files.exists(consumerPom), "consumer pom not found at " + consumerPom);
 
         // Verify mixins are removed from consumer POM
@@ -89,6 +87,39 @@ class MavenITgh11456MixinsConsumerPomTest extends AbstractMavenIntegrationTestCa
         assertTrue(
                 consumerPomModel.getMixins().isEmpty(),
                 "Mixins should be removed from consumer POM when flattening is enabled");
+    }
+
+    /**
+     * Verify that Maven succeeds when mixins are used with flattening enabled.
+     */
+    @Test
+    void testMixinsWithPreserveModelVersion() throws Exception {
+        Path basedir = extractResources("/gh-11456-mixins-consumer-pom/preserve-model-version").toPath();
+
+        Verifier verifier = newVerifier(basedir.toString());
+        verifier.addCliArgument("-Dmaven.repo.local=" + basedir.resolve("repo").toString());
+        verifier.addCliArgument("package");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+
+        // Verify consumer POM was created
+        Path consumerPom = basedir.resolve(Paths.get(
+                "target",
+                "project-local-repo",
+                "org.apache.maven.its.gh11456",
+                "preserve-model-version",
+                "1.0",
+                "preserve-model-version-1.0-consumer.pom"));
+        assertTrue(Files.exists(consumerPom), "consumer pom not found at " + consumerPom);
+
+        // Verify mixins are removed from consumer POM
+        Model consumerPomModel;
+        try (Reader r = Files.newBufferedReader(consumerPom)) {
+            consumerPomModel = new MavenStaxReader().read(r);
+        }
+        assertFalse(
+                consumerPomModel.getMixins().isEmpty(),
+                "Mixins should be kept in consumer POM when preserveModelVersion is enabled");
     }
 }
 

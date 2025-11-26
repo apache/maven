@@ -77,7 +77,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         boolean flattenEnabled = Features.consumerPomFlatten(session.getConfigProperties());
 
         // Check if mixins are present without flattening enabled
-        if (!flattenEnabled && !model.getMixins().isEmpty()) {
+        if (!model.getMixins().isEmpty() && !flattenEnabled && !model.isPreserveModelVersion()) {
             throw new MavenException("The consumer POM for "
                     + project.getId()
                     + " cannot be created because the POM contains mixins, which require flattening to be enabled. "
