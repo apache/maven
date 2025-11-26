@@ -24,14 +24,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-
 class RepositoryUtilsTest {
 
     @Test
     void testToArtifactMethodsReturnNullWhenInputParameterIsNull() {
-        assertNull(RepositoryUtils.toArtifact( (Dependency) null));
-        assertNull(RepositoryUtils.toArtifact( (Artifact) null));
-        assertNull(RepositoryUtils.toArtifact( (org.apache.maven.artifact.Artifact) null));
+        assertNull(RepositoryUtils.toArtifact((Dependency) null));
+        assertNull(RepositoryUtils.toArtifact((Artifact) null));
+        assertNull(RepositoryUtils.toArtifact((org.apache.maven.artifact.Artifact) null));
     }
-
 }
