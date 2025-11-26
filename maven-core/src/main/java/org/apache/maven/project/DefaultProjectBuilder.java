@@ -831,7 +831,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             try {
                 DeploymentRepository r = project.getDistributionManagement().getRepository();
                 if (!StringUtils.isEmpty(r.getId()) && !StringUtils.isEmpty(r.getUrl())) {
-                    ArtifactRepository repo = repositorySystem.buildArtifactRepository(r);
+                    ArtifactRepository repo = repositorySystem.buildArtifactRepositoryFromRepo(r);
                     repositorySystem.injectProxy(projectBuildingRequest.getRepositorySession(), Arrays.asList(repo));
                     repositorySystem.injectAuthentication(
                             projectBuildingRequest.getRepositorySession(), Arrays.asList(repo));
@@ -849,7 +849,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             try {
                 DeploymentRepository r = project.getDistributionManagement().getSnapshotRepository();
                 if (!StringUtils.isEmpty(r.getId()) && !StringUtils.isEmpty(r.getUrl())) {
-                    ArtifactRepository repo = repositorySystem.buildArtifactRepository(r);
+                    ArtifactRepository repo = repositorySystem.buildArtifactRepositoryFromRepo(r);
                     repositorySystem.injectProxy(projectBuildingRequest.getRepositorySession(), Arrays.asList(repo));
                     repositorySystem.injectAuthentication(
                             projectBuildingRequest.getRepositorySession(), Arrays.asList(repo));

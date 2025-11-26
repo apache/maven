@@ -75,6 +75,9 @@ public class SettingsXmlConfigurationProcessor implements ConfigurationProcessor
     @Inject
     private SettingsDecrypter settingsDecrypter;
 
+    @Inject
+    private MavenRepositorySystem mavenRepositorySystem;
+
     @Override
     public void process(CliRequest cliRequest) throws Exception {
         CommandLine commandLine = cliRequest.getCommandLine();
@@ -212,7 +215,8 @@ public class SettingsXmlConfigurationProcessor implements ConfigurationProcessor
                 List<Repository> remoteRepositories = rawProfile.getRepositories();
                 for (Repository remoteRepository : remoteRepositories) {
                     try {
-                        request.addRemoteRepository(MavenRepositorySystem.buildArtifactRepository(remoteRepository));
+                        request.addRemoteRepository(
+                                mavenRepositorySystem.buildArtifactRepositoryFromRepo(remoteRepository));
                     } catch (InvalidRepositoryException e) {
                         // do nothing for now
                     }
@@ -222,7 +226,7 @@ public class SettingsXmlConfigurationProcessor implements ConfigurationProcessor
                 for (Repository pluginRepository : pluginRepositories) {
                     try {
                         request.addPluginArtifactRepository(
-                                MavenRepositorySystem.buildArtifactRepository(pluginRepository));
+                                mavenRepositorySystem.buildArtifactRepositoryFromRepo(pluginRepository));
                     } catch (InvalidRepositoryException e) {
                         // do nothing for now
                     }

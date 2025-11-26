@@ -36,19 +36,20 @@ import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.Authentication;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout2;
-import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.artifact.resolver.filter.ExclusionArtifactFilter;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.Repository;
 import org.apache.maven.repository.Proxy;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Mirror;
@@ -60,6 +61,8 @@ import org.eclipse.aether.repository.AuthenticationContext;
 import org.eclipse.aether.repository.AuthenticationSelector;
 import org.eclipse.aether.repository.ProxySelector;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Jason van Zyl
@@ -67,11 +70,21 @@ import org.eclipse.aether.repository.RemoteRepository;
  */
 @Component(role = MavenRepositorySystem.class, hint = "default")
 public class MavenRepositorySystem {
+
+    // Singleton instance for static deprecated methods
+    private static MavenRepositorySystem instance;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MavenRepositorySystem.class);
+
     @Requirement
     private ArtifactHandlerManager artifactHandlerManager;
 
     @Requirement(role = ArtifactRepositoryLayout.class)
     private Map<String, ArtifactRepositoryLayout> layouts;
+
+    MavenRepositorySystem() {
+        instance = this;
+    }
 
     // DefaultProjectBuilder
     public Artifact createArtifact(String groupId, String artifactId, String version, String scope, String type) {
@@ -200,7 +213,7 @@ public class MavenRepositorySystem {
             repository.setUrl(mirror.getUrl());
 
             if (StringUtils.isNotEmpty(mirror.getLayout())) {
-                repository.setLayout(getLayout(mirror.getLayout()));
+                repository.setLayout(getLayout(mirror.getId(), mirror.getLayout()));
             }
 
             repository.setBlocked(mirror.isBlocked());
@@ -275,8 +288,13 @@ public class MavenRepositorySystem {
         }
     }
 
-    private ArtifactRepositoryLayout getLayout(String id) {
-        ArtifactRepositoryLayout layout = layouts.get(id);
+    private ArtifactRepositoryLayout getLayout(String repoId, String layoutId) {
+        ArtifactRepositoryLayout layout = layouts.get(layoutId);
+
+        if (layout == null) {
+            LOGGER.debug("No layout '{}' found for repository id '{}'", layoutId, repoId);
+            layout = new UnknownRepositoryLayout(layoutId, layouts.get("default"));
+        }
 
         return layout;
     }
@@ -308,12 +326,36 @@ public class MavenRepositorySystem {
         return modelRepositoryPolicy;
     }
 
+    /**
+     * @deprecated use a service method {@link #buildArtifactRepositoryFromRepo(org.apache.maven.settings.Repository) instead
+     */
+    @Deprecated
     public static ArtifactRepository buildArtifactRepository(org.apache.maven.settings.Repository repo)
             throws InvalidRepositoryException {
-        return buildArtifactRepository(fromSettingsRepository(repo));
+        return instance.buildArtifactRepositoryFromRepo(repo);
     }
 
+    /**
+     * @since 3.9.12
+     */
+    public ArtifactRepository buildArtifactRepositoryFromRepo(org.apache.maven.settings.Repository repo)
+            throws InvalidRepositoryException {
+        return buildArtifactRepositoryFromRepo(fromSettingsRepository(repo));
+    }
+
+    /**
+     * @deprecated use a service method {@link #buildArtifactRepositoryFromRepo(Repository)}  instead
+     */
+    @Deprecated
     public static ArtifactRepository buildArtifactRepository(org.apache.maven.model.Repository repo)
+            throws InvalidRepositoryException {
+        return instance.buildArtifactRepositoryFromRepo(repo);
+    }
+
+    /**
+     * @since 3.9.12
+     */
+    public ArtifactRepository buildArtifactRepositoryFromRepo(org.apache.maven.model.Repository repo)
             throws InvalidRepositoryException {
         if (repo != null) {
             String id = repo.getId();
@@ -332,7 +374,7 @@ public class MavenRepositorySystem {
 
             ArtifactRepositoryPolicy releases = buildArtifactRepositoryPolicy(repo.getReleases());
 
-            ArtifactRepositoryLayout layout = new DefaultRepositoryLayout();
+            ArtifactRepositoryLayout layout = getLayout(repo.getId(), repo.getLayout());
 
             return createArtifactRepository(id, url, layout, snapshots, releases);
         } else {
@@ -815,5 +857,44 @@ public class MavenRepositorySystem {
         }
 
         return result;
+    }
+
+    /**
+     * In the future, the legacy system might encounter repository types for which no layout components exists because
+     * the actual communication with the repository happens via a repository connector. As a minimum, the legacy system
+     * needs to retain the id of this layout so that the content type of the remote repository can still be accurately
+     * described.
+     */
+    static class UnknownRepositoryLayout implements ArtifactRepositoryLayout {
+
+        private final String id;
+
+        private final ArtifactRepositoryLayout fallback;
+
+        UnknownRepositoryLayout(String id, ArtifactRepositoryLayout fallback) {
+            this.id = id;
+            this.fallback = fallback;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public String pathOf(Artifact artifact) {
+            return fallback.pathOf(artifact);
+        }
+
+        public String pathOfLocalRepositoryMetadata(ArtifactMetadata metadata, ArtifactRepository repository) {
+            return fallback.pathOfLocalRepositoryMetadata(metadata, repository);
+        }
+
+        public String pathOfRemoteRepositoryMetadata(ArtifactMetadata metadata) {
+            return fallback.pathOfRemoteRepositoryMetadata(metadata);
+        }
+
+        @Override
+        public String toString() {
+            return getId();
+        }
     }
 }
