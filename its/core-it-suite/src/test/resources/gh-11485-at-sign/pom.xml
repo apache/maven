@@ -36,6 +36,8 @@ under the License.
   <properties>
     <pathWithAtProp>${path.with.at}</pathWithAtProp>
     <propWithAtProp>${prop.with.at}</propWithAtProp>
+    <cmdlinePath>${cmdline.path}</cmdlinePath>
+    <cmdlineValue>${cmdline.value}</cmdlineValue>
   </properties>
 
   <build>
@@ -55,6 +57,8 @@ under the License.
               <expressions>
                 <expression>project/properties/pathWithAtProp</expression>
                 <expression>project/properties/propWithAtProp</expression>
+                <expression>project/properties/cmdlinePath</expression>
+                <expression>project/properties/cmdlineValue</expression>
               </expressions>
             </configuration>
           </execution>

@@ -170,6 +170,7 @@ concat_lines() {
   if [ -f "$1" ]; then
     result=""
     # Read the file line by line
+    # Do not use `xargs -0` as this is not POSIX-compliant
     while IFS= read -r line || [ -n "$line" ]; do
       # Convert CR to LF
       line=$(echo "$line" | tr '\r' '\n')

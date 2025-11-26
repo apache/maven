@@ -55,5 +55,32 @@ public class MavenITgh11485AtSignInJvmConfigTest extends AbstractMavenIntegratio
                 props.getProperty("project.properties.propWithAtProp"),
                 "Property value with @ character should be preserved");
     }
+
+    @Test
+    public void testAtSignInCommandLineProperty() throws Exception {
+        File testDir = extractResources("/gh-11485-at-sign");
+
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.addCliArgument(
+                "-Dexpression.outputFile=" + new File(testDir, "target/pom.properties").getAbsolutePath());
+        verifier.setForkJvm(true); // custom .mvn/jvm.config
+        // Pass a path with @ character via command line (simulating Jenkins workspace)
+        String jenkinsPath = testDir.getAbsolutePath().replace('\\', '/') + "/jenkins.workspace/proj@2";
+        verifier.addCliArgument("-Dcmdline.path=" + jenkinsPath);
+        verifier.addCliArgument("-Dcmdline.value=test@value");
+        verifier.addCliArgument("validate");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+
+        Properties props = verifier.loadProperties("target/pom.properties");
+        assertEquals(
+                jenkinsPath,
+                props.getProperty("project.properties.cmdlinePath").replace('\\', '/'),
+                "Command-line path with @ character should be preserved");
+        assertEquals(
+                "test@value",
+                props.getProperty("project.properties.cmdlineValue"),
+                "Command-line value with @ character should be preserved");
+    }
 }
 
