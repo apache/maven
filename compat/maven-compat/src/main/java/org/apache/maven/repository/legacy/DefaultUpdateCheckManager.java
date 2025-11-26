@@ -161,7 +161,7 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
         File touchfile = getTouchfile(artifact);
 
         if (file.exists()) {
-            touchfile.delete();
+            trackingFileManager.delete(touchfile);
         } else {
             writeLastUpdated(touchfile, getRepositoryKey(repository), error);
         }
