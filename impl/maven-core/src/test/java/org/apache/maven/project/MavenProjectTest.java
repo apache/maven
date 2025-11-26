@@ -232,20 +232,17 @@ class MavenProjectTest extends AbstractMavenProjectTestCase {
 
         assertEquals(1, project.getSourceRoots().size());
 
-        //Try remove
-        //different directory
+        //Try to remove a different directory
         project.removeSourceRoot(ProjectScope.MAIN, Language.JAVA_FAMILY, "src/test/java");
 
         assertEquals(1, project.getSourceRoots().size());
 
-        //Try remove
-        //different scope
+        //Try to remove a different scope
         project.removeSourceRoot(ProjectScope.TEST, Language.JAVA_FAMILY, "src/main/java");
 
         assertEquals(1, project.getSourceRoots().size());
 
-        //Remove previously
-        //added root
+        //Remove previously added root
         project.removeSourceRoot(ProjectScope.MAIN, Language.JAVA_FAMILY, "src/main/java");
 
         assertEquals(0, project.getSourceRoots().size());
