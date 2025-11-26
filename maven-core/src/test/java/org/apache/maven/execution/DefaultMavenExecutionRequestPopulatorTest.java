@@ -18,21 +18,29 @@
  */
 package org.apache.maven.execution;
 
-import javax.inject.Inject;
-
 import java.util.List;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Settings;
-import org.eclipse.sisu.launch.InjectedTestCase;
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.PlexusTestCase;
 
-public class DefaultMavenExecutionRequestPopulatorTest extends InjectedTestCase {
-    @Inject
-    MavenExecutionRequestPopulator testee;
+public class DefaultMavenExecutionRequestPopulatorTest extends PlexusTestCase {
+
+    @Override
+    protected void customizeContainerConfiguration(ContainerConfiguration configuration) {
+        super.customizeContainerConfiguration(configuration);
+        configuration.setAutoWiring(true);
+        configuration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
+    }
 
     public void testPluginRepositoryInjection() throws Exception {
+
+        MavenExecutionRequestPopulator testee = lookup(MavenExecutionRequestPopulator.class);
+
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
 
         Repository r = new Repository();

@@ -88,7 +88,7 @@ public class DefaultProjectBuildingHelper implements ProjectBuildingHelper {
         List<ArtifactRepository> internalRepositories = new ArrayList<>();
 
         for (Repository repository : pomRepositories) {
-            internalRepositories.add(repositorySystem.buildArtifactRepository(repository));
+            internalRepositories.add(repositorySystem.buildArtifactRepositoryFromRepo(repository));
         }
 
         repositorySystem.injectMirror(request.getRepositorySession(), internalRepositories);

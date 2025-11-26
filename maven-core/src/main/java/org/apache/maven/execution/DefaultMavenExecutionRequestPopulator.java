@@ -241,7 +241,7 @@ public class DefaultMavenExecutionRequestPopulator implements MavenExecutionRequ
                 List<Repository> remoteRepositories = rawProfile.getRepositories();
                 for (Repository remoteRepository : remoteRepositories) {
                     try {
-                        request.addRemoteRepository(repositorySystem.buildArtifactRepository(remoteRepository));
+                        request.addRemoteRepository(repositorySystem.buildArtifactRepositoryFromRepo(remoteRepository));
                     } catch (InvalidRepositoryException e) {
                         // do nothing for now
                     }
@@ -250,7 +250,8 @@ public class DefaultMavenExecutionRequestPopulator implements MavenExecutionRequ
                 List<Repository> pluginRepositories = rawProfile.getPluginRepositories();
                 for (Repository pluginRepo : pluginRepositories) {
                     try {
-                        request.addPluginArtifactRepository(repositorySystem.buildArtifactRepository(pluginRepo));
+                        request.addPluginArtifactRepository(
+                                repositorySystem.buildArtifactRepositoryFromRepo(pluginRepo));
                     } catch (InvalidRepositoryException e) {
                         // do nothing for now
                     }

@@ -288,7 +288,7 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
         List<ArtifactRepository> pomRepositories = new ArrayList<>();
         for (Repository modelRepository : model.getRepositories()) {
             try {
-                pomRepositories.add(MavenRepositorySystem.buildArtifactRepository(modelRepository));
+                pomRepositories.add(repositorySystem.buildArtifactRepositoryFromRepo(modelRepository));
             } catch (InvalidRepositoryException e) {
                 // can not use this then
             }
