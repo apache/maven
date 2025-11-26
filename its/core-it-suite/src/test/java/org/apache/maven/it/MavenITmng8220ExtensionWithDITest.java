@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -34,14 +34,14 @@ public class MavenITmng8220ExtensionWithDITest extends AbstractMavenIntegrationT
      */
     @Test
     public void testitModel() throws Exception {
-        File testDir = extractResources("/mng-8220-extension-with-di");
+        Path testDir = extractResources("mng-8220-extension-with-di");
 
-        Verifier verifier = newVerifier(new File(testDir, "extensions").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("extensions"));
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(new File(testDir, "test").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("test"));
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

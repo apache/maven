@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -36,9 +36,9 @@ class MavenITmng7967ArtifactHandlerLanguageTest extends AbstractMavenIntegration
 
     @Test
     void javadocIsExecutedAndFailed() throws Exception {
-        File testDir = extractResources("/mng-7967-artifact-handler-language");
+        Path testDir = extractResources("mng-7967-artifact-handler-language");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("org.apache.maven.plugins:maven-javadoc-plugin:3.6.3:jar");
 

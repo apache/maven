@@ -18,7 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -43,9 +44,9 @@ class MavenITmng8347TransitiveDependencyManagerTest extends AbstractMavenIntegra
      */
     @Test
     void transitiveDependencyManager() throws Exception {
-        File testDir = extractResources("/mng-8347-transitive-dependency-manager");
+        Path testDir = extractResources("mng-8347-transitive-dependency-manager");
 
-        Verifier verifier = new Verifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir, null);
         verifier.addCliArgument("-V");
         verifier.addCliArgument("dependency:3.8.0:tree");
         verifier.addCliArgument("-Dmaven.repo.local.tail=" + testDir + "/local-repo");
@@ -69,9 +70,9 @@ class MavenITmng8347TransitiveDependencyManagerTest extends AbstractMavenIntegra
      */
     @Test
     void useCaseBndPlugin() throws Exception {
-        File testDir = extractResources("/mng-8347-bnd-plugin");
+        Path testDir = extractResources("mng-8347-bnd-plugin");
 
-        Verifier verifier = new Verifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir, null);
         verifier.addCliArgument("-V");
         verifier.addCliArgument("dependency:3.8.0:tree");
         verifier.addCliArgument("-Dmaven.repo.local.tail=" + testDir + "/local-repo");
@@ -89,9 +90,9 @@ class MavenITmng8347TransitiveDependencyManagerTest extends AbstractMavenIntegra
      */
     @Test
     void useCaseQuarkusTlsRegistry() throws Exception {
-        File testDir = extractResources("/mng-8347-quarkus-tls-registry");
+        Path testDir = extractResources("mng-8347-quarkus-tls-registry");
 
-        Verifier verifier = new Verifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir, null);
         verifier.addCliArgument("-V");
         verifier.addCliArgument("dependency:3.8.0:tree");
         verifier.addCliArgument("-Dmaven.repo.local.tail=" + testDir + "/local-repo");

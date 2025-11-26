@@ -18,9 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Files;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -28,16 +27,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MavenITmng5387ArtifactReplacementPlugin extends AbstractMavenIntegrationTestCase {
 
-    private File testDir;
+    private Path testDir;
 
     @BeforeEach
     public void setUp() throws Exception {
-        testDir = extractResources("/mng-5387");
+        testDir = extractResources("mng-5387");
     }
 
     @Test
     public void testArtifactReplacementExecution() throws Exception {
-        Verifier v0 = newVerifier(testDir.getAbsolutePath());
+        Verifier v0 = newVerifier(testDir);
         v0.setAutoclean(false);
         v0.deleteDirectory("target");
         v0.deleteArtifacts("org.apache.maven.its.mng5387");
@@ -45,8 +44,8 @@ public class MavenITmng5387ArtifactReplacementPlugin extends AbstractMavenIntegr
         v0.execute();
         v0.verifyErrorFreeLog();
 
-        String path = v0.getArtifactPath("org.apache.maven.its.mng5387", "mng5387-it", "0.0.1-SNAPSHOT", "txt", "c");
-        String contents = Files.readString(new File(path).toPath());
+        Path path = v0.getArtifactPath("org.apache.maven.its.mng5387", "mng5387-it", "0.0.1-SNAPSHOT", "txt", "c");
+        String contents = Files.readString(path);
         assertTrue(contents.contains("This is the second file"));
     }
 }

@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -37,9 +37,9 @@ public class MavenITmng0522InheritedPluginMgmtConfigTest extends AbstractMavenIn
      */
     @Test
     public void testitMNG522() throws Exception {
-        File testDir = extractResources("/mng-0522");
+        Path testDir = extractResources("mng-0522");
 
-        Verifier verifier = newVerifier(new File(testDir, "child-project").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("child-project"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("process-resources");

@@ -18,10 +18,9 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -57,9 +56,9 @@ public class MavenITmng3886ExecutionGoalsOrderTest extends AbstractMavenIntegrat
     }
 
     private void testitMNG3886(String project) throws Exception {
-        File testDir = extractResources("/mng-3886");
+        Path testDir = extractResources("mng-3886");
 
-        Verifier verifier = newVerifier(new File(testDir, project).getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve(project));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

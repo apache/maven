@@ -18,11 +18,12 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -71,27 +72,54 @@ public abstract class AbstractMavenIntegrationTestCase {
 
 
 
-    protected File extractResources(String resourcePath) throws IOException {
-        return new File(
-                        new File(System.getProperty("maven.test.tmpdir", System.getProperty("java.io.tmpdir"))),
-                        resourcePath)
-                .getAbsoluteFile();
+    /**
+     * Extracts test resources to a temporary directory.
+     *
+     * @param resourcePath The path to the resource directory, must not be <code>null</code>.
+     * @return The path to the extracted resources, never <code>null</code>.
+     * @throws IOException If the resources could not be extracted.
+     * @since 4.0.0
+     */
+    protected Path extractResources(String resourcePath) throws IOException {
+        return Paths.get(System.getProperty("maven.test.tmpdir", System.getProperty("java.io.tmpdir")))
+                .resolve(resourcePath)
+                .toAbsolutePath();
     }
 
+    @Deprecated
     protected Verifier newVerifier(String basedir) throws VerificationException {
         return newVerifier(basedir, true);
     }
 
+    protected Verifier newVerifier(Path basedir) throws VerificationException {
+        return newVerifier(basedir, true);
+    }
+
+    @Deprecated
     protected Verifier newVerifier(String basedir, String settings) throws VerificationException {
         return newVerifier(basedir, settings, true);
     }
 
+    protected Verifier newVerifier(Path basedir, String settings) throws VerificationException {
+        return newVerifier(basedir, settings, true);
+    }
+
+    @Deprecated
     protected Verifier newVerifier(String basedir, boolean createDotMvn) throws VerificationException {
         return newVerifier(basedir, "remote", createDotMvn);
     }
 
+    protected Verifier newVerifier(Path basedir, boolean createDotMvn) throws VerificationException {
+        return newVerifier(basedir, "remote", createDotMvn);
+    }
+
+    @Deprecated
     protected Verifier newVerifier(String basedir, String settings, boolean createDotMvn) throws VerificationException {
-        Verifier verifier = new Verifier(basedir, createDotMvn);
+        return newVerifier(Paths.get(basedir), settings, createDotMvn);
+    }
+
+    protected Verifier newVerifier(Path basedir, String settings, boolean createDotMvn) throws VerificationException {
+        Verifier verifier = new Verifier(basedir, null, createDotMvn);
 
         // try to get jacoco arg from command line if any then use it to start IT to populate jacoco data
         // we use a different file than the main one
@@ -107,27 +135,27 @@ public abstract class AbstractMavenIntegrationTestCase {
         verifier.setAutoclean(false);
 
         if (settings != null) {
-            File settingsFile;
+            Path settingsPath;
             if (!settings.isEmpty()) {
-                settingsFile = new File("settings-" + settings + ".xml");
+                settingsPath = Paths.get("settings-" + settings + ".xml");
             } else {
-                settingsFile = new File("settings.xml");
+                settingsPath = Paths.get("settings.xml");
             }
 
-            if (!settingsFile.isAbsolute()) {
+            if (!settingsPath.isAbsolute()) {
                 String settingsDir = System.getProperty("maven.it.global-settings.dir", "");
                 if (!settingsDir.isEmpty()) {
-                    settingsFile = new File(settingsDir, settingsFile.getPath());
+                    settingsPath = Paths.get(settingsDir).resolve(settingsPath);
                 } else {
                     //
                     // Make is easier to run ITs from m2e in Maven IT mode without having to set any additional
                     // properties.
                     //
-                    settingsFile = new File("target/test-classes", settingsFile.getPath());
+                    settingsPath = Paths.get("target/test-classes").resolve(settingsPath);
                 }
             }
 
-            String path = settingsFile.getAbsolutePath();
+            String path = settingsPath.toAbsolutePath().toString();
             verifier.addCliArgument("--install-settings");
             if (path.indexOf(' ') < 0) {
                 verifier.addCliArgument(path);
