@@ -179,8 +179,8 @@ concat_lines() {
     while read -r arg; do
       # Replace variables first
       arg=$(echo "$arg" | sed \
-        -e "s@\${MAVEN_PROJECTBASEDIR}@$MAVEN_PROJECTBASEDIR@g" \
-        -e "s@\$MAVEN_PROJECTBASEDIR@$MAVEN_PROJECTBASEDIR@g")
+        -e "s|\${MAVEN_PROJECTBASEDIR}|${MAVEN_PROJECTBASEDIR}|g" \
+        -e "s|\$MAVEN_PROJECTBASEDIR|${MAVEN_PROJECTBASEDIR}|g")
 
       echo "$arg"
     done | \
