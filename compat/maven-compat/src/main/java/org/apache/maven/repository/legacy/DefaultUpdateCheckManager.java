@@ -207,7 +207,8 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
 
     private void writeLastUpdated(File touchfile, String key, String error) {
         HashMap<String, String> update = new HashMap<>();
-        update.put(key, error); // if error=null delete
+        update.put(key, Long.toString(System.currentTimeMillis()));
+        update.put(key + ERROR_KEY_SUFFIX, error); // error==null => remove mapping
         trackingFileManager.update(touchfile, update);
     }
 
