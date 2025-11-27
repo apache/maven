@@ -54,6 +54,45 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Builds consumer POMs from project models, transforming them into a format suitable for downstream consumers.
+ * <p>
+ * A consumer POM is a simplified version of a project's POM that is published for consumption by other projects.
+ * It removes build-specific information and internal details while preserving essential information like
+ * dependencies, repositories, and distribution management.
+ * <p>
+ * This builder applies two orthogonal transformations:
+ * <ul>
+ *   <li><b>Dependency Flattening</b>: When enabled via {@code maven.consumer.pom.flatten=true}, dependency management
+ *       is flattened into direct dependencies for non-POM projects, and mixins are removed.</li>
+ *   <li><b>Model Version Handling</b>: When {@code preserve.model.version=true} is set, the consumer POM
+ *       maintains the original model version (4.2.0) instead of downgrading to 4.0.0 for Maven 3 compatibility.
+ *       This allows modern features like mixins to be preserved in the consumer POM.</li>
+ * </ul>
+ * <p>
+ * <b>Mixin Handling</b>: Mixins are only supported in model version 4.2.0 or later. If a POM contains mixins:
+ * <ul>
+ *   <li>Setting {@code preserve.model.version=true} preserves them in the consumer POM with model version 4.2.0</li>
+ *   <li>Setting {@code maven.consumer.pom.flatten=true} removes them during transformation</li>
+ *   <li>Otherwise, an exception is thrown requiring one of the above options or manual mixin removal</li>
+ * </ul>
+ * <p>
+ * <b>Dependency Filtering</b>: For non-POM projects with dependency management, the builder:
+ * <ul>
+ *   <li>Filters dependencies to include only those with transitive scopes (compile/runtime)</li>
+ *   <li>Applies managed dependency metadata (version, scope, optional flag, exclusions) to direct dependencies</li>
+ *   <li>Removes managed dependencies that are not used by direct dependencies</li>
+ *   <li>Retains only managed dependencies that appear in the resolved dependency tree</li>
+ * </ul>
+ * <p>
+ * <b>Repository and Profile Pruning</b>: The consumer POM removal strategy:
+ * <ul>
+ *   <li>Removes the central repository (only non-central repositories are kept)</li>
+ *   <li>Removes build, mailing lists, issue management, and other build-specific information</li>
+ *   <li>Removes profiles that have no activation, build, dependencies, or properties</li>
+ *   <li>Preserves relocation information in distribution management</li>
+ * </ul>
+ */
 @Named
 class DefaultConsumerPomBuilder implements PomBuilder {
     private static final String BOM_PACKAGING = "bom";
@@ -80,10 +119,14 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         if (!model.getMixins().isEmpty() && !flattenEnabled && !model.isPreserveModelVersion()) {
             throw new MavenException("The consumer POM for "
                     + project.getId()
-                    + " cannot be created because the POM contains mixins, which require flattening to be enabled. "
-                    + "Mixins cannot be part of the consumer POM and must be removed during transformation. "
-                    + "Please enable flattening by setting the property 'maven.consumer.pom.flatten=true' "
-                    + "or remove the mixins from your POM.");
+                    + " cannot be created because the POM contains mixins. "
+                    + "Mixins are not supported in the default consumer POM format. "
+                    + "You have the following options to resolve this:" + System.lineSeparator()
+                    + "  1. Preserve the model version by setting 'preserve.model.version=true' to generate a consumer POM with <modelVersion>4.2.0</modelVersion>, which supports mixins"
+                    + System.lineSeparator()
+                    + "  2. Enable flattening by setting the property 'maven.consumer.pom.flatten=true' to remove mixins during transformation"
+                    + System.lineSeparator()
+                    + "  3. Remove the mixins from your POM");
         }
 
         // Check if consumer POM flattening is disabled
