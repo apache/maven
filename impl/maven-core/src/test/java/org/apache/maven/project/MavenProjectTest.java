@@ -20,9 +20,13 @@ package org.apache.maven.project;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.api.Language;
+import org.apache.maven.api.ProjectScope;
+import org.apache.maven.impl.DefaultSourceRoot;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
@@ -210,6 +214,36 @@ class MavenProjectTest extends AbstractMavenProjectTestCase {
         project.addCompileSourceRoot(".");
 
         assertEquals(1, project.getCompileSourceRoots().size());
+    }
+
+    @Test
+    void testRemoveSourceRoot() {
+        MavenProject project = new MavenProject();
+
+        File basedir = new File(System.getProperty("java.io.tmpdir"));
+        project.setFile(new File(basedir, "file"));
+
+        assertEquals(0, project.getSourceRoots().size());
+
+        project.addSourceRoot(new DefaultSourceRoot(
+                ProjectScope.MAIN, Language.JAVA_FAMILY, Path.of(basedir.getAbsolutePath(), "src/main/java")));
+
+        assertEquals(1, project.getSourceRoots().size());
+
+        // Try to remove a different directory
+        project.removeSourceRoot(ProjectScope.MAIN, Language.JAVA_FAMILY, "src/test/java");
+
+        assertEquals(1, project.getSourceRoots().size());
+
+        // Try to remove a different scope
+        project.removeSourceRoot(ProjectScope.TEST, Language.JAVA_FAMILY, "src/main/java");
+
+        assertEquals(1, project.getSourceRoots().size());
+
+        // Remove previously added root
+        project.removeSourceRoot(ProjectScope.MAIN, Language.JAVA_FAMILY, "src/main/java");
+
+        assertEquals(0, project.getSourceRoots().size());
     }
 
     private void assertNoNulls(List<String> elements) {
