@@ -327,7 +327,7 @@ public class MavenRepositorySystem {
     }
 
     /**
-     * @deprecated use a service method {@link #buildArtifactRepositoryFromRepo(org.apache.maven.settings.Repository) instead
+     * @deprecated use a service method {@link #buildArtifactRepositoryFromRepo(org.apache.maven.settings.Repository)} instead
      */
     @Deprecated
     public static ArtifactRepository buildArtifactRepository(org.apache.maven.settings.Repository repo)
@@ -344,7 +344,7 @@ public class MavenRepositorySystem {
     }
 
     /**
-     * @deprecated use a service method {@link #buildArtifactRepositoryFromRepo(Repository)}  instead
+     * @deprecated use a service method {@link #buildArtifactRepositoryFromRepo(Repository)} instead
      */
     @Deprecated
     public static ArtifactRepository buildArtifactRepository(org.apache.maven.model.Repository repo)
