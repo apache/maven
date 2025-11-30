@@ -669,6 +669,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 boolean hasScript = false;
                 boolean hasMain = false;
                 boolean hasTest = false;
+                boolean hasMainResources = false;
+                boolean hasTestResources = false;
                 for (var source : sources) {
                     var src = DefaultSourceRoot.fromModel(session, baseDir, outputDirectory, source);
                     project.addSourceRoot(src);
@@ -679,6 +681,13 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                             hasMain = true;
                         } else {
                             hasTest |= ProjectScope.TEST.equals(scope);
+                        }
+                    } else if (Language.RESOURCES.equals(language)) {
+                        ProjectScope scope = src.scope();
+                        if (ProjectScope.MAIN.equals(scope)) {
+                            hasMainResources = true;
+                        } else {
+                            hasTestResources |= ProjectScope.TEST.equals(scope);
                         }
                     } else {
                         hasScript |= Language.SCRIPT.equals(language);
@@ -700,11 +709,149 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 if (!hasTest) {
                     project.addTestCompileSourceRoot(build.getTestSourceDirectory());
                 }
-                for (Resource resource : project.getBuild().getDelegate().getResources()) {
-                    project.addSourceRoot(new DefaultSourceRoot(baseDir, ProjectScope.MAIN, resource));
+                // Extract modules from sources to detect modular projects
+                Set<String> modules = extractModules(sources);
+                boolean isModularProject = !modules.isEmpty();
+
+                logger.debug(
+                        "Module detection for project {}: found {} module(s) {} - modular project: {}",
+                        project.getId(),
+                        modules.size(),
+                        modules,
+                        isModularProject);
+
+                /*
+                 * Handle main resources - modular project has highest priority:
+                 * 1. Modular project: use resources from <sources> if present, otherwise inject defaults
+                 * 2. Classic project: use resources from <sources> if present, otherwise use legacy <resources>
+                 */
+                List<Resource> resources = project.getBuild().getDelegate().getResources();
+                if (isModularProject) {
+                    if (hasMainResources) {
+                        // Modular project with resources configured via <sources> - already added above
+                        if (!resources.isEmpty()
+                                && !hasOnlySuperPomDefaults(resources, baseDir, ProjectScope.MAIN.id())) {
+                            logger.warn("Legacy <resources> element is ignored because main resources are "
+                                    + "configured via <source><lang>resources</lang></source> in <sources>");
+                        }
+                        logger.debug(
+                                "Main resources configured via <sources> element, ignoring legacy <resources> element");
+                    } else {
+                        // Modular project without resources in <sources> - inject module-aware defaults
+                        if (!resources.isEmpty()
+                                && !hasOnlySuperPomDefaults(resources, baseDir, ProjectScope.MAIN.id())) {
+                            String message =
+                                    "Legacy <resources> element is ignored because modular sources are configured. "
+                                            + "Use <source><lang>resources</lang></source> in <sources> for custom resource paths.";
+                            logger.warn(message);
+                            result.getProblemCollector()
+                                    .reportProblem(new org.apache.maven.impl.model.DefaultModelProblem(
+                                            message,
+                                            Severity.WARNING,
+                                            Version.V41,
+                                            project.getModel().getDelegate(),
+                                            -1,
+                                            -1,
+                                            null));
+                        }
+                        logger.debug("Injecting module-aware main resource roots for {} modules", modules.size());
+                        for (String module : modules) {
+                            Path resourcePath = baseDir.resolve("src")
+                                    .resolve(module)
+                                    .resolve(ProjectScope.MAIN.id())
+                                    .resolve("resources");
+                            logger.debug("  - Adding main resource root: {} (module: {})", resourcePath, module);
+                            project.addSourceRoot(
+                                    createModularResourceRoot(baseDir, module, ProjectScope.MAIN, outputDirectory));
+                        }
+                    }
+                } else {
+                    // Classic (non-modular) project
+                    if (hasMainResources) {
+                        // Resources configured via <sources> - already added above
+                        if (!resources.isEmpty()
+                                && !hasOnlySuperPomDefaults(resources, baseDir, ProjectScope.MAIN.id())) {
+                            logger.warn("Legacy <resources> element is ignored because main resources are "
+                                    + "configured via <source><lang>resources</lang></source> in <sources>");
+                        }
+                        logger.debug(
+                                "Main resources configured via <sources> element, ignoring legacy <resources> element");
+                    } else {
+                        // Use legacy <resources> element
+                        logger.debug("Using explicit or default resources ({} resources configured)", resources.size());
+                        for (Resource resource : resources) {
+                            project.addSourceRoot(new DefaultSourceRoot(baseDir, ProjectScope.MAIN, resource));
+                        }
+                    }
                 }
-                for (Resource resource : project.getBuild().getDelegate().getTestResources()) {
-                    project.addSourceRoot(new DefaultSourceRoot(baseDir, ProjectScope.TEST, resource));
+
+                /*
+                 * Handle test resources - same priority as main resources:
+                 * 1. Modular project: use test resources from <sources> if present, otherwise inject defaults
+                 * 2. Classic project: use test resources from <sources> if present, otherwise use legacy <testResources>
+                 */
+                List<Resource> testResources = project.getBuild().getDelegate().getTestResources();
+                if (isModularProject) {
+                    if (hasTestResources) {
+                        // Modular project with test resources configured via <sources> - already added above
+                        if (!testResources.isEmpty()
+                                && !hasOnlySuperPomDefaults(testResources, baseDir, ProjectScope.TEST.id())) {
+                            logger.warn(
+                                    "Legacy <testResources> element is ignored because test resources are "
+                                            + "configured via <source><lang>resources</lang><scope>test</scope></source> in <sources>");
+                        }
+                        logger.debug(
+                                "Test resources configured via <sources> element, ignoring legacy <testResources> element");
+                    } else {
+                        // Modular project without test resources in <sources> - inject module-aware defaults
+                        if (!testResources.isEmpty()
+                                && !hasOnlySuperPomDefaults(testResources, baseDir, ProjectScope.TEST.id())) {
+                            String message =
+                                    "Legacy <testResources> element is ignored because modular sources are configured. "
+                                            + "Use <source><lang>resources</lang><scope>test</scope></source> in <sources> for custom resource paths.";
+                            logger.warn(message);
+                            result.getProblemCollector()
+                                    .reportProblem(new org.apache.maven.impl.model.DefaultModelProblem(
+                                            message,
+                                            Severity.WARNING,
+                                            Version.V41,
+                                            project.getModel().getDelegate(),
+                                            -1,
+                                            -1,
+                                            null));
+                        }
+                        logger.debug("Injecting module-aware test resource roots for {} modules", modules.size());
+                        for (String module : modules) {
+                            Path resourcePath = baseDir.resolve("src")
+                                    .resolve(module)
+                                    .resolve(ProjectScope.TEST.id())
+                                    .resolve("resources");
+                            logger.debug("  - Adding test resource root: {} (module: {})", resourcePath, module);
+                            project.addSourceRoot(
+                                    createModularResourceRoot(baseDir, module, ProjectScope.TEST, outputDirectory));
+                        }
+                    }
+                } else {
+                    // Classic (non-modular) project
+                    if (hasTestResources) {
+                        // Test resources configured via <sources> - already added above
+                        if (!testResources.isEmpty()
+                                && !hasOnlySuperPomDefaults(testResources, baseDir, ProjectScope.TEST.id())) {
+                            logger.warn(
+                                    "Legacy <testResources> element is ignored because test resources are "
+                                            + "configured via <source><lang>resources</lang><scope>test</scope></source> in <sources>");
+                        }
+                        logger.debug(
+                                "Test resources configured via <sources> element, ignoring legacy <testResources> element");
+                    } else {
+                        // Use legacy <testResources> element
+                        logger.debug(
+                                "Using explicit or default test resources ({} resources configured)",
+                                testResources.size());
+                        for (Resource resource : testResources) {
+                            project.addSourceRoot(new DefaultSourceRoot(baseDir, ProjectScope.TEST, resource));
+                        }
+                    }
                 }
             }
 
@@ -1097,6 +1244,86 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             }
             return delegate.entrySet();
         }
+    }
+
+    /**
+     * Extracts unique module names from the given list of source elements.
+     * A project is considered modular if it has at least one module name.
+     *
+     * @param sources list of source elements from the build
+     * @return set of non-blank module names
+     */
+    private Set<String> extractModules(List<org.apache.maven.api.model.Source> sources) {
+        return sources.stream()
+                .map(org.apache.maven.api.model.Source::getModule)
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(s -> !s.isBlank())
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * Creates a DefaultSourceRoot for module-aware resource directories.
+     * Generates paths following the pattern: src/&lt;module&gt;/&lt;scope&gt;/resources
+     *
+     * @param baseDir base directory of the project
+     * @param module module name
+     * @param scope project scope (main or test)
+     * @param outputDirectory function providing output directory for the scope
+     * @return configured DefaultSourceRoot for the module's resources
+     */
+    private DefaultSourceRoot createModularResourceRoot(
+            Path baseDir, String module, ProjectScope scope, Function<ProjectScope, String> outputDirectory) {
+        Path resourceDir =
+                baseDir.resolve("src").resolve(module).resolve(scope.id()).resolve("resources");
+
+        return new DefaultSourceRoot(
+                scope,
+                Language.RESOURCES,
+                module,
+                null, // targetVersion
+                resourceDir,
+                null, // includes
+                null, // excludes
+                false, // stringFiltering
+                Path.of(module), // targetPath - resources go to target/classes/<module>
+                true // enabled
+                );
+    }
+
+    /**
+     * Checks if the given resource list contains only Super POM default resources.
+     * Super POM defaults are: src/{scope}/resources and src/{scope}/resources-filtered
+     *
+     * @param resources list of resources to check
+     * @param baseDir project base directory
+     * @param scope scope (main or test)
+     * @return true if only Super POM defaults are present
+     */
+    private boolean hasOnlySuperPomDefaults(List<Resource> resources, Path baseDir, String scope) {
+        if (resources.isEmpty()) {
+            return false;
+        }
+
+        // Super POM default paths
+        String defaultPath =
+                baseDir.resolve("src").resolve(scope).resolve("resources").toString();
+        String defaultFilteredPath = baseDir.resolve("src")
+                .resolve(scope)
+                .resolve("resources-filtered")
+                .toString();
+
+        // Check if all resources are Super POM defaults
+        for (Resource resource : resources) {
+            String resourceDir = resource.getDirectory();
+            if (resourceDir != null && !resourceDir.equals(defaultPath) && !resourceDir.equals(defaultFilteredPath)) {
+                // Found a non-default resource
+                return false;
+            }
+        }
+
+        logger.debug("Detected only Super POM default resources for scope: {}", scope);
+        return true;
     }
 
     private Model injectLifecycleBindings(
