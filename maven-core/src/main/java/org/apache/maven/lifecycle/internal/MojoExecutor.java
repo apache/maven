@@ -184,7 +184,7 @@ public class MojoExecutor {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
         try {
-            mavenPluginManager.checkRequiredMavenVersion(mojoDescriptor.getPluginDescriptor());
+            mavenPluginManager.checkPrerequisites(mojoDescriptor.getPluginDescriptor());
         } catch (PluginIncompatibleException e) {
             throw new LifecycleExecutionException(mojoExecution, session.getCurrentProject(), e);
         }

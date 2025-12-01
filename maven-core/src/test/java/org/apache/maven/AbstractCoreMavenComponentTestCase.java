@@ -192,7 +192,7 @@ public abstract class AbstractCoreMavenComponentTestCase extends PlexusTestCase 
         repository.setReleases(policy);
         repository.setSnapshots(policy);
 
-        return Arrays.asList(repositorySystem.buildArtifactRepository(repository));
+        return Arrays.asList(repositorySystem.buildArtifactRepositoryFromRepo(repository));
     }
 
     protected List<ArtifactRepository> getPluginArtifactRepositories() throws InvalidRepositoryException {
