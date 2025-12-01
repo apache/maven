@@ -38,8 +38,17 @@ import static java.util.Objects.requireNonNull;
 @Experimental
 public interface VersionRangeResolverRequest extends RepositoryAwareRequest {
 
+    enum Nature {
+        RELEASE,
+        SNAPSHOT,
+        RELEASE_OR_SNAPSHOT
+    }
+
     @Nonnull
     ArtifactCoordinates getArtifactCoordinates();
+
+    @Nonnull
+    Nature getNature();
 
     @Nonnull
     static VersionRangeResolverRequest build(
@@ -70,6 +79,7 @@ public interface VersionRangeResolverRequest extends RepositoryAwareRequest {
         RequestTrace trace;
         ArtifactCoordinates artifactCoordinates;
         List<RemoteRepository> repositories;
+        Nature nature = Nature.RELEASE_OR_SNAPSHOT;
 
         public VersionResolverRequestBuilder session(Session session) {
             this.session = session;
@@ -86,35 +96,49 @@ public interface VersionRangeResolverRequest extends RepositoryAwareRequest {
             return this;
         }
 
+        public VersionResolverRequestBuilder nature(Nature nature) {
+            this.nature = Objects.requireNonNullElse(nature, Nature.RELEASE_OR_SNAPSHOT);
+            return this;
+        }
+
         public VersionResolverRequestBuilder repositories(List<RemoteRepository> repositories) {
             this.repositories = repositories;
             return this;
         }
 
         public VersionRangeResolverRequest build() {
-            return new DefaultVersionResolverRequest(session, trace, artifactCoordinates, repositories);
+            return new DefaultVersionResolverRequest(session, trace, artifactCoordinates, repositories, nature);
         }
 
         private static class DefaultVersionResolverRequest extends BaseRequest<Session>
                 implements VersionRangeResolverRequest {
             private final ArtifactCoordinates artifactCoordinates;
             private final List<RemoteRepository> repositories;
+            private final Nature nature;
 
             @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultVersionResolverRequest(
                     @Nonnull Session session,
                     @Nullable RequestTrace trace,
                     @Nonnull ArtifactCoordinates artifactCoordinates,
-                    @Nullable List<RemoteRepository> repositories) {
+                    @Nullable List<RemoteRepository> repositories,
+                    @Nonnull Nature nature) {
                 super(session, trace);
-                this.artifactCoordinates = artifactCoordinates;
+                this.artifactCoordinates = requireNonNull(artifactCoordinates);
                 this.repositories = validate(repositories);
+                this.nature = requireNonNull(nature);
             }
 
             @Nonnull
             @Override
             public ArtifactCoordinates getArtifactCoordinates() {
                 return artifactCoordinates;
+            }
+
+            @Nonnull
+            @Override
+            public Nature getNature() {
+                return nature;
             }
 
             @Nullable
