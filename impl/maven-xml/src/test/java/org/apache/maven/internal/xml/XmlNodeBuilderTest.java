@@ -21,8 +21,10 @@ package org.apache.maven.internal.xml;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.api.xml.XmlService;
@@ -43,6 +45,10 @@ class XmlNodeBuilderTest {
         };
         XmlNode node1 = XmlService.read(r);
         XmlNode node2 = XmlService.read(r);
+        assertEquals(node1, node2);
+
+        node1 = XmlService.read(new ByteArrayInputStream(doc.getBytes(StandardCharsets.UTF_8)), null);
+        node2 = XmlService.read(new ByteArrayInputStream(doc.getBytes(StandardCharsets.UTF_8)), null);
         assertEquals(node1, node2);
     }
 
