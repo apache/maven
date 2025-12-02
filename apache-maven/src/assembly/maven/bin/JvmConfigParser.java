@@ -84,6 +84,7 @@ public class JvmConfigParser {
             });
 
             System.out.print(result.toString());
+            System.out.flush(); // Ensure output is flushed before exit (important on Windows)
         } catch (IOException e) {
             System.err.println("Error reading jvm.config: " + e.getMessage());
             System.exit(1);
