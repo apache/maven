@@ -183,26 +183,18 @@ set JVM_CONFIG_MAVEN_OPTS=
 if not exist "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" goto endReadJvmConfig
 
 rem Use Java to parse jvm.config to avoid batch script parsing issues with special characters
-rem This handles pipes, quotes, and other special characters correctly
-rem Use random temp directory to avoid conflicts between different Maven versions
+rem This handles pipes, quotes, @, and other special characters correctly
+rem Use random temp directory to avoid conflicts between different Maven invocations
 set "JVM_CONFIG_PARSER_DIR=%TEMP%\mvn-jvm-parser-%RANDOM%-%RANDOM%"
 mkdir "%JVM_CONFIG_PARSER_DIR%"
 set "JVM_CONFIG_TEMP=%TEMP%\mvn-jvm-config-%RANDOM%.txt"
-set "JVM_CONFIG_ERR=%TEMP%\mvn-jvm-config-err-%RANDOM%.txt"
 "%JAVACMD:java.exe=javac.exe%" -d "%JVM_CONFIG_PARSER_DIR%" "%MAVEN_HOME%\bin\JvmConfigParser.java" >nul 2>&1
-"%JAVACMD%" -cp "%JVM_CONFIG_PARSER_DIR%" JvmConfigParser "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" "%MAVEN_PROJECTBASEDIR%" > "%JVM_CONFIG_TEMP%" 2> "%JVM_CONFIG_ERR%"
+"%JAVACMD%" -cp "%JVM_CONFIG_PARSER_DIR%" JvmConfigParser "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" "%MAVEN_PROJECTBASEDIR%" > "%JVM_CONFIG_TEMP%" 2>nul
 rem Read the single line from temp file
 set /p JVM_CONFIG_MAVEN_OPTS=<"%JVM_CONFIG_TEMP%"
 
-rem Debug output to file for IT verification
-echo JVM_CONFIG_MAVEN_OPTS=%JVM_CONFIG_MAVEN_OPTS% > "%MAVEN_PROJECTBASEDIR%\mvn-debug.txt"
-echo MAVEN_OPTS=%MAVEN_OPTS% >> "%MAVEN_PROJECTBASEDIR%\mvn-debug.txt"
-echo PARSER_STDERR: >> "%MAVEN_PROJECTBASEDIR%\mvn-debug.txt"
-type "%JVM_CONFIG_ERR%" >> "%MAVEN_PROJECTBASEDIR%\mvn-debug.txt" 2>nul
-
 rem Cleanup temp files and directory
 del "%JVM_CONFIG_TEMP%" 2>nul
-del "%JVM_CONFIG_ERR%" 2>nul
 rmdir /s /q "%JVM_CONFIG_PARSER_DIR%" 2>nul
 
 :endReadJvmConfig

@@ -166,37 +166,42 @@ find_file_argument_basedir() {
 }
 
 # concatenates all lines of a file and replaces variables
+# Uses Java-based parser to handle all special characters correctly
+# This avoids shell parsing issues with pipes, quotes, @, and other special characters
+# and ensures POSIX compliance (no xargs -0, awk, or complex sed needed)
 concat_lines() {
   if [ -f "$1" ]; then
-    # Convert CR to LF, remove empty lines and comments, perform variable substitution,
-    # and escape pipe symbols for eval
-    tr '\r' '\n' < "$1" | \
-    sed -e '/^$/d' -e 's/#.*$//' | \
-    sed \
-      -e "s@\${MAVEN_PROJECTBASEDIR}@$MAVEN_PROJECTBASEDIR@g" \
-      -e "s@\$MAVEN_PROJECTBASEDIR@$MAVEN_PROJECTBASEDIR@g" | \
-    awk '
-    {
-      result = ""
-      in_quotes = 0
-      for (i = 1; i <= length($0); i++) {
-        char = substr($0, i, 1)
-        if (char == "\"") {
-          in_quotes = !in_quotes
-          result = result char
-        } else if (char == "|" && !in_quotes) {
-          # Escape unquoted pipes for eval
-          result = result "\\|"
-        } else {
-          result = result char
-        }
-      }
-      # Accumulate lines with space separator
-      if (NR > 1) printf " "
-      printf "%s", result
+    # Compile and run JvmConfigParser
+    # Use a temporary directory for compilation to avoid conflicts
+    jvm_parser_dir="${TMPDIR:-/tmp}/mvn-jvm-parser-$$"
+    mkdir -p "$jvm_parser_dir"
+
+    # Compile the parser
+    "$JAVACMD" -version >/dev/null 2>&1 || {
+      echo "Error: Java not found. Please set JAVA_HOME." >&2
+      return 1
     }
-    END { if (NR > 0) print "" }
-    '
+
+    javac_cmd="${JAVACMD%java*}javac"
+    if [ ! -x "$javac_cmd" ]; then
+      # Try to find javac in JAVA_HOME
+      if [ -n "$JAVA_HOME" ]; then
+        javac_cmd="$JAVA_HOME/bin/javac"
+      fi
+    fi
+
+    "$javac_cmd" -d "$jvm_parser_dir" "$MAVEN_HOME/bin/JvmConfigParser.java" >/dev/null 2>&1
+    if [ $? -eq 0 ]; then
+      # Run the parser and capture output
+      result=$("$JAVACMD" -cp "$jvm_parser_dir" JvmConfigParser "$1" "$MAVEN_PROJECTBASEDIR" 2>/dev/null)
+      # Clean up
+      rm -rf "$jvm_parser_dir"
+      echo "$result"
+    else
+      # Fallback: if compilation fails, just skip jvm.config
+      rm -rf "$jvm_parser_dir"
+      echo "Warning: Failed to compile JvmConfigParser, skipping jvm.config" >&2
+    fi
   fi
 }
 
