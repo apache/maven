@@ -26,8 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Parses .mvn/jvm.config file for Windows batch scripts.
- * This avoids the complexity of parsing special characters (pipes, quotes, etc.) in batch scripts.
+ * Parses .mvn/jvm.config file for Windows batch/Unix shell scripts.
+ * This avoids the complexity of parsing special characters (pipes, quotes, etc.) in scripts.
  *
  * Usage: java JvmConfigParser.java <jvm.config-path> <maven-project-basedir>
  *
