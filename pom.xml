@@ -157,7 +157,6 @@ under the License.
     <jmhVersion>1.37</jmhVersion>
     <junitVersion>6.0.1</junitVersion>
     <jxpathVersion>1.4.0</jxpathVersion>
-    <logbackClassicVersion>1.5.21</logbackClassicVersion>
     <mockitoVersion>5.20.0</mockitoVersion>
     <plexusInteractivityVersion>1.5.1</plexusInteractivityVersion>
     <plexusInterpolationVersion>1.29</plexusInterpolationVersion>
@@ -507,12 +506,6 @@ under the License.
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-simple</artifactId>
         <version>${slf4jVersion}</version>
-        <optional>true</optional>
-      </dependency>
-      <dependency>
-        <groupId>ch.qos.logback</groupId>
-        <artifactId>logback-classic</artifactId>
-        <version>${logbackClassicVersion}</version>
         <optional>true</optional>
       </dependency>
       <!--  Wagon -->
