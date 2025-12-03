@@ -182,15 +182,25 @@ set JVM_CONFIG_MAVEN_OPTS=
 
 if not exist "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" goto endReadJvmConfig
 
+rem DEBUG: Log that we found jvm.config file
+echo [DEBUG] Found .mvn\jvm.config file at: %MAVEN_PROJECTBASEDIR%\.mvn\jvm.config
+
 rem Use Java source-launch mode (JDK 11+) to parse jvm.config
 rem This avoids batch script parsing issues with special characters (pipes, quotes, @, etc.)
 rem Use random temp file to capture output
 set "JVM_CONFIG_TEMP=%TEMP%\mvn-jvm-config-%RANDOM%-%RANDOM%.txt"
 set "JVM_CONFIG_ERR=%TEMP%\mvn-jvm-config-err-%RANDOM%-%RANDOM%.txt"
 
+rem DEBUG: Log the parser command
+echo [DEBUG] Running JvmConfigParser with Java: %JAVACMD%
+echo [DEBUG] Parser arguments: "%MAVEN_HOME%\bin\JvmConfigParser.java" "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" "%MAVEN_PROJECTBASEDIR%"
+
 rem Run parser using source-launch mode - capture stdout and stderr separately
 "%JAVACMD%" "%MAVEN_HOME%\bin\JvmConfigParser.java" "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" "%MAVEN_PROJECTBASEDIR%" > "%JVM_CONFIG_TEMP%" 2> "%JVM_CONFIG_ERR%"
 set JVM_CONFIG_EXIT=%ERRORLEVEL%
+
+rem DEBUG: Log the exit code
+echo [DEBUG] JvmConfigParser exit code: %JVM_CONFIG_EXIT%
 
 rem Check if parser failed
 if %JVM_CONFIG_EXIT% neq 0 (
@@ -212,10 +222,32 @@ if %JVM_CONFIG_EXIT% neq 0 (
   exit /b 1
 )
 
+rem DEBUG: Log temp file contents
+if exist "%JVM_CONFIG_TEMP%" (
+  echo [DEBUG] JvmConfigParser output file exists
+  for /f "delims=" %%i in (%JVM_CONFIG_TEMP%) do (
+    echo [DEBUG] JvmConfigParser output: %%i
+  )
+) else (
+  echo [DEBUG] JvmConfigParser output file does not exist
+)
+
+if exist "%JVM_CONFIG_ERR%" (
+  echo [DEBUG] JvmConfigParser stderr file exists
+  for /f "delims=" %%i in (%JVM_CONFIG_ERR%) do (
+    echo [DEBUG] JvmConfigParser stderr: %%i
+  )
+) else (
+  echo [DEBUG] JvmConfigParser stderr file does not exist
+)
+
 rem Read the output if file exists and is not empty
 if exist "%JVM_CONFIG_TEMP%" (
   for /f "delims=" %%i in (%JVM_CONFIG_TEMP%) do set "JVM_CONFIG_MAVEN_OPTS=%%i"
 )
+
+rem DEBUG: Log the final JVM_CONFIG_MAVEN_OPTS value
+echo [DEBUG] Final JVM_CONFIG_MAVEN_OPTS: %JVM_CONFIG_MAVEN_OPTS%
 
 rem Cleanup temp files
 del "%JVM_CONFIG_TEMP%" 2>nul

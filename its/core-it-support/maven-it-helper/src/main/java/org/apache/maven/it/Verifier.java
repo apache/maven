@@ -478,15 +478,18 @@ public class Verifier {
             }
         }
 
-        // Add environment variables that would be set
+        // Add environment variables that would be set (excluding MAVEN_OPTS which is handled separately)
         if (request.environmentVariables().isPresent() && !request.environmentVariables().get().isEmpty()) {
             cmdLine.append("\n# Environment variables:");
             for (Map.Entry<String, String> entry : request.environmentVariables().get().entrySet()) {
-                cmdLine.append("\n# ").append(entry.getKey()).append("=").append(entry.getValue());
+                if (!"MAVEN_OPTS".equals(entry.getKey())) {
+                    cmdLine.append("\n# ").append(entry.getKey()).append("=").append(entry.getValue());
+                }
             }
         }
 
-        // Add JVM arguments that would be set via MAVEN_OPTS
+        // Compute the final MAVEN_OPTS value (combining env var + jvmArgs)
+        // This matches what ForkedMavenExecutor does
         List<String> jvmArgs = new ArrayList<>();
         if (!request.userHomeDirectory().equals(ExecutorRequest.getCanonicalPath(Paths.get(System.getProperty("user.home"))))) {
             jvmArgs.add("-Duser.home=" + request.userHomeDirectory().toString());
@@ -500,8 +503,23 @@ public class Verifier {
                     .toList());
         }
 
+        // Build the final MAVEN_OPTS value
+        StringBuilder mavenOpts = new StringBuilder();
+        if (request.environmentVariables().isPresent()) {
+            String existingMavenOpts = request.environmentVariables().get().get("MAVEN_OPTS");
+            if (existingMavenOpts != null && !existingMavenOpts.isEmpty()) {
+                mavenOpts.append(existingMavenOpts);
+            }
+        }
         if (!jvmArgs.isEmpty()) {
-            cmdLine.append("\n# MAVEN_OPTS=").append(String.join(" ", jvmArgs));
+            if (mavenOpts.length() > 0) {
+                mavenOpts.append(" ");
+            }
+            mavenOpts.append(String.join(" ", jvmArgs));
+        }
+
+        if (mavenOpts.length() > 0) {
+            cmdLine.append("\n# MAVEN_OPTS=").append(mavenOpts.toString());
         }
 
         if (request.skipMavenRc()) {
