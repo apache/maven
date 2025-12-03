@@ -182,37 +182,44 @@ set JVM_CONFIG_MAVEN_OPTS=
 
 if not exist "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" goto endReadJvmConfig
 
-rem Use Java to parse jvm.config to avoid batch script parsing issues with special characters
-rem This handles pipes, quotes, @, and other special characters correctly
-rem Use random temp directory to avoid conflicts between different Maven invocations
-set "JVM_CONFIG_PARSER_DIR=%TEMP%\mvn-jvm-parser-%RANDOM%-%RANDOM%"
-mkdir "%JVM_CONFIG_PARSER_DIR%" 2>nul
-set "JVM_CONFIG_TEMP=%TEMP%\mvn-jvm-config-%RANDOM%.txt"
-"%JAVACMD:java.exe=javac.exe%" -d "%JVM_CONFIG_PARSER_DIR%" "%MAVEN_HOME%\bin\JvmConfigParser.java" >nul 2>&1
-if errorlevel 1 goto skipJvmConfig
-rem Run parser - errors are printed to stderr and will cause exit code 1
-"%JAVACMD%" -cp "%JVM_CONFIG_PARSER_DIR%" JvmConfigParser "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" "%MAVEN_PROJECTBASEDIR%" > "%JVM_CONFIG_TEMP%"
-if errorlevel 1 goto cleanupJvmConfigAndExit
-rem Ensure file exists before reading
-if not exist "%JVM_CONFIG_TEMP%" goto cleanupJvmConfig
-rem Read the single line from temp file
-set /p JVM_CONFIG_MAVEN_OPTS=<"%JVM_CONFIG_TEMP%"
+rem Use Java source-launch mode (JDK 11+) to parse jvm.config
+rem This avoids batch script parsing issues with special characters (pipes, quotes, @, etc.)
+rem Use random temp file to capture output
+set "JVM_CONFIG_TEMP=%TEMP%\mvn-jvm-config-%RANDOM%-%RANDOM%.txt"
+set "JVM_CONFIG_ERR=%TEMP%\mvn-jvm-config-err-%RANDOM%-%RANDOM%.txt"
 
-:cleanupJvmConfig
-rem Cleanup temp files and directory
+rem Run parser using source-launch mode - capture stdout and stderr separately
+"%JAVACMD%" "%MAVEN_HOME%\bin\JvmConfigParser.java" "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" "%MAVEN_PROJECTBASEDIR%" > "%JVM_CONFIG_TEMP%" 2> "%JVM_CONFIG_ERR%"
+set JVM_CONFIG_EXIT=%ERRORLEVEL%
+
+rem Check if parser failed
+if %JVM_CONFIG_EXIT% neq 0 (
+  echo ERROR: JvmConfigParser failed with exit code %JVM_CONFIG_EXIT% 1>&2
+  echo   jvm.config path: %MAVEN_PROJECTBASEDIR%\.mvn\jvm.config 1>&2
+  echo   Maven basedir: %MAVEN_PROJECTBASEDIR% 1>&2
+  echo   Java command: %JAVACMD% 1>&2
+  echo   Parser stderr: 1>&2
+  if exist "%JVM_CONFIG_ERR%" (
+    for /f "delims=" %%i in (%JVM_CONFIG_ERR%) do echo     %%i 1>&2
+  )
+  echo   Parser stdout: 1>&2
+  if exist "%JVM_CONFIG_TEMP%" (
+    for /f "delims=" %%i in (%JVM_CONFIG_TEMP%) do echo     %%i 1>&2
+  )
+  rem Cleanup and exit
+  del "%JVM_CONFIG_TEMP%" 2>nul
+  del "%JVM_CONFIG_ERR%" 2>nul
+  exit /b 1
+)
+
+rem Read the output if file exists and is not empty
+if exist "%JVM_CONFIG_TEMP%" (
+  for /f "delims=" %%i in (%JVM_CONFIG_TEMP%) do set "JVM_CONFIG_MAVEN_OPTS=%%i"
+)
+
+rem Cleanup temp files
 del "%JVM_CONFIG_TEMP%" 2>nul
-rmdir /s /q "%JVM_CONFIG_PARSER_DIR%" 2>nul
-goto endReadJvmConfig
-
-:cleanupJvmConfigAndExit
-rem Cleanup and exit with error - jvm.config parsing failed
-del "%JVM_CONFIG_TEMP%" 2>nul
-rmdir /s /q "%JVM_CONFIG_PARSER_DIR%" 2>nul
-exit /b 1
-
-:skipJvmConfig
-rem Cleanup on compilation failure
-rmdir /s /q "%JVM_CONFIG_PARSER_DIR%" 2>nul
+del "%JVM_CONFIG_ERR%" 2>nul
 
 :endReadJvmConfig
 

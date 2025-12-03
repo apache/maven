@@ -171,44 +171,32 @@ find_file_argument_basedir() {
 # and ensures POSIX compliance (no xargs -0, awk, or complex sed needed)
 concat_lines() {
   if [ -f "$1" ]; then
-    # Compile and run JvmConfigParser
-    # Use a temporary directory for compilation to avoid conflicts
-    jvm_parser_dir="${TMPDIR:-/tmp}/mvn-jvm-parser-$$"
-    mkdir -p "$jvm_parser_dir"
+    # Use Java source-launch mode (JDK 11+) to run JvmConfigParser directly
+    # This avoids the need for compilation and temporary directories
 
-    # Compile the parser
+    # Verify Java is available
     "$JAVACMD" -version >/dev/null 2>&1 || {
       echo "Error: Java not found. Please set JAVA_HOME." >&2
       return 1
     }
 
-    javac_cmd="${JAVACMD%java*}javac"
-    if [ ! -x "$javac_cmd" ]; then
-      # Try to find javac in JAVA_HOME
-      if [ -n "$JAVA_HOME" ]; then
-        javac_cmd="$JAVA_HOME/bin/javac"
-      fi
+    # Run the parser using source-launch mode
+    # Capture both stdout and stderr for comprehensive error reporting
+    parser_output=$("$JAVACMD" "$MAVEN_HOME/bin/JvmConfigParser.java" "$1" "$MAVEN_PROJECTBASEDIR" 2>&1)
+    parser_exit=$?
+
+    if [ $parser_exit -ne 0 ]; then
+      # Parser failed - print comprehensive error information
+      echo "ERROR: JvmConfigParser failed with exit code $parser_exit" >&2
+      echo "  jvm.config path: $1" >&2
+      echo "  Maven basedir: $MAVEN_PROJECTBASEDIR" >&2
+      echo "  Java command: $JAVACMD" >&2
+      echo "  Parser output:" >&2
+      echo "$parser_output" | sed 's/^/    /' >&2
+      exit 1
     fi
 
-    "$javac_cmd" -d "$jvm_parser_dir" "$MAVEN_HOME/bin/JvmConfigParser.java" >/dev/null 2>&1
-    if [ $? -eq 0 ]; then
-      # Run the parser and capture output
-      # Errors are printed to stderr and will cause non-zero exit code
-      result=$("$JAVACMD" -cp "$jvm_parser_dir" JvmConfigParser "$1" "$MAVEN_PROJECTBASEDIR" 2>&1)
-      parser_exit=$?
-      # Clean up
-      rm -rf "$jvm_parser_dir"
-      if [ $parser_exit -ne 0 ]; then
-        # Parser failed - print error and exit
-        echo "$result" >&2
-        exit 1
-      fi
-      echo "$result"
-    else
-      # Fallback: if compilation fails, just skip jvm.config
-      rm -rf "$jvm_parser_dir"
-      echo "Warning: Failed to compile JvmConfigParser, skipping jvm.config" >&2
-    fi
+    echo "$parser_output"
   fi
 }
 
