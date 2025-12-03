@@ -729,8 +729,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 if (isModularProject) {
                     if (hasMainResources) {
                         // Modular project with resources configured via <sources> - already added above
-                        if (!resources.isEmpty()
-                                && !hasOnlySuperPomDefaults(resources, baseDir, ProjectScope.MAIN.id())) {
+                        if (hasExplicitLegacyResources(resources, baseDir, ProjectScope.MAIN.id())) {
                             logger.warn("Legacy <resources> element is ignored because main resources are "
                                     + "configured via <source><lang>resources</lang></source> in <sources>");
                         }
@@ -738,8 +737,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                                 "Main resources configured via <sources> element, ignoring legacy <resources> element");
                     } else {
                         // Modular project without resources in <sources> - inject module-aware defaults
-                        if (!resources.isEmpty()
-                                && !hasOnlySuperPomDefaults(resources, baseDir, ProjectScope.MAIN.id())) {
+                        if (hasExplicitLegacyResources(resources, baseDir, ProjectScope.MAIN.id())) {
                             String message =
                                     "Legacy <resources> element is ignored because modular sources are configured. "
                                             + "Use <source><lang>resources</lang></source> in <sources> for custom resource paths.";
@@ -769,8 +767,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     // Classic (non-modular) project
                     if (hasMainResources) {
                         // Resources configured via <sources> - already added above
-                        if (!resources.isEmpty()
-                                && !hasOnlySuperPomDefaults(resources, baseDir, ProjectScope.MAIN.id())) {
+                        if (hasExplicitLegacyResources(resources, baseDir, ProjectScope.MAIN.id())) {
                             logger.warn("Legacy <resources> element is ignored because main resources are "
                                     + "configured via <source><lang>resources</lang></source> in <sources>");
                         }
@@ -794,8 +791,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 if (isModularProject) {
                     if (hasTestResources) {
                         // Modular project with test resources configured via <sources> - already added above
-                        if (!testResources.isEmpty()
-                                && !hasOnlySuperPomDefaults(testResources, baseDir, ProjectScope.TEST.id())) {
+                        if (hasExplicitLegacyResources(testResources, baseDir, ProjectScope.TEST.id())) {
                             logger.warn(
                                     "Legacy <testResources> element is ignored because test resources are "
                                             + "configured via <source><lang>resources</lang><scope>test</scope></source> in <sources>");
@@ -804,8 +800,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                                 "Test resources configured via <sources> element, ignoring legacy <testResources> element");
                     } else {
                         // Modular project without test resources in <sources> - inject module-aware defaults
-                        if (!testResources.isEmpty()
-                                && !hasOnlySuperPomDefaults(testResources, baseDir, ProjectScope.TEST.id())) {
+                        if (hasExplicitLegacyResources(testResources, baseDir, ProjectScope.TEST.id())) {
                             String message =
                                     "Legacy <testResources> element is ignored because modular sources are configured. "
                                             + "Use <source><lang>resources</lang><scope>test</scope></source> in <sources> for custom resource paths.";
@@ -835,8 +830,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     // Classic (non-modular) project
                     if (hasTestResources) {
                         // Test resources configured via <sources> - already added above
-                        if (!testResources.isEmpty()
-                                && !hasOnlySuperPomDefaults(testResources, baseDir, ProjectScope.TEST.id())) {
+                        if (hasExplicitLegacyResources(testResources, baseDir, ProjectScope.TEST.id())) {
                             logger.warn(
                                     "Legacy <testResources> element is ignored because test resources are "
                                             + "configured via <source><lang>resources</lang><scope>test</scope></source> in <sources>");
@@ -1253,7 +1247,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
      * @param sources list of source elements from the build
      * @return set of non-blank module names
      */
-    private Set<String> extractModules(List<org.apache.maven.api.model.Source> sources) {
+    private static Set<String> extractModules(List<org.apache.maven.api.model.Source> sources) {
         return sources.stream()
                 .map(org.apache.maven.api.model.Source::getModule)
                 .filter(Objects::nonNull)
@@ -1292,17 +1286,17 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     }
 
     /**
-     * Checks if the given resource list contains only Super POM default resources.
-     * Super POM defaults are: src/{scope}/resources and src/{scope}/resources-filtered
+     * Checks if the given resource list contains explicit legacy resources that differ
+     * from Super POM defaults. Super POM defaults are: src/{scope}/resources and src/{scope}/resources-filtered
      *
      * @param resources list of resources to check
      * @param baseDir project base directory
      * @param scope scope (main or test)
-     * @return true if only Super POM defaults are present
+     * @return true if explicit legacy resources are present that would be ignored
      */
-    private boolean hasOnlySuperPomDefaults(List<Resource> resources, Path baseDir, String scope) {
+    private boolean hasExplicitLegacyResources(List<Resource> resources, Path baseDir, String scope) {
         if (resources.isEmpty()) {
-            return false;
+            return false; // No resources means no explicit legacy resources to warn about
         }
 
         // Super POM default paths
@@ -1313,17 +1307,17 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 .resolve("resources-filtered")
                 .toString();
 
-        // Check if all resources are Super POM defaults
+        // Check if any resource differs from Super POM defaults
         for (Resource resource : resources) {
             String resourceDir = resource.getDirectory();
             if (resourceDir != null && !resourceDir.equals(defaultPath) && !resourceDir.equals(defaultFilteredPath)) {
-                // Found a non-default resource
-                return false;
+                // Found an explicit legacy resource
+                return true;
             }
         }
 
-        logger.debug("Detected only Super POM default resources for scope: {}", scope);
-        return true;
+        logger.debug("Only Super POM default resources found for scope: {}", scope);
+        return false;
     }
 
     private Model injectLifecycleBindings(
