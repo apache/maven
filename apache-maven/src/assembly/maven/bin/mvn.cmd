@@ -186,15 +186,32 @@ rem Use Java to parse jvm.config to avoid batch script parsing issues with speci
 rem This handles pipes, quotes, @, and other special characters correctly
 rem Use random temp directory to avoid conflicts between different Maven invocations
 set "JVM_CONFIG_PARSER_DIR=%TEMP%\mvn-jvm-parser-%RANDOM%-%RANDOM%"
-mkdir "%JVM_CONFIG_PARSER_DIR%"
+mkdir "%JVM_CONFIG_PARSER_DIR%" 2>nul
 set "JVM_CONFIG_TEMP=%TEMP%\mvn-jvm-config-%RANDOM%.txt"
 "%JAVACMD:java.exe=javac.exe%" -d "%JVM_CONFIG_PARSER_DIR%" "%MAVEN_HOME%\bin\JvmConfigParser.java" >nul 2>&1
-"%JAVACMD%" -cp "%JVM_CONFIG_PARSER_DIR%" JvmConfigParser "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" "%MAVEN_PROJECTBASEDIR%" > "%JVM_CONFIG_TEMP%" 2>nul
+if errorlevel 1 goto skipJvmConfig
+rem Run parser - errors are printed to stderr and will cause exit code 1
+"%JAVACMD%" -cp "%JVM_CONFIG_PARSER_DIR%" JvmConfigParser "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" "%MAVEN_PROJECTBASEDIR%" > "%JVM_CONFIG_TEMP%"
+if errorlevel 1 goto cleanupJvmConfigAndExit
+rem Ensure file exists before reading
+if not exist "%JVM_CONFIG_TEMP%" goto cleanupJvmConfig
 rem Read the single line from temp file
 set /p JVM_CONFIG_MAVEN_OPTS=<"%JVM_CONFIG_TEMP%"
 
+:cleanupJvmConfig
 rem Cleanup temp files and directory
 del "%JVM_CONFIG_TEMP%" 2>nul
+rmdir /s /q "%JVM_CONFIG_PARSER_DIR%" 2>nul
+goto endReadJvmConfig
+
+:cleanupJvmConfigAndExit
+rem Cleanup and exit with error - jvm.config parsing failed
+del "%JVM_CONFIG_TEMP%" 2>nul
+rmdir /s /q "%JVM_CONFIG_PARSER_DIR%" 2>nul
+exit /b 1
+
+:skipJvmConfig
+rem Cleanup on compilation failure
 rmdir /s /q "%JVM_CONFIG_PARSER_DIR%" 2>nul
 
 :endReadJvmConfig

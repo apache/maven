@@ -24,7 +24,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * Parses .mvn/jvm.config file for Windows batch scripts.
@@ -49,45 +48,69 @@ public class JvmConfigParser {
             return;
         }
 
-        try (Stream<String> lines = Files.lines(jvmConfigPath, StandardCharsets.UTF_8)) {
-            StringBuilder result = new StringBuilder();
-
-            lines.forEach(line -> {
-                // Remove comments
-                int commentIndex = line.indexOf('#');
-                if (commentIndex >= 0) {
-                    line = line.substring(0, commentIndex);
-                }
-
-                // Trim whitespace
-                line = line.trim();
-
-                // Skip empty lines
-                if (line.isEmpty()) {
-                    return;
-                }
-
-                // Replace MAVEN_PROJECTBASEDIR placeholders
-                line = line.replace("${MAVEN_PROJECTBASEDIR}", mavenProjectBasedir);
-                line = line.replace("$MAVEN_PROJECTBASEDIR", mavenProjectBasedir);
-
-                // Parse line into individual arguments (split on spaces, respecting quotes)
-                List<String> parsed = parseArguments(line);
-
-                // Append each argument quoted
-                for (String arg : parsed) {
-                    if (result.length() > 0) {
-                        result.append(' ');
-                    }
-                    result.append('"').append(arg).append('"');
-                }
-            });
-
-            System.out.print(result.toString());
-            System.out.flush(); // Ensure output is flushed before exit (important on Windows)
+        try {
+            String result = parseJvmConfig(jvmConfigPath, mavenProjectBasedir);
+            System.out.print(result);
+            System.out.flush();
         } catch (IOException e) {
-            System.err.println("Error reading jvm.config: " + e.getMessage());
+            // If jvm.config exists but can't be read, this is a configuration error
+            // Print clear error and exit with error code to prevent Maven from running
+            System.err.println("ERROR: Failed to read .mvn/jvm.config: " + e.getMessage());
+            System.err.println("Please check file permissions and syntax.");
+            System.err.flush();
             System.exit(1);
+        }
+    }
+
+    /**
+     * Parse jvm.config file and return formatted arguments.
+     * Package-private for testing.
+     */
+    static String parseJvmConfig(Path jvmConfigPath, String mavenProjectBasedir) throws IOException {
+        StringBuilder result = new StringBuilder();
+
+        for (String line : Files.readAllLines(jvmConfigPath, StandardCharsets.UTF_8)) {
+            line = processLine(line, mavenProjectBasedir);
+            if (line.isEmpty()) {
+                continue;
+            }
+
+            List<String> parsed = parseArguments(line);
+            appendQuotedArguments(result, parsed);
+        }
+
+        return result.toString();
+    }
+
+    /**
+     * Process a single line: remove comments, trim whitespace, and replace placeholders.
+     */
+    private static String processLine(String line, String mavenProjectBasedir) {
+        // Remove comments
+        int commentIndex = line.indexOf('#');
+        if (commentIndex >= 0) {
+            line = line.substring(0, commentIndex);
+        }
+
+        // Trim whitespace
+        line = line.trim();
+
+        // Replace MAVEN_PROJECTBASEDIR placeholders
+        line = line.replace("${MAVEN_PROJECTBASEDIR}", mavenProjectBasedir);
+        line = line.replace("$MAVEN_PROJECTBASEDIR", mavenProjectBasedir);
+
+        return line;
+    }
+
+    /**
+     * Append parsed arguments as quoted strings to the result builder.
+     */
+    private static void appendQuotedArguments(StringBuilder result, List<String> args) {
+        for (String arg : args) {
+            if (result.length() > 0) {
+                result.append(' ');
+            }
+            result.append('"').append(arg).append('"');
         }
     }
 
@@ -98,19 +121,17 @@ public class JvmConfigParser {
     private static List<String> parseArguments(String line) {
         List<String> args = new ArrayList<>();
         StringBuilder current = new StringBuilder();
-        boolean inQuotes = false;
+        boolean inDoubleQuotes = false;
         boolean inSingleQuotes = false;
 
         for (int i = 0; i < line.length(); i++) {
             char c = line.charAt(i);
 
             if (c == '"' && !inSingleQuotes) {
-                inQuotes = !inQuotes;
-                // Don't include the quote character itself
-            } else if (c == '\'' && !inQuotes) {
+                inDoubleQuotes = !inDoubleQuotes;
+            } else if (c == '\'' && !inDoubleQuotes) {
                 inSingleQuotes = !inSingleQuotes;
-                // Don't include the quote character itself
-            } else if (c == ' ' && !inQuotes && !inSingleQuotes) {
+            } else if (c == ' ' && !inDoubleQuotes && !inSingleQuotes) {
                 // Space outside quotes - end of argument
                 if (current.length() > 0) {
                     args.add(current.toString());
@@ -129,4 +150,3 @@ public class JvmConfigParser {
         return args;
     }
 }
-

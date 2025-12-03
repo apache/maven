@@ -193,9 +193,16 @@ concat_lines() {
     "$javac_cmd" -d "$jvm_parser_dir" "$MAVEN_HOME/bin/JvmConfigParser.java" >/dev/null 2>&1
     if [ $? -eq 0 ]; then
       # Run the parser and capture output
-      result=$("$JAVACMD" -cp "$jvm_parser_dir" JvmConfigParser "$1" "$MAVEN_PROJECTBASEDIR" 2>/dev/null)
+      # Errors are printed to stderr and will cause non-zero exit code
+      result=$("$JAVACMD" -cp "$jvm_parser_dir" JvmConfigParser "$1" "$MAVEN_PROJECTBASEDIR" 2>&1)
+      parser_exit=$?
       # Clean up
       rm -rf "$jvm_parser_dir"
+      if [ $parser_exit -ne 0 ]; then
+        # Parser failed - print error and exit
+        echo "$result" >&2
+        exit 1
+      fi
       echo "$result"
     else
       # Fallback: if compilation fails, just skip jvm.config
