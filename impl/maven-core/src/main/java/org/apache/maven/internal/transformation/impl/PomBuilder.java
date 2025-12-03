@@ -21,10 +21,10 @@ package org.apache.maven.internal.transformation.impl;
 import javax.xml.stream.XMLStreamException;
 
 import java.io.IOException;
-import java.nio.file.Path;
 
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.ModelBuilderException;
+import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystemSession;
 
@@ -33,6 +33,6 @@ import org.eclipse.aether.RepositorySystemSession;
  * of {@link ConsumerPomArtifactTransformer}.
  */
 interface PomBuilder {
-    Model build(RepositorySystemSession session, MavenProject project, Path src)
+    Model build(RepositorySystemSession session, MavenProject project, ModelSource src)
             throws ModelBuilderException, IOException, XMLStreamException;
 }

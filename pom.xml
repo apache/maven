@@ -108,7 +108,7 @@ under the License.
   <scm>
     <connection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</connection>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</developerConnection>
-    <tag>maven-4.0.0-rc-1</tag>
+    <tag>master</tag>
     <url>https://github.com/apache/maven/tree/${project.scm.tag}</url>
   </scm>
   <issueManagement>
@@ -143,9 +143,10 @@ under the License.
     <project.build.outputTimestamp>2025-06-24T20:18:00Z</project.build.outputTimestamp>
     <!-- various versions -->
     <asmVersion>9.9</asmVersion>
-    <byteBuddyVersion>1.17.8</byteBuddyVersion>
+    <byteBuddyVersion>1.18.2</byteBuddyVersion>
     <classWorldsVersion>2.9.0</classWorldsVersion>
-    <commonsCliVersion>1.10.0</commonsCliVersion>
+    <commonsCliVersion>1.11.0</commonsCliVersion>
+    <domtripVersion>0.4.0</domtripVersion>
     <guiceVersion>5.1.0</guiceVersion>
     <guavaVersion>33.5.0-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
@@ -156,11 +157,11 @@ under the License.
     <jmhVersion>1.37</jmhVersion>
     <junitVersion>6.0.1</junitVersion>
     <jxpathVersion>1.4.0</jxpathVersion>
-    <logbackClassicVersion>1.5.20</logbackClassicVersion>
+    <logbackClassicVersion>1.5.21</logbackClassicVersion>
     <mockitoVersion>5.20.0</mockitoVersion>
-    <plexusInteractivityVersion>1.4</plexusInteractivityVersion>
-    <plexusInterpolationVersion>1.28</plexusInterpolationVersion>
-    <plexusTestingVersion>2.0.1</plexusTestingVersion>
+    <plexusInteractivityVersion>1.5.1</plexusInteractivityVersion>
+    <plexusInterpolationVersion>1.29</plexusInterpolationVersion>
+    <plexusTestingVersion>2.0.2</plexusTestingVersion>
     <plexusXmlVersion>4.1.0</plexusXmlVersion>
     <resolverVersion>2.0.13</resolverVersion>
     <securityDispatcherVersion>4.1.0</securityDispatcherVersion>
@@ -488,6 +489,16 @@ under the License.
         <version>${jlineVersion}</version>
       </dependency>
       <dependency>
+        <groupId>eu.maveniverse.maven.domtrip</groupId>
+        <artifactId>domtrip-core</artifactId>
+        <version>${domtripVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>eu.maveniverse.maven.domtrip</groupId>
+        <artifactId>domtrip-maven</artifactId>
+        <version>${domtripVersion}</version>
+      </dependency>
+      <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
         <version>${slf4jVersion}</version>
@@ -659,11 +670,7 @@ under the License.
         <artifactId>jimfs</artifactId>
         <version>1.3.1</version>
       </dependency>
-      <dependency>
-        <groupId>org.jdom</groupId>
-        <artifactId>jdom2</artifactId>
-        <version>2.0.6.1</version>
-      </dependency>
+
       <dependency>
         <groupId>org.openjdk.jmh</groupId>
         <artifactId>jmh-core</artifactId>
@@ -713,7 +720,7 @@ under the License.
         <plugin>
           <groupId>com.github.siom79.japicmp</groupId>
           <artifactId>japicmp-maven-plugin</artifactId>
-          <version>0.24.2</version>
+          <version>0.25.0</version>
           <executions>
             <execution>
               <goals>
@@ -781,7 +788,7 @@ under the License.
             <dependency>
               <groupId>net.sourceforge.pmd</groupId>
               <artifactId>pmd-core</artifactId>
-              <version>7.18.0</version>
+              <version>7.19.0</version>
             </dependency>
           </dependencies>
         </plugin>
@@ -1015,27 +1022,6 @@ under the License.
             </executions>
           </plugin>
           <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <inherited>false</inherited>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <phase>pre-site</phase>
-                <configuration>
-                  <target>
-                    <!-- directory should be created by org.eclipse.aether.tools.CollectConfiguration -->
-                    <!-- TODO: remove with next version of resolver-tools -->
-                    <mkdir dir="${project.build.directory}/generated-site/markdown" />
-                    <mkdir dir="${project.build.directory}/generated-site/resources" />
-                  </target>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
             <version>3.6.2</version>
@@ -1139,8 +1125,12 @@ under the License.
               </tags>
               <groups>
                 <group>
+                  <title>Maven 4 API - CLI</title>
+                  <packages>org.apache.maven.api.cli*</packages>
+                </group>
+                <group>
                   <title>Maven 4 API - Core</title>
-                  <packages>org.apache.maven.api*</packages>
+                  <packages>org.apache.maven.api:org.apache.maven.api.cache:org.apache.maven.api.feature:org.apache.maven.api.plugin:org.apache.maven.api.plugin.annotations:org.apache.maven.api.services:org.apache.maven.api.services.xml</packages>
                 </group>
                 <group>
                   <title>Maven 4 API - Plugin</title>
@@ -1159,12 +1149,12 @@ under the License.
                   <packages>org.apache.maven.api.toolchain</packages>
                 </group>
                 <group>
-                  <title>Maven 4 API - Meta</title>
+                  <title>Maven 4 API - Annotations</title>
                   <packages>org.apache.maven.api.annotations</packages>
                 </group>
                 <group>
                   <title>Maven 4 API - DI</title>
-                  <packages>org.apache.maven.api.di</packages>
+                  <packages>org.apache.maven.api.di:org.apache.maven.di.tool</packages>
                 </group>
                 <group>
                   <title>Maven 4 API - Metadata</title>

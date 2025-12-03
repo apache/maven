@@ -21,44 +21,37 @@ package org.apache.maven.cling.invoker.mvnup.goals;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import eu.maveniverse.domtrip.Document;
+import eu.maveniverse.domtrip.Editor;
+import eu.maveniverse.domtrip.Element;
+import eu.maveniverse.domtrip.maven.MavenPomElements;
 import org.apache.maven.api.Lifecycle;
 import org.apache.maven.api.cli.mvnup.UpgradeOptions;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Priority;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
-import org.jdom2.Attribute;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
 
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.BUILD;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.EXECUTIONS;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.MODEL_VERSION;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.MODULE;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.MODULES;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PLUGIN;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PLUGINS;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PLUGIN_MANAGEMENT;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PROFILE;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PROFILES;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.SUBPROJECT;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.SUBPROJECTS;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.ModelVersions.MODEL_VERSION_4_0_0;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.ModelVersions.MODEL_VERSION_4_1_0;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Namespaces.MAVEN_4_0_0_NAMESPACE;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Namespaces.MAVEN_4_1_0_NAMESPACE;
 import static org.apache.maven.cling.invoker.mvnup.goals.ModelVersionUtils.getSchemaLocationForModelVersion;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.ModelVersions.MODEL_VERSION_4_0_0;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.ModelVersions.MODEL_VERSION_4_1_0;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.ModelVersions.MODEL_VERSION_4_2_0;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.Namespaces.MAVEN_4_0_0_NAMESPACE;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.Namespaces.MAVEN_4_1_0_NAMESPACE;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.Namespaces.MAVEN_4_2_0_NAMESPACE;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlAttributes.SCHEMA_LOCATION;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlAttributes.XSI_NAMESPACE_PREFIX;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlAttributes.XSI_NAMESPACE_URI;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.BUILD;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.EXECUTION;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.EXECUTIONS;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.MODULE;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.MODULES;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.PHASE;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.PLUGIN;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.PLUGINS;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.PLUGIN_MANAGEMENT;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.PROFILE;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.PROFILES;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.SUBPROJECT;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.SUBPROJECTS;
 
 /**
  * Strategy for upgrading Maven model versions (e.g., 4.0.0 → 4.1.0).
@@ -118,7 +111,10 @@ public class ModelUpgradeStrategy extends AbstractUpgradeStrategy {
                     // Perform the actual upgrade
                     context.indent();
                     try {
-                        performModelUpgrade(pomDocument, context, currentVersion, targetModelVersion);
+                        Document upgradedDocument =
+                                performModelUpgrade(pomDocument, context, currentVersion, targetModelVersion);
+                        // Update the map with the modified document
+                        pomMap.put(pomPath, upgradedDocument);
                     } finally {
                         context.unindent();
                     }
@@ -142,73 +138,86 @@ public class ModelUpgradeStrategy extends AbstractUpgradeStrategy {
 
     /**
      * Performs the core model upgrade from current version to target version.
-     * This includes namespace updates and module conversion.
+     * This includes namespace updates and module conversion using domtrip.
+     * Returns the upgraded document.
      */
-    private void performModelUpgrade(
+    private Document performModelUpgrade(
             Document pomDocument, UpgradeContext context, String currentVersion, String targetModelVersion) {
-        // Update namespace and schema location to target version
-        upgradeNamespaceAndSchemaLocation(pomDocument, context, targetModelVersion);
+        // Create Editor from domtrip Document
+        Editor editor = new Editor(pomDocument);
+
+        // Update model version element
+        Element root = editor.root();
+        Element modelVersionElement = root.child(MODEL_VERSION).orElse(null);
+        if (modelVersionElement != null) {
+            editor.setTextContent(modelVersionElement, targetModelVersion);
+            context.detail("Updated modelVersion to " + targetModelVersion);
+        } else {
+            // Create new modelVersion element if it doesn't exist
+            DomUtils.insertContentElement(root, MODEL_VERSION, targetModelVersion);
+            context.detail("Added modelVersion " + targetModelVersion);
+        }
+
+        // Update namespace and schema location
+        upgradeNamespaceAndSchemaLocation(editor, context, targetModelVersion);
 
         // Convert modules to subprojects (for 4.1.0 and higher)
         if (ModelVersionUtils.isVersionGreaterOrEqual(targetModelVersion, MODEL_VERSION_4_1_0)) {
-            convertModulesToSubprojects(pomDocument, context);
-            upgradeDeprecatedPhases(pomDocument, context);
+            convertModulesToSubprojects(editor, context);
+            upgradeDeprecatedPhases(editor, context);
         }
 
-        // Update modelVersion to target version (perhaps removed later during inference step)
-        ModelVersionUtils.updateModelVersion(pomDocument, targetModelVersion);
-        context.detail("Updated modelVersion to " + targetModelVersion);
+        // Return the modified document from the editor
+        return editor.document();
     }
 
     /**
-     * Updates namespace and schema location for the target model version.
+     * Updates namespace and schema location for the target model version using domtrip.
      */
-    private void upgradeNamespaceAndSchemaLocation(
-            Document pomDocument, UpgradeContext context, String targetModelVersion) {
-        Element root = pomDocument.getRootElement();
+    private void upgradeNamespaceAndSchemaLocation(Editor editor, UpgradeContext context, String targetModelVersion) {
+        Element root = editor.root();
+        if (root == null) {
+            return;
+        }
 
         // Update namespace based on target model version
         String targetNamespace = getNamespaceForModelVersion(targetModelVersion);
-        Namespace newNamespace = Namespace.getNamespace(targetNamespace);
-        updateElementNamespace(root, newNamespace);
+
+        // Use element's attribute method to set the namespace declaration
+        // This modifies the element in place and marks it as modified
+        root.attribute("xmlns", targetNamespace);
         context.detail("Updated namespace to " + targetNamespace);
 
-        // Update schema location
-        Attribute schemaLocationAttr =
-                root.getAttribute(SCHEMA_LOCATION, Namespace.getNamespace(XSI_NAMESPACE_PREFIX, XSI_NAMESPACE_URI));
-        if (schemaLocationAttr != null) {
-            schemaLocationAttr.setValue(getSchemaLocationForModelVersion(targetModelVersion));
+        // Update schema location if present
+        String currentSchemaLocation = root.attribute("xsi:schemaLocation");
+        if (currentSchemaLocation != null) {
+            String newSchemaLocation = getSchemaLocationForModelVersion(targetModelVersion);
+            root.attribute("xsi:schemaLocation", newSchemaLocation);
             context.detail("Updated xsi:schemaLocation");
         }
     }
 
     /**
-     * Recursively updates the namespace of an element and all its children.
+     * Converts modules to subprojects for 4.1.0 compatibility using domtrip.
      */
-    private void updateElementNamespace(Element element, Namespace newNamespace) {
-        element.setNamespace(newNamespace);
-        for (Element child : element.getChildren()) {
-            updateElementNamespace(child, newNamespace);
+    private void convertModulesToSubprojects(Editor editor, UpgradeContext context) {
+        Element root = editor.root();
+        if (root == null) {
+            return;
         }
-    }
-
-    /**
-     * Converts modules to subprojects for 4.1.0 compatibility.
-     */
-    private void convertModulesToSubprojects(Document pomDocument, UpgradeContext context) {
-        Element root = pomDocument.getRootElement();
-        Namespace namespace = root.getNamespace();
 
         // Convert modules element to subprojects
-        Element modulesElement = root.getChild(MODULES, namespace);
+        Element modulesElement = root.child(MODULES).orElse(null);
         if (modulesElement != null) {
-            modulesElement.setName(SUBPROJECTS);
+            // domtrip makes this much simpler - just change the element name
+            // The formatting and structure are preserved automatically
+            modulesElement.name(SUBPROJECTS);
             context.detail("Converted <modules> to <subprojects>");
 
             // Convert all module children to subproject
-            List<Element> moduleElements = modulesElement.getChildren(MODULE, namespace);
+            var moduleElements = modulesElement.children(MODULE).toList();
             for (Element moduleElement : moduleElements) {
-                moduleElement.setName(SUBPROJECT);
+                moduleElement.name(SUBPROJECT);
             }
 
             if (!moduleElements.isEmpty()) {
@@ -217,17 +226,18 @@ public class ModelUpgradeStrategy extends AbstractUpgradeStrategy {
         }
 
         // Also check inside profiles
-        Element profilesElement = root.getChild(PROFILES, namespace);
+        Element profilesElement = root.child(PROFILES).orElse(null);
         if (profilesElement != null) {
-            List<Element> profileElements = profilesElement.getChildren(PROFILE, namespace);
+            var profileElements = profilesElement.children(PROFILE).toList();
             for (Element profileElement : profileElements) {
-                Element profileModulesElement = profileElement.getChild(MODULES, namespace);
+                Element profileModulesElement = profileElement.child(MODULES).orElse(null);
                 if (profileModulesElement != null) {
-                    profileModulesElement.setName(SUBPROJECTS);
+                    profileModulesElement.name(SUBPROJECTS);
 
-                    List<Element> profileModuleElements = profileModulesElement.getChildren(MODULE, namespace);
+                    var profileModuleElements =
+                            profileModulesElement.children(MODULE).toList();
                     for (Element moduleElement : profileModuleElements) {
-                        moduleElement.setName(SUBPROJECT);
+                        moduleElement.name(SUBPROJECT);
                     }
 
                     if (!profileModuleElements.isEmpty()) {
@@ -258,8 +268,8 @@ public class ModelUpgradeStrategy extends AbstractUpgradeStrategy {
      * Gets the namespace URI for a model version.
      */
     private String getNamespaceForModelVersion(String modelVersion) {
-        if (MODEL_VERSION_4_2_0.equals(modelVersion)) {
-            return MAVEN_4_2_0_NAMESPACE;
+        if (MavenPomElements.ModelVersions.MODEL_VERSION_4_2_0.equals(modelVersion)) {
+            return MavenPomElements.Namespaces.MAVEN_4_2_0_NAMESPACE;
         } else if (MODEL_VERSION_4_1_0.equals(modelVersion)) {
             return MAVEN_4_1_0_NAMESPACE;
         } else {
@@ -271,25 +281,32 @@ public class ModelUpgradeStrategy extends AbstractUpgradeStrategy {
      * Upgrades deprecated Maven 3 phase names to Maven 4 equivalents.
      * This replaces pre-/post- phases with before:/after: phases.
      */
-    private void upgradeDeprecatedPhases(Document pomDocument, UpgradeContext context) {
+    private void upgradeDeprecatedPhases(Editor editor, UpgradeContext context) {
         // Create mapping of deprecated phases to their Maven 4 equivalents
         Map<String, String> phaseUpgrades = createPhaseUpgradeMap();
 
-        Element root = pomDocument.getRootElement();
-        Namespace namespace = root.getNamespace();
+        Element root = editor.root();
+        if (root == null) {
+            return;
+        }
 
         int totalUpgrades = 0;
 
         // Upgrade phases in main build section
-        totalUpgrades += upgradePhaseElements(root.getChild(BUILD, namespace), namespace, phaseUpgrades, context);
+        Element buildElement = root.child(BUILD).orElse(null);
+        if (buildElement != null) {
+            totalUpgrades += upgradePhaseElements(buildElement, phaseUpgrades, context);
+        }
 
         // Upgrade phases in profiles
-        Element profilesElement = root.getChild(PROFILES, namespace);
+        Element profilesElement = root.child(PROFILES).orElse(null);
         if (profilesElement != null) {
-            List<Element> profileElements = profilesElement.getChildren(PROFILE, namespace);
+            var profileElements = profilesElement.children(PROFILE).toList();
             for (Element profileElement : profileElements) {
-                Element profileBuildElement = profileElement.getChild(BUILD, namespace);
-                totalUpgrades += upgradePhaseElements(profileBuildElement, namespace, phaseUpgrades, context);
+                Element profileBuildElement = profileElement.child(BUILD).orElse(null);
+                if (profileBuildElement != null) {
+                    totalUpgrades += upgradePhaseElements(profileBuildElement, phaseUpgrades, context);
+                }
             }
         }
 
@@ -323,8 +340,7 @@ public class ModelUpgradeStrategy extends AbstractUpgradeStrategy {
     /**
      * Upgrades phase elements within a build section.
      */
-    private int upgradePhaseElements(
-            Element buildElement, Namespace namespace, Map<String, String> phaseUpgrades, UpgradeContext context) {
+    private int upgradePhaseElements(Element buildElement, Map<String, String> phaseUpgrades, UpgradeContext context) {
         if (buildElement == null) {
             return 0;
         }
@@ -332,17 +348,18 @@ public class ModelUpgradeStrategy extends AbstractUpgradeStrategy {
         int upgrades = 0;
 
         // Check plugins section
-        Element pluginsElement = buildElement.getChild(PLUGINS, namespace);
+        Element pluginsElement = buildElement.child(PLUGINS).orElse(null);
         if (pluginsElement != null) {
-            upgrades += upgradePhaseElementsInPlugins(pluginsElement, namespace, phaseUpgrades, context);
+            upgrades += upgradePhaseElementsInPlugins(pluginsElement, phaseUpgrades, context);
         }
 
         // Check pluginManagement section
-        Element pluginManagementElement = buildElement.getChild(PLUGIN_MANAGEMENT, namespace);
+        Element pluginManagementElement = buildElement.child(PLUGIN_MANAGEMENT).orElse(null);
         if (pluginManagementElement != null) {
-            Element managedPluginsElement = pluginManagementElement.getChild(PLUGINS, namespace);
+            Element managedPluginsElement =
+                    pluginManagementElement.child(PLUGINS).orElse(null);
             if (managedPluginsElement != null) {
-                upgrades += upgradePhaseElementsInPlugins(managedPluginsElement, namespace, phaseUpgrades, context);
+                upgrades += upgradePhaseElementsInPlugins(managedPluginsElement, phaseUpgrades, context);
             }
         }
 
@@ -353,21 +370,25 @@ public class ModelUpgradeStrategy extends AbstractUpgradeStrategy {
      * Upgrades phase elements within a plugins section.
      */
     private int upgradePhaseElementsInPlugins(
-            Element pluginsElement, Namespace namespace, Map<String, String> phaseUpgrades, UpgradeContext context) {
+            Element pluginsElement, Map<String, String> phaseUpgrades, UpgradeContext context) {
         int upgrades = 0;
 
-        List<Element> pluginElements = pluginsElement.getChildren(PLUGIN, namespace);
+        var pluginElements = pluginsElement.children(PLUGIN).toList();
         for (Element pluginElement : pluginElements) {
-            Element executionsElement = pluginElement.getChild(EXECUTIONS, namespace);
+            Element executionsElement = pluginElement.child(EXECUTIONS).orElse(null);
             if (executionsElement != null) {
-                List<Element> executionElements = executionsElement.getChildren(EXECUTION, namespace);
+                var executionElements = executionsElement
+                        .children(MavenPomElements.Elements.EXECUTION)
+                        .toList();
                 for (Element executionElement : executionElements) {
-                    Element phaseElement = executionElement.getChild(PHASE, namespace);
+                    Element phaseElement = executionElement
+                            .child(MavenPomElements.Elements.PHASE)
+                            .orElse(null);
                     if (phaseElement != null) {
-                        String currentPhase = phaseElement.getTextTrim();
+                        String currentPhase = phaseElement.textContent().trim();
                         String newPhase = phaseUpgrades.get(currentPhase);
                         if (newPhase != null) {
-                            phaseElement.setText(newPhase);
+                            phaseElement.textContent(newPhase);
                             context.detail("Upgraded phase: " + currentPhase + " → " + newPhase);
                             upgrades++;
                         }

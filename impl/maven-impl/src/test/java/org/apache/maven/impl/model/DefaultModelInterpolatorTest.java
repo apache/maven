@@ -575,6 +575,26 @@ class DefaultModelInterpolatorTest {
         assertEquals(uninterpolatedName, out.getName());
     }
 
+    @Test
+    void testProjectUrlPropertyDoesNotCauseRecursion() throws Exception {
+        // GH-11384: ${project.url} should resolve to the property "project.url" before
+        // trying to resolve via model reflection, which would cause recursion
+        Map<String, String> modelProperties = new HashMap<>();
+        modelProperties.put("project.url", "https://github.com/slackapi/java-slack-sdk");
+
+        Model model = Model.newBuilder()
+                .url("${project.url}")
+                .properties(modelProperties)
+                .build();
+
+        SimpleProblemCollector collector = new SimpleProblemCollector();
+        Model out = interpolator.interpolateModel(
+                model, null, createModelBuildingRequest(context).build(), collector);
+
+        assertProblemFree(collector);
+        assertEquals("https://github.com/slackapi/java-slack-sdk", out.getUrl());
+    }
+
     @Provides
     @Priority(10)
     @SuppressWarnings("unused")

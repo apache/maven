@@ -32,4 +32,4 @@ Maven SLF4J Provider
 
 * See Also
 
- * {{{../maven-embedder/logging.html}Maven Logging}}
+ * {{{../../compat/maven-embedder/logging.html}Maven Logging}}

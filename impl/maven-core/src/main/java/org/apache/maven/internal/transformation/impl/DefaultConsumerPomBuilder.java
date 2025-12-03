@@ -21,7 +21,6 @@ package org.apache.maven.internal.transformation.impl;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,11 +40,12 @@ import org.apache.maven.api.model.ModelBase;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.model.Scm;
+import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
-import org.apache.maven.api.services.Sources;
+import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.model.LifecycleBindingsInjector;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.model.v4.MavenModelVersion;
@@ -54,6 +54,45 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Builds consumer POMs from project models, transforming them into a format suitable for downstream consumers.
+ * <p>
+ * A consumer POM is a simplified version of a project's POM that is published for consumption by other projects.
+ * It removes build-specific information and internal details while preserving essential information like
+ * dependencies, repositories, and distribution management.
+ * <p>
+ * This builder applies two orthogonal transformations:
+ * <ul>
+ *   <li><b>Dependency Flattening</b>: When enabled via {@code maven.consumer.pom.flatten=true}, dependency management
+ *       is flattened into direct dependencies for non-POM projects, and mixins are removed.</li>
+ *   <li><b>Model Version Handling</b>: When {@code preserve.model.version=true} is set, the consumer POM
+ *       maintains the original model version (4.2.0) instead of downgrading to 4.0.0 for Maven 3 compatibility.
+ *       This allows modern features like mixins to be preserved in the consumer POM.</li>
+ * </ul>
+ * <p>
+ * <b>Mixin Handling</b>: Mixins are only supported in model version 4.2.0 or later. If a POM contains mixins:
+ * <ul>
+ *   <li>Setting {@code preserve.model.version=true} preserves them in the consumer POM with model version 4.2.0</li>
+ *   <li>Setting {@code maven.consumer.pom.flatten=true} removes them during transformation</li>
+ *   <li>Otherwise, an exception is thrown requiring one of the above options or manual mixin removal</li>
+ * </ul>
+ * <p>
+ * <b>Dependency Filtering</b>: For non-POM projects with dependency management, the builder:
+ * <ul>
+ *   <li>Filters dependencies to include only those with transitive scopes (compile/runtime)</li>
+ *   <li>Applies managed dependency metadata (version, scope, optional flag, exclusions) to direct dependencies</li>
+ *   <li>Removes managed dependencies that are not used by direct dependencies</li>
+ *   <li>Retains only managed dependencies that appear in the resolved dependency tree</li>
+ * </ul>
+ * <p>
+ * <b>Repository and Profile Pruning</b>: The consumer POM removal strategy:
+ * <ul>
+ *   <li>Removes the central repository (only non-central repositories are kept)</li>
+ *   <li>Removes build, mailing lists, issue management, and other build-specific information</li>
+ *   <li>Removes profiles that have no activation, build, dependencies, or properties</li>
+ *   <li>Preserves relocation information in distribution management</li>
+ * </ul>
+ */
 @Named
 class DefaultConsumerPomBuilder implements PomBuilder {
     private static final String BOM_PACKAGING = "bom";
@@ -71,21 +110,44 @@ class DefaultConsumerPomBuilder implements PomBuilder {
     }
 
     @Override
-    public Model build(RepositorySystemSession session, MavenProject project, Path src) throws ModelBuilderException {
+    public Model build(RepositorySystemSession session, MavenProject project, ModelSource src)
+            throws ModelBuilderException {
         Model model = project.getModel().getDelegate();
         boolean flattenEnabled = Features.consumerPomFlatten(session.getConfigProperties());
+        String packaging = model.getPackaging();
+        String originalPackaging = project.getOriginalModel().getPackaging();
+
+        // Check if this is a BOM (original packaging is "bom")
+        boolean isBom = BOM_PACKAGING.equals(originalPackaging);
+
+        // Check if mixins are present without flattening enabled
+        if (!model.getMixins().isEmpty() && !flattenEnabled && !model.isPreserveModelVersion()) {
+            throw new MavenException("The consumer POM for "
+                    + project.getId()
+                    + " cannot be created because the POM contains mixins. "
+                    + "Mixins are not supported in the default consumer POM format. "
+                    + "You have the following options to resolve this:" + System.lineSeparator()
+                    + "  1. Preserve the model version by setting 'preserve.model.version=true' to generate a consumer POM with <modelVersion>4.2.0</modelVersion>, which supports mixins"
+                    + System.lineSeparator()
+                    + "  2. Enable flattening by setting the property 'maven.consumer.pom.flatten=true' to remove mixins during transformation"
+                    + System.lineSeparator()
+                    + "  3. Remove the mixins from your POM");
+        }
 
         // Check if consumer POM flattening is disabled
         if (!flattenEnabled) {
             // When flattening is disabled, treat non-POM projects like parent POMs
             // Apply only basic transformations without flattening dependency management
-            return buildPom(session, project, src);
+            // However, BOMs still need special handling to transform packaging from "bom" to "pom"
+            if (isBom) {
+                return buildBomWithoutFlatten(session, project, src);
+            } else {
+                return buildPom(session, project, src);
+            }
         }
         // Default behavior: flatten the consumer POM
-        String packaging = model.getPackaging();
-        String originalPackaging = project.getOriginalModel().getPackaging();
         if (POM_PACKAGING.equals(packaging)) {
-            if (BOM_PACKAGING.equals(originalPackaging)) {
+            if (isBom) {
                 return buildBom(session, project, src);
             } else {
                 return buildPom(session, project, src);
@@ -95,27 +157,36 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         }
     }
 
-    protected Model buildPom(RepositorySystemSession session, MavenProject project, Path src)
+    protected Model buildPom(RepositorySystemSession session, MavenProject project, ModelSource src)
             throws ModelBuilderException {
         ModelBuilderResult result = buildModel(session, src);
         Model model = result.getRawModel();
         return transformPom(model, project);
     }
 
-    protected Model buildBom(RepositorySystemSession session, MavenProject project, Path src)
+    protected Model buildBomWithoutFlatten(RepositorySystemSession session, MavenProject project, ModelSource src)
+            throws ModelBuilderException {
+        ModelBuilderResult result = buildModel(session, src);
+        Model model = result.getRawModel();
+        // For BOMs without flattening, we just need to transform the packaging from "bom" to "pom"
+        // but keep everything else from the raw model (including unresolved versions)
+        return transformBom(model, project);
+    }
+
+    protected Model buildBom(RepositorySystemSession session, MavenProject project, ModelSource src)
             throws ModelBuilderException {
         ModelBuilderResult result = buildModel(session, src);
         Model model = result.getEffectiveModel();
         return transformBom(model, project);
     }
 
-    protected Model buildNonPom(RepositorySystemSession session, MavenProject project, Path src)
+    protected Model buildNonPom(RepositorySystemSession session, MavenProject project, ModelSource src)
             throws ModelBuilderException {
         Model model = buildEffectiveModel(session, src);
         return transformNonPom(model, project);
     }
 
-    private Model buildEffectiveModel(RepositorySystemSession session, Path src) throws ModelBuilderException {
+    private Model buildEffectiveModel(RepositorySystemSession session, ModelSource src) throws ModelBuilderException {
         InternalSession iSession = InternalSession.from(session);
         ModelBuilderResult result = buildModel(session, src);
         Model model = result.getEffectiveModel();
@@ -222,12 +293,13 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                 + (dependency.getClassifier() != null ? dependency.getClassifier() : "");
     }
 
-    private ModelBuilderResult buildModel(RepositorySystemSession session, Path src) throws ModelBuilderException {
+    private ModelBuilderResult buildModel(RepositorySystemSession session, ModelSource src)
+            throws ModelBuilderException {
         InternalSession iSession = InternalSession.from(session);
         ModelBuilderRequest.ModelBuilderRequestBuilder request = ModelBuilderRequest.builder();
         request.requestType(ModelBuilderRequest.RequestType.BUILD_CONSUMER);
         request.session(iSession);
-        request.source(Sources.buildSource(src));
+        request.source(src);
         request.locationTracking(false);
         request.systemProperties(session.getSystemProperties());
         request.userProperties(session.getUserProperties());

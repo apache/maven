@@ -270,7 +270,32 @@ public class Verifier {
             stdout = new ByteArrayOutputStream();
             stderr = new ByteArrayOutputStream();
             ExecutorRequest request = builder.stdOut(stdout).stdErr(stderr).build();
+
+            // Store the command line to prepend to log file after execution
+            // Skip adding command line info if quiet logging is enabled (respects -q flag)
+            String commandLineHeader = null;
+            if (logFileName != null && !isQuietLogging(args)) {
+                try {
+                    commandLineHeader = formatCommandLine(request, mode);
+                } catch (Exception e) {
+                    // Don't fail the execution if we can't format the command line, just log it
+                    System.err.println("Warning: Could not format command line: " + e.getMessage());
+                }
+            }
+
             int ret = executorHelper.execute(mode, request);
+
+            // After execution, prepend the command line to the log file
+            if (commandLineHeader != null && Files.exists(logFile)) {
+                try {
+                    String existingContent = Files.readString(logFile, StandardCharsets.UTF_8);
+                    String newContent = commandLineHeader + existingContent;
+                    Files.writeString(logFile, newContent, StandardCharsets.UTF_8);
+                } catch (IOException e) {
+                    // Don't fail the execution if we can't write the command line, just log it
+                    System.err.println("Warning: Could not prepend command line to log file: " + e.getMessage());
+                }
+            }
             if (ret > 0) {
                 String dump;
                 try {
@@ -416,6 +441,85 @@ public class Verifier {
         } catch (IOException e) {
             return "(Error reading log contents: " + e.getMessage() + ")";
         }
+    }
+
+    /**
+     * Formats the command line that would be executed for the given ExecutorRequest and mode.
+     * This provides a human-readable representation of the Maven command for debugging purposes.
+     */
+    private String formatCommandLine(ExecutorRequest request, ExecutorHelper.Mode mode) {
+        StringBuilder cmdLine = new StringBuilder();
+
+        cmdLine.append("# Command line: ");
+        // Add the Maven executable path
+        Path mavenExecutable = request.installationDirectory()
+                .resolve("bin")
+                .resolve(System.getProperty("os.name").toLowerCase().contains("windows")
+                    ? request.command() + ".cmd"
+                    : request.command());
+        cmdLine.append(mavenExecutable.toString());
+
+        // Add MAVEN_ARGS if they would be used (only for forked mode)
+        if (mode == ExecutorHelper.Mode.FORKED || mode == ExecutorHelper.Mode.AUTO) {
+            String mavenArgsEnv = System.getenv("MAVEN_ARGS");
+            if (mavenArgsEnv != null && !mavenArgsEnv.isEmpty()) {
+                cmdLine.append(" ").append(mavenArgsEnv);
+            }
+        }
+
+        // Add the arguments
+        for (String arg : request.arguments()) {
+            cmdLine.append(" ");
+            // Quote arguments that contain spaces
+            if (arg.contains(" ")) {
+                cmdLine.append("\"").append(arg).append("\"");
+            } else {
+                cmdLine.append(arg);
+            }
+        }
+
+        // Add environment variables that would be set
+        if (request.environmentVariables().isPresent() && !request.environmentVariables().get().isEmpty()) {
+            cmdLine.append("\n# Environment variables:");
+            for (Map.Entry<String, String> entry : request.environmentVariables().get().entrySet()) {
+                cmdLine.append("\n# ").append(entry.getKey()).append("=").append(entry.getValue());
+            }
+        }
+
+        // Add JVM arguments that would be set via MAVEN_OPTS
+        List<String> jvmArgs = new ArrayList<>();
+        if (!request.userHomeDirectory().equals(ExecutorRequest.getCanonicalPath(Paths.get(System.getProperty("user.home"))))) {
+            jvmArgs.add("-Duser.home=" + request.userHomeDirectory().toString());
+        }
+        if (request.jvmArguments().isPresent()) {
+            jvmArgs.addAll(request.jvmArguments().get());
+        }
+        if (request.jvmSystemProperties().isPresent()) {
+            jvmArgs.addAll(request.jvmSystemProperties().get().entrySet().stream()
+                    .map(e -> "-D" + e.getKey() + "=" + e.getValue())
+                    .toList());
+        }
+
+        if (!jvmArgs.isEmpty()) {
+            cmdLine.append("\n# MAVEN_OPTS=").append(String.join(" ", jvmArgs));
+        }
+
+        if (request.skipMavenRc()) {
+            cmdLine.append("\n# MAVEN_SKIP_RC=true");
+        }
+
+        cmdLine.append("\n# Working directory: ").append(request.cwd().toString());
+        cmdLine.append("\n# Execution mode: ").append(mode.toString());
+
+        cmdLine.append("\n");
+        return cmdLine.toString();
+    }
+
+    /**
+     * Checks if quiet logging is enabled by looking for the -q or --quiet flag in the arguments.
+     */
+    private boolean isQuietLogging(List<String> args) {
+        return args.contains("-q") || args.contains("--quiet");
     }
 
     public String getLogFileName() {

@@ -16,12 +16,5 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+public class Test {}
 
-/**
- * Provides annotations for Maven plugin development, including mojo configuration,
- * parameter definitions, and lifecycle bindings. These annotations are used to
- * generate plugin descriptors and configure plugin behavior.
- *
- * @since 4.0.0
- */
-package org.apache.maven.api.plugin.annotations;

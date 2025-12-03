@@ -1133,7 +1133,11 @@ public class DefaultModelBuilder implements ModelBuilder {
             try {
                 ModelBuilderSessionState derived = derive(candidateSource);
                 Model candidateModel = derived.readAsParentModel(profileActivationContext, parentChain);
-                addActivePomProfiles(derived.result.getActivePomProfiles());
+                // Add profiles from parent, preserving model ID tracking
+                for (Map.Entry<String, List<Profile>> entry :
+                        derived.result.getActivePomProfilesByModel().entrySet()) {
+                    addActivePomProfiles(entry.getKey(), entry.getValue());
+                }
 
                 String groupId = getGroupId(candidateModel);
                 String artifactId = candidateModel.getArtifactId();
@@ -1292,7 +1296,13 @@ public class DefaultModelBuilder implements ModelBuilder {
                     .source(modelSource)
                     .build();
 
-            Model parentModel = derive(lenientRequest).readAsParentModel(profileActivationContext, parentChain);
+            ModelBuilderSessionState derived = derive(lenientRequest);
+            Model parentModel = derived.readAsParentModel(profileActivationContext, parentChain);
+            // Add profiles from parent, preserving model ID tracking
+            for (Map.Entry<String, List<Profile>> entry :
+                    derived.result.getActivePomProfilesByModel().entrySet()) {
+                addActivePomProfiles(entry.getKey(), entry.getValue());
+            }
 
             if (!parent.getVersion().equals(version)) {
                 String rawChildModelVersion = childModel.getVersion();
@@ -1416,12 +1426,19 @@ public class DefaultModelBuilder implements ModelBuilder {
             // profile activation
             profileActivationContext.setModel(model);
 
-            // profile injection
+            // Activate profiles from the input model (before inheritance) to get only local profiles
+            // Parent profiles are already added when the parent model is read
+            List<Profile> localActivePomProfiles =
+                    getActiveProfiles(inputModel.getProfiles(), profileActivationContext);
+
+            // profile injection - inject all profiles (local + inherited) into the model
             List<Profile> activePomProfiles = getActiveProfiles(model.getProfiles(), profileActivationContext);
             model = profileInjector.injectProfiles(model, activePomProfiles, request, this);
             model = profileInjector.injectProfiles(model, activeExternalProfiles, request, this);
 
-            addActivePomProfiles(activePomProfiles);
+            // Track only the local profiles for this model
+            // Use ModelProblemUtils.toId() to get groupId:artifactId:version format (without packaging)
+            addActivePomProfiles(ModelProblemUtils.toId(model), localActivePomProfiles);
 
             // model interpolation
             Model resultModel = model;
@@ -1449,12 +1466,10 @@ public class DefaultModelBuilder implements ModelBuilder {
             return resultModel;
         }
 
-        private void addActivePomProfiles(List<Profile> activePomProfiles) {
-            if (activePomProfiles != null) {
-                if (result.getActivePomProfiles() == null) {
-                    result.setActivePomProfiles(new ArrayList<>());
-                }
-                result.getActivePomProfiles().addAll(activePomProfiles);
+        private void addActivePomProfiles(String modelId, List<Profile> activePomProfiles) {
+            if (activePomProfiles != null && !activePomProfiles.isEmpty()) {
+                // Track profiles by model ID
+                result.setActivePomProfiles(modelId, activePomProfiles);
             }
         }
 
@@ -1832,7 +1847,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                         replayRecordIntoContext(e.getKey(), profileActivationContext);
                     }
                     // Add the activated profiles from cache to the result
-                    addActivePomProfiles(cached.activatedProfiles());
+                    addActivePomProfiles(cached.model().getId(), cached.activatedProfiles());
                     return cached.model();
                 }
             }
@@ -1848,7 +1863,9 @@ public class DefaultModelBuilder implements ModelBuilder {
             replayRecordIntoContext(record, profileActivationContext);
 
             parentsPerContext.put(record, modelWithProfiles);
-            addActivePomProfiles(modelWithProfiles.activatedProfiles());
+            // Use ModelProblemUtils.toId() to get groupId:artifactId:version format (without packaging)
+            addActivePomProfiles(
+                    ModelProblemUtils.toId(modelWithProfiles.model()), modelWithProfiles.activatedProfiles());
             return modelWithProfiles.model();
         }
 
