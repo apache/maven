@@ -184,21 +184,51 @@ if not exist "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" goto endReadJvmConfig
 
 rem Use Java source-launch mode (JDK 11+) to parse jvm.config
 rem This avoids batch script parsing issues with special characters (pipes, quotes, @, etc.)
-rem Capture stdout directly using for /f to avoid temp file locking issues on Windows
+rem Use temp file approach with cmd /c to ensure proper file handle release
 
-rem First verify the parser runs without errors (exit code 0)
-"%JAVACMD%" "%MAVEN_HOME%\bin\JvmConfigParser.java" "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" "%MAVEN_PROJECTBASEDIR%" >nul 2>&1
-if %ERRORLEVEL% neq 0 (
+set "JVM_CONFIG_TEMP=%TEMP%\mvn-jvm-config-%RANDOM%-%RANDOM%.txt"
+
+rem Debug logging (set MAVEN_DEBUG_SCRIPT=1 to enable)
+if defined MAVEN_DEBUG_SCRIPT (
+  echo [DEBUG] Found .mvn\jvm.config file at: %MAVEN_PROJECTBASEDIR%\.mvn\jvm.config
+  echo [DEBUG] Using temp file: %JVM_CONFIG_TEMP%
+  echo [DEBUG] Running JvmConfigParser with Java: %JAVACMD%
+  echo [DEBUG] Parser arguments: "%MAVEN_HOME%\bin\JvmConfigParser.java" "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" "%MAVEN_PROJECTBASEDIR%"
+)
+
+rem Run parser in a subshell (cmd /c) to ensure file handles are released before we read
+cmd /c ""%JAVACMD%" "%MAVEN_HOME%\bin\JvmConfigParser.java" "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" "%MAVEN_PROJECTBASEDIR%" > "%JVM_CONFIG_TEMP%" 2>&1"
+set JVM_CONFIG_EXIT=%ERRORLEVEL%
+
+if defined MAVEN_DEBUG_SCRIPT (
+  echo [DEBUG] JvmConfigParser exit code: %JVM_CONFIG_EXIT%
+)
+
+rem Check if parser failed
+if %JVM_CONFIG_EXIT% neq 0 (
   echo ERROR: Failed to parse .mvn/jvm.config file 1>&2
   echo   jvm.config path: %MAVEN_PROJECTBASEDIR%\.mvn\jvm.config 1>&2
-  "%JAVACMD%" "%MAVEN_HOME%\bin\JvmConfigParser.java" "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" "%MAVEN_PROJECTBASEDIR%" 1>&2
+  echo   Java command: %JAVACMD% 1>&2
+  if exist "%JVM_CONFIG_TEMP%" (
+    echo   Parser output: 1>&2
+    type "%JVM_CONFIG_TEMP%" 1>&2
+    del "%JVM_CONFIG_TEMP%" 2>nul
+  )
   exit /b 1
 )
 
-rem Run parser and capture output directly (no temp files to avoid locking issues)
-rem Using 'usebackq' to allow backtick-quoted command, 'tokens=*' to get entire line
-for /f "usebackq tokens=*" %%i in (`"%JAVACMD%" "%MAVEN_HOME%\bin\JvmConfigParser.java" "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" "%MAVEN_PROJECTBASEDIR%" 2^>nul`) do (
-  set "JVM_CONFIG_MAVEN_OPTS=%%i"
+rem Read the output file
+if exist "%JVM_CONFIG_TEMP%" (
+  if defined MAVEN_DEBUG_SCRIPT (
+    echo [DEBUG] Temp file contents:
+    type "%JVM_CONFIG_TEMP%"
+  )
+  for /f "usebackq tokens=*" %%i in ("%JVM_CONFIG_TEMP%") do set "JVM_CONFIG_MAVEN_OPTS=%%i"
+  del "%JVM_CONFIG_TEMP%" 2>nul
+)
+
+if defined MAVEN_DEBUG_SCRIPT (
+  echo [DEBUG] Final JVM_CONFIG_MAVEN_OPTS: %JVM_CONFIG_MAVEN_OPTS%
 )
 
 :endReadJvmConfig

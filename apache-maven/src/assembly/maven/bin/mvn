@@ -169,10 +169,18 @@ find_file_argument_basedir() {
 # Uses Java-based parser to handle all special characters correctly
 # This avoids shell parsing issues with pipes, quotes, @, and other special characters
 # and ensures POSIX compliance (no xargs -0, awk, or complex sed needed)
+# Set MAVEN_DEBUG_SCRIPT=1 to enable debug logging
 concat_lines() {
   if [ -f "$1" ]; then
     # Use Java source-launch mode (JDK 11+) to run JvmConfigParser directly
     # This avoids the need for compilation and temporary directories
+
+    # Debug logging
+    if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
+      echo "[DEBUG] Found jvm.config file at: $1" >&2
+      echo "[DEBUG] Running JvmConfigParser with Java: $JAVACMD" >&2
+      echo "[DEBUG] Parser arguments: $MAVEN_HOME/bin/JvmConfigParser.java $1 $MAVEN_PROJECTBASEDIR" >&2
+    fi
 
     # Verify Java is available
     "$JAVACMD" -version >/dev/null 2>&1 || {
@@ -184,6 +192,11 @@ concat_lines() {
     # Capture both stdout and stderr for comprehensive error reporting
     parser_output=$("$JAVACMD" "$MAVEN_HOME/bin/JvmConfigParser.java" "$1" "$MAVEN_PROJECTBASEDIR" 2>&1)
     parser_exit=$?
+
+    if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
+      echo "[DEBUG] JvmConfigParser exit code: $parser_exit" >&2
+      echo "[DEBUG] JvmConfigParser output: $parser_output" >&2
+    fi
 
     if [ $parser_exit -ne 0 ]; then
       # Parser failed - print comprehensive error information
@@ -209,6 +222,9 @@ if [ -n "$_jvm_config" ]; then
   else
     MAVEN_OPTS="$_jvm_config"
   fi
+fi
+if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
+  echo "[DEBUG] Final MAVEN_OPTS: $MAVEN_OPTS" >&2
 fi
 LAUNCHER_JAR=`echo "$MAVEN_HOME"/boot/plexus-classworlds-*.jar`
 LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
