@@ -40,6 +40,8 @@ public class MavenITgh11485AtSignInJvmConfigTest extends AbstractMavenIntegratio
         verifier.addCliArgument(
                 "-Dexpression.outputFile=" + new File(testDir, "target/pom.properties").getAbsolutePath());
         verifier.setForkJvm(true); // custom .mvn/jvm.config
+        // Enable debug logging for launcher script to diagnose jvm.config parsing issues
+        verifier.setEnvironmentVariable("MAVEN_DEBUG_SCRIPT", "1");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

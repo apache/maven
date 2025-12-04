@@ -18,6 +18,7 @@
  */
 
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,29 +30,53 @@ import java.util.List;
  * Parses .mvn/jvm.config file for Windows batch/Unix shell scripts.
  * This avoids the complexity of parsing special characters (pipes, quotes, etc.) in scripts.
  *
- * Usage: java JvmConfigParser.java <jvm.config-path> <maven-project-basedir>
+ * Usage: java JvmConfigParser.java <jvm.config-path> <maven-project-basedir> [output-file]
+ *
+ * If output-file is provided, writes result to that file (avoids Windows file locking issues).
+ * Otherwise, outputs to stdout.
  *
  * Outputs: Single line with space-separated quoted arguments (safe for batch scripts)
  */
 public class JvmConfigParser {
     public static void main(String[] args) {
-        if (args.length != 2) {
-            System.err.println("Usage: java JvmConfigParser.java <jvm.config-path> <maven-project-basedir>");
+        if (args.length < 2 || args.length > 3) {
+            System.err.println("Usage: java JvmConfigParser.java <jvm.config-path> <maven-project-basedir> [output-file]");
             System.exit(1);
         }
 
         Path jvmConfigPath = Paths.get(args[0]);
         String mavenProjectBasedir = args[1];
+        Path outputFile = args.length == 3 ? Paths.get(args[2]) : null;
 
         if (!Files.exists(jvmConfigPath)) {
-            // No jvm.config file - output nothing
+            // No jvm.config file - output nothing (create empty file if output specified)
+            if (outputFile != null) {
+                try {
+                    Files.writeString(outputFile, "", StandardCharsets.UTF_8);
+                } catch (IOException e) {
+                    System.err.println("ERROR: Failed to write output file: " + e.getMessage());
+                    System.err.flush();
+                    System.exit(1);
+                }
+            }
             return;
         }
 
         try {
             String result = parseJvmConfig(jvmConfigPath, mavenProjectBasedir);
-            System.out.print(result);
-            System.out.flush();
+            if (outputFile != null) {
+                // Write directly to file - this ensures proper file handle cleanup on Windows
+                // Add newline at end for Windows 'for /f' command compatibility
+                try (Writer writer = Files.newBufferedWriter(outputFile, StandardCharsets.UTF_8)) {
+                    writer.write(result);
+                    if (!result.isEmpty()) {
+                        writer.write(System.lineSeparator());
+                    }
+                }
+            } else {
+                System.out.print(result);
+                System.out.flush();
+            }
         } catch (IOException e) {
             // If jvm.config exists but can't be read, this is a configuration error
             // Print clear error and exit with error code to prevent Maven from running

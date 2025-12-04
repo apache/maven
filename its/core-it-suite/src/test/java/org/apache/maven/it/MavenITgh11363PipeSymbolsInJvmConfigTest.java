@@ -42,6 +42,8 @@ public class MavenITgh11363PipeSymbolsInJvmConfigTest extends AbstractMavenInteg
 
         Verifier verifier = newVerifier(basedir.toString());
         verifier.setForkJvm(true); // Use forked JVM to test .mvn/jvm.config processing
+        // Enable debug logging for launcher script to diagnose jvm.config parsing issues
+        verifier.setEnvironmentVariable("MAVEN_DEBUG_SCRIPT", "1");
         verifier.addCliArguments("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
