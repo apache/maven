@@ -294,4 +294,9 @@ for arg in "$@"; do
     cmd="$cmd \"$arg\""
 done
 
+if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
+  echo "[DEBUG] Launching JVM with command:" >&2
+  echo "[DEBUG]   $cmd" >&2
+fi
+
 eval exec "$cmd"
