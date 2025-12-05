@@ -47,9 +47,9 @@ class XmlNodeBuilderTest {
         XmlNode node2 = XmlService.read(r);
         assertEquals(node1, node2);
 
-        node1 = XmlService.read(new ByteArrayInputStream(doc.getBytes(StandardCharsets.UTF_8)), null);
-        node2 = XmlService.read(new ByteArrayInputStream(doc.getBytes(StandardCharsets.UTF_8)), null);
-        assertEquals(node1, node2);
+        XmlNode node3 = XmlService.read(new ByteArrayInputStream(doc.getBytes(StandardCharsets.UTF_8)), null);
+        XmlNode node4 = XmlService.read(new ByteArrayInputStream(doc.getBytes(StandardCharsets.UTF_8)), null);
+        assertEquals(node3, node4);
     }
 
     @Test
