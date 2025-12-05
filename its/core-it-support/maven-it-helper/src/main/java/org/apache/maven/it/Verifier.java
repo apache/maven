@@ -296,6 +296,30 @@ public class Verifier {
                     System.err.println("Warning: Could not prepend command line to log file: " + e.getMessage());
                 }
             }
+
+            // Save stdout/stderr to files if not empty (captures shell script debug output)
+            if (logFileName != null) {
+                String logBaseName = logFileName.endsWith(".txt")
+                        ? logFileName.substring(0, logFileName.length() - 4)
+                        : logFileName;
+                if (stdout.size() > 0) {
+                    try {
+                        Path stdoutFile = basedir.resolve(logBaseName + "-stdout.txt");
+                        Files.writeString(stdoutFile, stdout.toString(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
+                    } catch (IOException e) {
+                        System.err.println("Warning: Could not write stdout file: " + e.getMessage());
+                    }
+                }
+                if (stderr.size() > 0) {
+                    try {
+                        Path stderrFile = basedir.resolve(logBaseName + "-stderr.txt");
+                        Files.writeString(stderrFile, stderr.toString(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
+                    } catch (IOException e) {
+                        System.err.println("Warning: Could not write stderr file: " + e.getMessage());
+                    }
+                }
+            }
+
             if (ret > 0) {
                 String dump;
                 try {
@@ -478,15 +502,18 @@ public class Verifier {
             }
         }
 
-        // Add environment variables that would be set
+        // Add environment variables that would be set (excluding MAVEN_OPTS which is handled separately)
         if (request.environmentVariables().isPresent() && !request.environmentVariables().get().isEmpty()) {
             cmdLine.append("\n# Environment variables:");
             for (Map.Entry<String, String> entry : request.environmentVariables().get().entrySet()) {
-                cmdLine.append("\n# ").append(entry.getKey()).append("=").append(entry.getValue());
+                if (!"MAVEN_OPTS".equals(entry.getKey())) {
+                    cmdLine.append("\n# ").append(entry.getKey()).append("=").append(entry.getValue());
+                }
             }
         }
 
-        // Add JVM arguments that would be set via MAVEN_OPTS
+        // Compute the final MAVEN_OPTS value (combining env var + jvmArgs)
+        // This matches what ForkedMavenExecutor does
         List<String> jvmArgs = new ArrayList<>();
         if (!request.userHomeDirectory().equals(ExecutorRequest.getCanonicalPath(Paths.get(System.getProperty("user.home"))))) {
             jvmArgs.add("-Duser.home=" + request.userHomeDirectory().toString());
@@ -500,8 +527,23 @@ public class Verifier {
                     .toList());
         }
 
+        // Build the final MAVEN_OPTS value
+        StringBuilder mavenOpts = new StringBuilder();
+        if (request.environmentVariables().isPresent()) {
+            String existingMavenOpts = request.environmentVariables().get().get("MAVEN_OPTS");
+            if (existingMavenOpts != null && !existingMavenOpts.isEmpty()) {
+                mavenOpts.append(existingMavenOpts);
+            }
+        }
         if (!jvmArgs.isEmpty()) {
-            cmdLine.append("\n# MAVEN_OPTS=").append(String.join(" ", jvmArgs));
+            if (mavenOpts.length() > 0) {
+                mavenOpts.append(" ");
+            }
+            mavenOpts.append(String.join(" ", jvmArgs));
+        }
+
+        if (mavenOpts.length() > 0) {
+            cmdLine.append("\n# MAVEN_OPTS=").append(mavenOpts.toString());
         }
 
         if (request.skipMavenRc()) {
