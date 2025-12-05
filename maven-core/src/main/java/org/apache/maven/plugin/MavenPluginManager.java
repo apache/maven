@@ -74,7 +74,9 @@ public interface MavenPluginManager {
      * @deprecated Use {@link #checkPrerequisites(PluginDescriptor)} instead.
      */
     @Deprecated
-    void checkRequiredMavenVersion(PluginDescriptor pluginDescriptor) throws PluginIncompatibleException;
+    default void checkRequiredMavenVersion(PluginDescriptor pluginDescriptor) throws PluginIncompatibleException {
+        checkPrerequisites(pluginDescriptor);
+    }
 
     /**
      * Verifies that the specified plugin's prerequisites are met.
@@ -82,7 +84,9 @@ public interface MavenPluginManager {
      * @param pluginDescriptor The descriptor of the plugin to check, must not be {@code null}.
      * @since 3.9.12
      */
-    void checkPrerequisites(PluginDescriptor pluginDescriptor) throws PluginIncompatibleException;
+    default void checkPrerequisites(PluginDescriptor pluginDescriptor) throws PluginIncompatibleException {
+        checkRequiredMavenVersion(pluginDescriptor);
+    }
 
     /**
      * Sets up the class realm for the specified plugin. Both the class realm and the plugin artifacts that constitute
