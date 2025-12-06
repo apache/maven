@@ -42,6 +42,8 @@ import org.apache.maven.wagon.events.TransferEvent;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.observers.AbstractTransferListener;
 import org.apache.maven.wagon.observers.Debug;
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
 
@@ -56,6 +58,12 @@ public class DefaultWagonManagerTest extends PlexusTestCase {
     private ArtifactFactory artifactFactory;
 
     private ArtifactRepositoryFactory artifactRepositoryFactory;
+
+    @Override
+    protected void customizeContainerConfiguration(ContainerConfiguration configuration) {
+        configuration.setAutoWiring(true);
+        configuration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
+    }
 
     protected void setUp() throws Exception {
         super.setUp();
