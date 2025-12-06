@@ -26,10 +26,6 @@ import org.apache.maven.model.Plugin;
 public class PluginIncompatibleException extends PluginManagerException {
 
     public PluginIncompatibleException(Plugin plugin, String message) {
-        this(plugin, message, null);
-    }
-
-    public PluginIncompatibleException(Plugin plugin, String message, Throwable cause) {
-        super(plugin, message, cause);
+        super(plugin, message, (Throwable) null);
     }
 }
