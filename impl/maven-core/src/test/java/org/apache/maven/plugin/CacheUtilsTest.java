@@ -20,22 +20,14 @@ package org.apache.maven.plugin;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class CacheUtilsTest {
 
-    private Plugin pluginOne;
-    private Plugin pluginTwo;
-
-    @BeforeEach
-    void doBeforeEachTest() {
-        pluginOne = new Plugin();
-        pluginTwo = new Plugin();
-    }
+    private Plugin pluginOne = new Plugin();
+    private Plugin pluginTwo = new Plugin();
 
     @Test
     void testPluginEqualsEmptyPlugins() {
