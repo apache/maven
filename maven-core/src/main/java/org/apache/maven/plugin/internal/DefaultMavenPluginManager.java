@@ -296,14 +296,12 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         });
         // aggregate all exceptions
         if (!prerequisiteExceptions.isEmpty()) {
-            String ln = System.lineSeparator();
             String messages = prerequisiteExceptions.stream()
                     .map(IllegalStateException::getMessage)
-                    .collect(Collectors.joining(ln + '\t'));
+                    .collect(Collectors.joining("\n\t"));
             PluginIncompatibleException pie = new PluginIncompatibleException(
                     pluginDescriptor.getPlugin(),
-                    ln + "The plugin " + pluginDescriptor.getId() + " has unmet prerequisites: " + ln + '\t'
-                            + messages);
+                    "\nThe plugin " + pluginDescriptor.getId() + " has unmet prerequisites: \n\t" + messages);
             prerequisiteExceptions.forEach(pie::addSuppressed);
             throw pie;
         }
