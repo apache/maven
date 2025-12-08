@@ -26,7 +26,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Map;
 
 import com.ctc.wstx.exc.WstxEOFException;
 import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
@@ -243,7 +243,7 @@ class DefaultPluginXmlFactoryTest {
     @Test
     void locateExistingPomWithFilePathShouldReturnSameFileIfRegularFile() throws IOException {
         Path pomFile = Files.createTempFile(tempDir, "pom", ".xml");
-        DefaultModelProcessor processor = new DefaultModelProcessor(mock(ModelXmlFactory.class), List.of());
+        DefaultModelProcessor processor = new DefaultModelProcessor(mock(ModelXmlFactory.class), Map.of());
         assertThat(processor.locateExistingPom(pomFile)).isEqualTo(pomFile);
     }
 
