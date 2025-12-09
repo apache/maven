@@ -32,7 +32,7 @@ import org.apache.maven.api.spi.ModelParserException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Named("dumb3")
+@Named("dumb")
 final class DumbModelParser3 implements ModelParser {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());

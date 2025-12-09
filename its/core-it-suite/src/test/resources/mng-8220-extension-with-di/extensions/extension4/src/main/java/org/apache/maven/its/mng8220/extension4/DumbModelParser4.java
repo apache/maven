@@ -33,7 +33,7 @@ import org.apache.maven.api.spi.ModelParserException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Named("dumb4")
+@Named
 @Singleton
 final class DumbModelParser4 implements ModelParser {
 
