@@ -1001,4 +1001,12 @@ class DefaultModelValidatorTest {
         SimpleProblemCollector result = validateFile("raw-model/self-combine-bad.xml");
         assertViolations(result, 0, 1, 0);
     }
+
+    @Test
+    void profileActivationConditionWithBasedirExpression() throws Exception {
+        // Test that ${project.basedir} in activation.condition is allowed (no warnings)
+        SimpleProblemCollector result = validateRaw(
+                "raw-model/profile-activation-condition-with-basedir.xml", ModelValidator.VALIDATION_LEVEL_STRICT);
+        assertViolations(result, 0, 0, 0);
+    }
 }
