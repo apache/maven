@@ -29,7 +29,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * This is a test set for <a href="https://github.com/apache/maven/issues/11363">gh-11363</a>:
  * Verify that pipe symbols in .mvn/jvm.config are properly handled and don't cause shell command parsing errors.
  */
-public class MavenITgh11363PipeSymbolsInJvmConfigTest extends AbstractMavenIntegrationTestCase {
+class MavenITgh11363PipeSymbolsInJvmConfigTest extends AbstractMavenIntegrationTestCase {
+
+    MavenITgh11363PipeSymbolsInJvmConfigTest() {
+        super("[4.0.0,)");
+    }
 
     /**
      * Verify that pipe symbols in .mvn/jvm.config are properly handled
