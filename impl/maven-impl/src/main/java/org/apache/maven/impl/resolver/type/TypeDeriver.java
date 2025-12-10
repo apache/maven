@@ -40,8 +40,16 @@ import org.slf4j.LoggerFactory;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Type deriver, that handles special case of "processor" type: if a dependency node is of this type, all of its
- * children need to be remapped to certain processor type as well, to end up on proper path type.
+ * Type deriver, that handles special cases of "processor" (annotation processor) node transitive dependencies: all
+ * children of "processor" type are "redirected" to corresponding processor subtypes:
+ * <ul>
+ *     <li>{@code jar -> processor}</li>
+ *     <li>{@code classpathJar -> classpathProcessor}</li>
+ *     <li>{@code modularJar -> modularProcessor}</li>
+ * </ul>
+ *
+ * Maven 4 introduces new types to describe intent of dependencies, and the "processor" new type (and it's subtypes)
+ * will add processors and their dependencies to proper processor paths, as modern Java versions require.
  *
  * @since 4.0.0
  */

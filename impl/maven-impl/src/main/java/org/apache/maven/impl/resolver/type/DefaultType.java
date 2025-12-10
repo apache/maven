@@ -36,7 +36,7 @@ import org.eclipse.aether.artifact.ArtifactType;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Default implementation of {@link Type} and Resolver {@link ArtifactType}.
+ * Default implementation of {@link Type} and adapter for Resolver {@link ArtifactType}.
  *
  * @since 4.0.0
  */
@@ -119,6 +119,12 @@ public class DefaultType implements Type {
                 + properties + ']';
     }
 
+    /**
+     * Adapts this instance to Resolver {@link ArtifactType}.
+     * <p>
+     * Note: one notable difference exists, the {@link #getClassifier()} method behavior.
+     * Once that harmonized, this adapting can go away.
+     */
     public ArtifactType toArtifactType() {
         return new ArtifactTypeAdapter(this);
     }

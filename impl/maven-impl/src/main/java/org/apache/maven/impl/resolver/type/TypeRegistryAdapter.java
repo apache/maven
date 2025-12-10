@@ -26,6 +26,9 @@ import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * Adapter between Maven {@link TypeRegistry} and Resolver {@link ArtifactTypeRegistry}.
+ */
 public class TypeRegistryAdapter implements ArtifactTypeRegistry {
     private final TypeRegistry typeRegistry;
 

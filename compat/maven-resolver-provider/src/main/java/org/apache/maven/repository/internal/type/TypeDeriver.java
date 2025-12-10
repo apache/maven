@@ -44,7 +44,9 @@ import static java.util.Objects.requireNonNull;
  * children need to be remapped to certain processor type as well, to end up on proper path type.
  *
  * @since 4.0.0
+ * @deprecated since 4.0.0, this is internal detail of Maven.
  */
+@Deprecated(since = "4.0.0")
 public class TypeDeriver implements DependencyGraphTransformer {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
