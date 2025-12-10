@@ -26,22 +26,22 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * This is a test set for <a href="https://github.com/apache/maven/issues/10937">gh-10937</a>.
- * @since 3.0.0
- *
+ * This is a test set for <a href="https://github.com/apache/maven/issues/11363">gh-11363</a>:
+ * Verify that pipe symbols in .mvn/jvm.config are properly handled and don't cause shell command parsing errors.
  */
-class MavenITgh10937QuotedPipesInMavenOptsTest extends AbstractMavenIntegrationTestCase {
+public class MavenITgh11363PipeSymbolsInJvmConfigTest extends AbstractMavenIntegrationTestCase {
 
     /**
-     *  Verify the dependency management of the consumer POM is computed correctly
+     * Verify that pipe symbols in .mvn/jvm.config are properly handled
      */
     @Test
-    void testIt() throws Exception {
-        Path basedir =
-                extractResources("/gh-10937-pipes-maven-opts").getAbsoluteFile().toPath();
+    void testPipeSymbolsInJvmConfig() throws Exception {
+        Path basedir = extractResources("/gh-11363-pipe-symbols-jvm-config")
+                .getAbsoluteFile()
+                .toPath();
 
         Verifier verifier = newVerifier(basedir.toString());
-        verifier.setEnvironmentVariable("MAVEN_OPTS", "-Dprop.maven-opts=\"foo|bar\"");
+        verifier.setForkJvm(true); // Use forked JVM to test .mvn/jvm.config processing
         // Enable debug logging for launcher script to diagnose jvm.config parsing issues
         verifier.setEnvironmentVariable("MAVEN_DEBUG_SCRIPT", "1");
         verifier.addCliArguments("validate");
@@ -49,7 +49,7 @@ class MavenITgh10937QuotedPipesInMavenOptsTest extends AbstractMavenIntegrationT
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties("target/pom.properties");
-        assertEquals("foo|bar", props.getProperty("project.properties.pom.prop.jvm-opts"));
-        assertEquals("foo|bar", props.getProperty("project.properties.pom.prop.maven-opts"));
+        assertEquals("de|*.de|my.company.mirror.de", props.getProperty("project.properties.pom.prop.nonProxyHosts"));
+        assertEquals("value|with|pipes", props.getProperty("project.properties.pom.prop.with.pipes"));
     }
 }

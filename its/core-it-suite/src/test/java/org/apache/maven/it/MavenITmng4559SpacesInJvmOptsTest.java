@@ -42,6 +42,8 @@ class MavenITmng4559SpacesInJvmOptsTest extends AbstractMavenIntegrationTestCase
 
         Verifier verifier = newVerifier(basedir.toString());
         verifier.setEnvironmentVariable("MAVEN_OPTS", "-Dprop.maven-opts=\"foo bar\"");
+        // Enable debug logging for launcher script to diagnose jvm.config parsing issues
+        verifier.setEnvironmentVariable("MAVEN_DEBUG_SCRIPT", "1");
         verifier.addCliArguments("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
