@@ -30,10 +30,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Verify that @ character in .mvn/jvm.config values is handled correctly.
  * This is important for Jenkins workspaces like workspace/project_PR-350@2
  */
-public class MavenITgh11485AtSignInJvmConfigTest extends AbstractMavenIntegrationTestCase {
+class MavenITgh11485AtSignInJvmConfigTest extends AbstractMavenIntegrationTestCase {
+
+    MavenITgh11485AtSignInJvmConfigTest() {
+        super("[4.0.0,)");
+    }
 
     @Test
-    public void testAtSignInJvmConfig() throws Exception {
+    void testAtSignInJvmConfig() throws Exception {
         File testDir = extractResources("/gh-11485-at-sign");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
