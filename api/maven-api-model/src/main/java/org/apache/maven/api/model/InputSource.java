@@ -34,7 +34,7 @@ import java.util.stream.Stream;
  *
  * @since 4.0.0
  */
-public class InputSource implements Serializable {
+public final class InputSource implements Serializable {
 
     private final String modelId;
     private final String location;

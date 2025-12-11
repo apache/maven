@@ -23,7 +23,7 @@ import java.io.Serializable;
 /**
  * Class InputSource.
  */
-public class InputSource implements Serializable {
+public final class InputSource implements Serializable {
 
     private final String location;
 
