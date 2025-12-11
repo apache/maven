@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.di.impl;
+package org.apache.maven.injection.impl;
 
 import java.lang.annotation.Retention;
 import java.util.ArrayList;
@@ -33,8 +33,8 @@ import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.di.Qualifier;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.di.Typed;
-import org.apache.maven.di.Injector;
-import org.apache.maven.di.Key;
+import org.apache.maven.injection.Injector;
+import org.apache.maven.injection.Key;
 import org.junit.jupiter.api.Test;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;

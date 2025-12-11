@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.di.impl;
+package org.apache.maven.injection.impl;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
@@ -30,7 +30,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.maven.di.Key;
+import org.apache.maven.injection.Key;
 
 public abstract class Binding<T> {
     private final Set<Dependency<?>> dependencies;

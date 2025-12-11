@@ -20,9 +20,9 @@ package org.apache.maven.api.di.testing;
 
 import java.io.File;
 
-import org.apache.maven.di.Injector;
-import org.apache.maven.di.Key;
-import org.apache.maven.di.impl.DIException;
+import org.apache.maven.injection.Injector;
+import org.apache.maven.injection.Key;
+import org.apache.maven.injection.impl.DIException;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.di.impl;
+package org.apache.maven.injection.impl;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -25,10 +25,10 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import org.apache.maven.di.Key;
+import org.apache.maven.injection.Key;
 import org.junit.jupiter.api.Test;
 
-import static org.apache.maven.di.impl.Types.simplifyType;
+import static org.apache.maven.injection.impl.Types.simplifyType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 

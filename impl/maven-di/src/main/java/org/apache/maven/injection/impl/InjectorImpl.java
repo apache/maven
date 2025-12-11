@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.di.impl;
+package org.apache.maven.injection.impl;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -51,11 +51,11 @@ import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.di.Qualifier;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.di.Typed;
-import org.apache.maven.di.Injector;
-import org.apache.maven.di.Key;
-import org.apache.maven.di.Scope;
+import org.apache.maven.injection.Injector;
+import org.apache.maven.injection.Key;
+import org.apache.maven.injection.Scope;
 
-import static org.apache.maven.di.impl.Binding.getPriorityComparator;
+import static org.apache.maven.injection.impl.Binding.getPriorityComparator;
 
 public class InjectorImpl implements Injector {
 

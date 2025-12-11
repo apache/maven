@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.di;
+package org.apache.maven.injection;
 
 import java.util.function.Supplier;
 

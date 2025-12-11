@@ -18,7 +18,7 @@
  */
 package org.apache.maven.impl.di;
 
-import org.apache.maven.di.impl.DIException;
+import org.apache.maven.injection.impl.DIException;
 
 public class OutOfScopeException extends DIException {
     public OutOfScopeException(String message) {

@@ -16,9 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.di.impl;
+package org.apache.maven.injection.impl;
 
-import org.apache.maven.di.Key;
+import org.apache.maven.injection.Key;
 
 public record Dependency<T>(Key<T> key, boolean optional) {
     public String getDisplayString() {

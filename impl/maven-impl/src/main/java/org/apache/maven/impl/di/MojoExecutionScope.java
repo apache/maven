@@ -25,9 +25,9 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.di.Key;
-import org.apache.maven.di.Scope;
-import org.apache.maven.di.impl.DIException;
+import org.apache.maven.injection.Key;
+import org.apache.maven.injection.Scope;
+import org.apache.maven.injection.impl.DIException;
 
 /**
  * MojoExecutionScope

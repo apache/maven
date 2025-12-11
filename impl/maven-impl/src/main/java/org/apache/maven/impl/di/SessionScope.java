@@ -31,9 +31,9 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.di.Key;
-import org.apache.maven.di.Scope;
-import org.apache.maven.di.impl.Types;
+import org.apache.maven.injection.Key;
+import org.apache.maven.injection.Scope;
+import org.apache.maven.injection.impl.Types;
 
 public class SessionScope implements Scope {
 

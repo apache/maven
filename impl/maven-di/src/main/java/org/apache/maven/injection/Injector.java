@@ -16,13 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.di;
+package org.apache.maven.injection;
 
 import java.lang.annotation.Annotation;
 import java.util.function.Supplier;
 
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.di.impl.InjectorImpl;
+import org.apache.maven.injection.impl.InjectorImpl;
 
 /**
  * The main entry point for Maven's dependency injection framework.

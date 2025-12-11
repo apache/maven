@@ -16,15 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.di;
+package org.apache.maven.injection;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Objects;
 
 import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.di.impl.ReflectionUtils;
-import org.apache.maven.di.impl.Types;
+import org.apache.maven.injection.impl.ReflectionUtils;
+import org.apache.maven.injection.impl.Types;
 
 /**
  * A binding key that uniquely identifies a dependency in the injection system.

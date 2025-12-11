@@ -39,7 +39,7 @@ import org.apache.maven.cling.extensions.BootstrapCoreExtensionManager;
 import org.apache.maven.cling.extensions.ExtensionConfigurationModule;
 import org.apache.maven.cling.extensions.LoadedCoreExtension;
 import org.apache.maven.cling.logging.Slf4jLoggerManager;
-import org.apache.maven.di.Injector;
+import org.apache.maven.injection.Injector;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
