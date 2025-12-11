@@ -271,6 +271,30 @@ public class Verifier {
             stderr = new ByteArrayOutputStream();
             ExecutorRequest request = builder.stdOut(stdout).stdErr(stderr).build();
             int ret = executorHelper.execute(mode, request);
+
+            // Save stdout/stderr to files if not empty (captures shell script debug output)
+            if (logFileName != null) {
+                String logBaseName = logFileName.endsWith(".txt")
+                        ? logFileName.substring(0, logFileName.length() - 4)
+                        : logFileName;
+                if (stdout.size() > 0) {
+                    try {
+                        Path stdoutFile = basedir.resolve(logBaseName + "-stdout.txt");
+                        Files.writeString(stdoutFile, stdout.toString(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
+                    } catch (IOException e) {
+                        System.err.println("Warning: Could not write stdout file: " + e.getMessage());
+                    }
+                }
+                if (stderr.size() > 0) {
+                    try {
+                        Path stderrFile = basedir.resolve(logBaseName + "-stderr.txt");
+                        Files.writeString(stderrFile, stderr.toString(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
+                    } catch (IOException e) {
+                        System.err.println("Warning: Could not write stderr file: " + e.getMessage());
+                    }
+                }
+            }
+
             if (ret > 0) {
                 String dump;
                 try {
