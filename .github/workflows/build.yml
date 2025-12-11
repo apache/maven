@@ -24,6 +24,7 @@ on:
   push:
     branches:
       - master
+      - 'gab/**'  # Long-lived branches for testing
   pull_request:
     types: [opened, synchronize, reopened]
   workflow_dispatch:
@@ -55,4 +56,4 @@ jobs:
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=sonarsource_gab_staging -DskipTests -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=sonarsource_gab_staging -Dsonar.branch.longLivedBranches.regex="(master|gab/.*)" -DskipTests -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true
