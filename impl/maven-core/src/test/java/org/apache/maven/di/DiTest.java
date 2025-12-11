@@ -93,7 +93,7 @@ public class DiTest {
         @Test
         void testDI() throws Exception {
             DiInjected diInjected = new DiInjected();
-            container.lookup(org.apache.maven.di.Injector.class).injectInstance(diInjected);
+            container.lookup(org.apache.maven.injection.Injector.class).injectInstance(diInjected);
             assertNotNull(diInjected.parser);
             assertNotNull(diInjected.parsers);
             assertEquals(1, diInjected.parsers.size());
@@ -165,7 +165,7 @@ public class DiTest {
         @EnabledIf("org.apache.maven.di.DiTest#testShouldNotHaveDuplicates")
         void testDI() throws Exception {
             DiInjected diInjected = new DiInjected();
-            container.lookup(org.apache.maven.di.Injector.class).injectInstance(diInjected);
+            container.lookup(org.apache.maven.injection.Injector.class).injectInstance(diInjected);
             assertNotNull(diInjected.parser);
             assertNotNull(diInjected.parsers);
             assertEquals(1, diInjected.parsers.size());
@@ -237,7 +237,7 @@ public class DiTest {
         @EnabledIf("org.apache.maven.di.DiTest#testShouldNotHaveDuplicates")
         void testDI() throws Exception {
             DiInjected diInjected = new DiInjected();
-            container.lookup(org.apache.maven.di.Injector.class).injectInstance(diInjected);
+            container.lookup(org.apache.maven.injection.Injector.class).injectInstance(diInjected);
             assertNotNull(diInjected.parser);
             assertNotNull(diInjected.parsers);
             assertEquals(1, diInjected.parsers.size());
@@ -315,7 +315,7 @@ public class DiTest {
         @Test
         void testDI() throws Exception {
             DiInjected diInjected = new DiInjected();
-            container.lookup(org.apache.maven.di.Injector.class).injectInstance(diInjected);
+            container.lookup(org.apache.maven.injection.Injector.class).injectInstance(diInjected);
             assertNotNull(diInjected.parser);
             assertInstanceOf(TestModelParserSisu.class, diInjected.parser);
             assertNotNull(diInjected.parsers);

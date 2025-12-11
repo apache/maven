@@ -53,7 +53,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.eclipse.sisu.BeanEntry;
 import org.eclipse.sisu.inject.BeanLocator;
 
-import static org.apache.maven.di.impl.Binding.getPriorityComparator;
+import static org.apache.maven.injection.impl.Binding.getPriorityComparator;
 
 @Named
 public class SisuDiBridgeModule extends AbstractModule {

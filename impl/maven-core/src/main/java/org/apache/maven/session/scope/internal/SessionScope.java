@@ -37,8 +37,8 @@ public class SessionScope extends org.apache.maven.impl.di.SessionScope implemen
     @Override
     public <T> Provider<T> scope(final Key<T> key, final Provider<T> unscoped) {
         Object qualifier = key.getAnnotation() instanceof Named n ? n.value() : key.getAnnotation();
-        org.apache.maven.di.Key<T> k =
-                org.apache.maven.di.Key.ofType(key.getTypeLiteral().getType(), qualifier);
+        org.apache.maven.injection.Key<T> k =
+                org.apache.maven.injection.Key.ofType(key.getTypeLiteral().getType(), qualifier);
         return scope(k, unscoped::get)::get;
     }
 
