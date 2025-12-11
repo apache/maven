@@ -21,9 +21,9 @@ package org.apache.maven.impl.standalone;
 import java.lang.reflect.Type;
 import java.util.Set;
 
+import org.apache.maven.impl.ExtensibleEnumRegistries;
 import org.apache.maven.injection.Injector;
 import org.apache.maven.injection.impl.Types;
-import org.apache.maven.impl.ExtensibleEnumRegistries;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
