@@ -18,10 +18,13 @@
  */
 package org.apache.maven.cli;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class CLIReportingUtilsTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+public class CLIReportingUtilsTest {
+
+    @Test
     public void testFormatDuration() {
         assertEquals("0.001 s", CLIReportingUtils.formatDuration(1));
         assertEquals("0.999 s", CLIReportingUtils.formatDuration(1000 - 1));
