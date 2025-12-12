@@ -18,10 +18,13 @@
  */
 package org.apache.maven.plugin.descriptor;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class MojoDescriptorTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+public class MojoDescriptorTest {
+
+    @Test
     public void testGetParameterMap() throws DuplicateParameterException {
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
         Parameter param1 = new Parameter();

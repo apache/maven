@@ -18,11 +18,14 @@
  */
 package org.apache.maven.artifact;
 
-import junit.framework.TestCase;
 import org.apache.maven.artifact.handler.ArtifactHandlerMock;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.junit.jupiter.api.BeforeEach;
 
-public class DefaultArtifactTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class DefaultArtifactTest {
 
     private DefaultArtifact artifact;
 
@@ -43,8 +46,8 @@ public class DefaultArtifactTest extends TestCase {
 
     private ArtifactHandlerMock artifactHandler;
 
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         artifactHandler = new ArtifactHandlerMock();
         versionRange = VersionRange.createFromVersion(version);
         artifact = new DefaultArtifact(groupId, artifactId, versionRange, scope, type, classifier, artifactHandler);

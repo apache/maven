@@ -22,20 +22,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.TestCase;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Tests {@link ArtifactUtils}.
  *
  * @author Benjamin Bentmann
  */
-public class ArtifactUtilsTest extends TestCase {
+public class ArtifactUtilsTest {
 
     private Artifact newArtifact(String aid) {
         return new DefaultArtifact("group", aid, VersionRange.createFromVersion("1.0"), "test", "jar", "tests", null);
     }
 
+    @Test
     public void testIsSnapshot() {
         assertEquals(false, ArtifactUtils.isSnapshot(null));
         assertEquals(false, ArtifactUtils.isSnapshot(""));
@@ -46,6 +50,7 @@ public class ArtifactUtilsTest extends TestCase {
         assertEquals(false, ArtifactUtils.isSnapshot("1.2.3-20090413X094722-2"));
     }
 
+    @Test
     public void testToSnapshotVersion() {
         assertEquals("1.2.3", ArtifactUtils.toSnapshotVersion("1.2.3"));
         assertEquals("1.2.3-SNAPSHOT", ArtifactUtils.toSnapshotVersion("1.2.3-SNAPSHOT"));
@@ -56,6 +61,7 @@ public class ArtifactUtilsTest extends TestCase {
     /**
      * Tests that the ordering of the map resembles the ordering of the input collection of artifacts.
      */
+    @Test
     public void testArtifactMapByVersionlessIdOrdering() throws Exception {
         List<Artifact> list = new ArrayList<>();
         list.add(newArtifact("b"));

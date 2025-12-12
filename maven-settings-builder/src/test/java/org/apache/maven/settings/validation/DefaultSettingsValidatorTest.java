@@ -21,7 +21,6 @@ package org.apache.maven.settings.validation;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Proxy;
@@ -30,30 +29,29 @@ import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.building.SettingsProblem.Severity;
 import org.apache.maven.settings.building.SettingsProblemCollector;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author mkleint
  */
-public class DefaultSettingsValidatorTest extends TestCase {
+public class DefaultSettingsValidatorTest {
 
     private DefaultSettingsValidator validator;
 
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
-
         validator = new DefaultSettingsValidator();
     }
 
-    protected void tearDown() throws Exception {
-        validator = null;
-
-        super.tearDown();
-    }
-
     private void assertContains(String msg, String substring) {
-        assertTrue("\"" + substring + "\" was not found in: " + msg, msg.contains(substring));
+        assertTrue(msg.contains(substring), "\"" + substring + "\" was not found in: " + msg);
     }
 
+    @Test
     public void testValidate() {
         Settings model = new Settings();
         Profile prof = new Profile();
@@ -80,6 +78,7 @@ public class DefaultSettingsValidatorTest extends TestCase {
         assertEquals(0, problems.messages.size());
     }
 
+    @Test
     public void testValidateMirror() throws Exception {
         Settings settings = new Settings();
         Mirror mirror = new Mirror();
@@ -100,6 +99,7 @@ public class DefaultSettingsValidatorTest extends TestCase {
         assertContains(problems.messages.get(3), "'mirrors.mirror.id' must not contain any of these characters");
     }
 
+    @Test
     public void testValidateRepository() throws Exception {
         Profile profile = new Profile();
         Repository repo = new Repository();
@@ -125,6 +125,7 @@ public class DefaultSettingsValidatorTest extends TestCase {
                 "'profiles.profile[default].repositories.repository.id' must not contain any of these characters");
     }
 
+    @Test
     public void testValidateUniqueServerId() throws Exception {
         Settings settings = new Settings();
         Server server1 = new Server();
@@ -141,6 +142,7 @@ public class DefaultSettingsValidatorTest extends TestCase {
                 problems.messages.get(0), "'servers.server.id' must be unique but found duplicate server with id test");
     }
 
+    @Test
     public void testValidateUniqueProfileId() throws Exception {
         Settings settings = new Settings();
         Profile profile1 = new Profile();
@@ -158,6 +160,7 @@ public class DefaultSettingsValidatorTest extends TestCase {
                 "'profiles.profile.id' must be unique but found duplicate profile with id test");
     }
 
+    @Test
     public void testValidateUniqueRepositoryId() throws Exception {
         Settings settings = new Settings();
         Profile profile = new Profile();
@@ -181,6 +184,7 @@ public class DefaultSettingsValidatorTest extends TestCase {
                         + " but found duplicate repository with id test");
     }
 
+    @Test
     public void testValidateUniqueProxyId() throws Exception {
         Settings settings = new Settings();
         Proxy proxy = new Proxy();
@@ -198,6 +202,7 @@ public class DefaultSettingsValidatorTest extends TestCase {
                 "'proxies.proxy.id' must be unique" + " but found duplicate proxy with id " + id);
     }
 
+    @Test
     public void testValidateProxy() throws Exception {
         Settings settings = new Settings();
         Proxy proxy1 = new Proxy();
