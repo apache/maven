@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.maven.api.Language;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
@@ -50,6 +51,7 @@ import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.RequestTraceHelper;
 import org.apache.maven.impl.model.ModelProblemUtils;
 import org.apache.maven.impl.resolver.artifact.MavenArtifactProperties;
+import org.apache.maven.impl.resolver.type.DefaultType;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.RepositoryException;
@@ -382,6 +384,10 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
 
     private Dependency convert(org.apache.maven.api.model.Dependency dependency, ArtifactTypeRegistry stereotypes) {
         ArtifactType stereotype = stereotypes.get(dependency.getType());
+        if (stereotype == null) {
+            stereotype = new DefaultType(dependency.getType(), Language.NONE, dependency.getType(), null, false)
+                    .toArtifactType();
+        }
 
         boolean system = dependency.getSystemPath() != null
                 && !dependency.getSystemPath().isEmpty();
