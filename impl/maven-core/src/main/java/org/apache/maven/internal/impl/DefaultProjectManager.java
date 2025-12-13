@@ -119,15 +119,16 @@ public class DefaultProjectManager implements ProjectManager {
                     artifact.getExtension(),
                     null);
         }
-        if (!Objects.equals(project.getGroupId(), artifact.getGroupId())
-                || !Objects.equals(project.getArtifactId(), artifact.getArtifactId())
-                || !Objects.equals(
-                        project.getVersion(), artifact.getBaseVersion().toString())) {
+        // Verify groupId and version, intentionally allow artifactId to differ as a project may be multi-module.
+        String g1 = project.getGroupId();
+        String g2 = artifact.getGroupId();
+        String v1 = project.getVersion();
+        String v2 = artifact.getBaseVersion().toString();
+        if (!Objects.equals(g1, g2) || !Objects.equals(v1, v2)) {
             throw new IllegalArgumentException(
-                    "The produced artifact must have the same groupId/artifactId/version than the project it is attached to. Expecting "
-                            + project.getGroupId() + ":" + project.getArtifactId() + ":" + project.getVersion()
-                            + " but received " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":"
-                            + artifact.getBaseVersion());
+                    "The produced artifact must have the same groupId and version than the project it is attached to. Expecting "
+                            + g1 + ':' + project.getArtifactId() + ':' + v1 + " but received "
+                            + g2 + ':' + artifact.getArtifactId() + ':' + v2);
         }
         getMavenProject(project)
                 .addAttachedArtifact(
