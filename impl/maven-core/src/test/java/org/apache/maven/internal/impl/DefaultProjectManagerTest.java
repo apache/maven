@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 class DefaultProjectManagerTest {
@@ -56,7 +57,15 @@ class DefaultProjectManagerTest {
         when(artifact.getBaseVersion()).thenReturn(versionParser.parseVersion("1.0-SNAPSHOT"));
         projectManager.attachArtifact(project, artifact, path);
 
+        // Verify that no exception is thrown when only the arficactId differ
         when(artifact.getArtifactId()).thenReturn("anotherArtifact");
-        assertThrows(IllegalArgumentException.class, () -> projectManager.attachArtifact(project, artifact, path));
+        projectManager.attachArtifact(project, artifact, path);
+
+        when(artifact.getGroupId()).thenReturn("anotherGroup");
+        String message = assertThrows(
+                        IllegalArgumentException.class, () -> projectManager.attachArtifact(project, artifact, path))
+                .getMessage();
+        assertTrue(message.contains("myGroup:myArtifact:1.0-SNAPSHOT"));
+        assertTrue(message.contains("anotherGroup:anotherArtifact:1.0-SNAPSHOT"));
     }
 }
