@@ -453,15 +453,29 @@ class ReactorReader implements MavenWorkspaceReader {
         Path target = getArtifactPath(
                 artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), classifier, extension);
         try {
-            LOGGER.info("Copying {} to project local repository", artifact);
-            Files.createDirectories(target.getParent());
-            Files.copy(
-                    artifact.getPath(),
-                    target,
-                    StandardCopyOption.REPLACE_EXISTING,
-                    StandardCopyOption.COPY_ATTRIBUTES);
+            // Log nothing as creating links should be very fast.
+            Path source = artifact.getPath();
+            if (!(Files.isRegularFile(target) && Files.isSameFile(source, target))) {
+                Files.createDirectories(target.getParent());
+                try {
+                    Files.deleteIfExists(target);
+                    Files.createLink(target, source);
+                } catch (UnsupportedOperationException | IOException suppressed) {
+                    LOGGER.info("Copying {} to project local repository.", artifact);
+                    try {
+                        Files.copy(
+                                source,
+                                target,
+                                StandardCopyOption.REPLACE_EXISTING,
+                                StandardCopyOption.COPY_ATTRIBUTES);
+                    } catch (IOException e) {
+                        e.addSuppressed(suppressed);
+                        throw e;
+                    }
+                }
+            }
         } catch (IOException e) {
-            LOGGER.error("Error while copying artifact to project local repository", e);
+            LOGGER.error("Error while copying artifact " + artifact + " to project local repository.", e);
         }
     }
 
@@ -481,9 +495,11 @@ class ReactorReader implements MavenWorkspaceReader {
                 .resolve(artifactId)
                 .resolve(version)
                 .resolve(artifactId
-                        + "-" + version
+                        + '-'
+                        + version
                         + (classifier != null && !classifier.isEmpty() ? "-" + classifier : "")
-                        + "." + extension);
+                        + '.'
+                        + extension);
     }
 
     private Path getProjectLocalRepo() {
