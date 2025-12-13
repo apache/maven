@@ -721,12 +721,15 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                         isModularProject);
 
                 // Handle main and test resources using shared method
-                ResourceHandlingContext ctx =
+                ResourceHandlingContext context =
                         new ResourceHandlingContext(project, baseDir, modules, isModularProject, result);
                 handleResourceConfiguration(
-                        ctx, project.getBuild().getDelegate().getResources(), hasMainResources, ProjectScope.MAIN);
+                        context, project.getBuild().getDelegate().getResources(), hasMainResources, ProjectScope.MAIN);
                 handleResourceConfiguration(
-                        ctx, project.getBuild().getDelegate().getTestResources(), hasTestResources, ProjectScope.TEST);
+                        context,
+                        project.getBuild().getDelegate().getTestResources(),
+                        hasTestResources,
+                        ProjectScope.TEST);
             }
 
             project.setActiveProfiles(
