@@ -26,12 +26,12 @@ import java.util.TimeZone;
 
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MetadataTest {
 
@@ -39,7 +39,7 @@ public class MetadataTest {
 
     Metadata target;
 
-    @Before
+    @BeforeEach
     public void before() {
         artifact = new DefaultArtifact("myGroup:myArtifact:1.0-SNAPSHOT");
         target = createMetadataFromArtifact(artifact);

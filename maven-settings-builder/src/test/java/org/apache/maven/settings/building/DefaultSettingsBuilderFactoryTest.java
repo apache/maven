@@ -20,17 +20,20 @@ package org.apache.maven.settings.building;
 
 import java.io.File;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author Benjamin Bentmann
  */
-public class DefaultSettingsBuilderFactoryTest extends TestCase {
+public class DefaultSettingsBuilderFactoryTest {
 
     private File getSettings(String name) {
         return new File("src/test/resources/settings/factory/" + name + ".xml").getAbsoluteFile();
     }
 
+    @Test
     public void testCompleteWiring() throws Exception {
         SettingsBuilder builder = new DefaultSettingsBuilderFactory().newInstance();
         assertNotNull(builder);

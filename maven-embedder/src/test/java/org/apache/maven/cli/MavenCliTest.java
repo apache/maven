@@ -31,10 +31,10 @@ import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.apache.maven.toolchain.building.ToolchainsBuildingRequest;
 import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
 import org.codehaus.plexus.PlexusContainer;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.function.ThrowingRunnable;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -56,13 +56,13 @@ public class MavenCliTest {
 
     private String origBasedir;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         cli = new MavenCli();
         origBasedir = System.getProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         if (origBasedir != null) {
             System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, origBasedir);
