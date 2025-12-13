@@ -1138,13 +1138,13 @@ public class DefaultProjectBuilder implements ProjectBuilder {
      * Handles resource configuration for a given scope (main or test).
      * This method applies the resource priority rules:
      * <ol>
-     *   <li>Modular project: use resources from &lt;sources&gt; if present, otherwise inject defaults</li>
-     *   <li>Classic project: use resources from &lt;sources&gt; if present, otherwise use legacy resources</li>
+     *   <li>Modular project: use resources from {@code <sources>} if present, otherwise inject defaults</li>
+     *   <li>Classic project: use resources from {@code <sources>} if present, otherwise use legacy resources</li>
      * </ol>
      *
      * @param ctx the resource handling context containing project info
-     * @param resources the legacy resource list (from &lt;resources&gt; or &lt;testResources&gt;)
-     * @param hasResourcesInSources whether resources are configured via &lt;sources&gt;
+     * @param resources the legacy resource list (from {@code <resources>} or {@code <testResources>})
+     * @param hasResourcesInSources whether resources are configured via {@code <sources>}
      * @param scope the project scope (MAIN or TEST)
      */
     private void handleResourceConfiguration(
@@ -1247,7 +1247,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
     /**
      * Creates a DefaultSourceRoot for module-aware resource directories.
-     * Generates paths following the pattern: src/&lt;module&gt;/&lt;scope&gt;/resources
+     * Generates paths following the pattern: {@code src/<module>/<scope>/resources}
      *
      * @param baseDir base directory of the project
      * @param module module name
