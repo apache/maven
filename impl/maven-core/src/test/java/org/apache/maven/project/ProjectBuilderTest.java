@@ -26,9 +26,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
+import org.apache.maven.api.Language;
+import org.apache.maven.api.ProjectScope;
+import org.apache.maven.api.SourceRoot;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.InputLocation;
@@ -370,5 +375,99 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         assertNotNull(pluginLocation, "missing build plugin");
         assertEquals(
                 "org.apache.maven.its:parent:0.1", pluginLocation.getSource().getModelId());
+    }
+    /**
+     * Tests that a project with multiple modules defined in sources is detected as modular,
+     * and module-aware resource roots are injected for each module.
+     */
+    @Test
+    void testModularSourcesInjectResourceRoots() throws Exception {
+        File pom = getProject("modular-sources");
+
+        MavenSession session = createMavenSession(pom);
+        MavenProject project = session.getCurrentProject();
+
+        // Get all resource source roots for main scope
+        List<SourceRoot> mainResourceRoots = project.getEnabledSourceRoots(ProjectScope.MAIN, Language.RESOURCES)
+                .collect(Collectors.toList());
+
+        // Should have resource roots for both modules
+        Set<String> modules = mainResourceRoots.stream()
+                .map(SourceRoot::module)
+                .filter(opt -> opt.isPresent())
+                .map(opt -> opt.get())
+                .collect(Collectors.toSet());
+
+        assertEquals(2, modules.size(), "Should have resource roots for 2 modules");
+        assertTrue(modules.contains("org.foo.moduleA"), "Should have resource root for moduleA");
+        assertTrue(modules.contains("org.foo.moduleB"), "Should have resource root for moduleB");
+
+        // Get all resource source roots for test scope
+        List<SourceRoot> testResourceRoots = project.getEnabledSourceRoots(ProjectScope.TEST, Language.RESOURCES)
+                .collect(Collectors.toList());
+
+        // Should have test resource roots for both modules
+        Set<String> testModules = testResourceRoots.stream()
+                .map(SourceRoot::module)
+                .filter(opt -> opt.isPresent())
+                .map(opt -> opt.get())
+                .collect(Collectors.toSet());
+
+        assertEquals(2, testModules.size(), "Should have test resource roots for 2 modules");
+        assertTrue(testModules.contains("org.foo.moduleA"), "Should have test resource root for moduleA");
+        assertTrue(testModules.contains("org.foo.moduleB"), "Should have test resource root for moduleB");
+    }
+
+    /**
+     * Tests that when modular sources are configured alongside explicit legacy resources,
+     * the legacy resources are ignored and a warning is issued.
+     *
+     * This verifies the behavior described in the design:
+     * - Modular projects with explicit legacy {@code <resources>} configuration should issue a warning
+     * - The modular resource roots are injected instead of using the legacy configuration
+     */
+    @Test
+    void testModularSourcesWithExplicitResourcesIssuesWarning() throws Exception {
+        File pom = getProject("modular-sources-with-explicit-resources");
+
+        MavenSession mavenSession = createMavenSession(null);
+        ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
+        configuration.setRepositorySession(mavenSession.getRepositorySession());
+
+        ProjectBuildingResult result = getContainer()
+                .lookup(org.apache.maven.project.ProjectBuilder.class)
+                .build(pom, configuration);
+
+        MavenProject project = result.getProject();
+
+        // Verify warnings are issued for ignored legacy resources
+        List<ModelProblem> warnings = result.getProblems().stream()
+                .filter(p -> p.getSeverity() == ModelProblem.Severity.WARNING)
+                .filter(p -> p.getMessage().contains("Legacy") && p.getMessage().contains("ignored"))
+                .collect(Collectors.toList());
+
+        assertEquals(2, warnings.size(), "Should have 2 warnings (one for resources, one for testResources)");
+        assertTrue(
+                warnings.stream().anyMatch(w -> w.getMessage().contains("<resources>")),
+                "Should warn about ignored <resources>");
+        assertTrue(
+                warnings.stream().anyMatch(w -> w.getMessage().contains("<testResources>")),
+                "Should warn about ignored <testResources>");
+
+        // Verify modular resources are still injected correctly
+        List<SourceRoot> mainResourceRoots = project.getEnabledSourceRoots(ProjectScope.MAIN, Language.RESOURCES)
+                .collect(Collectors.toList());
+
+        assertEquals(2, mainResourceRoots.size(), "Should have 2 modular resource roots (one per module)");
+
+        Set<String> mainModules = mainResourceRoots.stream()
+                .map(SourceRoot::module)
+                .filter(opt -> opt.isPresent())
+                .map(opt -> opt.get())
+                .collect(Collectors.toSet());
+
+        assertEquals(2, mainModules.size(), "Should have resource roots for 2 modules");
+        assertTrue(mainModules.contains("org.foo.moduleA"), "Should have resource root for moduleA");
+        assertTrue(mainModules.contains("org.foo.moduleB"), "Should have resource root for moduleB");
     }
 }
