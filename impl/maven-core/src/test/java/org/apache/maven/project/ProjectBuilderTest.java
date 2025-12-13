@@ -441,8 +441,8 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         MavenProject project = result.getProject();
 
         // Verify warnings are issued for ignored legacy resources
-        List<org.apache.maven.model.building.ModelProblem> warnings = result.getProblems().stream()
-                .filter(p -> p.getSeverity() == org.apache.maven.model.building.ModelProblem.Severity.WARNING)
+        List<ModelProblem> warnings = result.getProblems().stream()
+                .filter(p -> p.getSeverity() == ModelProblem.Severity.WARNING)
                 .filter(p -> p.getMessage().contains("Legacy") && p.getMessage().contains("ignored"))
                 .collect(Collectors.toList());
 
