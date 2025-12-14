@@ -197,21 +197,6 @@ final class PathSelector implements PathMatcher {
     private final PathMatcher[] excludes;
 
     /**
-     * The matcher for all directories to include. This array includes the parents of all those directories,
-     * because they need to be accepted before we can walk to the sub-directories.
-     * This is an optimization for skipping whole directories when possible.
-     * An empty array means to include all directories.
-     */
-    private final PathMatcher[] dirIncludes;
-
-    /**
-     * The matcher for directories to exclude. This array does <em>not</em> include the parent directories,
-     * because they may contain other sub-trees that need to be included.
-     * This is an optimization for skipping whole directories when possible.
-     */
-    private final PathMatcher[] dirExcludes;
-
-    /**
      * The base directory. All files will be relativized to that directory before to be matched.
      */
     private final Path baseDirectory;
@@ -243,8 +228,6 @@ final class PathSelector implements PathMatcher {
         FileSystem fileSystem = baseDirectory.getFileSystem();
         this.includes = matchers(fileSystem, includePatterns);
         this.excludes = matchers(fileSystem, excludePatterns);
-        dirIncludes = matchers(fileSystem, directoryPatterns(includePatterns, false));
-        dirExcludes = matchers(fileSystem, directoryPatterns(excludePatterns, true));
         needRelativize = needRelativize(includePatterns) || needRelativize(excludePatterns);
     }
 
@@ -598,30 +581,73 @@ final class PathSelector implements PathMatcher {
     }
 
     /**
-     * Returns whether {@link #couldHoldSelected(Path)} may return {@code false} for some directories.
-     * This method can be used to determine if directory filtering optimization is possible.
-     *
-     * @return {@code true} if directory filtering is possible, {@code false} if all directories
-     *         will be considered as potentially containing selected files
+     * Returns a matcher that can be used for pre-filtering the directories.
+     * The returned matcher can be used as an optimization for skipping whole directories when possible.
+     * If there is no such optimization, then this method returns {@link #INCLUDES_ALL}.
      */
-    boolean canFilterDirectories() {
-        return dirIncludes.length != 0 || dirExcludes.length != 0;
+    PathMatcher createDirectoryMatcher() {
+        return new DirectoryPrefiltering().simplify();
     }
 
     /**
-     * Determines whether a directory could contain selected paths.
-     *
-     * @param directory the directory pathname to test, must not be {@code null}
-     * @return {@code true} if the given directory might contain selected paths, {@code false} if the
-     *         directory will definitively not contain selected paths
+     * A matcher for skipping whole directories when possible.
      */
-    public boolean couldHoldSelected(Path directory) {
-        if (baseDirectory.equals(directory)) {
-            return true;
+    private final class DirectoryPrefiltering implements PathMatcher {
+        /**
+         * The matcher for all directories to include. Shall include the parent directories,
+         * because they need to be accepted before we can walk to the sub-directories.
+         */
+        private final PathMatcher[] dirIncludes;
+
+        /**
+         * The matcher for directories to exclude. Shall <em>not</em> exclude the parent directories,
+         * because they may contain other sub-trees that need to be included.
+         */
+        private final PathMatcher[] dirExcludes;
+
+        /**
+         * Creates a new matcher for directories.
+         */
+        DirectoryPrefiltering() {
+            FileSystem fileSystem = baseDirectory.getFileSystem();
+            dirIncludes = matchers(fileSystem, directoryPatterns(includePatterns, false));
+            dirExcludes = matchers(fileSystem, directoryPatterns(excludePatterns, true));
         }
-        directory = baseDirectory.relativize(directory);
-        return (dirIncludes.length == 0 || isMatched(directory, dirIncludes))
-                && (dirExcludes.length == 0 || !isMatched(directory, dirExcludes));
+
+        /**
+         * {@return a potentially simpler matcher equivalent to this matcher}.
+         */
+        @SuppressWarnings("checkstyle:MissingSwitchDefault")
+        PathMatcher simplify() {
+            if (!needRelativize && dirExcludes.length == 0) {
+                switch (dirIncludes.length) {
+                    case 0:
+                        return INCLUDES_ALL;
+                    case 1:
+                        return dirIncludes[0];
+                }
+            }
+            return this;
+        }
+
+        /**
+         * Determines whether a directory could contain selected paths.
+         *
+         * @param directory the directory pathname to test, must not be {@code null}
+         * @return {@code true} if the given directory might contain selected paths, {@code false} if the
+         *         directory will definitively not contain selected paths
+         */
+        @Override
+        public boolean matches(Path directory) {
+            if (baseDirectory.equals(directory)) {
+                return true;
+            }
+            if (needRelativize) {
+                directory = baseDirectory.relativize(directory);
+            }
+            return (dirIncludes.length == 0 || isMatched(directory, dirIncludes))
+                    && (dirExcludes.length == 0 || !isMatched(directory, dirExcludes));
+        }
     }
 
     /**

@@ -235,4 +235,29 @@ public class DefaultPathMatcherFactoryTest {
         assertTrue(dirMatcher4.matches(subDir)
                 || !dirMatcher4.matches(subDir)); // Always true, just testing it doesn't throw
     }
+
+    /**
+     * Verifies that the directory matcher accepts the {@code "foo"} directory (at root)
+     * when using the {@code "**​/foo/*"} include pattern. Of course, the {@code "org/foo"}
+     * directory must also be accepted.
+     */
+    @Test
+    public void testWildcardMatchesAlsoZeroDirectory(@TempDir Path tempDir) throws IOException {
+        Path packageDirectory = tempDir.resolve("org").resolve("foo");
+        Path sameDirButAtRoot = tempDir.resolve("foo");
+        Path subPackage = packageDirectory.resolve("bar");
+        Path sameSubDir = sameDirButAtRoot.resolve("bar");
+
+        PathMatcher anyMatcher = factory.createPathMatcher(tempDir, List.of("**/foo/*"), null, false);
+        PathMatcher dirMatcher = factory.deriveDirectoryMatcher(anyMatcher);
+
+        assertTrue(anyMatcher.matches(subPackage), "org/foo/bar");
+        assertTrue(anyMatcher.matches(sameSubDir), "foo/bar");
+        assertTrue(dirMatcher.matches(subPackage), "org/foo/bar");
+        assertTrue(dirMatcher.matches(sameSubDir), "foo/bar");
+        assertFalse(anyMatcher.matches(packageDirectory), "org/foo");
+        assertFalse(anyMatcher.matches(sameDirButAtRoot), "foo");
+        assertTrue(dirMatcher.matches(packageDirectory), "org/foo");
+        assertTrue(dirMatcher.matches(sameDirButAtRoot), "foo");
+    }
 }
