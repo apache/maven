@@ -238,26 +238,30 @@ public class DefaultPathMatcherFactoryTest {
 
     /**
      * Verifies that the directory matcher accepts the {@code "foo"} directory (at root)
-     * when using the {@code "**​/foo/*"} include pattern. Of course, the {@code "org/foo"}
-     * directory must also be accepted.
+     * when using the {@code "**​/*foo*​/**"} include pattern.
+     * Of course, the {@code "org/foo"} directory must also be accepted.
      */
     @Test
-    public void testWildcardMatchesAlsoZeroDirectory(@TempDir Path tempDir) throws IOException {
-        Path packageDirectory = tempDir.resolve("org").resolve("foo");
-        Path sameDirButAtRoot = tempDir.resolve("foo");
-        Path subPackage = packageDirectory.resolve("bar");
-        Path sameSubDir = sameDirButAtRoot.resolve("bar");
+    public void testWildcardMatchesAlsoZeroDirectory() {
+        Path dir = Path.of("/tmp"); // We will not really create any file.
 
-        PathMatcher anyMatcher = factory.createPathMatcher(tempDir, List.of("**/foo/*"), null, false);
+        // We need two patterns for preventing `PathSelector` to discard itself as an optimization.
+        PathMatcher anyMatcher = factory.createPathMatcher(dir, List.of("**/*foo*/**", "dummy/**"), null, false);
         PathMatcher dirMatcher = factory.deriveDirectoryMatcher(anyMatcher);
 
-        assertTrue(anyMatcher.matches(subPackage), "org/foo/bar");
-        assertTrue(anyMatcher.matches(sameSubDir), "foo/bar");
-        assertTrue(dirMatcher.matches(subPackage), "org/foo/bar");
-        assertTrue(dirMatcher.matches(sameSubDir), "foo/bar");
-        assertFalse(anyMatcher.matches(packageDirectory), "org/foo");
-        assertFalse(anyMatcher.matches(sameDirButAtRoot), "foo");
-        assertTrue(dirMatcher.matches(packageDirectory), "org/foo");
-        assertTrue(dirMatcher.matches(sameDirButAtRoot), "foo");
+        assertTrue(dirMatcher.matches(dir.resolve(Path.of("foo"))));
+        assertTrue(anyMatcher.matches(dir.resolve(Path.of("foo"))));
+        assertTrue(dirMatcher.matches(dir.resolve(Path.of("org", "foo"))));
+        assertTrue(anyMatcher.matches(dir.resolve(Path.of("org", "foo"))));
+        assertTrue(dirMatcher.matches(dir.resolve(Path.of("foo", "more"))));
+        assertTrue(anyMatcher.matches(dir.resolve(Path.of("foo", "more"))));
+        assertTrue(dirMatcher.matches(dir.resolve(Path.of("org", "foo", "more"))));
+        assertTrue(anyMatcher.matches(dir.resolve(Path.of("org", "foo", "more"))));
+        assertTrue(dirMatcher.matches(dir.resolve(Path.of("org", "0foo0", "more"))));
+        assertTrue(anyMatcher.matches(dir.resolve(Path.of("org", "0foo0", "more"))));
+        assertFalse(dirMatcher.matches(dir.resolve(Path.of("org", "bar", "more"))));
+        assertFalse(anyMatcher.matches(dir.resolve(Path.of("org", "bar", "more"))));
+        assertFalse(dirMatcher.matches(dir.resolve(Path.of("bar"))));
+        assertFalse(anyMatcher.matches(dir.resolve(Path.of("bar"))));
     }
 }
