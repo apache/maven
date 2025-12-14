@@ -57,10 +57,11 @@ class DefaultProjectManagerTest {
         when(artifact.getBaseVersion()).thenReturn(versionParser.parseVersion("1.0-SNAPSHOT"));
         projectManager.attachArtifact(project, artifact, path);
 
-        // Verify that no exception is thrown when only the arficactId differ
+        // Verify that no exception is thrown when only the artifactId differs
         when(artifact.getArtifactId()).thenReturn("anotherArtifact");
         projectManager.attachArtifact(project, artifact, path);
 
+        // Verify that an exception is thrown when the groupId differs
         when(artifact.getGroupId()).thenReturn("anotherGroup");
         String message = assertThrows(
                         IllegalArgumentException.class, () -> projectManager.attachArtifact(project, artifact, path))
