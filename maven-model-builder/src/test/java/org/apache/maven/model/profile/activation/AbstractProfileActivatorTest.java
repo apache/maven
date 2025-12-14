@@ -21,11 +21,13 @@ package org.apache.maven.model.profile.activation;
 import java.util.Objects;
 import java.util.Properties;
 
-import junit.framework.TestCase;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.SimpleProblemCollector;
 import org.apache.maven.model.profile.DefaultProfileActivationContext;
 import org.apache.maven.model.profile.ProfileActivationContext;
+import org.junit.jupiter.api.BeforeEach;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Provides common services to test {@link ProfileActivator} implementations.
@@ -34,7 +36,7 @@ import org.apache.maven.model.profile.ProfileActivationContext;
  *
  * @author Benjamin Bentmann
  */
-public abstract class AbstractProfileActivatorTest<T extends ProfileActivator> extends TestCase {
+public abstract class AbstractProfileActivatorTest<T extends ProfileActivator> {
 
     private Class<T> activatorClass;
 
@@ -44,18 +46,9 @@ public abstract class AbstractProfileActivatorTest<T extends ProfileActivator> e
         this.activatorClass = Objects.requireNonNull(activatorClass, "activatorClass cannot be null");
     }
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
-
         activator = activatorClass.getConstructor().newInstance();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        activator = null;
-
-        super.tearDown();
     }
 
     protected ProfileActivationContext newContext(final Properties userProperties, final Properties systemProperties) {
@@ -68,8 +61,7 @@ public abstract class AbstractProfileActivatorTest<T extends ProfileActivator> e
 
         assertEquals(active, activator.isActive(profile, context, problems));
 
-        assertEquals(problems.getErrors().toString(), 0, problems.getErrors().size());
-        assertEquals(
-                problems.getWarnings().toString(), 0, problems.getWarnings().size());
+        assertEquals(0, problems.getErrors().size(), problems.getErrors().toString());
+        assertEquals(0, problems.getWarnings().size(), problems.getWarnings().toString());
     }
 }

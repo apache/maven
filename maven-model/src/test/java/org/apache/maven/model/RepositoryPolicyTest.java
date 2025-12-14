@@ -18,30 +18,38 @@
  */
 package org.apache.maven.model;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@code RepositoryPolicy}.
  *
  * @author Benjamin Bentmann
  */
-public class RepositoryPolicyTest extends TestCase {
+public class RepositoryPolicyTest {
 
+    @Test
     public void testHashCodeNullSafe() {
         new RepositoryPolicy().hashCode();
     }
 
+    @Test
     public void testEqualsNullSafe() {
         assertFalse(new RepositoryPolicy().equals(null));
 
         new RepositoryPolicy().equals(new RepositoryPolicy());
     }
 
+    @Test
     public void testEqualsIdentity() {
         RepositoryPolicy thing = new RepositoryPolicy();
         assertTrue(thing.equals(thing));
     }
 
+    @Test
     public void testToStringNullSafe() {
         assertNotNull(new RepositoryPolicy().toString());
     }

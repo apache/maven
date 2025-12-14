@@ -20,7 +20,6 @@ package org.apache.maven.model.profile.activation;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.apache.maven.model.Activation;
@@ -29,8 +28,11 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.path.DefaultPathTranslator;
 import org.apache.maven.model.path.ProfileActivationFilePathInterpolator;
 import org.apache.maven.model.profile.DefaultProfileActivationContext;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests {@link FileProfileActivator}.
@@ -38,7 +40,9 @@ import org.junit.Test;
  * @author Ravil Galeyev
  */
 public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileActivator> {
-    Path tempDir;
+
+    @TempDir
+    private Path tempDir;
 
     private final DefaultProfileActivationContext context = new DefaultProfileActivationContext();
 
@@ -46,11 +50,9 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
         super(FileProfileActivator.class);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-
-        tempDir = Files.createTempDirectory(null);
 
         activator.setProfileActivationFilePathInterpolator(
                 new ProfileActivationFilePathInterpolator().setPathTranslator(new DefaultPathTranslator()));

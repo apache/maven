@@ -24,6 +24,10 @@ import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.SimpleProblemCollector;
 import org.apache.maven.model.profile.ProfileActivationContext;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@link JdkVersionProfileActivator}.
@@ -52,6 +56,7 @@ public class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest
         return props;
     }
 
+    @Test
     public void testNullSafe() throws Exception {
         Profile p = new Profile();
 
@@ -62,6 +67,7 @@ public class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest
         assertActivation(false, p, newContext(null, null));
     }
 
+    @Test
     public void testPrefix() throws Exception {
         Profile profile = newProfile("1.4");
 
@@ -75,6 +81,7 @@ public class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest
         assertActivation(false, profile, newContext(null, newProperties("1.5")));
     }
 
+    @Test
     public void testPrefixNegated() throws Exception {
         Profile profile = newProfile("!1.4");
 
@@ -88,6 +95,7 @@ public class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest
         assertActivation(true, profile, newContext(null, newProperties("1.5")));
     }
 
+    @Test
     public void testVersionRangeInclusiveBounds() throws Exception {
         Profile profile = newProfile("[1.5,1.6]");
 
@@ -108,6 +116,7 @@ public class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest
         assertActivation(true, profile, newContext(null, newProperties("1.6.0_09-b03")));
     }
 
+    @Test
     public void testVersionRangeExclusiveBounds() throws Exception {
         Profile profile = newProfile("(1.3,1.6)");
 
@@ -129,6 +138,7 @@ public class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest
         assertActivation(false, profile, newContext(null, newProperties("1.6")));
     }
 
+    @Test
     public void testVersionRangeInclusiveLowerBound() throws Exception {
         Profile profile = newProfile("[1.5,)");
 
@@ -149,6 +159,7 @@ public class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest
         assertActivation(true, profile, newContext(null, newProperties("1.6.0_09-b03")));
     }
 
+    @Test
     public void testVersionRangeExclusiveUpperBound() throws Exception {
         Profile profile = newProfile("(,1.6)");
 
@@ -164,6 +175,7 @@ public class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest
         assertActivation(false, profile, newContext(null, newProperties("1.6.0_09-b03")));
     }
 
+    @Test
     public void testRubbishJavaVersion() {
         Profile profile = newProfile("[1.8,)");
 
@@ -179,9 +191,10 @@ public class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest
 
         assertEquals(false, activator.isActive(profile, context, problems));
 
-        assertEquals(problems.getErrors().toString(), 0, problems.getErrors().size());
-        assertEquals(
-                problems.getWarnings().toString(), 1, problems.getWarnings().size());
-        assertTrue(problems.getWarnings().get(0), problems.getWarnings().get(0).contains(warningContains));
+        assertEquals(0, problems.getErrors().size(), problems.getErrors().toString());
+        assertEquals(1, problems.getWarnings().size(), problems.getWarnings().toString());
+        assertTrue(
+                problems.getWarnings().get(0).contains(warningContains),
+                problems.getWarnings().get(0));
     }
 }

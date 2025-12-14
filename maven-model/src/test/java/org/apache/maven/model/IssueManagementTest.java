@@ -18,34 +18,43 @@
  */
 package org.apache.maven.model;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@code IssueManagement}.
  *
  * @author Benjamin Bentmann
  */
-public class IssueManagementTest extends TestCase {
+public class IssueManagementTest {
 
+    @Test
     public void testHashCodeNullSafe() {
         new IssueManagement().hashCode();
     }
 
+    @Test
     public void testEqualsNullSafe() {
         assertFalse(new IssueManagement().equals(null));
 
         new IssueManagement().equals(new IssueManagement());
     }
 
+    @Test
     public void testEqualsIdentity() {
         IssueManagement thing = new IssueManagement();
         assertTrue(thing.equals(thing));
     }
 
+    @Test
     public void testToStringNullSafe() {
         assertNotNull(new IssueManagement().toString());
     }
 
+    @Test
     public void testToStringNotNonsense() {
         IssueManagement im = new IssueManagement();
         im.setSystem("Velociraptor");

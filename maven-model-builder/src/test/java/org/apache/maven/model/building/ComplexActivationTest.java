@@ -21,17 +21,22 @@ package org.apache.maven.model.building;
 import java.io.File;
 import java.util.Properties;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * @author Konstantin Perikov
  */
-public class ComplexActivationTest extends TestCase {
+public class ComplexActivationTest {
 
     private File getPom(String name) {
         return new File("src/test/resources/poms/factory/" + name + ".xml").getAbsoluteFile();
     }
 
+    @Test
     public void testAndConditionInActivation() throws Exception {
         Properties sysProperties = new Properties();
         sysProperties.setProperty("myproperty", "test");

@@ -22,16 +22,19 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.nio.file.Paths;
 
-import junit.framework.TestCase;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Benjamin Bentmann
  */
-public class DefaultModelBuilderFactoryTest extends TestCase {
+public class DefaultModelBuilderFactoryTest {
 
     private static final String BASE_DIR =
             Paths.get("src", "test", "resources", "poms", "factory").toString();
@@ -40,6 +43,7 @@ public class DefaultModelBuilderFactoryTest extends TestCase {
         return new File(Paths.get(BASE_DIR, name + ".xml").toString()).getAbsoluteFile();
     }
 
+    @Test
     public void testCompleteWiring() throws Exception {
         ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
         assertNotNull(builder);

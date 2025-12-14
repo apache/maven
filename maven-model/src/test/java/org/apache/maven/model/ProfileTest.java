@@ -18,30 +18,38 @@
  */
 package org.apache.maven.model;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@code Profile}.
  *
  * @author Benjamin Bentmann
  */
-public class ProfileTest extends TestCase {
+public class ProfileTest {
 
+    @Test
     public void testHashCodeNullSafe() {
         new Profile().hashCode();
     }
 
+    @Test
     public void testEqualsNullSafe() {
         assertFalse(new Profile().equals(null));
 
         new Profile().equals(new Profile());
     }
 
+    @Test
     public void testEqualsIdentity() {
         Profile thing = new Profile();
         assertTrue(thing.equals(thing));
     }
 
+    @Test
     public void testToStringNullSafe() {
         assertNotNull(new Profile().toString());
     }

@@ -24,9 +24,10 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.resolution.InvalidRepositoryException;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Guillaume Nodet
@@ -75,7 +76,7 @@ public class DefaultModelBuilderTest {
             + "  </dependencyManagement>\n"
             + "</project>\n";
 
-    @Test(expected = ModelBuildingException.class)
+    @Test
     public void testCycleInImports() throws Exception {
         ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
         assertNotNull(builder);
@@ -84,7 +85,9 @@ public class DefaultModelBuilderTest {
         request.setModelSource(new StringModelSource(BASE1));
         request.setModelResolver(new CycleInImportsResolver());
 
-        builder.build(request);
+        assertThrows(ModelBuildingException.class, () -> {
+            builder.build(request);
+        });
     }
 
     static class CycleInImportsResolver extends BaseModelResolver {

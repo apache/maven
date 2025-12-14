@@ -18,30 +18,38 @@
  */
 package org.apache.maven.model;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@code Notifier}.
  *
  * @author Benjamin Bentmann
  */
-public class NotifierTest extends TestCase {
+public class NotifierTest {
 
+    @Test
     public void testHashCodeNullSafe() {
         new Notifier().hashCode();
     }
 
+    @Test
     public void testEqualsNullSafe() {
         assertFalse(new Notifier().equals(null));
 
         new Notifier().equals(new Notifier());
     }
 
+    @Test
     public void testEqualsIdentity() {
         Notifier thing = new Notifier();
         assertTrue(thing.equals(thing));
     }
 
+    @Test
     public void testToStringNullSafe() {
         assertNotNull(new Notifier().toString());
     }

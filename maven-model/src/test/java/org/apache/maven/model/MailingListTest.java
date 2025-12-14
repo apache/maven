@@ -18,34 +18,44 @@
  */
 package org.apache.maven.model;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@code MailingList}.
  *
  * @author Benjamin Bentmann
  */
-public class MailingListTest extends TestCase {
+public class MailingListTest {
 
+    @Test
     public void testHashCodeNullSafe() {
         new MailingList().hashCode();
     }
 
+    @Test
     public void testEqualsNullSafe() {
         assertFalse(new MailingList().equals(null));
 
         new MailingList().equals(new MailingList());
     }
 
+    @Test
     public void testEqualsIdentity() {
         MailingList thing = new MailingList();
         assertTrue(thing.equals(thing));
     }
 
+    @Test
     public void testToStringNullSafe() {
         assertNotNull(new MailingList().toString());
     }
 
+    @Test
     public void testToStringNotNonsense() {
         MailingList list = new MailingList();
         list.setName("modello-dev");

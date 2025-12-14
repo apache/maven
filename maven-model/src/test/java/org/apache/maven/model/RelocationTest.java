@@ -18,30 +18,38 @@
  */
 package org.apache.maven.model;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@code Relocation}.
  *
  * @author Benjamin Bentmann
  */
-public class RelocationTest extends TestCase {
+public class RelocationTest {
 
+    @Test
     public void testHashCodeNullSafe() {
         new Relocation().hashCode();
     }
 
+    @Test
     public void testEqualsNullSafe() {
         assertFalse(new Relocation().equals(null));
 
         new Relocation().equals(new Relocation());
     }
 
+    @Test
     public void testEqualsIdentity() {
         Relocation thing = new Relocation();
         assertTrue(thing.equals(thing));
     }
 
+    @Test
     public void testToStringNullSafe() {
         assertNotNull(new Relocation().toString());
     }
