@@ -376,6 +376,12 @@ class WrapperProperties extends Properties {
         }
 
         @Override
+        public synchronized void clear() {
+            keyOrder.clear();
+            super.clear();
+        }
+
+        @Override
         public synchronized void forEach(BiConsumer<? super Object, ? super Object> action) {
             entrySet().forEach(e -> action.accept(e.getKey(), e.getValue()));
         }
