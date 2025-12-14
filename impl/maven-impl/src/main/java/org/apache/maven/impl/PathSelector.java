@@ -537,15 +537,18 @@ final class PathSelector implements PathMatcher {
     }
 
     /**
-     * {@return a potentially simpler matcher equivalent to this matcher}.
+     * {@return a potentially simpler matcher equivalent to this matcher}
      */
     @SuppressWarnings("checkstyle:MissingSwitchDefault")
     private PathMatcher simplify() {
-        if (!needRelativize && excludes.length == 0) {
+        if (excludes.length == 0) {
             switch (includes.length) {
                 case 0:
                     return INCLUDES_ALL;
                 case 1:
+                    if (needRelativize) {
+                        break;
+                    }
                     return includes[0];
             }
         }
@@ -615,15 +618,18 @@ final class PathSelector implements PathMatcher {
         }
 
         /**
-         * {@return a potentially simpler matcher equivalent to this matcher}.
+         * {@return a potentially simpler matcher equivalent to this matcher}
          */
         @SuppressWarnings("checkstyle:MissingSwitchDefault")
         PathMatcher simplify() {
-            if (!needRelativize && dirExcludes.length == 0) {
+            if (dirExcludes.length == 0) {
                 switch (dirIncludes.length) {
                     case 0:
                         return INCLUDES_ALL;
                     case 1:
+                        if (needRelativize) {
+                            break;
+                        }
                         return dirIncludes[0];
                 }
             }
