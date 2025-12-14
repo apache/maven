@@ -126,7 +126,7 @@ public class DefaultProjectManager implements ProjectManager {
         String v2 = artifact.getBaseVersion().toString();
         if (!Objects.equals(g1, g2) || !Objects.equals(v1, v2)) {
             throw new IllegalArgumentException(
-                    "The produced artifact must have the same groupId and version than the project it is attached to. Expecting "
+                    "The produced artifact must have the same groupId and version as the project it is attached to. Expecting "
                             + g1 + ':' + project.getArtifactId() + ':' + v1 + " but received "
                             + g2 + ':' + artifact.getArtifactId() + ':' + v2);
         }
