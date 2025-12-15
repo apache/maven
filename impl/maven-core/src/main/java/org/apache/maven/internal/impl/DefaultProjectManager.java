@@ -129,22 +129,36 @@ public class DefaultProjectManager implements ProjectManager {
 
         // ArtifactId may differ only for multi-module projects (source roots with module name)
         boolean isMultiModule = false;
-        boolean artifactMatchesModule = false;
+        boolean validArtifactId = Objects.equals(a1, a2);
         for (SourceRoot sr : getSourceRoots(project)) {
             Optional<String> moduleName = sr.module();
             if (moduleName.isPresent()) {
                 isMultiModule = true;
                 if (moduleName.get().equals(a2)) {
-                    artifactMatchesModule = true;
+                    validArtifactId = true;
                     break;
                 }
             }
         }
-        if (!(Objects.equals(g1, g2) && Objects.equals(v1, v2) && (artifactMatchesModule || Objects.equals(a1, a2)))) {
-            throw new IllegalArgumentException(String.format(
-                    "The produced artifact must have the same groupId%s and version as the project it is attached to.%n"
-                            + "Expecting %s:%s:%s but received %s:%s:%s.",
-                    isMultiModule ? "" : ", artifactID", g1, a1, v1, g2, a2, v2));
+        boolean isSameGroupAndVersion = Objects.equals(g1, g2) && Objects.equals(v1, v2);
+        if (isMultiModule) {
+            if (!isSameGroupAndVersion) {
+                throw new IllegalArgumentException(String.format(
+                        "The produced artifact must have the same groupId and version as the project it is attached to.%n"
+                                + "Expecting \"%s:%s:%s\" but received \"%s:%s:%s\".",
+                        g1, validArtifactId ? a2 : "${module}", v1, g2, a2, v2));
+            }
+            if (!validArtifactId) {
+                throw new IllegalArgumentException(String.format(
+                        "The produced artifactId must be the name of a Java module. It cannot be \"%s\".", a2));
+            }
+        } else {
+            if (!(isSameGroupAndVersion && validArtifactId)) {
+                throw new IllegalArgumentException(String.format(
+                        "The produced artifact must have the same groupId, artifactId and version as the project it is attached to.%n"
+                                + "Expecting \"%s:%s:%s\" but received \"%s:%s:%s\".",
+                        g1, a1, v1, g2, a2, v2));
+            }
         }
         getMavenProject(project)
                 .addAttachedArtifact(

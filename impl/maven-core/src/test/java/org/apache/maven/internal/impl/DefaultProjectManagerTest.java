@@ -71,7 +71,7 @@ class DefaultProjectManagerTest {
 
         // Verify that an exception is thrown when the artifactId differs
         when(artifact.getArtifactId()).thenReturn("anotherArtifact");
-        assertExceptionMessageContains("myGroup:anotherArtifact:1.0-SNAPSHOT");
+        assertExceptionMessageContains("myGroup:myArtifact:1.0-SNAPSHOT", "myGroup:anotherArtifact:1.0-SNAPSHOT");
 
         // Add a Java module. It should relax the restriction on artifactId.
         projectManager.addSourceRoot(
@@ -89,7 +89,7 @@ class DefaultProjectManagerTest {
                         true));
 
         // Verify that we get the same exception when the artifactId does not match the module name
-        assertExceptionMessageContains("myGroup:anotherArtifact:1.0-SNAPSHOT");
+        assertExceptionMessageContains("", "anotherArtifact");
 
         // Verify that no exception is thrown when the artifactId is the module name
         when(artifact.getArtifactId()).thenReturn("org.foo.bar");
@@ -97,17 +97,25 @@ class DefaultProjectManagerTest {
 
         // Verify that an exception is thrown when the groupId differs
         when(artifact.getGroupId()).thenReturn("anotherGroup");
-        assertExceptionMessageContains("anotherGroup:org.foo.bar:1.0-SNAPSHOT");
+        assertExceptionMessageContains("myGroup:org.foo.bar:1.0-SNAPSHOT", "anotherGroup:org.foo.bar:1.0-SNAPSHOT");
     }
 
-    private void assertExceptionMessageContains(String expectedGAV) {
+    /**
+     * Verifies that {@code projectManager.attachArtifact(…)} throws an exception,
+     * and that the expecption message contains the expected and actual <abbr>GAV</abbr>.
+     *
+     * @param expectedGAV the actual <abbr>GAV</abbr> that the exception message should contain
+     * @param actualGAV the actual <abbr>GAV</abbr> that the exception message should contain
+     */
+    private void assertExceptionMessageContains(String expectedGAV, String actualGAV) {
         String cause = assertThrows(
                         IllegalArgumentException.class,
                         () -> projectManager.attachArtifact(project, artifact, artifactPath))
                 .getMessage();
         Supplier<String> message = () ->
                 String.format("The exception message does not contain the expected GAV. Message was:%n%s%n", cause);
-        assertTrue(cause.contains("myGroup:myArtifact:1.0-SNAPSHOT"), message);
+
         assertTrue(cause.contains(expectedGAV), message);
+        assertTrue(cause.contains(actualGAV), message);
     }
 }
