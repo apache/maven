@@ -160,13 +160,13 @@ final class PathSelector implements PathMatcher {
 
     /**
      * The wildcard used by the "glob" syntax for meaning zero or more leading directories.
-     * It cannot be {@code "**​/"} because that wildcard matches one or more directory.
+     * It cannot be {@code "**​/"} because that wildcard matches one or more directories.
      */
     private static final String WILDCARD_FOR_ANY_PREFIX = "{**/,}";
 
     /**
      * The wildcard used by the "glob" syntax for meaning zero or more trailing directories.
-     * It cannot be {@code "/**​"} because that wildcard matches one or more directory.
+     * It cannot be {@code "/**​"} because that wildcard matches one or more directories.
      */
     private static final String WILDCARD_FOR_ANY_SUFFIX = "{/**,}";
 
