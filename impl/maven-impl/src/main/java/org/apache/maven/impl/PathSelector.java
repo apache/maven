@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import org.apache.maven.api.annotations.Nonnull;
 
@@ -49,9 +48,10 @@ import org.apache.maven.api.annotations.Nonnull;
  * <ul>
  *   <li>The platform-specific separator ({@code '\\'} on Windows) is replaced by {@code '/'}.
  *       Note that it means that the backslash cannot be used for escaping characters.</li>
- *   <li>Trailing {@code "/"} is completed as {@code "/**"}.</li>
- *   <li>The {@code "**"} wildcard means "0 or more directories" instead of "1 or more directories".
- *       This is implemented by adding variants of the pattern without the {@code "**"} wildcard.</li>
+ *   <li>Trailing {@code "/"} is completed as {@value #WILDCARD_FOR_ANY_SUFFIX}.</li>
+ *   <li>The Maven {@code "**"} wildcard means "0 or more directories" instead of "1 or more directories".
+ *       The Maven behavior is implemented with the {@value #WILDCARD_FOR_ANY_PREFIX} or
+ *       {@value #WILDCARD_FOR_ANY_SUFFIX} wildcard, depending where the wildcard appears.</li>
  *   <li>Bracket characters [ ] and { } are escaped.</li>
  *   <li>On Unix only, the escape character {@code '\\'} is itself escaped.</li>
  * </ul>
@@ -159,6 +159,18 @@ final class PathSelector implements PathMatcher {
     private static final String SPECIAL_CHARACTERS = "*?[]{}\\";
 
     /**
+     * The wildcard used by the "glob" syntax for meaning zero or more leading directories.
+     * It cannot be {@code "**​/"} because that wildcard matches one or more directories.
+     */
+    private static final String WILDCARD_FOR_ANY_PREFIX = "{**/,}";
+
+    /**
+     * The wildcard used by the "glob" syntax for meaning zero or more trailing directories.
+     * It cannot be {@code "/**​"} because that wildcard matches one or more directories.
+     */
+    private static final String WILDCARD_FOR_ANY_SUFFIX = "{/**,}";
+
+    /**
      * A path matcher which accepts all files.
      *
      * @see #simplify()
@@ -197,21 +209,6 @@ final class PathSelector implements PathMatcher {
     private final PathMatcher[] excludes;
 
     /**
-     * The matcher for all directories to include. This array includes the parents of all those directories,
-     * because they need to be accepted before we can walk to the sub-directories.
-     * This is an optimization for skipping whole directories when possible.
-     * An empty array means to include all directories.
-     */
-    private final PathMatcher[] dirIncludes;
-
-    /**
-     * The matcher for directories to exclude. This array does <em>not</em> include the parent directories,
-     * because they may contain other sub-trees that need to be included.
-     * This is an optimization for skipping whole directories when possible.
-     */
-    private final PathMatcher[] dirExcludes;
-
-    /**
      * The base directory. All files will be relativized to that directory before to be matched.
      */
     private final Path baseDirectory;
@@ -243,8 +240,6 @@ final class PathSelector implements PathMatcher {
         FileSystem fileSystem = baseDirectory.getFileSystem();
         this.includes = matchers(fileSystem, includePatterns);
         this.excludes = matchers(fileSystem, excludePatterns);
-        dirIncludes = matchers(fileSystem, directoryPatterns(includePatterns, false));
-        dirExcludes = matchers(fileSystem, directoryPatterns(excludePatterns, true));
         needRelativize = needRelativize(includePatterns) || needRelativize(excludePatterns);
     }
 
@@ -461,69 +456,20 @@ final class PathSelector implements PathMatcher {
                     // Transform ** patterns to use brace expansion for POSIX behavior
                     // This replaces the complex addPatternsWithOneDirRemoved logic
                     // We perform this after escaping so that only these injected braces participate in expansion
-                    pattern = pattern.replace("**/", "{**/,}");
-
+                    pattern = pattern.replace("**/", WILDCARD_FOR_ANY_PREFIX);
+                    if (pattern.endsWith("/**")) {
+                        pattern = pattern.substring(0, pattern.length() - 3) + WILDCARD_FOR_ANY_SUFFIX;
+                    }
                     normalized.add(DEFAULT_SYNTAX + pattern);
                 } else {
                     normalized.add(pattern);
                 }
             }
         }
-        return simplify(normalized, excludes);
-    }
-
-    /**
-     * Applies some heuristic rules for simplifying the set of patterns,
-     * then returns the patterns as an array.
-     *
-     * @param patterns the patterns to simplify and return as an array
-     * @param excludes whether the patterns are exclude patterns
-     * @return the set content as an array, after simplification
-     */
-    private static String[] simplify(Set<String> patterns, boolean excludes) {
-        /*
-         * If the "**" pattern is present, it makes all other patterns useless.
-         * In the case of include patterns, an empty set means to include everything.
-         */
-        if (patterns.remove("**")) {
-            patterns.clear();
-            if (excludes) {
-                patterns.add("**");
-            }
+        if (!excludes && normalized.contains(DEFAULT_SYNTAX + WILDCARD_FOR_ANY_PREFIX)) {
+            return new String[0]; // Include everything.
         }
-        return patterns.toArray(String[]::new);
-    }
-
-    /**
-     * Eventually adds the parent directory of the given patterns, without duplicated values.
-     * The patterns given to this method should have been normalized.
-     *
-     * @param patterns the normalized include or exclude patterns
-     * @param excludes whether the patterns are exclude patterns
-     * @return patterns of directories to include or exclude
-     */
-    private static String[] directoryPatterns(final String[] patterns, final boolean excludes) {
-        // TODO: use `LinkedHashSet.newLinkedHashSet(int)` instead with JDK19.
-        final var directories = new LinkedHashSet<String>(patterns.length);
-        for (String pattern : patterns) {
-            if (pattern.startsWith(DEFAULT_SYNTAX)) {
-                if (excludes) {
-                    if (pattern.endsWith("/**")) {
-                        directories.add(pattern.substring(0, pattern.length() - 3));
-                    }
-                } else {
-                    int s = pattern.indexOf(':');
-                    if (pattern.regionMatches(++s, "**/", 0, 3)) {
-                        s = pattern.indexOf('/', s + 3);
-                        if (s < 0) {
-                            return new String[0]; // Pattern is "**", so we need to accept everything.
-                        }
-                        directories.add(pattern.substring(0, s));
-                    }
-                }
-            }
-        }
-        return simplify(directories, excludes);
+        return normalized.toArray(String[]::new);
     }
 
     /**
@@ -534,7 +480,7 @@ final class PathSelector implements PathMatcher {
      */
     private static boolean needRelativize(String[] patterns) {
         for (String pattern : patterns) {
-            if (!pattern.startsWith(DEFAULT_SYNTAX + "**/")) {
+            if (!pattern.startsWith(DEFAULT_SYNTAX + WILDCARD_FOR_ANY_PREFIX)) {
                 return true;
             }
         }
@@ -554,15 +500,18 @@ final class PathSelector implements PathMatcher {
     }
 
     /**
-     * {@return a potentially simpler matcher equivalent to this matcher}.
+     * {@return a potentially simpler matcher equivalent to this matcher}
      */
     @SuppressWarnings("checkstyle:MissingSwitchDefault")
     private PathMatcher simplify() {
-        if (!needRelativize && excludes.length == 0) {
+        if (excludes.length == 0) {
             switch (includes.length) {
                 case 0:
                     return INCLUDES_ALL;
                 case 1:
+                    if (needRelativize) {
+                        break;
+                    }
                     return includes[0];
             }
         }
@@ -598,30 +547,115 @@ final class PathSelector implements PathMatcher {
     }
 
     /**
-     * Returns whether {@link #couldHoldSelected(Path)} may return {@code false} for some directories.
-     * This method can be used to determine if directory filtering optimization is possible.
-     *
-     * @return {@code true} if directory filtering is possible, {@code false} if all directories
-     *         will be considered as potentially containing selected files
+     * Returns a matcher that can be used for pre-filtering the directories.
+     * The returned matcher can be used as an optimization for skipping whole directories when possible.
+     * If there is no such optimization, then this method returns {@link #INCLUDES_ALL}.
      */
-    boolean canFilterDirectories() {
-        return dirIncludes.length != 0 || dirExcludes.length != 0;
+    PathMatcher createDirectoryMatcher() {
+        return new DirectoryPrefiltering().simplify();
     }
 
     /**
-     * Determines whether a directory could contain selected paths.
-     *
-     * @param directory the directory pathname to test, must not be {@code null}
-     * @return {@code true} if the given directory might contain selected paths, {@code false} if the
-     *         directory will definitively not contain selected paths
+     * A matcher for skipping whole directories when possible.
      */
-    public boolean couldHoldSelected(Path directory) {
-        if (baseDirectory.equals(directory)) {
-            return true;
+    private final class DirectoryPrefiltering implements PathMatcher {
+        /**
+         * Suffixes of patterns matching a whole directory.
+         */
+        private static final String[] SUFFIXES = {WILDCARD_FOR_ANY_SUFFIX, "/**"};
+
+        /**
+         * Matchers for directories that can safely be skipped fully.
+         */
+        private final PathMatcher[] dirExcludes;
+
+        /**
+         * Whether to ignore the includes defined by the enclosing class.
+         * This flag can be {@code false} if we determined that all includes are applicable to directories.
+         * This flag should be {@code true} in case of doubt since directory filtering is only an optimization.
+         */
+        private final boolean ignoreIncludes;
+
+        /**
+         * Creates a new matcher for directories.
+         */
+        @SuppressWarnings("StringEquality")
+        DirectoryPrefiltering() {
+            final var excludeDirPatterns = new LinkedHashSet<String>();
+            for (String pattern : excludePatterns) {
+                String directory = trimSuffixes(pattern);
+                if (directory != pattern) { // Identity comparison is sufficient here.
+                    excludeDirPatterns.add(directory);
+                }
+            }
+            if (excludeDirPatterns.contains(DEFAULT_SYNTAX)) {
+                // A pattern was something like "glob:{/**,}", which exclude everything.
+                dirExcludes = new PathMatcher[] {INCLUDES_ALL};
+                ignoreIncludes = true;
+                return;
+            }
+            dirExcludes = matchers(baseDirectory.getFileSystem(), excludeDirPatterns.toArray(String[]::new));
+            for (String pattern : includePatterns) {
+                if (trimSuffixes(pattern) == pattern) { // Identity comparison is sufficient here.
+                    ignoreIncludes = true;
+                    return;
+                }
+            }
+            ignoreIncludes = (includes.length == 0);
         }
-        directory = baseDirectory.relativize(directory);
-        return (dirIncludes.length == 0 || isMatched(directory, dirIncludes))
-                && (dirExcludes.length == 0 || !isMatched(directory, dirExcludes));
+
+        /**
+         * If the given pattern matches everything (files and sub-directories) in a directory,
+         * returns the pattern without the "match all" suffix.
+         * Otherwise returns {@code pattern}.
+         */
+        private static String trimSuffixes(String pattern) {
+            if (pattern.startsWith(DEFAULT_SYNTAX)) {
+                // This algorithm is not really exhaustive, but it is probably not worth to be stricter.
+                for (String suffix : SUFFIXES) {
+                    while (pattern.endsWith(suffix)) {
+                        pattern = pattern.substring(0, pattern.length() - suffix.length());
+                    }
+                }
+            }
+            return pattern;
+        }
+
+        /**
+         * {@return a potentially simpler matcher equivalent to this matcher}
+         */
+        PathMatcher simplify() {
+            if (dirExcludes.length == 0) {
+                if (ignoreIncludes) {
+                    return INCLUDES_ALL;
+                }
+                if (includes.length == 1) {
+                    return includes[0];
+                }
+            }
+            return this;
+        }
+
+        /**
+         * Determines whether a directory could contain selected paths.
+         *
+         * @param directory the directory pathname to test, must not be {@code null}
+         * @return {@code true} if the given directory might contain selected paths, {@code false} if the
+         *         directory will definitively not contain selected paths
+         */
+        @Override
+        public boolean matches(Path directory) {
+            if (baseDirectory.equals(directory)) {
+                return true;
+            }
+            if (needRelativize) {
+                directory = baseDirectory.relativize(directory);
+            }
+            if (isMatched(directory, dirExcludes)) {
+                return false;
+            }
+            return ignoreIncludes || isMatched(directory, includes);
+        }
     }
 
     /**
