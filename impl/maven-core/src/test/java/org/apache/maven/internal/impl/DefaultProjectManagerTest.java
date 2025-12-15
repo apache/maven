@@ -20,11 +20,15 @@ package org.apache.maven.internal.impl;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.function.Supplier;
 
+import org.apache.maven.api.Language;
 import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
+import org.apache.maven.api.ProjectScope;
 import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.impl.DefaultModelVersionParser;
+import org.apache.maven.impl.DefaultSourceRoot;
 import org.apache.maven.impl.DefaultVersionParser;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.util.version.GenericVersionScheme;
@@ -37,17 +41,25 @@ import static org.mockito.Mockito.when;
 
 class DefaultProjectManagerTest {
 
+    private DefaultProjectManager projectManager;
+
+    private Project project;
+
+    private ProducedArtifact artifact;
+
+    private Path artifactPath;
+
     @Test
     void attachArtifact() {
         InternalMavenSession session = Mockito.mock(InternalMavenSession.class);
         ArtifactManager artifactManager = Mockito.mock(ArtifactManager.class);
         MavenProject mavenProject = new MavenProject();
-        Project project = new DefaultProject(session, mavenProject);
-        ProducedArtifact artifact = Mockito.mock(ProducedArtifact.class);
-        Path path = Paths.get("");
+        project = new DefaultProject(session, mavenProject);
+        artifact = Mockito.mock(ProducedArtifact.class);
+        artifactPath = Paths.get("");
         DefaultVersionParser versionParser =
                 new DefaultVersionParser(new DefaultModelVersionParser(new GenericVersionScheme()));
-        DefaultProjectManager projectManager = new DefaultProjectManager(session, artifactManager);
+        projectManager = new DefaultProjectManager(session, artifactManager);
 
         mavenProject.setGroupId("myGroup");
         mavenProject.setArtifactId("myArtifact");
@@ -55,18 +67,47 @@ class DefaultProjectManagerTest {
         when(artifact.getGroupId()).thenReturn("myGroup");
         when(artifact.getArtifactId()).thenReturn("myArtifact");
         when(artifact.getBaseVersion()).thenReturn(versionParser.parseVersion("1.0-SNAPSHOT"));
-        projectManager.attachArtifact(project, artifact, path);
+        projectManager.attachArtifact(project, artifact, artifactPath);
 
-        // Verify that no exception is thrown when only the artifactId differs
+        // Verify that an exception is thrown when the artifactId differs
         when(artifact.getArtifactId()).thenReturn("anotherArtifact");
-        projectManager.attachArtifact(project, artifact, path);
+        assertExceptionMessageContains("myGroup:anotherArtifact:1.0-SNAPSHOT");
+
+        // Add a Java module. It should relax the restriction on artifactId.
+        projectManager.addSourceRoot(
+                project,
+                new DefaultSourceRoot(
+                        ProjectScope.MAIN,
+                        Language.JAVA_FAMILY,
+                        "org.foo.bar",
+                        null,
+                        Path.of("myProject"),
+                        null,
+                        null,
+                        false,
+                        null,
+                        true));
+
+        // Verify that we get the same exception when the artifactId does not match the module name
+        assertExceptionMessageContains("myGroup:anotherArtifact:1.0-SNAPSHOT");
+
+        // Verify that no exception is thrown when the artifactId is the module name
+        when(artifact.getArtifactId()).thenReturn("org.foo.bar");
+        projectManager.attachArtifact(project, artifact, artifactPath);
 
         // Verify that an exception is thrown when the groupId differs
         when(artifact.getGroupId()).thenReturn("anotherGroup");
-        String message = assertThrows(
-                        IllegalArgumentException.class, () -> projectManager.attachArtifact(project, artifact, path))
+        assertExceptionMessageContains("anotherGroup:org.foo.bar:1.0-SNAPSHOT");
+    }
+
+    private void assertExceptionMessageContains(String expectedGAV) {
+        String cause = assertThrows(
+                        IllegalArgumentException.class,
+                        () -> projectManager.attachArtifact(project, artifact, artifactPath))
                 .getMessage();
-        assertTrue(message.contains("myGroup:myArtifact:1.0-SNAPSHOT"));
-        assertTrue(message.contains("anotherGroup:anotherArtifact:1.0-SNAPSHOT"));
+        Supplier<String> message = () ->
+                String.format("The exception message does not contain the expected GAV. Message was:%n%s%n", cause);
+        assertTrue(cause.contains("myGroup:myArtifact:1.0-SNAPSHOT"), message);
+        assertTrue(cause.contains(expectedGAV), message);
     }
 }
