@@ -1249,23 +1249,31 @@ public class Verifier {
                 }
             }
         } else {
-            Path expectedPath = Paths.get(filePath);
-
-            // NOTE: On Windows, a path with a leading (back-)slash is relative to the current drive
-            if (!expectedPath.isAbsolute() && !filePath.startsWith("/") && !filePath.startsWith("\\")) {
-                expectedPath = basedir.resolve(filePath);
-            }
-
             if (filePath.indexOf('*') > -1) {
-                Path parent = expectedPath.getParent();
+                // Handle wildcard patterns - don't use Paths.get() with wildcards as '*' is illegal on Windows
+                int lastSep = Math.max(filePath.lastIndexOf('/'), filePath.lastIndexOf('\\'));
+                String parentPath = lastSep > -1 ? filePath.substring(0, lastSep) : "";
+                String filePattern = lastSep > -1 ? filePath.substring(lastSep + 1) : filePath;
 
-                if (parent == null || !Files.exists(parent)) {
+                Path parent;
+                if (parentPath.isEmpty()) {
+                    parent = basedir;
+                } else {
+                    Path parentPathObj = Paths.get(parentPath);
+                    if (!parentPathObj.isAbsolute() && !parentPath.startsWith("/") && !parentPath.startsWith("\\")) {
+                        parent = basedir.resolve(parentPath);
+                    } else {
+                        parent = parentPathObj;
+                    }
+                }
+
+                if (!Files.exists(parent)) {
                     if (wanted) {
                         throw new VerificationException(
-                                "Expected file pattern was not found: " + expectedPath);
+                                "Expected file pattern was not found: " + filePath + " (parent directory does not exist)");
                     }
                 } else {
-                    String shortNamePattern = expectedPath.getFileName().toString().replaceAll("\\*", ".*");
+                    String shortNamePattern = filePattern.replaceAll("\\*", ".*");
 
                     boolean found = false;
 
@@ -1281,13 +1289,19 @@ public class Verifier {
                     }
 
                     if (!found && wanted) {
-                        throw new VerificationException(
-                                "Expected file pattern was not found: " + expectedPath);
+                        throw new VerificationException("Expected file pattern was not found: " + filePath);
                     } else if (found && !wanted) {
-                        throw new VerificationException("Unwanted file pattern was found: " + expectedPath);
+                        throw new VerificationException("Unwanted file pattern was found: " + filePath);
                     }
                 }
             } else {
+                Path expectedPath = Paths.get(filePath);
+
+                // NOTE: On Windows, a path with a leading (back-)slash is relative to the current drive
+                if (!expectedPath.isAbsolute() && !filePath.startsWith("/") && !filePath.startsWith("\\")) {
+                    expectedPath = basedir.resolve(filePath);
+                }
+
                 if (!Files.exists(expectedPath)) {
                     if (wanted) {
                         throw new VerificationException("Expected file was not found: " + expectedPath);
