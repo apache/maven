@@ -18,6 +18,8 @@
  */
 package org.apache.maven.repository.internal;
 
+import javax.inject.Inject;
+
 import java.net.MalformedURLException;
 import java.util.Arrays;
 
@@ -26,9 +28,16 @@ import org.apache.maven.model.Parent;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.impl.ArtifactResolver;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.impl.VersionRangeResolver;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Test cases for the default {@code ModelResolver} implementation.
@@ -36,15 +45,10 @@ import org.eclipse.aether.impl.VersionRangeResolver;
  * @author Christian Schulte
  * @since 3.5.0
  */
-public final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
+@PlexusTest
+public final class DefaultModelResolverTest extends AbstractRepositoryTest {
 
-    /**
-     * Creates a new {@code DefaultModelResolverTest} instance.
-     */
-    public DefaultModelResolverTest() {
-        super();
-    }
-
+    @Test
     public void testResolveParentThrowsUnresolvableModelExceptionWhenNotFound() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("ut.simple");
@@ -60,6 +64,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
         }
     }
 
+    @Test
     public void testResolveParentThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("ut.simple");
@@ -74,6 +79,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
         }
     }
 
+    @Test
     public void testResolveParentThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("ut.simple");
@@ -88,6 +94,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
         }
     }
 
+    @Test
     public void testResolveParentSuccessfullyResolvesExistingParentWithoutRange() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("ut.simple");
@@ -98,6 +105,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
         assertEquals("1.0", parent.getVersion());
     }
 
+    @Test
     public void testResolveParentSuccessfullyResolvesExistingParentUsingHighestVersion() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("ut.simple");
@@ -108,6 +116,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
         assertEquals("1.0", parent.getVersion());
     }
 
+    @Test
     public void testResolveDependencyThrowsUnresolvableModelExceptionWhenNotFound() throws Exception {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("ut.simple");
@@ -123,6 +132,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
         }
     }
 
+    @Test
     public void testResolveDependencyThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("ut.simple");
@@ -137,6 +147,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
         }
     }
 
+    @Test
     public void testResolveDependencyThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound()
             throws Exception {
         final Dependency dependency = new Dependency();
@@ -153,6 +164,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
         }
     }
 
+    @Test
     public void testResolveDependencySuccessfullyResolvesExistingDependencyWithoutRange() throws Exception {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("ut.simple");
@@ -163,6 +175,7 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
         assertEquals("1.0", dependency.getVersion());
     }
 
+    @Test
     public void testResolveDependencySuccessfullyResolvesExistingDependencyUsingHighestVersion() throws Exception {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("ut.simple");
@@ -173,14 +186,23 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
         assertEquals("1.0", dependency.getVersion());
     }
 
+    @Inject
+    private ArtifactResolver artifactResolver;
+
+    @Inject
+    private VersionRangeResolver versionRangeResolver;
+
+    @Inject
+    private RemoteRepositoryManager remoteRepositoryManager;
+
     private ModelResolver newModelResolver() throws ComponentLookupException, MalformedURLException {
         return new DefaultModelResolver(
                 this.session,
                 null,
                 this.getClass().getName(),
-                lookup(ArtifactResolver.class),
-                lookup(VersionRangeResolver.class),
-                lookup(RemoteRepositoryManager.class),
+                artifactResolver,
+                versionRangeResolver,
+                remoteRepositoryManager,
                 Arrays.asList(newTestRepository()));
     }
 }

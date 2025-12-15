@@ -31,21 +31,18 @@ import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.apache.maven.toolchain.building.ToolchainsBuildingRequest;
 import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
 import org.codehaus.plexus.PlexusContainer;
-import org.junit.function.ThrowingRunnable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -73,24 +70,24 @@ public class MavenCliTest {
 
     @Test
     public void testCalculateDegreeOfConcurrency() {
-        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("0"));
-        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("-1"));
-        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("0x4"));
-        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("1.0"));
-        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("1."));
-        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("AA"));
-        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("C"));
-        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("C2.2C"));
-        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("C2.2"));
-        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("2C2"));
-        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("CXXX"));
-        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("XXXC"));
+        assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("0"));
+        assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("-1"));
+        assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("0x4"));
+        assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("1.0"));
+        assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("1."));
+        assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("AA"));
+        assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("C"));
+        assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("C2.2C"));
+        assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("C2.2"));
+        assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("2C2"));
+        assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("CXXX"));
+        assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("XXXC"));
 
         int cpus = Runtime.getRuntime().availableProcessors();
         assertEquals((int) (cpus * 2.2), cli.calculateDegreeOfConcurrency("2.2C"));
         assertEquals(1, cli.calculateDegreeOfConcurrency("0.0001C"));
-        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("-2.2C"));
-        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("0C"));
+        assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("-2.2C"));
+        assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("0C"));
     }
 
     @Test
@@ -255,7 +252,7 @@ public class MavenCliTest {
 
     @Test
     public void testStyleColors() throws Exception {
-        assumeTrue("ANSI not supported", MessageUtils.isColorEnabled());
+        assumeTrue(MessageUtils.isColorEnabled(), "ANSI not supported");
         CliRequest request;
 
         MessageUtils.setColorEnabled(true);
@@ -391,25 +388,13 @@ public class MavenCliTest {
         cli.properties(request);
 
         // Assert
-        assertThat(request.getUserProperties().getProperty("valFound"), is("sbari"));
-        assertThat(request.getUserProperties().getProperty("valNotFound"), is("s${foz}i"));
-        assertThat(request.getUserProperties().getProperty("valRootDirectory"), is("myRootDirectory/.mvn/foo"));
-        assertThat(request.getUserProperties().getProperty("valTopDirectory"), is("myTopDirectory/pom.xml"));
-        assertThat(request.getCommandLine().getOptionValue('f'), is("myRootDirectory/my-child"));
-        assertThat(request.getCommandLine().getArgs(), equalTo(new String[] {"prefix:3.0.0:bar", "validate"}));
-    }
-
-    class ConcurrencyCalculator implements ThrowingRunnable {
-
-        private final String value;
-
-        ConcurrencyCalculator(String value) {
-            this.value = value;
-        }
-
-        @Override
-        public void run() throws Throwable {
-            cli.calculateDegreeOfConcurrency(value);
-        }
+        assertEquals("sbari", request.getUserProperties().getProperty("valFound"));
+        assertEquals("s${foz}i", request.getUserProperties().getProperty("valNotFound"));
+        assertEquals("myRootDirectory/.mvn/foo", request.getUserProperties().getProperty("valRootDirectory"));
+        assertEquals("myTopDirectory/pom.xml", request.getUserProperties().getProperty("valTopDirectory"));
+        assertEquals("myRootDirectory/my-child", request.getCommandLine().getOptionValue('f'));
+        assertArrayEquals(
+                new String[] {"prefix:3.0.0:bar", "validate"},
+                request.getCommandLine().getArgs());
     }
 }

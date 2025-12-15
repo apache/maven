@@ -18,29 +18,38 @@
  */
 package org.apache.maven.repository.internal;
 
+import javax.inject.Inject;
+
+import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.impl.ArtifactDescriptorReader;
 import org.eclipse.aether.impl.RepositoryEventDispatcher;
 import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class DefaultArtifactDescriptorReaderTest extends AbstractRepositoryTestCase {
+@PlexusTest
+public class DefaultArtifactDescriptorReaderTest extends AbstractRepositoryTest {
 
+    @Inject
+    private ArtifactDescriptorReader reader;
+
+    @Test
     public void testMng5459() throws Exception {
         // prepare
-        DefaultArtifactDescriptorReader reader =
-                (DefaultArtifactDescriptorReader) lookup(ArtifactDescriptorReader.class);
 
         RepositoryEventDispatcher eventDispatcher = mock(RepositoryEventDispatcher.class);
 
         ArgumentCaptor<RepositoryEvent> event = ArgumentCaptor.forClass(RepositoryEvent.class);
 
-        reader.setRepositoryEventDispatcher(eventDispatcher);
+        ((DefaultArtifactDescriptorReader) reader).setRepositoryEventDispatcher(eventDispatcher);
 
         ArtifactDescriptorRequest request = new ArtifactDescriptorRequest();
 

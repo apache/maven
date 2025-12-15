@@ -18,6 +18,8 @@
  */
 package org.apache.maven.profiles.manager;
 
+import javax.inject.Inject;
+
 import java.util.List;
 import java.util.Properties;
 
@@ -26,19 +28,20 @@ import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.testing.PlexusTest;
+import org.junit.jupiter.api.Test;
 
-public class DefaultProfileManagerTest extends PlexusTestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-    @Override
-    protected void customizeContainerConfiguration(ContainerConfiguration configuration) {
-        super.customizeContainerConfiguration(configuration);
-        configuration.setAutoWiring(true);
-        configuration.setClassPathScanning(PlexusConstants.SCANNING_ON);
-    }
+@PlexusTest
+public class DefaultProfileManagerTest {
 
+    @Inject
+    private PlexusContainer container;
+
+    @Test
     public void testShouldActivateDefaultProfile() throws Exception {
         Profile notActivated = new Profile();
         notActivated.setId("notActivated");
@@ -60,7 +63,7 @@ public class DefaultProfileManagerTest extends PlexusTestCase {
 
         Properties props = System.getProperties();
 
-        ProfileManager profileManager = new DefaultProfileManager(getContainer(), props);
+        ProfileManager profileManager = new DefaultProfileManager(container, props);
 
         profileManager.addProfile(notActivated);
         profileManager.addProfile(defaultActivated);
@@ -72,6 +75,7 @@ public class DefaultProfileManagerTest extends PlexusTestCase {
         assertEquals("defaultActivated", ((Profile) active.get(0)).getId());
     }
 
+    @Test
     public void testShouldNotActivateDefaultProfile() throws Exception {
         Profile syspropActivated = new Profile();
         syspropActivated.setId("syspropActivated");
@@ -96,7 +100,7 @@ public class DefaultProfileManagerTest extends PlexusTestCase {
 
         Properties props = System.getProperties();
 
-        ProfileManager profileManager = new DefaultProfileManager(getContainer(), props);
+        ProfileManager profileManager = new DefaultProfileManager(container, props);
 
         profileManager.addProfile(syspropActivated);
         profileManager.addProfile(defaultActivated);
@@ -108,6 +112,7 @@ public class DefaultProfileManagerTest extends PlexusTestCase {
         assertEquals("syspropActivated", ((Profile) active.get(0)).getId());
     }
 
+    @Test
     public void testShouldNotActivateReversalOfPresentSystemProperty() throws Exception {
         Profile syspropActivated = new Profile();
         syspropActivated.setId("syspropActivated");
@@ -123,7 +128,7 @@ public class DefaultProfileManagerTest extends PlexusTestCase {
 
         Properties props = System.getProperties();
 
-        ProfileManager profileManager = new DefaultProfileManager(getContainer(), props);
+        ProfileManager profileManager = new DefaultProfileManager(container, props);
 
         profileManager.addProfile(syspropActivated);
 
@@ -133,6 +138,7 @@ public class DefaultProfileManagerTest extends PlexusTestCase {
         assertEquals(0, active.size());
     }
 
+    @Test
     public void testShouldOverrideAndActivateInactiveProfile() throws Exception {
         Profile syspropActivated = new Profile();
         syspropActivated.setId("syspropActivated");
@@ -148,7 +154,7 @@ public class DefaultProfileManagerTest extends PlexusTestCase {
 
         Properties props = System.getProperties();
 
-        ProfileManager profileManager = new DefaultProfileManager(getContainer(), props);
+        ProfileManager profileManager = new DefaultProfileManager(container, props);
 
         profileManager.addProfile(syspropActivated);
 
@@ -161,6 +167,7 @@ public class DefaultProfileManagerTest extends PlexusTestCase {
         assertEquals("syspropActivated", ((Profile) active.get(0)).getId());
     }
 
+    @Test
     public void testShouldOverrideAndDeactivateActiveProfile() throws Exception {
         Profile syspropActivated = new Profile();
         syspropActivated.setId("syspropActivated");
@@ -176,7 +183,7 @@ public class DefaultProfileManagerTest extends PlexusTestCase {
 
         Properties props = System.getProperties();
 
-        ProfileManager profileManager = new DefaultProfileManager(getContainer(), props);
+        ProfileManager profileManager = new DefaultProfileManager(container, props);
 
         profileManager.addProfile(syspropActivated);
 

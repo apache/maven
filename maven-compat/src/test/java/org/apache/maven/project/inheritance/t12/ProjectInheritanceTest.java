@@ -24,11 +24,17 @@ import java.util.Map;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
+import org.codehaus.plexus.testing.PlexusTest;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.AssertionsKt.assertNotNull;
 
 /**
  * Verifies that plugin execution sections in the parent POM that have
  * inherit == false are not inherited to the child POM.
  */
+@PlexusTest
 public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //
@@ -41,6 +47,7 @@ public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     //
     // ----------------------------------------------------------------------
 
+    @Test
     public void testFalsePluginExecutionInheritValue() throws Exception {
         File localRepo = getLocalRepositoryPath();
 
@@ -58,7 +65,7 @@ public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
 
         Map executionMap = compilerPlugin.getExecutionsAsMap();
         assertNull(
-                "Plugin execution: \'test\' should NOT exist in the compiler plugin specification for the child project!",
-                executionMap.get("test"));
+                executionMap.get("test"),
+                "Plugin execution: \'test\' should NOT exist in the compiler plugin specification for the child project!");
     }
 }

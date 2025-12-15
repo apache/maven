@@ -21,6 +21,7 @@ package org.apache.maven.repository.internal;
 import java.util.Arrays;
 import java.util.List;
 
+import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
@@ -31,8 +32,17 @@ import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResult;
+import org.junit.jupiter.api.Test;
 
-public class RepositorySystemTest extends AbstractRepositoryTestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@PlexusTest
+public class RepositorySystemTest extends AbstractRepositoryTest {
+
     public void testResolveVersionRange() throws Exception {
         // VersionRangeResult resolveVersionRange( RepositorySystemSession session, VersionRangeRequest request )
         //                throws VersionRangeResolutionException;
@@ -44,6 +54,7 @@ public class RepositorySystemTest extends AbstractRepositoryTestCase {
         //                throws VersionResolutionException;
     }
 
+    @Test
     public void testReadArtifactDescriptor() throws Exception {
         Artifact artifact = new DefaultArtifact("ut.simple:artifact:extension:classifier:1.0");
 
@@ -102,6 +113,7 @@ public class RepositorySystemTest extends AbstractRepositoryTestCase {
         assertEquals(4, depArtifact.getProperties().size());
     }
 
+    @Test
     public void testCollectDependencies() throws Exception {
         Artifact artifact = new DefaultArtifact("ut.simple:artifact:extension:classifier:1.0");
         // notice: extension and classifier not really used in this test...
@@ -118,6 +130,7 @@ public class RepositorySystemTest extends AbstractRepositoryTestCase {
                 nodes.get(0).getDependency(), nodes.get(1).getDependency());
     }
 
+    @Test
     public void testResolveArtifact() throws Exception {
         Artifact artifact = new DefaultArtifact("ut.simple:artifact:1.0");
 
@@ -147,6 +160,7 @@ public class RepositorySystemTest extends AbstractRepositoryTestCase {
         assertEquals(filename, artifact.getFile().getName());
     }
 
+    @Test
     public void testResolveArtifacts() throws Exception {
         ArtifactRequest req1 = new ArtifactRequest();
         req1.setArtifact(new DefaultArtifact("ut.simple:artifact:1.0"));

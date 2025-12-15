@@ -18,6 +18,8 @@
  */
 package org.apache.maven.repository.legacy.resolver.conflict;
 
+import javax.inject.Inject;
+
 import java.util.Collections;
 
 import org.apache.maven.artifact.Artifact;
@@ -26,14 +28,18 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ResolutionNode;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
-import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.PlexusContainer;
+import org.junit.jupiter.api.BeforeEach;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Provides a basis for testing conflict resolvers.
  *
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  */
-public abstract class AbstractConflictResolverTest extends PlexusTestCase {
+public abstract class AbstractConflictResolverTest {
     // constants --------------------------------------------------------------
 
     private static final String GROUP_ID = "test";
@@ -48,7 +54,11 @@ public abstract class AbstractConflictResolverTest extends PlexusTestCase {
 
     private final String roleHint;
 
+    @Inject
     private ArtifactFactory artifactFactory;
+
+    @Inject
+    private PlexusContainer container;
 
     private ConflictResolver conflictResolver;
 
@@ -63,29 +73,14 @@ public abstract class AbstractConflictResolverTest extends PlexusTestCase {
     /*
      * @see junit.framework.TestCase#setUp()
      */
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
 
-        artifactFactory = (ArtifactFactory) lookup(ArtifactFactory.ROLE);
-        conflictResolver = (ConflictResolver) lookup(ConflictResolver.ROLE, roleHint);
+        conflictResolver = (ConflictResolver) container.lookup(ConflictResolver.ROLE, roleHint);
 
         a1 = createArtifact("a", "1.0");
         a2 = createArtifact("a", "2.0");
         b1 = createArtifact("b", "1.0");
-    }
-
-    /*
-     * @see org.codehaus.plexus.PlexusTestCase#tearDown()
-     */
-    protected void tearDown() throws Exception {
-        a1 = null;
-        a2 = null;
-        b1 = null;
-
-        artifactFactory = null;
-        conflictResolver = null;
-
-        super.tearDown();
     }
 
     // protected methods ------------------------------------------------------
@@ -98,8 +93,8 @@ public abstract class AbstractConflictResolverTest extends PlexusTestCase {
             ResolutionNode expectedNode, ResolutionNode actualNode1, ResolutionNode actualNode2) {
         ResolutionNode resolvedNode = getConflictResolver().resolveConflict(actualNode1, actualNode2);
 
-        assertNotNull("Expected resolvable", resolvedNode);
-        assertEquals("Resolution node", expectedNode, resolvedNode);
+        assertNotNull(resolvedNode, "Expected resolvable");
+        assertEquals(expectedNode, resolvedNode, "Resolution node");
     }
 
     protected Artifact createArtifact(String id, String version) throws InvalidVersionSpecificationException {

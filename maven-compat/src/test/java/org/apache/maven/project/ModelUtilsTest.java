@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.TestCase;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
@@ -34,9 +33,16 @@ import org.apache.maven.model.PluginExecution;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.junit.jupiter.api.Test;
 
-public class ModelUtilsTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
+public class ModelUtilsTest {
+
+    @Test
     public void testShouldUseMainPluginDependencyVersionOverManagedDepVersion() {
         Plugin mgtPlugin = createPlugin("group", "artifact", "1", Collections.EMPTY_MAP);
         Dependency mgtDep = createDependency("g", "a", "2");
@@ -60,6 +66,7 @@ public class ModelUtilsTest extends TestCase {
         return dep;
     }
 
+    @Test
     public void testShouldNotInheritPluginWithInheritanceSetToFalse() {
         PluginContainer parent = new PluginContainer();
 
@@ -99,6 +106,7 @@ public class ModelUtilsTest extends TestCase {
      *   X -&gt; Y -&gt; A -&gt; B -&gt; C -&gt; D -&gt; E -&gt; F
      * </pre>
      */
+    @Test
     public void testShouldPreserveChildOrderingOfPluginsAfterParentMerge() {
         PluginContainer parent = new PluginContainer();
 
@@ -163,6 +171,7 @@ public class ModelUtilsTest extends TestCase {
         return plugin;
     }
 
+    @Test
     public void testShouldInheritOnePluginWithExecution() {
         Plugin parent = new Plugin();
         parent.setArtifactId("testArtifact");
@@ -184,6 +193,7 @@ public class ModelUtilsTest extends TestCase {
         assertEquals(1, child.getExecutions().size());
     }
 
+    @Test
     public void testShouldMergeInheritedPluginHavingExecutionWithLocalPlugin() {
         Plugin parent = new Plugin();
         parent.setArtifactId("testArtifact");
@@ -210,6 +220,7 @@ public class ModelUtilsTest extends TestCase {
         assertEquals(2, child.getExecutions().size());
     }
 
+    @Test
     public void testShouldMergeOnePluginWithInheritExecutionWithoutDuplicatingPluginInList() {
         Plugin parent = new Plugin();
         parent.setArtifactId("testArtifact");
@@ -243,6 +254,7 @@ public class ModelUtilsTest extends TestCase {
         assertEquals(1, plugin.getExecutions().size());
     }
 
+    @Test
     public void testShouldMergePluginWithDifferentExecutionFromParentWithoutDuplicatingPluginInList() {
         Plugin parent = new Plugin();
         parent.setArtifactId("testArtifact");
@@ -281,6 +293,7 @@ public class ModelUtilsTest extends TestCase {
         assertEquals(2, plugin.getExecutions().size());
     }
 
+    @Test
     public void testShouldNOTMergeInheritedPluginHavingInheritEqualFalse() {
         Plugin parent = new Plugin();
         parent.setArtifactId("testArtifact");
@@ -307,6 +320,7 @@ public class ModelUtilsTest extends TestCase {
      * Verifies MNG-1499: The order of the merged list should be the plugins specified by the parent followed by the
      * child list.
      */
+    @Test
     public void testShouldKeepOriginalPluginOrdering() {
         Plugin parentPlugin1 = new Plugin();
         parentPlugin1.setArtifactId("testArtifact");
@@ -368,6 +382,7 @@ public class ModelUtilsTest extends TestCase {
     /**
      * Verifies MNG-1499: The ordering of plugin executions should also be in the specified order.
      */
+    @Test
     public void testShouldKeepOriginalPluginExecutionOrdering() {
         Plugin parent = new Plugin();
         parent.setArtifactId("testArtifact");
@@ -416,6 +431,7 @@ public class ModelUtilsTest extends TestCase {
         assertEquals(dep.getManagementKey(), dep2.getManagementKey());
     }
 
+    @Test
     public void testShouldOverwritePluginConfigurationSubItemsByDefault() throws XmlPullParserException, IOException {
         String parentConfigStr = "<configuration><items><item>one</item><item>two</item></items></configuration>";
         Xpp3Dom parentConfig = Xpp3DomBuilder.build(new StringReader(parentConfigStr));
@@ -440,6 +456,7 @@ public class ModelUtilsTest extends TestCase {
         assertEquals("three", item.getValue());
     }
 
+    @Test
     public void testShouldMergePluginConfigurationSubItemsWithMergeAttributeSet()
             throws XmlPullParserException, IOException {
         String parentConfigStr = "<configuration><items><item>one</item><item>two</item></items></configuration>";
@@ -471,6 +488,7 @@ public class ModelUtilsTest extends TestCase {
         assertEquals(expected, actual);
     }
 
+    @Test
     public void testShouldNotMergePluginExecutionWhenExecInheritedIsFalseAndTreatAsInheritanceIsTrue() {
         String gid = "group";
         String aid = "artifact";
@@ -507,9 +525,10 @@ public class ModelUtilsTest extends TestCase {
         ModelUtils.mergePluginDefinitions(pChild, pParent, true);
 
         Map executionMap = pChild.getExecutionsAsMap();
-        assertNull("test execution should not be inherited from parent.", executionMap.get(testId));
+        assertNull(executionMap.get(testId), "test execution should not be inherited from parent.");
     }
 
+    @Test
     public void testShouldNotMergePluginExecutionWhenPluginInheritedIsFalseAndTreatAsInheritanceIsTrue() {
         String gid = "group";
         String aid = "artifact";
@@ -546,9 +565,10 @@ public class ModelUtilsTest extends TestCase {
         ModelUtils.mergePluginDefinitions(pChild, pParent, true);
 
         Map executionMap = pChild.getExecutionsAsMap();
-        assertNull("test execution should not be inherited from parent.", executionMap.get(testId));
+        assertNull(executionMap.get(testId), "test execution should not be inherited from parent.");
     }
 
+    @Test
     public void testShouldMergePluginExecutionWhenExecInheritedIsTrueAndTreatAsInheritanceIsTrue() {
         String gid = "group";
         String aid = "artifact";
@@ -585,6 +605,6 @@ public class ModelUtilsTest extends TestCase {
         ModelUtils.mergePluginDefinitions(pChild, pParent, true);
 
         Map executionMap = pChild.getExecutionsAsMap();
-        assertNotNull("test execution should be inherited from parent.", executionMap.get(testId));
+        assertNotNull(executionMap.get(testId), "test execution should be inherited from parent.");
     }
 }

@@ -21,16 +21,19 @@ package org.apache.maven.artifact.resolver;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test the artifact resolution exception message
  *
  * @author Mauro Talevi
  */
-public class ArtifactResolutionExceptionTest extends TestCase {
+public class ArtifactResolutionExceptionTest {
     private static final String LS = System.lineSeparator();
 
+    @Test
     public void testMissingArtifactMessageFormat() {
         String message = "Missing artifact";
         String indentation = "  ";

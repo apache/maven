@@ -22,6 +22,11 @@ import java.io.File;
 
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
+import org.codehaus.plexus.testing.PlexusTest;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Verifies scope of root project is preserved regardless of parent dependency management.
@@ -29,6 +34,7 @@ import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
  * @author <a href="mailto:pschneider@gmail.com">Patrick Schneider</a>
  * @see <a href="https://issues.apache.org/jira/browse/MNG-2919">MNG-2919</a>
  */
+@PlexusTest
 public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //
@@ -41,6 +47,7 @@ public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     //
     // ----------------------------------------------------------------------
 
+    @Test
     public void testDependencyManagementDoesNotOverrideScopeOfCurrentArtifact() throws Exception {
         File localRepo = getLocalRepositoryPath();
 
@@ -53,7 +60,7 @@ public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
 
         assertEquals(pom0Basedir, project1.getParent().getBasedir());
         assertNull(
-                "dependencyManagement has overwritten the scope of the currently building child project",
-                project1.getArtifact().getScope());
+                project1.getArtifact().getScope(),
+                "dependencyManagement has overwritten the scope of the currently building child project");
     }
 }

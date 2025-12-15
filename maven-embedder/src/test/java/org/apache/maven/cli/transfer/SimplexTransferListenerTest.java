@@ -29,7 +29,7 @@ import org.eclipse.aether.transfer.TransferResource;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class SimplexTransferListenerTest {
     @Test

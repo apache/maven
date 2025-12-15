@@ -24,12 +24,19 @@ import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
+import org.codehaus.plexus.testing.PlexusTest;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * A test which demonstrates maven's dependency management
  *
  * @author <a href="rgoers@apache.org">Ralph Goers</a>
  */
+@PlexusTest
 public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //
@@ -42,6 +49,7 @@ public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     //
     // ----------------------------------------------------------------------
 
+    @Test
     public void testDependencyManagement() throws Exception {
         File localRepo = getLocalRepositoryPath();
         File pom0 = new File(localRepo, "p0/pom.xml");
@@ -56,16 +64,15 @@ public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
 
         assertEquals(pom0Basedir, project1.getParent().getBasedir());
         Set set = project1.getArtifacts();
-        assertNotNull("No artifacts", set);
-        assertTrue("No Artifacts", set.size() > 0);
+        assertNotNull(set, "No artifacts");
+        assertTrue(set.size() > 0, "No Artifacts");
 
         for (Object aSet : set) {
             Artifact artifact = (Artifact) aSet;
             System.out.println("Artifact: " + artifact.getDependencyConflictId() + " " + artifact.getVersion()
                     + " Scope: " + artifact.getScope());
             assertTrue(
-                    "Incorrect version for " + artifact.getDependencyConflictId(),
-                    artifact.getVersion().equals("1.0"));
+                    artifact.getVersion().equals("1.0"), "Incorrect version for " + artifact.getDependencyConflictId());
         }
     }
 }

@@ -535,23 +535,7 @@ under the License.
         <scope>test</scope>
       </dependency>
     </dependencies>
-    <!--bootstrap-start-comment-->
   </dependencyManagement>
-  <!--bootstrap-end-comment-->
-  <!--bootstrap-start-comment-->
-  <dependencies>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-  <!--bootstrap-end-comment-->
 
   <build>
     <pluginManagement>
