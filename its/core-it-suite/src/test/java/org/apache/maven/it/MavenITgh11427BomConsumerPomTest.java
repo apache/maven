@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -51,8 +50,8 @@ class MavenITgh11427BomConsumerPomTest extends AbstractMavenIntegrationTestCase 
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Path consumerPomPath = Paths.get(
-                verifier.getArtifactPath("org.apache.maven.its.gh-11427", "bom", "1.0.0-SNAPSHOT", "pom"));
+        Path consumerPomPath =
+                verifier.getArtifactPath("org.apache.maven.its.gh-11427", "bom", "1.0.0-SNAPSHOT", "pom");
 
         assertTrue(Files.exists(consumerPomPath), "consumer pom not found at " + consumerPomPath);
 
@@ -87,8 +86,8 @@ class MavenITgh11427BomConsumerPomTest extends AbstractMavenIntegrationTestCase 
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Path consumerPomPath = Paths.get(
-                verifier.getArtifactPath("org.apache.maven.its.gh-11427", "bom", "1.0.0-SNAPSHOT", "pom"));
+        Path consumerPomPath =
+                verifier.getArtifactPath("org.apache.maven.its.gh-11427", "bom", "1.0.0-SNAPSHOT", "pom");
 
         assertTrue(Files.exists(consumerPomPath), "consumer pom not found at " + consumerPomPath);
 
