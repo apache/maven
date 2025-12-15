@@ -97,7 +97,7 @@ class DefaultProjectManagerTest {
 
         // Verify that an exception is thrown when the groupId differs
         when(artifact.getGroupId()).thenReturn("anotherGroup");
-        assertExceptionMessageContains("myGroup:org.foo.bar:1.0-SNAPSHOT", "anotherGroup:org.foo.bar:1.0-SNAPSHOT");
+        assertExceptionMessageContains("myGroup:myArtifact:1.0-SNAPSHOT", "anotherGroup:org.foo.bar:1.0-SNAPSHOT");
     }
 
     /**

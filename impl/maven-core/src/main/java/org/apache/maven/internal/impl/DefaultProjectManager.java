@@ -141,24 +141,31 @@ public class DefaultProjectManager implements ProjectManager {
             }
         }
         boolean isSameGroupAndVersion = Objects.equals(g1, g2) && Objects.equals(v1, v2);
-        if (isMultiModule) {
-            if (!isSameGroupAndVersion) {
-                throw new IllegalArgumentException(String.format(
-                        "The produced artifact must have the same groupId and version as the project it is attached to.%n"
-                                + "Expecting \"%s:%s:%s\" but received \"%s:%s:%s\".",
-                        g1, validArtifactId ? a2 : "${module}", v1, g2, a2, v2));
+        if (!(isSameGroupAndVersion && validArtifactId)) {
+            String message;
+            if (isMultiModule) {
+                // Multi-module project: artifactId may match any declared module name
+                message = String.format(
+                        "Cannot attach artifact to project: groupId and version must match the project, "
+                                + "and artifactId must match either the project or a declared module name.%n"
+                                + "  Project coordinates:  %s:%s:%s%n"
+                                + "  Artifact coordinates: %s:%s:%s%n",
+                        g1, a1, v1, g2, a2, v2);
+                if (isSameGroupAndVersion) {
+                    message += String.format(
+                            "  Hint: The artifactId '%s' does not match the project artifactId '%s' "
+                                    + "nor any declared module name in source roots.",
+                            a2, a1);
+                }
+            } else {
+                // Non-modular project: artifactId must match exactly
+                message = String.format(
+                        "Cannot attach artifact to project: groupId, artifactId and version must match the project.%n"
+                                + "  Project coordinates:  %s:%s:%s%n"
+                                + "  Artifact coordinates: %s:%s:%s",
+                        g1, a1, v1, g2, a2, v2);
             }
-            if (!validArtifactId) {
-                throw new IllegalArgumentException(String.format(
-                        "The produced artifactId must be the name of a Java module. It cannot be \"%s\".", a2));
-            }
-        } else {
-            if (!(isSameGroupAndVersion && validArtifactId)) {
-                throw new IllegalArgumentException(String.format(
-                        "The produced artifact must have the same groupId, artifactId and version as the project it is attached to.%n"
-                                + "Expecting \"%s:%s:%s\" but received \"%s:%s:%s\".",
-                        g1, a1, v1, g2, a2, v2));
-            }
+            throw new IllegalArgumentException(message);
         }
         getMavenProject(project)
                 .addAttachedArtifact(
