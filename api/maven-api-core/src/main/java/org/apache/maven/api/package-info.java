@@ -119,9 +119,9 @@
  *
  * <p><dfn>Project aggregation</dfn> allows building several projects together. This is only
  * for projects that are built, hence available on the file system. One project,
- * called the <dfn>aggregator project</dfn> lists one or more <dfn>modules</dfn>
+ * called the <dfn>aggregator project</dfn> lists one or more <dfn>sub-projects</dfn>
  * which are relative pointers on the file system to other projects. This is done using
- * the {@code /project/modules/module} elements of the POM in the aggregator project.
+ * the {@code /project/subprojects/subproject} elements of the POM in the aggregator project.
  * Note that the aggregator project is required to have a {@code pom} packaging.</p>
  *
  * <p><dfn>Project inheritance</dfn> defines a parent-child relationship between projects.

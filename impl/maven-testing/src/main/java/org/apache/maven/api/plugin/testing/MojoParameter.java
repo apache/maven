@@ -88,4 +88,28 @@ public @interface MojoParameter {
      * @return the parameter value
      */
     String value();
+
+    /**
+     * Whether to parse the value as XML.
+     * When {@code true} (default), the value is parsed as XML content within the parameter element.
+     * When {@code false}, the value is treated as plain text (useful for comma-separated lists).
+     *
+     * <p>Example with XML parsing enabled (default):</p>
+     * <pre>
+     * {@code
+     * @MojoParameter(name = "items", value = "<item>one</item><item>two</item>")
+     * }
+     * </pre>
+     *
+     * <p>Example with XML parsing disabled:</p>
+     * <pre>
+     * {@code
+     * @MojoParameter(name = "items", value = "one,two,three", xml = false)
+     * }
+     * </pre>
+     *
+     * @return {@code true} to parse as XML, {@code false} to treat as plain text
+     * @since 4.0.0
+     */
+    boolean xml() default true;
 }

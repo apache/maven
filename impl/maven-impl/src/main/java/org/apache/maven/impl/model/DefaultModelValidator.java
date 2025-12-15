@@ -738,7 +738,8 @@ public class DefaultModelValidator implements ModelValidator {
                 while (matcher.find()) {
                     String propertyName = matcher.group(0);
 
-                    if (path.startsWith("activation.file.") && "${project.basedir}".equals(propertyName)) {
+                    if ((path.startsWith("activation.file.") || path.equals("activation.condition"))
+                            && "${project.basedir}".equals(propertyName)) {
                         continue;
                     }
                     addViolation(

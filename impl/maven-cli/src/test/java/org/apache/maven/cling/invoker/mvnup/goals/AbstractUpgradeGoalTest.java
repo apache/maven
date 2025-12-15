@@ -24,10 +24,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import eu.maveniverse.domtrip.Document;
 import org.apache.maven.api.cli.mvnup.UpgradeOptions;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
-import org.jdom2.Document;
-import org.jdom2.input.SAXBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -56,13 +55,11 @@ class AbstractUpgradeGoalTest {
 
     private TestableAbstractUpgradeGoal upgradeGoal;
     private StrategyOrchestrator mockOrchestrator;
-    private SAXBuilder saxBuilder;
 
     @BeforeEach
     void setUp() {
         mockOrchestrator = mock(StrategyOrchestrator.class);
         upgradeGoal = new TestableAbstractUpgradeGoal(mockOrchestrator);
-        saxBuilder = new SAXBuilder();
     }
 
     private UpgradeContext createMockContext(Path workingDirectory) {

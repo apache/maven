@@ -235,4 +235,33 @@ public class DefaultPathMatcherFactoryTest {
         assertTrue(dirMatcher4.matches(subDir)
                 || !dirMatcher4.matches(subDir)); // Always true, just testing it doesn't throw
     }
+
+    /**
+     * Verifies that the directory matcher accepts the {@code "foo"} directory (at root)
+     * when using the {@code "**​/*foo*​/**"} include pattern.
+     * Of course, the {@code "org/foo"} directory must also be accepted.
+     */
+    @Test
+    public void testWildcardMatchesAlsoZeroDirectory() {
+        Path dir = Path.of("/tmp"); // We will not really create any file.
+
+        // We need two patterns for preventing `PathSelector` to discard itself as an optimization.
+        PathMatcher anyMatcher = factory.createPathMatcher(dir, List.of("**/*foo*/**", "dummy/**"), null, false);
+        PathMatcher dirMatcher = factory.deriveDirectoryMatcher(anyMatcher);
+
+        assertTrue(dirMatcher.matches(dir.resolve(Path.of("foo"))));
+        assertTrue(anyMatcher.matches(dir.resolve(Path.of("foo"))));
+        assertTrue(dirMatcher.matches(dir.resolve(Path.of("org", "foo"))));
+        assertTrue(anyMatcher.matches(dir.resolve(Path.of("org", "foo"))));
+        assertTrue(dirMatcher.matches(dir.resolve(Path.of("foo", "more"))));
+        assertTrue(anyMatcher.matches(dir.resolve(Path.of("foo", "more"))));
+        assertTrue(dirMatcher.matches(dir.resolve(Path.of("org", "foo", "more"))));
+        assertTrue(anyMatcher.matches(dir.resolve(Path.of("org", "foo", "more"))));
+        assertTrue(dirMatcher.matches(dir.resolve(Path.of("org", "0foo0", "more"))));
+        assertTrue(anyMatcher.matches(dir.resolve(Path.of("org", "0foo0", "more"))));
+        assertFalse(dirMatcher.matches(dir.resolve(Path.of("org", "bar", "more"))));
+        assertFalse(anyMatcher.matches(dir.resolve(Path.of("org", "bar", "more"))));
+        assertFalse(dirMatcher.matches(dir.resolve(Path.of("bar"))));
+        assertFalse(anyMatcher.matches(dir.resolve(Path.of("bar"))));
+    }
 }

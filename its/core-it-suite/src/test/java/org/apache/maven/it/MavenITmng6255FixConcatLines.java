@@ -45,7 +45,7 @@ class MavenITmng6255FixConcatLines extends AbstractMavenIntegrationTestCase {
     @Test
     @Disabled
     void testJvmConfigFileCR() throws Exception {
-        runWithLineEndings("\r");
+        runWithLineEndings("\r", "cr");
     }
 
     /**
@@ -55,7 +55,7 @@ class MavenITmng6255FixConcatLines extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void testJvmConfigFileLF() throws Exception {
-        runWithLineEndings("\n");
+        runWithLineEndings("\n", "lf");
     }
 
     /**
@@ -65,25 +65,27 @@ class MavenITmng6255FixConcatLines extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void testJvmConfigFileCRLF() throws Exception {
-        runWithLineEndings("\r\n");
+        runWithLineEndings("\r\n", "crlf");
     }
 
-    protected void runWithLineEndings(String lineEndings) throws Exception {
-        Path baseDir = extractResources("mng-6255");
+    protected void runWithLineEndings(String lineEndings, String test) throws Exception {
+        Path baseDir = extractResources("/mng-6255");
         Path mvnDir = baseDir.resolve(".mvn");
 
         Path jvmConfig = mvnDir.resolve("jvm.config");
         createJvmConfigFile(jvmConfig, lineEndings, "-Djvm.config=ok", "-Xms256m", "-Xmx512m");
 
         Verifier verifier = newVerifier(baseDir);
+        // Use different log file for each test to avoid overwriting
+        verifier.setLogFileName("log-" + test + ".txt");
         verifier.addCliArgument(
-                "-Dexpression.outputFile=" + baseDir.resolve("expression.properties"));
+                "-Dexpression.outputFile=" + baseDir.resolve("expression-" + test + ".properties"));
         verifier.setForkJvm(true); // custom .mvn/jvm.config
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties("expression.properties");
+        Properties props = verifier.loadProperties("expression-" + test + ".properties");
         assertEquals("ok", props.getProperty("project.properties.jvm-config"));
     }
 

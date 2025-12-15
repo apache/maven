@@ -177,38 +177,57 @@ cd /d "%EXEC_DIR%"
 
 :endDetectBaseDir
 
+rem Initialize JVM_CONFIG_MAVEN_OPTS to empty to avoid inheriting from environment
+set JVM_CONFIG_MAVEN_OPTS=
+
 if not exist "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" goto endReadJvmConfig
 
-@setlocal EnableExtensions EnableDelayedExpansion
-set JVM_CONFIG_MAVEN_OPTS=
-for /F "usebackq tokens=* delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config") do (
-    set "line=%%a"
+rem Use Java source-launch mode (JDK 11+) to parse jvm.config
+rem This avoids batch script parsing issues with special characters (pipes, quotes, @, etc.)
+rem Use temp file approach with cmd /c to ensure proper file handle release
 
-    rem Skip empty lines and full-line comments
-    echo !line! | findstr /b /r /c:"[ ]*#" >nul
-    if errorlevel 1 (
-        rem Handle end-of-line comments by taking everything before #
-        for /f "tokens=1* delims=#" %%i in ("!line!") do set "line=%%i"
+set "JVM_CONFIG_TEMP=%TEMP%\mvn-jvm-config-%RANDOM%-%RANDOM%.txt"
 
-        rem Trim leading/trailing spaces while preserving spaces in quotes
-        set "trimmed=!line!"
-        for /f "tokens=* delims= " %%i in ("!trimmed!") do set "trimmed=%%i"
-        for /l %%i in (1,1,100) do if "!trimmed:~-1!"==" " set "trimmed=!trimmed:~0,-1!"
-
-        rem Replace MAVEN_PROJECTBASEDIR placeholders
-        set "trimmed=!trimmed:${MAVEN_PROJECTBASEDIR}=%MAVEN_PROJECTBASEDIR%!"
-        set "trimmed=!trimmed:$MAVEN_PROJECTBASEDIR=%MAVEN_PROJECTBASEDIR%!"
-
-        if not "!trimmed!"=="" (
-            if "!JVM_CONFIG_MAVEN_OPTS!"=="" (
-                set "JVM_CONFIG_MAVEN_OPTS=!trimmed!"
-            ) else (
-                set "JVM_CONFIG_MAVEN_OPTS=!JVM_CONFIG_MAVEN_OPTS! !trimmed!"
-            )
-        )
-    )
+rem Debug logging (set MAVEN_DEBUG_SCRIPT=1 to enable)
+if defined MAVEN_DEBUG_SCRIPT (
+  echo [DEBUG] Found .mvn\jvm.config file at: %MAVEN_PROJECTBASEDIR%\.mvn\jvm.config
+  echo [DEBUG] Using temp file: %JVM_CONFIG_TEMP%
+  echo [DEBUG] Running JvmConfigParser with Java: %JAVACMD%
+  echo [DEBUG] Parser arguments: "%MAVEN_HOME%\bin\JvmConfigParser.java" "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" "%MAVEN_PROJECTBASEDIR%" "%JVM_CONFIG_TEMP%"
 )
-@endlocal & set JVM_CONFIG_MAVEN_OPTS=%JVM_CONFIG_MAVEN_OPTS%
+
+rem Run parser with output file as third argument - Java writes directly to file to avoid Windows file locking issues
+"%JAVACMD%" "%MAVEN_HOME%\bin\JvmConfigParser.java" "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" "%MAVEN_PROJECTBASEDIR%" "%JVM_CONFIG_TEMP%"
+set JVM_CONFIG_EXIT=%ERRORLEVEL%
+
+if defined MAVEN_DEBUG_SCRIPT (
+  echo [DEBUG] JvmConfigParser exit code: %JVM_CONFIG_EXIT%
+)
+
+rem Check if parser failed
+if %JVM_CONFIG_EXIT% neq 0 (
+  echo ERROR: Failed to parse .mvn/jvm.config file 1>&2
+  echo   jvm.config path: %MAVEN_PROJECTBASEDIR%\.mvn\jvm.config 1>&2
+  echo   Java command: %JAVACMD% 1>&2
+  if exist "%JVM_CONFIG_TEMP%" (
+    del "%JVM_CONFIG_TEMP%" 2>nul
+  )
+  exit /b 1
+)
+
+rem Read the output file
+if exist "%JVM_CONFIG_TEMP%" (
+  if defined MAVEN_DEBUG_SCRIPT (
+    echo [DEBUG] Temp file contents:
+    type "%JVM_CONFIG_TEMP%"
+  )
+  for /f "usebackq tokens=*" %%i in ("%JVM_CONFIG_TEMP%") do set "JVM_CONFIG_MAVEN_OPTS=%%i"
+  del "%JVM_CONFIG_TEMP%" 2>nul
+)
+
+if defined MAVEN_DEBUG_SCRIPT (
+  echo [DEBUG] Final JVM_CONFIG_MAVEN_OPTS: %JVM_CONFIG_MAVEN_OPTS%
+)
 
 :endReadJvmConfig
 
@@ -250,6 +269,11 @@ call :processArgs %*
 for %%i in ("%MAVEN_HOME%"\boot\plexus-classworlds-*) do set LAUNCHER_JAR="%%i"
 set LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
 if "%MAVEN_MAIN_CLASS%"=="" @set MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenCling
+
+if defined MAVEN_DEBUG_SCRIPT (
+  echo [DEBUG] Launching JVM with command:
+  echo [DEBUG]   "%JAVACMD%" %INTERNAL_MAVEN_OPTS% %MAVEN_OPTS% %JVM_CONFIG_MAVEN_OPTS% %MAVEN_DEBUG_OPTS% --enable-native-access=ALL-UNNAMED -classpath %LAUNCHER_JAR% "-Dclassworlds.conf=%CLASSWORLDS_CONF%" "-Dmaven.home=%MAVEN_HOME%" "-Dmaven.mainClass=%MAVEN_MAIN_CLASS%" "-Dlibrary.jline.path=%MAVEN_HOME%\lib\jline-native" "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" %LAUNCHER_CLASS% %MAVEN_ARGS% %*
+)
 
 "%JAVACMD%" ^
   %INTERNAL_MAVEN_OPTS% ^

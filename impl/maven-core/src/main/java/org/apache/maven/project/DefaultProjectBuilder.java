@@ -714,8 +714,21 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                             .toList());
 
             project.setInjectedProfileIds("external", getProfileIds(result.getActiveExternalProfiles()));
-            project.setInjectedProfileIds(
-                    result.getEffectiveModel().getId(), getProfileIds(result.getActivePomProfiles()));
+
+            // Track profile sources correctly by using the per-model profile tracking
+            Map<String, List<org.apache.maven.api.model.Profile>> profilesByModel =
+                    result.getActivePomProfilesByModel();
+
+            if (profilesByModel.isEmpty()) {
+                // Fallback to old behavior if map is empty
+                // This happens when no profiles are active or there's an issue with profile tracking
+                project.setInjectedProfileIds(
+                        result.getEffectiveModel().getId(), getProfileIds(result.getActivePomProfiles()));
+            } else {
+                for (Map.Entry<String, List<org.apache.maven.api.model.Profile>> entry : profilesByModel.entrySet()) {
+                    project.setInjectedProfileIds(entry.getKey(), getProfileIds(entry.getValue()));
+                }
+            }
 
             //
             // All the parts that were taken out of MavenProject for Maven 4.0.0
