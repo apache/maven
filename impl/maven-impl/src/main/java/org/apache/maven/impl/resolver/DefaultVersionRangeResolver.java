@@ -113,9 +113,7 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
             } else {
                 Metadata.Nature wantedNature;
                 String natureString = ConfigUtils.getString(
-                        session,
-                        Metadata.Nature.RELEASE_OR_SNAPSHOT.name(),
-                        Constants.MAVEN_VERSION_RANGE_RESOLVER_NATURE_OVERRIDE);
+                        session, request.getNature().name(), Constants.MAVEN_VERSION_RANGE_RESOLVER_NATURE_OVERRIDE);
                 if ("auto".equals(natureString)) {
                     org.eclipse.aether.artifact.Artifact lowerArtifact = lowerBound != null
                             ? request.getArtifact()
