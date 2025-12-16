@@ -33,6 +33,7 @@ import org.apache.maven.api.services.VersionRangeResolverException;
 import org.apache.maven.api.services.VersionRangeResolverRequest;
 import org.apache.maven.api.services.VersionRangeResolverResult;
 import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.metadata.Metadata;
 import org.eclipse.aether.repository.ArtifactRepository;
 import org.eclipse.aether.resolution.VersionRangeRequest;
 import org.eclipse.aether.resolution.VersionRangeResolutionException;
@@ -73,6 +74,7 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
                                             request.getRepositories() != null
                                                     ? request.getRepositories()
                                                     : session.getRemoteRepositories()),
+                                    toResolver(request.getNature()),
                                     trace.context())
                             .setTrace(trace.trace()));
 
@@ -113,5 +115,13 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
         } finally {
             RequestTraceHelper.exit(trace);
         }
+    }
+
+    private Metadata.Nature toResolver(VersionRangeResolverRequest.Nature nature) {
+        return switch (nature) {
+            case RELEASE_OR_SNAPSHOT -> Metadata.Nature.RELEASE_OR_SNAPSHOT;
+            case SNAPSHOT -> Metadata.Nature.SNAPSHOT;
+            case RELEASE -> Metadata.Nature.RELEASE;
+        };
     }
 }
