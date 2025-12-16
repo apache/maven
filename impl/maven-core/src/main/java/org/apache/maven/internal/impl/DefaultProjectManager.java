@@ -119,7 +119,8 @@ public class DefaultProjectManager implements ProjectManager {
                     artifact.getExtension(),
                     null);
         }
-        // Verify groupId and version, intentionally allow artifactId to differ as a project may be multi-module.
+        // Verify groupId and version, intentionally allow artifactId to differ as Maven project may be
+        // multi-module with modular sources structure that provide module names used as artifactIds.
         String g1 = project.getGroupId();
         String a1 = project.getArtifactId();
         String v1 = project.getVersion();
@@ -127,7 +128,8 @@ public class DefaultProjectManager implements ProjectManager {
         String a2 = artifact.getArtifactId();
         String v2 = artifact.getBaseVersion().toString();
 
-        // ArtifactId may differ only for multi-module projects (source roots with module name)
+        // ArtifactId may differ only for multi-module projects, in which case
+        // it must match the module name from a source root in modular sources.
         boolean isMultiModule = false;
         boolean validArtifactId = Objects.equals(a1, a2);
         for (SourceRoot sr : getSourceRoots(project)) {
