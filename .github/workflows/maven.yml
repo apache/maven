@@ -175,7 +175,7 @@ jobs:
             mvn40-
 
       - name: Download Maven distribution
-        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           name: maven-distributions
           path: maven-dist
@@ -276,7 +276,7 @@ jobs:
             mvn40-
 
       - name: Download Maven distribution
-        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           name: maven-distributions
           path: maven-dist
@@ -347,7 +347,7 @@ jobs:
       - integration-tests
     steps:
       - name: Download Caches
-        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           merge-multiple: true
           pattern: 'cache-${{ runner.os }}*'
