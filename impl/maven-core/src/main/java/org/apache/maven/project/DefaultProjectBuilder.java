@@ -686,8 +686,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                         ProjectScope scope = src.scope();
                         if (ProjectScope.MAIN.equals(scope)) {
                             hasMainResources = true;
-                        } else {
-                            hasTestResources |= ProjectScope.TEST.equals(scope);
+                        } else if (ProjectScope.TEST.equals(scope)) {
+                            hasTestResources = true;
                         }
                     } else {
                         hasScript |= Language.SCRIPT.equals(language);
