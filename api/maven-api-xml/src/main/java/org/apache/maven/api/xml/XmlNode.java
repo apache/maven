@@ -54,6 +54,10 @@ import org.apache.maven.api.annotations.ThreadSafe;
 @Immutable
 public interface XmlNode {
 
+    /**
+     * @deprecated since 4.0.0.
+     *             Use {@link XmlService#CHILDREN_COMBINATION_MODE_ATTRIBUTE} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     String CHILDREN_COMBINATION_MODE_ATTRIBUTE = XmlService.CHILDREN_COMBINATION_MODE_ATTRIBUTE;
 
