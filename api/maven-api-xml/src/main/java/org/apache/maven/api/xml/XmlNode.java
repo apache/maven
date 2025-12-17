@@ -61,34 +61,66 @@ public interface XmlNode {
     @Deprecated(since = "4.0.0", forRemoval = true)
     String CHILDREN_COMBINATION_MODE_ATTRIBUTE = XmlService.CHILDREN_COMBINATION_MODE_ATTRIBUTE;
 
+    /**
+     * @deprecated since 4.0.0.
+     *             Use {@link XmlService#CHILDREN_COMBINATION_MERGE} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     String CHILDREN_COMBINATION_MERGE = XmlService.CHILDREN_COMBINATION_MERGE;
 
+
+    /**
+     * @deprecated since 4.0.0.
+     *             Use {@link XmlService#CHILDREN_COMBINATION_APPEND} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     String CHILDREN_COMBINATION_APPEND = XmlService.CHILDREN_COMBINATION_APPEND;
+
 
     /**
      * This default mode for combining children DOMs during merge means that where element names match, the process will
      * try to merge the element data, rather than putting the dominant and recessive elements (which share the same
      * element name) as siblings in the resulting DOM.
+     *
+     * @deprecated since 4.0.0.
+     *             Use {@link XmlService#DEFAULT_CHILDREN_COMBINATION_MODE} instead.
      */
     @Deprecated(since = "4.0.0", forRemoval = true)
     String DEFAULT_CHILDREN_COMBINATION_MODE = XmlService.DEFAULT_CHILDREN_COMBINATION_MODE;
 
+    /**
+     * @deprecated since 4.0.0.
+     *             Use {@link XmlService#SELF_COMBINATION_MODE_ATTRIBUTE} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     String SELF_COMBINATION_MODE_ATTRIBUTE = XmlService.SELF_COMBINATION_MODE_ATTRIBUTE;
-
+    /**
+     * @deprecated since 4.0.0.
+     *             Use {@link XmlService#SELF_COMBINATION_OVERRIDE} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     String SELF_COMBINATION_OVERRIDE = XmlService.SELF_COMBINATION_OVERRIDE;
 
+    /**
+     * @deprecated since 4.0.0.
+     *             Use {@link XmlService#SELF_COMBINATION_MERGE} instead.
+     */
+
     @Deprecated(since = "4.0.0", forRemoval = true)
     String SELF_COMBINATION_MERGE = XmlService.SELF_COMBINATION_MERGE;
+    /**
+     * @deprecated since 4.0.0.
+     *             Use {@link XmlService#SELF_COMBINATION_REMOVE} instead.
+     */
 
     @Deprecated(since = "4.0.0", forRemoval = true)
     String SELF_COMBINATION_REMOVE = XmlService.SELF_COMBINATION_REMOVE;
 
     /**
      * In case of complex XML structures, combining can be done based on id.
+     *
+     * @deprecated since 4.0.0.
+     *             Use {@link XmlService#ID_COMBINATION_MODE_ATTRIBUTE} instead.
      */
     @Deprecated(since = "4.0.0", forRemoval = true)
     String ID_COMBINATION_MODE_ATTRIBUTE = XmlService.ID_COMBINATION_MODE_ATTRIBUTE;
@@ -96,6 +128,9 @@ public interface XmlNode {
     /**
      * In case of complex XML structures, combining can be done based on keys.
      * This is a comma separated list of attribute names.
+     *
+     * @deprecated since 4.0.0.
+     *             Use {@link XmlService#KEYS_COMBINATION_MODE_ATTRIBUTE} instead.
      */
     @Deprecated(since = "4.0.0", forRemoval = true)
     String KEYS_COMBINATION_MODE_ATTRIBUTE = XmlService.KEYS_COMBINATION_MODE_ATTRIBUTE;
@@ -105,6 +140,9 @@ public interface XmlNode {
      * try to merge the element attributes and values, rather than overriding the recessive element completely with the
      * dominant one. This means that wherever the dominant element doesn't provide the value or a particular attribute,
      * that value or attribute will be set from the recessive DOM node.
+     *
+     * @deprecated since 4.0.0.
+     *             Use {@link XmlService#DEFAULT_SELF_COMBINATION_MODE} instead.
      */
     @Deprecated(since = "4.0.0", forRemoval = true)
     String DEFAULT_SELF_COMBINATION_MODE = XmlService.DEFAULT_SELF_COMBINATION_MODE;
@@ -186,54 +224,89 @@ public interface XmlNode {
     Object inputLocation();
 
     // Deprecated methods that delegate to new ones
+    /**
+     * @deprecated since 4.0.0.
+     *             Use {@link #name()} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
     default String getName() {
         return name();
     }
 
+    /**
+     * @deprecated since 4.0.0.
+     *             Use {@link #namespaceUri()} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
     default String getNamespaceUri() {
         return namespaceUri();
     }
 
+    /**
+     * @deprecated since 4.0.0.
+     *             Use {@link #prefix()} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
     default String getPrefix() {
         return prefix();
     }
-
+    /**
+     * @deprecated since 4.0.0.
+     *             Use {@link #value()} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     @Nullable
     default String getValue() {
         return value();
     }
 
+    /**
+     * @deprecated since 4.0.0.
+     *             Use {@link #attributes()} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
     default Map<String, String> getAttributes() {
         return attributes();
     }
 
+    /**
+     * @deprecated since 4.0.0.
+     *             Use {@link #attribute(String)} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     @Nullable
     default String getAttribute(@Nonnull String name) {
         return attribute(name);
     }
 
+    /**
+     * @deprecated since 4.0.0.
+     *             Use {@link #children()} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
     default List<XmlNode> getChildren() {
         return children();
     }
 
+    /**
+     * @deprecated since 4.0.0.
+     *             Use {@link #child(String)} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     @Nullable
     default XmlNode getChild(String name) {
         return child(name);
     }
 
+    /**
+     * @deprecated since 4.0.0.
+     *             Use {@link #inputLocation()} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     @Nullable
     default Object getInputLocation() {
@@ -241,7 +314,8 @@ public interface XmlNode {
     }
 
     /**
-     * @deprecated use {@link XmlService#merge(XmlNode, XmlNode, Boolean)} instead
+     * @deprecated since 4.0.0.
+     *             Use {@link XmlService#merge(XmlNode, XmlNode, Boolean)} instead.
      */
     @Deprecated(since = "4.0.0", forRemoval = true)
     default XmlNode merge(@Nullable XmlNode source) {
@@ -249,12 +323,14 @@ public interface XmlNode {
     }
 
     /**
-     * @deprecated use {@link XmlService#merge(XmlNode, XmlNode, Boolean)} instead
+     * @deprecated since 4.0.0.
+     *             Use {@link XmlService#merge(XmlNode, XmlNode, Boolean)} instead.
      */
     @Deprecated(since = "4.0.0", forRemoval = true)
     default XmlNode merge(@Nullable XmlNode source, @Nullable Boolean childMergeOverride) {
         return XmlService.merge(this, source, childMergeOverride);
     }
+
 
     /**
      * Merge recessive into dominant and return either {@code dominant}
@@ -265,7 +341,8 @@ public interface XmlNode {
      * @param recessive if {@code null}, nothing will happen
      * @return the merged node
      *
-     * @deprecated use {@link XmlService#merge(XmlNode, XmlNode, Boolean)} instead
+     * @deprecated since 4.0.0.
+     *             Use {@link XmlService#merge(XmlNode, XmlNode, Boolean)} instead.
      */
     @Deprecated(since = "4.0.0", forRemoval = true)
     @Nullable

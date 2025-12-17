@@ -94,7 +94,7 @@ public record DefaultSourceRoot(
             @Nonnull Language language,
             @Nullable String moduleName,
             @Nullable Version targetVersionOrNull,
-            @Nullable Path directory,
+            @Nonnull Path directory,
             @Nullable List<String> includes,
             @Nullable List<String> excludes,
             boolean stringFiltering,

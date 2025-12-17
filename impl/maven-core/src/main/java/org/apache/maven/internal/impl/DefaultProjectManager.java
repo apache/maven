@@ -119,15 +119,55 @@ public class DefaultProjectManager implements ProjectManager {
                     artifact.getExtension(),
                     null);
         }
-        if (!Objects.equals(project.getGroupId(), artifact.getGroupId())
-                || !Objects.equals(project.getArtifactId(), artifact.getArtifactId())
-                || !Objects.equals(
-                        project.getVersion(), artifact.getBaseVersion().toString())) {
-            throw new IllegalArgumentException(
-                    "The produced artifact must have the same groupId/artifactId/version than the project it is attached to. Expecting "
-                            + project.getGroupId() + ":" + project.getArtifactId() + ":" + project.getVersion()
-                            + " but received " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":"
-                            + artifact.getBaseVersion());
+        // Verify groupId and version, intentionally allow artifactId to differ as Maven project may be
+        // multi-module with modular sources structure that provide module names used as artifactIds.
+        String g1 = project.getGroupId();
+        String a1 = project.getArtifactId();
+        String v1 = project.getVersion();
+        String g2 = artifact.getGroupId();
+        String a2 = artifact.getArtifactId();
+        String v2 = artifact.getBaseVersion().toString();
+
+        // ArtifactId may differ only for multi-module projects, in which case
+        // it must match the module name from a source root in modular sources.
+        boolean isMultiModule = false;
+        boolean validArtifactId = Objects.equals(a1, a2);
+        for (SourceRoot sr : getSourceRoots(project)) {
+            Optional<String> moduleName = sr.module();
+            if (moduleName.isPresent()) {
+                isMultiModule = true;
+                if (moduleName.get().equals(a2)) {
+                    validArtifactId = true;
+                    break;
+                }
+            }
+        }
+        boolean isSameGroupAndVersion = Objects.equals(g1, g2) && Objects.equals(v1, v2);
+        if (!(isSameGroupAndVersion && validArtifactId)) {
+            String message;
+            if (isMultiModule) {
+                // Multi-module project: artifactId may match any declared module name
+                message = String.format(
+                        "Cannot attach artifact to project: groupId and version must match the project, "
+                                + "and artifactId must match either the project or a declared module name.%n"
+                                + "  Project coordinates:  %s:%s:%s%n"
+                                + "  Artifact coordinates: %s:%s:%s%n",
+                        g1, a1, v1, g2, a2, v2);
+                if (isSameGroupAndVersion) {
+                    message += String.format(
+                            "  Hint: The artifactId '%s' does not match the project artifactId '%s' "
+                                    + "nor any declared module name in source roots.",
+                            a2, a1);
+                }
+            } else {
+                // Non-modular project: artifactId must match exactly
+                message = String.format(
+                        "Cannot attach artifact to project: groupId, artifactId and version must match the project.%n"
+                                + "  Project coordinates:  %s:%s:%s%n"
+                                + "  Artifact coordinates: %s:%s:%s",
+                        g1, a1, v1, g2, a2, v2);
+            }
+            throw new IllegalArgumentException(message);
         }
         getMavenProject(project)
                 .addAttachedArtifact(
