@@ -30,7 +30,13 @@ public class MavenPluginJavaPrerequisiteCheckerTest {
     public void testMatchesVersion() {
         MavenPluginJavaPrerequisiteChecker checker = new MavenPluginJavaPrerequisiteChecker();
         assertTrue(checker.matchesVersion("8", "1.8"));
+        assertTrue(checker.matchesVersion("[8,)", "1.8"));
         assertTrue(checker.matchesVersion("8", "9.0.1+11"));
+        assertTrue(checker.matchesVersion("[8,)", "9.0.1+11"));
+        assertTrue(checker.matchesVersion("1.8", "1.8"));
+        assertTrue(checker.matchesVersion("[1.8,)", "1.8"));
+        assertTrue(checker.matchesVersion("1.8", "9.0.1+11"));
+        assertTrue(checker.matchesVersion("[1.8,)", "9.0.1+11"));
         assertTrue(checker.matchesVersion("1.0", "1.8"));
         assertTrue(checker.matchesVersion("1.8", "9.0.1+11"));
         assertFalse(checker.matchesVersion("[1.0,2],[3,4]", "2.1"));
