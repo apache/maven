@@ -47,9 +47,13 @@ public class MavenPluginJavaPrerequisiteChecker implements MavenPluginPrerequisi
     }
 
     boolean matchesVersion(String requiredVersion, String currentVersion) {
+        // Java 8 is consistent: it will always say "1.8...". Users are not consistent.
+        if (!requiredVersion.contains("1.8") && currentVersion.startsWith("1.8")) {
+            currentVersion = currentVersion.substring(2);
+        }
         VersionConstraint constraint;
         try {
-            constraint = versionScheme.parseVersionConstraint(requiredVersion.equals("8") ? "1.8" : requiredVersion);
+            constraint = versionScheme.parseVersionConstraint(requiredVersion);
         } catch (InvalidVersionSpecificationException e) {
             throw new IllegalArgumentException("Invalid 'requiredJavaVersion' given in plugin descriptor", e);
         }
