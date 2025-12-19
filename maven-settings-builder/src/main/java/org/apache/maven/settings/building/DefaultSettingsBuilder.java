@@ -29,9 +29,12 @@ import java.io.StringWriter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.maven.building.FileSource;
 import org.apache.maven.building.Source;
+import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.TrackableBase;
 import org.apache.maven.settings.io.SettingsParseException;
@@ -91,10 +94,10 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
         Source globalSettingsSource =
                 getSettingsSource(request.getGlobalSettingsFile(), request.getGlobalSettingsSource());
-        Settings globalSettings = readSettings(globalSettingsSource, request, problems);
+        Settings globalSettings = readSettings(globalSettingsSource, problems);
 
         Source userSettingsSource = getSettingsSource(request.getUserSettingsFile(), request.getUserSettingsSource());
-        Settings userSettings = readSettings(userSettingsSource, request, problems);
+        Settings userSettings = readSettings(userSettingsSource, problems);
 
         settingsMerger.merge(userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL);
 
@@ -139,8 +142,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         return null;
     }
 
-    private Settings readSettings(
-            Source settingsSource, SettingsBuildingRequest request, DefaultSettingsProblemCollector problems) {
+    private Settings readSettings(Source settingsSource, DefaultSettingsProblemCollector problems) {
         if (settingsSource == null) {
             return new Settings();
         }
@@ -180,9 +182,24 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             return new Settings();
         }
 
+        settings.setServers(serversByIds(settings.getServers()));
         settingsValidator.validate(settings, problems);
 
         return settings;
+    }
+
+    private List<Server> serversByIds(List<Server> servers) {
+        return servers.stream()
+                .flatMap(server -> Stream.concat(
+                        Stream.of(server), server.getIds().stream().map(id -> serverAlias(server, id))))
+                .collect(Collectors.toList());
+    }
+
+    private Server serverAlias(Server server, String id) {
+        Server serverClone = server.clone();
+        serverClone.setId(id);
+        serverClone.setIds(Collections.emptyList());
+        return serverClone;
     }
 
     private Settings interpolate(
