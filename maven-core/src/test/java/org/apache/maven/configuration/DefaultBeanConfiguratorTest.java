@@ -18,35 +18,28 @@
  */
 package org.apache.maven.configuration;
 
+import javax.inject.Inject;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Benjamin Bentmann
  */
-public class DefaultBeanConfiguratorTest extends PlexusTestCase {
+@PlexusTest
+public class DefaultBeanConfiguratorTest {
 
+    @Inject
     private BeanConfigurator configurator;
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        configurator = lookup(BeanConfigurator.class);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        configurator = null;
-
-        super.tearDown();
-    }
 
     private Xpp3Dom toConfig(String xml) {
         try {
@@ -56,6 +49,7 @@ public class DefaultBeanConfiguratorTest extends PlexusTestCase {
         }
     }
 
+    @Test
     public void testMinimal() throws BeanConfigurationException {
         SomeBean bean = new SomeBean();
 
@@ -69,6 +63,7 @@ public class DefaultBeanConfiguratorTest extends PlexusTestCase {
         assertEquals(new File("test"), bean.file);
     }
 
+    @Test
     public void testPreAndPostProcessing() throws BeanConfigurationException {
         SomeBean bean = new SomeBean();
 
@@ -98,6 +93,7 @@ public class DefaultBeanConfiguratorTest extends PlexusTestCase {
         assertEquals(new File("base/test").getAbsoluteFile(), bean.file);
     }
 
+    @Test
     public void testChildConfigurationElement() throws BeanConfigurationException {
         SomeBean bean = new SomeBean();
 

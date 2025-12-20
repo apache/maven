@@ -20,12 +20,10 @@ package org.apache.maven.lifecycle.internal;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Kristian Rosenvold
@@ -36,10 +34,7 @@ public class ProjectBuildListTest {
         final MavenSession session = ProjectDependencyGraphStub.getMavenSession();
         ProjectBuildList projectBuildList = ProjectDependencyGraphStub.getProjectBuildList(session);
         TaskSegment taskSegment = projectBuildList.get(0).getTaskSegment();
-        assertThat(
-                "This test assumes there are at least 6 elements in projectBuilds",
-                projectBuildList.size(),
-                is(greaterThanOrEqualTo(6)));
+        assertTrue(projectBuildList.size() >= 6, "This test assumes there are at least 6 elements in projectBuilds");
 
         final ProjectBuildList byTaskSegment = projectBuildList.getByTaskSegment(taskSegment);
         assertEquals(projectBuildList.size(), byTaskSegment.size()); // TODO Make multiple segments on projectBuildList

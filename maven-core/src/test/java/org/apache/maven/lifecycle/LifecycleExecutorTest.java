@@ -18,6 +18,9 @@
  */
 package org.apache.maven.lifecycle;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,14 +28,12 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
-import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.execution.MojoExecutionListener;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.execution.ProjectExecutionEvent;
 import org.apache.maven.execution.ProjectExecutionListener;
-import org.apache.maven.lifecycle.internal.DefaultLifecycleTaskSegmentCalculator;
 import org.apache.maven.lifecycle.internal.ExecutionPlanItem;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.lifecycle.internal.LifecycleTask;
@@ -45,37 +46,36 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.fail;
+
+@PlexusTest
 public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
-    @Requirement
-    private DefaultLifecycleExecutor lifecycleExecutor;
+    @Inject
+    private LifecycleExecutor lifecycleExecutor;
 
-    @Requirement
-    private DefaultLifecycleTaskSegmentCalculator lifeCycleTaskSegmentCalculator;
+    @Inject
+    private LifecycleTaskSegmentCalculator lifeCycleTaskSegmentCalculator;
 
-    @Requirement
+    @Inject
     private LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator;
 
-    @Requirement
+    @Inject
     private MojoDescriptorCreator mojoDescriptorCreator;
 
-    protected void setUp() throws Exception {
-        super.setUp();
-        lifecycleExecutor = (DefaultLifecycleExecutor) lookup(LifecycleExecutor.class);
-        lifeCycleTaskSegmentCalculator =
-                (DefaultLifecycleTaskSegmentCalculator) lookup(LifecycleTaskSegmentCalculator.class);
-        lifeCycleExecutionPlanCalculator = lookup(LifecycleExecutionPlanCalculator.class);
-        mojoDescriptorCreator = lookup(MojoDescriptorCreator.class);
-        lookup(ExceptionHandler.class);
-    }
+    @Inject
+    @Named("delegating")
+    private ProjectExecutionListener projectExecutionListener;
 
-    @Override
-    protected void tearDown() throws Exception {
-        lifecycleExecutor = null;
-        super.tearDown();
-    }
+    @Inject
+    @Named("delegating")
+    private MojoExecutionListener mojoExecutionListener;
 
     protected String getProjectsDirectory() {
         return "src/test/projects/lifecycle-executor";
@@ -85,6 +85,7 @@ public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     // Tests which exercise the lifecycle executor when it is dealing with default lifecycle phases.
     // -----------------------------------------------------------------------------------------------
 
+    @Test
     public void testCalculationOfBuildPlanWithIndividualTaskWherePluginIsSpecifiedInThePom() throws Exception {
         // We are doing something like "mvn resources:resources" where no version is specified but this
         // project we are working on has the version specified in the POM so the version should come from there.
@@ -106,6 +107,7 @@ public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
                 "0.1", mojoExecution.getMojoDescriptor().getPluginDescriptor().getVersion());
     }
 
+    @Test
     public void testCalculationOfBuildPlanWithIndividualTaskOfTheCleanLifecycle() throws Exception {
         // We are doing something like "mvn clean:clean" where no version is specified but this
         // project we are working on has the version specified in the POM so the version should come from there.
@@ -127,6 +129,7 @@ public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
                 "0.1", mojoExecution.getMojoDescriptor().getPluginDescriptor().getVersion());
     }
 
+    @Test
     public void testCalculationOfBuildPlanWithIndividualTaskOfTheCleanCleanGoal() throws Exception {
         // We are doing something like "mvn clean:clean" where no version is specified but this
         // project we are working on has the version specified in the POM so the version should come from there.
@@ -157,6 +160,7 @@ public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     // We need to take in multiple lifecycles
+    @Test
     public void testCalculationOfBuildPlanTasksOfTheCleanLifecycleAndTheInstallLifecycle() throws Exception {
         File pom = getProject("project-with-additional-lifecycle-elements");
         MavenSession session = createMavenSession(pom);
@@ -200,6 +204,7 @@ public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     // We need to take in multiple lifecycles
+    @Test
     public void testCalculationOfBuildPlanWithMultipleExecutionsOfModello() throws Exception {
         File pom = getProject("project-with-multiple-executions");
         MavenSession session = createMavenSession(pom);
@@ -258,6 +263,7 @@ public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
                 new MojoExecutionXPathContainer(executions.get(4)).getValue("configuration/models[1]/model"));
     }
 
+    @Test
     public void testLifecycleQueryingUsingADefaultLifecyclePhase() throws Exception {
         File pom = getProject("project-with-additional-lifecycle-elements");
         MavenSession session = createMavenSession(pom);
@@ -296,12 +302,14 @@ public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
         assertEquals("jar:jar", executionPlan.get(7).getMojoDescriptor().getFullGoalName());
     }
 
+    @Test
     public void testLifecyclePluginsRetrievalForDefaultLifecycle() throws Exception {
         List<Plugin> plugins = new ArrayList<>(lifecycleExecutor.getPluginsBoundByDefaultToAllLifecycles("jar"));
 
         assertEquals(8, plugins.size());
     }
 
+    @Test
     public void testPluginConfigurationCreation() throws Exception {
         File pom = getProject("project-with-additional-lifecycle-elements");
         MavenSession session = createMavenSession(pom);
@@ -325,6 +333,7 @@ public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
                 session, session.getCurrentProject(), mergedSegment.getTasks());
     }
 
+    @Test
     public void testInvalidGoalName() throws Exception {
         File pom = getProject("project-basic");
         MavenSession session = createMavenSession(pom);
@@ -344,6 +353,7 @@ public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
         }
     }
 
+    @Test
     public void testPluginPrefixRetrieval() throws Exception {
         File pom = getProject("project-basic");
         MavenSession session = createMavenSession(pom);
@@ -353,7 +363,7 @@ public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     // Prefixes
-
+    @Test
     public void testFindingPluginPrefixforCleanClean() throws Exception {
         File pom = getProject("project-basic");
         MavenSession session = createMavenSession(pom);
@@ -361,6 +371,7 @@ public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
         assertNotNull(plugin);
     }
 
+    @Test
     public void testSetupMojoExecution() throws Exception {
         File pom = getProject("mojo-configuration");
 
@@ -371,7 +382,7 @@ public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
                 session, session.getCurrentProject(), Arrays.asList((Object) task), false);
 
         MojoExecution execution = executionPlan.getMojoExecutions().get(0);
-        assertEquals(execution.toString(), "maven-it-plugin", execution.getArtifactId());
+        assertEquals("maven-it-plugin", execution.getArtifactId(), execution.toString());
         assertNull(execution.getConfiguration());
 
         lifeCycleExecutionPlanCalculator.setupMojoExecution(session, session.getCurrentProject(), execution);
@@ -379,6 +390,7 @@ public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
         assertEquals("1.0", execution.getConfiguration().getChild("version").getAttribute("default-value"));
     }
 
+    @Test
     public void testExecutionListeners() throws Exception {
         final File pom = getProject("project-basic");
         final MavenSession session = createMavenSession(pom);
@@ -478,15 +490,11 @@ public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
                 log.add("afterProjectExecutionFailure " + event.getProject().getArtifactId());
             }
         };
-        lookup(DelegatingProjectExecutionListener.class).addProjectExecutionListener(projectListener);
-        lookup(DelegatingMojoExecutionListener.class).addMojoExecutionListener(mojoListener);
 
-        try {
-            lifecycleExecutor.execute(session);
-        } finally {
-            lookup(DelegatingProjectExecutionListener.class).removeProjectExecutionListener(projectListener);
-            lookup(DelegatingMojoExecutionListener.class).removeMojoExecutionListener(mojoListener);
-        }
+        ((DelegatingProjectExecutionListener) projectExecutionListener).addProjectExecutionListener(projectListener);
+        ((DelegatingMojoExecutionListener) mojoExecutionListener).addMojoExecutionListener(mojoListener);
+
+        lifecycleExecutor.execute(session);
 
         List<String> expectedLog = Arrays.asList(
                 "beforeProjectExecution project-basic", //

@@ -21,17 +21,20 @@ package org.apache.maven.graph;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.TestCase;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Kristian Rosenvold
  */
-public class DefaultProjectDependencyGraphTest extends TestCase {
+public class DefaultProjectDependencyGraphTest {
 
     private final MavenProject aProject = createA();
 
@@ -58,6 +61,7 @@ public class DefaultProjectDependencyGraphTest extends TestCase {
 
     private final MavenProject transitiveOnly = createProject(Arrays.asList(toDependency(depender3)), "depender5");
 
+    @Test
     public void testNonTransitiveFiltering() throws DuplicateProjectException, CycleDetectedException {
         ProjectDependencyGraph graph = new FilteredProjectDependencyGraph(
                 new DefaultProjectDependencyGraph(Arrays.asList(aProject, bProject, cProject)),
@@ -90,6 +94,7 @@ public class DefaultProjectDependencyGraphTest extends TestCase {
     // are not whitelisted, so they should return their downstream projects, both have dProject and eProject as
     // downstream projects. Which would result in dProject and eProject being returned twice, but now the results are
     // made unique.
+    @Test
     public void testGetDownstreamDoesNotDuplicateProjects() throws CycleDetectedException, DuplicateProjectException {
         ProjectDependencyGraph graph =
                 new DefaultProjectDependencyGraph(Arrays.asList(aProject, bProject, cProject, dProject, eProject));
@@ -100,6 +105,7 @@ public class DefaultProjectDependencyGraphTest extends TestCase {
         assertTrue(downstreamProjects.contains(eProject));
     }
 
+    @Test
     public void testGetSortedProjects() throws DuplicateProjectException, CycleDetectedException {
         ProjectDependencyGraph graph = new DefaultProjectDependencyGraph(Arrays.asList(depender1, aProject));
         final List<MavenProject> sortedProjects = graph.getSortedProjects();
@@ -107,6 +113,7 @@ public class DefaultProjectDependencyGraphTest extends TestCase {
         assertEquals(depender1, sortedProjects.get(1));
     }
 
+    @Test
     public void testVerifyExpectedParentStructure() throws CycleDetectedException, DuplicateProjectException {
         // This test verifies the baseline structure used in subsequent tests. If this fails, the rest will fail.
         ProjectDependencyGraph graph = threeProjectsDependingOnASingle();
@@ -117,6 +124,7 @@ public class DefaultProjectDependencyGraphTest extends TestCase {
         assertEquals(depender3, sortedProjects.get(3));
     }
 
+    @Test
     public void testVerifyThatDownstreamProjectsComeInSortedOrder()
             throws CycleDetectedException, DuplicateProjectException {
         final List<MavenProject> downstreamProjects =
@@ -126,6 +134,7 @@ public class DefaultProjectDependencyGraphTest extends TestCase {
         assertEquals(depender3, downstreamProjects.get(2));
     }
 
+    @Test
     public void testTransitivesInOrder() throws CycleDetectedException, DuplicateProjectException {
         final ProjectDependencyGraph graph =
                 new DefaultProjectDependencyGraph(Arrays.asList(depender1, depender4, depender2, depender3, aProject));
@@ -137,6 +146,7 @@ public class DefaultProjectDependencyGraphTest extends TestCase {
         assertEquals(depender2, downstreamProjects.get(3));
     }
 
+    @Test
     public void testNonTransitivesInOrder() throws CycleDetectedException, DuplicateProjectException {
         final ProjectDependencyGraph graph =
                 new DefaultProjectDependencyGraph(Arrays.asList(depender1, depender4, depender2, depender3, aProject));
@@ -148,6 +158,7 @@ public class DefaultProjectDependencyGraphTest extends TestCase {
         assertEquals(depender2, downstreamProjects.get(3));
     }
 
+    @Test
     public void testWithTransitiveOnly() throws CycleDetectedException, DuplicateProjectException {
         final ProjectDependencyGraph graph = new DefaultProjectDependencyGraph(
                 Arrays.asList(depender1, transitiveOnly, depender2, depender3, aProject));
@@ -159,6 +170,7 @@ public class DefaultProjectDependencyGraphTest extends TestCase {
         assertEquals(depender2, downstreamProjects.get(3));
     }
 
+    @Test
     public void testWithMissingTransitiveOnly() throws CycleDetectedException, DuplicateProjectException {
         final ProjectDependencyGraph graph = new DefaultProjectDependencyGraph(
                 Arrays.asList(depender1, transitiveOnly, depender2, depender3, aProject));
@@ -169,6 +181,7 @@ public class DefaultProjectDependencyGraphTest extends TestCase {
         assertEquals(depender2, downstreamProjects.get(2));
     }
 
+    @Test
     public void testGetUpstreamProjects() throws CycleDetectedException, DuplicateProjectException {
         ProjectDependencyGraph graph = threeProjectsDependingOnASingle();
         final List<MavenProject> downstreamProjects = graph.getUpstreamProjects(depender1, true);

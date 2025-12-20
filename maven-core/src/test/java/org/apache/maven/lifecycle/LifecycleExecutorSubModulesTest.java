@@ -18,64 +18,51 @@
  */
 package org.apache.maven.lifecycle;
 
-import org.apache.maven.AbstractCoreMavenComponentTestCase;
-import org.apache.maven.exception.ExceptionHandler;
+import javax.inject.Inject;
+
 import org.apache.maven.lifecycle.internal.LifecycleDependencyResolver;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.lifecycle.internal.LifecycleModuleBuilder;
 import org.apache.maven.lifecycle.internal.LifecycleTaskSegmentCalculator;
 import org.apache.maven.lifecycle.internal.MojoExecutor;
-import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.testing.PlexusTest;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Just asserts that it's able to create those components. Handy when plexus gets a nervous breakdown.
  *
  * @author Kristian Rosenvold
  */
-public class LifecycleExecutorSubModulesTest extends AbstractCoreMavenComponentTestCase {
-    @Requirement
+@PlexusTest
+public class LifecycleExecutorSubModulesTest {
+    @Inject
     private DefaultLifecycles defaultLifeCycles;
 
-    @Requirement
+    @Inject
     private MojoExecutor mojoExecutor;
 
-    @Requirement
+    @Inject
     private LifecycleModuleBuilder lifeCycleBuilder;
 
-    @Requirement
+    @Inject
     private LifecycleDependencyResolver lifeCycleDependencyResolver;
 
-    @Requirement
+    @Inject
     private LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator;
 
-    @Requirement
+    @Inject
     private LifeCyclePluginAnalyzer lifeCyclePluginAnalyzer;
 
-    @Requirement
+    @Inject
     private LifecycleTaskSegmentCalculator lifeCycleTaskSegmentCalculator;
-
-    protected void setUp() throws Exception {
-        super.setUp();
-        defaultLifeCycles = lookup(DefaultLifecycles.class);
-        mojoExecutor = lookup(MojoExecutor.class);
-        lifeCycleBuilder = lookup(LifecycleModuleBuilder.class);
-        lifeCycleDependencyResolver = lookup(LifecycleDependencyResolver.class);
-        lifeCycleExecutionPlanCalculator = lookup(LifecycleExecutionPlanCalculator.class);
-        lifeCyclePluginAnalyzer = lookup(LifeCyclePluginAnalyzer.class);
-        lifeCycleTaskSegmentCalculator = lookup(LifecycleTaskSegmentCalculator.class);
-        lookup(ExceptionHandler.class);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        defaultLifeCycles = null;
-        super.tearDown();
-    }
 
     protected String getProjectsDirectory() {
         return "src/test/projects/lifecycle-executor";
     }
 
+    @Test
     public void testCreation() throws Exception {
         assertNotNull(defaultLifeCycles);
         assertNotNull(mojoExecutor);

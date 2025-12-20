@@ -18,6 +18,8 @@
  */
 package org.apache.maven;
 
+import javax.inject.Inject;
+
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
@@ -27,25 +29,18 @@ import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.testing.PlexusTest;
+import org.junit.jupiter.api.Test;
 
+import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.endsWith;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@PlexusTest
 public class ProjectDependenciesResolverTest extends AbstractCoreMavenComponentTestCase {
-    @Requirement
+    @Inject
     private ProjectDependenciesResolver resolver;
-
-    protected void setUp() throws Exception {
-        super.setUp();
-        resolver = lookup(ProjectDependenciesResolver.class);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        resolver = null;
-        super.tearDown();
-    }
 
     protected String getProjectsDirectory() {
         return "src/test/projects/project-dependencies-resolver";
@@ -75,6 +70,7 @@ public class ProjectDependenciesResolverTest extends AbstractCoreMavenComponentT
     }
     */
 
+    @Test
     public void testSystemScopeDependencies() throws Exception {
         MavenSession session = createMavenSession(null);
         MavenProject project = session.getCurrentProject();
@@ -92,6 +88,7 @@ public class ProjectDependenciesResolverTest extends AbstractCoreMavenComponentT
         assertEquals(1, artifactDependencies.size());
     }
 
+    @Test
     public void testSystemScopeDependencyIsPresentInTheCompileClasspathElements() throws Exception {
         File pom = getProject("it0063");
 

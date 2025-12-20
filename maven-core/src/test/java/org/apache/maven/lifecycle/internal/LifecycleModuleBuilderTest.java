@@ -18,6 +18,8 @@
  */
 package org.apache.maven.lifecycle.internal;
 
+import javax.inject.Inject;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,19 +35,22 @@ import org.apache.maven.lifecycle.internal.stub.MojoExecutorStub;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.testing.PlexusTest;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class LifecycleModuleBuilderTest extends PlexusTestCase {
-    @Override
-    protected void customizeContainerConfiguration(ContainerConfiguration configuration) {
-        configuration.setAutoWiring(true);
-        configuration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
-    }
+@PlexusTest
+public class LifecycleModuleBuilderTest {
 
+    @Inject
+    private LifecycleModuleBuilder moduleBuilder;
+
+    @Inject
+    private LifecycleStarter lifecycleStarter;
+
+    @Test
     public void testCurrentProject() throws Exception {
         List<MavenProject> currentProjects = new ArrayList<>();
         MojoExecutorStub mojoExecutor = new MojoExecutorStub() {
@@ -66,11 +71,9 @@ public class LifecycleModuleBuilderTest extends PlexusTestCase {
         session.setProjectDependencyGraph(dependencyGraphStub);
         session.setProjects(dependencyGraphStub.getSortedProjects());
 
-        LifecycleModuleBuilder moduleBuilder = lookup(LifecycleModuleBuilder.class);
         set(moduleBuilder, "mojoExecutor", mojoExecutor);
 
-        LifecycleStarter ls = lookup(LifecycleStarter.class);
-        ls.execute(session);
+        lifecycleStarter.execute(session);
 
         assertNull(session.getCurrentProject());
         assertEquals(

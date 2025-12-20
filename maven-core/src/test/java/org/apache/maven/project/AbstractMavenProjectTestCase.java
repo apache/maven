@@ -18,6 +18,8 @@
  */
 package org.apache.maven.project;
 
+import javax.inject.Inject;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
@@ -31,43 +33,36 @@ import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.testing.PlexusTestConfiguration;
 import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * @author Jason van Zyl
  */
-public abstract class AbstractMavenProjectTestCase extends PlexusTestCase {
+public abstract class AbstractMavenProjectTestCase implements PlexusTestConfiguration {
+
+    @Inject
+    protected PlexusContainer container;
+
     protected ProjectBuilder projectBuilder;
 
+    @Inject
     protected RepositorySystem repositorySystem;
 
-    @Override
-    protected void customizeContainerConfiguration(ContainerConfiguration containerConfiguration) {
-        super.customizeContainerConfiguration(containerConfiguration);
-        containerConfiguration.setAutoWiring(true);
-        containerConfiguration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
-    }
+    @Inject
+    protected ArtifactRepositoryLayout repoLayout;
 
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
 
-        if (getContainer().hasComponent(ProjectBuilder.class, "test")) {
-            projectBuilder = lookup(ProjectBuilder.class, "test");
+        if (container.hasComponent(ProjectBuilder.class, "test")) {
+            projectBuilder = container.lookup(ProjectBuilder.class, "test");
         } else {
             // default over to the main project builder...
-            projectBuilder = lookup(ProjectBuilder.class);
+            projectBuilder = container.lookup(ProjectBuilder.class);
         }
-
-        repositorySystem = lookup(RepositorySystem.class);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        projectBuilder = null;
-
-        super.tearDown();
     }
 
     protected ProjectBuilder getProjectBuilder() {
@@ -75,8 +70,9 @@ public abstract class AbstractMavenProjectTestCase extends PlexusTestCase {
     }
 
     @Override
-    protected String getCustomConfigurationName() {
-        return AbstractMavenProjectTestCase.class.getName().replace('.', '/') + ".xml";
+    public void customizeConfiguration(ContainerConfiguration containerConfiguration) {
+        String name = AbstractMavenProjectTestCase.class.getName().replace('.', '/') + ".xml";
+        containerConfiguration.setContainerConfiguration(name);
     }
 
     // ----------------------------------------------------------------------
@@ -103,7 +99,6 @@ public abstract class AbstractMavenProjectTestCase extends PlexusTestCase {
     }
 
     protected ArtifactRepository getLocalRepository() throws Exception {
-        ArtifactRepositoryLayout repoLayout = lookup(ArtifactRepositoryLayout.class, "legacy");
 
         ArtifactRepository r = repositorySystem.createArtifactRepository(
                 "local", "file://" + getLocalRepositoryPath().getAbsolutePath(), repoLayout, null, null);

@@ -20,7 +20,6 @@ package org.apache.maven.lifecycle.internal;
 
 import java.util.HashSet;
 
-import junit.framework.TestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
@@ -28,11 +27,15 @@ import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub;
 import org.apache.maven.lifecycle.internal.stub.LoggerStub;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Kristian Rosenvold
  */
-public class BuilderCommonTest extends TestCase {
+public class BuilderCommonTest {
+    @Test
     public void testResolveBuildPlan() throws Exception {
         MavenSession original = ProjectDependencyGraphStub.getMavenSession();
 
@@ -46,12 +49,6 @@ public class BuilderCommonTest extends TestCase {
         assertEquals(
                 LifecycleExecutionPlanCalculatorStub.getProjectAExceutionPlan().size(), plan.size());
     }
-
-    public void testHandleBuildError() throws Exception {}
-
-    public void testAttachToThread() throws Exception {}
-
-    public void testGetKey() throws Exception {}
 
     public static BuilderCommon getBuilderCommon() {
         final LifecycleDebugLogger logger = new LifecycleDebugLogger(new LoggerStub());

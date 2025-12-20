@@ -19,50 +19,35 @@
 package org.apache.maven.project;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.testing.PlexusTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
+import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.AssertionsKt.assertNull;
 
+@PlexusTest
 public class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
 
-    private List<File> filesToDelete = new ArrayList<>();
-
+    @TempDir
     private File localRepoDir;
 
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
-        super.setUp();
-
-        projectBuilder = lookup(ProjectBuilder.class);
-
-        localRepoDir = new File(System.getProperty("java.io.tmpdir"), "local-repo." + System.currentTimeMillis());
-        localRepoDir.mkdirs();
-
-        filesToDelete.add(localRepoDir);
-    }
-
-    @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
-
-        if (!filesToDelete.isEmpty()) {
-            for (File file : filesToDelete) {
-                if (file.exists()) {
-                    if (file.isDirectory()) {
-                        FileUtils.deleteDirectory(file);
-                    } else {
-                        file.delete();
-                    }
-                }
-            }
-        }
+        projectBuilder = container.lookup(ProjectBuilder.class);
     }
 
     protected MavenProject getProject(Artifact pom, boolean allowStub) throws Exception {
@@ -75,8 +60,10 @@ public class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase
 
     /**
      * Check that we can build ok from the middle pom of a (parent,child,grandchild) hierarchy
+     *
      * @throws Exception
      */
+    @Test
     public void testBuildFromMiddlePom() throws Exception {
         File f1 = getTestFile("src/test/resources/projects/grandchild-check/child/pom.xml");
         File f2 = getTestFile("src/test/resources/projects/grandchild-check/child/grandchild/pom.xml");
@@ -88,6 +75,7 @@ public class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase
         getProject(f2);
     }
 
+    @Test
     public void testDuplicatePluginDefinitionsMerged() throws Exception {
         File f1 = getTestFile("src/test/resources/projects/duplicate-plugins-merged-pom.xml");
 
@@ -98,6 +86,7 @@ public class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase
                 "first", project.getBuildPlugins().get(0).getExecutions().get(0).getId());
     }
 
+    @Test
     public void testFutureModelVersion() throws Exception {
         File f1 = getTestFile("src/test/resources/projects/future-model-version-pom.xml");
 
@@ -109,6 +98,7 @@ public class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase
         }
     }
 
+    @Test
     public void testPastModelVersion() throws Exception {
         // a Maven 1.x pom will not even
         // update the resource if we stop supporting modelVersion 4.0.0
@@ -122,6 +112,7 @@ public class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase
         }
     }
 
+    @Test
     public void testFutureSchemaModelVersion() throws Exception {
         File f1 = getTestFile("src/test/resources/projects/future-schema-model-version-pom.xml");
 
@@ -140,6 +131,7 @@ public class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase
         }
     }
 
+    @Test
     public void testBuildStubModelForMissingRemotePom() throws Exception {
         Artifact pom = repositorySystem.createProjectArtifact("org.apache.maven.its", "missing", "0.1");
         MavenProject project = getProject(pom, true);
@@ -160,12 +152,13 @@ public class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase
 
     @Override
     protected ArtifactRepository getLocalRepository() throws Exception {
-        ArtifactRepositoryLayout repoLayout = lookup(ArtifactRepositoryLayout.class, "default");
         ArtifactRepository r = repositorySystem.createArtifactRepository(
                 "local", "file://" + localRepoDir.getAbsolutePath(), repoLayout, null, null);
         return r;
     }
 
+    @Test
+    @Disabled
     public void xtestLoop() throws Exception {
         while (true) {
             File f1 = getTestFile("src/test/resources/projects/duplicate-plugins-merged-pom.xml");
@@ -173,6 +166,7 @@ public class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase
         }
     }
 
+    @Test
     public void testPartialResultUponBadDependencyDeclaration() throws Exception {
         File pomFile = getTestFile("src/test/resources/projects/bad-dependency.xml");
 
@@ -195,6 +189,7 @@ public class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase
         }
     }
 
+    @Test
     public void testImportScopePomResolvesFromPropertyBasedRepository() throws Exception {
         File pomFile =
                 getTestFile("src/test/resources/projects/import-scope-pom-resolves-from-property-based-repository.xml");
@@ -209,6 +204,7 @@ public class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase
      *
      * @throws Exception
      */
+    @Test
     public void testBuildValidParentVersionRangeLocally() throws Exception {
         File f1 = getTestFile("src/test/resources/projects/parent-version-range-local-valid/child/pom.xml");
 
@@ -227,6 +223,7 @@ public class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase
      *
      * @throws Exception
      */
+    @Test
     public void testBuildParentVersionRangeLocallyWithoutChildVersion() throws Exception {
         File f1 = getTestFile(
                 "src/test/resources/projects/parent-version-range-local-child-without-version/child/pom.xml");
@@ -245,6 +242,7 @@ public class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase
      *
      * @throws Exception
      */
+    @Test
     public void testBuildParentVersionRangeLocallyWithChildProjectVersionExpression() throws Exception {
         File f1 = getTestFile(
                 "src/test/resources/projects/parent-version-range-local-child-project-version-expression/child/pom.xml");
@@ -263,6 +261,7 @@ public class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase
      *
      * @throws Exception
      */
+    @Test
     public void testBuildParentVersionRangeLocallyWithChildProjectParentVersionExpression() throws Exception {
         File f1 = getTestFile(
                 "src/test/resources/projects/parent-version-range-local-child-project-parent-version-expression/child/pom.xml");
@@ -281,6 +280,7 @@ public class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase
      *
      * @throws Exception
      */
+    @Test
     public void testBuildParentVersionRangeLocallyWithChildRevisionExpression() throws Exception {
         File f1 = getTestFile(
                 "src/test/resources/projects/parent-version-range-local-child-revision-expression/child/pom.xml");
@@ -295,6 +295,7 @@ public class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase
      *
      * @throws Exception
      */
+    @Test
     public void testBuildParentVersionRangeExternally() throws Exception {
         File f1 = getTestFile("src/test/resources/projects/parent-version-range-external-valid/pom.xml");
 
@@ -313,6 +314,7 @@ public class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase
      *
      * @throws Exception
      */
+    @Test
     public void testBuildParentVersionRangeExternallyWithoutChildVersion() throws Exception {
         File f1 =
                 getTestFile("src/test/resources/projects/parent-version-range-external-child-without-version/pom.xml");
@@ -331,6 +333,7 @@ public class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase
      *
      * @throws Exception
      */
+    @Test
     public void testBuildParentVersionRangeExternallyWithChildProjectVersionExpression() throws Exception {
         File f1 = getTestFile(
                 "src/test/resources/projects/parent-version-range-external-child-project-version-expression/pom.xml");
@@ -349,6 +352,7 @@ public class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase
      *
      * @throws Exception
      */
+    @Test
     public void testBuildParentVersionRangeExternallyWithChildPomVersionExpression() throws Exception {
         File f1 = getTestFile(
                 "src/test/resources/projects/parent-version-range-external-child-pom-version-expression/pom.xml");
@@ -367,6 +371,7 @@ public class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase
      *
      * @throws Exception
      */
+    @Test
     public void testBuildParentVersionRangeExternallyWithChildPomParentVersionExpression() throws Exception {
         File f1 = getTestFile(
                 "src/test/resources/projects/parent-version-range-external-child-pom-parent-version-expression/pom.xml");
@@ -385,6 +390,7 @@ public class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase
      *
      * @throws Exception
      */
+    @Test
     public void testBuildParentVersionRangeExternallyWithChildProjectParentVersionExpression() throws Exception {
         File f1 = getTestFile(
                 "src/test/resources/projects/parent-version-range-external-child-project-parent-version-expression/pom.xml");
@@ -403,6 +409,7 @@ public class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase
      *
      * @throws Exception
      */
+    @Test
     public void testBuildParentVersionRangeExternallyWithChildRevisionExpression() throws Exception {
         File f1 = getTestFile(
                 "src/test/resources/projects/parent-version-range-external-child-revision-expression/pom.xml");

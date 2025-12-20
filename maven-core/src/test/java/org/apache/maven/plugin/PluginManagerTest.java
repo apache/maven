@@ -18,6 +18,8 @@
  */
 package org.apache.maven.plugin;
 
+import javax.inject.Inject;
+
 import java.util.List;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
@@ -30,28 +32,25 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
+import org.codehaus.plexus.testing.PlexusTest;
+import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
+
+@PlexusTest
 public class PluginManagerTest extends AbstractCoreMavenComponentTestCase {
-    @Requirement
-    private DefaultBuildPluginManager pluginManager;
 
-    protected void setUp() throws Exception {
-        super.setUp();
-        pluginManager = (DefaultBuildPluginManager) lookup(BuildPluginManager.class);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        pluginManager = null;
-        super.tearDown();
-    }
+    @Inject
+    private BuildPluginManager pluginManager;
 
     protected String getProjectsDirectory() {
         return "src/test/projects/plugin-manager";
     }
 
+    @Test
     public void testPluginLoading() throws Exception {
         MavenSession session = createMavenSession(null);
         Plugin plugin = new Plugin();
@@ -63,6 +62,7 @@ public class PluginManagerTest extends AbstractCoreMavenComponentTestCase {
         assertNotNull(pluginDescriptor);
     }
 
+    @Test
     public void testMojoDescriptorRetrieval() throws Exception {
         MavenSession session = createMavenSession(null);
         String goal = "it";
@@ -99,6 +99,7 @@ public class PluginManagerTest extends AbstractCoreMavenComponentTestCase {
     //      only deal in concrete terms -- all version finding mumbo jumbo is a customization to base functionality
     //      the plugin manager provides.
 
+    @Test
     public void testRemoteResourcesPlugin() throws Exception {
         // TODO turn an equivalent back on when the RR plugin is released.
 
@@ -126,6 +127,7 @@ public class PluginManagerTest extends AbstractCoreMavenComponentTestCase {
     }
 
     // TODO this will be the basis of the customizable lifecycle execution so need to figure this out quickly.
+    @Test
     public void testSurefirePlugin() throws Exception {
         /*
         MavenSession session = createMavenSession( getProject( "project-with-inheritance" ) );
@@ -148,6 +150,7 @@ public class PluginManagerTest extends AbstractCoreMavenComponentTestCase {
         */
     }
 
+    @Test
     public void testMojoConfigurationIsMergedCorrectly() throws Exception {}
 
     /**
@@ -155,24 +158,28 @@ public class PluginManagerTest extends AbstractCoreMavenComponentTestCase {
      * is in the Antlr plugin which comes bundled with a version of Antlr but the user often times needs
      * to use a specific version. We need to make sure the version that they specify takes precedence.
      */
+    @Test
     public void testMojoWhereInternallyStatedDependencyIsOverriddenByProject() throws Exception {}
 
     /**
      * The case where you have a plugin in the current build that you want to be used on projects in
      * the current build.
      */
+    @Test
     public void testMojoThatIsPresentInTheCurrentBuild() throws Exception {}
 
     /**
      * This is the case where the Mojo wants to execute on every project and then do something at the end
      * with the results of each project.
      */
+    @Test
     public void testAggregatorMojo() throws Exception {}
 
     /**
      * This is the case where a Mojo needs the lifecycle run to a certain phase before it can do
      * anything useful.
      */
+    @Test
     public void testMojoThatRequiresExecutionToAGivenPhaseBeforeExecutingItself() throws Exception {}
 
     // test that mojo which does not require dependency resolution trigger no downloading of dependencies
@@ -181,6 +188,7 @@ public class PluginManagerTest extends AbstractCoreMavenComponentTestCase {
 
     // test a build where projects use different versions of the same plugin
 
+    @Test
     public void testThatPluginDependencyThatHasSystemScopeIsResolved() throws Exception {
         MavenSession session = createMavenSession(getProject("project-contributing-system-scope-plugin-dep"));
         MavenProject project = session.getCurrentProject();
@@ -220,6 +228,7 @@ public class PluginManagerTest extends AbstractCoreMavenComponentTestCase {
         assertEquals(version, pd.getVersion());
     }
 
+    @Test
     public void testPluginRealmCache() throws Exception {
         RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
         repositoryRequest.setLocalRepository(getLocalRepository());
@@ -258,6 +267,7 @@ public class PluginManagerTest extends AbstractCoreMavenComponentTestCase {
         }
     }
 
+    @Test
     public void testBuildExtensionsPluginLoading() throws Exception {
         RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
         repositoryRequest.setLocalRepository(getLocalRepository());

@@ -20,10 +20,12 @@ package org.apache.maven.plugin;
 
 import java.util.Collections;
 
-import junit.framework.TestCase;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * MNG-3131
@@ -31,8 +33,9 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
  * @author Robert Scholte
  *
  */
-public class PluginParameterExceptionTest extends TestCase {
+public class PluginParameterExceptionTest {
 
+    @Test
     public void testMissingRequiredStringArrayTypeParameter() {
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
         mojoDescriptor.setGoal("goal");
@@ -63,6 +66,7 @@ public class PluginParameterExceptionTest extends TestCase {
                 exception.buildDiagnosticMessage());
     }
 
+    @Test
     public void testMissingRequiredCollectionTypeParameter() {
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
         mojoDescriptor.setGoal("goal");
@@ -93,6 +97,7 @@ public class PluginParameterExceptionTest extends TestCase {
                 exception.buildDiagnosticMessage());
     }
 
+    @Test
     public void testMissingRequiredMapTypeParameter() {
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
         mojoDescriptor.setGoal("goal");
@@ -123,6 +128,7 @@ public class PluginParameterExceptionTest extends TestCase {
                 exception.buildDiagnosticMessage());
     }
 
+    @Test
     public void testMissingRequiredPropertiesTypeParameter() {
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
         mojoDescriptor.setGoal("goal");

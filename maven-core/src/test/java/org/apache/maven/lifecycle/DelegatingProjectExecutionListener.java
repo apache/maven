@@ -27,7 +27,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.maven.execution.ProjectExecutionEvent;
 import org.apache.maven.execution.ProjectExecutionListener;
 
-@Named
+@Named("delegating")
 @Singleton
 public class DelegatingProjectExecutionListener implements ProjectExecutionListener {
     private final List<ProjectExecutionListener> listeners = new CopyOnWriteArrayList<>();

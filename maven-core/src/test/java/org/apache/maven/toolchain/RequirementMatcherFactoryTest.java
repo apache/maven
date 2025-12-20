@@ -18,21 +18,22 @@
  */
 package org.apache.maven.toolchain;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
  * @author mkleint
  */
-public class RequirementMatcherFactoryTest extends TestCase {
-
-    public RequirementMatcherFactoryTest(String testName) {
-        super(testName);
-    }
+public class RequirementMatcherFactoryTest {
 
     /**
      * Test of createExactMatcher method, of class RequirementMatcherFactory.
      */
+    @Test
     public void testCreateExactMatcher() {
         RequirementMatcher matcher;
         matcher = RequirementMatcherFactory.createExactMatcher("foo");
@@ -45,6 +46,7 @@ public class RequirementMatcherFactoryTest extends TestCase {
     /**
      * Test of createVersionMatcher method, of class RequirementMatcherFactory.
      */
+    @Test
     public void testCreateVersionMatcher() {
         RequirementMatcher matcher;
         matcher = RequirementMatcherFactory.createVersionMatcher("1.5.2");

@@ -25,9 +25,9 @@ import org.apache.maven.toolchain.model.ToolchainModel;
 import org.apache.maven.toolchain.model.TrackableBase;
 import org.apache.maven.toolchain.model.io.xpp3.MavenToolchainsXpp3Reader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MavenToolchainMergerTest {
     private MavenToolchainMerger merger = new MavenToolchainMerger();

@@ -18,6 +18,8 @@
  */
 package org.apache.maven;
 
+import javax.inject.Inject;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,31 +48,24 @@ import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
 
-public abstract class AbstractCoreMavenComponentTestCase extends PlexusTestCase {
-    @Requirement
+import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
+
+public abstract class AbstractCoreMavenComponentTestCase {
+
+    @Inject
     protected MavenRepositorySystem repositorySystem;
 
-    @Requirement
+    @Inject
     protected org.apache.maven.project.ProjectBuilder projectBuilder;
 
-    protected void setUp() throws Exception {
-        repositorySystem = lookup(MavenRepositorySystem.class);
-        projectBuilder = lookup(org.apache.maven.project.ProjectBuilder.class);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        repositorySystem = null;
-        projectBuilder = null;
-        super.tearDown();
-    }
+    @Inject
+    protected PlexusContainer container;
 
     protected abstract String getProjectsDirectory();
 
@@ -155,7 +150,7 @@ public abstract class AbstractCoreMavenComponentTestCase extends PlexusTestCase 
         }
 
         MavenSession session = new MavenSession(
-                getContainer(), configuration.getRepositorySession(), request, new DefaultMavenExecutionResult());
+                container, configuration.getRepositorySession(), request, new DefaultMavenExecutionResult());
         session.setProjects(projects);
         session.setAllProjects(session.getProjects());
 

@@ -18,13 +18,26 @@
  */
 package org.apache.maven.artifact.handler;
 
+import javax.inject.Inject;
+
 import java.io.File;
 import java.util.List;
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.FileUtils;
+import org.junit.jupiter.api.Test;
 
-public class ArtifactHandlerTest extends PlexusTestCase {
+import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@PlexusTest
+public class ArtifactHandlerTest {
+
+    @Inject
+    private PlexusContainer container;
+
+    @Test
     public void testAptConsistency() throws Exception {
         File apt = getTestFile("src/site/apt/artifact-handlers.apt");
 
@@ -47,7 +60,7 @@ public class ArtifactHandlerTest extends PlexusTestCase {
 
                 int i = 0;
                 for (String col : cols) {
-                    assertEquals("Wrong column header", expected[i++], col.trim());
+                    assertEquals(expected[i++], col.trim(), "Wrong column header");
                 }
             } else if (line.startsWith("|")) {
                 String[] cols = line.split("\\|");
@@ -60,17 +73,18 @@ public class ArtifactHandlerTest extends PlexusTestCase {
                 String addedToClasspath = trimApt(cols[6]);
                 String includesDependencies = trimApt(cols[7]);
 
-                ArtifactHandler handler = lookup(ArtifactHandler.class, type);
-                assertEquals(type + " extension", handler.getExtension(), extension);
-                assertEquals(type + " packaging", handler.getPackaging(), packaging);
-                assertEquals(type + " classifier", handler.getClassifier(), classifier);
-                assertEquals(type + " language", handler.getLanguage(), language);
+                ArtifactHandler handler = container.lookup(ArtifactHandler.class, type);
+
+                assertEquals(handler.getExtension(), extension, type + " extension");
+                assertEquals(handler.getPackaging(), packaging, type + " packaging");
+                assertEquals(handler.getClassifier(), classifier, type + " classifier");
+                assertEquals(handler.getLanguage(), language, type + " language");
                 assertEquals(
-                        type + " addedToClasspath", handler.isAddedToClasspath() ? "true" : null, addedToClasspath);
+                        handler.isAddedToClasspath() ? "true" : null, addedToClasspath, type + " addedToClasspath");
                 assertEquals(
-                        type + " includesDependencies",
                         handler.isIncludesDependencies() ? "true" : null,
-                        includesDependencies);
+                        includesDependencies,
+                        type + " includesDependencies");
             }
         }
     }

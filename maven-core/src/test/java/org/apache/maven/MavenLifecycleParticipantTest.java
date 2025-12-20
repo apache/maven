@@ -30,9 +30,14 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
+import org.codehaus.plexus.testing.PlexusTest;
+import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+@PlexusTest
 public class MavenLifecycleParticipantTest extends AbstractCoreMavenComponentTestCase {
 
     private static final String INJECTED_ARTIFACT_ID = "injected";
@@ -86,17 +91,12 @@ public class MavenLifecycleParticipantTest extends AbstractCoreMavenComponentTes
     }
 
     @Override
-    protected void setupContainer() {
-        super.setupContainer();
-    }
-
-    @Override
     protected String getProjectsDirectory() {
         return "src/test/projects/lifecycle-listener";
     }
 
+    @Test
     public void testDependencyInjection() throws Exception {
-        PlexusContainer container = getContainer();
 
         ComponentDescriptor<? extends AbstractMavenLifecycleParticipant> cd =
                 new ComponentDescriptor<>(InjectDependencyLifecycleListener.class, container.getContainerRealm());
@@ -109,7 +109,7 @@ public class MavenLifecycleParticipantTest extends AbstractCoreMavenComponentTes
         request.setGoals(Arrays.asList("validate"));
         MavenExecutionResult result = maven.execute(request);
 
-        assertFalse(result.getExceptions().toString(), result.hasExceptions());
+        assertFalse(result.hasExceptions(), result.getExceptions().toString());
 
         MavenProject project = result.getProject();
 
@@ -121,6 +121,7 @@ public class MavenLifecycleParticipantTest extends AbstractCoreMavenComponentTes
         assertEquals(INJECTED_ARTIFACT_ID, artifacts.get(0).getArtifactId());
     }
 
+    @Test
     public void testReactorDependencyInjection() throws Exception {
         List<String> reactorOrder =
                 getReactorOrder("lifecycle-participant-reactor-dependency-injection", InjectReactorDependency.class);
@@ -128,7 +129,6 @@ public class MavenLifecycleParticipantTest extends AbstractCoreMavenComponentTes
     }
 
     private <T> List<String> getReactorOrder(String testProject, Class<T> participant) throws Exception {
-        PlexusContainer container = getContainer();
 
         ComponentDescriptor<T> cd = new ComponentDescriptor<>(participant, container.getContainerRealm());
         cd.setRoleClass(AbstractMavenLifecycleParticipant.class);
@@ -140,7 +140,7 @@ public class MavenLifecycleParticipantTest extends AbstractCoreMavenComponentTes
         request.setGoals(Arrays.asList("validate"));
         MavenExecutionResult result = maven.execute(request);
 
-        assertFalse(result.getExceptions().toString(), result.hasExceptions());
+        assertFalse(result.hasExceptions(), result.getExceptions().toString());
 
         List<String> order = new ArrayList<>();
         for (MavenProject project : result.getTopologicallySortedProjects()) {

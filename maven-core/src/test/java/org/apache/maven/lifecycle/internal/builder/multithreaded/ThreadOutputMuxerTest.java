@@ -31,7 +31,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import junit.framework.TestCase;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
@@ -45,11 +44,14 @@ import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Kristian Rosenvold
  */
-public class ThreadOutputMuxerTest extends TestCase {
+public class ThreadOutputMuxerTest {
 
     final String paid = "Paid";
 
@@ -57,6 +59,7 @@ public class ThreadOutputMuxerTest extends TestCase {
 
     final String full = "Full";
 
+    @Test
     public void testSingleThreaded() throws Exception {
         ProjectBuildList src = getProjectBuildList();
         ProjectBuildList projectBuildList = new ProjectBuildList(Arrays.asList(src.get(0), src.get(1), src.get(2)));
@@ -82,6 +85,7 @@ public class ThreadOutputMuxerTest extends TestCase {
         assertEquals((paid + in + full).length(), byteArrayOutputStream.size());
     }
 
+    @Test
     public void testMultiThreaded() throws Exception {
         ProjectBuildList projectBuildList = getProjectBuildList();
 
@@ -115,7 +119,7 @@ public class ThreadOutputMuxerTest extends TestCase {
         threadOutputMuxer.close();
         final byte[] bytes = byteArrayOutputStream.toByteArray();
         String result = new String(bytes);
-        assertEquals(result, expectedLength, bytes.length);
+        assertEquals(expectedLength, bytes.length, result);
     }
 
     class Outputter implements Callable<ProjectSegment> {
@@ -131,7 +135,7 @@ public class ThreadOutputMuxerTest extends TestCase {
             this.response = response;
         }
 
-        public ProjectSegment call() throws Exception {
+        public ProjectSegment call() {
             threadOutputMuxer.associateThreadWithProjectSegment(item);
             System.out.print(response);
             threadOutputMuxer.setThisModuleComplete(item);
