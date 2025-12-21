@@ -366,7 +366,7 @@ public class DefaultXmlService extends XmlService {
                             .namespaceUri(dominant.getNamespaceUri())
                             .name(dominant.getName())
                             .value(value != null ? value : dominant.getValue())
-                            .getAttributes(attrs)
+                            .attributes(attrs)
                             .children(children)
                             .inputLocation(location)
                             .build();
