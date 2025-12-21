@@ -18,34 +18,44 @@
  */
 package org.apache.maven.model;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@code Organization}.
  *
  * @author Benjamin Bentmann
  */
-public class OrganizationTest extends TestCase {
+public class OrganizationTest {
 
+    @Test
     public void testHashCodeNullSafe() {
         new Organization().hashCode();
     }
 
+    @Test
     public void testEqualsNullSafe() {
         assertFalse(new Organization().equals(null));
 
         new Organization().equals(new Organization());
     }
 
+    @Test
     public void testEqualsIdentity() {
         Organization thing = new Organization();
         assertTrue(thing.equals(thing));
     }
 
+    @Test
     public void testToStringNullSafe() {
         assertNotNull(new Organization().toString());
     }
 
+    @Test
     public void testToStringNotNonsense11() {
         Organization org = new Organization();
         org.setName("Testing Maven Unit");
@@ -54,6 +64,7 @@ public class OrganizationTest extends TestCase {
         assertEquals("Organization {name=Testing Maven Unit, url=https://maven.localdomain}", org.toString());
     }
 
+    @Test
     public void testToStringNotNonsense10() {
         Organization org = new Organization();
         org.setName("Testing Maven Unit");
@@ -61,6 +72,7 @@ public class OrganizationTest extends TestCase {
         assertEquals("Organization {name=Testing Maven Unit, url=null}", org.toString());
     }
 
+    @Test
     public void testToStringNotNonsense01() {
         Organization org = new Organization();
         org.setUrl("https://maven.localdomain");
@@ -68,6 +80,7 @@ public class OrganizationTest extends TestCase {
         assertEquals("Organization {name=null, url=https://maven.localdomain}", org.toString());
     }
 
+    @Test
     public void testToStringNotNonsense00() {
         Organization org = new Organization();
 

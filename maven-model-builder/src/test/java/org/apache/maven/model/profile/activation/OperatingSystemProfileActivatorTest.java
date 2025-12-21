@@ -23,6 +23,7 @@ import java.util.Properties;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationOS;
 import org.apache.maven.model.Profile;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests {@link OperatingSystemProfileActivator}.
@@ -52,6 +53,7 @@ public class OperatingSystemProfileActivatorTest extends AbstractProfileActivato
         return props;
     }
 
+    @Test
     public void testVersionStringComparison() throws Exception {
         ActivationOS os = new ActivationOS();
         os.setVersion("6.5.0-1014-aws");
@@ -63,6 +65,7 @@ public class OperatingSystemProfileActivatorTest extends AbstractProfileActivato
         assertActivation(false, profile, newContext(null, newProperties("linux", "3.1.0", "amd64")));
     }
 
+    @Test
     public void testVersionRegexMatching() throws Exception {
         ActivationOS os = new ActivationOS();
         os.setVersion("regex:.*aws");
@@ -74,6 +77,7 @@ public class OperatingSystemProfileActivatorTest extends AbstractProfileActivato
         assertActivation(false, profile, newContext(null, newProperties("linux", "3.1.0", "amd64")));
     }
 
+    @Test
     public void testName() {
         ActivationOS os = new ActivationOS();
         os.setName("windows");
@@ -83,6 +87,7 @@ public class OperatingSystemProfileActivatorTest extends AbstractProfileActivato
         assertActivation(true, profile, newContext(null, newProperties("windows", "6.5.0-1014-aws", "aarch64")));
     }
 
+    @Test
     public void testNegatedName() {
         ActivationOS os = new ActivationOS();
         os.setName("!windows");
@@ -92,6 +97,7 @@ public class OperatingSystemProfileActivatorTest extends AbstractProfileActivato
         assertActivation(false, profile, newContext(null, newProperties("windows", "6.5.0-1014-aws", "aarch64")));
     }
 
+    @Test
     public void testArch() {
         ActivationOS os = new ActivationOS();
         os.setArch("amd64");
@@ -101,6 +107,7 @@ public class OperatingSystemProfileActivatorTest extends AbstractProfileActivato
         assertActivation(false, profile, newContext(null, newProperties("windows", "6.5.0-1014-aws", "aarch64")));
     }
 
+    @Test
     public void testNegatedArch() {
         ActivationOS os = new ActivationOS();
         os.setArch("!amd64");
@@ -110,6 +117,7 @@ public class OperatingSystemProfileActivatorTest extends AbstractProfileActivato
         assertActivation(true, profile, newContext(null, newProperties("windows", "6.5.0-1014-aws", "aarch64")));
     }
 
+    @Test
     public void testFamily() {
         ActivationOS os = new ActivationOS();
         os.setFamily("windows");
@@ -119,6 +127,7 @@ public class OperatingSystemProfileActivatorTest extends AbstractProfileActivato
         assertActivation(true, profile, newContext(null, newProperties("windows", "6.5.0-1014-aws", "aarch64")));
     }
 
+    @Test
     public void testNegatedFamily() {
         ActivationOS os = new ActivationOS();
         os.setFamily("!windows");
@@ -128,6 +137,7 @@ public class OperatingSystemProfileActivatorTest extends AbstractProfileActivato
         assertActivation(false, profile, newContext(null, newProperties("windows", "6.5.0-1014-aws", "aarch64")));
     }
 
+    @Test
     public void testAllOsConditions() {
         ActivationOS os = new ActivationOS();
         os.setFamily("windows");
@@ -142,6 +152,7 @@ public class OperatingSystemProfileActivatorTest extends AbstractProfileActivato
         assertActivation(true, profile, newContext(null, newProperties("windows", "99", "aarch64")));
     }
 
+    @Test
     public void testCapitalOsName() {
         ActivationOS os = new ActivationOS();
         os.setFamily("Mac");

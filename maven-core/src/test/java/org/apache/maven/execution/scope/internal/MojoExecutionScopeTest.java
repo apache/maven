@@ -22,12 +22,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.inject.Key;
 import com.google.inject.Provider;
-import junit.framework.TestCase;
 import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.execution.scope.WeakMojoExecutionListener;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.junit.jupiter.api.Test;
 
-public class MojoExecutionScopeTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.fail;
+
+public class MojoExecutionScopeTest {
+
+    @Test
     public void testNestedEnter() throws Exception {
         MojoExecutionScope scope = new MojoExecutionScope();
 
@@ -54,6 +60,7 @@ public class MojoExecutionScopeTest extends TestCase {
         }
     }
 
+    @Test
     public void testMultiKeyInstance() throws Exception {
         MojoExecutionScope scope = new MojoExecutionScope();
         scope.enter();

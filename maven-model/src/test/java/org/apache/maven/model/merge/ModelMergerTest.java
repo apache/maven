@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 import org.apache.maven.model.License;
 import org.apache.maven.model.Model;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ModelMergerTest {
 

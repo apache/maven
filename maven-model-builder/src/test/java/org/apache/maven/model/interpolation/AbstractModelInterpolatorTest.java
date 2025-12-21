@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
 
-import junit.framework.TestCase;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
@@ -39,25 +38,27 @@ import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.SimpleProblemCollector;
 import org.apache.maven.model.path.PathTranslator;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author jdcasey
  */
-public abstract class AbstractModelInterpolatorTest extends TestCase {
+public abstract class AbstractModelInterpolatorTest {
     private Properties context;
 
     protected void setUp() throws Exception {
-        super.setUp();
-
         context = new Properties();
         context.put("basedir", "myBasedir");
         context.put("project.baseUri", "myBaseUri");
     }
 
     protected void assertProblemFree(SimpleProblemCollector collector) {
-        assertEquals("Expected no errors", 0, collector.getErrors().size());
-        assertEquals("Expected no warnings", 0, collector.getWarnings().size());
-        assertEquals("Expected no fatals", 0, collector.getFatals().size());
+        assertEquals(0, collector.getErrors().size(), "Expected no errors");
+        assertEquals(0, collector.getWarnings().size(), "Expected no warnings");
+        assertEquals(0, collector.getFatals().size(), "Expected no fatals");
     }
 
     /**
@@ -66,9 +67,9 @@ public abstract class AbstractModelInterpolatorTest extends TestCase {
     @Deprecated
     protected void assertColllectorState(
             int numFatals, int numErrors, int numWarnings, SimpleProblemCollector collector) {
-        assertEquals("Errors", numErrors, collector.getErrors().size());
-        assertEquals("Warnings", numWarnings, collector.getWarnings().size());
-        assertEquals("Fatals", numFatals, collector.getFatals().size());
+        assertEquals(numErrors, collector.getErrors().size(), "Errors");
+        assertEquals(numWarnings, collector.getWarnings().size(), "Warnings");
+        assertEquals(numFatals, collector.getFatals().size(), "Fatals");
     }
 
     protected void assertCollectorState(
@@ -84,6 +85,7 @@ public abstract class AbstractModelInterpolatorTest extends TestCase {
         return config;
     }
 
+    @Test
     public void testDefaultBuildTimestampFormatShouldFormatTimeIn24HourFormat() {
         Calendar cal = Calendar.getInstance();
         cal.setTimeZone(MavenBuildTimestamp.DEFAULT_BUILD_TIME_ZONE);
@@ -114,6 +116,7 @@ public abstract class AbstractModelInterpolatorTest extends TestCase {
         assertEquals("1976-11-11T23:16:00Z", format.format(secondTestDate));
     }
 
+    @Test
     public void testDefaultBuildTimestampFormatWithLocalTimeZoneMidnightRollover() {
         Calendar cal = Calendar.getInstance();
         cal.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
@@ -137,6 +140,7 @@ public abstract class AbstractModelInterpolatorTest extends TestCase {
         assertEquals("2014-11-16T00:16:00Z", format.format(secondTestDate));
     }
 
+    @Test
     public void testShouldNotThrowExceptionOnReferenceToNonExistentValue() throws Exception {
         Model model = new Model();
 
@@ -154,6 +158,7 @@ public abstract class AbstractModelInterpolatorTest extends TestCase {
         assertEquals("${test}/somepath", out.getScm().getConnection());
     }
 
+    @Test
     public void testShouldThrowExceptionOnRecursiveScmConnectionReference() throws Exception {
         Model model = new Model();
 
@@ -173,6 +178,7 @@ public abstract class AbstractModelInterpolatorTest extends TestCase {
         }
     }
 
+    @Test
     public void testShouldNotThrowExceptionOnReferenceToValueContainingNakedExpression() throws Exception {
         Model model = new Model();
 
@@ -193,6 +199,7 @@ public abstract class AbstractModelInterpolatorTest extends TestCase {
         assertEquals("test/somepath", out.getScm().getConnection());
     }
 
+    @Test
     public void testShouldInterpolateOrganizationNameCorrectly() throws Exception {
         String orgName = "MyCo";
 
@@ -212,6 +219,7 @@ public abstract class AbstractModelInterpolatorTest extends TestCase {
         assertEquals(orgName + " Tools", out.getName());
     }
 
+    @Test
     public void testShouldInterpolateDependencyVersionToSetSameAsProjectVersion() throws Exception {
         Model model = new Model();
         model.setVersion("3.8.1");
@@ -230,6 +238,7 @@ public abstract class AbstractModelInterpolatorTest extends TestCase {
         assertEquals("3.8.1", (out.getDependencies().get(0)).getVersion());
     }
 
+    @Test
     public void testShouldNotInterpolateDependencyVersionWithInvalidReference() throws Exception {
         Model model = new Model();
         model.setVersion("3.8.1");
@@ -263,6 +272,7 @@ public abstract class AbstractModelInterpolatorTest extends TestCase {
         assertEquals("${something}", (out.getDependencies().get(0)).getVersion());
     }
 
+    @Test
     public void testTwoReferences() throws Exception {
         Model model = new Model();
         model.setVersion("3.8.1");
@@ -282,6 +292,7 @@ public abstract class AbstractModelInterpolatorTest extends TestCase {
         assertEquals("foo-3.8.1", (out.getDependencies().get(0)).getVersion());
     }
 
+    @Test
     public void testBasedir() throws Exception {
         Model model = new Model();
         model.setVersion("3.8.1");
@@ -303,6 +314,7 @@ public abstract class AbstractModelInterpolatorTest extends TestCase {
                 "file://localhost/myBasedir/temp-repo", (out.getRepositories().get(0)).getUrl());
     }
 
+    @Test
     public void testBaseUri() throws Exception {
         Model model = new Model();
         model.setVersion("3.8.1");
@@ -323,6 +335,7 @@ public abstract class AbstractModelInterpolatorTest extends TestCase {
         assertEquals("myBaseUri/temp-repo", (out.getRepositories().get(0)).getUrl());
     }
 
+    @Test
     public void testEnvars() throws Exception {
         Properties context = new Properties();
 
@@ -345,6 +358,7 @@ public abstract class AbstractModelInterpolatorTest extends TestCase {
         assertEquals("/path/to/home", out.getProperties().getProperty("outputDirectory"));
     }
 
+    @Test
     public void testEnvarExpressionThatEvaluatesToNullReturnsTheLiteralString() throws Exception {
         Model model = new Model();
 
@@ -363,6 +377,7 @@ public abstract class AbstractModelInterpolatorTest extends TestCase {
         assertEquals(out.getProperties().getProperty("outputDirectory"), "${env.DOES_NOT_EXIST}");
     }
 
+    @Test
     public void testExpressionThatEvaluatesToNullReturnsTheLiteralString() throws Exception {
         Model model = new Model();
 
@@ -381,6 +396,7 @@ public abstract class AbstractModelInterpolatorTest extends TestCase {
         assertEquals(out.getProperties().getProperty("outputDirectory"), "${DOES_NOT_EXIST}");
     }
 
+    @Test
     public void testShouldInterpolateSourceDirectoryReferencedFromResourceDirectoryCorrectly() throws Exception {
         Model model = new Model();
 
@@ -418,6 +434,7 @@ public abstract class AbstractModelInterpolatorTest extends TestCase {
         assertEquals(build.getSourceDirectory(), resIt.next().getDirectory());
     }
 
+    @Test
     public void testShouldInterpolateUnprefixedBasedirExpression() throws Exception {
         File basedir = new File("/test/path");
         Model model = new Model();

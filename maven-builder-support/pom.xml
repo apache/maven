@@ -31,4 +31,11 @@ under the License.
   <name>Maven Builder Support</name>
   <description>Support for descriptor builders (model, setting, toolchains)</description>
 
+  <dependencies>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 </project>

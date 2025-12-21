@@ -18,28 +18,27 @@
  */
 package org.apache.maven.execution;
 
+import javax.inject.Inject;
+
 import java.util.List;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Settings;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.testing.PlexusTest;
+import org.junit.jupiter.api.Test;
 
-public class DefaultMavenExecutionRequestPopulatorTest extends PlexusTestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    @Override
-    protected void customizeContainerConfiguration(ContainerConfiguration configuration) {
-        super.customizeContainerConfiguration(configuration);
-        configuration.setAutoWiring(true);
-        configuration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
-    }
+@PlexusTest
+public class DefaultMavenExecutionRequestPopulatorTest {
 
+    @Inject
+    private MavenExecutionRequestPopulator testee;
+
+    @Test
     public void testPluginRepositoryInjection() throws Exception {
-
-        MavenExecutionRequestPopulator testee = lookup(MavenExecutionRequestPopulator.class);
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
 

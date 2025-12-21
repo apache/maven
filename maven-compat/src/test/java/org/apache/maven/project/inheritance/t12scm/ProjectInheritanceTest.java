@@ -22,12 +22,17 @@ import java.io.File;
 
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
+import org.codehaus.plexus.testing.PlexusTest;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Verifies SCM inheritance uses modules statement from parent.
  *
  * @author jdcasey
  */
+@PlexusTest
 public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //
@@ -40,6 +45,7 @@ public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     //
     // ----------------------------------------------------------------------
 
+    @Test
     public void testScmInfoCalculatedCorrectlyOnParentAndChildRead() throws Exception {
         File localRepo = getLocalRepositoryPath();
 
@@ -69,6 +75,7 @@ public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
                 project1.getScm().getDeveloperConnection(), project0.getScm().getDeveloperConnection() + "/modules/p1");
     }
 
+    @Test
     public void testScmInfoCalculatedCorrectlyOnChildOnlyRead() throws Exception {
         File localRepo = getLocalRepositoryPath();
 

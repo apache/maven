@@ -18,21 +18,33 @@
  */
 package org.apache.maven.rtinfo.internal;
 
+import javax.inject.Inject;
+
 import org.apache.maven.rtinfo.RuntimeInformation;
-import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.testing.PlexusTest;
+import org.junit.jupiter.api.Test;
 
-public class DefaultRuntimeInformationTest extends PlexusTestCase {
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
+@PlexusTest
+public class DefaultRuntimeInformationTest {
+
+    @Inject
+    private RuntimeInformation rtInfo;
+
+    @Test
     public void testGetMavenVersion() throws Exception {
-        RuntimeInformation rtInfo = lookup(RuntimeInformation.class);
 
         String mavenVersion = rtInfo.getMavenVersion();
         assertNotNull(mavenVersion);
         assertTrue(mavenVersion.length() > 0);
     }
 
+    @Test
     public void testIsMavenVersion() throws Exception {
-        RuntimeInformation rtInfo = lookup(RuntimeInformation.class);
 
         assertTrue(rtInfo.isMavenVersion("2.0"));
         assertFalse(rtInfo.isMavenVersion("9.9"));

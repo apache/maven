@@ -18,9 +18,11 @@
  */
 package org.apache.maven.repository.legacy;
 
+import javax.inject.Inject;
+
 import java.io.File;
 
-import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
+import org.apache.maven.artifact.AbstractArtifactComponentTest;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -28,9 +30,22 @@ import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
+import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.internal.impl.DefaultTrackingFileManager;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class DefaultUpdateCheckManagerTest extends AbstractArtifactComponentTestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@PlexusTest
+public class DefaultUpdateCheckManagerTest extends AbstractArtifactComponentTest {
+
+    @Inject
+    private ArtifactFactory artifactFactory;
 
     DefaultUpdateCheckManager updateCheckManager;
 
@@ -40,6 +55,7 @@ public class DefaultUpdateCheckManagerTest extends AbstractArtifactComponentTest
     }
 
     @Override
+    @BeforeEach
     protected void setUp() throws Exception {
         super.setUp();
 
@@ -47,6 +63,7 @@ public class DefaultUpdateCheckManagerTest extends AbstractArtifactComponentTest
                 new ConsoleLogger(Logger.LEVEL_DEBUG, "test"), new DefaultTrackingFileManager());
     }
 
+    @Test
     public void testArtifact() throws Exception {
         ArtifactRepository remoteRepository = remoteRepository();
 
@@ -201,8 +218,8 @@ public class DefaultUpdateCheckManagerTest extends AbstractArtifactComponentTest
                 touchFile, updateCheckManager.getMetadataKey(remoteRepository, file)));
     }
 
+    @Test
     public void testArtifactTouchFileName() throws Exception {
-        ArtifactFactory artifactFactory = (ArtifactFactory) lookup(ArtifactFactory.ROLE);
 
         ArtifactRepository localRepository = localRepository();
 

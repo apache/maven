@@ -18,30 +18,38 @@
  */
 package org.apache.maven.model;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@code Exclusion}.
  *
  * @author Benjamin Bentmann
  */
-public class ExclusionTest extends TestCase {
+public class ExclusionTest {
 
+    @Test
     public void testHashCodeNullSafe() {
         new Exclusion().hashCode();
     }
 
+    @Test
     public void testEqualsNullSafe() {
         assertFalse(new Exclusion().equals(null));
 
         new Exclusion().equals(new Exclusion());
     }
 
+    @Test
     public void testEqualsIdentity() {
         Exclusion thing = new Exclusion();
         assertTrue(thing.equals(thing));
     }
 
+    @Test
     public void testToStringNullSafe() {
         assertNotNull(new Exclusion().toString());
     }

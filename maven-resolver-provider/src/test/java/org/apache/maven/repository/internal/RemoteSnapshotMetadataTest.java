@@ -29,25 +29,25 @@ import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.eclipse.aether.artifact.DefaultArtifact;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RemoteSnapshotMetadataTest {
     private Locale defaultLocale;
 
     private static final Pattern DATE_FILTER = Pattern.compile("\\..*");
 
-    @Before
+    @BeforeEach
     public void setLocaleToUseBuddhistCalendar() {
         defaultLocale = Locale.getDefault();
         Locale.setDefault(new Locale("th", "TH"));
     }
 
-    @After
+    @AfterEach
     public void restoreLocale() {
         Locale.setDefault(defaultLocale);
     }
@@ -74,7 +74,7 @@ public class RemoteSnapshotMetadataTest {
 
         /* Allow for this test running across midnight */
         Set<String> expected = new HashSet<>(Arrays.asList(dateBefore, dateAfter));
-        assertTrue("Expected " + datePart + " to be in " + expected, expected.contains(datePart));
+        assertTrue(expected.contains(datePart), "Expected " + datePart + " to be in " + expected);
     }
 
     @Test

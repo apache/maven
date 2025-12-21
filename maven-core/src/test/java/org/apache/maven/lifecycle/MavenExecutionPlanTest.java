@@ -20,16 +20,21 @@ package org.apache.maven.lifecycle;
 
 import java.util.Set;
 
-import junit.framework.TestCase;
 import org.apache.maven.lifecycle.internal.ExecutionPlanItem;
 import org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub;
 import org.apache.maven.model.Plugin;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.AssertionsKt.assertNotNull;
 
 /**
  * @author Kristian Rosenvold
  */
-public class MavenExecutionPlanTest extends TestCase {
+public class MavenExecutionPlanTest {
 
+    @Test
     public void testFindLastInPhase() throws Exception {
         MavenExecutionPlan plan = LifecycleExecutionPlanCalculatorStub.getProjectAExceutionPlan();
 
@@ -39,6 +44,7 @@ public class MavenExecutionPlanTest extends TestCase {
         assertNotNull(expected);
     }
 
+    @Test
     public void testThreadSafeMojos() throws Exception {
         MavenExecutionPlan plan = LifecycleExecutionPlanCalculatorStub.getProjectAExceutionPlan();
         final Set<Plugin> unSafePlugins = plan.getNonThreadSafePlugins();
@@ -46,6 +52,7 @@ public class MavenExecutionPlanTest extends TestCase {
         assertEquals(plan.size() - 1, unSafePlugins.size());
     }
 
+    @Test
     public void testFindLastWhenFirst() throws Exception {
         MavenExecutionPlan plan = LifecycleExecutionPlanCalculatorStub.getProjectAExceutionPlan();
 
@@ -54,6 +61,7 @@ public class MavenExecutionPlanTest extends TestCase {
         assertNull(beerPhase);
     }
 
+    @Test
     public void testFindLastInPhaseMisc() throws Exception {
         MavenExecutionPlan plan = LifecycleExecutionPlanCalculatorStub.getProjectAExceutionPlan();
 

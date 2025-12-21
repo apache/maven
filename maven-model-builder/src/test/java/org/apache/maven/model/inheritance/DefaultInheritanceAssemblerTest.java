@@ -21,31 +21,33 @@ package org.apache.maven.model.inheritance;
 import java.io.File;
 import java.io.IOException;
 
-import junit.framework.TestCase;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.SimpleProblemCollector;
 import org.apache.maven.model.io.DefaultModelReader;
 import org.apache.maven.model.io.DefaultModelWriter;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.io.ModelWriter;
-import org.xmlunit.matchers.CompareMatcher;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.Diff;
 
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Hervé Boutemy
  */
-public class DefaultInheritanceAssemblerTest extends TestCase {
+public class DefaultInheritanceAssemblerTest {
     private ModelReader reader;
 
     private ModelWriter writer;
 
     private InheritanceAssembler assembler;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
-
         reader = new DefaultModelReader();
         writer = new DefaultModelWriter();
         assembler = new DefaultInheritanceAssembler();
@@ -59,6 +61,7 @@ public class DefaultInheritanceAssemblerTest extends TestCase {
         return reader.read(getPom(name), null);
     }
 
+    @Test
     public void testPluginConfiguration() throws Exception {
         testInheritance("plugin-configuration");
     }
@@ -68,6 +71,7 @@ public class DefaultInheritanceAssemblerTest extends TestCase {
      * and child directory == artifactId
      * @throws IOException Model read problem
      */
+    @Test
     public void testUrls() throws Exception {
         testInheritance("urls");
     }
@@ -76,6 +80,7 @@ public class DefaultInheritanceAssemblerTest extends TestCase {
      * Flat directory structure: parent &amp; child POMs in sibling directories, child directory == artifactId.
      * @throws IOException Model read problem
      */
+    @Test
     public void testFlatUrls() throws IOException {
         testInheritance("flat-urls");
     }
@@ -84,6 +89,7 @@ public class DefaultInheritanceAssemblerTest extends TestCase {
      * MNG-5951 MNG-6059 child.x.y.inherit.append.path="false" test
      * @throws Exception
      */
+    @Test
     public void testNoAppendUrls() throws Exception {
         testInheritance("no-append-urls");
     }
@@ -92,6 +98,7 @@ public class DefaultInheritanceAssemblerTest extends TestCase {
      * MNG-5951 special case test: inherit with partial override
      * @throws Exception
      */
+    @Test
     public void testNoAppendUrls2() throws Exception {
         testInheritance("no-append-urls2");
     }
@@ -100,6 +107,7 @@ public class DefaultInheritanceAssemblerTest extends TestCase {
      * MNG-5951 special case test: child.x.y.inherit.append.path="true" in child should not reset content
      * @throws Exception
      */
+    @Test
     public void testNoAppendUrls3() throws Exception {
         testInheritance("no-append-urls3");
     }
@@ -110,6 +118,7 @@ public class DefaultInheritanceAssemblerTest extends TestCase {
      * This is why MNG-5000 fix in code is marked as bad practice (uses file names)
      * @throws IOException Model read problem
      */
+    @Test
     public void testFlatTrickyUrls() throws IOException {
         // parent references child with artifactId (which is not directory name)
         // then relative path calculation will fail during build from disk but success when calculated from repo
@@ -120,11 +129,11 @@ public class DefaultInheritanceAssemblerTest extends TestCase {
         } catch (AssertionError afe) {
             // expected failure: wrong relative path calculation
             assertTrue(
-                    afe.getMessage(),
                     afe.getMessage()
                             .contains(
                                     "Expected text value 'http://www.apache.org/path/to/parent/child-artifact-id/' but was "
-                                            + "'http://www.apache.org/path/to/parent/../child-artifact-id/'"));
+                                            + "'http://www.apache.org/path/to/parent/../child-artifact-id/'"),
+                    afe.getMessage());
         }
         // but ok from repo: local disk is ignored
         testInheritance("tricky-flat-artifactId-urls", true);
@@ -138,14 +147,15 @@ public class DefaultInheritanceAssemblerTest extends TestCase {
         } catch (AssertionError afe) {
             // expected failure
             assertTrue(
-                    afe.getMessage(),
                     afe.getMessage()
                             .contains(
                                     "Expected text value 'http://www.apache.org/path/to/parent/../child-artifact-id/' but was "
-                                            + "'http://www.apache.org/path/to/parent/child-artifact-id/'"));
+                                            + "'http://www.apache.org/path/to/parent/child-artifact-id/'"),
+                    afe.getMessage());
         }
     }
 
+    @Test
     public void testWithEmptyUrl() throws IOException {
         testInheritance("empty-urls", false);
     }
@@ -179,10 +189,15 @@ public class DefaultInheritanceAssemblerTest extends TestCase {
         // check with getPom( baseName + "-expected" )
         File expected = getPom(baseName + "-expected");
 
-        assertThat(
-                actual, CompareMatcher.isIdenticalTo(expected).ignoreComments().ignoreWhitespace());
+        Diff diff = DiffBuilder.compare(expected)
+                .withTest(actual)
+                .ignoreComments()
+                .ignoreWhitespace()
+                .build();
+        assertFalse(diff.hasDifferences(), diff.fullDescription());
     }
 
+    @Test
     public void testModulePathNotArtifactId() throws IOException {
         Model parent = getModel("module-path-not-artifactId-parent");
 
@@ -199,7 +214,11 @@ public class DefaultInheritanceAssemblerTest extends TestCase {
         // check with getPom( "module-path-not-artifactId-effective" )
         File expected = getPom("module-path-not-artifactId-expected");
 
-        assertThat(
-                actual, CompareMatcher.isIdenticalTo(expected).ignoreComments().ignoreWhitespace());
+        Diff diff = DiffBuilder.compare(expected)
+                .withTest(actual)
+                .ignoreComments()
+                .ignoreWhitespace()
+                .build();
+        assertFalse(diff.hasDifferences(), diff.fullDescription());
     }
 }

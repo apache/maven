@@ -27,6 +27,11 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
+import org.codehaus.plexus.testing.PlexusTest;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * A test which demonstrates maven's recursive inheritance where
@@ -39,6 +44,7 @@ import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
  *
  * @author Jason van Zyl
  */
+@PlexusTest
 public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //
@@ -54,6 +60,7 @@ public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     //
     // ----------------------------------------------------------------------
 
+    @Test
     public void testProjectInheritance() throws Exception {
         File localRepo = getLocalRepositoryPath();
 

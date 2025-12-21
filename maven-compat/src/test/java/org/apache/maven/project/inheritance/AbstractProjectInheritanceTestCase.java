@@ -22,6 +22,8 @@ import java.io.File;
 
 import org.apache.maven.project.AbstractMavenProjectTestCase;
 
+import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
+
 /**
  * @author Jason van Zyl
  */

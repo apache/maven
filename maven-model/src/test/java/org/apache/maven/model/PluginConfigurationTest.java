@@ -18,30 +18,38 @@
  */
 package org.apache.maven.model;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@code PluginConfiguration}.
  *
  * @author Benjamin Bentmann
  */
-public class PluginConfigurationTest extends TestCase {
+public class PluginConfigurationTest {
 
+    @Test
     public void testHashCodeNullSafe() {
         new PluginConfiguration().hashCode();
     }
 
+    @Test
     public void testEqualsNullSafe() {
         assertFalse(new PluginConfiguration().equals(null));
 
         new PluginConfiguration().equals(new PluginConfiguration());
     }
 
+    @Test
     public void testEqualsIdentity() {
         PluginConfiguration thing = new PluginConfiguration();
         assertTrue(thing.equals(thing));
     }
 
+    @Test
     public void testToStringNullSafe() {
         assertNotNull(new PluginConfiguration().toString());
     }

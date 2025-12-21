@@ -18,29 +18,25 @@
  */
 package org.apache.maven.lifecycle;
 
+import javax.inject.Inject;
+
 import java.util.List;
 
-import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.testing.PlexusTest;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author Kristian Rosenvold
  */
-public class DefaultLifecyclesTest extends PlexusTestCase {
-    @Requirement
+@PlexusTest
+public class DefaultLifecyclesTest {
+    @Inject
     private DefaultLifecycles defaultLifeCycles;
 
-    protected void setUp() throws Exception {
-        super.setUp();
-        defaultLifeCycles = lookup(DefaultLifecycles.class);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        defaultLifeCycles = null;
-        super.tearDown();
-    }
-
+    @Test
     public void testLifecycle() throws Exception {
         final List<Lifecycle> cycles = defaultLifeCycles.getLifeCycles();
         assertNotNull(cycles);

@@ -18,6 +18,8 @@
  */
 package org.apache.maven.repository.legacy;
 
+import javax.inject.Inject;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,43 +44,37 @@ import org.apache.maven.wagon.events.TransferEvent;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.observers.AbstractTransferListener;
 import org.apache.maven.wagon.observers.Debug;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.FileUtils;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
  */
-public class DefaultWagonManagerTest extends PlexusTestCase {
-    private DefaultWagonManager wagonManager;
+@PlexusTest
+public class DefaultWagonManagerTest {
+
+    @Inject
+    private WagonManager wagonManager;
 
     private TransferListener transferListener = new Debug();
 
+    @Inject
     private ArtifactFactory artifactFactory;
 
+    @Inject
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
-    @Override
-    protected void customizeContainerConfiguration(ContainerConfiguration configuration) {
-        configuration.setAutoWiring(true);
-        configuration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
-    }
-
-    protected void setUp() throws Exception {
-        super.setUp();
-        wagonManager = (DefaultWagonManager) lookup(WagonManager.class);
-        artifactFactory = lookup(ArtifactFactory.class);
-        artifactRepositoryFactory = lookup(ArtifactRepositoryFactory.class);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        wagonManager = null;
-        artifactFactory = null;
-        super.tearDown();
-    }
-
+    @Test
     public void testUnnecessaryRepositoryLookup() throws Exception {
         Artifact artifact = createTestPomArtifact("target/test-data/get-missing-pom");
 
@@ -106,6 +102,7 @@ public class DefaultWagonManagerTest extends PlexusTestCase {
         assertEquals(1, listener.events.size());
     }
 
+    @Test
     public void testGetMissingJar() throws TransferFailedException, UnsupportedProtocolException, IOException {
         Artifact artifact = createTestArtifact("target/test-data/get-missing-jar", "jar");
 
@@ -122,6 +119,7 @@ public class DefaultWagonManagerTest extends PlexusTestCase {
         assertFalse(artifact.getFile().exists());
     }
 
+    @Test
     public void testGetMissingJarForced() throws TransferFailedException, UnsupportedProtocolException, IOException {
         Artifact artifact = createTestArtifact("target/test-data/get-missing-jar", "jar");
 
@@ -138,6 +136,7 @@ public class DefaultWagonManagerTest extends PlexusTestCase {
         assertFalse(artifact.getFile().exists());
     }
 
+    @Test
     public void testGetRemoteJar()
             throws TransferFailedException, ResourceDoesNotExistException, UnsupportedProtocolException, IOException,
                     AuthorizationException {
@@ -198,16 +197,7 @@ public class DefaultWagonManagerTest extends PlexusTestCase {
         return artifactRepositoryFactory.createArtifactRepository(id, url, new DefaultRepositoryLayout(), null, null);
     }
 
-    /**
-     * Build an ArtifactRepository object.
-     *
-     * @param id
-     * @return
-     */
-    private ArtifactRepository getRepo(String id) {
-        return getRepo(id, "http://something");
-    }
-
+    @Test
     public void testDefaultWagonManager() throws Exception {
         assertWagon("a");
 
@@ -230,6 +220,7 @@ public class DefaultWagonManagerTest extends PlexusTestCase {
     /**
      * Check that transfer listeners are properly removed after getArtifact and putArtifact
      */
+    @Test
     public void testWagonTransferListenerRemovedAfterGetArtifactAndPutArtifact() throws Exception {
         Artifact artifact = createTestArtifact("target/test-data/transfer-listener", "jar");
         ArtifactRepository repo = createStringRepo();
@@ -238,29 +229,31 @@ public class DefaultWagonManagerTest extends PlexusTestCase {
 
         /* getArtifact */
         assertFalse(
-                "Transfer listener is registered before test",
-                wagon.getTransferEventSupport().hasTransferListener(transferListener));
+                wagon.getTransferEventSupport().hasTransferListener(transferListener),
+                "Transfer listener is registered before test");
         wagonManager.getArtifact(artifact, repo, transferListener, false);
         assertFalse(
-                "Transfer listener still registered after getArtifact",
-                wagon.getTransferEventSupport().hasTransferListener(transferListener));
+                wagon.getTransferEventSupport().hasTransferListener(transferListener),
+                "Transfer listener still registered after getArtifact");
 
         /* putArtifact */
         File sampleFile = getTestFile("target/test-file");
         FileUtils.fileWrite(sampleFile.getAbsolutePath(), "sample file");
 
         assertFalse(
-                "Transfer listener is registered before test",
-                wagon.getTransferEventSupport().hasTransferListener(transferListener));
+                wagon.getTransferEventSupport().hasTransferListener(transferListener),
+                "Transfer listener is registered before test");
         wagonManager.putArtifact(sampleFile, artifact, repo, transferListener);
         assertFalse(
-                "Transfer listener still registered after putArtifact",
-                wagon.getTransferEventSupport().hasTransferListener(transferListener));
+                wagon.getTransferEventSupport().hasTransferListener(transferListener),
+                "Transfer listener still registered after putArtifact");
     }
 
     /**
      * Checks the verification of checksums.
      */
+    @Test
+    @Disabled
     public void xtestChecksumVerification() throws Exception {
         ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy(
                 true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL);
@@ -343,6 +336,7 @@ public class DefaultWagonManagerTest extends PlexusTestCase {
         }
     }
 
+    @Test
     public void testPerLookupInstantiation() throws Exception {
         String protocol = "perlookup";
 
@@ -355,7 +349,7 @@ public class DefaultWagonManagerTest extends PlexusTestCase {
     private void assertWagon(String protocol) throws Exception {
         Wagon wagon = wagonManager.getWagon(protocol);
 
-        assertNotNull("Check wagon, protocol=" + protocol, wagon);
+        assertNotNull(wagon, "Check wagon, protocol=" + protocol);
     }
 
     private final class ArtifactRepositoryLayoutStub implements ArtifactRepositoryLayout {

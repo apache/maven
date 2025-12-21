@@ -23,10 +23,14 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class SettingsUtilsTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.AssertionsKt.assertNotNull;
 
+public class SettingsUtilsTest {
+
+    @Test
     public void testShouldAppendRecessivePluginGroupIds() {
         Settings dominant = new Settings();
         dominant.addPluginGroup("org.apache.maven.plugins");

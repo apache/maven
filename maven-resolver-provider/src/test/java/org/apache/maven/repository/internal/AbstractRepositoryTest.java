@@ -18,43 +18,31 @@
  */
 package org.apache.maven.repository.internal;
 
+import javax.inject.Inject;
+
 import java.net.MalformedURLException;
 
 import org.apache.maven.repository.internal.util.ConsoleRepositoryListener;
 import org.apache.maven.repository.internal.util.ConsoleTransferListener;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.junit.jupiter.api.BeforeEach;
 
-public abstract class AbstractRepositoryTestCase extends PlexusTestCase {
+import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
+
+public abstract class AbstractRepositoryTest {
+
+    @Inject
     protected RepositorySystem system;
 
     protected RepositorySystemSession session;
 
-    @Override
-    protected void customizeContainerConfiguration(ContainerConfiguration containerConfiguration) {
-        super.customizeContainerConfiguration(containerConfiguration);
-        containerConfiguration.setAutoWiring(true);
-        containerConfiguration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
-    }
-
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
-        system = lookup(RepositorySystem.class);
         session = newMavenRepositorySystemSession(system);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        session = null;
-        system = null;
-        super.tearDown();
     }
 
     public static RepositorySystemSession newMavenRepositorySystemSession(RepositorySystem system) {

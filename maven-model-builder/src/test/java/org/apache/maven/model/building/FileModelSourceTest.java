@@ -21,12 +21,12 @@ package org.apache.maven.model.building;
 import java.io.File;
 import java.io.IOException;
 
-import org.codehaus.plexus.util.Os;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test that validate the solution of MNG-6261 issue
@@ -49,9 +49,8 @@ public class FileModelSourceTest {
     }
 
     @Test
+    @EnabledOnOs(OS.WINDOWS)
     public void testWindowsPaths() throws Exception {
-        assumeTrue(Os.isFamily("Windows"));
-
         File upperCaseFile = createTempFile("TESTE");
         String absolutePath = upperCaseFile.getAbsolutePath();
         File lowerCaseFile = new File(absolutePath.toLowerCase());

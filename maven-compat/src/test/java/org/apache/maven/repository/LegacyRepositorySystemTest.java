@@ -18,6 +18,8 @@
  */
 package org.apache.maven.repository;
 
+import javax.inject.Inject;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
@@ -35,43 +37,32 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.repository.legacy.LegacyRepositorySystem;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
+import org.junit.jupiter.api.Test;
+
+import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@link LegacyRepositorySystem}.
  *
  * @author Benjamin Bentmann
  */
-public class LegacyRepositorySystemTest extends PlexusTestCase {
+@PlexusTest
+public class LegacyRepositorySystemTest {
+    @Inject
     private RepositorySystem repositorySystem;
 
+    @Inject
     private ResolutionErrorHandler resolutionErrorHandler;
 
-    @Override
-    protected void customizeContainerConfiguration(ContainerConfiguration containerConfiguration) {
-        super.customizeContainerConfiguration(containerConfiguration);
-        containerConfiguration.setAutoWiring(true);
-        containerConfiguration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        repositorySystem = lookup(RepositorySystem.class, "default");
-        resolutionErrorHandler = lookup(ResolutionErrorHandler.class);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        repositorySystem = null;
-        resolutionErrorHandler = null;
-        super.tearDown();
-    }
+    @Inject
+    private LegacySupport legacySupport;
 
     protected List<ArtifactRepository> getRemoteRepositories() throws Exception {
         File repoDir = new File(getBasedir(), "src/test/remote-repo").getAbsoluteFile();
@@ -96,6 +87,7 @@ public class LegacyRepositorySystemTest extends PlexusTestCase {
         return repositorySystem.createLocalRepository(repoDir);
     }
 
+    @Test
     public void testThatASystemScopedDependencyIsNotResolvedFromRepositories() throws Exception {
         //
         // We should get a whole slew of dependencies resolving this artifact transitively
@@ -118,9 +110,8 @@ public class LegacyRepositorySystemTest extends PlexusTestCase {
         LocalRepository localRepo =
                 new LocalRepository(request.getLocalRepository().getBasedir());
         session.setLocalRepositoryManager(new SimpleLocalRepositoryManagerFactory().newInstance(session, localRepo));
-        LegacySupport legacySupport = lookup(LegacySupport.class);
-        legacySupport.setSession(new MavenSession(
-                getContainer(), session, new DefaultMavenExecutionRequest(), new DefaultMavenExecutionResult()));
+        legacySupport.setSession(
+                new MavenSession(null, session, new DefaultMavenExecutionRequest(), new DefaultMavenExecutionResult()));
 
         ArtifactResolutionResult result = repositorySystem.resolve(request);
         resolutionErrorHandler.throwErrors(request, result);
@@ -176,6 +167,7 @@ public class LegacyRepositorySystemTest extends PlexusTestCase {
         }
     }
 
+    @Test
     public void testLocalRepositoryBasedir() throws Exception {
         File localRepoDir = new File("").getAbsoluteFile();
 

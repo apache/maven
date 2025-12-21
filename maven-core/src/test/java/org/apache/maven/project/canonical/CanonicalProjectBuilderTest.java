@@ -25,12 +25,20 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.project.AbstractMavenProjectTestCase;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.AssertionsKt.assertNotNull;
 
 /**
  * @author Jason van Zyl
  */
+@PlexusTest
 public class CanonicalProjectBuilderTest extends AbstractMavenProjectTestCase {
+
+    @Test
     public void testProjectBuilder() throws Exception {
         File f = getFileForClasspathResource("canonical-pom.xml");
 

@@ -18,28 +18,25 @@
  */
 package org.apache.maven.repository.internal;
 
+import javax.inject.Inject;
+
+import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.impl.VersionResolver;
 import org.eclipse.aether.resolution.VersionRequest;
 import org.eclipse.aether.resolution.VersionResult;
+import org.junit.jupiter.api.Test;
 
-public class DefaultVersionResolverTest extends AbstractRepositoryTestCase {
-    private DefaultVersionResolver versionResolver;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        // be sure we're testing the right class, i.e. DefaultVersionResolver.class
-        versionResolver = (DefaultVersionResolver) lookup(VersionResolver.class, "default");
-    }
+@PlexusTest
+public class DefaultVersionResolverTest extends AbstractRepositoryTest {
 
-    @Override
-    protected void tearDown() throws Exception {
-        versionResolver = null;
-        super.tearDown();
-    }
+    @Inject
+    private VersionResolver versionResolver;
 
+    @Test
     public void testResolveSeparateInstalledClassifiedNonUniqueVersionedArtifacts() throws Exception {
         VersionRequest requestB = new VersionRequest();
         requestB.addRepository(newTestRepository());
@@ -61,6 +58,7 @@ public class DefaultVersionResolverTest extends AbstractRepositoryTestCase {
         assertEquals("07.20.3-20120809.112124-88", resultA.getVersion());
     }
 
+    @Test
     public void testResolveSeparateInstalledClassifiedNonVersionedArtifacts() throws Exception {
         VersionRequest requestA = new VersionRequest();
         requestA.addRepository(newTestRepository());

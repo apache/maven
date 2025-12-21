@@ -23,6 +23,7 @@ import java.util.Properties;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests {@link PropertyProfileActivator}.
@@ -55,6 +56,7 @@ public class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<P
         return props;
     }
 
+    @Test
     public void testNullSafe() throws Exception {
         Profile p = new Profile();
 
@@ -65,6 +67,7 @@ public class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<P
         assertActivation(false, p, newContext(null, null));
     }
 
+    @Test
     public void testWithNameOnlyUserProperty() throws Exception {
         Profile profile = newProfile("prop", null);
 
@@ -75,6 +78,7 @@ public class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<P
         assertActivation(false, profile, newContext(newProperties("other", "value"), null));
     }
 
+    @Test
     public void testWithNameOnlySystemProperty() throws Exception {
         Profile profile = newProfile("prop", null);
 
@@ -85,6 +89,7 @@ public class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<P
         assertActivation(false, profile, newContext(null, newProperties("other", "value")));
     }
 
+    @Test
     public void testWithNegatedNameOnlyUserProperty() throws Exception {
         Profile profile = newProfile("!prop", null);
 
@@ -95,6 +100,7 @@ public class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<P
         assertActivation(true, profile, newContext(newProperties("other", "value"), null));
     }
 
+    @Test
     public void testWithNegatedNameOnlySystemProperty() throws Exception {
         Profile profile = newProfile("!prop", null);
 
@@ -105,6 +111,7 @@ public class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<P
         assertActivation(true, profile, newContext(null, newProperties("other", "value")));
     }
 
+    @Test
     public void testWithValueUserProperty() throws Exception {
         Profile profile = newProfile("prop", "value");
 
@@ -115,6 +122,7 @@ public class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<P
         assertActivation(false, profile, newContext(newProperties("prop", ""), null));
     }
 
+    @Test
     public void testWithValueSystemProperty() throws Exception {
         Profile profile = newProfile("prop", "value");
 
@@ -125,6 +133,7 @@ public class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<P
         assertActivation(false, profile, newContext(null, newProperties("other", "")));
     }
 
+    @Test
     public void testWithNegatedValueUserProperty() throws Exception {
         Profile profile = newProfile("prop", "!value");
 
@@ -135,6 +144,7 @@ public class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<P
         assertActivation(true, profile, newContext(newProperties("prop", ""), null));
     }
 
+    @Test
     public void testWithNegatedValueSystemProperty() throws Exception {
         Profile profile = newProfile("prop", "!value");
 
@@ -145,6 +155,7 @@ public class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<P
         assertActivation(true, profile, newContext(null, newProperties("other", "")));
     }
 
+    @Test
     public void testWithValueUserPropertyDominantOverSystemProperty() throws Exception {
         Profile profile = newProfile("prop", "value");
 

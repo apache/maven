@@ -18,31 +18,33 @@
  */
 package org.apache.maven.artifact.resolver;
 
+import javax.inject.Inject;
+
 import java.util.Collections;
 
-import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
+import org.apache.maven.artifact.AbstractArtifactComponentTest;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.DefaultArtifactResolver.DaemonThreadCreator;
+import org.codehaus.plexus.testing.PlexusTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class DefaultArtifactResolverTest extends AbstractArtifactComponentTestCase {
-    private DefaultArtifactResolver artifactResolver;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@PlexusTest
+public class DefaultArtifactResolverTest extends AbstractArtifactComponentTest {
+
+    @Inject
+    private ArtifactResolver artifactResolver;
 
     private Artifact projectArtifact;
 
     @Override
+    @BeforeEach
     protected void setUp() throws Exception {
         super.setUp();
 
-        artifactResolver = (DefaultArtifactResolver) lookup(ArtifactResolver.class);
-
         projectArtifact = createLocalArtifact("project", "3.0");
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        artifactFactory = null;
-        projectArtifact = null;
-        super.tearDown();
     }
 
     @Override
@@ -50,6 +52,7 @@ public class DefaultArtifactResolverTest extends AbstractArtifactComponentTestCa
         return "resolver";
     }
 
+    @Test
     public void testMNG4738() throws Exception {
         Artifact g = createLocalArtifact("g", "1.0");
         createLocalArtifact("h", "1.0");
@@ -81,14 +84,10 @@ public class DefaultArtifactResolverTest extends AbstractArtifactComponentTestCa
             for (Thread active : ts) {
                 String name = active.getName();
                 boolean daemon = active.isDaemon();
-                assertTrue(name + " is no daemon Thread.", daemon);
+                assertTrue(daemon, name + " is no daemon Thread.");
             }
         }
 
-        assertTrue("Could not find ThreadGroup: " + DaemonThreadCreator.THREADGROUP_NAME, seen);
-    }
-
-    public void testLookup() throws Exception {
-        lookup(ArtifactResolver.class, "default");
+        assertTrue(seen, "Could not find ThreadGroup: " + DaemonThreadCreator.THREADGROUP_NAME);
     }
 }

@@ -18,6 +18,8 @@
  */
 package org.apache.maven.plugin;
 
+import javax.inject.Inject;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,30 +44,29 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
-import org.codehaus.plexus.MutablePlexusContainer;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
+import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
+import org.junit.jupiter.api.Test;
+
+import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * @author Jason van Zyl
  */
+@PlexusTest
 public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentTestCase {
     private static final String FS = File.separator;
 
+    @Inject
     private MavenRepositorySystem factory;
 
-    public void setUp() throws Exception {
-        super.setUp();
-        factory = lookup(MavenRepositorySystem.class);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        factory = null;
-        super.tearDown();
-    }
-
+    @Test
     public void testPluginDescriptorExpressionReference() throws Exception {
         MojoExecution exec = newMojoExecution();
 
@@ -76,11 +77,12 @@ public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenCom
         System.out.println("Result: " + result);
 
         assertSame(
-                "${plugin} expression does not return plugin descriptor.",
                 exec.getMojoDescriptor().getPluginDescriptor(),
-                result);
+                result,
+                "${plugin} expression does not return plugin descriptor.");
     }
 
+    @Test
     public void testPluginArtifactsExpressionReference() throws Exception {
         MojoExecution exec = newMojoExecution();
 
@@ -101,9 +103,10 @@ public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenCom
 
         assertNotNull(depResults);
         assertEquals(1, depResults.size());
-        assertSame("dependency artifact is wrong.", depArtifact, depResults.get(0));
+        assertSame(depArtifact, depResults.get(0), "dependency artifact is wrong.");
     }
 
+    @Test
     public void testPluginArtifactMapExpressionReference() throws Exception {
         MojoExecution exec = newMojoExecution();
 
@@ -125,11 +128,12 @@ public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenCom
         assertNotNull(depResults);
         assertEquals(1, depResults.size());
         assertSame(
-                "dependency artifact is wrong.",
                 depArtifact,
-                depResults.get(ArtifactUtils.versionlessKey(depArtifact)));
+                depResults.get(ArtifactUtils.versionlessKey(depArtifact)),
+                "dependency artifact is wrong.");
     }
 
+    @Test
     public void testPluginArtifactIdExpressionReference() throws Exception {
         MojoExecution exec = newMojoExecution();
 
@@ -140,11 +144,12 @@ public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenCom
         System.out.println("Result: " + result);
 
         assertSame(
-                "${plugin.artifactId} expression does not return plugin descriptor's artifactId.",
                 exec.getMojoDescriptor().getPluginDescriptor().getArtifactId(),
-                result);
+                result,
+                "${plugin.artifactId} expression does not return plugin descriptor's artifactId.");
     }
 
+    @Test
     public void testValueExtractionWithAPomValueContainingAPath() throws Exception {
         String expected = getTestFile("target/test-classes/target/classes").getCanonicalPath();
 
@@ -165,6 +170,7 @@ public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenCom
         assertEquals(expected, actual);
     }
 
+    @Test
     public void testEscapedVariablePassthrough() throws Exception {
         String var = "${var}";
 
@@ -180,6 +186,7 @@ public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenCom
         assertEquals(var, value);
     }
 
+    @Test
     public void testEscapedVariablePassthroughInLargerExpression() throws Exception {
         String var = "${var}";
         String key = var + " with version: ${project.version}";
@@ -196,6 +203,7 @@ public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenCom
         assertEquals("${var} with version: 1", value);
     }
 
+    @Test
     public void testMultipleSubExpressionsInLargerExpression() throws Exception {
         String key = "${project.artifactId} with version: ${project.version}";
 
@@ -212,6 +220,7 @@ public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenCom
         assertEquals("test with version: 1", value);
     }
 
+    @Test
     public void testMissingPOMPropertyRefInLargerExpression() throws Exception {
         String expr = "/path/to/someproject-${baseVersion}";
 
@@ -224,6 +233,7 @@ public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenCom
         assertEquals(expr, value);
     }
 
+    @Test
     public void testPOMPropertyExtractionWithMissingProjectWithDotNotation() throws Exception {
         String key = "m2.name";
         String checkValue = "value";
@@ -243,6 +253,7 @@ public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenCom
         assertEquals(checkValue, value);
     }
 
+    @Test
     public void testBasedirExtractionWithMissingProject() throws Exception {
         ExpressionEvaluator ee = createExpressionEvaluator(null, null, new Properties());
 
@@ -251,6 +262,7 @@ public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenCom
         assertEquals(System.getProperty("user.dir"), value);
     }
 
+    @Test
     public void testValueExtractionFromSystemPropertiesWithMissingProject() throws Exception {
         String sysprop = "PPEET_sysprop1";
 
@@ -267,6 +279,7 @@ public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenCom
         assertEquals("value", value);
     }
 
+    @Test
     public void testValueExtractionOfMissingPrefixedProperty() throws Exception {
         Properties executionProperties = new Properties();
 
@@ -277,6 +290,7 @@ public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenCom
         assertEquals("prefix-${PPEET_nonexisting_p_property}", value);
     }
 
+    @Test
     public void testValueExtractionOfMissingSuffixedProperty() throws Exception {
         Properties executionProperties = new Properties();
 
@@ -287,6 +301,7 @@ public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenCom
         assertEquals("${PPEET_nonexisting_s_property}-suffix", value);
     }
 
+    @Test
     public void testValueExtractionOfMissingPrefixedSuffixedProperty() throws Exception {
         Properties executionProperties = new Properties();
 
@@ -297,6 +312,7 @@ public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenCom
         assertEquals("prefix-${PPEET_nonexisting_ps_property}-suffix", value);
     }
 
+    @Test
     public void testValueExtractionOfMissingProperty() throws Exception {
         Properties executionProperties = new Properties();
 
@@ -307,6 +323,7 @@ public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenCom
         assertNull(value);
     }
 
+    @Test
     public void testValueExtractionFromSystemPropertiesWithMissingProjectWithDotNotation() throws Exception {
         String sysprop = "PPEET.sysprop2";
 
@@ -324,7 +341,7 @@ public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenCom
     }
 
     @SuppressWarnings("deprecation")
-    private static MavenSession createSession(PlexusContainer container, ArtifactRepository repo, Properties properties)
+    private static MavenSession createSession(ArtifactRepository repo, Properties properties)
             throws CycleDetectedException, DuplicateProjectException {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
                 .setSystemProperties(properties)
@@ -333,9 +350,10 @@ public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenCom
                 .setLocalRepository(repo);
 
         return new MavenSession(
-                container, request, new DefaultMavenExecutionResult(), Collections.<MavenProject>emptyList());
+                null, request, new DefaultMavenExecutionResult(), Collections.<MavenProject>emptyList());
     }
 
+    @Test
     public void testLocalRepositoryExtraction() throws Exception {
         ExpressionEvaluator expressionEvaluator =
                 createExpressionEvaluator(createDefaultProject(), null, new Properties());
@@ -344,6 +362,7 @@ public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenCom
         assertEquals("local", ((ArtifactRepository) value).getId());
     }
 
+    @Test
     public void testTwoExpressions() throws Exception {
         Build build = new Build();
         build.setDirectory("expected-directory");
@@ -360,6 +379,7 @@ public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenCom
         assertEquals("expected-directory" + File.separatorChar + "expected-finalName", value);
     }
 
+    @Test
     public void testShouldExtractPluginArtifacts() throws Exception {
         PluginDescriptor pd = new PluginDescriptor();
 
@@ -371,7 +391,7 @@ public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenCom
 
         Object value = ee.evaluate("${plugin.artifacts}");
 
-        assertTrue(value instanceof List);
+        assertInstanceOf(List.class, value);
 
         @SuppressWarnings("unchecked")
         List<Artifact> artifacts = (List<Artifact>) value;
@@ -391,8 +411,7 @@ public class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenCom
             MavenProject project, PluginDescriptor pluginDescriptor, Properties executionProperties) throws Exception {
         ArtifactRepository repo = factory.createLocalRepository(null, RepositorySystem.defaultUserLocalRepository);
 
-        MutablePlexusContainer container = (MutablePlexusContainer) getContainer();
-        MavenSession session = createSession(container, repo, executionProperties);
+        MavenSession session = createSession(repo, executionProperties);
         session.setCurrentProject(project);
 
         MojoDescriptor mojo = new MojoDescriptor();

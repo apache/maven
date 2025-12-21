@@ -18,19 +18,24 @@
  */
 package org.apache.maven.repository.internal;
 
-import junit.framework.TestCase;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.impl.MetadataGeneratorFactory;
 import org.eclipse.aether.spi.locator.ServiceLocator;
+import org.junit.jupiter.api.Test;
 
-public class MavenRepositorySystemUtilsTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+public class MavenRepositorySystemUtilsTest {
+
+    @Test
     public void testGetRepositorySystem() {
         ServiceLocator locator = MavenRepositorySystemUtils.newServiceLocator();
         RepositorySystem repoSys = locator.getService(RepositorySystem.class);
         assertNotNull(repoSys);
     }
 
+    @Test
     public void testGetMetadataGeneratorFactories() {
         ServiceLocator locator = MavenRepositorySystemUtils.newServiceLocator();
         assertEquals(2, locator.getServices(MetadataGeneratorFactory.class).size());

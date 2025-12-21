@@ -18,37 +18,43 @@
  */
 package org.apache.maven.repository.metadata;
 
-import org.codehaus.plexus.PlexusTestCase;
+import javax.inject.Inject;
+
+import org.codehaus.plexus.testing.PlexusTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  *
  * @author <a href="mailto:oleg@codehaus.org">Oleg Gusakov</a>
  *
  */
-public class DefaultGraphConflictResolutionPolicyTest extends PlexusTestCase {
+@PlexusTest
+public class DefaultGraphConflictResolutionPolicyTest {
+    @Inject
     GraphConflictResolutionPolicy policy;
+
     MetadataGraphEdge e1;
     MetadataGraphEdge e2;
     MetadataGraphEdge e3;
-    // ------------------------------------------------------------------------------------------
-    @Override
+
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
-        policy = (GraphConflictResolutionPolicy) lookup(GraphConflictResolutionPolicy.ROLE, "default");
         e1 = new MetadataGraphEdge("1.1", true, null, null, 2, 1);
         e2 = new MetadataGraphEdge("1.2", true, null, null, 3, 2);
         e3 = new MetadataGraphEdge("1.2", true, null, null, 2, 3);
     }
-    // ------------------------------------------------------------------------------------------
+
+    @Test
     public void testDefaultPolicy() throws Exception {
         MetadataGraphEdge res;
 
         res = policy.apply(e1, e2);
-        assertEquals("Wrong depth edge selected", "1.1", res.getVersion());
+        assertEquals("1.1", res.getVersion(), "Wrong depth edge selected");
 
         res = policy.apply(e1, e3);
-        assertEquals("Wrong version edge selected", "1.2", res.getVersion());
+        assertEquals("1.2", res.getVersion(), "Wrong version edge selected");
     }
-    // ------------------------------------------------------------------------------------------
-    // ------------------------------------------------------------------------------------------
 }

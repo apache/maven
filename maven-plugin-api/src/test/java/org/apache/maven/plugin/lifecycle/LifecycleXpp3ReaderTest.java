@@ -20,15 +20,17 @@ package org.apache.maven.plugin.lifecycle;
 
 import java.io.IOException;
 
-import junit.framework.TestCase;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test the lifecycle reader.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
-public class LifecycleXpp3ReaderTest extends TestCase {
+public class LifecycleXpp3ReaderTest {
+
+    @Test
     public void testLifecycleReader() throws IOException, XmlPullParserException {
         /*
         LifecycleMappingsXpp3Reader reader = new LifecycleMappingsXpp3Reader();

@@ -18,25 +18,25 @@
  */
 package org.apache.maven.project.artifact;
 
+import javax.inject.Inject;
+
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
-import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.testing.PlexusTest;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
-public class DefaultProjectArtifactsCacheTest extends PlexusTestCase {
+@PlexusTest
+public class DefaultProjectArtifactsCacheTest {
 
+    @Inject
     private ProjectArtifactsCache cache;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        cache = lookup(ProjectArtifactsCache.class);
-    }
-
+    @Test
     public void testProjectDependencyOrder() throws Exception {
         ProjectArtifactsCache.Key project1 = new ProjectArtifactsCache.Key() {};
 

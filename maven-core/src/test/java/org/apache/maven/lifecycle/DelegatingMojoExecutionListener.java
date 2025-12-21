@@ -28,7 +28,7 @@ import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.execution.MojoExecutionListener;
 import org.apache.maven.plugin.MojoExecutionException;
 
-@Named
+@Named("delegating")
 @Singleton
 public class DelegatingMojoExecutionListener implements MojoExecutionListener {
     private final List<MojoExecutionListener> listeners = new CopyOnWriteArrayList<>();

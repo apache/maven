@@ -18,6 +18,8 @@
  */
 package org.apache.maven;
 
+import javax.inject.Inject;
+
 import java.io.File;
 import java.nio.file.Files;
 import java.util.concurrent.atomic.AtomicReference;
@@ -31,10 +33,22 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.repository.internal.MavenWorkspaceReader;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.testing.PlexusTest;
+import org.junit.jupiter.api.Test;
 
 import static java.util.Arrays.asList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@PlexusTest
 public class DefaultMavenTest extends AbstractCoreMavenComponentTestCase {
+
+    @Inject
+    private Maven maven;
+
+    @Inject
+    private MavenProjectHelper mavenProjectHelper;
+
     @Component(role = AbstractMavenLifecycleParticipant.class, hint = "WsrClassCatcher")
     private static final class WsrClassCatcher extends AbstractMavenLifecycleParticipant {
         private final AtomicReference<Class<?>> wsrClassRef = new AtomicReference<>(null);
@@ -45,20 +59,21 @@ public class DefaultMavenTest extends AbstractCoreMavenComponentTestCase {
         }
     }
 
+    @Test
     public void testEnsureResolverSessionHasMavenWorkspaceReader() throws Exception {
         WsrClassCatcher wsrClassCatcher =
-                (WsrClassCatcher) getContainer().lookup(AbstractMavenLifecycleParticipant.class, "WsrClassCatcher");
-        Maven maven = getContainer().lookup(Maven.class);
+                (WsrClassCatcher) container.lookup(AbstractMavenLifecycleParticipant.class, "WsrClassCatcher");
         MavenExecutionRequest request =
                 createMavenExecutionRequest(getProject("simple")).setGoals(asList("validate"));
 
         maven.execute(request);
 
         Class<?> wsrClass = wsrClassCatcher.wsrClassRef.get();
-        assertTrue("is null", wsrClass != null);
-        assertTrue(String.valueOf(wsrClass), MavenWorkspaceReader.class.isAssignableFrom(wsrClass));
+        assertTrue(wsrClass != null, "is null");
+        assertTrue(MavenWorkspaceReader.class.isAssignableFrom(wsrClass), String.valueOf(wsrClass));
     }
 
+    @Test
     public void testMavenProjectEditArtifacts() throws Exception {
         MavenProject mavenProject = new MavenProject();
         DefaultArtifact artifact = new DefaultArtifact("g", "a", "1.0", Artifact.SCOPE_TEST, "jar", "", null);
@@ -66,8 +81,8 @@ public class DefaultMavenTest extends AbstractCoreMavenComponentTestCase {
         mavenProject.getAttachedArtifacts().remove(artifact);
     }
 
+    @Test
     public void testThatErrorDuringProjectDependencyGraphCreationAreStored() throws Exception {
-        Maven maven = getContainer().lookup(Maven.class);
         MavenExecutionRequest request =
                 createMavenExecutionRequest(getProject("cyclic-reference")).setGoals(asList("validate"));
 
@@ -81,8 +96,8 @@ public class DefaultMavenTest extends AbstractCoreMavenComponentTestCase {
         return "src/test/projects/default-maven";
     }
 
+    @Test
     public void testMavenProjectNoDuplicateArtifacts() throws Exception {
-        MavenProjectHelper mavenProjectHelper = lookup(MavenProjectHelper.class);
         MavenProject mavenProject = new MavenProject();
         mavenProject.setArtifact(new DefaultArtifact("g", "a", "1.0", Artifact.SCOPE_TEST, "jar", "", null));
         File artifactFile = Files.createTempFile("foo", "tmp").toFile();

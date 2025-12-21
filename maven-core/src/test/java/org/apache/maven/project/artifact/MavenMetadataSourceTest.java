@@ -18,22 +18,12 @@
  */
 package org.apache.maven.project.artifact;
 
-import org.codehaus.plexus.PlexusTestCase;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Test;
 
-@Ignore
-public class MavenMetadataSourceTest extends PlexusTestCase {
+public class MavenMetadataSourceTest {
 
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
-    public void testShouldNotCarryExclusionsOverFromDependencyToDependency() throws Exception {
+    @Test
+    public void testShouldNotCarryExclusionsOverFromDependencyToDependency() {
         /*
         Dependency dep1 = new Dependency();
         dep1.setGroupId( "test" );

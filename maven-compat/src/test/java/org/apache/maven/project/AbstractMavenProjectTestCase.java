@@ -18,6 +18,8 @@
  */
 package org.apache.maven.project;
 
+import javax.inject.Inject;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
@@ -31,54 +33,44 @@ import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.testing.PlexusTestConfiguration;
 import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.junit.jupiter.api.BeforeEach;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Jason van Zyl
  */
-public abstract class AbstractMavenProjectTestCase extends PlexusTestCase {
+public abstract class AbstractMavenProjectTestCase implements PlexusTestConfiguration {
+
     protected ProjectBuilder projectBuilder;
 
+    @Inject
     protected RepositorySystem repositorySystem;
 
-    @Override
-    protected void customizeContainerConfiguration(ContainerConfiguration containerConfiguration) {
-        super.customizeContainerConfiguration(containerConfiguration);
-        containerConfiguration.setAutoWiring(true);
-        containerConfiguration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
-    }
+    @Inject
+    protected PlexusContainer container;
 
+    @Inject
+    private ArtifactRepositoryLayout repoLayout;
+
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
 
-        if (getContainer().hasComponent(ProjectBuilder.class, "test")) {
-            projectBuilder = lookup(ProjectBuilder.class, "test");
+        if (container.hasComponent(ProjectBuilder.class, "test")) {
+            projectBuilder = container.lookup(ProjectBuilder.class, "test");
         } else {
             // default over to the main project builder...
-            projectBuilder = lookup(ProjectBuilder.class);
+            projectBuilder = container.lookup(ProjectBuilder.class);
         }
-
-        repositorySystem = lookup(RepositorySystem.class);
     }
 
     @Override
-    protected void tearDown() throws Exception {
-        projectBuilder = null;
-
-        super.tearDown();
-    }
-
-    protected ProjectBuilder getProjectBuilder() {
-        return projectBuilder;
-    }
-
-    @Override
-    protected String getCustomConfigurationName() {
+    public void customizeConfiguration(ContainerConfiguration containerConfiguration) {
         String name = AbstractMavenProjectTestCase.class.getName().replace('.', '/') + ".xml";
-        System.out.println(name);
-        return name;
+        containerConfiguration.setContainerConfiguration(name);
     }
 
     // ----------------------------------------------------------------------
@@ -104,12 +96,10 @@ public abstract class AbstractMavenProjectTestCase extends PlexusTestCase {
         return new File(resourceUrl.toURI());
     }
 
-    protected ArtifactRepository getLocalRepository() throws Exception {
-        ArtifactRepositoryLayout repoLayout = lookup(ArtifactRepositoryLayout.class, "legacy");
+    private ArtifactRepository getLocalRepository() throws Exception {
 
         ArtifactRepository r = repositorySystem.createArtifactRepository(
                 "local", "file://" + getLocalRepositoryPath().getAbsolutePath(), repoLayout, null, null);
-
         return r;
     }
 
@@ -150,7 +140,7 @@ public abstract class AbstractMavenProjectTestCase extends PlexusTestCase {
         return projectBuilder.build(pom, configuration).getProject();
     }
 
-    protected void initRepoSession(ProjectBuildingRequest request) {
+    private void initRepoSession(ProjectBuildingRequest request) {
         File localRepo = new File(request.getLocalRepository().getBasedir());
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
         session.setLocalRepositoryManager(new LegacyLocalRepositoryManager(localRepo));

@@ -18,6 +18,8 @@
  */
 package org.apache.maven.lifecycle.internal;
 
+import javax.inject.Inject;
+
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,22 +32,20 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.junit.Test;
+import org.codehaus.plexus.testing.PlexusTest;
+import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@PlexusTest
 public class LifecycleDependencyResolverTest extends AbstractCoreMavenComponentTestCase {
-    @Requirement
+
+    @Inject
     private LifecycleDependencyResolver resolver;
 
     @Override
     protected String getProjectsDirectory() {
         return null;
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        resolver = lookup(LifecycleDependencyResolver.class);
     }
 
     @Test

@@ -19,17 +19,16 @@
 package org.apache.maven.cli;
 
 import org.apache.commons.cli.CommandLine;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CLIManagerTest {
     private CLIManager cliManager;
 
-    @Before
+    @BeforeEach
     public void setup() {
         cliManager = new CLIManager();
     }
@@ -38,7 +37,7 @@ public class CLIManagerTest {
     public void spacedOptions() throws Exception {
         CommandLine cmdLine = cliManager.parse("-X -Dx=1 -D y=2 test".split(" "));
         assertTrue(cmdLine.hasOption(CLIManager.DEBUG));
-        assertThat(cmdLine.getOptionValues(CLIManager.SET_SYSTEM_PROPERTY)[0], is("x=1"));
-        assertThat(cmdLine.getOptionValues(CLIManager.SET_SYSTEM_PROPERTY)[1], is("y=2"));
+        assertEquals("x=1", cmdLine.getOptionValues(CLIManager.SET_SYSTEM_PROPERTY)[0]);
+        assertEquals("y=2", cmdLine.getOptionValues(CLIManager.SET_SYSTEM_PROPERTY)[1]);
     }
 }

@@ -18,6 +18,8 @@
  */
 package org.apache.maven.artifact;
 
+import javax.inject.Inject;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -31,15 +33,12 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.artifact.resolver.TestMavenWorkspaceReader;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.collection.DependencyGraphTransformer;
@@ -48,7 +47,6 @@ import org.eclipse.aether.collection.DependencySelector;
 import org.eclipse.aether.collection.DependencyTraverser;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
-import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
 import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
@@ -63,75 +61,44 @@ import org.eclipse.aether.util.graph.transformer.NearestVersionSelector;
 import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
 import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
+import org.junit.jupiter.api.BeforeEach;
+
+import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  */
-public abstract class AbstractArtifactComponentTestCase extends PlexusTestCase {
+public abstract class AbstractArtifactComponentTest {
+
+    @Inject
     protected ArtifactFactory artifactFactory;
 
+    @Inject
     protected ArtifactRepositoryFactory artifactRepositoryFactory;
 
-    @Override
-    protected void customizeContainerConfiguration(ContainerConfiguration containerConfiguration) {
-        super.customizeContainerConfiguration(containerConfiguration);
-        containerConfiguration.setAutoWiring(true);
-        containerConfiguration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
-    }
+    @Inject
+    private LegacySupport legacySupport;
 
-    @Override
+    @Inject
+    private ArtifactRepositoryLayout repoLayout;
+
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
-        artifactFactory = lookup(ArtifactFactory.class);
-        artifactRepositoryFactory = lookup(ArtifactRepositoryFactory.class);
 
         RepositorySystemSession repoSession = initRepoSession();
         MavenSession session = new MavenSession(
-                getContainer(), repoSession, new DefaultMavenExecutionRequest(), new DefaultMavenExecutionResult());
+                null, repoSession, new DefaultMavenExecutionRequest(), new DefaultMavenExecutionResult());
 
-        LegacySupport legacySupport = lookup(LegacySupport.class);
         legacySupport.setSession(session);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        release(artifactFactory);
-
-        super.tearDown();
-    }
-
     protected abstract String component();
-
-    /**
-     * Return an existing file, not a directory - causes creation to fail.
-     *
-     * @throws Exception
-     */
-    protected ArtifactRepository badLocalRepository() throws Exception {
-        String path = "target/test-repositories/" + component() + "/bad-local-repository";
-
-        File f = new File(getBasedir(), path);
-
-        f.createNewFile();
-
-        ArtifactRepositoryLayout repoLayout =
-                (ArtifactRepositoryLayout) lookup(ArtifactRepositoryLayout.ROLE, "default");
-
-        return artifactRepositoryFactory.createArtifactRepository(
-                "test", "file://" + f.getPath(), repoLayout, null, null);
-    }
-
-    protected String getRepositoryLayout() {
-        return "default";
-    }
 
     protected ArtifactRepository localRepository() throws Exception {
         String path = "target/test-repositories/" + component() + "/local-repository";
 
         File f = new File(getBasedir(), path);
-
-        ArtifactRepositoryLayout repoLayout =
-                (ArtifactRepositoryLayout) lookup(ArtifactRepositoryLayout.ROLE, "default");
 
         return artifactRepositoryFactory.createArtifactRepository(
                 "local", "file://" + f.getPath(), repoLayout, null, null);
@@ -142,9 +109,6 @@ public abstract class AbstractArtifactComponentTestCase extends PlexusTestCase {
 
         File f = new File(getBasedir(), path);
 
-        ArtifactRepositoryLayout repoLayout =
-                (ArtifactRepositoryLayout) lookup(ArtifactRepositoryLayout.ROLE, "default");
-
         return artifactRepositoryFactory.createArtifactRepository(
                 "test",
                 "file://" + f.getPath(),
@@ -154,23 +118,9 @@ public abstract class AbstractArtifactComponentTestCase extends PlexusTestCase {
     }
 
     protected ArtifactRepository badRemoteRepository() throws Exception {
-        ArtifactRepositoryLayout repoLayout =
-                (ArtifactRepositoryLayout) lookup(ArtifactRepositoryLayout.ROLE, "default");
 
         return artifactRepositoryFactory.createArtifactRepository(
                 "test", "http://foo.bar/repository", repoLayout, null, null);
-    }
-
-    protected void assertRemoteArtifactPresent(Artifact artifact) throws Exception {
-        ArtifactRepository remoteRepo = remoteRepository();
-
-        String path = remoteRepo.pathOf(artifact);
-
-        File file = new File(remoteRepo.getBasedir(), path);
-
-        if (!file.exists()) {
-            fail("Remote artifact " + file + " should be present.");
-        }
     }
 
     protected void assertLocalArtifactPresent(Artifact artifact) throws Exception {
@@ -182,30 +132,6 @@ public abstract class AbstractArtifactComponentTestCase extends PlexusTestCase {
 
         if (!file.exists()) {
             fail("Local artifact " + file + " should be present.");
-        }
-    }
-
-    protected void assertRemoteArtifactNotPresent(Artifact artifact) throws Exception {
-        ArtifactRepository remoteRepo = remoteRepository();
-
-        String path = remoteRepo.pathOf(artifact);
-
-        File file = new File(remoteRepo.getBasedir(), path);
-
-        if (file.exists()) {
-            fail("Remote artifact " + file + " should not be present.");
-        }
-    }
-
-    protected void assertLocalArtifactNotPresent(Artifact artifact) throws Exception {
-        ArtifactRepository localRepo = localRepository();
-
-        String path = localRepo.pathOf(artifact);
-
-        File file = new File(localRepo.getBasedir(), path);
-
-        if (file.exists()) {
-            fail("Local artifact " + file + " should not be present.");
         }
     }
 
@@ -239,14 +165,6 @@ public abstract class AbstractArtifactComponentTestCase extends PlexusTestCase {
         createArtifact(artifact, remoteRepository());
 
         return artifact;
-    }
-
-    protected void createLocalArtifact(Artifact artifact) throws Exception {
-        createArtifact(artifact, localRepository());
-    }
-
-    protected void createRemoteArtifact(Artifact artifact) throws Exception {
-        createArtifact(artifact, remoteRepository());
     }
 
     protected void createArtifact(Artifact artifact, ArtifactRepository repository) throws Exception {
@@ -315,11 +233,7 @@ public abstract class AbstractArtifactComponentTestCase extends PlexusTestCase {
 
         LocalRepository localRepo = new LocalRepository(localRepository().getBasedir());
         session.setLocalRepositoryManager(new SimpleLocalRepositoryManagerFactory().newInstance(session, localRepo));
-        try {
-            session.setWorkspaceReader(lookup(WorkspaceReader.class, "test"));
-        } catch (ComponentLookupException e) {
-            // no reader, nothing to do...
-        }
+        session.setWorkspaceReader(new TestMavenWorkspaceReader());
 
         return session;
     }

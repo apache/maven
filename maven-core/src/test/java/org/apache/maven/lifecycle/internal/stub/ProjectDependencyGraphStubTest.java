@@ -20,15 +20,19 @@ package org.apache.maven.lifecycle.internal.stub;
 
 import java.util.List;
 
-import junit.framework.TestCase;
 import org.apache.maven.project.MavenProject;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests the stub. Yeah, I know.
  *
  * @author Kristian Rosenvold
  */
-public class ProjectDependencyGraphStubTest extends TestCase {
+public class ProjectDependencyGraphStubTest {
+    @Test
     public void testADependencies() {
         ProjectDependencyGraphStub stub = new ProjectDependencyGraphStub();
         final List<MavenProject> mavenProjects = stub.getUpstreamProjects(ProjectDependencyGraphStub.A, false);

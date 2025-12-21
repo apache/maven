@@ -18,34 +18,43 @@
  */
 package org.apache.maven.model;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@code Developer}.
  *
  * @author Benjamin Bentmann
  */
-public class DeveloperTest extends TestCase {
+public class DeveloperTest {
 
+    @Test
     public void testHashCodeNullSafe() {
         new Developer().hashCode();
     }
 
+    @Test
     public void testEqualsNullSafe() {
         assertFalse(new Developer().equals(null));
 
         new Developer().equals(new Developer());
     }
 
+    @Test
     public void testEqualsIdentity() {
         Developer thing = new Developer();
         assertTrue(thing.equals(thing));
     }
 
+    @Test
     public void testToStringNullSafe() {
         assertNotNull(new Developer().toString());
     }
 
+    @Test
     public void testToStringNotNonsense() {
         Developer dev = new Developer();
         dev.setName("Maven Tester");

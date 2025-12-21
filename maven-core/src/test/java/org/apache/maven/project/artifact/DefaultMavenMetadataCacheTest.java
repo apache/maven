@@ -21,7 +21,6 @@ package org.apache.maven.project.artifact;
 import java.util.Arrays;
 import java.util.Collections;
 
-import junit.framework.TestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
@@ -29,24 +28,24 @@ import org.apache.maven.project.artifact.DefaultMavenMetadataCache.CacheKey;
 import org.apache.maven.repository.DelegatingLocalArtifactRepository;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.TestRepositorySystem;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 /**
  * @author Igor Fedorenko
  */
-public class DefaultMavenMetadataCacheTest extends TestCase {
+public class DefaultMavenMetadataCacheTest {
     private RepositorySystem repositorySystem;
 
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         repositorySystem = new TestRepositorySystem();
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        repositorySystem = null;
-        super.tearDown();
-    }
-
+    @Test
     public void testCacheKey() throws Exception {
         Artifact a1 = repositorySystem.createArtifact("testGroup", "testArtifact", "1.2.3", "jar");
         @SuppressWarnings("deprecation")

@@ -20,6 +20,10 @@ package org.apache.maven.project.inheritance.t00;
 
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
+import org.codehaus.plexus.testing.PlexusTest;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * A test which demonstrates maven's recursive inheritance where
@@ -32,6 +36,7 @@ import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
  *
  * @author Jason van Zyl
  */
+@PlexusTest
 public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //
@@ -47,6 +52,7 @@ public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     //
     // ----------------------------------------------------------------------
 
+    @Test
     public void testProjectInheritance() throws Exception {
         MavenProject p4 = getProject(projectFile("p4"));
 

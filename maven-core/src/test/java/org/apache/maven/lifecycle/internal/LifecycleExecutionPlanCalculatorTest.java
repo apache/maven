@@ -18,7 +18,6 @@
  */
 package org.apache.maven.lifecycle.internal;
 
-import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.stub.BuildPluginManagerStub;
@@ -26,12 +25,16 @@ import org.apache.maven.lifecycle.internal.stub.DefaultLifecyclesStub;
 import org.apache.maven.lifecycle.internal.stub.PluginPrefixResolverStub;
 import org.apache.maven.lifecycle.internal.stub.PluginVersionResolverStub;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Kristian Rosenvold
  */
-public class LifecycleExecutionPlanCalculatorTest extends AbstractCoreMavenComponentTestCase {
+public class LifecycleExecutionPlanCalculatorTest {
 
+    @Test
     public void testCalculateExecutionPlanWithGoalTasks() throws Exception {
         MojoDescriptorCreator mojoDescriptorCreator = createMojoDescriptorCreator();
         LifecycleExecutionPlanCalculator lifecycleExecutionPlanCalculator =
@@ -71,10 +74,5 @@ public class LifecycleExecutionPlanCalculatorTest extends AbstractCoreMavenCompo
                 new BuildPluginManagerStub(),
                 new PluginPrefixResolverStub(),
                 new LifecyclePluginResolver(new PluginVersionResolverStub()));
-    }
-
-    @Override
-    protected String getProjectsDirectory() {
-        return "src/test/projects/lifecycle-executor";
     }
 }

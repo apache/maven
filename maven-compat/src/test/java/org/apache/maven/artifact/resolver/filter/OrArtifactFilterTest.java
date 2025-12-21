@@ -20,15 +20,19 @@ package org.apache.maven.artifact.resolver.filter;
 
 import java.util.Arrays;
 
-import junit.framework.TestCase;
 import org.apache.maven.artifact.Artifact;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@link OrArtifactFilter}.
  *
  * @author Benjamin Bentmann
  */
-public class OrArtifactFilterTest extends TestCase {
+public class OrArtifactFilterTest {
 
     private ArtifactFilter newSubFilter() {
         return new ArtifactFilter() {
@@ -38,6 +42,7 @@ public class OrArtifactFilterTest extends TestCase {
         };
     }
 
+    @Test
     public void testEquals() {
         OrArtifactFilter filter1 = new OrArtifactFilter();
 

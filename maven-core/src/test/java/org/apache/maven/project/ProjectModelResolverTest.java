@@ -18,6 +18,8 @@
  */
 package org.apache.maven.project;
 
+import javax.inject.Inject;
+
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
@@ -28,13 +30,22 @@ import org.apache.maven.model.Parent;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
+import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.repository.LocalRepositoryManager;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
+import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Test cases for the project {@code ModelResolver} implementation.
@@ -42,7 +53,17 @@ import static org.hamcrest.Matchers.containsString;
  * @author Christian Schulte
  * @since 3.5.0
  */
-public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
+@PlexusTest
+public class ProjectModelResolverTest {
+
+    @Inject
+    private RepositorySystem repositorySystem;
+
+    @Inject
+    private RemoteRepositoryManager remoteRepositoryManager;
+
+    @TempDir
+    private File localRepo;
 
     /**
      * Creates a new {@code ProjectModelResolverTest} instance.
@@ -51,6 +72,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
         super();
     }
 
+    @Test
     public void testResolveParentThrowsUnresolvableModelExceptionWhenNotFound() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("org.apache");
@@ -66,6 +88,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
         }
     }
 
+    @Test
     public void testResolveParentThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("org.apache");
@@ -80,6 +103,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
         }
     }
 
+    @Test
     public void testResolveParentThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("org.apache");
@@ -94,6 +118,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
         }
     }
 
+    @Test
     public void testResolveParentSuccessfullyResolvesExistingParentWithoutRange() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("org.apache");
@@ -104,6 +129,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
         assertEquals("1", parent.getVersion());
     }
 
+    @Test
     public void testResolveParentSuccessfullyResolvesExistingParentUsingHighestVersion() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("org.apache");
@@ -114,6 +140,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
         assertEquals("1", parent.getVersion());
     }
 
+    @Test
     public void testResolveDependencyThrowsUnresolvableModelExceptionWhenNotFound() throws Exception {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("org.apache");
@@ -129,6 +156,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
         }
     }
 
+    @Test
     public void testResolveDependencyThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("org.apache");
@@ -143,6 +171,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
         }
     }
 
+    @Test
     public void testResolveDependencyThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound()
             throws Exception {
         final Dependency dependency = new Dependency();
@@ -159,6 +188,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
         }
     }
 
+    @Test
     public void testResolveDependencySuccessfullyResolvesExistingDependencyWithoutRange() throws Exception {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("org.apache");
@@ -169,6 +199,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
         assertEquals("1", dependency.getVersion());
     }
 
+    @Test
     public void testResolveDependencySuccessfullyResolvesExistingDependencyUsingHighestVersion() throws Exception {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("org.apache");
@@ -180,15 +211,16 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
     }
 
     private ModelResolver newModelResolver() throws Exception {
-        final File localRepo = new File(this.getLocalRepository().getBasedir());
         final DefaultRepositorySystemSession repoSession = MavenRepositorySystemUtils.newSession();
-        repoSession.setLocalRepositoryManager(new LegacyLocalRepositoryManager(localRepo));
+        LocalRepositoryManager localRepositoryManager =
+                repositorySystem.newLocalRepositoryManager(repoSession, new LocalRepository(localRepo));
+        repoSession.setLocalRepositoryManager(localRepositoryManager);
 
         return new ProjectModelResolver(
                 repoSession,
                 null,
-                lookup(RepositorySystem.class),
-                lookup(RemoteRepositoryManager.class),
+                repositorySystem,
+                remoteRepositoryManager,
                 this.getRemoteRepositories(),
                 ProjectBuildingRequest.RepositoryMerging.REQUEST_DOMINANT,
                 null);
