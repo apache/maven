@@ -383,8 +383,38 @@ public interface XmlNode {
             }
 
             @Override
+            public String getName() {
+                return name();
+            }
+
+            @Override
+            public String getNamespaceUri() {
+                return namespaceUri();
+            }
+
+            @Override
+            public String getPrefix() {
+                return prefix();
+            }
+
+            @Override
+            public String getValue() {
+                return value();
+            }
+
+            @Override
+            public Map<String, String> getAttributes() {
+                return attributes();
+            }
+
+            @Override
             public String getAttribute(@Nonnull String name) {
                 return attributes.get(name);
+            }
+
+            @Override
+            public List<XmlNode> getChildren() {
+                return children();
             }
 
             @Override
@@ -399,6 +429,11 @@ public interface XmlNode {
                     }
                 }
                 return null;
+            }
+
+            @Override
+            public Object getInputLocation() {
+                return inputLocation();
             }
 
             @Override

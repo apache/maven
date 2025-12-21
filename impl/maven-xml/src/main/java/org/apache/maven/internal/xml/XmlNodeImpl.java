@@ -168,12 +168,10 @@ public class XmlNodeImpl implements Serializable, XmlNode {
 
     @Override
     @Nonnull
-    @Deprecated(since = "4.0.0", forRemoval = true)
     public List<XmlNode> getChildren() {
         return children;
     }
 
-    @Deprecated(since = "4.0.0", forRemoval = true)
     public int getChildCount() {
         return children.size();
     }
@@ -186,7 +184,6 @@ public class XmlNodeImpl implements Serializable, XmlNode {
      * @since 3.2.0
      * @return input location
      */
-    @Deprecated(since = "4.0.0", forRemoval = true)
     @Override
     public Object getInputLocation() {
         return location;
