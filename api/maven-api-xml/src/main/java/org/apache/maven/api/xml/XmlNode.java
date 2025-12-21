@@ -118,7 +118,6 @@ public interface XmlNode {
     @Nullable
     Object inputLocation();
 
-
     @Nonnull
     String getName();
 
