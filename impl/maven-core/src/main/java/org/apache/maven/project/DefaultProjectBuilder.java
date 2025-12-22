@@ -713,8 +713,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 Set<String> modules = extractModules(sources);
                 boolean isModularProject = !modules.isEmpty();
 
-                logger.debug(
-                        "Module detection for project {}: found {} module(s) {} - modular project: {}",
+                logger.trace(
+                        "Module detection for project {}: found {} module(s) {} - modular project: {}.",
                         project.getId(),
                         modules.size(),
                         modules,
@@ -1165,15 +1165,16 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 // Modular project with resources configured via <sources> - already added above
                 if (hasExplicitLegacyResources(resources, context.baseDir(), scopeId)) {
                     logger.warn(
-                            "Legacy {} element is ignored because {} resources are configured via {} in <sources>",
+                            "Legacy {} element is ignored because {} resources are configured via {} in <sources>.",
                             legacyElement,
                             scopeId,
                             sourcesConfig);
+                } else {
+                    logger.trace(
+                            "{} resources configured via <sources> element, ignoring legacy {} element.",
+                            scopeName,
+                            legacyElement);
                 }
-                logger.debug(
-                        "{} resources configured via <sources> element, ignoring legacy {} element",
-                        scopeName,
-                        legacyElement);
             } else {
                 // Modular project without resources in <sources> - inject module-aware defaults
                 if (hasExplicitLegacyResources(resources, context.baseDir(), scopeId)) {
@@ -1192,18 +1193,15 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                                     -1,
                                     null));
                 }
-                logger.debug(
-                        "Injecting module-aware {} resource roots for {} modules",
-                        scopeId,
-                        context.modules().size());
                 for (String module : context.modules()) {
-                    Path resourcePath = context.baseDir()
-                            .resolve("src")
-                            .resolve(module)
-                            .resolve(scopeId)
-                            .resolve("resources");
-                    logger.debug("  - Adding {} resource root: {} (module: {})", scopeId, resourcePath, module);
                     context.project().addSourceRoot(createModularResourceRoot(context.baseDir(), module, scope));
+                }
+                if (!context.modules().isEmpty()) {
+                    logger.trace(
+                            "Injected {} module-aware {} resource root(s) for modules: {}.",
+                            context.modules().size(),
+                            scopeId,
+                            context.modules());
                 }
             }
         } else {
@@ -1212,19 +1210,20 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 // Resources configured via <sources> - already added above
                 if (hasExplicitLegacyResources(resources, context.baseDir(), scopeId)) {
                     logger.warn(
-                            "Legacy {} element is ignored because {} resources are configured via {} in <sources>",
+                            "Legacy {} element is ignored because {} resources are configured via {} in <sources>.",
                             legacyElement,
                             scopeId,
                             sourcesConfig);
+                } else {
+                    logger.trace(
+                            "{} resources configured via <sources> element, ignoring legacy {} element.",
+                            scopeName,
+                            legacyElement);
                 }
-                logger.debug(
-                        "{} resources configured via <sources> element, ignoring legacy {} element",
-                        scopeName,
-                        legacyElement);
             } else {
                 // Use legacy resources element
-                logger.debug(
-                        "Using explicit or default {} resources ({} resources configured)", scopeId, resources.size());
+                logger.trace(
+                        "Using explicit or default {} resources ({} resources configured).", scopeId, resources.size());
                 for (Resource resource : resources) {
                     context.project().addSourceRoot(new DefaultSourceRoot(context.baseDir(), scope, resource));
                 }
@@ -1257,7 +1256,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
      * @param scope project scope (main or test)
      * @return configured DefaultSourceRoot for the module's resources
      */
-    private DefaultSourceRoot createModularResourceRoot(Path baseDir, String module, ProjectScope scope) {
+    private static DefaultSourceRoot createModularResourceRoot(Path baseDir, String module, ProjectScope scope) {
         Path resourceDir =
                 baseDir.resolve("src").resolve(module).resolve(scope.id()).resolve("resources");
 
@@ -1284,7 +1283,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
      * @param scope scope (main or test)
      * @return true if explicit legacy resources are present that would be ignored
      */
-    private boolean hasExplicitLegacyResources(List<Resource> resources, Path baseDir, String scope) {
+    private static boolean hasExplicitLegacyResources(List<Resource> resources, Path baseDir, String scope) {
         if (resources.isEmpty()) {
             return false; // No resources means no explicit legacy resources to warn about
         }
@@ -1306,7 +1305,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             }
         }
 
-        logger.debug("Only Super POM default resources found for scope: {}", scope);
         return false;
     }
 
