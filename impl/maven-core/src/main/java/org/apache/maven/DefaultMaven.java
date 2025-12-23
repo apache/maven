@@ -402,9 +402,16 @@ public class DefaultMaven implements Maven {
     }
 
     /**
-     * Nobody should ever use this method.
-     *
-     * @deprecated If you use this method and your code is not in Maven Core, stop doing this.
+     * @deprecated since 3.x
+     * <p>
+     * This method is part of Maven core internal infrastructure and was never
+     * intended for use outside of Maven Core itself.
+     * </p>
+     * <p>
+     * External consumers should not rely on this method, as it is subject to
+     * change or removal without notice. Code outside of Maven Core should use
+     * supported public APIs instead.
+     * </p>
      */
     @Deprecated
     public RepositorySystemSession newRepositorySession(MavenExecutionRequest request) {
