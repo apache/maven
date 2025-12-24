@@ -92,7 +92,7 @@ class ResourceHandlingContext {
                             scopeId,
                             sourcesConfig);
                 } else {
-                    LOGGER.trace(
+                    LOGGER.debug(
                             "{} resources configured via <sources> element, ignoring legacy {} element.",
                             scopeName,
                             legacyElement);
@@ -118,7 +118,7 @@ class ResourceHandlingContext {
                     project.addSourceRoot(createModularResourceRoot(module, scope));
                 }
                 if (!modules.isEmpty()) {
-                    LOGGER.trace(
+                    LOGGER.debug(
                             "Injected {} module-aware {} resource root(s) for modules: {}.",
                             modules.size(),
                             scopeId,
@@ -136,14 +136,14 @@ class ResourceHandlingContext {
                             scopeId,
                             sourcesConfig);
                 } else {
-                    LOGGER.trace(
+                    LOGGER.debug(
                             "{} resources configured via <sources> element, ignoring legacy {} element.",
                             scopeName,
                             legacyElement);
                 }
             } else {
                 // Use legacy resources element
-                LOGGER.trace(
+                LOGGER.debug(
                         "Using explicit or default {} resources ({} resources configured).", scopeId, resources.size());
                 for (Resource resource : resources) {
                     project.addSourceRoot(new DefaultSourceRoot(baseDir, scope, resource));
