@@ -42,7 +42,7 @@ import static java.util.Objects.requireNonNull;
  * @deprecated since 4.0.0, use {@code maven-api-impl} jar instead
  */
 @Deprecated(since = "4.0.0")
-public class DefaultType implements Type, ArtifactType {
+public class DefaultType implements Type {
     private final String id;
     private final Language language;
     private final String extension;
@@ -81,11 +81,6 @@ public class DefaultType implements Type, ArtifactType {
     }
 
     @Override
-    public String getId() {
-        return id();
-    }
-
-    @Override
     public Language getLanguage() {
         return language;
     }
@@ -105,13 +100,44 @@ public class DefaultType implements Type, ArtifactType {
         return this.includesDependencies;
     }
 
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+
     @Override
     public Set<PathType> getPathTypes() {
         return this.pathTypes;
     }
 
-    @Override
-    public Map<String, String> getProperties() {
-        return properties;
+    public ArtifactType toArtifactType() {
+        return new ArtifactTypeAdapter(this);
+    }
+
+    private static class ArtifactTypeAdapter implements ArtifactType {
+        private final DefaultType type;
+
+        private ArtifactTypeAdapter(DefaultType type) {
+            this.type = type;
+        }
+
+        @Override
+        public String getId() {
+            return type.id();
+        }
+
+        @Override
+        public String getExtension() {
+            return type.getExtension();
+        }
+
+        @Override
+        public String getClassifier() {
+            return type.getClassifier() == null ? "" : type.getClassifier();
+        }
+
+        @Override
+        public Map<String, String> getProperties() {
+            return type.getProperties();
+        }
     }
 }
