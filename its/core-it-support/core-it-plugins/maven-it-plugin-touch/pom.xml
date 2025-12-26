@@ -57,7 +57,7 @@ under the License.
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-archiver</artifactId>
-      <version>3.6.5</version>
+      <version>3.6.6</version>
     </dependency>
   </dependencies>
 </project>
