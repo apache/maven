@@ -62,7 +62,6 @@ import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.ReportPlugin;
-import org.apache.maven.api.model.Resource;
 import org.apache.maven.api.services.ArtifactResolver;
 import org.apache.maven.api.services.ArtifactResolverException;
 import org.apache.maven.api.services.ArtifactResolverRequest;
@@ -669,6 +668,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 boolean hasScript = false;
                 boolean hasMain = false;
                 boolean hasTest = false;
+                boolean hasMainResources = false;
+                boolean hasTestResources = false;
                 for (var source : sources) {
                     var src = DefaultSourceRoot.fromModel(session, baseDir, outputDirectory, source);
                     project.addSourceRoot(src);
@@ -679,6 +680,13 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                             hasMain = true;
                         } else {
                             hasTest |= ProjectScope.TEST.equals(scope);
+                        }
+                    } else if (Language.RESOURCES.equals(language)) {
+                        ProjectScope scope = src.scope();
+                        if (ProjectScope.MAIN.equals(scope)) {
+                            hasMainResources = true;
+                        } else if (ProjectScope.TEST.equals(scope)) {
+                            hasTestResources = true;
                         }
                     } else {
                         hasScript |= Language.SCRIPT.equals(language);
@@ -700,12 +708,22 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 if (!hasTest) {
                     project.addTestCompileSourceRoot(build.getTestSourceDirectory());
                 }
-                for (Resource resource : project.getBuild().getDelegate().getResources()) {
-                    project.addSourceRoot(new DefaultSourceRoot(baseDir, ProjectScope.MAIN, resource));
-                }
-                for (Resource resource : project.getBuild().getDelegate().getTestResources()) {
-                    project.addSourceRoot(new DefaultSourceRoot(baseDir, ProjectScope.TEST, resource));
-                }
+                // Extract modules from sources to detect modular projects
+                Set<String> modules = extractModules(sources);
+                boolean isModularProject = !modules.isEmpty();
+
+                logger.trace(
+                        "Module detection for project {}: found {} module(s) {} - modular project: {}.",
+                        project.getId(),
+                        modules.size(),
+                        modules,
+                        isModularProject);
+
+                // Handle main and test resources
+                ResourceHandlingContext resourceContext =
+                        new ResourceHandlingContext(project, baseDir, modules, isModularProject, result);
+                resourceContext.handleResourceConfiguration(ProjectScope.MAIN, hasMainResources);
+                resourceContext.handleResourceConfiguration(ProjectScope.TEST, hasTestResources);
             }
 
             project.setActiveProfiles(
@@ -1097,6 +1115,22 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             }
             return delegate.entrySet();
         }
+    }
+
+    /**
+     * Extracts unique module names from the given list of source elements.
+     * A project is considered modular if it has at least one module name.
+     *
+     * @param sources list of source elements from the build
+     * @return set of non-blank module names
+     */
+    private static Set<String> extractModules(List<org.apache.maven.api.model.Source> sources) {
+        return sources.stream()
+                .map(org.apache.maven.api.model.Source::getModule)
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(s -> !s.isBlank())
+                .collect(Collectors.toSet());
     }
 
     private Model injectLifecycleBindings(
