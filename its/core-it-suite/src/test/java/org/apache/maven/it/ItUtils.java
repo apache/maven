@@ -18,12 +18,15 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileTime;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
+import org.codehaus.plexus.util.FileUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -32,60 +35,54 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class ItUtils {
 
-    public static String calcHash(File file, String algo) throws Exception {
+    public static String calcHash(Path file, String algo) throws Exception {
         MessageDigest digester = MessageDigest.getInstance(algo);
 
-        DigestInputStream dis;
-        try (FileInputStream is = new FileInputStream(file)) {
-            dis = new DigestInputStream(is, digester);
-
-            for (byte[] buffer = new byte[1024 * 4]; dis.read(buffer) >= 0; ) {
+        try (InputStream is = new DigestInputStream(Files.newInputStream(file), digester)) {
+            byte[] buffer = new byte[1024 * 4];
+            while (is.read(buffer) >= 0) {
                 // just read it
             }
         }
 
         byte[] digest = digester.digest();
-
         StringBuilder hash = new StringBuilder(digest.length * 2);
-
         for (byte aDigest : digest) {
             int b = aDigest & 0xFF;
-
             if (b < 0x10) {
                 hash.append('0');
             }
-
             hash.append(Integer.toHexString(b));
         }
 
         return hash.toString();
     }
 
-    /**
-     * @deprecated Use {@link Verifier#setUserHomeDirectory(Path)} instead.
-     */
-    @Deprecated
-    public static void setUserHome(Verifier verifier, File file) {
-        setUserHome(verifier, file.toPath());
+    public static void assertCanonicalFileEquals(Path expected, Path actual) throws IOException {
+        assertEquals(canonicalPath(expected), canonicalPath(actual));
     }
 
-    /**
-     * @deprecated Use {@link Verifier#setUserHomeDirectory(Path)} instead.
-     */
-    @Deprecated
-    public static void setUserHome(Verifier verifier, Path home) {
-        verifier.setUserHomeDirectory(home);
+    public static void createFile(Path path) throws IOException {
+        Files.newInputStream(path, StandardOpenOption.CREATE).close();
     }
 
-    public static void assertCanonicalFileEquals(File expected, File actual) throws IOException {
-        assertEquals(expected.getCanonicalFile(), actual.getCanonicalFile());
+    public static long lastModified(Path path) throws IOException {
+        return Files.getLastModifiedTime(path).toMillis();
     }
 
-    public static void assertCanonicalFileEquals(String expected, String actual, String message) throws IOException {
-        assertEquals(new File(expected).getCanonicalFile(), new File(actual).getCanonicalFile(), message);
+    public static void lastModified(Path path, long millis) throws IOException {
+        Files.setLastModifiedTime(path, FileTime.fromMillis(millis));
     }
 
-    public static void assertCanonicalFileEquals(String expected, String actual) throws IOException {
-        assertEquals(new File(expected).getCanonicalFile(), new File(actual).getCanonicalFile());
+    public static void deleteDirectory(Path path) throws IOException {
+        FileUtils.deleteDirectory(path.toFile());
+    }
+
+    public static void copyDirectoryStructure(Path src, Path dest) throws IOException {
+        FileUtils.copyDirectory(src.toFile(), dest.toFile());
+    }
+
+    public static String canonicalPath(Path path) throws IOException {
+        return path.toFile().getCanonicalPath();
     }
 }

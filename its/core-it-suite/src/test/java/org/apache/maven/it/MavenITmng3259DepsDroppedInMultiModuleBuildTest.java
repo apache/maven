@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -36,18 +36,18 @@ public class MavenITmng3259DepsDroppedInMultiModuleBuildTest extends AbstractMav
 
     @Test
     public void testitMNG3259() throws Exception {
-        File testDir = extractResources("/mng-3259");
+        Path testDir = extractResources("mng-3259");
 
         Verifier verifier;
 
-        verifier = newVerifier(new File(testDir, "parent").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("parent"));
 
         verifier.addCliArgument("install");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir);
 
         verifier.addCliArgument("install");
         verifier.execute();

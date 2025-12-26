@@ -43,11 +43,9 @@ class MavenITmng8645ConsumerPomDependencyManagementTest extends AbstractMavenInt
      */
     @Test
     void testIt() throws Exception {
-        Path basedir = extractResources("/mng-8645-consumer-pom-dep-mgmt")
-                .getAbsoluteFile()
-                .toPath();
+        Path basedir = extractResources("mng-8645-consumer-pom-dep-mgmt");
 
-        Verifier verifier = newVerifier(basedir.toString());
+        Verifier verifier = newVerifier(basedir);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();

@@ -18,10 +18,9 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +30,7 @@ import org.junit.jupiter.api.Test;
  * check that Maven bundled transports work as expected.
  */
 public class MavenITmng7470ResolverTransportTest extends AbstractMavenIntegrationTestCase {
-    private File projectDir;
+    private Path projectDir;
 
     private HttpServer server;
 
@@ -39,10 +38,10 @@ public class MavenITmng7470ResolverTransportTest extends AbstractMavenIntegratio
 
     @BeforeEach
     protected void setUp() throws Exception {
-        File testDir = extractResources("/mng-7470-resolver-transport");
-        projectDir = new File(testDir, "project");
+        Path testDir = extractResources("mng-7470-resolver-transport");
+        projectDir = testDir.resolve("project");
 
-        server = HttpServer.builder().port(0).source(new File(testDir, "repo")).build();
+        server = HttpServer.builder().port(0).source(testDir.resolve("repo")).build();
         server.start();
         if (server.isFailed()) {
             fail("Couldn't bind the server socket to a free port!");
@@ -60,7 +59,7 @@ public class MavenITmng7470ResolverTransportTest extends AbstractMavenIntegratio
     }
 
     private void performTest(/* nullable */ final String transport, final String logSnippet) throws Exception {
-        Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        Verifier verifier = newVerifier(projectDir);
 
         Map<String, String> properties = new HashMap<>();
         properties.put("@port@", Integer.toString(port));
@@ -75,7 +74,7 @@ public class MavenITmng7470ResolverTransportTest extends AbstractMavenIntegratio
         verifier.deleteArtifacts("org.apache.maven.its.resolver-transport");
         verifier.addCliArgument("-X");
         verifier.addCliArgument("-s");
-        verifier.addCliArgument(new File(projectDir, "settings.xml").getAbsolutePath());
+        verifier.addCliArgument(projectDir.resolve("settings.xml").toString());
         verifier.addCliArgument("-Pmaven-core-it-repo");
         if (transport != null) {
             verifier.addCliArgument("-Dmaven.resolver.transport=" + transport);

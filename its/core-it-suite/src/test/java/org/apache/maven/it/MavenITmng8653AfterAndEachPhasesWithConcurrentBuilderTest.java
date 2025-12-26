@@ -37,9 +37,9 @@ class MavenITmng8653AfterAndEachPhasesWithConcurrentBuilderTest extends Abstract
      */
     @Test
     void testIt() throws Exception {
-        Path basedir = extractResources("/mng-8653").getAbsoluteFile().toPath();
+        Path basedir = extractResources("mng-8653");
 
-        Verifier verifier = newVerifier(basedir.toString());
+        Verifier verifier = newVerifier(basedir);
         verifier.addCliArguments("compile", "-b", "concurrent", "-T8");
         verifier.execute();
         verifier.verifyErrorFreeLog();

@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -36,9 +36,9 @@ public class MavenITmng4040ProfileInjectedModulesTest extends AbstractMavenInteg
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4040");
+        Path testDir = extractResources("mng-4040");
 
-        Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("sub"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
