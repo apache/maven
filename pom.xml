@@ -512,6 +512,34 @@ under the License.
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-component-metadata</artifactId>
           <version>${plexusVersion}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory" />
+            <argLine>-Xmx256m @{jacocoArgLine} --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED</argLine>
+            <systemPropertyVariables combine.children="append">
+              <version.toolbox>${toolboxVersion}</version.toolbox>
+            </systemPropertyVariables>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <configuration>
+            <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory" />
+            <argLine>-Xmx256m @{jacocoArgLine}</argLine>
+            <systemPropertyVariables combine.children="append">
+              <version.toolbox>${toolboxVersion}</version.toolbox>
+            </systemPropertyVariables>
+          </configuration>
+        </plugin>
+        <!-- enforce backwards compatibility -->
+        <plugin>
+          <groupId>com.github.siom79.japicmp</groupId>
+          <artifactId>japicmp-maven-plugin</artifactId>
+          <version>0.25.1</version>
           <executions>
             <execution>
               <goals>
