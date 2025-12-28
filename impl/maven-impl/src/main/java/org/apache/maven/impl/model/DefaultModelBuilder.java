@@ -21,7 +21,6 @@ package org.apache.maven.impl.model;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -68,7 +67,6 @@ import org.apache.maven.api.model.DeploymentRepository;
 import org.apache.maven.api.model.DistributionManagement;
 import org.apache.maven.api.model.Exclusion;
 import org.apache.maven.api.model.InputLocation;
-import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Profile;
@@ -118,6 +116,8 @@ import org.apache.maven.api.spi.ModelParserException;
 import org.apache.maven.api.spi.ModelTransformer;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.RequestTraceHelper;
+import org.apache.maven.impl.model.DefaultModelBuilder.ModelBuilderSessionState;
+import org.apache.maven.impl.model.DefaultModelBuilder.SourceResponse;
 import org.apache.maven.impl.util.PhasingExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1502,18 +1502,10 @@ public class DefaultModelBuilder implements ModelBuilder {
                             e);
                 }
 
-                InputLocation loc = model.getLocation("");
-                InputSource v4src = loc != null ? loc.getSource() : null;
-                if (v4src != null) {
-                    try {
-                        Field field = InputSource.class.getDeclaredField("modelId");
-                        field.setAccessible(true);
-                        field.set(v4src, ModelProblemUtils.toId(model));
-                    } catch (Throwable t) {
-                        // TODO: use a lazy source ?
-                        throw new IllegalStateException("Unable to set modelId on InputSource", t);
-                    }
-                }
+                // Intentionally do nothing.
+                // InputSource in the Maven API model is immutable.
+                // modelId must not be mutated here.
+
             } catch (XmlReaderException e) {
                 add(
                         Severity.FATAL,
