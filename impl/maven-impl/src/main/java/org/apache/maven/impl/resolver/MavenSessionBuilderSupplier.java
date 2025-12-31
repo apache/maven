@@ -26,6 +26,7 @@ import org.apache.maven.impl.resolver.artifact.FatArtifactTraverser;
 import org.apache.maven.impl.resolver.scopes.Maven3ScopeManagerConfiguration;
 import org.apache.maven.impl.resolver.scopes.Maven4ScopeManagerConfiguration;
 import org.apache.maven.impl.resolver.type.DefaultTypeProvider;
+import org.apache.maven.impl.resolver.type.TypeDeriver;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession.CloseableSession;
 import org.eclipse.aether.RepositorySystemSession.SessionBuilder;
@@ -110,7 +111,8 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
                 new ConflictResolver(
                         new ConfigurableVersionSelector(), new ManagedScopeSelector(getScopeManager()),
                         new SimpleOptionalitySelector(), new ManagedScopeDeriver(getScopeManager())),
-                new ManagedDependencyContextRefiner(getScopeManager()));
+                new ManagedDependencyContextRefiner(getScopeManager()),
+                new TypeDeriver());
     }
 
     /**
@@ -124,7 +126,7 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
      */
     protected ArtifactTypeRegistry getArtifactTypeRegistry() {
         DefaultArtifactTypeRegistry stereotypes = new DefaultArtifactTypeRegistry();
-        new DefaultTypeProvider().types().forEach(stereotypes::add);
+        new DefaultTypeProvider().types().forEach(t -> stereotypes.add(t.toArtifactType()));
         return stereotypes;
     }
 
