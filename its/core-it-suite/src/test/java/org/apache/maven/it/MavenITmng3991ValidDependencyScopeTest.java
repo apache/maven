@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -44,9 +44,9 @@ public class MavenITmng3991ValidDependencyScopeTest extends AbstractMavenIntegra
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-3991");
+        Path testDir = extractResources("mng-3991");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         try {

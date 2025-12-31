@@ -18,18 +18,16 @@
  */
 package org.apache.maven.it;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
-
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
@@ -182,11 +180,11 @@ public class HttpServer {
             return this;
         }
 
-        public HttpServerBuilder source(final File source) {
+        public HttpServerBuilder source(final Path source) {
             this.source = new StreamSource() {
                 @Override
                 public InputStream stream(String path) throws IOException {
-                    return new FileInputStream(new File(source, path));
+                    return Files.newInputStream(source.resolve(path));
                 }
             };
             return this;
@@ -227,7 +225,7 @@ public class HttpServer {
                 .port(0) //
                 .username("maven") //
                 .password("secret") //
-                .source(new File("/tmp/repo")) //
+                .source(Path.of("/tmp/repo")) //
                 .build();
         server.start();
     }

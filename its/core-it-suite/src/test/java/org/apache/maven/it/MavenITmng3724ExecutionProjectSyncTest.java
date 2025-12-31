@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -37,19 +37,19 @@ public class MavenITmng3724ExecutionProjectSyncTest extends AbstractMavenIntegra
 
     @Test
     public void testitMNG3724() throws Exception {
-        File testDir = extractResources("/mng-3724");
-        File pluginDir = new File(testDir, "maven-mng3724-plugin");
-        File projectDir = new File(testDir, "project");
+        Path testDir = extractResources("mng-3724");
+        Path pluginDir = testDir.resolve("maven-mng3724-plugin");
+        Path projectDir = testDir.resolve("project");
 
         Verifier verifier;
 
-        verifier = newVerifier(pluginDir.getAbsolutePath());
+        verifier = newVerifier(pluginDir);
 
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir);
 
         verifier.addCliArgument("package");
         verifier.execute();

@@ -41,7 +41,7 @@ class MavenITmng8400CanonicalMavenHomeTest extends AbstractMavenIntegrationTestC
      */
     @Test
     void testIt() throws Exception {
-        Path basedir = extractResources("/mng-8400").getAbsoluteFile().toPath();
+        Path basedir = extractResources("mng-8400");
         Path tempDir = basedir.resolve("tmp");
         Files.createDirectories(tempDir);
 

@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -38,9 +38,9 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest extends Abstr
      */
     @Test
     public void testitFailFastSingleThread() throws Exception {
-        File testDir = extractResources("/mng-0095");
+        Path testDir = extractResources("mng-0095");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("subproject1/target");
@@ -72,9 +72,9 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest extends Abstr
      */
     @Test
     public void testitFailNeverSingleThread() throws Exception {
-        File testDir = extractResources("/mng-0095");
+        Path testDir = extractResources("mng-0095");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("subproject1/target");
@@ -101,9 +101,9 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest extends Abstr
      */
     @Test
     public void testitFailAtEndSingleThread() throws Exception {
-        File testDir = extractResources("/mng-0095");
+        Path testDir = extractResources("mng-0095");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("subproject1/target");
@@ -134,9 +134,9 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest extends Abstr
      */
     @Test
     public void testitFailNeverTwoThreads() throws Exception {
-        File testDir = extractResources("/mng-0095");
+        Path testDir = extractResources("mng-0095");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("subproject1/target");
@@ -163,9 +163,9 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest extends Abstr
      */
     @Test
     public void testitFailAtEndTwoThreads() throws Exception {
-        File testDir = extractResources("/mng-0095");
+        Path testDir = extractResources("mng-0095");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("subproject1/target");

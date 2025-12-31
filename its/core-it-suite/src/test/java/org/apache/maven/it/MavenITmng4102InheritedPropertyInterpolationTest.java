@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -59,9 +59,9 @@ public class MavenITmng4102InheritedPropertyInterpolationTest extends AbstractMa
     }
 
     private void testit(String project) throws Exception {
-        File testDir = extractResources("/mng-4102/" + project);
+        Path testDir = extractResources("mng-4102/" + project);
 
-        Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("sub"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
