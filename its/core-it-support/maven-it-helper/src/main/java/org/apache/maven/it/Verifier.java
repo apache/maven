@@ -614,6 +614,14 @@ public class Verifier {
     }
 
     /**
+     * @deprecated Use {@link #textOccurrencesInLog(List, String)} instead
+     */
+    @Deprecated
+    public static long textOccurencesInLog(List<String> lines, String text) {
+        return textOccurrencesInLog(lines, text);
+    }
+
+    /**
      * Checks whether the specified line is just an error message from Velocity. Especially old versions of Doxia employ
      * a very noisy Velocity instance.
      *
