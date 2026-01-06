@@ -36,7 +36,7 @@ env:
   MIMIR_BASEDIR: ~/.mimir
   MIMIR_LOCAL: ~/.mimir/local
   MAVEN_OPTS: -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./target/java_heapdump.hprof
-  MVNW_REPOURL: https://maven-central.storage-download.googleapis.com/maven2/
+  MVNW_REPOURL: https://maven-central.storage-download.googleapis.com/maven2
 
 jobs:
   initial-build:
