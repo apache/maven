@@ -32,7 +32,7 @@ concurrency:
 permissions: {}
 
 env:
-  MIMIR_VERSION: 0.10.6
+  MIMIR_VERSION: 0.11.1
   MIMIR_BASEDIR: ~/.mimir
   MIMIR_LOCAL: ~/.mimir/local
   MAVEN_OPTS: -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./target/java_heapdump.hprof
