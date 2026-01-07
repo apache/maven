@@ -665,49 +665,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                         return build.getDirectory();
                     }
                 };
-                boolean hasScript = false;
-                boolean hasMain = false;
-                boolean hasTest = false;
-                boolean hasMainResources = false;
-                boolean hasTestResources = false;
-                for (var source : sources) {
-                    var src = DefaultSourceRoot.fromModel(session, baseDir, outputDirectory, source);
-                    project.addSourceRoot(src);
-                    Language language = src.language();
-                    if (Language.JAVA_FAMILY.equals(language)) {
-                        ProjectScope scope = src.scope();
-                        if (ProjectScope.MAIN.equals(scope)) {
-                            hasMain = true;
-                        } else {
-                            hasTest |= ProjectScope.TEST.equals(scope);
-                        }
-                    } else if (Language.RESOURCES.equals(language)) {
-                        ProjectScope scope = src.scope();
-                        if (ProjectScope.MAIN.equals(scope)) {
-                            hasMainResources = true;
-                        } else if (ProjectScope.TEST.equals(scope)) {
-                            hasTestResources = true;
-                        }
-                    } else {
-                        hasScript |= Language.SCRIPT.equals(language);
-                    }
-                }
-                /*
-                 * `sourceDirectory`, `testSourceDirectory` and `scriptSourceDirectory`
-                 * are ignored if the POM file contains at least one <source> element
-                 * for the corresponding scope and language. This rule exists because
-                 * Maven provides default values for those elements which may conflict
-                 * with user's configuration.
-                 */
-                if (!hasScript) {
-                    project.addScriptSourceRoot(build.getScriptSourceDirectory());
-                }
-                if (!hasMain) {
-                    project.addCompileSourceRoot(build.getSourceDirectory());
-                }
-                if (!hasTest) {
-                    project.addTestCompileSourceRoot(build.getTestSourceDirectory());
-                }
                 // Extract modules from sources to detect modular projects
                 Set<String> modules = extractModules(sources);
                 boolean isModularProject = !modules.isEmpty();
@@ -719,11 +676,40 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                         modules,
                         isModularProject);
 
-                // Handle main and test resources
-                ResourceHandlingContext resourceContext =
-                        new ResourceHandlingContext(project, baseDir, modules, isModularProject, result);
-                resourceContext.handleResourceConfiguration(ProjectScope.MAIN, hasMainResources);
-                resourceContext.handleResourceConfiguration(ProjectScope.TEST, hasTestResources);
+                // Create source handling context for unified tracking of all lang/scope combinations
+                SourceHandlingContext sourceContext =
+                        new SourceHandlingContext(project, baseDir, modules, isModularProject, result);
+
+                // Process all sources, tracking enabled ones and detecting duplicates
+                for (var source : sources) {
+                    var sourceRoot = DefaultSourceRoot.fromModel(session, baseDir, outputDirectory, source);
+                    // Track enabled sources for duplicate detection and hasSources() queries
+                    // Only add source if it's not a duplicate enabled source (first enabled wins)
+                    if (sourceContext.shouldAddSource(sourceRoot)) {
+                        project.addSourceRoot(sourceRoot);
+                    }
+                }
+
+                /*
+                 * `sourceDirectory`, `testSourceDirectory` and `scriptSourceDirectory`
+                 * are ignored if the POM file contains at least one enabled <source> element
+                 * for the corresponding scope and language. This rule exists because
+                 * Maven provides default values for those elements which may conflict
+                 * with user's configuration.
+                 */
+                if (!sourceContext.hasSources(Language.SCRIPT, ProjectScope.MAIN)) {
+                    project.addScriptSourceRoot(build.getScriptSourceDirectory());
+                }
+                if (!sourceContext.hasSources(Language.JAVA_FAMILY, ProjectScope.MAIN)) {
+                    project.addCompileSourceRoot(build.getSourceDirectory());
+                }
+                if (!sourceContext.hasSources(Language.JAVA_FAMILY, ProjectScope.TEST)) {
+                    project.addTestCompileSourceRoot(build.getTestSourceDirectory());
+                }
+
+                // Handle main and test resources using unified source handling
+                sourceContext.handleResourceConfiguration(ProjectScope.MAIN);
+                sourceContext.handleResourceConfiguration(ProjectScope.TEST);
             }
 
             project.setActiveProfiles(

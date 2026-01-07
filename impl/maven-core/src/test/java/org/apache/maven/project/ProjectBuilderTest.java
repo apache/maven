@@ -379,6 +379,10 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     /**
      * Tests that a project with multiple modules defined in sources is detected as modular,
      * and module-aware resource roots are injected for each module.
+     * <p>
+     * Acceptance Criterion: AC2 (unified source tracking for all lang/scope combinations)
+     *
+     * @see <a href="https://github.com/apache/maven/issues/11612">Issue #11612</a>
      */
     @Test
     void testModularSourcesInjectResourceRoots() throws Exception {
@@ -389,7 +393,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
 
         // Get all resource source roots for main scope
         List<SourceRoot> mainResourceRoots = project.getEnabledSourceRoots(ProjectScope.MAIN, Language.RESOURCES)
-                .collect(Collectors.toList());
+                .toList();
 
         // Should have resource roots for both modules
         Set<String> modules = mainResourceRoots.stream()
@@ -404,7 +408,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
 
         // Get all resource source roots for test scope
         List<SourceRoot> testResourceRoots = project.getEnabledSourceRoots(ProjectScope.TEST, Language.RESOURCES)
-                .collect(Collectors.toList());
+                .toList();
 
         // Should have test resource roots for both modules
         Set<String> testModules = testResourceRoots.stream()
@@ -421,10 +425,14 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     /**
      * Tests that when modular sources are configured alongside explicit legacy resources,
      * the legacy resources are ignored and a warning is issued.
-     *
+     * <p>
      * This verifies the behavior described in the design:
      * - Modular projects with explicit legacy {@code <resources>} configuration should issue a warning
      * - The modular resource roots are injected instead of using the legacy configuration
+     * <p>
+     * Acceptance Criterion: AC2 (unified source tracking for all lang/scope combinations)
+     *
+     * @see <a href="https://github.com/apache/maven/issues/11612">Issue #11612</a>
      */
     @Test
     void testModularSourcesWithExplicitResourcesIssuesWarning() throws Exception {
@@ -444,7 +452,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         List<ModelProblem> warnings = result.getProblems().stream()
                 .filter(p -> p.getSeverity() == ModelProblem.Severity.WARNING)
                 .filter(p -> p.getMessage().contains("Legacy") && p.getMessage().contains("ignored"))
-                .collect(Collectors.toList());
+                .toList();
 
         assertEquals(2, warnings.size(), "Should have 2 warnings (one for resources, one for testResources)");
         assertTrue(
@@ -456,7 +464,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
 
         // Verify modular resources are still injected correctly
         List<SourceRoot> mainResourceRoots = project.getEnabledSourceRoots(ProjectScope.MAIN, Language.RESOURCES)
-                .collect(Collectors.toList());
+                .toList();
 
         assertEquals(2, mainResourceRoots.size(), "Should have 2 modular resource roots (one per module)");
 
@@ -469,5 +477,254 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         assertEquals(2, mainModules.size(), "Should have resource roots for 2 modules");
         assertTrue(mainModules.contains("org.foo.moduleA"), "Should have resource root for moduleA");
         assertTrue(mainModules.contains("org.foo.moduleB"), "Should have resource root for moduleB");
+    }
+
+    /**
+     * Tests mixed source configuration where:
+     * - Modular sources are defined for main Java (should override sourceDirectory)
+     * - Classic testSourceDirectory is used (should be preserved since no modular test sources)
+     * <p>
+     * This verifies:
+     * - sourceDirectory is ignored when modular main sources exist
+     * - testSourceDirectory is used when no modular test sources are defined
+     * <p>
+     * Acceptance Criterion: AC1 (boolean flags eliminated - uses hasSources() for main/test detection)
+     *
+     * @see <a href="https://github.com/apache/maven/issues/11612">Issue #11612</a>
+     */
+    @Test
+    void testMixedSourcesModularMainClassicTest() throws Exception {
+        File pom = getProject("mixed-sources");
+
+        MavenSession session = createMavenSession(pom);
+        MavenProject project = session.getCurrentProject();
+
+        // Get main Java source roots - should have modular sources, not classic sourceDirectory
+        List<SourceRoot> mainJavaRoots = project.getEnabledSourceRoots(ProjectScope.MAIN, Language.JAVA_FAMILY)
+                .toList();
+
+        // Should have 2 modular main Java sources (moduleA and moduleB)
+        assertEquals(2, mainJavaRoots.size(), "Should have 2 modular main Java source roots");
+
+        Set<String> mainModules = mainJavaRoots.stream()
+                .map(SourceRoot::module)
+                .filter(opt -> opt.isPresent())
+                .map(opt -> opt.get())
+                .collect(Collectors.toSet());
+
+        assertEquals(2, mainModules.size(), "Should have main sources for 2 modules");
+        assertTrue(mainModules.contains("org.foo.moduleA"), "Should have main source for moduleA");
+        assertTrue(mainModules.contains("org.foo.moduleB"), "Should have main source for moduleB");
+
+        // Verify the classic sourceDirectory is NOT used (should be ignored)
+        boolean hasClassicMainSource =
+                mainJavaRoots.stream().anyMatch(sr -> sr.directory().toString().contains("src/classic/main/java"));
+        assertTrue(!hasClassicMainSource, "Classic sourceDirectory should be ignored");
+
+        // Get test Java source roots - should use classic testSourceDirectory since no modular test sources
+        List<SourceRoot> testJavaRoots = project.getEnabledSourceRoots(ProjectScope.TEST, Language.JAVA_FAMILY)
+                .toList();
+
+        // Should have 1 test source (from classic testSourceDirectory)
+        assertEquals(1, testJavaRoots.size(), "Should have 1 test Java source root (classic)");
+
+        // The test source should be the classic one (no module)
+        SourceRoot testRoot = testJavaRoots.get(0);
+        assertTrue(testRoot.module().isEmpty(), "Classic test source should not have a module");
+        assertTrue(
+                testRoot.directory().toString().contains("src/classic/test/java"),
+                "Should use classic testSourceDirectory");
+    }
+
+    /**
+     * Tests mixed modular/non-modular sources within the same {@code <sources>} element.
+     * <p>
+     * This verifies:
+     * - Both modular sources (with module attribute) are added
+     * - Non-modular sources (without module attribute) are added
+     * - sourceDirectory is ignored because {@code <source scope="main" lang="java">} exists
+     * <p>
+     * Acceptance Criterion: AC1 (boolean flags eliminated - uses hasSources() for source detection)
+     *
+     * @see <a href="https://github.com/apache/maven/issues/11612">Issue #11612</a>
+     */
+    @Test
+    void testSourcesMixedModulesWithinSources() throws Exception {
+        File pom = getProject("sources-mixed-modules");
+
+        MavenSession session = createMavenSession(pom);
+        MavenProject project = session.getCurrentProject();
+
+        // Get main Java source roots
+        List<SourceRoot> mainJavaRoots = project.getEnabledSourceRoots(ProjectScope.MAIN, Language.JAVA_FAMILY)
+                .toList();
+
+        // Should have 2 main sources: 1 modular (moduleA) + 1 non-modular
+        assertEquals(2, mainJavaRoots.size(), "Should have 2 main Java source roots (1 modular + 1 non-modular)");
+
+        // Count modular vs non-modular sources
+        long modularCount =
+                mainJavaRoots.stream().filter(sr -> sr.module().isPresent()).count();
+        long nonModularCount =
+                mainJavaRoots.stream().filter(sr -> sr.module().isEmpty()).count();
+
+        assertEquals(1, modularCount, "Should have 1 modular main source");
+        assertEquals(1, nonModularCount, "Should have 1 non-modular main source");
+
+        // Verify the modular source is moduleA
+        Set<String> mainModules = mainJavaRoots.stream()
+                .map(SourceRoot::module)
+                .filter(opt -> opt.isPresent())
+                .map(opt -> opt.get())
+                .collect(Collectors.toSet());
+
+        assertTrue(mainModules.contains("org.foo.moduleA"), "Should have modular source for moduleA");
+
+        // Verify sourceDirectory is NOT used (should be ignored because <sources> has main java)
+        boolean hasIgnoredSource =
+                mainJavaRoots.stream().anyMatch(sr -> sr.directory().toString().contains("src/should-be-ignored"));
+        assertTrue(!hasIgnoredSource, "sourceDirectory should be ignored when <sources> has main java");
+
+        // Get test Java source roots - should have modular test source for moduleA
+        List<SourceRoot> testJavaRoots = project.getEnabledSourceRoots(ProjectScope.TEST, Language.JAVA_FAMILY)
+                .toList();
+
+        assertEquals(1, testJavaRoots.size(), "Should have 1 test Java source root");
+        assertTrue(testJavaRoots.get(0).module().isPresent(), "Test source should be modular");
+        assertEquals("org.foo.moduleA", testJavaRoots.get(0).module().get(), "Test source should be for moduleA");
+    }
+
+    /**
+     * Tests that multiple source directories for the same (lang, scope, module) combination
+     * are allowed and all are added as source roots.
+     * <p>
+     * This is a valid use case for Phase 2: users may have generated sources alongside regular sources,
+     * both belonging to the same module. Different directories = different identities = not duplicates.
+     * <p>
+     * Acceptance Criterion: AC2 (unified source tracking - multiple directories per module supported)
+     *
+     * @see <a href="https://github.com/apache/maven/issues/11612">Issue #11612</a>
+     */
+    @Test
+    void testMultipleDirectoriesSameModule() throws Exception {
+        File pom = getProject("multiple-directories-same-module");
+
+        MavenSession session = createMavenSession(pom);
+        MavenProject project = session.getCurrentProject();
+
+        // Get main Java source roots
+        List<SourceRoot> mainJavaRoots = project.getEnabledSourceRoots(ProjectScope.MAIN, Language.JAVA_FAMILY)
+                .toList();
+
+        // Should have 2 main sources: both for com.example.app but different directories
+        assertEquals(2, mainJavaRoots.size(), "Should have 2 main Java source roots for same module");
+
+        // Both should be for the same module
+        long moduleCount = mainJavaRoots.stream()
+                .filter(sr -> sr.module().isPresent()
+                        && "com.example.app".equals(sr.module().get()))
+                .count();
+        assertEquals(2, moduleCount, "Both main sources should be for com.example.app module");
+
+        // One should be implicit directory, one should be generated-sources
+        boolean hasImplicitDir = mainJavaRoots.stream()
+                .anyMatch(sr -> sr.directory().toString().contains("src/com.example.app/main/java"));
+        boolean hasGeneratedDir = mainJavaRoots.stream()
+                .anyMatch(sr -> sr.directory().toString().contains("target/generated-sources/com.example.app/java"));
+
+        assertTrue(hasImplicitDir, "Should have implicit source directory for module");
+        assertTrue(hasGeneratedDir, "Should have generated-sources directory for module");
+
+        // Get test Java source roots
+        List<SourceRoot> testJavaRoots = project.getEnabledSourceRoots(ProjectScope.TEST, Language.JAVA_FAMILY)
+                .toList();
+
+        // Should have 2 test sources: both for com.example.app
+        assertEquals(2, testJavaRoots.size(), "Should have 2 test Java source roots for same module");
+
+        // Both test sources should be for the same module
+        long testModuleCount = testJavaRoots.stream()
+                .filter(sr -> sr.module().isPresent()
+                        && "com.example.app".equals(sr.module().get()))
+                .count();
+        assertEquals(2, testModuleCount, "Both test sources should be for com.example.app module");
+    }
+
+    /**
+     * Tests duplicate handling with enabled discriminator.
+     * <p>
+     * Test scenario:
+     * - Same (lang, scope, module, directory) with enabled=true appearing twice → triggers WARNING
+     * - Same identity with enabled=false → should be filtered out (disabled sources are no-ops)
+     * - Different modules should be added normally
+     * <p>
+     * Verifies:
+     * - First enabled source wins, subsequent duplicates trigger WARNING
+     * - Disabled sources don't count as duplicates
+     * - Different modules are unaffected
+     * <p>
+     * Acceptance Criteria:
+     * - AC3 (duplicate detection - duplicates trigger WARNING)
+     * - AC4 (first enabled wins - duplicates are skipped)
+     * - AC5 (disabled sources unchanged - still added but filtered by getEnabledSourceRoots)
+     *
+     * @see <a href="https://github.com/apache/maven/issues/11612">Issue #11612</a>
+     */
+    @Test
+    void testDuplicateEnabledSources() throws Exception {
+        File pom = getProject("duplicate-enabled-sources");
+
+        MavenSession mavenSession = createMavenSession(null);
+        ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
+        configuration.setRepositorySession(mavenSession.getRepositorySession());
+
+        ProjectBuildingResult result = getContainer()
+                .lookup(org.apache.maven.project.ProjectBuilder.class)
+                .build(pom, configuration);
+
+        MavenProject project = result.getProject();
+
+        // Verify warnings are issued for duplicate enabled sources
+        List<ModelProblem> duplicateWarnings = result.getProblems().stream()
+                .filter(p -> p.getSeverity() == ModelProblem.Severity.WARNING)
+                .filter(p -> p.getMessage().contains("Duplicate enabled source"))
+                .toList();
+
+        // We have 2 duplicate pairs: main scope and test scope for com.example.dup
+        assertEquals(2, duplicateWarnings.size(), "Should have 2 duplicate warnings (main and test scope)");
+
+        // Get main Java source roots
+        List<SourceRoot> mainJavaRoots = project.getEnabledSourceRoots(ProjectScope.MAIN, Language.JAVA_FAMILY)
+                .toList();
+
+        // Should have 2 main sources: 1 for com.example.dup (first wins) + 1 for com.example.other
+        // Note: MavenProject.addSourceRoot still adds all sources, but tracking only counts first enabled
+        assertEquals(2, mainJavaRoots.size(), "Should have 2 main Java source roots");
+
+        // Verify com.example.other module is present
+        boolean hasOtherModule = mainJavaRoots.stream()
+                .anyMatch(sr -> sr.module().isPresent()
+                        && "com.example.other".equals(sr.module().get()));
+        assertTrue(hasOtherModule, "Should have source root for com.example.other module");
+
+        // Verify com.example.dup module is present (first enabled wins)
+        boolean hasDupModule = mainJavaRoots.stream()
+                .anyMatch(sr -> sr.module().isPresent()
+                        && "com.example.dup".equals(sr.module().get()));
+        assertTrue(hasDupModule, "Should have source root for com.example.dup module");
+
+        // Get test Java source roots
+        List<SourceRoot> testJavaRoots = project.getEnabledSourceRoots(ProjectScope.TEST, Language.JAVA_FAMILY)
+                .toList();
+
+        // Test scope has 1 source for com.example.dup (first wins)
+        assertEquals(1, testJavaRoots.size(), "Should have 1 test Java source root");
+
+        // Verify it's for the dup module
+        assertTrue(
+                testJavaRoots.get(0).module().isPresent()
+                        && "com.example.dup"
+                                .equals(testJavaRoots.get(0).module().get()),
+                "Test source root should be for com.example.dup module");
     }
 }
