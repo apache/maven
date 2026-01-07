@@ -525,7 +525,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 return pomFiles.stream()
                         .map(pomFile -> build(pomFile, recursive))
                         .flatMap(List::stream)
-                        .collect(Collectors.toList());
+                        .toList();
             } finally {
                 Thread.currentThread().setContextClassLoader(oldContextClassLoader);
             }
@@ -571,7 +571,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     project.setCollectedProjects(results(r)
                             .filter(cr -> cr != r && cr.getEffectiveModel() != null)
                             .map(cr -> projectIndex.get(cr.getEffectiveModel().getId()))
-                            .collect(Collectors.toList()));
+                            .toList());
 
                     DependencyResolutionResult resolutionResult = null;
                     if (request.isResolveDependencies()) {
@@ -1022,7 +1022,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     }
 
     private List<String> getProfileIds(List<Profile> profiles) {
-        return profiles.stream().map(Profile::getId).collect(Collectors.toList());
+        return profiles.stream().map(Profile::getId).toList();
     }
 
     private static ModelSource createStubModelSource(Artifact artifact) {
