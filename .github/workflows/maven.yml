@@ -32,10 +32,11 @@ concurrency:
 permissions: {}
 
 env:
-  MIMIR_VERSION: 0.10.6
+  MIMIR_VERSION: 0.11.2
   MIMIR_BASEDIR: ~/.mimir
   MIMIR_LOCAL: ~/.mimir/local
   MAVEN_OPTS: -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./target/java_heapdump.hprof
+  MVNW_REPOURL: https://maven-central.storage-download.googleapis.com/maven2
 
 jobs:
   initial-build:
@@ -71,7 +72,7 @@ jobs:
 
       - name: Set up Maven
         shell: bash
-        run: mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.4:wrapper "-Dmaven=4.0.0-rc-4"
+        run: mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.4:wrapper "-Dmaven=4.0.0-rc-5"
 
       - name: Prepare Mimir for Maven 4.x
         shell: bash
