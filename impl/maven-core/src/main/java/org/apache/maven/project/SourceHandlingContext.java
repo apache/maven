@@ -19,34 +19,55 @@
 package org.apache.maven.project;
 
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.api.Language;
 import org.apache.maven.api.ProjectScope;
+import org.apache.maven.api.SourceRoot;
 import org.apache.maven.api.model.Resource;
 import org.apache.maven.api.services.BuilderProblem.Severity;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelProblem.Version;
 import org.apache.maven.impl.DefaultSourceRoot;
+import org.apache.maven.impl.model.DefaultModelProblem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Handles resource configuration for Maven projects.
- * Groups parameters shared between main and test resource handling.
+ * Handles source configuration for Maven projects with unified tracking for all language/scope combinations.
+ * <p>
+ * This class replaces the previous approach of hardcoded boolean flags (hasMain, hasTest, etc.)
+ * with a flexible set-based tracking mechanism that works for any language and scope combination.
+ * <p>
+ * Key features:
+ * <ul>
+ *   <li>Tracks declared sources using {@code (language, scope, module, directory)} identity</li>
+ *   <li>Only tracks enabled sources - disabled sources are effectively no-ops</li>
+ *   <li>Detects duplicate enabled sources and emits warnings</li>
+ *   <li>Provides {@link #hasSources(Language, ProjectScope)} to check if sources exist for a combination</li>
+ * </ul>
+ *
+ * @since 4.0.0
  */
-class ResourceHandlingContext {
+class SourceHandlingContext {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ResourceHandlingContext.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SourceHandlingContext.class);
+
+    /**
+     * Identity key for source tracking. Two sources with the same key are considered duplicates.
+     */
+    record SourceKey(Language language, ProjectScope scope, String module, Path directory) {}
 
     private final MavenProject project;
     private final Path baseDir;
     private final Set<String> modules;
     private final boolean modularProject;
     private final ModelBuilderResult result;
+    private final Set<SourceKey> declaredSources = new HashSet<>();
 
-    ResourceHandlingContext(
+    SourceHandlingContext(
             MavenProject project,
             Path baseDir,
             Set<String> modules,
@@ -60,6 +81,73 @@ class ResourceHandlingContext {
     }
 
     /**
+     * Determines if a source root should be added to the project and tracks it for duplicate detection.
+     * <p>
+     * Rules:
+     * <ul>
+     *   <li>Disabled sources are always added (they're filtered by {@code getEnabledSourceRoots()})</li>
+     *   <li>First enabled source for an identity is added and tracked</li>
+     *   <li>Subsequent enabled sources with same identity trigger a WARNING and are NOT added</li>
+     * </ul>
+     *
+     * @param sourceRoot the source root to evaluate
+     * @return true if the source should be added to the project, false if it's a duplicate enabled source
+     */
+    boolean shouldAddSource(SourceRoot sourceRoot) {
+        if (!sourceRoot.enabled()) {
+            // Disabled sources are always added - they're filtered out by getEnabledSourceRoots()
+            LOGGER.debug(
+                    "Adding disabled source (will be filtered by getEnabledSourceRoots): lang={}, scope={}, module={}, dir={}",
+                    sourceRoot.language(),
+                    sourceRoot.scope(),
+                    sourceRoot.module().orElse(null),
+                    sourceRoot.directory());
+            return true;
+        }
+
+        SourceKey key = new SourceKey(
+                sourceRoot.language(), sourceRoot.scope(), sourceRoot.module().orElse(null), sourceRoot.directory());
+
+        if (declaredSources.contains(key)) {
+            String message = String.format(
+                    "Duplicate enabled source detected: lang=%s, scope=%s, module=%s, directory=%s. "
+                            + "First enabled source wins, this duplicate is ignored.",
+                    key.language(), key.scope(), key.module() != null ? key.module() : "(none)", key.directory());
+            LOGGER.warn(message);
+            result.getProblemCollector()
+                    .reportProblem(new DefaultModelProblem(
+                            message,
+                            Severity.WARNING,
+                            Version.V41,
+                            project.getModel().getDelegate(),
+                            -1,
+                            -1,
+                            null));
+            return false; // Don't add duplicate enabled source
+        }
+
+        declaredSources.add(key);
+        LOGGER.debug(
+                "Adding and tracking enabled source: lang={}, scope={}, module={}, dir={}",
+                key.language(),
+                key.scope(),
+                key.module(),
+                key.directory());
+        return true; // Add first enabled source with this identity
+    }
+
+    /**
+     * Checks if any enabled sources have been declared for the given language and scope combination.
+     *
+     * @param language the language to check (e.g., {@link Language#JAVA_FAMILY}, {@link Language#RESOURCES})
+     * @param scope the scope to check (e.g., {@link ProjectScope#MAIN}, {@link ProjectScope#TEST})
+     * @return true if at least one enabled source exists for this combination
+     */
+    boolean hasSources(Language language, ProjectScope scope) {
+        return declaredSources.stream().anyMatch(key -> language.equals(key.language()) && scope.equals(key.scope()));
+    }
+
+    /**
      * Handles resource configuration for a given scope (main or test).
      * This method applies the resource priority rules:
      * <ol>
@@ -68,9 +156,10 @@ class ResourceHandlingContext {
      * </ol>
      *
      * @param scope the project scope (MAIN or TEST)
-     * @param hasResourcesInSources whether resources are configured via {@code <sources>}
      */
-    void handleResourceConfiguration(ProjectScope scope, boolean hasResourcesInSources) {
+    void handleResourceConfiguration(ProjectScope scope) {
+        boolean hasResourcesInSources = hasSources(Language.RESOURCES, scope);
+
         List<Resource> resources = scope == ProjectScope.MAIN
                 ? project.getBuild().getDelegate().getResources()
                 : project.getBuild().getDelegate().getTestResources();
@@ -105,7 +194,7 @@ class ResourceHandlingContext {
                             + "Use " + sourcesConfig + " in <sources> for custom resource paths.";
                     LOGGER.warn(message);
                     result.getProblemCollector()
-                            .reportProblem(new org.apache.maven.impl.model.DefaultModelProblem(
+                            .reportProblem(new DefaultModelProblem(
                                     message,
                                     Severity.WARNING,
                                     Version.V41,

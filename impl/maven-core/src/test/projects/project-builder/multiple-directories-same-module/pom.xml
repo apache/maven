@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Tests multiple source directories for the same (lang, scope, module) combination.
+  This is a valid use case: users may have generated sources alongside regular sources.
+
+  Expected behavior:
+  - Both directories should be added as source roots
+  - Both should have the same module attribute
+  - The compiler will merge sources from both directories into the same output
+-->
+<project xmlns="http://maven.apache.org/POM/4.1.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 https://maven.apache.org/xsd/maven-4.1.0.xsd">
+    <modelVersion>4.1.0</modelVersion>
+
+    <groupId>org.apache.maven.tests</groupId>
+    <artifactId>multiple-directories-same-module-test</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <build>
+        <sources>
+            <!-- Primary Java source for module (uses implicit directory) -->
+            <source>
+                <scope>main</scope>
+                <lang>java</lang>
+                <module>com.example.app</module>
+            </source>
+            <!-- Generated sources for the same module (explicit directory) -->
+            <source>
+                <scope>main</scope>
+                <lang>java</lang>
+                <module>com.example.app</module>
+                <directory>target/generated-sources/com.example.app/java</directory>
+            </source>
+            <!-- Test sources for module -->
+            <source>
+                <scope>test</scope>
+                <lang>java</lang>
+                <module>com.example.app</module>
+            </source>
+            <!-- Generated test sources -->
+            <source>
+                <scope>test</scope>
+                <lang>java</lang>
+                <module>com.example.app</module>
+                <directory>target/generated-test-sources/com.example.app/java</directory>
+            </source>
+        </sources>
+    </build>
+</project>
