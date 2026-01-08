@@ -517,8 +517,8 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         assertTrue(mainModules.contains("org.foo.moduleB"), "Should have main source for moduleB");
 
         // Verify the classic sourceDirectory is NOT used (should be ignored)
-        boolean hasClassicMainSource =
-                mainJavaRoots.stream().anyMatch(sr -> sr.directory().toString().contains("src/classic/main/java"));
+        boolean hasClassicMainSource = mainJavaRoots.stream()
+                .anyMatch(sr -> sr.directory().toString().replace('\\', '/').contains("src/classic/main/java"));
         assertTrue(!hasClassicMainSource, "Classic sourceDirectory should be ignored");
 
         // Get test Java source roots - should use classic testSourceDirectory since no modular test sources
@@ -532,7 +532,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         SourceRoot testRoot = testJavaRoots.get(0);
         assertTrue(testRoot.module().isEmpty(), "Classic test source should not have a module");
         assertTrue(
-                testRoot.directory().toString().contains("src/classic/test/java"),
+                testRoot.directory().toString().replace('\\', '/').contains("src/classic/test/java"),
                 "Should use classic testSourceDirectory");
     }
 
@@ -628,9 +628,11 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
 
         // One should be implicit directory, one should be generated-sources
         boolean hasImplicitDir = mainJavaRoots.stream()
-                .anyMatch(sr -> sr.directory().toString().contains("src/com.example.app/main/java"));
-        boolean hasGeneratedDir = mainJavaRoots.stream()
-                .anyMatch(sr -> sr.directory().toString().contains("target/generated-sources/com.example.app/java"));
+                .anyMatch(sr -> sr.directory().toString().replace('\\', '/').contains("src/com.example.app/main/java"));
+        boolean hasGeneratedDir = mainJavaRoots.stream().anyMatch(sr -> sr.directory()
+                .toString()
+                .replace('\\', '/')
+                .contains("target/generated-sources/com.example.app/java"));
 
         assertTrue(hasImplicitDir, "Should have implicit source directory for module");
         assertTrue(hasGeneratedDir, "Should have generated-sources directory for module");
