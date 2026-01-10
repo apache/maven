@@ -1502,18 +1502,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                             e);
                 }
 
-                InputLocation loc = model.getLocation("");
-                InputSource v4src = loc != null ? loc.getSource() : null;
-                if (v4src != null) {
-                    try {
-                        Field field = InputSource.class.getDeclaredField("modelId");
-                        field.setAccessible(true);
-                        field.set(v4src, ModelProblemUtils.toId(model));
-                    } catch (Throwable t) {
-                        // TODO: use a lazy source ?
-                        throw new IllegalStateException("Unable to set modelId on InputSource", t);
-                    }
-                }
             } catch (XmlReaderException e) {
                 add(
                         Severity.FATAL,
