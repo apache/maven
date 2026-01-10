@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -43,9 +43,9 @@ public class MavenITmng0947OptionalDependencyTest extends AbstractMavenIntegrati
     public void testit() throws Exception {
         // failingMavenVersions("(,3.1.0-alpha-1)");
 
-        File testDir = extractResources("/mng-0947");
+        Path testDir = extractResources("mng-0947");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng0947");
