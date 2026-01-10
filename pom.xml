@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>45</version>
+    <version>46</version>
     <relativePath />
   </parent>
 
@@ -157,11 +157,11 @@ under the License.
     <jmhVersion>1.37</jmhVersion>
     <junitVersion>6.0.2</junitVersion>
     <jxpathVersion>1.4.0</jxpathVersion>
-    <logbackClassicVersion>1.5.23</logbackClassicVersion>
+    <logbackClassicVersion>1.5.24</logbackClassicVersion>
     <mockitoVersion>5.21.0</mockitoVersion>
     <plexusInteractivityVersion>1.5.1</plexusInteractivityVersion>
     <plexusInterpolationVersion>1.29</plexusInterpolationVersion>
-    <plexusTestingVersion>2.0.2</plexusTestingVersion>
+    <plexusTestingVersion>2.1.0</plexusTestingVersion>
     <plexusXmlVersion>4.1.0</plexusXmlVersion>
     <resolverVersion>2.0.14</resolverVersion>
     <securityDispatcherVersion>4.1.0</securityDispatcherVersion>
@@ -720,7 +720,7 @@ under the License.
         <plugin>
           <groupId>com.github.siom79.japicmp</groupId>
           <artifactId>japicmp-maven-plugin</artifactId>
-          <version>0.25.1</version>
+          <version>0.25.2</version>
           <executions>
             <execution>
               <goals>
@@ -804,6 +804,30 @@ under the License.
             </dependency>
           </dependencies>
         </plugin>
+        <plugin>
+          <groupId>org.apache.rat</groupId>
+          <artifactId>apache-rat-plugin</artifactId>
+          <configuration>
+            <excludes>
+              <exclude>Jenkinsfile</exclude>
+              <exclude>**/.gitattributes</exclude>
+              <exclude>src/main/resources/META-INF/services/**</exclude>
+              <exclude>src/test/resources*/**</exclude>
+              <exclude>src/test/projects/**</exclude>
+              <exclude>src/test/remote-repo/**</exclude>
+              <exclude>its/**</exclude>
+              <exclude>**/*.odg</exclude>
+              <exclude>**/*.svg</exclude>
+              <exclude>.asf.yaml</exclude>
+              <exclude>.mvn/**</exclude>
+              <exclude>.jbang/**</exclude>
+              <!--
+                ! Excluded the license files itself cause they do not have a license of themselves.
+              -->
+              <exclude>src/main/appended-resources/licenses/**</exclude>
+            </excludes>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -825,37 +849,6 @@ under the License.
             lifecycle.</charter>
           </asfExtOptions>
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.rat</groupId>
-        <artifactId>apache-rat-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>rat-check</id>
-            <inherited>false</inherited>
-            <configuration>
-              <excludes>
-                <exclude>Jenkinsfile</exclude>
-                <exclude>**/.gitattributes</exclude>
-                <exclude>src/test/resources*/**</exclude>
-                <exclude>src/test/projects/**</exclude>
-                <exclude>src/test/remote-repo/**</exclude>
-                <exclude>its/**</exclude>
-                <exclude>**/*.odg</exclude>
-                <exclude>**/*.svg</exclude>
-                <exclude>.asf.yaml</exclude>
-                <exclude>.mvn/**</exclude>
-                <exclude>.jbang/**</exclude>
-                <!--
-                  ! Excluded the license files itself cause they do not have have a license of themselves.
-                -->
-                <exclude>src/main/appended-resources/licenses/EPL-1.0.txt</exclude>
-                <exclude>src/main/appended-resources/licenses/unrecognized-aopalliance-1.0.txt</exclude>
-                <exclude>src/main/appended-resources/licenses/unrecognized-javax.annotation-api-1.3.2.txt</exclude>
-              </excludes>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
