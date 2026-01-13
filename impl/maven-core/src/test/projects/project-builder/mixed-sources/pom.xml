@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Tests mixed source configuration:
-  - Modular sources for main Java (should override sourceDirectory)
-  - Classic testSourceDirectory (should be used since no modular test sources)
+  Tests that legacy directories are ignored in modular projects.
+
+  Expected behavior:
+  - Modular sources for main Java are processed
+  - Both sourceDirectory and testSourceDirectory are unconditionally ignored
+  - WARNINGs are emitted because both are explicitly set (differ from defaults)
 -->
 <project xmlns="http://maven.apache.org/POM/4.1.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -15,9 +18,9 @@
     <packaging>jar</packaging>
 
     <build>
-        <!-- Classic sourceDirectory - should be IGNORED because <sources> has main java -->
+        <!-- Classic sourceDirectory - ignored with WARNING because project is modular -->
         <sourceDirectory>src/classic/main/java</sourceDirectory>
-        <!-- Classic testSourceDirectory - should be USED because <sources> has no test java -->
+        <!-- Classic testSourceDirectory - ignored with WARNING because project is modular -->
         <testSourceDirectory>src/classic/test/java</testSourceDirectory>
 
         <sources>
@@ -32,7 +35,7 @@
                 <lang>java</lang>
                 <module>org.foo.moduleB</module>
             </source>
-            <!-- No test sources defined - testSourceDirectory should be used -->
+            <!-- No test sources defined in <sources> -->
         </sources>
     </build>
 </project>

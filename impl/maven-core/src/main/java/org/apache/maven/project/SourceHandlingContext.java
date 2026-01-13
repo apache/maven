@@ -65,7 +65,7 @@ class SourceHandlingContext {
     private final Set<String> modules;
     private final boolean modularProject;
     private final ModelBuilderResult result;
-    private final Set<SourceKey> declaredSources = new HashSet<>();
+    private final Set<SourceKey> declaredSources;
 
     SourceHandlingContext(
             MavenProject project,
@@ -78,6 +78,8 @@ class SourceHandlingContext {
         this.modules = modules;
         this.modularProject = modularProject;
         this.result = result;
+        // Each module typically has main, test, main resources, test resources = 4 sources
+        this.declaredSources = new HashSet<>(4 * modules.size());
     }
 
     /**
@@ -96,7 +98,7 @@ class SourceHandlingContext {
     boolean shouldAddSource(SourceRoot sourceRoot) {
         if (!sourceRoot.enabled()) {
             // Disabled sources are always added - they're filtered out by getEnabledSourceRoots()
-            LOGGER.debug(
+            LOGGER.trace(
                     "Adding disabled source (will be filtered by getEnabledSourceRoots): lang={}, scope={}, module={}, dir={}",
                     sourceRoot.language(),
                     sourceRoot.scope(),
@@ -105,8 +107,10 @@ class SourceHandlingContext {
             return true;
         }
 
+        // Normalize path for consistent duplicate detection (handles symlinks, relative paths)
+        Path normalizedDir = sourceRoot.directory().toAbsolutePath().normalize();
         SourceKey key = new SourceKey(
-                sourceRoot.language(), sourceRoot.scope(), sourceRoot.module().orElse(null), sourceRoot.directory());
+                sourceRoot.language(), sourceRoot.scope(), sourceRoot.module().orElse(null), normalizedDir);
 
         if (declaredSources.contains(key)) {
             String message = String.format(
@@ -145,6 +149,48 @@ class SourceHandlingContext {
      */
     boolean hasSources(Language language, ProjectScope scope) {
         return declaredSources.stream().anyMatch(key -> language.equals(key.language()) && scope.equals(key.scope()));
+    }
+
+    /**
+     * Validates that a project does not mix modular and classic (non-modular) sources.
+     * <p>
+     * A project must be either fully modular (all sources have a module) or fully classic
+     * (no sources have a module). Mixing modular and non-modular sources within the same
+     * project is not supported because the compiler plugin cannot handle such configurations.
+     * <p>
+     * This validation checks each (language, scope) combination and reports an ERROR if
+     * both modular and non-modular sources are found.
+     */
+    void validateNoMixedModularAndClassicSources() {
+        for (ProjectScope scope : List.of(ProjectScope.MAIN, ProjectScope.TEST)) {
+            for (Language language : List.of(Language.JAVA_FAMILY, Language.RESOURCES)) {
+                boolean hasModular = declaredSources.stream()
+                        .anyMatch(key ->
+                                language.equals(key.language()) && scope.equals(key.scope()) && key.module() != null);
+                boolean hasClassic = declaredSources.stream()
+                        .anyMatch(key ->
+                                language.equals(key.language()) && scope.equals(key.scope()) && key.module() == null);
+
+                if (hasModular && hasClassic) {
+                    String message = String.format(
+                            "Mixed modular and classic sources detected for lang=%s, scope=%s. "
+                                    + "A project must be either fully modular (all sources have a module) "
+                                    + "or fully classic (no sources have a module). "
+                                    + "The compiler plugin cannot handle mixed configurations.",
+                            language.id(), scope.id());
+                    LOGGER.error(message);
+                    result.getProblemCollector()
+                            .reportProblem(new DefaultModelProblem(
+                                    message,
+                                    Severity.ERROR,
+                                    Version.V41,
+                                    project.getModel().getDelegate(),
+                                    -1,
+                                    -1,
+                                    null));
+                }
+            }
+        }
     }
 
     /**
