@@ -480,15 +480,21 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     /**
-     * Tests mixed source configuration where:
-     * - Modular sources are defined for main Java (should override sourceDirectory)
-     * - Classic testSourceDirectory is used (should be preserved since no modular test sources)
+     * Tests that legacy sourceDirectory and testSourceDirectory are ignored in modular projects.
+     * <p>
+     * In modular projects, legacy directories are unconditionally ignored because it is not clear
+     * how to dispatch their content between different modules. A warning is emitted if these
+     * properties are explicitly set (differ from Super POM defaults).
      * <p>
      * This verifies:
-     * - sourceDirectory is ignored when modular main sources exist
-     * - testSourceDirectory is used when no modular test sources are defined
+     * - WARNINGs are emitted for explicitly set legacy directories in modular projects
+     * - sourceDirectory and testSourceDirectory are both ignored
+     * - Only modular sources from {@code <sources>} are used
      * <p>
-     * Acceptance Criterion: AC1 (boolean flags eliminated - uses hasSources() for main/test detection)
+     * Acceptance Criteria:
+     * - AC1 (boolean flags eliminated - uses hasSources() for main/test detection)
+     * - AC7 (legacy directories warning - {@code <sourceDirectory>} and {@code <testSourceDirectory>}
+     *   are unconditionally ignored with a WARNING in modular projects)
      *
      * @see <a href="https://github.com/apache/maven/issues/11612">Issue #11612</a>
      */
@@ -496,8 +502,30 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     void testMixedSourcesModularMainClassicTest() throws Exception {
         File pom = getProject("mixed-sources");
 
-        MavenSession session = createMavenSession(pom);
-        MavenProject project = session.getCurrentProject();
+        MavenSession mavenSession = createMavenSession(null);
+        ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
+        configuration.setRepositorySession(mavenSession.getRepositorySession());
+
+        ProjectBuildingResult result = getContainer()
+                .lookup(org.apache.maven.project.ProjectBuilder.class)
+                .build(pom, configuration);
+
+        MavenProject project = result.getProject();
+
+        // Verify WARNINGs are emitted for explicitly set legacy directories
+        List<ModelProblem> warnings = result.getProblems().stream()
+                .filter(p -> p.getSeverity() == ModelProblem.Severity.WARNING)
+                .filter(p -> p.getMessage().contains("Legacy") && p.getMessage().contains("ignored in modular project"))
+                .toList();
+
+        // Should have 2 warnings: one for sourceDirectory, one for testSourceDirectory
+        assertEquals(2, warnings.size(), "Should have 2 warnings for ignored legacy directories");
+        assertTrue(
+                warnings.stream().anyMatch(w -> w.getMessage().contains("<sourceDirectory>")),
+                "Should warn about ignored <sourceDirectory>");
+        assertTrue(
+                warnings.stream().anyMatch(w -> w.getMessage().contains("<testSourceDirectory>")),
+                "Should warn about ignored <testSourceDirectory>");
 
         // Get main Java source roots - should have modular sources, not classic sourceDirectory
         List<SourceRoot> mainJavaRoots = project.getEnabledSourceRoots(ProjectScope.MAIN, Language.JAVA_FAMILY)
@@ -521,30 +549,27 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
                 .anyMatch(sr -> sr.directory().toString().replace('\\', '/').contains("src/classic/main/java"));
         assertTrue(!hasClassicMainSource, "Classic sourceDirectory should be ignored");
 
-        // Get test Java source roots - should use classic testSourceDirectory since no modular test sources
+        // Test sources should NOT be added (legacy testSourceDirectory is ignored in modular projects)
         List<SourceRoot> testJavaRoots = project.getEnabledSourceRoots(ProjectScope.TEST, Language.JAVA_FAMILY)
                 .toList();
-
-        // Should have 1 test source (from classic testSourceDirectory)
-        assertEquals(1, testJavaRoots.size(), "Should have 1 test Java source root (classic)");
-
-        // The test source should be the classic one (no module)
-        SourceRoot testRoot = testJavaRoots.get(0);
-        assertTrue(testRoot.module().isEmpty(), "Classic test source should not have a module");
-        assertTrue(
-                testRoot.directory().toString().replace('\\', '/').contains("src/classic/test/java"),
-                "Should use classic testSourceDirectory");
+        assertEquals(0, testJavaRoots.size(), "Should have no test Java sources (legacy is ignored)");
     }
 
     /**
-     * Tests mixed modular/non-modular sources within the same {@code <sources>} element.
+     * Tests that mixing modular and non-modular sources within {@code <sources>} is not allowed.
+     * <p>
+     * A project must be either fully modular (all sources have a module) or fully classic
+     * (no sources have a module). Mixing them within the same project is not supported
+     * because the compiler plugin cannot handle such configurations.
      * <p>
      * This verifies:
-     * - Both modular sources (with module attribute) are added
-     * - Non-modular sources (without module attribute) are added
+     * - An ERROR is reported when both modular and non-modular sources exist in {@code <sources>}
      * - sourceDirectory is ignored because {@code <source scope="main" lang="java">} exists
      * <p>
-     * Acceptance Criterion: AC1 (boolean flags eliminated - uses hasSources() for source detection)
+     * Acceptance Criteria:
+     * - AC1 (boolean flags eliminated - uses hasSources() for source detection)
+     * - AC6 (mixed sources error - mixing modular and classic sources within {@code <sources>}
+     *   triggers an ERROR)
      *
      * @see <a href="https://github.com/apache/maven/issues/11612">Issue #11612</a>
      */
@@ -552,46 +577,23 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     void testSourcesMixedModulesWithinSources() throws Exception {
         File pom = getProject("sources-mixed-modules");
 
-        MavenSession session = createMavenSession(pom);
-        MavenProject project = session.getCurrentProject();
+        MavenSession mavenSession = createMavenSession(null);
+        ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
+        configuration.setRepositorySession(mavenSession.getRepositorySession());
 
-        // Get main Java source roots
-        List<SourceRoot> mainJavaRoots = project.getEnabledSourceRoots(ProjectScope.MAIN, Language.JAVA_FAMILY)
+        ProjectBuildingResult result = getContainer()
+                .lookup(org.apache.maven.project.ProjectBuilder.class)
+                .build(pom, configuration);
+
+        // Verify an ERROR is reported for mixing modular and non-modular sources
+        List<ModelProblem> errors = result.getProblems().stream()
+                .filter(p -> p.getSeverity() == ModelProblem.Severity.ERROR)
+                .filter(p -> p.getMessage().contains("Mixed modular and classic sources"))
                 .toList();
 
-        // Should have 2 main sources: 1 modular (moduleA) + 1 non-modular
-        assertEquals(2, mainJavaRoots.size(), "Should have 2 main Java source roots (1 modular + 1 non-modular)");
-
-        // Count modular vs non-modular sources
-        long modularCount =
-                mainJavaRoots.stream().filter(sr -> sr.module().isPresent()).count();
-        long nonModularCount =
-                mainJavaRoots.stream().filter(sr -> sr.module().isEmpty()).count();
-
-        assertEquals(1, modularCount, "Should have 1 modular main source");
-        assertEquals(1, nonModularCount, "Should have 1 non-modular main source");
-
-        // Verify the modular source is moduleA
-        Set<String> mainModules = mainJavaRoots.stream()
-                .map(SourceRoot::module)
-                .filter(opt -> opt.isPresent())
-                .map(opt -> opt.get())
-                .collect(Collectors.toSet());
-
-        assertTrue(mainModules.contains("org.foo.moduleA"), "Should have modular source for moduleA");
-
-        // Verify sourceDirectory is NOT used (should be ignored because <sources> has main java)
-        boolean hasIgnoredSource =
-                mainJavaRoots.stream().anyMatch(sr -> sr.directory().toString().contains("src/should-be-ignored"));
-        assertTrue(!hasIgnoredSource, "sourceDirectory should be ignored when <sources> has main java");
-
-        // Get test Java source roots - should have modular test source for moduleA
-        List<SourceRoot> testJavaRoots = project.getEnabledSourceRoots(ProjectScope.TEST, Language.JAVA_FAMILY)
-                .toList();
-
-        assertEquals(1, testJavaRoots.size(), "Should have 1 test Java source root");
-        assertTrue(testJavaRoots.get(0).module().isPresent(), "Test source should be modular");
-        assertEquals("org.foo.moduleA", testJavaRoots.get(0).module().get(), "Test source should be for moduleA");
+        assertEquals(1, errors.size(), "Should have 1 error for mixed modular/classic configuration");
+        assertTrue(errors.get(0).getMessage().contains("lang=java"), "Error should mention java language");
+        assertTrue(errors.get(0).getMessage().contains("scope=main"), "Error should mention main scope");
     }
 
     /**

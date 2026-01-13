@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -696,16 +697,40 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                  * for the corresponding scope and language. This rule exists because
                  * Maven provides default values for those elements which may conflict
                  * with user's configuration.
+                 *
+                 * Additionally, for modular projects, legacy directories are unconditionally
+                 * ignored because it is not clear how to dispatch their content between
+                 * different modules. A warning is emitted if these properties are explicitly set.
                  */
                 if (!sourceContext.hasSources(Language.SCRIPT, ProjectScope.MAIN)) {
                     project.addScriptSourceRoot(build.getScriptSourceDirectory());
                 }
-                if (!sourceContext.hasSources(Language.JAVA_FAMILY, ProjectScope.MAIN)) {
-                    project.addCompileSourceRoot(build.getSourceDirectory());
+                if (isModularProject) {
+                    // Modular projects: unconditionally ignore legacy directories, warn if explicitly set
+                    warnIfExplicitLegacyDirectory(
+                            build.getSourceDirectory(),
+                            baseDir.resolve("src/main/java"),
+                            "<sourceDirectory>",
+                            project.getId(),
+                            result);
+                    warnIfExplicitLegacyDirectory(
+                            build.getTestSourceDirectory(),
+                            baseDir.resolve("src/test/java"),
+                            "<testSourceDirectory>",
+                            project.getId(),
+                            result);
+                } else {
+                    // Classic projects: use legacy directories if no sources defined in <sources>
+                    if (!sourceContext.hasSources(Language.JAVA_FAMILY, ProjectScope.MAIN)) {
+                        project.addCompileSourceRoot(build.getSourceDirectory());
+                    }
+                    if (!sourceContext.hasSources(Language.JAVA_FAMILY, ProjectScope.TEST)) {
+                        project.addTestCompileSourceRoot(build.getTestSourceDirectory());
+                    }
                 }
-                if (!sourceContext.hasSources(Language.JAVA_FAMILY, ProjectScope.TEST)) {
-                    project.addTestCompileSourceRoot(build.getTestSourceDirectory());
-                }
+
+                // Validate that modular and classic sources are not mixed within <sources>
+                sourceContext.validateNoMixedModularAndClassicSources();
 
                 // Handle main and test resources using unified source handling
                 sourceContext.handleResourceConfiguration(ProjectScope.MAIN);
@@ -878,6 +903,49 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                                 e));
             }
             project.setRemoteArtifactRepositories(remoteRepositories);
+        }
+
+        /**
+         * Warns about legacy directory usage in a modular project. Two cases are handled:
+         * <ul>
+         *   <li>Case 1: The default legacy directory exists on the filesystem (e.g., src/main/java exists)</li>
+         *   <li>Case 2: An explicit legacy directory is configured that differs from the default</li>
+         * </ul>
+         * Legacy directories are unconditionally ignored in modular projects because it is not clear
+         * how to dispatch their content between different modules.
+         */
+        private void warnIfExplicitLegacyDirectory(
+                String configuredDir,
+                Path defaultDir,
+                String elementName,
+                String projectId,
+                ModelBuilderResult result) {
+            if (configuredDir != null) {
+                Path configuredPath = Path.of(configuredDir).toAbsolutePath().normalize();
+                Path defaultPath = defaultDir.toAbsolutePath().normalize();
+                if (!configuredPath.equals(defaultPath)) {
+                    // Case 2: Explicit configuration differs from default - always warn
+                    String message = String.format(
+                            "Legacy %s is ignored in modular project %s. "
+                                    + "In modular projects, source directories must be defined via <sources> "
+                                    + "with a module element for each module.",
+                            elementName, projectId);
+                    logger.warn(message);
+                    result.getProblemCollector()
+                            .reportProblem(new org.apache.maven.impl.model.DefaultModelProblem(
+                                    message, Severity.WARNING, Version.V41, null, -1, -1, null));
+                } else if (Files.isDirectory(defaultPath)) {
+                    // Case 1: Default configuration, but the default directory exists on filesystem
+                    String message = String.format(
+                            "Legacy %s '%s' exists but is ignored in modular project %s. "
+                                    + "In modular projects, source directories must be defined via <sources>.",
+                            elementName, defaultPath, projectId);
+                    logger.warn(message);
+                    result.getProblemCollector()
+                            .reportProblem(new org.apache.maven.impl.model.DefaultModelProblem(
+                                    message, Severity.WARNING, Version.V41, null, -1, -1, null));
+                }
+            }
         }
 
         private void initParent(MavenProject project, ModelBuilderResult result) {
