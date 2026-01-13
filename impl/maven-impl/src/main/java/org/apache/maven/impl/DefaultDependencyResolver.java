@@ -292,7 +292,8 @@ public class DefaultDependencyResolver implements DependencyResolver {
                 String artifactId = artifact.getArtifactId();
                 String version = artifact.getVersion();
 
-                if (containsUnresolvedExpression(groupId) || containsUnresolvedExpression(artifactId)
+                if (containsUnresolvedExpression(groupId)
+                        || containsUnresolvedExpression(artifactId)
                         || containsUnresolvedExpression(version)) {
                     enhanced.append(" due to unresolved expression(s) in dependency: ")
                             .append(groupId)
@@ -313,7 +314,8 @@ public class DefaultDependencyResolver implements DependencyResolver {
                     String artifactId = artifact.getArtifactId();
                     String version = artifact.getVersion();
 
-                    if (containsUnresolvedExpression(groupId) || containsUnresolvedExpression(artifactId)
+                    if (containsUnresolvedExpression(groupId)
+                            || containsUnresolvedExpression(artifactId)
                             || containsUnresolvedExpression(version)) {
                         enhanced.append(" due to unresolved expression(s) in dependency: ")
                                 .append(groupId)
