@@ -55,8 +55,7 @@ import org.apache.maven.api.annotations.ThreadSafe;
 public interface XmlNode {
 
     /**
-     * @deprecated since 4.0.0.
-     *             Use {@link XmlService#CHILDREN_COMBINATION_MODE_ATTRIBUTE} instead.
+     * @deprecated Use {@link XmlService#CHILDREN_COMBINATION_MODE_ATTRIBUTE} instead.
      */
     @Deprecated(since = "4.0.0", forRemoval = true)
     String CHILDREN_COMBINATION_MODE_ATTRIBUTE = XmlService.CHILDREN_COMBINATION_MODE_ATTRIBUTE;
@@ -65,6 +64,9 @@ public interface XmlNode {
      * @deprecated since 4.0.0.
      *             Use {@link XmlService#CHILDREN_COMBINATION_MERGE} instead.
      */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    String CHILDREN_COMBINATION_MODE_ATTRIBUTE = XmlService.CHILDREN_COMBINATION_MODE_ATTRIBUTE;
+
     @Deprecated(since = "4.0.0", forRemoval = true)
     String CHILDREN_COMBINATION_MERGE = XmlService.CHILDREN_COMBINATION_MERGE;
 
@@ -223,11 +225,6 @@ public interface XmlNode {
     @Nullable
     Object inputLocation();
 
-    // Deprecated methods that delegate to new ones
-    /**
-     * @deprecated since 4.0.0.
-     *             Use {@link #name()} instead.
-     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
     default String getName() {
