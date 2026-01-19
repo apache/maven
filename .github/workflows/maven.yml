@@ -62,7 +62,7 @@ jobs:
           cp .github/ci-extensions.xml .mvn/extensions.xml
 
       - name: Restore Mimir caches
-        uses: actions/cache/restore@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+        uses: actions/cache/restore@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
         with:
           path: ${{ env.MIMIR_LOCAL }}
           key: master-${{ runner.os }}-${{ github.run_id }}
@@ -167,7 +167,7 @@ jobs:
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
 
       - name: Restore Mimir caches
-        uses: actions/cache/restore@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+        uses: actions/cache/restore@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
         with:
           path: ${{ env.MIMIR_LOCAL }}
           key: master-${{ runner.os }}-${{ github.run_id }}
@@ -268,7 +268,7 @@ jobs:
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
 
       - name: Restore Mimir caches
-        uses: actions/cache/restore@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+        uses: actions/cache/restore@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
         with:
           path: ${{ env.MIMIR_LOCAL }}
           key: master-${{ runner.os }}-${{ github.run_id }}
@@ -354,7 +354,7 @@ jobs:
           pattern: 'cache-${{ runner.os }}*'
           path: ${{ env.MIMIR_LOCAL }}
       - name: Publish cache
-        uses: actions/cache/save@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+        uses: actions/cache/save@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
         if: ${{ github.event_name != 'pull_request' && !cancelled() && !failure() }}
         with:
           path: ${{ env.MIMIR_LOCAL }}
