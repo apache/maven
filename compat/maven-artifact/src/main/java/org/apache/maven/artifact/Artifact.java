@@ -40,7 +40,8 @@ public interface Artifact extends Comparable<Artifact> {
     /**
      * @deprecated
      * The use of the {@code RELEASE} version is discouraged because it results
-     * in non-reproducible builds.
+     * in non-reproducible builds and exposes projects to potential
+     * supply chain attacks.
      * Use explicit versions instead.
      */
     @Deprecated(since = "4.0.0")
