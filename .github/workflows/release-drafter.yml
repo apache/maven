@@ -26,4 +26,4 @@ jobs:
    update_release_draft:
       uses: apache/maven-gh-actions-shared/.github/workflows/release-drafter.yml@v4
       with:
-        commits-since: '2025-06-18T10:29:46Z' # date of first commit on maven-4.0.x branch, bed0f8174bf728978f86fac533aa38a9511f3872
+        initial-commits-since: '2025-06-18T10:29:46Z' # date of first commit on maven-4.0.x branch, bed0f8174bf728978f86fac533aa38a9511f3872
