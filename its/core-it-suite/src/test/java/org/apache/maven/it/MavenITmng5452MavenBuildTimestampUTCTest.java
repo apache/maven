@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -34,9 +34,9 @@ public class MavenITmng5452MavenBuildTimestampUTCTest extends AbstractMavenInteg
 
     @Test
     public void testMavenBuildTimestampIsUsingUTC() throws Exception {
-        File testDir = extractResources("/mng-5452-maven-build-timestamp-utc");
+        Path testDir = extractResources("mng-5452-maven-build-timestamp-utc");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument("process-resources");
         verifier.execute();
         //

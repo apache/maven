@@ -18,19 +18,19 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.io.IOException;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng7404IgnorePrefixlessExpressionsTest extends AbstractMavenIntegrationTestCase {
-    private static final String PROJECT_PATH = "/mng-7404-ignore-prefixless-expressions";
+    private static final String PROJECT_PATH = "mng-7404-ignore-prefixless-expressions";
 
     @Test
     public void testIgnorePrefixlessExpressions() throws IOException, VerificationException {
-        final File projectDir = extractResources(PROJECT_PATH);
-        final Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        final Path projectDir = extractResources(PROJECT_PATH);
+        final Verifier verifier = newVerifier(projectDir);
 
         verifier.addCliArgument("validate");
         verifier.execute();

@@ -18,22 +18,21 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.io.IOException;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng7112ProjectsWithNonRecursiveTest extends AbstractMavenIntegrationTestCase {
-    private static final String PROJECT_PATH = "/mng-7112-projects-with-non-recursive";
+    private static final String PROJECT_PATH = "mng-7112-projects-with-non-recursive";
 
     @Test
     public void testAggregatesCanBeBuiltNonRecursively() throws IOException, VerificationException {
-        final File projectDir = extractResources(PROJECT_PATH);
-        Verifier cleaner = newVerifier(projectDir.getAbsolutePath());
+        final Path projectDir = extractResources(PROJECT_PATH);
+        Verifier cleaner = newVerifier(projectDir);
         cleaner.addCliArgument("clean");
         cleaner.execute();
 
-        final Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        final Verifier verifier = newVerifier(projectDir);
 
         verifier.addCliArgument("-pl");
         verifier.addCliArgument(":aggregator-a,:aggregator-b");
@@ -51,12 +50,12 @@ public class MavenITmng7112ProjectsWithNonRecursiveTest extends AbstractMavenInt
 
     @Test
     public void testAggregatesCanBeDeselectedNonRecursively() throws IOException, VerificationException {
-        final File projectDir = extractResources(PROJECT_PATH);
-        Verifier cleaner = newVerifier(projectDir.getAbsolutePath());
+        final Path projectDir = extractResources(PROJECT_PATH);
+        Verifier cleaner = newVerifier(projectDir);
         cleaner.addCliArgument("clean");
         cleaner.execute();
 
-        final Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        final Verifier verifier = newVerifier(projectDir);
 
         verifier.addCliArgument("-pl");
         verifier.addCliArgument("!:aggregator-a,!:aggregator-b");
