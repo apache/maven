@@ -26,7 +26,7 @@ Apache Maven
 - [3.9.x](https://github.com/apache/maven/tree/maven-3.9.x): [![Maven Central](https://img.shields.io/maven-central/v/org.apache.maven/apache-maven.svg?label=Maven%20Central&versionPrefix=3.)](https://central.sonatype.com/artifact/org.apache.maven/apache-maven)
 
 
-Apache Maven is a software project management and comprehension tool. Based on
+Apache Maven is a software project management and build automation tool. Based on
 the concept of a project object model (POM), Maven can manage a project's
 build, reporting and documentation from a central piece of information.
 
