@@ -53,7 +53,8 @@ public interface Language extends ExtensibleEnum {
     /**
      * The "script" language. This constant is retained for backward compatibility with Maven 3.
      *
-     * @deprecated Use {@link #RESOURCES} instead.
+     * @deprecated since 4.0.0.
+     *              Use {@link #RESOURCES} instead.
      */
     @Deprecated(since = "4.0.0")
     Language SCRIPT = language("script");
