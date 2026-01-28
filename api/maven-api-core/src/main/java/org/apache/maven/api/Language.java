@@ -55,10 +55,10 @@ public interface Language extends ExtensibleEnum {
      * <p>
      * This constant is retained for backward compatibility with Maven 3.
      *
-     * @deprecated Since Maven 4.0.0-alpha.
+     * @deprecated Since 4.0.0.
      *             Use {@link #RESOURCES} instead.
      */
-    @Deprecated(since = "4.0.0-alpha", forRemoval = false)
+    @Deprecated(since = "4.0.0")
     Language SCRIPT = language("script");
 
     // TODO: this should be moved out from here to Java Support (builtin into core)
