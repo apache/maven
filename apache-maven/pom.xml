@@ -64,9 +64,17 @@ under the License.
     </dependency>
 
     <!-- CLI -->
+    <!-- bridge from Apache Commons Logging (JCL) to SLF4J-->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
+      <version>${slf4jVersion}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- bridge from System.Logger to SLF4J (Platform Logging API, added by JEP 264) -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-jdk-platform-logging</artifactId>
       <version>${slf4jVersion}</version>
       <scope>runtime</scope>
     </dependency>
