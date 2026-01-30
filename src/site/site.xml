@@ -59,11 +59,11 @@ under the License.
     </menu>
 
     <menu inherit="bottom" name="Reference">
-      <item name="Lifecycles" href="./impl/maven-core/lifecycles.html"/>
-      <item name="Plugin Bindings to Default Lifecycle" href="./impl/maven-core/default-bindings.html"/>
-      <item name="Artifact Handlers" href="./impl/maven-core/artifact-handlers.html"/>
-      <item name="CLI options" href="./compat/maven-embedder/cli.html"/>
-      <item name="Super POM" href="./compat/maven-model-builder/super-pom.html"/>
+      <item name="Lifecycles" href="./maven-impl-modules/maven-core/lifecycles.html"/>
+      <item name="Plugin Bindings to Default Lifecycle" href="./maven-impl-modules/maven-core/default-bindings.html"/>
+      <item name="Artifact Handlers" href="./maven-impl-modules/maven-core/artifact-handlers.html"/>
+      <item name="CLI options" href="./maven-compat-modules/maven-embedder/cli.html"/>
+      <item name="Super POM" href="./maven-compat-modules/maven-model-builder/super-pom.html"/>
     </menu>
 
     <menu inherit="bottom" name="Development">
