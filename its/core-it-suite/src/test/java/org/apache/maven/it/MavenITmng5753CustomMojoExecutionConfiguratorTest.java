@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.nio.file.Files;
 
 import org.junit.jupiter.api.Test;
@@ -29,33 +29,33 @@ public class MavenITmng5753CustomMojoExecutionConfiguratorTest extends AbstractM
 
     @Test
     public void testCustomMojoExecutionConfigurator() throws Exception {
-        File testDir = extractResources("/mng-5753-custom-mojo-execution-configurator");
-        File pluginDir = new File(testDir, "plugin");
-        File projectDir = new File(testDir, "project");
+        Path testDir = extractResources("mng-5753-custom-mojo-execution-configurator");
+        Path pluginDir = testDir.resolve("plugin");
+        Path projectDir = testDir.resolve("project");
 
         Verifier verifier;
 
         // install the test plugin
-        verifier = newVerifier(pluginDir.getAbsolutePath());
+        verifier = newVerifier(pluginDir);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        File configurationFile = new File(projectDir, "configuration.txt");
-        configurationFile.delete();
+        Path configurationFile = projectDir.resolve("configuration.txt");
+        Files.deleteIfExists(configurationFile);
 
         // build the test project
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent(configurationFile.getCanonicalPath());
+        verifier.verifyFilePresent(configurationFile);
         //
         // The <name/> element in the original configuration is "ORIGINAL". We want to assert that our
         // custom MojoExecutionConfigurator made the transformation of the element from "ORIGINAL" to "TRANSFORMED"
         //
-        String actual = Files.readString(configurationFile.toPath());
+        String actual = Files.readString(configurationFile);
         assertEquals("TRANSFORMED", actual);
     }
 }

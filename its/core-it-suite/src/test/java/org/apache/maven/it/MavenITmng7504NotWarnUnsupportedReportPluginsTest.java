@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.io.IOException;
 import java.util.List;
 
@@ -35,13 +35,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  * @author Slawomir Jaranowski
  */
 public class MavenITmng7504NotWarnUnsupportedReportPluginsTest extends AbstractMavenIntegrationTestCase {
-    private static final String PROJECT_PATH = "/mng-7504-warn-unsupported-report-plugins";
+    private static final String PROJECT_PATH = "mng-7504-warn-unsupported-report-plugins";
 
     @Test
     public void testWarnNotPresent() throws IOException, VerificationException {
-        File rootDir = extractResources(PROJECT_PATH);
+        Path rootDir = extractResources(PROJECT_PATH);
 
-        Verifier verifier = newVerifier(rootDir.getAbsolutePath());
+        Verifier verifier = newVerifier(rootDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("site");

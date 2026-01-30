@@ -18,9 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,15 +38,15 @@ public class MavenITmng4590ImportedPomUsesSystemAndUserPropertiesTest extends Ab
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4590");
+        Path testDir = extractResources("mng-4590");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4590");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.setEnvironmentVariable("MAVEN_OPTS", "-Dtest.file=pom.xml");
-        verifier.addCliArgument("-Dtest.dir=" + testDir.getAbsolutePath());
+        verifier.addCliArgument("-Dtest.dir=" + testDir.toString());
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
@@ -58,7 +57,7 @@ public class MavenITmng4590ImportedPomUsesSystemAndUserPropertiesTest extends Ab
         assertEquals("1", props.getProperty("project.dependencyManagement.dependencies"));
         assertEquals("dep-a", props.getProperty("project.dependencyManagement.dependencies.0.artifactId"));
         assertEquals(
-                new File(testDir, "pom.xml").getAbsoluteFile(),
-                new File(props.getProperty("project.dependencyManagement.dependencies.0.systemPath")));
+                testDir.resolve("pom.xml"),
+                Path.of(props.getProperty("project.dependencyManagement.dependencies.0.systemPath")));
     }
 }
