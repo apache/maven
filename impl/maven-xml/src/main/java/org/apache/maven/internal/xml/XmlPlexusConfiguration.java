@@ -76,40 +76,40 @@ public class XmlPlexusConfiguration implements PlexusConfiguration {
 
     @Override
     public String getName() {
-        return xmlNode.name();
+        return xmlNode.getName();
     }
 
     public synchronized void setName(String name) {
         this.xmlNode = XmlNode.newBuilder()
                 .name(name)
-                .value(xmlNode.value())
-                .attributes(xmlNode.attributes())
-                .children(xmlNode.children())
-                .namespaceUri(xmlNode.namespaceUri())
-                .prefix(xmlNode.prefix())
+                .value(xmlNode.getValue())
+                .attributes(xmlNode.getAttributes())
+                .children(xmlNode.getChildren())
+                .namespaceUri(xmlNode.getNamespaceUri())
+                .prefix(xmlNode.getPrefix())
                 .inputLocation(xmlNode.inputLocation())
                 .build();
         clearCache();
     }
 
     public String getValue() {
-        return xmlNode.value();
+        return xmlNode.getValue();
     }
 
     public String getValue(String defaultValue) {
-        String value = xmlNode.value();
+        String value = xmlNode.getValue();
         return value != null ? value : defaultValue;
     }
 
     public synchronized void setValue(String value) {
         this.xmlNode = XmlNode.newBuilder()
-                .name(xmlNode.name())
+                .name(xmlNode.getName())
                 .value(value)
-                .attributes(xmlNode.attributes())
-                .children(xmlNode.children())
-                .namespaceUri(xmlNode.namespaceUri())
-                .prefix(xmlNode.prefix())
-                .inputLocation(xmlNode.inputLocation())
+                .attributes(xmlNode.getAttributes())
+                .children(xmlNode.getChildren())
+                .namespaceUri(xmlNode.getNamespaceUri())
+                .prefix(xmlNode.getPrefix())
+                .inputLocation(xmlNode.getInputLocation())
                 .build();
         clearCache();
     }
@@ -120,39 +120,39 @@ public class XmlPlexusConfiguration implements PlexusConfiguration {
     }
 
     public synchronized void setAttribute(String name, String value) {
-        Map<String, String> newAttributes = new HashMap<>(xmlNode.attributes());
+        Map<String, String> newAttributes = new HashMap<>(xmlNode.getAttributes());
         if (value == null) {
             newAttributes.remove(name);
         } else {
             newAttributes.put(name, value);
         }
         this.xmlNode = XmlNode.newBuilder()
-                .name(xmlNode.name())
-                .value(xmlNode.value())
+                .name(xmlNode.getName())
+                .value(xmlNode.getValue())
                 .attributes(newAttributes)
-                .children(xmlNode.children())
-                .namespaceUri(xmlNode.namespaceUri())
-                .prefix(xmlNode.prefix())
+                .children(xmlNode.getChildren())
+                .namespaceUri(xmlNode.getNamespaceUri())
+                .prefix(xmlNode.getPrefix())
                 .inputLocation(xmlNode.inputLocation())
                 .build();
         clearCache();
     }
 
     public String[] getAttributeNames() {
-        return xmlNode.attributes().keySet().toArray(new String[0]);
+        return xmlNode.getAttributes().keySet().toArray(new String[0]);
     }
 
     public String getAttribute(String paramName) {
-        return xmlNode.attribute(paramName);
+        return xmlNode.getAttribute(paramName);
     }
 
     public String getAttribute(String name, String defaultValue) {
-        String value = xmlNode.attribute(name);
+        String value = xmlNode.getAttribute(name);
         return value != null ? value : defaultValue;
     }
 
     public PlexusConfiguration getChild(String child) {
-        XmlNode childNode = xmlNode.child(child);
+        XmlNode childNode = xmlNode.getChild(child);
         if (childNode != null) {
             return new XmlPlexusConfiguration(childNode);
         } else {
@@ -163,7 +163,7 @@ public class XmlPlexusConfiguration implements PlexusConfiguration {
     }
 
     public PlexusConfiguration getChild(int i) {
-        List<XmlNode> children = xmlNode.children();
+        List<XmlNode> children = xmlNode.getChildren();
         if (i >= 0 && i < children.size()) {
             return new XmlPlexusConfiguration(children.get(i));
         }
@@ -171,21 +171,21 @@ public class XmlPlexusConfiguration implements PlexusConfiguration {
     }
 
     public synchronized PlexusConfiguration getChild(String child, boolean createChild) {
-        XmlNode childNode = xmlNode.child(child);
+        XmlNode childNode = xmlNode.getChild(child);
         if (childNode == null) {
             if (createChild) {
                 // Create a new child node
                 XmlNode newChild = XmlNode.newInstance(child);
-                List<XmlNode> newChildren = new ArrayList<>(xmlNode.children());
+                List<XmlNode> newChildren = new ArrayList<>(xmlNode.getChildren());
                 newChildren.add(newChild);
 
                 this.xmlNode = XmlNode.newBuilder()
-                        .name(xmlNode.name())
-                        .value(xmlNode.value())
-                        .attributes(xmlNode.attributes())
+                        .name(xmlNode.getName())
+                        .value(xmlNode.getValue())
+                        .attributes(xmlNode.getAttributes())
                         .children(newChildren)
-                        .namespaceUri(xmlNode.namespaceUri())
-                        .prefix(xmlNode.prefix())
+                        .namespaceUri(xmlNode.getNamespaceUri())
+                        .prefix(xmlNode.getPrefix())
                         .inputLocation(xmlNode.inputLocation())
                         .build();
                 clearCache();
@@ -200,7 +200,7 @@ public class XmlPlexusConfiguration implements PlexusConfiguration {
 
     public synchronized PlexusConfiguration[] getChildren() {
         if (childrenCache == null) {
-            List<XmlNode> children = xmlNode.children();
+            List<XmlNode> children = xmlNode.getChildren();
             childrenCache = new PlexusConfiguration[children.size()];
             for (int i = 0; i < children.size(); i++) {
                 childrenCache[i] = new XmlPlexusConfiguration(children.get(i));
@@ -211,8 +211,8 @@ public class XmlPlexusConfiguration implements PlexusConfiguration {
 
     public PlexusConfiguration[] getChildren(String name) {
         List<PlexusConfiguration> result = new ArrayList<>();
-        for (XmlNode child : xmlNode.children()) {
-            if (name.equals(child.name())) {
+        for (XmlNode child : xmlNode.getChildren()) {
+            if (name.equals(child.getName())) {
                 result.add(new XmlPlexusConfiguration(child));
             }
         }
@@ -222,16 +222,16 @@ public class XmlPlexusConfiguration implements PlexusConfiguration {
     public synchronized void addChild(PlexusConfiguration configuration) {
         // Convert PlexusConfiguration to XmlNode
         XmlNode newChild = convertToXmlNode(configuration);
-        List<XmlNode> newChildren = new ArrayList<>(xmlNode.children());
+        List<XmlNode> newChildren = new ArrayList<>(xmlNode.getChildren());
         newChildren.add(newChild);
 
         this.xmlNode = XmlNode.newBuilder()
-                .name(xmlNode.name())
-                .value(xmlNode.value())
-                .attributes(xmlNode.attributes())
+                .name(xmlNode.getName())
+                .value(xmlNode.getValue())
+                .attributes(xmlNode.getAttributes())
                 .children(newChildren)
-                .namespaceUri(xmlNode.namespaceUri())
-                .prefix(xmlNode.prefix())
+                .namespaceUri(xmlNode.getNamespaceUri())
+                .prefix(xmlNode.getPrefix())
                 .inputLocation(xmlNode.inputLocation())
                 .build();
         clearCache();
@@ -239,16 +239,16 @@ public class XmlPlexusConfiguration implements PlexusConfiguration {
 
     public synchronized PlexusConfiguration addChild(String name) {
         XmlNode newChild = XmlNode.newInstance(name);
-        List<XmlNode> newChildren = new ArrayList<>(xmlNode.children());
+        List<XmlNode> newChildren = new ArrayList<>(xmlNode.getChildren());
         newChildren.add(newChild);
 
         this.xmlNode = XmlNode.newBuilder()
-                .name(xmlNode.name())
-                .value(xmlNode.value())
-                .attributes(xmlNode.attributes())
+                .name(xmlNode.getName())
+                .value(xmlNode.getValue())
+                .attributes(xmlNode.getAttributes())
                 .children(newChildren)
-                .namespaceUri(xmlNode.namespaceUri())
-                .prefix(xmlNode.prefix())
+                .namespaceUri(xmlNode.getNamespaceUri())
+                .prefix(xmlNode.getPrefix())
                 .inputLocation(xmlNode.inputLocation())
                 .build();
         clearCache();
@@ -258,16 +258,16 @@ public class XmlPlexusConfiguration implements PlexusConfiguration {
 
     public synchronized PlexusConfiguration addChild(String name, String value) {
         XmlNode newChild = XmlNode.newInstance(name, value);
-        List<XmlNode> newChildren = new ArrayList<>(xmlNode.children());
+        List<XmlNode> newChildren = new ArrayList<>(xmlNode.getChildren());
         newChildren.add(newChild);
 
         this.xmlNode = XmlNode.newBuilder()
-                .name(xmlNode.name())
-                .value(xmlNode.value())
-                .attributes(xmlNode.attributes())
+                .name(xmlNode.getName())
+                .value(xmlNode.getValue())
+                .attributes(xmlNode.getAttributes())
                 .children(newChildren)
-                .namespaceUri(xmlNode.namespaceUri())
-                .prefix(xmlNode.prefix())
+                .namespaceUri(xmlNode.getNamespaceUri())
+                .prefix(xmlNode.getPrefix())
                 .inputLocation(xmlNode.inputLocation())
                 .build();
         clearCache();
@@ -276,7 +276,7 @@ public class XmlPlexusConfiguration implements PlexusConfiguration {
     }
 
     public int getChildCount() {
-        return xmlNode.children().size();
+        return xmlNode.getChildren().size();
     }
 
     public String toString() {
