@@ -18,7 +18,7 @@
  */
 package org.apache.maven.plugin.coreit;
 
-import junit.framework.TestCase;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
@@ -29,7 +29,7 @@ import org.apache.maven.plugins.annotations.Mojo;
  * loadable when that dependency is missing (in the runtime environment).
  */
 @Mojo(name = "no-class-def-found-error-mojo", requiresProject = false)
-public class NoClassDefFoundErrorInterfaceMojo extends TestCase implements org.apache.maven.plugin.Mojo {
+public class NoClassDefFoundErrorInterfaceMojo extends StringUtils implements org.apache.maven.plugin.Mojo {
 
     private Log log;
 

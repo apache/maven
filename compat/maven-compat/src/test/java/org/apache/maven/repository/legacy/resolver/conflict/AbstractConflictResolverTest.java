@@ -69,11 +69,6 @@ public abstract class AbstractConflictResolverTest {
         this.roleHint = roleHint;
     }
 
-    // TestCase methods -------------------------------------------------------
-
-    /*
-     * @see junit.framework.TestCase#setUp()
-     */
     @BeforeEach
     public void setUp() throws Exception {
         conflictResolver = (ConflictResolver) container.lookup(ConflictResolver.ROLE, roleHint);
