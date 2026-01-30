@@ -43,13 +43,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up JDK
-        uses: actions/setup-java@f2beeb24e141e01a676f977032f5a29d81c9e27e # v5.1.0
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
         with:
           java-version: 17
           distribution: 'temurin'
 
       - name: Checkout maven
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
@@ -62,7 +62,7 @@ jobs:
           cp .github/ci-extensions.xml .mvn/extensions.xml
 
       - name: Restore Mimir caches
-        uses: actions/cache/restore@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+        uses: actions/cache/restore@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
         with:
           path: ${{ env.MIMIR_LOCAL }}
           key: master-${{ runner.os }}-${{ github.run_id }}
@@ -135,7 +135,7 @@ jobs:
         java: ['17', '21', '25']
     steps:
       - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@f2beeb24e141e01a676f977032f5a29d81c9e27e # v5.1.0
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
@@ -153,7 +153,7 @@ jobs:
         run: choco install graphviz
 
       - name: Checkout maven
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
@@ -167,7 +167,7 @@ jobs:
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
 
       - name: Restore Mimir caches
-        uses: actions/cache/restore@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+        uses: actions/cache/restore@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
         with:
           path: ${{ env.MIMIR_LOCAL }}
           key: master-${{ runner.os }}-${{ github.run_id }}
@@ -248,13 +248,13 @@ jobs:
         java: ['17', '21', '25']
     steps:
       - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@f2beeb24e141e01a676f977032f5a29d81c9e27e # v5.1.0
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
 
       - name: Checkout maven
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
@@ -268,7 +268,7 @@ jobs:
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
 
       - name: Restore Mimir caches
-        uses: actions/cache/restore@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+        uses: actions/cache/restore@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
         with:
           path: ${{ env.MIMIR_LOCAL }}
           key: master-${{ runner.os }}-${{ github.run_id }}
@@ -354,7 +354,7 @@ jobs:
           pattern: 'cache-${{ runner.os }}*'
           path: ${{ env.MIMIR_LOCAL }}
       - name: Publish cache
-        uses: actions/cache/save@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+        uses: actions/cache/save@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
         if: ${{ github.event_name != 'pull_request' && !cancelled() && !failure() }}
         with:
           path: ${{ env.MIMIR_LOCAL }}

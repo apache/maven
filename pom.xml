@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>46</version>
+    <version>47</version>
     <relativePath />
   </parent>
 
@@ -143,7 +143,7 @@ under the License.
     <project.build.outputTimestamp>2025-06-24T20:18:00Z</project.build.outputTimestamp>
     <!-- various versions -->
     <asmVersion>9.9.1</asmVersion>
-    <byteBuddyVersion>1.18.3</byteBuddyVersion>
+    <byteBuddyVersion>1.18.4</byteBuddyVersion>
     <classWorldsVersion>2.9.0</classWorldsVersion>
     <commonsCliVersion>1.11.0</commonsCliVersion>
     <domtripVersion>0.4.0</domtripVersion>
@@ -157,12 +157,12 @@ under the License.
     <jmhVersion>1.37</jmhVersion>
     <junitVersion>6.0.2</junitVersion>
     <jxpathVersion>1.4.0</jxpathVersion>
-    <logbackClassicVersion>1.5.24</logbackClassicVersion>
+    <logbackClassicVersion>1.5.25</logbackClassicVersion>
     <mockitoVersion>5.21.0</mockitoVersion>
     <plexusInteractivityVersion>1.5.1</plexusInteractivityVersion>
     <plexusInterpolationVersion>1.29</plexusInterpolationVersion>
     <plexusTestingVersion>2.1.0</plexusTestingVersion>
-    <plexusXmlVersion>4.1.0</plexusXmlVersion>
+    <plexusXmlVersion>4.1.1</plexusXmlVersion>
     <resolverVersion>2.0.14</resolverVersion>
     <securityDispatcherVersion>4.1.0</securityDispatcherVersion>
     <sisuVersion>0.9.0.M4</sisuVersion>
@@ -720,7 +720,7 @@ under the License.
         <plugin>
           <groupId>com.github.siom79.japicmp</groupId>
           <artifactId>japicmp-maven-plugin</artifactId>
-          <version>0.25.2</version>
+          <version>0.25.4</version>
           <executions>
             <execution>
               <goals>
@@ -755,7 +755,7 @@ under the License.
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>buildnumber-maven-plugin</artifactId>
-          <version>3.2.1</version>
+          <version>3.3.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -1017,7 +1017,7 @@ under the License.
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
-            <version>3.6.2</version>
+            <version>3.6.3</version>
             <inherited>false</inherited>
             <dependencies>
               <dependency>

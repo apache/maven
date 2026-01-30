@@ -21,7 +21,7 @@ pipeline {
               withEnv(["JAVA_HOME=${tool "jdk_17_latest"}",
                        "PATH+MAVEN=${ tool "jdk_17_latest" }/bin:${tool "maven_3_latest"}/bin",
                        "MAVEN_OPTS=-Xms4G -Xmx4G -Djava.awt.headless=true"]) {
-                sh "mvn clean deploy -DdeployAtEnd=true -B"
+                sh "./mvnw clean deploy -DdeployAtEnd=true -B -V"
               }
             }
           }
@@ -50,7 +50,7 @@ def mavenBuild(jdk, extraArgs) {
       withEnv(["JAVA_HOME=${tool "$jdk"}",
                "PATH+MAVEN=${tool "$jdk"}/bin:${tool "maven_3_latest"}/bin",
                "MAVEN_OPTS=-Xms4G -Xmx4G -Djava.awt.headless=true"]) {
-        sh "mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper -Dmaven=3.9.10"
+        sh "mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.4:wrapper -Dmaven=3.9.12"
         sh "echo run Its"
         sh "./mvnw -e -B -V install $extraArgs"
       }
