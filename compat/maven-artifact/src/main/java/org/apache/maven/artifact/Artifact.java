@@ -32,13 +32,22 @@ import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
 
 /**
- * Maven Artifact interface. Notice that it mixes artifact definition concepts (groupId, artifactId, version)
+ * Maven Artifact interface. Notice that it mixes artifact definition concepts
+ * (groupId, artifactId, version)
  * with dependency information (version range, scope).
  */
 public interface Artifact extends Comparable<Artifact> {
+    /**
+     * @deprecated since 4.0.0.
+     *             Use an explicit version instead.
+     */
 
     @Deprecated(since = "4.0.0")
     String RELEASE_VERSION = "RELEASE";
+    /**
+     * @deprecated since 4.0.0.
+     *             Avoid using "LATEST"; prefer an explicit version instead.
+     */
 
     @Deprecated(since = "4.0.0")
     String LATEST_VERSION = "LATEST";
