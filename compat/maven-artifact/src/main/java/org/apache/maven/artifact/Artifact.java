@@ -38,17 +38,17 @@ import org.apache.maven.artifact.versioning.VersionRange;
 public interface Artifact extends Comparable<Artifact> {
 
     /**
-    * @deprecated since 4.0.0
+    * @deprecated since 3.0
     * Use explicit version resolution instead of special version constants.
     */
-    @Deprecated(since = "4.0.0")
+    @Deprecated(since = "3.0")
     String RELEASE_VERSION = "RELEASE";
 
     /**
-    * @deprecated since 4.0.0.
+    * @deprecated since 3.0
     * Use a fixed version or an explicit version range instead of special version tokens.
     */
-    @Deprecated(since = "4.0.0")
+    @Deprecated(since = "3.0")
     String LATEST_VERSION = "LATEST";
 
     String SNAPSHOT_VERSION = "SNAPSHOT";
