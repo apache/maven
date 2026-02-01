@@ -401,8 +401,7 @@
      * @return The POM file from which this model originated or {@code null} if this model does not belong to a local
      *         project (e.g. describes the metadata of some artifact from the repository).
      *
-     * @deprecated since 4.0.0.
-     *             Use {@link #getPomPath()} instead.
+     * @deprecated Use getPomPath() instead.
      */
     @Deprecated
     public java.io.File getPomFile() {
@@ -410,8 +409,7 @@
     }
 
     /**
-     * @deprecated since 4.0.0.
-     *             Use {@link #setPomPath(java.nio.file.Path)} instead.
+     * @deprecated Use setPomPath(Path) instead.
      */
     @Deprecated
     public void setPomFile(java.io.File pomFile) {
