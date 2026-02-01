@@ -1089,7 +1089,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         }
     }
 
-    private List<String> getProfileIds(List<Profile> profiles) {
+    private static List<String> getProfileIds(List<Profile> profiles) {
         return profiles.stream().map(Profile::getId).toList();
     }
 

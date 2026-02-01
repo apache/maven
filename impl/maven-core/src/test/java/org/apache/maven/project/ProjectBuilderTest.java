@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -398,8 +399,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         // Should have resource roots for both modules
         Set<String> modules = mainResourceRoots.stream()
                 .map(SourceRoot::module)
-                .filter(opt -> opt.isPresent())
-                .map(opt -> opt.get())
+                .flatMap(Optional::stream)
                 .collect(Collectors.toSet());
 
         assertEquals(2, modules.size(), "Should have resource roots for 2 modules");
@@ -413,8 +413,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         // Should have test resource roots for both modules
         Set<String> testModules = testResourceRoots.stream()
                 .map(SourceRoot::module)
-                .filter(opt -> opt.isPresent())
-                .map(opt -> opt.get())
+                .flatMap(Optional::stream)
                 .collect(Collectors.toSet());
 
         assertEquals(2, testModules.size(), "Should have test resource roots for 2 modules");
@@ -470,8 +469,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
 
         Set<String> mainModules = mainResourceRoots.stream()
                 .map(SourceRoot::module)
-                .filter(opt -> opt.isPresent())
-                .map(opt -> opt.get())
+                .flatMap(Optional::stream)
                 .collect(Collectors.toSet());
 
         assertEquals(2, mainModules.size(), "Should have resource roots for 2 modules");
@@ -536,8 +534,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
 
         Set<String> mainModules = mainJavaRoots.stream()
                 .map(SourceRoot::module)
-                .filter(opt -> opt.isPresent())
-                .map(opt -> opt.get())
+                .flatMap(Optional::stream)
                 .collect(Collectors.toSet());
 
         assertEquals(2, mainModules.size(), "Should have main sources for 2 modules");
@@ -545,8 +542,10 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         assertTrue(mainModules.contains("org.foo.moduleB"), "Should have main source for moduleB");
 
         // Verify the classic sourceDirectory is NOT used (should be ignored)
-        boolean hasClassicMainSource = mainJavaRoots.stream()
-                .anyMatch(sr -> sr.directory().toString().replace('\\', '/').contains("src/classic/main/java"));
+        boolean hasClassicMainSource = mainJavaRoots.stream().anyMatch(sr -> sr.directory()
+                .toString()
+                .replace(File.separatorChar, '/')
+                .contains("src/classic/main/java"));
         assertTrue(!hasClassicMainSource, "Classic sourceDirectory should be ignored");
 
         // Test sources should NOT be added (legacy testSourceDirectory is ignored in modular projects)
@@ -623,17 +622,18 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
 
         // Both should be for the same module
         long moduleCount = mainJavaRoots.stream()
-                .filter(sr -> sr.module().isPresent()
-                        && "com.example.app".equals(sr.module().get()))
+                .filter(sr -> "com.example.app".equals(sr.module().orElse(null)))
                 .count();
         assertEquals(2, moduleCount, "Both main sources should be for com.example.app module");
 
         // One should be implicit directory, one should be generated-sources
-        boolean hasImplicitDir = mainJavaRoots.stream()
-                .anyMatch(sr -> sr.directory().toString().replace('\\', '/').contains("src/com.example.app/main/java"));
+        boolean hasImplicitDir = mainJavaRoots.stream().anyMatch(sr -> sr.directory()
+                .toString()
+                .replace(File.separatorChar, '/')
+                .contains("src/com.example.app/main/java"));
         boolean hasGeneratedDir = mainJavaRoots.stream().anyMatch(sr -> sr.directory()
                 .toString()
-                .replace('\\', '/')
+                .replace(File.separatorChar, '/')
                 .contains("target/generated-sources/com.example.app/java"));
 
         assertTrue(hasImplicitDir, "Should have implicit source directory for module");
@@ -648,8 +648,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
 
         // Both test sources should be for the same module
         long testModuleCount = testJavaRoots.stream()
-                .filter(sr -> sr.module().isPresent()
-                        && "com.example.app".equals(sr.module().get()))
+                .filter(sr -> "com.example.app".equals(sr.module().orElse(null)))
                 .count();
         assertEquals(2, testModuleCount, "Both test sources should be for com.example.app module");
     }
@@ -707,14 +706,12 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
 
         // Verify com.example.other module is present
         boolean hasOtherModule = mainJavaRoots.stream()
-                .anyMatch(sr -> sr.module().isPresent()
-                        && "com.example.other".equals(sr.module().get()));
+                .anyMatch(sr -> "com.example.other".equals(sr.module().orElse(null)));
         assertTrue(hasOtherModule, "Should have source root for com.example.other module");
 
         // Verify com.example.dup module is present (first enabled wins)
         boolean hasDupModule = mainJavaRoots.stream()
-                .anyMatch(sr -> sr.module().isPresent()
-                        && "com.example.dup".equals(sr.module().get()));
+                .anyMatch(sr -> "com.example.dup".equals(sr.module().orElse(null)));
         assertTrue(hasDupModule, "Should have source root for com.example.dup module");
 
         // Get test Java source roots
@@ -725,10 +722,9 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         assertEquals(1, testJavaRoots.size(), "Should have 1 test Java source root");
 
         // Verify it's for the dup module
-        assertTrue(
-                testJavaRoots.get(0).module().isPresent()
-                        && "com.example.dup"
-                                .equals(testJavaRoots.get(0).module().get()),
+        assertEquals(
+                "com.example.dup",
+                testJavaRoots.get(0).module().orElse(null),
                 "Test source root should be for com.example.dup module");
     }
 }
