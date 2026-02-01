@@ -38,17 +38,14 @@ import org.apache.maven.artifact.versioning.VersionRange;
  */
 public interface Artifact extends Comparable<Artifact> {
     /**
-     * @deprecated since 4.0.0.
-     *             Use an explicit version instead.
+     * @deprecated Use {@link #VERSION} instead.
      */
-
     @Deprecated(since = "4.0.0")
     String RELEASE_VERSION = "RELEASE";
-    /**
-     * @deprecated since 4.0.0.
-     *             Avoid using "LATEST"; prefer an explicit version instead.
-     */
 
+    /**
+     * @deprecated Avoid using {@code LATEST}; prefer an explicit version instead.
+     */
     @Deprecated(since = "4.0.0")
     String LATEST_VERSION = "LATEST";
 
