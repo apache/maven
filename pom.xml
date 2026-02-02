@@ -157,7 +157,7 @@ under the License.
     <jmhVersion>1.37</jmhVersion>
     <junitVersion>6.0.2</junitVersion>
     <jxpathVersion>1.4.0</jxpathVersion>
-    <logbackClassicVersion>1.5.26</logbackClassicVersion>
+    <logbackClassicVersion>1.5.27</logbackClassicVersion>
     <mockitoVersion>5.21.0</mockitoVersion>
     <plexusInteractivityVersion>1.5.1</plexusInteractivityVersion>
     <plexusInterpolationVersion>1.29</plexusInterpolationVersion>
