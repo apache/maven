@@ -594,23 +594,31 @@ public class Verifier {
     }
 
     public static void verifyTextNotInLog(List<String> lines, String text) throws VerificationException {
-        if (textOccurencesInLog(lines, text) > 0) {
+        if (textOccurrencesInLog(lines, text) > 0) {
             throw new VerificationException("Text found in log: " + text);
         }
     }
 
     public static void verifyTextInLog(List<String> lines, String text) throws VerificationException {
-        if (textOccurencesInLog(lines, text) <= 0) {
+        if (textOccurrencesInLog(lines, text) <= 0) {
             throw new VerificationException("Text not found in log: " + text);
         }
     }
 
     public long textOccurrencesInLog(String text) throws IOException {
-        return textOccurencesInLog(loadLogLines(), text);
+        return textOccurrencesInLog(loadLogLines(), text);
     }
 
-    public static long textOccurencesInLog(List<String> lines, String text) {
+    public static long textOccurrencesInLog(List<String> lines, String text) {
         return lines.stream().filter(line -> stripAnsi(line).contains(text)).count();
+    }
+
+    /**
+     * @deprecated Use {@link #textOccurrencesInLog(List, String)} instead
+     */
+    @Deprecated
+    public static long textOccurencesInLog(List<String> lines, String text) {
+        return textOccurrencesInLog(lines, text);
     }
 
     /**
