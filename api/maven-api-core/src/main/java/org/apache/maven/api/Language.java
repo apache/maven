@@ -55,7 +55,7 @@ public interface Language extends ExtensibleEnum {
      *
      * @deprecated Use {@link #RESOURCES} instead.
      */
-    @Deprecated
+    @Deprecated(since = "4.0.0-alpha", forRemoval = false)
     Language SCRIPT = language("script");
 
     // TODO: this should be moved out from here to Java Support (builtin into core)
