@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -525,7 +526,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 return pomFiles.stream()
                         .map(pomFile -> build(pomFile, recursive))
                         .flatMap(List::stream)
-                        .collect(Collectors.toList());
+                        .toList();
             } finally {
                 Thread.currentThread().setContextClassLoader(oldContextClassLoader);
             }
@@ -571,7 +572,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     project.setCollectedProjects(results(r)
                             .filter(cr -> cr != r && cr.getEffectiveModel() != null)
                             .map(cr -> projectIndex.get(cr.getEffectiveModel().getId()))
-                            .collect(Collectors.toList()));
+                            .toList());
 
                     DependencyResolutionResult resolutionResult = null;
                     if (request.isResolveDependencies()) {
@@ -665,49 +666,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                         return build.getDirectory();
                     }
                 };
-                boolean hasScript = false;
-                boolean hasMain = false;
-                boolean hasTest = false;
-                boolean hasMainResources = false;
-                boolean hasTestResources = false;
-                for (var source : sources) {
-                    var src = DefaultSourceRoot.fromModel(session, baseDir, outputDirectory, source);
-                    project.addSourceRoot(src);
-                    Language language = src.language();
-                    if (Language.JAVA_FAMILY.equals(language)) {
-                        ProjectScope scope = src.scope();
-                        if (ProjectScope.MAIN.equals(scope)) {
-                            hasMain = true;
-                        } else {
-                            hasTest |= ProjectScope.TEST.equals(scope);
-                        }
-                    } else if (Language.RESOURCES.equals(language)) {
-                        ProjectScope scope = src.scope();
-                        if (ProjectScope.MAIN.equals(scope)) {
-                            hasMainResources = true;
-                        } else if (ProjectScope.TEST.equals(scope)) {
-                            hasTestResources = true;
-                        }
-                    } else {
-                        hasScript |= Language.SCRIPT.equals(language);
-                    }
-                }
-                /*
-                 * `sourceDirectory`, `testSourceDirectory` and `scriptSourceDirectory`
-                 * are ignored if the POM file contains at least one <source> element
-                 * for the corresponding scope and language. This rule exists because
-                 * Maven provides default values for those elements which may conflict
-                 * with user's configuration.
-                 */
-                if (!hasScript) {
-                    project.addScriptSourceRoot(build.getScriptSourceDirectory());
-                }
-                if (!hasMain) {
-                    project.addCompileSourceRoot(build.getSourceDirectory());
-                }
-                if (!hasTest) {
-                    project.addTestCompileSourceRoot(build.getTestSourceDirectory());
-                }
                 // Extract modules from sources to detect modular projects
                 Set<String> modules = extractModules(sources);
                 boolean isModularProject = !modules.isEmpty();
@@ -719,11 +677,64 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                         modules,
                         isModularProject);
 
-                // Handle main and test resources
-                ResourceHandlingContext resourceContext =
-                        new ResourceHandlingContext(project, baseDir, modules, isModularProject, result);
-                resourceContext.handleResourceConfiguration(ProjectScope.MAIN, hasMainResources);
-                resourceContext.handleResourceConfiguration(ProjectScope.TEST, hasTestResources);
+                // Create source handling context for unified tracking of all lang/scope combinations
+                SourceHandlingContext sourceContext =
+                        new SourceHandlingContext(project, baseDir, modules, isModularProject, result);
+
+                // Process all sources, tracking enabled ones and detecting duplicates
+                for (var source : sources) {
+                    var sourceRoot = DefaultSourceRoot.fromModel(session, baseDir, outputDirectory, source);
+                    // Track enabled sources for duplicate detection and hasSources() queries
+                    // Only add source if it's not a duplicate enabled source (first enabled wins)
+                    if (sourceContext.shouldAddSource(sourceRoot)) {
+                        project.addSourceRoot(sourceRoot);
+                    }
+                }
+
+                /*
+                 * `sourceDirectory`, `testSourceDirectory` and `scriptSourceDirectory`
+                 * are ignored if the POM file contains at least one enabled <source> element
+                 * for the corresponding scope and language. This rule exists because
+                 * Maven provides default values for those elements which may conflict
+                 * with user's configuration.
+                 *
+                 * Additionally, for modular projects, legacy directories are unconditionally
+                 * ignored because it is not clear how to dispatch their content between
+                 * different modules. A warning is emitted if these properties are explicitly set.
+                 */
+                if (!sourceContext.hasSources(Language.SCRIPT, ProjectScope.MAIN)) {
+                    project.addScriptSourceRoot(build.getScriptSourceDirectory());
+                }
+                if (isModularProject) {
+                    // Modular projects: unconditionally ignore legacy directories, warn if explicitly set
+                    warnIfExplicitLegacyDirectory(
+                            build.getSourceDirectory(),
+                            baseDir.resolve("src/main/java"),
+                            "<sourceDirectory>",
+                            project.getId(),
+                            result);
+                    warnIfExplicitLegacyDirectory(
+                            build.getTestSourceDirectory(),
+                            baseDir.resolve("src/test/java"),
+                            "<testSourceDirectory>",
+                            project.getId(),
+                            result);
+                } else {
+                    // Classic projects: use legacy directories if no sources defined in <sources>
+                    if (!sourceContext.hasSources(Language.JAVA_FAMILY, ProjectScope.MAIN)) {
+                        project.addCompileSourceRoot(build.getSourceDirectory());
+                    }
+                    if (!sourceContext.hasSources(Language.JAVA_FAMILY, ProjectScope.TEST)) {
+                        project.addTestCompileSourceRoot(build.getTestSourceDirectory());
+                    }
+                }
+
+                // Validate that modular and classic sources are not mixed within <sources>
+                sourceContext.validateNoMixedModularAndClassicSources();
+
+                // Handle main and test resources using unified source handling
+                sourceContext.handleResourceConfiguration(ProjectScope.MAIN);
+                sourceContext.handleResourceConfiguration(ProjectScope.TEST);
             }
 
             project.setActiveProfiles(
@@ -894,6 +905,49 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             project.setRemoteArtifactRepositories(remoteRepositories);
         }
 
+        /**
+         * Warns about legacy directory usage in a modular project. Two cases are handled:
+         * <ul>
+         *   <li>Case 1: The default legacy directory exists on the filesystem (e.g., src/main/java exists)</li>
+         *   <li>Case 2: An explicit legacy directory is configured that differs from the default</li>
+         * </ul>
+         * Legacy directories are unconditionally ignored in modular projects because it is not clear
+         * how to dispatch their content between different modules.
+         */
+        private void warnIfExplicitLegacyDirectory(
+                String configuredDir,
+                Path defaultDir,
+                String elementName,
+                String projectId,
+                ModelBuilderResult result) {
+            if (configuredDir != null) {
+                Path configuredPath = Path.of(configuredDir).toAbsolutePath().normalize();
+                Path defaultPath = defaultDir.toAbsolutePath().normalize();
+                if (!configuredPath.equals(defaultPath)) {
+                    // Case 2: Explicit configuration differs from default - always warn
+                    String message = String.format(
+                            "Legacy %s is ignored in modular project %s. "
+                                    + "In modular projects, source directories must be defined via <sources> "
+                                    + "with a module element for each module.",
+                            elementName, projectId);
+                    logger.warn(message);
+                    result.getProblemCollector()
+                            .reportProblem(new org.apache.maven.impl.model.DefaultModelProblem(
+                                    message, Severity.WARNING, Version.V41, null, -1, -1, null));
+                } else if (Files.isDirectory(defaultPath)) {
+                    // Case 1: Default configuration, but the default directory exists on filesystem
+                    String message = String.format(
+                            "Legacy %s '%s' exists but is ignored in modular project %s. "
+                                    + "In modular projects, source directories must be defined via <sources>.",
+                            elementName, defaultPath, projectId);
+                    logger.warn(message);
+                    result.getProblemCollector()
+                            .reportProblem(new org.apache.maven.impl.model.DefaultModelProblem(
+                                    message, Severity.WARNING, Version.V41, null, -1, -1, null));
+                }
+            }
+        }
+
         private void initParent(MavenProject project, ModelBuilderResult result) {
             Model parentModel = result.getParentModel();
 
@@ -1035,8 +1089,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         }
     }
 
-    private List<String> getProfileIds(List<Profile> profiles) {
-        return profiles.stream().map(Profile::getId).collect(Collectors.toList());
+    private static List<String> getProfileIds(List<Profile> profiles) {
+        return profiles.stream().map(Profile::getId).toList();
     }
 
     private static ModelSource createStubModelSource(Artifact artifact) {
