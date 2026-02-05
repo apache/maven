@@ -72,7 +72,7 @@ public interface XmlNode {
 
 
     /**
-     * @deprecated since 4.0.0.
+     * @deprecated since = "4.0.0"
      *             Use {@link XmlService#CHILDREN_COMBINATION_APPEND} instead.
      */
     @Deprecated(since = "4.0.0", forRemoval = true)
