@@ -506,12 +506,12 @@ under the License.
 
   <repositories>
     <repository>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
       <releases>
         <enabled>false</enabled>
       </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
       <id>central-snapshots</id>
       <url>https://central.sonatype.com/repository/maven-snapshots</url>
     </repository>
