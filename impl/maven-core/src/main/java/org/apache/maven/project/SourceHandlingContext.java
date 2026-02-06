@@ -221,11 +221,19 @@ class SourceHandlingContext {
             if (hasResourcesInSources) {
                 // Modular project with resources configured via <sources> - already added above
                 if (hasExplicitLegacyResources(resources, scopeId)) {
-                    LOGGER.warn(
-                            "Legacy {} element is ignored because {} resources are configured via {} in <sources>.",
-                            legacyElement,
-                            scopeId,
-                            sourcesConfig);
+                    String message = String.format(
+                            "Legacy %s element must not be used because %s resources are configured via %s in <sources>.",
+                            legacyElement, scopeId, sourcesConfig);
+                    LOGGER.error(message);
+                    result.getProblemCollector()
+                            .reportProblem(new DefaultModelProblem(
+                                    message,
+                                    Severity.ERROR,
+                                    Version.V41,
+                                    project.getModel().getDelegate(),
+                                    -1,
+                                    -1,
+                                    null));
                 } else {
                     LOGGER.debug(
                             "{} resources configured via <sources> element, ignoring legacy {} element.",
@@ -236,13 +244,13 @@ class SourceHandlingContext {
                 // Modular project without resources in <sources> - inject module-aware defaults
                 if (hasExplicitLegacyResources(resources, scopeId)) {
                     String message = "Legacy " + legacyElement
-                            + " element is ignored because modular sources are configured. "
+                            + " element must not be used because modular sources are configured. "
                             + "Use " + sourcesConfig + " in <sources> for custom resource paths.";
-                    LOGGER.warn(message);
+                    LOGGER.error(message);
                     result.getProblemCollector()
                             .reportProblem(new DefaultModelProblem(
                                     message,
-                                    Severity.WARNING,
+                                    Severity.ERROR,
                                     Version.V41,
                                     project.getModel().getDelegate(),
                                     -1,
@@ -265,11 +273,19 @@ class SourceHandlingContext {
             if (hasResourcesInSources) {
                 // Resources configured via <sources> - already added above
                 if (hasExplicitLegacyResources(resources, scopeId)) {
-                    LOGGER.warn(
-                            "Legacy {} element is ignored because {} resources are configured via {} in <sources>.",
-                            legacyElement,
-                            scopeId,
-                            sourcesConfig);
+                    String message = String.format(
+                            "Legacy %s element must not be used because %s resources are configured via %s in <sources>.",
+                            legacyElement, scopeId, sourcesConfig);
+                    LOGGER.error(message);
+                    result.getProblemCollector()
+                            .reportProblem(new DefaultModelProblem(
+                                    message,
+                                    Severity.ERROR,
+                                    Version.V41,
+                                    project.getModel().getDelegate(),
+                                    -1,
+                                    -1,
+                                    null));
                 } else {
                     LOGGER.debug(
                             "{} resources configured via <sources> element, ignoring legacy {} element.",
@@ -319,7 +335,7 @@ class SourceHandlingContext {
      *
      * @param resources list of resources to check
      * @param scope scope (main or test)
-     * @return true if explicit legacy resources are present that would be ignored
+     * @return true if explicit legacy resources are present that conflict with modular sources
      */
     private boolean hasExplicitLegacyResources(List<Resource> resources, String scope) {
         if (resources.isEmpty()) {

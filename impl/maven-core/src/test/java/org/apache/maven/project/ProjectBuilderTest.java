@@ -422,19 +422,21 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     /**
-     * Tests that when modular sources are configured alongside explicit legacy resources,
-     * the legacy resources are ignored and a warning is issued.
+     * Tests that when modular sources are configured alongside explicit legacy resources, an error is raised.
      * <p>
      * This verifies the behavior described in the design:
-     * - Modular projects with explicit legacy {@code <resources>} configuration should issue a warning
+     * - Modular projects with explicit legacy {@code <resources>} configuration should raise an error
      * - The modular resource roots are injected instead of using the legacy configuration
      * <p>
-     * Acceptance Criterion: AC2 (unified source tracking for all lang/scope combinations)
+     * Acceptance Criteria:
+     * - AC2 (unified source tracking for all lang/scope combinations)
+     * - AC8 (legacy directories error - supersedes AC7 which originally used WARNING)
      *
      * @see <a href="https://github.com/apache/maven/issues/11612">Issue #11612</a>
+     * @see <a href="https://github.com/apache/maven/issues/11701#issuecomment-3858462609">AC8 definition</a>
      */
     @Test
-    void testModularSourcesWithExplicitResourcesIssuesWarning() throws Exception {
+    void testModularSourcesWithExplicitResourcesIssuesError() throws Exception {
         File pom = getProject("modular-sources-with-explicit-resources");
 
         MavenSession mavenSession = createMavenSession(null);
@@ -447,19 +449,19 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
 
         MavenProject project = result.getProject();
 
-        // Verify warnings are issued for ignored legacy resources
-        List<ModelProblem> warnings = result.getProblems().stream()
-                .filter(p -> p.getSeverity() == ModelProblem.Severity.WARNING)
-                .filter(p -> p.getMessage().contains("Legacy") && p.getMessage().contains("ignored"))
+        // Verify errors are raised for conflicting legacy resources (AC8)
+        List<ModelProblem> errors = result.getProblems().stream()
+                .filter(p -> p.getSeverity() == ModelProblem.Severity.ERROR)
+                .filter(p -> p.getMessage().contains("Legacy") && p.getMessage().contains("must not be used"))
                 .toList();
 
-        assertEquals(2, warnings.size(), "Should have 2 warnings (one for resources, one for testResources)");
+        assertEquals(2, errors.size(), "Should have 2 errors (one for resources, one for testResources)");
         assertTrue(
-                warnings.stream().anyMatch(w -> w.getMessage().contains("<resources>")),
-                "Should warn about ignored <resources>");
+                errors.stream().anyMatch(e -> e.getMessage().contains("<resources>")),
+                "Should error about conflicting <resources>");
         assertTrue(
-                warnings.stream().anyMatch(w -> w.getMessage().contains("<testResources>")),
-                "Should warn about ignored <testResources>");
+                errors.stream().anyMatch(e -> e.getMessage().contains("<testResources>")),
+                "Should error about conflicting <testResources>");
 
         // Verify modular resources are still injected correctly
         List<SourceRoot> mainResourceRoots = project.getEnabledSourceRoots(ProjectScope.MAIN, Language.RESOURCES)
@@ -478,23 +480,23 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     /**
-     * Tests that legacy sourceDirectory and testSourceDirectory are ignored in modular projects.
+     * Tests that legacy sourceDirectory and testSourceDirectory raise an error in modular projects.
      * <p>
-     * In modular projects, legacy directories are unconditionally ignored because it is not clear
-     * how to dispatch their content between different modules. A warning is emitted if these
-     * properties are explicitly set (differ from Super POM defaults).
+     * In modular projects, legacy directories must not occur because it is not clear
+     * how to dispatch their content between different modules. An error is raised if these
+     * properties are explicitly set (and differ from Super POM defaults).
      * <p>
      * This verifies:
-     * - WARNINGs are emitted for explicitly set legacy directories in modular projects
-     * - sourceDirectory and testSourceDirectory are both ignored
+     * - ERRORs are raised for explicitly set legacy directories in modular projects
      * - Only modular sources from {@code <sources>} are used
      * <p>
      * Acceptance Criteria:
      * - AC1 (boolean flags eliminated - uses hasSources() for main/test detection)
-     * - AC7 (legacy directories warning - {@code <sourceDirectory>} and {@code <testSourceDirectory>}
-     *   are unconditionally ignored with a WARNING in modular projects)
+     * - AC8 (legacy directories error - supersedes AC7 which originally used WARNING;
+     *   {@code <sourceDirectory>} and {@code <testSourceDirectory>} are raising an ERROR in modular projects)
      *
      * @see <a href="https://github.com/apache/maven/issues/11612">Issue #11612</a>
+     * @see <a href="https://github.com/apache/maven/issues/11701#issuecomment-3858462609">AC8 definition</a>
      */
     @Test
     void testMixedSourcesModularMainClassicTest() throws Exception {
@@ -510,20 +512,21 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
 
         MavenProject project = result.getProject();
 
-        // Verify WARNINGs are emitted for explicitly set legacy directories
-        List<ModelProblem> warnings = result.getProblems().stream()
-                .filter(p -> p.getSeverity() == ModelProblem.Severity.WARNING)
-                .filter(p -> p.getMessage().contains("Legacy") && p.getMessage().contains("ignored in modular project"))
+        // Verify ERRORs are raised for explicitly set legacy directories (AC8)
+        List<ModelProblem> errors = result.getProblems().stream()
+                .filter(p -> p.getSeverity() == ModelProblem.Severity.ERROR)
+                .filter(p -> p.getMessage().contains("Legacy")
+                        && p.getMessage().contains("must not be used in modular project"))
                 .toList();
 
-        // Should have 2 warnings: one for sourceDirectory, one for testSourceDirectory
-        assertEquals(2, warnings.size(), "Should have 2 warnings for ignored legacy directories");
+        // Should have 2 errors: one for sourceDirectory, one for testSourceDirectory
+        assertEquals(2, errors.size(), "Should have 2 errors for conflicting legacy directories");
         assertTrue(
-                warnings.stream().anyMatch(w -> w.getMessage().contains("<sourceDirectory>")),
-                "Should warn about ignored <sourceDirectory>");
+                errors.stream().anyMatch(e -> e.getMessage().contains("<sourceDirectory>")),
+                "Should error about conflicting <sourceDirectory>");
         assertTrue(
-                warnings.stream().anyMatch(w -> w.getMessage().contains("<testSourceDirectory>")),
-                "Should warn about ignored <testSourceDirectory>");
+                errors.stream().anyMatch(e -> e.getMessage().contains("<testSourceDirectory>")),
+                "Should error about conflicting <testSourceDirectory>");
 
         // Get main Java source roots - should have modular sources, not classic sourceDirectory
         List<SourceRoot> mainJavaRoots = project.getEnabledSourceRoots(ProjectScope.MAIN, Language.JAVA_FAMILY)
@@ -541,17 +544,17 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         assertTrue(mainModules.contains("org.foo.moduleA"), "Should have main source for moduleA");
         assertTrue(mainModules.contains("org.foo.moduleB"), "Should have main source for moduleB");
 
-        // Verify the classic sourceDirectory is NOT used (should be ignored)
+        // Verify the classic sourceDirectory is NOT used (rejected in modular projects)
         boolean hasClassicMainSource = mainJavaRoots.stream().anyMatch(sr -> sr.directory()
                 .toString()
                 .replace(File.separatorChar, '/')
                 .contains("src/classic/main/java"));
-        assertTrue(!hasClassicMainSource, "Classic sourceDirectory should be ignored");
+        assertTrue(!hasClassicMainSource, "Classic sourceDirectory must not be used");
 
-        // Test sources should NOT be added (legacy testSourceDirectory is ignored in modular projects)
+        // Test sources should NOT be added (legacy testSourceDirectory is rejected in modular projects)
         List<SourceRoot> testJavaRoots = project.getEnabledSourceRoots(ProjectScope.TEST, Language.JAVA_FAMILY)
                 .toList();
-        assertEquals(0, testJavaRoots.size(), "Should have no test Java sources (legacy is ignored)");
+        assertEquals(0, testJavaRoots.size(), "Should have no test Java sources (legacy is rejected)");
     }
 
     /**
@@ -563,7 +566,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
      * <p>
      * This verifies:
      * - An ERROR is reported when both modular and non-modular sources exist in {@code <sources>}
-     * - sourceDirectory is ignored because {@code <source scope="main" lang="java">} exists
+     * - sourceDirectory is not used because {@code <source scope="main" lang="java">} exists
      * <p>
      * Acceptance Criteria:
      * - AC1 (boolean flags eliminated - uses hasSources() for source detection)
