@@ -452,7 +452,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         // Verify errors are raised for conflicting legacy resources (AC8)
         List<ModelProblem> errors = result.getProblems().stream()
                 .filter(p -> p.getSeverity() == ModelProblem.Severity.ERROR)
-                .filter(p -> p.getMessage().contains("Legacy") && p.getMessage().contains("must not be used"))
+                .filter(p -> p.getMessage().contains("Legacy") && p.getMessage().contains("cannot be used"))
                 .toList();
 
         assertEquals(2, errors.size(), "Should have 2 errors (one for resources, one for testResources)");
@@ -482,7 +482,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     /**
      * Tests that legacy sourceDirectory and testSourceDirectory raise an error in modular projects.
      * <p>
-     * In modular projects, legacy directories must not occur because it is not clear
+     * Legacy directories cannot be used in modular projects because it is not clear
      * how to dispatch their content between different modules. An error is raised if these
      * properties are explicitly set (and differ from Super POM defaults).
      * <p>
@@ -516,7 +516,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         List<ModelProblem> errors = result.getProblems().stream()
                 .filter(p -> p.getSeverity() == ModelProblem.Severity.ERROR)
                 .filter(p -> p.getMessage().contains("Legacy")
-                        && p.getMessage().contains("must not be used in modular project"))
+                        && p.getMessage().contains("cannot be used in modular project"))
                 .toList();
 
         // Should have 2 errors: one for sourceDirectory, one for testSourceDirectory
@@ -549,7 +549,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
                 .toString()
                 .replace(File.separatorChar, '/')
                 .contains("src/classic/main/java"));
-        assertTrue(!hasClassicMainSource, "Classic sourceDirectory must not be used");
+        assertTrue(!hasClassicMainSource, "Classic sourceDirectory cannot be used");
 
         // Test sources should NOT be added (legacy testSourceDirectory is rejected in modular projects)
         List<SourceRoot> testJavaRoots = project.getEnabledSourceRoots(ProjectScope.TEST, Language.JAVA_FAMILY)
