@@ -31,9 +31,9 @@ import org.sonatype.plexus.components.sec.dispatcher.PasswordDecryptor;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 
 /**
- * Provides "maven" named security dispatcher, used by Maven. This component is configured slightly differently than the
- * default one, as default is unaware of Maven specific configuration file locations. The default named component
- * should not be used (injected or referenced in any way) at all in any Maven related codebase.
+ * Provides a security dispatcher named "maven". Maven uses this security dispatcher instead of the default.
+ * The default security dispatcher is unaware of Maven specific configuration file locations and should not be used
+ * (injected or referenced in any way) at all in any Maven related codebase.
  * <p>
  * Note: This whole stuff is really deprecated and replaced with proper security in Maven 4, while this one is
  * just "security through obscurity".
