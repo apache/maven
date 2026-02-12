@@ -21,8 +21,7 @@ Apache Maven
 [![Reproducible Builds](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jvm-repo-rebuild/reproducible-central/master/content/org/apache/maven/maven/badge.json)](https://github.com/jvm-repo-rebuild/reproducible-central/blob/master/content/org/apache/maven/maven/README.md)
 
 - [master](https://github.com/apache/maven) = 4.1.x
-[![Jenkins Build](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci-maven.apache.org%2Fjob%2FMaven%2Fjob%2Fmaven-box%2Fjob%2Fmaven%2Fjob%2Fmaster%2F)
-  ][build]
+[![Jenkins Build](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci-maven.apache.org%2Fjob%2FMaven%2Fjob%2Fmaven-box%2Fjob%2Fmaven%2Fjob%2Fmaster%2F)][build]
 [![Java CI](https://github.com/apache/maven/actions/workflows/maven.yml/badge.svg?branch=master)][gh-build]
 
 - [4.0.x](https://github.com/apache/maven/tree/maven-4.0.x): 
@@ -76,7 +75,7 @@ Quick Build
 -------
 If you want to bootstrap Maven, you'll need:
 - Java 17+
-- Maven 3.6.3 or later
+- Maven 3.9.0 or later
 - Run Maven, specifying a location into which the completed Maven distro should be installed:
     ```
     mvn -DdistributionTargetDir="$HOME/app/maven/apache-maven-4.1.x-SNAPSHOT" clean package
