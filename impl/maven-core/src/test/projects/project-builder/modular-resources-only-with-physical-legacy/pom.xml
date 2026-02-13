@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Tests AC8: Modular project with only resources in <sources> and physical default legacy directory.
+
+  Expected behavior:
+  - Modular resources from <sources> are processed
+  - Physical src/main/java and src/test/java directories exist but would be ignored
+  - ERROR is raised because physical default directories exist (AC8 physical presence check)
+  - Unlike non-modular projects (AC9), modular projects cannot use legacy directories as fallback
+
+  Note: The src/main/java and src/test/java directories are created empty to trigger
+  the physical presence check.
+-->
+<project xmlns="http://maven.apache.org/POM/4.1.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 https://maven.apache.org/xsd/maven-4.1.0.xsd">
+    <modelVersion>4.1.0</modelVersion>
+
+    <groupId>org.apache.maven.tests</groupId>
+    <artifactId>modular-resources-only-with-physical-legacy-test</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <build>
+        <!-- No explicit sourceDirectory/testSourceDirectory - uses Super POM defaults -->
+        <!-- But physical src/main/java and src/test/java directories exist -->
+
+        <sources>
+            <!-- Only modular resources - no Java sources -->
+            <source>
+                <scope>main</scope>
+                <lang>resources</lang>
+                <module>org.example.app</module>
+            </source>
+            <source>
+                <scope>test</scope>
+                <lang>resources</lang>
+                <module>org.example.app</module>
+            </source>
+        </sources>
+    </build>
+</project>

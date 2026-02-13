@@ -692,49 +692,102 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 }
 
                 /*
-                 * `sourceDirectory`, `testSourceDirectory` and `scriptSourceDirectory`
-                 * are not used if the POM file contains at least one enabled <source> element
-                 * for the corresponding scope and language. This rule exists because
-                 * Maven provides default values for those elements which may conflict
-                 * with user's configuration.
+                 * Source directory handling depends on project type and <sources> configuration:
                  *
-                 * Additionally, for modular projects, legacy directories are unconditionally
-                 * rejected because it is not clear how to dispatch their content between
-                 * different modules. The build fails if these properties are explicitly set.
+                 * 1. CLASSIC projects (no <sources>):
+                 *    - All legacy directories are used
+                 *
+                 * 2. MODULAR projects (have <module> in <sources>):
+                 *    - ALL legacy directories are rejected (can't dispatch between modules)
+                 *    - Physical presence of default directories (src/main/java) also triggers ERROR
+                 *
+                 * 3. NON-MODULAR projects with <sources>:
+                 *    - Explicit legacy directories (differ from default) are always rejected
+                 *    - If <sources> has Java for a scope: legacy is not used (even if matching default)
+                 *    - If <sources> has no Java for a scope: legacy is used as implicit fallback
+                 *      only if it matches the default (could be inherited)
+                 *    - This allows incremental adoption (e.g., custom resources + default Java)
                  */
-                if (!sourceContext.hasSources(Language.SCRIPT, ProjectScope.MAIN)) {
+                if (sources.isEmpty()) {
+                    // Classic fallback: no <sources> configured, use legacy directories
                     project.addScriptSourceRoot(build.getScriptSourceDirectory());
-                }
-                if (isModularProject) {
-                    // Modular projects: legacy directories conflict with modular sources
-                    failIfLegacyDirectoryPresent(
-                            build.getSourceDirectory(),
-                            baseDir.resolve("src/main/java"),
-                            "<sourceDirectory>",
-                            project.getId(),
-                            result);
-                    failIfLegacyDirectoryPresent(
-                            build.getTestSourceDirectory(),
-                            baseDir.resolve("src/test/java"),
-                            "<testSourceDirectory>",
-                            project.getId(),
-                            result);
+                    project.addCompileSourceRoot(build.getSourceDirectory());
+                    project.addTestCompileSourceRoot(build.getTestSourceDirectory());
+                    // Handle resources using legacy configuration
+                    sourceContext.handleResourceConfiguration(ProjectScope.MAIN);
+                    sourceContext.handleResourceConfiguration(ProjectScope.TEST);
                 } else {
-                    // Classic projects: use legacy directories if no sources defined in <sources>
-                    if (!sourceContext.hasSources(Language.JAVA_FAMILY, ProjectScope.MAIN)) {
-                        project.addCompileSourceRoot(build.getSourceDirectory());
+                    // Add script source root if no <sources lang="script"> configured
+                    if (!sourceContext.hasSources(Language.SCRIPT, ProjectScope.MAIN)) {
+                        project.addScriptSourceRoot(build.getScriptSourceDirectory());
                     }
-                    if (!sourceContext.hasSources(Language.JAVA_FAMILY, ProjectScope.TEST)) {
-                        project.addTestCompileSourceRoot(build.getTestSourceDirectory());
+
+                    if (isModularProject) {
+                        // Modular: reject ALL legacy directory configurations
+                        failIfLegacyDirectoryPresent(
+                                build.getSourceDirectory(),
+                                baseDir.resolve("src/main/java"),
+                                "<sourceDirectory>",
+                                project.getId(),
+                                result,
+                                true); // check physical presence
+                        failIfLegacyDirectoryPresent(
+                                build.getTestSourceDirectory(),
+                                baseDir.resolve("src/test/java"),
+                                "<testSourceDirectory>",
+                                project.getId(),
+                                result,
+                                true); // check physical presence
+                    } else {
+                        // Non-modular: always validate legacy directories (error if differs from default)
+                        Path mainDefault = baseDir.resolve("src/main/java");
+                        Path testDefault = baseDir.resolve("src/test/java");
+
+                        failIfLegacyDirectoryPresent(
+                                build.getSourceDirectory(),
+                                mainDefault,
+                                "<sourceDirectory>",
+                                project.getId(),
+                                result,
+                                false); // no physical presence check
+                        failIfLegacyDirectoryPresent(
+                                build.getTestSourceDirectory(),
+                                testDefault,
+                                "<testSourceDirectory>",
+                                project.getId(),
+                                result,
+                                false); // no physical presence check
+
+                        // Use legacy as fallback only if:
+                        // 1. <sources> doesn't have Java for this scope
+                        // 2. Legacy matches default (otherwise error was reported above)
+                        if (!sourceContext.hasSources(Language.JAVA_FAMILY, ProjectScope.MAIN)) {
+                            Path configuredMain = Path.of(build.getSourceDirectory())
+                                    .toAbsolutePath()
+                                    .normalize();
+                            if (configuredMain.equals(
+                                    mainDefault.toAbsolutePath().normalize())) {
+                                project.addCompileSourceRoot(build.getSourceDirectory());
+                            }
+                        }
+                        if (!sourceContext.hasSources(Language.JAVA_FAMILY, ProjectScope.TEST)) {
+                            Path configuredTest = Path.of(build.getTestSourceDirectory())
+                                    .toAbsolutePath()
+                                    .normalize();
+                            if (configuredTest.equals(
+                                    testDefault.toAbsolutePath().normalize())) {
+                                project.addTestCompileSourceRoot(build.getTestSourceDirectory());
+                            }
+                        }
                     }
+
+                    // Fail if modular and classic sources are mixed within <sources>
+                    sourceContext.failIfMixedModularAndClassicSources();
+
+                    // Handle main and test resources using unified source handling
+                    sourceContext.handleResourceConfiguration(ProjectScope.MAIN);
+                    sourceContext.handleResourceConfiguration(ProjectScope.TEST);
                 }
-
-                // Validate that modular and classic sources are not mixed within <sources>
-                sourceContext.validateNoMixedModularAndClassicSources();
-
-                // Handle main and test resources using unified source handling
-                sourceContext.handleResourceConfiguration(ProjectScope.MAIN);
-                sourceContext.handleResourceConfiguration(ProjectScope.TEST);
             }
 
             project.setActiveProfiles(
@@ -906,42 +959,56 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         }
 
         /**
-         * Fails the build if a legacy directory is present in a modular project.
+         * Validates that legacy directory configuration does not conflict with {@code <sources>}.
          * <p>
-         * "Present" means either:
+         * When {@code <sources>} is configured, the build fails if:
          * <ul>
-         *   <li><b>Configuration presence</b>: an explicit configuration differs from the default</li>
-         *   <li><b>Physical presence</b>: the default directory exists on the filesystem</li>
+         *   <li><b>Configuration presence</b>: an explicit legacy configuration differs from the default</li>
+         *   <li><b>Physical presence</b>: the default directory exists on the filesystem (only checked
+         *       when {@code checkPhysicalPresence} is true, typically for modular projects where
+         *       {@code <source>} elements use different paths like {@code src/<module>/main/java})</li>
          * </ul>
-         * In both cases, the legacy directory conflicts with modular sources and cannot be used.
-         * Failing the build forces the user to resolve the conflict explicitly.
+         * <p>
+         * The presence of {@code <sources>} is the trigger for this validation, not whether the
+         * project is modular or non-modular.
+         * <p>
+         * This ensures consistency with resource handling.
+         *
+         * @param configuredDir the configured legacy directory value
+         * @param defaultDir the default legacy directory path
+         * @param elementName the XML element name for error messages
+         * @param projectId the project ID for error messages
+         * @param result the model builder result for reporting problems
+         * @param checkPhysicalPresence whether to check for physical presence of the default directory
+         * @see SourceHandlingContext#handleResourceConfiguration(ProjectScope)
          */
         private void failIfLegacyDirectoryPresent(
                 String configuredDir,
                 Path defaultDir,
                 String elementName,
                 String projectId,
-                ModelBuilderResult result) {
+                ModelBuilderResult result,
+                boolean checkPhysicalPresence) {
             if (configuredDir != null) {
                 Path configuredPath = Path.of(configuredDir).toAbsolutePath().normalize();
                 Path defaultPath = defaultDir.toAbsolutePath().normalize();
                 if (!configuredPath.equals(defaultPath)) {
                     // Configuration presence: explicit config differs from default
                     String message = String.format(
-                            "Legacy %s cannot be used in modular project %s."
-                                    + "In modular projects, source directories must be defined via <sources> "
-                                    + "with a module element for each module.",
-                            elementName, projectId);
+                            "Legacy %s cannot be used in project %s because sources are configured via <sources>. "
+                                    + "Remove the %s configuration.",
+                            elementName, projectId, elementName);
                     logger.error(message);
                     result.getProblemCollector()
                             .reportProblem(new org.apache.maven.impl.model.DefaultModelProblem(
                                     message, Severity.ERROR, Version.V41, null, -1, -1, null));
-                } else if (Files.isDirectory(defaultPath)) {
-                    // Physical presence: default directory exists on filesystem
+                } else if (checkPhysicalPresence && Files.isDirectory(defaultPath)) {
+                    // Physical presence: default directory exists but would be ignored
                     String message = String.format(
-                            "Legacy %s '%s' exists but cannot be used in modular project %s."
-                                    + "In modular projects, source directories must be defined via <sources>.",
-                            elementName, defaultPath, projectId);
+                            "Legacy directory '%s' exists but cannot be used in project %s "
+                                    + "because sources are configured via <sources>. "
+                                    + "Remove or rename the directory.",
+                            defaultPath, projectId);
                     logger.error(message);
                     result.getProblemCollector()
                             .reportProblem(new org.apache.maven.impl.model.DefaultModelProblem(
