@@ -763,11 +763,14 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
 
         // Should have 2 errors: one for src/main/java, one for src/test/java
         assertEquals(2, errors.size(), "Should have 2 errors for physical legacy directories");
+        // Use File.separator for platform-independent path matching (backslash on Windows)
+        String mainJava = "src" + File.separator + "main" + File.separator + "java";
+        String testJava = "src" + File.separator + "test" + File.separator + "java";
         assertTrue(
-                errors.stream().anyMatch(e -> e.getMessage().contains("src/main/java")),
+                errors.stream().anyMatch(e -> e.getMessage().contains(mainJava)),
                 "Should error about physical src/main/java");
         assertTrue(
-                errors.stream().anyMatch(e -> e.getMessage().contains("src/test/java")),
+                errors.stream().anyMatch(e -> e.getMessage().contains(testJava)),
                 "Should error about physical src/test/java");
     }
 
@@ -803,11 +806,14 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         // Should have 2 errors: one for src/main/java, one for src/test/java
         assertEquals(
                 2, errors.size(), "Should have 2 errors for physical legacy directories (no AC9 fallback for modular)");
+        // Use File.separator for platform-independent path matching (backslash on Windows)
+        String mainJava = "src" + File.separator + "main" + File.separator + "java";
+        String testJava = "src" + File.separator + "test" + File.separator + "java";
         assertTrue(
-                errors.stream().anyMatch(e -> e.getMessage().contains("src/main/java")),
+                errors.stream().anyMatch(e -> e.getMessage().contains(mainJava)),
                 "Should error about physical src/main/java");
         assertTrue(
-                errors.stream().anyMatch(e -> e.getMessage().contains("src/test/java")),
+                errors.stream().anyMatch(e -> e.getMessage().contains(testJava)),
                 "Should error about physical src/test/java");
     }
 
