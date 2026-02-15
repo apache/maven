@@ -403,7 +403,7 @@
      *
      * @deprecated Use getPomPath() instead.
      */
-    @Deprecated
+    @Deprecated(since = "4.0.0")
     public java.io.File getPomFile() {
         return (getDelegate().getPomFile() != null) ? getDelegate().getPomFile().toFile() : null;
     }
@@ -411,7 +411,7 @@
     /**
      * @deprecated Use setPomPath(Path) instead.
      */
-    @Deprecated
+    @Deprecated(since = "4.0.0")
     public void setPomFile(java.io.File pomFile) {
         update( getDelegate().withPomFile(pomFile != null ? pomFile.toPath() : null));
     }
