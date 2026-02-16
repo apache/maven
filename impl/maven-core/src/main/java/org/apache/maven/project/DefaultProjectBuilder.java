@@ -692,22 +692,22 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 }
 
                 /*
-                 * Source directory handling depends on project type and <sources> configuration:
-                 *
-                 * 1. CLASSIC projects (no <sources>):
-                 *    - All legacy directories are used
-                 *
-                 * 2. MODULAR projects (have <module> in <sources>):
-                 *    - ALL legacy directories are rejected (can't dispatch between modules)
-                 *    - Physical presence of default directories (src/main/java) also triggers ERROR
-                 *
-                 * 3. NON-MODULAR projects with <sources>:
-                 *    - Explicit legacy directories (differ from default) are always rejected
-                 *    - If <sources> has Java for a scope: legacy is not used (even if matching default)
-                 *    - If <sources> has no Java for a scope: legacy is used as implicit fallback
-                 *      only if it matches the default (could be inherited)
-                 *    - This allows incremental adoption (e.g., custom resources + default Java)
-                 */
+                  Source directory handling depends on project type and <sources> configuration:
+
+                  1. CLASSIC projects (no <sources>):
+                     - All legacy directories are used
+
+                  2. MODULAR projects (have <module> in <sources>):
+                     - ALL legacy directories are rejected (cannot dispatch between modules)
+                     - Physical presence of default directories (src/main/java) also triggers ERROR
+
+                  3. NON-MODULAR projects with <sources>:
+                     - Explicit legacy directories (differ from default) are always rejected
+                     - Legacy directories for scopes where <sources> defines Java are ignored
+                     - Legacy directories for scopes where <sources> has no Java serve as
+                       implicit fallback (only if they match the default, e.g., inherited)
+                     - This allows incremental adoption (e.g., custom resources + default Java)
+                */
                 if (sources.isEmpty()) {
                     // Classic fallback: no <sources> configured, use legacy directories
                     project.addScriptSourceRoot(build.getScriptSourceDirectory());
@@ -963,8 +963,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
          * <p>
          * When {@code <sources>} is configured, the build fails if:
          * <ul>
-         *   <li><b>Configuration presence</b>: an explicit legacy configuration differs from the default</li>
-         *   <li><b>Physical presence</b>: the default directory exists on the filesystem (only checked
+         *   <li><strong>Configuration presence</strong>: an explicit legacy configuration differs from the default</li>
+         *   <li><strong>Physical presence</strong>: the default directory exists on the filesystem (only checked
          *       when {@code checkPhysicalPresence} is true, typically for modular projects where
          *       {@code <source>} elements use different paths like {@code src/<module>/main/java})</li>
          * </ul>
