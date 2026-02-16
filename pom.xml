@@ -143,7 +143,7 @@ under the License.
     <project.build.outputTimestamp>2025-06-24T20:18:00Z</project.build.outputTimestamp>
     <!-- various versions -->
     <asmVersion>9.9.1</asmVersion>
-    <byteBuddyVersion>1.18.4</byteBuddyVersion>
+    <byteBuddyVersion>1.18.5</byteBuddyVersion>
     <classWorldsVersion>2.9.0</classWorldsVersion>
     <commonsCliVersion>1.11.0</commonsCliVersion>
     <domtripVersion>0.4.0</domtripVersion>
