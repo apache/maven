@@ -930,7 +930,9 @@
             interpreted rather than compiled).
             The default value is {@code src/main/scripts}.
 
-            @deprecated Replaced by {@code &lt;Source&gt;} with {@code script} language.
+            @deprecated since 4.0.0.
+            Use {@code &lt;source&gt;} elements with {@code script} language
+            to configure script sources.
           </description>
           <type>String</type>
           <annotations>
