@@ -18,36 +18,30 @@
  */
 package org.apache.maven.it;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.Collections;
 
-import org.eclipse.jetty.security.ConstraintMapping;
-import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.http.HttpHeader;
+import org.eclipse.jetty.io.Content;
+import org.eclipse.jetty.security.Constraint;
 import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.security.UserStore;
 import org.eclipse.jetty.security.authentication.BasicAuthenticator;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.eclipse.jetty.util.log.Log;
-import org.eclipse.jetty.util.log.Logger;
-import org.eclipse.jetty.util.log.StdErrLog;
-import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.Callback;
 import org.eclipse.jetty.util.security.Password;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
-import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
 
 /**
  * An HTTP server that handles all requests on a given port from a specified source, optionally secured using BASIC auth
@@ -57,13 +51,6 @@ import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
  * @author Jason van Zyl
  */
 public class HttpServer {
-    static {
-        Log.initialized();
-        Logger rootLogger = Log.getRootLogger();
-        if (rootLogger instanceof StdErrLog) {
-            ((StdErrLog) rootLogger).setLevel(StdErrLog.LEVEL_WARN);
-        }
-    }
 
     private final Server server;
 
@@ -106,7 +93,6 @@ public class HttpServer {
         threadPool.setMaxThreads(500);
         Server server = new Server(threadPool);
         server.setConnectors(new Connector[] {new ServerConnector(server)});
-        server.addBean(new ScheduledExecutorScheduler());
 
         ServerConnector connector = (ServerConnector) server.getConnectors()[0];
         connector.setIdleTimeout(30_000L);
@@ -121,22 +107,12 @@ public class HttpServer {
             loginService.setUserStore(userStore);
             server.addBean(loginService);
 
-            ConstraintSecurityHandler security = new ConstraintSecurityHandler();
-            server.setHandler(security);
-
-            Constraint constraint = new Constraint();
-            constraint.setName("auth");
-            constraint.setAuthenticate(true);
-            constraint.setRoles(new String[] {"user", "admin"});
-
-            ConstraintMapping mapping = new ConstraintMapping();
-            mapping.setPathSpec("/*");
-            mapping.setConstraint(constraint);
-
-            security.setConstraintMappings(Collections.singletonList(mapping));
+            SecurityHandler.PathMapped security = new SecurityHandler.PathMapped();
             security.setAuthenticator(new BasicAuthenticator());
             security.setLoginService(loginService);
+            security.put("/*", Constraint.from("auth", Constraint.Authorization.ANY_USER));
             security.setHandler(handler);
+            server.setHandler(security);
         } else {
             server.setHandler(handler);
         }
@@ -201,7 +177,7 @@ public class HttpServer {
         InputStream stream(String path) throws IOException;
     }
 
-    public static class StreamSourceHandler extends AbstractHandler {
+    public static class StreamSourceHandler extends Handler.Abstract {
 
         private final StreamSource source;
 
@@ -210,15 +186,16 @@ public class HttpServer {
         }
 
         @Override
-        public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
-                throws IOException, ServletException {
-            response.setContentType("application/octet-stream");
-            response.setStatus(HttpServletResponse.SC_OK);
+        public boolean handle(Request request, Response response, Callback callback) throws Exception {
+            response.getHeaders().put(HttpHeader.CONTENT_TYPE, "application/octet-stream");
+            response.setStatus(200);
+            String target = Request.getPathInContext(request);
             try (InputStream in = source.stream(target.substring(1));
-                    OutputStream out = response.getOutputStream()) {
+                    OutputStream out = Content.Sink.asOutputStream(response)) {
                 in.transferTo(out);
             }
-            baseRequest.setHandled(true);
+            callback.succeeded();
+            return true;
         }
     }
 

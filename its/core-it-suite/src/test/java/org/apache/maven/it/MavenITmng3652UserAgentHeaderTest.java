@@ -18,18 +18,18 @@
  */
 package org.apache.maven.it;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import java.io.File;
-import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 
+import org.eclipse.jetty.http.HttpHeader;
+import org.eclipse.jetty.io.Content;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.util.Callback;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,25 +55,26 @@ class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase
 
     @BeforeEach
     protected void setUp() throws Exception {
-        Handler handler = new AbstractHandler() {
+        Handler handler = new Handler.Abstract() {
             @Override
-            public void handle(
-                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
-                    throws IOException {
-                System.out.println("Handling URL: '" + request.getRequestURL() + "'");
+            public boolean handle(Request request, Response response, Callback callback) throws Exception {
+                System.out.println("Handling URL: '" + request.getHttpURI().toString() + "'");
 
-                userAgent = request.getHeader("User-Agent");
+                userAgent = request.getHeaders().get("User-Agent");
 
-                customHeader = request.getHeader("Custom-Header");
+                customHeader = request.getHeaders().get("Custom-Header");
 
                 System.out.println("Got User-Agent: '" + userAgent + "'");
 
-                response.setContentType("text/plain");
-                response.setStatus(HttpServletResponse.SC_OK);
-                response.getWriter().println("some content");
-                response.getWriter().println();
+                response.getHeaders().put(HttpHeader.CONTENT_TYPE, "text/plain");
+                response.setStatus(200);
+                PrintWriter writer = new PrintWriter(Content.Sink.asOutputStream(response));
+                writer.println("some content");
+                writer.println();
+                writer.flush();
 
-                ((Request) request).setHandled(true);
+                callback.succeeded();
+                return true;
             }
         };
 

@@ -18,11 +18,7 @@
  */
 package org.apache.maven.it;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
 import java.util.Deque;
@@ -30,11 +26,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import org.eclipse.jetty.io.Content;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.util.Callback;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -68,14 +66,12 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest extends Abstra
 
         final Deque<String> uris = new ConcurrentLinkedDeque<>();
 
-        Handler repoHandler = new AbstractHandler() {
+        Handler repoHandler = new Handler.Abstract() {
             @Override
-            public void handle(
-                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
-                    throws IOException {
-                PrintWriter writer = response.getWriter();
+            public boolean handle(Request request, Response response, Callback callback) throws Exception {
+                PrintWriter writer = new PrintWriter(Content.Sink.asOutputStream(response));
 
-                String uri = request.getRequestURI();
+                String uri = Request.getPathInContext(request);
 
                 if (uri.startsWith("/repo/org/apache/maven/its/mng4326")
                         && !uri.endsWith(".md5")
@@ -88,7 +84,7 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest extends Abstra
                     fmt.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
                     String now = fmt.format(new Date(System.currentTimeMillis() + 3000));
 
-                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.setStatus(200);
                     writer.println("<metadata>");
                     writer.println("  <groupId>org.apache.maven.its.mng4326</groupId>");
                     writer.println("  <artifactId>dep</artifactId>");
@@ -102,7 +98,7 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest extends Abstra
                     writer.println("  </versioning>");
                     writer.println("</metadata>");
                 } else if (uri.endsWith(".pom")) {
-                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.setStatus(200);
                     writer.println("<project xmlns=\"http://maven.apache.org/POM/4.0.0\">");
                     writer.println("  <modelVersion>4.0.0</modelVersion>");
                     writer.println("  <groupId>org.apache.maven.its.mng4326</groupId>");
@@ -110,13 +106,15 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest extends Abstra
                     writer.println("  <version>0.1-SNAPSHOT</version>");
                     writer.println("</project>");
                 } else if (uri.endsWith(".jar")) {
-                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.setStatus(200);
                     writer.println("empty");
                 } else {
-                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    response.setStatus(404);
                 }
 
-                ((Request) request).setHandled(true);
+                writer.flush();
+                callback.succeeded();
+                return true;
             }
         };
 
