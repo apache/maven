@@ -698,11 +698,14 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                      - All legacy directories are used
 
                   2. MODULAR projects (have <module> in <sources>):
-                     - ALL legacy directories are rejected (cannot dispatch between modules)
-                     - Physical presence of default directories (src/main/java) also triggers ERROR
+                     - ALL legacy directories cause the build to fail (cannot dispatch
+                       between modules)
+                     - The build also fails if default directories (src/main/java)
+                       physically exist on the filesystem
 
                   3. NON-MODULAR projects with <sources>:
-                     - Explicit legacy directories (differ from default) are always rejected
+                     - Explicit legacy directories (differ from default) always cause
+                       the build to fail
                      - Legacy directories for scopes where <sources> defines Java are ignored
                      - Legacy directories for scopes where <sources> has no Java serve as
                        implicit fallback (only if they match the default, e.g., inherited)
