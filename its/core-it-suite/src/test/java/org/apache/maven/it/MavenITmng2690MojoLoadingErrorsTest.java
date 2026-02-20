@@ -58,7 +58,7 @@ class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegrationTestCa
         int msg = indexOf(lines, "(?i).*required class is missing.*");
         assertTrue(msg >= 0, "User-friendly message was not found in output.");
 
-        int cls = lines.get(msg).toString().replace('/', '.').indexOf("junit.framework.TestCase");
+        int cls = lines.get(msg).toString().replace('/', '.').indexOf("org.apache.commons.lang3.StringUtils");
         assertTrue(cls >= 0, "Missing class name was not found in output.");
     }
 
@@ -78,7 +78,7 @@ class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegrationTestCa
         int msg = indexOf(lines, "(?i).*required class (i|wa)s missing( during (mojo )?configuration)?.*");
         assertTrue(msg >= 0, "User-friendly message was not found in output.");
 
-        int cls = lines.get(msg).toString().replace('/', '.').indexOf("junit.framework.TestCase");
+        int cls = lines.get(msg).toString().replace('/', '.').indexOf("org.apache.commons.lang3.StringUtils");
         assertTrue(cls >= 0, "Missing class name was not found in output.");
     }
 
