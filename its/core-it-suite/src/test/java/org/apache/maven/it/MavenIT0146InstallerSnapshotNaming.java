@@ -27,8 +27,8 @@ import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.util.resource.ResourceFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,12 +50,13 @@ public class MavenIT0146InstallerSnapshotNaming extends AbstractMavenIntegration
 
     @BeforeEach
     protected void setUp() throws Exception {
+        server = new Server(0);
+
         ResourceHandler resourceHandler = new ResourceHandler();
-        resourceHandler.setResourceBase(new File(testDir, "repo").getAbsolutePath());
-        HandlerList handlers = new HandlerList();
+        resourceHandler.setBaseResource(ResourceFactory.of(server).newResource(new File(testDir, "repo").toPath()));
+        Handler.Sequence handlers = new Handler.Sequence();
         handlers.setHandlers(new Handler[] {resourceHandler, new DefaultHandler()});
 
-        server = new Server(0);
         server.setHandler(handlers);
         server.start();
         if (server.isFailed()) {

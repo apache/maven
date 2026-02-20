@@ -22,22 +22,21 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.jetty.security.ConstraintMapping;
-import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.Constraint;
 import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.security.UserStore;
+import org.eclipse.jetty.security.authentication.BasicAuthenticator;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.resource.ResourceFactory;
 import org.eclipse.jetty.util.security.Password;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.eclipse.jetty.util.security.Constraint.__BASIC_AUTH;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4068">MNG-4068</a>.
@@ -57,35 +56,26 @@ public class MavenITmng4068AuthenticatedMirrorTest extends AbstractMavenIntegrat
     protected void setUp() throws Exception {
         testDir = extractResources("/mng-4068");
 
-        Constraint constraint = new Constraint();
-        constraint.setName(Constraint.__BASIC_AUTH);
-        constraint.setRoles(new String[] {"user"});
-        constraint.setAuthenticate(true);
-
-        ConstraintMapping constraintMapping = new ConstraintMapping();
-        constraintMapping.setConstraint(constraint);
-        constraintMapping.setPathSpec("/*");
-
         HashLoginService userRealm = new HashLoginService("TestRealm");
         UserStore userStore = new UserStore();
         userStore.addUser("testuser", new Password("testtest"), new String[] {"user"});
         userRealm.setUserStore(userStore);
 
         server = new Server(0);
-        ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
+        SecurityHandler.PathMapped securityHandler = new SecurityHandler.PathMapped();
         securityHandler.setLoginService(userRealm);
-        securityHandler.setAuthMethod(__BASIC_AUTH);
-        securityHandler.setConstraintMappings(new ConstraintMapping[] {constraintMapping});
+        securityHandler.setAuthenticator(new BasicAuthenticator());
+        securityHandler.put("/*", Constraint.from("auth", Constraint.Authorization.ANY_USER));
 
         ResourceHandler repoHandler = new ResourceHandler();
-        repoHandler.setResourceBase(new File(testDir, "repo").getAbsolutePath());
+        repoHandler.setBaseResource(ResourceFactory.of(server).newResource(new File(testDir, "repo").toPath()));
 
-        HandlerList handlerList = new HandlerList();
-        handlerList.addHandler(securityHandler);
+        Handler.Sequence handlerList = new Handler.Sequence();
         handlerList.addHandler(repoHandler);
         handlerList.addHandler(new DefaultHandler());
 
-        server.setHandler(handlerList);
+        securityHandler.setHandler(handlerList);
+        server.setHandler(securityHandler);
         server.start();
         if (server.isFailed()) {
             fail("Couldn't bind the server socket to a free port!");
