@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -57,9 +57,9 @@ public class MavenITmng1142VersionRangeIntersectionTest extends AbstractMavenInt
     }
 
     private void testit(String project) throws Exception {
-        File testDir = extractResources("/mng-1142");
+        Path testDir = extractResources("mng-1142");
 
-        Verifier verifier = newVerifier(new File(testDir, project).getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve(project));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng1142");

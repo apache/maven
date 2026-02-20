@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -41,9 +41,9 @@ public class MavenITmng2222OutputDirectoryReactorResolutionTest extends Abstract
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-2222");
+        Path testDir = extractResources("mng-2222");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("mod-a/target");
         verifier.deleteDirectory("mod-b/target");

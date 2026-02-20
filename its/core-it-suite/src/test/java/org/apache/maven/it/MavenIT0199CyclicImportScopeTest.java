@@ -18,8 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 public class MavenIT0199CyclicImportScopeTest extends AbstractMavenIntegrationTestCase {
@@ -39,8 +38,8 @@ public class MavenIT0199CyclicImportScopeTest extends AbstractMavenIntegrationTe
     }
 
     private void build(String module, String expectedArtifact) throws Exception {
-        File testDir = extractResources("/cyclic-import-scope");
-        Verifier verifier = newVerifier(new File(testDir.getAbsolutePath(), module).getAbsolutePath());
+        Path testDir = extractResources("cyclic-import-scope");
+        Verifier verifier = newVerifier(testDir.resolve(module));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");

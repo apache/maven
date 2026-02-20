@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -31,9 +31,9 @@ public class MavenITmng3535SelfReferentialPropertiesTest extends AbstractMavenIn
 
     @Test
     public void testitMNG3535ShouldSucceed() throws Exception {
-        File testDir = extractResources("/mng-3535/success");
+        Path testDir = extractResources("mng-3535/success");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
 
         verifier.addCliArgument("-X");
 
@@ -51,9 +51,9 @@ public class MavenITmng3535SelfReferentialPropertiesTest extends AbstractMavenIn
 
     @Test
     public void testitMNG3535ShouldFail() throws Exception {
-        File testDir = extractResources("/mng-3535/failure");
+        Path testDir = extractResources("mng-3535/failure");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.addCliArgument("-X");
         verifier.addCliArgument("verify");

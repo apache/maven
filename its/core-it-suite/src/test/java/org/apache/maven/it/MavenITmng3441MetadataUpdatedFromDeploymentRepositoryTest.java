@@ -18,11 +18,10 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-
-import org.codehaus.plexus.util.FileUtils;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -39,15 +38,15 @@ public class MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest extends A
 
     @Test
     public void testitMNG3441() throws Exception {
-        File testDir = extractResources("/mng-3441");
+        Path testDir = extractResources("mng-3441");
 
-        File targetRepository = new File(testDir, "target-repo");
-        FileUtils.deleteDirectory(targetRepository);
-        FileUtils.copyDirectoryStructure(new File(testDir, "deploy-repo"), targetRepository);
+        Path targetRepository = testDir.resolve("target-repo");
+        ItUtils.deleteDirectory(targetRepository);
+        ItUtils.copyDirectoryStructure(testDir.resolve("deploy-repo"), targetRepository);
 
         Verifier verifier;
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir);
 
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
@@ -56,8 +55,8 @@ public class MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest extends A
 
         verifier.verifyErrorFreeLog();
 
-        Xpp3Dom dom = readDom(new File(
-                targetRepository, "org/apache/maven/its/mng3441/test-artifact/1.0-SNAPSHOT/maven-metadata.xml"));
+        Xpp3Dom dom = readDom(
+                targetRepository.resolve("org/apache/maven/its/mng3441/test-artifact/1.0-SNAPSHOT/maven-metadata.xml"));
         assertEquals(
                 "2",
                 dom.getChild("versioning")
@@ -65,14 +64,14 @@ public class MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest extends A
                         .getChild("buildNumber")
                         .getValue());
 
-        dom = readDom(new File(targetRepository, "org/apache/maven/its/mng3441/maven-metadata.xml"));
+        dom = readDom(targetRepository.resolve("org/apache/maven/its/mng3441/maven-metadata.xml"));
         Xpp3Dom[] plugins = dom.getChild("plugins").getChildren();
         assertEquals("other-plugin", plugins[0].getChild("prefix").getValue());
         assertEquals("test-artifact", plugins[1].getChild("prefix").getValue());
     }
 
-    private Xpp3Dom readDom(File file) throws XmlPullParserException, IOException {
-        try (FileReader reader = new FileReader(file)) {
+    private Xpp3Dom readDom(Path file) throws XmlPullParserException, IOException {
+        try (Reader reader = Files.newBufferedReader(file)) {
             return Xpp3DomBuilder.build(reader);
         }
     }

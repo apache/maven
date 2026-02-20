@@ -18,8 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -40,9 +39,9 @@ class MavenITgh11381ResourceTargetPathTest extends AbstractMavenIntegrationTestC
      */
     @Test
     void testRelativeTargetPathInResources() throws Exception {
-        File testDir = extractResources("/gh-11381");
+        Path testDir = extractResources("gh-11381");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("process-resources");

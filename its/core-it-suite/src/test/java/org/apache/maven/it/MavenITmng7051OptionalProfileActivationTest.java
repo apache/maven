@@ -18,12 +18,11 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng7051OptionalProfileActivationTest extends AbstractMavenIntegrationTestCase {
-    private static final String PROJECT_PATH = "/mng-7051-optional-profile-activation";
+    private static final String PROJECT_PATH = "mng-7051-optional-profile-activation";
 
     /**
      * This test verifies that activating a non-existing profile breaks the build.
@@ -32,8 +31,8 @@ public class MavenITmng7051OptionalProfileActivationTest extends AbstractMavenIn
      */
     @Test
     public void testActivatingNonExistingProfileBreaks() throws Exception {
-        final File projectDir = extractResources(PROJECT_PATH);
-        final Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        final Path projectDir = extractResources(PROJECT_PATH);
+        final Verifier verifier = newVerifier(projectDir);
 
         verifier.addCliArgument("-P");
         verifier.addCliArgument("non-existing-profile");
@@ -57,8 +56,8 @@ public class MavenITmng7051OptionalProfileActivationTest extends AbstractMavenIn
      */
     @Test
     public void testActivatingNonExistingProfileWithQuestionMarkDoesNotBreak() throws Exception {
-        final File projectDir = extractResources(PROJECT_PATH);
-        final Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        final Path projectDir = extractResources(PROJECT_PATH);
+        final Verifier verifier = newVerifier(projectDir);
 
         verifier.addCliArgument("-P");
         verifier.addCliArgument("?non-existing-profile");
@@ -78,8 +77,8 @@ public class MavenITmng7051OptionalProfileActivationTest extends AbstractMavenIn
      */
     @Test
     public void testActivatingExistingAndNonExistingProfiles() throws Exception {
-        final File projectDir = extractResources(PROJECT_PATH);
-        final Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        final Path projectDir = extractResources(PROJECT_PATH);
+        final Verifier verifier = newVerifier(projectDir);
 
         verifier.addCliArgument("-P");
         verifier.addCliArgument("?non-existing-profile,existing");
@@ -99,8 +98,8 @@ public class MavenITmng7051OptionalProfileActivationTest extends AbstractMavenIn
      */
     @Test
     public void testDeactivatingNonExistingProfileWithQuestionMarkDoesNotBreak() throws Exception {
-        final File projectDir = extractResources(PROJECT_PATH);
-        final Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        final Path projectDir = extractResources(PROJECT_PATH);
+        final Verifier verifier = newVerifier(projectDir);
 
         verifier.addCliArgument("-P");
         verifier.addCliArgument("!?non-existing-profile");
@@ -120,8 +119,8 @@ public class MavenITmng7051OptionalProfileActivationTest extends AbstractMavenIn
      */
     @Test
     public void testDeactivatingExistingAndNonExistingProfiles() throws Exception {
-        final File projectDir = extractResources(PROJECT_PATH);
-        final Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        final Path projectDir = extractResources(PROJECT_PATH);
+        final Verifier verifier = newVerifier(projectDir);
 
         verifier.addCliArgument("-P");
         verifier.addCliArgument("!?non-existing-profile,!existing");
