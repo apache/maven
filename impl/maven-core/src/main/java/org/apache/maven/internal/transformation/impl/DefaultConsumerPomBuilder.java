@@ -37,6 +37,7 @@ import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DistributionManagement;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.ModelBase;
+import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.model.Scm;
@@ -50,6 +51,7 @@ import org.apache.maven.api.services.model.LifecycleBindingsInjector;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.SourceQueries;
 import org.eclipse.aether.RepositorySystemSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -342,7 +344,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         return model;
     }
 
-    static Model transformBom(Model model, MavenProject project) {
+    private static Model transformBom(Model model, MavenProject project) {
         boolean preserveModelVersion = model.isPreserveModelVersion();
 
         Model.Builder builder = prune(
@@ -369,11 +371,25 @@ class DefaultConsumerPomBuilder implements PomBuilder {
 
         // raw to consumer transform
         model = model.withRoot(false).withModules(null).withSubprojects(null);
-        if (model.getParent() != null) {
-            model = model.withParent(model.getParent().withRelativePath(null));
+        Parent parent = model.getParent();
+        if (parent != null) {
+            model = model.withParent(parent.withRelativePath(null));
         }
-
+        var projectSources = project.getBuild().getDelegate().getSources();
+        if (SourceQueries.usesModuleSourceHierarchy(projectSources)) {
+            // Dependencies are dispatched by maven-jar-plugin in the POM generated for each module.
+            model = model.withDependencies(null).withPackaging(POM_PACKAGING);
+        }
         if (!preserveModelVersion) {
+            /*
+             * If tne <build> contains <source> elements, it is not compatible with the Maven 4.0.0 model.
+             * Remove the full <build> element instead of removing only the <sources> element, because the
+             * build without sources does not mean much. Reminder: this removal can be disabled by setting
+             * the `preserveModelVersion` XML attribute or `preserve.model.version` property to true.
+             */
+            if (SourceQueries.hasEnabledSources(projectSources)) {
+                model = model.withBuild(null);
+            }
             model = model.withPreserveModelVersion(false);
             String modelVersion = new MavenModelVersion().getModelVersion(model);
             model = model.withModelVersion(modelVersion);
@@ -381,7 +397,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         return model;
     }
 
-    static void warnNotDowngraded(MavenProject project) {
+    private static void warnNotDowngraded(MavenProject project) {
         LOGGER.warn("The consumer POM for " + project.getId() + " cannot be downgraded to 4.0.0. "
                 + "If you intent your build to be consumed with Maven 3 projects, you need to remove "
                 + "the features that request a newer model version.  If you're fine with having the "
