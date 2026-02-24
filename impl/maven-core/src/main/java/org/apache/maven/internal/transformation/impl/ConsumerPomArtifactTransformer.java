@@ -96,7 +96,7 @@ class ConsumerPomArtifactTransformer extends TransformerSupport {
         }
     }
 
-    TransformedArtifact createConsumerPomArtifact(
+    private TransformedArtifact createConsumerPomArtifact(
             MavenProject project, Path consumer, RepositorySystemSession session) {
         Path actual = project.getFile().toPath();
         Path parent = project.getBaseDirectory();

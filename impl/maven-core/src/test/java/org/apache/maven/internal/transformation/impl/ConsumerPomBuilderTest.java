@@ -51,6 +51,7 @@ import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -88,15 +89,22 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         return services;
     }
 
-    @Test
-    void testTrivialConsumer() throws Exception {
-        InternalMavenSession.from(InternalSession.from(session))
+    /**
+     * Configures {@link #session} with the root directory of a test in {@code src/test/resources/consumer}.
+     * Returns the request in case the caller wants to apply more configuration.
+     */
+    private MavenExecutionRequest setRootDirectory(String test) {
+        MavenExecutionRequest request = InternalMavenSession.from(InternalSession.from(session))
                 .getMavenSession()
-                .getRequest()
-                .setRootDirectory(Paths.get("src/test/resources/consumer/trivial"));
+                .getRequest();
+        request.setRootDirectory(Paths.get("src/test/resources/consumer", test));
+        return request;
+    }
 
-        Path file = Paths.get("src/test/resources/consumer/trivial/child/pom.xml");
-
+    /**
+     * Builds the effective model for the given {@code pom.xml} file.
+     */
+    private MavenProject getEffectiveModel(Path file) {
         ModelBuilder.ModelBuilderSession mbs = modelBuilder.newSession();
         InternalSession.from(session).getData().set(SessionData.key(ModelBuilder.ModelBuilderSession.class), mbs);
         Model orgModel = mbs.build(ModelBuilderRequest.builder()
@@ -108,37 +116,48 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
 
         MavenProject project = new MavenProject(orgModel);
         project.setOriginalModel(new org.apache.maven.model.Model(orgModel));
+        return project;
+    }
+
+    @Test
+    void testTrivialConsumer() throws Exception {
+        setRootDirectory("trivial");
+        Path file = Paths.get("src/test/resources/consumer/trivial/child/pom.xml");
+
+        MavenProject project = getEffectiveModel(file);
         Model model = builder.build(session, project, Sources.buildSource(file));
 
         assertNotNull(model);
+        assertNotNull(model.getDependencies());
     }
 
     @Test
     void testSimpleConsumer() throws Exception {
-        MavenExecutionRequest request = InternalMavenSession.from(InternalSession.from(session))
-                .getMavenSession()
-                .getRequest();
-        request.setRootDirectory(Paths.get("src/test/resources/consumer/simple"));
+        MavenExecutionRequest request = setRootDirectory("simple");
         request.getUserProperties().setProperty("changelist", "MNG6957");
-
         Path file = Paths.get("src/test/resources/consumer/simple/simple-parent/simple-weather/pom.xml");
 
-        ModelBuilder.ModelBuilderSession mbs = modelBuilder.newSession();
-        InternalSession.from(session).getData().set(SessionData.key(ModelBuilder.ModelBuilderSession.class), mbs);
-        Model orgModel = mbs.build(ModelBuilderRequest.builder()
-                        .session(InternalSession.from(session))
-                        .source(Sources.buildSource(file))
-                        .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
-                        .build())
-                .getEffectiveModel();
-
-        MavenProject project = new MavenProject(orgModel);
-        project.setOriginalModel(new org.apache.maven.model.Model(orgModel));
+        MavenProject project = getEffectiveModel(file);
         request.setRootDirectory(Paths.get("src/test/resources/consumer/simple"));
         Model model = builder.build(session, project, Sources.buildSource(file));
 
         assertNotNull(model);
+        assertFalse(model.getDependencies().isEmpty());
         assertTrue(model.getProfiles().isEmpty());
+    }
+
+    @Test
+    void testMultiModuleConsumer() throws Exception {
+        setRootDirectory("multi-module");
+        Path file = Paths.get("src/test/resources/consumer/multi-module/pom.xml");
+
+        MavenProject project = getEffectiveModel(file);
+        Model model = builder.build(session, project, Sources.buildSource(file));
+
+        assertNotNull(model);
+        assertNull(model.getBuild());
+        assertTrue(model.getDependencies().isEmpty());
+        assertFalse(model.getDependencyManagement().getDependencies().isEmpty());
     }
 
     @Test
