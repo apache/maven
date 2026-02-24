@@ -182,6 +182,12 @@ if ERRORLEVEL 1 goto skipEnableNativeAccess
 set "INTERNAL_MAVEN_OPTS=--enable-native-access=ALL-UNNAMED %INTERNAL_MAVEN_OPTS%"
 :skipEnableNativeAccess
 
+
+"%JAVACMD%" --sun-misc-unsafe-memory-access=allow -version >nul 2>&1
+if ERRORLEVEL 1 goto skipSunMemoryAccess
+set "INTERNAL_MAVEN_OPTS=--sun-misc-unsafe-memory-access=allow %INTERNAL_MAVEN_OPTS%"
+:skipSunMemoryAccess
+
 "%JAVACMD%" ^
   %JVM_CONFIG_MAVEN_PROPS% ^
   %INTERNAL_MAVEN_OPTS% ^
