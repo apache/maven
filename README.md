@@ -34,7 +34,7 @@ Apache Maven
 [![Jenkins Build](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci-maven.apache.org%2Fjob%2FMaven%2Fjob%2Fmaven-box%2Fjob%2Fmaven%2Fjob%2Fmaven-3.9.x%2F)][build-3.9]
 [![Java CI](https://github.com/apache/maven/actions/workflows/maven.yml/badge.svg?branch=maven-3.9.x)][gh-build-3.9]
 
-Apache Maven is a software project management and comprehension tool. Based on
+Apache Maven is a software project management and build automation tool. Based on
 the concept of a project object model (POM), Maven can manage a project's
 build, reporting and documentation from a central piece of information.
 
