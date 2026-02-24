@@ -110,34 +110,14 @@ public class XmlNodeImpl implements Serializable, XmlNode {
 
     @Override
     @Nonnull
-    public String prefix() {
-        return getPrefix();
-    }
-
-    @Override
-    @Nonnull
-    @Deprecated(since = "4.0.0", forRemoval = true)
     public String getNamespaceUri() {
         return namespaceUri;
     }
 
     @Override
     @Nonnull
-    public String namespaceUri() {
-        return getNamespaceUri();
-    }
-
-    @Override
-    @Nonnull
-    @Deprecated(since = "4.0.0", forRemoval = true)
     public String getName() {
         return name;
-    }
-
-    @Override
-    @Nonnull
-    public String name() {
-        return getName();
     }
 
     // ----------------------------------------------------------------------
@@ -148,11 +128,6 @@ public class XmlNodeImpl implements Serializable, XmlNode {
     @Deprecated(since = "4.0.0", forRemoval = true)
     public String getValue() {
         return value;
-    }
-
-    @Override
-    public String value() {
-        return getValue();
     }
 
     // ----------------------------------------------------------------------
@@ -167,20 +142,9 @@ public class XmlNodeImpl implements Serializable, XmlNode {
     }
 
     @Override
-    @Nonnull
-    public Map<String, String> attributes() {
-        return getAttributes();
-    }
-
-    @Override
     @Deprecated(since = "4.0.0", forRemoval = true)
     public String getAttribute(@Nonnull String name) {
         return attributes.get(name);
-    }
-
-    @Override
-    public String attribute(@Nonnull String name) {
-        return getAttribute(name);
     }
 
     // ----------------------------------------------------------------------
@@ -203,24 +167,11 @@ public class XmlNodeImpl implements Serializable, XmlNode {
     }
 
     @Override
-    public XmlNode child(String name) {
-        return getChild(name);
-    }
-
-    @Override
     @Nonnull
-    @Deprecated(since = "4.0.0", forRemoval = true)
     public List<XmlNode> getChildren() {
         return children;
     }
 
-    @Override
-    @Nonnull
-    public List<XmlNode> children() {
-        return getChildren();
-    }
-
-    @Deprecated(since = "4.0.0", forRemoval = true)
     public int getChildCount() {
         return children.size();
     }
@@ -233,7 +184,6 @@ public class XmlNodeImpl implements Serializable, XmlNode {
      * @since 3.2.0
      * @return input location
      */
-    @Deprecated(since = "4.0.0", forRemoval = true)
     @Override
     public Object getInputLocation() {
         return location;
@@ -278,10 +228,10 @@ public class XmlNodeImpl implements Serializable, XmlNode {
     public boolean equals(Object o) {
         return this == o
                 || o instanceof XmlNode that
-                        && Objects.equals(this.name, that.name())
-                        && Objects.equals(this.value, that.value())
-                        && Objects.equals(this.attributes, that.attributes())
-                        && Objects.equals(this.children, that.children());
+                        && Objects.equals(this.name, that.getName())
+                        && Objects.equals(this.value, that.getValue())
+                        && Objects.equals(this.attributes, that.getAttributes())
+                        && Objects.equals(this.children, that.getChildren());
     }
 
     @Override
