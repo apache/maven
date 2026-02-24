@@ -74,6 +74,9 @@ public class PropertyProfileActivator implements ProfileActivator {
             sysValue = context.getModelPackaging();
         }
         if (sysValue == null) {
+            sysValue = context.getModelProperty(name);
+        }
+        if (sysValue == null) {
             sysValue = context.getSystemProperty(name);
         }
 

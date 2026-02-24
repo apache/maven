@@ -1534,6 +1534,82 @@ class PomConstructionTest {
         assertEquals("a", pom.getValue("build/plugins[1]/dependencies[1]/artifactId"));
     }
 
+    /* MNG-3309 */
+    @Test
+    void testCascadingProfileActivation() throws Exception {
+        Properties props = new Properties();
+        props.put("trigger", "start");
+
+        PomTestWrapper pom = buildPom("cascading-profile-activation", props, null);
+
+        // Verify that cascading profile activation works
+        // profile1 should be activated by trigger=start
+        // profile2 should be activated by profile1's cascade.level1=activate property
+        // profile3 should be activated by profile2's cascade.level2=activate property
+
+        List<org.apache.maven.model.Profile> activeProfiles =
+                pom.getMavenProject().getActiveProfiles();
+
+        // Should have 3 active profiles (profile1, profile2, profile3)
+        assertEquals(3, activeProfiles.size());
+
+        // Verify specific profiles are active
+        assertTrue(activeProfiles.stream().anyMatch(p -> "profile1".equals(p.getId())));
+        assertTrue(activeProfiles.stream().anyMatch(p -> "profile2".equals(p.getId())));
+        assertTrue(activeProfiles.stream().anyMatch(p -> "profile3".equals(p.getId())));
+
+        // Verify profile4 is NOT active (no trigger)
+        assertTrue(activeProfiles.stream().noneMatch(p -> "profile4".equals(p.getId())));
+
+        // Verify properties are set correctly (last profile wins)
+        assertEquals("profile3", pom.getValue("properties/test.property"));
+        assertEquals("true", pom.getValue("properties/profile1.activated"));
+        assertEquals("true", pom.getValue("properties/profile2.activated"));
+        assertEquals("true", pom.getValue("properties/profile3.activated"));
+    }
+
+    /* MNG-3309 - Test circular dependency handling */
+    @Test
+    void testCascadingProfileActivationCircular() throws Exception {
+        Properties props = new Properties();
+        props.put("circular", "test");
+
+        PomTestWrapper pom = buildPom("cascading-profile-activation", props, null);
+
+        // Verify that circular dependencies are handled gracefully
+        // profile5 sets trigger=start which would activate profile1
+        // But this should not cause infinite loops
+
+        List<org.apache.maven.model.Profile> activeProfiles =
+                pom.getMavenProject().getActiveProfiles();
+
+        // Should have profile5 and profile1 active (and cascaded profiles)
+        assertTrue(activeProfiles.stream().anyMatch(p -> "profile5".equals(p.getId())));
+        assertTrue(activeProfiles.stream().anyMatch(p -> "profile1".equals(p.getId())));
+
+        // Verify no infinite loop occurred (test should complete)
+        assertTrue(activeProfiles.size() >= 2);
+    }
+
+    /* MNG-3309 - Test no cascading baseline */
+    @Test
+    void testNoCascadingProfileActivation() throws Exception {
+        // Test with no trigger properties - no profiles should be activated
+        PomTestWrapper pom = buildPom("cascading-profile-activation");
+
+        List<org.apache.maven.model.Profile> activeProfiles =
+                pom.getMavenProject().getActiveProfiles();
+
+        // No profiles should be active
+        assertEquals(0, activeProfiles.size());
+
+        // Properties should remain at default values
+        assertEquals("default", pom.getValue("properties/test.property"));
+        assertEquals("false", pom.getValue("properties/profile1.activated"));
+        assertEquals("false", pom.getValue("properties/profile2.activated"));
+        assertEquals("false", pom.getValue("properties/profile3.activated"));
+    }
+
     /** MNG-4116 */
     @Test
     void testPercentEncodedUrlsMustNotBeDecoded() throws Exception {

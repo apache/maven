@@ -63,32 +63,49 @@ public class DefaultProfileSelector implements ProfileSelector {
     @Override
     public List<Profile> getActiveProfiles(
             Collection<Profile> profiles, ProfileActivationContext context, ModelProblemCollector problems) {
-        List<Profile> activeProfiles = new ArrayList<>(profiles.size());
-        List<Profile> activePomProfilesByDefault = new ArrayList<>();
-        boolean activatedPomProfileNotByDefault = false;
 
-        for (Profile profile : profiles) {
-            if (!context.isProfileInactive(profile.getId())) {
-                if (context.isProfileActive(profile.getId()) || isActive(profile, context, problems)) {
-                    activeProfiles.add(profile);
-                    if (Profile.SOURCE_POM.equals(profile.getSource())) {
-                        activatedPomProfileNotByDefault = true;
-                    }
-                } else if (isActiveByDefault(profile)) {
-                    if (Profile.SOURCE_POM.equals(profile.getSource())) {
-                        activePomProfilesByDefault.add(profile);
-                    } else {
-                        activeProfiles.add(profile);
+        List<Profile> activeSettingsProfiles = new ArrayList<>();
+        List<Profile> activePomProfiles = new ArrayList<>();
+        List<Profile> activePomProfilesByDefault = new ArrayList<>();
+
+        // Cascading mode: iterate until no more profiles are activated
+        List<Profile> remainingProfiles = new ArrayList<>(profiles);
+        List<Profile> activatedProfiles;
+        do {
+            activatedProfiles = new ArrayList<>();
+            for (Profile profile : List.copyOf(remainingProfiles)) {
+                if (!context.isProfileInactive(profile.getId())) {
+                    boolean activated = context.isProfileActive(profile.getId());
+                    boolean active = isActive(profile, context, problems);
+                    boolean activeByDefault = isActiveByDefault(profile);
+                    if (activated || active || activeByDefault) {
+                        if (Profile.SOURCE_POM.equals(profile.getSource())) {
+                            if (activated || active) {
+                                activePomProfiles.add(profile);
+                            } else {
+                                activePomProfilesByDefault.add(profile);
+                            }
+                        } else {
+                            activeSettingsProfiles.add(profile);
+                        }
+                        remainingProfiles.remove(profile);
+                        activatedProfiles.add(profile);
                     }
                 }
             }
-        }
+            // Add profile properties for cascading activation
+            context.addProfileProperties(activatedProfiles);
+        } while (!activatedProfiles.isEmpty());
 
-        if (!activatedPomProfileNotByDefault) {
-            activeProfiles.addAll(activePomProfilesByDefault);
+        List<Profile> allActivated = new ArrayList<>();
+        if (activePomProfiles.isEmpty()) {
+            allActivated.addAll(activePomProfilesByDefault);
+        } else {
+            allActivated.addAll(activePomProfiles);
         }
+        allActivated.addAll(activeSettingsProfiles);
 
-        return activeProfiles;
+        return allActivated;
     }
 
     private boolean isActive(Profile profile, ProfileActivationContext context, ModelProblemCollector problems) {

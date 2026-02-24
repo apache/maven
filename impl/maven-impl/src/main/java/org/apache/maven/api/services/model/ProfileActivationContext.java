@@ -18,9 +18,12 @@
  */
 package org.apache.maven.api.services.model;
 
+import java.util.Collection;
+
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.services.InterpolatorException;
 import org.apache.maven.api.services.ModelBuilderException;
 
@@ -130,4 +133,12 @@ public interface ProfileActivationContext {
      * @throws InterpolatorException if an error occurs during interpolation
      */
     boolean exists(@Nullable String path, boolean glob);
+
+    /**
+     * Inject properties from newly activated profiles in order to trigger the cascading mechanism.
+     * This method allows profiles to contribute properties that can trigger the activation of other profiles.
+     *
+     * @param activatedProfiles The collection of profiles that have been activated that may trigger the cascading effect.
+     */
+    void addProfileProperties(Collection<Profile> activatedProfiles);
 }
