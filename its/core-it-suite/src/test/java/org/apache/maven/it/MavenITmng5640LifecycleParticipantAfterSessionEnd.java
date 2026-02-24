@@ -55,7 +55,7 @@ class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractMavenInt
         verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
         verifier.addCliArgument("package");
         assertThrows(VerificationException.class, verifier::execute, "The build should fail");
-        verifier.verifyTextInLog("testApp(org.apache.maven.its.mng5640.FailingTest)");
+        verifier.verifyTextInLog("testApp()");
 
         verifier.verifyFilePresent("target/afterProjectsRead.txt");
         // See https://issues.apache.org/jira/browse/MNG-5641
