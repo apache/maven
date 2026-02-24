@@ -18,12 +18,11 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Properties;
-
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -41,9 +40,9 @@ public class MavenITmng3822BasedirAlignedInterpolationTest extends AbstractMaven
      */
     @Test
     public void testitMNG3822() throws Exception {
-        File testDir = extractResources("/mng-3822");
+        Path testDir = extractResources("mng-3822");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("initialize");
@@ -60,9 +59,9 @@ public class MavenITmng3822BasedirAlignedInterpolationTest extends AbstractMaven
         assertEquals(testDir, "target/site", pomProps.getProperty("project.properties.siteOut"));
     }
 
-    private void assertEquals(File testDir, String buildDir, String interpolatedPath) throws Exception {
-        File actual = new File(interpolatedPath);
-        File expected = new File(testDir, buildDir);
+    private void assertEquals(Path testDir, String buildDir, String interpolatedPath) throws Exception {
+        Path actual = Paths.get(interpolatedPath);
+        Path expected = testDir.resolve(buildDir);
 
         assertTrue(actual.isAbsolute());
         ItUtils.assertCanonicalFileEquals(expected, actual);

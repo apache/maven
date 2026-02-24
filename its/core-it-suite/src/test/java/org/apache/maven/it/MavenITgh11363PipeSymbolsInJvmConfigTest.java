@@ -36,11 +36,9 @@ public class MavenITgh11363PipeSymbolsInJvmConfigTest extends AbstractMavenInteg
      */
     @Test
     void testPipeSymbolsInJvmConfig() throws Exception {
-        Path basedir = extractResources("/gh-11363-pipe-symbols-jvm-config")
-                .getAbsoluteFile()
-                .toPath();
+        Path basedir = extractResources("/gh-11363-pipe-symbols-jvm-config");
 
-        Verifier verifier = newVerifier(basedir.toString());
+        Verifier verifier = newVerifier(basedir);
         verifier.setForkJvm(true); // Use forked JVM to test .mvn/jvm.config processing
         // Enable debug logging for launcher script to diagnose jvm.config parsing issues
         verifier.setEnvironmentVariable("MAVEN_DEBUG_SCRIPT", "1");

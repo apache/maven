@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -36,9 +36,9 @@ public class MavenITmng5214DontMapWsdlToJar extends AbstractMavenIntegrationTest
      */
     @Test
     public void testitTestPhase() throws Exception {
-        File setupDir = extractResources("/mng-5214/dependency");
+        Path setupDir = extractResources("mng-5214/dependency");
 
-        Verifier setupVerifier = newVerifier(setupDir.getAbsolutePath());
+        Verifier setupVerifier = newVerifier(setupDir);
         setupVerifier.setAutoclean(false);
         setupVerifier.addCliArgument("-X");
         setupVerifier.deleteDirectory("target");
@@ -48,9 +48,9 @@ public class MavenITmng5214DontMapWsdlToJar extends AbstractMavenIntegrationTest
         setupVerifier.addCliArgument("generate-resources");
         setupVerifier.execute();
 
-        File testDir = extractResources("/mng-5214");
+        Path testDir = extractResources("mng-5214");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("consumer/target");
         verifier.deleteDirectory("dependency/target");

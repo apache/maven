@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.net.InetAddress;
 import java.util.List;
 import java.util.Map;
@@ -47,10 +47,10 @@ public class MavenITmng4991NonProxyHostsTest extends AbstractMavenIntegrationTes
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4991");
+        Path testDir = extractResources("mng-4991");
 
         ResourceHandler resourceHandler = new ResourceHandler();
-        resourceHandler.setResourceBase(new File(testDir, "repo").getAbsolutePath());
+        resourceHandler.setResourceBase(testDir.resolve("repo").toString());
 
         HandlerList handlers = new HandlerList();
         handlers.setHandlers(new Handler[] {resourceHandler, new DefaultHandler()});
@@ -65,7 +65,7 @@ public class MavenITmng4991NonProxyHostsTest extends AbstractMavenIntegrationTes
         Server proxy = new Server(0);
         proxy.setHandler(new DefaultHandler());
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         try {
             server.start();
             if (server.isFailed()) {

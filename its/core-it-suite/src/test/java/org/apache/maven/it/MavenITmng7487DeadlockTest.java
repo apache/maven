@@ -18,25 +18,24 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.io.IOException;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng7487DeadlockTest extends AbstractMavenIntegrationTestCase {
-    private static final String PROJECT_PATH = "/mng-7487-deadlock";
+    private static final String PROJECT_PATH = "mng-7487-deadlock";
 
     @Test
     public void testDeadlock() throws IOException, VerificationException {
-        final File rootDir = extractResources(PROJECT_PATH);
+        final Path rootDir = extractResources(PROJECT_PATH);
 
-        final File pluginDir = new File(rootDir, "plugin");
-        final Verifier pluginVerifier = newVerifier(pluginDir.getAbsolutePath());
+        final Path pluginDir = rootDir.resolve("plugin");
+        final Verifier pluginVerifier = newVerifier(pluginDir);
         pluginVerifier.addCliArgument("install");
         pluginVerifier.execute();
 
-        final File consumerDir = new File(rootDir, "consumer");
-        final Verifier consumerVerifier = newVerifier(consumerDir.getAbsolutePath());
+        final Path consumerDir = rootDir.resolve("consumer");
+        final Verifier consumerVerifier = newVerifier(consumerDir);
         consumerVerifier.setForkJvm(true); // TODO: why?
 
         consumerVerifier.addCliArgument("-T2");

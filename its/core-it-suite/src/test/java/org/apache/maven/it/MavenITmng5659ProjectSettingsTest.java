@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -30,8 +30,8 @@ public class MavenITmng5659ProjectSettingsTest extends AbstractMavenIntegrationT
 
     @Test
     public void testProjectSettings() throws IOException, VerificationException {
-        File testDir = extractResources("/mng-5659-project-settings");
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Path testDir = extractResources("mng-5659-project-settings");
+        Verifier verifier = newVerifier(testDir);
 
         verifier.addCliArgument("validate");
         verifier.execute();

@@ -18,9 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Files;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -39,9 +38,9 @@ public class MavenITmng2820PomCommentsTest extends AbstractMavenIntegrationTestC
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-2820");
+        Path testDir = extractResources("mng-2820");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng2820");
@@ -49,15 +48,15 @@ public class MavenITmng2820PomCommentsTest extends AbstractMavenIntegrationTestC
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        File installed = new File(verifier.getArtifactPath("org.apache.maven.its.mng2820", "test", "0.1", "pom"));
+        Path installed = verifier.getArtifactPath("org.apache.maven.its.mng2820", "test", "0.1", "pom");
         assertPomComments(installed);
 
-        File deployed = new File(testDir, "target/repo/org/apache/maven/its/mng2820/test/0.1/test-0.1.pom");
+        Path deployed = testDir.resolve("target/repo/org/apache/maven/its/mng2820/test/0.1/test-0.1.pom");
         assertPomComments(deployed);
     }
 
-    private void assertPomComments(File pomFile) throws Exception {
-        String pom = Files.readString(pomFile.toPath());
+    private void assertPomComments(Path pomFile) throws Exception {
+        String pom = Files.readString(pomFile);
         assertPomComment(pom, "DOCUMENT-COMMENT-PRE-1");
         assertPomComment(pom, "DOCUMENT-COMMENT-PRE-2");
         assertPomComment(pom, "DOCUMENT-COMMENT-POST-1");

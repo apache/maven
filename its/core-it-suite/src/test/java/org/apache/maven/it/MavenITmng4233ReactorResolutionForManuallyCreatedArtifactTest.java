@@ -18,12 +18,9 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
-
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4233">MNG-4233</a>.
@@ -42,9 +39,9 @@ public class MavenITmng4233ReactorResolutionForManuallyCreatedArtifactTest exten
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4233");
+        Path testDir = extractResources("mng-4233");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("consumer/target");
         verifier.addCliArgument("validate");
@@ -52,9 +49,8 @@ public class MavenITmng4233ReactorResolutionForManuallyCreatedArtifactTest exten
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties("consumer/target/artifact.properties");
-        assertEquals(
-                new File(testDir.getCanonicalFile(), "producer/pom.xml"),
-                new File(props.getProperty("org.apache.maven.its.mng4233:producer:jar:1.0-SNAPSHOT"))
-                        .getCanonicalFile());
+        ItUtils.assertCanonicalFileEquals(
+                testDir.resolve("producer/pom.xml"),
+                Path.of(props.getProperty("org.apache.maven.its.mng4233:producer:jar:1.0-SNAPSHOT")));
     }
 }

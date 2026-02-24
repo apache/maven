@@ -21,7 +21,7 @@ package org.apache.maven.it;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
@@ -137,9 +137,9 @@ public class MavenITmng3953AuthenticatedDeploymentTest extends AbstractMavenInte
     }
 
     private void testitMNG3953(String project) throws Exception {
-        File testDir = extractResources("/mng-3953/" + project);
+        Path testDir = extractResources("mng-3953/" + project);
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

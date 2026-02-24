@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -42,8 +42,8 @@ public class MavenIT0087PluginRealmWithProjectLevelDepsTest extends AbstractMave
      */
     @Test
     public void testit0087() throws Exception {
-        File testDir = extractResources("/it0087");
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Path testDir = extractResources("it0087");
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.it0087");

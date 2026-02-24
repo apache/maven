@@ -18,10 +18,10 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.regex.Pattern;
-
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -41,9 +41,9 @@ public class MavenITmng5608ProfileActivationWarningTest extends AbstractMavenInt
 
     @Test
     public void testitMNG5608() throws Exception {
-        File testDir = extractResources("/mng-5608-profile-activation-warning");
+        Path testDir = extractResources("mng-5608-profile-activation-warning");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -58,9 +58,9 @@ public class MavenITmng5608ProfileActivationWarningTest extends AbstractMavenInt
         assertNotNull(findWarning(logFile, "mng-5608-missing-project.basedir"));
     }
 
-    private void assertFileExists(File dir, String filename) {
-        File file = new File(dir, filename);
-        assertTrue(file.exists(), "expected file: " + file);
+    private void assertFileExists(Path dir, String filename) {
+        Path file = dir.resolve(filename);
+        assertTrue(Files.exists(file), "expected file: " + file);
     }
 
     private String findWarning(List<String> logLines, String profileId) {

@@ -18,9 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Map;
-
 import org.junit.jupiter.api.Test;
 
 /**
@@ -30,18 +29,20 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTestCase {
 
+    private static final String RESOURCE_PATH = "mng-5771-core-extensions";
+
     @Test
     public void testCoreExtension() throws Exception {
-        File testDir = extractResources("/mng-5771-core-extensions");
+        Path testDir = extractResources(RESOURCE_PATH);
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.filterFile("settings-template.xml", "settings.xml");
 
-        verifier = newVerifier(new File(testDir, "client").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("client"));
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.it-core-extensions");
         verifier.addCliArgument("-s");
-        verifier.addCliArgument(new File(testDir, "settings.xml").getAbsolutePath());
+        verifier.addCliArgument(testDir.resolve("settings.xml").toString());
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -49,16 +50,16 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
 
     @Test
     public void testCoreExtensionNoDescriptor() throws Exception {
-        File testDir = extractResources("/mng-5771-core-extensions");
+        Path testDir = extractResources(RESOURCE_PATH);
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.filterFile("settings-template.xml", "settings.xml");
 
-        verifier = newVerifier(new File(testDir, "client-no-descriptor").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("client-no-descriptor"));
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.it-core-extensions");
         verifier.addCliArgument("-s");
-        verifier.addCliArgument(new File(testDir, "settings.xml").getAbsolutePath());
+        verifier.addCliArgument(testDir.resolve("settings.xml").toString());
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -72,28 +73,28 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
     public void testCoreExtensionRetrievedFromAMirrorWithBasicAuthentication() throws Exception {
         // requiresMavenVersion("[3.3.2,)");
 
-        File testDir = extractResources("/mng-5771-core-extensions");
+        Path testDir = extractResources(RESOURCE_PATH);
 
         HttpServer server = HttpServer.builder() //
                 .port(0) //
                 .username("maven") //
                 .password("secret") //
-                .source(new File(testDir, "repo")) //
+                .source(testDir.resolve("repo").toString()) //
                 .build();
         server.start();
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         Map<String, String> properties = verifier.newDefaultFilterMap();
         properties.put("@port@", Integer.toString(server.port()));
         String mirrorOf = "*";
         properties.put("@mirrorOf@", mirrorOf);
         verifier.filterFile("settings-template-mirror-auth.xml", "settings.xml", properties);
 
-        verifier = newVerifier(new File(testDir, "client").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("client"));
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.it-core-extensions");
         verifier.addCliArgument("-s");
-        verifier.addCliArgument(new File(testDir, "settings.xml").getAbsolutePath());
+        verifier.addCliArgument(testDir.resolve("settings.xml").toString());
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -108,16 +109,16 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
     public void testCoreExtensionWithProperties() throws Exception {
         // requiresMavenVersion("[3.8.5,)");
 
-        File testDir = extractResources("/mng-5771-core-extensions");
+        Path testDir = extractResources(RESOURCE_PATH);
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.filterFile("settings-template.xml", "settings.xml");
 
-        verifier = newVerifier(new File(testDir, "client-properties").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("client-properties"));
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.it-core-extensions");
         verifier.addCliArgument("-s");
-        verifier.addCliArgument(new File(testDir, "settings.xml").getAbsolutePath());
+        verifier.addCliArgument(testDir.resolve("settings.xml").toString());
         verifier.addCliArgument("-Dtest-extension-version=0.1");
         verifier.addCliArgument("validate");
         verifier.execute();
@@ -131,16 +132,16 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
     public void testCoreExtensionWithConfig() throws Exception {
         // requiresMavenVersion("[3.8.5,)");
 
-        File testDir = extractResources("/mng-5771-core-extensions");
+        Path testDir = extractResources(RESOURCE_PATH);
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.filterFile("settings-template.xml", "settings.xml");
 
-        verifier = newVerifier(new File(testDir, "client-config").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("client-config"));
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.it-core-extensions");
         verifier.addCliArgument("-s");
-        verifier.addCliArgument(new File(testDir, "settings.xml").getAbsolutePath());
+        verifier.addCliArgument(testDir.resolve("settings.xml").toString());
         verifier.setForkJvm(true); // force forked JVM since we need the shell script to detect .mvn/
         verifier.addCliArgument("validate");
         verifier.execute();

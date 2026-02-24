@@ -18,8 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -37,19 +36,19 @@ public class MavenITmng3716AggregatorForkingTest extends AbstractMavenIntegratio
 
     @Test
     public void testitMNG3716() throws Exception {
-        File testDir = extractResources("/mng-3716");
-        File pluginDir = new File(testDir, "maven-mng3716-plugin");
-        File projectsDir = new File(testDir, "projects");
+        Path testDir = extractResources("mng-3716");
+        Path pluginDir = testDir.resolve("maven-mng3716-plugin");
+        Path projectsDir = testDir.resolve("projects");
 
         Verifier verifier;
 
-        verifier = newVerifier(pluginDir.getAbsolutePath());
+        verifier = newVerifier(pluginDir);
         verifier.addCliArgument("install");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectsDir.getAbsolutePath());
+        verifier = newVerifier(projectsDir);
         verifier.addCliArgument("org.apache.maven.its.mng3716:mavenit-mng3716-plugin:1:run");
         verifier.execute();
 

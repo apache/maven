@@ -18,8 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -39,9 +38,9 @@ public class MavenITmng6772NestedImportScopeRepositoryOverride extends AbstractM
     // This will test the behavior using ProjectModelResolver
     @Test
     public void testitInProject() throws Exception {
-        final File testDir = extractResources("/mng-6772-override-in-project");
+        final Path testDir = extractResources("mng-6772-override-in-project");
 
-        final Verifier verifier = newVerifier(testDir.getAbsolutePath(), null);
+        final Verifier verifier = newVerifier(testDir.toString(), null);
         overrideGlobalSettings(testDir, verifier);
         verifier.deleteArtifacts("org.apache.maven.its.mng6772");
 
@@ -55,9 +54,9 @@ public class MavenITmng6772NestedImportScopeRepositoryOverride extends AbstractM
     // This will test the behavior using DefaultModelResolver
     @Test
     public void testitInDependency() throws Exception {
-        final File testDir = extractResources("/mng-6772-override-in-dependency");
+        final Path testDir = extractResources("mng-6772-override-in-dependency");
 
-        final Verifier verifier = newVerifier(testDir.getAbsolutePath(), null);
+        final Verifier verifier = newVerifier(testDir.toString(), null);
         overrideGlobalSettings(testDir, verifier);
         verifier.deleteArtifacts("org.apache.maven.its.mng6772");
 
@@ -69,9 +68,9 @@ public class MavenITmng6772NestedImportScopeRepositoryOverride extends AbstractM
     }
 
     // central must not be defined in any settings.xml or super POM will never be in play.
-    private void overrideGlobalSettings(final File testDir, final Verifier verifier) {
-        final File settingsFile = new File(testDir, "settings-override.xml");
-        final String path = settingsFile.getAbsolutePath();
+    private void overrideGlobalSettings(final Path testDir, final Verifier verifier) {
+        final Path settingsFile = testDir.resolve("settings-override.xml");
+        final String path = settingsFile.toString();
         verifier.addCliArgument("--global-settings");
         if (path.indexOf(' ') < 0) {
             verifier.addCliArgument(path);

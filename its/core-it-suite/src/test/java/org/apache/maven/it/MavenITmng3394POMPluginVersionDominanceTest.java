@@ -18,8 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -34,14 +33,14 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng3394POMPluginVersionDominanceTest extends AbstractMavenIntegrationTestCase {
 
-    private static final String BASEDIR_PREFIX = "/mng-3394/";
+    private static final String PROJECT_PATH = "mng-3394/";
 
     @Test
     public void testitMNG3394a() throws Exception {
         // testShouldUsePluginVersionFromPluginMgmtForLifecycleMojoWhenNotInBuildPlugins
-        File testDir = extractResources(BASEDIR_PREFIX + "lifecycleMojoVersionInPluginMgmt");
+        Path testDir = extractResources(PROJECT_PATH + "lifecycleMojoVersionInPluginMgmt");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("process-resources");
@@ -54,9 +53,9 @@ public class MavenITmng3394POMPluginVersionDominanceTest extends AbstractMavenIn
     @Test
     public void testitMNG3394b() throws Exception {
         // testShouldPreferPluginVersionFromBuildPluginsOverThatInPluginMgmt
-        File testDir = extractResources(BASEDIR_PREFIX + "preferBuildPluginOverPluginMgmt");
+        Path testDir = extractResources(PROJECT_PATH + "preferBuildPluginOverPluginMgmt");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
 
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

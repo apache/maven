@@ -18,9 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-
-import org.apache.commons.io.FileUtils;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -35,25 +34,20 @@ class MavenITmng7228LeakyModelTest extends AbstractMavenIntegrationTestCase {
 
     @Test
     void testLeakyModel() throws Exception {
-        File testDir = extractResources("/mng-7228-leaky-model");
+        Path testDir = extractResources("mng-7228-leaky-model");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setForkJvm(true); // TODO: why?
 
-        verifier.addCliArgument("-e");
-        verifier.addCliArgument("-s");
-        verifier.addCliArgument(new File(testDir, "settings.xml").getAbsolutePath());
-        verifier.addCliArgument("-Pmanual-profile");
-
-        verifier.addCliArgument("install");
+        verifier.addCliArguments("-e", "-s", testDir.resolve("settings.xml").toString(), "-Pmanual-profile", "install");
 
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
         String classifier = "build";
-        String pom = FileUtils.readFileToString(new File(
-                verifier.getArtifactPath("org.apache.maven.its.mng7228", "test", "1.0.0-SNAPSHOT", "pom", classifier)));
+        String pom = Files.readString(
+                verifier.getArtifactPath("org.apache.maven.its.mng7228", "test", "1.0.0-SNAPSHOT", "pom", classifier));
 
         assertTrue(pom.contains("projectProperty"));
         assertFalse(pom.contains("activeProperty"), "POM should not contain activeProperty but was: " + pom);

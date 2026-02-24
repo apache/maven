@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -41,8 +41,8 @@ public class MavenITmng2892HideCorePlexusUtilsTest extends AbstractMavenIntegrat
      */
     @Test
     public void testitMNG2892() throws Exception {
-        File testDir = extractResources("/mng-2892");
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Path testDir = extractResources("mng-2892");
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifact("org.codehaus.plexus", "plexus-utils", "0.1-mng2892", "jar");

@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -39,11 +39,11 @@ public class MavenITmng2695OfflinePluginSnapshotsTest extends AbstractMavenInteg
      */
     @Test
     public void testitMNG2695() throws Exception {
-        File testDir = extractResources("/mng-2695");
+        Path testDir = extractResources("mng-2695");
         Verifier verifier;
 
         // phase 1: run build in online mode to fill local repo
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng2695");
         verifier.setAutoclean(false);
@@ -58,7 +58,7 @@ public class MavenITmng2695OfflinePluginSnapshotsTest extends AbstractMavenInteg
         verifier.verifyErrorFreeLog();
 
         // phase 2: run build in offline mode to check it still passes
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir);
         verifier.deleteDirectory("target");
         verifier.setAutoclean(false);
         verifier.setLogFileName("log2.txt");

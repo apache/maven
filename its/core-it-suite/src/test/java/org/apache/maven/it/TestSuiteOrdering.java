@@ -59,7 +59,7 @@ public class TestSuiteOrdering implements ClassOrderer {
             System.clearProperty("classworlds.conf");
 
             // Set maven.version system property (needed by some tests)
-            Verifier verifier = new Verifier("", false);
+            Verifier verifier = new Verifier(Paths.get(""), null, false);
             String mavenVersion = verifier.getMavenVersion();
             System.setProperty("maven.version", mavenVersion);
 

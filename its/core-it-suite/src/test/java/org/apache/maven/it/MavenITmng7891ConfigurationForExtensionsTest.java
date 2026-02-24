@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -33,14 +33,14 @@ class MavenITmng7891ConfigurationForExtensionsTest extends AbstractMavenIntegrat
 
     @Test
     void testConfigurationForCoreExtension() throws Exception {
-        File testDir = extractResources("/mng-7891-extension-configuration");
+        Path testDir = extractResources("mng-7891-extension-configuration");
 
-        Verifier verifier = newVerifier(new File(testDir, "extension").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("extension"));
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(new File(testDir, "core-extension").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("core-extension"));
         verifier.addCliArgument("install");
         verifier.addCliArgument("-DuserValue=the-value");
         verifier.execute();
@@ -57,14 +57,14 @@ class MavenITmng7891ConfigurationForExtensionsTest extends AbstractMavenIntegrat
 
     @Test
     void testConfigurationForBuildExtension() throws Exception {
-        File testDir = extractResources("/mng-7891-extension-configuration");
+        Path testDir = extractResources("mng-7891-extension-configuration");
 
-        Verifier verifier = newVerifier(new File(testDir, "extension").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("extension"));
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(new File(testDir, "build-extension").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("build-extension"));
         verifier.addCliArgument("install");
         verifier.addCliArgument("-DuserValue=the-value");
         verifier.execute();

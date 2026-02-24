@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -27,14 +27,14 @@ public class MavenITmng5840RelativePathReactorMatching extends AbstractMavenInte
 
     @Test
     public void testRelativePathPointsToWrongVersion() throws Exception {
-        File testDir = extractResources("/mng-5840-relative-path-reactor-matching");
+        Path testDir = extractResources("mng-5840-relative-path-reactor-matching");
 
-        Verifier verifier = newVerifier(new File(testDir, "parent-1").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("parent-1"));
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(new File(testDir, "child").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("child"));
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

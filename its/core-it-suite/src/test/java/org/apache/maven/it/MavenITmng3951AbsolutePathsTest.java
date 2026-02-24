@@ -18,9 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
-
 import org.junit.jupiter.api.Test;
 
 /**
@@ -39,17 +38,17 @@ public class MavenITmng3951AbsolutePathsTest extends AbstractMavenIntegrationTes
      */
     @Test
     public void testitMNG3951() throws Exception {
-        File testDir = extractResources("/mng-3951");
+        Path testDir = extractResources("mng-3951");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
 
         /*
          * Cut off anything before the first file separator from the local repo path. This is harmless on a Unix-like
          * filesystem but will make the path drive-relative on Windows so we can check how Maven handles it.
          */
-        String repoDir = new File(verifier.getLocalRepository()).getAbsolutePath();
-        if (getRoot(new File(repoDir)).equals(getRoot(testDir))) {
-            verifier.addCliArgument("-Dmaven.repo.local=" + repoDir.substring(repoDir.indexOf(File.separator)));
+        Path repoDir = verifier.getLocalRepository();
+        if (getRoot(repoDir).equals(getRoot(testDir))) {
+            verifier.addCliArgument("-Dmaven.repo.local=" + repoDir.subpath(1, repoDir.getNameCount()));
         }
 
         verifier.setAutoclean(false);
@@ -62,15 +61,15 @@ public class MavenITmng3951AbsolutePathsTest extends AbstractMavenIntegrationTes
         Properties props = verifier.loadProperties("target/path.properties");
 
         ItUtils.assertCanonicalFileEquals(
-                new File(testDir, "tmp").getAbsoluteFile(), new File(props.getProperty("fileParams.0")));
+                testDir.resolve("tmp"), Path.of(props.getProperty("fileParams.0")));
         ItUtils.assertCanonicalFileEquals(
-                new File(getRoot(testDir), "tmp").getAbsoluteFile(), new File(props.getProperty("fileParams.1")));
-        ItUtils.assertCanonicalFileEquals(new File(repoDir), new File(props.getProperty("stringParams.0")));
+                getRoot(testDir).resolve("tmp"), Path.of(props.getProperty("fileParams.1")));
+        ItUtils.assertCanonicalFileEquals(repoDir, Path.of(props.getProperty("stringParams.0")));
     }
 
-    private static File getRoot(File path) {
-        File root = path;
-        for (File dir = path; dir != null; dir = dir.getParentFile()) {
+    private static Path getRoot(Path path) {
+        Path root = path;
+        for (Path dir = path; dir != null; dir = dir.getParent()) {
             root = dir;
         }
         return root;

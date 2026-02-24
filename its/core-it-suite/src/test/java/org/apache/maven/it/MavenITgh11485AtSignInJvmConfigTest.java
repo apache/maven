@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -34,11 +34,11 @@ public class MavenITgh11485AtSignInJvmConfigTest extends AbstractMavenIntegratio
 
     @Test
     public void testAtSignInJvmConfig() throws Exception {
-        File testDir = extractResources("/gh-11485-at-sign");
+        Path testDir = extractResources("/gh-11485-at-sign");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument(
-                "-Dexpression.outputFile=" + new File(testDir, "target/pom.properties").getAbsolutePath());
+                "-Dexpression.outputFile=" + testDir.resolve("target/pom.properties"));
         verifier.setForkJvm(true); // custom .mvn/jvm.config
         // Enable debug logging for launcher script to diagnose jvm.config parsing issues
         verifier.setEnvironmentVariable("MAVEN_DEBUG_SCRIPT", "1");
@@ -47,7 +47,7 @@ public class MavenITgh11485AtSignInJvmConfigTest extends AbstractMavenIntegratio
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties("target/pom.properties");
-        String expectedPath = testDir.getAbsolutePath().replace('\\', '/');
+        String expectedPath = testDir.toString().replace('\\', '/');
         assertEquals(
                 expectedPath + "/workspace@2/test",
                 props.getProperty("project.properties.pathWithAtProp").replace('\\', '/'),
@@ -60,14 +60,14 @@ public class MavenITgh11485AtSignInJvmConfigTest extends AbstractMavenIntegratio
 
     @Test
     public void testAtSignInCommandLineProperty() throws Exception {
-        File testDir = extractResources("/gh-11485-at-sign");
+        Path testDir = extractResources("/gh-11485-at-sign");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument(
-                "-Dexpression.outputFile=" + new File(testDir, "target/pom.properties").getAbsolutePath());
+                "-Dexpression.outputFile=" + testDir.resolve("target/pom.properties"));
         verifier.setForkJvm(true); // custom .mvn/jvm.config
         // Pass a path with @ character via command line (simulating Jenkins workspace)
-        String jenkinsPath = testDir.getAbsolutePath().replace('\\', '/') + "/jenkins.workspace/proj@2";
+        String jenkinsPath = testDir.toString().replace('\\', '/') + "/jenkins.workspace/proj@2";
         verifier.addCliArgument("-Dcmdline.path=" + jenkinsPath);
         verifier.addCliArgument("-Dcmdline.value=test@value");
         verifier.addCliArgument("validate");

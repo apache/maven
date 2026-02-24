@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -38,9 +38,9 @@ class MavenITgh11409ProfileSourceTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void testProfileSourceInMultiModuleProject() throws Exception {
-        File testDir = extractResources("/gh-11409");
+        Path testDir = extractResources("/gh-11409");
 
-        Verifier verifier = newVerifier(new File(testDir, "subproject").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("subproject"));
         verifier.addCliArgument("help:active-profiles");
         verifier.execute();
         verifier.verifyErrorFreeLog();

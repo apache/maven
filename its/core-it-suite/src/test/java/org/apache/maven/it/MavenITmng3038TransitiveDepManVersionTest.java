@@ -18,9 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.io.IOException;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -35,14 +34,14 @@ public class MavenITmng3038TransitiveDepManVersionTest extends AbstractMavenInte
 
     @Test
     public void testitMNG3038() throws Exception {
-        File testDirBase = extractResources("/mng-3038");
+        Path testDirBase = extractResources("mng-3038");
 
         compileDDep(testDirBase, "D1", "1.0");
         compileDDep(testDirBase, "D2", "2.0");
 
-        File testProjectDir = new File(testDirBase, "test-project");
+        Path testProjectDir = testDirBase.resolve("test-project");
 
-        Verifier verifier = newVerifier(testProjectDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testProjectDir);
         verifier.deleteArtifact("org.apache.maven.its.it0121", "A", "1.0", "pom");
         verifier.deleteArtifact("org.apache.maven.its.it0121", "A", "1.0", "jar");
         verifier.deleteArtifact("org.apache.maven.its.it0121", "B", "1.0", "pom");
@@ -54,10 +53,10 @@ public class MavenITmng3038TransitiveDepManVersionTest extends AbstractMavenInte
         verifier.verifyErrorFreeLog();
     }
 
-    private void compileDDep(File testDirBase, String projectDDepDir, String version)
+    private void compileDDep(Path testDirBase, String projectDDepDir, String version)
             throws VerificationException, IOException {
-        File testOtherDepDir = new File(testDirBase, "test-other-deps/" + projectDDepDir);
-        Verifier verifierOtherDep = newVerifier(testOtherDepDir.getAbsolutePath());
+        Path testOtherDepDir = testDirBase.resolve("test-other-deps/" + projectDDepDir);
+        Verifier verifierOtherDep = newVerifier(testOtherDepDir);
         verifierOtherDep.deleteArtifact("org.apache.maven.its.it0121", "D", version, "jar");
         verifierOtherDep.deleteArtifact("org.apache.maven.its.it0121", "D", version, "pom");
         verifierOtherDep.addCliArgument("install");

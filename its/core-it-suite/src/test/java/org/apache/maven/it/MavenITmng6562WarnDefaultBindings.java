@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -26,10 +26,10 @@ public class MavenITmng6562WarnDefaultBindings extends AbstractMavenIntegrationT
 
     @Test
     public void testItShouldNotWarn() throws Exception {
-        File testDir = extractResources("/mng-6562-default-bindings");
+        Path testDir = extractResources("mng-6562-default-bindings");
 
         String phase = "validate";
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.setLogFileName(phase + ".txt");
         verifier.addCliArgument("-fos");
@@ -42,10 +42,10 @@ public class MavenITmng6562WarnDefaultBindings extends AbstractMavenIntegrationT
 
     @Test
     public void testItShouldNotWarn2() throws Exception {
-        File testDir = extractResources("/mng-6562-default-bindings");
+        Path testDir = extractResources("mng-6562-default-bindings");
 
         String phase = "process-resources";
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.setLogFileName(phase + ".txt");
         verifier.addCliArgument("-fos");
@@ -58,10 +58,10 @@ public class MavenITmng6562WarnDefaultBindings extends AbstractMavenIntegrationT
 
     @Test
     public void testItShouldWarnForCompilerPlugin() throws Exception {
-        File testDir = extractResources("/mng-6562-default-bindings");
+        Path testDir = extractResources("mng-6562-default-bindings");
 
         String phase = "compile";
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.setLogFileName(phase + ".txt");
         verifier.addCliArgument(phase);
@@ -73,10 +73,10 @@ public class MavenITmng6562WarnDefaultBindings extends AbstractMavenIntegrationT
 
     @Test
     public void testItShouldWarnForCompilerPlugin2() throws Exception {
-        File testDir = extractResources("/mng-6562-default-bindings");
+        Path testDir = extractResources("mng-6562-default-bindings");
 
         String phase = "process-test-resources";
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.setLogFileName(phase + ".txt");
         verifier.addCliArgument(phase);
@@ -89,10 +89,10 @@ public class MavenITmng6562WarnDefaultBindings extends AbstractMavenIntegrationT
 
     @Test
     public void testItShouldWarnForCompilerPlugin3() throws Exception {
-        File testDir = extractResources("/mng-6562-default-bindings");
+        Path testDir = extractResources("mng-6562-default-bindings");
 
         String phase = "test-compile";
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.setLogFileName(phase + ".txt");
         verifier.addCliArgument(phase);
@@ -105,10 +105,10 @@ public class MavenITmng6562WarnDefaultBindings extends AbstractMavenIntegrationT
 
     @Test
     public void testItShouldWarnForCompilerPluginAndSurefirePlugin() throws Exception {
-        File testDir = extractResources("/mng-6562-default-bindings");
+        Path testDir = extractResources("mng-6562-default-bindings");
 
         String phase = "test";
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.setLogFileName(phase + ".txt");
         verifier.addCliArgument(phase);

@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
@@ -37,9 +37,9 @@ public class MavenITmng2562Timestamp322Test extends AbstractMavenIntegrationTest
 
     @Test
     public void testitDefaultFormat() throws Exception {
-        File testDir = extractResources("/mng-2562/default");
+        Path testDir = extractResources("mng-2562/default");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
@@ -61,9 +61,9 @@ public class MavenITmng2562Timestamp322Test extends AbstractMavenIntegrationTest
 
     @Test
     public void testitCustomFormat() throws Exception {
-        File testDir = extractResources("/mng-2562/custom");
+        Path testDir = extractResources("mng-2562/custom");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
@@ -81,9 +81,9 @@ public class MavenITmng2562Timestamp322Test extends AbstractMavenIntegrationTest
 
     @Test
     public void testitSameValueAcrossModules() throws Exception {
-        File testDir = extractResources("/mng-2562/reactor");
+        Path testDir = extractResources("mng-2562/reactor");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("child-1/target");

@@ -18,9 +18,9 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Properties;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -77,23 +77,23 @@ public class MavenITmng6223FindBasedir extends AbstractMavenIntegrationTestCase 
     }
 
     protected void runCoreExtensionWithOption(String option, String subdir, boolean pom) throws Exception {
-        File testDir = extractResources("/mng-5889-find.mvn");
+        Path testDir = extractResources("mng-5889-find.mvn");
 
-        File basedir =
-                new File(testDir, "../mng-" + (pom ? "5889" : "6223") + "-find.mvn" + option + (pom ? "Pom" : "Dir"));
-        basedir.mkdir();
+        Path basedir =
+                testDir.resolve("../mng-" + (pom ? "5889" : "6223") + "-find.mvn" + option + (pom ? "Pom" : "Dir"));
+        Files.createDirectories(basedir);
 
         if (subdir != null) {
-            testDir = new File(testDir, subdir);
-            basedir = new File(basedir, subdir);
-            basedir.mkdirs();
+            testDir = testDir.resolve(subdir);
+            basedir = basedir.resolve(subdir);
+            Files.createDirectories(basedir);
         }
 
-        Verifier verifier = newVerifier(basedir.getAbsolutePath());
+        Verifier verifier = newVerifier(basedir);
         verifier.addCliArgument(
-                "-Dexpression.outputFile=" + new File(basedir, "expression.properties").getAbsolutePath());
+                "-Dexpression.outputFile=" + basedir.resolve("expression.properties"));
         verifier.addCliArgument(option); // -f/--file client/pom.xml
-        verifier.addCliArgument((pom ? new File(testDir, "pom.xml") : testDir).getAbsolutePath());
+        verifier.addCliArgument((pom ? testDir.resolve("pom.xml") : testDir).toString());
         verifier.setForkJvm(true); // force forked JVM since we need the shell script to detect .mvn/ location
         verifier.addCliArgument("validate");
         verifier.execute();

@@ -20,22 +20,20 @@ package org.apache.maven.it;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -53,7 +51,6 @@ import org.apache.maven.cling.executor.embedded.EmbeddedMavenExecutor;
 import org.apache.maven.cling.executor.forked.ForkedMavenExecutor;
 import org.apache.maven.cling.executor.internal.HelperImpl;
 import org.apache.maven.cling.executor.internal.ToolboxTool;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 
 import static java.util.Objects.requireNonNull;
@@ -131,16 +128,12 @@ public class Verifier {
 
     private ByteArrayOutputStream stderr;
 
-    public Verifier(String basedir) throws VerificationException {
-        this(basedir, null);
+    public Verifier(Path basedir) throws VerificationException {
+        this(basedir, null, true);
     }
 
-    public Verifier(String basedir, List<String> defaultCliArguments) throws VerificationException {
+    public Verifier(Path basedir, List<String> defaultCliArguments) throws VerificationException {
         this(basedir, defaultCliArguments, true);
-    }
-
-    public Verifier(String basedir, boolean createDotMvn) throws VerificationException {
-        this(basedir, null, createDotMvn);
     }
 
     /**
@@ -153,10 +146,10 @@ public class Verifier {
      *
      * @see #DEFAULT_CLI_ARGUMENTS
      */
-    public Verifier(String basedir, List<String> defaultCliArguments, boolean createDotMvn) throws VerificationException {
+    public Verifier(Path basedir, List<String> defaultCliArguments, boolean createDotMvn) throws VerificationException {
         requireNonNull(basedir);
         try {
-            this.basedir = Paths.get(basedir).toAbsolutePath();
+            this.basedir = basedir.toAbsolutePath();
             if (createDotMvn) {
                 Files.createDirectories(this.basedir.resolve(".mvn"));
             }
@@ -199,10 +192,15 @@ public class Verifier {
         return executorHelper.getDefaultMode();
     }
 
+    public void  execute(String... args) throws VerificationException {
+        addCliArguments(args);
+        execute();
+    }
+
     public void execute() throws VerificationException {
         List<String> args = new ArrayList<>(defaultCliArguments);
         for (String cliArgument : cliArguments) {
-            args.add(cliArgument.replace("${basedir}", getBasedir()));
+            args.add(cliArgument.replace("${basedir}", getBasedir().toString()));
         }
 
         if (handleLocalRepoTail) {
@@ -400,8 +398,8 @@ public class Verifier {
         }
     }
 
-    public String getBasedir() {
-        return basedir.toString();
+    public Path getBasedir() {
+        return basedir;
     }
 
     public void setLogFileName(String logFileName) {
@@ -428,11 +426,15 @@ public class Verifier {
         this.handleLocalRepoTail = handleLocalRepoTail;
     }
 
-    public String getLocalRepository() {
+    public Path getLocalRepository() {
         return getLocalRepositoryWithSettings(null);
     }
 
-    public String getLocalRepositoryWithSettings(String settingsXml) {
+    public Path getLocalRepositoryWithSettings(String settingsXml) {
+        return Path.of(doGetLocalRepositoryWithSettings(settingsXml)).toAbsolutePath();
+    }
+
+    private String doGetLocalRepositoryWithSettings(String settingsXml) {
         if (settingsXml != null) {
             // when invoked with settings.xml, the file must be resolved from basedir (as Maven does)
             // but we should not use basedir, as it may contain extensions.xml or a project, that Maven will eagerly
@@ -573,7 +575,7 @@ public class Verifier {
     }
 
     public void verifyErrorFreeLog() throws VerificationException {
-        List<String> lines = loadFile(logFile.toFile(), false);
+        List<String> lines = loadFile(logFile);
 
         for (String line : lines) {
             // A hack to keep stupid velocity resource loader errors from triggering failure
@@ -639,7 +641,7 @@ public class Verifier {
      * @throws VerificationException if text is not found in log
      */
     public void verifyTextInLog(String text) throws VerificationException {
-        List<String> lines = loadFile(logFile.toFile(), false);
+        List<String> lines = loadFile(logFile);
 
         boolean result = false;
         for (String line : lines) {
@@ -666,11 +668,22 @@ public class Verifier {
     }
 
     public Properties loadProperties(String filename) throws VerificationException {
+        return loadProperties(basedir.resolve(filename));
+    }
+
+    /**
+     * Loads properties from the specified file.
+     *
+     * @param propertiesPath The path to the properties file, must not be <code>null</code>.
+     * @return The loaded properties, never <code>null</code>.
+     * @throws VerificationException If the properties could not be loaded.
+     * @since 4.0.0
+     */
+    public Properties loadProperties(Path propertiesPath) throws VerificationException {
         Properties properties = new Properties();
 
-        File propertiesFile = new File(getBasedir(), filename);
-        try (FileInputStream fis = new FileInputStream(propertiesFile)) {
-            properties.load(fis);
+        try (InputStream is = Files.newInputStream(propertiesPath)) {
+            properties.load(is);
         } catch (IOException e) {
             throw new VerificationException("Error reading properties file", e);
         }
@@ -702,33 +715,38 @@ public class Verifier {
     }
 
     private BufferedReader getReader(String filename, String encoding) throws IOException {
-        File file = new File(getBasedir(), filename);
+        return getReader(basedir.resolve(filename), encoding);
+    }
+
+    private BufferedReader getReader(Path filePath, String encoding) throws IOException {
         if (encoding != null && !encoding.isEmpty()) {
-            return Files.newBufferedReader(file.toPath(), Charset.forName(encoding));
+            return Files.newBufferedReader(filePath, Charset.forName(encoding));
         } else {
-            return Files.newBufferedReader(file.toPath());
+            return Files.newBufferedReader(filePath);
         }
     }
 
-    public List<String> loadFile(String basedir, String filename, boolean hasCommand) throws VerificationException {
-        return loadFile(new File(basedir, filename), hasCommand);
+    public List<String> loadFile(String basedir, String filename) throws VerificationException {
+        return loadFile(Paths.get(basedir).resolve(filename));
     }
 
-    public List<String> loadFile(File file, boolean hasCommand) throws VerificationException {
+    /**
+     * Loads the lines of the specified file.
+     *
+     * @param filePath The path to the file to load, must not be <code>null</code>.
+     * @return The list of lines from the file, can be empty but never <code>null</code>.
+     * @throws VerificationException If the file could not be loaded.
+     * @since 4.0.0
+     */
+    public List<String> loadFile(Path filePath) throws VerificationException {
         List<String> lines = new ArrayList<>();
 
-        if (file.exists()) {
-            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-                String line = reader.readLine();
-
-                while (line != null) {
-                    line = line.trim();
-
-                    if (!line.startsWith("#") && !line.isEmpty()) {
-                        lines.addAll(replaceArtifacts(line, hasCommand));
-                    }
-                    line = reader.readLine();
-                }
+        if (Files.exists(filePath)) {
+            try (Stream<String> stream = Files.lines(filePath)) {
+                return stream
+                        .map(String::trim)
+                        .filter(line -> !line.startsWith("#") && !line.isEmpty())
+                        .toList();
             } catch (IOException e) {
                 throw new VerificationException("Verifier loadFile failure", e);
             }
@@ -749,68 +767,22 @@ public class Verifier {
         return loadLines(filename, null);
     }
 
-    private static final String MARKER = "${artifact:";
-
-    private List<String> replaceArtifacts(String line, boolean hasCommand) {
-        int index = line.indexOf(MARKER);
-        if (index >= 0) {
-            String newLine = line.substring(0, index);
-            index = line.indexOf("}", index);
-            if (index < 0) {
-                throw new IllegalArgumentException("line does not contain ending artifact marker: '" + line + "'");
-            }
-            String artifact = line.substring(newLine.length() + MARKER.length(), index);
-
-            newLine += getArtifactPath(artifact);
-            newLine += line.substring(index + 1);
-
-            List<String> l = new ArrayList<>();
-            l.add(newLine);
-
-            int endIndex = newLine.lastIndexOf('/');
-
-            String command = null;
-            String filespec;
-            if (hasCommand) {
-                int startIndex = newLine.indexOf(' ');
-
-                command = newLine.substring(0, startIndex);
-
-                filespec = newLine.substring(startIndex + 1, endIndex);
-            } else {
-                filespec = newLine;
-            }
-
-            File dir = new File(filespec);
-            addMetadataToList(dir, hasCommand, l, command);
-            addMetadataToList(dir.getParentFile(), hasCommand, l, command);
-
-            return l;
-        } else {
-            return Collections.singletonList(line);
-        }
-    }
-
-    private static void addMetadataToList(File dir, boolean hasCommand, List<String> l, String command) {
-        if (dir.exists() && dir.isDirectory()) {
-            String[] files = dir.list(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    return name.startsWith("maven-metadata") && name.endsWith(".xml");
+    private static void addMetadataToList(Path dir, List<Path> l) {
+        if (Files.exists(dir) && Files.isDirectory(dir)) {
+            try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir, "maven-metadata*.xml")) {
+                for (Path file : stream) {
+                    String fileName = file.getFileName().toString();
+                    if (fileName.startsWith("maven-metadata") && fileName.endsWith(".xml")) {
+                        l.add(file);
+                    }
                 }
-            });
-
-            for (String file : files) {
-                if (hasCommand) {
-                    l.add(command + " " + new File(dir, file).getPath());
-                } else {
-                    l.add(new File(dir, file).getPath());
-                }
+            } catch (IOException e) {
+                // Ignore directory access errors
             }
         }
     }
 
-    private String getArtifactPath(String artifact) {
+    private Path getArtifactPath(String artifact) {
         StringTokenizer tok = new StringTokenizer(artifact, ":");
         if (tok.countTokens() != 4) {
             throw new IllegalArgumentException("Artifact must have 4 tokens: '" + artifact + "'");
@@ -828,7 +800,7 @@ public class Verifier {
         return getArtifactPath(groupId, artifactId, version, ext);
     }
 
-    public String getArtifactPath(String groupId, String artifactId, String version, String ext) {
+    public Path getArtifactPath(String groupId, String artifactId, String version, String ext) {
         return getArtifactPath(groupId, artifactId, version, ext, null);
     }
 
@@ -843,7 +815,7 @@ public class Verifier {
      * @return the absolute path to the artifact denoted by groupId, artifactId, version, extension and classifier,
      *         never null.
      */
-    public String getArtifactPath(String gid, String aid, String version, String ext, String classifier) {
+    public Path getArtifactPath(String gid, String aid, String version, String ext, String classifier) {
         if (classifier != null && classifier.isEmpty()) {
             classifier = null;
         }
@@ -863,12 +835,10 @@ public class Verifier {
         } else {
             gav = gid + ":" + aid + ":" + ext + ":" + version;
         }
-        return getLocalRepository()
-                + File.separator
-                + executorTool.artifactPath(executorHelper.executorRequest(), gav, null);
+        return getLocalRepository().resolve(executorTool.artifactPath(executorHelper.executorRequest(), gav, null));
     }
 
-    private String getSupportArtifactPath(String artifact) {
+    private Path getSupportArtifactPath(String artifact) {
         StringTokenizer tok = new StringTokenizer(artifact, ":");
         if (tok.countTokens() != 4) {
             throw new IllegalArgumentException("Artifact must have 4 tokens: '" + artifact + "'");
@@ -886,7 +856,7 @@ public class Verifier {
         return getSupportArtifactPath(groupId, artifactId, version, ext);
     }
 
-    public String getSupportArtifactPath(String groupId, String artifactId, String version, String ext) {
+    public Path getSupportArtifactPath(String groupId, String artifactId, String version, String ext) {
         return getSupportArtifactPath(groupId, artifactId, version, ext, null);
     }
 
@@ -901,7 +871,7 @@ public class Verifier {
      * @return the absolute path to the artifact denoted by groupId, artifactId, version, extension and classifier,
      *         never null.
      */
-    public String getSupportArtifactPath(String gid, String aid, String version, String ext, String classifier) {
+    public Path getSupportArtifactPath(String gid, String aid, String version, String ext, String classifier) {
         if (classifier != null && classifier.isEmpty()) {
             classifier = null;
         }
@@ -925,17 +895,18 @@ public class Verifier {
                 .resolve(executorTool.artifactPath(
                         executorHelper.executorRequest().argument("-Dmaven.repo.local=" + outerLocalRepository),
                         gav,
-                        null))
-                .toString();
+                        null));
     }
 
-    public List<String> getArtifactFileNameList(String org, String name, String version, String ext) {
-        List<String> files = new ArrayList<>();
-        String artifactPath = getArtifactPath(org, name, version, ext);
-        File dir = new File(artifactPath);
+    public List<Path> getArtifactFileNameList(String org, String name, String version, String ext) {
+        List<Path> files = new ArrayList<>();
+        Path artifactPath = getArtifactPath(org, name, version, ext);
         files.add(artifactPath);
-        addMetadataToList(dir, false, files, null);
-        addMetadataToList(dir.getParentFile(), false, files, null);
+        addMetadataToList(artifactPath, files);
+        Path parent = artifactPath.getParent();
+        if (parent != null) {
+            addMetadataToList(parent, files);
+        }
         return files;
     }
 
@@ -948,7 +919,7 @@ public class Verifier {
      * @param version The artifact version, may be <code>null</code>.
      * @return The (absolute) path to the local artifact metadata, never <code>null</code>.
      */
-    public String getArtifactMetadataPath(String gid, String aid, String version) {
+    public Path getArtifactMetadataPath(String gid, String aid, String version) {
         return getArtifactMetadataPath(gid, aid, version, "maven-metadata.xml");
     }
 
@@ -962,7 +933,7 @@ public class Verifier {
      * @param filename The filename to use, must not be <code>null</code>.
      * @return The (absolute) path to the local artifact metadata, never <code>null</code>.
      */
-    public String getArtifactMetadataPath(String gid, String aid, String version, String filename) {
+    public Path getArtifactMetadataPath(String gid, String aid, String version, String filename) {
         return getArtifactMetadataPath(gid, aid, version, filename, null);
     }
 
@@ -977,7 +948,7 @@ public class Verifier {
      * @param repoId   The remote repository ID from where metadata originate, may be <code>null</code>.
      * @return The (absolute) path to the local artifact metadata, never <code>null</code>.
      */
-    public String getArtifactMetadataPath(String gid, String aid, String version, String filename, String repoId) {
+    public Path getArtifactMetadataPath(String gid, String aid, String version, String filename, String repoId) {
         String gav;
         if (gid != null) {
             gav = gid + ":";
@@ -995,9 +966,7 @@ public class Verifier {
             gav += ":";
         }
         gav += filename;
-        return getLocalRepository()
-                + File.separator
-                + executorTool.metadataPath(executorHelper.executorRequest(), gav, repoId);
+        return getLocalRepository().resolve(executorTool.metadataPath(executorHelper.executorRequest(), gav, repoId));
     }
 
     /**
@@ -1008,14 +977,14 @@ public class Verifier {
      * @param aid The artifact id, must not be <code>null</code>.
      * @return The (absolute) path to the local artifact metadata, never <code>null</code>.
      */
-    public String getArtifactMetadataPath(String gid, String aid) {
+    public Path getArtifactMetadataPath(String gid, String aid) {
         return getArtifactMetadataPath(gid, aid, null);
     }
 
     public void deleteArtifact(String org, String name, String version, String ext) throws IOException {
-        List<String> files = getArtifactFileNameList(org, name, version, ext);
-        for (String fileName : files) {
-            FileUtils.forceDelete(new File(fileName));
+        List<Path> files = getArtifactFileNameList(org, name, version, ext);
+        for (Path fileName : files) {
+            Files.deleteIfExists(fileName);
         }
     }
 
@@ -1028,8 +997,8 @@ public class Verifier {
      */
     public void deleteArtifacts(String gid) throws IOException {
         String mdPath = executorTool.metadataPath(executorHelper.executorRequest(), gid, null);
-        Path dir = Paths.get(getLocalRepository()).resolve(mdPath).getParent();
-        FileUtils.deleteDirectory(dir.toFile());
+        Path dir = getLocalRepository().resolve(mdPath).getParent();
+        deleteDirectoryRecursively(dir);
     }
 
     /**
@@ -1048,8 +1017,8 @@ public class Verifier {
 
         String mdPath =
                 executorTool.metadataPath(executorHelper.executorRequest(), gid + ":" + aid + ":" + version, null);
-        Path dir = Paths.get(getLocalRepository()).resolve(mdPath).getParent();
-        FileUtils.deleteDirectory(dir.toFile());
+        Path dir = getLocalRepository().resolve(mdPath).getParent();
+        deleteDirectoryRecursively(dir);
     }
 
     /**
@@ -1060,15 +1029,36 @@ public class Verifier {
      * @since 1.2
      */
     public void deleteDirectory(String path) throws IOException {
-        FileUtils.deleteDirectory(new File(getBasedir(), path));
+        deleteDirectoryRecursively(basedir.resolve(path));
     }
 
-    public File filterFile(String srcPath, String dstPath) throws IOException {
-        return filterFile(srcPath, dstPath, (String) null);
+    /**
+     * Recursively deletes a directory and all its contents using NIO2.
+     *
+     * @param dir The directory to delete, must not be <code>null</code>.
+     * @throws IOException If the directory could not be deleted.
+     */
+    private static void deleteDirectoryRecursively(Path dir) throws IOException {
+        if (Files.exists(dir)) {
+            try (Stream<Path> paths = Files.walk(dir)) {
+                paths.sorted(Comparator.reverseOrder())
+                        .forEach(path -> {
+                            try {
+                                Files.delete(path);
+                            } catch (IOException e) {
+                                // Ignore individual file deletion errors
+                            }
+                        });
+            }
+        }
     }
 
-    public File filterFile(String srcPath, String dstPath, Map<String, String> filterMap) throws IOException {
-        return filterFile(srcPath, dstPath, null, filterMap);
+    public Path filterFile(String srcPath, String dstPath) throws IOException {
+        return filterFile(basedir.resolve(srcPath), basedir.resolve(dstPath), null, newDefaultFilterMap());
+    }
+
+    public Path filterFile(String srcPath, String dstPath, Map<String, String> filterMap) throws IOException {
+        return filterFile(basedir.resolve(srcPath), basedir.resolve(dstPath), null, filterMap);
     }
 
     /**
@@ -1089,8 +1079,8 @@ public class Verifier {
      * @throws IOException If the file could not be filtered.
      * @since 2.0
      */
-    public File filterFile(String srcPath, String dstPath, String fileEncoding) throws IOException {
-        return filterFile(srcPath, dstPath, fileEncoding, newDefaultFilterMap());
+    public Path filterFile(String srcPath, String dstPath, String fileEncoding) throws IOException {
+        return filterFile(basedir.resolve(srcPath), basedir.resolve(dstPath), fileEncoding, newDefaultFilterMap());
     }
 
     /**
@@ -1107,22 +1097,36 @@ public class Verifier {
      * @throws IOException If the file could not be filtered.
      * @since 1.2
      */
-    public File filterFile(String srcPath, String dstPath, String fileEncoding, Map<String, String> filterMap)
+    public Path filterFile(String srcPath, String dstPath, String fileEncoding, Map<String, String> filterMap)
+            throws IOException {
+        return filterFile(basedir.resolve(srcPath), basedir.resolve(dstPath), fileEncoding, filterMap);
+    }
+
+    /**
+     * Filters a text file by replacing some user-defined tokens.
+     *
+     * @param srcPath      The path to the input file, must not be <code>null</code>.
+     * @param dstPath      The path to the output file, must not be <code>null</code>.
+     * @param fileEncoding The file encoding to use, may be <code>null</code> or empty to use the platform's default
+     *                     encoding.
+     * @param filterMap    The mapping from tokens to replacement values, must not be <code>null</code>.
+     * @return The path to the filtered output file, never <code>null</code>.
+     * @throws IOException If the file could not be filtered.
+     * @since 4.0.0
+     */
+    public Path filterFile(Path srcPath, Path dstPath, String fileEncoding, Map<String, String> filterMap)
             throws IOException {
         Charset charset = fileEncoding != null ? Charset.forName(fileEncoding) : StandardCharsets.UTF_8;
-        File srcFile = new File(getBasedir(), srcPath);
-        String data = Files.readString(srcFile.toPath(), charset);
+        String data = Files.readString(srcPath, charset);
 
         for (Map.Entry<String, String> entry : filterMap.entrySet()) {
             data = StringUtils.replace(data, entry.getKey(), entry.getValue());
         }
 
-        File dstFile = new File(getBasedir(), dstPath);
-        //noinspection ResultOfMethodCallIgnored
-        dstFile.getParentFile().mkdirs();
-        Files.writeString(dstFile.toPath(), data, charset);
+        Files.createDirectories(dstPath.getParent());
+        Files.writeString(dstPath, data, charset);
 
-        return dstFile;
+        return dstPath;
     }
 
     /**
@@ -1135,7 +1139,7 @@ public class Verifier {
     public Map<String, String> newDefaultFilterMap() {
         Map<String, String> filterMap = new HashMap<>();
 
-        Path basedir = Paths.get(getBasedir()).toAbsolutePath();
+        Path basedir = getBasedir();
         filterMap.put("@basedir@", basedir.toString());
         filterMap.put("@baseurl@", basedir.toUri().toASCIIString());
 
@@ -1153,6 +1157,16 @@ public class Verifier {
     }
 
     /**
+     * Verifies that the given file exists.
+     *
+     * @param file the path of the file to check
+     * @throws VerificationException in case the given file does not exist
+     */
+    public void verifyFilePresent(Path file) throws VerificationException {
+        verifyFilePresence(file.toString(), true);
+    }
+
+    /**
      * Verifies that the given file does not exist.
      *
      * @param file the path of the file to check
@@ -1162,11 +1176,21 @@ public class Verifier {
         verifyFilePresence(file, false);
     }
 
+    /**
+     * Verifies that the given file does not exist.
+     *
+     * @param file the path of the file to check
+     * @throws VerificationException if the given file exists
+     */
+    public void verifyFileNotPresent(Path file) throws VerificationException {
+        verifyFilePresence(file.toString(), false);
+    }
+
     private void verifyArtifactPresence(boolean wanted, String groupId, String artifactId, String version, String ext)
             throws VerificationException {
-        List<String> files = getArtifactFileNameList(groupId, artifactId, version, ext);
-        for (String fileName : files) {
-            verifyFilePresence(fileName, wanted);
+        List<Path> files = getArtifactFileNameList(groupId, artifactId, version, ext);
+        for (Path fileName : files) {
+            verifyFilePresence(fileName.toString(), wanted);
         }
     }
 
@@ -1200,7 +1224,6 @@ public class Verifier {
 
     private void verifyFilePresence(String filePath, boolean wanted) throws VerificationException {
         if (filePath.contains("!/")) {
-            Path basedir = Paths.get(getBasedir()).toAbsolutePath();
             String urlString = "jar:" + basedir.toUri().toASCIIString() + "/" + filePath;
 
             InputStream is = null;
@@ -1234,52 +1257,66 @@ public class Verifier {
                 }
             }
         } else {
-            File expectedFile = new File(filePath);
-
-            // NOTE: On Windows, a path with a leading (back-)slash is relative to the current drive
-            if (!expectedFile.isAbsolute() && !expectedFile.getPath().startsWith(File.separator)) {
-                expectedFile = new File(getBasedir(), filePath);
-            }
-
             if (filePath.indexOf('*') > -1) {
-                File parent = expectedFile.getParentFile();
+                // Handle wildcard patterns - don't use Paths.get() with wildcards as '*' is illegal on Windows
+                int lastSep = Math.max(filePath.lastIndexOf('/'), filePath.lastIndexOf('\\'));
+                String parentPath = lastSep > -1 ? filePath.substring(0, lastSep) : "";
+                String filePattern = lastSep > -1 ? filePath.substring(lastSep + 1) : filePath;
 
-                if (!parent.exists()) {
+                Path parent;
+                if (parentPath.isEmpty()) {
+                    parent = basedir;
+                } else {
+                    Path parentPathObj = Paths.get(parentPath);
+                    if (!parentPathObj.isAbsolute() && !parentPath.startsWith("/") && !parentPath.startsWith("\\")) {
+                        parent = basedir.resolve(parentPath);
+                    } else {
+                        parent = parentPathObj;
+                    }
+                }
+
+                if (!Files.exists(parent)) {
                     if (wanted) {
                         throw new VerificationException(
-                                "Expected file pattern was not found: " + expectedFile.getPath());
+                                "Expected file pattern was not found: " + filePath + " (parent directory does not exist)");
                     }
                 } else {
-                    String shortNamePattern = expectedFile.getName().replaceAll("\\*", ".*");
-
-                    String[] candidates = parent.list();
+                    String shortNamePattern = filePattern.replaceAll("\\*", ".*");
 
                     boolean found = false;
 
-                    if (candidates != null) {
-                        for (String candidate : candidates) {
-                            if (candidate.matches(shortNamePattern)) {
+                    try (DirectoryStream<Path> stream = Files.newDirectoryStream(parent)) {
+                        for (Path candidate : stream) {
+                            if (candidate.getFileName().toString().matches(shortNamePattern)) {
                                 found = true;
                                 break;
                             }
                         }
+                    } catch (IOException e) {
+                        // Ignore directory access errors
                     }
 
                     if (!found && wanted) {
-                        throw new VerificationException(
-                                "Expected file pattern was not found: " + expectedFile.getPath());
+                        throw new VerificationException("Expected file pattern was not found: " + filePath);
                     } else if (found && !wanted) {
-                        throw new VerificationException("Unwanted file pattern was found: " + expectedFile.getPath());
+                        throw new VerificationException("Unwanted file pattern was found: " + filePath);
                     }
                 }
             } else {
-                if (!expectedFile.exists()) {
+                Path expectedPath = Paths.get(filePath);
+
+                // NOTE: On Windows, a path with a leading (back-)slash is relative to the current drive
+                if (!expectedPath.isAbsolute() && !filePath.startsWith("/") && !filePath.startsWith("\\")) {
+                    expectedPath = basedir.resolve(filePath);
+                }
+
+                if (!Files.exists(expectedPath)) {
                     if (wanted) {
-                        throw new VerificationException("Expected file was not found: " + expectedFile.getPath());
+                        throw new VerificationException("Expected file was not found: " + expectedPath);
                     }
                 } else {
                     if (!wanted) {
-                        throw new VerificationException("Unwanted file was found: " + expectedFile.getPath());
+                        throw new VerificationException("Unwanted file was found: " + expectedPath);
                     }
                 }
             }
@@ -1299,8 +1336,9 @@ public class Verifier {
      */
     public void verifyArtifactContent(String groupId, String artifactId, String version, String ext, String content)
             throws IOException, VerificationException {
-        String fileName = getArtifactPath(groupId, artifactId, version, ext);
-        if (!content.equals(FileUtils.fileRead(fileName))) {
+        Path fileName = getArtifactPath(groupId, artifactId, version, ext);
+        String actualContent = Files.readString(fileName);
+        if (!content.equals(actualContent)) {
             throw new VerificationException("Content of " + fileName + " does not equal " + content);
         }
     }

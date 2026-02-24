@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -33,17 +33,17 @@ public class MavenITmng3536AppendedAbsolutePathsTest extends AbstractMavenIntegr
 
     @Test
     public void testitMNG3536() throws Exception {
-        File testDir = extractResources("/mng-3536");
-        File pluginDir = new File(testDir, "plugin");
-        Verifier verifier = newVerifier(pluginDir.getAbsolutePath());
+        Path testDir = extractResources("mng-3536");
+        Path pluginDir = testDir.resolve("plugin");
+        Verifier verifier = newVerifier(pluginDir);
 
         verifier.addCliArgument("install");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        File projectDir = new File(testDir, "project");
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        Path projectDir = testDir.resolve("project");
+        verifier = newVerifier(projectDir);
 
         verifier.addCliArgument("verify");
         verifier.execute();

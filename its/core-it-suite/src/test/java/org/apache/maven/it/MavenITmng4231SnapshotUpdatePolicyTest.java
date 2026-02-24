@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.Properties;
 
@@ -40,9 +40,9 @@ public class MavenITmng4231SnapshotUpdatePolicyTest extends AbstractMavenIntegra
      */
     @Test
     public void testitAlways() throws Exception {
-        File testDir = extractResources("/mng-4231");
+        Path testDir = extractResources("mng-4231");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4231");
         verifier.addCliArgument("-s");
@@ -78,9 +78,9 @@ public class MavenITmng4231SnapshotUpdatePolicyTest extends AbstractMavenIntegra
      */
     @Test
     public void testitNever() throws Exception {
-        File testDir = extractResources("/mng-4231");
+        Path testDir = extractResources("mng-4231");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4231");
         verifier.addCliArgument("-s");

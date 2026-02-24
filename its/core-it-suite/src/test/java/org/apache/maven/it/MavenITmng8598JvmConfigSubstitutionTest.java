@@ -18,9 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,18 +33,18 @@ public class MavenITmng8598JvmConfigSubstitutionTest extends AbstractMavenIntegr
 
     @Test
     public void testProjectBasedirSubstitution() throws Exception {
-        File testDir = extractResources("/mng-8598");
+        Path testDir = extractResources("mng-8598");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument(
-                "-Dexpression.outputFile=" + new File(testDir, "target/pom.properties").getAbsolutePath());
+                "-Dexpression.outputFile=" + testDir.resolve("target/pom.properties"));
         verifier.setForkJvm(true); // custom .mvn/jvm.config
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties("target/pom.properties");
-        String expectedPath = testDir.getAbsolutePath().replace('\\', '/');
+        String expectedPath = testDir.toString().replace('\\', '/');
         assertEquals(
                 expectedPath + "/curated",
                 props.getProperty("project.properties.curatedPathProp").replace('\\', '/'));

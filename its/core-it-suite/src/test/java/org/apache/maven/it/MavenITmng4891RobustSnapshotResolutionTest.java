@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -40,9 +40,9 @@ public class MavenITmng4891RobustSnapshotResolutionTest extends AbstractMavenInt
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4891");
+        Path testDir = extractResources("mng-4891");
 
-        Verifier verifier = newVerifier(new File(testDir, "producer").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("producer"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4891");
@@ -50,7 +50,7 @@ public class MavenITmng4891RobustSnapshotResolutionTest extends AbstractMavenInt
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(new File(testDir, "consumer").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("consumer"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

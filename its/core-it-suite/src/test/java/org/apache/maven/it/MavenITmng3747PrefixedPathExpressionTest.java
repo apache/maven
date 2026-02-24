@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -40,9 +40,9 @@ public class MavenITmng3747PrefixedPathExpressionTest extends AbstractMavenInteg
 
     @Test
     public void testitMNG3747() throws Exception {
-        File testDir = extractResources("/mng-3747");
+        Path testDir = extractResources("mng-3747");
 
-        Verifier verifier = newVerifier(testDir.getCanonicalPath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
@@ -51,7 +51,7 @@ public class MavenITmng3747PrefixedPathExpressionTest extends AbstractMavenInteg
 
         Properties props = verifier.loadProperties("target/config.properties");
         assertEquals(
-                "path is: " + new File(testDir, "relative").getCanonicalPath() + "/somepath",
+                "path is: " + testDir.resolve("relative") + "/somepath",
                 props.getProperty("stringParam"));
     }
 }

@@ -18,8 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -28,11 +27,11 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng6084Jsr250PluginTest extends AbstractMavenIntegrationTestCase {
 
-    private File testDir;
+    private Path testDir;
 
     @BeforeEach
     public void setUp() throws Exception {
-        testDir = extractResources("/mng-6084-jsr250-support");
+        testDir = extractResources("mng-6084-jsr250-support");
     }
 
     @Test
@@ -40,7 +39,7 @@ public class MavenITmng6084Jsr250PluginTest extends AbstractMavenIntegrationTest
         //
         // Build a plugin that uses JSR 250 annotations
         //
-        Verifier v0 = newVerifier(testDir.getAbsolutePath());
+        Verifier v0 = newVerifier(testDir);
         v0.setAutoclean(false);
         v0.deleteDirectory("target");
         v0.deleteArtifacts("org.apache.maven.its.mng6084");
@@ -51,7 +50,7 @@ public class MavenITmng6084Jsr250PluginTest extends AbstractMavenIntegrationTest
         //
         // Execute the JSR 250 plugin
         //
-        Verifier v1 = newVerifier(testDir.getAbsolutePath());
+        Verifier v1 = newVerifier(testDir);
         v1.setAutoclean(false);
         v1.addCliArgument("org.apache.maven.its.mng6084:jsr250-maven-plugin:0.0.1-SNAPSHOT:hello");
         v1.execute();

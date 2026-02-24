@@ -18,8 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,7 +30,7 @@ public class MavenITmng6972AllowAccessToGraphPackageTest extends AbstractMavenIn
     public void testit() throws Exception {
 
         // The testdir is computed from the location of this file.
-        final File testDir = extractResources("/mng-6972-allow-access-to-graph-package");
+        final Path testDir = extractResources("mng-6972-allow-access-to-graph-package");
 
         Verifier verifier;
 
@@ -42,18 +41,18 @@ public class MavenITmng6972AllowAccessToGraphPackageTest extends AbstractMavenIn
          * unstable test results. Fortunately, the verifier
          * makes it easy to do this.
          */
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir);
         verifier.deleteArtifact("mng-6972-allow-access-to-graph-package", "build-plugin", "1.0", "jar");
         verifier.deleteArtifact("mng-6972-allow-access-to-graph-package", "using-module", "1.0", "jar");
 
-        verifier = newVerifier(new File(testDir.getAbsolutePath(), "build-plugin").getAbsolutePath());
-        verifier.getSystemProperties().put("maven.multiModuleProjectDirectory", testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.resolve( "build-plugin"));
+        verifier.getSystemProperties().put("maven.multiModuleProjectDirectory", testDir.toString());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(new File(testDir.getAbsolutePath(), "using-module").getAbsolutePath());
-        verifier.getSystemProperties().put("maven.multiModuleProjectDirectory", testDir.getAbsolutePath());
+        verifier = newVerifier(testDir.resolve( "using-module"));
+        verifier.getSystemProperties().put("maven.multiModuleProjectDirectory", testDir.toString());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();

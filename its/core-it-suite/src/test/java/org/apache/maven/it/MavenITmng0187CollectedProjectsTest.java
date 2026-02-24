@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,9 +44,9 @@ public class MavenITmng0187CollectedProjectsTest extends AbstractMavenIntegratio
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-0187");
+        Path testDir = extractResources("mng-0187");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("sub-1/target");

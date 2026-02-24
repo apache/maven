@@ -18,9 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.net.URI;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -28,7 +27,7 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng6759TransitiveDependencyRepositoriesTest extends AbstractMavenIntegrationTestCase {
 
-    private final String projectBaseDir = "/mng-6759-transitive-dependency-repositories";
+    private static final String RESOURCE_PATH = "mng-6759-transitive-dependency-repositories";
 
     /**
      * Verifies that a project with a dependency graph like {@code A -> B -> C},
@@ -39,11 +38,11 @@ public class MavenITmng6759TransitiveDependencyRepositoriesTest extends Abstract
     @Test
     public void testTransitiveDependenciesAccountForRepositoriesListedByDependencyTrailPredecessor() throws Exception {
         installDependencyCInCustomRepo();
-        File testDir = extractResources(projectBaseDir);
+        Path testDir = extractResources(RESOURCE_PATH);
 
         // First, build the test plugin
         Verifier verifier =
-                newVerifier(new File(testDir, "mng6759-plugin-resolves-project-dependencies").getAbsolutePath());
+                newVerifier(testDir.resolve("mng6759-plugin-resolves-project-dependencies"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -51,7 +50,7 @@ public class MavenITmng6759TransitiveDependencyRepositoriesTest extends Abstract
         verifier.verifyErrorFreeLog();
 
         // Then, run the test project that uses the plugin
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir);
 
         verifier.addCliArgument("package");
         verifier.execute();
@@ -59,9 +58,9 @@ public class MavenITmng6759TransitiveDependencyRepositoriesTest extends Abstract
     }
 
     private void installDependencyCInCustomRepo() throws Exception {
-        File dependencyCProjectDir = extractResources(projectBaseDir + "/dependency-in-custom-repo");
-        URI customRepoUri = new File(new File(dependencyCProjectDir, "target"), "repo").toURI();
-        Verifier verifier = newVerifier(dependencyCProjectDir.getAbsolutePath());
+        Path dependencyCProjectDir = extractResources(RESOURCE_PATH + "/dependency-in-custom-repo");
+        URI customRepoUri = dependencyCProjectDir.resolve("target").resolve("repo").toUri();
+        Verifier verifier = newVerifier(dependencyCProjectDir);
 
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-DaltDeploymentRepository=customRepo::" + customRepoUri);

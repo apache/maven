@@ -18,17 +18,15 @@
  */
 package org.apache.maven.it;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Deque;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
-
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -45,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 2.0.8
  */
 public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenIntegrationTestCase {
-    private static final String RESOURCE_BASE = "/mng-3415";
+    private static final String RESOURCE_BASE = "mng-3415";
 
     public MavenITmng3415JunkRepositoryMetadataTest() {
         // we're going to control the test execution according to the maven version present within each test method.
@@ -83,11 +81,11 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
     public void testitTransferFailed() throws Exception {
         String methodName = getMethodName();
 
-        File testDir = extractResources(RESOURCE_BASE);
+        Path testDir = extractResources(RESOURCE_BASE);
 
         Verifier verifier;
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng3415");
 
@@ -96,11 +94,11 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
         Map<String, String> filterProps = verifier.newDefaultFilterMap();
         filterProps.put("@protocol@", "invalid");
         filterProps.put("@port@", "0");
-        File settings = verifier.filterFile("settings-template.xml", "settings-a.xml", filterProps);
+        Path settings = verifier.filterFile("settings-template.xml", "settings-a.xml", filterProps);
 
         verifier.addCliArgument("-X");
         verifier.addCliArgument("-s");
-        verifier.addCliArgument(settings.getName());
+        verifier.addCliArgument(settings.toString());
 
         verifier.setLogFileName("log-" + methodName + "-firstBuild.txt");
         verifier.addCliArgument("validate");
@@ -154,11 +152,11 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
     public void testShouldNotRepeatedlyUpdateOnResourceNotFoundException() throws Exception {
         String methodName = getMethodName();
 
-        File testDir = extractResources(RESOURCE_BASE);
+        Path testDir = extractResources(RESOURCE_BASE);
 
         Verifier verifier;
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng3415");
 
@@ -193,11 +191,11 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
             Map<String, String> filterProps = verifier.newDefaultFilterMap();
             filterProps.put("@protocol@", "http");
             filterProps.put("@port@", Integer.toString(port));
-            File settings = verifier.filterFile("settings-template.xml", "settings-b.xml", filterProps);
+            Path settings = verifier.filterFile("settings-template.xml", "settings-b.xml", filterProps);
 
             verifier.addCliArgument("-X");
             verifier.addCliArgument("-s");
-            verifier.addCliArgument(settings.getName());
+            verifier.addCliArgument(settings.toString());
 
             setupDummyDependency(verifier, testDir, true);
 
@@ -213,8 +211,8 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
 
             requestUris.clear();
 
-            File updateCheckFile = getUpdateCheckFile(verifier);
-            long firstLastMod = updateCheckFile.lastModified();
+            Path updateCheckFile = getUpdateCheckFile(verifier);
+            long firstLastMod = ItUtils.lastModified(updateCheckFile);
 
             setupDummyDependency(verifier, testDir, false);
 
@@ -230,7 +228,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
 
             assertEquals(
                     firstLastMod,
-                    updateCheckFile.lastModified(),
+                    ItUtils.lastModified(updateCheckFile),
                     "Last-modified time should be unchanged from first build through second build for the file we use for"
                             + " updateInterval checks.");
         } finally {
@@ -240,14 +238,14 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
     }
 
     private void assertMetadataMissing(Verifier verifier) {
-        File metadata = getMetadataFile(verifier);
+        Path metadata = getMetadataFile(verifier);
 
         assertFalse(
-                metadata.exists(),
-                "Metadata file should NOT be present in local repository: " + metadata.getAbsolutePath());
+                Files.exists(metadata),
+                "Metadata file should NOT be present in local repository: " + metadata);
     }
 
-    private void setupDummyDependency(Verifier verifier, File testDir, boolean resetUpdateInterval) throws IOException {
+    private void setupDummyDependency(Verifier verifier, Path testDir, boolean resetUpdateInterval) throws IOException {
         String gid = "org.apache.maven.its.mng3415";
         String aid = "missing";
         String version = "1.0-SNAPSHOT";
@@ -256,35 +254,35 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
             verifier.deleteArtifacts(gid);
         }
 
-        File pom = new File(verifier.getArtifactPath(gid, aid, version, "pom"));
+        Path pom = verifier.getArtifactPath(gid, aid, version, "pom");
 
-        File pomSrc = new File(testDir, "dependency-pom.xml");
+        Path pomSrc = testDir.resolve("dependency-pom.xml");
 
         System.out.println("Copying dependency POM\nfrom: " + pomSrc + "\nto: " + pom);
-        Files.createDirectories(pom.toPath().getParent());
-        Files.copy(pomSrc.toPath(), pom.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        Files.createDirectories(pom.getParent());
+        Files.copy(pomSrc, pom, StandardCopyOption.REPLACE_EXISTING);
     }
 
-    private File getMetadataFile(Verifier verifier) {
+    private Path getMetadataFile(Verifier verifier) {
         String gid = "org.apache.maven.its.mng3415";
         String aid = "missing";
         String version = "1.0-SNAPSHOT";
         String name = "maven-metadata-testing-repo.xml";
 
-        return new File(verifier.getArtifactMetadataPath(gid, aid, version, name));
+        return verifier.getArtifactMetadataPath(gid, aid, version, name);
     }
 
     /**
      * If the current maven version is < 3.0, we'll use the metadata file itself (old maven-artifact code)...
      * otherwise, use the new resolver-status.properties file (new artifact code).
      */
-    private File getUpdateCheckFile(Verifier verifier) {
+    private Path getUpdateCheckFile(Verifier verifier) {
         String gid = "org.apache.maven.its.mng3415";
         String aid = "missing";
         String version = "1.0-SNAPSHOT";
         // < 3.0 (including snapshots)
         String name = "resolver-status.properties";
 
-        return new File(verifier.getArtifactMetadataPath(gid, aid, version, name));
+        return verifier.getArtifactMetadataPath(gid, aid, version, name);
     }
 }

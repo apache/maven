@@ -18,12 +18,10 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
-public class MavenITmng7128BlockExternalHttpReactorTest extends AbstractMavenIntegrationTestCase {
-    private static final String PROJECT_PATH = "/mng-7128-block-external-http-reactor";
+class MavenITmng7128BlockExternalHttpReactorTest extends AbstractMavenIntegrationTestCase {
 
     /**
      * This test verifies that defining a repository in pom.xml that uses HTTP is blocked.
@@ -31,9 +29,9 @@ public class MavenITmng7128BlockExternalHttpReactorTest extends AbstractMavenInt
      * @throws Exception in case of failure
      */
     @Test
-    public void testBlockedHttpRepositoryInPom() throws Exception {
-        final File projectDir = extractResources(PROJECT_PATH);
-        final Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+    void testBlockedHttpRepositoryInPom() throws Exception {
+        final Path projectDir = extractResources("mng-7128-block-external-http-reactor");
+        final Verifier verifier = newVerifier(projectDir);
         // ITs override global settings that provide blocked mirror: need to define the mirror in dedicated settings
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");

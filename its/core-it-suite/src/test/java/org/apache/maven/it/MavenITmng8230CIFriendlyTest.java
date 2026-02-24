@@ -18,9 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,18 +41,18 @@ class MavenITmng8230CIFriendlyTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void testitCiFriendlyWithProjectProperties() throws Exception {
-        File testDir = extractResources("/mng-8230-ci-friendly-and-gav");
+        Path testDir = extractResources("mng-8230-ci-friendly-and-gav");
 
-        File basedir = new File(testDir, "cif-with-project-props");
-        Verifier verifier = newVerifier(basedir.getAbsolutePath());
-        verifier.addCliArgument("-Dexpression.outputFile=" + new File(basedir, PROPERTIES).getPath());
+        Path basedir = testDir.resolve("cif-with-project-props");
+        Verifier verifier = newVerifier(basedir);
+        verifier.addCliArgument("-Dexpression.outputFile=" + basedir.resolve(PROPERTIES));
         verifier.addCliArgument("-Dexpression.expressions=project/version");
         verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval");
         verifier.execute();
         verifier.verifyErrorFreeLog();
         verifier.verifyFilePresent(PROPERTIES);
         Properties props = verifier.loadProperties(PROPERTIES);
-        assertEquals(props.getProperty("project.version"), "1.0-SNAPSHOT");
+        assertEquals("1.0-SNAPSHOT", props.getProperty("project.version"));
     }
 
     /**
@@ -63,11 +62,11 @@ class MavenITmng8230CIFriendlyTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void testitCiFriendlyWithProjectPropertiesOverride() throws Exception {
-        File testDir = extractResources("/mng-8230-ci-friendly-and-gav");
+        Path testDir = extractResources("mng-8230-ci-friendly-and-gav");
 
-        File basedir = new File(testDir, "cif-with-project-props");
-        Verifier verifier = newVerifier(basedir.getAbsolutePath());
-        verifier.addCliArgument("-Dexpression.outputFile=" + new File(basedir, PROPERTIES).getPath());
+        Path basedir = testDir.resolve("cif-with-project-props");
+        Verifier verifier = newVerifier(basedir);
+        verifier.addCliArgument("-Dexpression.outputFile=" + basedir.resolve(PROPERTIES));
         verifier.addCliArgument("-Dexpression.expressions=project/version");
         verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval");
         verifier.addCliArgument("-Dci-version=1.1-SNAPSHOT");
@@ -75,7 +74,7 @@ class MavenITmng8230CIFriendlyTest extends AbstractMavenIntegrationTestCase {
         verifier.verifyErrorFreeLog();
         verifier.verifyFilePresent(PROPERTIES);
         Properties props = verifier.loadProperties(PROPERTIES);
-        assertEquals(props.getProperty("project.version"), "1.1-SNAPSHOT");
+        assertEquals("1.1-SNAPSHOT", props.getProperty("project.version"));
     }
 
     /**
@@ -85,12 +84,12 @@ class MavenITmng8230CIFriendlyTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void testitCiFriendlyWithUserProperties() throws Exception {
-        File testDir = extractResources("/mng-8230-ci-friendly-and-gav");
+        Path testDir = extractResources("mng-8230-ci-friendly-and-gav");
 
-        File basedir = new File(testDir, "cif-with-user-props");
-        Verifier verifier = newVerifier(basedir.getAbsolutePath());
+        Path basedir = testDir.resolve("cif-with-user-props");
+        Verifier verifier = newVerifier(basedir);
 
-        verifier.addCliArgument("-Dexpression.outputFile=" + new File(basedir, PROPERTIES).getPath());
+        verifier.addCliArgument("-Dexpression.outputFile=" + basedir.resolve(PROPERTIES));
         verifier.addCliArgument("-Dexpression.expressions=project/version");
         verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval");
         verifier.addCliArgument("-Dci-version=1.1-SNAPSHOT");
@@ -98,7 +97,7 @@ class MavenITmng8230CIFriendlyTest extends AbstractMavenIntegrationTestCase {
         verifier.verifyErrorFreeLog();
         verifier.verifyFilePresent(PROPERTIES);
         Properties props = verifier.loadProperties(PROPERTIES);
-        assertEquals(props.getProperty("project.version"), "1.1-SNAPSHOT");
+        assertEquals("1.1-SNAPSHOT", props.getProperty("project.version"));
     }
 
     /**
@@ -108,11 +107,11 @@ class MavenITmng8230CIFriendlyTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void testitCiFriendlyWithUserPropertiesNotGiven() throws Exception {
-        File testDir = extractResources("/mng-8230-ci-friendly-and-gav");
+        Path testDir = extractResources("mng-8230-ci-friendly-and-gav");
 
-        File basedir = new File(testDir, "cif-with-user-props");
-        Verifier verifier = newVerifier(basedir.getAbsolutePath());
-        verifier.addCliArgument("-Dexpression.outputFile=" + new File(basedir, PROPERTIES).getPath());
+        Path basedir = testDir.resolve("cif-with-user-props");
+        Verifier verifier = newVerifier(basedir);
+        verifier.addCliArgument("-Dexpression.outputFile=" + basedir.resolve(PROPERTIES));
         verifier.addCliArgument("-Dexpression.expressions=project/version");
         verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval");
         try {
@@ -129,11 +128,11 @@ class MavenITmng8230CIFriendlyTest extends AbstractMavenIntegrationTestCase {
 
     @Test
     void testitExpressionInGroupId() throws Exception {
-        File testDir = extractResources("/mng-8230-ci-friendly-and-gav");
+        Path testDir = extractResources("mng-8230-ci-friendly-and-gav");
 
-        File basedir = new File(testDir, "exp-in-groupid");
-        Verifier verifier = newVerifier(basedir.getAbsolutePath());
-        verifier.addCliArgument("-Dexpression.outputFile=" + new File(basedir, PROPERTIES).getPath());
+        Path basedir = testDir.resolve("exp-in-groupid");
+        Verifier verifier = newVerifier(basedir);
+        verifier.addCliArgument("-Dexpression.outputFile=" + basedir.resolve(PROPERTIES));
         verifier.addCliArgument("-Dexpression.expressions=project/version");
         verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval");
         try {
@@ -150,11 +149,11 @@ class MavenITmng8230CIFriendlyTest extends AbstractMavenIntegrationTestCase {
 
     @Test
     void testitExpressionInArtifactId() throws Exception {
-        File testDir = extractResources("/mng-8230-ci-friendly-and-gav");
+        Path testDir = extractResources("mng-8230-ci-friendly-and-gav");
 
-        File basedir = new File(testDir, "exp-in-artifactid");
-        Verifier verifier = newVerifier(basedir.getAbsolutePath());
-        verifier.addCliArgument("-Dexpression.outputFile=" + new File(basedir, PROPERTIES).getPath());
+        Path basedir = testDir.resolve("exp-in-artifactid");
+        Verifier verifier = newVerifier(basedir);
+        verifier.addCliArgument("-Dexpression.outputFile=" + basedir.resolve(PROPERTIES));
         verifier.addCliArgument("-Dexpression.expressions=project/version");
         verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval");
         try {

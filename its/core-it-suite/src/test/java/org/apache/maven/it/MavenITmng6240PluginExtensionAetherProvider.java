@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -46,17 +46,17 @@ public class MavenITmng6240PluginExtensionAetherProvider extends AbstractMavenIn
      */
     @Test
     public void testPluginExtensionDependingOnMavenAetherProvider() throws Exception {
-        File testDir = extractResources("/mng-6240-plugin-extension-aether-provider");
-        File pluginDir = new File(testDir, "plugin-extension");
-        File projectDir = new File(testDir, "project");
+        Path testDir = extractResources("mng-6240-plugin-extension-aether-provider");
+        Path pluginDir = testDir.resolve("plugin-extension");
+        Path projectDir = testDir.resolve("project");
 
-        Verifier verifier = newVerifier(pluginDir.getAbsolutePath());
+        Verifier verifier = newVerifier(pluginDir);
         verifier.removeCIEnvironmentVariables();
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir);
         verifier.removeCIEnvironmentVariables();
         verifier.addCliArgument("deploy");
         verifier.execute();
