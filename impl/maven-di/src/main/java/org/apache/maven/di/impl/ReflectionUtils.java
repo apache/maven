@@ -298,7 +298,12 @@ public final class ReflectionUtils {
     @SuppressWarnings("unchecked")
     public static <T> Binding<T> bindingFromMethod(Method method) {
         method.setAccessible(true);
-        Binding<T> binding = Binding.to(
+
+        // Extract priority first
+        Priority priority = method.getAnnotation(Priority.class);
+        int priorityValue = priority != null ? priority.value() : 0;
+
+        return Binding.toMethod(
                 Key.ofType(method.getGenericReturnType(), ReflectionUtils.qualifierOf(method)),
                 args -> {
                     try {
@@ -323,14 +328,9 @@ public final class ReflectionUtils {
                         throw new DIException("Failed to call method " + method, e.getCause());
                     }
                 },
-                toDependencies(method.getDeclaringClass(), method));
-
-        Priority priority = method.getAnnotation(Priority.class);
-        if (priority != null) {
-            binding = binding.prioritize(priority.value());
-        }
-
-        return binding;
+                toDependencies(method.getDeclaringClass(), method),
+                method,
+                priorityValue);
     }
 
     public static <T> Binding<T> bindingFromConstructor(Key<T> key, Constructor<T> constructor) {
