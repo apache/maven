@@ -18,9 +18,6 @@
  */
 package org.apache.maven.it;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -30,23 +27,21 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.apache.maven.it.utils.DeployedResource;
 import org.codehaus.plexus.util.StringUtils;
-import org.eclipse.jetty.security.ConstraintMapping;
-import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.Constraint;
 import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.security.UserStore;
+import org.eclipse.jetty.security.authentication.BasicAuthenticator;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.Callback;
 import org.eclipse.jetty.util.security.Password;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.eclipse.jetty.util.security.Constraint.__BASIC_AUTH;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -66,14 +61,13 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest extends AbstractMa
 
     @BeforeEach
     protected void setUp() throws Exception {
-        Handler proxyHandler = new AbstractHandler() {
+        Handler proxyHandler = new Handler.Abstract() {
             @Override
-            public void handle(
-                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
+            public boolean handle(Request request, Response response, Callback callback) {
                 String tn = Thread.currentThread().getName();
-                System.out.println(tn + " Handling (proxy) " + request.getMethod() + " " + request.getRequestURL());
+                System.out.println(tn + " Handling (proxy) " + request.getMethod() + " " + request.getHttpURI());
 
-                String auth = request.getHeader("Proxy-Authorization");
+                String auth = request.getHeaders().get("Proxy-Authorization");
                 if (auth != null) {
                     auth = auth.substring(auth.indexOf(' ') + 1).trim();
                     auth = new String(Base64.getDecoder().decode(auth), StandardCharsets.US_ASCII);
@@ -81,59 +75,52 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest extends AbstractMa
                 System.out.println(tn + " Proxy-Authorization: " + auth);
 
                 if (!"proxyuser:proxypass".equals(auth)) {
-                    response.setStatus(HttpServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED);
-                    response.addHeader("Proxy-Authenticate", "Basic realm=\"Squid proxy-caching web server\"");
-                    ((Request) request).setHandled(true);
+                    response.setStatus(407);
+                    response.getHeaders().add("Proxy-Authenticate", "Basic realm=\"Squid proxy-caching web server\"");
+                    callback.succeeded();
+                    return true;
                 }
 
                 DeployedResource deployedResource = new DeployedResource();
 
                 deployedResource.httpMethod = request.getMethod();
-                deployedResource.requestUri = request.getRequestURI();
-                deployedResource.transferEncoding = request.getHeader("Transfer-Encoding");
-                deployedResource.contentLength = request.getHeader("Content-Length");
+                deployedResource.requestUri = Request.getPathInContext(request);
+                deployedResource.transferEncoding = request.getHeaders().get("Transfer-Encoding");
+                deployedResource.contentLength = request.getHeaders().get("Content-Length");
 
                 deployedResources.add(deployedResource);
-                System.out.println(tn + " Done (proxy) " + request.getMethod() + " " + request.getRequestURL());
+                System.out.println(tn + " Done (proxy) " + request.getMethod() + " " + request.getHttpURI());
+                return false;
             }
         };
 
-        Handler repoHandler = new AbstractHandler() {
+        Handler repoHandler = new Handler.Abstract() {
             @Override
-            public void handle(
-                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
+            public boolean handle(Request request, Response response, Callback callback) {
                 String tn = Thread.currentThread().getName();
-                System.out.println(tn + " Handling (repos) " + request.getMethod() + " " + request.getRequestURL());
+                System.out.println(tn + " Handling (repos) " + request.getMethod() + " " + request.getHttpURI());
 
                 if ("PUT".equalsIgnoreCase(request.getMethod())) {
-                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.setStatus(200);
                     deployed = true;
                 } else {
-                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    response.setStatus(404);
                 }
-
-                ((Request) request).setHandled(true);
 
                 DeployedResource deployedResource = new DeployedResource();
 
                 deployedResource.httpMethod = request.getMethod();
-                deployedResource.requestUri = request.getRequestURI();
-                deployedResource.transferEncoding = request.getHeader("Transfer-Encoding");
-                deployedResource.contentLength = request.getHeader("Content-Length");
+                deployedResource.requestUri = Request.getPathInContext(request);
+                deployedResource.transferEncoding = request.getHeaders().get("Transfer-Encoding");
+                deployedResource.contentLength = request.getHeaders().get("Content-Length");
 
                 deployedResources.add(deployedResource);
-                System.out.println(tn + " Done (repos) " + request.getMethod() + " " + request.getRequestURL());
+                System.out.println(tn + " Done (repos) " + request.getMethod() + " " + request.getHttpURI());
+
+                callback.succeeded();
+                return true;
             }
         };
-
-        Constraint constraint = new Constraint();
-        constraint.setName(Constraint.__BASIC_AUTH);
-        constraint.setRoles(new String[] {"deployer"});
-        constraint.setAuthenticate(true);
-
-        ConstraintMapping constraintMapping = new ConstraintMapping();
-        constraintMapping.setConstraint(constraint);
-        constraintMapping.setPathSpec("/*");
 
         HashLoginService userRealm = new HashLoginService("TestRealm");
         UserStore userStore = new UserStore();
@@ -141,15 +128,16 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest extends AbstractMa
         userRealm.setUserStore(userStore);
 
         server = new Server(0);
-        ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
+        SecurityHandler.PathMapped securityHandler = new SecurityHandler.PathMapped();
         securityHandler.setLoginService(userRealm);
-        securityHandler.setAuthMethod(__BASIC_AUTH);
-        securityHandler.setConstraintMappings(new ConstraintMapping[] {constraintMapping});
+        securityHandler.setAuthenticator(new BasicAuthenticator());
+        securityHandler.put("/*", Constraint.from("auth", Constraint.Authorization.ANY_USER));
 
-        HandlerList handlerList = new HandlerList();
+        securityHandler.setHandler(repoHandler);
+
+        Handler.Sequence handlerList = new Handler.Sequence();
         handlerList.addHandler(proxyHandler);
         handlerList.addHandler(securityHandler);
-        handlerList.addHandler(repoHandler);
 
         server.setHandler(handlerList);
         server.start();

@@ -18,9 +18,6 @@
  */
 package org.apache.maven.it;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,9 +25,9 @@ import java.nio.file.Path;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.util.Callback;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,30 +53,30 @@ public class MavenITmng5868NoDuplicateAttachedArtifacts extends AbstractMavenInt
     protected void setUp() throws Exception {
         testDir = extractResources("/mng-5868");
 
-        Handler repoHandler = new AbstractHandler() {
+        Handler repoHandler = new Handler.Abstract() {
             @Override
-            public void handle(
-                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
-                System.out.println("Handling " + request.getMethod() + " " + request.getRequestURL());
+            public boolean handle(Request request, Response response, Callback callback) throws Exception {
+                System.out.println("Handling " + request.getMethod() + " " + request.getHttpURI().toString());
 
                 if ("PUT".equalsIgnoreCase(request.getMethod())) {
-                    String uri = request.getRequestURI();
+                    String uri = Request.getPathInContext(request);
                     if (uri.startsWith("/repo/org/apache/maven/its/mng5868/mng5868/1.0-SNAPSHOT/mng5868-1.0")
                             && uri.endsWith("-run.jar")) {
                         deployedJarArtifactNumber++;
                     }
-                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.setStatus(200);
                 } else {
-                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    response.setStatus(404);
                 }
 
-                ((Request) request).setHandled(true);
+                callback.succeeded();
+                return true;
             }
         };
 
         server = new Server(0);
 
-        HandlerList handlerList = new HandlerList();
+        Handler.Sequence handlerList = new Handler.Sequence();
         handlerList.addHandler(repoHandler);
 
         server.setHandler(handlerList);
