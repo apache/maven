@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Tests AC8 scenario 5: Modular project with NO Java in <sources> for TEST scope
+  and explicit legacy <testSourceDirectory> that differs from default.
+
+  Expected behavior:
+  - ERROR for <testSourceDirectory> (modular project, no AC9 fallback)
+  - No test Java sources (legacy rejected, none in <sources>)
+-->
+<project xmlns="http://maven.apache.org/POM/4.1.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 https://maven.apache.org/xsd/maven-4.1.0.xsd">
+    <modelVersion>4.1.0</modelVersion>
+
+    <groupId>org.apache.maven.tests</groupId>
+    <artifactId>modular-no-test-java-with-explicit-test-source-dir-test</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <build>
+        <!-- Explicit legacy testSourceDirectory - triggers ERROR (AC8, no AC9 fallback for modular) -->
+        <testSourceDirectory>src/custom/test/java</testSourceDirectory>
+
+        <sources>
+            <!-- Modular main Java sources only - no test Java -->
+            <source>
+                <scope>main</scope>
+                <lang>java</lang>
+                <module>org.foo.app</module>
+            </source>
+            <!-- No test Java sources in <sources> -->
+        </sources>
+    </build>
+</project>
