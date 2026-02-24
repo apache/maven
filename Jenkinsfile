@@ -1,7 +1,7 @@
 #!groovy
 
 pipeline {
-  agent none
+  agent any
   // save some io during the build
   options {
     skipDefaultCheckout()
@@ -10,7 +10,7 @@ pipeline {
   }
   stages {
     stage("Build / Test - JDK17") {
-      agent { node { label 'ubuntu' } }
+      agent any
       steps {
         timeout(time: 210, unit: 'MINUTES') {
           checkout scm
