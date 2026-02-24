@@ -73,6 +73,20 @@ public class DefaultInheritanceAssembler implements InheritanceAssembler {
         return merger.merge(child, parent, false, hints);
     }
 
+    // Package-private overload to allow callers (e.g., for mixins) to control source dominance
+    Model assembleModelInheritance(
+            Model child,
+            Model parent,
+            ModelBuilderRequest request,
+            ModelProblemCollector problems,
+            boolean sourceDominant) {
+        Map<Object, Object> hints = new HashMap<>();
+        String childPath = child.getProperties().getOrDefault(CHILD_DIRECTORY_PROPERTY, child.getArtifactId());
+        hints.put(CHILD_DIRECTORY, childPath);
+        hints.put(MavenModelMerger.CHILD_PATH_ADJUSTMENT, getChildPathAdjustment(child, parent, childPath));
+        return merger.merge(child, parent, sourceDominant, hints);
+    }
+
     /**
      * Calculates the relative path from the base directory of the parent to the parent directory of the base directory
      * of the child. The general idea is to adjust inherited URLs to match the project layout (in SCM).
