@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
@@ -89,7 +90,7 @@ public class DefaultModelValidator implements ModelValidator {
 
     private static final String EMPTY = "";
 
-    private final Set<String> validIds = new HashSet<>();
+    private final Set<String> validIds = ConcurrentHashMap.newKeySet();
 
     private ModelVersionProcessor versionProcessor;
 
@@ -1125,7 +1126,7 @@ public class DefaultModelValidator implements ModelValidator {
             String id,
             String sourceHint,
             InputLocationTracker tracker) {
-        if (validIds.contains(id)) {
+        if (id != null && validIds.contains(id)) {
             return true;
         }
         if (!validateStringNotEmpty(prefix, fieldName, problems, severity, version, id, sourceHint, tracker)) {
