@@ -90,7 +90,7 @@ jobs:
         run: ls -la apache-maven/target
 
       - name: Upload Mimir caches
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         if: ${{ !cancelled() && !failure() }}
         with:
           name: cache-${{ runner.os }}-initial
@@ -98,7 +98,7 @@ jobs:
           path: ${{ env.MIMIR_LOCAL }}
 
       - name: Upload Maven distributions
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: maven-distributions
           path: |
@@ -106,7 +106,7 @@ jobs:
             apache-maven/target/apache-maven*.tar.gz
 
       - name: Upload test artifacts
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         if: ${{ failure() || cancelled() }}
         with:
           name: initial-logs
@@ -116,7 +116,7 @@ jobs:
             **/target/java_heapdump.hprof
 
       - name: Upload Mimir logs
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         if: always()
         with:
           name: initial-mimir-logs
@@ -211,7 +211,7 @@ jobs:
         run: mvn site -e -B -V -Preporting
 
       - name: Upload Mimir caches
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         if: ${{ !cancelled() && !failure() }}
         with:
           name: cache-${{ runner.os }}-full-build-${{ matrix.java }}
@@ -219,7 +219,7 @@ jobs:
           path: ${{ env.MIMIR_LOCAL }}
 
       - name: Upload test artifacts
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         if: failure() || cancelled()
         with:
           name: full-build-logs-${{ runner.os }}-${{ matrix.java }}
@@ -229,7 +229,7 @@ jobs:
             **/target/java_heapdump.hprof
 
       - name: Upload Mimir logs
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         if: always()
         with:
           name: full-build-mimir-logs-${{ runner.os }}-${{ matrix.java }}
@@ -308,7 +308,7 @@ jobs:
         run: mvn install -e -B -V -Prun-its,mimir
 
       - name: Upload Mimir caches
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         if: ${{ !cancelled() && !failure() }}
         with:
           name: cache-${{ runner.os }}-integration-tests-${{ matrix.java }}
@@ -316,7 +316,7 @@ jobs:
           path: ${{ env.MIMIR_LOCAL }}
 
       - name: Upload test artifacts
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         if: ${{ failure() || cancelled() }}
         with:
           name: integration-test-logs-${{ runner.os }}-${{ matrix.java }}
@@ -328,7 +328,7 @@ jobs:
             **/target/java_heapdump.hprof
 
       - name: Upload Mimir logs
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         if: always()
         with:
           name: integration-test-mimir-logs-${{ runner.os }}-${{ matrix.java }}
