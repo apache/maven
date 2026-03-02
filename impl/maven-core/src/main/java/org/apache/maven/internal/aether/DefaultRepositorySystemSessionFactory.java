@@ -18,6 +18,8 @@
  */
 package org.apache.maven.internal.aether;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -27,6 +29,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -212,6 +215,7 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         sessionBuilder.setMirrorSelector(mirrorSelector);
 
         DefaultProxySelector proxySelector = new DefaultProxySelector();
+        Set<String> coveredProtocols = new HashSet<>();
         for (Proxy proxy : request.getProxies()) {
             AuthenticationBuilder authBuilder = new AuthenticationBuilder();
             authBuilder.addUsername(proxy.getUsername()).addPassword(proxy.getPassword());
@@ -219,7 +223,9 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
                     new org.eclipse.aether.repository.Proxy(
                             proxy.getProtocol(), proxy.getHost(), proxy.getPort(), authBuilder.build()),
                     proxy.getNonProxyHosts());
+            coveredProtocols.add(proxy.getProtocol());
         }
+        addProxiesFromEnvironment(proxySelector, coveredProtocols, mergedProps);
         sessionBuilder.setProxySelector(proxySelector);
 
         // Note: we do NOT use WagonTransportConfigurationKeys here as Maven Core does NOT depend on Wagon Transport
@@ -507,6 +513,73 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
                 .filter(e -> e.getValue() != null)
                 .collect(Collectors.toMap(
                         e -> String.valueOf(e.getKey()), e -> String.valueOf(e.getValue()), (k1, k2) -> k2));
+    }
+
+    private void addProxiesFromEnvironment(
+            DefaultProxySelector proxySelector, Set<String> coveredProtocols, Map<String, String> mergedProps) {
+        // Convert NO_PROXY comma-separated list to Maven's pipe-separated nonProxyHosts
+        String noProxy = getEnvVar(mergedProps, "NO_PROXY", "no_proxy");
+        String nonProxyHosts = noProxy != null ? noProxy.replace(",", "|") : null;
+
+        if (!coveredProtocols.contains("http")) {
+            String httpProxy = getEnvVar(mergedProps, "HTTP_PROXY", "http_proxy");
+            if (httpProxy == null) {
+                httpProxy = getEnvVar(mergedProps, "ALL_PROXY", "all_proxy");
+            }
+            if (httpProxy != null) {
+                addProxyFromUrl(proxySelector, "http", httpProxy, nonProxyHosts);
+            }
+        }
+
+        if (!coveredProtocols.contains("https")) {
+            String httpsProxy = getEnvVar(mergedProps, "HTTPS_PROXY", "https_proxy");
+            if (httpsProxy == null) {
+                httpsProxy = getEnvVar(mergedProps, "ALL_PROXY", "all_proxy");
+            }
+            if (httpsProxy != null) {
+                addProxyFromUrl(proxySelector, "https", httpsProxy, nonProxyHosts);
+            }
+        }
+    }
+
+    /** Returns env var value: prefers lowercase key (Unix curl convention), falls back to uppercase. */
+    private String getEnvVar(Map<String, String> mergedProps, String upperCase, String lowerCase) {
+        String value = mergedProps.get("env." + lowerCase);
+        if (value == null) {
+            value = mergedProps.get("env." + upperCase);
+        }
+        return value;
+    }
+
+    private void addProxyFromUrl(
+            DefaultProxySelector proxySelector, String protocol, String proxyUrl, String nonProxyHosts) {
+        try {
+            URI uri = new URI(proxyUrl);
+            String host = uri.getHost();
+            if (host == null || host.isEmpty()) {
+                logger.warn("Ignoring invalid proxy URL from environment variable: {}", proxyUrl);
+                return;
+            }
+            int port = uri.getPort();
+            if (port < 0) {
+                port = "https".equals(protocol) ? 443 : 80;
+            }
+            AuthenticationBuilder authBuilder = new AuthenticationBuilder();
+            String userInfo = uri.getUserInfo();
+            if (userInfo != null) {
+                int colonIdx = userInfo.indexOf(':');
+                if (colonIdx >= 0) {
+                    authBuilder.addUsername(userInfo.substring(0, colonIdx));
+                    authBuilder.addPassword(userInfo.substring(colonIdx + 1));
+                } else {
+                    authBuilder.addUsername(userInfo);
+                }
+            }
+            proxySelector.add(
+                    new org.eclipse.aether.repository.Proxy(protocol, host, port, authBuilder.build()), nonProxyHosts);
+        } catch (URISyntaxException e) {
+            logger.warn("Failed to parse proxy URL from environment variable: {}", proxyUrl, e);
+        }
     }
 
     private String getUserAgent() {

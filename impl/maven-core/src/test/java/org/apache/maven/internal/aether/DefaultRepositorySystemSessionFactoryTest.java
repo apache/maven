@@ -40,7 +40,9 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.ConfigurationProperties;
+import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.collection.VersionFilter;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.util.graph.version.ChainedVersionFilter;
 import org.eclipse.aether.util.graph.version.ContextualSnapshotVersionFilter;
@@ -446,6 +448,87 @@ public class DefaultRepositorySystemSessionFactoryTest {
         versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
         assertNotNull(versionFilter);
         assertInstanceOf(ChainedVersionFilter.class, versionFilter);
+    }
+
+    @Test
+    void proxyFromEnvVarsTest() throws InvalidRepositoryException {
+        DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
+                aetherRepositorySystem,
+                eventSpyDispatcher,
+                information,
+                defaultTypeRegistry,
+                versionScheme,
+                Collections.emptyMap());
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        request.setLocalRepository(getLocalRepository());
+
+        Properties systemProps = new Properties();
+        systemProps.setProperty("env.HTTP_PROXY", "http://proxy.example.com:3128");
+        systemProps.setProperty("env.HTTPS_PROXY", "http://proxy.example.com:3128");
+        systemProps.setProperty("env.NO_PROXY", "localhost,127.0.0.1");
+        request.setSystemProperties(systemProps);
+
+        RepositorySystemSession session = systemSessionFactory.newRepositorySession(request);
+
+        RemoteRepository httpRepo = new RemoteRepository.Builder("test", "default", "http://repo.example.com/").build();
+        org.eclipse.aether.repository.Proxy httpProxy =
+                session.getProxySelector().getProxy(httpRepo);
+        assertNotNull(httpProxy);
+        assertEquals("proxy.example.com", httpProxy.getHost());
+        assertEquals(3128, httpProxy.getPort());
+
+        RemoteRepository httpsRepo =
+                new RemoteRepository.Builder("test2", "default", "https://repo.example.com/").build();
+        org.eclipse.aether.repository.Proxy httpsProxy =
+                session.getProxySelector().getProxy(httpsRepo);
+        assertNotNull(httpsProxy);
+        assertEquals("proxy.example.com", httpsProxy.getHost());
+        assertEquals(3128, httpsProxy.getPort());
+    }
+
+    @Test
+    void settingsProxyTakesPrecedenceOverEnvVarsTest() throws InvalidRepositoryException {
+        DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
+                aetherRepositorySystem,
+                eventSpyDispatcher,
+                information,
+                defaultTypeRegistry,
+                versionScheme,
+                Collections.emptyMap());
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        request.setLocalRepository(getLocalRepository());
+
+        // Settings proxy for http
+        org.apache.maven.settings.Proxy settingsProxy = new org.apache.maven.settings.Proxy();
+        settingsProxy.setProtocol("http");
+        settingsProxy.setHost("settings-proxy.example.com");
+        settingsProxy.setPort(8080);
+        request.addProxy(settingsProxy);
+
+        // Env var also set (should be ignored for http, used for https)
+        Properties systemProps = new Properties();
+        systemProps.setProperty("env.HTTP_PROXY", "http://env-proxy.example.com:3128");
+        systemProps.setProperty("env.HTTPS_PROXY", "http://env-proxy.example.com:3128");
+        request.setSystemProperties(systemProps);
+
+        RepositorySystemSession session = systemSessionFactory.newRepositorySession(request);
+
+        // Settings proxy wins for http
+        RemoteRepository httpRepo = new RemoteRepository.Builder("test", "default", "http://repo.example.com/").build();
+        org.eclipse.aether.repository.Proxy httpProxy =
+                session.getProxySelector().getProxy(httpRepo);
+        assertNotNull(httpProxy);
+        assertEquals("settings-proxy.example.com", httpProxy.getHost());
+
+        // Env var used for https (not covered by settings)
+        RemoteRepository httpsRepo =
+                new RemoteRepository.Builder("test2", "default", "https://repo.example.com/").build();
+        org.eclipse.aether.repository.Proxy httpsProxy =
+                session.getProxySelector().getProxy(httpsRepo);
+        assertNotNull(httpsProxy);
+        assertEquals("env-proxy.example.com", httpsProxy.getHost());
     }
 
     protected ArtifactRepository getLocalRepository() throws InvalidRepositoryException {
