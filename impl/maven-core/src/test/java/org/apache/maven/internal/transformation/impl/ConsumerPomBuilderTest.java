@@ -160,6 +160,27 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         assertFalse(model.getDependencyManagement().getDependencies().isEmpty());
     }
 
+    /**
+     * Same test as {@link #testMultiModuleConsumer()}, but verifies that
+     * {@code <build>} is preserved when {@code preserveModelVersion=true}.
+     */
+    @Test
+    void testMultiModuleConsumerPreserveModelVersion() throws Exception {
+        setRootDirectory("multi-module");
+        Path file = Paths.get("src/test/resources/consumer/multi-module/pom.xml");
+
+        MavenProject project = getEffectiveModel(file);
+        Model model = getEffectiveModel(file).getModel().getDelegate();
+        model = Model.newBuilder(model, true).preserveModelVersion(true).build();
+
+        Model transformed = DefaultConsumerPomBuilder.transformPom(model, project);
+
+        assertNotNull(transformed);
+        assertNotNull(transformed.getBuild());
+        assertTrue(transformed.getDependencies().isEmpty());
+        assertFalse(transformed.getDependencyManagement().getDependencies().isEmpty());
+    }
+
     @Test
     void testScmInheritance() throws Exception {
         Model model = Model.newBuilder()
