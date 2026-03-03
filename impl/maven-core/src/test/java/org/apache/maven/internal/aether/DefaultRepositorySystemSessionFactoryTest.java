@@ -34,6 +34,7 @@ import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.internal.impl.DefaultTypeRegistry;
+import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.settings.Server;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
@@ -50,6 +51,7 @@ import org.eclipse.aether.util.graph.version.HighestVersionFilter;
 import org.eclipse.aether.util.graph.version.LowestVersionFilter;
 import org.eclipse.aether.util.graph.version.PredicateVersionFilter;
 import org.eclipse.aether.version.VersionScheme;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
@@ -529,6 +531,39 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 session.getProxySelector().getProxy(httpsRepo);
         assertNotNull(httpsProxy);
         assertEquals("env-proxy.example.com", httpsProxy.getHost());
+    }
+
+    @Test
+    void proxyFromEnvVarsViaEnvironmentUtilsTest() throws InvalidRepositoryException {
+        // Skip if HTTPS_PROXY is not set in the real environment
+        String httpsProxy = System.getenv("HTTPS_PROXY");
+        if (httpsProxy == null) {
+            httpsProxy = System.getenv("https_proxy");
+        }
+        Assumptions.assumeTrue(httpsProxy != null, "HTTPS_PROXY env var not set; skipping e2e env var test");
+
+        DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
+                aetherRepositorySystem,
+                eventSpyDispatcher,
+                information,
+                defaultTypeRegistry,
+                versionScheme,
+                Collections.emptyMap());
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        request.setLocalRepository(getLocalRepository());
+
+        // Simulate what BaseParser.populateSystemProperties() does — reads real env vars
+        Properties systemProps = new Properties();
+        EnvironmentUtils.addEnvVars(systemProps);
+        request.setSystemProperties(systemProps);
+
+        RepositorySystemSession session = systemSessionFactory.newRepositorySession(request);
+
+        RemoteRepository httpsRepo =
+                new RemoteRepository.Builder("central", "default", "https://repo.maven.apache.org/maven2/").build();
+        org.eclipse.aether.repository.Proxy proxy = session.getProxySelector().getProxy(httpsRepo);
+        assertNotNull(proxy, "Expected proxy to be set from HTTPS_PROXY env var");
     }
 
     protected ArtifactRepository getLocalRepository() throws InvalidRepositoryException {
