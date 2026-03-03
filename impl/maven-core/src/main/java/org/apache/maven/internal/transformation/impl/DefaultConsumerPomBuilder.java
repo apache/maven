@@ -382,7 +382,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         }
         if (!preserveModelVersion) {
             /*
-             * If tne <build> contains <source> elements, it is not compatible with the Maven 4.0.0 model.
+             * If the <build> contains <source> elements, it is not compatible with the Maven 4.0.0 model.
              * Remove the full <build> element instead of removing only the <sources> element, because the
              * build without sources does not mean much. Reminder: this removal can be disabled by setting
              * the `preserveModelVersion` XML attribute or `preserve.model.version` property to true.
