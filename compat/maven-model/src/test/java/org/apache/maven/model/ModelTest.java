@@ -18,12 +18,16 @@
  */
 package org.apache.maven.model;
 
+import java.io.StringWriter;
+
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@code Model}.
@@ -65,6 +69,24 @@ class ModelTest {
     @Test
     void testToStringNullSafe() {
         assertNotNull(new Model().toString());
+    }
+
+    @Test
+    void testWritePreservesModelVersionNamespace() throws Exception {
+        Model model = new Model();
+        model.setModelVersion("4.1.0");
+        model.setGroupId("g");
+        model.setArtifactId("a");
+        model.setVersion("1");
+
+        StringWriter output = new StringWriter();
+        new MavenXpp3Writer().write(output, model);
+
+        String xml = output.toString();
+        assertTrue(xml.contains("xmlns=\"http://maven.apache.org/POM/4.1.0\""));
+        assertTrue(
+                xml.contains(
+                        "xsi:schemaLocation=\"http://maven.apache.org/POM/4.1.0 https://maven.apache.org/xsd/maven-4.1.0.xsd\""));
     }
 
     @Test
