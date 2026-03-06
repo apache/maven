@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -35,9 +35,9 @@ public class MavenITmng6071GetResourceWithCustomPom extends AbstractMavenIntegra
      */
     @Test
     public void testRunCustomPomWithDot() throws Exception {
-        File testDir = extractResources("/mng-6071");
+        Path testDir = extractResources("mng-6071");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument("-f");
         verifier.addCliArgument("./pom.xml");
         verifier.setForkJvm(true); // TODO: why?

@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -36,9 +36,9 @@ public class MavenITmng3545ProfileDeactivationTest extends AbstractMavenIntegrat
      */
     @Test
     public void testBasicBuildWithDefaultProfiles() throws Exception {
-        File testDir = extractResources("/mng-3545");
+        Path testDir = extractResources("mng-3545");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.setLogFileName("log1.txt");
@@ -62,9 +62,9 @@ public class MavenITmng3545ProfileDeactivationTest extends AbstractMavenIntegrat
      */
     @Test
     public void testDeactivateDefaultProfilesHyphen() throws Exception {
-        File testDir = extractResources("/mng-3545");
+        Path testDir = extractResources("mng-3545");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.setLogFileName("log2.txt");
@@ -84,9 +84,9 @@ public class MavenITmng3545ProfileDeactivationTest extends AbstractMavenIntegrat
 
     @Test
     public void testDeactivateDefaultProfilesExclamation() throws Exception {
-        File testDir = extractResources("/mng-3545");
+        Path testDir = extractResources("mng-3545");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.setLogFileName("log3.txt");
@@ -112,9 +112,9 @@ public class MavenITmng3545ProfileDeactivationTest extends AbstractMavenIntegrat
      */
     @Test
     public void testDeactivateActivatedByProp() throws Exception {
-        File testDir = extractResources("/mng-3545");
+        Path testDir = extractResources("mng-3545");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.setLogFileName("log4.txt");
@@ -142,9 +142,9 @@ public class MavenITmng3545ProfileDeactivationTest extends AbstractMavenIntegrat
      */
     @Test
     public void testActivateThenDeactivate() throws Exception {
-        File testDir = extractResources("/mng-3545");
+        Path testDir = extractResources("mng-3545");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.setLogFileName("log5.txt");
@@ -172,9 +172,9 @@ public class MavenITmng3545ProfileDeactivationTest extends AbstractMavenIntegrat
      */
     @Test
     public void testDefaultProfileAutoDeactivation() throws Exception {
-        File testDir = extractResources("/mng-3545");
+        Path testDir = extractResources("mng-3545");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.setLogFileName("log6.txt");

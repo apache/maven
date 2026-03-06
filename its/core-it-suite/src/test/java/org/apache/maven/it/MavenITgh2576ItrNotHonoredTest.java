@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -34,23 +34,23 @@ class MavenITgh2576ItrNotHonoredTest extends AbstractMavenIntegrationTestCase {
 
     @Test
     void testItrNotHonored() throws Exception {
-        File testDir = extractResources("/gh-2576-itr-not-honored").getAbsoluteFile();
+        Path testDir = extractResources("gh-2576-itr-not-honored");
 
-        Verifier verifier = new Verifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.deleteArtifacts("org.apache.maven.its.gh2576");
 
-        verifier = new Verifier(new File(testDir, "parent").toString());
+        verifier = newVerifier(testDir.resolve("parent"));
         verifier.addCliArguments("install:install-file", "-Dfile=pom.xml", "-DpomFile=pom.xml", "-DlocalRepositoryPath=../repo/");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // use maven 3 personality so that we don't flatten the pom
-        verifier = new Verifier(new File(testDir, "dep").toString());
+        verifier = newVerifier(testDir.resolve("dep"));
         verifier.addCliArguments("install", "-Dmaven.maven3Personality");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = new Verifier(new File(testDir, "consumer").toString());
+        verifier = newVerifier(testDir.resolve("consumer"));
         verifier.addCliArguments("install", "-itr");
         assertThrows(VerificationException.class, verifier::execute);
     }
