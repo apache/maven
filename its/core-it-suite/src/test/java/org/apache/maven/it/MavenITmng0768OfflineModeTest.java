@@ -18,22 +18,20 @@
  */
 package org.apache.maven.it;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jetty.io.Content;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.util.Callback;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -57,33 +55,34 @@ public class MavenITmng0768OfflineModeTest extends AbstractMavenIntegrationTestC
 
         final List<String> requestedUris = Collections.synchronizedList(new ArrayList<>());
 
-        Handler repoHandler = new AbstractHandler() {
-            public void handle(
-                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
-                    throws IOException {
-                System.out.println("Handling " + request.getMethod() + " " + request.getRequestURL());
+        Handler repoHandler = new Handler.Abstract() {
+            public boolean handle(Request request, Response response, Callback callback) throws Exception {
+                System.out.println("Handling " + request.getMethod() + " " + request.getHttpURI().toString());
 
-                requestedUris.add(request.getRequestURI());
+                String uri = Request.getPathInContext(request);
+                requestedUris.add(uri);
 
-                PrintWriter writer = response.getWriter();
+                PrintWriter writer = new PrintWriter(Content.Sink.asOutputStream(response));
 
-                response.setStatus(HttpServletResponse.SC_OK);
+                response.setStatus(200);
 
-                if (request.getRequestURI().endsWith(".pom")) {
+                if (uri.endsWith(".pom")) {
                     writer.println("<project xmlns=\"http://maven.apache.org/POM/4.0.0\">");
                     writer.println("  <modelVersion>4.0.0</modelVersion>");
                     writer.println("  <groupId>org.apache.maven.its.mng0768</groupId>");
                     writer.println("  <artifactId>dep</artifactId>");
                     writer.println("  <version>0.1</version>");
                     writer.println("</project>");
-                } else if (request.getRequestURI().endsWith(".jar")) {
+                } else if (uri.endsWith(".jar")) {
                     writer.println("empty");
-                } else if (request.getRequestURI().endsWith(".md5")
-                        || request.getRequestURI().endsWith(".sha1")) {
-                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                } else if (uri.endsWith(".md5")
+                        || uri.endsWith(".sha1")) {
+                    response.setStatus(404);
                 }
 
-                ((Request) request).setHandled(true);
+                writer.flush();
+                callback.succeeded();
+                return true;
             }
         };
 

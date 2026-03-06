@@ -18,18 +18,17 @@
  */
 package org.apache.maven.it;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import java.io.File;
-import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Map;
 
+import org.eclipse.jetty.io.Content;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.util.Callback;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -75,29 +74,33 @@ public class MavenITmng3461MirrorMatchingTest extends AbstractMavenIntegrationTe
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
-        Handler repoHandler = new AbstractHandler() {
+        Handler repoHandler = new Handler.Abstract() {
             @Override
-            public void handle(
-                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
-                    throws IOException {
-                System.out.println("Handling " + request.getMethod() + " " + request.getRequestURL());
+            public boolean handle(Request request, Response response, Callback callback) throws Exception {
+                System.out.println("Handling " + request.getMethod() + " " + request.getHttpURI().toString());
 
-                if (request.getRequestURI().endsWith("/b-0.1.jar")) {
-                    response.setStatus(HttpServletResponse.SC_OK);
-                    response.getWriter().println(request.getRequestURI());
-                } else if (request.getRequestURI().endsWith("/b-0.1.pom")) {
-                    response.setStatus(HttpServletResponse.SC_OK);
-                    response.getWriter().println("<project xmlns=\"http://maven.apache.org/POM/4.0.0\">");
-                    response.getWriter().println("  <modelVersion>4.0.0</modelVersion>");
-                    response.getWriter().println("  <groupId>org.apache.maven.its.mng3461</groupId>");
-                    response.getWriter().println("  <artifactId>b</artifactId>");
-                    response.getWriter().println("  <version>0.1</version>");
-                    response.getWriter().println("</project>");
+                String uri = Request.getPathInContext(request);
+                if (uri.endsWith("/b-0.1.jar")) {
+                    response.setStatus(200);
+                    PrintWriter writer = new PrintWriter(Content.Sink.asOutputStream(response));
+                    writer.println(uri);
+                    writer.flush();
+                } else if (uri.endsWith("/b-0.1.pom")) {
+                    response.setStatus(200);
+                    PrintWriter writer = new PrintWriter(Content.Sink.asOutputStream(response));
+                    writer.println("<project xmlns=\"http://maven.apache.org/POM/4.0.0\">");
+                    writer.println("  <modelVersion>4.0.0</modelVersion>");
+                    writer.println("  <groupId>org.apache.maven.its.mng3461</groupId>");
+                    writer.println("  <artifactId>b</artifactId>");
+                    writer.println("  <version>0.1</version>");
+                    writer.println("</project>");
+                    writer.flush();
                 } else {
-                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    response.setStatus(404);
                 }
 
-                ((Request) request).setHandled(true);
+                callback.succeeded();
+                return true;
             }
         };
 
