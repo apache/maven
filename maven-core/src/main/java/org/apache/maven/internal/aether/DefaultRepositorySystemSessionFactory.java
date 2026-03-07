@@ -249,7 +249,7 @@ public class DefaultRepositorySystemSessionFactory {
                 }
 
                 XmlPlexusConfiguration config = new XmlPlexusConfiguration(dom);
-                configProps.put("aether.connector.wagon.config." + server.getId(), config);
+                configProps.put("aether.transport.wagon.config." + server.getId(), config);
 
                 // Translate to proper resolver configuration properties as well (as Plexus XML above is Wagon specific
                 // only), but support only configuration/httpConfiguration/all, see
@@ -321,8 +321,8 @@ public class DefaultRepositorySystemSessionFactory {
                 }
             }
 
-            configProps.put("aether.connector.perms.fileMode." + server.getId(), server.getFilePermissions());
-            configProps.put("aether.connector.perms.dirMode." + server.getId(), server.getDirectoryPermissions());
+            configProps.put("aether.transport.wagon.perms.fileMode." + server.getId(), server.getFilePermissions());
+            configProps.put("aether.transport.wagon.perms.dirMode." + server.getId(), server.getDirectoryPermissions());
         }
         mainSessionBuilder.setAuthenticationSelector(authSelector);
 
@@ -354,7 +354,7 @@ public class DefaultRepositorySystemSessionFactory {
         mainSessionBuilder.setIgnoreArtifactDescriptorRepositories(request.isIgnoreTransitiveRepositories());
 
         try (RepositorySystemSession.CloseableSession protoSession =
-                setUpLocalRepositoryManager(request, mainSessionBuilder)) {
+                setUpLocalRepositoryManager(request, repoSystem, mainSessionBuilder)) {
             boolean recordReverseTree =
                     ConfigUtils.getBoolean(protoSession, false, MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE);
             if (recordReverseTree) {
@@ -374,52 +374,58 @@ public class DefaultRepositorySystemSessionFactory {
         }
     }
 
-    private RepositorySystemSession.CloseableSession setUpLocalRepositoryManager(
-            MavenExecutionRequest request, RepositorySystemSession.SessionBuilder sessionBuilder) {
+    private static RepositorySystemSession.CloseableSession setUpLocalRepositoryManager(
+            MavenExecutionRequest request,
+            RepositorySystem repoSystem,
+            RepositorySystemSession.SessionBuilder sessionBuilder) {
         Path requestLocalRepositoryPath = resolve(request.getLocalRepository().getBasedir());
         RepositorySystemSession.CloseableSession protoSession = sessionBuilder
                 .withLocalRepositoryBaseDirectories(requestLocalRepositoryPath)
                 .build();
+        LocalRepositoryManager lrm =
+                setUpLocalRepositoryManager(request.getLocalRepository().getBasedir(), repoSystem, protoSession);
+        sessionBuilder.setLocalRepositoryManager(lrm);
+        return protoSession;
+    }
+
+    public static LocalRepositoryManager setUpLocalRepositoryManager(
+            String localRepository, RepositorySystem repoSystem, RepositorySystemSession session) {
         List<Path> paths = new ArrayList<>();
-        String localRepoHead = ConfigUtils.getString(protoSession, null, MAVEN_REPO_LOCAL_HEAD);
+        String localRepoHead = ConfigUtils.getString(session, null, MAVEN_REPO_LOCAL_HEAD);
         if (localRepoHead != null) {
             Arrays.stream(localRepoHead.split(","))
                     .filter(p -> !p.trim().isEmpty())
-                    .map(this::resolve)
+                    .map(DefaultRepositorySystemSessionFactory::resolve)
                     .forEach(paths::add);
         }
 
-        paths.add(resolve(request.getLocalRepository().getBasedir()));
+        paths.add(resolve(localRepository));
 
-        String localRepoTail = ConfigUtils.getString(protoSession, null, MAVEN_REPO_LOCAL_TAIL);
+        String localRepoTail = ConfigUtils.getString(session, null, MAVEN_REPO_LOCAL_TAIL);
         if (localRepoTail != null) {
             Arrays.stream(localRepoTail.split(","))
                     .filter(p -> !p.trim().isEmpty())
-                    .map(this::resolve)
+                    .map(DefaultRepositorySystemSessionFactory::resolve)
                     .forEach(paths::add);
         }
 
         LocalRepository localRepo = new LocalRepository(paths.remove(0));
-        LocalRepositoryManager lrm = repoSystem.newLocalRepositoryManager(protoSession, localRepo);
+        LocalRepositoryManager lrm = repoSystem.newLocalRepositoryManager(session, localRepo);
 
-        if (paths.isEmpty()) {
-            // we have only one local repo path
-            sessionBuilder.setLocalRepositoryManager(lrm);
-        } else {
+        if (!paths.isEmpty()) {
             List<LocalRepositoryManager> tail = new ArrayList<>();
             for (Path path : paths) {
-                tail.add(repoSystem.newLocalRepositoryManager(protoSession, new LocalRepository(path)));
+                tail.add(repoSystem.newLocalRepositoryManager(session, new LocalRepository(path)));
             }
             boolean ignoreTailAvailability =
-                    ConfigUtils.getBoolean(protoSession, true, MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY);
+                    ConfigUtils.getBoolean(session, true, MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY);
 
-            sessionBuilder.setLocalRepositoryManager(
-                    new ChainedLocalRepositoryManager(lrm, tail, ignoreTailAvailability));
+            lrm = new ChainedLocalRepositoryManager(lrm, tail, ignoreTailAvailability);
         }
-        return protoSession;
+        return lrm;
     }
 
-    private Path resolve(String string) {
+    public static Path resolve(String string) {
         if (string.startsWith("~/") || string.startsWith("~\\")) {
             // resolve based on $HOME
             return Paths.get(System.getProperty("user.home"))

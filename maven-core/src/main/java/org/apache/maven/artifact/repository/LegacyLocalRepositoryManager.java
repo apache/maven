@@ -28,6 +28,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataStoreException;
+import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
 import org.apache.maven.repository.Proxy;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -64,18 +65,21 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
             return session;
         }
 
-        if (session != null) {
-            LocalRepositoryManager lrm = session.getLocalRepositoryManager();
-            if (lrm != null && lrm.getRepository().getBasedir().equals(new File(repository.getBasedir()))) {
-                return session;
-            }
-        } else {
-            session = new DefaultRepositorySystemSession();
+        LocalRepositoryManager lrm = session.getLocalRepositoryManager();
+        if (lrm != null
+                && lrm.getRepository()
+                        .getBasePath()
+                        .equals(DefaultRepositorySystemSessionFactory.resolve(repository.getBasedir()))) {
+            return session;
         }
-
-        final LocalRepositoryManager llrm = new LegacyLocalRepositoryManager(repository);
-
-        return new DefaultRepositorySystemSession(session).setLocalRepositoryManager(llrm);
+        if (repository.getLayout() instanceof DefaultRepositoryLayout) {
+            return new DefaultRepositorySystemSession(session)
+                    .setLocalRepositoryManager(DefaultRepositorySystemSessionFactory.setUpLocalRepositoryManager(
+                            repository.getBasedir(), system, session));
+        } else {
+            return new DefaultRepositorySystemSession(session)
+                    .setLocalRepositoryManager(new LegacyLocalRepositoryManager(repository));
+        }
     }
 
     private LegacyLocalRepositoryManager(ArtifactRepository delegate) {
