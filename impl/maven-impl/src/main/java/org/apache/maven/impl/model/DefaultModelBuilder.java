@@ -277,6 +277,15 @@ public class DefaultModelBuilder implements ModelBuilder {
         List<RemoteRepository> externalRepositories;
         List<RemoteRepository> repositories;
 
+        private RepositoryFactory repositoryFactory;
+
+        RepositoryFactory getRepositoryFactory() {
+            if (repositoryFactory == null) {
+                repositoryFactory = session.getService(RepositoryFactory.class);
+            }
+            return repositoryFactory;
+        }
+
         // Cycle detection chain shared across all derived sessions
         // Contains both GAV coordinates (groupId:artifactId:version) and file paths
         final Set<String> parentChain;
@@ -345,6 +354,19 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
             // Create a new parentChain for each derived session to prevent cycle detection issues
             // The parentChain now contains both GAV coordinates and file paths
+            // If the derived request specifies explicit repositories, use them as external
+            // repositories so that BOM imports can be resolved from non-central repos
+            // (e.g., repositories defined in settings.xml profiles).
+            List<RemoteRepository> derivedExtRepos = externalRepositories;
+            List<RemoteRepository> derivedRepos = repositories;
+            if (request.getRepositories() != null && !request.getRepositories().isEmpty()) {
+                derivedExtRepos = List.copyOf(request.getRepositories());
+                if (pomRepositories.isEmpty()) {
+                    derivedRepos = derivedExtRepos;
+                } else {
+                    derivedRepos = getRepositoryFactory().aggregate(session, pomRepositories, derivedExtRepos, false);
+                }
+            }
             return new ModelBuilderSessionState(
                     session,
                     request,
@@ -352,8 +374,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                     dag,
                     mappedSources,
                     pomRepositories,
-                    externalRepositories,
-                    repositories,
+                    derivedExtRepos,
+                    derivedRepos,
                     new LinkedHashSet<>());
         }
 
@@ -569,7 +591,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 repos = repos.stream().filter(r -> !ids.contains(r.getId())).toList();
             }
 
-            RepositoryFactory repositoryFactory = session.getService(RepositoryFactory.class);
+            RepositoryFactory repositoryFactory = getRepositoryFactory();
             if (request.getRepositoryMerging() == ModelBuilderRequest.RepositoryMerging.REQUEST_DOMINANT) {
                 repositories = repositoryFactory.aggregate(session, repositories, repos, true);
                 pomRepositories = repositories;
