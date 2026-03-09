@@ -18,10 +18,9 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -41,9 +40,9 @@ public class MavenITmng2362DeployedPomEncodingTest extends AbstractMavenIntegrat
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-2362");
+        Path testDir = extractResources("mng-2362");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("utf-8/target");
         verifier.deleteDirectory("latin-1/target");
@@ -52,34 +51,34 @@ public class MavenITmng2362DeployedPomEncodingTest extends AbstractMavenIntegrat
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        File pomFile;
+        Path pomFile;
 
-        pomFile = new File(verifier.getArtifactPath("org.apache.maven.its.mng2362", "utf-8", "0.1", "pom"));
+        pomFile = verifier.getArtifactPath("org.apache.maven.its.mng2362", "utf-8", "0.1", "pom");
         assertPomUtf8(pomFile);
 
-        pomFile = new File(testDir, "utf-8/target/repo/org/apache/maven/its/mng2362/utf-8/0.1/utf-8-0.1.pom");
+        pomFile = testDir.resolve("utf-8/target/repo/org/apache/maven/its/mng2362/utf-8/0.1/utf-8-0.1.pom");
         assertPomUtf8(pomFile);
 
-        pomFile = new File(verifier.getArtifactPath("org.apache.maven.its.mng2362", "latin-1", "0.1", "pom"));
+        pomFile = verifier.getArtifactPath("org.apache.maven.its.mng2362", "latin-1", "0.1", "pom");
         assertPomLatin1(pomFile);
 
-        pomFile = new File(testDir, "latin-1/target/repo/org/apache/maven/its/mng2362/latin-1/0.1/latin-1-0.1.pom");
+        pomFile = testDir.resolve("latin-1/target/repo/org/apache/maven/its/mng2362/latin-1/0.1/latin-1-0.1.pom");
         assertPomLatin1(pomFile);
     }
 
-    private void assertPomUtf8(File pomFile) throws Exception {
-        String pom = Files.readString(pomFile.toPath());
+    private void assertPomUtf8(Path pomFile) throws Exception {
+        String pom = Files.readString(pomFile);
         String chars = "\u00DF\u0131\u03A3\u042F\u05D0\u20AC";
         assertPom(pomFile, pom, chars);
     }
 
-    private void assertPomLatin1(File pomFile) throws Exception {
-        String pom = Files.readString(pomFile.toPath(), StandardCharsets.ISO_8859_1);
+    private void assertPomLatin1(Path pomFile) throws Exception {
+        String pom = Files.readString(pomFile, StandardCharsets.ISO_8859_1);
         String chars = "\u00C4\u00D6\u00DC\u00E4\u00F6\u00FC\u00DF";
         assertPom(pomFile, pom, chars);
     }
 
-    private void assertPom(File pomFile, String pom, String chars) throws Exception {
+    private void assertPom(Path pomFile, String pom, String chars) throws Exception {
         String prefix = "TEST-CHARS: ";
         int pos = pom.indexOf(prefix);
         assertTrue(

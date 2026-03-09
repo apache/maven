@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -55,9 +55,9 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
     @Disabled("This test goes against Maven (see javadoc above)")
     @Test
     public void testShouldResolveOutputDirectoryFromEarlierBuild() throws Exception {
-        final File testDir = extractResources("/mng-4660-resume-from");
+        final Path testDir = extractResources("mng-4660-resume-from");
 
-        final Verifier verifier1 = newVerifier(testDir.getAbsolutePath());
+        final Verifier verifier1 = newVerifier(testDir);
         verifier1.deleteDirectory("target");
         verifier1.deleteArtifacts("org.apache.maven.its.mng4660");
 
@@ -69,7 +69,7 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
             verifier1.verifyTextInLog("Deliberately fail test case");
         }
 
-        final Verifier verifier2 = newVerifier(testDir.getAbsolutePath());
+        final Verifier verifier2 = newVerifier(testDir);
         verifier2.setAutoclean(false);
         verifier2.addCliArgument("--resume-from");
         verifier2.addCliArgument(":module-b");
@@ -88,9 +88,9 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
      */
     @Test
     public void testShouldResolvePackagedArtifactFromEarlierBuild() throws Exception {
-        final File testDir = extractResources("/mng-4660-resume-from");
+        final Path testDir = extractResources("mng-4660-resume-from");
 
-        final Verifier verifier1 = newVerifier(testDir.getAbsolutePath());
+        final Verifier verifier1 = newVerifier(testDir);
         verifier1.deleteDirectory("target");
         verifier1.deleteArtifacts("org.apache.maven.its.mng4660");
 
@@ -102,7 +102,7 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
             verifier1.verifyTextInLog("Deliberately fail test case");
         }
 
-        final Verifier verifier2 = newVerifier(testDir.getAbsolutePath());
+        final Verifier verifier2 = newVerifier(testDir);
         verifier2.setAutoclean(false);
         verifier2.addCliArgument("--resume-from");
         verifier2.addCliArgument(":module-b");

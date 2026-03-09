@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,9 +39,9 @@ public class MavenIT0144LifecycleExecutionOrderTest extends AbstractMavenIntegra
      */
     @Test
     public void testit0144() throws Exception {
-        File testDir = extractResources("/it0144");
+        Path testDir = extractResources("it0144");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.deleteDirectory("target");
         verifier.setAutoclean(false);
         verifier.addCliArguments("post-clean", "deploy", "site-deploy");

@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.io.IOException;
 import java.util.List;
 
@@ -30,9 +30,9 @@ public class MavenITmng7443ConsistencyOfOptionalProjectsAndProfilesTest extends 
 
     @Test
     public void testConsistentLoggingOfOptionalProfilesAndProjects() throws IOException, VerificationException {
-        File testDir = extractResources("/mng-7443-consistency-of-optional-profiles-and-projects");
+        Path testDir = extractResources("mng-7443-consistency-of-optional-profiles-and-projects");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument("-pl");
         verifier.addCliArgument("?:does-not-exist");
         verifier.addCliArgument("-P");

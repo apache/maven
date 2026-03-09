@@ -18,13 +18,12 @@
  */
 package org.apache.maven.it;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -102,16 +101,16 @@ class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase
      */
     @Test
     public void testmng3652UnConfiguredHttp() throws Exception {
-        File testDir = extractResources("/mng-3652");
-        File pluginDir = new File(testDir, "test-plugin");
-        File projectDir = new File(testDir, "test-project");
+        Path testDir = extractResources("mng-3652");
+        Path pluginDir = testDir.resolve("test-plugin");
+        Path projectDir = testDir.resolve("test-project");
 
-        Verifier verifier = newVerifier(pluginDir.getAbsolutePath());
+        Verifier verifier = newVerifier(pluginDir);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir);
 
         verifier.addCliArgument("-DtestPort=" + port);
         verifier.addCliArgument("-X");
@@ -124,10 +123,10 @@ class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase
         String userAgent = this.userAgent;
         assertNotNull(userAgent);
 
-        File touchFile = new File(projectDir, "target/touch.txt");
-        assertTrue(touchFile.exists());
+        Path touchFile = projectDir.resolve("target/touch.txt");
+        assertTrue(Files.exists(touchFile));
 
-        List<String> lines = verifier.loadFile(touchFile, false);
+        List<String> lines = verifier.loadFile(touchFile);
 
         // NOTE: system property for maven.version may not exist if you use -Dtest
         // surefire parameter to run this single test. Therefore, the plugin writes
@@ -145,16 +144,16 @@ class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase
 
     @Test
     public void testmng3652UnConfiguredDAV() throws Exception {
-        File testDir = extractResources("/mng-3652");
-        File pluginDir = new File(testDir, "test-plugin");
-        File projectDir = new File(testDir, "test-project");
+        Path testDir = extractResources("mng-3652");
+        Path pluginDir = testDir.resolve("test-plugin");
+        Path projectDir = testDir.resolve("test-project");
 
-        Verifier verifier = newVerifier(pluginDir.getAbsolutePath());
+        Verifier verifier = newVerifier(pluginDir);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir);
 
         // test webdav
         verifier.addCliArgument("-DtestPort=" + port);
@@ -166,10 +165,10 @@ class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        File touchFile = new File(projectDir, "target/touch.txt");
-        assertTrue(touchFile.exists());
+        Path touchFile = projectDir.resolve("target/touch.txt");
+        assertTrue(Files.exists(touchFile));
 
-        List<String> lines = verifier.loadFile(touchFile, false);
+        List<String> lines = verifier.loadFile(touchFile);
 
         // NOTE: system property for maven.version may not exist if you use -Dtest
         // surefire parameter to run this single test. Therefore, the plugin writes
@@ -190,16 +189,16 @@ class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase
 
     @Test
     public void testmng3652ConfigurationInSettingsWithoutUserAgent() throws Exception {
-        File testDir = extractResources("/mng-3652");
-        File pluginDir = new File(testDir, "test-plugin");
-        File projectDir = new File(testDir, "test-project");
+        Path testDir = extractResources("mng-3652");
+        Path pluginDir = testDir.resolve("test-plugin");
+        Path projectDir = testDir.resolve("test-project");
 
-        Verifier verifier = newVerifier(pluginDir.getAbsolutePath());
+        Verifier verifier = newVerifier(pluginDir);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir);
 
         // test settings with no config
 
@@ -213,10 +212,10 @@ class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        File touchFile = new File(projectDir, "target/touch.txt");
-        assertTrue(touchFile.exists());
+        Path touchFile = projectDir.resolve("target/touch.txt");
+        assertTrue(Files.exists(touchFile));
 
-        List<String> lines = verifier.loadFile(touchFile, false);
+        List<String> lines = verifier.loadFile(touchFile);
 
         // NOTE: system property for maven.version may not exist if you use -Dtest
         // surefire parameter to run this single test. Therefore, the plugin writes
@@ -237,16 +236,16 @@ class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase
 
     @Test
     public void testmng3652UserAgentConfiguredInSettings() throws Exception {
-        File testDir = extractResources("/mng-3652");
-        File pluginDir = new File(testDir, "test-plugin");
-        File projectDir = new File(testDir, "test-project");
+        Path testDir = extractResources("mng-3652");
+        Path pluginDir = testDir.resolve("test-plugin");
+        Path projectDir = testDir.resolve("test-project");
 
-        Verifier verifier = newVerifier(pluginDir.getAbsolutePath());
+        Verifier verifier = newVerifier(pluginDir);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir);
 
         // test settings with config
 
@@ -269,16 +268,16 @@ class MavenITmng3652UserAgentHeaderTest extends AbstractMavenIntegrationTestCase
 
     @Test
     public void testmng3652AdditionnalHttpHeaderConfiguredInSettings() throws Exception {
-        File testDir = extractResources("/mng-3652");
-        File pluginDir = new File(testDir, "test-plugin");
-        File projectDir = new File(testDir, "test-project");
+        Path testDir = extractResources("mng-3652");
+        Path pluginDir = testDir.resolve("test-plugin");
+        Path projectDir = testDir.resolve("test-project");
 
-        Verifier verifier = newVerifier(pluginDir.getAbsolutePath());
+        Verifier verifier = newVerifier(pluginDir);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir);
 
         // test settings with config
 
