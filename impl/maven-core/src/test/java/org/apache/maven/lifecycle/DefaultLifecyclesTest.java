@@ -48,8 +48,8 @@ class DefaultLifecyclesTest {
     @Test
     void testDefaultLifecycles() {
         final List<Lifecycle> lifecycles = defaultLifeCycles.getLifeCycles();
-        assertEquals(3, lifecycles.size());
-        assertEquals(3, DefaultLifecycles.STANDARD_LIFECYCLES.length);
+        assertEquals(2, lifecycles.size());
+        assertEquals(2, DefaultLifecycles.STANDARD_LIFECYCLES.length);
     }
 
     @Test
@@ -64,13 +64,6 @@ class DefaultLifecyclesTest {
         final Lifecycle lifecycle = getLifeCycleById("clean");
         assertEquals("clean", lifecycle.getId());
         assertEquals(3, lifecycle.getPhases().size());
-    }
-
-    @Test
-    void testSiteLifecycle() {
-        final Lifecycle lifecycle = getLifeCycleById("site");
-        assertEquals("site", lifecycle.getId());
-        assertEquals(6, lifecycle.getPhases().size());
     }
 
     @Test
@@ -92,8 +85,7 @@ class DefaultLifecyclesTest {
 
         assertEquals("clean", dl.getLifeCycles().get(0).getId());
         assertEquals("default", dl.getLifeCycles().get(1).getId());
-        assertEquals("site", dl.getLifeCycles().get(2).getId());
-        assertEquals("etl", dl.getLifeCycles().get(3).getId());
+        assertEquals("etl", dl.getLifeCycles().get(2).getId());
     }
 
     private Lifecycle getLifeCycleById(String id) {

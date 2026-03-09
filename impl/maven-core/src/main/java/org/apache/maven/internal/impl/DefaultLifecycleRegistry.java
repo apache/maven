@@ -108,7 +108,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
     @Inject
     public DefaultLifecycleRegistry(List<LifecycleProvider> providers) {
         List<LifecycleProvider> p = new ArrayList<>(providers);
-        p.add(() -> List.of(new CleanLifecycle(), new DefaultLifecycle(), new SiteLifecycle()));
+        p.add(() -> List.of(new CleanLifecycle(), new DefaultLifecycle()));
         this.providers = p;
         // validate lifecycle
         for (Lifecycle lifecycle : this) {
