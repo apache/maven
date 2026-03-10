@@ -163,6 +163,14 @@ public class MavenSession implements Cloneable {
         return result;
     }
 
+    public File getTopDirectory() {
+        return request.getTopDirectory() != null ? request.getTopDirectory().toFile() : null;
+    }
+
+    public File getRootDirectory() {
+        return request.getRootDirectory() != null ? request.getRootDirectory().toFile() : null;
+    }
+
     // Backward compat
 
     public Map<String, Object> getPluginContext(PluginDescriptor plugin, MavenProject project) {

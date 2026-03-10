@@ -380,8 +380,8 @@ public class MavenCliTest {
                     "validate"
                 },
                 null);
-        request.rootDirectory = Paths.get("myRootDirectory");
-        request.topDirectory = Paths.get("myTopDirectory");
+        request.request.setRootDirectory(Paths.get("myRootDirectory"));
+        request.request.setTopDirectory(Paths.get("myTopDirectory"));
 
         // Act
         cli.cli(request);

@@ -19,6 +19,7 @@
 package org.apache.maven.execution;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -162,6 +163,10 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
 
     private Map<String, Object> data;
 
+    private Path topDirectory;
+
+    private Path rootDirectory;
+
     public DefaultMavenExecutionRequest() {}
 
     public static MavenExecutionRequest copy(MavenExecutionRequest original) {
@@ -204,6 +209,10 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
         copy.setExecutionListener(original.getExecutionListener());
         copy.setUseLegacyLocalRepository(original.isUseLegacyLocalRepository());
         copy.setBuilderId(original.getBuilderId());
+
+        copy.setTopDirectory(original.getTopDirectory());
+        copy.setRootDirectory(original.getRootDirectory());
+
         return copy;
     }
 
@@ -1096,5 +1105,33 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
         }
 
         return data;
+    }
+
+    @Override
+    public Path getTopDirectory() {
+        return topDirectory;
+    }
+
+    /**
+     * @since 3.10.0
+     */
+    @Override
+    public MavenExecutionRequest setTopDirectory(Path topDirectory) {
+        this.topDirectory = topDirectory;
+        return this;
+    }
+
+    @Override
+    public Path getRootDirectory() {
+        return rootDirectory;
+    }
+
+    /**
+     * @since 3.10.0
+     */
+    @Override
+    public MavenExecutionRequest setRootDirectory(Path rootDirectory) {
+        this.rootDirectory = rootDirectory;
+        return this;
     }
 }
