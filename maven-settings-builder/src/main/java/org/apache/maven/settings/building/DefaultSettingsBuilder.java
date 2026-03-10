@@ -24,8 +24,9 @@ import javax.inject.Singleton;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
-import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,7 @@ import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 import org.codehaus.plexus.interpolation.PropertiesBasedValueSource;
 import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
+import org.codehaus.plexus.util.IOUtil;
 
 /**
  * Builds the effective settings from a user settings file and/or a global settings file.
@@ -53,6 +55,7 @@ import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 @Named
 @Singleton
 public class DefaultSettingsBuilder implements SettingsBuilder {
+    private static final String MAVEN_SETTINGS_STRICT = "maven.settings.strictParsing";
 
     private SettingsReader settingsReader;
 
@@ -89,22 +92,35 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
     public SettingsBuildingResult build(SettingsBuildingRequest request) throws SettingsBuildingException {
         DefaultSettingsProblemCollector problems = new DefaultSettingsProblemCollector(null);
 
+        boolean strict = Boolean.parseBoolean(request.getUserProperties()
+                .getProperty(
+                        MAVEN_SETTINGS_STRICT,
+                        request.getSystemProperties().getProperty(MAVEN_SETTINGS_STRICT, Boolean.FALSE.toString())));
+
         Source globalSettingsSource =
                 getSettingsSource(request.getGlobalSettingsFile(), request.getGlobalSettingsSource());
-        Settings globalSettings = readSettings(globalSettingsSource, request, problems);
+        Settings globalSettings = readSettingsFromString(
+                globalSettingsSource,
+                interpolateFromSourceToString(globalSettingsSource, request, problems),
+                request,
+                problems,
+                strict);
 
         Source userSettingsSource = getSettingsSource(request.getUserSettingsFile(), request.getUserSettingsSource());
-        Settings userSettings = readSettings(userSettingsSource, request, problems);
+        Settings userSettings = readSettingsFromString(
+                userSettingsSource,
+                interpolateFromSourceToString(userSettingsSource, request, problems),
+                request,
+                problems,
+                strict);
 
         settingsMerger.merge(userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL);
 
         problems.setSource("");
 
-        userSettings = interpolate(userSettings, request, problems);
-
         // for the special case of a drive-relative Windows path, make sure it's absolute to save plugins from trouble
         String localRepository = userSettings.getLocalRepository();
-        if (localRepository != null && localRepository.length() > 0) {
+        if (localRepository != null && !localRepository.isEmpty()) {
             File file = new File(localRepository);
             if (!file.isAbsolute() && file.getPath().startsWith(File.separator)) {
                 userSettings.setLocalRepository(file.getAbsolutePath());
@@ -139,8 +155,12 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         return null;
     }
 
-    private Settings readSettings(
-            Source settingsSource, SettingsBuildingRequest request, DefaultSettingsProblemCollector problems) {
+    private Settings readSettingsFromString(
+            Source settingsSource,
+            String settingsString,
+            SettingsBuildingRequest request,
+            DefaultSettingsProblemCollector problems,
+            boolean strict) {
         if (settingsSource == null) {
             return new Settings();
         }
@@ -153,14 +173,22 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             Map<String, ?> options = Collections.singletonMap(SettingsReader.IS_STRICT, Boolean.TRUE);
 
             try {
-                settings = settingsReader.read(settingsSource.getInputStream(), options);
+                settings = settingsReader.read(new StringReader(settingsString), options);
             } catch (SettingsParseException e) {
-                options = Collections.singletonMap(SettingsReader.IS_STRICT, Boolean.FALSE);
-
-                settings = settingsReader.read(settingsSource.getInputStream(), options);
-
-                problems.add(
-                        SettingsProblem.Severity.WARNING, e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e);
+                if (strict) {
+                    problems.add(
+                            SettingsProblem.Severity.FATAL, e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e);
+                    return new Settings();
+                } else {
+                    options = Collections.singletonMap(SettingsReader.IS_STRICT, Boolean.FALSE);
+                    settings = settingsReader.read(new StringReader(settingsString), options);
+                    problems.add(
+                            SettingsProblem.Severity.WARNING,
+                            e.getMessage(),
+                            e.getLineNumber(),
+                            e.getColumnNumber(),
+                            e);
+                }
             }
         } catch (SettingsParseException e) {
             problems.add(
@@ -185,69 +213,60 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         return settings;
     }
 
-    private Settings interpolate(
-            Settings settings, SettingsBuildingRequest request, SettingsProblemCollector problems) {
-        StringWriter writer = new StringWriter(1024 * 4);
-
-        try {
-            settingsWriter.write(writer, null, settings);
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to serialize settings to memory", e);
+    private String interpolateFromSourceToString(
+            Source settingsSource, SettingsBuildingRequest request, SettingsProblemCollector problems) {
+        String serializedSettings = null;
+        if (settingsSource == null) {
+            return "<settings></settings>";
         }
-
-        String serializedSettings = writer.toString();
-
-        RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
-
-        interpolator.addValueSource(new PropertiesBasedValueSource(request.getUserProperties()));
-
-        interpolator.addValueSource(new PropertiesBasedValueSource(request.getSystemProperties()));
-
         try {
-            interpolator.addValueSource(new EnvarBasedValueSource());
-        } catch (IOException e) {
-            problems.add(
-                    SettingsProblem.Severity.WARNING,
-                    "Failed to use environment variables for interpolation: " + e.getMessage(),
-                    -1,
-                    -1,
-                    e);
-        }
-
-        interpolator.addPostProcessor(new InterpolationPostProcessor() {
-            @Override
-            public Object execute(String expression, Object value) {
-                if (value != null) {
-                    // we're going to parse this back in as XML so we need to escape XML markup
-                    value = value.toString()
-                            .replace("&", "&amp;")
-                            .replace("<", "&lt;")
-                            .replace(">", "&gt;");
-                    return value;
-                }
-                return null;
+            try (InputStream inputStream = settingsSource.getInputStream()) {
+                serializedSettings = IOUtil.toString(inputStream, StandardCharsets.UTF_8.name());
             }
-        });
+            RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
+            interpolator.addValueSource(new PropertiesBasedValueSource(request.getUserProperties()));
+            interpolator.addValueSource(new PropertiesBasedValueSource(request.getSystemProperties()));
 
-        try {
-            serializedSettings = interpolator.interpolate(serializedSettings, "settings");
-        } catch (InterpolationException e) {
-            problems.add(
-                    SettingsProblem.Severity.ERROR, "Failed to interpolate settings: " + e.getMessage(), -1, -1, e);
+            try {
+                interpolator.addValueSource(new EnvarBasedValueSource());
+            } catch (IOException e) {
+                problems.add(
+                        SettingsProblem.Severity.WARNING,
+                        "Failed to use environment variables for interpolation: " + e.getMessage(),
+                        -1,
+                        -1,
+                        e);
+            }
 
-            return settings;
-        }
+            interpolator.addPostProcessor(new InterpolationPostProcessor() {
+                @Override
+                public Object execute(String expression, Object value) {
+                    if (value != null) {
+                        // we're going to parse this back in as XML so we need to escape XML markup
+                        value = value.toString()
+                                .replace("&", "&amp;")
+                                .replace("<", "&lt;")
+                                .replace(">", "&gt;");
+                        return value;
+                    }
+                    return null;
+                }
+            });
 
-        Settings result;
-        try {
-            Map<String, ?> options = Collections.singletonMap(SettingsReader.IS_STRICT, Boolean.FALSE);
-            result = settingsReader.read(new StringReader(serializedSettings), options);
+            try {
+                serializedSettings = interpolator.interpolate(serializedSettings, "settings");
+            } catch (InterpolationException e) {
+                problems.add(
+                        SettingsProblem.Severity.ERROR, "Failed to interpolate settings: " + e.getMessage(), -1, -1, e);
+
+                return serializedSettings;
+            }
+
+            return serializedSettings;
         } catch (IOException e) {
             problems.add(
                     SettingsProblem.Severity.ERROR, "Failed to interpolate settings: " + e.getMessage(), -1, -1, e);
-            return settings;
+            return serializedSettings;
         }
-
-        return result;
     }
 }

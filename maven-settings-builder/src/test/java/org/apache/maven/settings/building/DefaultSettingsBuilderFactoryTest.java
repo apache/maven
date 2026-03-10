@@ -19,10 +19,13 @@
 package org.apache.maven.settings.building;
 
 import java.io.File;
+import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Benjamin Bentmann
@@ -45,5 +48,64 @@ public class DefaultSettingsBuilderFactoryTest {
         SettingsBuildingResult result = builder.build(request);
         assertNotNull(result);
         assertNotNull(result.getEffectiveSettings());
+    }
+
+    @Test
+    public void testNonStringInterpolationHappyPath() throws Exception {
+        SettingsBuilder builder = new DefaultSettingsBuilderFactory().newInstance();
+        assertNotNull(builder);
+
+        boolean testActive = true;
+        int testPort = 2026;
+        Properties userProperties = new Properties();
+        userProperties.setProperty("test.active", Boolean.toString(testActive));
+        userProperties.setProperty("test.port", Integer.toString(testPort));
+        userProperties.setProperty("maven.settings.strictParsing", Boolean.TRUE.toString());
+
+        DefaultSettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
+        request.setUserProperties(userProperties);
+        request.setSystemProperties(System.getProperties());
+        request.setUserSettingsFile(getSettings("proxy"));
+
+        SettingsBuildingResult result = builder.build(request);
+        assertNotNull(result);
+        assertNotNull(result.getEffectiveSettings());
+        assertEquals(
+                testActive, result.getEffectiveSettings().getProxies().get(0).isActive());
+        assertEquals(testPort, result.getEffectiveSettings().getProxies().get(0).getPort());
+    }
+
+    @Test
+    public void testNonStringInterpolationNonHappyPath() {
+        SettingsBuilder builder = new DefaultSettingsBuilderFactory().newInstance();
+        assertNotNull(builder);
+
+        Properties userProperties = new Properties();
+        userProperties.setProperty("test.active", "yes");
+        userProperties.setProperty("test.port", "foo");
+        userProperties.setProperty("maven.settings.strictParsing", Boolean.TRUE.toString());
+
+        DefaultSettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
+        request.setUserProperties(userProperties);
+        request.setSystemProperties(System.getProperties());
+        request.setUserSettingsFile(getSettings("proxy"));
+
+        assertThrows(SettingsBuildingException.class, () -> builder.build(request));
+    }
+
+    @Test
+    public void testNonStringInterpolationMissingProperties() {
+        SettingsBuilder builder = new DefaultSettingsBuilderFactory().newInstance();
+        assertNotNull(builder);
+
+        Properties userProperties = new Properties();
+        userProperties.setProperty("maven.settings.strictParsing", Boolean.TRUE.toString());
+
+        DefaultSettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
+        request.setUserProperties(userProperties);
+        request.setSystemProperties(System.getProperties());
+        request.setUserSettingsFile(getSettings("proxy"));
+
+        assertThrows(SettingsBuildingException.class, () -> builder.build(request));
     }
 }
