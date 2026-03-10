@@ -68,7 +68,7 @@ public class DefaultModelResolver implements ModelResolver {
                         parent.getGroupId(),
                         parent.getArtifactId(),
                         parent.getVersion(),
-                        null),
+                        parent.getClassifier()),
                 parent.getLocation("version"),
                 "parent");
         if (result.version() != null) {

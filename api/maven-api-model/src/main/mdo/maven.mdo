@@ -1814,6 +1814,16 @@
           </description>
           <type>String</type>
         </field>
+        <field>
+          <name>classifier</name>
+          <version>4.1.0+</version>
+          <description>
+            The classifier of the parent POM to resolve from the repository.
+            This is used by consumer POMs to reference the full-fidelity consumer POM
+            of the parent project, which is deployed with a classifier (e.g., {@code consumer}).
+          </description>
+          <type>String</type>
+        </field>
       </fields>
       <codeSegments>
         <codeSegment>

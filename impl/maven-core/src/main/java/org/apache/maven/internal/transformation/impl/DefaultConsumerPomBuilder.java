@@ -33,8 +33,11 @@ import org.apache.maven.api.Node;
 import org.apache.maven.api.PathScope;
 import org.apache.maven.api.SessionData;
 import org.apache.maven.api.feature.Features;
+import org.apache.maven.api.model.Activation;
+import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DistributionManagement;
+import org.apache.maven.api.model.Extension;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.ModelBase;
 import org.apache.maven.api.model.Profile;
@@ -101,6 +104,47 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         } else {
             return buildNonPom(session, project, src);
         }
+    }
+
+    @Override
+    public ConsumerPomBuildResult buildConsumerPoms(
+            RepositorySystemSession session, MavenProject project, ModelSource src) throws ModelBuilderException {
+        Model model = project.getModel().getDelegate();
+        boolean flattenEnabled = Features.consumerPomFlatten(session.getConfigProperties());
+        String packaging = model.getPackaging();
+        String originalPackaging = project.getOriginalModel().getPackaging();
+
+        boolean isBom = BOM_PACKAGING.equals(originalPackaging);
+
+        if (!flattenEnabled) {
+            if (POM_PACKAGING.equals(packaging) && !isBom) {
+                return buildPomConsumerPoms(session, project, src);
+            }
+        } else {
+            if (POM_PACKAGING.equals(packaging) && !isBom) {
+                return buildPomConsumerPoms(session, project, src);
+            }
+        }
+        // For non-POM, BOMs, etc., fall back to single POM
+        return new ConsumerPomBuildResult(build(session, project, src), null);
+    }
+
+    protected ConsumerPomBuildResult buildPomConsumerPoms(
+            RepositorySystemSession session, MavenProject project, ModelSource src) throws ModelBuilderException {
+        ModelBuilderResult result = buildModel(session, src);
+        Model rawModel = result.getRawModel();
+        Model consumerModel = transformPom(rawModel, project);
+
+        String modelVersion = consumerModel.getModelVersion();
+        if (ModelBuilder.MODEL_VERSION_4_0_0.equals(modelVersion) || consumerModel.isPreserveModelVersion()) {
+            return new ConsumerPomBuildResult(consumerModel, null);
+        }
+
+        // Generate dual consumer POMs: main (4.0.0) + consumer (4.1.0)
+        Model consumer410 = addConsumerClassifierToParent(consumerModel);
+        Model main400 = stripTo400(consumerModel);
+
+        return new ConsumerPomBuildResult(main400, consumer410);
     }
 
     protected Model buildPom(RepositorySystemSession session, MavenProject project, ModelSource src)
@@ -379,5 +423,66 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         return repositories.stream()
                 .filter(r -> !org.apache.maven.api.Repository.CENTRAL_ID.equals(r.getId()))
                 .collect(Collectors.toList());
+    }
+
+    static Model stripTo400(Model model) {
+        // Strip profile condition and packaging activation (4.1.0 features)
+        if (!model.getProfiles().isEmpty()) {
+            List<Profile> strippedProfiles = model.getProfiles().stream()
+                    .map(DefaultConsumerPomBuilder::stripProfileTo400)
+                    .collect(Collectors.toList());
+            model = model.withProfiles(strippedProfiles);
+        }
+
+        // Strip build sources (4.1.0 feature)
+        if (model.getBuild() != null) {
+            model = model.withBuild(stripBuildTo400(model.getBuild()));
+        }
+
+        // Strip subprojects (4.1.0 feature, should already be stripped by transformPom but be safe)
+        model = model.withSubprojects(null);
+
+        // Force model version to 4.0.0
+        model = model.withModelVersion(ModelBuilder.MODEL_VERSION_4_0_0);
+        model = model.withPreserveModelVersion(false);
+        model = model.withRoot(false);
+
+        return model;
+    }
+
+    private static Profile stripProfileTo400(Profile profile) {
+        if (profile.getActivation() != null) {
+            Activation activation = profile.getActivation();
+            if (activation.getCondition() != null || activation.getPackaging() != null) {
+                activation = Activation.newBuilder(activation, true)
+                        .condition(null)
+                        .packaging(null)
+                        .build();
+                profile = profile.withActivation(activation);
+            }
+        }
+        return profile;
+    }
+
+    private static Build stripBuildTo400(Build build) {
+        // Strip sources (4.1.0 feature)
+        if (!build.getSources().isEmpty()) {
+            build = build.withSources(null);
+        }
+        // Strip extension configuration (4.1.0 feature)
+        if (!build.getExtensions().isEmpty()) {
+            List<Extension> strippedExtensions = build.getExtensions().stream()
+                    .map(ext -> ext.getConfiguration() != null ? ext.withConfiguration(null) : ext)
+                    .collect(Collectors.toList());
+            build = build.withExtensions(strippedExtensions);
+        }
+        return build;
+    }
+
+    static Model addConsumerClassifierToParent(Model model) {
+        if (model.getParent() != null) {
+            model = model.withParent(model.getParent().withClassifier("consumer"));
+        }
+        return model;
     }
 }

@@ -1050,7 +1050,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 Set<String> parentChain)
                 throws ModelBuilderException {
             Model parentModel = null;
-            if (isBuildRequest()) {
+            if (isBuildRequest() && parent.getClassifier() == null) {
                 parentModel = readParentLocally(childModel, parent, profileActivationContext, parentChain);
             }
             if (parentModel == null) {

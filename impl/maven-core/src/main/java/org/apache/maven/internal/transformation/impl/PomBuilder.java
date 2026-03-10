@@ -35,4 +35,12 @@ import org.eclipse.aether.RepositorySystemSession;
 interface PomBuilder {
     Model build(RepositorySystemSession session, MavenProject project, ModelSource src)
             throws ModelBuilderException, IOException, XMLStreamException;
+
+    default ConsumerPomBuildResult buildConsumerPoms(
+            RepositorySystemSession session, MavenProject project, ModelSource src)
+            throws ModelBuilderException, IOException, XMLStreamException {
+        return new ConsumerPomBuildResult(build(session, project, src), null);
+    }
+
+    record ConsumerPomBuildResult(Model main, Model consumer) {}
 }
