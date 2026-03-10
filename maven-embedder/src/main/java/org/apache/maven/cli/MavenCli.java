@@ -18,14 +18,12 @@
  */
 package org.apache.maven.cli;
 
-import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.Console;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -39,6 +37,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -152,7 +151,11 @@ public class MavenCli {
     private static final String UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE = "Unable to find the root directory. Create a "
             + DOT_MVN + " directory in the project root directory to identify it.";
 
-    private static final String EXTENSIONS_FILENAME = DOT_MVN + "/extensions.xml";
+    private static final String PROJECT_EXTENSIONS_FILENAME = DOT_MVN + "/extensions.xml";
+
+    private static final File USER_EXTENSIONS_FILE = new File(USER_MAVEN_CONFIGURATION_HOME, "extensions.xml");
+
+    public static final File GLOBAL_EXTENSIONS_FILE = new File(System.getProperty("maven.conf"), "extensions.xml");
 
     private static final String MVN_MAVEN_CONFIG = DOT_MVN + "/maven.config";
 
@@ -717,15 +720,42 @@ public class MavenCli {
             return Collections.emptyList();
         }
 
-        File extensionsFile = new File(cliRequest.multiModuleProjectDirectory, EXTENSIONS_FILENAME);
-        if (!extensionsFile.isFile()) {
+        File projectExtensionsFile = new File(cliRequest.multiModuleProjectDirectory, PROJECT_EXTENSIONS_FILENAME);
+        if (!projectExtensionsFile.isFile() && !USER_EXTENSIONS_FILE.isFile() && !GLOBAL_EXTENSIONS_FILE.isFile()) {
             return Collections.emptyList();
         }
 
-        List<CoreExtension> extensions = readCoreExtensionsDescriptor(extensionsFile);
-        if (extensions.isEmpty()) {
+        List<CoreExtension> projectExtensions = null;
+        List<CoreExtension> userExtensions = null;
+        List<CoreExtension> globalExtensions = null;
+        if (projectExtensionsFile.isFile()) {
+            projectExtensions = readCoreExtensionsDescriptor(projectExtensionsFile.toPath());
+        }
+        if (USER_EXTENSIONS_FILE.isFile()) {
+            userExtensions = readCoreExtensionsDescriptor(USER_EXTENSIONS_FILE.toPath());
+        }
+        if (GLOBAL_EXTENSIONS_FILE.isFile()) {
+            globalExtensions = readCoreExtensionsDescriptor(GLOBAL_EXTENSIONS_FILE.toPath());
+        }
+
+        if ((projectExtensions == null || projectExtensions.isEmpty())
+                && (userExtensions == null || userExtensions.isEmpty())
+                && (globalExtensions == null || globalExtensions.isEmpty())) {
             return Collections.emptyList();
         }
+
+        Map<Path, List<CoreExtension>> configuredCoreExtensions = new LinkedHashMap<>();
+        if (projectExtensions != null && !projectExtensions.isEmpty()) {
+            configuredCoreExtensions.put(projectExtensionsFile.toPath(), projectExtensions);
+        }
+        if (userExtensions != null && !userExtensions.isEmpty()) {
+            configuredCoreExtensions.put(USER_EXTENSIONS_FILE.toPath(), userExtensions);
+        }
+        if (globalExtensions != null && !globalExtensions.isEmpty()) {
+            configuredCoreExtensions.put(GLOBAL_EXTENSIONS_FILE.toPath(), globalExtensions);
+        }
+        // mediate versions
+        List<CoreExtension> extensions = selectCoreExtensions(configuredCoreExtensions);
 
         ContainerConfiguration cc = new DefaultContainerConfiguration() //
                 .setClassWorld(cliRequest.classWorld) //
@@ -773,14 +803,54 @@ public class MavenCli {
         }
     }
 
-    private List<CoreExtension> readCoreExtensionsDescriptor(File extensionsFile)
+    private List<CoreExtension> readCoreExtensionsDescriptor(Path extensionsFile)
             throws IOException, XmlPullParserException {
         CoreExtensionsXpp3Reader parser = new CoreExtensionsXpp3Reader();
-
-        try (InputStream is = new BufferedInputStream(new FileInputStream(extensionsFile))) {
-
+        try (BufferedReader is = Files.newBufferedReader(extensionsFile, StandardCharsets.UTF_8)) {
             return parser.read(is).getExtensions();
         }
+    }
+
+    private List<CoreExtension> selectCoreExtensions(Map<Path, List<CoreExtension>> configuredCoreExtensions) {
+        slf4jLogger.debug("Configured core extensions (in precedence order):");
+        for (Map.Entry<Path, List<CoreExtension>> source : configuredCoreExtensions.entrySet()) {
+            slf4jLogger.debug("* Source file: {}", source.getKey());
+            for (CoreExtension extension : source.getValue()) {
+                slf4jLogger.debug("  - {} -> {}", extension.getId(), source.getKey());
+            }
+        }
+
+        LinkedHashMap<String, CoreExtension> selectedExtensions = new LinkedHashMap<>();
+        List<String> conflicts = new ArrayList<>();
+        for (Map.Entry<Path, List<CoreExtension>> coreExtensions : configuredCoreExtensions.entrySet()) {
+            for (CoreExtension coreExtension : coreExtensions.getValue()) {
+                String key = coreExtension.getGroupId() + ":" + coreExtension.getArtifactId();
+                CoreExtension conflict = selectedExtensions.putIfAbsent(key, coreExtension);
+                if (conflict != null && !Objects.equals(coreExtension.getVersion(), conflict.getVersion())) {
+                    conflicts.add(String.format(
+                            "Conflicting extension %s: %s vs %s in %s",
+                            key, coreExtension.getVersion(), conflict.getVersion(), coreExtensions.getKey()));
+                }
+            }
+        }
+        if (!conflicts.isEmpty()) {
+            slf4jLogger.warn("Found {} extension conflict(s):", conflicts.size());
+            for (String conflict : conflicts) {
+                slf4jLogger.warn("* {}", conflict);
+            }
+            slf4jLogger.warn("");
+            slf4jLogger.warn(
+                    "Order of core extensions precedence is project > user > installation. Selected extensions are:");
+            for (CoreExtension extension : selectedExtensions.values()) {
+                slf4jLogger.warn("* {}", extension.getId());
+            }
+        }
+
+        slf4jLogger.debug("Selected core extensions (in loading order):");
+        for (CoreExtension source : selectedExtensions.values()) {
+            slf4jLogger.debug("* {}: ", source.getId());
+        }
+        return new ArrayList<>(selectedExtensions.values());
     }
 
     private ClassRealm setupContainerRealm(
