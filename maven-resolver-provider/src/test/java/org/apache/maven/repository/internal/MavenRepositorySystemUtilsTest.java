@@ -19,8 +19,7 @@
 package org.apache.maven.repository.internal;
 
 import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.impl.MetadataGeneratorFactory;
-import org.eclipse.aether.spi.locator.ServiceLocator;
+import org.eclipse.aether.supplier.RepositorySystemSupplier;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,14 +29,14 @@ public class MavenRepositorySystemUtilsTest {
 
     @Test
     public void testGetRepositorySystem() {
-        ServiceLocator locator = MavenRepositorySystemUtils.newServiceLocator();
-        RepositorySystem repoSys = locator.getService(RepositorySystem.class);
+        RepositorySystem repoSys = new RepositorySystemSupplier().get();
         assertNotNull(repoSys);
     }
 
     @Test
     public void testGetMetadataGeneratorFactories() {
-        ServiceLocator locator = MavenRepositorySystemUtils.newServiceLocator();
-        assertEquals(2, locator.getServices(MetadataGeneratorFactory.class).size());
+        assertEquals(
+                3,
+                new RepositorySystemSupplier().getMetadataGeneratorFactories().size());
     }
 }

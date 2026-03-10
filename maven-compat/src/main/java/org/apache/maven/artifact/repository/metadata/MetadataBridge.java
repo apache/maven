@@ -19,6 +19,7 @@
 package org.apache.maven.artifact.repository.metadata;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
 
@@ -89,6 +90,14 @@ public final class MetadataBridge extends AbstractMetadata implements MergeableM
     }
 
     public MetadataBridge setFile(File file) {
+        return this;
+    }
+
+    public Path getPath() {
+        return null;
+    }
+
+    public MetadataBridge setPath(Path file) {
         return this;
     }
 
