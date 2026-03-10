@@ -1112,9 +1112,6 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
         return topDirectory;
     }
 
-    /**
-     * @since 3.10.0
-     */
     @Override
     public MavenExecutionRequest setTopDirectory(Path topDirectory) {
         this.topDirectory = topDirectory;
@@ -1126,9 +1123,6 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
         return rootDirectory;
     }
 
-    /**
-     * @since 3.10.0
-     */
     @Override
     public MavenExecutionRequest setRootDirectory(Path rootDirectory) {
         this.rootDirectory = rootDirectory;
