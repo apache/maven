@@ -19,6 +19,7 @@
 package org.apache.maven.execution;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -455,4 +456,24 @@ public interface MavenExecutionRequest {
      * @since 3.3.0
      */
     Map<String, Object> getData();
+
+    /**
+     * @since 3.10.0
+     */
+    Path getTopDirectory();
+
+    /**
+     * @since 3.10.0
+     */
+    MavenExecutionRequest setTopDirectory(Path topDirectory);
+
+    /**
+     * @since 3.10.0
+     */
+    Path getRootDirectory();
+
+    /**
+     * @since 3.10.0
+     */
+    MavenExecutionRequest setRootDirectory(Path rootDirectory);
 }
