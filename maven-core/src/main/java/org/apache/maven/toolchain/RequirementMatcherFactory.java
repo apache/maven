@@ -86,31 +86,29 @@ public final class RequirementMatcherFactory {
         private static final VersionScheme VERSION_SCHEME = new GenericVersionScheme();
 
         private static boolean matchesRequirement(String version, String requirement) {
-            boolean interval = false;
-            boolean included = false;
-            if (requirement.endsWith("+")) {
-                interval = true;
-                included = true;
-                requirement = requirement.substring(0, requirement.length() - 1);
-            } else if (requirement.endsWith("-")) {
-                interval = true;
-                requirement = requirement.substring(0, requirement.length() - 1);
-            }
-            final String req = requirement;
-
             // if requirement is not a version range itself
-            if (!req.contains("[") && !req.contains("(") && !req.contains(",")) {
+            if (!requirement.contains("[") && !requirement.contains("(") && !requirement.contains(",")) {
+                boolean interval = false;
+                boolean included = false;
+                if (requirement.endsWith("+")) {
+                    interval = true;
+                    included = true;
+                    requirement = requirement.substring(0, requirement.length() - 1);
+                } else if (requirement.endsWith("-")) {
+                    interval = true;
+                    requirement = requirement.substring(0, requirement.length() - 1);
+                }
                 if (!interval) {
-                    return version.startsWith(req + "."); // "11" -> "11.xxx"
+                    return version.startsWith(requirement + "."); // "11" -> "11.xxx"
                 } else {
                     try {
                         if (included) {
                             return VERSION_SCHEME
-                                    .parseVersionRange("[" + req + ",)")
+                                    .parseVersionRange("[" + requirement + ",)")
                                     .containsVersion(VERSION_SCHEME.parseVersion(version)); // "11+" -> "[11,)"
                         } else {
                             return VERSION_SCHEME
-                                    .parseVersionRange("(," + req + ")")
+                                    .parseVersionRange("(," + requirement + ")")
                                     .containsVersion(VERSION_SCHEME.parseVersion(version)); // "11-" -> "(,11)"
                         }
                     } catch (InvalidVersionSpecificationException e) {
@@ -121,7 +119,7 @@ public final class RequirementMatcherFactory {
             } else {
                 try {
                     return VERSION_SCHEME
-                            .parseVersionRange(req)
+                            .parseVersionRange(requirement)
                             .containsVersion(VERSION_SCHEME.parseVersion(version)); // "range" -> "range"
                 } catch (InvalidVersionSpecificationException e) {
                     // nope; GenericVersionScheme never throes but we need to make compiler happy
