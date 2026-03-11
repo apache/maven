@@ -93,7 +93,7 @@ under the License.
       <artifactId>maven-slf4j-provider</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.fusesource.jansi</groupId>
+      <groupId>org.jline</groupId>
       <artifactId>jansi</artifactId>
     </dependency>
     <dependency>
@@ -145,7 +145,7 @@ under the License.
             </goals>
             <configuration>
               <includeArtifactIds>jansi</includeArtifactIds>
-              <includes>org/fusesource/jansi/internal/native/Windows/**</includes>
+              <includes>org/jline/nativ/Windows/**</includes>
             </configuration>
           </execution>
         </executions>

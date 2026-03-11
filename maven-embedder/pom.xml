@@ -160,7 +160,7 @@ under the License.
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.fusesource.jansi</groupId>
+      <groupId>org.jline</groupId>
       <artifactId>jansi</artifactId>
       <scope>test</scope>
     </dependency>
