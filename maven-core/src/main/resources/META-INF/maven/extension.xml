@@ -127,7 +127,7 @@ under the License.
     <exportedPackage>org.slf4j.event.*</exportedPackage>
 
     <!-- JAnsi -->
-    <exportedPackage>org.fusesource.jansi.*</exportedPackage>
+    <exportedPackage>org.jline.jansi.*</exportedPackage>
   </exportedPackages>
 
   <exportedArtifacts>
@@ -174,7 +174,7 @@ under the License.
     <exportedArtifact>javax.inject:javax.inject</exportedArtifact>
     <exportedArtifact>javax.annotation:javax.annotation-api</exportedArtifact>
     <exportedArtifact>org.slf4j:slf4j-api</exportedArtifact>
-    <exportedArtifact>org.fusesource.jansi:jansi</exportedArtifact>
+    <exportedArtifact>org.jline:jansi</exportedArtifact>
 
     <!--
       | We must also filter out the old Aether or NoClassDefFoundErrors will surface  
