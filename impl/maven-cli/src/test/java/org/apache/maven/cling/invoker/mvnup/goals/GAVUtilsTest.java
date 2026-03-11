@@ -209,9 +209,12 @@ class GAVUtilsTest {
 
             Set<Coordinates> gavs = InferenceStrategy.computeAllArtifactCoordinates(context, pomMap);
 
-            assertEquals(2, gavs.size());
-            assertTrue(gavs.contains(Coordinates.of("com.example", "parent-project", "1.0.0")));
-            assertTrue(gavs.contains(Coordinates.of("com.example", "child-project", "1.0.0")));
+            Set<String> gavStrings = gavs.stream().map(Coordinates::toGAV).collect(java.util.stream.Collectors.toSet());
+            assertEquals(2, gavStrings.size());
+            assertTrue(gavStrings.contains(
+                    Coordinates.of("com.example", "parent-project", "1.0.0").toGAV()));
+            assertTrue(gavStrings.contains(
+                    Coordinates.of("com.example", "child-project", "1.0.0").toGAV()));
         }
 
         @Test
@@ -250,8 +253,10 @@ class GAVUtilsTest {
 
             Set<Coordinates> gavs = InferenceStrategy.computeAllArtifactCoordinates(context, pomMap);
 
-            assertEquals(1, gavs.size());
-            assertTrue(gavs.contains(Coordinates.of("com.example", "duplicate-project", "1.0.0")));
+            Set<String> gavStrings = gavs.stream().map(Coordinates::toGAV).collect(java.util.stream.Collectors.toSet());
+            assertEquals(1, gavStrings.size());
+            assertTrue(gavStrings.contains(
+                    Coordinates.of("com.example", "duplicate-project", "1.0.0").toGAV()));
         }
 
         @Test
@@ -287,8 +292,10 @@ class GAVUtilsTest {
 
             Set<Coordinates> gavs = InferenceStrategy.computeAllArtifactCoordinates(context, pomMap);
 
-            assertEquals(1, gavs.size());
-            assertTrue(gavs.contains(Coordinates.of("com.example", "valid-project", "1.0.0")));
+            Set<String> gavStrings = gavs.stream().map(Coordinates::toGAV).collect(java.util.stream.Collectors.toSet());
+            assertEquals(1, gavStrings.size());
+            assertTrue(gavStrings.contains(
+                    Coordinates.of("com.example", "valid-project", "1.0.0").toGAV()));
         }
     }
 

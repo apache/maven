@@ -205,22 +205,25 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
         Stream<DependencyContainer> dependencyContainers = Stream.concat(
                 // Root level dependencies
                 Stream.of(
-                                new DependencyContainer(root.child(DEPENDENCIES).orElse(null), DEPENDENCIES),
                                 new DependencyContainer(
-                                        root.child(DEPENDENCY_MANAGEMENT)
-                                                .flatMap(dm -> dm.child(DEPENDENCIES))
+                                        root.childElement(DEPENDENCIES).orElse(null), DEPENDENCIES),
+                                new DependencyContainer(
+                                        root.childElement(DEPENDENCY_MANAGEMENT)
+                                                .flatMap(dm -> dm.childElement(DEPENDENCIES))
                                                 .orElse(null),
                                         DEPENDENCY_MANAGEMENT))
                         .filter(container -> container.element != null),
                 // Profile dependencies
-                root.child(PROFILES).stream()
-                        .flatMap(profiles -> profiles.children(PROFILE))
+                root.childElement(PROFILES).stream()
+                        .flatMap(profiles -> profiles.childElements(PROFILE))
                         .flatMap(profile -> Stream.of(
                                         new DependencyContainer(
-                                                profile.child(DEPENDENCIES).orElse(null), "profile dependencies"),
+                                                profile.childElement(DEPENDENCIES)
+                                                        .orElse(null),
+                                                "profile dependencies"),
                                         new DependencyContainer(
-                                                profile.child(DEPENDENCY_MANAGEMENT)
-                                                        .flatMap(dm -> dm.child(DEPENDENCIES))
+                                                profile.childElement(DEPENDENCY_MANAGEMENT)
+                                                        .flatMap(dm -> dm.childElement(DEPENDENCIES))
                                                         .orElse(null),
                                                 "profile dependencyManagement"))
                                 .filter(container -> container.element != null)));
@@ -249,12 +252,13 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
         // Collect all build elements to process
         Stream<BuildContainer> buildContainers = Stream.concat(
                 // Root level build
-                Stream.of(new BuildContainer(root.child(BUILD).orElse(null), BUILD))
+                Stream.of(new BuildContainer(root.childElement(BUILD).orElse(null), BUILD))
                         .filter(container -> container.element != null),
                 // Profile builds
-                root.child(PROFILES).stream()
-                        .flatMap(profiles -> profiles.children(PROFILE))
-                        .map(profile -> new BuildContainer(profile.child(BUILD).orElse(null), "profile build"))
+                root.childElement(PROFILES).stream()
+                        .flatMap(profiles -> profiles.childElements(PROFILE))
+                        .map(profile ->
+                                new BuildContainer(profile.childElement(BUILD).orElse(null), "profile build"))
                         .filter(container -> container.element != null));
 
         return buildContainers
@@ -282,15 +286,16 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
         Stream<Element> repositoryContainers = Stream.concat(
                 // Root level repositories
                 Stream.of(
-                                root.child(REPOSITORIES).orElse(null),
-                                root.child(PLUGIN_REPOSITORIES).orElse(null))
+                                root.childElement(REPOSITORIES).orElse(null),
+                                root.childElement(PLUGIN_REPOSITORIES).orElse(null))
                         .filter(Objects::nonNull),
                 // Profile repositories
-                root.child(PROFILES).stream()
-                        .flatMap(profiles -> profiles.children(PROFILE))
+                root.childElement(PROFILES).stream()
+                        .flatMap(profiles -> profiles.childElements(PROFILE))
                         .flatMap(profile -> Stream.of(
-                                        profile.child(REPOSITORIES).orElse(null),
-                                        profile.child(PLUGIN_REPOSITORIES).orElse(null))
+                                        profile.childElement(REPOSITORIES).orElse(null),
+                                        profile.childElement(PLUGIN_REPOSITORIES)
+                                                .orElse(null))
                                 .filter(Objects::nonNull)));
 
         return repositoryContainers
@@ -305,12 +310,12 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
             Document pomDocument, Path pomPath, Map<Path, Document> pomMap, UpgradeContext context) {
         Element root = pomDocument.root();
 
-        Element parentElement = root.child(PARENT).orElse(null);
+        Element parentElement = root.childElement(PARENT).orElse(null);
         if (parentElement == null) {
             return false; // No parent to fix
         }
 
-        Element relativePathElement = parentElement.child(RELATIVE_PATH).orElse(null);
+        Element relativePathElement = parentElement.childElement(RELATIVE_PATH).orElse(null);
         String currentRelativePath =
                 relativePathElement != null ? relativePathElement.textContent().trim() : DEFAULT_PARENT_RELATIVE_PATH;
 
@@ -351,7 +356,8 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
                     return attr != null && attributeValue.equals(attr);
                 }),
                 // Recursively check children
-                element.children().flatMap(child -> findElementsWithAttribute(child, attributeName, attributeValue)));
+                element.childElements()
+                        .flatMap(child -> findElementsWithAttribute(child, attributeName, attributeValue)));
     }
 
     /**
@@ -359,7 +365,8 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
      */
     private boolean fixDuplicateDependenciesInSection(
             Element dependenciesElement, UpgradeContext context, String sectionName) {
-        List<Element> dependencies = dependenciesElement.children(DEPENDENCY).toList();
+        List<Element> dependencies =
+                dependenciesElement.childElements(DEPENDENCY).toList();
         Map<String, Element> seenDependencies = new HashMap<>();
 
         List<Element> duplicates = dependencies.stream()
@@ -394,15 +401,16 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
     private boolean fixPluginsInBuildElement(Element buildElement, UpgradeContext context, String sectionName) {
         boolean fixed = false;
 
-        Element pluginsElement = buildElement.child(PLUGINS).orElse(null);
+        Element pluginsElement = buildElement.childElement(PLUGINS).orElse(null);
         if (pluginsElement != null) {
             fixed |= fixDuplicatePluginsInSection(pluginsElement, context, sectionName + "/" + PLUGINS);
         }
 
-        Element pluginManagementElement = buildElement.child(PLUGIN_MANAGEMENT).orElse(null);
+        Element pluginManagementElement =
+                buildElement.childElement(PLUGIN_MANAGEMENT).orElse(null);
         if (pluginManagementElement != null) {
             Element managedPluginsElement =
-                    pluginManagementElement.child(PLUGINS).orElse(null);
+                    pluginManagementElement.childElement(PLUGINS).orElse(null);
             if (managedPluginsElement != null) {
                 fixed |= fixDuplicatePluginsInSection(
                         managedPluginsElement, context, sectionName + "/" + PLUGIN_MANAGEMENT + "/" + PLUGINS);
@@ -416,7 +424,7 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
      * Fixes duplicate plugins within a specific plugins section.
      */
     private boolean fixDuplicatePluginsInSection(Element pluginsElement, UpgradeContext context, String sectionName) {
-        List<Element> plugins = pluginsElement.children(PLUGIN).toList();
+        List<Element> plugins = pluginsElement.childElements(PLUGIN).toList();
         Map<String, Element> seenPlugins = new HashMap<>();
 
         List<Element> duplicates = plugins.stream()
@@ -460,10 +468,11 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
 
         boolean fixed = false;
         String elementType = repositoriesElement.name().equals(REPOSITORIES) ? REPOSITORY : PLUGIN_REPOSITORY;
-        List<Element> repositories = repositoriesElement.children(elementType).toList();
+        List<Element> repositories =
+                repositoriesElement.childElements(elementType).toList();
 
         for (Element repository : repositories) {
-            Element urlElement = repository.child("url").orElse(null);
+            Element urlElement = repository.childElement("url").orElse(null);
             if (urlElement != null) {
                 String url = urlElement.textContent().trim();
                 if (url.contains("${")) {

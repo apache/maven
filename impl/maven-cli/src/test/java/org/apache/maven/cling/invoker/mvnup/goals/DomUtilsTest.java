@@ -298,7 +298,7 @@ class DomUtilsTest {
 
         Document doc = Document.of(pomXml);
         Element root = doc.root();
-        Element customParent = root.child("customParent").orElse(null);
+        Element customParent = root.childElement("customParent").orElse(null);
         assertNotNull(customParent, "customParent should exist");
 
         // Insert element in parent that has no ordering defined
@@ -335,9 +335,9 @@ class DomUtilsTest {
 
         Document doc = Document.of(pomXml);
         Element root = doc.root();
-        Element dependencies = root.child("dependencies").orElse(null);
+        Element dependencies = root.childElement("dependencies").orElse(null);
         assertNotNull(dependencies, "dependencies should exist");
-        Element dependency = dependencies.child("dependency").orElse(null);
+        Element dependency = dependencies.childElement("dependency").orElse(null);
         assertNotNull(dependency, "dependency should exist");
 
         // Insert elements in dependency according to dependency ordering
@@ -382,7 +382,7 @@ class DomUtilsTest {
 
         Document doc = Document.of(pomXml);
         Element root = doc.root();
-        Element build = root.child("build").orElse(null);
+        Element build = root.childElement("build").orElse(null);
         assertNotNull(build, "build should exist");
 
         // Insert elements in build according to build ordering
