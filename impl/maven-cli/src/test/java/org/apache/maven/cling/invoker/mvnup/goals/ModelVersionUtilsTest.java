@@ -68,7 +68,7 @@ class ModelVersionUtilsTest {
         @DisplayName("should detect model version")
         void shouldDetectModelVersionFromNamespace(String targetVersion) throws Exception {
             String pomXml = PomBuilder.create()
-                    .namespace("http://maven.apache.org/POM/" + targetVersion)
+                    .namespace("http://maven.apache.org/POM/4.0.0")
                     .modelVersion(targetVersion)
                     .groupId("test")
                     .artifactId("test")

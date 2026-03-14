@@ -49,8 +49,6 @@ import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.SUBPROJECT;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.SUBPROJECTS;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.ModelVersions.MODEL_VERSION_4_0_0;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.ModelVersions.MODEL_VERSION_4_1_0;
-import static eu.maveniverse.domtrip.maven.MavenPomElements.Namespaces.MAVEN_4_0_0_NAMESPACE;
-import static eu.maveniverse.domtrip.maven.MavenPomElements.Namespaces.MAVEN_4_1_0_NAMESPACE;
 import static org.apache.maven.cling.invoker.mvnup.goals.ModelVersionUtils.getSchemaLocationForModelVersion;
 
 /**
@@ -158,8 +156,8 @@ public class ModelUpgradeStrategy extends AbstractUpgradeStrategy {
             context.detail("Added modelVersion " + targetModelVersion);
         }
 
-        // Update namespace and schema location
-        upgradeNamespaceAndSchemaLocation(editor, context, targetModelVersion);
+        // Update schema location only (namespace remains at 4.0.0)
+        upgradeSchemaLocation(editor, context, targetModelVersion);
 
         // Convert modules to subprojects (for 4.1.0 and higher)
         if (ModelVersionUtils.isVersionGreaterOrEqual(targetModelVersion, MODEL_VERSION_4_1_0)) {
@@ -172,27 +170,22 @@ public class ModelUpgradeStrategy extends AbstractUpgradeStrategy {
     }
 
     /**
-     * Updates namespace and schema location for the target model version using domtrip.
+     * Updates schema location for the target model version using domtrip.
+     * Namespace remains at http://maven.apache.org/POM/4.0.0 for all versions.
      */
-    private void upgradeNamespaceAndSchemaLocation(Editor editor, UpgradeContext context, String targetModelVersion) {
+    private void upgradeSchemaLocation(Editor editor, UpgradeContext context, String targetModelVersion) {
         Element root = editor.root();
         if (root == null) {
             return;
         }
 
-        // Update namespace based on target model version
-        String targetNamespace = getNamespaceForModelVersion(targetModelVersion);
-
-        // Use element's attribute method to set the namespace declaration
-        // This modifies the element in place and marks it as modified
-        root.attribute("xmlns", targetNamespace);
-        context.detail("Updated namespace to " + targetNamespace);
-
-        // Update schema location if present
+        // Only update schema location if present
         String currentSchemaLocation = root.attribute("xsi:schemaLocation");
         if (currentSchemaLocation != null) {
+            String namespace = "http://maven.apache.org/POM/4.0.0";
             String newSchemaLocation = getSchemaLocationForModelVersion(targetModelVersion);
-            root.attribute("xsi:schemaLocation", newSchemaLocation);
+            String fullSchemaLocation = namespace + " " + newSchemaLocation;
+            root.attribute("xsi:schemaLocation", fullSchemaLocation);
             context.detail("Updated xsi:schemaLocation");
         }
     }
@@ -261,19 +254,6 @@ public class ModelUpgradeStrategy extends AbstractUpgradeStrategy {
             return MODEL_VERSION_4_1_0;
         } else {
             return MODEL_VERSION_4_0_0;
-        }
-    }
-
-    /**
-     * Gets the namespace URI for a model version.
-     */
-    private String getNamespaceForModelVersion(String modelVersion) {
-        if (MavenPomElements.ModelVersions.MODEL_VERSION_4_2_0.equals(modelVersion)) {
-            return MavenPomElements.Namespaces.MAVEN_4_2_0_NAMESPACE;
-        } else if (MODEL_VERSION_4_1_0.equals(modelVersion)) {
-            return MAVEN_4_1_0_NAMESPACE;
-        } else {
-            return MAVEN_4_0_0_NAMESPACE;
         }
     }
 

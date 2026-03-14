@@ -29,7 +29,7 @@
 #else
   #set ( $ioVersion = $version )
 #end
-#set ( $namespace = $xmlModelMetadata.getNamespace($ioVersion) )
+#set ( $namespace = "http://maven.apache.org/POM/4.0.0" )
 #set ( $schemaLocation = $xmlModelMetadata.getSchemaLocation($ioVersion) )
 #set ( $rootXml = $Helper.xmlClassMetadata( $root ) )
 #set ( $rootTag = $rootXml.tagName )

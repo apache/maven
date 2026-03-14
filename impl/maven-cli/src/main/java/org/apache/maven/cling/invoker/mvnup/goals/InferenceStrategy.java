@@ -304,20 +304,10 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
 
     /**
      * Applies model version inference optimization.
-     * Removes modelVersion element when it can be inferred from namespace.
+     * This optimization was based on inferring version from namespace.
+     * With stable namespace, this optimization is no longer applicable.
      */
     private boolean applyModelVersionInference(UpgradeContext context, Document pomDocument) {
-        String currentVersion = ModelVersionUtils.detectModelVersion(pomDocument);
-
-        // Only remove modelVersion for 4.1.0+ models where it can be inferred from namespace
-        if (MODEL_VERSION_4_1_0.equals(currentVersion) || ModelVersionUtils.isNewerThan410(currentVersion)) {
-
-            if (ModelVersionUtils.removeModelVersion(pomDocument)) {
-                context.detail("Removed: modelVersion element (can be inferred from namespace)");
-                return true;
-            }
-        }
-
         return false;
     }
 
