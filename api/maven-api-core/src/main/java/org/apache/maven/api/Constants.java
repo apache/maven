@@ -742,5 +742,11 @@ public final class Constants {
      */
     public static final String MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE_PREFIX = "maven.model.processor.referenceType.";
 
+    /**
+     * System property to keep temp material for diagnostics.
+     *
+     */
+    public static final String KEEP_PROP = "maven.tempfile.keep";
+
     private Constants() {}
 }
