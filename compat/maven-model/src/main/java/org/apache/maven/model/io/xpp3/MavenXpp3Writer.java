@@ -33,6 +33,14 @@ import org.apache.maven.model.v4.MavenStaxWriter;
  */
 @Deprecated
 public class MavenXpp3Writer {
+    private static final String NAMESPACE_PREFIX = "http://maven.apache.org/POM/";
+
+    private static final String SCHEMA_LOCATION_PREFIX = "https://maven.apache.org/xsd/maven-";
+
+    private static final String SCHEMA_LOCATION_SUFFIX = ".xsd";
+
+    private static final String DEFAULT_MODEL_VERSION = "4.0.0";
+
     // --------------------------/
     // - Class/Member Variables -/
     // --------------------------/
@@ -79,6 +87,7 @@ public class MavenXpp3Writer {
      */
     public void write(Writer writer, Model model) throws IOException {
         try {
+            configureDelegate(model);
             delegate.write(writer, model.getDelegate());
         } catch (XMLStreamException e) {
             throw new IOException(e);
@@ -94,9 +103,28 @@ public class MavenXpp3Writer {
      */
     public void write(OutputStream stream, Model model) throws IOException {
         try {
+            configureDelegate(model);
             delegate.write(stream, model.getDelegate());
         } catch (XMLStreamException e) {
             throw new IOException(e);
         }
     } // -- void write( OutputStream, Model )
+
+    private void configureDelegate(Model model) {
+        String version = model.getModelVersion();
+        if (version != null) {
+            version = version.trim();
+        }
+        if (version == null || version.isBlank()) {
+            String namespaceUri = model.getDelegate().getNamespaceUri();
+            if (namespaceUri != null && namespaceUri.startsWith(NAMESPACE_PREFIX)) {
+                version = namespaceUri.substring(NAMESPACE_PREFIX.length()).trim();
+            }
+        }
+        if (version == null || version.isBlank()) {
+            version = DEFAULT_MODEL_VERSION;
+        }
+        delegate.setNamespace(NAMESPACE_PREFIX + version);
+        delegate.setSchemaLocation(SCHEMA_LOCATION_PREFIX + version + SCHEMA_LOCATION_SUFFIX);
+    }
 }
