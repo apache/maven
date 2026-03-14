@@ -195,9 +195,9 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         Map<String, PluginUpgradeInfo> pluginUpgrades = getPluginUpgradesMap();
 
         // Check build/plugins
-        Element buildElement = root.child(BUILD).orElse(null);
+        Element buildElement = root.childElement(BUILD).orElse(null);
         if (buildElement != null) {
-            Element pluginsElement = buildElement.child(PLUGINS).orElse(null);
+            Element pluginsElement = buildElement.childElement(PLUGINS).orElse(null);
             if (pluginsElement != null) {
                 hasUpgrades |= upgradePluginsInSection(
                         pluginsElement, pluginUpgrades, pomDocument, BUILD + "/" + PLUGINS, context);
@@ -205,10 +205,10 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
 
             // Check build/pluginManagement/plugins
             Element pluginManagementElement =
-                    buildElement.child(PLUGIN_MANAGEMENT).orElse(null);
+                    buildElement.childElement(PLUGIN_MANAGEMENT).orElse(null);
             if (pluginManagementElement != null) {
                 Element managedPluginsElement =
-                        pluginManagementElement.child(PLUGINS).orElse(null);
+                        pluginManagementElement.childElement(PLUGINS).orElse(null);
                 if (managedPluginsElement != null) {
                     hasUpgrades |= upgradePluginsInSection(
                             managedPluginsElement,
@@ -260,7 +260,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             UpgradeContext context) {
 
         return pluginsElement
-                .children(PLUGIN)
+                .childElements(PLUGIN)
                 .map(pluginElement -> {
                     String groupId = getChildText(pluginElement, GROUP_ID);
                     String artifactId = getChildText(pluginElement, ARTIFACT_ID);
@@ -292,7 +292,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             Document pomDocument,
             String sectionName,
             UpgradeContext context) {
-        Element versionElement = pluginElement.child(VERSION).orElse(null);
+        Element versionElement = pluginElement.childElement(VERSION).orElse(null);
         String currentVersion;
         boolean isProperty = false;
         String propertyName = null;
@@ -342,10 +342,11 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             UpgradeContext context) {
         Editor editor = new Editor(pomDocument);
         Element root = editor.root();
-        Element propertiesElement = root.child(PROPERTIES).orElse(null);
+        Element propertiesElement = root.childElement(PROPERTIES).orElse(null);
 
         if (propertiesElement != null) {
-            Element propertyElement = propertiesElement.child(propertyName).orElse(null);
+            Element propertyElement =
+                    propertiesElement.childElement(propertyName).orElse(null);
             if (propertyElement != null) {
                 String currentVersion = propertyElement.textContentTrimmed();
                 if (isVersionBelow(currentVersion, upgrade.minVersion)) {
@@ -411,7 +412,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
      * Helper method to get child element text.
      */
     private String getChildText(Element parent, String childName) {
-        Element child = parent.child(childName).orElse(null);
+        Element child = parent.childElement(childName).orElse(null);
         return child != null ? child.textContentTrimmed() : null;
     }
 
@@ -744,7 +745,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             String version = getChildText(root, VERSION);
 
             // Handle inheritance from parent
-            Element parentElement = root.child(PARENT).orElse(null);
+            Element parentElement = root.childElement(PARENT).orElse(null);
             if (parentElement != null) {
                 if (groupId == null) {
                     groupId = getChildText(parentElement, GROUP_ID);
@@ -775,17 +776,19 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         Element root = pomDocument.root();
 
         // Ensure build/pluginManagement/plugins structure exists
-        Element buildElement = root.child(BUILD).orElse(null);
+        Element buildElement = root.childElement(BUILD).orElse(null);
         if (buildElement == null) {
             buildElement = DomUtils.insertNewElement(BUILD, root);
         }
 
-        Element pluginManagementElement = buildElement.child(PLUGIN_MANAGEMENT).orElse(null);
+        Element pluginManagementElement =
+                buildElement.childElement(PLUGIN_MANAGEMENT).orElse(null);
         if (pluginManagementElement == null) {
             pluginManagementElement = DomUtils.insertNewElement(PLUGIN_MANAGEMENT, buildElement);
         }
 
-        Element managedPluginsElement = pluginManagementElement.child(PLUGINS).orElse(null);
+        Element managedPluginsElement =
+                pluginManagementElement.childElement(PLUGINS).orElse(null);
         if (managedPluginsElement == null) {
             managedPluginsElement = DomUtils.insertNewElement(PLUGINS, pluginManagementElement);
         }
@@ -809,7 +812,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
      * Checks if a plugin is already managed in the given plugins element.
      */
     private boolean isPluginAlreadyManagedInElement(Element pluginsElement, PluginUpgrade upgrade) {
-        List<Element> pluginElements = pluginsElement.children(PLUGIN).toList();
+        List<Element> pluginElements = pluginsElement.childElements(PLUGIN).toList();
         for (Element pluginElement : pluginElements) {
             String groupId = getChildText(pluginElement, GROUP_ID);
             String artifactId = getChildText(pluginElement, ARTIFACT_ID);
