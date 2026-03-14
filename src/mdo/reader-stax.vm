@@ -265,32 +265,58 @@ public class ${className} {
 #if ( $needXmlContext )
         Deque<Object> context = new ArrayDeque<>();
 #end
-        $rootUcapName $rootLcapName = null;
-        int eventType = parser.getEventType();
-        boolean parsed = false;
-        while (eventType != XMLStreamReader.END_DOCUMENT) {
-            if (eventType == XMLStreamReader.START_ELEMENT) {
-                if (strict && ! "${rootTag}".equals(parser.getLocalName())) {
-                    throw new XMLStreamException("Expected root element '${rootTag}' but found '" + parser.getName() + "'", parser.getLocation(), null);
-                } else if (parsed) {
-                    // fallback, already expected a XMLStreamException due to invalid XML
-                    throw new XMLStreamException("Duplicated tag: '${rootTag}'", parser.getLocation(), null);
-                }
-#if ( $locationTracking )
-                $rootLcapName = parse${rootUcapName}(parser, strict, parser.getNamespaceURI(), inputSrc);
-#elseif ( $needXmlContext )
-                $rootLcapName = parse${rootUcapName}(parser, strict, parser.getNamespaceURI(), context);
-#else
-                $rootLcapName = parse${rootUcapName}(parser, strict, parser.getNamespaceURI());
-#end
-                parsed = true;
+$rootUcapName $rootLcapName = null;
+    int eventType = parser.getEventType();
+    boolean parsed = false;
+    while (eventType != XMLStreamReader.END_DOCUMENT) {
+    if (eventType == XMLStreamReader.START_ELEMENT) {
+    if (strict && ! "${rootTag}".equals(parser.getLocalName())) {
+    throw new XMLStreamException("Expected root element '${rootTag}' but found '" + parser.getName() + "'", parser.getLocation(), null);
+    } else if (parsed) {
+    throw new XMLStreamException("Duplicated tag: '${rootTag}'", parser.getLocation(), null);
+    }
+    // Root namespace policy:
+    //  - POM ('project'): allow no namespace or any http://maven.apache.org/POM/<version>
+    //  - METADATA ('metadata'): allow no namespace or any http://maven.apache.org/METADATA/<version>
+    //  - Other readers: do not enforce root namespace here (child checks still apply when strict)
+    if (strict) {
+        final String rootNs = parser.getNamespaceURI();
+        final boolean hasNs = rootNs != null && !rootNs.isEmpty();
+
+        if ("project".equals("${rootTag}")) {
+            if (hasNs && !rootNs.startsWith("http://maven.apache.org/POM/")) {
+            throw new XMLStreamException("Unrecognized POM namespace '" + rootNs + "'. Expected something like 'http://maven.apache.org/POM/4.x.y' or no namespace.",
+            parser.getLocation(), null);
             }
-            eventType = parser.next();
-        }
-        if (parsed) {
-            return $rootLcapName;
-        }
-            throw new XMLStreamException("Expected root element '${rootTag}' but found no element at all: invalid XML document", parser.getLocation(), null);
+        } else if ("metadata".equals("${rootTag}")) {
+            if (hasNs && !rootNs.startsWith("http://maven.apache.org/METADATA/")) {
+               throw new XMLStreamException("Unrecognized METADATA namespace '" + rootNs  + "'. Expected something like 'http://maven.apache.org/METADATA/1.x.y' or no namespace.",
+                parser.getLocation(), null);
+            }
+        } else {
+            // Other generated models (settings, lifecycles, extensions, plugin, toolchains, …):
+            // no hard-coded enforcement at the root level.
+            }
+    }
+
+    #if ( $locationTracking )
+        $rootLcapName = parse${rootUcapName}(parser, strict, parser.getNamespaceURI(), inputSrc);
+    #elseif ( $needXmlContext )
+        $rootLcapName = parse${rootUcapName}(parser, strict, parser.getNamespaceURI(), context);
+    #else
+        $rootLcapName = parse${rootUcapName}(parser, strict, parser.getNamespaceURI());
+    #end
+    parsed = true;
+    }
+    eventType = parser.next();
+    }
+
+    if (parsed) {
+    return $rootLcapName;
+    }
+    throw new XMLStreamException(
+    "Expected root element '${rootTag}' but found no element at all: invalid XML document",
+    parser.getLocation(), null);
     } //-- ${root.name} read(XMLStreamReader, boolean)
 
 #foreach ( $class in $model.allClasses )
