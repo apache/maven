@@ -96,7 +96,6 @@ class ModelVersionUtilsTest {
             String result = ModelVersionUtils.detectModelVersion(document);
             assertEquals("4.0.0", result); // Default version
         }
-
     }
 
     @Nested

@@ -22,18 +22,17 @@ import eu.maveniverse.domtrip.Document;
 import eu.maveniverse.domtrip.Editor;
 import eu.maveniverse.domtrip.Element;
 
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.ModelVersions.MODEL_VERSION_4_0_0;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.ModelVersions.MODEL_VERSION_4_1_0;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.SchemaLocations.MAVEN_4_1_0_SCHEMA_LOCATION;
-import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.MODEL_VERSION;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.MODEL_VERSION;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.ModelVersions.MODEL_VERSION_4_0_0;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.ModelVersions.MODEL_VERSION_4_1_0;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.ModelVersions.MODEL_VERSION_4_2_0;
-import static eu.maveniverse.domtrip.maven.MavenPomElements.Namespaces.MAVEN_4_0_0_NAMESPACE;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.SchemaLocations.MAVEN_4_0_0_SCHEMA_LOCATION;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.SchemaLocations.MAVEN_4_1_0_SCHEMA_LOCATION;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.SchemaLocations.MAVEN_4_2_0_SCHEMA_LOCATION;
+import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.ModelVersions.MODEL_VERSION_4_0_0;
+import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.ModelVersions.MODEL_VERSION_4_1_0;
+import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.SchemaLocations.MAVEN_4_1_0_SCHEMA_LOCATION;
+import static org.apache.maven.cling.invoker.mvnup.goals.UpgradeConstants.XmlElements.MODEL_VERSION;
 
 /**
  * Utility class for handling Maven model version operations during upgrades.

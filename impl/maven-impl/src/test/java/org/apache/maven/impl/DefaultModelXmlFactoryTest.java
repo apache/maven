@@ -60,8 +60,7 @@ class DefaultModelXmlFactoryTest {
 
     @Test
     void testValidNamespaceWithModelVersion410() throws Exception {
-        String xml =
-                """
+        String xml = """
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                   <modelVersion>4.1.0</modelVersion>
                 </project>""";
