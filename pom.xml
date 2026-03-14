@@ -825,6 +825,17 @@ under the License.
                 ! Excluded the license files itself cause they do not have a license of themselves.
               -->
               <exclude>src/main/appended-resources/licenses/**</exclude>
+              <!--
+                ! Exclude build output directories (stale or non-module target/ dirs
+                ! are not excluded by RAT's excludeSubProjects and not cleaned by mvn clean)
+              -->
+              <exclude>**/target/**</exclude>
+              <!--
+                ! Exclude Eclipse IDE project files (not cleaned by mvn clean)
+              -->
+              <exclude>**/.classpath</exclude>
+              <exclude>**/.project</exclude>
+              <exclude>**/.settings/**</exclude>
             </excludes>
           </configuration>
         </plugin>
