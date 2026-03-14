@@ -36,13 +36,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * configuring a mojo.
  *
  * @author jdcasey
+ * @since 2.1.0-M1
+ *
  */
 @SuppressWarnings("checkstyle:UnusedLocalVariable")
 class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng2690MojoLoadingErrorsTest() {
-        super("(2.1.0-M1,)");
-    }
 
     @Test
     public void testNoClassDefFromMojoLoad() throws IOException, VerificationException {
@@ -60,7 +58,7 @@ class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegrationTestCa
         int msg = indexOf(lines, "(?i).*required class is missing.*");
         assertTrue(msg >= 0, "User-friendly message was not found in output.");
 
-        int cls = lines.get(msg).toString().replace('/', '.').indexOf("junit.framework.TestCase");
+        int cls = lines.get(msg).toString().replace('/', '.').indexOf("org.apache.commons.lang3.StringUtils");
         assertTrue(cls >= 0, "Missing class name was not found in output.");
     }
 
@@ -80,7 +78,7 @@ class MavenITmng2690MojoLoadingErrorsTest extends AbstractMavenIntegrationTestCa
         int msg = indexOf(lines, "(?i).*required class (i|wa)s missing( during (mojo )?configuration)?.*");
         assertTrue(msg >= 0, "User-friendly message was not found in output.");
 
-        int cls = lines.get(msg).toString().replace('/', '.').indexOf("junit.framework.TestCase");
+        int cls = lines.get(msg).toString().replace('/', '.').indexOf("org.apache.commons.lang3.StringUtils");
         assertTrue(cls >= 0, "Missing class name was not found in output.");
     }
 

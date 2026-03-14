@@ -29,9 +29,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2124">MNG-2124</a>.
  */
 public class MavenITmng2124PomInterpolationWithParentValuesTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng2124PomInterpolationWithParentValuesTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test that ${parent.artifactId} resolves correctly. [MNG-2124]

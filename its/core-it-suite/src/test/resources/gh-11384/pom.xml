@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.1.0" root="true">
+  <groupId>org.apache.maven.its.mng11384</groupId>
+  <artifactId>test</artifactId>
+  <version>1.0</version>
+  <packaging>pom</packaging>
+
+  <name>Maven Integration Test :: GH-11384</name>
+  <description>Test that project.url can refer to a property named project.url without causing recursion</description>
+
+  <!-- This pattern is used by slack-sdk-parent and should not cause a recursive variable reference error -->
+  <url>${project.url}</url>
+
+  <properties>
+    <project.url>https://github.com/slackapi/java-slack-sdk</project.url>
+  </properties>
+</project>
+

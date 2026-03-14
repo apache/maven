@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng2865MirrorWildcardTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2865MirrorWildcardTest() {
-        super("(2.0.4,)");
-    }
-
     /**
      * Test that the mirror wildcard * matches any repo, in particular file:// repos.
      *

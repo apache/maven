@@ -24,10 +24,6 @@ import org.junit.jupiter.api.Test;
 
 public class MavenITmng6506PackageAnnotationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng6506PackageAnnotationTest() {
-        super("[3.6.1,)");
-    }
-
     @Test
     public void testGetPackageAnnotation() throws Exception {
         File testDir = extractResources("/mng-6506-package-annotation");

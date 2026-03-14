@@ -208,7 +208,7 @@ public interface XmlReaderRequest {
 
             @Override
             public URL getURL() {
-                return null;
+                return url;
             }
 
             @Override

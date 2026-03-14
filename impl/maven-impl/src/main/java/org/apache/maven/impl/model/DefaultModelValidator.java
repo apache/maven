@@ -39,6 +39,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import org.apache.maven.api.DependencyScope;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Inject;
@@ -77,7 +78,6 @@ import org.apache.maven.api.xml.XmlService;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.model.v4.MavenTransformer;
-import org.eclipse.aether.scope.DependencyScope;
 import org.eclipse.aether.scope.ScopeManager;
 
 /**
@@ -355,6 +355,43 @@ public class DefaultModelValidator implements ModelValidator {
             }
         }
 
+        // Validate mixins
+        if (!model.getMixins().isEmpty()) {
+            // Ensure model version is at least 4.2.0 when using mixins
+            if (compareModelVersions("4.2.0", model.getModelVersion()) < 0) {
+                addViolation(
+                        problems,
+                        Severity.ERROR,
+                        Version.V40,
+                        "mixins",
+                        null,
+                        "Mixins are only supported in modelVersion 4.2.0 or higher, but found '"
+                                + model.getModelVersion() + "'.",
+                        model);
+            }
+
+            // Validate each mixin
+            for (Parent mixin : model.getMixins()) {
+                if (mixin.getRelativePath() != null
+                        && !mixin.getRelativePath().isEmpty()
+                        && (mixin.getGroupId() != null && !mixin.getGroupId().isEmpty()
+                                || mixin.getArtifactId() != null
+                                        && !mixin.getArtifactId().isEmpty())
+                        && validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_4_0
+                        && ModelBuilder.KNOWN_MODEL_VERSIONS.contains(model.getModelVersion())
+                        && !Objects.equals(model.getModelVersion(), ModelBuilder.MODEL_VERSION_4_0_0)) {
+                    addViolation(
+                            problems,
+                            Severity.WARNING,
+                            Version.BASE,
+                            "mixins.mixin.relativePath",
+                            null,
+                            "only specify relativePath or groupId/artifactId for mixin",
+                            mixin);
+                }
+            }
+        }
+
         if (validationLevel == ModelValidator.VALIDATION_LEVEL_MINIMAL) {
             // profiles: they are essential for proper model building (may contribute profiles, dependencies...)
             HashSet<String> minProfileIds = new HashSet<>();
@@ -505,16 +542,6 @@ public class DefaultModelValidator implements ModelValidator {
                         validationLevel);
             }
 
-            validateRawRepositories(
-                    problems, model.getRepositories(), "repositories.repository.", EMPTY, validationLevel);
-
-            validateRawRepositories(
-                    problems,
-                    model.getPluginRepositories(),
-                    "pluginRepositories.pluginRepository.",
-                    EMPTY,
-                    validationLevel);
-
             Build build = model.getBuild();
             if (build != null) {
                 validate20RawPlugins(problems, build.getPlugins(), "build.plugins.plugin.", EMPTY, validationLevel);
@@ -567,16 +594,6 @@ public class DefaultModelValidator implements ModelValidator {
                             isModelVersion41OrMore,
                             validationLevel);
                 }
-
-                validateRawRepositories(
-                        problems, profile.getRepositories(), prefix, "repositories.repository.", validationLevel);
-
-                validateRawRepositories(
-                        problems,
-                        profile.getPluginRepositories(),
-                        prefix,
-                        "pluginRepositories.pluginRepository.",
-                        validationLevel);
 
                 BuildBase buildBase = profile.getBuild();
                 if (buildBase != null) {
@@ -648,6 +665,44 @@ public class DefaultModelValidator implements ModelValidator {
                         parent);
             }
         }
+
+        if (validationLevel > VALIDATION_LEVEL_MINIMAL) {
+            validateRawRepositories(
+                    problems, model.getRepositories(), "repositories.repository.", EMPTY, validationLevel);
+
+            validateRawRepositories(
+                    problems,
+                    model.getPluginRepositories(),
+                    "pluginRepositories.pluginRepository.",
+                    EMPTY,
+                    validationLevel);
+
+            for (Profile profile : model.getProfiles()) {
+                String prefix = "profiles.profile[" + profile.getId() + "].";
+
+                validateRawRepositories(
+                        problems, profile.getRepositories(), prefix, "repositories.repository.", validationLevel);
+
+                validateRawRepositories(
+                        problems,
+                        profile.getPluginRepositories(),
+                        prefix,
+                        "pluginRepositories.pluginRepository.",
+                        validationLevel);
+            }
+
+            DistributionManagement distMgmt = model.getDistributionManagement();
+            if (distMgmt != null) {
+                validateRawRepository(
+                        problems, distMgmt.getRepository(), "distributionManagement.repository.", "", true);
+                validateRawRepository(
+                        problems,
+                        distMgmt.getSnapshotRepository(),
+                        "distributionManagement.snapshotRepository.",
+                        "",
+                        true);
+            }
+        }
     }
 
     private void validate30RawProfileActivation(ModelProblemCollector problems, Activation activation, String prefix) {
@@ -683,7 +738,8 @@ public class DefaultModelValidator implements ModelValidator {
                 while (matcher.find()) {
                     String propertyName = matcher.group(0);
 
-                    if (path.startsWith("activation.file.") && "${project.basedir}".equals(propertyName)) {
+                    if ((path.startsWith("activation.file.") || path.equals("activation.condition"))
+                            && "${project.basedir}".equals(propertyName)) {
                         continue;
                     }
                     addViolation(
@@ -855,7 +911,7 @@ public class DefaultModelValidator implements ModelValidator {
 
         validateStringNotEmpty("packaging", problems, Severity.ERROR, Version.BASE, model.getPackaging(), model);
 
-        if (!model.getModules().isEmpty()) {
+        if (!model.getModules().isEmpty() || !model.getSubprojects().isEmpty()) {
             if (!"pom".equals(model.getPackaging())) {
                 addViolation(
                         problems,
@@ -889,6 +945,30 @@ public class DefaultModelValidator implements ModelValidator {
                             null,
                             "has been specified without a path to the project directory.",
                             model.getLocation("modules"));
+                }
+            }
+
+            for (int index = 0, size = model.getSubprojects().size(); index < size; index++) {
+                String subproject = model.getSubprojects().get(index);
+
+                boolean isBlankSubproject = true;
+                if (subproject != null) {
+                    for (int charIndex = 0; charIndex < subproject.length(); charIndex++) {
+                        if (!Character.isWhitespace(subproject.charAt(charIndex))) {
+                            isBlankSubproject = false;
+                        }
+                    }
+                }
+
+                if (isBlankSubproject) {
+                    addViolation(
+                            problems,
+                            Severity.ERROR,
+                            Version.BASE,
+                            "subprojects.subproject[" + index + "]",
+                            null,
+                            "has been specified without a path to the project directory.",
+                            model.getLocation("subprojects"));
                 }
             }
         }
@@ -1120,6 +1200,25 @@ public class DefaultModelValidator implements ModelValidator {
                 }
             }
 
+            // MNG-8750: New dependency scopes are only supported starting with modelVersion 4.1.0
+            // When using modelVersion 4.0.0, fail validation if one of the new scopes is present
+            if (!is41OrBeyond) {
+                String scope = dependency.getScope();
+                if (DependencyScope.COMPILE_ONLY.id().equals(scope)
+                        || DependencyScope.TEST_ONLY.id().equals(scope)
+                        || DependencyScope.TEST_RUNTIME.id().equals(scope)) {
+                    addViolation(
+                            problems,
+                            Severity.ERROR,
+                            Version.V20,
+                            prefix + prefix2 + "scope",
+                            SourceHint.dependencyManagementKey(dependency),
+                            "scope '" + scope + "' is not supported with modelVersion 4.0.0; "
+                                    + "use modelVersion 4.1.0 or remove this scope.",
+                            dependency);
+                }
+            }
+
             if (equals("LATEST", dependency.getVersion()) || equals("RELEASE", dependency.getVersion())) {
                 addViolation(
                         problems,
@@ -1220,12 +1319,12 @@ public class DefaultModelValidator implements ModelValidator {
                             dependency);
 
                     /*
-                     * TODO Extensions like Flex Mojos use custom scopes like "merged", "internal", "external", etc. In
-                     * order to don't break backward-compat with those, only warn but don't error out.
+                     * Extensions like Flex Mojos use custom scopes like "merged", "internal", "external", etc. In
+                     * order to not break backward-compat with those, only warn but don't error out.
                      */
                     ScopeManager scopeManager =
                             InternalSession.from(session).getSession().getScopeManager();
-                    validateEnum(
+                    validateDependencyScope(
                             prefix,
                             "scope",
                             problems,
@@ -1235,19 +1334,20 @@ public class DefaultModelValidator implements ModelValidator {
                             SourceHint.dependencyManagementKey(dependency),
                             dependency,
                             scopeManager.getDependencyScopeUniverse().stream()
-                                    .map(DependencyScope::getId)
+                                    .map(org.eclipse.aether.scope.DependencyScope::getId)
                                     .distinct()
-                                    .toArray(String[]::new));
+                                    .toArray(String[]::new),
+                            false);
 
                     validateEffectiveModelAgainstDependency(prefix, problems, model, dependency);
                 } else {
                     ScopeManager scopeManager =
                             InternalSession.from(session).getSession().getScopeManager();
                     Set<String> scopes = scopeManager.getDependencyScopeUniverse().stream()
-                            .map(DependencyScope::getId)
+                            .map(org.eclipse.aether.scope.DependencyScope::getId)
                             .collect(Collectors.toCollection(HashSet::new));
                     scopes.add("import");
-                    validateEnum(
+                    validateDependencyScope(
                             prefix,
                             "scope",
                             problems,
@@ -1256,7 +1356,8 @@ public class DefaultModelValidator implements ModelValidator {
                             dependency.getScope(),
                             SourceHint.dependencyManagementKey(dependency),
                             dependency,
-                            scopes.toArray(new String[0]));
+                            scopes.toArray(new String[0]),
+                            true);
                 }
             }
         }
@@ -1478,40 +1579,7 @@ public class DefaultModelValidator implements ModelValidator {
         Map<String, Repository> index = new HashMap<>();
 
         for (Repository repository : repositories) {
-            validateStringNotEmpty(
-                    prefix, prefix2, "id", problems, Severity.ERROR, Version.V20, repository.getId(), null, repository);
-
-            if (validateStringNotEmpty(
-                    prefix,
-                    prefix2,
-                    "[" + repository.getId() + "].url",
-                    problems,
-                    Severity.ERROR,
-                    Version.V20,
-                    repository.getUrl(),
-                    null,
-                    repository)) {
-                // only allow ${basedir} and ${project.basedir}
-                Matcher matcher = EXPRESSION_NAME_PATTERN.matcher(repository.getUrl());
-                while (matcher.find()) {
-                    String expr = matcher.group(1);
-                    if (!("basedir".equals(expr)
-                            || "project.basedir".equals(expr)
-                            || expr.startsWith("project.basedir.")
-                            || "project.rootDirectory".equals(expr)
-                            || expr.startsWith("project.rootDirectory."))) {
-                        addViolation(
-                                problems,
-                                Severity.ERROR,
-                                Version.V40,
-                                prefix + prefix2 + "[" + repository.getId() + "].url",
-                                null,
-                                "contains an unsupported expression (only expressions starting with 'project.basedir' or 'project.rootDirectory' are supported).",
-                                repository);
-                        break;
-                    }
-                }
-            }
+            validateRawRepository(problems, repository, prefix, prefix2, false);
 
             String key = repository.getId();
 
@@ -1531,6 +1599,57 @@ public class DefaultModelValidator implements ModelValidator {
                         repository);
             } else {
                 index.put(key, repository);
+            }
+        }
+    }
+
+    private void validateRawRepository(
+            ModelProblemCollector problems,
+            Repository repository,
+            String prefix,
+            String prefix2,
+            boolean allowEmptyUrl) {
+        if (repository == null) {
+            return;
+        }
+        if (validateStringNotEmpty(
+                prefix, prefix2, "id", problems, Severity.ERROR, Version.V20, repository.getId(), null, repository)) {
+            // Check for uninterpolated expressions in ID - these should have been interpolated by now
+            Matcher matcher = EXPRESSION_NAME_PATTERN.matcher(repository.getId());
+            if (matcher.find()) {
+                addViolation(
+                        problems,
+                        Severity.ERROR,
+                        Version.V40,
+                        prefix + prefix2 + "[" + repository.getId() + "].id",
+                        null,
+                        "contains an uninterpolated expression.",
+                        repository);
+            }
+        }
+
+        if (!allowEmptyUrl
+                && validateStringNotEmpty(
+                        prefix,
+                        prefix2,
+                        "[" + repository.getId() + "].url",
+                        problems,
+                        Severity.ERROR,
+                        Version.V20,
+                        repository.getUrl(),
+                        null,
+                        repository)) {
+            // Check for uninterpolated expressions in URL - these should have been interpolated by now
+            Matcher matcher = EXPRESSION_NAME_PATTERN.matcher(repository.getUrl());
+            if (matcher.find()) {
+                addViolation(
+                        problems,
+                        Severity.ERROR,
+                        Version.V40,
+                        prefix + prefix2 + "[" + repository.getId() + "].url",
+                        null,
+                        "contains an uninterpolated expression.",
+                        repository);
             }
         }
     }
@@ -1697,9 +1816,9 @@ public class DefaultModelValidator implements ModelValidator {
 
     private boolean isValidProfileId(String id) {
         return switch (id.charAt(0)) { // avoid first character that has special CLI meaning in "mvn -P xxx"
-                // +: activate
-                // -, !: deactivate
-                // ?: optional
+            // +: activate
+            // -, !: deactivate
+            // ?: optional
             case '+', '-', '!', '?' -> false;
             default -> true;
         };
@@ -1989,6 +2108,52 @@ public class DefaultModelValidator implements ModelValidator {
                 sourceHint,
                 "must be one of " + values + " but is '" + string + "'.",
                 tracker);
+
+        return false;
+    }
+
+    @SuppressWarnings("checkstyle:parameternumber")
+    private boolean validateDependencyScope(
+            String prefix,
+            String fieldName,
+            ModelProblemCollector problems,
+            Severity severity,
+            Version version,
+            String scope,
+            @Nullable SourceHint sourceHint,
+            InputLocationTracker tracker,
+            String[] validScopes,
+            boolean isDependencyManagement) {
+        if (scope == null || scope.isEmpty()) {
+            return true;
+        }
+
+        List<String> values = Arrays.asList(validScopes);
+
+        if (values.contains(scope)) {
+            return true;
+        }
+
+        // Provide a more helpful error message for the 'import' scope
+        if ("import".equals(scope) && !isDependencyManagement) {
+            addViolation(
+                    problems,
+                    severity,
+                    version,
+                    prefix + fieldName,
+                    sourceHint,
+                    "has scope 'import'. The 'import' scope is only valid in <dependencyManagement> sections.",
+                    tracker);
+        } else {
+            addViolation(
+                    problems,
+                    severity,
+                    version,
+                    prefix + fieldName,
+                    sourceHint,
+                    "must be one of " + values + " but is '" + scope + "'.",
+                    tracker);
+        }
 
         return false;
     }
@@ -2306,7 +2471,7 @@ public class DefaultModelValidator implements ModelValidator {
             return () -> {
                 String hint;
                 if (dependency.getClassifier() == null
-                        || dependency.getClassifier().isBlank()) {
+                        || dependency.getClassifier().isEmpty()) {
                     hint = "groupId=" + valueToValueString(dependency.getGroupId())
                             + ", artifactId=" + valueToValueString(dependency.getArtifactId())
                             + ", type=" + valueToValueString(dependency.getType());

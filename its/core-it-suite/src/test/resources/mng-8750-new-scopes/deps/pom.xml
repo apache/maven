@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.1.0">
+  <parent />
+  <artifactId>parent</artifactId>
+  <packaging>pom</packaging>
+
+  <distributionManagement>
+    <repository>
+      <id>local-test-repo</id>
+      <url>file://${project.basedir}/../repo</url>
+    </repository>
+  </distributionManagement>
+</project>

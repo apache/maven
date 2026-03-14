@@ -27,7 +27,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -140,7 +140,41 @@ import static org.apache.maven.api.Constants.MAVEN_INSTALLATION_CONF;
 @Deprecated
 public class MavenCli {
 
+    /**
+     * @deprecated Use {@link org.apache.maven.api.Constants#MAVEN_REPO_LOCAL} instead
+     */
+    public static final String LOCAL_REPO_PROPERTY = "maven.repo.local";
+
+    /**
+     * @deprecated Use {@link org.apache.maven.api.Session#getRootDirectory()} instead
+     */
     public static final String MULTIMODULE_PROJECT_DIRECTORY = "maven.multiModuleProjectDirectory";
+
+    /**
+     * @deprecated Use {@link System#getProperty(String)} with "user.home" instead
+     */
+    public static final String USER_HOME = System.getProperty("user.home");
+
+    /**
+     * @deprecated Use {@link org.apache.maven.api.Constants#MAVEN_USER_CONF} instead
+     */
+    public static final File USER_MAVEN_CONFIGURATION_HOME = new File(USER_HOME, ".m2");
+
+    /**
+     * @deprecated Use {@link org.apache.maven.api.Constants#MAVEN_USER_TOOLCHAINS} instead
+     */
+    public static final File DEFAULT_USER_TOOLCHAINS_FILE = new File(USER_MAVEN_CONFIGURATION_HOME, "toolchains.xml");
+
+    /**
+     * @deprecated Use {@link org.apache.maven.api.Constants#MAVEN_INSTALLATION_TOOLCHAINS} instead
+     */
+    public static final File DEFAULT_GLOBAL_TOOLCHAINS_FILE =
+            new File(System.getProperty("maven.conf"), "toolchains.xml");
+
+    /**
+     * @deprecated Use {@link org.apache.maven.api.Constants#MAVEN_STYLE_COLOR_PROPERTY} instead
+     */
+    public static final String STYLE_COLOR_PROPERTY = "style.color";
 
     private static final String MVN_MAVEN_CONFIG = ".mvn/maven.config";
 
@@ -384,7 +418,7 @@ public class MavenCli {
             File configFile = new File(cliRequest.multiModuleProjectDirectory, MVN_MAVEN_CONFIG);
 
             if (configFile.isFile()) {
-                try (Stream<String> lines = Files.lines(configFile.toPath(), Charset.defaultCharset())) {
+                try (Stream<String> lines = Files.lines(configFile.toPath(), StandardCharsets.UTF_8)) {
                     String[] args = lines.filter(arg -> !arg.isEmpty() && !arg.startsWith("#"))
                             .toArray(String[]::new);
                     mavenConfig = cliManager.parse(args);
@@ -544,9 +578,10 @@ public class MavenCli {
                         switch (logLevelThreshold.toLowerCase(Locale.ENGLISH)) {
                             case "warn", "warning" -> LogLevelRecorder.Level.WARN;
                             case "error" -> LogLevelRecorder.Level.ERROR;
-                            default -> throw new IllegalArgumentException(
-                                    logLevelThreshold
-                                            + " is not a valid log severity threshold. Valid severities are WARN/WARNING and ERROR.");
+                            default ->
+                                throw new IllegalArgumentException(
+                                        logLevelThreshold
+                                                + " is not a valid log severity threshold. Valid severities are WARN/WARNING and ERROR.");
                         };
                 recorder.setMaxLevelAllowed(level);
                 slf4jLogger.info("Enabled to break the build on log level {}.", logLevelThreshold);
@@ -860,7 +895,7 @@ public class MavenCli {
             if (Files.exists(extensionsPath)) {
                 try (InputStream is = Files.newInputStream(extensionsPath)) {
                     return new CoreExtensionsStaxReader()
-                            .read(is, true, new InputSource(extensionsFile))
+                            .read(is, true, InputSource.of(extensionsFile))
                             .getExtensions();
                 }
             }
@@ -964,6 +999,7 @@ public class MavenCli {
 
     private int execute(CliRequest cliRequest) throws MavenExecutionRequestPopulationException {
         MavenExecutionRequest request = executionRequestPopulator.populateDefaults(cliRequest.request);
+        request.setRepositoryCache(new DefaultRepositoryCache()); // reset caches
 
         if (cliRequest.request.getRepositoryCache() == null) {
             cliRequest.request.setRepositoryCache(new DefaultRepositoryCache());
@@ -1719,11 +1755,7 @@ public class MavenCli {
     }
 
     private static Path getCanonicalPath(Path path) {
-        try {
-            return path.toRealPath();
-        } catch (IOException e) {
-            return getCanonicalPath(path.getParent()).resolve(path.getFileName());
-        }
+        return path.toAbsolutePath().normalize();
     }
 
     static class ExitException extends Exception {

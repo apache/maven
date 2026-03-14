@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng2831CustomArtifactHandlerAndCustomLifecycleTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2831CustomArtifactHandlerAndCustomLifecycleTest() {
-        super("(2.0.1,2.0.5),(2.0.6,3.0-alpha-1),[3.0-alpha-3,)");
-    }
-
     /**
      * Test the use of a custom lifecycle from a plugin that is defined as a build extension.
      *

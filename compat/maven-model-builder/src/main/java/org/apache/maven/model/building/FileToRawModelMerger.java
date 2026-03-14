@@ -139,6 +139,12 @@ class FileToRawModelMerger extends MavenMerger {
     }
 
     @Override
+    protected void mergeModel_Mixins(
+            Model.Builder builder, Model target, Model source, boolean sourceDominant, Map<Object, Object> context) {
+        // don't merge
+    }
+
+    @Override
     protected void mergeModelBase_Dependencies(
             ModelBase.Builder builder,
             ModelBase target,

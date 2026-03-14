@@ -30,12 +30,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4091">MNG-4091</a>:
  * Bad plugin descriptor error handling
+ * @since 2.1.0
+ *
  */
 public class MavenITmng4091BadPluginDescriptorTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng4091BadPluginDescriptorTest() {
-        super("[2.1.0,)"); // only test in 2.1.0+
-    }
 
     @Test
     public void testitMNG4091InvalidDescriptor() throws Exception {

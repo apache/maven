@@ -27,13 +27,12 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.impl.cache.Cache;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.SetWithResolutionResult;
 import org.apache.maven.project.MavenProject;
@@ -158,8 +157,9 @@ public class DefaultProjectArtifactsCache implements ProjectArtifactsCache {
         }
     }
 
-    protected final Map<Key, CacheRecord> cache = new ConcurrentHashMap<>();
-    protected final Map<Key, Key> keys = new ConcurrentHashMap<>();
+    protected final Cache<Key, CacheRecord> cache =
+            Cache.newCache(Cache.ReferenceType.SOFT, "ProjectArtifactsCache-Records");
+    protected final Cache<Key, Key> keys = Cache.newCache(Cache.ReferenceType.SOFT, "ProjectArtifactsCache-Keys");
 
     @Override
     public Key createKey(
@@ -201,18 +201,14 @@ public class DefaultProjectArtifactsCache implements ProjectArtifactsCache {
             throw new IllegalArgumentException("projectArtifacts must implement ArtifactsSetWithResult");
         }
 
-        CacheRecord record = new CacheRecord(artifacts);
-        cache.put(key, record);
-        return record;
+        return cache.computeIfAbsent(key, k -> new CacheRecord(artifacts));
     }
 
     @Override
     public CacheRecord put(Key key, LifecycleExecutionException exception) {
         Objects.requireNonNull(exception, "exception cannot be null");
         assertUniqueKey(key);
-        CacheRecord record = new CacheRecord(exception);
-        cache.put(key, record);
-        return record;
+        return cache.computeIfAbsent(key, k -> new CacheRecord(exception));
     }
 
     protected void assertUniqueKey(Key key) {

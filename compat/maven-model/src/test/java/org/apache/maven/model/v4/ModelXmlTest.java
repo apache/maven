@@ -83,7 +83,7 @@ class ModelXmlTest {
         assertEquals("", myConfig.prefix());
         assertEquals("myConfig", myConfig.name());
         String config = node.toString();
-        assertFalse(config.isEmpty());
+        assertFalse(config.isEmpty(), "Expected collection to not be empty but was empty");
     }
 
     String toXml(Model model) throws IOException, XMLStreamException {

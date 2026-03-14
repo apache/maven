@@ -18,8 +18,6 @@
  */
 package org.apache.maven.api.services;
 
-import java.io.Serial;
-
 import org.apache.maven.api.annotations.Experimental;
 
 /**
@@ -29,9 +27,6 @@ import org.apache.maven.api.annotations.Experimental;
  */
 @Experimental
 public class SettingsBuilderException extends MavenBuilderException {
-
-    @Serial
-    private static final long serialVersionUID = 4714858598345418083L;
 
     /**
      * @param message the message to give

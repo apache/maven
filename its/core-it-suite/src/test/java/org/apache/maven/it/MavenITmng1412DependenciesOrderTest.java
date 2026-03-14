@@ -31,12 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author <a href="mailto:hboutemy@apache.org">Hervé Boutemy</a>
  *
+ * @since 2.0.8
+ *
  */
 public class MavenITmng1412DependenciesOrderTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng1412DependenciesOrderTest() {
-        super("(2.0.8,)"); // 2.0.9+
-    }
 
     @Test
     public void testitMNG1412() throws Exception {

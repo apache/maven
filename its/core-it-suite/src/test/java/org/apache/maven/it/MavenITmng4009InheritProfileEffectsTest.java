@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4009InheritProfileEffectsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4009InheritProfileEffectsTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that the effects of profiles on a parent are inherited by children.
      *

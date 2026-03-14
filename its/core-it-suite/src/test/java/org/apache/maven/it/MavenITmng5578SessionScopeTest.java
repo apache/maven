@@ -23,9 +23,6 @@ import java.io.File;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng5578SessionScopeTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng5578SessionScopeTest() {
-        super("[3.2.4,)");
-    }
 
     @Test
     public void testBasic() throws Exception {

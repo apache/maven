@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4891RobustSnapshotResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4891RobustSnapshotResolutionTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0.1,)");
-    }
-
     /**
      * Verify that resolution of a local snapshot still succeeds even if the maven-metadata-local.xml has been
      * corrupted by a remote repository that misuses the same repo id, i.e. "local".

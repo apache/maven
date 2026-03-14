@@ -27,12 +27,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * IT that verifies that lifecycle participant
  * methods are invoked even with various build failures/errors.
+ * @since 3.2.2
+ *
  */
 @SuppressWarnings("checkstyle:UnusedLocalVariable")
 class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractMavenIntegrationTestCase {
-    MavenITmng5640LifecycleParticipantAfterSessionEnd() {
-        super("[3.2.2,)");
-    }
 
     /**
      * IT executing a Maven build that has UT failure.
@@ -56,7 +55,7 @@ class MavenITmng5640LifecycleParticipantAfterSessionEnd extends AbstractMavenInt
         verifier = newVerifier(projectDir.getAbsolutePath(), "remote");
         verifier.addCliArgument("package");
         assertThrows(VerificationException.class, verifier::execute, "The build should fail");
-        verifier.verifyTextInLog("testApp(org.apache.maven.its.mng5640.FailingTest)");
+        verifier.verifyTextInLog("testApp()");
 
         verifier.verifyFilePresent("target/afterProjectsRead.txt");
         // See https://issues.apache.org/jira/browse/MNG-5641

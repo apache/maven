@@ -38,10 +38,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng6391PrintVersionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng6391PrintVersionTest() {
-        super("[3.6.0,)");
-    }
-
     /**
      * Check that the resulting output is
      * as expected for the root module and last
@@ -54,7 +50,7 @@ public class MavenITmng6391PrintVersionTest extends AbstractMavenIntegrationTest
     public void testitShouldPrintVersionAtTopAndAtBottom() throws Exception {
         File testDir = extractResources("/mng-6391-print-version");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
 
         verifier.setLogFileName("version-log.txt");
@@ -95,7 +91,7 @@ public class MavenITmng6391PrintVersionTest extends AbstractMavenIntegrationTest
     public void testitShouldPrintVersionInAllLines() throws Exception {
         File testDir = extractResources("/mng-6391-print-version-aggregator");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
 
         verifier.setLogFileName("version-log.txt");

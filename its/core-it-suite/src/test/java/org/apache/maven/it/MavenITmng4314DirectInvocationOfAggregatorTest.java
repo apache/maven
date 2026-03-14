@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4314DirectInvocationOfAggregatorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4314DirectInvocationOfAggregatorTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that aggregator mojos invoked from the CLI run only once, namely at the top-level project.
      *

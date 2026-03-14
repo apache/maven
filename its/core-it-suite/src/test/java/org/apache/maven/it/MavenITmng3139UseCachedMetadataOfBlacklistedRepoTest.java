@@ -31,10 +31,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest() {
-        super("[2.0.11,2.1.0-M1),[2.1.0,)");
-    }
-
     /**
      * Test that locally cached metadata of blacklisted repositories is consulted to resolve metaversions.
      *

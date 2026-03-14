@@ -49,10 +49,6 @@ public class MavenITmng2387InactiveProxyTest extends AbstractMavenIntegrationTes
 
     private File testDir;
 
-    public MavenITmng2387InactiveProxyTest() {
-        super("[2.0.11,2.1.0-M1),[2.1.0,)"); // 2.0.11+, 2.1.0+
-    }
-
     @BeforeEach
     protected void setUp() throws Exception {
         testDir = extractResources("/mng-2387");

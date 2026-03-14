@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -33,11 +34,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Brett Porter
  *
  */
+@Disabled("Bounds: 2.0.11,2.1.0-M1),[2.1.0-M2,4.0.0-alpha-1)")
 public class MavenITmng3719PomExecutionOrderingTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng3719PomExecutionOrderingTest() {
-        super("[2.0.11,2.1.0-M1),[2.1.0-M2,4.0.0-alpha-1)");
-    }
 
     /**
      * Test that 3 executions are run in the correct order.

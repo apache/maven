@@ -25,6 +25,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -127,7 +128,7 @@ public class SisuDiBridgeModule extends AbstractModule {
             } else if (key.getQualifier() instanceof Annotation a) {
                 return (com.google.inject.Key<U>) com.google.inject.Key.get(key.getType(), a);
             } else {
-                return (com.google.inject.Key<U>) com.google.inject.Key.get(key.getType());
+                return (com.google.inject.Key<U>) com.google.inject.Key.get(key.getType(), Named.class);
             }
         }
 
@@ -201,6 +202,22 @@ public class SisuDiBridgeModule extends AbstractModule {
                                 .distinct()
                                 .collect(Collectors.joining("\n - ", " - ", "")));
             }
+        }
+
+        @Override
+        public <T> Set<Binding<T>> getAllBindings(Class<T> clazz) {
+            Key<T> key = Key.of(clazz);
+            Set<Binding<T>> bindings = new HashSet<>();
+            Set<Binding<T>> diBindings = super.getBindings(key);
+            if (diBindings != null) {
+                bindings.addAll(diBindings);
+            }
+            for (var bean : locator.get().locate(toGuiceKey(key))) {
+                if (isPlexusBean(bean)) {
+                    bindings.add(new BindingToBeanEntry<>(Key.of(bean.getImplementationClass())).toBeanEntry(bean));
+                }
+            }
+            return bindings;
         }
 
         private <Q> Supplier<Q> getListSupplier(Key<Q> key) {

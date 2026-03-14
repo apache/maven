@@ -53,7 +53,7 @@ Maven Repository Metadata Model
 
    * {{{./apidocs/index.html}Java sources}} with Reader and Writers for the Xpp3 XML parser, to read and write <<<maven-metadata(-*).xml>>> files,
 
-   * a {{{./repository-metadata.html}Descriptor Reference}}.
+   * a {{{../../api/maven-api-metadata/repository-metadata.html}Descriptor Reference}}.
  
  For more information see this page: {{{https://maven.apache.org/repositories/metadata.html}Maven Metadata}}.
 

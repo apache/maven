@@ -32,9 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  */
 public class MavenITmng0507ArtifactRelocationTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng0507ArtifactRelocationTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test artifact relocation.

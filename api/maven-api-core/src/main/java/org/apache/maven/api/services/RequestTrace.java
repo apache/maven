@@ -50,7 +50,10 @@ import org.apache.maven.api.annotations.Nullable;
  *             object being processed or any application-specific state information. May be null if no
  *             additional data is needed.
  */
-public record RequestTrace(@Nullable String context, @Nullable RequestTrace parent, @Nullable Object data) {
+public record RequestTrace(
+        @Nullable String context,
+        @Nullable RequestTrace parent,
+        @Nullable Object data) {
 
     public static final String CONTEXT_PLUGIN = "plugin";
     public static final String CONTEXT_PROJECT = "project";

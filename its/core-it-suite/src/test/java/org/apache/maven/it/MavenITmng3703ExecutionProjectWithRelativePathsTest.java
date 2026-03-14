@@ -29,11 +29,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author jdcasey
+ * @since 2.1.0-M1
+ *
  */
 public class MavenITmng3703ExecutionProjectWithRelativePathsTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng3703ExecutionProjectWithRelativePathsTest() {
-        super("[2.1.0-M1,)"); // only test in 2.1.0+
-    }
 
     @Test
     public void testForkFromMojo() throws Exception {

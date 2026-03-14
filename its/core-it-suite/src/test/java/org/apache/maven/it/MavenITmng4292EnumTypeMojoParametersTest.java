@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4292EnumTypeMojoParametersTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4292EnumTypeMojoParametersTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Test that mojo parameters can be configured with enums.
      *

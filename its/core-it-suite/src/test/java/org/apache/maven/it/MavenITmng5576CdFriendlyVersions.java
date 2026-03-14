@@ -33,9 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  * @author Jason van Zyl
  */
 public class MavenITmng5576CdFriendlyVersions extends AbstractMavenIntegrationTestCase {
-    public MavenITmng5576CdFriendlyVersions() {
-        super("[3.2,)");
-    }
 
     /**
      * Verifies that property references with dotted notation work within

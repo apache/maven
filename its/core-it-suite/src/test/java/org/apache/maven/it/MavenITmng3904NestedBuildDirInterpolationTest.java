@@ -31,10 +31,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng3904NestedBuildDirInterpolationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3904NestedBuildDirInterpolationTest() {
-        super("[2.1.0-M1,)");
-    }
-
     /**
      * Test that properties which refer to build directories which in turn refer to other build directories are
      * properly interpolated.

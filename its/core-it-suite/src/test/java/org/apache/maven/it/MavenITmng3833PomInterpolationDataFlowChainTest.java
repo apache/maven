@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3833PomInterpolationDataFlowChainTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3833PomInterpolationDataFlowChainTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that POM interpolation fully interpolates all properties in data flow chain, i.e. where property
      * A depends on property B, and property B depends on property C and so on.

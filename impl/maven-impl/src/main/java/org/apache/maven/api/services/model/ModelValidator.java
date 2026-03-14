@@ -50,9 +50,17 @@ public interface ModelValidator {
      */
     int VALIDATION_LEVEL_MAVEN_4_0 = 40;
     /**
+     * Denotes validation as performed by Maven 4.1. This validation level is meant for new projects.
+     */
+    int VALIDATION_LEVEL_MAVEN_4_1 = 41;
+    /**
+     * Denotes validation as performed by Maven 4.2. This validation level is meant for new projects.
+     */
+    int VALIDATION_LEVEL_MAVEN_4_2 = 42;
+    /**
      * Denotes strict validation as recommended by the current Maven version.
      */
-    int VALIDATION_LEVEL_STRICT = VALIDATION_LEVEL_MAVEN_4_0;
+    int VALIDATION_LEVEL_STRICT = VALIDATION_LEVEL_MAVEN_4_2;
 
     /**
      * Checks the specified file model for missing or invalid values. This model is directly created from the POM

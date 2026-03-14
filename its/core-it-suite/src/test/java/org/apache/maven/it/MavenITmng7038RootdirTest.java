@@ -26,16 +26,15 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * This IT manually manages {@code .mvn} directories, so instructs Verifier to NOT create any.
+ */
 public class MavenITmng7038RootdirTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng7038RootdirTest() {
-        super("[4.0.0-alpha-6,)");
-    }
 
     @Test
     public void testRootdir() throws IOException, VerificationException {
         File testDir = extractResources("/mng-7038-rootdir");
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
 
         verifier.addCliArgument("validate");
         verifier.execute();
@@ -123,7 +122,7 @@ public class MavenITmng7038RootdirTest extends AbstractMavenIntegrationTestCase 
     @Test
     public void testRootdirWithTopdirAndRoot() throws IOException, VerificationException {
         File testDir = extractResources("/mng-7038-rootdir");
-        Verifier verifier = newVerifier(new File(testDir, "module-a").getAbsolutePath());
+        Verifier verifier = newVerifier(new File(testDir, "module-a").getAbsolutePath(), false);
 
         verifier.addCliArgument("validate");
         verifier.execute();
@@ -181,7 +180,7 @@ public class MavenITmng7038RootdirTest extends AbstractMavenIntegrationTestCase 
     @Test
     public void testRootdirWithTopdirAndNoRoot() throws IOException, VerificationException {
         File testDir = extractResources("/mng-7038-rootdir");
-        Verifier verifier = newVerifier(new File(testDir, "module-b").getAbsolutePath());
+        Verifier verifier = newVerifier(new File(testDir, "module-b").getAbsolutePath(), false);
 
         verifier.addCliArgument("validate");
         verifier.execute();

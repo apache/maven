@@ -31,5 +31,5 @@ Maven 4 API - Immutable Toolchains Model
 
    * {{{./apidocs/index.html}Java sources}} with <<<Builder>>> inner classes for immutable instances creation.
 
- See also corresponding {{{../../maven-toolchain-model/index.html}Maven classical toolchains model documentation}}.
+ See also corresponding {{{../../compat/maven-toolchain-model/index.html}Maven classical toolchains model documentation}}.
  

@@ -27,9 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MavenITmng5214DontMapWsdlToJar extends AbstractMavenIntegrationTestCase {
-    public MavenITmng5214DontMapWsdlToJar() {
-        super("[3.1,)");
-    }
 
     /**
      * Test that the code that allows test-jar and ejb-client dependencies to resolve to the

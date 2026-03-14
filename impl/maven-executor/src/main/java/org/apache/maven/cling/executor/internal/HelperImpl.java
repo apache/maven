@@ -19,7 +19,6 @@
 package org.apache.maven.cling.executor.internal;
 
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -94,8 +93,7 @@ public class HelperImpl implements ExecutorHelper {
     }
 
     private Executor getExecutorByRequest(ExecutorRequest request) {
-        if (request.environmentVariables().orElse(Collections.emptyMap()).isEmpty()
-                && request.jvmArguments().orElse(Collections.emptyList()).isEmpty()) {
+        if (request.environmentVariables().isEmpty() && request.jvmArguments().isEmpty()) {
             return getExecutor(Mode.EMBEDDED, request);
         } else {
             return getExecutor(Mode.FORKED, request);

@@ -28,9 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8181">MNG-8181</a>.
  */
 public class MavenITmng8181CentralRepoTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng8181CentralRepoTest() {
-        super("[4.0.0-beta-4,)");
-    }
 
     /**
      *  Verify that the central url can be overridden by a user property.
@@ -47,10 +44,15 @@ public class MavenITmng8181CentralRepoTest extends AbstractMavenIntegrationTestC
         verifier.addCliArgument("--settings=settings.xml");
         verifier.addCliArgument("-Dmaven.repo.local=" + testDir.toPath().resolve("target/local-repo"));
         verifier.addCliArgument("-Dmaven.repo.local.tail=target/null");
-        verifier.addCliArgument("-Dmaven.repo.central=http://repo1.maven.org/");
+        // note: intentionally bad URL, we just want tu ensure that this bad URL is used
+        verifier.addCliArgument("-Dmaven.repo.central=https://repo1.maven.org");
         verifier.addCliArgument("validate");
-        verifier.setHandleLocalRepoTail(false); // we want isolation to have Maven fail due non-HTTPS repo
+        verifier.setHandleLocalRepoTail(false); // we want isolation to have Maven fail due bad URL
         assertThrows(VerificationException.class, verifier::execute);
-        verifier.verifyTextInLog("central (http://repo1.maven.org/, default, releases)");
+        // error is
+        // PluginResolutionException: Plugin eu.maveniverse.maven.mimir:extension3:XXX or one of its dependencies could
+        // not be resolved:
+        //	 Could not find artifact eu.maveniverse.maven.mimir:extension3:jar:XXX in central (https://repo1.maven.org)
+        verifier.verifyTextInLog("central (https://repo1.maven.org)");
     }
 }

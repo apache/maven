@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4393ParseExternalParenPomLenientTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4393ParseExternalParenPomLenientTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that parent POMs get parsed in lenient mode when resolved from the repository.
      *

@@ -29,9 +29,6 @@ import org.junit.jupiter.api.Test;
  *
  */
 public class MavenITmng0496IgnoreUnknownPluginParametersTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng0496IgnoreUnknownPluginParametersTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test that unused configuration parameters from the POM don't cause the

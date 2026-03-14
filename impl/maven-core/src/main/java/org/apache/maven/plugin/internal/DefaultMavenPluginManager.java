@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -47,6 +48,7 @@ import org.apache.maven.api.Node;
 import org.apache.maven.api.PathScope;
 import org.apache.maven.api.PathType;
 import org.apache.maven.api.Project;
+import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.plugin.descriptor.Resolution;
 import org.apache.maven.api.services.DependencyResolver;
@@ -314,13 +316,11 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         if (!prerequisiteExceptions.isEmpty()) {
             String messages = prerequisiteExceptions.stream()
                     .map(IllegalStateException::getMessage)
-                    .collect(Collectors.joining(", "));
+                    .collect(Collectors.joining("\n\t"));
             PluginIncompatibleException pie = new PluginIncompatibleException(
                     pluginDescriptor.getPlugin(),
-                    "The plugin " + pluginDescriptor.getId() + " has unmet prerequisites: " + messages,
-                    prerequisiteExceptions.get(0));
-            // the first exception is added as cause, all other ones as suppressed exceptions
-            prerequisiteExceptions.stream().skip(1).forEach(pie::addSuppressed);
+                    "\nThe plugin " + pluginDescriptor.getId() + " has unmet prerequisites: \n\t" + messages);
+            prerequisiteExceptions.forEach(pie::addSuppressed);
             throw pie;
         }
     }
@@ -565,6 +565,10 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             injector.bindInstance(Project.class, project);
             injector.bindInstance(org.apache.maven.api.MojoExecution.class, execution);
             injector.bindInstance(org.apache.maven.api.plugin.Log.class, log);
+
+            Map<Class<? extends Service>, Supplier<? extends Service>> services = sessionV4.getAllServices();
+            services.forEach((itf, svc) -> injector.bindSupplier((Class<Service>) itf, (Supplier<Service>) svc));
+
             mojo = mojoInterface.cast(injector.getInstance(
                     Key.of(mojoDescriptor.getImplementationClass(), mojoDescriptor.getRoleHint())));
 

@@ -33,12 +33,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3477">MNG-3477</a>.
  * and extends for <a href="https://issues.apache.org/jira/browse/MNG-7758">MNG-7758</a>
+ * @since 4.0.0-beta-4
+ *
  */
 class MavenITmng3477DependencyResolutionErrorMessageTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng3477DependencyResolutionErrorMessageTest() {
-        super("[4.0.0-beta-4,)");
-    }
 
     /**
      * Tests that dependency resolution errors tell the underlying transport issue.
@@ -93,10 +91,12 @@ class MavenITmng3477DependencyResolutionErrorMessageTest extends AbstractMavenIn
     void connectionProblemsPlugin() throws Exception {
         testit(
                 54312,
-                new String[] {
+                new String[] { // JDK "Connection to..." Apache "Connect to..."
+                    // with removal of connector hack https://github.com/apache/maven-resolver/pull/1676
+                    // the order is not stable anymore, so repoId may be any of two
                     ".*The following artifacts could not be resolved: org.apache.maven.its.plugins:maven-it-plugin-not-exists:pom:1.2.3 \\(absent\\): "
                             + "Could not transfer artifact org.apache.maven.its.plugins:maven-it-plugin-not-exists:pom:1.2.3 from/to "
-                            + "central \\(http://localhost:.*/repo\\): Connection to http://localhost:.*2/repo/ refused.*"
+                            + "(central|maven-core-it) \\(http://localhost:.*/repo\\):.*Connect.*refused.*"
                 },
                 "pom-plugin.xml");
     }

@@ -51,10 +51,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.lessThan;
-import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -1033,13 +1029,17 @@ class PomConstructionTest {
         PomTestWrapper pom = buildPom("merged-filter-order/sub");
 
         assertEquals(7, ((List<?>) pom.getValue("build/filters")).size());
-        assertThat(pom.getValue("build/filters[1]").toString(), endsWith("child-a.properties"));
-        assertThat(pom.getValue("build/filters[2]").toString(), endsWith("child-c.properties"));
-        assertThat(pom.getValue("build/filters[3]").toString(), endsWith("child-b.properties"));
-        assertThat(pom.getValue("build/filters[4]").toString(), endsWith("child-d.properties"));
-        assertThat(pom.getValue("build/filters[5]").toString(), endsWith("parent-c.properties"));
-        assertThat(pom.getValue("build/filters[6]").toString(), endsWith("parent-b.properties"));
-        assertThat(pom.getValue("build/filters[7]").toString(), endsWith("parent-d.properties"));
+        assertTrue(
+                pom.getValue("build/filters[1]").toString().endsWith("child-a.properties"),
+                "Expected " + pom.getValue("build/filters[1]") + " to end with child-a.properties");
+        assertTrue(
+                pom.getValue("build/filters[2]").toString().endsWith("child-c.properties"),
+                "Expected " + pom.getValue("build/filters[2]") + " to end with child-c.properties");
+        assertTrue(pom.getValue("build/filters[3]").toString().endsWith("child-b.properties"));
+        assertTrue(pom.getValue("build/filters[4]").toString().endsWith("child-d.properties"));
+        assertTrue(pom.getValue("build/filters[5]").toString().endsWith("parent-c.properties"));
+        assertTrue(pom.getValue("build/filters[6]").toString().endsWith("parent-b.properties"));
+        assertTrue(pom.getValue("build/filters[7]").toString().endsWith("parent-d.properties"));
     }
 
     /** MNG-4027*/
@@ -1180,7 +1180,7 @@ class PomConstructionTest {
         PomTestWrapper pom = buildPom("baseuri-interpolation/pom.xml");
         String prop1 = pom.getValue("properties/prop1").toString();
         assertEquals(pom.getBasedir().toPath().toUri().toASCIIString(), prop1);
-        assertThat(prop1, startsWith("file:///"));
+        assertTrue(prop1.startsWith("file:///"), "Expected " + prop1 + " to start with " + "file:///");
     }
 
     /* MNG-3811*/
@@ -1223,6 +1223,25 @@ class PomConstructionTest {
         PomTestWrapper pom = buildPom("complete-model/w-parent/sub");
 
         testCompleteModel(pom);
+    }
+
+    /*MNG-11062*/
+    @Test
+    void testTargetPathResourceRegression() throws Exception {
+        PomTestWrapper pom = buildPom("target-path-regression");
+
+        // Verify main resources targetPath is preserved
+        assertEquals(1, ((List<?>) pom.getValue("build/resources")).size());
+        assertEquals("custom-classes", pom.getValue("build/resources[1]/targetPath"));
+        assertPathSuffixEquals("src/main/resources", pom.getValue("build/resources[1]/directory"));
+
+        // Verify testResources targetPath with property interpolation is preserved
+        assertEquals(2, ((List<?>) pom.getValue("build/testResources")).size());
+        String buildPath = pom.getBasedir().toPath().resolve("target").toString();
+        assertEquals(buildPath + "/test-classes", pom.getValue("build/testResources[1]/targetPath"));
+        assertPathSuffixEquals("src/test/resources", pom.getValue("build/testResources[1]/directory"));
+        assertEquals(buildPath + "/test-run", pom.getValue("build/testResources[2]/targetPath"));
+        assertPathSuffixEquals("src/test/data", pom.getValue("build/testResources[2]/directory"));
     }
 
     @SuppressWarnings("checkstyle:MethodLength")
@@ -1752,10 +1771,10 @@ class PomConstructionTest {
         for (int i = 0; i < plugins.size(); i++) {
             Plugin plugin = plugins.get(i);
             if ("maven-resources-plugin".equals(plugin.getArtifactId())) {
-                assertThat(resourcesPlugin, lessThan(0));
+                assertTrue(resourcesPlugin < 0, "Expected " + resourcesPlugin + " to be < " + 0);
                 resourcesPlugin = i;
             } else if ("maven-it-plugin-log-file".equals(plugin.getArtifactId())) {
-                assertThat(customPlugin, lessThan(0));
+                assertTrue(customPlugin < 0, "Expected " + customPlugin + " to be < " + 0);
                 customPlugin = i;
             }
         }

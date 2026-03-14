@@ -36,7 +36,7 @@ public class MavenITmng5895CIFriendlyUsageWithPropertyTest extends AbstractMaven
     public MavenITmng5895CIFriendlyUsageWithPropertyTest() {
         // The first version which contains the fix for the MNG-issue.
         // TODO: Think about it!
-        super("[3.5.0-alpha-2,)");
+        super();
     }
 
     /**
@@ -50,7 +50,7 @@ public class MavenITmng5895CIFriendlyUsageWithPropertyTest extends AbstractMaven
     public void testitShouldResolveTheDependenciesWithoutBuildConsumer() throws Exception {
         File testDir = extractResources("/mng-5895-ci-friendly-usage-with-property");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
 
         // verifier.setLogFileName( "log-only.txt" );
@@ -67,7 +67,7 @@ public class MavenITmng5895CIFriendlyUsageWithPropertyTest extends AbstractMaven
     public void testitShouldResolveTheDependenciesWithBuildConsumer() throws Exception {
         File testDir = extractResources("/mng-5895-ci-friendly-usage-with-property");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
 
         verifier.setLogFileName("log-bc.txt");

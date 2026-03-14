@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4317PluginVersionResolutionFromMultiReposTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4317PluginVersionResolutionFromMultiReposTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that the g:a level metadata files from different repositories are properly merged when trying to resolve
      * a version for some plugin that was invoked with g:a:goal.

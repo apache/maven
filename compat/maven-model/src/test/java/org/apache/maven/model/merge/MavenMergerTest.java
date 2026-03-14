@@ -26,9 +26,8 @@ import org.apache.maven.api.model.Model;
 import org.apache.maven.model.v4.MavenMerger;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * MavenMerger is based on same instances, subclasses should override KeyComputer per type
@@ -43,10 +42,16 @@ class MavenMergerTest {
         Model source = Model.newBuilder().artifactId("SOURCE").build();
 
         Model merged = mavenMerger.merge(target, source, true, null);
-        assertThat(merged.getArtifactId(), is("SOURCE"));
+        assertEquals(
+                "SOURCE",
+                merged.getArtifactId(),
+                "Expected merged artifactId to be SOURCE but was " + merged.getArtifactId());
 
         merged = mavenMerger.merge(target, source, false, null);
-        assertThat(merged.getArtifactId(), is("TARGET"));
+        assertEquals(
+                "TARGET",
+                merged.getArtifactId(),
+                "Expected merged artifactId to be TARGET but was " + merged.getArtifactId());
     }
 
     @Test
@@ -62,7 +67,10 @@ class MavenMergerTest {
 
         Model merged = mavenMerger.merge(target, source, true, null);
 
-        assertThat(merged.getContributors(), contains(contributor));
+        assertEquals(1, merged.getContributors().size(), "Expected exactly 1 contributor");
+        assertTrue(
+                merged.getContributors().contains(contributor),
+                "Expected contributors to contain " + contributor + " but was " + merged.getContributors());
     }
 
     @Test
@@ -81,6 +89,9 @@ class MavenMergerTest {
 
         Model merged = mavenMerger.merge(target, source, true, null);
 
-        assertThat(merged.getDependencies(), contains(dependency));
+        assertEquals(1, merged.getDependencies().size(), "Expected exactly 1 dependency");
+        assertTrue(
+                merged.getDependencies().contains(dependency),
+                "Expected dependencies to contain " + dependency + " but was " + merged.getDependencies());
     }
 }

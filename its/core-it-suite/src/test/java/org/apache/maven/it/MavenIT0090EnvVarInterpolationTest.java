@@ -26,9 +26,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MavenIT0090EnvVarInterpolationTest extends AbstractMavenIntegrationTestCase {
-    public MavenIT0090EnvVarInterpolationTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test that ensures that envars are interpolated correctly into plugin

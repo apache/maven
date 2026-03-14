@@ -18,13 +18,11 @@
  */
 package org.apache.maven.cling.invoker.mvnup.goals;
 
-import java.io.StringReader;
 import java.util.stream.Stream;
 
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.input.SAXBuilder;
-import org.junit.jupiter.api.BeforeEach;
+import eu.maveniverse.domtrip.Document;
+import eu.maveniverse.domtrip.Element;
+import eu.maveniverse.domtrip.Parser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -33,6 +31,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.MODEL_VERSION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -46,34 +45,28 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @DisplayName("ModelVersionUtils")
 class ModelVersionUtilsTest {
 
-    private SAXBuilder saxBuilder;
-
-    @BeforeEach
-    void setUp() {
-        saxBuilder = new SAXBuilder();
-    }
-
     @Nested
     @DisplayName("Model Version Detection")
     class ModelVersionDetectionTests {
 
         @Test
         @DisplayName("should detect model version from document")
-        void shouldDetectModelVersionFromDocument() throws Exception {
+        void shouldDetectModelVersionFromDocument() {
             String pomXml = PomBuilder.create()
                     .groupId("test")
                     .artifactId("test")
                     .version("1.0.0")
                     .build();
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             String result = ModelVersionUtils.detectModelVersion(document);
             assertEquals("4.0.0", result);
         }
 
-        @Test
-        @DisplayName("should detect 4.1.0 model version")
-        void shouldDetect410ModelVersion() throws Exception {
+        @ParameterizedTest(name = "for {0}")
+        @ValueSource(strings = {"4.0.0", "4.1.0", "4.2.0"})
+        @DisplayName("should detect model version")
+        void shouldDetectModelVersionFromNamespace(String targetVersion) throws Exception {
             String pomXml = PomBuilder.create()
                     .namespace("http://maven.apache.org/POM/4.0.0")
                     .modelVersion("4.1.0")
@@ -82,16 +75,15 @@ class ModelVersionUtilsTest {
                     .version("1.0.0")
                     .build();
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             String result = ModelVersionUtils.detectModelVersion(document);
-            assertEquals("4.1.0", result);
+            assertEquals(targetVersion, result);
         }
 
         @Test
         @DisplayName("should return default version when model version is missing")
         void shouldReturnDefaultVersionWhenModelVersionMissing() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <groupId>test</groupId>
@@ -100,10 +92,11 @@ class ModelVersionUtilsTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             String result = ModelVersionUtils.detectModelVersion(document);
             assertEquals("4.0.0", result); // Default version
         }
+
     }
 
     @Nested
@@ -111,14 +104,14 @@ class ModelVersionUtilsTest {
     class ModelVersionValidationTests {
 
         @ParameterizedTest
-        @ValueSource(strings = {"4.0.0", "4.1.0"})
+        @ValueSource(strings = {"4.0.0", "4.1.0", "4.2.0"})
         @DisplayName("should validate supported model versions")
         void shouldValidateSupportedModelVersions(String version) {
             assertTrue(ModelVersionUtils.isValidModelVersion(version));
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {"3.0.0", "5.0.0", "4.2.0", "2.0.0", "6.0.0"})
+        @ValueSource(strings = {"3.0.0", "5.0.0", "2.0.0", "6.0.0"})
         @DisplayName("should reject unsupported model versions")
         void shouldRejectUnsupportedModelVersions(String version) {
             assertFalse(ModelVersionUtils.isValidModelVersion(version));
@@ -151,45 +144,60 @@ class ModelVersionUtilsTest {
     @DisplayName("Upgrade Path Validation")
     class UpgradePathValidationTests {
 
-        @Test
-        @DisplayName("should validate upgrade path from 4.0.0 to 4.1.0")
-        void shouldValidateUpgradePathFrom400To410() {
-            assertTrue(ModelVersionUtils.canUpgrade("4.0.0", "4.1.0"));
+        @ParameterizedTest(name = "from {0} to {1}")
+        @MethodSource("provideValidPathUpgradeVersions")
+        @DisplayName("should validate upgrade path")
+        void shouldValidateUpgradePath(String from, String to) {
+            assertTrue(ModelVersionUtils.canUpgrade(from, to));
         }
 
-        @Test
-        @DisplayName("should reject downgrade from 4.1.0 to 4.0.0")
-        void shouldRejectDowngradeFrom410To400() {
-            assertFalse(ModelVersionUtils.canUpgrade("4.1.0", "4.0.0"));
+        private static Stream<Arguments> provideValidPathUpgradeVersions() {
+            return Stream.of(
+                    Arguments.of("4.0.0", "4.1.0"), Arguments.of("4.1.0", "4.2.0"), Arguments.of("4.0.0", "4.2.0"));
         }
 
-        @Test
+        @ParameterizedTest(name = "from {0} to {1}")
+        @MethodSource("provideInvalidPathUpgradeVersions")
+        @DisplayName("should reject downgrade")
+        void shouldRejectDowngrade(String from, String to) {
+            assertFalse(ModelVersionUtils.canUpgrade(from, to));
+        }
+
+        private static Stream<Arguments> provideInvalidPathUpgradeVersions() {
+            return Stream.of(
+                    Arguments.of("4.1.0", "4.0.0"), Arguments.of("4.2.0", "4.1.0"), Arguments.of("4.2.0", "4.0.0"));
+        }
+
+        @ParameterizedTest(name = "from {0} to {0}")
+        @ValueSource(strings = {"4.0.0", "4.1.0", "4.2.0"})
         @DisplayName("should reject upgrade to same version")
-        void shouldRejectUpgradeToSameVersion() {
-            assertFalse(ModelVersionUtils.canUpgrade("4.0.0", "4.0.0"));
-            assertFalse(ModelVersionUtils.canUpgrade("4.1.0", "4.1.0"));
+        void shouldRejectUpgradeToSameVersion(String version) {
+            assertFalse(ModelVersionUtils.canUpgrade(version, version));
         }
 
-        @Test
+        @ParameterizedTest(name = "from {0}")
+        @ValueSource(strings = {"3.0.0", "5.0.0"})
         @DisplayName("should reject upgrade from unsupported version")
-        void shouldRejectUpgradeFromUnsupportedVersion() {
-            assertFalse(ModelVersionUtils.canUpgrade("3.0.0", "4.1.0"));
-            assertFalse(ModelVersionUtils.canUpgrade("5.0.0", "4.1.0"));
+        void shouldRejectUpgradeFromUnsupportedVersion(String unsupportedVersion) {
+            assertFalse(ModelVersionUtils.canUpgrade(unsupportedVersion, "4.1.0"));
         }
 
-        @Test
+        @ParameterizedTest(name = "to {0}")
+        @ValueSource(strings = {"3.0.0", "5.0.0"})
         @DisplayName("should reject upgrade to unsupported version")
-        void shouldRejectUpgradeToUnsupportedVersion() {
-            assertFalse(ModelVersionUtils.canUpgrade("4.0.0", "3.0.0"));
-            assertFalse(ModelVersionUtils.canUpgrade("4.0.0", "5.0.0"));
+        void shouldRejectUpgradeToUnsupportedVersion(String unsupportedVersion) {
+            assertFalse(ModelVersionUtils.canUpgrade("4.0.0", unsupportedVersion));
         }
 
-        @Test
+        @ParameterizedTest(name = "from {0} to {1}")
+        @MethodSource("provideNullVersionsInUpgradePairs")
         @DisplayName("should handle null versions in upgrade validation")
-        void shouldHandleNullVersionsInUpgradeValidation() {
-            assertFalse(ModelVersionUtils.canUpgrade(null, "4.1.0"));
-            assertFalse(ModelVersionUtils.canUpgrade("4.0.0", null));
-            assertFalse(ModelVersionUtils.canUpgrade(null, null));
+        void shouldHandleNullVersionsInUpgradeValidation(String from, String to) {
+            assertFalse(ModelVersionUtils.canUpgrade(from, to));
+        }
+
+        private static Stream<Arguments> provideNullVersionsInUpgradePairs() {
+            return Stream.of(Arguments.of(null, "4.1.0"), Arguments.of("4.0.0", null), Arguments.of(null, null));
         }
     }
 
@@ -229,18 +237,18 @@ class ModelVersionUtilsTest {
     @DisplayName("Inference Eligibility")
     class InferenceEligibilityTests {
 
-        @Test
+        @ParameterizedTest(name = "for model version {0}")
+        @ValueSource(strings = {"4.0.0", "4.1.0"})
         @DisplayName("should determine inference eligibility correctly")
-        void shouldDetermineInferenceEligibilityCorrectly() {
-            assertTrue(ModelVersionUtils.isEligibleForInference("4.0.0"));
-            assertTrue(ModelVersionUtils.isEligibleForInference("4.1.0"));
+        void shouldDetermineInferenceEligibilityCorrectly(String modelVersion) {
+            assertTrue(ModelVersionUtils.isEligibleForInference(modelVersion));
         }
 
-        @Test
-        @DisplayName("should reject inference for unsupported versions")
-        void shouldRejectInferenceForUnsupportedVersions() {
-            assertFalse(ModelVersionUtils.isEligibleForInference("3.0.0"));
-            assertFalse(ModelVersionUtils.isEligibleForInference("5.0.0"));
+        @ParameterizedTest(name = "{0}")
+        @ValueSource(strings = {"3.0.0", "5.0.0"})
+        @DisplayName("should reject inference for unsupported version")
+        void shouldRejectInferenceForUnsupportedVersions(String modelVersion) {
+            assertFalse(ModelVersionUtils.isEligibleForInference(modelVersion));
         }
 
         @Test
@@ -254,11 +262,11 @@ class ModelVersionUtilsTest {
     @DisplayName("Model Version Updates")
     class ModelVersionUpdateTests {
 
-        @Test
+        @ParameterizedTest(name = "for model version {0}")
+        @ValueSource(strings = {"4.1.0", "4.2.0"})
         @DisplayName("should update model version in document")
-        void shouldUpdateModelVersionInDocument() throws Exception {
-            String pomXml =
-                    """
+        void shouldUpdateModelVersionInDocument(String targetVersion) throws Exception {
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -268,18 +276,18 @@ class ModelVersionUtilsTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
-            ModelVersionUtils.updateModelVersion(document, "4.1.0");
-            Element root = document.getRootElement();
-            Element modelVersionElement = root.getChild("modelVersion", root.getNamespace());
-            assertEquals("4.1.0", modelVersionElement.getTextTrim());
+            Document document = new Parser().parse(pomXml);
+            ModelVersionUtils.updateModelVersion(document, targetVersion);
+            Element root = document.root();
+            Element modelVersionElement = root.child("modelVersion").orElse(null);
+            assertEquals(targetVersion, modelVersionElement.textContentTrimmed());
         }
 
-        @Test
+        @ParameterizedTest(name = "to target version {0}")
+        @ValueSource(strings = {"4.1.0", "4.2.0"})
         @DisplayName("should add model version when missing")
-        void shouldAddModelVersionWhenMissing() throws Exception {
-            String pomXml =
-                    """
+        void shouldAddModelVersionWhenMissing(String targetVersion) throws Exception {
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <groupId>test</groupId>
@@ -288,19 +296,18 @@ class ModelVersionUtilsTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
-            ModelVersionUtils.updateModelVersion(document, "4.1.0");
-            Element root = document.getRootElement();
-            Element modelVersionElement = root.getChild("modelVersion", root.getNamespace());
+            Document document = Document.of(pomXml);
+            ModelVersionUtils.updateModelVersion(document, targetVersion);
+            Element root = document.root();
+            Element modelVersionElement = root.child("modelVersion").orElse(null);
             assertNotNull(modelVersionElement);
-            assertEquals("4.1.0", modelVersionElement.getTextTrim());
+            assertEquals(targetVersion, modelVersionElement.textContentTrimmed());
         }
 
         @Test
         @DisplayName("should remove model version from document")
         void shouldRemoveModelVersionFromDocument() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -310,20 +317,19 @@ class ModelVersionUtilsTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             boolean result = ModelVersionUtils.removeModelVersion(document);
 
             assertTrue(result);
-            Element root = document.getRootElement();
-            Element modelVersionElement = root.getChild("modelVersion", root.getNamespace());
+            Element root = document.root();
+            Element modelVersionElement = root.child(MODEL_VERSION).orElse(null);
             assertNull(modelVersionElement);
         }
 
         @Test
         @DisplayName("should handle missing model version in removal")
         void shouldHandleMissingModelVersionInRemoval() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <groupId>test</groupId>
@@ -332,7 +338,7 @@ class ModelVersionUtilsTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             boolean result = ModelVersionUtils.removeModelVersion(document);
 
             assertFalse(result); // Nothing to remove
@@ -343,31 +349,26 @@ class ModelVersionUtilsTest {
     @DisplayName("Schema Location Operations")
     class SchemaLocationOperationTests {
 
-        @Test
+        @ParameterizedTest
+        @ValueSource(strings = {"4.0.0", "4.1.0", "4.2.0"})
         @DisplayName("should get schema location for model version")
-        void shouldGetSchemaLocationForModelVersion() {
-            String schemaLocation410 = ModelVersionUtils.getSchemaLocationForModelVersion("4.1.0");
-            assertNotNull(schemaLocation410);
-            assertTrue(schemaLocation410.contains("4.1.0"));
-        }
-
-        @Test
-        @DisplayName("should get schema location for 4.0.0")
-        void shouldGetSchemaLocationFor400() {
-            String schemaLocation400 = ModelVersionUtils.getSchemaLocationForModelVersion("4.0.0");
-            assertNotNull(schemaLocation400);
-            assertTrue(schemaLocation400.contains("4.0.0"));
+        void shouldGetSchemaLocationForModelVersion(String targetVersion) {
+            String schemaLocation = ModelVersionUtils.getSchemaLocationForModelVersion(targetVersion);
+            assertNotNull(schemaLocation);
+            assertTrue(
+                    schemaLocation.contains(targetVersion),
+                    "Expected " + schemaLocation + " to contain " + targetVersion);
         }
 
         @Test
         @DisplayName("should handle unknown model version in schema location")
         void shouldHandleUnknownModelVersionInSchemaLocation() {
             String schemaLocation = ModelVersionUtils.getSchemaLocationForModelVersion("5.0.0");
-            assertNotNull(schemaLocation); // Should return 4.1.0 schema for newer versions
-            // The method returns the 4.1.0 schema location for versions newer than 4.1.0
+            assertNotNull(schemaLocation); // Should return 4.2.0 schema for newer versions
+            // The method returns the 4.2.0 schema location for versions newer than 4.1.0
             assertTrue(
-                    schemaLocation.contains("4.1.0"),
-                    "Expected schema location to contain '4.1.0', but was: " + schemaLocation);
+                    schemaLocation.contains("4.2.0"),
+                    "Expected schema location to contain '4.2.0', but was: " + schemaLocation);
         }
     }
 
@@ -378,8 +379,7 @@ class ModelVersionUtilsTest {
         @Test
         @DisplayName("should handle missing modelVersion element")
         void shouldHandleMissingModelVersion() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <groupId>com.example</groupId>
@@ -388,7 +388,7 @@ class ModelVersionUtilsTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
 
             String version = ModelVersionUtils.detectModelVersion(document);
 
@@ -404,7 +404,7 @@ class ModelVersionUtilsTest {
                     "https://maven.apache.org/POM/4.1.0"
                 })
         @DisplayName("should handle various namespace formats")
-        void shouldHandleVariousNamespaceFormats(String namespace) throws Exception {
+        void shouldHandleVariousNamespaceFormats(String namespace) {
             String pomXml = PomBuilder.create()
                     .namespace(namespace)
                     .groupId("com.example")
@@ -413,15 +413,15 @@ class ModelVersionUtilsTest {
                     .build();
 
             // Test that the POM can be parsed successfully and namespace is preserved
-            Document document = saxBuilder.build(new StringReader(pomXml));
-            Element root = document.getRootElement();
+            Document document = Document.of(pomXml);
+            Element root = document.root();
 
-            assertEquals(namespace, root.getNamespaceURI(), "POM should preserve the specified namespace");
+            assertEquals(namespace, root.namespaceURI(), "POM should preserve the specified namespace");
         }
 
         @Test
         @DisplayName("should handle custom modelVersion values")
-        void shouldHandleCustomModelVersionValues() throws Exception {
+        void shouldHandleCustomModelVersionValues() {
             String pomXml = PomBuilder.create()
                     .modelVersion("5.0.0")
                     .groupId("com.example")
@@ -429,7 +429,7 @@ class ModelVersionUtilsTest {
                     .version("1.0.0")
                     .build();
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
 
             String version = ModelVersionUtils.detectModelVersion(document);
 
@@ -439,8 +439,7 @@ class ModelVersionUtilsTest {
         @Test
         @DisplayName("should handle modelVersion with whitespace")
         void shouldHandleModelVersionWithWhitespace() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>  4.1.0  </modelVersion>
@@ -450,7 +449,7 @@ class ModelVersionUtilsTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
 
             String version = ModelVersionUtils.detectModelVersion(document);
 

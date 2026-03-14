@@ -181,12 +181,14 @@ class DefaultModelValidatorTest {
         assertViolations(result, 1, 0, 0);
 
         String errorMessage = result.getFatals().get(0);
-        assertTrue(errorMessage.contains("modelVersion"));
+        assertTrue(errorMessage.contains("modelVersion"), "Expected " + errorMessage + " to contain " + "modelVersion");
         // Should include Maven version (either "4.0.0-test" from mock or "unknown" as fallback)
         assertTrue(
                 errorMessage.contains("4.0.0-test") || errorMessage.contains("unknown"),
                 "Error message should include Maven version: " + errorMessage);
-        assertTrue(errorMessage.contains("is not supported by this Maven version"));
+        assertTrue(
+                errorMessage.contains("is not supported by this Maven version"),
+                "Expected " + errorMessage + " to contain " + "is not supported by this Maven version");
     }
 
     @Test
@@ -322,10 +324,18 @@ class DefaultModelValidatorTest {
 
         List<String> messages = result.getErrors();
 
-        assertTrue(messages.contains("'modelVersion' is missing."));
-        assertTrue(messages.contains("'groupId' is missing."));
-        assertTrue(messages.contains("'artifactId' is missing."));
-        assertTrue(messages.contains("'version' is missing."));
+        assertTrue(
+                messages.contains("'modelVersion' is missing."),
+                "Expected " + messages + " to contain " + "'modelVersion' is missing.");
+        assertTrue(
+                messages.contains("'groupId' is missing."),
+                "Expected " + messages + " to contain " + "'groupId' is missing.");
+        assertTrue(
+                messages.contains("'artifactId' is missing."),
+                "Expected " + messages + " to contain " + "'artifactId' is missing.");
+        assertTrue(
+                messages.contains("'version' is missing."),
+                "Expected " + messages + " to contain " + "'version' is missing.");
         // type is inherited from the super pom
     }
 
@@ -355,7 +365,7 @@ class DefaultModelValidatorTest {
     @Test
     void testMissingRepositoryId() throws Exception {
         SimpleProblemCollector result =
-                validateFile("missing-repository-id-pom.xml", ModelValidator.VALIDATION_LEVEL_STRICT);
+                validateRaw("missing-repository-id-pom.xml", ModelValidator.VALIDATION_LEVEL_STRICT);
 
         assertViolations(result, 0, 4, 0);
 
@@ -410,6 +420,10 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 0, 2);
 
         assertTrue(result.getWarnings().get(0).contains("groupId='test', artifactId='f'"));
+        // Check that the import scope error message is more helpful
+        assertTrue(result.getWarnings()
+                .get(0)
+                .contains("has scope 'import'. The 'import' scope is only valid in <dependencyManagement> sections"));
 
         assertTrue(result.getWarnings().get(1).contains("groupId='test', artifactId='g'"));
     }
@@ -527,6 +541,24 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 1, 0);
 
         assertTrue(result.getErrors().get(0).contains("'modules.module[0]' has been specified without a path"));
+    }
+
+    @Test
+    void testInvalidAggregatorPackagingSubprojects() throws Exception {
+        SimpleProblemCollector result = validate("invalid-aggregator-packaging-subprojects-pom.xml");
+
+        assertViolations(result, 0, 1, 0);
+
+        assertTrue(result.getErrors().get(0).contains("Aggregator projects require 'pom' as packaging."));
+    }
+
+    @Test
+    void testEmptySubproject() throws Exception {
+        SimpleProblemCollector result = validate("empty-subproject.xml");
+
+        assertViolations(result, 0, 1, 0);
+
+        assertTrue(result.getErrors().get(0).contains("'subprojects.subproject[0]' has been specified without a path"));
     }
 
     @Test
@@ -874,16 +906,41 @@ class DefaultModelValidatorTest {
     @Test
     void repositoryWithExpression() throws Exception {
         SimpleProblemCollector result = validateFile("raw-model/repository-with-expression.xml");
-        assertViolations(result, 0, 1, 0);
-        assertEquals(
-                "'repositories.repository.[repo].url' contains an unsupported expression (only expressions starting with 'project.basedir' or 'project.rootDirectory' are supported).",
-                result.getErrors().get(0));
+        // Interpolation in repository URLs is allowed; unresolved placeholders will fail later during resolution
+        assertViolations(result, 0, 0, 0);
     }
 
     @Test
     void repositoryWithBasedirExpression() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/repository-with-basedir-expression.xml");
-        assertViolations(result, 0, 0, 0);
+        // This test runs on raw model without interpolation, so all expressions appear uninterpolated
+        // In the real flow, supported expressions would be interpolated before validation
+        assertViolations(result, 0, 3, 0);
+    }
+
+    @Test
+    void repositoryWithUnsupportedExpression() throws Exception {
+        SimpleProblemCollector result = validateRaw("raw-model/repository-with-unsupported-expression.xml");
+        // Unsupported expressions should cause validation errors
+        assertViolations(result, 0, 1, 0);
+    }
+
+    @Test
+    void repositoryWithUninterpolatedId() throws Exception {
+        SimpleProblemCollector result = validateRaw("raw-model/repository-with-uninterpolated-id.xml");
+        // Uninterpolated expressions in repository IDs should cause validation errors
+        assertViolations(result, 0, 3, 0);
+
+        // Check that all three repository ID validation errors are present
+        assertTrue(result.getErrors().stream()
+                .anyMatch(error -> error.contains("repositories.repository.[${repository.id}].id")
+                        && error.contains("contains an uninterpolated expression")));
+        assertTrue(result.getErrors().stream()
+                .anyMatch(error -> error.contains("pluginRepositories.pluginRepository.[${plugin.repository.id}].id")
+                        && error.contains("contains an uninterpolated expression")));
+        assertTrue(result.getErrors().stream()
+                .anyMatch(error -> error.contains("distributionManagement.repository.[${staging.repository.id}].id")
+                        && error.contains("contains an uninterpolated expression")));
     }
 
     @Test
@@ -943,5 +1000,13 @@ class DefaultModelValidatorTest {
     void selfCombineBad() throws Exception {
         SimpleProblemCollector result = validateFile("raw-model/self-combine-bad.xml");
         assertViolations(result, 0, 1, 0);
+    }
+
+    @Test
+    void profileActivationConditionWithBasedirExpression() throws Exception {
+        // Test that ${project.basedir} in activation.condition is allowed (no warnings)
+        SimpleProblemCollector result = validateRaw(
+                "raw-model/profile-activation-condition-with-basedir.xml", ModelValidator.VALIDATION_LEVEL_STRICT);
+        assertViolations(result, 0, 0, 0);
     }
 }

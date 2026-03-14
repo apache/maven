@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng2576MakeLikeReactorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2576MakeLikeReactorTest() {
-        super("[2.1.0,)");
-    }
-
     private void clean(Verifier verifier) throws Exception {
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("sub-a/target");
@@ -184,7 +180,7 @@ public class MavenITmng2576MakeLikeReactorTest extends AbstractMavenIntegrationT
     @Test
     public void testitMatchesByBasedirPlus() throws Exception {
         // as per MNG-5230
-        requiresMavenVersion("[3.2,)");
+        // requiresMavenVersion("[3.2,)");
 
         File testDir = extractResources("/mng-2576");
 
@@ -239,7 +235,7 @@ public class MavenITmng2576MakeLikeReactorTest extends AbstractMavenIntegrationT
     @Test
     public void testitMatchesByArtifactId() throws Exception {
         // as per MNG-4244
-        requiresMavenVersion("[3.0-alpha-3,)");
+        // requiresMavenVersion("[3.0-alpha-3,)");
 
         File testDir = extractResources("/mng-2576");
 

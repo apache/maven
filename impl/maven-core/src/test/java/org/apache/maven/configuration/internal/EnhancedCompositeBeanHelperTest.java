@@ -124,7 +124,7 @@ class EnhancedCompositeBeanHelperTest {
 
         // Second call should be faster (though this is not guaranteed in all environments)
         // We mainly verify that both calls work correctly
-        assertTrue(time2 >= 0); // Just verify it completed
+        assertTrue(time2 >= 0, "Expected " + time2 + " to be >= " + 0); // Just verify it completed
     }
 
     @Test
@@ -144,6 +144,68 @@ class EnhancedCompositeBeanHelperTest {
         TestBean bean2 = new TestBean();
         helper.setProperty(bean2, "name", String.class, config);
         assertEquals("testValue", bean2.getName());
+    }
+
+    @Test
+    void testFieldAccessibilityIsProperlyRestored() throws Exception {
+        TestBean bean = new TestBean();
+        PlexusConfiguration config = new XmlPlexusConfiguration("test");
+        config.setValue("fieldValue");
+
+        when(evaluator.evaluate("fieldValue")).thenReturn("fieldValue");
+
+        // Get the field to check its accessibility state
+        java.lang.reflect.Field field = TestBean.class.getDeclaredField("directField");
+
+        // Verify field is not accessible initially
+        boolean initialAccessibility = field.canAccess(bean);
+
+        // Set the property using the helper
+        helper.setProperty(bean, "directField", String.class, config);
+
+        // Verify the value was set correctly
+        assertEquals("fieldValue", bean.getDirectField());
+
+        // Verify field accessibility is restored to its original state
+        boolean finalAccessibility = field.canAccess(bean);
+        assertEquals(
+                initialAccessibility,
+                finalAccessibility,
+                "Field accessibility should be restored to its original state after setting value");
+    }
+
+    @Test
+    void testMultipleFieldAccessesDoNotLeakAccessibility() throws Exception {
+        // This test verifies that repeated field accesses don't leave fields in an accessible state
+        // which was the issue with the old caching implementation
+        TestBean bean1 = new TestBean();
+        TestBean bean2 = new TestBean();
+        PlexusConfiguration config = new XmlPlexusConfiguration("test");
+        config.setValue("value1");
+
+        when(evaluator.evaluate("value1")).thenReturn("value1");
+        when(evaluator.evaluate("value2")).thenReturn("value2");
+
+        java.lang.reflect.Field field = TestBean.class.getDeclaredField("directField");
+
+        // First access
+        helper.setProperty(bean1, "directField", String.class, config);
+        boolean accessibilityAfterFirst = field.canAccess(bean1);
+
+        // Second access with different bean
+        config.setValue("value2");
+        helper.setProperty(bean2, "directField", String.class, config);
+        boolean accessibilityAfterSecond = field.canAccess(bean2);
+
+        // Both should have the same accessibility state (not accessible)
+        assertEquals(
+                accessibilityAfterFirst,
+                accessibilityAfterSecond,
+                "Field accessibility should be consistent across multiple accesses");
+
+        // Verify values were set correctly
+        assertEquals("value1", bean1.getDirectField());
+        assertEquals("value2", bean2.getDirectField());
     }
 
     /**

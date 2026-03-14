@@ -30,10 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng6173GetProjectsAndDependencyGraphTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng6173GetProjectsAndDependencyGraphTest() {
-        super("[3.0-alpha-3,)");
-    }
-
     /**
      * Verifies that {@code MavenSession#getProjects()} returns the projects being built and that
      * {@code MavenSession#getDependencyGraph()} returns the dependency graph.

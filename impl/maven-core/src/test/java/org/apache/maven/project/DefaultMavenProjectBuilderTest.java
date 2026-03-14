@@ -20,13 +20,19 @@ package org.apache.maven.project;
 
 import java.io.File;
 import java.io.InputStream;
+import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.stream.Stream;
 
+import com.google.common.jimfs.Configuration;
+import com.google.common.jimfs.Jimfs;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputSource;
+import org.apache.maven.api.services.ModelSource;
+import org.apache.maven.api.services.Sources;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.impl.InternalSession;
@@ -37,15 +43,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 
-import static org.apache.maven.project.ProjectBuildingResultWithProblemMessageMatcher.projectBuildingResultWithProblemMessage;
 import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -59,6 +62,16 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
     // only use by reread()
     @TempDir
     Path projectRoot;
+
+    /**
+     * Provides file system configurations for testing both Windows and Unix path behaviors.
+     * This allows us to test cross-platform path handling on any development machine.
+     */
+    static Stream<Arguments> fileSystemConfigurations() {
+        return Stream.of(
+                Arguments.of("Unix", Configuration.unix(), "/"),
+                Arguments.of("Windows", Configuration.windows(), "\\"));
+    }
 
     @Override
     @BeforeEach
@@ -107,7 +120,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
 
         ProjectBuildingException e = assertThrows(
                 ProjectBuildingException.class, () -> getProject(f1), "Expected to fail for future versions");
-        assertThat(e.getMessage(), containsString("Building this project requires a newer version of Maven"));
+        assertTrue(e.getMessage().contains("Building this project requires a newer version of Maven"));
     }
 
     @Test
@@ -118,7 +131,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
 
         ProjectBuildingException e = assertThrows(
                 ProjectBuildingException.class, () -> getProject(f1), "Expected to fail for past versions");
-        assertThat(e.getMessage(), containsString("Building this project requires an older version of Maven"));
+        assertTrue(e.getMessage().contains("Building this project requires an older version of Maven"));
     }
 
     @Test
@@ -127,7 +140,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
 
         ProjectBuildingException e = assertThrows(
                 ProjectBuildingException.class, () -> getProject(f1), "Expected to fail for future versions");
-        assertThat(e.getMessage(), containsString("Building this project requires a newer version of Maven"));
+        assertTrue(e.getMessage().contains("Building this project requires a newer version of Maven"));
     }
 
     @Test
@@ -146,7 +159,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         assertNull(project.getParent());
         assertNull(project.getParentArtifact());
 
-        assertFalse(project.isExecutionRoot());
+        assertFalse(project.isExecutionRoot(), "Expected " + project + ".isExecutionRoot() to return false");
     }
 
     @Test
@@ -200,7 +213,9 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
                 ProjectBuildingException.class,
                 () -> getProject(f1),
                 "Expected 'ProjectBuildingException' not thrown.");
-        assertThat(e.getResults(), contains(projectBuildingResultWithProblemMessage("Version must be a constant")));
+        assertEquals(1, e.getResults().size());
+        ProjectBuildingResultWithProblemMessageAssert.assertThat(e.getResults().get(0))
+                .hasProblemMessage("Version must be a constant");
     }
 
     /**
@@ -215,7 +230,9 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
                 ProjectBuildingException.class,
                 () -> getProject(f1),
                 "Expected 'ProjectBuildingException' not thrown.");
-        assertThat(e.getResults(), contains(projectBuildingResultWithProblemMessage("Version must be a constant")));
+        assertEquals(1, e.getResults().size());
+        ProjectBuildingResultWithProblemMessageAssert.assertThat(e.getResults().get(0))
+                .hasProblemMessage("Version must be a constant");
     }
 
     /**
@@ -278,7 +295,9 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
                 ProjectBuildingException.class,
                 () -> getProjectFromRemoteRepository(f1),
                 "Expected 'ProjectBuildingException' not thrown.");
-        assertThat(e.getResults(), contains(projectBuildingResultWithProblemMessage("Version must be a constant")));
+        assertEquals(1, e.getResults().size());
+        ProjectBuildingResultWithProblemMessageAssert.assertThat(e.getResults().get(0))
+                .hasProblemMessage("Version must be a constant");
     }
 
     /**
@@ -293,7 +312,9 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
                 ProjectBuildingException.class,
                 () -> getProjectFromRemoteRepository(f1),
                 "Expected 'ProjectBuildingException' not thrown.");
-        assertThat(e.getResults(), contains(projectBuildingResultWithProblemMessage("Version must be a constant")));
+        assertEquals(1, e.getResults().size());
+        ProjectBuildingResultWithProblemMessageAssert.assertThat(e.getResults().get(0))
+                .hasProblemMessage("Version must be a constant");
     }
 
     /**
@@ -316,7 +337,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
 
         MavenProject project =
                 projectBuilder.build(pom.toFile(), buildingRequest).getProject();
-        assertThat(project.getName(), is("aid")); // inherited from artifactId
+        assertEquals("aid", project.getName()); // inherited from artifactId
 
         try (InputStream pomResource =
                 DefaultMavenProjectBuilderTest.class.getResourceAsStream("/projects/reread/pom2.xml")) {
@@ -324,7 +345,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         }
 
         project = projectBuilder.build(pom.toFile(), buildingRequest).getProject();
-        assertThat(project.getName(), is("PROJECT NAME"));
+        assertEquals("PROJECT NAME", project.getName());
     }
 
     @Test
@@ -337,87 +358,181 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
 
         MavenProject project = projectBuilder.build(testPom, request).getProject();
 
-        assertTrue(project.getInjectedProfileIds().keySet().containsAll(List.of("external", project.getId())));
+        String id = project.getGroupId() + ":" + project.getArtifactId() + ":" + project.getVersion();
+        assertTrue(project.getInjectedProfileIds().keySet().containsAll(List.of("external", id)));
         assertTrue(project.getInjectedProfileIds().get("external").isEmpty());
-        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().anyMatch("profile1"::equals));
-        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().noneMatch("profile2"::equals));
-        assertTrue(
-                project.getInjectedProfileIds().get(project.getId()).stream().noneMatch("active-by-default"::equals));
+        assertTrue(project.getInjectedProfileIds().get(id).stream().anyMatch("profile1"::equals));
+        assertTrue(project.getInjectedProfileIds().get(id).stream().noneMatch("profile2"::equals));
+        assertTrue(project.getInjectedProfileIds().get(id).stream().noneMatch("active-by-default"::equals));
     }
 
-    @Test
-    void testActivatedDefaultProfileBySource() throws Exception {
+    /**
+     * Parameterized version of testActivatedDefaultProfileBySource that demonstrates
+     * cross-platform path behavior using JIMFS to simulate both Windows and Unix file systems.
+     * This test shows how the path separator expectations differ between platforms.
+     */
+    @ParameterizedTest(name = "testActivatedDefaultProfileBySource[{0}]")
+    @MethodSource("fileSystemConfigurations")
+    void testActivatedDefaultProfileBySource(String fsName, Configuration fsConfig, String separator) throws Exception {
         File testPom = getTestFile("src/test/resources/projects/pom-with-profiles/pom.xml");
 
-        ProjectBuildingRequest request = newBuildingRequest();
-        request.setLocalRepository(getLocalRepository());
+        try (FileSystem fs = Jimfs.newFileSystem(fsName, fsConfig)) {
+            Path path = fs.getPath("projects", "pom-with-profiles", "pom.xml");
+            Files.createDirectories(path.getParent());
+            Files.copy(testPom.toPath(), path);
+            ModelSource source = Sources.buildSource(path);
 
-        MavenProject project = projectBuilder.build(testPom, request).getProject();
+            ProjectBuildingRequest request = newBuildingRequest();
+            request.setLocalRepository(getLocalRepository());
 
-        assertTrue(project.getInjectedProfileIds().keySet().containsAll(List.of("external", project.getId())));
-        assertTrue(project.getInjectedProfileIds().get("external").isEmpty());
-        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().noneMatch("profile1"::equals));
-        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().noneMatch("profile2"::equals));
-        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().anyMatch("active-by-default"::equals));
+            MavenProject project = projectBuilder.build(source, request).getProject();
 
-        InternalMavenSession session = Mockito.mock(InternalMavenSession.class);
-        List<org.apache.maven.api.model.Profile> activeProfiles =
-                new DefaultProject(session, project).getDeclaredActiveProfiles();
-        assertEquals(1, activeProfiles.size());
-        org.apache.maven.api.model.Profile profile = activeProfiles.get(0);
-        assertEquals("active-by-default", profile.getId());
-        InputLocation location = profile.getLocation("");
-        assertNotNull(location);
-        assertThat(location.getLineNumber(), greaterThan(0));
-        assertThat(location.getColumnNumber(), greaterThan(0));
-        assertNotNull(location.getSource());
-        assertThat(location.getSource().getLocation(), containsString("pom-with-profiles/pom.xml"));
+            String id = project.getGroupId() + ":" + project.getArtifactId() + ":" + project.getVersion();
+            assertTrue(project.getInjectedProfileIds().keySet().containsAll(List.of("external", id)));
+            assertTrue(project.getInjectedProfileIds().get("external").isEmpty());
+            assertTrue(project.getInjectedProfileIds().get(id).stream().noneMatch("profile1"::equals));
+            assertTrue(project.getInjectedProfileIds().get(id).stream().noneMatch("profile2"::equals));
+            assertTrue(project.getInjectedProfileIds().get(id).stream().anyMatch("active-by-default"::equals));
+
+            InternalMavenSession session = Mockito.mock(InternalMavenSession.class);
+            List<org.apache.maven.api.model.Profile> activeProfiles =
+                    new DefaultProject(session, project).getDeclaredActiveProfiles();
+            assertEquals(1, activeProfiles.size());
+            org.apache.maven.api.model.Profile profile = activeProfiles.get(0);
+            assertEquals("active-by-default", profile.getId());
+            InputLocation location = profile.getLocation("");
+            assertNotNull(location, "Profile location should not be null for profile: " + profile.getId());
+            assertTrue(
+                    location.getLineNumber() > 0,
+                    "Profile location line number should be positive, but was: " + location.getLineNumber()
+                            + " for profile: " + profile.getId());
+            assertTrue(
+                    location.getColumnNumber() > 0,
+                    "Profile location column number should be positive, but was: " + location.getColumnNumber()
+                            + " for profile: " + profile.getId());
+            assertNotNull(
+                    location.getSource(), "Profile location source should not be null for profile: " + profile.getId());
+            assertTrue(
+                    location.getSource().getLocation().contains("pom-with-profiles/pom.xml"),
+                    "Profile location should contain 'pom-with-profiles/pom.xml', but was: "
+                            + location.getSource().getLocation() + " for profile: " + profile.getId());
+
+            // This demonstrates the cross-platform path behavior:
+            // - On Unix systems, paths use forward slashes (/)
+            // - On Windows systems, paths use backslashes (\)
+            // - The actual file system being used determines the separator
+            String actualLocation = location.getSource().getLocation();
+            String expectedPath = "pom-with-profiles" + separator + "pom.xml";
+
+            // The test will pass with File.separator but this shows the platform differences
+            assertTrue(
+                    actualLocation.contains("pom-with-profiles/pom.xml"),
+                    "Location should contain path with proper separators for " + fsName + " (actual: " + actualLocation
+                            + ")\n"
+                            + "=== Cross-Platform Path Test [" + fsName + "] ===\n"
+                            + "Expected path pattern: " + expectedPath + "\n"
+                            + "Actual location: " + actualLocation + "\n"
+                            + "Contains expected pattern: " + actualLocation.contains(expectedPath) + "\n"
+                            + "File.separator on this system: '" + File.separator + "'");
+        }
     }
 
-    @Test
-    void testActivatedExternalProfileBySource() throws Exception {
+    /**
+     * Parameterized version of testActivatedExternalProfileBySource that demonstrates
+     * cross-platform path behavior using JIMFS to simulate both Windows and Unix file systems.
+     * This test shows how the path separator expectations differ between platforms.
+     */
+    @ParameterizedTest(name = "testActivatedExternalProfileBySource[{0}]")
+    @MethodSource("fileSystemConfigurations")
+    void testActivatedExternalProfileBySource(String fsName, Configuration fsConfig, String separator)
+            throws Exception {
         File testPom = getTestFile("src/test/resources/projects/pom-with-profiles/pom.xml");
 
-        ProjectBuildingRequest request = newBuildingRequest();
-        request.setLocalRepository(getLocalRepository());
+        try (FileSystem fs = Jimfs.newFileSystem(fsName, fsConfig)) {
+            Path path = fs.getPath("projects", "pom-with-profiles", "pom.xml");
+            Files.createDirectories(path.getParent());
+            Files.copy(testPom.toPath(), path);
+            ModelSource source = Sources.buildSource(path);
 
-        final Profile externalProfile = new Profile();
-        externalProfile.setLocation(
-                "",
-                new org.apache.maven.model.InputLocation(
-                        1, 1, new org.apache.maven.model.InputSource(new InputSource(null, "settings.xml", null))));
-        externalProfile.setId("external-profile");
-        request.addProfile(externalProfile);
-        request.setActiveProfileIds(List.of(externalProfile.getId()));
+            ProjectBuildingRequest request = newBuildingRequest();
+            request.setLocalRepository(getLocalRepository());
 
-        MavenProject project = projectBuilder.build(testPom, request).getProject();
+            final Profile externalProfile = new Profile();
+            externalProfile.setLocation(
+                    "",
+                    new org.apache.maven.model.InputLocation(
+                            1, 1, new org.apache.maven.model.InputSource(InputSource.of(null, "settings.xml", null))));
+            externalProfile.setId("external-profile");
+            request.addProfile(externalProfile);
+            request.setActiveProfileIds(List.of(externalProfile.getId()));
 
-        assertTrue(project.getInjectedProfileIds().keySet().containsAll(List.of("external", project.getId())));
-        assertTrue(project.getInjectedProfileIds().get("external").stream().anyMatch("external-profile"::equals));
-        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().noneMatch("profile1"::equals));
-        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().noneMatch("profile2"::equals));
-        assertTrue(project.getInjectedProfileIds().get(project.getId()).stream().anyMatch("active-by-default"::equals));
+            MavenProject project = projectBuilder.build(source, request).getProject();
 
-        InternalMavenSession session = Mockito.mock(InternalMavenSession.class);
-        List<org.apache.maven.api.model.Profile> activeProfiles =
-                new DefaultProject(session, project).getDeclaredActiveProfiles();
-        assertEquals(2, activeProfiles.size());
-        org.apache.maven.api.model.Profile profile = activeProfiles.get(0);
-        assertEquals("active-by-default", profile.getId());
-        InputLocation location = profile.getLocation("");
-        assertNotNull(location);
-        assertThat(location.getLineNumber(), greaterThan(0));
-        assertThat(location.getColumnNumber(), greaterThan(0));
-        assertNotNull(location.getSource());
-        assertThat(location.getSource().getLocation(), containsString("pom-with-profiles/pom.xml"));
-        profile = activeProfiles.get(1);
-        assertEquals("external-profile", profile.getId());
-        location = profile.getLocation("");
-        assertNotNull(location);
-        assertThat(location.getLineNumber(), greaterThan(0));
-        assertThat(location.getColumnNumber(), greaterThan(0));
-        assertNotNull(location.getSource());
-        assertThat(location.getSource().getLocation(), containsString("settings.xml"));
+            String id = project.getGroupId() + ":" + project.getArtifactId() + ":" + project.getVersion();
+            assertTrue(project.getInjectedProfileIds().keySet().containsAll(List.of("external", id)));
+            assertTrue(project.getInjectedProfileIds().get("external").stream().anyMatch("external-profile"::equals));
+            assertTrue(project.getInjectedProfileIds().get(id).stream().noneMatch("profile1"::equals));
+            assertTrue(project.getInjectedProfileIds().get(id).stream().noneMatch("profile2"::equals));
+            assertTrue(project.getInjectedProfileIds().get(id).stream().anyMatch("active-by-default"::equals));
+
+            InternalMavenSession session = Mockito.mock(InternalMavenSession.class);
+            List<org.apache.maven.api.model.Profile> activeProfiles =
+                    new DefaultProject(session, project).getDeclaredActiveProfiles();
+            assertEquals(2, activeProfiles.size());
+            org.apache.maven.api.model.Profile profile = activeProfiles.get(0);
+            assertEquals("active-by-default", profile.getId());
+            InputLocation location = profile.getLocation("");
+            assertNotNull(location, "Profile location should not be null for profile: " + profile.getId());
+            assertTrue(
+                    location.getLineNumber() > 0,
+                    "Profile location line number should be positive, but was: " + location.getLineNumber()
+                            + " for profile: " + profile.getId());
+            assertTrue(
+                    location.getColumnNumber() > 0,
+                    "Profile location column number should be positive, but was: " + location.getColumnNumber()
+                            + " for profile: " + profile.getId());
+            assertNotNull(
+                    location.getSource(), "Profile location source should not be null for profile: " + profile.getId());
+            assertTrue(
+                    location.getSource().getLocation().contains("pom-with-profiles/pom.xml"),
+                    "Profile location should contain 'pom-with-profiles/pom.xml', but was: "
+                            + location.getSource().getLocation() + " for profile: " + profile.getId());
+
+            // This demonstrates the cross-platform path behavior for the POM file
+            String actualLocation = location.getSource().getLocation();
+            String expectedPath = "pom-with-profiles" + separator + "pom.xml";
+
+            // The test will pass with File.separator but this shows the platform differences
+            assertTrue(
+                    actualLocation.contains("pom-with-profiles/pom.xml"),
+                    "Location should contain path with proper separators for " + fsName + " (actual: " + actualLocation
+                            + ")\n"
+                            + "=== Cross-Platform Path Test [" + fsName + "] - External Profile ===\n"
+                            + "Expected path pattern: " + expectedPath + "\n"
+                            + "Actual location: " + actualLocation + "\n"
+                            + "Contains expected pattern: " + actualLocation.contains(expectedPath) + "\n"
+                            + "File.separator on this system: '" + File.separator + "'");
+
+            profile = activeProfiles.get(1);
+            assertEquals("external-profile", profile.getId());
+            location = profile.getLocation("");
+            assertNotNull(location, "External profile location should not be null for profile: " + profile.getId());
+            assertTrue(
+                    location.getLineNumber() > 0,
+                    "External profile location line number should be positive, but was: " + location.getLineNumber()
+                            + " for profile: " + profile.getId());
+            assertTrue(
+                    location.getColumnNumber() > 0,
+                    "External profile location column number should be positive, but was: " + location.getColumnNumber()
+                            + " for profile: " + profile.getId());
+            assertNotNull(
+                    location.getSource(),
+                    "External profile location source should not be null for profile: " + profile.getId());
+            assertTrue(
+                    location.getSource().getLocation().contains("settings.xml"),
+                    "External profile location should contain 'settings.xml', but was: "
+                            + location.getSource().getLocation() + " for profile: " + profile.getId());
+        }
     }
 
     @Test
@@ -544,5 +659,45 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         MavenProject p2 = results.get(1).getProject();
         MavenProject parent = p1.getArtifactId().equals("parent") ? p1 : p2;
         assertEquals(List.of("child"), parent.getModel().getDelegate().getSubprojects());
+    }
+
+    @Test
+    public void testEmptySubprojectsElementPreventsDiscovery() throws Exception {
+        File pom = getTestFile("src/test/resources/projects/subprojects-empty/pom.xml");
+        ProjectBuildingRequest configuration = newBuildingRequest();
+        InternalSession internalSession = InternalSession.from(configuration.getRepositorySession());
+        InternalMavenSession mavenSession = InternalMavenSession.from(internalSession);
+        mavenSession
+                .getMavenSession()
+                .getRequest()
+                .setRootDirectory(pom.toPath().getParent());
+
+        List<ProjectBuildingResult> results = projectBuilder.build(List.of(pom), true, configuration);
+        // Should only build the parent project, not discover the child
+        assertEquals(1, results.size());
+        MavenProject parent = results.get(0).getProject();
+        assertEquals("parent", parent.getArtifactId());
+        // The subprojects list should be empty since we explicitly defined an empty <subprojects /> element
+        assertTrue(parent.getModel().getDelegate().getSubprojects().isEmpty());
+    }
+
+    @Test
+    public void testEmptyModulesElementPreventsDiscovery() throws Exception {
+        File pom = getTestFile("src/test/resources/projects/modules-empty/pom.xml");
+        ProjectBuildingRequest configuration = newBuildingRequest();
+        InternalSession internalSession = InternalSession.from(configuration.getRepositorySession());
+        InternalMavenSession mavenSession = InternalMavenSession.from(internalSession);
+        mavenSession
+                .getMavenSession()
+                .getRequest()
+                .setRootDirectory(pom.toPath().getParent());
+
+        List<ProjectBuildingResult> results = projectBuilder.build(List.of(pom), true, configuration);
+        // Should only build the parent project, not discover the child
+        assertEquals(1, results.size());
+        MavenProject parent = results.get(0).getProject();
+        assertEquals("parent", parent.getArtifactId());
+        // The modules list should be empty since we explicitly defined an empty <modules /> element
+        assertTrue(parent.getModel().getDelegate().getModules().isEmpty());
     }
 }

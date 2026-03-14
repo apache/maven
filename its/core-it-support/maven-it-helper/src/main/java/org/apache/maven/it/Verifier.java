@@ -108,6 +108,9 @@ public class Verifier {
 
     private final List<String> jvmArguments = new ArrayList<>();
 
+    // TestSuiteOrdering creates Verifier in non-forked JVM as well, and there no prop set is set (so use default)
+    private final String toolboxVersion = System.getProperty("version.toolbox", "0.14.1");
+
     private Path userHomeDirectory; // the user home
 
     private String executable = ExecutorRequest.MVN;
@@ -124,8 +127,20 @@ public class Verifier {
 
     private boolean skipMavenRc = true;
 
+    private ByteArrayOutputStream stdout;
+
+    private ByteArrayOutputStream stderr;
+
     public Verifier(String basedir) throws VerificationException {
         this(basedir, null);
+    }
+
+    public Verifier(String basedir, List<String> defaultCliArguments) throws VerificationException {
+        this(basedir, defaultCliArguments, true);
+    }
+
+    public Verifier(String basedir, boolean createDotMvn) throws VerificationException {
+        this(basedir, null, createDotMvn);
     }
 
     /**
@@ -134,13 +149,17 @@ public class Verifier {
      *
      * @param basedir The basedir, cannot be {@code null}
      * @param defaultCliArguments The defaultCliArguments override, may be {@code null}
+     * @param createDotMvn If {@code true}, Verifier will create {@code .mvn} in passed basedir.
      *
      * @see #DEFAULT_CLI_ARGUMENTS
      */
-    public Verifier(String basedir, List<String> defaultCliArguments) throws VerificationException {
+    public Verifier(String basedir, List<String> defaultCliArguments, boolean createDotMvn) throws VerificationException {
         requireNonNull(basedir);
         try {
             this.basedir = Paths.get(basedir).toAbsolutePath();
+            if (createDotMvn) {
+                Files.createDirectories(this.basedir.resolve(".mvn"));
+            }
             this.tempBasedir = Files.createTempDirectory("verifier");
             this.userHomeDirectory = Paths.get(System.getProperty("maven.test.user.home", "user.home"));
             Files.createDirectories(this.userHomeDirectory);
@@ -151,7 +170,7 @@ public class Verifier {
                     this.userHomeDirectory,
                     EMBEDDED_MAVEN_EXECUTOR,
                     FORKED_MAVEN_EXECUTOR);
-            this.executorTool = new ToolboxTool(executorHelper);
+            this.executorTool = new ToolboxTool(executorHelper, toolboxVersion);
             this.defaultCliArguments =
                     new ArrayList<>(defaultCliArguments != null ? defaultCliArguments : DEFAULT_CLI_ARGUMENTS);
             this.logFile = this.basedir.resolve(logFileName);
@@ -162,6 +181,10 @@ public class Verifier {
 
     public void setUserHomeDirectory(Path userHomeDirectory) {
         this.userHomeDirectory = requireNonNull(userHomeDirectory, "userHomeDirectory");
+    }
+
+    public String getToolboxVersion() {
+        return toolboxVersion;
     }
 
     public String getExecutable() {
@@ -192,8 +215,8 @@ public class Verifier {
 
             String itTail = args.stream()
                     .filter(s -> s.startsWith("-Dmaven.repo.local.tail="))
-                    .map(s -> s.substring(24).trim())
                     .findFirst()
+                    .map(s -> s.substring(24).trim())
                     .orElse("");
             if (!itTail.isEmpty()) {
                 // remove it
@@ -220,6 +243,10 @@ public class Verifier {
             args.add(0, "-l");
         }
 
+        // TODO: disable RRF for now until https://github.com/apache/maven-resolver/issues/1641 can be fixed
+        args.add("-Daether.remoteRepositoryFilter.groupId=false");
+        args.add("-Daether.remoteRepositoryFilter.prefixes=false");
+
         try {
             ExecutorRequest.Builder builder = executorHelper
                     .executorRequest()
@@ -240,10 +267,59 @@ public class Verifier {
             if (forkJvm) {
                 mode = ExecutorHelper.Mode.FORKED;
             }
-            ByteArrayOutputStream stdout = new ByteArrayOutputStream();
-            ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+            stdout = new ByteArrayOutputStream();
+            stderr = new ByteArrayOutputStream();
             ExecutorRequest request = builder.stdOut(stdout).stdErr(stderr).build();
+
+            // Store the command line to prepend to log file after execution
+            // Skip adding command line info if quiet logging is enabled (respects -q flag)
+            String commandLineHeader = null;
+            if (logFileName != null && !isQuietLogging(args)) {
+                try {
+                    commandLineHeader = formatCommandLine(request, mode);
+                } catch (Exception e) {
+                    // Don't fail the execution if we can't format the command line, just log it
+                    System.err.println("Warning: Could not format command line: " + e.getMessage());
+                }
+            }
+
             int ret = executorHelper.execute(mode, request);
+
+            // After execution, prepend the command line to the log file
+            if (commandLineHeader != null && Files.exists(logFile)) {
+                try {
+                    String existingContent = Files.readString(logFile, StandardCharsets.UTF_8);
+                    String newContent = commandLineHeader + existingContent;
+                    Files.writeString(logFile, newContent, StandardCharsets.UTF_8);
+                } catch (IOException e) {
+                    // Don't fail the execution if we can't write the command line, just log it
+                    System.err.println("Warning: Could not prepend command line to log file: " + e.getMessage());
+                }
+            }
+
+            // Save stdout/stderr to files if not empty (captures shell script debug output)
+            if (logFileName != null) {
+                String logBaseName = logFileName.endsWith(".txt")
+                        ? logFileName.substring(0, logFileName.length() - 4)
+                        : logFileName;
+                if (stdout.size() > 0) {
+                    try {
+                        Path stdoutFile = basedir.resolve(logBaseName + "-stdout.txt");
+                        Files.writeString(stdoutFile, stdout.toString(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
+                    } catch (IOException e) {
+                        System.err.println("Warning: Could not write stdout file: " + e.getMessage());
+                    }
+                }
+                if (stderr.size() > 0) {
+                    try {
+                        Path stderrFile = basedir.resolve(logBaseName + "-stderr.txt");
+                        Files.writeString(stderrFile, stderr.toString(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
+                    } catch (IOException e) {
+                        System.err.println("Warning: Could not write stderr file: " + e.getMessage());
+                    }
+                }
+            }
+
             if (ret > 0) {
                 String dump;
                 try {
@@ -391,6 +467,103 @@ public class Verifier {
         }
     }
 
+    /**
+     * Formats the command line that would be executed for the given ExecutorRequest and mode.
+     * This provides a human-readable representation of the Maven command for debugging purposes.
+     */
+    private String formatCommandLine(ExecutorRequest request, ExecutorHelper.Mode mode) {
+        StringBuilder cmdLine = new StringBuilder();
+
+        cmdLine.append("# Command line: ");
+        // Add the Maven executable path
+        Path mavenExecutable = request.installationDirectory()
+                .resolve("bin")
+                .resolve(System.getProperty("os.name").toLowerCase().contains("windows")
+                    ? request.command() + ".cmd"
+                    : request.command());
+        cmdLine.append(mavenExecutable.toString());
+
+        // Add MAVEN_ARGS if they would be used (only for forked mode)
+        if (mode == ExecutorHelper.Mode.FORKED || mode == ExecutorHelper.Mode.AUTO) {
+            String mavenArgsEnv = System.getenv("MAVEN_ARGS");
+            if (mavenArgsEnv != null && !mavenArgsEnv.isEmpty()) {
+                cmdLine.append(" ").append(mavenArgsEnv);
+            }
+        }
+
+        // Add the arguments
+        for (String arg : request.arguments()) {
+            cmdLine.append(" ");
+            // Quote arguments that contain spaces
+            if (arg.contains(" ")) {
+                cmdLine.append("\"").append(arg).append("\"");
+            } else {
+                cmdLine.append(arg);
+            }
+        }
+
+        // Add environment variables that would be set (excluding MAVEN_OPTS which is handled separately)
+        if (request.environmentVariables().isPresent() && !request.environmentVariables().get().isEmpty()) {
+            cmdLine.append("\n# Environment variables:");
+            for (Map.Entry<String, String> entry : request.environmentVariables().get().entrySet()) {
+                if (!"MAVEN_OPTS".equals(entry.getKey())) {
+                    cmdLine.append("\n# ").append(entry.getKey()).append("=").append(entry.getValue());
+                }
+            }
+        }
+
+        // Compute the final MAVEN_OPTS value (combining env var + jvmArgs)
+        // This matches what ForkedMavenExecutor does
+        List<String> jvmArgs = new ArrayList<>();
+        if (!request.userHomeDirectory().equals(ExecutorRequest.getCanonicalPath(Paths.get(System.getProperty("user.home"))))) {
+            jvmArgs.add("-Duser.home=" + request.userHomeDirectory().toString());
+        }
+        if (request.jvmArguments().isPresent()) {
+            jvmArgs.addAll(request.jvmArguments().get());
+        }
+        if (request.jvmSystemProperties().isPresent()) {
+            jvmArgs.addAll(request.jvmSystemProperties().get().entrySet().stream()
+                    .map(e -> "-D" + e.getKey() + "=" + e.getValue())
+                    .toList());
+        }
+
+        // Build the final MAVEN_OPTS value
+        StringBuilder mavenOpts = new StringBuilder();
+        if (request.environmentVariables().isPresent()) {
+            String existingMavenOpts = request.environmentVariables().get().get("MAVEN_OPTS");
+            if (existingMavenOpts != null && !existingMavenOpts.isEmpty()) {
+                mavenOpts.append(existingMavenOpts);
+            }
+        }
+        if (!jvmArgs.isEmpty()) {
+            if (mavenOpts.length() > 0) {
+                mavenOpts.append(" ");
+            }
+            mavenOpts.append(String.join(" ", jvmArgs));
+        }
+
+        if (mavenOpts.length() > 0) {
+            cmdLine.append("\n# MAVEN_OPTS=").append(mavenOpts.toString());
+        }
+
+        if (request.skipMavenRc()) {
+            cmdLine.append("\n# MAVEN_SKIP_RC=true");
+        }
+
+        cmdLine.append("\n# Working directory: ").append(request.cwd().toString());
+        cmdLine.append("\n# Execution mode: ").append(mode.toString());
+
+        cmdLine.append("\n");
+        return cmdLine.toString();
+    }
+
+    /**
+     * Checks if quiet logging is enabled by looking for the -q or --quiet flag in the arguments.
+     */
+    private boolean isQuietLogging(List<String> args) {
+        return args.contains("-q") || args.contains("--quiet");
+    }
+
     public String getLogFileName() {
         return logFileName;
     }
@@ -421,23 +594,31 @@ public class Verifier {
     }
 
     public static void verifyTextNotInLog(List<String> lines, String text) throws VerificationException {
-        if (textOccurencesInLog(lines, text) > 0) {
+        if (textOccurrencesInLog(lines, text) > 0) {
             throw new VerificationException("Text found in log: " + text);
         }
     }
 
     public static void verifyTextInLog(List<String> lines, String text) throws VerificationException {
-        if (textOccurencesInLog(lines, text) <= 0) {
+        if (textOccurrencesInLog(lines, text) <= 0) {
             throw new VerificationException("Text not found in log: " + text);
         }
     }
 
     public long textOccurrencesInLog(String text) throws IOException {
-        return textOccurencesInLog(loadLogLines(), text);
+        return textOccurrencesInLog(loadLogLines(), text);
     }
 
-    public static long textOccurencesInLog(List<String> lines, String text) {
+    public static long textOccurrencesInLog(List<String> lines, String text) {
         return lines.stream().filter(line -> stripAnsi(line).contains(text)).count();
+    }
+
+    /**
+     * @deprecated Use {@link #textOccurrencesInLog(List, String)} instead
+     */
+    @Deprecated
+    public static long textOccurencesInLog(List<String> lines, String text) {
+        return textOccurrencesInLog(lines, text);
     }
 
     /**
@@ -470,6 +651,14 @@ public class Verifier {
         if (!result) {
             throw new VerificationException("Text not found in log: " + text);
         }
+    }
+
+    public String getStdout() {
+        return stdout != null ? stdout.toString(StandardCharsets.UTF_8) : "";
+    }
+
+    public String getStderr() {
+        return stderr != null ? stderr.toString(StandardCharsets.UTF_8) : "";
     }
 
     public static String stripAnsi(String msg) {

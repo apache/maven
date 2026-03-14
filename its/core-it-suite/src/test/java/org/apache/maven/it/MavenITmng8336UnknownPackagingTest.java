@@ -24,12 +24,10 @@ import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8336">MNG-8336</a>.
+ * @since 4.0.0-beta-6
+ *
  */
 class MavenITmng8336UnknownPackagingTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8336UnknownPackagingTest() {
-        super("[4.0.0-beta-6,)");
-    }
 
     /**
      *  Verify that the build succeeds

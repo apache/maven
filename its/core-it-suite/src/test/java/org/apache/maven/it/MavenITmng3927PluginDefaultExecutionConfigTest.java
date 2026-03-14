@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng3927PluginDefaultExecutionConfigTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3927PluginDefaultExecutionConfigTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that the configuration for a plugin execution without an identifier does not pollute the configuration
      * of default plugin executions introduced by the packaging.

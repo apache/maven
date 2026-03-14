@@ -32,12 +32,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8414">MNG-8414</a>.
+ * @since 4.0.0-rc-2
+ *
  */
 class MavenITmng8414ConsumerPomWithNewFeaturesTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8414ConsumerPomWithNewFeaturesTest() {
-        super("[4.0.0-rc-2,)");
-    }
 
     /**
      *  Verify behavior of the consumer POM when using a feature that require a newer model.
@@ -48,7 +46,7 @@ class MavenITmng8414ConsumerPomWithNewFeaturesTest extends AbstractMavenIntegrat
                 extractResources("/mng-8414-consumer-pom-with-new-features").toPath();
 
         Verifier verifier = newVerifier(basedir.toString(), null);
-        verifier.addCliArguments("package");
+        verifier.addCliArguments("package", "-Dmaven.consumer.pom.flatten=true");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
@@ -80,7 +78,7 @@ class MavenITmng8414ConsumerPomWithNewFeaturesTest extends AbstractMavenIntegrat
 
         Verifier verifier = newVerifier(basedir.toString(), null);
         verifier.setLogFileName("log-preserving.txt");
-        verifier.addCliArguments("-f", "pom-preserving.xml", "package");
+        verifier.addCliArguments("-f", "pom-preserving.xml", "package", "-Dmaven.consumer.pom.flatten=true");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 

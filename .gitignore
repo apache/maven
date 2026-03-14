@@ -3,6 +3,7 @@
 .classpath
 .settings/
 .svn/
+.jbang/
 
 # Intellij
 *.ipr
@@ -14,7 +15,6 @@
 .java-version
 .checkstyle
 .factorypath
-repo/
 
 # VSCode
 .vscode/

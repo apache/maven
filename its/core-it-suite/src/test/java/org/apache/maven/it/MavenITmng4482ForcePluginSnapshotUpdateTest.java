@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  */
 public class MavenITmng4482ForcePluginSnapshotUpdateTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4482ForcePluginSnapshotUpdateTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-alpha-6,)");
-    }
-
     /**
      * Verify that snapshot updates of plugins/extensions can be forced from the command line via "-U".
      *

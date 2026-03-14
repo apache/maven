@@ -41,10 +41,6 @@ public class MavenITmng3506ArtifactHandlersFromPluginsTest extends AbstractMaven
     private static final String BAD_TYPE1 = "coreit-1";
     private static final String BAD_TYPE2 = "coreit-2";
 
-    public MavenITmng3506ArtifactHandlersFromPluginsTest() {
-        super("(2.2.0,)");
-    }
-
     @Test
     public void testProjectPackagingUsage() throws IOException, VerificationException {
         File testDir = extractResources("/" + AID);

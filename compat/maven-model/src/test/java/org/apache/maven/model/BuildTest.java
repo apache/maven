@@ -45,7 +45,7 @@ class BuildTest {
     @Test
     void testEqualsIdentity() {
         Build thing = new Build();
-        assertTrue(thing.equals(thing));
+        assertTrue(thing.equals(thing), "Expected " + thing + " to equal " + thing);
     }
 
     @Test

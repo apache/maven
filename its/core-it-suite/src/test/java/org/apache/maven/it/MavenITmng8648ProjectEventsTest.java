@@ -24,10 +24,6 @@ import org.junit.jupiter.api.Test;
 
 public class MavenITmng8648ProjectEventsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng8648ProjectEventsTest() {
-        super("[4.0.0-rc-4,)");
-    }
-
     @Test
     public void test() throws Exception {
         File extensionDir = extractResources("/mng-8648/extension");

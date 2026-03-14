@@ -23,9 +23,6 @@ import java.io.File;
 import org.junit.jupiter.api.Test;
 
 public class MavenIT0023SettingsProfileTest extends AbstractMavenIntegrationTestCase {
-    public MavenIT0023SettingsProfileTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test profile inclusion from settings.xml (this one is activated by an id

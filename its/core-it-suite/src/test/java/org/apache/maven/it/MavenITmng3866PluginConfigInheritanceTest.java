@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3866PluginConfigInheritanceTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3866PluginConfigInheritanceTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that inheritance merges plugin definitions based on groupId:artifactId, i.e. plugin version is
      * irrelevant for merging.

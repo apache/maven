@@ -157,7 +157,7 @@ class TestApi {
         assertNotNull(resolved);
         assertNotNull(resolved.getPath());
         Optional<Path> op = session.getArtifactPath(resolved);
-        assertTrue(op.isPresent());
+        assertTrue(op.isPresent(), "Expected " + op + ".isPresent() to return true");
         assertEquals(resolved.getPath(), op.get());
     }
 

@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4275RelocationWarningTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4275RelocationWarningTest() {
-        super("[2.0,2.0.9),[2.2.1,3.0-alpha-1),[3.0-alpha-3,)");
-    }
-
     /**
      * Verify that relocations are logged (at warning level).
      *

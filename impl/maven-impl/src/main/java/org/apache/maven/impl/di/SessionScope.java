@@ -119,32 +119,32 @@ public class SessionScope implements Scope {
     protected Class<?>[] getInterfaces(Class<?> superType) {
         if (superType.isInterface()) {
             return new Class<?>[] {superType};
-        } else {
-            for (Annotation a : superType.getAnnotations()) {
-                Class<? extends Annotation> annotationType = a.annotationType();
-                if (isTypeAnnotation(annotationType)) {
-                    try {
-                        Class<?>[] value =
-                                (Class<?>[]) annotationType.getMethod("value").invoke(a);
-                        if (value.length == 0) {
-                            value = superType.getInterfaces();
-                        }
-                        List<Class<?>> nonInterfaces =
-                                Stream.of(value).filter(c -> !c.isInterface()).toList();
-                        if (!nonInterfaces.isEmpty()) {
-                            throw new IllegalArgumentException(
-                                    "The Typed annotation must contain only interfaces but the following types are not: "
-                                            + nonInterfaces);
-                        }
-                        return value;
-                    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                        throw new IllegalStateException(e);
+        }
+        for (Annotation a : superType.getAnnotations()) {
+            Class<? extends Annotation> annotationType = a.annotationType();
+            if (isTypeAnnotation(annotationType)) {
+                try {
+                    Class<?>[] value =
+                            (Class<?>[]) annotationType.getMethod("value").invoke(a);
+                    if (value.length == 0) {
+                        // Only direct interfaces implemented by the class
+                        value = superType.getInterfaces();
                     }
+                    List<Class<?>> nonInterfaces =
+                            Stream.of(value).filter(c -> !c.isInterface()).toList();
+                    if (!nonInterfaces.isEmpty()) {
+                        throw new IllegalArgumentException(
+                                "The Typed annotation must contain only interfaces but the following types are not: "
+                                        + nonInterfaces);
+                    }
+                    return value;
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                    throw new IllegalStateException(e);
                 }
             }
-            throw new IllegalArgumentException("The use of session scoped proxies require "
-                    + "a org.eclipse.sisu.Typed or javax.enterprise.inject.Typed annotation");
         }
+        throw new IllegalArgumentException(
+                "The use of session scoped proxies require a org.apache.maven.api.di.Typed, org.eclipse.sisu.Typed or javax.enterprise.inject.Typed annotation");
     }
 
     protected boolean isTypeAnnotation(Class<? extends Annotation> annotationType) {

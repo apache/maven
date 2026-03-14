@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4411VersionInfoTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4411VersionInfoTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that "mvn --version" outputs the Maven version and stops the execution after that.
      *

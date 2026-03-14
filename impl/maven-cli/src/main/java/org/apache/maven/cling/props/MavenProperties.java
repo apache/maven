@@ -28,6 +28,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -64,7 +65,7 @@ public class MavenProperties extends AbstractMap<String, String> {
     /**
      * Unless standard java props, use UTF-8
      */
-    static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
+    static final Charset DEFAULT_ENCODING = StandardCharsets.UTF_8;
 
     /** Constant for the platform specific line separator.*/
     private static final String LINE_SEPARATOR = System.lineSeparator();

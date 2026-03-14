@@ -153,8 +153,7 @@ class XmlNodeImplTest {
 
     @Test
     void testAppend() throws Exception {
-        String lhs =
-                """
+        String lhs = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <compilerArgs combine.children="append">
                     <arg>-Xmaxerrs</arg>
@@ -163,8 +162,7 @@ class XmlNodeImplTest {
                     <arg>100</arg>
                 </compilerArgs>
                 """;
-        String result =
-                """
+        String result = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <compilerArgs combine.children="append">
                   <arg>-Xmaxerrs</arg>
@@ -324,15 +322,13 @@ class XmlNodeImplTest {
      */
     @Test
     void testShouldPerformAppendAtFirstSubElementLevel() throws XMLStreamException {
-        String lhs =
-                """
+        String lhs = """
                 <top combine.children="append">
                   <topsub1>t1s1Value</topsub1>
                   <topsub1>t1s2Value</topsub1>
                 </top>
                 """;
-        String rhs =
-                """
+        String rhs = """
                 <top>
                     <topsub1>t2s1Value</topsub1>
                     <topsub1>t2s2Value</topsub1>

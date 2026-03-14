@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4342IndependentMojoParameterDefaultValuesTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4342IndependentMojoParameterDefaultValuesTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that multiple goals within a single execution get their default configuration properly injected. In
      * particular, the default values for one goal should not influence the default values of the other goal.

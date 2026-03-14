@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.api.Constants;
+import org.apache.maven.api.services.Sources;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.v4.MavenStaxReader;
 import org.apache.maven.project.MavenProject;
@@ -39,9 +40,12 @@ import org.eclipse.aether.deployment.DeployRequest;
 import org.eclipse.aether.installation.InstallRequest;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.xmlunit.assertj.XmlAssert;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.Diff;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 class ConsumerPomArtifactTransformerTest {
@@ -63,14 +67,19 @@ class ConsumerPomArtifactTransformerTest {
             MavenProject project = new MavenProject(model);
             project.setOriginalModel(model);
             ConsumerPomArtifactTransformer t = new ConsumerPomArtifactTransformer((s, p, f) -> {
-                try (InputStream is = Files.newInputStream(f)) {
+                try (InputStream is = f.openStream()) {
                     return DefaultConsumerPomBuilder.transformPom(new MavenStaxReader().read(is), project);
                 }
             });
 
-            t.transform(project, systemSessionMock, beforePomFile, tempFile);
+            t.transform(project, systemSessionMock, Sources.buildSource(beforePomFile), tempFile);
         }
-        XmlAssert.assertThat(tempFile.toFile()).and(afterPomFile.toFile()).areIdentical();
+        Diff diff = DiffBuilder.compare(afterPomFile.toFile())
+                .withTest(tempFile.toFile())
+                .ignoreComments()
+                .ignoreWhitespace()
+                .build();
+        assertFalse(diff.hasDifferences(), "XML files should be identical: " + diff.toString());
     }
 
     @Test
@@ -90,14 +99,19 @@ class ConsumerPomArtifactTransformerTest {
             MavenProject project = new MavenProject(model);
             project.setOriginalModel(model);
             ConsumerPomArtifactTransformer t = new ConsumerPomArtifactTransformer((s, p, f) -> {
-                try (InputStream is = Files.newInputStream(f)) {
+                try (InputStream is = f.openStream()) {
                     return DefaultConsumerPomBuilder.transformNonPom(new MavenStaxReader().read(is), project);
                 }
             });
 
-            t.transform(project, systemSessionMock, beforePomFile, tempFile);
+            t.transform(project, systemSessionMock, Sources.buildSource(beforePomFile), tempFile);
         }
-        XmlAssert.assertThat(afterPomFile.toFile()).and(tempFile.toFile()).areIdentical();
+        Diff diff = DiffBuilder.compare(afterPomFile.toFile())
+                .withTest(tempFile.toFile())
+                .ignoreComments()
+                .ignoreWhitespace()
+                .build();
+        assertFalse(diff.hasDifferences(), "XML files should be identical: " + diff.toString());
     }
 
     @Test
@@ -111,7 +125,7 @@ class ConsumerPomArtifactTransformerTest {
         new ConsumerPomArtifactTransformer((session, project, src) -> null)
                 .injectTransformedArtifacts(systemSessionMock, emptyProject);
 
-        assertThat(emptyProject.getAttachedArtifacts()).isEmpty();
+        assertTrue(emptyProject.getAttachedArtifacts().isEmpty());
     }
 
     @Test
@@ -126,10 +140,11 @@ class ConsumerPomArtifactTransformerTest {
 
         // Should have both consumer POM (no classifier) and build POM (with "build" classifier)
         Collection<Artifact> artifacts = result.getArtifacts();
-        assertThat(artifacts).hasSize(3); // original jar + consumer pom + build pom
+        assertEquals(3, artifacts.size()); // original jar + consumer pom + build pom
 
-        assertThat(artifacts).anyMatch(a -> "pom".equals(a.getExtension()) && "".equals(a.getClassifier()));
-        assertThat(artifacts).anyMatch(a -> "pom".equals(a.getExtension()) && "build".equals(a.getClassifier()));
+        assertTrue(artifacts.stream().anyMatch(a -> "pom".equals(a.getExtension()) && "".equals(a.getClassifier())));
+        assertTrue(
+                artifacts.stream().anyMatch(a -> "pom".equals(a.getExtension()) && "build".equals(a.getClassifier())));
     }
 
     @Test
@@ -145,10 +160,11 @@ class ConsumerPomArtifactTransformerTest {
 
         // Should have only consumer POM (no classifier), no build POM
         Collection<Artifact> artifacts = result.getArtifacts();
-        assertThat(artifacts).hasSize(2); // original jar + consumer pom (no build pom)
+        assertEquals(2, artifacts.size()); // original jar + consumer pom (no build pom)
 
-        assertThat(artifacts).anyMatch(a -> "pom".equals(a.getExtension()) && "".equals(a.getClassifier()));
-        assertThat(artifacts).noneMatch(a -> "pom".equals(a.getExtension()) && "build".equals(a.getClassifier()));
+        assertTrue(artifacts.stream().anyMatch(a -> "pom".equals(a.getExtension()) && "".equals(a.getClassifier())));
+        assertTrue(
+                artifacts.stream().noneMatch(a -> "pom".equals(a.getExtension()) && "build".equals(a.getClassifier())));
     }
 
     @Test
@@ -164,10 +180,11 @@ class ConsumerPomArtifactTransformerTest {
 
         // Should have both consumer POM (no classifier) and build POM (with "build" classifier)
         Collection<Artifact> artifacts = result.getArtifacts();
-        assertThat(artifacts).hasSize(3); // original jar + consumer pom + build pom
+        assertEquals(3, artifacts.size()); // original jar + consumer pom + build pom
 
-        assertThat(artifacts).anyMatch(a -> "pom".equals(a.getExtension()) && "".equals(a.getClassifier()));
-        assertThat(artifacts).anyMatch(a -> "pom".equals(a.getExtension()) && "build".equals(a.getClassifier()));
+        assertTrue(artifacts.stream().anyMatch(a -> "pom".equals(a.getExtension()) && "".equals(a.getClassifier())));
+        assertTrue(
+                artifacts.stream().anyMatch(a -> "pom".equals(a.getExtension()) && "build".equals(a.getClassifier())));
     }
 
     @Test
@@ -183,10 +200,11 @@ class ConsumerPomArtifactTransformerTest {
 
         // Should have only consumer POM (no classifier), no build POM
         Collection<Artifact> artifacts = result.getArtifacts();
-        assertThat(artifacts).hasSize(2); // original jar + consumer pom (no build pom)
+        assertEquals(2, artifacts.size()); // original jar + consumer pom (no build pom)
 
-        assertThat(artifacts).anyMatch(a -> "pom".equals(a.getExtension()) && "".equals(a.getClassifier()));
-        assertThat(artifacts).noneMatch(a -> "pom".equals(a.getExtension()) && "build".equals(a.getClassifier()));
+        assertTrue(artifacts.stream().anyMatch(a -> "pom".equals(a.getExtension()) && "".equals(a.getClassifier())));
+        assertTrue(
+                artifacts.stream().noneMatch(a -> "pom".equals(a.getExtension()) && "build".equals(a.getClassifier())));
     }
 
     @Test
@@ -202,10 +220,11 @@ class ConsumerPomArtifactTransformerTest {
 
         // Should have both consumer POM and build POM even when deployment is disabled
         Collection<Artifact> artifacts = result.getArtifacts();
-        assertThat(artifacts).hasSize(3); // original jar + consumer pom + build pom
+        assertEquals(3, artifacts.size()); // original jar + consumer pom + build pom
 
-        assertThat(artifacts).anyMatch(a -> "pom".equals(a.getExtension()) && "".equals(a.getClassifier()));
-        assertThat(artifacts).anyMatch(a -> "pom".equals(a.getExtension()) && "build".equals(a.getClassifier()));
+        assertTrue(artifacts.stream().anyMatch(a -> "pom".equals(a.getExtension()) && "".equals(a.getClassifier())));
+        assertTrue(
+                artifacts.stream().anyMatch(a -> "pom".equals(a.getExtension()) && "build".equals(a.getClassifier())));
     }
 
     @Test
@@ -220,7 +239,7 @@ class ConsumerPomArtifactTransformerTest {
         DeployRequest result = transformer.remapDeployArtifacts(session, request);
 
         // Should be unchanged since there's no consumer POM
-        assertThat(result.getArtifacts()).isEqualTo(request.getArtifacts());
+        assertEquals(request.getArtifacts(), result.getArtifacts());
     }
 
     private RepositorySystemSession createMockSession(Map<String, Object> configProperties) {

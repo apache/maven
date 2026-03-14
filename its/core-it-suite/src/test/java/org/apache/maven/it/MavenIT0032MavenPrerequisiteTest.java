@@ -23,9 +23,6 @@ import java.io.File;
 import org.junit.jupiter.api.Test;
 
 public class MavenIT0032MavenPrerequisiteTest extends AbstractMavenIntegrationTestCase {
-    public MavenIT0032MavenPrerequisiteTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Tests that a specified Maven version requirement that is lower doesn't cause any problems

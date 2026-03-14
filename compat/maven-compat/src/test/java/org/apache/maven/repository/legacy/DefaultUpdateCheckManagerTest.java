@@ -30,6 +30,7 @@ import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
+import org.eclipse.aether.internal.impl.DefaultTrackingFileManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -57,7 +58,8 @@ class DefaultUpdateCheckManagerTest extends AbstractArtifactComponentTestCase {
     public void setUp() throws Exception {
         super.setUp();
 
-        updateCheckManager = new DefaultUpdateCheckManager(new ConsoleLogger(Logger.LEVEL_DEBUG, "test"));
+        updateCheckManager = new DefaultUpdateCheckManager(
+                new ConsoleLogger(Logger.LEVEL_DEBUG, "test"), new DefaultTrackingFileManager());
     }
 
     @Test
@@ -108,7 +110,7 @@ class DefaultUpdateCheckManagerTest extends AbstractArtifactComponentTestCase {
 
         assertFalse(updateCheckManager.isUpdateRequired(a, remoteRepository));
 
-        assertFalse(file.exists());
+        assertFalse(file.exists(), "Expected " + file + ".exists() to return false");
         assertNotNull(
                 updateCheckManager.readLastUpdated(touchFile, updateCheckManager.getRepositoryKey(remoteRepository)));
     }
@@ -161,7 +163,7 @@ class DefaultUpdateCheckManagerTest extends AbstractArtifactComponentTestCase {
 
         assertFalse(updateCheckManager.isUpdateRequired(a, remoteRepository));
 
-        assertFalse(file.exists());
+        assertFalse(file.exists(), "Expected " + file + ".exists() to return false");
         assertNotNull(
                 updateCheckManager.readLastUpdated(touchFile, updateCheckManager.getRepositoryKey(remoteRepository)));
     }

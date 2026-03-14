@@ -30,12 +30,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1142">MNG-1142</a>.
  *
  * @author Benjamin Bentmann
+ * @since 2.0.7
  */
 public class MavenITmng1142VersionRangeIntersectionTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng1142VersionRangeIntersectionTest() {
-        super("[2.0.7,3.0-alpha-1),[3.0,)");
-    }
 
     /**
      * Verify that user properties from the CLI do not override POM properties of transitive dependencies.

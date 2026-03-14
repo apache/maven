@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng0866EvaluateDefaultValueTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng0866EvaluateDefaultValueTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that expressions inside the default value of plugin parameters are evaluated.
      *

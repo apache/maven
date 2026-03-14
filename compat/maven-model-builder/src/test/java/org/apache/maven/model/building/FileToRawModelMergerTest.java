@@ -28,8 +28,7 @@ import java.util.stream.Stream;
 import org.apache.maven.model.v4.MavenMerger;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItems;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Deprecated
 class FileToRawModelMergerTest {
@@ -65,6 +64,8 @@ class FileToRawModelMergerTest {
                 .filter(m -> m.startsWith("merge"))
                 .collect(Collectors.toList());
 
-        assertThat(overriddenMethods, hasItems(methodNames.toArray(new String[0])));
+        assertTrue(
+                overriddenMethods.containsAll(methodNames),
+                "Expected overriddenMethods " + overriddenMethods + " to contain all methodNames " + methodNames);
     }
 }

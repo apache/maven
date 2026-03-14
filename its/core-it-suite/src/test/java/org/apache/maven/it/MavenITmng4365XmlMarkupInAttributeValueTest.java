@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4365XmlMarkupInAttributeValueTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4365XmlMarkupInAttributeValueTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that the POM parser doesn't choke on attribute values that contain entities which resolve to markup.
      *

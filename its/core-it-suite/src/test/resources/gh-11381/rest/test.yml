@@ -1,0 +1,4 @@
+# Test YAML file for GH-11381
+test:
+  key: value
+

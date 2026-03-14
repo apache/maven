@@ -26,7 +26,7 @@ class MavenITmng7837ProjectElementInPomTest extends AbstractMavenIntegrationTest
 
     protected MavenITmng7837ProjectElementInPomTest() {
         // Broken in 4.0.0-alpha-7
-        super("(,4.0.0-alpha-7),(4.0.0-alpha-7,)");
+        super();
     }
 
     @Test

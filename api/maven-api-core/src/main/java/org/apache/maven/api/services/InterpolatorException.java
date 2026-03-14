@@ -18,8 +18,6 @@
  */
 package org.apache.maven.api.services;
 
-import java.io.Serial;
-
 import org.apache.maven.api.annotations.Experimental;
 
 /**
@@ -30,9 +28,6 @@ import org.apache.maven.api.annotations.Experimental;
  */
 @Experimental
 public class InterpolatorException extends MavenException {
-
-    @Serial
-    private static final long serialVersionUID = -1219149033636851813L;
 
     /**
      * Constructs a new InterpolatorException with {@code null} as its

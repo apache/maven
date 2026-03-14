@@ -20,6 +20,7 @@ package org.apache.maven.it;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -27,12 +28,13 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
+@Disabled("Bounds: [5.0,)")
 public class MavenITmng3991ValidDependencyScopeTest extends AbstractMavenIntegrationTestCase {
 
     public MavenITmng3991ValidDependencyScopeTest() {
         // TODO: One day, we should be able to error out but this requires to consider extensions and their use cases
         // Disabled for Maven 4.x due to behavior change - see GitHub issue #2510
-        super("[5.0,)");
+        super();
     }
 
     /**

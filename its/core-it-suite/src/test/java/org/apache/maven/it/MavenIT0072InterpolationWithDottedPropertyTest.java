@@ -32,9 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  */
 public class MavenIT0072InterpolationWithDottedPropertyTest extends AbstractMavenIntegrationTestCase {
-    public MavenIT0072InterpolationWithDottedPropertyTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Verifies that property references with dotted notation work within

@@ -28,9 +28,6 @@ import org.junit.jupiter.api.Test;
  *
  */
 public class MavenITmng3485OverrideWagonExtensionTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng3485OverrideWagonExtensionTest() {
-        super("(2.0.8,3.0-alpha-1),[3.0-alpha-7,)");
-    }
 
     @Test
     public void testitMNG3485() throws Exception {

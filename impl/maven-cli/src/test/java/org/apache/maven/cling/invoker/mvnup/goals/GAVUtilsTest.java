@@ -18,7 +18,6 @@
  */
 package org.apache.maven.cling.invoker.mvnup.goals;
 
-import java.io.StringReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -26,9 +25,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import eu.maveniverse.domtrip.Document;
+import eu.maveniverse.domtrip.maven.Coordinates;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
-import org.jdom2.Document;
-import org.jdom2.input.SAXBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -43,29 +42,24 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Unit tests for the {@link GAVUtils} utility class.
- * Tests GAV extraction, computation, and parent resolution functionality.
+ * Tests Artifact extraction, computation, and parent resolution functionality.
  */
 @DisplayName("GAVUtils")
 class GAVUtilsTest {
 
-    private SAXBuilder saxBuilder;
-
     @BeforeEach
-    void setUp() {
-        saxBuilder = new SAXBuilder();
-    }
+    void setUp() {}
 
     private UpgradeContext createMockContext() {
         return TestUtils.createMockContext();
     }
 
     @Nested
-    @DisplayName("GAV Extraction")
+    @DisplayName("Artifact Extraction")
     class GAVExtractionTests {
 
         @Test
-        @DisplayName("should extract GAV from complete POM")
+        @DisplayName("should extract Artifact from complete POM")
         void shouldExtractGAVFromCompletePOM() throws Exception {
             String pomXml = PomBuilder.create()
                     .groupId("com.example")
@@ -73,10 +67,10 @@ class GAVUtilsTest {
                     .version("1.0.0")
                     .build();
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             UpgradeContext context = createMockContext();
 
-            GAV gav = GAVUtils.extractGAVWithParentResolution(context, document);
+            Coordinates gav = AbstractUpgradeStrategy.extractArtifactCoordinatesWithParentResolution(context, document);
 
             assertNotNull(gav);
             assertEquals("com.example", gav.groupId());
@@ -85,10 +79,9 @@ class GAVUtilsTest {
         }
 
         @Test
-        @DisplayName("should extract GAV with parent inheritance")
+        @DisplayName("should extract Artifact with parent inheritance")
         void shouldExtractGAVWithParentInheritance() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -102,10 +95,10 @@ class GAVUtilsTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             UpgradeContext context = createMockContext();
 
-            GAV gav = GAVUtils.extractGAVWithParentResolution(context, document);
+            Coordinates gav = AbstractUpgradeStrategy.extractArtifactCoordinatesWithParentResolution(context, document);
 
             assertNotNull(gav);
             assertEquals("com.example", gav.groupId());
@@ -116,8 +109,7 @@ class GAVUtilsTest {
         @Test
         @DisplayName("should handle partial parent inheritance")
         void shouldHandlePartialParentInheritance() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -132,10 +124,10 @@ class GAVUtilsTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             UpgradeContext context = createMockContext();
 
-            GAV gav = GAVUtils.extractGAVWithParentResolution(context, document);
+            Coordinates gav = AbstractUpgradeStrategy.extractArtifactCoordinatesWithParentResolution(context, document);
 
             assertNotNull(gav);
             assertEquals("com.example.child", gav.groupId());
@@ -145,7 +137,7 @@ class GAVUtilsTest {
 
         @ParameterizedTest
         @MethodSource("provideInvalidGAVScenarios")
-        @DisplayName("should return null for invalid GAV scenarios")
+        @DisplayName("should return null for invalid Artifact scenarios")
         void shouldReturnNullForInvalidGAVScenarios(
                 String groupId, String artifactId, String version, String description) throws Exception {
             String pomXml = PomBuilder.create()
@@ -154,10 +146,10 @@ class GAVUtilsTest {
                     .version(version)
                     .build();
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             UpgradeContext context = createMockContext();
 
-            GAV gav = GAVUtils.extractGAVWithParentResolution(context, document);
+            Coordinates gav = AbstractUpgradeStrategy.extractArtifactCoordinatesWithParentResolution(context, document);
 
             assertNull(gav, description);
         }
@@ -176,14 +168,13 @@ class GAVUtilsTest {
     }
 
     @Nested
-    @DisplayName("GAV Computation")
+    @DisplayName("Artifact Computation")
     class GAVComputationTests {
 
         @Test
         @DisplayName("should compute GAVs from multiple POMs")
         void shouldComputeGAVsFromMultiplePOMs() throws Exception {
-            String parentPomXml =
-                    """
+            String parentPomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -194,8 +185,7 @@ class GAVUtilsTest {
                 </project>
                 """;
 
-            String childPomXml =
-                    """
+            String childPomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -208,8 +198,8 @@ class GAVUtilsTest {
                 </project>
                 """;
 
-            Document parentDoc = saxBuilder.build(new StringReader(parentPomXml));
-            Document childDoc = saxBuilder.build(new StringReader(childPomXml));
+            Document parentDoc = Document.of(parentPomXml);
+            Document childDoc = Document.of(childPomXml);
 
             Map<Path, Document> pomMap = new HashMap<>();
             pomMap.put(Paths.get("/project/pom.xml"), parentDoc);
@@ -217,11 +207,11 @@ class GAVUtilsTest {
 
             UpgradeContext context = createMockContext();
 
-            Set<GAV> gavs = GAVUtils.computeAllGAVs(context, pomMap);
+            Set<Coordinates> gavs = InferenceStrategy.computeAllArtifactCoordinates(context, pomMap);
 
             assertEquals(2, gavs.size());
-            assertTrue(gavs.contains(new GAV("com.example", "parent-project", "1.0.0")));
-            assertTrue(gavs.contains(new GAV("com.example", "child-project", "1.0.0")));
+            assertTrue(gavs.contains(Coordinates.of("com.example", "parent-project", "1.0.0")));
+            assertTrue(gavs.contains(Coordinates.of("com.example", "child-project", "1.0.0")));
         }
 
         @Test
@@ -230,17 +220,16 @@ class GAVUtilsTest {
             UpgradeContext context = createMockContext();
             Map<Path, Document> pomMap = new HashMap<>();
 
-            Set<GAV> gavs = GAVUtils.computeAllGAVs(context, pomMap);
+            Set<Coordinates> gavs = AbstractUpgradeStrategy.computeAllArtifactCoordinates(context, pomMap);
 
             assertNotNull(gavs);
-            assertTrue(gavs.isEmpty());
+            assertTrue(gavs.isEmpty(), "Expected collection to be empty but had " + gavs.size() + " elements: " + gavs);
         }
 
         @Test
         @DisplayName("should deduplicate identical GAVs")
         void shouldDeduplicateIdenticalGAVs() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -250,8 +239,8 @@ class GAVUtilsTest {
                 </project>
                 """;
 
-            Document doc1 = saxBuilder.build(new StringReader(pomXml));
-            Document doc2 = saxBuilder.build(new StringReader(pomXml));
+            Document doc1 = Document.of(pomXml);
+            Document doc2 = Document.of(pomXml);
 
             Map<Path, Document> pomMap = new HashMap<>();
             pomMap.put(Paths.get("/project/pom1.xml"), doc1);
@@ -259,17 +248,16 @@ class GAVUtilsTest {
 
             UpgradeContext context = createMockContext();
 
-            Set<GAV> gavs = GAVUtils.computeAllGAVs(context, pomMap);
+            Set<Coordinates> gavs = InferenceStrategy.computeAllArtifactCoordinates(context, pomMap);
 
             assertEquals(1, gavs.size());
-            assertTrue(gavs.contains(new GAV("com.example", "duplicate-project", "1.0.0")));
+            assertTrue(gavs.contains(Coordinates.of("com.example", "duplicate-project", "1.0.0")));
         }
 
         @Test
         @DisplayName("should skip POMs with incomplete GAVs")
         void shouldSkipPOMsWithIncompleteGAVs() throws Exception {
-            String validPomXml =
-                    """
+            String validPomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -279,8 +267,7 @@ class GAVUtilsTest {
                 </project>
                 """;
 
-            String invalidPomXml =
-                    """
+            String invalidPomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -289,8 +276,8 @@ class GAVUtilsTest {
                 </project>
                 """;
 
-            Document validDoc = saxBuilder.build(new StringReader(validPomXml));
-            Document invalidDoc = saxBuilder.build(new StringReader(invalidPomXml));
+            Document validDoc = Document.of(validPomXml);
+            Document invalidDoc = Document.of(invalidPomXml);
 
             Map<Path, Document> pomMap = new HashMap<>();
             pomMap.put(Paths.get("/project/valid.xml"), validDoc);
@@ -298,10 +285,10 @@ class GAVUtilsTest {
 
             UpgradeContext context = createMockContext();
 
-            Set<GAV> gavs = GAVUtils.computeAllGAVs(context, pomMap);
+            Set<Coordinates> gavs = InferenceStrategy.computeAllArtifactCoordinates(context, pomMap);
 
             assertEquals(1, gavs.size());
-            assertTrue(gavs.contains(new GAV("com.example", "valid-project", "1.0.0")));
+            assertTrue(gavs.contains(Coordinates.of("com.example", "valid-project", "1.0.0")));
         }
     }
 
@@ -318,20 +305,19 @@ class GAVUtilsTest {
                     .version("1.0.0")
                     .build();
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             UpgradeContext context = createMockContext();
 
-            GAV gav = GAVUtils.extractGAVWithParentResolution(context, document);
+            Coordinates gav = AbstractUpgradeStrategy.extractArtifactCoordinatesWithParentResolution(context, document);
 
             // Should handle whitespace-only groupId as invalid
-            assertNull(gav, "GAV should be null for whitespace-only groupId");
+            assertNull(gav, "Artifact should be null for whitespace-only groupId");
         }
 
         @Test
         @DisplayName("should handle POM with empty elements")
         void shouldHandlePOMWithEmptyElements() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -341,16 +327,16 @@ class GAVUtilsTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             UpgradeContext context = createMockContext();
 
-            GAV gav = GAVUtils.extractGAVWithParentResolution(context, document);
+            Coordinates gav = AbstractUpgradeStrategy.extractArtifactCoordinatesWithParentResolution(context, document);
 
-            assertNull(gav, "GAV should be null for empty groupId");
+            assertNull(gav, "Artifact should be null for empty groupId");
         }
 
         @Test
-        @DisplayName("should handle POM with special characters in GAV")
+        @DisplayName("should handle POM with special characters in Artifact")
         void shouldHandlePOMWithSpecialCharacters() throws Exception {
             String pomXml = PomBuilder.create()
                     .groupId("com.example-test_group")
@@ -358,12 +344,12 @@ class GAVUtilsTest {
                     .version("1.0.0-SNAPSHOT")
                     .build();
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             UpgradeContext context = createMockContext();
 
-            GAV gav = GAVUtils.extractGAVWithParentResolution(context, document);
+            Coordinates gav = AbstractUpgradeStrategy.extractArtifactCoordinatesWithParentResolution(context, document);
 
-            assertNotNull(gav, "GAV should be valid for special characters");
+            assertNotNull(gav, "Artifact should be valid for special characters");
             assertEquals("com.example-test_group", gav.groupId());
             assertEquals("test-project.artifact", gav.artifactId());
             assertEquals("1.0.0-SNAPSHOT", gav.version());
@@ -372,8 +358,7 @@ class GAVUtilsTest {
         @Test
         @DisplayName("should handle deeply nested parent inheritance")
         void shouldHandleDeeplyNestedParentInheritance() throws Exception {
-            String pomXml =
-                    """
+            String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
@@ -387,12 +372,12 @@ class GAVUtilsTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             UpgradeContext context = createMockContext();
 
-            GAV gav = GAVUtils.extractGAVWithParentResolution(context, document);
+            Coordinates gav = AbstractUpgradeStrategy.extractArtifactCoordinatesWithParentResolution(context, document);
 
-            assertNotNull(gav, "GAV should be resolved from parent");
+            assertNotNull(gav, "Artifact should be resolved from parent");
             assertEquals("com.example", gav.groupId());
             assertEquals("child-project", gav.artifactId());
             assertEquals("1.0.0", gav.version());
@@ -411,22 +396,22 @@ class GAVUtilsTest {
                         .artifactId("module" + i)
                         .version("1.0.0")
                         .build();
-                Document document = saxBuilder.build(new StringReader(pomContent));
+                Document document = Document.of(pomContent);
                 largePomMap.put(pomPath, document);
             }
 
             UpgradeContext context = createMockContext();
 
             long startTime = System.currentTimeMillis();
-            Set<GAV> gavs = GAVUtils.computeAllGAVs(context, largePomMap);
+            Set<Coordinates> gavs = InferenceStrategy.computeAllArtifactCoordinates(context, largePomMap);
             long endTime = System.currentTimeMillis();
 
             // Performance assertion - should complete within reasonable time
             long duration = endTime - startTime;
-            assertTrue(duration < 5000, "GAV computation should complete within 5 seconds for 100 POMs");
+            assertTrue(duration < 5000, "Artifact computation should complete within 5 seconds for 100 POMs");
 
             // Verify correctness
-            assertNotNull(gavs, "GAV set should not be null");
+            assertNotNull(gavs, "Artifact set should not be null");
             assertEquals(100, gavs.size(), "Should have computed GAVs for all 100 POMs");
         }
     }

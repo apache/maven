@@ -23,15 +23,22 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.MetadataReader;
 import org.apache.maven.model.Build;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginManagement;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
@@ -81,48 +88,50 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
     public PluginPrefixResult resolve(PluginPrefixRequest request) throws NoPluginFoundForPrefixException {
         logger.debug("Resolving plugin prefix {} from {}", request.getPrefix(), request.getPluginGroups());
 
-        PluginPrefixResult result = resolveFromProject(request);
+        Model pom = request.getPom();
+        Build build = pom != null ? pom.getBuild() : null;
+        PluginManagement management = build != null ? build.getPluginManagement() : null;
+
+        // map of groupId -> Set(artifactId) plugin candidates:
+        // if value is null, keys are coming from settings, and no artifactId filtering is applied
+        // if value is non-null: we allow only plugins that have enlisted artifactId only
+        // ---
+        // end game is: settings enlisted groupIds are obeying order and are "free for all" (artifactId)
+        // while POM enlisted plugins coming from non-enlisted settings groupIds (ie conflict of prefixes)
+        // will prevail/win.
+        LinkedHashMap<String, Set<String>> candidates = Stream.of(build, management)
+                .flatMap(container -> container != null ? container.getPlugins().stream() : Stream.empty())
+                .filter(p -> !request.getPluginGroups().contains(p.getGroupId()))
+                .collect(Collectors.groupingBy(
+                        Plugin::getGroupId,
+                        LinkedHashMap::new,
+                        Collectors.mapping(Plugin::getArtifactId, Collectors.toSet())));
+        request.getPluginGroups().forEach(g -> candidates.put(g, null));
+        PluginPrefixResult result = resolveFromRepository(request, candidates);
+
+        // If we haven't been able to resolve the plugin from the repository,
+        // as a last resort, we go through all declared plugins, load them
+        // one by one, and try to find a matching prefix.
+        if (result == null && build != null) {
+            result = resolveFromProject(request, build.getPlugins());
+            if (result == null && management != null) {
+                result = resolveFromProject(request, management.getPlugins());
+            }
+        }
 
         if (result == null) {
-            result = resolveFromRepository(request);
-
-            if (result == null) {
-                throw new NoPluginFoundForPrefixException(
-                        request.getPrefix(),
-                        request.getPluginGroups(),
-                        request.getRepositorySession().getLocalRepository(),
-                        request.getRepositories());
-            } else {
-                logger.debug(
-                        "Resolved plugin prefix {} to {}:{} from repository {}",
-                        request.getPrefix(),
-                        result.getGroupId(),
-                        result.getArtifactId(),
-                        (result.getRepository() != null ? result.getRepository().getId() : "null"));
-            }
+            throw new NoPluginFoundForPrefixException(
+                    request.getPrefix(),
+                    new ArrayList<>(candidates.keySet()),
+                    request.getRepositorySession().getLocalRepository(),
+                    request.getRepositories());
         } else {
             logger.debug(
-                    "Resolved plugin prefix {} to {}:{} from POM {}",
+                    "Resolved plugin prefix {} to {}:{} from repository {}",
                     request.getPrefix(),
                     result.getGroupId(),
                     result.getArtifactId(),
-                    request.getPom());
-        }
-
-        return result;
-    }
-
-    private PluginPrefixResult resolveFromProject(PluginPrefixRequest request) {
-        PluginPrefixResult result = null;
-
-        if (request.getPom() != null && request.getPom().getBuild() != null) {
-            Build build = request.getPom().getBuild();
-
-            result = resolveFromProject(request, build.getPlugins());
-
-            if (result == null && build.getPluginManagement() != null) {
-                result = resolveFromProject(request, build.getPluginManagement().getPlugins());
-            }
+                    (result.getRepository() != null ? result.getRepository().getId() : "null"));
         }
 
         return result;
@@ -149,12 +158,13 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
         return null;
     }
 
-    private PluginPrefixResult resolveFromRepository(PluginPrefixRequest request) {
+    private PluginPrefixResult resolveFromRepository(
+            PluginPrefixRequest request, LinkedHashMap<String, Set<String>> candidates) {
         RequestTrace trace = RequestTrace.newChild(null, request);
 
         List<MetadataRequest> requests = new ArrayList<>();
 
-        for (String pluginGroup : request.getPluginGroups()) {
+        for (String pluginGroup : candidates.keySet()) {
             org.eclipse.aether.metadata.Metadata metadata =
                     new DefaultMetadata(pluginGroup, "maven-metadata.xml", DefaultMetadata.Nature.RELEASE_OR_SNAPSHOT);
 
@@ -170,7 +180,7 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
         List<MetadataResult> results = repositorySystem.resolveMetadata(request.getRepositorySession(), requests);
         requests.clear();
 
-        PluginPrefixResult result = processResults(request, trace, results, requests);
+        PluginPrefixResult result = processResults(request, trace, results, requests, candidates);
 
         if (result != null) {
             return result;
@@ -184,7 +194,7 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
 
             results = repositorySystem.resolveMetadata(session, requests);
 
-            return processResults(request, trace, results, null);
+            return processResults(request, trace, results, null, candidates);
         }
 
         return null;
@@ -194,7 +204,8 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
             PluginPrefixRequest request,
             RequestTrace trace,
             List<MetadataResult> results,
-            List<MetadataRequest> requests) {
+            List<MetadataRequest> requests,
+            LinkedHashMap<String, Set<String>> candidates) {
         for (MetadataResult res : results) {
             org.eclipse.aether.metadata.Metadata metadata = res.getMetadata();
 
@@ -205,7 +216,7 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
                 }
 
                 PluginPrefixResult result =
-                        resolveFromRepository(request, trace, metadata.getGroupId(), metadata, repository);
+                        resolveFromRepository(request, trace, metadata.getGroupId(), metadata, repository, candidates);
 
                 if (result != null) {
                     return result;
@@ -225,18 +236,22 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
             RequestTrace trace,
             String pluginGroup,
             org.eclipse.aether.metadata.Metadata metadata,
-            ArtifactRepository repository) {
-        if (metadata != null && metadata.getFile() != null && metadata.getFile().isFile()) {
+            ArtifactRepository repository,
+            LinkedHashMap<String, Set<String>> candidates) {
+        if (metadata != null && metadata.getPath() != null && Files.isRegularFile(metadata.getPath())) {
             try {
                 Map<String, ?> options = Collections.singletonMap(MetadataReader.IS_STRICT, Boolean.FALSE);
 
-                Metadata pluginGroupMetadata = metadataReader.read(metadata.getFile(), options);
+                Metadata pluginGroupMetadata =
+                        metadataReader.read(metadata.getPath().toFile(), options);
 
                 List<org.apache.maven.artifact.repository.metadata.Plugin> plugins = pluginGroupMetadata.getPlugins();
 
                 if (plugins != null) {
                     for (org.apache.maven.artifact.repository.metadata.Plugin plugin : plugins) {
-                        if (request.getPrefix().equals(plugin.getPrefix())) {
+                        if (request.getPrefix().equals(plugin.getPrefix())
+                                && (candidates.get(pluginGroup) == null
+                                        || candidates.get(pluginGroup).contains(plugin.getArtifactId()))) {
                             return new DefaultPluginPrefixResult(pluginGroup, plugin.getArtifactId(), repository);
                         }
                     }

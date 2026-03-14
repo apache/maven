@@ -27,12 +27,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4559">MNG-4559</a>.
+ * @since 4.0.0-rc-4
+ *
  */
 class MavenITmng4559SpacesInJvmOptsTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng4559SpacesInJvmOptsTest() {
-        super("[4.0.0-rc-4,)");
-    }
 
     /**
      *  Verify the dependency management of the consumer POM is computed correctly
@@ -44,6 +42,8 @@ class MavenITmng4559SpacesInJvmOptsTest extends AbstractMavenIntegrationTestCase
 
         Verifier verifier = newVerifier(basedir.toString());
         verifier.setEnvironmentVariable("MAVEN_OPTS", "-Dprop.maven-opts=\"foo bar\"");
+        // Enable debug logging for launcher script to diagnose jvm.config parsing issues
+        verifier.setEnvironmentVariable("MAVEN_DEBUG_SCRIPT", "1");
         verifier.addCliArguments("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

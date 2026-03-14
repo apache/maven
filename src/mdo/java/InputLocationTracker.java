@@ -18,6 +18,31 @@
  */
 package ${package};
 
+/**
+ * Tracks input source locations for model fields.
+ * <p>
+ * Implementations provide a mapping from keys (typically field names or indices) to
+ * {@link InputLocation} instances to support precise error reporting and diagnostics.
+ * Keys must be non-null.
+ *
+ * @since 4.0.0
+ */
 public interface InputLocationTracker {
+    /**
+     * Gets the location of the specified field in the input source.
+     *
+     * @param field the key of the field, must not be {@code null}
+     * @return the location of the field in the input source or {@code null} if unknown
+     * @throws NullPointerException if {@code field} is {@code null}
+     */
     InputLocation getLocation(Object field);
+
+    /**
+     * Gets the parent InputLocation where this InputLocation may have been imported from.
+     * Can return {@code null}.
+     *
+     * @return InputLocation
+     * @since 4.0.0
+     */
+    InputLocation getImportedFrom();
 }

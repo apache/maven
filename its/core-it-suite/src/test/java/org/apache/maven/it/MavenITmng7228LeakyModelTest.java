@@ -21,18 +21,16 @@ package org.apache.maven.it;
 import java.io.File;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.not;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MavenITmng7228LeakyModelTest extends AbstractMavenIntegrationTestCase {
 
     protected MavenITmng7228LeakyModelTest() {
         // broken: 4.0.0-alpha-3 - 4.0.0-alpha-6
-        super("[,4.0.0-alpha-3),(4.0.0-alpha-6,]");
+        super();
     }
 
     @Test
@@ -53,23 +51,20 @@ class MavenITmng7228LeakyModelTest extends AbstractMavenIntegrationTestCase {
 
         verifier.verifyErrorFreeLog();
 
-        String classifier = null;
-        if (getMavenVersion().compareTo(new DefaultArtifactVersion("4.0.0-alpha-7")) > 0) {
-            classifier = "build";
-        }
+        String classifier = "build";
         String pom = FileUtils.readFileToString(new File(
                 verifier.getArtifactPath("org.apache.maven.its.mng7228", "test", "1.0.0-SNAPSHOT", "pom", classifier)));
 
-        assertThat(pom, containsString("projectProperty"));
-        assertThat(pom, not(containsString("activeProperty")));
-        assertThat(pom, not(containsString("manualProperty")));
+        assertTrue(pom.contains("projectProperty"));
+        assertFalse(pom.contains("activeProperty"), "POM should not contain activeProperty but was: " + pom);
+        assertFalse(pom.contains("manualProperty"), "POM should not contain manualProperty but was: " + pom);
 
-        assertThat(pom, containsString("project-repo"));
-        assertThat(pom, not(containsString("active-repo")));
-        assertThat(pom, not(containsString("manual-repo")));
+        assertTrue(pom.contains("project-repo"));
+        assertFalse(pom.contains("active-repo"), "POM should not contain active-repo but was: " + pom);
+        assertFalse(pom.contains("manual-repo"), "POM should not contain manual-repo but was: " + pom);
 
-        assertThat(pom, containsString("project-plugin-repo"));
-        assertThat(pom, not(containsString("active-plugin-repo")));
-        assertThat(pom, not(containsString("manual-plugin-repo")));
+        assertTrue(pom.contains("project-plugin-repo"));
+        assertFalse(pom.contains("active-plugin-repo"), "POM should not contain active-plugin-repo but was: " + pom);
+        assertFalse(pom.contains("manual-plugin-repo"), "POM should not contain manual-plugin-repo but was: " + pom);
     }
 }

@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4203TransitiveDependencyExclusionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4203TransitiveDependencyExclusionTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that exclusions defined on a dependency apply to its transitive dependencies as well.
      *

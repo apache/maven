@@ -19,7 +19,7 @@
 package org.apache.maven.cling.invoker.mvn;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -64,7 +64,7 @@ public class MavenParser extends BaseParser {
     }
 
     protected MavenOptions parseMavenAtFileOptions(Path atFile) {
-        try (Stream<String> lines = Files.lines(atFile, Charset.defaultCharset())) {
+        try (Stream<String> lines = Files.lines(atFile, StandardCharsets.UTF_8)) {
             List<String> args =
                     lines.filter(arg -> !arg.isEmpty() && !arg.startsWith("#")).toList();
             return parseArgs("atFile", args);
@@ -77,7 +77,7 @@ public class MavenParser extends BaseParser {
     }
 
     protected MavenOptions parseMavenConfigOptions(Path configFile) {
-        try (Stream<String> lines = Files.lines(configFile, Charset.defaultCharset())) {
+        try (Stream<String> lines = Files.lines(configFile, StandardCharsets.UTF_8)) {
             List<String> args =
                     lines.filter(arg -> !arg.isEmpty() && !arg.startsWith("#")).toList();
             MavenOptions options = parseArgs("maven.config", args);

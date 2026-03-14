@@ -29,9 +29,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MavenITmng7110ExtensionClassloader extends AbstractMavenIntegrationTestCase {
-    public MavenITmng7110ExtensionClassloader() {
-        super(ALL_MAVEN_VERSIONS);
-    }
+    public MavenITmng7110ExtensionClassloader() {}
 
     @Test
     public void testVerifyResourceOfExtensionAndDependency() throws IOException, VerificationException {

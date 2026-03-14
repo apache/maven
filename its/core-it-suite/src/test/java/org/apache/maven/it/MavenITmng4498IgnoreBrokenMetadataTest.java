@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4498IgnoreBrokenMetadataTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4498IgnoreBrokenMetadataTest() {
-        super("[3.0-alpha-6,)");
-    }
-
     /**
      * Test that unreadable metadata from one repository does not fail the entire dependency resolution.
      *

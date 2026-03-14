@@ -188,7 +188,7 @@ public class CLIManager {
         options.addOption(Option.builder(Character.toString(ACTIVATE_PROFILES))
                 .longOpt("activate-profiles")
                 .desc(
-                        "Comma-delimited list of profiles to activate. Prefixing a profile with ! excludes it, and ? marks it as optional")
+                        "Comma-delimited list of profiles to activate. Don't use spaces between commas or double quote the full list. Prefixing a profile with ! excludes it, and ? marks it as optional.")
                 .hasArg()
                 .build());
         options.addOption(Option.builder(Character.toString(BATCH_MODE))
@@ -271,7 +271,7 @@ public class CLIManager {
         options.addOption(Option.builder(PROJECT_LIST)
                 .longOpt("projects")
                 .desc(
-                        "Comma-delimited list of specified reactor projects to build instead of all projects. A project can be specified by [groupId]:artifactId or by its relative path. Prefixing a project with ! excludes it, and ? marks it as optional")
+                        "Comma-delimited list of specified reactor projects to build instead of all projects. Don't use spaces between commas or double quote the full list. A project can be specified by [groupId]:artifactId or by its relative path. Prefixing a project with ! excludes it, and ? marks it as optional.")
                 .hasArg()
                 .build());
         options.addOption(Option.builder(ALSO_MAKE)

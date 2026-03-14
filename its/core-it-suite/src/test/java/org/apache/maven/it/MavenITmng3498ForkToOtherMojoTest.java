@@ -32,9 +32,6 @@ import org.junit.jupiter.api.Test;
  *
  */
 public class MavenITmng3498ForkToOtherMojoTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng3498ForkToOtherMojoTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     @Test
     public void testitMNG3498() throws Exception {

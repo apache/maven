@@ -42,4 +42,8 @@ under the License.
     <module>maven-testing</module>
     <module>maven-executor</module>
   </modules>
+
+  <properties>
+    <project.directory>impl</project.directory>
+  </properties>
 </project>

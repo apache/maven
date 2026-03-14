@@ -43,7 +43,7 @@ import static java.util.Objects.requireNonNull;
  */
 @Experimental
 @Immutable
-public interface ModelBuilderRequest extends Request<Session> {
+public interface ModelBuilderRequest extends RepositoryAwareRequest {
 
     /**
      * The possible request types for building a model.
@@ -132,9 +132,6 @@ public interface ModelBuilderRequest extends Request<Session> {
 
     @Nonnull
     RepositoryMerging getRepositoryMerging();
-
-    @Nullable
-    List<RemoteRepository> getRepositories();
 
     @Nullable
     ModelTransformer getLifecycleBindingsInjector();
@@ -338,7 +335,7 @@ public interface ModelBuilderRequest extends Request<Session> {
                         systemProperties != null ? Map.copyOf(systemProperties) : session.getSystemProperties();
                 this.userProperties = userProperties != null ? Map.copyOf(userProperties) : session.getUserProperties();
                 this.repositoryMerging = repositoryMerging;
-                this.repositories = repositories != null ? List.copyOf(repositories) : null;
+                this.repositories = repositories != null ? List.copyOf(validate(repositories)) : null;
                 this.lifecycleBindingsInjector = lifecycleBindingsInjector;
             }
 

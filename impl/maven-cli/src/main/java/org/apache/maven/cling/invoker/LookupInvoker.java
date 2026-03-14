@@ -149,6 +149,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         validate(context);
         pushCoreProperties(context);
         pushUserProperties(context);
+        setupGuiceClassLoading(context);
         configureLogging(context);
         createTerminal(context);
         activateLogging(context);
@@ -247,6 +248,16 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         }
     }
 
+    /**
+     * Sets up Guice class loading mode to CHILD, if not already set.
+     * Default Guice class loading mode uses a terminally deprecated JDK memory-access classes.
+     */
+    protected void setupGuiceClassLoading(C context) {
+        if (System.getProperty("guice_custom_class_loading", "").isBlank()) {
+            System.setProperty("guice_custom_class_loading", "CHILD");
+        }
+    }
+
     protected void configureLogging(C context) throws Exception {
         // LOG COLOR
         Map<String, String> effectiveProperties = context.protoSession.getEffectiveProperties();
@@ -273,15 +284,17 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         context.loggerFactory = LoggerFactory.getILoggerFactory();
         context.slf4jConfiguration = Slf4jConfigurationFactory.getConfiguration(context.loggerFactory);
 
-        context.loggerLevel = Slf4jConfiguration.Level.INFO;
         if (context.invokerRequest.effectiveVerbose()) {
             context.loggerLevel = Slf4jConfiguration.Level.DEBUG;
+            context.slf4jConfiguration.setRootLoggerLevel(context.loggerLevel);
         } else if (context.options().quiet().orElse(false)) {
             context.loggerLevel = Slf4jConfiguration.Level.ERROR;
+            context.slf4jConfiguration.setRootLoggerLevel(context.loggerLevel);
+        } else {
+            // fall back to default log level specified in conf
+            // see https://issues.apache.org/jira/browse/MNG-2570 and https://github.com/apache/maven/issues/11199
+            context.loggerLevel = Slf4jConfiguration.Level.INFO; // default for display purposes
         }
-        context.slf4jConfiguration.setRootLoggerLevel(context.loggerLevel);
-        // else fall back to default log level specified in conf
-        // see https://issues.apache.org/jira/browse/MNG-2570
     }
 
     protected BuildEventListener determineBuildEventListener(C context) {
@@ -361,7 +374,15 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     /**
      * Override this method to add some special handling for "raw streams" <em>enabled</em> option.
      */
-    protected void doConfigureWithTerminalWithRawStreamsEnabled(C context) {}
+    protected void doConfigureWithTerminalWithRawStreamsEnabled(C context) {
+        context.invokerRequest.stdIn().ifPresent(System::setIn);
+        context.invokerRequest
+                .stdOut()
+                .ifPresent(out -> System.setOut(out instanceof PrintStream pw ? pw : new PrintStream(out, true)));
+        context.invokerRequest
+                .stdErr()
+                .ifPresent(err -> System.setErr(err instanceof PrintStream pw ? pw : new PrintStream(err, true)));
+    }
 
     /**
      * Override this method to add some special handling for "raw streams" <em>disabled</em> option.
@@ -417,9 +438,10 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                         switch (logLevelThreshold.toLowerCase(Locale.ENGLISH)) {
                             case "warn", "warning" -> LogLevelRecorder.Level.WARN;
                             case "error" -> LogLevelRecorder.Level.ERROR;
-                            default -> throw new IllegalArgumentException(
-                                    logLevelThreshold
-                                            + " is not a valid log severity threshold. Valid severities are WARN/WARNING and ERROR.");
+                            default ->
+                                throw new IllegalArgumentException(
+                                        logLevelThreshold
+                                                + " is not a valid log severity threshold. Valid severities are WARN/WARNING and ERROR.");
                         };
                 recorder.setMaxLevelAllowed(level);
                 context.logger.info("Enabled to break the build on log level " + logLevelThreshold + ".");

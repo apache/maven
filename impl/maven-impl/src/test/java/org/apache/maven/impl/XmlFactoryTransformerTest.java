@@ -47,8 +47,7 @@ class XmlFactoryTransformerTest {
             return value;
         };
 
-        String pomXml =
-                """
+        String pomXml = """
             <?xml version="1.0" encoding="UTF-8"?>
             <project xmlns="http://maven.apache.org/POM/4.0.0">
                 <modelVersion>4.0.0</modelVersion>
@@ -90,8 +89,7 @@ class XmlFactoryTransformerTest {
             return value;
         };
 
-        String settingsXml =
-                """
+        String settingsXml = """
             <?xml version="1.0" encoding="UTF-8"?>
             <settings xmlns="http://maven.apache.org/SETTINGS/1.2.0">
                 <localRepository>/path/to/local/repo</localRepository>
@@ -137,8 +135,7 @@ class XmlFactoryTransformerTest {
             return value;
         };
 
-        String toolchainsXml =
-                """
+        String toolchainsXml = """
             <?xml version="1.0" encoding="UTF-8"?>
             <toolchains xmlns="http://maven.apache.org/TOOLCHAINS/1.1.0">
                 <toolchain>
@@ -195,8 +192,7 @@ class XmlFactoryTransformerTest {
             return value;
         };
 
-        String pluginXml =
-                """
+        String pluginXml = """
             <?xml version="1.0" encoding="UTF-8"?>
             <plugin>
                 <name>test-plugin</name>

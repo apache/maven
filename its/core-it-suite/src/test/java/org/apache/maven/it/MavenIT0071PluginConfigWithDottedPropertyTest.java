@@ -29,9 +29,6 @@ import org.junit.jupiter.api.Test;
  *
  */
 public class MavenIT0071PluginConfigWithDottedPropertyTest extends AbstractMavenIntegrationTestCase {
-    public MavenIT0071PluginConfigWithDottedPropertyTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Verifies that dotted property references work within plugin

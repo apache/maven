@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4269BadReactorResolutionFromOutDirTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4269BadReactorResolutionFromOutDirTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that dependency resolution from the reactor is not too eager and does not resolve plugin artifacts from
      * the build directory of their plugin project when the plugin project hasn't been built yet. The technical

@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4072InactiveProfileReposTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4072InactiveProfileReposTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that repositories from inactive profiles are actually not used for artifact resolution.
      *

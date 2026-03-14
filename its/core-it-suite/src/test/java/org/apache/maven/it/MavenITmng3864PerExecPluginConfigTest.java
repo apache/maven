@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3864PerExecPluginConfigTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3864PerExecPluginConfigTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that plain per-execution plugin configuration works correctly.
      *

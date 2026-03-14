@@ -28,6 +28,7 @@ import java.nio.file.Path;
 
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.ModelBuilderException;
+import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.internal.transformation.PomArtifactTransformer;
 import org.apache.maven.model.v4.MavenStaxReader;
 import org.apache.maven.model.v4.MavenStaxWriter;
@@ -58,7 +59,7 @@ abstract class TransformerSupport implements PomArtifactTransformer {
     public void injectTransformedArtifacts(RepositorySystemSession session, MavenProject project) throws IOException {}
 
     @Override
-    public void transform(MavenProject project, RepositorySystemSession session, Path src, Path tgt)
+    public void transform(MavenProject project, RepositorySystemSession session, ModelSource src, Path tgt)
             throws ModelBuilderException, XMLStreamException, IOException {
         throw new IllegalStateException("This transformer does not use this call.");
     }

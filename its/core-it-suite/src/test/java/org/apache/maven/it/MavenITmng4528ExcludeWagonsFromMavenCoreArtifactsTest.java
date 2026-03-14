@@ -21,6 +21,7 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -30,11 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
  *
  * @author Benjamin Bentmann
  */
+@Disabled("Bounds: [2.0.5,3.0-alpha-1),[3.0-alpha-7,4.0.0-alpha-1)")
 public class MavenITmng4528ExcludeWagonsFromMavenCoreArtifactsTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng4528ExcludeWagonsFromMavenCoreArtifactsTest() {
-        super("[2.0.5,3.0-alpha-1),[3.0-alpha-7,4.0.0-alpha-1)");
-    }
 
     /**
      * Test that wagon providers pulled in via transitive dependencies of Maven core artifacts get excluded from

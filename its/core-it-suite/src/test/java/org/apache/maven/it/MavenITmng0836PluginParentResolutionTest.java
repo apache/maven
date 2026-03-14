@@ -29,9 +29,6 @@ import org.junit.jupiter.api.Test;
  *
  */
 public class MavenITmng0836PluginParentResolutionTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng0836PluginParentResolutionTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test that parent POMs referenced by a plugin POM can be resolved from ordinary repos, i.e. non-plugin repos.
@@ -52,19 +49,14 @@ public class MavenITmng0836PluginParentResolutionTest extends AbstractMavenInteg
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         // Maven 3.x aims to separate plugins and project dependencies (MNG-4191)
-        if (matchesVersionRange("(,3.0-alpha-1),(3.0-alpha-1,3.0-alpha-7)")) {
+        // Inline version check: (,3.0-alpha-1),(3.0-alpha-1,3.0-alpha-7) - current Maven version doesn't match
+        try {
             verifier.addCliArgument("validate");
             verifier.execute();
             verifier.verifyErrorFreeLog();
-        } else {
-            try {
-                verifier.addCliArgument("validate");
-                verifier.execute();
-                verifier.verifyErrorFreeLog();
-                fail("Plugin parent POM was erroneously resolved from non-plugin repository.");
-            } catch (VerificationException e) {
-                // expected
-            }
+            fail("Plugin parent POM was erroneously resolved from non-plugin repository.");
+        } catch (VerificationException e) {
+            // expected
         }
     }
 }

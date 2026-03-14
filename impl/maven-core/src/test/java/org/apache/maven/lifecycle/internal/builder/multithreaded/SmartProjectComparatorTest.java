@@ -20,6 +20,11 @@ package org.apache.maven.lifecycle.internal.builder.multithreaded;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
@@ -153,5 +158,54 @@ class SmartProjectComparatorTest {
         long weightB = comparator.getProjectWeight(ProjectDependencyGraphStub.B);
         long weightC = comparator.getProjectWeight(ProjectDependencyGraphStub.C);
         assertEquals(weightB, weightC, "Projects B and C should have the same weight");
+    }
+
+    @Test
+    void testConcurrentWeightCalculation() throws Exception {
+        // Test that concurrent weight calculation doesn't cause recursive update issues
+        // This test simulates the scenario that causes the IllegalStateException
+
+        int numThreads = 10;
+        int numIterations = 100;
+        ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+        CountDownLatch latch = new CountDownLatch(numThreads);
+        AtomicReference<Exception> exception = new AtomicReference<>();
+
+        for (int i = 0; i < numThreads; i++) {
+            executor.submit(() -> {
+                try {
+                    for (int j = 0; j < numIterations; j++) {
+                        // Simulate concurrent access to weight calculation
+                        // This can trigger the recursive update issue
+                        List<MavenProject> projects = Arrays.asList(
+                                ProjectDependencyGraphStub.A,
+                                ProjectDependencyGraphStub.B,
+                                ProjectDependencyGraphStub.C,
+                                ProjectDependencyGraphStub.X,
+                                ProjectDependencyGraphStub.Y,
+                                ProjectDependencyGraphStub.Z);
+
+                        // Sort projects concurrently - this triggers weight calculation
+                        projects.sort(comparator.getComparator());
+
+                        // Also directly access weights to increase contention
+                        for (MavenProject project : projects) {
+                            comparator.getProjectWeight(project);
+                        }
+                    }
+                } catch (Exception e) {
+                    exception.set(e);
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        latch.await(30, TimeUnit.SECONDS);
+        executor.shutdown();
+
+        if (exception.get() != null) {
+            throw exception.get();
+        }
     }
 }

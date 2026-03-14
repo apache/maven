@@ -31,5 +31,5 @@ Maven 4 API - Immutable Settings Model
 
    * {{{./apidocs/index.html}Java sources}} with <<<Builder>>> inner classes for immutable instances creation.
 
- See also corresponding {{{../../maven-settings/index.html}Maven classical settings model documentation}}.
+ See also corresponding {{{../../compat/maven-settings/index.html}Maven classical settings model documentation}}.
  

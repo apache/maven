@@ -26,10 +26,6 @@ import org.junit.jupiter.api.Test;
 public class MavenITmng7335MissingJarInParallelBuild extends AbstractMavenIntegrationTestCase {
     private static final String PROJECT_PATH = "/mng-7335-missing-jar-in-parallel-build";
 
-    public MavenITmng7335MissingJarInParallelBuild() {
-        super("[3.8.1,)");
-    }
-
     @Test
     public void testMissingJarInParallelBuild() throws IOException, VerificationException {
         final File projectDir = extractResources(PROJECT_PATH);

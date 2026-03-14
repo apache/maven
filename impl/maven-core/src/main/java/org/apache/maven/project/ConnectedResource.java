@@ -18,6 +18,7 @@
  */
 package org.apache.maven.project;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +31,7 @@ import org.apache.maven.model.Resource;
  * A Resource wrapper that maintains a connection to the underlying project model.
  * When includes/excludes are modified, the changes are propagated back to the project's SourceRoots.
  */
+@SuppressWarnings("deprecation")
 class ConnectedResource extends Resource {
     private final SourceRoot originalSourceRoot;
     private final ProjectScope scope;
@@ -41,6 +43,7 @@ class ConnectedResource extends Resource {
                 .includes(sourceRoot.includes())
                 .excludes(sourceRoot.excludes())
                 .filtering(Boolean.toString(sourceRoot.stringFiltering()))
+                .targetPath(sourceRoot.targetPath().map(Path::toString).orElse(null))
                 .build());
         this.originalSourceRoot = sourceRoot;
         this.scope = scope;

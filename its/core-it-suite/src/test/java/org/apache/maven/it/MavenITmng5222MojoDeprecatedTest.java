@@ -35,9 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * <a href="https://issues.apache.org/jira/browse/MNG-7457">MNG-7457</a>
  */
 public class MavenITmng5222MojoDeprecatedTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng5222MojoDeprecatedTest() {
-        super("[3.9.0,)");
-    }
 
     /**
      * Test that ensures that deprecation is not printed for empty and default value

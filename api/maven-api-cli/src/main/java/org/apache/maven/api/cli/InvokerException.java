@@ -58,7 +58,7 @@ public class InvokerException extends MavenException {
         private final int exitCode;
 
         public ExitException(int exitCode) {
-            super("EXIT");
+            super("EXIT=" + exitCode);
             this.exitCode = exitCode;
         }
 

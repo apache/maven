@@ -23,9 +23,6 @@ import java.io.File;
 import org.junit.jupiter.api.Test;
 
 public class MavenIT0018DependencyManagementTest extends AbstractMavenIntegrationTestCase {
-    public MavenIT0018DependencyManagementTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Ensure that managed dependencies for dependency POMs are calculated

@@ -18,8 +18,6 @@
  */
 package org.apache.maven.api.services;
 
-import java.io.Serial;
-
 import org.apache.maven.api.annotations.Experimental;
 
 /**
@@ -29,9 +27,6 @@ import org.apache.maven.api.annotations.Experimental;
  */
 @Experimental
 public class MavenException extends RuntimeException {
-
-    @Serial
-    private static final long serialVersionUID = 9027638326336093132L;
 
     public MavenException() {}
 

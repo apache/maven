@@ -22,8 +22,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -37,6 +39,7 @@ import org.apache.maven.api.PathType;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Named;
@@ -67,6 +70,45 @@ import static org.apache.maven.impl.ImplUtils.map;
 @Named
 @Singleton
 public class DefaultDependencyResolver implements DependencyResolver {
+
+    /**
+     * Cache of information about the modules contained in a path element.
+     * Keys are the Java versions targeted by the project.
+     *
+     * <p><b>TODO:</b> This field should not be in this class, because the cache should be global to the session.
+     * This field exists here only temporarily, until clarified where to store session-wide caches.</p>
+     */
+    private final Map<Runtime.Version, PathModularizationCache> moduleCaches;
+
+    /**
+     * Creates an initially empty resolver.
+     */
+    public DefaultDependencyResolver() {
+        // TODO: the cache should not be instantiated here, but should rather be session-wide.
+        moduleCaches = new ConcurrentHashMap<>();
+    }
+
+    /**
+     * {@return the cache for the given request}.
+     *
+     * @param  request the request for which to get the target version
+     * @throws IllegalArgumentException if the version string cannot be interpreted as a valid version
+     */
+    private PathModularizationCache moduleCache(DependencyResolverRequest request) {
+        return moduleCaches.computeIfAbsent(getTargetVersion(request), PathModularizationCache::new);
+    }
+
+    /**
+     * Returns the target version of the given request as a Java version object.
+     *
+     * @param  request the request for which to get the target version
+     * @return the target version as a Java object
+     * @throws IllegalArgumentException if the version string cannot be interpreted as a valid version
+     */
+    static Runtime.Version getTargetVersion(DependencyResolverRequest request) {
+        Version target = request.getTargetVersion();
+        return (target != null) ? Runtime.Version.parse(target.toString()) : Runtime.version();
+    }
 
     @Nonnull
     @Override
@@ -110,7 +152,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
                     .setRoot(root != null ? session.toDependency(root, false) : null)
                     .setDependencies(session.toDependencies(dependencies, false))
                     .setManagedDependencies(session.toDependencies(managedDependencies, true))
-                    .setRepositories(session.toRepositories(remoteRepositories))
+                    .setRepositories(session.toResolvingRepositories(remoteRepositories))
                     .setRequestContext(trace.context())
                     .setTrace(trace.trace());
             collectRequest.setResolutionScope(resolutionScope);
@@ -126,9 +168,14 @@ public class DefaultDependencyResolver implements DependencyResolver {
                 final CollectResult result =
                         session.getRepositorySystem().collectDependencies(systemSession, collectRequest);
                 return new DefaultDependencyResolverResult(
-                        null, null, result.getExceptions(), session.getNode(result.getRoot(), request.getVerbose()), 0);
+                        null,
+                        moduleCache(request),
+                        result.getExceptions(),
+                        session.getNode(result.getRoot(), request.getVerbose()),
+                        0);
             } catch (DependencyCollectionException e) {
-                throw new DependencyResolverException("Unable to collect dependencies", e);
+                String enhancedMessage = enhanceCollectionError(e, collectRequest);
+                throw new DependencyResolverException(enhancedMessage, e);
             }
         } finally {
             RequestTraceHelper.exit(trace);
@@ -171,8 +218,8 @@ public class DefaultDependencyResolver implements DependencyResolver {
         InternalSession session =
                 InternalSession.from(requireNonNull(request, "request").getSession());
         RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
+        DependencyResolverResult result;
         try {
-            DependencyResolverResult result;
             DependencyResolverResult collectorResult = collect(request);
             List<RemoteRepository> repositories = request.getRepositories() != null
                     ? request.getRepositories()
@@ -191,18 +238,17 @@ public class DefaultDependencyResolver implements DependencyResolver {
                         .map(Artifact::toCoordinates)
                         .collect(Collectors.toList());
                 Predicate<PathType> filter = request.getPathTypeFilter();
+                DefaultDependencyResolverResult resolverResult = new DefaultDependencyResolverResult(
+                        null,
+                        moduleCache(request),
+                        collectorResult.getExceptions(),
+                        collectorResult.getRoot(),
+                        nodes.size());
                 if (request.getRequestType() == DependencyResolverRequest.RequestType.FLATTEN) {
-                    DefaultDependencyResolverResult flattenResult = new DefaultDependencyResolverResult(
-                            null, null, collectorResult.getExceptions(), collectorResult.getRoot(), nodes.size());
                     for (Node node : nodes) {
-                        flattenResult.addNode(node);
+                        resolverResult.addNode(node);
                     }
-                    result = flattenResult;
                 } else {
-                    PathModularizationCache cache =
-                            new PathModularizationCache(); // TODO: should be project-wide cache.
-                    DefaultDependencyResolverResult resolverResult = new DefaultDependencyResolverResult(
-                            null, cache, collectorResult.getExceptions(), collectorResult.getRoot(), nodes.size());
                     ArtifactResolverResult artifactResolverResult =
                             session.getService(ArtifactResolver.class).resolve(session, coordinates, repositories);
                     for (Node node : nodes) {
@@ -217,16 +263,73 @@ public class DefaultDependencyResolver implements DependencyResolver {
                             throw cannotReadModuleInfo(path, e);
                         }
                     }
-                    result = resolverResult;
                 }
+                result = resolverResult;
             }
-            return result;
         } finally {
             RequestTraceHelper.exit(trace);
         }
+        return result;
     }
 
     private static DependencyResolverException cannotReadModuleInfo(final Path path, final IOException cause) {
         return new DependencyResolverException("Cannot read module information of " + path, cause);
+    }
+
+    private static boolean containsUnresolvedExpression(String value) {
+        return value != null && value.contains("${") && value.contains("}");
+    }
+
+    private static String enhanceCollectionError(DependencyCollectionException e, CollectRequest request) {
+        if (e.getMessage() != null && e.getMessage().contains("Invalid Collect Request")) {
+            StringBuilder enhanced = new StringBuilder();
+            enhanced.append("Failed to collect dependencies");
+
+            org.eclipse.aether.graph.Dependency root = request.getRoot();
+            if (root != null && root.getArtifact() != null) {
+                org.eclipse.aether.artifact.Artifact artifact = root.getArtifact();
+                String groupId = artifact.getGroupId();
+                String artifactId = artifact.getArtifactId();
+                String version = artifact.getVersion();
+
+                if (containsUnresolvedExpression(groupId)
+                        || containsUnresolvedExpression(artifactId)
+                        || containsUnresolvedExpression(version)) {
+                    enhanced.append(" due to unresolved expression(s) in dependency: ")
+                            .append(groupId)
+                            .append(":")
+                            .append(artifactId)
+                            .append(":")
+                            .append(version)
+                            .append(".\n")
+                            .append("Please check that all properties are defined in your POM or settings.xml.");
+                    return enhanced.toString();
+                }
+            }
+
+            for (org.eclipse.aether.graph.Dependency dep : request.getDependencies()) {
+                if (dep != null && dep.getArtifact() != null) {
+                    org.eclipse.aether.artifact.Artifact artifact = dep.getArtifact();
+                    String groupId = artifact.getGroupId();
+                    String artifactId = artifact.getArtifactId();
+                    String version = artifact.getVersion();
+
+                    if (containsUnresolvedExpression(groupId)
+                            || containsUnresolvedExpression(artifactId)
+                            || containsUnresolvedExpression(version)) {
+                        enhanced.append(" due to unresolved expression(s) in dependency: ")
+                                .append(groupId)
+                                .append(":")
+                                .append(artifactId)
+                                .append(":")
+                                .append(version)
+                                .append(".\n")
+                                .append("Please check that all properties are defined in your POM or settings.xml.");
+                        return enhanced.toString();
+                    }
+                }
+            }
+        }
+        return e.getMessage();
     }
 }

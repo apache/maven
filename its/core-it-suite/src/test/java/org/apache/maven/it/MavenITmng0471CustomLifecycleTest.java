@@ -29,9 +29,6 @@ import org.junit.jupiter.api.Test;
  *
  */
 public class MavenITmng0471CustomLifecycleTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng0471CustomLifecycleTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test @execute with a custom lifecycle, including configuration

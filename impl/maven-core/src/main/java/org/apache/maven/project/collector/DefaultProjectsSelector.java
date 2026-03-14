@@ -75,7 +75,7 @@ public class DefaultProjectsSelector implements ProjectsSelector {
                         "{} {} encountered while building the effective model for '{}' (use -e to see details)",
                         problemsCount,
                         (problemsCount == 1) ? "problem was" : "problems were",
-                        result.getProject().getId());
+                        result.getProjectId());
 
                 if (request.isShowErrors()) { // this means -e or -X (as -X enables -e as well)
                     for (ModelProblem problem : result.getProblems()) {

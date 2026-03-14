@@ -203,8 +203,8 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
                 if (session.getProjects() != null) {
                     pomRepositories = session.getProjects().stream()
                             .filter(p -> artifact.equals(p.getArtifact()))
-                            .map(MavenProject::getRemoteArtifactRepositories)
                             .findFirst()
+                            .map(MavenProject::getRemoteArtifactRepositories)
                             .orElseGet(() -> getRepositoriesFromModel(repositorySession, model));
                 } else {
                     pomRepositories = getRepositoriesFromModel(repositorySession, model);

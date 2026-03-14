@@ -28,6 +28,6 @@ public class EmbeddedMavenExecutorTest extends MavenExecutorTestSupport {
 
     @Override
     protected Executor doSelectExecutor() {
-        return EMBEDDED_MAVEN_EXECUTOR;
+        return new EmbeddedMavenExecutor();
     }
 }

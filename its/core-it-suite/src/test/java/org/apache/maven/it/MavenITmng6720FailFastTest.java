@@ -31,18 +31,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * <a href="https://issues.apache.org/jira/browse/MNG-6720">MNG-6720</a>.
  *
+ * @since 3.6.2
+ *
  */
 class MavenITmng6720FailFastTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng6720FailFastTest() {
-        super("[3.6.2,)");
-    }
 
     @Test
     void testItShouldWaitForConcurrentModulesToFinish() throws Exception {
         File testDir = extractResources("/mng-6720-fail-fast");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.addCliArguments("-T", "2");
         verifier.addCliArgument("-Dmaven.test.redirectTestOutputToFile=true");

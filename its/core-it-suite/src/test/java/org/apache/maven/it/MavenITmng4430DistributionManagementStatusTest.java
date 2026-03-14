@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng4430DistributionManagementStatusTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4430DistributionManagementStatusTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that presence of status field in distribution management of a local project POM causes a validation error,
      * this field is only allowed for POMs from the repo.

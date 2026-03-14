@@ -37,9 +37,6 @@ public class MavenITmng0505VersionRangeTest extends AbstractMavenIntegrationTest
      * Oleg 2009.04.30: the same functionality but simpler - no multiple ranges - syntax
      * is tested in MNG-4150
      */
-    public MavenITmng0505VersionRangeTest() {
-        super("(,3.0-alpha-1),[3.0-alpha-3,)");
-    }
 
     /**
      * Test version range support.

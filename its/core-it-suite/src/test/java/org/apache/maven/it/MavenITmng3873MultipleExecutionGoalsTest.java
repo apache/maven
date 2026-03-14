@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng3873MultipleExecutionGoalsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3873MultipleExecutionGoalsTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that all goals from a plugin execution are actually executed and not only one when no {@code <pluginManagement>}
      * is involved.

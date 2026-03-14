@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3808ReportInheritanceOrderingTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3808ReportInheritanceOrderingTest() {
-        super("[2.0.11,2.1.0-M1),[2.1.0-M2,)");
-    }
-
     /**
      * Test that 3 executions are run in the correct order.
      *

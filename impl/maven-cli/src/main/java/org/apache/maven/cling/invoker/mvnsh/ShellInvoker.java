@@ -89,8 +89,7 @@ public class ShellInvoker extends LookupInvoker<LookupContext> {
         DefaultParser parser = new DefaultParser();
         parser.setRegexCommand("[:]{0,1}[a-zA-Z!]{1,}\\S*"); // change default regex to support shell commands
 
-        String banner =
-                """
+        String banner = """
 
                 ░▒▓██████████████▓▒░ ░▒▓█▓▒░░▒▓█▓▒░░▒▓███████▓▒░  ░▒▓███████▓▒░░▒▓█▓▒░░▒▓█▓▒░\s
                 ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░       ░▒▓█▓▒░░▒▓█▓▒░\s

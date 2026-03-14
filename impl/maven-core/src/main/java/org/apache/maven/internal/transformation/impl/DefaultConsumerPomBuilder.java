@@ -21,7 +21,6 @@ package org.apache.maven.internal.transformation.impl;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,29 +28,73 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.ArtifactCoordinates;
+import org.apache.maven.api.DependencyScope;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.PathScope;
 import org.apache.maven.api.SessionData;
+import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DistributionManagement;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.ModelBase;
+import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.model.Scm;
+import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
-import org.apache.maven.api.services.Sources;
+import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.model.LifecycleBindingsInjector;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.SourceQueries;
 import org.eclipse.aether.RepositorySystemSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Builds consumer POMs from project models, transforming them into a format suitable for downstream consumers.
+ * <p>
+ * A consumer POM is a simplified version of a project's POM that is published for consumption by other projects.
+ * It removes build-specific information and internal details while preserving essential information like
+ * dependencies, repositories, and distribution management.
+ * <p>
+ * This builder applies two orthogonal transformations:
+ * <ul>
+ *   <li><b>Dependency Flattening</b>: When enabled via {@code maven.consumer.pom.flatten=true}, dependency management
+ *       is flattened into direct dependencies for non-POM projects, and mixins are removed.</li>
+ *   <li><b>Model Version Handling</b>: When {@code preserve.model.version=true} is set, the consumer POM
+ *       maintains the original model version (4.2.0) instead of downgrading to 4.0.0 for Maven 3 compatibility.
+ *       This allows modern features like mixins to be preserved in the consumer POM.</li>
+ * </ul>
+ * <p>
+ * <b>Mixin Handling</b>: Mixins are only supported in model version 4.2.0 or later. If a POM contains mixins:
+ * <ul>
+ *   <li>Setting {@code preserve.model.version=true} preserves them in the consumer POM with model version 4.2.0</li>
+ *   <li>Setting {@code maven.consumer.pom.flatten=true} removes them during transformation</li>
+ *   <li>Otherwise, an exception is thrown requiring one of the above options or manual mixin removal</li>
+ * </ul>
+ * <p>
+ * <b>Dependency Filtering</b>: For non-POM projects with dependency management, the builder:
+ * <ul>
+ *   <li>Filters dependencies to include only those with transitive scopes (compile/runtime)</li>
+ *   <li>Applies managed dependency metadata (version, scope, optional flag, exclusions) to direct dependencies</li>
+ *   <li>Removes managed dependencies that are not used by direct dependencies</li>
+ *   <li>Retains only managed dependencies that appear in the resolved dependency tree</li>
+ * </ul>
+ * <p>
+ * <b>Repository and Profile Pruning</b>: The consumer POM removal strategy:
+ * <ul>
+ *   <li>Removes the central repository (only non-central repositories are kept)</li>
+ *   <li>Removes build, mailing lists, issue management, and other build-specific information</li>
+ *   <li>Removes profiles that have no activation, build, dependencies, or properties</li>
+ *   <li>Preserves relocation information in distribution management</li>
+ * </ul>
+ */
 @Named
 class DefaultConsumerPomBuilder implements PomBuilder {
     private static final String BOM_PACKAGING = "bom";
@@ -69,12 +112,44 @@ class DefaultConsumerPomBuilder implements PomBuilder {
     }
 
     @Override
-    public Model build(RepositorySystemSession session, MavenProject project, Path src) throws ModelBuilderException {
+    public Model build(RepositorySystemSession session, MavenProject project, ModelSource src)
+            throws ModelBuilderException {
         Model model = project.getModel().getDelegate();
+        boolean flattenEnabled = Features.consumerPomFlatten(session.getConfigProperties());
         String packaging = model.getPackaging();
         String originalPackaging = project.getOriginalModel().getPackaging();
+
+        // Check if this is a BOM (original packaging is "bom")
+        boolean isBom = BOM_PACKAGING.equals(originalPackaging);
+
+        // Check if mixins are present without flattening enabled
+        if (!model.getMixins().isEmpty() && !flattenEnabled && !model.isPreserveModelVersion()) {
+            throw new MavenException("The consumer POM for "
+                    + project.getId()
+                    + " cannot be created because the POM contains mixins. "
+                    + "Mixins are not supported in the default consumer POM format. "
+                    + "You have the following options to resolve this:" + System.lineSeparator()
+                    + "  1. Preserve the model version by setting 'preserve.model.version=true' to generate a consumer POM with <modelVersion>4.2.0</modelVersion>, which supports mixins"
+                    + System.lineSeparator()
+                    + "  2. Enable flattening by setting the property 'maven.consumer.pom.flatten=true' to remove mixins during transformation"
+                    + System.lineSeparator()
+                    + "  3. Remove the mixins from your POM");
+        }
+
+        // Check if consumer POM flattening is disabled
+        if (!flattenEnabled) {
+            // When flattening is disabled, treat non-POM projects like parent POMs
+            // Apply only basic transformations without flattening dependency management
+            // However, BOMs still need special handling to transform packaging from "bom" to "pom"
+            if (isBom) {
+                return buildBomWithoutFlatten(session, project, src);
+            } else {
+                return buildPom(session, project, src);
+            }
+        }
+        // Default behavior: flatten the consumer POM
         if (POM_PACKAGING.equals(packaging)) {
-            if (BOM_PACKAGING.equals(originalPackaging)) {
+            if (isBom) {
                 return buildBom(session, project, src);
             } else {
                 return buildPom(session, project, src);
@@ -84,27 +159,36 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         }
     }
 
-    protected Model buildPom(RepositorySystemSession session, MavenProject project, Path src)
+    protected Model buildPom(RepositorySystemSession session, MavenProject project, ModelSource src)
             throws ModelBuilderException {
         ModelBuilderResult result = buildModel(session, src);
         Model model = result.getRawModel();
         return transformPom(model, project);
     }
 
-    protected Model buildBom(RepositorySystemSession session, MavenProject project, Path src)
+    protected Model buildBomWithoutFlatten(RepositorySystemSession session, MavenProject project, ModelSource src)
+            throws ModelBuilderException {
+        ModelBuilderResult result = buildModel(session, src);
+        Model model = result.getRawModel();
+        // For BOMs without flattening, we just need to transform the packaging from "bom" to "pom"
+        // but keep everything else from the raw model (including unresolved versions)
+        return transformBom(model, project);
+    }
+
+    protected Model buildBom(RepositorySystemSession session, MavenProject project, ModelSource src)
             throws ModelBuilderException {
         ModelBuilderResult result = buildModel(session, src);
         Model model = result.getEffectiveModel();
         return transformBom(model, project);
     }
 
-    protected Model buildNonPom(RepositorySystemSession session, MavenProject project, Path src)
+    protected Model buildNonPom(RepositorySystemSession session, MavenProject project, ModelSource src)
             throws ModelBuilderException {
         Model model = buildEffectiveModel(session, src);
         return transformNonPom(model, project);
     }
 
-    private Model buildEffectiveModel(RepositorySystemSession session, Path src) throws ModelBuilderException {
+    private Model buildEffectiveModel(RepositorySystemSession session, ModelSource src) throws ModelBuilderException {
         InternalSession iSession = InternalSession.from(session);
         ModelBuilderResult result = buildModel(session, src);
         Model model = result.getEffectiveModel();
@@ -114,7 +198,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
             ArtifactCoordinates artifact = iSession.createArtifactCoordinates(
                     model.getGroupId(), model.getArtifactId(), model.getVersion(), null);
             Node node = iSession.collectDependencies(
-                    iSession.createDependencyCoordinates(artifact), PathScope.TEST_RUNTIME);
+                    iSession.createDependencyCoordinates(artifact), PathScope.MAIN_RUNTIME);
 
             Map<String, Node> nodes = node.stream()
                     .collect(Collectors.toMap(n -> getDependencyKey(n.getDependency()), Function.identity()));
@@ -159,6 +243,8 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                 }
                 return dependency;
             });
+            // Only keep transitive scopes (null/empty => COMPILE)
+            directDependencies.values().removeIf(DefaultConsumerPomBuilder::hasDependencyScope);
             managedDependencies.keySet().removeAll(directDependencies.keySet());
 
             model = model.withDependencyManagement(
@@ -166,13 +252,36 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                                     ? null
                                     : model.getDependencyManagement().withDependencies(managedDependencies.values()))
                     .withDependencies(directDependencies.isEmpty() ? null : directDependencies.values());
+        } else {
+            // Even without dependencyManagement, filter direct dependencies to compile/runtime only
+            Map<String, Dependency> directDependencies = model.getDependencies().stream()
+                    .filter(dependency -> !"import".equals(dependency.getScope()))
+                    .collect(Collectors.toMap(
+                            DefaultConsumerPomBuilder::getDependencyKey,
+                            Function.identity(),
+                            this::merge,
+                            LinkedHashMap::new));
+            // Only keep transitive scopes
+            directDependencies.values().removeIf(DefaultConsumerPomBuilder::hasDependencyScope);
+            model = model.withDependencies(directDependencies.isEmpty() ? null : directDependencies.values());
         }
 
         return model;
     }
 
+    private static boolean hasDependencyScope(Dependency dependency) {
+        String scopeId = dependency.getScope();
+        DependencyScope scope;
+        if (scopeId == null || scopeId.isEmpty()) {
+            scope = DependencyScope.COMPILE;
+        } else {
+            scope = DependencyScope.forId(scopeId);
+        }
+        return scope == null || !scope.isTransitive();
+    }
+
     private Dependency merge(Dependency dep1, Dependency dep2) {
-        throw new IllegalArgumentException("Duplicate dependency: " + dep1);
+        throw new IllegalArgumentException("Duplicate dependency: " + getDependencyKey(dep1));
     }
 
     private static String getDependencyKey(org.apache.maven.api.Dependency dependency) {
@@ -182,16 +291,17 @@ class DefaultConsumerPomBuilder implements PomBuilder {
 
     private static String getDependencyKey(Dependency dependency) {
         return dependency.getGroupId() + ":" + dependency.getArtifactId() + ":"
-                + (dependency.getType() != null ? dependency.getType() : "") + ":"
+                + (dependency.getType() != null ? dependency.getType() : "jar") + ":"
                 + (dependency.getClassifier() != null ? dependency.getClassifier() : "");
     }
 
-    private ModelBuilderResult buildModel(RepositorySystemSession session, Path src) throws ModelBuilderException {
+    private ModelBuilderResult buildModel(RepositorySystemSession session, ModelSource src)
+            throws ModelBuilderException {
         InternalSession iSession = InternalSession.from(session);
         ModelBuilderRequest.ModelBuilderRequestBuilder request = ModelBuilderRequest.builder();
         request.requestType(ModelBuilderRequest.RequestType.BUILD_CONSUMER);
         request.session(iSession);
-        request.source(Sources.buildSource(src));
+        request.source(src);
         request.locationTracking(false);
         request.systemProperties(session.getSystemProperties());
         request.userProperties(session.getUserProperties());
@@ -209,6 +319,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                                 .preserveModelVersion(false)
                                 .root(false)
                                 .parent(null)
+                                .mixins(null)
                                 .build(null),
                         model)
                 .mailingLists(null)
@@ -229,10 +340,11 @@ class DefaultConsumerPomBuilder implements PomBuilder {
             warnNotDowngraded(project);
         }
         model = model.withModelVersion(modelVersion);
+
         return model;
     }
 
-    static Model transformBom(Model model, MavenProject project) {
+    private static Model transformBom(Model model, MavenProject project) {
         boolean preserveModelVersion = model.isPreserveModelVersion();
 
         Model.Builder builder = prune(
@@ -259,11 +371,25 @@ class DefaultConsumerPomBuilder implements PomBuilder {
 
         // raw to consumer transform
         model = model.withRoot(false).withModules(null).withSubprojects(null);
-        if (model.getParent() != null) {
-            model = model.withParent(model.getParent().withRelativePath(null));
+        Parent parent = model.getParent();
+        if (parent != null) {
+            model = model.withParent(parent.withRelativePath(null));
         }
-
+        var projectSources = project.getBuild().getDelegate().getSources();
+        if (SourceQueries.usesModuleSourceHierarchy(projectSources)) {
+            // Dependencies are dispatched by maven-jar-plugin in the POM generated for each module.
+            model = model.withDependencies(null).withPackaging(POM_PACKAGING);
+        }
         if (!preserveModelVersion) {
+            /*
+             * If the <build> contains <source> elements, it is not compatible with the Maven 4.0.0 model.
+             * Remove the full <build> element instead of removing only the <sources> element, because the
+             * build without sources does not mean much. Reminder: this removal can be disabled by setting
+             * the `preserveModelVersion` XML attribute or `preserve.model.version` property to true.
+             */
+            if (SourceQueries.hasEnabledSources(projectSources)) {
+                model = model.withBuild(null);
+            }
             model = model.withPreserveModelVersion(false);
             String modelVersion = new MavenModelVersion().getModelVersion(model);
             model = model.withModelVersion(modelVersion);
@@ -271,7 +397,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         return model;
     }
 
-    static void warnNotDowngraded(MavenProject project) {
+    private static void warnNotDowngraded(MavenProject project) {
         LOGGER.warn("The consumer POM for " + project.getId() + " cannot be downgraded to 4.0.0. "
                 + "If you intent your build to be consumed with Maven 3 projects, you need to remove "
                 + "the features that request a newer model version.  If you're fine with having the "

@@ -36,10 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3732ActiveProfilesTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3732ActiveProfilesTest() {
-        super("[2.0,)");
-    }
-
     /**
      * Verify that MavenProject.getActiveProfiles() includes profiles from all sources.
      *
@@ -54,11 +50,7 @@ public class MavenITmng3732ActiveProfilesTest extends AbstractMavenIntegrationTe
         verifier.deleteDirectory("target");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
-        if (matchesVersionRange("[4.0.0-alpha-1,)")) {
-            verifier.addCliArgument("-Ppom,settings");
-        } else {
-            verifier.addCliArgument("-Ppom,profiles,settings");
-        }
+        verifier.addCliArgument("-Ppom,settings");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -67,32 +59,16 @@ public class MavenITmng3732ActiveProfilesTest extends AbstractMavenIntegrationTe
         List<String> ids = new ArrayList<>();
 
         // support for profiles.xml removed from 3.x (see MNG-4060)
-        if (matchesVersionRange("[2.0,3.0-alpha-1)")) {
-            ids.add(props.getProperty("project.activeProfiles.0.id", ""));
-            ids.add(props.getProperty("project.activeProfiles.1.id", ""));
-            ids.add(props.getProperty("project.activeProfiles.2.id", ""));
-            ids.add(props.getProperty("project.activeProfiles.3.id", ""));
-            ids.remove("it-defaults");
-            Collections.sort(ids);
+        ids.add(props.getProperty("project.activeProfiles.0.id", ""));
+        ids.add(props.getProperty("project.activeProfiles.1.id", ""));
+        ids.add(props.getProperty("project.activeProfiles.2.id", ""));
+        ids.remove("it-defaults");
+        Collections.sort(ids);
 
-            assertEquals(Arrays.asList(new String[] {"pom", "profiles", "settings"}), ids);
-            assertEquals("4", props.getProperty("project.activeProfiles"));
+        assertEquals(Arrays.asList(new String[] {"pom", "settings"}), ids);
+        assertEquals("3", props.getProperty("project.activeProfiles"));
 
-            assertEquals("PASSED-1", props.getProperty("project.properties.pomProperty"));
-            assertEquals("PASSED-2", props.getProperty("project.properties.settingsProperty"));
-            assertEquals("PASSED-3", props.getProperty("project.properties.profilesProperty"));
-        } else {
-            ids.add(props.getProperty("project.activeProfiles.0.id", ""));
-            ids.add(props.getProperty("project.activeProfiles.1.id", ""));
-            ids.add(props.getProperty("project.activeProfiles.2.id", ""));
-            ids.remove("it-defaults");
-            Collections.sort(ids);
-
-            assertEquals(Arrays.asList(new String[] {"pom", "settings"}), ids);
-            assertEquals("3", props.getProperty("project.activeProfiles"));
-
-            assertEquals("PASSED-1", props.getProperty("project.properties.pomProperty"));
-            assertEquals("PASSED-2", props.getProperty("project.properties.settingsProperty"));
-        }
+        assertEquals("PASSED-1", props.getProperty("project.properties.pomProperty"));
+        assertEquals("PASSED-2", props.getProperty("project.properties.settingsProperty"));
     }
 }

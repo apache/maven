@@ -29,9 +29,6 @@ import org.junit.jupiter.api.Test;
  *
  */
 public class MavenITmng0773SettingsProfileReactorPollutionTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng0773SettingsProfileReactorPollutionTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Verify that profiles from settings.xml do not pollute module lists across projects in a reactorized build.

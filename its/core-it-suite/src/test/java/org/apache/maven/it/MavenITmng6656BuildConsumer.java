@@ -45,10 +45,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng6656BuildConsumer extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng6656BuildConsumer() {
-        super("[4.0.0-alpha-1,)");
-    }
-
     /**
      * Verifies:
      * <ul>
@@ -64,11 +60,11 @@ public class MavenITmng6656BuildConsumer extends AbstractMavenIntegrationTestCas
     public void testPublishedPoms() throws Exception {
         File testDir = extractResources("/mng-6656-buildconsumer");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.addCliArgument("-Dchangelist=MNG6656");
 
-        verifier.addCliArgument("install");
+        verifier.addCliArguments("install", "-Dmaven.consumer.pom.flatten=true");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 

@@ -21,6 +21,7 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,11 +32,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Benjamin Bentmann
  */
+@Disabled("Bounds: [3.0-beta-1,4.0.0-alpha-2]")
 public class MavenITmng4162ReportingMigrationTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng4162ReportingMigrationTest() {
-        super("[3.0-beta-1,4.0.0-alpha-2]");
-    }
 
     /**
      * Verify that the legacy reporting section is automatically converted into ordinary plugin configuration of the

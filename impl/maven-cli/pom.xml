@@ -160,8 +160,13 @@ under the License.
     </dependency>
 
     <dependency>
-      <groupId>org.jdom</groupId>
-      <artifactId>jdom2</artifactId>
+      <groupId>eu.maveniverse.maven.domtrip</groupId>
+      <artifactId>domtrip-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>eu.maveniverse.maven.domtrip</groupId>
+      <artifactId>domtrip-maven</artifactId>
     </dependency>
 
     <dependency>
@@ -235,15 +240,14 @@ under the License.
       <artifactId>jline-native</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>eu.maveniverse.maven.mimir</groupId>
+      <artifactId>testing</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
-    <testResources>
-      <testResource>
-        <filtering>true</filtering>
-        <directory>src/test/resources-filtered</directory>
-      </testResource>
-    </testResources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

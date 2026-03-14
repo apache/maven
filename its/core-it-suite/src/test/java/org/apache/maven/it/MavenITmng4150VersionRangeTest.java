@@ -33,9 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  */
 public class MavenITmng4150VersionRangeTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng4150VersionRangeTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test version range support.

@@ -24,12 +24,10 @@ import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8293">MNG-8293</a>.
+ * @since 3.6.3
+ *
  */
 class MavenITmng8293BomImportFromReactor extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8293BomImportFromReactor() {
-        super("[3.6.3,)");
-    }
 
     /**
      *  Verify that project doing BOM import of BOM from reactor can be loaded up

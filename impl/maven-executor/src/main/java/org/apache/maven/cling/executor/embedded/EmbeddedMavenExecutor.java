@@ -183,10 +183,10 @@ public class EmbeddedMavenExecutor implements Executor {
     @Override
     public String mavenVersion(ExecutorRequest executorRequest) throws ExecutorException {
         requireNonNull(executorRequest);
-        validate(executorRequest);
         if (closed.get()) {
             throw new ExecutorException("Executor is closed");
         }
+        validate(executorRequest);
         return mayCreate(executorRequest).version;
     }
 
@@ -208,10 +208,12 @@ public class EmbeddedMavenExecutor implements Executor {
                     getClass().getSimpleName() + " does not support command " + executorRequest.command());
         }
         if (executorRequest.environmentVariables().isPresent()) {
-            throw new IllegalArgumentException(getClass().getSimpleName() + " does not support environment variables");
+            throw new IllegalArgumentException(getClass().getSimpleName() + " does not support environment variables: "
+                    + executorRequest.environmentVariables().get());
         }
         if (executorRequest.jvmArguments().isPresent()) {
-            throw new IllegalArgumentException(getClass().getSimpleName() + " does not support jvmArguments");
+            throw new IllegalArgumentException(getClass().getSimpleName() + " does not support jvmArguments: "
+                    + executorRequest.jvmArguments().get());
         }
         Path boot = mavenHome.resolve("boot");
         Path m2conf = mavenHome.resolve("bin/m2.conf");

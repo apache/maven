@@ -35,7 +35,7 @@ public class MavenITmng6090CIFriendlyTest extends AbstractMavenIntegrationTestCa
     public MavenITmng6090CIFriendlyTest() {
         // The first version which contains the fix for the MNG-issue.
         // TODO: Think about it!
-        super("[3.5.0-alpha-2,)");
+        super();
     }
 
     /**
@@ -50,7 +50,7 @@ public class MavenITmng6090CIFriendlyTest extends AbstractMavenIntegrationTestCa
     public void testitShouldResolveTheDependenciesWithoutBuildConsumer() throws Exception {
         File testDir = extractResources("/mng-6090-ci-friendly");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
 
         verifier.addCliArgument("-Drevision=1.2");
@@ -60,7 +60,7 @@ public class MavenITmng6090CIFriendlyTest extends AbstractMavenIntegrationTestCa
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.getAbsolutePath(), false);
+        verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
 
         verifier.addCliArgument("-Drevision=1.2");
@@ -75,7 +75,7 @@ public class MavenITmng6090CIFriendlyTest extends AbstractMavenIntegrationTestCa
     public void testitShouldResolveTheDependenciesWithBuildConsumer() throws Exception {
         File testDir = extractResources("/mng-6090-ci-friendly");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.setForkJvm(true); // TODO: why?
 
@@ -86,7 +86,7 @@ public class MavenITmng6090CIFriendlyTest extends AbstractMavenIntegrationTestCa
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.getAbsolutePath(), false);
+        verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.setForkJvm(true); // TODO: why?
 

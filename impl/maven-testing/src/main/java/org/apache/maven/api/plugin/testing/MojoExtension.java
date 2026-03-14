@@ -18,6 +18,8 @@
  */
 package org.apache.maven.api.plugin.testing;
 
+import javax.xml.stream.XMLStreamException;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -71,6 +73,7 @@ import org.apache.maven.api.services.ArtifactFactory;
 import org.apache.maven.api.services.ArtifactInstaller;
 import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.api.services.LocalRepositoryManager;
+import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.services.ProjectBuilder;
 import org.apache.maven.api.services.ProjectManager;
 import org.apache.maven.api.services.RepositoryFactory;
@@ -265,11 +268,27 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             XmlNode pluginConfiguration = model.getBuild().getPlugins().stream()
                     .filter(p ->
                             Objects.equals(p.getGroupId(), coord[0]) && Objects.equals(p.getArtifactId(), coord[1]))
-                    .map(ConfigurationContainer::getConfiguration)
                     .findFirst()
+                    .map(ConfigurationContainer::getConfiguration)
                     .orElseGet(() -> XmlNode.newInstance("config"));
             List<XmlNode> children = mojoParameters.stream()
-                    .map(mp -> XmlNode.newInstance(mp.name(), mp.value()))
+                    .map(mp -> {
+                        String value = mp.value();
+                        if (!mp.xml()) {
+                            // Treat as plain text - escape XML special characters
+                            value = value.replace("&", "&amp;")
+                                    .replace("<", "&lt;")
+                                    .replace(">", "&gt;")
+                                    .replace("\"", "&quot;")
+                                    .replace("'", "&apos;");
+                        }
+                        String s = '<' + mp.name() + '>' + value + "</" + mp.name() + '>';
+                        try {
+                            return XmlService.read(new StringReader(s));
+                        } catch (XMLStreamException e) {
+                            throw new MavenException("Unable to parse xml: " + e + System.lineSeparator() + s, e);
+                        }
+                    })
                     .collect(Collectors.toList());
             XmlNode config = XmlNode.newInstance("configuration", null, null, children, null);
             pluginConfiguration = XmlService.merge(config, pluginConfiguration);
@@ -444,6 +463,19 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             @Singleton
             @Priority(-10)
             private InternalSession createSession() {
+                MojoTest mojoTest = context.getRequiredTestClass().getAnnotation(MojoTest.class);
+                if (mojoTest != null && mojoTest.realSession()) {
+                    // Try to create a real session using ApiRunner without compile-time dependency
+                    try {
+                        Class<?> apiRunner = Class.forName("org.apache.maven.impl.standalone.ApiRunner");
+                        Object session = apiRunner.getMethod("createSession").invoke(null);
+                        return (InternalSession) session;
+                    } catch (Throwable t) {
+                        // Explicit request: do not fall back; abort the test with details instead of mocking
+                        throw new org.opentest4j.TestAbortedException(
+                                "@MojoTest(realSession=true) requested but could not create a real session.", t);
+                    }
+                }
                 return SessionMock.getMockSession(getBasedir());
             }
 

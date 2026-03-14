@@ -53,10 +53,6 @@ public class MavenITmng4068AuthenticatedMirrorTest extends AbstractMavenIntegrat
 
     private int port;
 
-    public MavenITmng4068AuthenticatedMirrorTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     @BeforeEach
     protected void setUp() throws Exception {
         testDir = extractResources("/mng-4068");

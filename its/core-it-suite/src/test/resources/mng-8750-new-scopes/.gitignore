@@ -1,0 +1,7 @@
+# Re-include the pre-populated test repo for this IT, even though root .gitignore ignores 'repo/'
+# The IT preference is to keep a pre-populated test repository in resources.
+!.gitignore
+!repo/
+# But still ignore any transient build outputs within the repo if any appear
+repo/**/target/
+

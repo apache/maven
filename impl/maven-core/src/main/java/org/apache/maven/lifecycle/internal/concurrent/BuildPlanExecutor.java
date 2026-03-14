@@ -298,8 +298,7 @@ public class BuildPlanExecutor {
                         .filter(execution -> !execution.getMojoDescriptor().isV4Api())
                         .collect(Collectors.toSet());
                 if (!unsafeExecutions.isEmpty()) {
-                    for (String s : MultilineMessageHelper.format(
-                            """
+                    for (String s : MultilineMessageHelper.format("""
                                 Your build is requesting concurrent execution, but this project contains the \
                                 following plugin(s) that have goals not built with Maven 4 to support concurrent \
                                 execution. While this /may/ work fine, please look for plugin updates and/or \

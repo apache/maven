@@ -66,6 +66,14 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
         invoke(cwd, userHome, List.of("verify"), List.of());
     }
 
+    @Disabled("Enable it when fully moved to NIO2 with Path/Filesystem (ie MavenExecutionRequest)")
+    @Test
+    void jimFs() throws Exception {
+        try (FileSystem fs = Jimfs.newFileSystem(Configuration.unix())) {
+            invoke(fs.getPath("/cwd"), fs.getPath("/home"), List.of("verify"), List.of());
+        }
+    }
+
     /**
      * Same source (user or project extensions.xml) must not contain same GA with different V.
      */
@@ -74,8 +82,7 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
             throws Exception {
-        String projectExtensionsXml =
-                """
+        String projectExtensionsXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <extensions>
                     <extension>
@@ -95,8 +102,7 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
         Path projectExtensions = dotMvn.resolve("extensions.xml");
         Files.writeString(projectExtensions, projectExtensionsXml);
 
-        String userExtensionsXml =
-                """
+        String userExtensionsXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <extensions>
                     <extension>
@@ -122,8 +128,7 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
             throws Exception {
-        String extensionsXml =
-                """
+        String extensionsXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <extensions>
                     <extension>
@@ -163,8 +168,7 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
             throws Exception {
-        String settingsXml =
-                """
+        String settingsXml = """
 <?xml version="1.0"?>
 <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
@@ -218,19 +222,11 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
         Map<String, String> logs = invoke(
                 cwd,
                 userHome,
-                List.of("eu.maveniverse.maven.plugins:toolbox:0.7.4:help"),
+                List.of("eu.maveniverse.maven.plugins:toolbox:" + Environment.TOOLBOX_VERSION + ":dump"),
                 List.of("--force-interactive"));
 
-        String log = logs.get("eu.maveniverse.maven.plugins:toolbox:0.7.4:help");
+        String log = logs.get("eu.maveniverse.maven.plugins:toolbox:" + Environment.TOOLBOX_VERSION + ":dump");
         assertTrue(log.contains("https://repo1.maven.org/maven2"), log);
         assertFalse(log.contains("https://repo.maven.apache.org/maven2"), log);
-    }
-
-    @Disabled("Until we move off fully from File")
-    @Test
-    void jimFs() throws Exception {
-        try (FileSystem fs = Jimfs.newFileSystem(Configuration.unix())) {
-            invoke(fs.getPath("/cwd"), fs.getPath("/home"), List.of("verify"), List.of());
-        }
     }
 }

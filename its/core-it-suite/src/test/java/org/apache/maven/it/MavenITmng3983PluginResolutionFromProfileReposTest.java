@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng3983PluginResolutionFromProfileReposTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3983PluginResolutionFromProfileReposTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that plugins can be resolved from remote plugin repositories defined by (active) profiles in the POM.
      *
@@ -41,7 +37,7 @@ public class MavenITmng3983PluginResolutionFromProfileReposTest extends Abstract
      */
     @Test
     public void testitFromPom() throws Exception {
-        requiresMavenVersion("[2.0,3.0-alpha-1),[3.0-alpha-3,)");
+        // requiresMavenVersion("[2.0,3.0-alpha-1),[3.0-alpha-3,)");
 
         File testDir = extractResources("/mng-3983/test-1");
 

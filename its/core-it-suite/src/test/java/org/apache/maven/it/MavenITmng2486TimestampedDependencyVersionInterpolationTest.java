@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng2486TimestampedDependencyVersionInterpolationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2486TimestampedDependencyVersionInterpolationTest() {
-        super("[2.0.5,)");
-    }
-
     /**
      * Verify that the expression ${project.version} gets resolved to X-SNAPSHOT and not the actual timestamp
      * during transitive dependency resolution. In part, this depends on the deployed SNAPSHOT POMs to retain their

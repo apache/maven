@@ -166,30 +166,66 @@ find_file_argument_basedir() {
 }
 
 # concatenates all lines of a file and replaces variables
+# Uses Java-based parser to handle all special characters correctly
+# This avoids shell parsing issues with pipes, quotes, @, and other special characters
+# and ensures POSIX compliance (no xargs -0, awk, or complex sed needed)
+# Set MAVEN_DEBUG_SCRIPT=1 to enable debug logging
 concat_lines() {
   if [ -f "$1" ]; then
-    # First convert all CR to LF using tr
-    tr '\r' '\n' < "$1" | \
-    sed -e '/^$/d' -e 's/#.*$//' | \
-    # Replace LF with NUL for xargs
-    tr '\n' '\0' | \
-    # Split into words and process each argument
-    # Use -0 with NUL to avoid special behaviour on quotes
-    xargs -n 1 -0 | \
-    while read -r arg; do
-      # Replace variables first
-      arg=$(echo "$arg" | sed \
-        -e "s@\${MAVEN_PROJECTBASEDIR}@$MAVEN_PROJECTBASEDIR@g" \
-        -e "s@\$MAVEN_PROJECTBASEDIR@$MAVEN_PROJECTBASEDIR@g")
+    # Use Java source-launch mode (JDK 11+) to run JvmConfigParser directly
+    # This avoids the need for compilation and temporary directories
 
-      echo "$arg"
-    done | \
-    tr '\n' ' '
+    # Debug logging
+    if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
+      echo "[DEBUG] Found jvm.config file at: $1" >&2
+      echo "[DEBUG] Running JvmConfigParser with Java: $JAVACMD" >&2
+      echo "[DEBUG] Parser arguments: $MAVEN_HOME/bin/JvmConfigParser.java $1 $MAVEN_PROJECTBASEDIR" >&2
+    fi
+
+    # Verify Java is available
+    "$JAVACMD" -version >/dev/null 2>&1 || {
+      echo "Error: Java not found. Please set JAVA_HOME." >&2
+      return 1
+    }
+
+    # Run the parser using source-launch mode
+    # Capture both stdout and stderr for comprehensive error reporting
+    parser_output=$("$JAVACMD" "$MAVEN_HOME/bin/JvmConfigParser.java" "$1" "$MAVEN_PROJECTBASEDIR" 2>&1)
+    parser_exit=$?
+
+    if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
+      echo "[DEBUG] JvmConfigParser exit code: $parser_exit" >&2
+      echo "[DEBUG] JvmConfigParser output: $parser_output" >&2
+    fi
+
+    if [ $parser_exit -ne 0 ]; then
+      # Parser failed - print comprehensive error information
+      echo "ERROR: JvmConfigParser failed with exit code $parser_exit" >&2
+      echo "  jvm.config path: $1" >&2
+      echo "  Maven basedir: $MAVEN_PROJECTBASEDIR" >&2
+      echo "  Java command: $JAVACMD" >&2
+      echo "  Parser output:" >&2
+      echo "$parser_output" | sed 's/^/    /' >&2
+      exit 1
+    fi
+
+    echo "$parser_output"
   fi
 }
 
 MAVEN_PROJECTBASEDIR="`find_maven_basedir "$@"`"
-MAVEN_OPTS="$MAVEN_OPTS `concat_lines "$MAVEN_PROJECTBASEDIR/.mvn/jvm.config"`"
+# Read JVM config and append to MAVEN_OPTS, preserving special characters
+_jvm_config="`concat_lines "$MAVEN_PROJECTBASEDIR/.mvn/jvm.config"`"
+if [ -n "$_jvm_config" ]; then
+  if [ -n "$MAVEN_OPTS" ]; then
+    MAVEN_OPTS="$MAVEN_OPTS $_jvm_config"
+  else
+    MAVEN_OPTS="$_jvm_config"
+  fi
+fi
+if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
+  echo "[DEBUG] Final MAVEN_OPTS: $MAVEN_OPTS" >&2
+fi
 LAUNCHER_JAR=`echo "$MAVEN_HOME"/boot/plexus-classworlds-*.jar`
 LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
 
@@ -239,6 +275,7 @@ handle_args() {
 handle_args "$@"
 MAVEN_MAIN_CLASS=${MAVEN_MAIN_CLASS:=org.apache.maven.cling.MavenCling}
 
+# Build command string for eval
 cmd="\"$JAVACMD\" \
   $MAVEN_OPTS \
   $MAVEN_DEBUG_OPTS \
@@ -251,13 +288,15 @@ cmd="\"$JAVACMD\" \
   \"-Dmaven.multiModuleProjectDirectory=$MAVEN_PROJECTBASEDIR\" \
   $LAUNCHER_CLASS \
   $MAVEN_ARGS"
+
 # Add remaining arguments with proper quoting
 for arg in "$@"; do
     cmd="$cmd \"$arg\""
 done
 
-# Debug: print the command that will be executed
-#echo "About to execute:"
-#echo "$cmd"
+if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
+  echo "[DEBUG] Launching JVM with command:" >&2
+  echo "[DEBUG]   $cmd" >&2
+fi
 
 eval exec "$cmd"

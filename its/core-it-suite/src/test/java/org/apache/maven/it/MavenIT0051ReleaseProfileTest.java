@@ -20,13 +20,14 @@ package org.apache.maven.it;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+/**
+ * @since 2.0.2
+ */
+@Disabled("Bounds: (2.0.2,4.0.0-alpha-1)")
 public class MavenIT0051ReleaseProfileTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenIT0051ReleaseProfileTest() {
-        super("(2.0.2,4.0.0-alpha-1)");
-    }
 
     /**
      * Test source attachment when -DperformRelease=true is specified.

@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3586SystemScopePluginDependencyTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3586SystemScopePluginDependencyTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that plugin dependencies with scope system are part of the plugin class realm. This test checks
      * dependencies that are declared in the plugin POM.

@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class MavenITmng3811ReportingPluginConfigurationInheritanceTest extends AbstractMavenIntegrationTestCase {
     public MavenITmng3811ReportingPluginConfigurationInheritanceTest() {
         // TODO: fix for 3.0+
-        super("[2.0.11,2.1.0-M1),[2.1.0,)");
+        super();
     }
 
     /**

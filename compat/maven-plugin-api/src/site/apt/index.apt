@@ -33,7 +33,7 @@ Maven 3 Plugin API
 
  []
 
- A plugin is described in a {{{./plugin.html}<<<META-INF/maven/plugin.xml>>> plugin descriptor}},
+ A plugin is described in a {{{../../api/maven-api-plugin/plugin.html}<<<META-INF/maven/plugin.xml>>> plugin descriptor}},
  generally generated from plugin sources using {{{/plugin-tools/maven-plugin-plugin/}maven-plugin-plugin}}.
 
 * See Also

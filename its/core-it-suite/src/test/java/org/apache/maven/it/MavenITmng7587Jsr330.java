@@ -26,13 +26,9 @@ import org.junit.jupiter.api.Test;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-7587">MNG-7587</a>.
  * Simply verifies that plexus component using JSR330 and compiled with JDK 17 bytecode can
  * work on maven.
+ * @since 4.0.0-alpha-5
  */
 class MavenITmng7587Jsr330 extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng7587Jsr330() {
-        // affected Maven versions: 4.0.0-alpha-5
-        super("(4.0.0-alpha-5,)");
-    }
 
     /**
      * Verify components can be written using JSR330.

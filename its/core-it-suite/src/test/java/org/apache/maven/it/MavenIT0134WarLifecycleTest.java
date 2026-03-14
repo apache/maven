@@ -29,10 +29,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenIT0134WarLifecycleTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenIT0134WarLifecycleTest() {
-        super("[2.0.0,)");
-    }
-
     /**
      * Test default binding of goals for "war" lifecycle.
      *

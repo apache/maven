@@ -23,9 +23,7 @@ import java.io.File;
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng5840RelativePathReactorMatching extends AbstractMavenIntegrationTestCase {
-    public MavenITmng5840RelativePathReactorMatching() {
-        super(ALL_MAVEN_VERSIONS);
-    }
+    public MavenITmng5840RelativePathReactorMatching() {}
 
     @Test
     public void testRelativePathPointsToWrongVersion() throws Exception {

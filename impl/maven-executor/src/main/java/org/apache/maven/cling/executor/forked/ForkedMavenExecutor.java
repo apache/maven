@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.maven.api.cli.Executor;
 import org.apache.maven.api.cli.ExecutorException;
@@ -45,6 +46,7 @@ import static org.apache.maven.api.cli.ExecutorRequest.getCanonicalPath;
  */
 public class ForkedMavenExecutor implements Executor {
     protected final boolean useMavenArgsEnv;
+    protected final AtomicBoolean closed;
 
     public ForkedMavenExecutor() {
         this(true);
@@ -52,11 +54,15 @@ public class ForkedMavenExecutor implements Executor {
 
     public ForkedMavenExecutor(boolean useMavenArgsEnv) {
         this.useMavenArgsEnv = useMavenArgsEnv;
+        this.closed = new AtomicBoolean(false);
     }
 
     @Override
     public int execute(ExecutorRequest executorRequest) throws ExecutorException {
         requireNonNull(executorRequest);
+        if (closed.get()) {
+            throw new ExecutorException("Executor is closed");
+        }
         validate(executorRequest);
 
         return doExecute(executorRequest);
@@ -65,6 +71,9 @@ public class ForkedMavenExecutor implements Executor {
     @Override
     public String mavenVersion(ExecutorRequest executorRequest) throws ExecutorException {
         requireNonNull(executorRequest);
+        if (closed.get()) {
+            throw new ExecutorException("Executor is closed");
+        }
         validate(executorRequest);
         try {
             Path cwd = Files.createTempDirectory("forked-executor-maven-version");
@@ -206,5 +215,12 @@ public class ForkedMavenExecutor implements Executor {
         stdinPump.setName("stdin" + suffix);
         stdinPump.start();
         return latch;
+    }
+
+    @Override
+    public void close() throws ExecutorException {
+        if (closed.compareAndExchange(false, true)) {
+            // nothing yet
+        }
     }
 }

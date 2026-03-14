@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng0674PluginParameterAliasTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng0674PluginParameterAliasTest() {
-        super("[3.0,)");
-    }
-
     /**
      * Test parameter alias usage for lifecycle-bound goal execution.
      *

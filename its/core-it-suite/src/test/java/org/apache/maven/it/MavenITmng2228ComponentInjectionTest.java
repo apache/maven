@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng2228ComponentInjectionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2228ComponentInjectionTest() {
-        super("(2.0.4,)");
-    }
-
     /**
      * Verify that components injected into plugins are actually assignment-compatible with the corresponding mojo
      * fields in case the field type is both provided by a plugin dependency and by a build extension.

@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4345DefaultPluginExecutionOrderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4345DefaultPluginExecutionOrderTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that plugin executions contributed by default lifecycle mappings always execute first in the targeted
      * lifecycle phase regardless of other plugin executions bound to the same phase and regardless of the POM

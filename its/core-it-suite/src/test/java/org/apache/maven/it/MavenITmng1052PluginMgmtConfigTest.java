@@ -29,9 +29,6 @@ import org.junit.jupiter.api.Test;
  *
  */
 public class MavenITmng1052PluginMgmtConfigTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng1052PluginMgmtConfigTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test that configuration for a lifecycle-bound plugin is injected from

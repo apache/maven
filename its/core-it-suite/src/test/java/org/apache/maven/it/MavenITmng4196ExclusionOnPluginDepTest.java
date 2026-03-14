@@ -35,10 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  */
 public class MavenITmng4196ExclusionOnPluginDepTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4196ExclusionOnPluginDepTest() {
-        super("[2.0.9,)");
-    }
-
     /**
      * Verify that exclusions on a project-level plugin dependency are effective.
      *

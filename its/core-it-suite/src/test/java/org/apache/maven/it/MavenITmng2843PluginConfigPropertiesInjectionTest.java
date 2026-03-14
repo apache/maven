@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng2843PluginConfigPropertiesInjectionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng2843PluginConfigPropertiesInjectionTest() {
-        super("(2.0.5,)");
-    }
-
     /**
      * Test that plugins can have the project properties injected via ${project.properties}.
      *

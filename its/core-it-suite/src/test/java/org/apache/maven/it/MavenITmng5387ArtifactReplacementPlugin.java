@@ -30,10 +30,6 @@ public class MavenITmng5387ArtifactReplacementPlugin extends AbstractMavenIntegr
 
     private File testDir;
 
-    public MavenITmng5387ArtifactReplacementPlugin() {
-        super("[3.1,)");
-    }
-
     @BeforeEach
     public void setUp() throws Exception {
         testDir = extractResources("/mng-5387");

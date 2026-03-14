@@ -22,8 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -35,6 +34,7 @@ import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.model.ModelProcessor;
 import org.apache.maven.api.services.xml.ModelXmlFactory;
+import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.spi.ModelParser;
 import org.apache.maven.api.spi.ModelParserException;
@@ -69,10 +69,10 @@ import org.apache.maven.api.spi.ModelParserException;
 public class DefaultModelProcessor implements ModelProcessor {
 
     private final ModelXmlFactory modelXmlFactory;
-    private final List<ModelParser> modelParsers;
+    private final Map<String, ModelParser> modelParsers;
 
     @Inject
-    public DefaultModelProcessor(ModelXmlFactory modelXmlFactory, @Nullable List<ModelParser> modelParsers) {
+    public DefaultModelProcessor(ModelXmlFactory modelXmlFactory, @Nullable Map<String, ModelParser> modelParsers) {
         this.modelXmlFactory = modelXmlFactory;
         this.modelParsers = modelParsers;
     }
@@ -81,7 +81,7 @@ public class DefaultModelProcessor implements ModelProcessor {
     public Path locateExistingPom(Path projectDirectory) {
         // Note that the ModelProcessor#locatePom never returns null
         // while the ModelParser#locatePom needs to return an existing path!
-        Path pom = modelParsers.stream()
+        Path pom = modelParsers.values().stream()
                 .map(m -> m.locate(projectDirectory)
                         .map(org.apache.maven.api.services.Source::getPath)
                         .orElse(null))
@@ -100,22 +100,27 @@ public class DefaultModelProcessor implements ModelProcessor {
         Path pomFile = request.getPath();
         if (pomFile != null) {
             Path projectDirectory = pomFile.getParent();
-            List<ModelParserException> exceptions = new ArrayList<>();
-            for (ModelParser parser : modelParsers) {
+            Map<String, ModelParserException> exceptions = new LinkedHashMap<>();
+            for (Map.Entry<String, ModelParser> parser : modelParsers.entrySet()) {
                 try {
-                    Optional<Model> model =
-                            parser.locateAndParse(projectDirectory, Map.of(ModelParser.STRICT, request.isStrict()));
+                    Optional<Model> model = parser.getValue()
+                            .locateAndParse(projectDirectory, Map.of(ModelParser.STRICT, request.isStrict()));
                     if (model.isPresent()) {
                         return model.get().withPomFile(pomFile);
                     }
                 } catch (ModelParserException e) {
-                    exceptions.add(e);
+                    exceptions.put(parser.getKey(), e);
                 }
             }
             try {
                 return doRead(request);
-            } catch (IOException e) {
-                exceptions.forEach(e::addSuppressed);
+            } catch (IOException | XmlReaderException e) {
+                if (!exceptions.isEmpty()) {
+                    IOException ioException = new IOException(buildDetailedErrorMessage(pomFile, exceptions, e));
+                    exceptions.values().forEach(ioException::addSuppressed);
+                    ioException.addSuppressed(e);
+                    throw ioException;
+                }
                 throw e;
             }
         } else {
@@ -139,5 +144,58 @@ public class DefaultModelProcessor implements ModelProcessor {
 
     private Model doRead(XmlReaderRequest request) throws IOException {
         return modelXmlFactory.read(request);
+    }
+
+    private String buildDetailedErrorMessage(
+            Path pomFile, Map<String, ModelParserException> parserExceptions, Exception defaultReaderException) {
+        StringBuilder message = new StringBuilder();
+        message.append("Unable to parse POM ").append(pomFile).append(System.lineSeparator());
+
+        if (!parserExceptions.isEmpty()) {
+            message.append("        Tried ")
+                    .append(parserExceptions.size())
+                    .append(" parser")
+                    .append(parserExceptions.size() > 1 ? "s" : "")
+                    .append(":")
+                    .append(System.lineSeparator());
+
+            for (Map.Entry<String, ModelParserException> entry : parserExceptions.entrySet()) {
+                ModelParserException e = entry.getValue();
+                message.append("          ").append(entry.getKey()).append(") ");
+
+                String parserMessage = e.getMessage();
+                if (parserMessage != null && !parserMessage.isEmpty()) {
+                    message.append(parserMessage);
+                } else {
+                    message.append(e.getClass().getSimpleName());
+                }
+
+                if (e.getLineNumber() > 0) {
+                    message.append(" at line ").append(e.getLineNumber());
+                    if (e.getColumnNumber() > 0) {
+                        message.append(", column ").append(e.getColumnNumber());
+                    }
+                }
+
+                if (e.getCause() != null && e.getCause().getMessage() != null) {
+                    String causeMessage = e.getCause().getMessage();
+                    if (parserMessage == null || !parserMessage.contains(causeMessage)) {
+                        message.append(": ").append(causeMessage);
+                    }
+                }
+
+                message.append(System.lineSeparator());
+            }
+        }
+
+        message.append("          default) XML reader also failed: ");
+        String defaultMessage = defaultReaderException.getMessage();
+        if (defaultMessage != null && !defaultMessage.isEmpty()) {
+            message.append(defaultMessage);
+        } else {
+            message.append(defaultReaderException.getClass().getSimpleName());
+        }
+
+        return message.toString();
     }
 }

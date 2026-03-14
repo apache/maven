@@ -30,10 +30,6 @@ public class MavenITmng6084Jsr250PluginTest extends AbstractMavenIntegrationTest
 
     private File testDir;
 
-    public MavenITmng6084Jsr250PluginTest() {
-        super("[3.5.1,)");
-    }
-
     @BeforeEach
     public void setUp() throws Exception {
         testDir = extractResources("/mng-6084-jsr250-support");

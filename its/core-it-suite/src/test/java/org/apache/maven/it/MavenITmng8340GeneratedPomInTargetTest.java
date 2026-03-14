@@ -27,10 +27,6 @@ import org.junit.jupiter.api.Test;
  */
 class MavenITmng8340GeneratedPomInTargetTest extends AbstractMavenIntegrationTestCase {
 
-    MavenITmng8340GeneratedPomInTargetTest() {
-        super("[3.8.6,4.0.0-beta-5),[4.0.0-beta-6,)");
-    }
-
     /**
      *  Verify that the build succeeds.
      */

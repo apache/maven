@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4116UndecodedUrlsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4116UndecodedUrlsTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that the project builder does not decode URLs (which must be done by the transport layer instead).
      *

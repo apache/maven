@@ -25,12 +25,10 @@ import org.junit.jupiter.api.Timeout;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8341">MNG-8341</a>.
+ * @since 4.0.0-beta-6
+ *
  */
 class MavenITmng8341DeadlockTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8341DeadlockTest() {
-        super("[4.0.0-beta-6,)");
-    }
 
     /**
      *  Verify that the build succeeds

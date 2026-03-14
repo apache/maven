@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3401CLIDefaultExecIdTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3401CLIDefaultExecIdTest() {
-        super("[2.2.0,)");
-    }
-
     /**
      * Test that the configuration of an execution block with the id "default-cli" applies to direct CLI
      * invocations of a goal as well if the plugin is configured under build/plugins.

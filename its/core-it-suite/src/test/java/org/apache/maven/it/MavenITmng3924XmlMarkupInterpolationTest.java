@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3924XmlMarkupInterpolationTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3924XmlMarkupInterpolationTest() {
-        super("[2.1.0-M1,)");
-    }
-
     /**
      * Test that interpolation of properties that resolve to XML markup doesn't crash the project builder.
      *

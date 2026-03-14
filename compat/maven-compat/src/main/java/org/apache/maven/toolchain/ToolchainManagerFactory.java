@@ -72,21 +72,64 @@ public class ToolchainManagerFactory {
         return new DefaultToolchainManagerV4();
     }
 
+    @Provides
+    @Typed(ToolchainFactory.class)
+    @Named("jdk")
+    ToolchainFactory jdkFactory() {
+        return createV3FactoryBridge("jdk");
+    }
+
+    /**
+     * Creates a v3 ToolchainFactory bridge that wraps a v4 ToolchainFactory.
+     */
+    public ToolchainFactory createV3FactoryBridge(String type) {
+        try {
+            org.apache.maven.api.services.ToolchainFactory v4Factory =
+                    lookup.lookup(org.apache.maven.api.services.ToolchainFactory.class, type);
+            if (v4Factory == null) {
+                return null;
+            }
+            return createV3FactoryBridgeForV4Factory(v4Factory);
+        } catch (Exception e) {
+            // If lookup fails, no v4 factory exists for this type
+            return null;
+        }
+    }
+
+    /**
+     * Creates a v3 ToolchainFactory bridge that wraps a specific v4 ToolchainFactory instance.
+     */
+    public ToolchainFactory createV3FactoryBridgeForV4Factory(
+            org.apache.maven.api.services.ToolchainFactory v4Factory) {
+        return new ToolchainFactory() {
+            @Override
+            public ToolchainPrivate createToolchain(ToolchainModel model) throws MisconfiguredToolchainException {
+                try {
+                    org.apache.maven.api.Toolchain v4Toolchain = v4Factory.createToolchain(model.getDelegate());
+                    return getToolchainV3(v4Toolchain);
+                } catch (ToolchainFactoryException e) {
+                    throw new MisconfiguredToolchainException(e.getMessage(), e);
+                }
+            }
+
+            @Override
+            public ToolchainPrivate createDefaultToolchain() {
+                try {
+                    return v4Factory
+                            .createDefaultToolchain()
+                            .map(ToolchainManagerFactory.this::getToolchainV3)
+                            .orElse(null);
+                } catch (ToolchainFactoryException e) {
+                    return null;
+                }
+            }
+        };
+    }
+
     private org.apache.maven.impl.DefaultToolchainManager getDelegate() {
-        return getToolchainManager(lookup, logger);
-    }
-
-    private org.apache.maven.impl.DefaultToolchainManager getToolchainManager(Lookup lookup, Logger logger) {
-        return getToolchainManager(
-                lookup.lookupMap(ToolchainFactory.class),
-                lookup.lookupMap(org.apache.maven.api.services.ToolchainFactory.class),
-                logger);
-    }
-
-    private org.apache.maven.impl.DefaultToolchainManager getToolchainManager(
-            Map<String, ToolchainFactory> v3Factories,
-            Map<String, org.apache.maven.api.services.ToolchainFactory> v4Factories,
-            Logger logger) {
+        Map<String, ToolchainFactory> v3Factories = lookup.lookupMap(ToolchainFactory.class);
+        Map<String, org.apache.maven.api.services.ToolchainFactory> v4Factories =
+                lookup.lookupMap(org.apache.maven.api.services.ToolchainFactory.class);
         Map<String, org.apache.maven.api.services.ToolchainFactory> allFactories = new HashMap<>();
         for (Map.Entry<String, ToolchainFactory> entry : v3Factories.entrySet()) {
             ToolchainFactory v3Factory = entry.getValue();

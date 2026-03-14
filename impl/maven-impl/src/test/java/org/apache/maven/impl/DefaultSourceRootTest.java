@@ -19,10 +19,14 @@
 package org.apache.maven.impl;
 
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 import org.apache.maven.api.Language;
 import org.apache.maven.api.ProjectScope;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.model.Resource;
 import org.apache.maven.api.model.Source;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,9 +37,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.LenientStubber;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 
+@SuppressWarnings("deprecation")
 @ExtendWith(MockitoExtension.class)
 public class DefaultSourceRootTest {
 
@@ -51,10 +58,28 @@ public class DefaultSourceRootTest {
         stub.when(session.requireLanguage(eq("resources"))).thenReturn(Language.RESOURCES);
     }
 
+    /**
+     * Returns the output directory relative to the base directory.
+     */
+    private static Function<ProjectScope, String> outputDirectory() {
+        return (scope) -> {
+            if (scope == ProjectScope.MAIN) {
+                return "target/classes";
+            } else if (scope == ProjectScope.TEST) {
+                return "target/test-classes";
+            } else {
+                return "target";
+            }
+        };
+    }
+
     @Test
     void testMainJavaDirectory() {
-        var source = new DefaultSourceRoot(
-                session, Path.of("myproject"), Source.newBuilder().build());
+        var source = DefaultSourceRoot.fromModel(
+                session,
+                Path.of("myproject"),
+                outputDirectory(),
+                Source.newBuilder().build());
 
         assertTrue(source.module().isEmpty());
         assertEquals(ProjectScope.MAIN, source.scope());
@@ -65,8 +90,11 @@ public class DefaultSourceRootTest {
 
     @Test
     void testTestJavaDirectory() {
-        var source = new DefaultSourceRoot(
-                session, Path.of("myproject"), Source.newBuilder().scope("test").build());
+        var source = DefaultSourceRoot.fromModel(
+                session,
+                Path.of("myproject"),
+                outputDirectory(),
+                Source.newBuilder().scope("test").build());
 
         assertTrue(source.module().isEmpty());
         assertEquals(ProjectScope.TEST, source.scope());
@@ -77,9 +105,10 @@ public class DefaultSourceRootTest {
 
     @Test
     void testTestResourceDirectory() {
-        var source = new DefaultSourceRoot(
+        var source = DefaultSourceRoot.fromModel(
                 session,
                 Path.of("myproject"),
+                outputDirectory(),
                 Source.newBuilder().scope("test").lang("resources").build());
 
         assertTrue(source.module().isEmpty());
@@ -91,9 +120,10 @@ public class DefaultSourceRootTest {
 
     @Test
     void testModuleMainDirectory() {
-        var source = new DefaultSourceRoot(
+        var source = DefaultSourceRoot.fromModel(
                 session,
                 Path.of("myproject"),
+                outputDirectory(),
                 Source.newBuilder().module("org.foo.bar").build());
 
         assertEquals("org.foo.bar", source.module().orElseThrow());
@@ -105,9 +135,10 @@ public class DefaultSourceRootTest {
 
     @Test
     void testModuleTestDirectory() {
-        var source = new DefaultSourceRoot(
+        var source = DefaultSourceRoot.fromModel(
                 session,
                 Path.of("myproject"),
+                outputDirectory(),
                 Source.newBuilder().module("org.foo.bar").scope("test").build());
 
         assertEquals("org.foo.bar", source.module().orElseThrow());
@@ -115,5 +146,144 @@ public class DefaultSourceRootTest {
         assertEquals(Language.JAVA_FAMILY, source.language());
         assertEquals(Path.of("myproject", "src", "org.foo.bar", "test", "java"), source.directory());
         assertTrue(source.targetVersion().isEmpty());
+    }
+
+    /**
+     * Tests that relative target paths are stored as relative paths.
+     */
+    @Test
+    void testRelativeMainTargetPath() {
+        var source = DefaultSourceRoot.fromModel(
+                session,
+                Path.of("myproject"),
+                outputDirectory(),
+                Source.newBuilder().targetPath("user-output").build());
+
+        assertEquals(ProjectScope.MAIN, source.scope());
+        assertEquals(Language.JAVA_FAMILY, source.language());
+        assertEquals(Path.of("user-output"), source.targetPath().orElseThrow());
+    }
+
+    /**
+     * Tests that relative target paths are stored as relative paths.
+     */
+    @Test
+    void testRelativeTestTargetPath() {
+        var source = DefaultSourceRoot.fromModel(
+                session,
+                Path.of("myproject"),
+                outputDirectory(),
+                Source.newBuilder().targetPath("user-output").scope("test").build());
+
+        assertEquals(ProjectScope.TEST, source.scope());
+        assertEquals(Language.JAVA_FAMILY, source.language());
+        assertEquals(Path.of("user-output"), source.targetPath().orElseThrow());
+    }
+
+    /*MNG-11062*/
+    @Test
+    void testExtractsTargetPathFromResource() {
+        // Test the Resource constructor with relative targetPath
+        // targetPath should be kept as relative path
+        Resource resource = Resource.newBuilder()
+                .directory("src/test/resources")
+                .targetPath("test-output")
+                .build();
+
+        DefaultSourceRoot sourceRoot = new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource);
+
+        Optional<Path> targetPath = sourceRoot.targetPath();
+        assertTrue(targetPath.isPresent(), "targetPath should be present");
+        assertEquals(Path.of("test-output"), targetPath.get(), "targetPath should be relative to output directory");
+        assertEquals(Path.of("myproject", "src", "test", "resources"), sourceRoot.directory());
+        assertEquals(ProjectScope.TEST, sourceRoot.scope());
+        assertEquals(Language.RESOURCES, sourceRoot.language());
+    }
+
+    /*MNG-11062*/
+    @Test
+    void testHandlesNullTargetPathFromResource() {
+        // Test null targetPath handling
+        Resource resource =
+                Resource.newBuilder().directory("src/test/resources").build();
+        // targetPath is null by default
+
+        DefaultSourceRoot sourceRoot = new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource);
+
+        Optional<Path> targetPath = sourceRoot.targetPath();
+        assertFalse(targetPath.isPresent(), "targetPath should be empty when null");
+    }
+
+    /*MNG-11062*/
+    @Test
+    void testHandlesEmptyTargetPathFromResource() {
+        // Test empty string targetPath
+        Resource resource = Resource.newBuilder()
+                .directory("src/test/resources")
+                .targetPath("")
+                .build();
+
+        DefaultSourceRoot sourceRoot = new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource);
+
+        Optional<Path> targetPath = sourceRoot.targetPath();
+        assertFalse(targetPath.isPresent(), "targetPath should be empty for empty string");
+    }
+
+    /*MNG-11062*/
+    @Test
+    void testHandlesPropertyPlaceholderInTargetPath() {
+        // Test property placeholder preservation
+        Resource resource = Resource.newBuilder()
+                .directory("src/test/resources")
+                .targetPath("${project.build.directory}/custom")
+                .build();
+
+        DefaultSourceRoot sourceRoot = new DefaultSourceRoot(Path.of("myproject"), ProjectScope.MAIN, resource);
+
+        Optional<Path> targetPath = sourceRoot.targetPath();
+        assertTrue(targetPath.isPresent(), "Property placeholder targetPath should be present");
+        assertEquals(
+                Path.of("${project.build.directory}/custom"),
+                targetPath.get(),
+                "Property placeholder should be kept as-is (relative path)");
+    }
+
+    /*MNG-11062*/
+    @Test
+    void testResourceConstructorRequiresNonNullDirectory() {
+        // Test that null directory throws exception
+        Resource resource = Resource.newBuilder().build();
+        // directory is null by default
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource),
+                "Should throw exception for null directory");
+    }
+
+    /*MNG-11062*/
+    @Test
+    void testResourceConstructorPreservesOtherProperties() {
+        // Test that other Resource properties are correctly preserved
+        Resource resource = Resource.newBuilder()
+                .directory("src/test/resources")
+                .targetPath("test-classes")
+                .filtering("true")
+                .includes(List.of("*.properties"))
+                .excludes(List.of("*.tmp"))
+                .build();
+
+        DefaultSourceRoot sourceRoot = new DefaultSourceRoot(Path.of("myproject"), ProjectScope.TEST, resource);
+
+        // Verify all properties are preserved
+        assertEquals(
+                Path.of("test-classes"),
+                sourceRoot.targetPath().orElseThrow(),
+                "targetPath should be relative to output directory");
+        assertTrue(sourceRoot.stringFiltering(), "Filtering should be true");
+        assertEquals(1, sourceRoot.includes().size());
+        assertTrue(sourceRoot.includes().contains("*.properties"));
+        assertEquals(1, sourceRoot.excludes().size());
+        assertTrue(sourceRoot.excludes().contains("*.tmp"));
     }
 }

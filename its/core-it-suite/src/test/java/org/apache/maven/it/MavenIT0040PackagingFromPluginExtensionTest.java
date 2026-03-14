@@ -30,10 +30,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenIT0040PackagingFromPluginExtensionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenIT0040PackagingFromPluginExtensionTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test the use of a packaging from a plugin
      *

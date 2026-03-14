@@ -32,9 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  */
 public class MavenITmng0249ResolveDepsFromReactorTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng0249ResolveDepsFromReactorTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
 
     /**
      * Test that the reactor can establish the artifact location of known projects for dependencies.

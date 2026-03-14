@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4332DefaultPluginExecutionOrderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4332DefaultPluginExecutionOrderTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that default plugin executions contributed by the packaging are executed before user-defined
      * executions from the POM's build section, regardless whether the executions are defined in the regular

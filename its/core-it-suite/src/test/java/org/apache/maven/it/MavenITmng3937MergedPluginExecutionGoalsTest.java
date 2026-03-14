@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng3937MergedPluginExecutionGoalsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3937MergedPluginExecutionGoalsTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Test that during inheritance/merging of a plugin execution the goals specified by child and parent are properly
      * ordered when no {@code <pluginManagement>} is involved.

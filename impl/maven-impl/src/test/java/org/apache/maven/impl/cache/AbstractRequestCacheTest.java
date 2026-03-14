@@ -235,6 +235,10 @@ class AbstractRequestCacheTest {
             failures.put(request, exception);
         }
 
+        public CacheStatistics getStatistics() {
+            return null; // Not implemented for test
+        }
+
         @Override
         protected <REQ extends Request<?>, REP extends Result<REQ>> CachingSupplier<REQ, REP> doCache(
                 REQ req, Function<REQ, REP> supplier) {

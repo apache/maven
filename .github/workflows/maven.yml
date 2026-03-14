@@ -23,43 +23,63 @@ on:
   pull_request:
     branches: [ master ]
 
+# allow single build per branch or PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 # clear all permissions for GITHUB_TOKEN
 permissions: {}
+
+env:
+  MIMIR_VERSION: 0.11.2
+  MIMIR_BASEDIR: ~/.mimir
+  MIMIR_LOCAL: ~/.mimir/local
+  MAVEN_OPTS: -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./target/java_heapdump.hprof
+  MVNW_REPOURL: https://maven-central.storage-download.googleapis.com/maven2
 
 jobs:
   initial-build:
     runs-on: ubuntu-latest
     steps:
       - name: Set up JDK
-        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
         with:
           java-version: 17
           distribution: 'temurin'
 
       - name: Checkout maven
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
-      - name: Prepare Mimir
+      - name: Prepare Mimir for Maven 3.x
         shell: bash
         run: |
-          mkdir -p ~/.mimir
-          cp .github/ci-extensions.xml ~/.m2/extensions.xml
-          cp .github/ci-mimir-daemon.properties ~/.mimir/daemon.properties
+          mkdir -p ${{ env.MIMIR_BASEDIR }}
+          cp .github/ci-mimir-session.properties ${{ env.MIMIR_BASEDIR }}/session.properties
+          cp .github/ci-mimir-daemon.properties ${{ env.MIMIR_BASEDIR }}/daemon.properties
+          cp .github/ci-extensions.xml .mvn/extensions.xml
 
-      - name: Handle Mimir caches
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
+      - name: Restore Mimir caches
+        uses: actions/cache/restore@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
         with:
-          path: ~/.mimir/local
-          key: mimir-${{ runner.os }}-initial-${{ hashFiles('**/pom.xml') }}
+          path: ${{ env.MIMIR_LOCAL }}
+          key: master-${{ runner.os }}-${{ github.run_id }}
           restore-keys: |
-            mimir-${{ runner.os }}-initial-
-            mimir-${{ runner.os }}-
+            master-${{ runner.os }}-
+            master-
 
       - name: Set up Maven
         shell: bash
-        run: mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper "-Dmaven=4.0.0-rc-3"
+        run: mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.4:wrapper "-Dmaven=4.0.0-rc-5"
+
+      - name: Prepare Mimir for Maven 4.x
+        shell: bash
+        run: |
+          rm .mvn/extensions.xml
+          mkdir -p ~/.m2
+          cp .github/ci-extensions.xml ~/.m2/extensions.xml
 
       - name: Build Maven distributions
         shell: bash
@@ -69,13 +89,41 @@ jobs:
         shell: bash
         run: ls -la apache-maven/target
 
+      - name: Upload Mimir caches
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        if: ${{ !cancelled() && !failure() }}
+        with:
+          name: cache-${{ runner.os }}-initial
+          retention-days: 1
+          path: ${{ env.MIMIR_LOCAL }}
+
       - name: Upload Maven distributions
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: maven-distributions
           path: |
             apache-maven/target/apache-maven*.zip
             apache-maven/target/apache-maven*.tar.gz
+
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        if: ${{ failure() || cancelled() }}
+        with:
+          name: initial-logs
+          retention-days: 1
+          path: |
+            **/target/surefire-reports/*
+            **/target/java_heapdump.hprof
+
+      - name: Upload Mimir logs
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        if: always()
+        with:
+          name: initial-mimir-logs
+          include-hidden-files: true
+          retention-days: 1
+          path: |
+            ~/.mimir/*.log
 
   full-build:
     needs: initial-build
@@ -84,10 +132,10 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        java: ['17', '21', '24']
+        java: ['17', '21', '25']
     steps:
       - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
@@ -105,29 +153,30 @@ jobs:
         run: choco install graphviz
 
       - name: Checkout maven
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
-      - name: Prepare Mimir
+      - name: Prepare Mimir for Maven 4.x
         shell: bash
         run: |
+          mkdir -p ${{ env.MIMIR_BASEDIR }}
+          cp .github/ci-mimir-session.properties ${{ env.MIMIR_BASEDIR }}/session.properties
+          cp .github/ci-mimir-daemon.properties ${{ env.MIMIR_BASEDIR }}/daemon.properties
           mkdir -p ~/.m2
-          mkdir -p ~/.mimir
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
-          cp .github/ci-mimir-daemon.properties ~/.mimir/daemon.properties
 
-      - name: Handle Mimir caches
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
+      - name: Restore Mimir caches
+        uses: actions/cache/restore@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
         with:
-          path: ~/.mimir/local
-          key: mimir-${{ runner.os }}-full-${{ hashFiles('**/pom.xml') }}
+          path: ${{ env.MIMIR_LOCAL }}
+          key: master-${{ runner.os }}-${{ github.run_id }}
           restore-keys: |
-            mimir-${{ runner.os }}-full-
-            mimir-${{ runner.os }}-
+            master-${{ runner.os }}-
+            master-
 
       - name: Download Maven distribution
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8.0.0
         with:
           name: maven-distributions
           path: maven-dist
@@ -152,10 +201,6 @@ jobs:
           fi
           echo "MAVEN_HOME=$PWD/maven-local" >> $GITHUB_ENV
           echo "$PWD/maven-local/bin" >> $GITHUB_PATH
-
-      - name: Show IP
-        shell: bash
-        run: curl --silent https://api.ipify.org
 
       - name: Build with downloaded Maven
         shell: bash
@@ -165,12 +210,33 @@ jobs:
         shell: bash
         run: mvn site -e -B -V -Preporting
 
+      - name: Upload Mimir caches
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        if: ${{ !cancelled() && !failure() }}
+        with:
+          name: cache-${{ runner.os }}-full-build-${{ matrix.java }}
+          retention-days: 1
+          path: ${{ env.MIMIR_LOCAL }}
+
       - name: Upload test artifacts
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         if: failure() || cancelled()
         with:
-          name: ${{ github.run_number }}-full-build-artifact-${{ runner.os }}-${{ matrix.java }}
-          path: '**/target/surefire-reports/*'
+          name: full-build-logs-${{ runner.os }}-${{ matrix.java }}
+          retention-days: 1
+          path: |
+            **/target/surefire-reports/*
+            **/target/java_heapdump.hprof
+
+      - name: Upload Mimir logs
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        if: always()
+        with:
+          name: full-build-mimir-logs-${{ runner.os }}-${{ matrix.java }}
+          include-hidden-files: true
+          retention-days: 1
+          path: |
+            ~/.mimir/*.log
 
   integration-tests:
     needs: initial-build
@@ -179,38 +245,39 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        java: ['17', '21', '24']
+        java: ['17', '21', '25']
     steps:
       - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
 
       - name: Checkout maven
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
-      - name: Prepare Mimir
+      - name: Prepare Mimir for Maven 4.x
         shell: bash
         run: |
+          mkdir -p ${{ env.MIMIR_BASEDIR }}
+          cp .github/ci-mimir-session.properties ${{ env.MIMIR_BASEDIR }}/session.properties
+          cp .github/ci-mimir-daemon.properties ${{ env.MIMIR_BASEDIR }}/daemon.properties
           mkdir -p ~/.m2
-          mkdir -p ~/.mimir
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
-          cp .github/ci-mimir-daemon.properties ~/.mimir/daemon.properties
 
-      - name: Handle Mimir caches
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
+      - name: Restore Mimir caches
+        uses: actions/cache/restore@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
         with:
-          path: ~/.mimir/local
-          key: mimir-${{ runner.os }}-its-${{ hashFiles('**/pom.xml') }}
+          path: ${{ env.MIMIR_LOCAL }}
+          key: master-${{ runner.os }}-${{ github.run_id }}
           restore-keys: |
-            mimir-${{ runner.os }}-its-
-            mimir-${{ runner.os }}-
+            master-${{ runner.os }}-
+            master-
 
       - name: Download Maven distribution
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8.0.0
         with:
           name: maven-distributions
           path: maven-dist
@@ -236,17 +303,59 @@ jobs:
           echo "MAVEN_HOME=$PWD/maven-local" >> $GITHUB_ENV
           echo "$PWD/maven-local/bin" >> $GITHUB_PATH
 
-      - name: Show IP
-        shell: bash
-        run: curl --silent https://api.ipify.org
-
       - name: Build Maven and ITs and run them
         shell: bash
-        run: mvn verify -e -B -V -Prun-its,mimir
+        run: mvn install -e -B -V -Prun-its,mimir
+
+      - name: Upload Mimir caches
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        if: ${{ !cancelled() && !failure() }}
+        with:
+          name: cache-${{ runner.os }}-integration-tests-${{ matrix.java }}
+          retention-days: 1
+          path: ${{ env.MIMIR_LOCAL }}
 
       - name: Upload test artifacts
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        if: failure() || cancelled()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        if: ${{ failure() || cancelled() }}
         with:
-          name: ${{ github.run_number }}-integration-test-artifact-${{ runner.os }}-${{ matrix.java }}
-          path: ./its/core-it-suite/target/test-classes/
+          name: integration-test-logs-${{ runner.os }}-${{ matrix.java }}
+          retention-days: 1
+          path: |
+            **/target/surefire-reports/*
+            **/target/failsafe-reports/*
+            ./its/core-it-suite/target/test-classes/**
+            **/target/java_heapdump.hprof
+
+      - name: Upload Mimir logs
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        if: always()
+        with:
+          name: integration-test-mimir-logs-${{ runner.os }}-${{ matrix.java }}
+          include-hidden-files: true
+          retention-days: 1
+          path: |
+            ~/.mimir/*.log
+
+  consolidate-caches:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    needs:
+      - full-build
+      - integration-tests
+    steps:
+      - name: Download Caches
+        uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8.0.0
+        with:
+          merge-multiple: true
+          pattern: 'cache-${{ runner.os }}*'
+          path: ${{ env.MIMIR_LOCAL }}
+      - name: Publish cache
+        uses: actions/cache/save@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+        if: ${{ github.event_name != 'pull_request' && !cancelled() && !failure() }}
+        with:
+          path: ${{ env.MIMIR_LOCAL }}
+          key: master-${{ runner.os }}-${{ github.run_id }}

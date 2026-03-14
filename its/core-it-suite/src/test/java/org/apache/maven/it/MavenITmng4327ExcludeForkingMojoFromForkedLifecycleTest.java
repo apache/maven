@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4327ExcludeForkingMojoFromForkedLifecycleTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4327ExcludeForkingMojoFromForkedLifecycleTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that lifecycle forking mojos are excluded from the lifecycles that have directly or indirectly forked
      * by them.

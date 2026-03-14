@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4008MergedFilterOrderTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4008MergedFilterOrderTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that filter definitions are properly merged.
      *

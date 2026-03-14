@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng6173GetAllProjectsInReactorTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng6173GetAllProjectsInReactorTest() {
-        super("[3.2.1,3.3.1),[3.5.0-alpha-2,)");
-    }
-
     /**
      * Verifies that {@code MavenSession#getAllProjects()} returns all projects in the reactor
      * not only the ones being built.

@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Properties;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,11 +37,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Benjamin Bentmann
  */
+@Disabled("Bounds: [3.0-alpha-3,4.0.0-alpha-1)")
 public class MavenITmng4421DeprecatedPomInterpolationExpressionsTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng4421DeprecatedPomInterpolationExpressionsTest() {
-        super("[3.0-alpha-3,4.0.0-alpha-1)");
-    }
 
     /**
      * Test that expressions of the form ${pom.*} and {*} referring to the model cause build warnings.

@@ -26,12 +26,10 @@ import org.junit.jupiter.api.Test;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3536">MNG-3536</a>.
  *
  *
+ * @since 2.1.0-M1
+ *
  */
 public class MavenITmng3536AppendedAbsolutePathsTest extends AbstractMavenIntegrationTestCase {
-
-    public MavenITmng3536AppendedAbsolutePathsTest() {
-        super("[2.1.0-M1,)"); // 2.1.0+ only
-    }
 
     @Test
     public void testitMNG3536() throws Exception {

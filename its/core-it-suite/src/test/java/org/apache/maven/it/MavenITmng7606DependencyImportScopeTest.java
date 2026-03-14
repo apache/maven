@@ -29,9 +29,7 @@ import org.junit.jupiter.api.Test;
  */
 class MavenITmng7606DependencyImportScopeTest extends AbstractMavenIntegrationTestCase {
 
-    MavenITmng7606DependencyImportScopeTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
+    MavenITmng7606DependencyImportScopeTest() {}
 
     /**
      * Verify that dependencies which are managed through imported dependency management work

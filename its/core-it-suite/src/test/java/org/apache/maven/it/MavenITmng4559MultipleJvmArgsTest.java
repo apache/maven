@@ -32,9 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * - Ensures arguments are correctly split and passed to the JVM
  */
 public class MavenITmng4559MultipleJvmArgsTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng4559MultipleJvmArgsTest() {
-        super("[4.0.0-rc-4,)");
-    }
 
     @Test
     void testMultipleJvmArgs() throws Exception {

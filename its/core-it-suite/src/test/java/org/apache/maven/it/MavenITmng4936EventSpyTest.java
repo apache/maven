@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4936EventSpyTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4936EventSpyTest() {
-        super("[3.0.2,)");
-    }
-
     /**
      * Verify that loading of an event spy extension from CLI works.
      *
@@ -60,15 +56,10 @@ public class MavenITmng4936EventSpyTest extends AbstractMavenIntegrationTestCase
         assertTrue(lines.get(lines.size() - 1).toString().startsWith("close"), lines.toString());
         assertTrue(
                 lines.contains(
-                        matchesVersionRange("[4.0.0-beta-5,)")
-                                ? "event: org.apache.maven.api.services.SettingsBuilderRequest$SettingsBuilderRequestBuilder$DefaultSettingsBuilderRequest"
-                                : "event: org.apache.maven.settings.building.DefaultSettingsBuildingRequest"),
+                        "event: org.apache.maven.api.services.SettingsBuilderRequest$SettingsBuilderRequestBuilder$DefaultSettingsBuilderRequest"),
                 lines.toString());
         assertTrue(
-                lines.contains(
-                        matchesVersionRange("[4.0.0-beta-5,)")
-                                ? "event: org.apache.maven.impl.DefaultSettingsBuilder$DefaultSettingsBuilderResult"
-                                : "event: org.apache.maven.settings.building.DefaultSettingsBuildingResult"),
+                lines.contains("event: org.apache.maven.impl.DefaultSettingsBuilder$DefaultSettingsBuilderResult"),
                 lines.toString());
         assertTrue(lines.contains("event: org.apache.maven.execution.DefaultMavenExecutionRequest"), lines.toString());
         assertTrue(lines.contains("event: org.apache.maven.execution.DefaultMavenExecutionResult"), lines.toString());

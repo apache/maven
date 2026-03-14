@@ -402,11 +402,11 @@ public class DefaultMaven implements Maven {
     }
 
     /**
-     * Nobody should ever use this method.
-     *
-     * @deprecated If you use this method and your code is not in Maven Core, stop doing this.
+     * This method is part of Maven core internal infrastructure and was never
+     * intended for use outside of Maven Core itself. External consumers should
+     * not rely on this method, as it may change or be removed without notice.
      */
-    @Deprecated
+    @Deprecated(since = "4.0.0")
     public RepositorySystemSession newRepositorySession(MavenExecutionRequest request) {
         if (!Boolean.parseBoolean(System.getProperty("maven.newRepositorySession.warningsDisabled", "false"))) {
             if (logger.isDebugEnabled()) {

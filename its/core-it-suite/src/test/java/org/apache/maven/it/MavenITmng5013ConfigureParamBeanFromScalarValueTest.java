@@ -30,10 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng5013ConfigureParamBeanFromScalarValueTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5013ConfigureParamBeanFromScalarValueTest() {
-        super("[3.0.3,)");
-    }
-
     /**
      * Verify that plugin parameter beans can be configured from a single value.
      *

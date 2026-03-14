@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import org.apache.maven.api.services.ModelBuilderException;
+import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.deployment.DeployRequest;
@@ -41,6 +42,6 @@ public interface PomArtifactTransformer {
 
     void injectTransformedArtifacts(RepositorySystemSession session, MavenProject currentProject) throws IOException;
 
-    void transform(MavenProject project, RepositorySystemSession session, Path src, Path tgt)
+    void transform(MavenProject project, RepositorySystemSession session, ModelSource src, Path tgt)
             throws ModelBuilderException, XMLStreamException, IOException;
 }

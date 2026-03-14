@@ -267,10 +267,18 @@ class DefaultModelValidatorTest {
 
         List<String> messages = result.getErrors();
 
-        assertTrue(messages.contains("'modelVersion' is missing."));
-        assertTrue(messages.contains("'groupId' is missing."));
-        assertTrue(messages.contains("'artifactId' is missing."));
-        assertTrue(messages.contains("'version' is missing."));
+        assertTrue(
+                messages.contains("'modelVersion' is missing."),
+                "Expected " + messages + " to contain " + "'modelVersion' is missing.");
+        assertTrue(
+                messages.contains("'groupId' is missing."),
+                "Expected " + messages + " to contain " + "'groupId' is missing.");
+        assertTrue(
+                messages.contains("'artifactId' is missing."),
+                "Expected " + messages + " to contain " + "'artifactId' is missing.");
+        assertTrue(
+                messages.contains("'version' is missing."),
+                "Expected " + messages + " to contain " + "'version' is missing.");
         // type is inherited from the super pom
     }
 
@@ -355,6 +363,10 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 0, 2);
 
         assertTrue(result.getWarnings().get(0).contains("test:f"));
+        // Check that the import scope error message is more helpful
+        assertTrue(result.getWarnings()
+                .get(0)
+                .contains("has scope 'import'. The 'import' scope is only valid in <dependencyManagement> sections"));
 
         assertTrue(result.getWarnings().get(1).contains("test:g"));
     }

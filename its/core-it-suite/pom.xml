@@ -100,17 +100,13 @@ under the License.
   <dependencies>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter</artifactId>
+      <artifactId>junit-jupiter-api</artifactId>
       <!-- NOTE: Use compile scope for transitivity. -->
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest</artifactId>
-      <version>3.0</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
+      <version>${plexusUtilsVersion}</version>
       <!-- NOTE: Use compile scope for transitivity. -->
     </dependency>
 
@@ -412,6 +408,15 @@ under the License.
         <configuration>
           <skipInstallation>true</skipInstallation>
           <localRepositoryPath>${preparedUserHome}/.m2/repository</localRepositoryPath>
+          <extraArtifacts>
+            <extraArtifact>eu.maveniverse.maven.plugins:toolbox:${toolboxVersion}:maven-plugin</extraArtifact>
+            <!--
+            Required by:
+            MavenITmng0449PluginVersionResolutionTest
+            MavenITmng0479OverrideCentralRepoTest
+            -->
+            <extraArtifact>org.apache.maven:maven-plugin-api:3.8.6</extraArtifact>
+          </extraArtifacts>
         </configuration>
         <executions>
           <execution>
@@ -463,17 +468,6 @@ under the License.
             <goals>
               <goal>integration-test</goal>
               <goal>verify</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>test-jar</goal>
             </goals>
           </execution>
         </executions>
@@ -549,7 +543,7 @@ under the License.
                   <target>
                     <delete dir="${preparedUserHome}" />
                     <copy file="${sessionRootDirectory}/.github/ci-extensions.xml" toFile="${preparedUserHome}/.m2/extensions.xml" />
-                    <copy file="${project.build.testOutputDirectory}/it-mimir.properties" toFile="${preparedUserHome}/.mimir/mimir.properties" />
+                    <copy file="${project.build.testOutputDirectory}/it-mimir-session.properties" toFile="${preparedUserHome}/.mimir/session.properties" />
                   </target>
                 </configuration>
               </execution>
@@ -585,11 +579,6 @@ under the License.
         <dependency>
           <groupId>org.slf4j</groupId>
           <artifactId>slf4j-api</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-simple</artifactId>
           <scope>test</scope>
         </dependency>
       </dependencies>

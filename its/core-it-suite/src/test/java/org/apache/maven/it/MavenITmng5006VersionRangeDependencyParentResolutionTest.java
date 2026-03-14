@@ -32,10 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng5006VersionRangeDependencyParentResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng5006VersionRangeDependencyParentResolutionTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0.3,)");
-    }
-
     /**
      * Verify that resolution of parent POMs of dependencies that use a version range is not restricted to the
      * repository from which the specific dependency version was picked. Or put differently, the fact that a:0.1

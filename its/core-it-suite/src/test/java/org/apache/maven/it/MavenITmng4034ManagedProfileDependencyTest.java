@@ -35,10 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng4034ManagedProfileDependencyTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4034ManagedProfileDependencyTest() {
-        super(ALL_MAVEN_VERSIONS);
-    }
-
     /**
      * Verify that dependencies defined in profiles get their version injected from the dependency management of the
      * parent.

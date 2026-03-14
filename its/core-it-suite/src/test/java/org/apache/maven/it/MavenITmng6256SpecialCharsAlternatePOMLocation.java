@@ -26,11 +26,10 @@ import org.junit.jupiter.api.Test;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-6256">MNG-6256</a>: check that directories
  * passed via <code>-f/--file</code> containing special characters do not break the script. E.g
  * <code>-f "directoryWithClosing)Bracket/pom.xml"</code>.
+ *
+ * This IT manually manages {@code .mvn} directories, so instructs Verifier to NOT create any.
  */
 public class MavenITmng6256SpecialCharsAlternatePOMLocation extends AbstractMavenIntegrationTestCase {
-    public MavenITmng6256SpecialCharsAlternatePOMLocation() {
-        super("(3.6.0,)");
-    }
 
     /**
      * check script is working when path to POM is set to <code>directory-with- -space</code>
@@ -68,7 +67,7 @@ public class MavenITmng6256SpecialCharsAlternatePOMLocation extends AbstractMave
         File testDir = new File(resourceDir, "../mng-6256-" + subDir);
         testDir.mkdir();
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
         verifier.addCliArgument(option); // -f/--file
         verifier.addCliArgument("\"" + new File(resourceDir, subDir).getAbsolutePath() + "\""); // "<path>"
         verifier.addCliArgument("validate");

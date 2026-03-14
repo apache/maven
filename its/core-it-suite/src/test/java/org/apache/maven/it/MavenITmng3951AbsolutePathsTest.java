@@ -31,10 +31,6 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng3951AbsolutePathsTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng3951AbsolutePathsTest() {
-        super("(2.0.10,2.1.0-M1),(2.1.0-M1,)");
-    }
-
     /**
      * Test that the paths retrieved from the core are always absolute, in particular the drive-relative paths on
      * Windows must be properly resolved.

@@ -26,11 +26,10 @@ import org.junit.jupiter.api.Test;
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3355">MNG-3355</a>.
  *
  *
+ * @since 2.0.8
+ *
  */
 public class MavenITmng3355TranslatedPathInterpolationTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng3355TranslatedPathInterpolationTest() {
-        super("(2.0.8,)"); // 2.0.9+
-    }
 
     @Test
     public void testitMNG3355() throws Exception {

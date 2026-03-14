@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.impl.resolver.artifact.MavenArtifactProperties;
@@ -258,13 +259,15 @@ public class RepositoryUtils {
     }
 
     public static ArtifactType newArtifactType(String id, ArtifactHandler handler) {
-        return new DefaultArtifactType(
-                id,
-                handler.getExtension(),
-                handler.getClassifier(),
-                handler.getLanguage(),
-                handler.isAddedToClasspath(),
-                handler.isIncludesDependencies());
+        return handler != null
+                ? new DefaultArtifactType(
+                        id,
+                        handler.getExtension(),
+                        handler.getClassifier(),
+                        handler.getLanguage(),
+                        handler.isAddedToClasspath(),
+                        handler.isIncludesDependencies())
+                : null;
     }
 
     public static Dependency toDependency(
@@ -304,6 +307,14 @@ public class RepositoryUtils {
 
     private static Exclusion toExclusion(org.apache.maven.model.Exclusion exclusion) {
         return new Exclusion(exclusion.getGroupId(), exclusion.getArtifactId(), "*", "*");
+    }
+
+    /**
+     * @deprecated Use by maven-artifact-transfer.
+     */
+    @Deprecated
+    public static ArtifactTypeRegistry newArtifactTypeRegistry(ArtifactHandlerManager handlerManager) {
+        return typeId -> newArtifactType(typeId, handlerManager.getArtifactHandler(typeId));
     }
 
     public static Collection<Artifact> toArtifacts(Collection<org.apache.maven.artifact.Artifact> artifactsToConvert) {

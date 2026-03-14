@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITmng4800NearestWinsVsScopeWideningTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4800NearestWinsVsScopeWideningTest() {
-        super("[3.0-beta-4,)");
-    }
-
     @Test
     public void testitAB() throws Exception {
         testit("test-ab");

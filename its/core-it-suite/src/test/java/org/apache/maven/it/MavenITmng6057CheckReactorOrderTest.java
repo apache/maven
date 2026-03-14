@@ -39,7 +39,7 @@ public class MavenITmng6057CheckReactorOrderTest extends AbstractMavenIntegratio
     public MavenITmng6057CheckReactorOrderTest() {
         // The first version which contains the fix for the MNG-6057 issue.
         // TODO: Think about it!
-        super("[3.5.0-alpha-2,)");
+        super();
     }
 
     /**
@@ -51,7 +51,7 @@ public class MavenITmng6057CheckReactorOrderTest extends AbstractMavenIntegratio
     public void testitReactorShouldResultInExpectedOrder() throws Exception {
         File testDir = extractResources("/mng-6057-check-reactor-order");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath(), false);
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
 
         verifier.setLogFileName("log-only.txt");

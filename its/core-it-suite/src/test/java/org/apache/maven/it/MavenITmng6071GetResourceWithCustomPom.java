@@ -27,9 +27,6 @@ import org.junit.jupiter.api.Test;
  * check that getClass().getResource("/") returns consistent results when Maven is run with <code>-f ./pom.xml</code>.
  */
 public class MavenITmng6071GetResourceWithCustomPom extends AbstractMavenIntegrationTestCase {
-    public MavenITmng6071GetResourceWithCustomPom() {
-        super("[3.8.2,)");
-    }
 
     /**
      * check when path to POM set by <code>-f ./pom.xml</code>

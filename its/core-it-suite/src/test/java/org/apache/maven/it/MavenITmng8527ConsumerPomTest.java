@@ -31,12 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8527">MNG-8527</a>.
+ * @since 4.0.0-rc-3-SNAPSHOT
+ *
  */
 class MavenITmng8527ConsumerPomTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8527ConsumerPomTest() {
-        super("[4.0.0-rc-3-SNAPSHOT,)");
-    }
 
     /**
      *  Verify project is buildable.
@@ -47,7 +45,7 @@ class MavenITmng8527ConsumerPomTest extends AbstractMavenIntegrationTestCase {
                 extractResources("/mng-8527-consumer-pom").getAbsoluteFile().toPath();
 
         Verifier verifier = newVerifier(basedir.toString());
-        verifier.addCliArgument("install");
+        verifier.addCliArguments("install", "-Dmaven.consumer.pom.flatten=true");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
@@ -70,11 +68,11 @@ class MavenITmng8527ConsumerPomTest extends AbstractMavenIntegrationTestCase {
                 consumerPomLines.stream().anyMatch(s -> s.contains("<organization>")),
                 "Consumer pom should have an <organization> element");
         assertEquals(
-                2,
+                1,
                 consumerPomLines.stream()
                         .filter(s -> s.contains("<dependency>"))
                         .count(),
-                "Consumer pom should have two dependencies");
+                "Consumer pom should have one dependency");
 
         List<String> buildPomLines;
         try (Stream<String> lines = Files.lines(buildPomPath)) {

@@ -26,13 +26,14 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 
+import eu.maveniverse.maven.mimir.testing.MimirInfuser;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Executor;
 import org.apache.maven.api.cli.ExecutorRequest;
-import org.apache.maven.cling.executor.embedded.EmbeddedMavenExecutor;
-import org.apache.maven.cling.executor.forked.ForkedMavenExecutor;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.io.CleanupMode;
@@ -43,13 +44,47 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.condition.OS.WINDOWS;
 
+@Timeout(60)
 public abstract class MavenExecutorTestSupport {
-    @Timeout(15)
+    @TempDir(cleanup = CleanupMode.NEVER)
+    private static Path tempDir;
+
+    private Path cwd;
+
+    private Path userHome;
+
+    @BeforeEach
+    void beforeEach(TestInfo testInfo) throws Exception {
+        cwd = tempDir.resolve(testInfo.getTestMethod().orElseThrow().getName()).resolve("cwd");
+        Files.createDirectories(cwd.resolve(".mvn"));
+        userHome = tempDir.resolve(testInfo.getTestMethod().orElseThrow().getName())
+                .resolve("home");
+        Files.createDirectories(userHome);
+
+        System.out.println("=== " + testInfo.getTestMethod().orElseThrow().getName());
+    }
+
+    private static Executor executor;
+
+    protected final Executor createAndMemoizeExecutor() {
+        if (executor == null) {
+            executor = doSelectExecutor();
+        }
+        return executor;
+    }
+
+    @AfterAll
+    static void afterAll() {
+        if (executor != null) {
+            executor.close();
+            executor = null;
+        }
+    }
+
+    protected abstract Executor doSelectExecutor();
+
     @Test
-    void mvnenc(
-            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
-            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
-            throws Exception {
+    void mvnenc4() throws Exception {
         String logfile = "m4.log";
         execute(
                 cwd.resolve(logfile),
@@ -67,208 +102,193 @@ public abstract class MavenExecutorTestSupport {
     @DisabledOnOs(
             value = WINDOWS,
             disabledReason = "JUnit on Windows fails to clean up as mvn3 does not close log file properly")
-    @Timeout(15)
     @Test
-    void dump3(
-            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
-            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
-            throws Exception {
+    void dump3() throws Exception {
         String logfile = "m3.log";
         execute(
                 cwd.resolve(logfile),
                 List.of(mvn3ExecutorRequestBuilder()
                         .cwd(cwd)
                         .userHomeDirectory(userHome)
-                        .argument("eu.maveniverse.maven.plugins:toolbox:0.7.4:gav-dump")
+                        .argument("eu.maveniverse.maven.plugins:toolbox:" + Environment.TOOLBOX_VERSION + ":gav-dump")
                         .argument("-l")
                         .argument(logfile)
                         .build()));
         System.out.println(Files.readString(cwd.resolve(logfile)));
     }
 
-    @Timeout(15)
     @Test
-    void dump4(
-            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
-            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
-            throws Exception {
+    void dump4() throws Exception {
         String logfile = "m4.log";
         execute(
                 cwd.resolve(logfile),
                 List.of(mvn4ExecutorRequestBuilder()
                         .cwd(cwd)
                         .userHomeDirectory(userHome)
-                        .argument("eu.maveniverse.maven.plugins:toolbox:0.7.4:gav-dump")
+                        .argument("eu.maveniverse.maven.plugins:toolbox:" + Environment.TOOLBOX_VERSION + ":gav-dump")
                         .argument("-l")
                         .argument(logfile)
                         .build()));
         System.out.println(Files.readString(cwd.resolve(logfile)));
-    }
-
-    @Timeout(15)
-    @Test
-    void defaultFs(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
-        layDownFiles(tempDir);
-        String logfile = "m4.log";
-        execute(
-                tempDir.resolve(logfile),
-                List.of(mvn4ExecutorRequestBuilder()
-                        .cwd(tempDir)
-                        .argument("-V")
-                        .argument("verify")
-                        .argument("-l")
-                        .argument(logfile)
-                        .build()));
-    }
-
-    @Timeout(15)
-    @Test
-    void version() throws Exception {
-        assertEquals(
-                System.getProperty("maven4version"),
-                mavenVersion(mvn4ExecutorRequestBuilder().build()));
     }
 
     @DisabledOnOs(
             value = WINDOWS,
             disabledReason = "JUnit on Windows fails to clean up as mvn3 does not close log file properly")
-    @Timeout(15)
     @Test
-    void defaultFs3x(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
-        layDownFiles(tempDir);
+    void defaultFs3() throws Exception {
+        layDownFiles(cwd);
         String logfile = "m3.log";
         execute(
-                tempDir.resolve(logfile),
+                cwd.resolve(logfile),
                 List.of(mvn3ExecutorRequestBuilder()
-                        .cwd(tempDir)
+                        .cwd(cwd)
                         .argument("-V")
                         .argument("verify")
                         .argument("-l")
                         .argument(logfile)
                         .build()));
+        System.out.println(Files.readString(cwd.resolve(logfile)));
     }
 
-    @Timeout(15)
     @Test
-    void version3x() throws Exception {
+    void defaultFs4() throws Exception {
+        layDownFiles(cwd);
+        String logfile = "m4.log";
+        execute(
+                cwd.resolve(logfile),
+                List.of(mvn4ExecutorRequestBuilder()
+                        .cwd(cwd)
+                        .argument("-V")
+                        .argument("verify")
+                        .argument("-l")
+                        .argument(logfile)
+                        .build()));
+        System.out.println(Files.readString(cwd.resolve(logfile)));
+    }
+
+    @Test
+    void version3() throws Exception {
         assertEquals(
                 System.getProperty("maven3version"),
                 mavenVersion(mvn3ExecutorRequestBuilder().build()));
     }
 
-    @Timeout(15)
     @Test
-    void defaultFsCaptureOutput(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
-        layDownFiles(tempDir);
+    void version4() throws Exception {
+        assertEquals(
+                System.getProperty("maven4version"),
+                mavenVersion(mvn4ExecutorRequestBuilder().build()));
+    }
+
+    @Test
+    void defaultFs4CaptureOutput() throws Exception {
+        layDownFiles(cwd);
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
         execute(
                 null,
                 List.of(mvn4ExecutorRequestBuilder()
-                        .cwd(tempDir)
+                        .cwd(cwd)
                         .argument("-V")
                         .argument("verify")
                         .stdOut(stdout)
                         .build()));
+        System.out.println(stdout);
         assertFalse(stdout.toString().contains("[\u001B["), "By default no ANSI color codes");
         assertTrue(stdout.toString().contains("INFO"), "No INFO found");
     }
 
-    @Timeout(15)
     @Test
-    void defaultFsCaptureOutputWithForcedColor(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir)
-            throws Exception {
-        layDownFiles(tempDir);
+    void defaultFs4CaptureOutputWithForcedColor() throws Exception {
+        layDownFiles(cwd);
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
         execute(
                 null,
                 List.of(mvn4ExecutorRequestBuilder()
-                        .cwd(tempDir)
+                        .cwd(cwd)
                         .argument("-V")
                         .argument("verify")
                         .argument("--color=yes")
                         .stdOut(stdout)
                         .build()));
+        System.out.println(stdout);
         assertTrue(stdout.toString().contains("[\u001B["), "No ANSI codes present");
         assertTrue(stdout.toString().contains("INFO"), "No INFO found");
     }
 
-    @Timeout(15)
     @Test
-    void defaultFsCaptureOutputWithForcedOffColor(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir)
-            throws Exception {
-        layDownFiles(tempDir);
+    void defaultFs4CaptureOutputWithForcedOffColor() throws Exception {
+        layDownFiles(cwd);
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
         execute(
                 null,
                 List.of(mvn4ExecutorRequestBuilder()
-                        .cwd(tempDir)
+                        .cwd(cwd)
                         .argument("-V")
                         .argument("verify")
                         .argument("--color=no")
                         .stdOut(stdout)
                         .build()));
+        System.out.println(stdout);
         assertFalse(stdout.toString().contains("[\u001B["), "No ANSI codes present");
         assertTrue(stdout.toString().contains("INFO"), "No INFO found");
     }
 
-    @Timeout(15)
     @Test
-    void defaultFs3xCaptureOutput(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir) throws Exception {
-        layDownFiles(tempDir);
+    void defaultFs3CaptureOutput() throws Exception {
+        layDownFiles(cwd);
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
         execute(
                 null,
                 List.of(mvn3ExecutorRequestBuilder()
-                        .cwd(tempDir)
+                        .cwd(cwd)
                         .argument("-V")
                         .argument("verify")
                         .stdOut(stdout)
                         .build()));
+        System.out.println(stdout);
         // Note: we do not validate ANSI as Maven3 is weird in this respect (thinks is color but is not)
         // assertTrue(stdout.toString().contains("[\u001B["), "No ANSI codes present");
         assertTrue(stdout.toString().contains("INFO"), "No INFO found");
     }
 
-    @Timeout(15)
     @Test
-    void defaultFs3xCaptureOutputWithForcedColor(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir)
-            throws Exception {
-        layDownFiles(tempDir);
+    void defaultFs3CaptureOutputWithForcedColor() throws Exception {
+        layDownFiles(cwd);
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
         execute(
                 null,
                 List.of(mvn3ExecutorRequestBuilder()
-                        .cwd(tempDir)
+                        .cwd(cwd)
                         .argument("-V")
                         .argument("verify")
                         .argument("--color=yes")
                         .stdOut(stdout)
                         .build()));
+        System.out.println(stdout);
         assertTrue(stdout.toString().contains("[\u001B["), "No ANSI codes present");
         assertTrue(stdout.toString().contains("INFO"), "No INFO found");
     }
 
-    @Timeout(15)
     @Test
-    void defaultFs3xCaptureOutputWithForcedOffColor(@TempDir(cleanup = CleanupMode.ON_SUCCESS) Path tempDir)
-            throws Exception {
-        layDownFiles(tempDir);
+    void defaultFs3CaptureOutputWithForcedOffColor() throws Exception {
+        layDownFiles(cwd);
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
         execute(
                 null,
                 List.of(mvn3ExecutorRequestBuilder()
-                        .cwd(tempDir)
+                        .cwd(cwd)
                         .argument("-V")
                         .argument("verify")
                         .argument("--color=no")
                         .stdOut(stdout)
                         .build()));
+        System.out.println(stdout);
         assertFalse(stdout.toString().contains("[\u001B["), "No ANSI codes present");
         assertTrue(stdout.toString().contains("INFO"), "No INFO found");
     }
 
-    public static final String POM_STRING =
-            """
+    public static final String POM_STRING = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
@@ -302,8 +322,7 @@ public abstract class MavenExecutorTestSupport {
                 </project>
                 """;
 
-    public static final String APP_JAVA_STRING =
-            """
+    public static final String APP_JAVA_STRING = """
             package org.apache.maven.samples.sample;
 
             public class App {
@@ -316,7 +335,14 @@ public abstract class MavenExecutorTestSupport {
     protected void execute(@Nullable Path logFile, Collection<ExecutorRequest> requests) throws Exception {
         Executor invoker = createAndMemoizeExecutor();
         for (ExecutorRequest request : requests) {
-            MimirInfuser.infuse(request.userHomeDirectory());
+            if (MimirInfuser.isMimirPresentUW()) {
+                if (maven3Home().equals(request.installationDirectory())) {
+                    MimirInfuser.doInfusePW(request.cwd(), request.userHomeDirectory());
+                } else if (maven4Home().equals(request.installationDirectory())) {
+                    MimirInfuser.doInfuseUW(request.userHomeDirectory());
+                }
+                MimirInfuser.preseedItselfIntoInnerUserHome(request.userHomeDirectory());
+            }
             int exitCode = invoker.execute(request);
             if (exitCode != 0) {
                 throw new FailedExecution(request, exitCode, logFile == null ? "" : Files.readString(logFile));
@@ -328,15 +354,25 @@ public abstract class MavenExecutorTestSupport {
         return createAndMemoizeExecutor().mavenVersion(request);
     }
 
-    public static ExecutorRequest.Builder mvn3ExecutorRequestBuilder() {
-        return addTailRepo(ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven3home"))));
+    public ExecutorRequest.Builder mvn3ExecutorRequestBuilder() {
+        return customize(ExecutorRequest.mavenBuilder(maven3Home()));
     }
 
-    public static ExecutorRequest.Builder mvn4ExecutorRequestBuilder() {
-        return addTailRepo(ExecutorRequest.mavenBuilder(Paths.get(System.getProperty("maven4home"))));
+    private Path maven3Home() {
+        return ExecutorRequest.getCanonicalPath(Paths.get(System.getProperty("maven3home")));
     }
 
-    private static ExecutorRequest.Builder addTailRepo(ExecutorRequest.Builder builder) {
+    public ExecutorRequest.Builder mvn4ExecutorRequestBuilder() {
+        return customize(ExecutorRequest.mavenBuilder(maven4Home()));
+    }
+
+    private Path maven4Home() {
+        return ExecutorRequest.getCanonicalPath(Paths.get(System.getProperty("maven4home")));
+    }
+
+    private ExecutorRequest.Builder customize(ExecutorRequest.Builder builder) {
+        builder =
+                builder.cwd(cwd).userHomeDirectory(userHome).argument("-Daether.remoteRepositoryFilter.prefixes=false");
         if (System.getProperty("localRepository") != null) {
             builder.argument("-Dmaven.repo.local.tail=" + System.getProperty("localRepository"));
         }
@@ -344,7 +380,6 @@ public abstract class MavenExecutorTestSupport {
     }
 
     protected void layDownFiles(Path cwd) throws IOException {
-        Files.createDirectory(cwd.resolve(".mvn"));
         Path pom = cwd.resolve("pom.xml").toAbsolutePath();
         Files.writeString(pom, POM_STRING);
         Path appJava = cwd.resolve("src/main/java/org/apache/maven/samples/sample/App.java");
@@ -376,28 +411,4 @@ public abstract class MavenExecutorTestSupport {
             return log;
         }
     }
-
-    private static Executor executor;
-
-    protected final Executor createAndMemoizeExecutor() {
-        if (executor == null) {
-            executor = doSelectExecutor();
-        }
-        return executor;
-    }
-
-    @AfterAll
-    static void afterAll() {
-        if (executor != null) {
-            executor = null;
-        }
-    }
-
-    // NOTE: we keep these instances alive to make sure JVM (running tests) loads JAnsi/JLine native library ONLY once
-    // in real life you'd anyway keep these alive as long needed, but here, we repeat a series of tests against same
-    // instance, to prevent them attempting native load more than once.
-    public static final EmbeddedMavenExecutor EMBEDDED_MAVEN_EXECUTOR = new EmbeddedMavenExecutor();
-    public static final ForkedMavenExecutor FORKED_MAVEN_EXECUTOR = new ForkedMavenExecutor();
-
-    protected abstract Executor doSelectExecutor();
 }

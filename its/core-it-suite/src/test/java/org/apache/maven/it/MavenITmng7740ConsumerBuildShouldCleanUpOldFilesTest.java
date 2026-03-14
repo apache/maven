@@ -29,11 +29,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * @since 4.0.0-alpha-6
+ */
 class MavenITmng7740ConsumerBuildShouldCleanUpOldFilesTest extends AbstractMavenIntegrationTestCase {
-
-    protected MavenITmng7740ConsumerBuildShouldCleanUpOldFilesTest() {
-        super("[4.0.0-alpha-6,)");
-    }
 
     @Test
     void testConsumerBuildShouldCleanUpOldConsumerFiles() throws Exception {

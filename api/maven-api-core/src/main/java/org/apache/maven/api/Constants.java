@@ -410,9 +410,9 @@ public final class Constants {
 
     /**
      * User property for selecting dependency manager behaviour regarding transitive dependencies and dependency
-     * management entries in their POMs. Maven 3 targeted full backward compatibility with Maven2, hence it ignored
-     * dependency management entries in transitive dependency POMs. Maven 4 enables "transitivity" by default, hence
-     * unlike Maven2, obeys dependency management entries deep in dependency graph as well.
+     * management entries in their POMs. Maven 3 targeted full backward compatibility with Maven 2. Hence, it ignored
+     * dependency management entries in transitive dependency POMs. Maven 4 enables "transitivity" by default. Hence
+     * unlike Maven 3, it obeys dependency management entries deep in the dependency graph as well.
      * <br/>
      * Default: <code>"true"</code>.
      *
@@ -464,8 +464,20 @@ public final class Constants {
     public static final String MAVEN_CONSUMER_POM = "maven.consumer.pom";
 
     /**
+     * User property for controlling consumer POM flattening behavior.
+     * When set to <code>true</code> (default), consumer POMs are flattened by removing
+     * dependency management and keeping only direct dependencies with transitive scopes.
+     * When set to <code>false</code>, consumer POMs preserve dependency management
+     * like parent POMs, allowing dependency management to be inherited by consumers.
+     *
+     * @since 4.1.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "false")
+    public static final String MAVEN_CONSUMER_POM_FLATTEN = "maven.consumer.pom.flatten";
+
+    /**
      * User property for controlling "maven personality". If activated Maven will behave
-     * as previous major version, Maven 3.
+     * like the previous major version, Maven 3.
      *
      * @since 4.0.0
      */
@@ -533,7 +545,10 @@ public final class Constants {
      *     <li>"release" - query only release repositories to discover versions</li>
      *     <li>"snapshot" - query only snapshot repositories to discover versions</li>
      * </ul>
-     * Default (when unset) is existing Maven behaviour: "release_or_snapshots".
+     * Default (when unset) is using request carried nature. Hence, this configuration really makes sense with value
+     * {@code "auto"}, while ideally callers needs update and use newly added method on version range request to
+     * express preference.
+     *
      * @since 4.0.0
      */
     @Config(defaultValue = "release_or_snapshot")
@@ -661,6 +676,71 @@ public final class Constants {
      * @since 4.0.0
      */
     public static final String MAVEN_LOGGER_LOG_PREFIX = MAVEN_LOGGER_PREFIX + "log.";
+
+    /**
+     * User property key for cache configuration.
+     *
+     * @since 4.1.0
+     */
+    public static final String MAVEN_CACHE_CONFIG_PROPERTY = "maven.cache.config";
+
+    /**
+     * User property to enable cache statistics display at the end of the build.
+     * When set to true, detailed cache statistics including hit/miss ratios,
+     * request type breakdowns, and retention policy effectiveness will be displayed
+     * when the build completes.
+     *
+     * @since 4.1.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "false")
+    public static final String MAVEN_CACHE_STATS = "maven.cache.stats";
+
+    /**
+     * User property to configure separate reference types for cache keys.
+     * This enables fine-grained analysis of cache misses caused by key vs value evictions.
+     * Supported values are {@code HARD}, {@code SOFT} and {@code WEAK}.
+     *
+     * @since 4.1.0
+     */
+    public static final String MAVEN_CACHE_KEY_REFS = "maven.cache.keyValueRefs";
+
+    /**
+     * User property to configure separate reference types for cache values.
+     * This enables fine-grained analysis of cache misses caused by key vs value evictions.
+     * Supported values are {@code HARD}, {@code SOFT} and {@code WEAK}.
+     *
+     * @since 4.1.0
+     */
+    public static final String MAVEN_CACHE_VALUE_REFS = "maven.cache.keyValueRefs";
+
+    /**
+     * User property key for configuring which object types are pooled by ModelObjectProcessor.
+     * Value should be a comma-separated list of simple class names (e.g., "Dependency,Plugin,Build").
+     * Default is "Dependency" for backward compatibility.
+     *
+     * @since 4.1.0
+     */
+    @Config(defaultValue = "Dependency")
+    public static final String MAVEN_MODEL_PROCESSOR_POOLED_TYPES = "maven.model.processor.pooledTypes";
+
+    /**
+     * User property key for configuring the default reference type used by ModelObjectProcessor.
+     * Valid values are: "SOFT", "HARD", "WEAK", "NONE".
+     * Default is "HARD" for optimal performance.
+     *
+     * @since 4.1.0
+     */
+    @Config(defaultValue = "HARD")
+    public static final String MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE = "maven.model.processor.referenceType";
+
+    /**
+     * User property key prefix for configuring per-object-type reference types.
+     * Format: maven.model.processor.referenceType.{ClassName} = {ReferenceType}
+     * Example: maven.model.processor.referenceType.Dependency = SOFT
+     *
+     * @since 4.1.0
+     */
+    public static final String MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE_PREFIX = "maven.model.processor.referenceType.";
 
     private Constants() {}
 }

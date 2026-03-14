@@ -33,10 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 public class MavenITmng4747JavaAgentUsedByPluginTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITmng4747JavaAgentUsedByPluginTest() {
-        super("[2.0.3,3.0-alpha-1),[3.0-beta-2,)");
-    }
-
     /**
      * Verify that classes from JRE agents can be loaded from plugins. Agents are loaded into the system class loader
      * and hence plugins must have access to the system class loader.
@@ -45,8 +41,6 @@ public class MavenITmng4747JavaAgentUsedByPluginTest extends AbstractMavenIntegr
      */
     @Test
     public void testit() throws Exception {
-        requiresJavaVersion("[1.5,)");
-
         File testDir = extractResources("/mng-4747");
 
         Verifier verifier = newVerifier(testDir.getAbsolutePath());

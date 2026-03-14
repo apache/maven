@@ -21,14 +21,13 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.Properties;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Disabled("Bounds: (3.2.5,4.0.0-beta-4]")
 public class MavenITmng5774ConfigurationProcessorsTest extends AbstractMavenIntegrationTestCase {
-    public MavenITmng5774ConfigurationProcessorsTest() {
-        super("(3.2.5,4.0.0-beta-4]");
-    }
 
     @Test
     public void testBehaviourWhereThereIsOneUserSuppliedConfigurationProcessor() throws Exception {

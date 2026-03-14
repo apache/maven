@@ -27,12 +27,10 @@ import org.junit.jupiter.api.Test;
  *
  * Tests concurrent file-based profile activation in a multi-module build to ensure
  * that profiles are correctly activated/deactivated based on file existence in each module.
+ * @since 4.0.0-alpha-1
+ *
  */
 class MavenITmng8736ConcurrentFileActivationTest extends AbstractMavenIntegrationTestCase {
-
-    MavenITmng8736ConcurrentFileActivationTest() {
-        super("[4.0.0-alpha-1,)");
-    }
 
     /**
      * Verify that file-based profile activation works correctly in concurrent builds.
