@@ -144,7 +144,30 @@ class DefaultConsumerPomBuilder implements PomBuilder {
             if (isBom) {
                 return buildBomWithoutFlatten(session, project, src);
             } else {
-                return buildPom(session, project, src);
+                Model result = buildPom(session, project, src);
+                // Validate POM-packaged projects (parent POMs): if the consumer POM cannot be
+                // downgraded to 4.0.0, Maven 3 / Gradle cannot resolve the parent.
+                // Non-POM projects are consumed as dependencies where unknown elements are
+                // ignored, so a higher model version is acceptable (only a warning is logged
+                // by transformNonPom/transformPom).
+                if (POM_PACKAGING.equals(packaging)
+                        && !model.isPreserveModelVersion()
+                        && !ModelBuilder.MODEL_VERSION_4_0_0.equals(result.getModelVersion())) {
+                    throw new MavenException("The consumer POM for " + project.getId()
+                            + " cannot be downgraded to model version 4.0.0 because it contains"
+                            + " features that require a newer model version."
+                            + " Since consumer POM flattening is disabled, the parent reference is"
+                            + " preserved, which requires consumers to resolve the parent POM." + System.lineSeparator()
+                            + "You have the following options to resolve this:" + System.lineSeparator()
+                            + "  1. Enable flattening by setting the property 'maven.consumer.pom.flatten=true'"
+                            + " to inline parent content and produce a self-contained 4.0.0 consumer POM"
+                            + System.lineSeparator()
+                            + "  2. Preserve the model version by setting 'preserve.model.version=true'"
+                            + " on the <project> element (Maven 4 consumers only)"
+                            + System.lineSeparator()
+                            + "  3. Remove the features that require a newer model version");
+                }
+                return result;
             }
         }
         // Default behavior: flatten the consumer POM
@@ -192,6 +215,8 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         InternalSession iSession = InternalSession.from(session);
         ModelBuilderResult result = buildModel(session, src);
         Model model = result.getEffectiveModel();
+        boolean removeUnusedManagedDeps =
+                Features.consumerPomRemoveUnusedManagedDependencies(session.getConfigProperties());
 
         if (model.getDependencyManagement() != null
                 && !model.getDependencyManagement().getDependencies().isEmpty()) {
@@ -210,19 +235,13 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                             this::merge,
                             LinkedHashMap::new));
             Map<String, Dependency> managedDependencies = model.getDependencyManagement().getDependencies().stream()
-                    .filter(dependency ->
-                            nodes.containsKey(getDependencyKey(dependency)) && !"import".equals(dependency.getScope()))
+                    .filter(dependency -> !"import".equals(dependency.getScope())
+                            && (!removeUnusedManagedDeps || nodes.containsKey(getDependencyKey(dependency))))
                     .collect(Collectors.toMap(
                             DefaultConsumerPomBuilder::getDependencyKey,
                             Function.identity(),
                             this::merge,
                             LinkedHashMap::new));
-
-            // for each managed dep in the model:
-            // * if there is no corresponding node in the tree, discard the managed dep
-            // * if there's a direct dependency, apply the managed dependency to it and discard the managed dep
-            // * else keep the managed dep
-            managedDependencies.keySet().retainAll(nodes.keySet());
 
             directDependencies.replaceAll((key, dependency) -> {
                 var managedDependency = managedDependencies.get(key);

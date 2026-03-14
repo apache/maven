@@ -34,6 +34,7 @@ import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Scm;
 import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.DependencyResolverResult;
+import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.Sources;
@@ -54,6 +55,7 @@ import org.mockito.Mockito;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
@@ -179,6 +181,19 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         assertNotNull(transformed.getBuild());
         assertTrue(transformed.getDependencies().isEmpty());
         assertFalse(transformed.getDependencyManagement().getDependencies().isEmpty());
+    }
+
+    @Test
+    void testParentWithConditionsFailsConsumerPom() throws Exception {
+        setRootDirectory("parent-with-conditions");
+        Path file = Paths.get("src/test/resources/consumer/parent-with-conditions/pom.xml");
+
+        MavenProject project = getEffectiveModel(file);
+        // A parent POM with profile conditions cannot be downgraded to 4.0.0,
+        // so building the consumer POM should fail with actionable guidance.
+        MavenException ex =
+                assertThrows(MavenException.class, () -> builder.build(session, project, Sources.buildSource(file)));
+        assertTrue(ex.getMessage().contains("cannot be downgraded to model version 4.0.0"));
     }
 
     @Test
