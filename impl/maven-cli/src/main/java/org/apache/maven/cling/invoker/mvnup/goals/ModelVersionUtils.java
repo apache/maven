@@ -60,8 +60,6 @@ public final class ModelVersionUtils {
             return MODEL_VERSION_4_0_0;
         }
 
-        // Try to get from modelVersion element
-        Element modelVersionElement = root.getChild(MODEL_VERSION, namespace);
         // First try to get from modelVersion element
         Element modelVersionElement = root.child(MODEL_VERSION).orElse(null);
         if (modelVersionElement != null) {
