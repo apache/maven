@@ -61,7 +61,7 @@ class DefaultModelXmlFactoryTest {
     @Test
     void testValidNamespaceWithModelVersion410() throws Exception {
         String xml = """
-                <project xmlns="http://maven.apache.org/POM/4.1.0">
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
                   <modelVersion>4.1.0</modelVersion>
                 </project>""";
 
@@ -70,7 +70,7 @@ class DefaultModelXmlFactoryTest {
 
         Model model = factory.read(request);
         assertEquals("4.1.0", model.getModelVersion());
-        assertEquals("http://maven.apache.org/POM/4.1.0", model.getNamespaceUri());
+        assertEquals("http://maven.apache.org/POM/4.0.0", model.getNamespaceUri());
     }
 
     @Test

@@ -123,7 +123,6 @@ class ModelUpgradeStrategyTest {
                 String initialNamespace,
                 String initialModelVersion,
                 String targetModelVersion,
-                String expectedNamespace,
                 String expectedModelVersion,
                 int expectedModifiedCount,
                 String description) {
@@ -148,11 +147,8 @@ class ModelUpgradeStrategyTest {
             assertTrue(result.success(), "Model upgrade should succeed: " + description);
             assertEquals(expectedModifiedCount, result.modifiedCount(), description);
 
-            // Verify the model version and namespace - use the updated document from pomMap
-            Document updatedDocument = pomMap.get(Paths.get("pom.xml"));
-            Editor editor = new Editor(updatedDocument);
-            Element root = editor.root();
-            assertEquals(expectedNamespace, root.namespaceURI(), "Namespace should be updated: " + description);
+            // Verify the model version and namespace
+            Element root = document.getRootElement();
 
             Element modelVersionElement = DomUtils.findChildElement(root, "modelVersion");
             if (expectedModelVersion != null) {
@@ -170,15 +166,13 @@ class ModelUpgradeStrategyTest {
                             "http://maven.apache.org/POM/4.0.0",
                             "4.0.0",
                             "4.1.0",
-                            "http://maven.apache.org/POM/4.1.0",
                             "4.1.0",
                             1,
                             "Should upgrade from 4.0.0 to 4.1.0"),
                     Arguments.of(
-                            "http://maven.apache.org/POM/4.1.0",
+                            "http://maven.apache.org/POM/4.0.0",
                             "4.1.0",
                             "4.1.0",
-                            "http://maven.apache.org/POM/4.1.0",
                             "4.1.0",
                             0,
                             "Should not modify when already at target version"),
@@ -186,7 +180,6 @@ class ModelUpgradeStrategyTest {
                             "http://maven.apache.org/POM/4.0.0",
                             null,
                             "4.1.0",
-                            "http://maven.apache.org/POM/4.1.0",
                             "4.1.0",
                             1,
                             "Should add model version when missing"));
@@ -194,8 +187,8 @@ class ModelUpgradeStrategyTest {
     }
 
     @Nested
-    @DisplayName("Namespace Updates")
-    class NamespaceUpdateTests {
+    @DisplayName("Model Version Updates")
+    class ModelVersionUpdateTests {
 
         @Test
         @DisplayName("should update namespace recursively")
@@ -793,7 +786,7 @@ class ModelUpgradeStrategyTest {
         void shouldFailWhenAttemptingDowngrade() throws Exception {
             String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.1.0">
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.1.0</modelVersion>
                     <groupId>com.example</groupId>
                     <artifactId>test-project</artifactId>

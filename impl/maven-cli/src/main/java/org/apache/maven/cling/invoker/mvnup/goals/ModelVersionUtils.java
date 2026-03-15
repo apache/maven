@@ -26,9 +26,6 @@ import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.MODEL_VERSI
 import static eu.maveniverse.domtrip.maven.MavenPomElements.ModelVersions.MODEL_VERSION_4_0_0;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.ModelVersions.MODEL_VERSION_4_1_0;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.ModelVersions.MODEL_VERSION_4_2_0;
-import static eu.maveniverse.domtrip.maven.MavenPomElements.Namespaces.MAVEN_4_0_0_NAMESPACE;
-import static eu.maveniverse.domtrip.maven.MavenPomElements.Namespaces.MAVEN_4_1_0_NAMESPACE;
-import static eu.maveniverse.domtrip.maven.MavenPomElements.Namespaces.MAVEN_4_2_0_NAMESPACE;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.SchemaLocations.MAVEN_4_0_0_SCHEMA_LOCATION;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.SchemaLocations.MAVEN_4_1_0_SCHEMA_LOCATION;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.SchemaLocations.MAVEN_4_2_0_SCHEMA_LOCATION;
@@ -47,7 +44,7 @@ public final class ModelVersionUtils {
 
     /**
      * Detects the model version from a POM document.
-     * Uses both the modelVersion element and namespace URI for detection.
+     * Uses the modelVersion element for detection.
      *
      * @param pomDocument the POM document (domtrip Document)
      * @return the detected model version
@@ -66,16 +63,6 @@ public final class ModelVersionUtils {
             if (!modelVersion.isEmpty()) {
                 return modelVersion;
             }
-        }
-
-        // Fallback to namespace URI detection
-        String namespaceUri = root.namespaceDeclaration(null);
-        if (MAVEN_4_2_0_NAMESPACE.equals(namespaceUri)) {
-            return MODEL_VERSION_4_2_0;
-        } else if (MAVEN_4_1_0_NAMESPACE.equals(namespaceUri)) {
-            return MODEL_VERSION_4_1_0;
-        } else if (MAVEN_4_0_0_NAMESPACE.equals(namespaceUri)) {
-            return MODEL_VERSION_4_0_0;
         }
 
         // Default fallback
