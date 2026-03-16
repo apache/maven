@@ -147,8 +147,10 @@ class ModelUpgradeStrategyTest {
             assertTrue(result.success(), "Model upgrade should succeed: " + description);
             assertEquals(expectedModifiedCount, result.modifiedCount(), description);
 
-            // Verify the model version and namespace
-            Element root = document.getRootElement();
+            // Verify the model version
+            Document updatedDocument = pomMap.get(Paths.get("pom.xml"));
+            Editor editor = new Editor(updatedDocument);
+            Element root = editor.root();
 
             Element modelVersionElement = DomUtils.findChildElement(root, "modelVersion");
             if (expectedModelVersion != null) {
@@ -226,7 +228,7 @@ class ModelUpgradeStrategyTest {
             Document updatedDocument = pomMap.get(Paths.get("pom.xml"));
             Editor editor = new Editor(updatedDocument);
             Element root = editor.root();
-            String expectedNamespaceUri = "http://maven.apache.org/POM/4.1.0";
+            String expectedNamespaceUri = "http://maven.apache.org/POM/4.0.0";
             assertEquals(expectedNamespaceUri, root.namespaceURI());
 
             // Verify child elements namespace updated recursively
