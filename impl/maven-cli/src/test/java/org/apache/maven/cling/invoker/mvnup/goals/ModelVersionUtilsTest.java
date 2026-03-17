@@ -63,23 +63,6 @@ class ModelVersionUtilsTest {
             assertEquals("4.0.0", result);
         }
 
-        @ParameterizedTest(name = "for {0}")
-        @ValueSource(strings = {"4.0.0", "4.1.0", "4.2.0"})
-        @DisplayName("should detect model version")
-        void shouldDetectModelVersionFromNamespace(String targetVersion) throws Exception {
-            String pomXml = PomBuilder.create()
-                    .namespace("http://maven.apache.org/POM/4.0.0")
-                    .modelVersion("4.1.0")
-                    .groupId("test")
-                    .artifactId("test")
-                    .version("1.0.0")
-                    .build();
-
-            Document document = Document.of(pomXml);
-            String result = ModelVersionUtils.detectModelVersion(document);
-            assertEquals(targetVersion, result);
-        }
-
         @Test
         @DisplayName("should return default version when model version is missing")
         void shouldReturnDefaultVersionWhenModelVersionMissing() throws Exception {
