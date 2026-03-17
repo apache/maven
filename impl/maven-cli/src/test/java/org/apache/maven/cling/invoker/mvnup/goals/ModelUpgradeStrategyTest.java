@@ -213,7 +213,7 @@ class ModelUpgradeStrategyTest {
             Map<Path, Document> pomMap = new HashMap<>();
             pomMap.put(Paths.get("pom.xml"), document);
 
-            // Create context with --model-version=4.1.0 option to trigger namespace update
+            // Create context with --model-version=4.1.0 option
             UpgradeOptions options = mock(UpgradeOptions.class);
             when(options.modelVersion()).thenReturn(Optional.of("4.1.0"));
             when(options.all()).thenReturn(Optional.empty());
@@ -224,7 +224,7 @@ class ModelUpgradeStrategyTest {
             assertTrue(result.success(), "Model upgrade should succeed");
             assertTrue(result.modifiedCount() > 0, "Should have upgraded namespace");
 
-            // Verify namespace was updated recursively - use the updated document from pomMap
+            // Verify namespace was not changed - use the updated document from pomMap
             Document updatedDocument = pomMap.get(Paths.get("pom.xml"));
             Editor editor = new Editor(updatedDocument);
             Element root = editor.root();
