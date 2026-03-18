@@ -196,8 +196,8 @@ class ParentCycleDetectionTest {
         Path parentPom = tempDir.resolve("parent").resolve("pom.xml");
         Files.createDirectories(parentPom.getParent());
         Files.writeString(parentPom, """
-            <project xmlns="http://maven.apache.org/POM/4.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-              xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 https://maven.apache.org/xsd/maven-4.1.0.xsd">
+            <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.1.0.xsd">
                 <modelVersion>4.1.0</modelVersion>
                 <groupId>test</groupId>
                 <artifactId>parent</artifactId>
