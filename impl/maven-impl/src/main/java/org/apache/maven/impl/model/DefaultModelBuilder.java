@@ -1562,13 +1562,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                 throw newModelBuilderException();
             }
 
-            if (model.getModelVersion() == null) {
-                String namespace = model.getNamespaceUri();
-                if (namespace != null && namespace.startsWith(NAMESPACE_PREFIX)) {
-                    model = model.withModelVersion(namespace.substring(NAMESPACE_PREFIX.length()));
-                }
-            }
-
             if (isBuildRequest()) {
                 model = model.withPomFile(modelSource.getPath());
 
