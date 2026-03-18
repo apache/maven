@@ -92,7 +92,9 @@
           <name>modelVersion</name>
           <version>4.0.0+</version>
           <required>true</required>
-          <description>Declares to which version of project descriptor this POM conforms.</description>
+          <description>Declares to which version of project descriptor this POM conforms to:
+            {@code 4.0.0} for Maven 3 or {@code 4.1.0} for Maven 4. If not set,
+            value is inferred from namespace if available.</description>
           <type>String</type>
         </field>
 
