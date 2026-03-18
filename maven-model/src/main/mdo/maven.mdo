@@ -86,7 +86,12 @@
           <name>modelVersion</name>
           <version>4.0.0+</version>
           <required>true</required>
-          <description>Declares to which version of project descriptor this POM conforms.</description>
+          <description>
+            <![CDATA[
+            Declares to which version of project descriptor this POM conforms to: <code>4.0.0</code> is the only
+            value supported by Maven 3.
+            ]]>
+          </description>
           <type>String</type>
         </field>
 
