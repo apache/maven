@@ -26,9 +26,6 @@ import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.MODEL_VERSI
 import static eu.maveniverse.domtrip.maven.MavenPomElements.ModelVersions.MODEL_VERSION_4_0_0;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.ModelVersions.MODEL_VERSION_4_1_0;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.ModelVersions.MODEL_VERSION_4_2_0;
-import static eu.maveniverse.domtrip.maven.MavenPomElements.SchemaLocations.MAVEN_4_0_0_SCHEMA_LOCATION;
-import static eu.maveniverse.domtrip.maven.MavenPomElements.SchemaLocations.MAVEN_4_1_0_SCHEMA_LOCATION;
-import static eu.maveniverse.domtrip.maven.MavenPomElements.SchemaLocations.MAVEN_4_2_0_SCHEMA_LOCATION;
 
 /**
  * Utility class for handling Maven model version operations during upgrades.
@@ -226,20 +223,20 @@ public final class ModelVersionUtils {
     }
 
     /**
-     * Gets the schema location for a model version.
+     * Gets the xsi:schemaLocation attribute value for a model version.
      *
      * @param modelVersion the model version
      * @return the schema location
      */
     public static String getSchemaLocationForModelVersion(String modelVersion) {
         if (MODEL_VERSION_4_2_0.equals(modelVersion)) {
-            return MAVEN_4_2_0_SCHEMA_LOCATION;
+            return "http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.2.0.xsd";
         } else if (MODEL_VERSION_4_1_0.equals(modelVersion)) {
-            return MAVEN_4_1_0_SCHEMA_LOCATION;
+            return "http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.1.0.xsd";
         } else if (isNewerThan410(modelVersion)) {
             // For versions newer than 4.1.0 but not specifically 4.2.0, use 4.2.0 schema
-            return MAVEN_4_2_0_SCHEMA_LOCATION;
+            return "http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.2.0.xsd";
         }
-        return MAVEN_4_0_0_SCHEMA_LOCATION;
+        return "http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd";
     }
 }
