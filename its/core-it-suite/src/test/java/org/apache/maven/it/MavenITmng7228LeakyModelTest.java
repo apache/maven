@@ -34,7 +34,7 @@ class MavenITmng7228LeakyModelTest extends AbstractMavenIntegrationTestCase {
         super();
     }
 
-    @Disabled
+    @Disabled("Disabled because the maven-shade-plugin incorrectly derives namespace URIs from model versions")
     @Test
     void testLeakyModel() throws Exception {
         File testDir = extractResources("/mng-7228-leaky-model");
