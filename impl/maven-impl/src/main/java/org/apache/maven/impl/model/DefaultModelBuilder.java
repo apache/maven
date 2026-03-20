@@ -133,7 +133,6 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class DefaultModelBuilder implements ModelBuilder {
 
-    public static final String NAMESPACE_PREFIX = "http://maven.apache.org/POM/";
     private static final String RAW = "raw";
     private static final String FILE = "file";
     private static final String IMPORT = "import";
