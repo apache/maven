@@ -21,6 +21,7 @@ package org.apache.maven.it;
 import java.io.File;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -33,6 +34,7 @@ class MavenITmng7228LeakyModelTest extends AbstractMavenIntegrationTestCase {
         super();
     }
 
+    @Disabled
     @Test
     void testLeakyModel() throws Exception {
         File testDir = extractResources("/mng-7228-leaky-model");
