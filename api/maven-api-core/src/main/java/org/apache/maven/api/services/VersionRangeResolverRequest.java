@@ -148,10 +148,18 @@ public interface VersionRangeResolverRequest extends RepositoryAwareRequest {
      */
     @NotThreadSafe
     class VersionResolverRequestBuilder {
+        @Nullable
         Session session;
+
+        @Nullable
         RequestTrace trace;
+
+        @Nullable
         ArtifactCoordinates artifactCoordinates;
+
+        @Nullable
         List<RemoteRepository> repositories;
+
         Nature nature = Nature.RELEASE_OR_SNAPSHOT;
 
         /**
@@ -194,7 +202,7 @@ public interface VersionRangeResolverRequest extends RepositoryAwareRequest {
          * @param nature the repository nature, or {@code null} to use the default
          * @return this builder, never {@code null}
          */
-        public VersionResolverRequestBuilder nature(Nature nature) {
+        public VersionResolverRequestBuilder nature(@Nullable Nature nature) {
             this.nature = Objects.requireNonNullElse(nature, Nature.RELEASE_OR_SNAPSHOT);
             return this;
         }
@@ -205,7 +213,7 @@ public interface VersionRangeResolverRequest extends RepositoryAwareRequest {
          * @param repositories the repositories, or {@code null} to use the session's repositories
          * @return this builder, never {@code null}
          */
-        public VersionResolverRequestBuilder repositories(List<RemoteRepository> repositories) {
+        public VersionResolverRequestBuilder repositories(@Nullable List<RemoteRepository> repositories) {
             this.repositories = repositories;
             return this;
         }
@@ -216,13 +224,21 @@ public interface VersionRangeResolverRequest extends RepositoryAwareRequest {
          * @return the version range resolver request, never {@code null}
          */
         public VersionRangeResolverRequest build() {
-            return new DefaultVersionResolverRequest(session, trace, artifactCoordinates, repositories, nature);
+            return new DefaultVersionResolverRequest(
+                    requireNonNull(session, "session cannot be null"),
+                    trace,
+                    requireNonNull(artifactCoordinates, "artifactCoordinates cannot be null"),
+                    repositories,
+                    nature);
         }
 
         private static class DefaultVersionResolverRequest extends BaseRequest<Session>
                 implements VersionRangeResolverRequest {
             private final ArtifactCoordinates artifactCoordinates;
+
+            @Nullable
             private final List<RemoteRepository> repositories;
+
             private final Nature nature;
 
             @SuppressWarnings("checkstyle:ParameterNumber")

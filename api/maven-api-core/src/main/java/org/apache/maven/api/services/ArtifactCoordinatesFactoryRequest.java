@@ -26,6 +26,7 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
+import org.apache.maven.api.annotations.Nullable;
 
 import static java.util.Objects.requireNonNull;
 
@@ -38,23 +39,34 @@ import static java.util.Objects.requireNonNull;
 @Immutable
 public interface ArtifactCoordinatesFactoryRequest extends Request<Session> {
 
+    @Nullable
     String getGroupId();
 
+    @Nullable
     String getArtifactId();
 
+    @Nullable
     String getVersion();
 
+    @Nullable
     String getClassifier();
 
+    @Nullable
     String getExtension();
 
+    @Nullable
     String getType();
 
+    @Nullable
     String getCoordinatesString();
 
     @Nonnull
     static ArtifactCoordinatesFactoryRequest build(
-            @Nonnull Session session, String groupId, String artifactId, String version, String extension) {
+            @Nonnull Session session,
+            @Nullable String groupId,
+            @Nullable String artifactId,
+            @Nullable String version,
+            @Nullable String extension) {
         return ArtifactCoordinatesFactoryRequest.builder()
                 .session(requireNonNull(session, "session"))
                 .groupId(groupId)
@@ -67,12 +79,12 @@ public interface ArtifactCoordinatesFactoryRequest extends Request<Session> {
     @Nonnull
     static ArtifactCoordinatesFactoryRequest build(
             @Nonnull Session session,
-            String groupId,
-            String artifactId,
-            String version,
-            String classifier,
-            String extension,
-            String type) {
+            @Nullable String groupId,
+            @Nullable String artifactId,
+            @Nullable String version,
+            @Nullable String classifier,
+            @Nullable String extension,
+            @Nullable String type) {
         return ArtifactCoordinatesFactoryRequest.builder()
                 .session(requireNonNull(session, "session"))
                 .groupId(groupId)
@@ -110,14 +122,31 @@ public interface ArtifactCoordinatesFactoryRequest extends Request<Session> {
 
     @NotThreadSafe
     class ArtifactFactoryRequestBuilder {
+        @Nullable
         private Session session;
+
+        @Nullable
         private RequestTrace trace;
+
+        @Nullable
         private String groupId;
+
+        @Nullable
         private String artifactId;
+
+        @Nullable
         private String version;
+
+        @Nullable
         private String classifier;
+
+        @Nullable
         private String extension;
+
+        @Nullable
         private String type;
+
+        @Nullable
         private String coordinateString;
 
         ArtifactFactoryRequestBuilder() {}
@@ -132,67 +161,88 @@ public interface ArtifactCoordinatesFactoryRequest extends Request<Session> {
             return this;
         }
 
-        public ArtifactFactoryRequestBuilder groupId(String groupId) {
+        public ArtifactFactoryRequestBuilder groupId(@Nullable String groupId) {
             this.groupId = groupId;
             return this;
         }
 
-        public ArtifactFactoryRequestBuilder artifactId(String artifactId) {
+        public ArtifactFactoryRequestBuilder artifactId(@Nullable String artifactId) {
             this.artifactId = artifactId;
             return this;
         }
 
-        public ArtifactFactoryRequestBuilder version(String version) {
+        public ArtifactFactoryRequestBuilder version(@Nullable String version) {
             this.version = version;
             return this;
         }
 
-        public ArtifactFactoryRequestBuilder classifier(String classifier) {
+        public ArtifactFactoryRequestBuilder classifier(@Nullable String classifier) {
             this.classifier = classifier;
             return this;
         }
 
-        public ArtifactFactoryRequestBuilder extension(String extension) {
+        public ArtifactFactoryRequestBuilder extension(@Nullable String extension) {
             this.extension = extension;
             return this;
         }
 
-        public ArtifactFactoryRequestBuilder type(String type) {
+        public ArtifactFactoryRequestBuilder type(@Nullable String type) {
             this.type = type;
             return this;
         }
 
-        public ArtifactFactoryRequestBuilder coordinateString(String coordinateString) {
+        public ArtifactFactoryRequestBuilder coordinateString(@Nullable String coordinateString) {
             this.coordinateString = coordinateString;
             return this;
         }
 
         public ArtifactCoordinatesFactoryRequest build() {
             return new DefaultArtifactFactoryRequestArtifact(
-                    session, trace, groupId, artifactId, version, classifier, extension, type, coordinateString);
+                    requireNonNull(session, "session cannot be null"),
+                    trace,
+                    groupId,
+                    artifactId,
+                    version,
+                    classifier,
+                    extension,
+                    type,
+                    coordinateString);
         }
 
         private static class DefaultArtifactFactoryRequestArtifact extends BaseRequest<Session>
                 implements ArtifactCoordinatesFactoryRequest {
+            @Nullable
             private final String groupId;
+
+            @Nullable
             private final String artifactId;
+
+            @Nullable
             private final String version;
+
+            @Nullable
             private final String classifier;
+
+            @Nullable
             private final String extension;
+
+            @Nullable
             private final String type;
+
+            @Nullable
             private final String coordinatesString;
 
             @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultArtifactFactoryRequestArtifact(
                     @Nonnull Session session,
-                    RequestTrace trace,
-                    String groupId,
-                    String artifactId,
-                    String version,
-                    String classifier,
-                    String extension,
-                    String type,
-                    String coordinatesString) {
+                    @Nullable RequestTrace trace,
+                    @Nullable String groupId,
+                    @Nullable String artifactId,
+                    @Nullable String version,
+                    @Nullable String classifier,
+                    @Nullable String extension,
+                    @Nullable String type,
+                    @Nullable String coordinatesString) {
                 super(session, trace);
                 this.groupId = groupId;
                 this.artifactId = artifactId;
@@ -203,36 +253,43 @@ public interface ArtifactCoordinatesFactoryRequest extends Request<Session> {
                 this.coordinatesString = coordinatesString;
             }
 
+            @Nullable
             @Override
             public String getGroupId() {
                 return groupId;
             }
 
+            @Nullable
             @Override
             public String getArtifactId() {
                 return artifactId;
             }
 
+            @Nullable
             @Override
             public String getVersion() {
                 return version;
             }
 
+            @Nullable
             @Override
             public String getClassifier() {
                 return classifier;
             }
 
+            @Nullable
             @Override
             public String getExtension() {
                 return extension;
             }
 
+            @Nullable
             @Override
             public String getType() {
                 return type;
             }
 
+            @Nullable
             @Override
             public String getCoordinatesString() {
                 return coordinatesString;

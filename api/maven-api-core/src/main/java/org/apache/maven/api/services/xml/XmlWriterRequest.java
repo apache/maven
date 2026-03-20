@@ -27,6 +27,8 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * An XML writer request.
  *
@@ -56,10 +58,19 @@ public interface XmlWriterRequest<T> {
     }
 
     class XmlWriterRequestBuilder<T> {
+        @Nullable
         Path path;
+
+        @Nullable
         OutputStream outputStream;
+
+        @Nullable
         Writer writer;
+
+        @Nullable
         T content;
+
+        @Nullable
         Function<Object, String> inputLocationFormatter;
 
         public XmlWriterRequestBuilder<T> path(Path path) {
@@ -88,22 +99,35 @@ public interface XmlWriterRequest<T> {
         }
 
         public XmlWriterRequest<T> build() {
-            return new DefaultXmlWriterRequest<>(path, outputStream, writer, content, inputLocationFormatter);
+            return new DefaultXmlWriterRequest<>(
+                    path,
+                    outputStream,
+                    writer,
+                    requireNonNull(content, "content cannot be null"),
+                    inputLocationFormatter);
         }
 
         private static class DefaultXmlWriterRequest<T> implements XmlWriterRequest<T> {
+            @Nullable
             final Path path;
+
+            @Nullable
             final OutputStream outputStream;
+
+            @Nullable
             final Writer writer;
+
             final T content;
+
+            @Nullable
             final Function<Object, String> inputLocationFormatter;
 
             DefaultXmlWriterRequest(
-                    Path path,
-                    OutputStream outputStream,
-                    Writer writer,
-                    T content,
-                    Function<Object, String> inputLocationFormatter) {
+                    @Nullable Path path,
+                    @Nullable OutputStream outputStream,
+                    @Nullable Writer writer,
+                    @Nonnull T content,
+                    @Nullable Function<Object, String> inputLocationFormatter) {
                 this.path = path;
                 this.outputStream = outputStream;
                 this.writer = writer;
@@ -111,26 +135,31 @@ public interface XmlWriterRequest<T> {
                 this.inputLocationFormatter = inputLocationFormatter;
             }
 
+            @Nullable
             @Override
             public Path getPath() {
                 return path;
             }
 
+            @Nullable
             @Override
             public OutputStream getOutputStream() {
                 return outputStream;
             }
 
+            @Nullable
             @Override
             public Writer getWriter() {
                 return writer;
             }
 
+            @Nonnull
             @Override
             public T getContent() {
                 return content;
             }
 
+            @Nullable
             @Override
             public Function<Object, String> getInputLocationFormatter() {
                 return inputLocationFormatter;

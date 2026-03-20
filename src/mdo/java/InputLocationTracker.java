@@ -18,6 +18,8 @@
  */
 package ${package};
 
+import org.apache.maven.api.annotations.Nullable;
+
 /**
  * Tracks input source locations for model fields.
  * <p>
@@ -35,6 +37,7 @@ public interface InputLocationTracker {
      * @return the location of the field in the input source or {@code null} if unknown
      * @throws NullPointerException if {@code field} is {@code null}
      */
+    @Nullable
     InputLocation getLocation(Object field);
 
     /**
@@ -44,5 +47,6 @@ public interface InputLocationTracker {
      * @return InputLocation
      * @since 4.0.0
      */
+    @Nullable
     InputLocation getImportedFrom();
 }

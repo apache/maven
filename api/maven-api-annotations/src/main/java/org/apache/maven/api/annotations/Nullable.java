@@ -19,8 +19,10 @@
 package org.apache.maven.api.annotations;
 
 import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * The annotated element can be {@code null}.
@@ -31,4 +33,5 @@ import java.lang.annotation.RetentionPolicy;
 @Experimental
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
 public @interface Nullable {}

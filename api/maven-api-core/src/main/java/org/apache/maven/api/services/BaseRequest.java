@@ -21,6 +21,7 @@ package org.apache.maven.api.services;
 import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 
 import static java.util.Objects.requireNonNull;
 
@@ -33,13 +34,15 @@ import static java.util.Objects.requireNonNull;
 abstract class BaseRequest<S extends ProtoSession> implements Request<S> {
 
     private final S session;
+
+    @Nullable
     private final RequestTrace trace;
 
     protected BaseRequest(@Nonnull S session) {
         this(session, null);
     }
 
-    protected BaseRequest(@Nonnull S session, RequestTrace trace) {
+    protected BaseRequest(@Nonnull S session, @Nullable RequestTrace trace) {
         this.session = requireNonNull(session, "session cannot be null");
         this.trace = trace;
     }
@@ -50,6 +53,7 @@ abstract class BaseRequest<S extends ProtoSession> implements Request<S> {
         return session;
     }
 
+    @Nullable
     @Override
     public RequestTrace getTrace() {
         return trace;

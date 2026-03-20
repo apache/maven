@@ -106,7 +106,7 @@ public abstract class XmlService {
      * Convenience method to merge two XML nodes using default settings.
      */
     @Nullable
-    public static XmlNode merge(XmlNode dominant, XmlNode recessive) {
+    public static XmlNode merge(@Nullable XmlNode dominant, @Nullable XmlNode recessive) {
         return merge(dominant, recessive, null);
     }
 
@@ -184,7 +184,7 @@ public abstract class XmlService {
      * @return the parsed XML node
      * @throws XMLStreamException if there is an error parsing the XML
      */
-    protected abstract XmlNode doRead(InputStream input, InputLocationBuilder locationBuilder)
+    protected abstract XmlNode doRead(InputStream input, @Nullable InputLocationBuilder locationBuilder)
             throws XMLStreamException;
 
     /**
@@ -195,7 +195,8 @@ public abstract class XmlService {
      * @return the parsed XML node
      * @throws XMLStreamException if there is an error parsing the XML
      */
-    protected abstract XmlNode doRead(Reader reader, InputLocationBuilder locationBuilder) throws XMLStreamException;
+    protected abstract XmlNode doRead(Reader reader, @Nullable InputLocationBuilder locationBuilder)
+            throws XMLStreamException;
 
     /**
      * Implementation method for reading an XML node from an XMLStreamReader.
@@ -205,7 +206,7 @@ public abstract class XmlService {
      * @return the parsed XML node
      * @throws XMLStreamException if there is an error parsing the XML
      */
-    protected abstract XmlNode doRead(XMLStreamReader reader, InputLocationBuilder locationBuilder)
+    protected abstract XmlNode doRead(XMLStreamReader reader, @Nullable InputLocationBuilder locationBuilder)
             throws XMLStreamException;
 
     /**
@@ -225,7 +226,9 @@ public abstract class XmlService {
      * @param childMergeOverride optional override for the child merge mode
      * @return the merged XML node, or null if both inputs are null
      */
-    protected abstract XmlNode doMerge(XmlNode dominant, XmlNode recessive, Boolean childMergeOverride);
+    @Nullable
+    protected abstract XmlNode doMerge(
+            @Nullable XmlNode dominant, @Nullable XmlNode recessive, @Nullable Boolean childMergeOverride);
 
     /**
      * Gets the singleton instance of the XmlService.

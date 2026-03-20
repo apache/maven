@@ -25,6 +25,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.maven.api.annotations.Nullable;
+
 /**
  * Represents the location of an element within a model source file.
  * <p>
@@ -42,14 +44,14 @@ import java.util.Objects;
 public final class InputLocation implements Serializable, InputLocationTracker {
     private final int lineNumber;
     private final int columnNumber;
-    private final InputSource source;
+    @Nullable private final InputSource source;
     private final Map<Object, InputLocation> locations;
 #if ( $isMavenModel )
-    private final InputLocation importedFrom;
+    @Nullable private final InputLocation importedFrom;
 
     private volatile int hashCode = 0; // Cached hashCode for performance
 #else
-    private final InputLocation importedFrom;
+    @Nullable private final InputLocation importedFrom;
 #end
 
     private static final InputLocation EMPTY = new InputLocation(-1, -1);
@@ -75,7 +77,7 @@ public final class InputLocation implements Serializable, InputLocationTracker {
      * @param columnNumber the column number in the source file (1-based)
      */
     InputLocation(int lineNumber, int columnNumber) {
-        this(lineNumber, columnNumber, null, null);
+        this(lineNumber, columnNumber, (InputSource) null, null);
     }
 
     /**
@@ -85,7 +87,7 @@ public final class InputLocation implements Serializable, InputLocationTracker {
      * @param columnNumber the column number in the source file (1-based)
      * @param source the input source where this location originates from
      */
-    InputLocation(int lineNumber, int columnNumber, InputSource source) {
+    InputLocation(int lineNumber, int columnNumber, @Nullable InputSource source) {
         this(lineNumber, columnNumber, source, null);
     }
 
@@ -97,7 +99,7 @@ public final class InputLocation implements Serializable, InputLocationTracker {
      * @param source the input source where this location originates from
      * @param selfLocationKey the key to map this location to itself in the locations map
      */
-    InputLocation(int lineNumber, int columnNumber, InputSource source, Object selfLocationKey) {
+    InputLocation(int lineNumber, int columnNumber, @Nullable InputSource source, @Nullable Object selfLocationKey) {
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
         this.source = source;
@@ -115,7 +117,7 @@ public final class InputLocation implements Serializable, InputLocationTracker {
      * @param source the input source where this location originates from
      * @param locations a map of keys to InputLocation instances for nested elements
      */
-    InputLocation(int lineNumber, int columnNumber, InputSource source, Map<Object, InputLocation> locations) {
+    InputLocation(int lineNumber, int columnNumber, @Nullable InputSource source, @Nullable Map<Object, InputLocation> locations) {
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
         this.source = source;
@@ -250,6 +252,7 @@ public final class InputLocation implements Serializable, InputLocationTracker {
      *
      * @return the input source, or null if unknown
      */
+    @Nullable
     public InputSource getSource() {
         return source;
     }
@@ -260,10 +263,11 @@ public final class InputLocation implements Serializable, InputLocationTracker {
      * @param key the key to look up
      * @return the InputLocation for the specified key, or null if not found
      */
+    @Nullable
     @Override
     public InputLocation getLocation(Object key) {
         Objects.requireNonNull(key, "key");
-        return locations != null ? locations.get(key) : null;
+        return locations.get(key);
     }
 
     /**
@@ -282,6 +286,7 @@ public final class InputLocation implements Serializable, InputLocationTracker {
      * @return InputLocation
      * @since 4.0.0
      */
+    @Nullable
     @Override
     public InputLocation getImportedFrom() {
         return importedFrom;
@@ -295,7 +300,8 @@ public final class InputLocation implements Serializable, InputLocationTracker {
      * @param sourceDominant the boolean indicating of {@code source} is dominant compared to {@code target}
      * @return the merged location
      */
-    public static InputLocation merge(InputLocation target, InputLocation source, boolean sourceDominant) {
+    @Nullable
+    public static InputLocation merge(@Nullable InputLocation target, @Nullable InputLocation source, boolean sourceDominant) {
         if (source == null) {
             return target;
         } else if (target == null) {
@@ -332,7 +338,8 @@ public final class InputLocation implements Serializable, InputLocationTracker {
      * @param indices the list of integers for the indices
      * @return the merged location
      */
-    public static InputLocation merge(InputLocation target, InputLocation source, Collection<Integer> indices) {
+    @Nullable
+    public static InputLocation merge(@Nullable InputLocation target, @Nullable InputLocation source, Collection<Integer> indices) {
         if (source == null) {
             return target;
         } else if (target == null) {
@@ -389,9 +396,9 @@ public final class InputLocation implements Serializable, InputLocationTracker {
      */
     private static boolean safeLocationsEquals(
             InputLocation this1,
-            Map<Object, InputLocation> map1,
+            @Nullable Map<Object, InputLocation> map1,
             InputLocation this2,
-            Map<Object, InputLocation> map2) {
+            @Nullable Map<Object, InputLocation> map2) {
         if (map1 == map2) {
             return true;
         }
@@ -433,7 +440,7 @@ public final class InputLocation implements Serializable, InputLocationTracker {
         return result;
     }
 
-    public int safeHash(Map<Object, InputLocation> locations) {
+    public int safeHash(@Nullable Map<Object, InputLocation> locations) {
         if (locations == null) {
             return 0;
         }

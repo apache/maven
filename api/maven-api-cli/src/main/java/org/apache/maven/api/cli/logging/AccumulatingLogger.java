@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Logger;
 
 import static java.util.Objects.requireNonNull;
@@ -34,10 +35,10 @@ public class AccumulatingLogger implements Logger {
     private final AtomicReference<List<Entry>> entries = new AtomicReference<>(new CopyOnWriteArrayList<>());
 
     @Override
-    public void log(Level level, String message, Throwable error) {
+    public void log(Level level, String message, @Nullable Throwable error) {
         requireNonNull(level, "level");
         requireNonNull(message, "message");
-        entries.get().add(new Entry(level, message, error));
+        requireNonNull(entries.get()).add(new Entry(level, message, error));
     }
 
     @Override
