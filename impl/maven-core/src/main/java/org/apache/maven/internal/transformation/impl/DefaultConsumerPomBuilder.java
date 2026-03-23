@@ -334,6 +334,12 @@ class DefaultConsumerPomBuilder implements PomBuilder {
             }
             request.activeProfileIds(executionRequest.getActiveProfiles());
             request.inactiveProfileIds(executionRequest.getInactiveProfiles());
+        } else {
+            LOGGER.debug(
+                    "Session is not an InternalMavenSession ({}); settings.xml profiles will not be "
+                            + "passed to the consumer POM model builder. BOM imports from repositories "
+                            + "defined only in settings.xml profiles may fail to resolve.",
+                    iSession.getClass().getName());
         }
         ModelBuilder.ModelBuilderSession mbSession =
                 iSession.getData().get(SessionData.key(ModelBuilder.ModelBuilderSession.class));

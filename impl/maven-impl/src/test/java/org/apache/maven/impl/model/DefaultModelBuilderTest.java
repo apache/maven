@@ -256,70 +256,53 @@ class DefaultModelBuilderTest {
     }
 
     /**
-     * Verifies that when a derived session is created via {@code build()} with a request
-     * that has explicit repositories, those repositories are used in the derived session
-     * instead of the parent session's repositories.
+     * Verifies that when a BUILD_CONSUMER derived session is created with explicit
+     * repositories, those repositories are propagated to the derived session's
+     * {@code repositories} and {@code externalRepositories}.
      * <p>
      * This is critical for consumer POM building: the consumer POM builder reuses the
-     * existing {@code ModelBuilderSession} (created during the project build phase) and
-     * calls {@code build()} with a new request containing the project's repositories
-     * (which may include non-central repos from settings.xml profiles). Without this fix,
-     * the {@code derive()} method ignores the request's repositories and reuses the parent
-     * session's, causing BOM imports from non-central repositories to fail.
+     * existing {@code ModelBuilderSession} and calls {@code build()} with a request
+     * containing the project's repositories (which may include non-central repos from
+     * settings.xml profiles). Without this, BOM imports from non-central repositories fail.
      */
     @Test
-    public void testDeriveSessionUsesRequestRepositories() throws Exception {
-        // First build to create the mainSession
+    public void testBuildConsumerWithExplicitRepositories() {
+        // First build to create the mainSession (simulates project build phase)
         ModelBuilderRequest firstRequest = ModelBuilderRequest.builder()
                 .session(session)
                 .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
-                .source(Sources.buildSource(getPom("props-and-profiles")))
+                .source(Sources.buildSource(getPom("simple-standalone")))
                 .build();
         ModelBuilder.ModelBuilderSession mbs = builder.newSession();
         mbs.build(firstRequest);
 
-        // Get the mainSession via reflection
-        Field mainSessionField = DefaultModelBuilder.ModelBuilderSessionImpl.class.getDeclaredField("mainSession");
-        mainSessionField.setAccessible(true);
+        // Access the mainSession (package-private) to call derive() and verify state
         DefaultModelBuilder.ModelBuilderSessionState mainState =
-                (DefaultModelBuilder.ModelBuilderSessionState) mainSessionField.get(mbs);
+                ((DefaultModelBuilder.ModelBuilderSessionImpl) mbs).mainSession;
 
         // Verify the main session only has central
-        Field repositoriesField = DefaultModelBuilder.ModelBuilderSessionState.class.getDeclaredField("repositories");
-        repositoriesField.setAccessible(true);
-        List<RemoteRepository> mainRepos = (List<RemoteRepository>) repositoriesField.get(mainState);
-        assertEquals(1, mainRepos.size());
-        assertEquals("central", mainRepos.get(0).getId());
+        assertEquals(1, mainState.getRepositories().size());
+        assertEquals("central", mainState.getRepositories().get(0).getId());
 
-        // Now build again with explicit repositories (simulating consumer POM build)
+        // Derive a BUILD_CONSUMER session with explicit repositories
         RemoteRepository customRepo = session.createRemoteRepository("custom-repo", "https://repo.example.com/maven2");
-        ModelBuilderRequest secondRequest = ModelBuilderRequest.builder()
+        ModelBuilderRequest consumerRequest = ModelBuilderRequest.builder()
                 .session(session)
                 .requestType(ModelBuilderRequest.RequestType.BUILD_CONSUMER)
-                .source(Sources.buildSource(getPom("props-and-profiles")))
+                .source(Sources.buildSource(getPom("simple-standalone")))
                 .repositories(List.of(
                         customRepo, session.createRemoteRepository("central", "https://repo.maven.apache.org/maven2")))
                 .build();
 
-        // The derive() method should use the request's repositories
-        DefaultModelBuilder.ModelBuilderSessionState derived = mainState.derive(secondRequest);
-        List<RemoteRepository> derivedRepos = (List<RemoteRepository>) repositoriesField.get(derived);
+        DefaultModelBuilder.ModelBuilderSessionState derived = mainState.derive(consumerRequest);
 
-        // Verify the derived session has the custom repository
-        boolean hasCustomRepo = derivedRepos.stream().anyMatch(r -> "custom-repo".equals(r.getId()));
+        // Verify the derived session includes the custom repository
         assertTrue(
-                hasCustomRepo,
-                "Derived session should include repositories from the request, not just the parent session's repositories. "
-                        + "Without this, consumer POM building cannot resolve BOM imports from non-central repositories.");
-
-        // Also verify externalRepositories are updated
-        Field extReposField =
-                DefaultModelBuilder.ModelBuilderSessionState.class.getDeclaredField("externalRepositories");
-        extReposField.setAccessible(true);
-        List<RemoteRepository> extRepos = (List<RemoteRepository>) extReposField.get(derived);
-        boolean extHasCustomRepo = extRepos.stream().anyMatch(r -> "custom-repo".equals(r.getId()));
+                derived.getRepositories().stream().anyMatch(r -> "custom-repo".equals(r.getId())),
+                "Derived session repositories should include the custom repo from the request");
         assertTrue(
-                extHasCustomRepo, "Derived session's externalRepositories should include the request's repositories.");
+                derived.getExternalRepositories().stream().anyMatch(r -> "custom-repo".equals(r.getId())),
+                "Derived session externalRepositories should include the custom repo from the request");
     }
 
     private Path getPom(String name) {

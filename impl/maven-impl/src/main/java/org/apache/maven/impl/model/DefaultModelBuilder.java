@@ -277,13 +277,12 @@ public class DefaultModelBuilder implements ModelBuilder {
         List<RemoteRepository> externalRepositories;
         List<RemoteRepository> repositories;
 
-        private RepositoryFactory repositoryFactory;
+        List<RemoteRepository> getRepositories() {
+            return repositories;
+        }
 
-        RepositoryFactory getRepositoryFactory() {
-            if (repositoryFactory == null) {
-                repositoryFactory = session.getService(RepositoryFactory.class);
-            }
-            return repositoryFactory;
+        List<RemoteRepository> getExternalRepositories() {
+            return externalRepositories;
         }
 
         // Cycle detection chain shared across all derived sessions
@@ -354,17 +353,21 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
             // Create a new parentChain for each derived session to prevent cycle detection issues
             // The parentChain now contains both GAV coordinates and file paths
-            // If the derived request specifies explicit repositories, use them as external
-            // repositories so that BOM imports can be resolved from non-central repos
-            // (e.g., repositories defined in settings.xml profiles).
+            // For BUILD_CONSUMER requests, use the request's explicit repositories so that
+            // BOM imports can be resolved from non-central repos (e.g., settings.xml profiles).
+            // This is scoped to BUILD_CONSUMER to avoid unintended side effects on other
+            // derived sessions (e.g., parent POM resolution during project builds).
             List<RemoteRepository> derivedExtRepos = externalRepositories;
             List<RemoteRepository> derivedRepos = repositories;
-            if (request.getRepositories() != null && !request.getRepositories().isEmpty()) {
+            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_CONSUMER
+                    && request.getRepositories() != null
+                    && !request.getRepositories().isEmpty()) {
                 derivedExtRepos = List.copyOf(request.getRepositories());
                 if (pomRepositories.isEmpty()) {
                     derivedRepos = derivedExtRepos;
                 } else {
-                    derivedRepos = getRepositoryFactory().aggregate(session, pomRepositories, derivedExtRepos, false);
+                    RepositoryFactory repositoryFactory = session.getService(RepositoryFactory.class);
+                    derivedRepos = repositoryFactory.aggregate(session, pomRepositories, derivedExtRepos, false);
                 }
             }
             return new ModelBuilderSessionState(
@@ -591,7 +594,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 repos = repos.stream().filter(r -> !ids.contains(r.getId())).toList();
             }
 
-            RepositoryFactory repositoryFactory = getRepositoryFactory();
+            RepositoryFactory repositoryFactory = session.getService(RepositoryFactory.class);
             if (request.getRepositoryMerging() == ModelBuilderRequest.RepositoryMerging.REQUEST_DOMINANT) {
                 repositories = repositoryFactory.aggregate(session, repositories, repos, true);
                 pomRepositories = repositories;
