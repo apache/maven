@@ -125,6 +125,6 @@ public class DefaultProjectRealmCache implements ProjectRealmCache, Disposable {
 
     @Override
     public void dispose() {
-        flush();
+        cache.clear();
     }
 }
