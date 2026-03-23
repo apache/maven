@@ -100,7 +100,7 @@ public class InjectorImpl implements Injector {
                             BufferedReader reader =
                                     new BufferedReader(new InputStreamReader(Objects.requireNonNull(is)))) {
                         for (String line :
-                                reader.lines().filter(l -> !l.startsWith("#")).toList()) {
+                                reader.lines().filter(l -> !l.trim().isEmpty() && !l.startsWith("#")).toList()) {
                             Class<?> clazz = classLoader.loadClass(line);
                             bindImplicit(clazz);
                         }
