@@ -99,8 +99,9 @@ public class InjectorImpl implements Injector {
                     try (InputStream is = url.openStream();
                             BufferedReader reader =
                                     new BufferedReader(new InputStreamReader(Objects.requireNonNull(is)))) {
-                        for (String line :
-                                reader.lines().filter(l -> !l.trim().isEmpty() && !l.startsWith("#")).toList()) {
+                        for (String line : reader.lines()
+                                .filter(l -> !l.isBlank() && !l.startsWith("#"))
+                                .toList()) {
                             Class<?> clazz = classLoader.loadClass(line);
                             bindImplicit(clazz);
                         }
