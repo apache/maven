@@ -19,6 +19,7 @@
 package org.apache.maven.api.di.testing;
 
 import java.io.File;
+import java.util.Optional;
 
 import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
@@ -52,9 +53,11 @@ import org.junit.jupiter.api.extension.ExtensionContext;
  * </pre>
  */
 public class MavenDIExtension implements BeforeEachCallback, AfterEachCallback {
-    protected static ExtensionContext context;
-    protected Injector injector;
-    protected static String basedir;
+
+    private static final ExtensionContext.Namespace MAVEN_DI_EXTENSION =
+            ExtensionContext.Namespace.create("maven-di-extension");
+
+    private static final ThreadLocal<ExtensionContext> EXTENSION_CONTEXT_THREAD_LOCAL = new ThreadLocal<>();
 
     /**
      * Initializes the test environment before each test method execution.
@@ -65,7 +68,6 @@ public class MavenDIExtension implements BeforeEachCallback, AfterEachCallback {
      */
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
-        basedir = getBasedir();
         setContext(context);
         getInjector().bindInstance((Class<Object>) context.getRequiredTestClass(), context.getRequiredTestInstance());
         getInjector().injectInstance(context.getRequiredTestInstance());
@@ -76,10 +78,13 @@ public class MavenDIExtension implements BeforeEachCallback, AfterEachCallback {
      *
      * @param context The extension context to store
      */
-    protected void setContext(ExtensionContext context) {
-        MavenDIExtension.context = context;
+    protected static void setContext(ExtensionContext context) {
+        EXTENSION_CONTEXT_THREAD_LOCAL.set(context);
     }
 
+    protected static Optional<ExtensionContext> getContext() {
+        return Optional.ofNullable(EXTENSION_CONTEXT_THREAD_LOCAL.get());
+    }
     /**
      * Creates and configures the DI container for test execution.
      * Performs component discovery and sets up basic bindings.
@@ -87,7 +92,7 @@ public class MavenDIExtension implements BeforeEachCallback, AfterEachCallback {
      * @throws IllegalStateException if the ExtensionContext is null, the required test class is unavailable,
      *         the required test instance is unavailable, or if container setup fails
      */
-    protected void setupContainer() {
+    protected Injector setupContainer(ExtensionContext context) {
         if (context == null) {
             throw new IllegalStateException("ExtensionContext must not be null");
         }
@@ -101,11 +106,12 @@ public class MavenDIExtension implements BeforeEachCallback, AfterEachCallback {
         }
 
         try {
-            injector = Injector.create();
+            Injector injector = Injector.create();
             injector.bindInstance(ExtensionContext.class, context);
             injector.discover(testClass.getClassLoader());
             injector.bindInstance(Injector.class, injector);
             injector.bindInstance(testClass.asSubclass(Object.class), (Object) testInstance); // Safe generics handling
+            return injector;
         } catch (final Exception e) {
             throw new IllegalStateException(
                     String.format(
@@ -123,10 +129,11 @@ public class MavenDIExtension implements BeforeEachCallback, AfterEachCallback {
      */
     @Override
     public void afterEach(ExtensionContext context) throws Exception {
+        Injector injector = context.getStore(MAVEN_DI_EXTENSION).get(Injector.class, Injector.class);
         if (injector != null) {
             injector.dispose();
-            injector = null;
         }
+        EXTENSION_CONTEXT_THREAD_LOCAL.remove();
     }
 
     /**
@@ -135,8 +142,12 @@ public class MavenDIExtension implements BeforeEachCallback, AfterEachCallback {
      * @return The configured injector instance
      */
     public Injector getInjector() {
+        ExtensionContext context =
+                getContext().orElseThrow(() -> new IllegalStateException("ExtensionContext must not be null"));
+        Injector injector = context.getStore(MAVEN_DI_EXTENSION).get(Injector.class, Injector.class);
         if (injector == null) {
-            setupContainer();
+            injector = setupContainer(context);
+            context.getStore(MAVEN_DI_EXTENSION).put(Injector.class, injector);
         }
         return injector;
     }
@@ -246,11 +257,7 @@ public class MavenDIExtension implements BeforeEachCallback, AfterEachCallback {
      * @return The base directory path
      */
     public static String getBasedir() {
-        if (basedir != null) {
-            return basedir;
-        }
-
-        basedir = System.getProperty("basedir");
+        String basedir = System.getProperty("basedir");
 
         if (basedir == null) {
             basedir = new File("").getAbsolutePath();
