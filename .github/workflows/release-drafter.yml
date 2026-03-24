@@ -19,7 +19,7 @@ name: Release Drafter
 on:
   push:
     branches:
-      - maven-3.9.x
+      - maven-3.10.x
   workflow_dispatch:
 
 jobs:
@@ -27,3 +27,4 @@ jobs:
       uses: apache/maven-gh-actions-shared/.github/workflows/release-drafter.yml@v4
       with:
         config-name: 'release-drafter-3.x.yml'
+        initial-commits-since: '2026-03-09T10:55:05Z' # date of first commit on maven-3.10.x branch, 465a93ceb620266bf88bb1a0c9d69228630a4fb6

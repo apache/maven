@@ -17,7 +17,7 @@
  * under the License.
  */
 
-properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: env.BRANCH_NAME=='maven-3.9.x'?'5':'1'))])
+properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: env.BRANCH_NAME=='maven-3.10.x'?'5':'1'))])
 
 def buildOs = 'linux'
 def buildJdk = '21'
@@ -41,7 +41,7 @@ node(jenkinsEnv.nodeSelection(osNode)) {
         def MAVEN_GOAL='verify'
 
         stage('Configure deploy') {
-           if (env.BRANCH_NAME in ['master', 'maven-3.8.x', 'maven-3.9.x']){
+           if (env.BRANCH_NAME in ['maven-3.10.x']){
                MAVEN_GOAL='deploy'
            }
         }
@@ -94,7 +94,7 @@ for (String os in runITsOses) {
                         } catch (Throwable e) {
                           echo "Failure checkout ITs branch: ${ITS_BRANCH} - fallback maven-3.9.x branch"
                           checkout([$class: 'GitSCM',
-                                  branches: [[name: "maven-3.9.x"]],
+                                  branches: [[name: "maven-3.10.x"]],
                                   extensions: [[$class: 'CloneOption', depth: 1, noTags: true, shallow: true]],
                                   userRemoteConfigs: [[url: 'https://github.com/apache/maven-integration-testing.git']]])
                         }
