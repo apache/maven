@@ -36,10 +36,12 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class XmlNodeImplTest {
 
@@ -713,6 +715,198 @@ class XmlNodeImplTest {
         public Object toInputLocation(XMLStreamReader parser) {
             return location;
         }
+    }
+
+    /**
+     * Verifies that when an XmlNode has xmlns:prefix declarations and prefixed
+     * attributes, the write side produces valid XML with proper namespace handling.
+     */
+    @Test
+    void testWriteWithNamespaceDeclarationsAndPrefixedAttributes() throws Exception {
+        String xml = """
+                <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:mvn="http://maven.apache.org/POM/4.0.0">
+                    <compilerArgs mvn:combine.children="append">
+                        <arg>-Xlint:deprecation</arg>
+                    </compilerArgs>
+                </project>
+                """;
+
+        XmlNode node = toXmlNode(xml);
+
+        // The xmlns:mvn declaration should be preserved in the parsed node
+        assertEquals("http://maven.apache.org/POM/4.0.0", node.attribute("xmlns:mvn"));
+
+        // Write and re-read to verify round-trip produces valid XML
+        java.io.StringWriter writer = new java.io.StringWriter();
+        XmlService.write(node, writer);
+        String output = writer.toString();
+
+        // The output should be parseable XML (no undeclared namespace prefix errors)
+        XmlNode reRead = toXmlNode(output);
+        assertNotNull(reRead);
+    }
+
+    /**
+     * Verifies that when a prefixed attribute has no corresponding xmlns declaration
+     * (as happens in consumer POM transformation), the prefix is stripped on write
+     * to produce valid XML.
+     */
+    @Test
+    void testWriteStripsOrphanedPrefixOnAttributes() throws Exception {
+        // Simulate a consumer POM scenario: mvn:combine.children exists
+        // but xmlns:mvn was lost during model transformation
+        XmlNode node = XmlNode.newBuilder()
+                .name("compilerArgs")
+                .attributes(java.util.Map.of("mvn:combine.children", "append"))
+                .children(java.util.List.of(XmlNode.newBuilder()
+                        .name("arg")
+                        .value("-Xlint:deprecation")
+                        .build()))
+                .build();
+
+        java.io.StringWriter writer = new java.io.StringWriter();
+        XmlService.write(node, writer);
+        String output = writer.toString();
+
+        // Should not contain the undeclared mvn: prefix
+        assertFalse(output.contains("mvn:combine"), "Output should not contain orphaned mvn: prefix");
+        // Should contain the unprefixed attribute instead
+        assertTrue(output.contains("combine.children=\"append\""), "Attribute should be written unprefixed");
+
+        // The output should be parseable XML
+        XmlNode reRead = toXmlNode(output);
+        assertNotNull(reRead);
+        assertEquals("append", reRead.attribute("combine.children"));
+    }
+
+    /**
+     * Verifies that foreign namespace prefixed attributes round-trip correctly
+     * when the xmlns declaration is on the same element as the prefixed attribute.
+     */
+    @Test
+    void testWriteForeignNamespaceAttributeRoundTrip() throws Exception {
+        // Build a node where xmlns:custom and custom:myattr are on the same element
+        XmlNode node = XmlNode.newBuilder()
+                .name("compilerArgs")
+                .attributes(java.util.Map.of(
+                        "xmlns:custom", "http://example.com/custom",
+                        "custom:myattr", "value"))
+                .children(java.util.List.of(XmlNode.newBuilder()
+                        .name("arg")
+                        .value("-Xlint:deprecation")
+                        .build()))
+                .build();
+
+        java.io.StringWriter writer = new java.io.StringWriter();
+        XmlService.write(node, writer);
+        String output = writer.toString();
+
+        XmlNode reRead = toXmlNode(output);
+        assertNotNull(reRead);
+        assertEquals("value", reRead.attribute("custom:myattr"));
+        assertEquals("http://example.com/custom", reRead.attribute("xmlns:custom"));
+    }
+
+    /**
+     * Verifies that when a prefixed attribute's xmlns declaration is on a parent
+     * element (and thus not in the child's attribute map), the prefix is stripped
+     * on write to produce valid XML.
+     */
+    @Test
+    void testWriteStripsOrphanedPrefixFromChildElement() throws Exception {
+        String xml = """
+                <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:custom="http://example.com/custom">
+                    <compilerArgs custom:myattr="value">
+                        <arg>-Xlint:deprecation</arg>
+                    </compilerArgs>
+                </project>
+                """;
+
+        XmlNode node = toXmlNode(xml);
+
+        // The child element has custom:myattr but NOT xmlns:custom in its attributes
+        XmlNode compilerArgs = node.child("compilerArgs");
+        assertNotNull(compilerArgs);
+        assertEquals("value", compilerArgs.attribute("custom:myattr"));
+        assertNull(compilerArgs.attribute("xmlns:custom"), "xmlns:custom should be on parent, not child");
+
+        // Writing the child alone should strip the orphaned prefix
+        java.io.StringWriter writer = new java.io.StringWriter();
+        XmlService.write(compilerArgs, writer);
+        String output = writer.toString();
+
+        XmlNode reRead = toXmlNode(output);
+        assertNotNull(reRead);
+        // Prefix was stripped, so the attribute is now unprefixed
+        assertEquals("value", reRead.attribute("myattr"));
+    }
+
+    /**
+     * Verifies that mvn:combine.children does NOT trigger merge behavior
+     * (only unprefixed combine.children works). This is correct per the XML
+     * namespace spec: unprefixed attributes are in no namespace, while
+     * prefixed attributes are in their declared namespace.
+     */
+    @Test
+    void testPrefixedCombineChildrenDoesNotMerge() throws Exception {
+        String dominant = """
+                <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:mvn="http://maven.apache.org/POM/4.0.0">
+                    <compilerArgs mvn:combine.children="append">
+                        <arg>-Xlint:deprecation</arg>
+                    </compilerArgs>
+                </project>
+                """;
+
+        String recessive = """
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <compilerArgs>
+                        <arg>-Xlint:unchecked</arg>
+                    </compilerArgs>
+                </project>
+                """;
+
+        XmlNode dominantNode = toXmlNode(dominant);
+        XmlNode recessiveNode = toXmlNode(recessive);
+        XmlNode merged = XmlService.merge(dominantNode, recessiveNode);
+
+        // mvn:combine.children should NOT trigger append behavior
+        // Default merge replaces children by name, so only 1 arg should be present
+        XmlNode compilerArgs = merged.child("compilerArgs");
+        assertNotNull(compilerArgs);
+        assertEquals(
+                1,
+                compilerArgs.children().size(),
+                "mvn:combine.children should not trigger append; only unprefixed combine.children works");
+    }
+
+    /**
+     * Verifies that unprefixed combine.children continues to work correctly.
+     */
+    @Test
+    void testUnprefixedCombineChildrenStillWorks() throws Exception {
+        String dominant = """
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <compilerArgs combine.children="append">
+                        <arg>-Xlint:deprecation</arg>
+                    </compilerArgs>
+                </project>
+                """;
+
+        String recessive = """
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <compilerArgs>
+                        <arg>-Xlint:unchecked</arg>
+                    </compilerArgs>
+                </project>
+                """;
+
+        XmlNode dominantNode = toXmlNode(dominant);
+        XmlNode recessiveNode = toXmlNode(recessive);
+        XmlNode merged = XmlService.merge(dominantNode, recessiveNode);
+
+        XmlNode compilerArgs = merged.child("compilerArgs");
+        assertNotNull(compilerArgs);
+        assertEquals(2, compilerArgs.children().size(), "Unprefixed combine.children=append should work");
     }
 
     public static Xpp3Dom build(Reader reader) throws XmlPullParserException, IOException {

@@ -162,9 +162,7 @@ public class DefaultXmlService extends XmlService {
     private void writeNode(XMLStreamWriter xmlWriter, XmlNode node) throws XMLStreamException {
         xmlWriter.writeStartElement(node.prefix(), node.name(), node.namespaceUri());
 
-        for (Map.Entry<String, String> attr : node.attributes().entrySet()) {
-            xmlWriter.writeAttribute(attr.getKey(), attr.getValue());
-        }
+        writeAttributes(xmlWriter, node.attributes());
 
         for (XmlNode child : node.children()) {
             writeNode(xmlWriter, child);
@@ -176,6 +174,42 @@ public class DefaultXmlService extends XmlService {
         }
 
         xmlWriter.writeEndElement();
+    }
+
+    static void writeAttributes(XMLStreamWriter xmlWriter, Map<String, String> attributes) throws XMLStreamException {
+        // Write namespace declarations first, then regular attributes
+        for (Map.Entry<String, String> attr : attributes.entrySet()) {
+            String key = attr.getKey();
+            if ("xmlns".equals(key)) {
+                xmlWriter.writeDefaultNamespace(attr.getValue());
+            } else if (key.startsWith("xmlns:")) {
+                xmlWriter.writeNamespace(key.substring(6), attr.getValue());
+            }
+        }
+        for (Map.Entry<String, String> attr : attributes.entrySet()) {
+            String key = attr.getKey();
+            String value = attr.getValue();
+            if ("xmlns".equals(key) || key.startsWith("xmlns:")) {
+                continue; // already written above
+            } else if (key.startsWith("xml:")) {
+                xmlWriter.writeAttribute("http://www.w3.org/XML/1998/namespace", key.substring(4), value);
+            } else if (key.contains(":")) {
+                int colon = key.indexOf(':');
+                String prefix = key.substring(0, colon);
+                String localName = key.substring(colon + 1);
+                String nsUri = attributes.get("xmlns:" + prefix);
+                if (nsUri != null) {
+                    xmlWriter.writeAttribute(prefix, nsUri, localName, value);
+                } else {
+                    // No namespace declaration found for this prefix; write as unprefixed
+                    // to produce valid XML (the namespace declaration may have been lost
+                    // during consumer POM transformation)
+                    xmlWriter.writeAttribute(localName, value);
+                }
+            } else {
+                xmlWriter.writeAttribute(key, value);
+            }
+        }
     }
 
     /**
