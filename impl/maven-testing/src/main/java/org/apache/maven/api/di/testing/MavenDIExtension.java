@@ -78,13 +78,19 @@ public class MavenDIExtension implements BeforeEachCallback, AfterEachCallback {
      *
      * @param context The extension context to store
      */
-    protected static void setContext(ExtensionContext context) {
+    protected void setContext(ExtensionContext context) {
         EXTENSION_CONTEXT_THREAD_LOCAL.set(context);
     }
 
+    /**
+     * Retrieves the extension context for the current thread.
+     *
+     * @return The extension context, or an empty Optional if not set
+     */
     protected static Optional<ExtensionContext> getContext() {
         return Optional.ofNullable(EXTENSION_CONTEXT_THREAD_LOCAL.get());
     }
+
     /**
      * Creates and configures the DI container for test execution.
      * Performs component discovery and sets up basic bindings.

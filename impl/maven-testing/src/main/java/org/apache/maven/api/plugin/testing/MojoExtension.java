@@ -339,9 +339,8 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
 
         String basedir = AnnotationSupport.findAnnotation(context.getElement().orElseThrow(), Basedir.class)
                 .map(Basedir::value)
-                .orElse(null);
-
-        if (basedir == null || basedir.isEmpty()) {
+                .orElse(pluginBasedir);
+        if (basedir.isEmpty()) {
             basedir = pluginBasedir + "/target/tests/"
                     + context.getRequiredTestClass().getSimpleName() + "/"
                     + context.getRequiredTestMethod().getName();
@@ -439,7 +438,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             model = new MavenMerger().merge(tmodel, defaultModel, false, null);
         }
         tmodel = new DefaultModelPathTranslator(new DefaultPathTranslator())
-                .alignToBaseDirectory(model, Paths.get(getBasedir()), null);
+                .alignToBaseDirectory(tmodel, Paths.get(getBasedir()), null);
         context.getStore(MOJO_EXTENSION).put(Model.class, tmodel);
 
         // mojo execution
