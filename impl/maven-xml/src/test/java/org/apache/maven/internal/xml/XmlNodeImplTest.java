@@ -24,6 +24,7 @@ import javax.xml.stream.XMLStreamReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -737,7 +738,7 @@ class XmlNodeImplTest {
         assertEquals("http://maven.apache.org/POM/4.0.0", node.attribute("xmlns:mvn"));
 
         // Write and re-read to verify round-trip produces valid XML
-        java.io.StringWriter writer = new java.io.StringWriter();
+        StringWriter writer = new StringWriter();
         XmlService.write(node, writer);
         String output = writer.toString();
 
@@ -757,14 +758,14 @@ class XmlNodeImplTest {
         // but xmlns:mvn was lost during model transformation
         XmlNode node = XmlNode.newBuilder()
                 .name("compilerArgs")
-                .attributes(java.util.Map.of("mvn:combine.children", "append"))
-                .children(java.util.List.of(XmlNode.newBuilder()
+                .attributes(Map.of("mvn:combine.children", "append"))
+                .children(List.of(XmlNode.newBuilder()
                         .name("arg")
                         .value("-Xlint:deprecation")
                         .build()))
                 .build();
 
-        java.io.StringWriter writer = new java.io.StringWriter();
+        StringWriter writer = new StringWriter();
         XmlService.write(node, writer);
         String output = writer.toString();
 
@@ -788,16 +789,16 @@ class XmlNodeImplTest {
         // Build a node where xmlns:custom and custom:myattr are on the same element
         XmlNode node = XmlNode.newBuilder()
                 .name("compilerArgs")
-                .attributes(java.util.Map.of(
+                .attributes(Map.of(
                         "xmlns:custom", "http://example.com/custom",
                         "custom:myattr", "value"))
-                .children(java.util.List.of(XmlNode.newBuilder()
+                .children(List.of(XmlNode.newBuilder()
                         .name("arg")
                         .value("-Xlint:deprecation")
                         .build()))
                 .build();
 
-        java.io.StringWriter writer = new java.io.StringWriter();
+        StringWriter writer = new StringWriter();
         XmlService.write(node, writer);
         String output = writer.toString();
 
@@ -808,9 +809,14 @@ class XmlNodeImplTest {
     }
 
     /**
-     * Verifies that when a prefixed attribute's xmlns declaration is on a parent
-     * element (and thus not in the child's attribute map), the prefix is stripped
-     * on write to produce valid XML.
+     * This test reproduces the consumer POM bug from issue #11760.
+     * In the consumer POM transformation, the model is re-serialized from the
+     * Model object. Namespace declarations like xmlns:custom on the &lt;project&gt;
+     * element are lost (they are not part of the Maven model), but prefixed
+     * attributes like custom:myattr survive in plugin configuration XmlNode trees.
+     * When these orphaned prefixed attributes are written without their namespace
+     * declaration, writing them as-is would produce invalid XML ("Undeclared
+     * namespace prefix"). Instead, the prefix is stripped to produce valid XML.
      */
     @Test
     void testWriteStripsOrphanedPrefixFromChildElement() throws Exception {
@@ -824,14 +830,17 @@ class XmlNodeImplTest {
 
         XmlNode node = toXmlNode(xml);
 
-        // The child element has custom:myattr but NOT xmlns:custom in its attributes
+        // The child element has custom:myattr but NOT xmlns:custom in its own attributes
+        // (the namespace declaration is on the parent <project> element)
         XmlNode compilerArgs = node.child("compilerArgs");
         assertNotNull(compilerArgs);
         assertEquals("value", compilerArgs.attribute("custom:myattr"));
         assertNull(compilerArgs.attribute("xmlns:custom"), "xmlns:custom should be on parent, not child");
 
-        // Writing the child alone should strip the orphaned prefix
-        java.io.StringWriter writer = new java.io.StringWriter();
+        // Writing the child alone (as happens during consumer POM serialization)
+        // must produce valid XML. Since xmlns:custom is not available, the prefix
+        // is stripped to avoid an "Undeclared namespace prefix" error.
+        StringWriter writer = new StringWriter();
         XmlService.write(compilerArgs, writer);
         String output = writer.toString();
 

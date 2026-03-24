@@ -176,22 +176,26 @@ public class DefaultXmlService extends XmlService {
         xmlWriter.writeEndElement();
     }
 
-    static void writeAttributes(XMLStreamWriter xmlWriter, Map<String, String> attributes) throws XMLStreamException {
+    private static void writeAttributes(XMLStreamWriter xmlWriter, Map<String, String> attributes)
+            throws XMLStreamException {
         // Write namespace declarations first, then regular attributes
-        for (Map.Entry<String, String> attr : attributes.entrySet()) {
-            String key = attr.getKey();
+        for (Map.Entry<String, String> attribute : attributes.entrySet()) {
+            String key = attribute.getKey();
             if ("xmlns".equals(key)) {
-                xmlWriter.writeDefaultNamespace(attr.getValue());
+                xmlWriter.writeDefaultNamespace(attribute.getValue());
             } else if (key.startsWith("xmlns:")) {
-                xmlWriter.writeNamespace(key.substring(6), attr.getValue());
+                xmlWriter.writeNamespace(key.substring(6), attribute.getValue());
             }
         }
-        for (Map.Entry<String, String> attr : attributes.entrySet()) {
-            String key = attr.getKey();
-            String value = attr.getValue();
+        for (Map.Entry<String, String> attribute : attributes.entrySet()) {
+            String key = attribute.getKey();
+            String value = attribute.getValue();
             if ("xmlns".equals(key) || key.startsWith("xmlns:")) {
                 continue; // already written above
             } else if (key.startsWith("xml:")) {
+                // The xml: prefix is predefined and bound to the XML namespace.
+                // It must not be declared, but attributes like xml:space still need
+                // to be written using the proper namespace URI.
                 xmlWriter.writeAttribute("http://www.w3.org/XML/1998/namespace", key.substring(4), value);
             } else if (key.contains(":")) {
                 int colon = key.indexOf(':');
