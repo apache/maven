@@ -53,7 +53,7 @@ jobs:
 
       - name: Set up Maven
         run:
-          mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.4:wrapper "-Dmaven=3.9.11"
+          mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.4:wrapper "-Dmaven=3.9.14"
 
       - name: Build with Maven
         run: ./mvnw verify -e -B -V -DdistributionFileName=apache-maven
@@ -83,7 +83,7 @@ jobs:
         run: |
           set +e
           repo=maven-integration-testing
-          target_branch=maven-3.9.x
+          target_branch=maven-3.10.x
           target_user=apache
           if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
             user=${PR_HEAD_LABEL%:*}
@@ -139,7 +139,7 @@ jobs:
 
       - name: Set up Maven
         run:
-          mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.4:wrapper "-Dmaven=3.9.11"
+          mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.4:wrapper "-Dmaven=3.9.14"
 
       - name: Running integration tests
         shell: bash
