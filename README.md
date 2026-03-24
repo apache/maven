@@ -29,8 +29,12 @@ Apache Maven
 [![Jenkins Build](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci-maven.apache.org%2Fjob%2FMaven%2Fjob%2Fmaven-box%2Fjob%2Fmaven%2Fjob%2Fmaven-4.0.x%2F)][build-4.0]
 [![Java CI](https://github.com/apache/maven/actions/workflows/maven.yml/badge.svg?branch=maven-4.0.x)][gh-build-4.0]
 
+- [3.10.x](https://github.com/apache/maven/tree/maven-3.10.x):
+[![Jenkins Build](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci-maven.apache.org%2Fjob%2FMaven%2Fjob%2Fmaven-box%2Fjob%2Fmaven%2Fjob%2Fmaven-3.10.x%2F)][build-3.10]
+[![Java CI](https://github.com/apache/maven/actions/workflows/maven.yml/badge.svg?branch=maven-3.10.x)][gh-build-3.10]
+
 - [3.9.x](https://github.com/apache/maven/tree/maven-3.9.x): 
-[![Maven Central](https://img.shields.io/maven-central/v/org.apache.maven/apache-maven.svg?label=Maven%20Central&versionPrefix=3.)](https://central.sonatype.com/artifact/org.apache.maven/apache-maven)
+[![Maven Central](https://img.shields.io/maven-central/v/org.apache.maven/apache-maven.svg?label=Maven%20Central&versionPrefix=3.9.)](https://central.sonatype.com/artifact/org.apache.maven/apache-maven)
 [![Jenkins Build](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci-maven.apache.org%2Fjob%2FMaven%2Fjob%2Fmaven-box%2Fjob%2Fmaven%2Fjob%2Fmaven-3.9.x%2F)][build-3.9]
 [![Java CI](https://github.com/apache/maven/actions/workflows/maven.yml/badge.svg?branch=maven-3.9.x)][gh-build-3.9]
 
@@ -86,9 +90,11 @@ If you want to bootstrap Maven, you'll need:
 [license]: https://www.apache.org/licenses/LICENSE-2.0
 [build]: https://ci-maven.apache.org/job/Maven/job/maven-box/job/maven/job/master/
 [build-4.0]: https://ci-maven.apache.org/job/Maven/job/maven-box/job/maven/job/maven-4.0.x/
+[build-3.10]: https://ci-maven.apache.org/job/Maven/job/maven-box/job/maven/job/maven-3.10.x/
 [build-3.9]: https://ci-maven.apache.org/job/Maven/job/maven-box/job/maven/job/maven-3.9.x/
 [gh-build]: https://github.com/apache/maven/actions/workflows/maven.yml?query=branch%3Amaster
 [gh-build-4.0]: https://github.com/apache/maven/actions/workflows/maven.yml?query=branch%3Amaven-4.0.x
+[gh-build-3.10]: https://github.com/apache/maven/actions/workflows/maven.yml?query=branch%3Amaven-3.10.x
 [gh-build-3.9]: https://github.com/apache/maven/actions/workflows/maven.yml?query=branch%3Amaven-3.9.x
 [maven-home]: https://maven.apache.org/
 [maven-download]: https://maven.apache.org/download.cgi
