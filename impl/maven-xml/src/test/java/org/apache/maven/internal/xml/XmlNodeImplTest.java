@@ -809,17 +809,12 @@ class XmlNodeImplTest {
     }
 
     /**
-     * This test reproduces the consumer POM bug from issue #11760.
-     * In the consumer POM transformation, the model is re-serialized from the
-     * Model object. Namespace declarations like xmlns:custom on the &lt;project&gt;
-     * element are lost (they are not part of the Maven model), but prefixed
-     * attributes like custom:myattr survive in plugin configuration XmlNode trees.
-     * When these orphaned prefixed attributes are written without their namespace
-     * declaration, writing them as-is would produce invalid XML ("Undeclared
-     * namespace prefix"). Instead, the prefix is stripped to produce valid XML.
+     * Verifies that when a prefixed attribute's xmlns declaration is on a parent
+     * element, the child node's namespace context (inherited from parsing) allows
+     * the prefix to be preserved when writing the child alone.
      */
     @Test
-    void testWriteStripsOrphanedPrefixFromChildElement() throws Exception {
+    void testWritePreservesPrefixFromInheritedNamespaceContext() throws Exception {
         String xml = """
                 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:custom="http://example.com/custom">
                     <compilerArgs custom:myattr="value">
@@ -831,23 +826,53 @@ class XmlNodeImplTest {
         XmlNode node = toXmlNode(xml);
 
         // The child element has custom:myattr but NOT xmlns:custom in its own attributes
-        // (the namespace declaration is on the parent <project> element)
         XmlNode compilerArgs = node.child("compilerArgs");
         assertNotNull(compilerArgs);
         assertEquals("value", compilerArgs.attribute("custom:myattr"));
         assertNull(compilerArgs.attribute("xmlns:custom"), "xmlns:custom should be on parent, not child");
+        // But the namespace context has the binding from the parent
+        assertEquals("http://example.com/custom", compilerArgs.namespaces().get("custom"));
 
-        // Writing the child alone (as happens during consumer POM serialization)
-        // must produce valid XML. Since xmlns:custom is not available, the prefix
-        // is stripped to avoid an "Undeclared namespace prefix" error.
+        // Writing the child alone should produce valid XML with the namespace declared
         StringWriter writer = new StringWriter();
         XmlService.write(compilerArgs, writer);
         String output = writer.toString();
 
         XmlNode reRead = toXmlNode(output);
         assertNotNull(reRead);
-        // Prefix was stripped, so the attribute is now unprefixed
-        assertEquals("value", reRead.attribute("myattr"));
+        // Prefix is preserved because the namespace context provided the URI
+        assertEquals("value", reRead.attribute("custom:myattr"));
+    }
+
+    /**
+     * Verifies that when namespace context is not available (e.g., XmlNode built
+     * programmatically without namespaces), orphaned prefixes are stripped on write
+     * to produce valid XML.
+     */
+    @Test
+    void testWriteStripsOrphanedPrefixWithoutNamespaceContext() throws Exception {
+        // Build a node with a prefixed attribute but no namespace context at all
+        XmlNode node = XmlNode.newBuilder()
+                .name("compilerArgs")
+                .attributes(Map.of("mvn:combine.children", "append"))
+                .children(List.of(XmlNode.newBuilder()
+                        .name("arg")
+                        .value("-Xlint:deprecation")
+                        .build()))
+                .build();
+
+        assertTrue(node.namespaces().isEmpty(), "No namespace context");
+
+        StringWriter writer = new StringWriter();
+        XmlService.write(node, writer);
+        String output = writer.toString();
+
+        assertFalse(output.contains("mvn:combine"), "Output should not contain orphaned mvn: prefix");
+        assertTrue(output.contains("combine.children=\"append\""), "Attribute should be written unprefixed");
+
+        XmlNode reRead = toXmlNode(output);
+        assertNotNull(reRead);
+        assertEquals("append", reRead.attribute("combine.children"));
     }
 
     /**

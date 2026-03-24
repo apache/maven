@@ -160,6 +160,24 @@ public interface XmlNode {
     String attribute(@Nonnull String name);
 
     /**
+     * Returns the namespace context for this node — a map of namespace prefix to URI
+     * for all namespace bindings in scope, including those declared on this element
+     * and those inherited from ancestor elements.
+     * <p>
+     * This is used by the write side to properly resolve prefixed attributes.
+     * For example, if an attribute {@code mvn:combine.children} exists on a child element
+     * but {@code xmlns:mvn} was declared on the root element, this map will contain
+     * the {@code mvn → http://maven.apache.org/POM/4.0.0} binding.
+     *
+     * @return map of namespace prefix to URI, never {@code null}
+     * @since 4.1.0
+     */
+    @Nonnull
+    default Map<String, String> namespaces() {
+        return Map.of();
+    }
+
+    /**
      * Returns an immutable list of all child nodes.
      *
      * @return list of child nodes, never {@code null}
@@ -358,6 +376,7 @@ public interface XmlNode {
         private String namespaceUri;
         private String prefix;
         private Map<String, String> attributes;
+        private Map<String, String> namespaces;
         private List<XmlNode> children;
         private Object inputLocation;
 
@@ -422,6 +441,21 @@ public interface XmlNode {
         }
 
         /**
+         * Sets the namespace context for this node.
+         * <p>
+         * This map contains all namespace prefix to URI bindings in scope,
+         * including inherited ones from ancestor elements.
+         *
+         * @param namespaces the map of namespace prefix to URI
+         * @return this builder instance
+         * @since 4.1.0
+         */
+        public Builder namespaces(Map<String, String> namespaces) {
+            this.namespaces = namespaces;
+            return this;
+        }
+
+        /**
          * Sets the child nodes of the XML node.
          * <p>
          * The provided list will be copied to ensure immutability.
@@ -454,7 +488,7 @@ public interface XmlNode {
          * @throws NullPointerException if name has not been set
          */
         public XmlNode build() {
-            return new Impl(prefix, namespaceUri, name, value, attributes, children, inputLocation);
+            return new Impl(prefix, namespaceUri, name, value, attributes, namespaces, children, inputLocation);
         }
 
         private record Impl(
@@ -463,6 +497,7 @@ public interface XmlNode {
                 @Nonnull String name,
                 String value,
                 @Nonnull Map<String, String> attributes,
+                @Nonnull Map<String, String> namespaces,
                 @Nonnull List<XmlNode> children,
                 Object inputLocation)
                 implements XmlNode, Serializable {
@@ -473,6 +508,7 @@ public interface XmlNode {
                 namespaceUri = namespaceUri == null ? "" : namespaceUri;
                 name = Objects.requireNonNull(name);
                 attributes = ImmutableCollections.copy(attributes);
+                namespaces = ImmutableCollections.copy(namespaces);
                 children = ImmutableCollections.copy(children);
             }
 
