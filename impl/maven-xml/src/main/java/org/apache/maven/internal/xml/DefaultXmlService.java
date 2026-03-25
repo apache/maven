@@ -79,10 +79,10 @@ public class DefaultXmlService extends XmlService {
             Map<String, String> parentNamespaces)
             throws XMLStreamException {
         boolean spacePreserve = false;
-        String lPrefix = null;
-        String lNamespaceUri = null;
-        String lName = null;
-        String lValue = null;
+        String elementPrefix = null;
+        String elementNamespaceUri = null;
+        String elementName = null;
+        String elementValue = null;
         Object location = null;
         Map<String, String> attrs = null;
         Map<String, String> nsContext = null;
@@ -93,62 +93,65 @@ public class DefaultXmlService extends XmlService {
             if (eventType == XMLStreamReader.START_ELEMENT) {
                 lastStartTag = parser.getLocation().getLineNumber() * 1000
                         + parser.getLocation().getColumnNumber();
-                if (lName == null) {
+                // The first START_ELEMENT we encounter is "this" element;
+                // subsequent START_ELEMENTs are children, handled in the else branch.
+                if (elementName == null) {
                     int namespacesSize = parser.getNamespaceCount();
-                    lPrefix = parser.getPrefix();
-                    lNamespaceUri = parser.getNamespaceURI();
-                    lName = parser.getLocalName();
+                    elementPrefix = parser.getPrefix();
+                    elementNamespaceUri = parser.getNamespaceURI();
+                    elementName = parser.getLocalName();
                     location = locationBuilder != null ? locationBuilder.toInputLocation(parser) : null;
-                    // Build the namespace context: start with inherited, add local declarations
+                    // Build the namespace context: start with inherited, add local declarations.
+                    // The default namespace (empty prefix) is excluded because per the XML namespace
+                    // spec (Section 6.2), default namespace declarations do NOT apply to attributes.
                     nsContext = new HashMap<>(parentNamespaces);
-                    for (int i = 0; i < namespacesSize; i++) {
-                        String nsPrefix = parser.getNamespacePrefix(i);
-                        String nsUri = parser.getNamespaceURI(i);
-                        if (nsPrefix != null && !nsPrefix.isEmpty()) {
-                            nsContext.put(nsPrefix, nsUri);
-                        }
-                    }
                     int attributesSize = parser.getAttributeCount();
                     if (attributesSize > 0 || namespacesSize > 0) {
                         attrs = new HashMap<>();
                         for (int i = 0; i < namespacesSize; i++) {
                             String nsPrefix = parser.getNamespacePrefix(i);
                             String nsUri = parser.getNamespaceURI(i);
-                            attrs.put(nsPrefix != null && !nsPrefix.isEmpty() ? "xmlns:" + nsPrefix : "xmlns", nsUri);
+                            if (nsPrefix != null && !nsPrefix.isEmpty()) {
+                                nsContext.put(nsPrefix, nsUri);
+                                attrs.put("xmlns:" + nsPrefix, nsUri);
+                            } else {
+                                attrs.put("xmlns", nsUri);
+                            }
                         }
                         for (int i = 0; i < attributesSize; i++) {
-                            String aName = parser.getAttributeLocalName(i);
-                            String aValue = parser.getAttributeValue(i);
-                            String aPrefix = parser.getAttributePrefix(i);
-                            if (aPrefix != null && !aPrefix.isEmpty()) {
-                                aName = aPrefix + ":" + aName;
+                            String attrName = parser.getAttributeLocalName(i);
+                            String attrValue = parser.getAttributeValue(i);
+                            String attrPrefix = parser.getAttributePrefix(i);
+                            if (attrPrefix != null && !attrPrefix.isEmpty()) {
+                                attrName = attrPrefix + ":" + attrName;
                             }
-                            attrs.put(aName, aValue);
-                            spacePreserve = spacePreserve || ("xml:space".equals(aName) && "preserve".equals(aValue));
+                            attrs.put(attrName, attrValue);
+                            spacePreserve =
+                                    spacePreserve || ("xml:space".equals(attrName) && "preserve".equals(attrValue));
                         }
                     }
                 } else {
                     if (children == null) {
                         children = new ArrayList<>();
                     }
-                    XmlNode child = doBuild(parser, trim, locationBuilder, nsContext != null ? nsContext : Map.of());
+                    XmlNode child = doBuild(parser, trim, locationBuilder, nsContext);
                     children.add(child);
                 }
             } else if (eventType == XMLStreamReader.CHARACTERS || eventType == XMLStreamReader.CDATA) {
                 String text = parser.getText();
-                lValue = lValue != null ? lValue + text : text;
+                elementValue = elementValue != null ? elementValue + text : text;
             } else if (eventType == XMLStreamReader.END_ELEMENT) {
                 boolean emptyTag = lastStartTag
                         == parser.getLocation().getLineNumber() * 1000
                                 + parser.getLocation().getColumnNumber();
-                if (lValue != null && trim && !spacePreserve) {
-                    lValue = lValue.trim();
+                if (elementValue != null && trim && !spacePreserve) {
+                    elementValue = elementValue.trim();
                 }
                 return XmlNode.newBuilder()
-                        .prefix(lPrefix)
-                        .namespaceUri(lNamespaceUri)
-                        .name(lName)
-                        .value(children == null ? (lValue != null ? lValue : emptyTag ? null : "") : null)
+                        .prefix(elementPrefix)
+                        .namespaceUri(elementNamespaceUri)
+                        .name(elementName)
+                        .value(children == null ? (elementValue != null ? elementValue : emptyTag ? null : "") : null)
                         .attributes(attrs)
                         .namespaces(nsContext)
                         .children(children)
@@ -203,7 +206,7 @@ public class DefaultXmlService extends XmlService {
      * @param attributes the attribute map (may contain xmlns: entries)
      * @param namespaces the namespace context (prefix → URI) for resolving prefixed attributes
      */
-    static void writeAttributes(
+    private static void writeAttributes(
             XMLStreamWriter xmlWriter, Map<String, String> attributes, Map<String, String> namespaces)
             throws XMLStreamException {
         // Collect which namespace prefixes need to be declared on this element:
