@@ -1477,17 +1477,17 @@ public class MavenCli {
             }
         } else {
             try {
-                int threads = Integer.parseInt(originalThreadConfiguration);
+                int threads = Integer.parseInt(threadConfiguration);
 
                 if (threads <= 0) {
                     throw new IllegalArgumentException(
-                            "Invalid threads value: '" + originalThreadConfiguration + "'. Value must be positive.");
+                            "Invalid threads value: '" + threadConfiguration + "'. Value must be positive.");
                 }
 
                 return threads;
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException(
-                        "Invalid threads value: '" + originalThreadConfiguration + "'. Supported are integer values.");
+                        "Invalid threads value: '" + threadConfiguration + "'. Supported are integer values.");
             }
         }
     }
