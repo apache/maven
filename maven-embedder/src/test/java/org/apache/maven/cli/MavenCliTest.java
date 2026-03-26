@@ -82,6 +82,10 @@ public class MavenCliTest {
         assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("2C2"));
         assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("CXXX"));
         assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("XXXC"));
+        assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("1c"));
+        assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency(" 1c"));
+        assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("1c "));
+        assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency(" 1c "));
 
         int cpus = Runtime.getRuntime().availableProcessors();
         assertEquals((int) (cpus * 2.2), cli.calculateDegreeOfConcurrency("2.2C"));
