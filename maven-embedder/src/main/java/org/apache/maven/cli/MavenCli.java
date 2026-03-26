@@ -1453,7 +1453,8 @@ public class MavenCli {
         return request;
     }
 
-    int calculateDegreeOfConcurrency(String threadConfiguration) {
+    int calculateDegreeOfConcurrency(String originalThreadConfiguration) {
+        String threadConfiguration = originalThreadConfiguration.trim();
         if (threadConfiguration.endsWith("C")) {
             threadConfiguration = threadConfiguration.substring(0, threadConfiguration.length() - 1);
 
@@ -1476,17 +1477,17 @@ public class MavenCli {
             }
         } else {
             try {
-                int threads = Integer.parseInt(threadConfiguration);
+                int threads = Integer.parseInt(originalThreadConfiguration);
 
                 if (threads <= 0) {
                     throw new IllegalArgumentException(
-                            "Invalid threads value: '" + threadConfiguration + "'. Value must be positive.");
+                            "Invalid threads value: '" + originalThreadConfiguration + "'. Value must be positive.");
                 }
 
                 return threads;
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException(
-                        "Invalid threads value: '" + threadConfiguration + "'. Supported are integer values.");
+                        "Invalid threads value: '" + originalThreadConfiguration + "'. Supported are integer values.");
             }
         }
     }
