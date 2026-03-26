@@ -135,11 +135,14 @@ public class MavenDIExtension implements BeforeEachCallback, AfterEachCallback {
      */
     @Override
     public void afterEach(ExtensionContext context) throws Exception {
-        Injector injector = context.getStore(MAVEN_DI_EXTENSION).get(Injector.class, Injector.class);
-        if (injector != null) {
-            injector.dispose();
+        try {
+            Injector injector = context.getStore(MAVEN_DI_EXTENSION).get(Injector.class, Injector.class);
+            if (injector != null) {
+                injector.dispose();
+            }
+        } finally {
+            EXTENSION_CONTEXT_THREAD_LOCAL.remove();
         }
-        EXTENSION_CONTEXT_THREAD_LOCAL.remove();
     }
 
     /**
