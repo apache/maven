@@ -28,6 +28,7 @@ import eu.maveniverse.domtrip.Document;
 import eu.maveniverse.domtrip.Editor;
 import eu.maveniverse.domtrip.Element;
 import eu.maveniverse.domtrip.maven.MavenPomElements;
+import eu.maveniverse.domtrip.maven.MavenPomElements.Namespaces;
 import org.apache.maven.api.Lifecycle;
 import org.apache.maven.api.cli.mvnup.UpgradeOptions;
 import org.apache.maven.api.di.Named;
@@ -49,13 +50,11 @@ import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.SUBPROJECT;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.SUBPROJECTS;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.ModelVersions.MODEL_VERSION_4_0_0;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.ModelVersions.MODEL_VERSION_4_1_0;
-import static eu.maveniverse.domtrip.maven.MavenPomElements.Namespaces.MAVEN_4_0_0_NAMESPACE;
-import static eu.maveniverse.domtrip.maven.MavenPomElements.Namespaces.MAVEN_4_1_0_NAMESPACE;
 import static org.apache.maven.cling.invoker.mvnup.goals.ModelVersionUtils.getSchemaLocationForModelVersion;
 
 /**
  * Strategy for upgrading Maven model versions (e.g., 4.0.0 → 4.1.0).
- * Handles namespace updates, schema location changes, and element conversions.
+ * Handles schema location changes and element conversions.
  */
 @Named
 @Singleton
@@ -181,7 +180,7 @@ public class ModelUpgradeStrategy extends AbstractUpgradeStrategy {
         }
 
         // Update namespace based on target model version
-        String targetNamespace = getNamespaceForModelVersion(targetModelVersion);
+        String targetNamespace = Namespaces.MAVEN_4_0_0_NAMESPACE;
 
         // Use element's attribute method to set the namespace declaration
         // This modifies the element in place and marks it as modified
@@ -261,19 +260,6 @@ public class ModelUpgradeStrategy extends AbstractUpgradeStrategy {
             return MODEL_VERSION_4_1_0;
         } else {
             return MODEL_VERSION_4_0_0;
-        }
-    }
-
-    /**
-     * Gets the namespace URI for a model version.
-     */
-    private String getNamespaceForModelVersion(String modelVersion) {
-        if (MavenPomElements.ModelVersions.MODEL_VERSION_4_2_0.equals(modelVersion)) {
-            return MavenPomElements.Namespaces.MAVEN_4_2_0_NAMESPACE;
-        } else if (MODEL_VERSION_4_1_0.equals(modelVersion)) {
-            return MAVEN_4_1_0_NAMESPACE;
-        } else {
-            return MAVEN_4_0_0_NAMESPACE;
         }
     }
 
