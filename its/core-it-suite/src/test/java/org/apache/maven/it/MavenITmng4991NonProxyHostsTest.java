@@ -27,8 +27,8 @@ import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.util.resource.ResourceFactory;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -49,13 +49,14 @@ public class MavenITmng4991NonProxyHostsTest extends AbstractMavenIntegrationTes
     public void testit() throws Exception {
         File testDir = extractResources("/mng-4991");
 
-        ResourceHandler resourceHandler = new ResourceHandler();
-        resourceHandler.setResourceBase(new File(testDir, "repo").getAbsolutePath());
+        Server server = new Server(0);
 
-        HandlerList handlers = new HandlerList();
+        ResourceHandler resourceHandler = new ResourceHandler();
+        resourceHandler.setBaseResource(ResourceFactory.of(server).newResource(new File(testDir, "repo").toPath()));
+
+        Handler.Sequence handlers = new Handler.Sequence();
         handlers.setHandlers(new Handler[] {resourceHandler, new DefaultHandler()});
 
-        Server server = new Server(0);
         server.setHandler(handlers);
 
         /*

@@ -18,9 +18,6 @@
  */
 package org.apache.maven.it;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,8 +27,9 @@ import java.util.Map;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.util.Callback;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -58,20 +56,20 @@ public class MavenITmng4348NoUnnecessaryRepositoryAccessTest extends AbstractMav
 
         final List<String> requestedUris = Collections.synchronizedList(new ArrayList<>());
 
-        Handler repoHandler = new AbstractHandler() {
+        Handler repoHandler = new Handler.Abstract() {
             @Override
-            public void handle(
-                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
-                System.out.println("Handling " + request.getMethod() + " " + request.getRequestURL());
+            public boolean handle(Request request, Response response, Callback callback) throws Exception {
+                System.out.println("Handling " + request.getMethod() + " " + request.getHttpURI().toString());
 
                 // NOTE: Old Maven versions use the test repo also to check for plugin updates so we need to filter
-                if (request.getRequestURI().startsWith("/org/apache/maven/its/mng4348")) {
-                    requestedUris.add(request.getRequestURI());
+                if (Request.getPathInContext(request).startsWith("/org/apache/maven/its/mng4348")) {
+                    requestedUris.add(Request.getPathInContext(request));
                 }
 
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.setStatus(404);
 
-                ((Request) request).setHandled(true);
+                callback.succeeded();
+                return true;
             }
         };
 

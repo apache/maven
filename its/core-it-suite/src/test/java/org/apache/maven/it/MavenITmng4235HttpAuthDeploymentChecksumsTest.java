@@ -18,13 +18,9 @@
  */
 package org.apache.maven.it;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,25 +28,24 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.apache.maven.it.utils.DeployedResource;
 import org.codehaus.plexus.util.StringUtils;
-import org.eclipse.jetty.security.ConstraintMapping;
-import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.Constraint;
 import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.security.UserStore;
+import org.eclipse.jetty.security.authentication.BasicAuthenticator;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.util.resource.Resource;
-import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.Callback;
+import org.eclipse.jetty.util.resource.ResourceFactory;
 import org.eclipse.jetty.util.security.Password;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import static org.eclipse.jetty.util.security.Constraint.__BASIC_AUTH;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -72,34 +67,30 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest extends AbstractMaven
     protected void setUp() throws Exception {
         testDir = extractResources("/mng-4235");
 
-        repoHandler.setResourceBase(testDir.getAbsolutePath());
-
-        Constraint constraint = new Constraint();
-        constraint.setName(Constraint.__BASIC_AUTH);
-        constraint.setRoles(new String[] {"deployer"});
-        constraint.setAuthenticate(true);
-
-        ConstraintMapping constraintMapping = new ConstraintMapping();
-        constraintMapping.setConstraint(constraint);
-        constraintMapping.setPathSpec("/*");
+        repoHandler.setBasePath(testDir.toPath());
 
         HashLoginService userRealm = new HashLoginService("TestRealm");
         UserStore userStore = new UserStore();
         userStore.addUser("testuser", new Password("testpass"), new String[] {"deployer"});
         userRealm.setUserStore(userStore);
 
-        ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
+        SecurityHandler.PathMapped securityHandler = new SecurityHandler.PathMapped();
         securityHandler.setLoginService(userRealm);
-        securityHandler.setAuthMethod(__BASIC_AUTH);
-        securityHandler.setConstraintMappings(new ConstraintMapping[] {constraintMapping});
-
-        HandlerList handlerList = new HandlerList();
-        handlerList.addHandler(securityHandler);
-        handlerList.addHandler(repoHandler);
-        handlerList.addHandler(new DefaultHandler());
+        securityHandler.setAuthenticator(new BasicAuthenticator());
+        securityHandler.put("/*", Constraint.from("auth", Constraint.Authorization.ANY_USER));
 
         server = new Server(0);
-        server.setHandler(handlerList);
+
+        ResourceHandler resourceHandler = new ResourceHandler();
+        resourceHandler.setBaseResource(ResourceFactory.of(server).newResource(testDir.toPath()));
+
+        Handler.Sequence handlerList = new Handler.Sequence();
+        handlerList.addHandler(repoHandler);
+        handlerList.addHandler(resourceHandler);
+        handlerList.addHandler(new DefaultHandler());
+
+        securityHandler.setHandler(handlerList);
+        server.setHandler(securityHandler);
         server.start();
         if (server.isFailed()) {
             fail("Couldn't bind the server socket to a free port!");
@@ -165,40 +156,44 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest extends AbstractMaven
         assertTrue(expectedHash.equalsIgnoreCase(actualHash), "expected=" + expectedHash + ", actual=" + actualHash);
     }
 
-    private static class RepoHandler extends ResourceHandler {
+    private static class RepoHandler extends Handler.Abstract {
         private final Deque<DeployedResource> deployedResources = new ConcurrentLinkedDeque<>();
+        private Path basePath;
+
+        void setBasePath(Path basePath) {
+            this.basePath = basePath;
+        }
 
         @Override
-        public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
-                throws IOException, ServletException {
-            System.out.println(request.getMethod() + " " + request.getRequestURI());
+        public boolean handle(Request request, Response response, Callback callback) throws Exception {
+            System.out.println(request.getMethod() + " " + Request.getPathInContext(request));
 
             if ("PUT".equals(request.getMethod())) {
-                Resource resource = getResource(request.getPathInfo());
+                Path resource = basePath.resolve(Request.getPathInContext(request).substring(1));
 
                 // NOTE: This can get called concurrently but File.mkdirs() isn't thread-safe in all JREs
-                File dir = resource.getFile().getParentFile();
+                File dir = resource.getParent().toFile();
                 for (int i = 0; i < 10 && !dir.exists(); i++) {
                     dir.mkdirs();
                 }
 
-                Files.copy(request.getInputStream(), resource.getFile().toPath(), REPLACE_EXISTING);
+                Files.copy(Request.asInputStream(request), resource, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
 
                 DeployedResource deployedResource = new DeployedResource();
 
                 deployedResource.httpMethod = request.getMethod();
-                deployedResource.requestUri = request.getRequestURI();
-                deployedResource.transferEncoding = request.getHeader("Transfer-Encoding");
-                deployedResource.contentLength = request.getHeader("Content-Length");
+                deployedResource.requestUri = Request.getPathInContext(request);
+                deployedResource.transferEncoding = request.getHeaders().get("Transfer-Encoding");
+                deployedResource.contentLength = request.getHeaders().get("Content-Length");
 
                 deployedResources.add(deployedResource);
 
-                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                response.setStatus(204);
 
-                ((Request) request).setHandled(true);
-            } else {
-                super.handle(target, baseRequest, request, response);
+                callback.succeeded();
+                return true;
             }
+            return false;
         }
     }
 }

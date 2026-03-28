@@ -18,9 +18,6 @@
  */
 package org.apache.maven.it;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import java.io.File;
 import java.util.Deque;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -28,9 +25,9 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.util.Callback;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,30 +50,30 @@ public class MavenITmng4781DeploymentToNexusStagingRepoTest extends AbstractMave
 
     @BeforeEach
     public void setUp() throws Exception {
-        Handler repoHandler = new AbstractHandler() {
+        Handler repoHandler = new Handler.Abstract() {
             private volatile boolean putSeen;
 
             @Override
-            public void handle(
-                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
-                System.out.println("Handling " + request.getMethod() + " " + request.getRequestURL());
+            public boolean handle(Request request, Response response, Callback callback) throws Exception {
+                System.out.println("Handling " + request.getMethod() + " " + request.getHttpURI().toString());
 
                 if ("PUT".equalsIgnoreCase(request.getMethod())) {
-                    response.setStatus(HttpServletResponse.SC_CREATED);
-                    deployedUris.add(request.getRequestURI());
+                    response.setStatus(201);
+                    deployedUris.add(Request.getPathInContext(request));
                     putSeen = true;
                 } else if (!putSeen) {
-                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    response.setStatus(400);
                 } else {
-                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                    requestedUris.add(request.getRequestURI());
+                    response.setStatus(404);
+                    requestedUris.add(Request.getPathInContext(request));
                 }
 
-                ((Request) request).setHandled(true);
+                callback.succeeded();
+                return true;
             }
         };
 
-        HandlerList handlerList = new HandlerList();
+        Handler.Sequence handlerList = new Handler.Sequence();
         handlerList.addHandler(repoHandler);
 
         server = new Server(0);

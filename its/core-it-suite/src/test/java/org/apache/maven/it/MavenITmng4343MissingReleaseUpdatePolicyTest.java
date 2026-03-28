@@ -18,21 +18,19 @@
  */
 package org.apache.maven.it;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Deque;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import org.eclipse.jetty.io.Content;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.util.Callback;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,40 +54,41 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest extends AbstractMavenI
 
     @BeforeEach
     protected void setUp() throws Exception {
-        Handler repoHandler = new AbstractHandler() {
+        Handler repoHandler = new Handler.Abstract() {
             @Override
-            public void handle(
-                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
-                    throws IOException {
-                System.out.println("Handling " + request.getMethod() + " " + request.getRequestURL());
+            public boolean handle(Request request, Response response, Callback callback) throws Exception {
+                System.out.println("Handling " + request.getMethod() + " " + request.getHttpURI().toString());
 
-                if (request.getRequestURI().startsWith("/org/apache/maven/its/mng4343")) {
-                    requestedUris.add(request.getRequestURI().substring(29));
+                String uri = Request.getPathInContext(request);
+                if (uri.startsWith("/org/apache/maven/its/mng4343")) {
+                    requestedUris.add(uri.substring(29));
                 }
 
                 if (blockAccess) {
-                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    response.setStatus(404);
                 } else {
-                    PrintWriter writer = response.getWriter();
+                    PrintWriter writer = new PrintWriter(Content.Sink.asOutputStream(response));
 
-                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.setStatus(200);
 
-                    if (request.getRequestURI().endsWith(".pom")) {
+                    if (uri.endsWith(".pom")) {
                         writer.println("<project xmlns=\"http://maven.apache.org/POM/4.0.0\">");
                         writer.println("  <modelVersion>4.0.0</modelVersion>");
                         writer.println("  <groupId>org.apache.maven.its.mng4343</groupId>");
                         writer.println("  <artifactId>dep</artifactId>");
                         writer.println("  <version>0.1</version>");
                         writer.println("</project>");
-                    } else if (request.getRequestURI().endsWith(".jar")) {
+                    } else if (uri.endsWith(".jar")) {
                         writer.println("empty");
-                    } else if (request.getRequestURI().endsWith(".md5")
-                            || request.getRequestURI().endsWith(".sha1")) {
-                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    } else if (uri.endsWith(".md5")
+                            || uri.endsWith(".sha1")) {
+                        response.setStatus(404);
                     }
+                    writer.flush();
                 }
 
-                ((Request) request).setHandled(true);
+                callback.succeeded();
+                return true;
             }
         };
 
