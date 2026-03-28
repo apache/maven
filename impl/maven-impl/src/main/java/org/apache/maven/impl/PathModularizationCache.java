@@ -189,10 +189,12 @@ final class PathModularizationCache {
             return Optional.empty();
         }
         String lineSeparator = System.lineSeparator();
+        String fileSeparator = lineSeparator + "  - ";
         var joiner = new StringJoiner(
-                lineSeparator + "  - ",
-                "Filename-based automodules detected on the module path: " + lineSeparator + "  - ",
-                lineSeparator + "Please don't publish this project to a public artifact repository.");
+                fileSeparator,
+                "Filename-based automodules detected on the module path: " + fileSeparator,
+                lineSeparator + "This project may not work in applications that do not use "
+                        + "these dependencies with exactly the same filenames as listed above.");
         automodulesDetected.forEach(joiner::add);
         return Optional.of(joiner.toString());
     }
