@@ -18,8 +18,13 @@
  */
 package org.apache.maven.cling.executor.forked;
 
+import java.util.List;
+
 import org.apache.maven.api.cli.Executor;
 import org.apache.maven.cling.executor.MavenExecutorTestSupport;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Forked executor UT
@@ -29,5 +34,34 @@ public class ForkedMavenExecutorTest extends MavenExecutorTestSupport {
     @Override
     protected Executor doSelectExecutor() {
         return new ForkedMavenExecutor();
+    }
+
+    @Test
+    void testParseArgumentsSimple() {
+        assertEquals(List.of("-T", "4", "clean", "install"), ForkedMavenExecutor.parseArguments("-T 4 clean install"));
+    }
+
+    @Test
+    void testParseArgumentsDoubleQuoted() {
+        assertEquals(
+                List.of("-f", "C:\\Program Files\\project\\pom.xml"),
+                ForkedMavenExecutor.parseArguments("-f \"C:\\Program Files\\project\\pom.xml\""));
+    }
+
+    @Test
+    void testParseArgumentsSingleQuoted() {
+        assertEquals(
+                List.of("-f", "/path with spaces/pom.xml"),
+                ForkedMavenExecutor.parseArguments("-f '/path with spaces/pom.xml'"));
+    }
+
+    @Test
+    void testParseArgumentsEmpty() {
+        assertEquals(List.of(), ForkedMavenExecutor.parseArguments(""));
+    }
+
+    @Test
+    void testParseArgumentsExtraWhitespace() {
+        assertEquals(List.of("clean", "install"), ForkedMavenExecutor.parseArguments("  clean   install  "));
     }
 }

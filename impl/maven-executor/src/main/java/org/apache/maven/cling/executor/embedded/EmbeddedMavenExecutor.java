@@ -31,7 +31,6 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -225,9 +224,9 @@ public class EmbeddedMavenExecutor implements Executor {
         ArrayList<String> mavenArgs = new ArrayList<>();
         String mavenArgsEnv = System.getenv("MAVEN_ARGS");
         if (useMavenArgsEnv && mavenArgsEnv != null && !mavenArgsEnv.isEmpty()) {
-            Arrays.stream(mavenArgsEnv.split(" "))
-                    .filter(s -> !s.trim().isEmpty())
-                    .forEach(s -> mavenArgs.add(0, s));
+            List<String> parsed = parseArguments(mavenArgsEnv);
+            Collections.reverse(parsed);
+            mavenArgs.addAll(parsed);
         }
 
         Properties properties = prepareProperties(executorRequest);
@@ -440,5 +439,48 @@ public class EmbeddedMavenExecutor implements Executor {
             }
             return UNKNOWN_VERSION;
         }
+    }
+
+    /**
+     * Parses a string of arguments respecting quoted strings.
+     * Handles both single and double quotes, and preserves backslashes
+     * (important for Windows paths).
+     */
+    static List<String> parseArguments(String args) {
+        List<String> result = new ArrayList<>();
+        StringBuilder current = new StringBuilder();
+        boolean inDoubleQuotes = false;
+        boolean inSingleQuotes = false;
+        for (int i = 0; i < args.length(); i++) {
+            char c = args.charAt(i);
+            if (inDoubleQuotes) {
+                if (c == '"') {
+                    inDoubleQuotes = false;
+                } else {
+                    current.append(c);
+                }
+            } else if (inSingleQuotes) {
+                if (c == '\'') {
+                    inSingleQuotes = false;
+                } else {
+                    current.append(c);
+                }
+            } else if (c == '"') {
+                inDoubleQuotes = true;
+            } else if (c == '\'') {
+                inSingleQuotes = true;
+            } else if (Character.isWhitespace(c)) {
+                if (!current.isEmpty()) {
+                    result.add(current.toString());
+                    current.setLength(0);
+                }
+            } else {
+                current.append(c);
+            }
+        }
+        if (!current.isEmpty()) {
+            result.add(current.toString());
+        }
+        return result;
     }
 }
