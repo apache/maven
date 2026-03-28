@@ -146,13 +146,23 @@ public interface ProjectBuilderRequest extends RepositoryAwareRequest {
      */
     @NotThreadSafe
     class ProjectBuilderRequestBuilder {
+        @Nullable
         Session session;
+
+        @Nullable
         RequestTrace trace;
+
+        @Nullable
         Path path;
+
+        @Nullable
         Source source;
+
         boolean allowStubModel;
         boolean recursive;
         boolean processPlugins = true;
+
+        @Nullable
         List<RemoteRepository> repositories;
 
         ProjectBuilderRequestBuilder() {}
@@ -237,16 +247,29 @@ public interface ProjectBuilderRequest extends RepositoryAwareRequest {
          */
         public ProjectBuilderRequest build() {
             return new DefaultProjectBuilderRequest(
-                    session, trace, path, source, allowStubModel, recursive, processPlugins, repositories);
+                    requireNonNull(session, "session cannot be null"),
+                    trace,
+                    path,
+                    source,
+                    allowStubModel,
+                    recursive,
+                    processPlugins,
+                    repositories);
         }
 
         private static class DefaultProjectBuilderRequest extends BaseRequest<Session>
                 implements ProjectBuilderRequest {
+            @Nullable
             private final Path path;
+
+            @Nullable
             private final Source source;
+
             private final boolean allowStubModel;
             private final boolean recursive;
             private final boolean processPlugins;
+
+            @Nullable
             private final List<RemoteRepository> repositories;
 
             @SuppressWarnings("checkstyle:ParameterNumber")
@@ -295,6 +318,7 @@ public interface ProjectBuilderRequest extends RepositoryAwareRequest {
                 return processPlugins;
             }
 
+            @Nullable
             @Override
             public List<RemoteRepository> getRepositories() {
                 return repositories;

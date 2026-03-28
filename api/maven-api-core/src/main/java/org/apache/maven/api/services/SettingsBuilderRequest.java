@@ -130,11 +130,22 @@ public interface SettingsBuilderRequest extends Request<ProtoSession> {
 
     @NotThreadSafe
     class SettingsBuilderRequestBuilder {
+        @Nullable
         ProtoSession session;
+
+        @Nullable
         RequestTrace trace;
+
+        @Nullable
         Source installationSettingsSource;
+
+        @Nullable
         Source projectSettingsSource;
+
+        @Nullable
         Source userSettingsSource;
+
+        @Nullable
         UnaryOperator<String> interpolationSource;
 
         public SettingsBuilderRequestBuilder session(ProtoSession session) {
@@ -147,29 +158,29 @@ public interface SettingsBuilderRequest extends Request<ProtoSession> {
             return this;
         }
 
-        public SettingsBuilderRequestBuilder installationSettingsSource(Source installationSettingsSource) {
+        public SettingsBuilderRequestBuilder installationSettingsSource(@Nullable Source installationSettingsSource) {
             this.installationSettingsSource = installationSettingsSource;
             return this;
         }
 
-        public SettingsBuilderRequestBuilder projectSettingsSource(Source projectSettingsSource) {
+        public SettingsBuilderRequestBuilder projectSettingsSource(@Nullable Source projectSettingsSource) {
             this.projectSettingsSource = projectSettingsSource;
             return this;
         }
 
-        public SettingsBuilderRequestBuilder userSettingsSource(Source userSettingsSource) {
+        public SettingsBuilderRequestBuilder userSettingsSource(@Nullable Source userSettingsSource) {
             this.userSettingsSource = userSettingsSource;
             return this;
         }
 
-        public SettingsBuilderRequestBuilder interpolationSource(UnaryOperator<String> interpolationSource) {
+        public SettingsBuilderRequestBuilder interpolationSource(@Nullable UnaryOperator<String> interpolationSource) {
             this.interpolationSource = interpolationSource;
             return this;
         }
 
         public SettingsBuilderRequest build() {
             return new DefaultSettingsBuilderRequest(
-                    session,
+                    requireNonNull(session, "session cannot be null"),
                     trace,
                     installationSettingsSource,
                     projectSettingsSource,
@@ -179,9 +190,16 @@ public interface SettingsBuilderRequest extends Request<ProtoSession> {
 
         private static class DefaultSettingsBuilderRequest extends BaseRequest<ProtoSession>
                 implements SettingsBuilderRequest {
+            @Nullable
             private final Source installationSettingsSource;
+
+            @Nullable
             private final Source projectSettingsSource;
+
+            @Nullable
             private final Source userSettingsSource;
+
+            @Nullable
             private final UnaryOperator<String> interpolationSource;
 
             @SuppressWarnings("checkstyle:ParameterNumber")

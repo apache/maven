@@ -91,9 +91,16 @@ public interface ToolchainsBuilderRequest extends Request<ProtoSession> {
 
     @NotThreadSafe
     class ToolchainsBuilderRequestBuilder {
+        @Nullable
         ProtoSession session;
+
+        @Nullable
         RequestTrace trace;
+
+        @Nullable
         Source installationToolchainsSource;
+
+        @Nullable
         Source userToolchainsSource;
 
         public ToolchainsBuilderRequestBuilder session(ProtoSession session) {
@@ -106,24 +113,31 @@ public interface ToolchainsBuilderRequest extends Request<ProtoSession> {
             return this;
         }
 
-        public ToolchainsBuilderRequestBuilder installationToolchainsSource(Source installationToolchainsSource) {
+        public ToolchainsBuilderRequestBuilder installationToolchainsSource(
+                @Nullable Source installationToolchainsSource) {
             this.installationToolchainsSource = installationToolchainsSource;
             return this;
         }
 
-        public ToolchainsBuilderRequestBuilder userToolchainsSource(Source userToolchainsSource) {
+        public ToolchainsBuilderRequestBuilder userToolchainsSource(@Nullable Source userToolchainsSource) {
             this.userToolchainsSource = userToolchainsSource;
             return this;
         }
 
         public ToolchainsBuilderRequest build() {
             return new ToolchainsBuilderRequestBuilder.DefaultToolchainsBuilderRequest(
-                    session, trace, installationToolchainsSource, userToolchainsSource);
+                    requireNonNull(session, "session cannot be null"),
+                    trace,
+                    installationToolchainsSource,
+                    userToolchainsSource);
         }
 
         private static class DefaultToolchainsBuilderRequest extends BaseRequest<ProtoSession>
                 implements ToolchainsBuilderRequest {
+            @Nullable
             private final Source installationToolchainsSource;
+
+            @Nullable
             private final Source userToolchainsSource;
 
             @SuppressWarnings("checkstyle:ParameterNumber")

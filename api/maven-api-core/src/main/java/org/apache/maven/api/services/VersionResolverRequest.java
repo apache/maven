@@ -68,9 +68,16 @@ public interface VersionResolverRequest extends RepositoryAwareRequest {
 
     @NotThreadSafe
     class VersionResolverRequestBuilder {
+        @Nullable
         Session session;
+
+        @Nullable
         RequestTrace trace;
+
+        @Nullable
         ArtifactCoordinates artifactCoordinates;
+
+        @Nullable
         List<RemoteRepository> repositories;
 
         public VersionResolverRequestBuilder session(Session session) {
@@ -88,18 +95,24 @@ public interface VersionResolverRequest extends RepositoryAwareRequest {
             return this;
         }
 
-        public VersionResolverRequestBuilder repositories(List<RemoteRepository> repositories) {
+        public VersionResolverRequestBuilder repositories(@Nullable List<RemoteRepository> repositories) {
             this.repositories = repositories;
             return this;
         }
 
         public VersionResolverRequest build() {
-            return new DefaultVersionResolverRequest(session, trace, artifactCoordinates, repositories);
+            return new DefaultVersionResolverRequest(
+                    requireNonNull(session, "session cannot be null"),
+                    trace,
+                    requireNonNull(artifactCoordinates, "artifactCoordinates cannot be null"),
+                    repositories);
         }
 
         private static class DefaultVersionResolverRequest extends BaseRequest<Session>
                 implements VersionResolverRequest {
             private final ArtifactCoordinates artifactCoordinates;
+
+            @Nullable
             private final List<RemoteRepository> repositories;
 
             @SuppressWarnings("checkstyle:ParameterNumber")
@@ -109,7 +122,7 @@ public interface VersionResolverRequest extends RepositoryAwareRequest {
                     @Nonnull ArtifactCoordinates artifactCoordinates,
                     @Nullable List<RemoteRepository> repositories) {
                 super(session, trace);
-                this.artifactCoordinates = artifactCoordinates;
+                this.artifactCoordinates = requireNonNull(artifactCoordinates, "artifactCoordinates cannot be null");
                 this.repositories = validate(repositories);
             }
 

@@ -59,6 +59,7 @@
     #set ( $dummy = $imports.add( "java.util.stream.Stream" ) )
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Generated" ) )
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Nonnull" ) )
+    #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Nullable" ) )
     #foreach ( $field in $allFields )
       #if ( $field.type == "java.util.List" )
           #set ( $dummy = $imports.add( "java.util.ArrayList" ) )

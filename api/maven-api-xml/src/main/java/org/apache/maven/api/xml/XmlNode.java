@@ -244,6 +244,7 @@ public interface XmlNode {
      * @deprecated use {@link XmlService#merge(XmlNode, XmlNode, Boolean)} instead
      */
     @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nullable
     default XmlNode merge(@Nullable XmlNode source) {
         return XmlService.merge(this, source);
     }
@@ -252,6 +253,7 @@ public interface XmlNode {
      * @deprecated use {@link XmlService#merge(XmlNode, XmlNode, Boolean)} instead
      */
     @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nullable
     default XmlNode merge(@Nullable XmlNode source, @Nullable Boolean childMergeOverride) {
         return XmlService.merge(this, source, childMergeOverride);
     }
@@ -353,12 +355,25 @@ public interface XmlNode {
      * {@link #build()}.
      */
     class Builder {
+        @Nullable
         private String name;
+
+        @Nullable
         private String value;
+
+        @Nullable
         private String namespaceUri;
+
+        @Nullable
         private String prefix;
+
+        @Nullable
         private Map<String, String> attributes;
+
+        @Nullable
         private List<XmlNode> children;
+
+        @Nullable
         private Object inputLocation;
 
         /**
@@ -458,30 +473,41 @@ public interface XmlNode {
         }
 
         private record Impl(
-                String prefix,
-                String namespaceUri,
+                @Nonnull String prefix,
+                @Nonnull String namespaceUri,
                 @Nonnull String name,
-                String value,
+                @Nullable String value,
                 @Nonnull Map<String, String> attributes,
                 @Nonnull List<XmlNode> children,
-                Object inputLocation)
+                @Nullable Object inputLocation)
                 implements XmlNode, Serializable {
 
-            private Impl {
+            private Impl(
+                    @Nullable String prefix,
+                    @Nullable String namespaceUri,
+                    @Nullable String name,
+                    @Nullable String value,
+                    @Nullable Map<String, String> attributes,
+                    @Nullable List<XmlNode> children,
+                    @Nullable Object inputLocation) {
                 // Validation and normalization from the original constructor
-                prefix = prefix == null ? "" : prefix;
-                namespaceUri = namespaceUri == null ? "" : namespaceUri;
-                name = Objects.requireNonNull(name);
-                attributes = ImmutableCollections.copy(attributes);
-                children = ImmutableCollections.copy(children);
+                this.prefix = prefix == null ? "" : prefix;
+                this.namespaceUri = namespaceUri == null ? "" : namespaceUri;
+                this.name = Objects.requireNonNull(name);
+                this.value = value;
+                this.attributes = ImmutableCollections.copy(attributes);
+                this.children = ImmutableCollections.copy(children);
+                this.inputLocation = inputLocation;
             }
 
             @Override
+            @Nullable
             public String attribute(@Nonnull String name) {
                 return attributes.get(name);
             }
 
             @Override
+            @Nullable
             public XmlNode child(String name) {
                 if (name != null) {
                     ListIterator<XmlNode> it = children.listIterator(children.size());
@@ -528,7 +554,7 @@ public interface XmlNode {
                 w = addToStringField(sb, prefix, o -> !o.isEmpty(), "prefix", w);
                 w = addToStringField(sb, namespaceUri, o -> !o.isEmpty(), "namespaceUri", w);
                 w = addToStringField(sb, name, o -> !o.isEmpty(), "name", w);
-                w = addToStringField(sb, value, o -> !o.isEmpty(), "value", w);
+                w = addToStringField(sb, value, o -> o != null && !o.isEmpty(), "value", w);
                 w = addToStringField(sb, attributes, o -> !o.isEmpty(), "attributes", w);
                 w = addToStringField(sb, children, o -> !o.isEmpty(), "children", w);
                 w = addToStringField(sb, inputLocation, Objects::nonNull, "inputLocation", w);
@@ -537,7 +563,7 @@ public interface XmlNode {
             }
 
             private static <T> boolean addToStringField(
-                    StringBuilder sb, T o, Function<T, Boolean> p, String n, boolean w) {
+                    StringBuilder sb, @Nullable T o, Function<T, Boolean> p, String n, boolean w) {
                 if (!p.apply(o)) {
                     if (w) {
                         sb.append(", ");

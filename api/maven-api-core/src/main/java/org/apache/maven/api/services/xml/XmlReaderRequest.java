@@ -85,15 +85,32 @@ public interface XmlReaderRequest {
 
     @NotThreadSafe
     class XmlReaderRequestBuilder {
+        @Nullable
         Path path;
+
+        @Nullable
         Path rootDirectory;
+
+        @Nullable
         URL url;
+
+        @Nullable
         InputStream inputStream;
+
+        @Nullable
         Reader reader;
+
+        @Nullable
         Transformer transformer;
+
         boolean strict;
+
+        @Nullable
         String modelId;
+
+        @Nullable
         String location;
+
         boolean addDefaultEntities = true;
 
         public XmlReaderRequestBuilder path(Path path) {
@@ -161,28 +178,45 @@ public interface XmlReaderRequest {
         }
 
         private static class DefaultXmlReaderRequest implements XmlReaderRequest {
+            @Nullable
             final Path path;
+
+            @Nullable
             final Path rootDirectory;
+
+            @Nullable
             final URL url;
+
+            @Nullable
             final InputStream inputStream;
+
+            @Nullable
             final Reader reader;
+
+            @Nullable
             final Transformer transformer;
+
             final boolean strict;
+
+            @Nullable
             final String modelId;
+
+            @Nullable
             final String location;
+
             final boolean addDefaultEntities;
 
             @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultXmlReaderRequest(
-                    Path path,
-                    Path rootDirectory,
-                    URL url,
-                    InputStream inputStream,
-                    Reader reader,
-                    Transformer transformer,
+                    @Nullable Path path,
+                    @Nullable Path rootDirectory,
+                    @Nullable URL url,
+                    @Nullable InputStream inputStream,
+                    @Nullable Reader reader,
+                    @Nullable Transformer transformer,
                     boolean strict,
-                    String modelId,
-                    String location,
+                    @Nullable String modelId,
+                    @Nullable String location,
                     boolean addDefaultEntities) {
                 this.path = path;
                 this.rootDirectory = rootDirectory;
@@ -196,31 +230,37 @@ public interface XmlReaderRequest {
                 this.addDefaultEntities = addDefaultEntities;
             }
 
+            @Nullable
             @Override
             public Path getPath() {
                 return path;
             }
 
+            @Nullable
             @Override
             public Path getRootDirectory() {
                 return rootDirectory;
             }
 
+            @Nullable
             @Override
             public URL getURL() {
                 return url;
             }
 
+            @Nullable
             @Override
             public InputStream getInputStream() {
                 return inputStream;
             }
 
+            @Nullable
             @Override
             public Reader getReader() {
                 return reader;
             }
 
+            @Nullable
             @Override
             public Transformer getTransformer() {
                 return transformer;
@@ -231,11 +271,13 @@ public interface XmlReaderRequest {
                 return strict;
             }
 
+            @Nullable
             @Override
             public String getModelId() {
                 return modelId;
             }
 
+            @Nullable
             @Override
             public String getLocation() {
                 return location;

@@ -27,6 +27,7 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.Toolchain;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
  * Service interface for managing Maven toolchains, which provide abstraction for different
@@ -51,7 +52,7 @@ public interface ToolchainManager extends Service {
      * @throws ToolchainManagerException if toolchain retrieval fails
      */
     @Nonnull
-    List<Toolchain> getToolchains(@Nonnull Session session, String type, Map<String, String> requirements);
+    List<Toolchain> getToolchains(@Nonnull Session session, String type, @Nullable Map<String, String> requirements);
 
     /**
      * Retrieves all toolchains of the specified type without additional requirements.

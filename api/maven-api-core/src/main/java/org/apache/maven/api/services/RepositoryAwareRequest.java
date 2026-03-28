@@ -97,7 +97,8 @@ public interface RepositoryAwareRequest extends Request<Session> {
      * @throws IllegalArgumentException if the list contains duplicate repositories
      * @throws IllegalArgumentException if the list contains null repository entries
      */
-    default List<RemoteRepository> validate(List<RemoteRepository> repositories) {
+    @Nullable
+    default List<RemoteRepository> validate(@Nullable List<RemoteRepository> repositories) {
         if (repositories == null) {
             return null;
         }
