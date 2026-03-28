@@ -21,11 +21,13 @@ package org.apache.maven.di.impl;
 import java.lang.annotation.Retention;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.di.Aggregate;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Priority;
@@ -39,6 +41,7 @@ import org.junit.jupiter.api.Test;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -513,5 +516,1039 @@ public class InjectorImplTest {
 
         @Named
         static class Bar {}
+    }
+
+    // ============================================================================
+    // Collection Aggregation Tests
+    // ============================================================================
+
+    @Test
+    void testListAggregationFromMultipleNamedBeans() {
+        Injector injector = Injector.create().bindImplicit(ListAggregationTest.class);
+
+        List<ListAggregationTest.MyService> services =
+                injector.getInstance(new Key<List<ListAggregationTest.MyService>>() {});
+
+        assertNotNull(services);
+        assertEquals(3, services.size());
+
+        // Verify all three implementations are present
+        assertTrue(services.stream().anyMatch(s -> s instanceof ListAggregationTest.FooService));
+        assertTrue(services.stream().anyMatch(s -> s instanceof ListAggregationTest.BarService));
+        assertTrue(services.stream().anyMatch(s -> s instanceof ListAggregationTest.BazService));
+    }
+
+    static class ListAggregationTest {
+        interface MyService {}
+
+        @Named("foo")
+        static class FooService implements MyService {}
+
+        @Named("bar")
+        static class BarService implements MyService {}
+
+        @Named("baz")
+        static class BazService implements MyService {}
+    }
+
+    @Test
+    void testListAggregationFromProvidesMethod() {
+        Injector injector = Injector.create().bindImplicit(ListAggregationFromProvides.class);
+
+        List<ListAggregationFromProvides.MyService> services =
+                injector.getInstance(new Key<List<ListAggregationFromProvides.MyService>>() {});
+
+        assertNotNull(services);
+        assertEquals(3, services.size());
+    }
+
+    static class ListAggregationFromProvides {
+        interface MyService {}
+
+        @Provides
+        MyService foo() {
+            return new MyService() {};
+        }
+
+        @Provides
+        MyService bar() {
+            return new MyService() {};
+        }
+
+        @Provides
+        MyService baz() {
+            return new MyService() {};
+        }
+    }
+
+    @Test
+    void testListAggregationMixedNamedAndProvides() {
+        Injector injector = Injector.create().bindImplicit(ListAggregationMixed.class);
+
+        List<ListAggregationMixed.MyService> services =
+                injector.getInstance(new Key<List<ListAggregationMixed.MyService>>() {});
+
+        assertNotNull(services);
+        assertEquals(4, services.size());
+    }
+
+    static class ListAggregationMixed {
+        interface MyService {}
+
+        @Named("foo")
+        static class FooService implements MyService {}
+
+        @Named("bar")
+        static class BarService implements MyService {}
+
+        @Provides
+        MyService provided1() {
+            return new MyService() {};
+        }
+
+        @Provides
+        MyService provided2() {
+            return new MyService() {};
+        }
+    }
+
+    @Test
+    void testEmptyListWhenNoBeansAvailable() {
+        Injector injector = Injector.create().bindImplicit(EmptyListTest.class);
+
+        List<EmptyListTest.NonExistentService> services =
+                injector.getInstance(new Key<List<EmptyListTest.NonExistentService>>() {});
+
+        assertNotNull(services);
+        assertEquals(0, services.size());
+    }
+
+    static class EmptyListTest {
+        interface NonExistentService {}
+    }
+
+    @Test
+    void testMapAggregationFromMultipleNamedBeans() {
+        Injector injector = Injector.create().bindImplicit(MapAggregationTest.class);
+
+        Map<String, MapAggregationTest.MyService> services =
+                injector.getInstance(new Key<Map<String, MapAggregationTest.MyService>>() {});
+
+        assertNotNull(services);
+        assertEquals(3, services.size());
+
+        assertTrue(services.containsKey("foo"));
+        assertTrue(services.containsKey("bar"));
+        assertTrue(services.containsKey("baz"));
+
+        assertInstanceOf(MapAggregationTest.FooService.class, services.get("foo"));
+        assertInstanceOf(MapAggregationTest.BarService.class, services.get("bar"));
+        assertInstanceOf(MapAggregationTest.BazService.class, services.get("baz"));
+    }
+
+    static class MapAggregationTest {
+        interface MyService {}
+
+        @Named("foo")
+        static class FooService implements MyService {}
+
+        @Named("bar")
+        static class BarService implements MyService {}
+
+        @Named("baz")
+        static class BazService implements MyService {}
+    }
+
+    @Test
+    void testMapAggregationFromNamedProvidesMethod() {
+        Injector injector = Injector.create().bindImplicit(MapAggregationFromProvides.class);
+
+        Map<String, MapAggregationFromProvides.MyService> services =
+                injector.getInstance(new Key<Map<String, MapAggregationFromProvides.MyService>>() {});
+
+        assertNotNull(services);
+        assertEquals(3, services.size());
+
+        assertTrue(services.containsKey("foo"));
+        assertTrue(services.containsKey("bar"));
+        assertTrue(services.containsKey("baz"));
+    }
+
+    static class MapAggregationFromProvides {
+        interface MyService {}
+
+        @Provides
+        @Named("foo")
+        MyService foo() {
+            return new MyService() {};
+        }
+
+        @Provides
+        @Named("bar")
+        MyService bar() {
+            return new MyService() {};
+        }
+
+        @Provides
+        @Named("baz")
+        MyService baz() {
+            return new MyService() {};
+        }
+    }
+
+    @Test
+    void testMapAggregationMixedNamedAndProvides() {
+        Injector injector = Injector.create().bindImplicit(MapAggregationMixed.class);
+
+        Map<String, MapAggregationMixed.MyService> services =
+                injector.getInstance(new Key<Map<String, MapAggregationMixed.MyService>>() {});
+
+        assertNotNull(services);
+        assertEquals(4, services.size());
+
+        assertTrue(services.containsKey("foo"));
+        assertTrue(services.containsKey("bar"));
+        assertTrue(services.containsKey("provided1"));
+        assertTrue(services.containsKey("provided2"));
+    }
+
+    static class MapAggregationMixed {
+        interface MyService {}
+
+        @Named("foo")
+        static class FooService implements MyService {}
+
+        @Named("bar")
+        static class BarService implements MyService {}
+
+        @Provides
+        @Named("provided1")
+        MyService provided1() {
+            return new MyService() {};
+        }
+
+        @Provides
+        @Named("provided2")
+        MyService provided2() {
+            return new MyService() {};
+        }
+    }
+
+    @Test
+    void testEmptyMapWhenNoNamedBeansAvailable() {
+        Injector injector = Injector.create().bindImplicit(EmptyMapTest.class);
+
+        Map<String, EmptyMapTest.NonExistentService> services =
+                injector.getInstance(new Key<Map<String, EmptyMapTest.NonExistentService>>() {});
+
+        assertNotNull(services);
+        assertEquals(0, services.size());
+    }
+
+    static class EmptyMapTest {
+        interface NonExistentService {}
+    }
+
+    @Test
+    void testMapIgnoresUnnamedBeans() {
+        Injector injector = Injector.create().bindImplicit(MapIgnoresUnnamed.class);
+
+        Map<String, MapIgnoresUnnamed.MyService> services =
+                injector.getInstance(new Key<Map<String, MapIgnoresUnnamed.MyService>>() {});
+
+        assertNotNull(services);
+        assertEquals(2, services.size()); // Only foo and bar, not unnamed
+
+        assertTrue(services.containsKey("foo"));
+        assertTrue(services.containsKey("bar"));
+    }
+
+    static class MapIgnoresUnnamed {
+        interface MyService {}
+
+        @Named("foo")
+        static class FooService implements MyService {}
+
+        @Named("bar")
+        static class BarService implements MyService {}
+
+        @Named // No value, so not added to map
+        static class UnnamedService implements MyService {}
+    }
+
+    @Test
+    void testListAggregationWithPriorityOrdering() {
+        Injector injector = Injector.create().bindImplicit(ListPriorityOrdering.class);
+
+        List<ListPriorityOrdering.MyService> services =
+                injector.getInstance(new Key<List<ListPriorityOrdering.MyService>>() {});
+
+        assertNotNull(services);
+        assertEquals(4, services.size());
+
+        // Verify priority ordering: highest priority first
+        assertInstanceOf(ListPriorityOrdering.HighPriority.class, services.get(0));
+        assertInstanceOf(ListPriorityOrdering.MediumPriority.class, services.get(1));
+        assertInstanceOf(ListPriorityOrdering.LowPriority.class, services.get(2));
+        assertInstanceOf(ListPriorityOrdering.NoPriority.class, services.get(3));
+    }
+
+    static class ListPriorityOrdering {
+        interface MyService {}
+
+        @Named
+        @Priority(100)
+        static class HighPriority implements MyService {}
+
+        @Named
+        @Priority(50)
+        static class MediumPriority implements MyService {}
+
+        @Named
+        @Priority(10)
+        static class LowPriority implements MyService {}
+
+        @Named
+        static class NoPriority implements MyService {}
+    }
+
+    @Test
+    void testInjectListIntoMojo() {
+        Injector injector = Injector.create().bindImplicit(InjectListIntoMojo.class);
+
+        InjectListIntoMojo.MyMojo mojo = injector.getInstance(InjectListIntoMojo.MyMojo.class);
+
+        assertNotNull(mojo);
+        assertNotNull(mojo.services);
+        assertEquals(3, mojo.services.size());
+    }
+
+    static class InjectListIntoMojo {
+        interface MyService {}
+
+        @Named("foo")
+        static class FooService implements MyService {}
+
+        @Named("bar")
+        static class BarService implements MyService {}
+
+        @Named("baz")
+        static class BazService implements MyService {}
+
+        @Named
+        static class MyMojo {
+            @Inject
+            List<MyService> services;
+        }
+    }
+
+    @Test
+    void testInjectMapIntoMojoViaConstructor() {
+        Injector injector = Injector.create().bindImplicit(InjectMapConstructor.class);
+
+        InjectMapConstructor.MyMojo mojo = injector.getInstance(InjectMapConstructor.MyMojo.class);
+
+        assertNotNull(mojo);
+        assertNotNull(mojo.services);
+        assertEquals(2, mojo.services.size());
+        assertTrue(mojo.services.containsKey("foo"));
+        assertTrue(mojo.services.containsKey("bar"));
+    }
+
+    static class InjectMapConstructor {
+        interface MyService {}
+
+        @Named("foo")
+        static class FooService implements MyService {}
+
+        @Named("bar")
+        static class BarService implements MyService {}
+
+        @Named
+        static class MyMojo {
+            final Map<String, MyService> services;
+
+            @Inject
+            MyMojo(Map<String, MyService> services) {
+                this.services = services;
+            }
+        }
+    }
+
+    @Test
+    void testListAggregationWithSingletonScope() {
+        Injector injector = Injector.create().bindImplicit(ListSingletonScope.class);
+
+        List<ListSingletonScope.MyService> services1 =
+                injector.getInstance(new Key<List<ListSingletonScope.MyService>>() {});
+        List<ListSingletonScope.MyService> services2 =
+                injector.getInstance(new Key<List<ListSingletonScope.MyService>>() {});
+
+        assertNotNull(services1);
+        assertNotNull(services2);
+        assertEquals(2, services1.size());
+        assertEquals(2, services2.size());
+
+        // Singleton beans should be the same instance
+        ListSingletonScope.MyService singleton1a = services1.stream()
+                .filter(s -> s instanceof ListSingletonScope.SingletonService)
+                .findFirst()
+                .orElse(null);
+        ListSingletonScope.MyService singleton1b = services2.stream()
+                .filter(s -> s instanceof ListSingletonScope.SingletonService)
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull(singleton1a);
+        assertNotNull(singleton1b);
+        assertEquals(singleton1a, singleton1b); // Same instance
+
+        // Non-singleton beans should be different instances
+        ListSingletonScope.MyService nonSingleton1a = services1.stream()
+                .filter(s -> s instanceof ListSingletonScope.NonSingletonService)
+                .findFirst()
+                .orElse(null);
+        ListSingletonScope.MyService nonSingleton1b = services2.stream()
+                .filter(s -> s instanceof ListSingletonScope.NonSingletonService)
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull(nonSingleton1a);
+        assertNotNull(nonSingleton1b);
+        assertNotEquals(nonSingleton1a, nonSingleton1b); // Different instances
+    }
+
+    static class ListSingletonScope {
+        interface MyService {}
+
+        @Named
+        @Singleton
+        static class SingletonService implements MyService {}
+
+        @Named
+        static class NonSingletonService implements MyService {}
+    }
+
+    @Test
+    void testMapAggregationWithQualifiers() {
+        Injector injector = Injector.create().bindImplicit(MapWithQualifiers.class);
+
+        Map<String, MapWithQualifiers.MyService> services =
+                injector.getInstance(new Key<Map<String, MapWithQualifiers.MyService>>() {});
+
+        assertNotNull(services);
+        // Should only include @Named beans, not other qualifiers
+        assertEquals(2, services.size());
+        assertTrue(services.containsKey("foo"));
+        assertTrue(services.containsKey("bar"));
+    }
+
+    static class MapWithQualifiers {
+        @Qualifier
+        @Retention(RUNTIME)
+        @interface CustomQualifier {}
+
+        interface MyService {}
+
+        @Named("foo")
+        static class FooService implements MyService {}
+
+        @Named("bar")
+        static class BarService implements MyService {}
+
+        @CustomQualifier
+        static class QualifiedService implements MyService {}
+    }
+
+    @Test
+    void testNestedListAndMapInjection() {
+        Injector injector = Injector.create().bindImplicit(NestedCollections.class);
+
+        NestedCollections.Aggregator aggregator = injector.getInstance(NestedCollections.Aggregator.class);
+
+        assertNotNull(aggregator);
+        assertNotNull(aggregator.allServices);
+        assertNotNull(aggregator.namedServices);
+
+        assertEquals(3, aggregator.allServices.size());
+        assertEquals(3, aggregator.namedServices.size());
+    }
+
+    static class NestedCollections {
+        interface MyService {}
+
+        @Named("foo")
+        static class FooService implements MyService {}
+
+        @Named("bar")
+        static class BarService implements MyService {}
+
+        @Named("baz")
+        static class BazService implements MyService {}
+
+        @Named
+        static class Aggregator {
+            @Inject
+            List<MyService> allServices;
+
+            @Inject
+            Map<String, MyService> namedServices;
+        }
+    }
+
+    @Test
+    void testListAggregationWithTypedAnnotation() {
+        Injector injector = Injector.create().bindImplicit(ListWithTyped.class);
+
+        List<ListWithTyped.MyService> services = injector.getInstance(new Key<List<ListWithTyped.MyService>>() {});
+
+        assertNotNull(services);
+        // @Typed beans should only be accessible by their explicit types
+        assertEquals(1, services.size());
+        assertInstanceOf(ListWithTyped.RegularService.class, services.get(0));
+    }
+
+    static class ListWithTyped {
+        interface MyService {}
+
+        @Named
+        static class RegularService implements MyService {}
+
+        @Named
+        @Typed(ListWithTyped.SpecificInterface.class)
+        static class TypedService implements MyService, SpecificInterface {}
+
+        interface SpecificInterface {}
+    }
+
+    // ============================================================================
+    // @Aggregate Annotation Tests
+    // ============================================================================
+
+    @Test
+    void testAggregateMapContribution() {
+        Injector injector = Injector.create().bindImplicit(AggregateMapTest.class);
+
+        Map<String, AggregateMapTest.MyService> services =
+                injector.getInstance(new Key<Map<String, AggregateMapTest.MyService>>() {});
+
+        assertNotNull(services);
+        assertEquals(4, services.size());
+
+        // Should contain all entries from both modules
+        assertTrue(services.containsKey("foo"));
+        assertTrue(services.containsKey("bar"));
+        assertTrue(services.containsKey("extra1"));
+        assertTrue(services.containsKey("extra2"));
+    }
+
+    static class AggregateMapTest {
+        interface MyService {}
+
+        @Named("foo")
+        static class FooService implements MyService {}
+
+        @Named("bar")
+        static class BarService implements MyService {}
+
+        // Bulk contribution using @Aggregate
+        @Provides
+        @Aggregate
+        Map<String, MyService> extraServices() {
+            Map<String, MyService> map = new java.util.HashMap<>();
+            map.put("extra1", new MyService() {});
+            map.put("extra2", new MyService() {});
+            return map;
+        }
+    }
+
+    @Test
+    void testAggregateListContribution() {
+        Injector injector = Injector.create().bindImplicit(AggregateListTest.class);
+
+        List<AggregateListTest.MyService> services =
+                injector.getInstance(new Key<List<AggregateListTest.MyService>>() {});
+
+        assertNotNull(services);
+        assertEquals(5, services.size()); // 2 named + 3 from aggregate
+    }
+
+    static class AggregateListTest {
+        interface MyService {}
+
+        @Named("foo")
+        static class FooService implements MyService {}
+
+        @Named("bar")
+        static class BarService implements MyService {}
+
+        // Bulk contribution using @Aggregate
+        @Provides
+        @Aggregate
+        List<MyService> extraServices() {
+            return Arrays.asList(new MyService() {}, new MyService() {}, new MyService() {});
+        }
+    }
+
+    @Test
+    void testExplicitMapProviderWithoutAggregate() {
+        Injector injector = Injector.create().bindImplicit(ExplicitMapProvider.class);
+
+        Map<String, ExplicitMapProvider.MyService> services =
+                injector.getInstance(new Key<Map<String, ExplicitMapProvider.MyService>>() {});
+
+        assertNotNull(services);
+        // Without @Aggregate, explicit provider REPLACES auto-aggregation
+        assertEquals(2, services.size());
+        assertTrue(services.containsKey("explicit1"));
+        assertTrue(services.containsKey("explicit2"));
+
+        // "foo" and "bar" should NOT be in the map
+        assertFalse(services.containsKey("foo"));
+        assertFalse(services.containsKey("bar"));
+    }
+
+    static class ExplicitMapProvider {
+        interface MyService {}
+
+        @Named("foo")
+        static class FooService implements MyService {}
+
+        @Named("bar")
+        static class BarService implements MyService {}
+
+        // Explicit provider WITHOUT @Aggregate replaces auto-aggregation
+        @Provides
+        Map<String, MyService> explicitMap() {
+            Map<String, MyService> map = new java.util.HashMap<>();
+            map.put("explicit1", new MyService() {});
+            map.put("explicit2", new MyService() {});
+            return map;
+        }
+    }
+
+    @Test
+    void testExplicitListProviderWithoutAggregate() {
+        Injector injector = Injector.create().bindImplicit(ExplicitListProvider.class);
+
+        List<ExplicitListProvider.MyService> services =
+                injector.getInstance(new Key<List<ExplicitListProvider.MyService>>() {});
+
+        assertNotNull(services);
+        // Without @Aggregate, explicit provider REPLACES auto-aggregation
+        assertEquals(2, services.size());
+
+        // Should only contain services from the explicit provider
+        // Not the @Named beans
+    }
+
+    static class ExplicitListProvider {
+        interface MyService {}
+
+        @Named("foo")
+        static class FooService implements MyService {}
+
+        @Named("bar")
+        static class BarService implements MyService {}
+
+        // Explicit provider WITHOUT @Aggregate replaces auto-aggregation
+        @Provides
+        List<MyService> explicitList() {
+            return Arrays.asList(new MyService() {}, new MyService() {});
+        }
+    }
+
+    @Test
+    void testMultipleAggregateProviders() {
+        Injector injector = Injector.create().bindImplicit(MultipleAggregateProviders.class);
+
+        Map<String, MultipleAggregateProviders.MyService> services =
+                injector.getInstance(new Key<Map<String, MultipleAggregateProviders.MyService>>() {});
+
+        assertNotNull(services);
+        assertEquals(6, services.size());
+
+        // Should contain entries from all sources
+        assertTrue(services.containsKey("foo"));
+        assertTrue(services.containsKey("bar"));
+        assertTrue(services.containsKey("module1"));
+        assertTrue(services.containsKey("module2"));
+        assertTrue(services.containsKey("module3"));
+        assertTrue(services.containsKey("module4"));
+    }
+
+    static class MultipleAggregateProviders {
+        interface MyService {}
+
+        @Named("foo")
+        static class FooService implements MyService {}
+
+        @Named("bar")
+        static class BarService implements MyService {}
+
+        @Provides
+        @Aggregate
+        Map<String, MyService> moduleA() {
+            Map<String, MyService> map = new java.util.HashMap<>();
+            map.put("module1", new MyService() {});
+            map.put("module2", new MyService() {});
+            return map;
+        }
+
+        @Provides
+        @Aggregate
+        Map<String, MyService> moduleB() {
+            Map<String, MyService> map = new java.util.HashMap<>();
+            map.put("module3", new MyService() {});
+            map.put("module4", new MyService() {});
+            return map;
+        }
+    }
+
+    @Test
+    void testAggregateWithDuplicateKeys() {
+        Injector injector = Injector.create().bindImplicit(AggregateWithDuplicates.class);
+
+        Map<String, AggregateWithDuplicates.MyService> services =
+                injector.getInstance(new Key<Map<String, AggregateWithDuplicates.MyService>>() {});
+
+        assertNotNull(services);
+        // When duplicate keys exist, last one wins (or you could throw an exception)
+        assertEquals(3, services.size());
+        assertTrue(services.containsKey("foo"));
+        assertTrue(services.containsKey("bar"));
+        assertTrue(services.containsKey("duplicate"));
+    }
+
+    static class AggregateWithDuplicates {
+        interface MyService {}
+
+        @Named("foo")
+        static class FooService implements MyService {}
+
+        @Named("bar")
+        static class BarService implements MyService {}
+
+        @Provides
+        @Aggregate
+        Map<String, MyService> module1() {
+            Map<String, MyService> map = new java.util.HashMap<>();
+            map.put("duplicate", new MyService() {});
+            return map;
+        }
+
+        @Provides
+        @Aggregate
+        Map<String, MyService> module2() {
+            Map<String, MyService> map = new java.util.HashMap<>();
+            map.put("duplicate", new MyService() {}); // Same key
+            return map;
+        }
+    }
+
+    @Test
+    void testAggregateSingleBeanToMap() {
+        Injector injector = Injector.create().bindImplicit(AggregateSingleToMap.class);
+
+        Map<String, AggregateSingleToMap.MyService> services =
+                injector.getInstance(new Key<Map<String, AggregateSingleToMap.MyService>>() {});
+
+        assertNotNull(services);
+        assertEquals(3, services.size());
+
+        assertTrue(services.containsKey("foo"));
+        assertTrue(services.containsKey("bar"));
+        assertTrue(services.containsKey("extra"));
+    }
+
+    static class AggregateSingleToMap {
+        interface MyService {}
+
+        @Named("foo")
+        static class FooService implements MyService {}
+
+        @Named("bar")
+        static class BarService implements MyService {}
+
+        // Single bean with @Aggregate and @Named - contributes to map
+        @Provides
+        @Aggregate
+        @Named("extra")
+        MyService extra() {
+            return new MyService() {};
+        }
+    }
+
+    @Test
+    void testAggregateSingleBeanToList() {
+        Injector injector = Injector.create().bindImplicit(AggregateSingleToList.class);
+
+        List<AggregateSingleToList.MyService> services =
+                injector.getInstance(new Key<List<AggregateSingleToList.MyService>>() {});
+
+        assertNotNull(services);
+        assertEquals(3, services.size());
+    }
+
+    static class AggregateSingleToList {
+        interface MyService {}
+
+        @Named("foo")
+        static class FooService implements MyService {}
+
+        @Named("bar")
+        static class BarService implements MyService {}
+
+        // Single bean with @Aggregate - contributes to list
+        @Provides
+        @Aggregate
+        MyService extra() {
+            return new MyService() {};
+        }
+    }
+
+    @Test
+    void testAggregateEmptyCollections() {
+        Injector injector = Injector.create().bindImplicit(AggregateEmptyCollections.class);
+
+        Map<String, AggregateEmptyCollections.MyService> mapServices =
+                injector.getInstance(new Key<Map<String, AggregateEmptyCollections.MyService>>() {});
+        List<AggregateEmptyCollections.MyService> listServices =
+                injector.getInstance(new Key<List<AggregateEmptyCollections.MyService>>() {});
+
+        assertNotNull(mapServices);
+        assertNotNull(listServices);
+
+        // Empty @Aggregate contributions should not cause errors
+        assertEquals(2, mapServices.size());
+        assertEquals(2, listServices.size());
+    }
+
+    static class AggregateEmptyCollections {
+        interface MyService {}
+
+        @Named("foo")
+        static class FooService implements MyService {}
+
+        @Named("bar")
+        static class BarService implements MyService {}
+
+        @Provides
+        @Aggregate
+        Map<String, MyService> emptyMap() {
+            return new java.util.HashMap<>();
+        }
+
+        @Provides
+        @Aggregate
+        List<MyService> emptyList() {
+            return new ArrayList<>();
+        }
+    }
+
+    @Test
+    void testAggregateWithPriorityInList() {
+        Injector injector = Injector.create().bindImplicit(AggregateWithPriority.class);
+
+        List<AggregateWithPriority.MyService> services =
+                injector.getInstance(new Key<List<AggregateWithPriority.MyService>>() {});
+
+        assertNotNull(services);
+        assertEquals(5, services.size());
+
+        // Priority ordering should apply to aggregated items too
+        assertInstanceOf(AggregateWithPriority.HighPriority.class, services.get(0));
+        assertInstanceOf(AggregateWithPriority.LowPriority.class, services.get(services.size() - 1));
+    }
+
+    static class AggregateWithPriority {
+        interface MyService {}
+
+        @Named
+        @Priority(100)
+        static class HighPriority implements MyService {}
+
+        @Named
+        @Priority(-10)
+        static class LowPriority implements MyService {}
+
+        @Provides
+        @Aggregate
+        List<MyService> extraServices() {
+            return Arrays.asList(new MyService() {}, new MyService() {}, new MyService() {});
+        }
+    }
+
+    @Test
+    void testMixedAggregateAndExplicitProviders() {
+        Injector injector = Injector.create().bindImplicit(MixedAggregateExplicit.class);
+
+        // When both @Aggregate and explicit (non-@Aggregate) providers exist,
+        // the explicit one should win and replace everything
+        Map<String, MixedAggregateExplicit.MyService> services =
+                injector.getInstance(new Key<Map<String, MixedAggregateExplicit.MyService>>() {});
+
+        assertNotNull(services);
+        assertEquals(2, services.size());
+        assertTrue(services.containsKey("explicit1"));
+        assertTrue(services.containsKey("explicit2"));
+
+        // Aggregate contributions should be ignored when explicit provider exists
+        assertFalse(services.containsKey("foo"));
+        assertFalse(services.containsKey("aggregate1"));
+    }
+
+    static class MixedAggregateExplicit {
+        interface MyService {}
+
+        @Named("foo")
+        static class FooService implements MyService {}
+
+        @Provides
+        @Aggregate
+        Map<String, MyService> aggregateMap() {
+            Map<String, MyService> map = new java.util.HashMap<>();
+            map.put("aggregate1", new MyService() {});
+            return map;
+        }
+
+        // Explicit provider (no @Aggregate) takes precedence
+        @Provides
+        Map<String, MyService> explicitMap() {
+            Map<String, MyService> map = new java.util.HashMap<>();
+            map.put("explicit1", new MyService() {});
+            map.put("explicit2", new MyService() {});
+            return map;
+        }
+    }
+
+    @Test
+    void testPriorityOnProvidesMethod() {
+        Injector injector = Injector.create().bindImplicit(PriorityProvidesTest.class);
+
+        List<PriorityProvidesTest.MyService> services =
+                injector.getInstance(new Key<List<PriorityProvidesTest.MyService>>() {});
+
+        assertNotNull(services);
+        assertEquals(3, services.size());
+
+        // Should be ordered by priority: High (100), Medium (50), Low (10)
+        assertInstanceOf(PriorityProvidesTest.HighPriorityService.class, services.get(0));
+        assertInstanceOf(PriorityProvidesTest.MediumPriorityService.class, services.get(1));
+        assertInstanceOf(PriorityProvidesTest.LowPriorityService.class, services.get(2));
+    }
+
+    static class PriorityProvidesTest {
+        interface MyService {}
+
+        static class HighPriorityService implements MyService {}
+
+        static class MediumPriorityService implements MyService {}
+
+        static class LowPriorityService implements MyService {}
+
+        @Provides
+        @Priority(100)
+        @Named("high")
+        MyService highPriorityService() {
+            return new HighPriorityService();
+        }
+
+        @Provides
+        @Priority(50)
+        @Named("medium")
+        MyService mediumPriorityService() {
+            return new MediumPriorityService();
+        }
+
+        @Provides
+        @Priority(10)
+        @Named("low")
+        MyService lowPriorityService() {
+            return new LowPriorityService();
+        }
+    }
+
+    @Test
+    void testAggregateMapContributesToNamedInjection() {
+        Injector injector = Injector.create()
+                .bindImplicit(AggregateMapToNamedTest.class)
+                .bindImplicit(AggregateMapToNamedTest.ServiceConsumer.class);
+
+        // Should be able to inject individual named services from @Aggregate Map provider
+        AggregateMapToNamedTest.ServiceConsumer consumer =
+                injector.getInstance(AggregateMapToNamedTest.ServiceConsumer.class);
+
+        assertNotNull(consumer);
+        assertNotNull(consumer.fooService);
+        assertNotNull(consumer.barService);
+
+        // Verify these are the services from the @Aggregate Map
+        assertEquals("foo-service", consumer.fooService.getName());
+        assertEquals("bar-service", consumer.barService.getName());
+    }
+
+    static class AggregateMapToNamedTest {
+        interface MyService {
+            String getName();
+        }
+
+        static class ServiceConsumer {
+            @Inject
+            @Named("foo")
+            MyService fooService;
+
+            @Inject
+            @Named("bar")
+            MyService barService;
+        }
+
+        @Provides
+        @Aggregate
+        Map<String, MyService> serviceMap() {
+            Map<String, MyService> map = new LinkedHashMap<>();
+            map.put("foo", () -> "foo-service");
+            map.put("bar", () -> "bar-service");
+            return map;
+        }
+    }
+
+    @Test
+    void testAggregateListContributesToIndividualInjection() {
+        Injector injector = Injector.create()
+                .bindImplicit(AggregateListToIndividualTest.class)
+                .bindImplicit(AggregateListToIndividualTest.ServiceConsumer.class);
+
+        // Should be able to inject individual services from @Aggregate List provider
+        AggregateListToIndividualTest.ServiceConsumer consumer =
+                injector.getInstance(AggregateListToIndividualTest.ServiceConsumer.class);
+
+        assertNotNull(consumer);
+        assertNotNull(consumer.service);
+
+        // Should get one of the services from the @Aggregate List
+        // (the exact one depends on priority/order, but it should be non-null)
+        assertNotNull(consumer.service.getName());
+        assertTrue(consumer.service.getName().startsWith("service-"));
+    }
+
+    static class AggregateListToIndividualTest {
+        interface MyService {
+            String getName();
+        }
+
+        static class ServiceConsumer {
+            @Inject
+            MyService service;
+        }
+
+        @Provides
+        @Aggregate
+        List<MyService> serviceList() {
+            List<MyService> list = new ArrayList<>();
+            list.add(() -> "service-1");
+            list.add(() -> "service-2");
+            return list;
+        }
     }
 }
