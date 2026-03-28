@@ -179,7 +179,7 @@ class CompatibilityFixStrategyTest {
             Element root = editor.root();
             Element dependencyManagement = DomUtils.findChildElement(root, "dependencyManagement");
             Element dependencies = DomUtils.findChildElement(dependencyManagement, "dependencies");
-            var dependencyElements = dependencies.children("dependency").toList();
+            var dependencyElements = dependencies.childElements("dependency").toList();
             assertEquals(1, dependencyElements.size(), "Should have only one dependency after duplicate removal");
         }
 
@@ -223,7 +223,7 @@ class CompatibilityFixStrategyTest {
             Editor editor = new Editor(document);
             Element root = editor.root();
             Element dependencies = DomUtils.findChildElement(root, "dependencies");
-            var dependencyElements = dependencies.children("dependency").toList();
+            var dependencyElements = dependencies.childElements("dependency").toList();
             assertEquals(1, dependencyElements.size(), "Should have only one dependency after duplicate removal");
         }
     }
@@ -276,7 +276,7 @@ class CompatibilityFixStrategyTest {
             Element build = DomUtils.findChildElement(root, "build");
             Element pluginManagement = DomUtils.findChildElement(build, "pluginManagement");
             Element plugins = DomUtils.findChildElement(pluginManagement, "plugins");
-            var pluginElements = plugins.children("plugin").toList();
+            var pluginElements = plugins.childElements("plugin").toList();
             assertEquals(1, pluginElements.size(), "Should have only one plugin after duplicate removal");
         }
     }
