@@ -236,7 +236,7 @@ final class PathModularization {
     /**
      * If the module has no name, adds the filename of the JAR file in the given collection.
      * This method should be invoked for dependencies placed on {@link JavaPathType#MODULES}
-     * for preparing a warning asking to not deploy the build artifact on a public repository.
+     * for preparing a warning saying that this project may fail to resolve these modules.
      * If the module has an explicit name either with a {@code module-info.class} file or with
      * an {@code "Automatic-Module-Name"} attribute in the {@code META-INF/MANIFEST.MF} file,
      * then this method does nothing.
