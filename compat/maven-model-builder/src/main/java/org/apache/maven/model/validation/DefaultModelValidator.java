@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
@@ -89,7 +90,9 @@ public class DefaultModelValidator implements ModelValidator {
 
     private static final String EMPTY = "";
 
-    private final Set<String> validIds = new HashSet<>();
+    // Thread-safe set required because class is @Singleton and validIds is accessed concurrently
+    // See: https://github.com/apache/maven/issues/11618
+    private final Set<String> validIds = ConcurrentHashMap.newKeySet();
 
     private ModelVersionProcessor versionProcessor;
 
