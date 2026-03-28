@@ -1453,7 +1453,8 @@ public class MavenCli {
         return request;
     }
 
-    int calculateDegreeOfConcurrency(String threadConfiguration) {
+    int calculateDegreeOfConcurrency(String originalThreadConfiguration) {
+        String threadConfiguration = originalThreadConfiguration.trim();
         if (threadConfiguration.endsWith("C")) {
             threadConfiguration = threadConfiguration.substring(0, threadConfiguration.length() - 1);
 
