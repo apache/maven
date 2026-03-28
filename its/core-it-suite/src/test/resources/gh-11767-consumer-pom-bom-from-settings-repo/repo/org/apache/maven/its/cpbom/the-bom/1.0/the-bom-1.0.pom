@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.cpbom</groupId>
+  <artifactId>the-bom</artifactId>
+  <version>1.0</version>
+  <packaging>pom</packaging>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.apache.maven.its.cpbom</groupId>
+        <artifactId>lib-a</artifactId>
+        <version>2.0</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+</project>
