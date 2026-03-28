@@ -1,3 +1,12 @@
+<!--
+We accept a pull request for target branches:
+
+ - master - new feature and bug fixing for 4.1.x version
+ - maven-4.0.x - bug fixing for 4.0.x version
+ - maven-3.10.x - new feature and bug fixing
+ - maven-3.9.x - only critical bug fixing for 3.9.x version, prepare for EOL
+-->
+
 Following this checklist to help us incorporate your
 contribution quickly and easily:
 
