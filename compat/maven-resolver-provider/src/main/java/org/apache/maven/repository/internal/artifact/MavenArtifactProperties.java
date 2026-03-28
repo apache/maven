@@ -45,6 +45,14 @@ public final class MavenArtifactProperties {
     public static final String CONSTITUTES_BUILD_PATH = "constitutesBuildPath";
 
     /**
+     * When an artifact is both a regular dependency and a transitive dependency
+     * of a processor, this property records the derived processor type ID.
+     *
+     * @since 4.0.0
+     */
+    public static final String PROCESSOR_TYPE = "maven.processor.type";
+
+    /**
      * The (expected) path to the artifact on the local filesystem. An artifact which has this property set is assumed
      * to be not present in any regular repository and likewise has no artifact descriptor. Artifact resolution will
      * verify the path and resolve the artifact if the path actually denotes an existing file. If the path isn't valid,

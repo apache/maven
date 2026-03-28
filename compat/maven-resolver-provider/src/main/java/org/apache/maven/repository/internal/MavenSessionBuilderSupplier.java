@@ -25,6 +25,7 @@ import org.apache.maven.api.DependencyScope;
 import org.apache.maven.repository.internal.artifact.FatArtifactTraverser;
 import org.apache.maven.repository.internal.scopes.Maven4ScopeManagerConfiguration;
 import org.apache.maven.repository.internal.type.DefaultTypeProvider;
+import org.apache.maven.repository.internal.type.TypeCollector;
 import org.apache.maven.repository.internal.type.TypeDeriver;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession.CloseableSession;
@@ -112,6 +113,7 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
 
     protected DependencyGraphTransformer getDependencyGraphTransformer() {
         return new ChainedDependencyGraphTransformer(
+                new TypeCollector(),
                 new ConflictResolver(
                         new ConfigurableVersionSelector(), new ManagedScopeSelector(getScopeManager()),
                         new SimpleOptionalitySelector(), new ManagedScopeDeriver(getScopeManager())),

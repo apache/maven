@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.api.Type;
+import org.apache.maven.impl.resolver.artifact.MavenArtifactProperties;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.ArtifactProperties;
 import org.eclipse.aether.artifact.ArtifactType;
@@ -58,6 +59,7 @@ public class TypeDeriver implements DependencyGraphTransformer {
 
     @Override
     public DependencyNode transformGraph(DependencyNode root, DependencyGraphTransformationContext context) {
+        ArtifactTypeRegistry registry = context.getSession().getArtifactTypeRegistry();
         if (logger.isDebugEnabled()) {
             StringBuilder sb = new StringBuilder();
             root.accept(new DependencyGraphDumper(
@@ -66,7 +68,16 @@ public class TypeDeriver implements DependencyGraphTransformer {
                             List.of(DependencyGraphDumper.artifactProperties(List.of(ArtifactProperties.TYPE))))));
             logger.debug("TYPES: Before transform:\n {}", sb);
         }
-        root.accept(new TypeDeriverVisitor(context.getSession().getArtifactTypeRegistry()));
+        root.accept(new TypeDeriverVisitor(registry));
+        // Apply processor type info collected by TypeCollector before conflict resolution.
+        // This handles the case where an artifact is both a direct dep (e.g., modular-jar)
+        // and a transitive dep of a processor — conflict resolution removes the transitive
+        // occurrence, but TypeCollector preserved the processor type information.
+        @SuppressWarnings("unchecked")
+        Map<String, String> collectedProcessorTypes = (Map<String, String>) context.get(TypeCollector.CONTEXT_KEY);
+        if (collectedProcessorTypes != null) {
+            root.accept(new ProcessorTypeMerger(collectedProcessorTypes));
+        }
         if (logger.isDebugEnabled()) {
             StringBuilder sb = new StringBuilder();
             root.accept(new DependencyGraphDumper(
@@ -148,6 +159,45 @@ public class TypeDeriver implements DependencyGraphTransformer {
                 result = modularProcessor;
             }
             return result;
+        }
+    }
+
+    /**
+     * Visitor that merges processor type info from {@link TypeCollector} into surviving nodes.
+     * For nodes that already have a processor type (handled by TypeDeriverVisitor), this is a no-op.
+     * For nodes that lost their processor occurrence to conflict resolution, this sets the
+     * {@link MavenArtifactProperties#PROCESSOR_TYPE} property so the artifact gets added
+     * to processor paths as well.
+     */
+    private static class ProcessorTypeMerger implements DependencyVisitor {
+        private final Map<String, String> collectedProcessorTypes;
+
+        ProcessorTypeMerger(Map<String, String> collectedProcessorTypes) {
+            this.collectedProcessorTypes = collectedProcessorTypes;
+        }
+
+        @Override
+        public boolean visitEnter(DependencyNode node) {
+            if (node.getArtifact() != null) {
+                String currentType = node.getArtifact().getProperty(ArtifactProperties.TYPE, "");
+                // Skip nodes that are already processor types (handled by TypeDeriverVisitor)
+                if (!TypeCollector.PROCESSOR_TYPE_IDS.contains(currentType)) {
+                    String key = TypeCollector.conflictKey(node);
+                    String processorType = collectedProcessorTypes.get(key);
+                    if (processorType != null) {
+                        Artifact artifact = node.getArtifact();
+                        Map<String, String> props = new HashMap<>(artifact.getProperties());
+                        props.put(MavenArtifactProperties.PROCESSOR_TYPE, processorType);
+                        node.setArtifact(artifact.setProperties(props));
+                    }
+                }
+            }
+            return true;
+        }
+
+        @Override
+        public boolean visitLeave(DependencyNode node) {
+            return true;
         }
     }
 }
