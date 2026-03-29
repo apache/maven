@@ -131,7 +131,7 @@ under the License.
     <commonsCliVersion>1.11.0</commonsCliVersion>
     <commonsIoVersion>2.21.0</commonsIoVersion>
     <hamcrestVersion>3.0</hamcrestVersion>
-    <mockitoVersion>4.11.0</mockitoVersion>
+    <mockitoVersion>5.23.0</mockitoVersion>
     <plexusVersion>2.2.0</plexusVersion>
     <plexusInterpolationVersion>1.29</plexusInterpolationVersion>
     <!-- Blocked by 3.4.0+ changes, see MNG-7710, downgrade from parent 4.0.1 -->
