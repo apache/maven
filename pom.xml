@@ -143,7 +143,7 @@ under the License.
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
     <cipherVersion>2.0</cipherVersion>
     <jxpathVersion>1.4.0</jxpathVersion>
-    <resolverVersion>1.9.27</resolverVersion>
+    <resolverVersion>2.0.15</resolverVersion>
     <slf4jVersion>1.7.36</slf4jVersion>
     <xmlunitVersion>2.11.0</xmlunitVersion>
     <powermockVersion>2.0.9</powermockVersion>
@@ -406,6 +406,11 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.apache.maven.resolver</groupId>
+        <artifactId>maven-resolver-supplier-mvn3</artifactId>
+        <version>${resolverVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.resolver</groupId>
         <artifactId>maven-resolver-util</artifactId>
         <version>${resolverVersion}</version>
       </dependency>
@@ -421,7 +426,7 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-transport-http</artifactId>
+        <artifactId>maven-resolver-transport-apache</artifactId>
         <version>${resolverVersion}</version>
       </dependency>
       <dependency>
@@ -509,6 +514,16 @@ under the License.
     </dependencies>
   </dependencyManagement>
 
+  <repositories>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>maven-2404</id>
+      <url>https://repository.apache.org/content/repositories/maven-2404/</url>
+    </repository>
+  </repositories>
+
   <build>
     <pluginManagement>
       <plugins>
@@ -535,6 +550,7 @@ under the License.
         <plugin>
           <groupId>org.codehaus.modello</groupId>
           <artifactId>modello-maven-plugin</artifactId>
+          <version>2.6.0</version>
           <executions>
             <execution>
               <id>modello-site-docs</id>

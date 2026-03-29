@@ -21,6 +21,7 @@ package org.apache.maven.internal.aether;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,8 +51,8 @@ import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.ConfigurationProperties;
-import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.LocalRepositoryManager;
 import org.eclipse.aether.repository.RepositoryPolicy;
@@ -115,15 +116,15 @@ public class DefaultRepositorySystemSessionFactory {
 
     private static final String MAVEN_RESOLVER_TRANSPORT_WAGON = "wagon";
 
-    private static final String MAVEN_RESOLVER_TRANSPORT_NATIVE = "native";
+    private static final String MAVEN_RESOLVER_TRANSPORT_APACHE = "native";
 
     private static final String MAVEN_RESOLVER_TRANSPORT_AUTO = "auto";
 
     private static final String WAGON_TRANSPORTER_PRIORITY_KEY = "aether.priority.WagonTransporterFactory";
 
-    private static final String NATIVE_HTTP_TRANSPORTER_PRIORITY_KEY = "aether.priority.HttpTransporterFactory";
+    private static final String APACHE_HTTP_TRANSPORTER_PRIORITY_KEY = "aether.priority.ApacheTransporterFactory";
 
-    private static final String NATIVE_FILE_TRANSPORTER_PRIORITY_KEY = "aether.priority.FileTransporterFactory";
+    private static final String FILE_TRANSPORTER_PRIORITY_KEY = "aether.priority.FileTransporterFactory";
 
     private static final String RESOLVER_MAX_PRIORITY = String.valueOf(Float.MAX_VALUE);
 
@@ -154,10 +155,9 @@ public class DefaultRepositorySystemSessionFactory {
     private RuntimeInformation runtimeInformation;
 
     @SuppressWarnings("checkstyle:methodlength")
-    public DefaultRepositorySystemSession newRepositorySession(MavenExecutionRequest request) {
-        DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
-
-        session.setCache(request.getRepositoryCache());
+    public RepositorySystemSession.SessionBuilder newRepositorySession(MavenExecutionRequest request) {
+        RepositorySystemSession.SessionBuilder mainSessionBuilder = MavenRepositorySystemUtils.newSession(repoSystem);
+        mainSessionBuilder.setCache(request.getRepositoryCache());
 
         Map<Object, Object> configProps = new LinkedHashMap<>();
         configProps.put(ConfigurationProperties.USER_AGENT, getUserAgent());
@@ -169,14 +169,14 @@ public class DefaultRepositorySystemSessionFactory {
         configProps.putAll(request.getSystemProperties());
         configProps.putAll(request.getUserProperties());
 
-        session.setOffline(request.isOffline());
-        session.setChecksumPolicy(request.getGlobalChecksumPolicy());
+        mainSessionBuilder.setOffline(request.isOffline());
+        mainSessionBuilder.setChecksumPolicy(request.getGlobalChecksumPolicy());
         if (request.isNoSnapshotUpdates()) {
-            session.setUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_NEVER);
+            mainSessionBuilder.setUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_NEVER);
         } else if (request.isUpdateSnapshots()) {
-            session.setUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_ALWAYS);
+            mainSessionBuilder.setUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_ALWAYS);
         } else {
-            session.setUpdatePolicy(null);
+            mainSessionBuilder.setUpdatePolicy(null);
         }
 
         int errorPolicy = 0;
@@ -186,15 +186,15 @@ public class DefaultRepositorySystemSessionFactory {
         errorPolicy |= request.isCacheTransferError()
                 ? ResolutionErrorPolicy.CACHE_TRANSFER_ERROR
                 : ResolutionErrorPolicy.CACHE_DISABLED;
-        session.setResolutionErrorPolicy(
+        mainSessionBuilder.setResolutionErrorPolicy(
                 new SimpleResolutionErrorPolicy(errorPolicy, errorPolicy | ResolutionErrorPolicy.CACHE_NOT_FOUND));
 
-        session.setArtifactTypeRegistry(RepositoryUtils.newArtifactTypeRegistry(artifactHandlerManager));
+        mainSessionBuilder.setArtifactTypeRegistry(RepositoryUtils.newArtifactTypeRegistry(artifactHandlerManager));
 
         if (request.getWorkspaceReader() != null) {
-            session.setWorkspaceReader(request.getWorkspaceReader());
+            mainSessionBuilder.setWorkspaceReader(request.getWorkspaceReader());
         } else {
-            session.setWorkspaceReader(workspaceRepository);
+            mainSessionBuilder.setWorkspaceReader(workspaceRepository);
         }
 
         DefaultSettingsDecryptionRequest decrypt = new DefaultSettingsDecryptionRequest();
@@ -219,7 +219,7 @@ public class DefaultRepositorySystemSessionFactory {
                     mirror.getMirrorOf(),
                     mirror.getMirrorOfLayouts());
         }
-        session.setMirrorSelector(mirrorSelector);
+        mainSessionBuilder.setMirrorSelector(mirrorSelector);
 
         DefaultProxySelector proxySelector = new DefaultProxySelector();
         for (Proxy proxy : decrypted.getProxies()) {
@@ -230,7 +230,7 @@ public class DefaultRepositorySystemSessionFactory {
                             proxy.getProtocol(), proxy.getHost(), proxy.getPort(), authBuilder.build()),
                     proxy.getNonProxyHosts());
         }
-        session.setProxySelector(proxySelector);
+        mainSessionBuilder.setProxySelector(proxySelector);
 
         DefaultAuthenticationSelector authSelector = new DefaultAuthenticationSelector();
         for (Server server : decrypted.getServers()) {
@@ -249,7 +249,7 @@ public class DefaultRepositorySystemSessionFactory {
                 }
 
                 XmlPlexusConfiguration config = new XmlPlexusConfiguration(dom);
-                configProps.put("aether.connector.wagon.config." + server.getId(), config);
+                configProps.put("aether.transport.wagon.config." + server.getId(), config);
 
                 // Translate to proper resolver configuration properties as well (as Plexus XML above is Wagon specific
                 // only), but support only configuration/httpConfiguration/all, see
@@ -321,105 +321,120 @@ public class DefaultRepositorySystemSessionFactory {
                 }
             }
 
-            configProps.put("aether.connector.perms.fileMode." + server.getId(), server.getFilePermissions());
-            configProps.put("aether.connector.perms.dirMode." + server.getId(), server.getDirectoryPermissions());
+            configProps.put("aether.transport.wagon.perms.fileMode." + server.getId(), server.getFilePermissions());
+            configProps.put("aether.transport.wagon.perms.dirMode." + server.getId(), server.getDirectoryPermissions());
         }
-        session.setAuthenticationSelector(authSelector);
+        mainSessionBuilder.setAuthenticationSelector(authSelector);
 
         Object transport = configProps.getOrDefault(MAVEN_RESOLVER_TRANSPORT_KEY, MAVEN_RESOLVER_TRANSPORT_DEFAULT);
         if (MAVEN_RESOLVER_TRANSPORT_DEFAULT.equals(transport)) {
             // The "default" mode (user did not set anything) from now on defaults to AUTO
-        } else if (MAVEN_RESOLVER_TRANSPORT_NATIVE.equals(transport)) {
+        } else if (MAVEN_RESOLVER_TRANSPORT_APACHE.equals(transport)) {
             // Make sure (whatever extra priority is set) that resolver native is selected
-            configProps.put(NATIVE_FILE_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
-            configProps.put(NATIVE_HTTP_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
+            configProps.put(FILE_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
+            configProps.put(APACHE_HTTP_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
         } else if (MAVEN_RESOLVER_TRANSPORT_WAGON.equals(transport)) {
             // Make sure (whatever extra priority is set) that wagon is selected
             configProps.put(WAGON_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
         } else if (!MAVEN_RESOLVER_TRANSPORT_AUTO.equals(transport)) {
             throw new IllegalArgumentException("Unknown resolver transport '" + transport
                     + "'. Supported transports are: " + MAVEN_RESOLVER_TRANSPORT_WAGON + ", "
-                    + MAVEN_RESOLVER_TRANSPORT_NATIVE + ", " + MAVEN_RESOLVER_TRANSPORT_AUTO);
+                    + MAVEN_RESOLVER_TRANSPORT_APACHE + ", " + MAVEN_RESOLVER_TRANSPORT_AUTO);
         }
 
-        session.setUserProperties(request.getUserProperties());
-        session.setSystemProperties(request.getSystemProperties());
-        session.setConfigProperties(configProps);
+        mainSessionBuilder.setUserProperties(request.getUserProperties());
+        mainSessionBuilder.setSystemProperties(request.getSystemProperties());
+        mainSessionBuilder.setConfigProperties(configProps);
 
-        session.setTransferListener(request.getTransferListener());
+        mainSessionBuilder.setTransferListener(request.getTransferListener());
 
-        session.setRepositoryListener(eventSpyDispatcher.chainListener(new LoggingRepositoryListener(logger)));
+        mainSessionBuilder.setRepositoryListener(
+                eventSpyDispatcher.chainListener(new LoggingRepositoryListener(logger)));
 
-        session.setIgnoreArtifactDescriptorRepositories(request.isIgnoreTransitiveRepositories());
+        mainSessionBuilder.setIgnoreArtifactDescriptorRepositories(request.isIgnoreTransitiveRepositories());
 
-        boolean recordReverseTree = ConfigUtils.getBoolean(session, false, MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE);
-        if (recordReverseTree) {
-            session.setRepositoryListener(new ChainedRepositoryListener(
-                    session.getRepositoryListener(), new ReverseTreeRepositoryListener()));
+        try (RepositorySystemSession.CloseableSession protoSession =
+                setUpLocalRepositoryManager(request, repoSystem, mainSessionBuilder)) {
+            boolean recordReverseTree =
+                    ConfigUtils.getBoolean(protoSession, false, MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE);
+            if (recordReverseTree) {
+                mainSessionBuilder.setRepositoryListener(new ChainedRepositoryListener(
+                        protoSession.getRepositoryListener(), new ReverseTreeRepositoryListener()));
+            }
+
+            mavenRepositorySystem.injectMirror(request.getRemoteRepositories(), request.getMirrors());
+            mavenRepositorySystem.injectProxy(protoSession, request.getRemoteRepositories());
+            mavenRepositorySystem.injectAuthentication(protoSession, request.getRemoteRepositories());
+
+            mavenRepositorySystem.injectMirror(request.getPluginArtifactRepositories(), request.getMirrors());
+            mavenRepositorySystem.injectProxy(protoSession, request.getPluginArtifactRepositories());
+            mavenRepositorySystem.injectAuthentication(protoSession, request.getPluginArtifactRepositories());
+
+            return mainSessionBuilder;
         }
-
-        mavenRepositorySystem.injectMirror(request.getRemoteRepositories(), request.getMirrors());
-        mavenRepositorySystem.injectProxy(session, request.getRemoteRepositories());
-        mavenRepositorySystem.injectAuthentication(session, request.getRemoteRepositories());
-
-        mavenRepositorySystem.injectMirror(request.getPluginArtifactRepositories(), request.getMirrors());
-        mavenRepositorySystem.injectProxy(session, request.getPluginArtifactRepositories());
-        mavenRepositorySystem.injectAuthentication(session, request.getPluginArtifactRepositories());
-
-        setUpLocalRepositoryManager(request, session);
-
-        return session;
     }
 
-    private void setUpLocalRepositoryManager(MavenExecutionRequest request, DefaultRepositorySystemSession session) {
-        List<String> paths = new ArrayList<>();
+    private static RepositorySystemSession.CloseableSession setUpLocalRepositoryManager(
+            MavenExecutionRequest request,
+            RepositorySystem repoSystem,
+            RepositorySystemSession.SessionBuilder sessionBuilder) {
+        Path requestLocalRepositoryPath = resolve(request.getLocalRepository().getBasedir());
+        RepositorySystemSession.CloseableSession protoSession = sessionBuilder
+                .withLocalRepositoryBaseDirectories(requestLocalRepositoryPath)
+                .build();
+        LocalRepositoryManager lrm =
+                setUpLocalRepositoryManager(request.getLocalRepository().getBasedir(), repoSystem, protoSession);
+        sessionBuilder.setLocalRepositoryManager(lrm);
+        return protoSession;
+    }
+
+    public static LocalRepositoryManager setUpLocalRepositoryManager(
+            String localRepository, RepositorySystem repoSystem, RepositorySystemSession session) {
+        List<Path> paths = new ArrayList<>();
         String localRepoHead = ConfigUtils.getString(session, null, MAVEN_REPO_LOCAL_HEAD);
         if (localRepoHead != null) {
             Arrays.stream(localRepoHead.split(","))
-                    .filter(p -> p != null && !p.trim().isEmpty())
-                    .map(this::resolve)
+                    .filter(p -> !p.trim().isEmpty())
+                    .map(DefaultRepositorySystemSessionFactory::resolve)
                     .forEach(paths::add);
         }
 
-        paths.add(request.getLocalRepository().getBasedir());
+        paths.add(resolve(localRepository));
 
         String localRepoTail = ConfigUtils.getString(session, null, MAVEN_REPO_LOCAL_TAIL);
         if (localRepoTail != null) {
             Arrays.stream(localRepoTail.split(","))
-                    .filter(p -> p != null && !p.trim().isEmpty())
-                    .map(this::resolve)
+                    .filter(p -> !p.trim().isEmpty())
+                    .map(DefaultRepositorySystemSessionFactory::resolve)
                     .forEach(paths::add);
         }
 
         LocalRepository localRepo = new LocalRepository(paths.remove(0));
         LocalRepositoryManager lrm = repoSystem.newLocalRepositoryManager(session, localRepo);
 
-        if (paths.isEmpty()) {
-            // we have only one local repo path
-            session.setLocalRepositoryManager(lrm);
-        } else {
+        if (!paths.isEmpty()) {
             List<LocalRepositoryManager> tail = new ArrayList<>();
-            for (String path : paths) {
+            for (Path path : paths) {
                 tail.add(repoSystem.newLocalRepositoryManager(session, new LocalRepository(path)));
             }
             boolean ignoreTailAvailability =
                     ConfigUtils.getBoolean(session, true, MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY);
 
-            session.setLocalRepositoryManager(new ChainedLocalRepositoryManager(lrm, tail, ignoreTailAvailability));
+            lrm = new ChainedLocalRepositoryManager(lrm, tail, ignoreTailAvailability);
         }
+        return lrm;
     }
 
-    private String resolve(String string) {
+    public static Path resolve(String string) {
         if (string.startsWith("~/") || string.startsWith("~\\")) {
             // resolve based on $HOME
             return Paths.get(System.getProperty("user.home"))
                     .resolve(string.substring(2))
                     .normalize()
-                    .toAbsolutePath()
-                    .toString();
+                    .toAbsolutePath();
         } else {
             // resolve based on $CWD
-            return Paths.get(string).normalize().toAbsolutePath().toString();
+            return Paths.get(string).normalize().toAbsolutePath();
         }
     }
 

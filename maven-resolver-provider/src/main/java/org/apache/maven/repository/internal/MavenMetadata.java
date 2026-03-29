@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
@@ -65,6 +66,13 @@ abstract class MavenMetadata extends AbstractMetadata implements MergeableMetada
     @Override
     public File getFile() {
         return file;
+    }
+
+    public Path getPath() {
+        if (file != null) {
+            return file.toPath();
+        }
+        return null;
     }
 
     @Override

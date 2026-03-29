@@ -162,15 +162,16 @@ public class DefaultMaven implements Maven {
         // so that @SessionScoped components can be @Injected into AbstractLifecycleParticipants.
         //
         sessionScope.enter();
-        try {
-            DefaultRepositorySystemSession repoSession = (DefaultRepositorySystemSession) newRepositorySession(request);
-            MavenSession session = new MavenSession(container, repoSession, request, result);
+        try (RepositorySystemSession.CloseableSession repoSession = newRepositorySession(request)) {
+            DefaultRepositorySystemSession mutableSession = new DefaultRepositorySystemSession(repoSession);
+            MavenSession session = new MavenSession(container, mutableSession, request, result);
 
+            sessionScope.seed(RepositorySystemSession.class, mutableSession);
             sessionScope.seed(MavenSession.class, session);
 
             legacySupport.setSession(session);
 
-            return doExecute(request, session, result, repoSession);
+            return doExecute(request, session, result, mutableSession);
         } finally {
             sessionScope.exit();
         }
@@ -308,8 +309,8 @@ public class DefaultMaven implements Maven {
         }
     }
 
-    public RepositorySystemSession newRepositorySession(MavenExecutionRequest request) {
-        return repositorySessionFactory.newRepositorySession(request);
+    public RepositorySystemSession.CloseableSession newRepositorySession(MavenExecutionRequest request) {
+        return repositorySessionFactory.newRepositorySession(request).build();
     }
 
     private void validateLocalRepository(MavenExecutionRequest request) throws LocalRepositoryNotAccessibleException {

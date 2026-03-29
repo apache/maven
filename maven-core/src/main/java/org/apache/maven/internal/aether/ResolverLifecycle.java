@@ -18,13 +18,13 @@
  */
 package org.apache.maven.internal.aether;
 
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.sisu.EagerSingleton;
+import org.eclipse.sisu.PreDestroy;
 
 import static java.util.Objects.requireNonNull;
 
