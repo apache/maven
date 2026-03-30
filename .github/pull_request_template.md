@@ -1,10 +1,14 @@
 <!--
-We accept a pull request for target branches:
+Please open pull requests against one of the following branches:
 
- - master - new feature and bug fixing for 4.1.x version
- - maven-4.0.x - bug fixing for 4.0.x version
- - maven-3.10.x - new feature and bug fixing
- - maven-3.9.x - only critical bug fixing for 3.9.x version, prepare for EOL
+- master — default target for all changes (new features + bug fixes).  
+  If the change should also go to maven-4.0.x, request a backport in the PR.
+
+- maven-3.10.x — target for 3.x changes (new features + bug fixes).  
+  If the change should also go to maven-3.9.x, request a backport in the PR.
+
+Backports are typically handled by maintainers; 
+however, after agreement you may open a separate backport PR to the target maintenance branch.
 -->
 
 Following this checklist to help us incorporate your
