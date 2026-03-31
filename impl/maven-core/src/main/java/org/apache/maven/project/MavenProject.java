@@ -838,6 +838,13 @@ public class MavenProject implements Cloneable {
 
     private void addResource(ProjectScope scope, Resource resource) {
         addSourceRoot(new DefaultSourceRoot(getBaseDirectory(), scope, resource.getDelegate()));
+        // Also update the model's Build to maintain compatibility with code that
+        // accesses resources via project.getBuild().getResources()
+        if (scope == ProjectScope.MAIN) {
+            getModelBuild().addResource(resource);
+        } else {
+            getModelBuild().addTestResource(resource);
+        }
     }
 
     /**
