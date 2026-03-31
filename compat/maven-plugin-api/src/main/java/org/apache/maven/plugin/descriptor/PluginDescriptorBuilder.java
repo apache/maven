@@ -71,7 +71,24 @@ public class PluginDescriptorBuilder {
      */
     @Deprecated
     public PluginDescriptor build(Reader reader, String source) throws PlexusConfigurationException {
-        return build(() -> reader, source);
+        try {
+            BufferedReader br = new BufferedReader(reader, BUFFER_SIZE);
+            br.mark(BUFFER_SIZE);
+            XMLStreamReader xsr = XMLInputFactory.newFactory().createXMLStreamReader(br);
+            xsr.nextTag();
+            String nsUri = xsr.getNamespaceURI();
+            br.reset();
+            if (PLUGIN_2_0_0.equals(nsUri)) {
+                xsr = XMLInputFactory.newFactory().createXMLStreamReader(br);
+                return new PluginDescriptor(new PluginDescriptorStaxReader().read(xsr, true));
+            } else {
+                // Call buildConfiguration() for backward compatibility with subclasses that override it
+                PlexusConfiguration cfg = buildConfiguration(br);
+                return build(source, cfg);
+            }
+        } catch (XMLStreamException | IOException e) {
+            throw new PlexusConfigurationException(e.getMessage(), e);
+        }
     }
 
     public PluginDescriptor build(ReaderSupplier readerSupplier) throws PlexusConfigurationException {
@@ -98,7 +115,24 @@ public class PluginDescriptorBuilder {
      */
     @Deprecated
     public PluginDescriptor build(InputStream input, String source) throws PlexusConfigurationException {
-        return build(() -> input, source);
+        try {
+            BufferedInputStream bis = new BufferedInputStream(input, BUFFER_SIZE);
+            bis.mark(BUFFER_SIZE);
+            XMLStreamReader xsr = XMLInputFactory.newFactory().createXMLStreamReader(bis);
+            xsr.nextTag();
+            String nsUri = xsr.getNamespaceURI();
+            bis.reset();
+            if (PLUGIN_2_0_0.equals(nsUri)) {
+                xsr = XMLInputFactory.newFactory().createXMLStreamReader(bis);
+                return new PluginDescriptor(new PluginDescriptorStaxReader().read(xsr, true));
+            } else {
+                // Call buildConfiguration() for backward compatibility with subclasses that override it
+                PlexusConfiguration cfg = buildConfiguration(bis);
+                return build(source, cfg);
+            }
+        } catch (XMLStreamException | IOException e) {
+            throw new PlexusConfigurationException(e.getMessage(), e);
+        }
     }
 
     public PluginDescriptor build(StreamSupplier inputSupplier) throws PlexusConfigurationException {
