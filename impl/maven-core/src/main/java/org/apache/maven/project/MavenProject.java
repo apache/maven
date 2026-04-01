@@ -848,16 +848,21 @@ public class MavenProject implements Cloneable {
     }
 
     /**
-     * @deprecated {@link Resource} is replaced by {@link SourceRoot}.
+     * Syncs {@code Build.resources/testResources} from the {@code sources} set
+     * for Maven 3 plugin compatibility (e.g. when resources come from {@code <sources>}).
      */
+    void syncBuildResources() {
+        getModelBuild().setResources(new java.util.ArrayList<>(getResources()));
+        getModelBuild().setTestResources(new java.util.ArrayList<>(getTestResources()));
+    }
+
+    /** @deprecated {@link Resource} is replaced by {@link SourceRoot}. */
     @Deprecated(since = "4.0.0")
     public void addResource(Resource resource) {
         addResource(ProjectScope.MAIN, resource);
     }
 
-    /**
-     * @deprecated {@link Resource} is replaced by {@link SourceRoot}.
-     */
+    /** @deprecated {@link Resource} is replaced by {@link SourceRoot}. */
     @Deprecated(since = "4.0.0")
     public void addTestResource(Resource testResource) {
         addResource(ProjectScope.TEST, testResource);
