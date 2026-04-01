@@ -38,6 +38,7 @@ import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.message.MessageBuilderFactory;
 import org.apache.maven.project.DefaultDependencyResolutionRequest;
 import org.apache.maven.project.DependencyResolutionException;
 import org.apache.maven.project.DependencyResolutionResult;
@@ -79,6 +80,9 @@ public class LifecycleDependencyResolver {
 
     @Inject
     private ProjectArtifactsCache projectArtifactsCache;
+
+    @Inject
+    private MessageBuilderFactory messageBuilderFactory;
 
     public LifecycleDependencyResolver() {}
 
@@ -243,7 +247,7 @@ public class LifecycleDependencyResolver {
 
                 logger.warn("Try running the build up to the lifecycle phase \"package\"");
             } else {
-                throw new LifecycleExecutionException(null, project, e);
+                throw new LifecycleExecutionException(messageBuilderFactory, null, project, e);
             }
         }
 

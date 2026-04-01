@@ -39,6 +39,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.internal.MultilineMessageHelper;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.MissingProjectException;
+import org.apache.maven.message.MessageBuilderFactory;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.MojoExecution;
@@ -87,6 +88,9 @@ public class MojoExecutor {
 
     @Requirement
     private ExecutionEventCatapult eventCatapult;
+
+    @Requirement
+    private MessageBuilderFactory messageBuilderFactory;
 
     private final OwnerReentrantReadWriteLock aggregatorLock = new OwnerReentrantReadWriteLock();
 
@@ -186,7 +190,7 @@ public class MojoExecutor {
         try {
             mavenPluginManager.checkPrerequisites(mojoDescriptor.getPluginDescriptor());
         } catch (PluginIncompatibleException e) {
-            throw new LifecycleExecutionException(mojoExecution, session.getCurrentProject(), e);
+            throw new LifecycleExecutionException(messageBuilderFactory, mojoExecution, session.getCurrentProject(), e);
         }
 
         if (mojoDescriptor.isProjectRequired() && !session.getRequest().isProjectPresent()) {
@@ -194,14 +198,15 @@ public class MojoExecutor {
                     "Goal requires a project to execute" + " but there is no POM in this directory ("
                             + session.getExecutionRootDirectory() + ")."
                             + " Please verify you invoked Maven from the correct directory.");
-            throw new LifecycleExecutionException(mojoExecution, null, cause);
+            throw new LifecycleExecutionException(messageBuilderFactory, mojoExecution, null, cause);
         }
 
         if (mojoDescriptor.isOnlineRequired() && session.isOffline()) {
             if (MojoExecution.Source.CLI.equals(mojoExecution.getSource())) {
                 Throwable cause = new IllegalStateException(
                         "Goal requires online mode for execution" + " but Maven is currently offline.");
-                throw new LifecycleExecutionException(mojoExecution, session.getCurrentProject(), cause);
+                throw new LifecycleExecutionException(
+                        messageBuilderFactory, mojoExecution, session.getCurrentProject(), cause);
             } else {
                 eventCatapult.fire(ExecutionEvent.Type.MojoSkipped, session, mojoExecution);
 
@@ -330,7 +335,8 @@ public class MojoExecutor {
                     | PluginManagerException
                     | PluginConfigurationException
                     | MojoExecutionException e) {
-                throw new LifecycleExecutionException(mojoExecution, session.getCurrentProject(), e);
+                throw new LifecycleExecutionException(
+                        messageBuilderFactory, mojoExecution, session.getCurrentProject(), e);
             }
 
             eventCatapult.fire(ExecutionEvent.Type.MojoSucceeded, session, mojoExecution);

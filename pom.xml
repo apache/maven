@@ -97,6 +97,7 @@ under the License.
     <module>maven-repository-metadata</module>
     <module>maven-slf4j-provider</module>
     <module>maven-embedder</module>
+    <module>maven-jline</module>
     <module>maven-compat</module>
     <module>apache-maven</module>
   </modules>
@@ -156,6 +157,7 @@ under the License.
     <checkstyle.violation.ignore>None</checkstyle.violation.ignore>
     <checkstyle.excludes>**/package-info.java</checkstyle.excludes>
     <project.build.outputTimestamp>2026-03-24T21:15:50Z</project.build.outputTimestamp>
+    <jlineVersion>3.30.9</jlineVersion>
   </properties>
 
   <!--bootstrap-start-comment-->
@@ -227,6 +229,11 @@ under the License.
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-slf4j-provider</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-jline</artifactId>
         <version>${project.version}</version>
       </dependency>
       <!--bootstrap-end-comment-->
@@ -339,21 +346,24 @@ under the License.
         <version>${plexusInterpolationVersion}</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.maven.shared</groupId>
-        <artifactId>maven-shared-utils</artifactId>
-        <version>3.4.2</version>
-        <exclusions>
-          <!-- We use org.apache.maven.shared.utils.logging only in Maven Core -->
-          <exclusion>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-          </exclusion>
-        </exclusions>
+        <groupId>org.jline</groupId>
+        <artifactId>jansi-core</artifactId>
+        <version>${jlineVersion}</version>
       </dependency>
       <dependency>
-        <groupId>org.fusesource.jansi</groupId>
-        <artifactId>jansi</artifactId>
-        <version>2.4.3</version>
+        <groupId>org.jline</groupId>
+        <artifactId>jline-terminal</artifactId>
+        <version>${jlineVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jline</groupId>
+        <artifactId>jline-terminal-jni</artifactId>
+        <version>${jlineVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jline</groupId>
+        <artifactId>jline-terminal-ffm</artifactId>
+        <version>${jlineVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -676,6 +686,22 @@ under the License.
                     <include>com.google.inject:guice:*:*:*:classes</include>
                   </includes>
                 </bannedDependencies>
+              </rules>
+              <fail>true</fail>
+            </configuration>
+          </execution>
+          <execution>
+            <id>enforce-bytecode-version</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <enforceBytecodeVersion>
+                  <excludes>
+                    <exclude>org.jline:jline-terminal-ffm</exclude>
+                  </excludes>
+                </enforceBytecodeVersion>
               </rules>
               <fail>true</fail>
             </configuration>
