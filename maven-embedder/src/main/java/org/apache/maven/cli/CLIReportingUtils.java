@@ -29,7 +29,7 @@ import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 
-import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
+import static org.apache.maven.jline.MessageUtils.builder;
 
 /**
  * Utility class used to report errors, statistics, application version info, etc.
@@ -53,7 +53,7 @@ public final class CLIReportingUtils {
         final String ls = System.lineSeparator();
         Properties properties = getBuildProperties();
         StringBuilder version = new StringBuilder(256);
-        version.append(buffer().strong(createMavenVersionString(properties))).append(ls);
+        version.append(builder().strong(createMavenVersionString(properties))).append(ls);
         version.append(reduce(properties.getProperty("distributionShortName") + " home: "
                         + System.getProperty("maven.home", "<unknown Maven " + "home>")))
                 .append(ls);

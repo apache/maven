@@ -27,7 +27,7 @@ import java.nio.file.Paths;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.Maven;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
-import org.apache.maven.shared.utils.logging.MessageUtils;
+import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.toolchain.building.ToolchainsBuildingRequest;
 import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
 import org.codehaus.plexus.PlexusContainer;
