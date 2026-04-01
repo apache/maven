@@ -777,6 +777,12 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     sourceContext.handleResourceConfiguration(ProjectScope.MAIN);
                     sourceContext.handleResourceConfiguration(ProjectScope.TEST);
                 }
+
+                // Sync model Build resources from sources set so that
+                // project.getBuild().getResources() is consistent with project.getResources().
+                // This is needed for Maven 3 plugin compatibility, since some plugins
+                // (e.g. maven-source-plugin) access resources via project.getBuild().getResources().
+                project.syncBuildResources();
             }
 
             project.setActiveProfiles(
