@@ -61,7 +61,7 @@ public class ClasspathArtifactResolver implements ArtifactResolver {
                     throw new IllegalStateException("Missing test POM for " + artifact, e);
                 }
             } else {
-                result.addException(new ArtifactNotFoundException(artifact, null));
+                result.addException(new ArtifactNotFoundException(artifact, "not found"));
                 throw new ArtifactResolutionException(results);
             }
         }
