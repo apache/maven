@@ -352,11 +352,11 @@ public class MavenCli {
             }
         }
         topDirectory = getCanonicalPath(topDirectory);
-        cliRequest.topDirectory = topDirectory;
+        cliRequest.request.setTopDirectory(topDirectory);
         // We're very early in the process and we don't have the container set up yet,
         // so we on searchAcceptableRootDirectory method to find us acceptable directory.
         // The method may return null if nothing acceptable found.
-        cliRequest.rootDirectory = searchAcceptableRootDirectory(topDirectory);
+        cliRequest.request.setRootDirectory(searchAcceptableRootDirectory(topDirectory));
 
         //
         // Make sure the Maven home directory is an absolute path to save us from confusion with say drive-relative
@@ -613,7 +613,7 @@ public class MavenCli {
         } catch (IllegalUseOfUndefinedProperty e) {
             String message = "ERROR: Illegal use of undefined property: " + e.property;
             System.err.println(message);
-            if (cliRequest.rootDirectory == null) {
+            if (cliRequest.request.getRootDirectory() == null) {
                 System.err.println();
                 System.err.println(UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE);
             }
@@ -1578,14 +1578,14 @@ public class MavenCli {
             @Override
             public Object getValue(String expression) {
                 if ("session.topDirectory".equals(expression)) {
-                    Path topDirectory = cliRequest.topDirectory;
+                    Path topDirectory = cliRequest.request.getTopDirectory();
                     if (topDirectory != null) {
                         return topDirectory.toString();
                     } else {
                         throw new IllegalUseOfUndefinedProperty(expression);
                     }
                 } else if ("session.rootDirectory".equals(expression)) {
-                    Path rootDirectory = cliRequest.rootDirectory;
+                    Path rootDirectory = cliRequest.request.getRootDirectory();
                     if (rootDirectory != null) {
                         return rootDirectory.toString();
                     } else {
