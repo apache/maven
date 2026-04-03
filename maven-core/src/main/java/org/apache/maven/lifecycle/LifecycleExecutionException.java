@@ -20,6 +20,7 @@ package org.apache.maven.lifecycle;
 
 import org.apache.maven.message.MessageBuilder;
 import org.apache.maven.message.MessageBuilderFactory;
+import org.apache.maven.message.internal.DefaultMessageBuilderFactory;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
@@ -54,6 +55,15 @@ public class LifecycleExecutionException extends Exception {
     public LifecycleExecutionException(String message, MojoExecution execution, MavenProject project, Throwable cause) {
         super(message, cause);
         this.project = project;
+    }
+
+    /**
+     * @deprecated Use {@link #LifecycleExecutionException(MessageBuilderFactory, MojoExecution, MavenProject, Throwable)}
+     * instead to allow for better message formatting.
+     */
+    @Deprecated
+    public LifecycleExecutionException(MojoExecution execution, MavenProject project, Throwable cause) {
+        this(createMessage(new DefaultMessageBuilderFactory(), execution, project, cause), execution, project, cause);
     }
 
     public LifecycleExecutionException(
