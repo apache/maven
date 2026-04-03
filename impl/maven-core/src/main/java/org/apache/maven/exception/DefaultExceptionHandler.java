@@ -40,6 +40,7 @@ import org.apache.maven.plugin.PluginContainerException;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingResult;
+import org.eclipse.aether.transfer.ArtifactFilteredOutException;
 
 /*
 
@@ -177,6 +178,9 @@ public class DefaultExceptionHandler implements ExceptionHandler {
                         reference = ConnectException.class.getSimpleName();
                     }
                 }
+                if (findCause(exception, ArtifactFilteredOutException.class) != null) {
+                    reference = "https://maven.apache.org/resolver/remote-repository-filtering.html";
+                }
             } else if (exception instanceof LinkageError) {
                 reference = LinkageError.class.getSimpleName();
             } else if (exception instanceof PluginExecutionException) {
@@ -207,7 +211,9 @@ public class DefaultExceptionHandler implements ExceptionHandler {
             }
         }
 
-        if ((reference != null && !reference.isEmpty()) && !reference.startsWith("http:")) {
+        if ((reference != null && !reference.isEmpty())
+                && !reference.startsWith("http:")
+                && !reference.startsWith("https:")) {
             reference = "http://cwiki.apache.org/confluence/display/MAVEN/" + reference;
         }
 
@@ -228,6 +234,8 @@ public class DefaultExceptionHandler implements ExceptionHandler {
 
     private String getMessage(String message, Throwable exception) {
         String fullMessage = (message != null) ? message : "";
+
+        boolean hasArtifactFilteredOut = false;
 
         // To break out of possible endless loop when getCause returns "this", or dejaVu for n-level recursion (n>1)
         Set<Throwable> dejaVu = Collections.newSetFromMap(new IdentityHashMap<>());
@@ -260,13 +268,41 @@ public class DefaultExceptionHandler implements ExceptionHandler {
                 fullMessage = join(fullMessage, exceptionMessage);
             }
 
+            if (t instanceof ArtifactFilteredOutException) {
+                hasArtifactFilteredOut = true;
+            }
+
             if (!dejaVu.add(t)) {
                 fullMessage = join(fullMessage, "[CIRCULAR REFERENCE]");
                 break;
             }
         }
 
+        if (hasArtifactFilteredOut) {
+            fullMessage += System.lineSeparator()
+                    + System.lineSeparator()
+                    + "This error indicates that the remote repository's prefix file does not list"
+                    + " this artifact's group. This commonly happens with repository managers"
+                    + " using virtual/group repositories that do not properly aggregate prefix files."
+                    + System.lineSeparator()
+                    + "To disable prefix-based filtering, add"
+                    + " -Daether.remoteRepositoryFilter.prefixes=false"
+                    + " to your command line or to .mvn/maven.config."
+                    + System.lineSeparator()
+                    + "See https://maven.apache.org/resolver/remote-repository-filtering.html";
+        }
+
         return fullMessage.trim();
+    }
+
+    private static <T extends Throwable> T findCause(Throwable exception, Class<T> type) {
+        Set<Throwable> dejaVu = Collections.newSetFromMap(new IdentityHashMap<>());
+        for (Throwable t = exception; t != null && dejaVu.add(t); t = t.getCause()) {
+            if (type.isInstance(t)) {
+                return type.cast(t);
+            }
+        }
+        return null;
     }
 
     private String join(String message1, String message2) {
