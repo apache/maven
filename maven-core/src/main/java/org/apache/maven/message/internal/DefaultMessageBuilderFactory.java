@@ -28,7 +28,7 @@ import org.eclipse.sisu.Priority;
 @Named
 @Singleton
 @Priority(-1)
-class DefaultMessageBuilderFactory implements MessageBuilderFactory {
+public class DefaultMessageBuilderFactory implements MessageBuilderFactory {
 
     @Override
     public boolean isColorEnabled() {
