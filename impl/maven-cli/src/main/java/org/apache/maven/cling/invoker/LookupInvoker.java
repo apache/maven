@@ -342,7 +342,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             context.coloredOutput = context.coloredOutput != null ? context.coloredOutput : false;
             context.closeables.add(out::flush);
         } else {
-            builder.systemOutput(TerminalBuilder.SystemOutput.ForcedSysOut);
+            builder.systemOutput(TerminalBuilder.SystemOutput.SysOut);
         }
         if (context.coloredOutput != null) {
             builder.color(context.coloredOutput);
@@ -354,12 +354,10 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
      */
     protected final void doConfigureWithTerminal(C context, Terminal terminal) {
         context.terminal = terminal;
-        // tricky thing: align what JLine3 detected and Maven thinks:
+        // Align Maven's color setting with JLine's terminal detection:
         // if embedded, we default to context.coloredOutput=false unless overridden (see above)
-        // if not embedded, JLine3 may detect redirection and will create dumb terminal.
+        // if not embedded, JLine detects redirection via SysOut and will create dumb terminal.
         // To align Maven with outcomes, we set here color enabled based on these premises.
-        // Note: Maven3 suffers from similar thing: if you do `mvn3 foo > log.txt`, the output will
-        // not be not colored (good), but Maven will print out "Message scheme: color".
         MessageUtils.setColorEnabled(
                 context.coloredOutput != null ? context.coloredOutput : !Terminal.TYPE_DUMB.equals(terminal.getType()));
 
