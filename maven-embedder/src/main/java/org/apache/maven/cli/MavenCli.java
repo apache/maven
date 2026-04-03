@@ -85,14 +85,14 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
+import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.message.MessageBuilder;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.properties.internal.SystemProperties;
 import org.apache.maven.session.scope.internal.SessionScopeModule;
-import org.apache.maven.shared.utils.logging.MessageBuilder;
-import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.apache.maven.toolchain.building.DefaultToolchainsBuildingRequest;
 import org.apache.maven.toolchain.building.ToolchainsBuilder;
 import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
@@ -124,7 +124,7 @@ import org.sonatype.plexus.components.sec.dispatcher.model.SettingsSecurity;
 
 import static org.apache.maven.cli.CLIManager.COLOR;
 import static org.apache.maven.cli.ResolveFile.resolveFile;
-import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
+import static org.apache.maven.jline.MessageUtils.builder;
 
 // TODO push all common bits back to plexus cli and prepare for transition to Guice. We don't need 50 ways to make CLIs
 
@@ -566,14 +566,15 @@ public class MavenCli {
 
         if (slf4jLogger.isDebugEnabled()) {
             slf4jLogger.debug("Message scheme: {}", (MessageUtils.isColorEnabled() ? "color" : "plain"));
+            slf4jLogger.debug("Message terminal: {}", MessageUtils.getTerminal());
             if (MessageUtils.isColorEnabled()) {
-                MessageBuilder buff = MessageUtils.buffer();
+                MessageBuilder buff = builder();
                 buff.a("Message styles: ");
-                buff.a(MessageUtils.level().debug("debug")).a(' ');
-                buff.a(MessageUtils.level().info("info")).a(' ');
-                buff.a(MessageUtils.level().warning("warning")).a(' ');
-                buff.a(MessageUtils.level().error("error")).a(' ');
-
+                buff.a(builder().trace("trace")).a(' ');
+                buff.a(builder().debug("debug")).a(' ');
+                buff.a(builder().info("info")).a(' ');
+                buff.a(builder().warning("warning")).a(' ');
+                buff.a(builder().error("error")).a(' ');
                 buff.success("success").a(' ');
                 buff.failure("failure").a(' ');
                 buff.strong("strong").a(' ');
@@ -944,11 +945,12 @@ public class MavenCli {
             if (!cliRequest.showErrors) {
                 slf4jLogger.error(
                         "To see the full stack trace of the errors, re-run Maven with the {} switch.",
-                        buffer().strong("-e"));
+                        builder().strong("-e"));
             }
             if (!slf4jLogger.isDebugEnabled()) {
                 slf4jLogger.error(
-                        "Re-run Maven using the {} switch to enable full debug logging.", buffer().strong("-X"));
+                        "Re-run Maven using the {} switch to enable full debug logging.",
+                        builder().strong("-X"));
             }
 
             if (!references.isEmpty()) {
@@ -957,7 +959,7 @@ public class MavenCli {
                         + ", please read the following articles:");
 
                 for (Map.Entry<String, String> entry : references.entrySet()) {
-                    slf4jLogger.error("{} {}", buffer().strong(entry.getValue()), entry.getKey());
+                    slf4jLogger.error("{} {}", builder().strong(entry.getValue()), entry.getKey());
                 }
             }
 
@@ -965,7 +967,8 @@ public class MavenCli {
                     && !project.equals(result.getTopologicallySortedProjects().get(0))) {
                 slf4jLogger.error("");
                 slf4jLogger.error("After correcting the problems, you can resume the build with the command");
-                slf4jLogger.error(buffer().a("  ")
+                slf4jLogger.error(builder()
+                        .a("  ")
                         .strong("mvn <args> -rf " + getResumeFrom(result.getTopologicallySortedProjects(), project))
                         .toString());
             }
@@ -1024,9 +1027,9 @@ public class MavenCli {
 
         if (StringUtils.isNotEmpty(referenceKey)) {
             if (msg.indexOf('\n') < 0) {
-                msg += " -> " + buffer().strong(referenceKey);
+                msg += " -> " + builder().strong(referenceKey);
             } else {
-                msg += "\n-> " + buffer().strong(referenceKey);
+                msg += "\n-> " + builder().strong(referenceKey);
             }
         }
 

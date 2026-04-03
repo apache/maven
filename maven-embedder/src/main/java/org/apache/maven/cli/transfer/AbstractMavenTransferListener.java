@@ -23,7 +23,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
-import org.apache.maven.shared.utils.logging.MessageUtils;
+import org.apache.maven.jline.MessageUtils;
 import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
@@ -192,6 +192,7 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
 
     @Override
     public void transferInitiated(TransferEvent event) {
+        // TODO use MessageBuilder
         String darkOn = MessageUtils.isColorEnabled() ? ANSI_DARK_SET : "";
         String darkOff = MessageUtils.isColorEnabled() ? ANSI_DARK_RESET : "";
 

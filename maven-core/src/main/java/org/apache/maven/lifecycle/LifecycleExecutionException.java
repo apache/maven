@@ -18,11 +18,11 @@
  */
 package org.apache.maven.lifecycle;
 
+import org.apache.maven.message.MessageBuilder;
+import org.apache.maven.message.MessageBuilderFactory;
+import org.apache.maven.message.internal.DefaultMessageBuilderFactory;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.utils.logging.MessageBuilder;
-
-import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -57,16 +57,33 @@ public class LifecycleExecutionException extends Exception {
         this.project = project;
     }
 
+    /**
+     * @deprecated Use {@link #LifecycleExecutionException(MessageBuilderFactory, MojoExecution, MavenProject, Throwable)}
+     * instead to allow for better message formatting.
+     */
+    @Deprecated
     public LifecycleExecutionException(MojoExecution execution, MavenProject project, Throwable cause) {
-        this(createMessage(execution, project, cause), execution, project, cause);
+        this(createMessage(new DefaultMessageBuilderFactory(), execution, project, cause), execution, project, cause);
+    }
+
+    public LifecycleExecutionException(
+            MessageBuilderFactory messageBuilderFactory,
+            MojoExecution execution,
+            MavenProject project,
+            Throwable cause) {
+        this(createMessage(messageBuilderFactory, execution, project, cause), execution, project, cause);
     }
 
     public MavenProject getProject() {
         return project;
     }
 
-    private static String createMessage(MojoExecution execution, MavenProject project, Throwable cause) {
-        MessageBuilder buffer = buffer(256);
+    private static String createMessage(
+            MessageBuilderFactory messageBuilderFactory,
+            MojoExecution execution,
+            MavenProject project,
+            Throwable cause) {
+        MessageBuilder buffer = messageBuilderFactory.builder(256);
 
         buffer.a("Failed to execute goal");
 
