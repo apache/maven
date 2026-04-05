@@ -48,7 +48,9 @@ import org.apache.maven.impl.resolver.MavenVersionScheme;
 import org.apache.maven.internal.impl.InternalMavenSession;
 import org.apache.maven.internal.transformation.AbstractRepositoryTestCase;
 import org.apache.maven.project.MavenProject;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -197,5 +199,66 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         assertNull(transformed.getScm().getChildScmConnectionInheritAppendPath());
         assertNull(transformed.getScm().getChildScmUrlInheritAppendPath());
         assertNull(transformed.getScm().getChildScmDeveloperConnectionInheritAppendPath());
+    }
+
+    /**
+     * Verifies that the consumer POM builder passes the project's remote repositories
+     * to the model builder request, so that BOM imports from non-central repositories
+     * (e.g. repositories defined in settings.xml profiles) can be resolved.
+     * <p>
+     * Without the fix in {@code DefaultConsumerPomBuilder.buildModel()}, the
+     * {@code ModelBuilderRequest} is constructed without repositories, profiles, or
+     * active profile IDs. This causes the model builder to only see Maven Central
+     * when resolving BOM imports, leading to "Non-resolvable import POM" failures
+     * for artifacts hosted in private/corporate repositories.
+     */
+    @Test
+    void testConsumerPomPassesProjectRepositoriesToModelBuilder() throws Exception {
+        setRootDirectory("trivial");
+        Path file = Paths.get("src/test/resources/consumer/trivial/child/pom.xml");
+
+        MavenProject project = getEffectiveModel(file);
+
+        // Add a custom remote repository to the project, simulating a repository
+        // injected from settings.xml profile (e.g. a corporate/private repository)
+        RemoteRepository customRepo =
+                new RemoteRepository.Builder("custom-repo", "default", "https://repo.example.com/maven2").build();
+        project.getRemoteProjectRepositories().add(customRepo);
+
+        // Spy on the ModelBuilderSession to capture the ModelBuilderRequest
+        ModelBuilder.ModelBuilderSession originalMbs = modelBuilder.newSession();
+        ModelBuilder.ModelBuilderSession spyMbs = Mockito.spy(originalMbs);
+        InternalSession.from(session).getData().set(SessionData.key(ModelBuilder.ModelBuilderSession.class), spyMbs);
+
+        // Build the consumer POM
+        builder.build(session, project, Sources.buildSource(file));
+
+        // Capture the ModelBuilderRequest passed to the ModelBuilderSession
+        ArgumentCaptor<ModelBuilderRequest> requestCaptor = ArgumentCaptor.forClass(ModelBuilderRequest.class);
+        Mockito.verify(spyMbs, Mockito.atLeastOnce()).build(requestCaptor.capture());
+
+        // Find the BUILD_CONSUMER request (there may be multiple calls)
+        ModelBuilderRequest consumerRequest = requestCaptor.getAllValues().stream()
+                .filter(r -> r.getRequestType() == ModelBuilderRequest.RequestType.BUILD_CONSUMER)
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull(consumerRequest, "Expected a BUILD_CONSUMER request to be made");
+
+        // Verify that repositories were passed to the request.
+        // Without the fix, getRepositories() returns null because buildModel() never sets them.
+        assertNotNull(
+                consumerRequest.getRepositories(),
+                "Consumer POM model builder request should include repositories from the project. "
+                        + "Without this, BOM imports from non-central repositories (e.g. settings.xml profiles) "
+                        + "cannot be resolved, causing 'Non-resolvable import POM' errors.");
+        assertFalse(
+                consumerRequest.getRepositories().isEmpty(),
+                "Consumer POM model builder request should have at least one repository");
+
+        // Verify the custom repository is included
+        boolean hasCustomRepo =
+                consumerRequest.getRepositories().stream().anyMatch(r -> "custom-repo".equals(r.getId()));
+        assertTrue(hasCustomRepo, "Consumer POM model builder request should include the project's custom repository");
     }
 }
