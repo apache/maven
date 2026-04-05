@@ -239,8 +239,15 @@ public abstract class XmlService {
 
     /** Holder class for lazy initialization of the default instance */
     private static final class Holder {
-        static final XmlService INSTANCE = ServiceLoader.load(XmlService.class)
+        static final XmlService INSTANCE = ServiceLoader.load(XmlService.class, XmlService.class.getClassLoader())
                 .findFirst()
+                .or(() -> {
+                    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+                    return contextClassLoader != null
+                            ? ServiceLoader.load(XmlService.class, contextClassLoader)
+                                    .findFirst()
+                            : java.util.Optional.empty();
+                })
                 .orElseThrow(() -> new IllegalStateException("No XmlService implementation found"));
 
         private Holder() {}
