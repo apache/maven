@@ -226,72 +226,100 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
                 }
 
                 @Override
+                public Collection<Phase> v3phases() {
+                    return buildOwnPhases();
+                }
+
+                @Override
                 public Collection<Phase> phases() {
+                    List<Phase> phases = new ArrayList<>(buildOwnPhases());
+                    // Include phases from getDefaultLifecyclePhases() that bind to phases
+                    // from other lifecycles (e.g. process-sources from the default lifecycle).
+                    // In Maven 3, <default-phases> could bind plugin goals to standard lifecycle
+                    // phases. These cross-lifecycle bindings must be preserved so they survive
+                    // the round-trip conversion back to a legacy Lifecycle.
+                    Map<String, LifecyclePhase> defaultPhases = lifecycle.getDefaultLifecyclePhases();
+                    if (defaultPhases != null) {
+                        Set<String> ownPhases = new HashSet<>(lifecycle.getPhases());
+                        for (String phaseName : defaultPhases.keySet()) {
+                            if (!ownPhases.contains(phaseName)) {
+                                phases.add(createPhase(phaseName, null));
+                            }
+                        }
+                    }
+                    return phases;
+                }
+
+                private List<Phase> buildOwnPhases() {
                     List<String> names = lifecycle.getPhases();
                     List<Phase> phases = new ArrayList<>();
                     for (int i = 0; i < names.size(); i++) {
                         String name = names.get(i);
                         String prev = i > 0 ? names.get(i - 1) : null;
-                        phases.add(new Phase() {
-                            @Override
-                            public String name() {
-                                return name;
-                            }
-
-                            @Override
-                            public List<Phase> phases() {
-                                return List.of();
-                            }
-
-                            @Override
-                            public Stream<Phase> allPhases() {
-                                return Stream.concat(
-                                        Stream.of(this), phases().stream().flatMap(Lifecycle.Phase::allPhases));
-                            }
-
-                            @Override
-                            public List<Plugin> plugins() {
-                                Map<String, LifecyclePhase> lfPhases = lifecycle.getDefaultLifecyclePhases();
-                                LifecyclePhase phase = lfPhases != null ? lfPhases.get(name) : null;
-                                if (phase != null) {
-                                    Map<String, Plugin> plugins = new LinkedHashMap<>();
-                                    DefaultPackagingRegistry.parseLifecyclePhaseDefinitions(plugins, name, phase);
-                                    return plugins.values().stream().toList();
-                                }
-                                return List.of();
-                            }
-
-                            @Override
-                            public Collection<Link> links() {
-                                if (prev == null) {
-                                    return List.of();
-                                } else {
-                                    return List.of(new Link() {
-                                        @Override
-                                        public Kind kind() {
-                                            return Kind.AFTER;
-                                        }
-
-                                        @Override
-                                        public Pointer pointer() {
-                                            return new Pointer() {
-                                                @Override
-                                                public String phase() {
-                                                    return prev;
-                                                }
-
-                                                @Override
-                                                public Type type() {
-                                                    return Type.PROJECT;
-                                                }
-                                            };
-                                        }
-                                    });
-                                }
-                            }
-                        });
+                        phases.add(createPhase(name, prev));
                     }
                     return phases;
+                }
+
+                private Phase createPhase(String name, String prev) {
+                    return new Phase() {
+                        @Override
+                        public String name() {
+                            return name;
+                        }
+
+                        @Override
+                        public List<Phase> phases() {
+                            return List.of();
+                        }
+
+                        @Override
+                        public Stream<Phase> allPhases() {
+                            return Stream.concat(
+                                    Stream.of(this), phases().stream().flatMap(Lifecycle.Phase::allPhases));
+                        }
+
+                        @Override
+                        public List<Plugin> plugins() {
+                            Map<String, LifecyclePhase> lfPhases = lifecycle.getDefaultLifecyclePhases();
+                            LifecyclePhase phase = lfPhases != null ? lfPhases.get(name) : null;
+                            if (phase != null) {
+                                Map<String, Plugin> plugins = new LinkedHashMap<>();
+                                DefaultPackagingRegistry.parseLifecyclePhaseDefinitions(plugins, name, phase);
+                                return plugins.values().stream().toList();
+                            }
+                            return List.of();
+                        }
+
+                        @Override
+                        public Collection<Link> links() {
+                            if (prev == null) {
+                                return List.of();
+                            } else {
+                                return List.of(new Link() {
+                                    @Override
+                                    public Kind kind() {
+                                        return Kind.AFTER;
+                                    }
+
+                                    @Override
+                                    public Pointer pointer() {
+                                        return new Pointer() {
+                                            @Override
+                                            public String phase() {
+                                                return prev;
+                                            }
+
+                                            @Override
+                                            public Type type() {
+                                                return Type.PROJECT;
+                                            }
+                                        };
+                                    }
+                                });
+                            }
+                        }
+                    };
                 }
 
                 @Override
