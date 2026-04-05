@@ -18,19 +18,20 @@
  */
 package org.apache.maven.it;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.http.HttpHeader;
+import org.eclipse.jetty.io.Content;
+import org.eclipse.jetty.util.Callback;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,22 +62,21 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test extends AbstractMavenInt
 
     @BeforeEach
     protected void setUp() throws Exception {
-        Handler handler = new AbstractHandler() {
-            public void handle(
-                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
-                    throws IOException {
-                System.out.println("Got request for URL: '" + request.getRequestURL() + "'");
+        Handler handler = new Handler.Abstract() {
+            public boolean handle(Request request, Response response, Callback callback) throws Exception {
+                System.out.println("Got request for URL: '" + request.getHttpURI().toString() + "'");
                 System.out.flush();
 
-                response.setContentType("text/plain");
+                response.getHeaders().put(HttpHeader.CONTENT_TYPE, "text/plain");
 
                 System.out.println("Checking for 'Proxy-Connection' header...");
-                if (request.getHeader("Proxy-Connection") != null) {
-                    response.setStatus(HttpServletResponse.SC_OK);
-                    if (request.getRequestURI().endsWith(".sha1")) {
-                        response.getWriter().print(CONTENT_CHECKSUM_SHA1);
+                PrintWriter writer = new PrintWriter(Content.Sink.asOutputStream(response));
+                if (request.getHeaders().get("Proxy-Connection") != null) {
+                    response.setStatus(200);
+                    if (Request.getPathInContext(request).endsWith(".sha1")) {
+                        writer.print(CONTENT_CHECKSUM_SHA1);
                     } else {
-                        response.getWriter().print(CONTENT);
+                        writer.print(CONTENT);
                     }
 
                     System.out.println("Proxy-Connection found.");
@@ -87,24 +87,26 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test extends AbstractMavenInt
                  * Changing the code to test for more generalized case: local proxy receives a request with
                  * correct server url and resource uri
                  */
-                else if (request.getRequestURI().startsWith("/org/apache/maven/its/mng3599/test-dependency")
-                        && request.getRequestURL().toString().startsWith("http://www.example.com")) {
-                    response.setStatus(HttpServletResponse.SC_OK);
-                    if (request.getRequestURI().endsWith(".sha1")) {
-                        response.getWriter().print(CONTENT_CHECKSUM_SHA1);
+                else if (Request.getPathInContext(request).startsWith("/org/apache/maven/its/mng3599/test-dependency")
+                        && request.getHttpURI().toString().startsWith("http://www.example.com")) {
+                    response.setStatus(200);
+                    if (Request.getPathInContext(request).endsWith(".sha1")) {
+                        writer.print(CONTENT_CHECKSUM_SHA1);
                     } else {
-                        response.getWriter().print(CONTENT);
+                        writer.print(CONTENT);
                     }
 
                     System.out.println(
                             "Correct proxied request 'http://www.example.com' for resource '/org/apache/maven/its/mng3599/test-dependency' found.");
                 } else {
-                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    response.setStatus(400);
 
                     System.out.println("Proxy-Connection not found.");
                 }
+                writer.flush();
 
-                ((Request) request).setHandled(true);
+                callback.succeeded();
+                return true;
             }
         };
 
