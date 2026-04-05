@@ -227,6 +227,64 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
 
                 @Override
                 public Collection<Phase> phases() {
+                    List<Phase> phases = new ArrayList<>(buildOwnPhases());
+                    // Also include phases for default-phases entries that reference phases
+                    // not defined in this lifecycle (e.g., standard lifecycle phases like
+                    // process-sources). This preserves plugin bindings from components.xml
+                    // <default-phases> that map goals to standard lifecycle phases.
+                    Map<String, LifecyclePhase> lfPhases = lifecycle.getDefaultLifecyclePhases();
+                    if (lfPhases != null) {
+                        Set<String> ownPhaseNames = new HashSet<>(lifecycle.getPhases());
+                        for (Map.Entry<String, LifecyclePhase> entry : lfPhases.entrySet()) {
+                            if (!ownPhaseNames.contains(entry.getKey())) {
+                                String phaseName = entry.getKey();
+                                LifecyclePhase lfPhase = entry.getValue();
+                                phases.add(new Phase() {
+                                    @Override
+                                    public String name() {
+                                        return phaseName;
+                                    }
+
+                                    @Override
+                                    public List<Phase> phases() {
+                                        return List.of();
+                                    }
+
+                                    @Override
+                                    public Stream<Phase> allPhases() {
+                                        return Stream.of(this);
+                                    }
+
+                                    @Override
+                                    public List<Plugin> plugins() {
+                                        Map<String, Plugin> plugins = new LinkedHashMap<>();
+                                        DefaultPackagingRegistry.parseLifecyclePhaseDefinitions(
+                                                plugins, phaseName, lfPhase);
+                                        return plugins.values().stream().toList();
+                                    }
+
+                                    @Override
+                                    public Collection<Link> links() {
+                                        return List.of();
+                                    }
+                                });
+                            }
+                        }
+                    }
+                    return phases;
+                }
+
+                @Override
+                public Collection<Phase> v3phases() {
+                    return buildOwnPhases();
+                }
+
+                @Override
+                public Collection<Alias> aliases() {
+                    return Collections.emptyList();
+                }
+
+                private List<Phase> buildOwnPhases() {
                     List<String> names = lifecycle.getPhases();
                     List<Phase> phases = new ArrayList<>();
                     for (int i = 0; i < names.size(); i++) {
@@ -292,11 +350,6 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
                         });
                     }
                     return phases;
-                }
-
-                @Override
-                public Collection<Alias> aliases() {
-                    return Collections.emptyList();
                 }
             };
         }
