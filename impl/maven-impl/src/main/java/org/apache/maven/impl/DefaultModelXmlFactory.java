@@ -63,7 +63,7 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
         requireNonNull(request, "request");
         Model model = doRead(request);
         if (isModelVersionGreaterThan400(model)
-                && !model.getNamespaceUri().startsWith("http://maven.apache.org/POM/")) {
+                && !model.getNamespaceUri().equals("http://maven.apache.org/POM/4.0.0")) {
             throw new XmlReaderException(
                     "Invalid namespace '" + model.getNamespaceUri() + "' for model version " + model.getModelVersion(),
                     null,

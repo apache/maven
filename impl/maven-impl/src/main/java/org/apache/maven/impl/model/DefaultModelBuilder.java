@@ -133,7 +133,6 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class DefaultModelBuilder implements ModelBuilder {
 
-    public static final String NAMESPACE_PREFIX = "http://maven.apache.org/POM/";
     private static final String RAW = "raw";
     private static final String FILE = "file";
     private static final String IMPORT = "import";
@@ -1560,13 +1559,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
                 add(Severity.FATAL, Version.BASE, "Non-readable POM " + modelSource.getLocation() + ": " + msg, e);
                 throw newModelBuilderException();
-            }
-
-            if (model.getModelVersion() == null) {
-                String namespace = model.getNamespaceUri();
-                if (namespace != null && namespace.startsWith(NAMESPACE_PREFIX)) {
-                    model = model.withModelVersion(namespace.substring(NAMESPACE_PREFIX.length()));
-                }
             }
 
             if (isBuildRequest()) {

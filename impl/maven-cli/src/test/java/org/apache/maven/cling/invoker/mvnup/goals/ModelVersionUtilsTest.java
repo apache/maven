@@ -63,23 +63,6 @@ class ModelVersionUtilsTest {
             assertEquals("4.0.0", result);
         }
 
-        @ParameterizedTest(name = "for {0}")
-        @ValueSource(strings = {"4.0.0", "4.1.0", "4.2.0"})
-        @DisplayName("should detect model version")
-        void shouldDetectModelVersionFromNamespace(String targetVersion) throws Exception {
-            String pomXml = PomBuilder.create()
-                    .namespace("http://maven.apache.org/POM/" + targetVersion)
-                    .modelVersion(targetVersion)
-                    .groupId("test")
-                    .artifactId("test")
-                    .version("1.0.0")
-                    .build();
-
-            Document document = Document.of(pomXml);
-            String result = ModelVersionUtils.detectModelVersion(document);
-            assertEquals(targetVersion, result);
-        }
-
         @Test
         @DisplayName("should return default version when model version is missing")
         void shouldReturnDefaultVersionWhenModelVersionMissing() throws Exception {
@@ -95,23 +78,6 @@ class ModelVersionUtilsTest {
             Document document = Document.of(pomXml);
             String result = ModelVersionUtils.detectModelVersion(document);
             assertEquals("4.0.0", result); // Default version
-        }
-
-        @Test
-        @DisplayName("should detect version from namespace when model version is missing")
-        void shouldDetectVersionFromNamespaceWhenModelVersionMissing() throws Exception {
-            String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.1.0">
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                </project>
-                """;
-
-            Document document = Document.of(pomXml);
-            String result = ModelVersionUtils.detectModelVersion(document);
-            assertEquals("4.1.0", result);
         }
     }
 
@@ -415,7 +381,7 @@ class ModelVersionUtilsTest {
         @ValueSource(
                 strings = {
                     "http://maven.apache.org/POM/4.0.0",
-                    "http://maven.apache.org/POM/4.1.0",
+                    "http://maven.apache.org/POM/4.0.0",
                     "https://maven.apache.org/POM/4.0.0",
                     "https://maven.apache.org/POM/4.1.0"
                 })
