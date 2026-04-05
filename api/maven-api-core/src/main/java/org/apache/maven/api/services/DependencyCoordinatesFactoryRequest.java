@@ -43,6 +43,7 @@ import static java.util.Objects.requireNonNull;
 @Immutable
 public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinatesFactoryRequest {
 
+    @Nullable
     String getScope();
 
     boolean isOptional();
@@ -53,12 +54,12 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
     @Nonnull
     static DependencyCoordinatesFactoryRequest build(
             @Nonnull Session session,
-            String groupId,
-            String artifactId,
-            String version,
-            String classifier,
-            String extension,
-            String type) {
+            @Nullable String groupId,
+            @Nullable String artifactId,
+            @Nullable String version,
+            @Nullable String classifier,
+            @Nullable String extension,
+            @Nullable String type) {
         return DependencyCoordinatesFactoryRequest.builder()
                 .session(requireNonNull(session, "session cannot be null"))
                 .groupId(groupId)
@@ -106,16 +107,36 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
 
     @NotThreadSafe
     class DependencyCoordinatesFactoryRequestBuilder {
+        @Nullable
         private Session session;
+
+        @Nullable
         private RequestTrace trace;
+
+        @Nullable
         private String groupId;
+
+        @Nullable
         private String artifactId;
+
+        @Nullable
         private String version;
+
+        @Nullable
         private String classifier;
+
+        @Nullable
         private String extension;
+
+        @Nullable
         private String type;
+
+        @Nullable
         private String coordinateString;
+
+        @Nullable
         private String scope;
+
         private boolean optional;
         private Collection<Exclusion> exclusions = Collections.emptyList();
 
@@ -131,42 +152,42 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
             return this;
         }
 
-        public DependencyCoordinatesFactoryRequestBuilder groupId(String groupId) {
+        public DependencyCoordinatesFactoryRequestBuilder groupId(@Nullable String groupId) {
             this.groupId = groupId;
             return this;
         }
 
-        public DependencyCoordinatesFactoryRequestBuilder artifactId(String artifactId) {
+        public DependencyCoordinatesFactoryRequestBuilder artifactId(@Nullable String artifactId) {
             this.artifactId = artifactId;
             return this;
         }
 
-        public DependencyCoordinatesFactoryRequestBuilder version(String version) {
+        public DependencyCoordinatesFactoryRequestBuilder version(@Nullable String version) {
             this.version = version;
             return this;
         }
 
-        public DependencyCoordinatesFactoryRequestBuilder classifier(String classifier) {
+        public DependencyCoordinatesFactoryRequestBuilder classifier(@Nullable String classifier) {
             this.classifier = classifier;
             return this;
         }
 
-        public DependencyCoordinatesFactoryRequestBuilder extension(String extension) {
+        public DependencyCoordinatesFactoryRequestBuilder extension(@Nullable String extension) {
             this.extension = extension;
             return this;
         }
 
-        public DependencyCoordinatesFactoryRequestBuilder type(String type) {
+        public DependencyCoordinatesFactoryRequestBuilder type(@Nullable String type) {
             this.type = type;
             return this;
         }
 
-        public DependencyCoordinatesFactoryRequestBuilder coordinateString(String coordinateString) {
+        public DependencyCoordinatesFactoryRequestBuilder coordinateString(@Nullable String coordinateString) {
             this.coordinateString = coordinateString;
             return this;
         }
 
-        public DependencyCoordinatesFactoryRequestBuilder scope(String scope) {
+        public DependencyCoordinatesFactoryRequestBuilder scope(@Nullable String scope) {
             this.scope = scope;
             return this;
         }
@@ -198,7 +219,7 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
 
         public DependencyCoordinatesFactoryRequest build() {
             return new DefaultDependencyCoordinatesFactoryRequest(
-                    session,
+                    requireNonNull(session, "session cannot be null"),
                     trace,
                     groupId,
                     artifactId,
@@ -214,14 +235,30 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
 
         private static class DefaultDependencyCoordinatesFactoryRequest extends BaseRequest<Session>
                 implements DependencyCoordinatesFactoryRequest {
+            @Nullable
             private final String groupId;
+
+            @Nullable
             private final String artifactId;
+
+            @Nullable
             private final String version;
+
+            @Nullable
             private final String classifier;
+
+            @Nullable
             private final String extension;
+
+            @Nullable
             private final String type;
+
+            @Nullable
             private final String coordinateString;
+
+            @Nullable
             private final String scope;
+
             private final boolean optional;
             private final Collection<Exclusion> exclusions;
 
@@ -229,14 +266,14 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
             private DefaultDependencyCoordinatesFactoryRequest(
                     @Nonnull Session session,
                     @Nullable RequestTrace trace,
-                    String groupId,
-                    String artifactId,
-                    String version,
-                    String classifier,
-                    String extension,
-                    String type,
-                    String coordinateString,
-                    String scope,
+                    @Nullable String groupId,
+                    @Nullable String artifactId,
+                    @Nullable String version,
+                    @Nullable String classifier,
+                    @Nullable String extension,
+                    @Nullable String type,
+                    @Nullable String coordinateString,
+                    @Nullable String scope,
                     boolean optional,
                     Collection<Exclusion> exclusions) {
                 super(session, trace);
@@ -252,41 +289,49 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
                 this.exclusions = exclusions;
             }
 
+            @Nullable
             @Override
             public String getGroupId() {
                 return groupId;
             }
 
+            @Nullable
             @Override
             public String getArtifactId() {
                 return artifactId;
             }
 
+            @Nullable
             @Override
             public String getVersion() {
                 return version;
             }
 
+            @Nullable
             @Override
             public String getClassifier() {
                 return classifier;
             }
 
+            @Nullable
             @Override
             public String getExtension() {
                 return extension;
             }
 
+            @Nullable
             @Override
             public String getType() {
                 return type;
             }
 
+            @Nullable
             @Override
             public String getCoordinatesString() {
                 return coordinateString;
             }
 
+            @Nullable
             @Override
             public String getScope() {
                 return scope;

@@ -61,11 +61,11 @@ public final class Features {
         return doGet(userProperties, Constants.MAVEN_DEPLOY_BUILD_POM, true);
     }
 
-    private static boolean doGet(Map<String, ?> userProperties, String key, boolean def) {
+    private static boolean doGet(@Nullable Map<String, ?> userProperties, String key, boolean def) {
         return doGet(userProperties != null ? userProperties.get(key) : null, def);
     }
 
-    private static boolean doGet(Object val, boolean def) {
+    private static boolean doGet(@Nullable Object val, boolean def) {
         if (val instanceof Boolean bool) {
             return bool;
         } else if (val != null) {

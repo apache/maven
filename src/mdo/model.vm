@@ -59,6 +59,7 @@
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Immutable" ) )
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Nonnull" ) )
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.NotThreadSafe" ) )
+    #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Nullable" ) )
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.ThreadSafe" ) )
     #if ( $package == "org.apache.maven.api.model" )
     #set ( $dummy = $imports.add( "org.apache.maven.api.model.ModelObjectProcessor" ) )
@@ -133,7 +134,9 @@ public class ${class.name}
     #end
 {
     #if ( $class == $root )
+    @Nullable
     final String namespaceUri;
+    @Nullable
     final String modelEncoding;
     #end
     #foreach ( $field in $class.getFields($version) )
@@ -146,12 +149,16 @@ public class ${class.name}
       #foreach( $ann in ${field.annotations} )
     ${ann}
       #end
+      #if ( $field.type != "java.util.List" && $field.type != "java.util.Properties" && $field.type != "java.util.Map" && $field.type != "boolean" && $field.type != "int" )
+    @Nullable
+      #end
     final ${type} $field.name;
     #end
     #if ( $locationTracking && ! $class.superClass )
     /** Locations */
     final Map<Object, InputLocation> locations;
     /** Location tracking */
+    @Nullable
     final InputLocation importedFrom;
     #end
 
@@ -204,10 +211,12 @@ public class ${class.name}
 
     #end
     #if ( $class == $root )
+    @Nullable
     public String getNamespaceUri() {
         return namespaceUri;
     }
 
+    @Nullable
     public String getModelEncoding() {
         return modelEncoding;
     }
@@ -234,6 +243,8 @@ public class ${class.name}
       #end
       #if ( $field.type == "java.util.List" || $field.type == "java.util.Properties" )
     @Nonnull
+      #elseif ( $field.type != "boolean" && $field.type != "int" )
+    @Nullable
       #end
     public ${type} ${pfx}${cap}() {
         return this.${field.name};
@@ -248,6 +259,7 @@ public class ${class.name}
      * @return the location of the field in the input source or {@code null} if unknown
      * @throws NullPointerException if {@code key} is {@code null}
      */
+    @Nullable
     public InputLocation getLocation(Object key) {
         Objects.requireNonNull(key, "key");
         return locations.get(key);
@@ -267,6 +279,7 @@ public class ${class.name}
     /**
      * Gets the input location that caused this model to be read.
      */
+    @Nullable
     public InputLocation getImportedFrom() {
         return importedFrom;
     }
@@ -384,10 +397,10 @@ public class ${class.name}
         extends ${class.superClass}.Builder
     #end
     {
-        ${class.name} base;
+        @Nullable ${class.name} base;
     #if ( $class == $root )
-        String namespaceUri;
-        String modelEncoding;
+        @Nullable String namespaceUri;
+        @Nullable String modelEncoding;
     #end
     #foreach ( $field in $class.getFields($version) )
       #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
@@ -395,16 +408,16 @@ public class ${class.name}
         #set ( $type = ${type.replace('List<','Collection<')} )
       #end
       #if ( $type == 'boolean' )
-        Boolean ${field.name};
+        @Nullable Boolean ${field.name};
       #elseif ( $type == 'int' )
-        Integer ${field.name};
+        @Nullable Integer ${field.name};
       #else
-        ${type} ${field.name};
+        @Nullable ${type} ${field.name};
     #end
     #end
     #if ( ! $class.superClass && $locationTracking )
-        Map<Object, InputLocation> locations;
-        InputLocation importedFrom;
+        @Nullable Map<Object, InputLocation> locations;
+        @Nullable InputLocation importedFrom;
     #end
 
         protected Builder(boolean withDefaults) {

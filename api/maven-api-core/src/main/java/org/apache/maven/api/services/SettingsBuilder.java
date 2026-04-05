@@ -53,7 +53,7 @@ public interface SettingsBuilder extends Service {
     @Nonnull
     default SettingsBuilderResult build(
             @Nonnull Session session, @Nonnull Source installationSettingsSource, @Nonnull Source userSettingsSource) {
-        return build(session, installationSettingsSource, null, userSettingsSource);
+        return build(SettingsBuilderRequest.build(session, installationSettingsSource, null, userSettingsSource));
     }
 
     /**
@@ -65,7 +65,7 @@ public interface SettingsBuilder extends Service {
     @Nonnull
     default SettingsBuilderResult build(
             @Nonnull Session session, @Nonnull Path installationSettingsPath, @Nonnull Path userSettingsPath) {
-        return build(session, installationSettingsPath, null, userSettingsPath);
+        return build(SettingsBuilderRequest.build(session, installationSettingsPath, null, userSettingsPath));
     }
 
     /**

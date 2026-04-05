@@ -19,6 +19,7 @@
 package org.apache.maven.api.spi;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.services.MavenException;
 
 @Experimental
@@ -28,15 +29,15 @@ public class ModelTransformerException extends MavenException {
         this(null, null);
     }
 
-    public ModelTransformerException(String message) {
+    public ModelTransformerException(@Nullable String message) {
         this(message, null);
     }
 
-    public ModelTransformerException(Throwable cause) {
+    public ModelTransformerException(@Nullable Throwable cause) {
         this(null, cause);
     }
 
-    public ModelTransformerException(String message, Throwable cause) {
+    public ModelTransformerException(@Nullable String message, @Nullable Throwable cause) {
         super(message, cause);
     }
 }

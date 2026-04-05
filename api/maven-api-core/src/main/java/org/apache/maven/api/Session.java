@@ -263,7 +263,11 @@ public interface Session extends ProtoSession {
      * @see ArtifactCoordinatesFactory#create(Session, String, String, String, String)
      */
     @Nonnull
-    ArtifactCoordinates createArtifactCoordinates(String groupId, String artifactId, String version, String extension);
+    ArtifactCoordinates createArtifactCoordinates(
+            @Nullable String groupId,
+            @Nullable String artifactId,
+            @Nullable String version,
+            @Nullable String extension);
 
     /**
      * Shortcut for {@code getService(ArtifactFactory.class).create(...)}.
@@ -280,7 +284,12 @@ public interface Session extends ProtoSession {
      */
     @Nonnull
     ArtifactCoordinates createArtifactCoordinates(
-            String groupId, String artifactId, String version, String classifier, String extension, String type);
+            @Nullable String groupId,
+            @Nullable String artifactId,
+            @Nullable String version,
+            @Nullable String classifier,
+            @Nullable String extension,
+            @Nullable String type);
 
     /**
      * Shortcut for {@code getService(ArtifactFactory.class).create(...)}.
@@ -327,7 +336,11 @@ public interface Session extends ProtoSession {
      * @see org.apache.maven.api.services.ArtifactFactory#create(Session, String, String, String, String)
      */
     @Nonnull
-    Artifact createArtifact(String groupId, String artifactId, String version, String extension);
+    Artifact createArtifact(
+            @Nullable String groupId,
+            @Nullable String artifactId,
+            @Nullable String version,
+            @Nullable String extension);
 
     /**
      * Shortcut for {@code getService(ArtifactFactory.class).create(...)}.
@@ -344,7 +357,12 @@ public interface Session extends ProtoSession {
      */
     @Nonnull
     Artifact createArtifact(
-            String groupId, String artifactId, String version, String classifier, String extension, String type);
+            @Nullable String groupId,
+            @Nullable String artifactId,
+            @Nullable String version,
+            @Nullable String classifier,
+            @Nullable String extension,
+            @Nullable String type);
 
     /**
      * Shortcut for {@code getService(ArtifactFactory.class).createProduced(...)}.
@@ -358,7 +376,11 @@ public interface Session extends ProtoSession {
      * @see org.apache.maven.api.services.ArtifactFactory#createProduced(Session, String, String, String, String)
      */
     @Nonnull
-    ProducedArtifact createProducedArtifact(String groupId, String artifactId, String version, String extension);
+    ProducedArtifact createProducedArtifact(
+            @Nullable String groupId,
+            @Nullable String artifactId,
+            @Nullable String version,
+            @Nullable String extension);
 
     /**
      * Shortcut for {@code getService(ArtifactFactory.class).createProduced(...)}.
@@ -375,7 +397,12 @@ public interface Session extends ProtoSession {
      */
     @Nonnull
     ProducedArtifact createProducedArtifact(
-            String groupId, String artifactId, String version, String classifier, String extension, String type);
+            @Nullable String groupId,
+            @Nullable String artifactId,
+            @Nullable String version,
+            @Nullable String classifier,
+            @Nullable String extension,
+            @Nullable String type);
 
     /**
      * Shortcut for {@code getService(ArtifactResolver.class).resolve(...)}.

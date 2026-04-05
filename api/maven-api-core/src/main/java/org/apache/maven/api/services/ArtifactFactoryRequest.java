@@ -38,16 +38,22 @@ import static java.util.Objects.requireNonNull;
 @Immutable
 public interface ArtifactFactoryRequest extends Request<Session> {
 
+    @Nullable
     String getGroupId();
 
+    @Nullable
     String getArtifactId();
 
+    @Nullable
     String getVersion();
 
+    @Nullable
     String getClassifier();
 
+    @Nullable
     String getExtension();
 
+    @Nullable
     String getType();
 
     static ArtifactFactoryRequest build(
@@ -86,13 +92,28 @@ public interface ArtifactFactoryRequest extends Request<Session> {
 
     @NotThreadSafe
     class ArtifactFactoryRequestBuilder {
+        @Nullable
         private Session session;
+
+        @Nullable
         private RequestTrace trace;
+
+        @Nullable
         private String groupId;
+
+        @Nullable
         private String artifactId;
+
+        @Nullable
         private String version;
+
+        @Nullable
         private String classifier;
+
+        @Nullable
         private String extension;
+
+        @Nullable
         private String type;
 
         ArtifactFactoryRequestBuilder() {}
@@ -139,28 +160,46 @@ public interface ArtifactFactoryRequest extends Request<Session> {
 
         public ArtifactFactoryRequest build() {
             return new DefaultArtifactFactoryRequest(
-                    session, trace, groupId, artifactId, version, classifier, extension, type);
+                    requireNonNull(session, "session cannot be null"),
+                    trace,
+                    groupId,
+                    artifactId,
+                    version,
+                    classifier,
+                    extension,
+                    type);
         }
 
         private static class DefaultArtifactFactoryRequest extends BaseRequest<Session>
                 implements ArtifactFactoryRequest {
+            @Nullable
             private final String groupId;
+
+            @Nullable
             private final String artifactId;
+
+            @Nullable
             private final String version;
+
+            @Nullable
             private final String classifier;
+
+            @Nullable
             private final String extension;
+
+            @Nullable
             private final String type;
 
             @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultArtifactFactoryRequest(
                     @Nonnull Session session,
                     @Nullable RequestTrace trace,
-                    String groupId,
-                    String artifactId,
-                    String version,
-                    String classifier,
-                    String extension,
-                    String type) {
+                    @Nullable String groupId,
+                    @Nullable String artifactId,
+                    @Nullable String version,
+                    @Nullable String classifier,
+                    @Nullable String extension,
+                    @Nullable String type) {
                 super(session, trace);
                 this.groupId = groupId;
                 this.artifactId = artifactId;
@@ -170,31 +209,37 @@ public interface ArtifactFactoryRequest extends Request<Session> {
                 this.type = type;
             }
 
+            @Nullable
             @Override
             public String getGroupId() {
                 return groupId;
             }
 
+            @Nullable
             @Override
             public String getArtifactId() {
                 return artifactId;
             }
 
+            @Nullable
             @Override
             public String getVersion() {
                 return version;
             }
 
+            @Nullable
             @Override
             public String getClassifier() {
                 return classifier;
             }
 
+            @Nullable
             @Override
             public String getExtension() {
                 return extension;
             }
 
+            @Nullable
             @Override
             public String getType() {
                 return type;

@@ -109,7 +109,7 @@ public final class Sources {
          * @param path the filesystem path to the source content
          * @throws NullPointerException if path is null
          */
-        PathSource(Path path) {
+        PathSource(@Nonnull Path path) {
             this(path, null);
         }
 
@@ -120,7 +120,7 @@ public final class Sources {
          * @param location the logical location of the source, used for reporting purposes.
          *                 If null, the path string representation is used
          */
-        protected PathSource(Path path, String location) {
+        protected PathSource(@Nonnull Path path, @Nullable String location) {
             this.path = requireNonNull(path, "path").normalize();
             this.location = location != null ? location : this.path.toString();
         }
@@ -173,12 +173,13 @@ public final class Sources {
         @Nullable
         private final String modelId;
 
-        ResolvedPathSource(Path path, String location, String modelId) {
+        ResolvedPathSource(@Nonnull Path path, @Nonnull String location, @Nullable String modelId) {
             super(path, location);
             this.modelId = modelId;
         }
 
         @Override
+        @Nullable
         public Path getPath() {
             return null;
         }
@@ -190,6 +191,7 @@ public final class Sources {
         }
 
         @Override
+        @Nullable
         public Source resolve(String relative) {
             return null;
         }
@@ -238,7 +240,11 @@ public final class Sources {
         @Nullable
         public ModelSource resolve(@Nonnull ModelLocator locator, @Nonnull String relative) {
             String norm = relative.replace('\\', File.separatorChar).replace('/', File.separatorChar);
-            Path path = getPath().getParent().resolve(norm);
+            Path parent = getPath().getParent();
+            if (parent == null) {
+                return null;
+            }
+            Path path = parent.resolve(norm);
             Path relatedPom = locator.locateExistingPom(path);
             if (relatedPom != null) {
                 return new BuildPathSource(relatedPom);

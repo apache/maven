@@ -18,6 +18,7 @@
  */
 package org.apache.maven.api.services;
 
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.Model;
 
@@ -59,8 +60,8 @@ public interface ModelProblemCollector {
             BuilderProblem.Severity severity,
             ModelProblem.Version version,
             String message,
-            InputLocation location,
-            Exception exception);
+            @Nullable InputLocation location,
+            @Nullable Exception exception);
 
     default void add(ModelProblem problem) {
         getProblemCollector().reportProblem(problem);
