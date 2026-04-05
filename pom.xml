@@ -351,9 +351,9 @@ under the License.
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.fusesource.jansi</groupId>
+        <groupId>org.jline</groupId>
         <artifactId>jansi</artifactId>
-        <version>2.4.3</version>
+        <version>3.30.9</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
