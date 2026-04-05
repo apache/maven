@@ -27,7 +27,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -116,9 +115,7 @@ public class ForkedMavenExecutor implements Executor {
 
         String mavenArgsEnv = System.getenv("MAVEN_ARGS");
         if (useMavenArgsEnv && mavenArgsEnv != null && !mavenArgsEnv.isEmpty()) {
-            Arrays.stream(mavenArgsEnv.split(" "))
-                    .filter(s -> !s.trim().isEmpty())
-                    .forEach(cmdAndArguments::add);
+            cmdAndArguments.addAll(parseArguments(mavenArgsEnv));
         }
 
         cmdAndArguments.addAll(executorRequest.arguments());
@@ -222,5 +219,48 @@ public class ForkedMavenExecutor implements Executor {
         if (closed.compareAndExchange(false, true)) {
             // nothing yet
         }
+    }
+
+    /**
+     * Parses a string of arguments respecting quoted strings.
+     * Handles both single and double quotes, and preserves backslashes
+     * (important for Windows paths).
+     */
+    static List<String> parseArguments(String args) {
+        List<String> result = new ArrayList<>();
+        StringBuilder current = new StringBuilder();
+        boolean inDoubleQuotes = false;
+        boolean inSingleQuotes = false;
+        for (int i = 0; i < args.length(); i++) {
+            char c = args.charAt(i);
+            if (inDoubleQuotes) {
+                if (c == '"') {
+                    inDoubleQuotes = false;
+                } else {
+                    current.append(c);
+                }
+            } else if (inSingleQuotes) {
+                if (c == '\'') {
+                    inSingleQuotes = false;
+                } else {
+                    current.append(c);
+                }
+            } else if (c == '"') {
+                inDoubleQuotes = true;
+            } else if (c == '\'') {
+                inSingleQuotes = true;
+            } else if (Character.isWhitespace(c)) {
+                if (!current.isEmpty()) {
+                    result.add(current.toString());
+                    current.setLength(0);
+                }
+            } else {
+                current.append(c);
+            }
+        }
+        if (!current.isEmpty()) {
+            result.add(current.toString());
+        }
+        return result;
     }
 }
