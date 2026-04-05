@@ -838,19 +838,31 @@ public class MavenProject implements Cloneable {
 
     private void addResource(ProjectScope scope, Resource resource) {
         addSourceRoot(new DefaultSourceRoot(getBaseDirectory(), scope, resource.getDelegate()));
+        // Also update the model's Build to maintain compatibility with code that
+        // accesses resources via project.getBuild().getResources()
+        if (scope == ProjectScope.MAIN) {
+            getModelBuild().addResource(resource);
+        } else {
+            getModelBuild().addTestResource(resource);
+        }
     }
 
     /**
-     * @deprecated {@link Resource} is replaced by {@link SourceRoot}.
+     * Syncs {@code Build.resources/testResources} from the {@code sources} set
+     * for Maven 3 plugin compatibility (e.g. when resources come from {@code <sources>}).
      */
+    void syncBuildResources() {
+        getModelBuild().setResources(new java.util.ArrayList<>(getResources()));
+        getModelBuild().setTestResources(new java.util.ArrayList<>(getTestResources()));
+    }
+
+    /** @deprecated {@link Resource} is replaced by {@link SourceRoot}. */
     @Deprecated(since = "4.0.0")
     public void addResource(Resource resource) {
         addResource(ProjectScope.MAIN, resource);
     }
 
-    /**
-     * @deprecated {@link Resource} is replaced by {@link SourceRoot}.
-     */
+    /** @deprecated {@link Resource} is replaced by {@link SourceRoot}. */
     @Deprecated(since = "4.0.0")
     public void addTestResource(Resource testResource) {
         addResource(ProjectScope.TEST, testResource);
