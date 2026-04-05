@@ -38,6 +38,7 @@ import org.apache.maven.impl.standalone.ApiRunner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -252,6 +253,67 @@ class DefaultModelBuilderTest {
             assertEquals("service", model.getDependencies().get(0).getArtifactId());
             assertEquals("${project.version}", model.getDependencies().get(0).getVersion());
         }
+    }
+
+    /**
+     * Verifies that BUILD_CONSUMER resolves properties defined in parent POM profiles
+     * when the parent is found via reactor model resolution (mappedSources).
+     *
+     * This reproduces the bug where readParentLocally() finds a parent via
+     * resolveReactorModel() during BUILD_CONSUMER processing, but the derived
+     * session preserves BUILD_CONSUMER type instead of using CONSUMER_PARENT.
+     * Since isBuildRequestWithActivation() returns false for BUILD_CONSUMER,
+     * property-activated profiles in parent POMs are skipped, leaving
+     * properties (like BOM import versions) unresolved.
+     */
+    @Test
+    public void testBuildConsumerResolvesParentProfileProperties() {
+        Path parentPom = getPom("consumer-profile-property-parent");
+        Path childPom = getPom("consumer-profile-property-child");
+
+        ModelBuilder.ModelBuilderSession mbs = builder.newSession();
+
+        // Build parent with BUILD_PROJECT to populate the reactor (mappedSources).
+        // This causes the parent to be discoverable via resolveReactorModel().
+        mbs.build(ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(parentPom))
+                .build());
+
+        // Build child with BUILD_CONSUMER on the same session.
+        // The parent will be found via resolveReactorModel() in readParentLocally().
+        // Without the fix, the derived session preserves BUILD_CONSUMER type,
+        // which disables profile activation, leaving ${managed.version} unresolved.
+        ModelBuilderResult consumerResult = assertDoesNotThrow(
+                () -> mbs.build(ModelBuilderRequest.builder()
+                        .session(session)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_CONSUMER)
+                        .source(Sources.buildSource(childPom))
+                        .build()),
+                "BUILD_CONSUMER should not fail when parent defines properties in profiles");
+
+        assertNotNull(consumerResult);
+        Model effectiveModel = consumerResult.getEffectiveModel();
+        assertNotNull(effectiveModel);
+
+        // The property from the parent's profile should be resolved
+        assertEquals(
+                "1.2.3",
+                effectiveModel.getProperties().get("managed.version"),
+                "Property from parent's profile should be resolved in BUILD_CONSUMER effective model");
+
+        // The managed dependency version should be interpolated
+        assertNotNull(effectiveModel.getDependencyManagement());
+        Dependency managedDep = effectiveModel.getDependencyManagement().getDependencies().stream()
+                .filter(d -> "managed-lib".equals(d.getArtifactId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(managedDep, "Managed dependency from parent should be inherited");
+        assertEquals(
+                "1.2.3",
+                managedDep.getVersion(),
+                "Managed dependency version should be interpolated, not ${managed.version}");
     }
 
     private Path getPom(String name) {

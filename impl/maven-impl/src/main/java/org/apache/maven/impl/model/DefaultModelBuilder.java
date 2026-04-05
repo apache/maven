@@ -1131,7 +1131,19 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             try {
-                ModelBuilderSessionState derived = derive(candidateSource);
+                // When processing BUILD_CONSUMER requests, parent models must be read
+                // with CONSUMER_PARENT type to enable profile activation. Without this,
+                // property-activated profiles in parent POMs are skipped (since
+                // BUILD_CONSUMER disables profile activation), leaving properties
+                // like BOM import versions unresolved.
+                ModelBuilderRequest parentRequest =
+                        request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_CONSUMER
+                                ? ModelBuilderRequest.builder(request)
+                                        .requestType(ModelBuilderRequest.RequestType.CONSUMER_PARENT)
+                                        .source(candidateSource)
+                                        .build()
+                                : ModelBuilderRequest.build(request, candidateSource);
+                ModelBuilderSessionState derived = derive(parentRequest);
                 Model candidateModel = derived.readAsParentModel(profileActivationContext, parentChain);
                 // Add profiles from parent, preserving model ID tracking
                 for (Map.Entry<String, List<Profile>> entry :
