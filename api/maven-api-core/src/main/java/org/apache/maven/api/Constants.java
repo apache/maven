@@ -476,6 +476,21 @@ public final class Constants {
     public static final String MAVEN_CONSUMER_POM_FLATTEN = "maven.consumer.pom.flatten";
 
     /**
+     * User property for controlling removal of unused managed dependencies during consumer POM flattening.
+     * When set to {@code true} (default), managed dependencies that do not appear in the resolved
+     * dependency tree are removed from the consumer POM to keep it lean. This is important when using
+     * BOMs like Spring Boot or Quarkus that contain hundreds of managed dependency entries.
+     * When set to {@code false}, all managed dependencies are preserved in the consumer POM,
+     * which may be needed in rare cases where downstream consumers override transitive dependency
+     * versions and rely on the original managed dependencies for alignment.
+     *
+     * @since 4.1.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "true")
+    public static final String MAVEN_CONSUMER_POM_REMOVE_UNUSED_MANAGED_DEPENDENCIES =
+            "maven.consumer.pom.removeUnusedManagedDependencies";
+
+    /**
      * User property for controlling "maven personality". If activated Maven will behave
      * like the previous major version, Maven 3.
      *
