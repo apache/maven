@@ -319,20 +319,20 @@ class InferenceStrategyTest {
             pomMap.put(Paths.get("project", "module-b", "pom.xml"), moduleBDoc);
 
             Element moduleBRoot = moduleBDoc.root();
-            Element build = moduleBRoot.child("build").orElse(null);
-            Element plugins = build.child("plugins").orElse(null);
-            Element plugin = plugins.child("plugin").orElse(null);
-            Element dependencies = plugin.child("dependencies").orElse(null);
-            Element dependency = dependencies.child("dependency").orElse(null);
+            Element build = moduleBRoot.childElement("build").orElse(null);
+            Element plugins = build.childElement("plugins").orElse(null);
+            Element plugin = plugins.childElement("plugin").orElse(null);
+            Element dependencies = plugin.childElement("dependencies").orElse(null);
+            Element dependency = dependencies.childElement("dependency").orElse(null);
 
             // Apply dependency inference
             UpgradeContext context = createMockContext();
             strategy.apply(context, pomMap);
 
             // Verify version and groupId were removed from plugin dependency
-            assertNull(dependency.child("version").orElse(null));
-            assertNull(dependency.child("groupId").orElse(null));
-            assertNotNull(dependency.child("artifactId").orElse(null));
+            assertNull(dependency.childElement("version").orElse(null));
+            assertNull(dependency.childElement("groupId").orElse(null));
+            assertNotNull(dependency.childElement("artifactId").orElse(null));
         }
     }
 
@@ -390,10 +390,10 @@ class InferenceStrategyTest {
             strategy.apply(context, pomMap);
 
             // Verify parent groupId and version were removed (since child doesn't have explicit ones)
-            assertNull(parentElement.child("groupId").orElse(null));
-            assertNull(parentElement.child("version").orElse(null));
+            assertNull(parentElement.childElement("groupId").orElse(null));
+            assertNull(parentElement.childElement("version").orElse(null));
             // artifactId should also be removed since parent POM is in pomMap
-            assertNull(parentElement.child("artifactId").orElse(null));
+            assertNull(parentElement.childElement("artifactId").orElse(null));
         }
 
         @Test
@@ -441,10 +441,10 @@ class InferenceStrategyTest {
             strategy.apply(context, pomMap);
 
             // Verify parent elements are kept (since child has explicit values)
-            assertNotNull(parentElement.child("groupId").orElse(null));
-            assertNotNull(parentElement.child("version").orElse(null));
+            assertNotNull(parentElement.childElement("groupId").orElse(null));
+            assertNotNull(parentElement.childElement("version").orElse(null));
             // artifactId should still be removed since parent POM is in pomMap
-            assertNull(parentElement.child("artifactId").orElse(null));
+            assertNull(parentElement.childElement("artifactId").orElse(null));
         }
 
         @Test
@@ -482,9 +482,9 @@ class InferenceStrategyTest {
             // - artifactId should NOT be removed (external parents need artifactId to be located)
             // - version should NOT be removed (external parents need version to be located)
             // This prevents the "parent.groupId is missing" error reported in issue #7934
-            assertNotNull(parentElement.child("groupId").orElse(null));
-            assertNotNull(parentElement.child("artifactId").orElse(null));
-            assertNotNull(parentElement.child("version").orElse(null));
+            assertNotNull(parentElement.childElement("groupId").orElse(null));
+            assertNotNull(parentElement.childElement("artifactId").orElse(null));
+            assertNotNull(parentElement.childElement("version").orElse(null));
         }
 
         @Test
@@ -526,7 +526,7 @@ class InferenceStrategyTest {
                     Paths.get("child", "pom.xml"), childDoc);
 
             Element childRoot = childDoc.root();
-            Element parentElement = childRoot.child("parent").orElse(null);
+            Element parentElement = childRoot.childElement("parent").orElse(null);
 
             // Apply inference
             UpgradeContext context = createMockContext();
@@ -536,9 +536,9 @@ class InferenceStrategyTest {
             // - groupId should be removed (child has no explicit groupId, parent is in reactor)
             // - artifactId should be removed (can be inferred from relativePath)
             // - version should be removed (child has no explicit version, parent is in reactor)
-            assertNull(parentElement.child("groupId").orElse(null));
-            assertNull(parentElement.child("artifactId").orElse(null));
-            assertNull(parentElement.child("version").orElse(null));
+            assertNull(parentElement.childElement("groupId").orElse(null));
+            assertNull(parentElement.childElement("artifactId").orElse(null));
+            assertNull(parentElement.childElement("version").orElse(null));
         }
     }
 
@@ -589,25 +589,25 @@ class InferenceStrategyTest {
             Element parentElement = DomUtils.findChildElement(childRoot, "parent");
 
             // Verify child and parent elements exist before inference
-            assertNotNull(childRoot.child("groupId").orElse(null));
-            assertNotNull(childRoot.child("version").orElse(null));
-            assertNotNull(parentElement.child("groupId").orElse(null));
-            assertNotNull(parentElement.child("artifactId").orElse(null));
-            assertNotNull(parentElement.child("version").orElse(null));
+            assertNotNull(childRoot.childElement("groupId").orElse(null));
+            assertNotNull(childRoot.childElement("version").orElse(null));
+            assertNotNull(parentElement.childElement("groupId").orElse(null));
+            assertNotNull(parentElement.childElement("artifactId").orElse(null));
+            assertNotNull(parentElement.childElement("version").orElse(null));
 
             // Apply inference
             UpgradeContext context = createMockContext();
             strategy.apply(context, pomMap);
 
             // Verify child groupId and version were removed (Maven 4.0.0 can infer these from parent)
-            assertNull(childRoot.child("groupId").orElse(null));
-            assertNull(childRoot.child("version").orElse(null));
+            assertNull(childRoot.childElement("groupId").orElse(null));
+            assertNull(childRoot.childElement("version").orElse(null));
             // Child artifactId should remain (always required)
-            assertNotNull(childRoot.child("artifactId").orElse(null));
+            assertNotNull(childRoot.childElement("artifactId").orElse(null));
             // Parent elements should all remain (no relativePath inference in 4.0.0)
-            assertNotNull(parentElement.child("groupId").orElse(null));
-            assertNotNull(parentElement.child("artifactId").orElse(null));
-            assertNotNull(parentElement.child("version").orElse(null));
+            assertNotNull(parentElement.childElement("groupId").orElse(null));
+            assertNotNull(parentElement.childElement("artifactId").orElse(null));
+            assertNotNull(parentElement.childElement("version").orElse(null));
         }
 
         @Test
@@ -649,20 +649,20 @@ class InferenceStrategyTest {
 
             Editor editor = new Editor(childDoc);
             Element childRoot = editor.root();
-            Element parentElement = childRoot.child("parent").orElse(null);
+            Element parentElement = childRoot.childElement("parent").orElse(null);
 
             // Apply inference
             UpgradeContext context = createMockContext();
             strategy.apply(context, pomMap);
 
             // Verify child elements are kept (since they differ from parent)
-            assertNotNull(childRoot.child("groupId").orElse(null));
-            assertNotNull(childRoot.child("version").orElse(null));
-            assertNotNull(childRoot.child("artifactId").orElse(null));
+            assertNotNull(childRoot.childElement("groupId").orElse(null));
+            assertNotNull(childRoot.childElement("version").orElse(null));
+            assertNotNull(childRoot.childElement("artifactId").orElse(null));
             // Parent elements should all remain (no relativePath inference in 4.0.0)
-            assertNotNull(parentElement.child("groupId").orElse(null));
-            assertNotNull(parentElement.child("artifactId").orElse(null));
-            assertNotNull(parentElement.child("version").orElse(null));
+            assertNotNull(parentElement.childElement("groupId").orElse(null));
+            assertNotNull(parentElement.childElement("artifactId").orElse(null));
+            assertNotNull(parentElement.childElement("version").orElse(null));
         }
 
         @Test
@@ -712,15 +712,15 @@ class InferenceStrategyTest {
             strategy.apply(context, pomMap);
 
             // Verify child groupId was removed (matches parent, can be inferred)
-            assertNull(childRoot.child("groupId").orElse(null));
+            assertNull(childRoot.childElement("groupId").orElse(null));
             // Verify child version was kept (differs from parent, cannot be inferred)
-            assertNotNull(childRoot.child("version").orElse(null));
+            assertNotNull(childRoot.childElement("version").orElse(null));
             // Verify child artifactId was kept (always required)
-            assertNotNull(childRoot.child("artifactId").orElse(null));
+            assertNotNull(childRoot.childElement("artifactId").orElse(null));
             // Parent elements should all remain (no relativePath inference in 4.0.0)
-            assertNotNull(parentElement.child("groupId").orElse(null));
-            assertNotNull(parentElement.child("artifactId").orElse(null));
-            assertNotNull(parentElement.child("version").orElse(null));
+            assertNotNull(parentElement.childElement("groupId").orElse(null));
+            assertNotNull(parentElement.childElement("artifactId").orElse(null));
+            assertNotNull(parentElement.childElement("version").orElse(null));
         }
 
         @Test
@@ -753,25 +753,25 @@ class InferenceStrategyTest {
             Editor editor = new Editor(moduleBDoc);
             Element moduleBRoot = editor.root();
             Element dependency = moduleBRoot
-                    .child("dependencies")
+                    .childElement("dependencies")
                     .orElse(null)
-                    .children("dependency")
+                    .childElements("dependency")
                     .findFirst()
                     .orElse(null);
 
             // Verify dependency elements exist before inference
-            assertNotNull(dependency.child("groupId").orElse(null));
-            assertNotNull(dependency.child("artifactId").orElse(null));
-            assertNotNull(dependency.child("version").orElse(null));
+            assertNotNull(dependency.childElement("groupId").orElse(null));
+            assertNotNull(dependency.childElement("artifactId").orElse(null));
+            assertNotNull(dependency.childElement("version").orElse(null));
 
             // Apply inference
             UpgradeContext context = createMockContext();
             strategy.apply(context, pomMap);
 
             // Verify dependency inference was NOT applied (all elements should remain for 4.0.0)
-            assertNotNull(dependency.child("groupId").orElse(null));
-            assertNotNull(dependency.child("artifactId").orElse(null));
-            assertNotNull(dependency.child("version").orElse(null));
+            assertNotNull(dependency.childElement("groupId").orElse(null));
+            assertNotNull(dependency.childElement("artifactId").orElse(null));
+            assertNotNull(dependency.childElement("version").orElse(null));
         }
     }
 

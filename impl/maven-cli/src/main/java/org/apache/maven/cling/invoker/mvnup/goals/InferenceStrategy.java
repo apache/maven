@@ -167,7 +167,7 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
         Element root = pomDocument.root();
 
         // Check if this POM has a parent
-        Element parentElement = root.child(PARENT).orElse(null);
+        Element parentElement = root.childElement(PARENT).orElse(null);
         if (parentElement == null) {
             return false;
         }
@@ -184,7 +184,7 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
         Element root = pomDocument.root();
 
         // Check if this POM has a parent
-        Element parentElement = root.child(PARENT).orElse(null);
+        Element parentElement = root.childElement(PARENT).orElse(null);
         if (parentElement == null) {
             return false;
         }
@@ -202,9 +202,10 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
         Element root = pomDocument.root();
 
         // Check dependencyManagement section
-        Element dependencyManagement = root.child(DEPENDENCY_MANAGEMENT).orElse(null);
+        Element dependencyManagement = root.childElement(DEPENDENCY_MANAGEMENT).orElse(null);
         if (dependencyManagement != null) {
-            Element dependencies = dependencyManagement.child(DEPENDENCIES).orElse(null);
+            Element dependencies =
+                    dependencyManagement.childElement(DEPENDENCIES).orElse(null);
             if (dependencies != null) {
                 hasChanges |=
                         removeManagedDependenciesFromSection(context, dependencies, allGAVs, DEPENDENCY_MANAGEMENT);
@@ -212,10 +213,10 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
         }
 
         // Check profiles for dependencyManagement
-        boolean profileChanges = root.child(PROFILES).stream()
-                .flatMap(profiles -> profiles.children(PROFILE))
-                .map(profile -> profile.child(DEPENDENCY_MANAGEMENT)
-                        .flatMap(dm -> dm.child(DEPENDENCIES))
+        boolean profileChanges = root.childElement(PROFILES).stream()
+                .flatMap(profiles -> profiles.childElements(PROFILE))
+                .map(profile -> profile.childElement(DEPENDENCY_MANAGEMENT)
+                        .flatMap(dm -> dm.childElement(DEPENDENCIES))
                         .map(deps -> removeManagedDependenciesFromSection(
                                 context, deps, allGAVs, "profile dependencyManagement"))
                         .orElse(false))
@@ -236,15 +237,15 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
         boolean hasChanges = false;
 
         // Process main dependencies
-        Element dependenciesElement = root.child(DEPENDENCIES).orElse(null);
+        Element dependenciesElement = root.childElement(DEPENDENCIES).orElse(null);
         if (dependenciesElement != null) {
             hasChanges |= removeDependencyInferenceFromSection(context, dependenciesElement, pomMap, DEPENDENCIES);
         }
 
         // Process profile dependencies
-        boolean profileDependencyChanges = root.child(PROFILES).stream()
-                .flatMap(profiles -> profiles.children(PROFILE))
-                .map(profile -> profile.child(DEPENDENCIES)
+        boolean profileDependencyChanges = root.childElement(PROFILES).stream()
+                .flatMap(profiles -> profiles.childElements(PROFILE))
+                .map(profile -> profile.childElement(DEPENDENCIES)
                         .map(deps ->
                                 removeDependencyInferenceFromSection(context, deps, pomMap, "profile dependencies"))
                         .orElse(false))
@@ -253,12 +254,14 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
         hasChanges |= profileDependencyChanges;
 
         // Process build plugin dependencies
-        boolean pluginDependencyChanges = root.child(BUILD).flatMap(build -> build.child(PLUGINS)).stream()
-                .flatMap(plugins -> plugins.children(PLUGIN))
-                .map(plugin -> plugin.child(DEPENDENCIES)
-                        .map(deps -> removeDependencyInferenceFromSection(context, deps, pomMap, "plugin dependencies"))
-                        .orElse(false))
-                .reduce(false, Boolean::logicalOr);
+        boolean pluginDependencyChanges =
+                root.childElement(BUILD).flatMap(build -> build.childElement(PLUGINS)).stream()
+                        .flatMap(plugins -> plugins.childElements(PLUGIN))
+                        .map(plugin -> plugin.childElement(DEPENDENCIES)
+                                .map(deps -> removeDependencyInferenceFromSection(
+                                        context, deps, pomMap, "plugin dependencies"))
+                                .orElse(false))
+                        .reduce(false, Boolean::logicalOr);
 
         hasChanges |= pluginDependencyChanges;
 
@@ -274,7 +277,7 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
         Element root = pomDocument.root();
 
         // Check main subprojects
-        Element subprojectsElement = root.child(SUBPROJECTS).orElse(null);
+        Element subprojectsElement = root.childElement(SUBPROJECTS).orElse(null);
         if (subprojectsElement != null) {
             if (isSubprojectsListRedundant(subprojectsElement, pomPath)) {
                 DomUtils.removeElement(subprojectsElement);
@@ -284,9 +287,9 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
         }
 
         // Check profiles for subprojects
-        boolean profileSubprojectsChanges = root.child(PROFILES).stream()
-                .flatMap(profiles -> profiles.children(PROFILE))
-                .map(profile -> profile.child(SUBPROJECTS)
+        boolean profileSubprojectsChanges = root.childElement(PROFILES).stream()
+                .flatMap(profiles -> profiles.childElements(PROFILE))
+                .map(profile -> profile.childElement(SUBPROJECTS)
                         .filter(subprojects -> isSubprojectsListRedundant(subprojects, pomPath))
                         .map(subprojects -> {
                             DomUtils.removeElement(subprojects);
@@ -338,7 +341,7 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
 
         // Remove child groupId if it matches parent groupId
         if (childGroupId != null && Objects.equals(childGroupId, parentGroupId)) {
-            Element childGroupIdElement = root.child(GROUP_ID).orElse(null);
+            Element childGroupIdElement = root.childElement(GROUP_ID).orElse(null);
             if (childGroupIdElement != null) {
                 DomUtils.removeElement(childGroupIdElement);
                 context.detail("Removed: child groupId (matches parent)");
@@ -348,7 +351,7 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
 
         // Remove child version if it matches parent version
         if (childVersion != null && Objects.equals(childVersion, parentVersion)) {
-            Element childVersionElement = root.child("version").orElse(null);
+            Element childVersionElement = root.childElement("version").orElse(null);
             if (childVersionElement != null) {
                 DomUtils.removeElement(childVersionElement);
                 context.detail("Removed: child version (matches parent)");
@@ -378,7 +381,8 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
         if (isParentInReactor(parentElement, pomMap, context)) {
             // Remove parent groupId if child has no explicit groupId
             if (childGroupId == null) {
-                Element parentGroupIdElement = parentElement.child(GROUP_ID).orElse(null);
+                Element parentGroupIdElement =
+                        parentElement.childElement(GROUP_ID).orElse(null);
                 if (parentGroupIdElement != null) {
                     DomUtils.removeElement(parentGroupIdElement);
                     context.detail("Removed: parent groupId (child has no explicit groupId)");
@@ -388,7 +392,8 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
 
             // Remove parent version if child has no explicit version
             if (childVersion == null) {
-                Element parentVersionElement = parentElement.child(VERSION).orElse(null);
+                Element parentVersionElement =
+                        parentElement.childElement(VERSION).orElse(null);
                 if (parentVersionElement != null) {
                     DomUtils.removeElement(parentVersionElement);
                     context.detail("Removed: parent version (child has no explicit version)");
@@ -399,7 +404,7 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
             // Remove parent artifactId if it can be inferred from relativePath
             if (canInferParentArtifactId(parentElement, pomMap)) {
                 Element parentArtifactIdElement =
-                        parentElement.child(ARTIFACT_ID).orElse(null);
+                        parentElement.childElement(ARTIFACT_ID).orElse(null);
                 if (parentArtifactIdElement != null) {
                     DomUtils.removeElement(parentArtifactIdElement);
                     context.detail("Removed: parent artifactId (can be inferred from relativePath)");
@@ -438,7 +443,7 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
         for (Document pomDocument : pomMap.values()) {
             Coordinates pomGAV =
                     AbstractUpgradeStrategy.extractArtifactCoordinatesWithParentResolution(context, pomDocument);
-            if (pomGAV != null && pomGAV.equals(parentGAV)) {
+            if (pomGAV != null && pomGAV.toGAV().equals(parentGAV.toGAV())) {
                 return true;
             }
         }
@@ -467,7 +472,7 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
      */
     private boolean isSubprojectsListRedundant(Element subprojectsElement, Path pomPath) {
         List<Element> subprojectElements =
-                subprojectsElement.children(SUBPROJECT).toList();
+                subprojectsElement.childElements(SUBPROJECT).toList();
         if (subprojectElements.isEmpty()) {
             return true; // Empty list is redundant
         }
@@ -509,7 +514,8 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
      */
     private boolean removeManagedDependenciesFromSection(
             UpgradeContext context, Element dependencies, Set<Coordinates> allGAVs, String sectionName) {
-        List<Element> dependencyElements = dependencies.children(DEPENDENCY).toList();
+        List<Element> dependencyElements =
+                dependencies.childElements(DEPENDENCY).toList();
 
         List<Element> projectArtifacts = dependencyElements.stream()
                 .filter(dependency -> {
@@ -542,7 +548,8 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
      */
     private boolean removeDependencyInferenceFromSection(
             UpgradeContext context, Element dependencies, Map<Path, Document> pomMap, String sectionName) {
-        List<Element> dependencyElements = dependencies.children(DEPENDENCY).toList();
+        List<Element> dependencyElements =
+                dependencies.childElements(DEPENDENCY).toList();
         boolean hasChanges = false;
 
         for (Element dependency : dependencyElements) {
@@ -556,7 +563,8 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
                 if (dependencyPom != null) {
                     // Check if we can infer groupId
                     if (groupId != null && canInferDependencyGroupId(context, dependencyPom, groupId)) {
-                        Element groupIdElement = dependency.child(GROUP_ID).orElse(null);
+                        Element groupIdElement =
+                                dependency.childElement(GROUP_ID).orElse(null);
                         if (groupIdElement != null) {
                             DomUtils.removeElement(groupIdElement);
                             context.detail("Removed: " + "dependency groupId " + groupId + " from " + sectionName
@@ -567,7 +575,8 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
 
                     // Check if we can infer version
                     if (version != null && canInferDependencyVersion(context, dependencyPom, version)) {
-                        Element versionElement = dependency.child(VERSION).orElse(null);
+                        Element versionElement =
+                                dependency.childElement(VERSION).orElse(null);
                         if (versionElement != null) {
                             DomUtils.removeElement(versionElement);
                             context.detail("Removed: " + "dependency version " + version + " from " + sectionName

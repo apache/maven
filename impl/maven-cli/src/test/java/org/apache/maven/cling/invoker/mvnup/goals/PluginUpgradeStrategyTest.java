@@ -449,10 +449,10 @@ class PluginUpgradeStrategyTest {
             // Verify the structure
             Editor editor = new Editor(document);
             Element root = editor.root();
-            Element buildElement = root.child("build").orElse(null);
+            Element buildElement = root.childElement("build").orElse(null);
             assertNotNull(buildElement, "Build element should exist");
 
-            List<Element> buildChildren = buildElement.children().toList();
+            List<Element> buildChildren = buildElement.childElements().toList();
 
             // Find the indices of pluginManagement and plugins
             int pluginManagementIndex = -1;

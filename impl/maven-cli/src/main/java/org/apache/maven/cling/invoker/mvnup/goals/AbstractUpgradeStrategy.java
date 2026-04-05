@@ -129,7 +129,7 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
 
         // If groupId or version is missing, try to get from parent
         if (groupId == null || version == null) {
-            Element parentElement = root.child(PARENT).orElse(null);
+            Element parentElement = root.childElement(PARENT).orElse(null);
             if (parentElement != null) {
                 if (groupId == null) {
                     groupId = parentElement.childTextTrimmed(MavenPomElements.Elements.GROUP_ID);

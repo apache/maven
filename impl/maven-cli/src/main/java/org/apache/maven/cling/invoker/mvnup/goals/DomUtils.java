@@ -45,18 +45,18 @@ import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.VERSION;
  * <p>Many operations can be performed directly using DomTrip's Element API:
  * <pre>{@code
  * // Find child element
- * Element child = parent.child("version").orElse(null);
+ * Element child = parent.childElement("version").orElse(null);
  *
  * // Check if child exists
- * boolean hasVersion = parent.child("version").isPresent();
+ * boolean hasVersion = parent.childElement("version").isPresent();
  *
  * // Get child text content
- * String version = parent.child("version")
+ * String version = parent.childElement("version")
  *     .map(Element::textContent)
  *     .orElse(null);
  *
  * // Get trimmed text content
- * String trimmedVersion = parent.child("version")
+ * String trimmedVersion = parent.childElement("version")
  *     .map(Element::textContentTrimmed)
  *     .orElse(null);
  *
@@ -119,7 +119,7 @@ public class DomUtils {
      *
      */
     public static Element findChildElement(Element parent, String name) {
-        return parent.child(name).orElse(null);
+        return parent.childElement(name).orElse(null);
     }
 
     /**
