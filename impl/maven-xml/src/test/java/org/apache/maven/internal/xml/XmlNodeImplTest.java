@@ -24,6 +24,7 @@ import javax.xml.stream.XMLStreamReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,10 +37,13 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class XmlNodeImplTest {
 
@@ -713,6 +717,801 @@ class XmlNodeImplTest {
         public Object toInputLocation(XMLStreamReader parser) {
             return location;
         }
+    }
+
+    // ========================================================================================
+    // Namespace context - Parsing tests
+    // ========================================================================================
+
+    @Test
+    void testParseNamespaceContextSinglePrefixOnRoot() throws Exception {
+        String xml = """
+                <root xmlns:mvn="http://maven.apache.org/POM/4.0.0">
+                    <child/>
+                </root>
+                """;
+        XmlNode node = toXmlNode(xml);
+        assertEquals("http://maven.apache.org/POM/4.0.0", node.namespaces().get("mvn"));
+    }
+
+    @Test
+    void testParseNamespaceContextMultiplePrefixes() throws Exception {
+        String xml = """
+                <root xmlns:mvn="http://maven.apache.org/POM/4.0.0"
+                      xmlns:custom="http://example.com/custom"
+                      xmlns:other="http://example.com/other">
+                    <child/>
+                </root>
+                """;
+        XmlNode node = toXmlNode(xml);
+        assertEquals(3, node.namespaces().size());
+        assertEquals("http://maven.apache.org/POM/4.0.0", node.namespaces().get("mvn"));
+        assertEquals("http://example.com/custom", node.namespaces().get("custom"));
+        assertEquals("http://example.com/other", node.namespaces().get("other"));
+    }
+
+    @Test
+    void testParseNamespaceContextInheritedByChild() throws Exception {
+        String xml = """
+                <root xmlns:mvn="http://maven.apache.org/POM/4.0.0">
+                    <child mvn:combine.children="append"/>
+                </root>
+                """;
+        XmlNode node = toXmlNode(xml);
+        XmlNode child = node.child("child");
+        assertNotNull(child);
+        // Child inherits parent's namespace context
+        assertEquals("http://maven.apache.org/POM/4.0.0", child.namespaces().get("mvn"));
+        // Child does NOT have xmlns:mvn in its own attributes
+        assertNull(child.attribute("xmlns:mvn"));
+    }
+
+    @Test
+    void testParseNamespaceContextInheritedAcrossThreeLevels() throws Exception {
+        String xml = """
+                <root xmlns:a="http://example.com/a">
+                    <level1 xmlns:b="http://example.com/b">
+                        <level2 a:x="1" b:y="2">
+                            <leaf/>
+                        </level2>
+                    </level1>
+                </root>
+                """;
+        XmlNode root = toXmlNode(xml);
+        XmlNode level1 = root.child("level1");
+        XmlNode level2 = level1.child("level2");
+        XmlNode leaf = level2.child("leaf");
+
+        // root has only "a"
+        assertEquals("http://example.com/a", root.namespaces().get("a"));
+        assertNull(root.namespaces().get("b"));
+
+        // level1 has both "a" (inherited) and "b" (own)
+        assertEquals("http://example.com/a", level1.namespaces().get("a"));
+        assertEquals("http://example.com/b", level1.namespaces().get("b"));
+
+        // level2 inherits both
+        assertEquals("http://example.com/a", level2.namespaces().get("a"));
+        assertEquals("http://example.com/b", level2.namespaces().get("b"));
+
+        // leaf also inherits both
+        assertEquals("http://example.com/a", leaf.namespaces().get("a"));
+        assertEquals("http://example.com/b", leaf.namespaces().get("b"));
+    }
+
+    @Test
+    void testParseDefaultNamespaceNotInNamespacesMap() throws Exception {
+        String xml = """
+                <root xmlns="http://maven.apache.org/POM/4.0.0">
+                    <child/>
+                </root>
+                """;
+        XmlNode node = toXmlNode(xml);
+        // Default namespace (no prefix) should NOT be in the namespaces map
+        // since namespaces() tracks prefix→URI bindings for resolving prefixed attributes
+        assertNull(node.namespaces().get(""));
+        assertNull(node.namespaces().get("xmlns"));
+        // The default namespace is stored as an attribute instead
+        assertEquals("http://maven.apache.org/POM/4.0.0", node.attribute("xmlns"));
+    }
+
+    @Test
+    void testParseNamespaceContextChildOverridesPrefix() throws Exception {
+        String xml = """
+                <root xmlns:ns="http://example.com/original">
+                    <child xmlns:ns="http://example.com/overridden" ns:attr="val">
+                        <grandchild ns:attr2="val2"/>
+                    </child>
+                </root>
+                """;
+        XmlNode root = toXmlNode(xml);
+        XmlNode child = root.child("child");
+        XmlNode grandchild = child.child("grandchild");
+
+        // Root has original binding
+        assertEquals("http://example.com/original", root.namespaces().get("ns"));
+        // Child overrides
+        assertEquals("http://example.com/overridden", child.namespaces().get("ns"));
+        // Grandchild inherits the overridden version
+        assertEquals("http://example.com/overridden", grandchild.namespaces().get("ns"));
+    }
+
+    @Test
+    void testParseNoNamespaceDeclarationsProducesEmptyMap() throws Exception {
+        String xml = "<root><child attr=\"value\"/></root>";
+        XmlNode root = toXmlNode(xml);
+        assertTrue(root.namespaces().isEmpty());
+        XmlNode child = root.child("child");
+        assertNotNull(child);
+        assertTrue(child.namespaces().isEmpty());
+    }
+
+    @Test
+    void testParseNamespacesMapIsImmutable() throws Exception {
+        String xml = """
+                <root xmlns:mvn="http://maven.apache.org/POM/4.0.0">
+                    <child/>
+                </root>
+                """;
+        XmlNode node = toXmlNode(xml);
+        assertThrows(
+                UnsupportedOperationException.class, () -> node.namespaces().put("foo", "bar"));
+    }
+
+    // ========================================================================================
+    // Namespace context - Writing tests
+    // ========================================================================================
+
+    @Test
+    void testWriteWithNamespaceDeclarationsAndPrefixedAttributes() throws Exception {
+        String xml = """
+                <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:mvn="http://maven.apache.org/POM/4.0.0">
+                    <compilerArgs mvn:combine.children="append">
+                        <arg>-Xlint:deprecation</arg>
+                    </compilerArgs>
+                </project>
+                """;
+
+        XmlNode node = toXmlNode(xml);
+        assertEquals("http://maven.apache.org/POM/4.0.0", node.attribute("xmlns:mvn"));
+
+        StringWriter writer = new StringWriter();
+        XmlService.write(node, writer);
+        String output = writer.toString();
+
+        XmlNode reRead = toXmlNode(output);
+        assertNotNull(reRead);
+    }
+
+    @Test
+    void testWriteStripsOrphanedPrefixOnAttributes() throws Exception {
+        XmlNode node = XmlNode.newBuilder()
+                .name("compilerArgs")
+                .attributes(Map.of("mvn:combine.children", "append"))
+                .children(List.of(XmlNode.newBuilder()
+                        .name("arg")
+                        .value("-Xlint:deprecation")
+                        .build()))
+                .build();
+
+        StringWriter writer = new StringWriter();
+        XmlService.write(node, writer);
+        String output = writer.toString();
+
+        assertFalse(output.contains("mvn:combine"), "Output should not contain orphaned mvn: prefix");
+        assertTrue(output.contains("combine.children=\"append\""), "Attribute should be written unprefixed");
+
+        XmlNode reRead = toXmlNode(output);
+        assertNotNull(reRead);
+        assertEquals("append", reRead.attribute("combine.children"));
+    }
+
+    @Test
+    void testWriteForeignNamespaceAttributeRoundTrip() throws Exception {
+        XmlNode node = XmlNode.newBuilder()
+                .name("compilerArgs")
+                .attributes(Map.of(
+                        "xmlns:custom", "http://example.com/custom",
+                        "custom:myattr", "value"))
+                .children(List.of(XmlNode.newBuilder()
+                        .name("arg")
+                        .value("-Xlint:deprecation")
+                        .build()))
+                .build();
+
+        StringWriter writer = new StringWriter();
+        XmlService.write(node, writer);
+        String output = writer.toString();
+
+        XmlNode reRead = toXmlNode(output);
+        assertNotNull(reRead);
+        assertEquals("value", reRead.attribute("custom:myattr"));
+        assertEquals("http://example.com/custom", reRead.attribute("xmlns:custom"));
+    }
+
+    @Test
+    void testWritePreservesPrefixFromInheritedNamespaceContext() throws Exception {
+        String xml = """
+                <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:custom="http://example.com/custom">
+                    <compilerArgs custom:myattr="value">
+                        <arg>-Xlint:deprecation</arg>
+                    </compilerArgs>
+                </project>
+                """;
+
+        XmlNode node = toXmlNode(xml);
+        XmlNode compilerArgs = node.child("compilerArgs");
+        assertNotNull(compilerArgs);
+        assertEquals("value", compilerArgs.attribute("custom:myattr"));
+        assertNull(compilerArgs.attribute("xmlns:custom"), "xmlns:custom should be on parent, not child");
+        assertEquals("http://example.com/custom", compilerArgs.namespaces().get("custom"));
+
+        StringWriter writer = new StringWriter();
+        XmlService.write(compilerArgs, writer);
+        String output = writer.toString();
+
+        XmlNode reRead = toXmlNode(output);
+        assertNotNull(reRead);
+        assertEquals("value", reRead.attribute("custom:myattr"));
+    }
+
+    @Test
+    void testWriteStripsOrphanedPrefixWithoutNamespaceContext() throws Exception {
+        XmlNode node = XmlNode.newBuilder()
+                .name("compilerArgs")
+                .attributes(Map.of("mvn:combine.children", "append"))
+                .children(List.of(XmlNode.newBuilder()
+                        .name("arg")
+                        .value("-Xlint:deprecation")
+                        .build()))
+                .build();
+
+        assertTrue(node.namespaces().isEmpty(), "No namespace context");
+
+        StringWriter writer = new StringWriter();
+        XmlService.write(node, writer);
+        String output = writer.toString();
+
+        assertFalse(output.contains("mvn:combine"), "Output should not contain orphaned mvn: prefix");
+        assertTrue(output.contains("combine.children=\"append\""), "Attribute should be written unprefixed");
+
+        XmlNode reRead = toXmlNode(output);
+        assertNotNull(reRead);
+        assertEquals("append", reRead.attribute("combine.children"));
+    }
+
+    @Test
+    void testWriteMultiplePrefixedAttributesFromDifferentNamespaces() throws Exception {
+        String xml = """
+                <root xmlns:a="http://example.com/a" xmlns:b="http://example.com/b">
+                    <child a:x="1" b:y="2"/>
+                </root>
+                """;
+        XmlNode root = toXmlNode(xml);
+        XmlNode child = root.child("child");
+        assertNotNull(child);
+
+        // Write only the child (which has prefixed attrs but no local xmlns:)
+        StringWriter writer = new StringWriter();
+        XmlService.write(child, writer);
+        String output = writer.toString();
+
+        // Both namespace declarations should be auto-declared
+        assertTrue(output.contains("xmlns:a="), "Should auto-declare xmlns:a");
+        assertTrue(output.contains("xmlns:b="), "Should auto-declare xmlns:b");
+
+        // Round-trip should preserve attributes
+        XmlNode reRead = toXmlNode(output);
+        assertEquals("1", reRead.attribute("a:x"));
+        assertEquals("2", reRead.attribute("b:y"));
+    }
+
+    @Test
+    void testWriteLocalXmlnsOverridesNamespaceContext() throws Exception {
+        // Build a node where the local attribute has xmlns:ns with one URI
+        // but the namespace context has a different URI for the same prefix.
+        // The local declaration should win.
+        XmlNode node = XmlNode.newBuilder()
+                .name("elem")
+                .attributes(Map.of(
+                        "xmlns:ns", "http://example.com/local",
+                        "ns:attr", "value"))
+                .namespaces(Map.of("ns", "http://example.com/context"))
+                .build();
+
+        StringWriter writer = new StringWriter();
+        XmlService.write(node, writer);
+        String output = writer.toString();
+
+        // The local xmlns:ns should be used, not the one from context
+        assertTrue(output.contains("http://example.com/local"), "Local xmlns: should take precedence");
+
+        XmlNode reRead = toXmlNode(output);
+        assertEquals("value", reRead.attribute("ns:attr"));
+        assertEquals("http://example.com/local", reRead.attribute("xmlns:ns"));
+    }
+
+    @Test
+    void testWriteXmlSpaceAttributeRoundTrip() throws Exception {
+        String xml = """
+                <root xml:space="preserve">  content with spaces  </root>
+                """;
+        XmlNode node = toXmlNode(xml);
+        assertEquals("preserve", node.attribute("xml:space"));
+
+        StringWriter writer = new StringWriter();
+        XmlService.write(node, writer);
+        String output = writer.toString();
+
+        // xml: prefix should be handled without explicit declaration
+        assertFalse(output.contains("xmlns:xml"), "xml: prefix must not be declared");
+        XmlNode reRead = toXmlNode(output);
+        assertEquals("preserve", reRead.attribute("xml:space"));
+        assertEquals("  content with spaces  ", reRead.value());
+    }
+
+    @Test
+    void testWriteUnprefixedAttributeUnchanged() throws Exception {
+        XmlNode node = XmlNode.newBuilder()
+                .name("elem")
+                .attributes(Map.of("simple", "value", "another", "val2"))
+                .build();
+
+        StringWriter writer = new StringWriter();
+        XmlService.write(node, writer);
+        String output = writer.toString();
+
+        XmlNode reRead = toXmlNode(output);
+        assertEquals("value", reRead.attribute("simple"));
+        assertEquals("val2", reRead.attribute("another"));
+    }
+
+    @Test
+    void testWriteNamespaceNotDeclaredTwice() throws Exception {
+        // When xmlns:mvn is both in attributes AND namespace context,
+        // it should only be declared once
+        XmlNode node = XmlNode.newBuilder()
+                .name("elem")
+                .attributes(Map.of(
+                        "xmlns:mvn", "http://maven.apache.org/POM/4.0.0",
+                        "mvn:combine.children", "append"))
+                .namespaces(Map.of("mvn", "http://maven.apache.org/POM/4.0.0"))
+                .build();
+
+        StringWriter writer = new StringWriter();
+        XmlService.write(node, writer);
+        String output = writer.toString();
+
+        // Count occurrences of xmlns:mvn - should be exactly 1
+        int count = 0;
+        int idx = 0;
+        while ((idx = output.indexOf("xmlns:mvn", idx)) != -1) {
+            count++;
+            idx += "xmlns:mvn".length();
+        }
+        assertEquals(1, count, "xmlns:mvn should be declared exactly once");
+
+        XmlNode reRead = toXmlNode(output);
+        assertEquals("append", reRead.attribute("mvn:combine.children"));
+    }
+
+    @Test
+    void testWriteChildInheritsContextAndWritesStandalone() throws Exception {
+        // Parse a 3-level structure, then write the grandchild standalone
+        String xml = """
+                <root xmlns:a="http://example.com/a">
+                    <mid xmlns:b="http://example.com/b">
+                        <leaf a:x="1" b:y="2" plain="3"/>
+                    </mid>
+                </root>
+                """;
+        XmlNode root = toXmlNode(xml);
+        XmlNode leaf = root.child("mid").child("leaf");
+
+        StringWriter writer = new StringWriter();
+        XmlService.write(leaf, writer);
+        String output = writer.toString();
+
+        XmlNode reRead = toXmlNode(output);
+        assertEquals("1", reRead.attribute("a:x"));
+        assertEquals("2", reRead.attribute("b:y"));
+        assertEquals("3", reRead.attribute("plain"));
+    }
+
+    // ========================================================================================
+    // Namespace context - Merge tests
+    // ========================================================================================
+
+    @Test
+    void testMergePreservesDominantNamespaces() throws Exception {
+        String dominant = """
+                <root xmlns:mvn="http://maven.apache.org/POM/4.0.0">
+                    <child mvn:combine.children="append">
+                        <item>dom</item>
+                    </child>
+                </root>
+                """;
+        String recessive = """
+                <root>
+                    <child>
+                        <item>rec</item>
+                    </child>
+                </root>
+                """;
+        XmlNode merged = XmlService.merge(toXmlNode(dominant), toXmlNode(recessive));
+
+        // The merged root should keep dominant's namespace context
+        assertEquals("http://maven.apache.org/POM/4.0.0", merged.namespaces().get("mvn"));
+
+        // The merged child should also have the namespace context
+        XmlNode child = merged.child("child");
+        assertNotNull(child);
+        assertEquals("http://maven.apache.org/POM/4.0.0", child.namespaces().get("mvn"));
+    }
+
+    @Test
+    void testMergeCombineChildrenAppendPreservesNamespaces() throws Exception {
+        String dominant = """
+                <root xmlns="http://maven.apache.org/POM/4.0.0" xmlns:mvn="http://maven.apache.org/POM/4.0.0">
+                    <items combine.children="append">
+                        <item>a</item>
+                    </items>
+                </root>
+                """;
+        String recessive = """
+                <root xmlns="http://maven.apache.org/POM/4.0.0">
+                    <items>
+                        <item>b</item>
+                    </items>
+                </root>
+                """;
+        XmlNode merged = XmlService.merge(toXmlNode(dominant), toXmlNode(recessive));
+        XmlNode items = merged.child("items");
+
+        assertEquals(2, items.children().size(), "append should merge children");
+        // Namespace context should be preserved on the merged element
+        assertEquals("http://maven.apache.org/POM/4.0.0", items.namespaces().get("mvn"));
+    }
+
+    @Test
+    void testMergeCombineSelfOverridePreservesNamespaces() throws Exception {
+        String dominant = """
+                <root xmlns:ns="http://example.com/ns">
+                    <child combine.self="override" ns:attr="dominant">
+                        <item>dom</item>
+                    </child>
+                </root>
+                """;
+        String recessive = """
+                <root>
+                    <child>
+                        <item>rec1</item>
+                        <item>rec2</item>
+                    </child>
+                </root>
+                """;
+        XmlNode merged = XmlService.merge(toXmlNode(dominant), toXmlNode(recessive));
+        XmlNode child = merged.child("child");
+
+        // override means dominant completely replaces recessive
+        assertEquals(1, child.children().size());
+        assertEquals("dom", child.children().get(0).value());
+        // Namespace context preserved
+        assertEquals("http://example.com/ns", child.namespaces().get("ns"));
+    }
+
+    @Test
+    void testMergedNodeWriteProducesValidXml() throws Exception {
+        String dominant = """
+                <root xmlns:mvn="http://maven.apache.org/POM/4.0.0">
+                    <child mvn:combine.children="append">
+                        <item>a</item>
+                    </child>
+                </root>
+                """;
+        String recessive = """
+                <root>
+                    <child>
+                        <item>b</item>
+                    </child>
+                </root>
+                """;
+        XmlNode merged = XmlService.merge(toXmlNode(dominant), toXmlNode(recessive));
+
+        // Write the merged child alone - it should produce valid XML
+        // because it has the namespace context from the dominant
+        XmlNode child = merged.child("child");
+        StringWriter writer = new StringWriter();
+        XmlService.write(child, writer);
+        String output = writer.toString();
+
+        // mvn:combine.children should be preserved with namespace declaration
+        assertTrue(output.contains("mvn:combine.children"), "Prefix should be preserved from context");
+        assertTrue(output.contains("xmlns:mvn="), "Namespace should be auto-declared");
+
+        XmlNode reRead = toXmlNode(output);
+        assertEquals("append", reRead.attribute("mvn:combine.children"));
+    }
+
+    // ========================================================================================
+    // Namespace context - Builder tests
+    // ========================================================================================
+
+    @Test
+    void testBuilderWithExplicitNamespaces() throws Exception {
+        XmlNode node = XmlNode.newBuilder()
+                .name("elem")
+                .attributes(Map.of("ns:attr", "value"))
+                .namespaces(Map.of("ns", "http://example.com/ns"))
+                .build();
+
+        assertEquals("http://example.com/ns", node.namespaces().get("ns"));
+
+        StringWriter writer = new StringWriter();
+        XmlService.write(node, writer);
+        String output = writer.toString();
+
+        assertTrue(output.contains("xmlns:ns="), "Namespace should be auto-declared from builder context");
+        XmlNode reRead = toXmlNode(output);
+        assertEquals("value", reRead.attribute("ns:attr"));
+    }
+
+    @Test
+    void testBuilderWithNullNamespacesDefaultsToEmpty() {
+        XmlNode node = XmlNode.newBuilder().name("elem").build();
+        assertNotNull(node.namespaces());
+        assertTrue(node.namespaces().isEmpty());
+    }
+
+    @Test
+    void testBuilderNamespacesAreImmutable() {
+        Map<String, String> mutableNs = new HashMap<>(Map.of("ns", "http://example.com"));
+        XmlNode node = XmlNode.newBuilder().name("elem").namespaces(mutableNs).build();
+
+        // Mutating the original map should not affect the node
+        mutableNs.put("other", "http://other.com");
+        assertNull(node.namespaces().get("other"));
+
+        // The namespaces map itself should be immutable
+        assertThrows(
+                UnsupportedOperationException.class, () -> node.namespaces().put("foo", "bar"));
+    }
+
+    @Test
+    void testDefaultNamespacesMethodReturnsEmptyMap() {
+        // XmlNode built with newInstance (which doesn't set namespaces)
+        // should return empty map from the default namespaces() method
+        XmlNode node = XmlNode.newInstance("test");
+        assertNotNull(node.namespaces());
+        assertTrue(node.namespaces().isEmpty());
+    }
+
+    // ========================================================================================
+    // Namespace context - Round-trip fidelity tests
+    // ========================================================================================
+
+    @Test
+    void testRoundTripPreservesNamespaceContext() throws Exception {
+        String xml = """
+                <root xmlns:a="http://example.com/a" xmlns:b="http://example.com/b">
+                    <child a:x="1" b:y="2"/>
+                </root>
+                """;
+        XmlNode original = toXmlNode(xml);
+
+        StringWriter writer = new StringWriter();
+        XmlService.write(original, writer);
+        XmlNode reRead = toXmlNode(writer.toString());
+
+        // Root namespace context should be preserved
+        assertEquals(original.namespaces().get("a"), reRead.namespaces().get("a"));
+        assertEquals(original.namespaces().get("b"), reRead.namespaces().get("b"));
+
+        // Child namespace context should be preserved
+        XmlNode origChild = original.child("child");
+        XmlNode reReadChild = reRead.child("child");
+        assertEquals(origChild.namespaces().get("a"), reReadChild.namespaces().get("a"));
+        assertEquals(origChild.namespaces().get("b"), reReadChild.namespaces().get("b"));
+    }
+
+    @Test
+    void testRoundTripDeepNestedStructure() throws Exception {
+        String xml = """
+                <root xmlns:ns="http://example.com/ns">
+                    <level1>
+                        <level2>
+                            <level3 ns:deep="value">text</level3>
+                        </level2>
+                    </level1>
+                </root>
+                """;
+        XmlNode original = toXmlNode(xml);
+
+        StringWriter writer = new StringWriter();
+        XmlService.write(original, writer);
+        XmlNode reRead = toXmlNode(writer.toString());
+
+        XmlNode level3 = reRead.child("level1").child("level2").child("level3");
+        assertEquals("value", level3.attribute("ns:deep"));
+        assertEquals("text", level3.value());
+        assertEquals("http://example.com/ns", level3.namespaces().get("ns"));
+    }
+
+    @Test
+    void testRoundTripWithOverriddenNamespace() throws Exception {
+        String xml = """
+                <root xmlns:ns="http://example.com/v1">
+                    <child xmlns:ns="http://example.com/v2" ns:attr="val"/>
+                </root>
+                """;
+        XmlNode original = toXmlNode(xml);
+        XmlNode child = original.child("child");
+        assertEquals("http://example.com/v2", child.namespaces().get("ns"));
+
+        // Write and re-read just the child
+        StringWriter writer = new StringWriter();
+        XmlService.write(child, writer);
+        XmlNode reRead = toXmlNode(writer.toString());
+
+        assertEquals("val", reRead.attribute("ns:attr"));
+        assertEquals("http://example.com/v2", reRead.namespaces().get("ns"));
+    }
+
+    // ========================================================================================
+    // Namespace context - Consumer POM simulation tests
+    // ========================================================================================
+
+    @Test
+    void testConsumerPomScenarioPrefixFromContext() throws Exception {
+        // Simulate: parse a full POM with xmlns:mvn on project, mvn:combine.children on child
+        String xml = """
+                <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:mvn="http://maven.apache.org/POM/4.0.0">
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <configuration>
+                                    <compilerArgs mvn:combine.children="append">
+                                        <arg>-Xlint</arg>
+                                    </compilerArgs>
+                                </configuration>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+        XmlNode project = toXmlNode(xml);
+        XmlNode compilerArgs = project.child("build")
+                .child("plugins")
+                .child("plugin")
+                .child("configuration")
+                .child("compilerArgs");
+        assertNotNull(compilerArgs);
+        assertEquals("append", compilerArgs.attribute("mvn:combine.children"));
+        assertEquals(
+                "http://maven.apache.org/POM/4.0.0", compilerArgs.namespaces().get("mvn"));
+
+        // Simulate consumer POM: write only the configuration subtree
+        XmlNode config = project.child("build").child("plugins").child("plugin").child("configuration");
+        StringWriter writer = new StringWriter();
+        XmlService.write(config, writer);
+        String output = writer.toString();
+
+        // Should produce valid XML with auto-declared xmlns:mvn
+        XmlNode reRead = toXmlNode(output);
+        XmlNode reReadArgs = reRead.child("compilerArgs");
+        assertEquals("append", reReadArgs.attribute("mvn:combine.children"));
+    }
+
+    @Test
+    void testConsumerPomScenarioNoContextFallback() throws Exception {
+        // Simulate: programmatically-built XmlNode without namespace context
+        // (as might happen if someone builds configuration in code)
+        XmlNode config = XmlNode.newBuilder()
+                .name("configuration")
+                .children(List.of(XmlNode.newBuilder()
+                        .name("compilerArgs")
+                        .attributes(Map.of("mvn:combine.children", "append"))
+                        .children(List.of(
+                                XmlNode.newBuilder().name("arg").value("-Xlint").build()))
+                        .build()))
+                .build();
+
+        StringWriter writer = new StringWriter();
+        XmlService.write(config, writer);
+        String output = writer.toString();
+
+        // Without namespace context, prefix should be stripped
+        assertFalse(output.contains("mvn:"), "No mvn: prefix without context");
+        XmlNode reRead = toXmlNode(output);
+        assertEquals("append", reRead.child("compilerArgs").attribute("combine.children"));
+    }
+
+    // ========================================================================================
+    // Namespace context - Merge directive interaction tests
+    // ========================================================================================
+
+    @Test
+    void testPrefixedCombineChildrenDoesNotMerge() throws Exception {
+        String dominant = """
+                <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:mvn="http://maven.apache.org/POM/4.0.0">
+                    <compilerArgs mvn:combine.children="append">
+                        <arg>-Xlint:deprecation</arg>
+                    </compilerArgs>
+                </project>
+                """;
+
+        String recessive = """
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <compilerArgs>
+                        <arg>-Xlint:unchecked</arg>
+                    </compilerArgs>
+                </project>
+                """;
+
+        XmlNode dominantNode = toXmlNode(dominant);
+        XmlNode recessiveNode = toXmlNode(recessive);
+        XmlNode merged = XmlService.merge(dominantNode, recessiveNode);
+
+        XmlNode compilerArgs = merged.child("compilerArgs");
+        assertNotNull(compilerArgs);
+        assertEquals(
+                1,
+                compilerArgs.children().size(),
+                "mvn:combine.children should not trigger append; only unprefixed combine.children works");
+    }
+
+    @Test
+    void testUnprefixedCombineChildrenStillWorks() throws Exception {
+        String dominant = """
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <compilerArgs combine.children="append">
+                        <arg>-Xlint:deprecation</arg>
+                    </compilerArgs>
+                </project>
+                """;
+
+        String recessive = """
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <compilerArgs>
+                        <arg>-Xlint:unchecked</arg>
+                    </compilerArgs>
+                </project>
+                """;
+
+        XmlNode dominantNode = toXmlNode(dominant);
+        XmlNode recessiveNode = toXmlNode(recessive);
+        XmlNode merged = XmlService.merge(dominantNode, recessiveNode);
+
+        XmlNode compilerArgs = merged.child("compilerArgs");
+        assertNotNull(compilerArgs);
+        assertEquals(2, compilerArgs.children().size(), "Unprefixed combine.children=append should work");
+    }
+
+    @Test
+    void testPrefixedCombineSelfDoesNotOverride() throws Exception {
+        String dominant = """
+                <root xmlns:mvn="http://maven.apache.org/POM/4.0.0">
+                    <child mvn:combine.self="override">
+                        <item>dom</item>
+                    </child>
+                </root>
+                """;
+        String recessive = """
+                <root>
+                    <child>
+                        <item>rec</item>
+                        <extra>bonus</extra>
+                    </child>
+                </root>
+                """;
+        XmlNode merged = XmlService.merge(toXmlNode(dominant), toXmlNode(recessive));
+        XmlNode child = merged.child("child");
+
+        // mvn:combine.self should NOT trigger override (only unprefixed combine.self works)
+        // Default merge behavior merges children by name
+        assertEquals("dom", child.child("item").value());
+        // The "extra" child from recessive should survive since combine.self wasn't triggered
+        assertNotNull(child.child("extra"), "Recessive children should survive since mvn:combine.self is ignored");
     }
 
     public static Xpp3Dom build(Reader reader) throws XmlPullParserException, IOException {
