@@ -38,7 +38,7 @@ public class MavenSimpleServiceProvider implements SLF4JServiceProvider {
      */
     // to avoid constant folding by the compiler, this field must *not* be final
     @SuppressWarnings({"checkstyle:staticvariablename", "checkstyle:visibilitymodifier"})
-    public static String REQUESTED_API_VERSION = "2.0.99"; // !final
+    public static String REQUESTED_API_VERSION = "2.0"; // !final
 
     private ILoggerFactory loggerFactory;
     private final IMarkerFactory markerFactory = new BasicMarkerFactory();
