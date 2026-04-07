@@ -45,8 +45,11 @@ public class MessageUtils {
     public static void systemInstall(Consumer<TerminalBuilder> builderConsumer, Consumer<Terminal> terminalConsumer) {
         MessageUtils.terminal = new FastTerminal(
                 () -> {
-                    TerminalBuilder builder =
-                            TerminalBuilder.builder().name("Maven").dumb(true);
+                    TerminalBuilder builder = TerminalBuilder.builder()
+                            .name("Maven")
+                            .dumb(true)
+                            .systemOutput(TerminalBuilder.SystemOutput.SysOut)
+                            .color(true);
                     if (builderConsumer != null) {
                         builderConsumer.accept(builder);
                     }

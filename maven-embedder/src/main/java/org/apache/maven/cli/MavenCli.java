@@ -525,6 +525,12 @@ public class MavenCli {
         } else if (cliRequest.commandLine.hasOption(CLIManager.BATCH_MODE)
                 || cliRequest.commandLine.hasOption(CLIManager.LOG_FILE)) {
             MessageUtils.setColorEnabled(false);
+        } else {
+            // if the terminal is detected as dumb terminal, disable colors
+            if (MessageUtils.getTerminal() != null
+                    && MessageUtils.getTerminal().getType().startsWith("dumb")) {
+                MessageUtils.setColorEnabled(false);
+            }
         }
 
         // LOG STREAMS
