@@ -165,6 +165,8 @@ public class MavenSession implements Cloneable {
 
     /**
      * Returns top directory if discovered or {@code null}.
+     * Top directory is directory where top level POM resides with respect of any reactor limiting or shaping like use 
+     * of {@code -f} or alike CLI options.
      *
      * @since 3.10.0
      */
@@ -174,6 +176,9 @@ public class MavenSession implements Cloneable {
 
     /**
      * Returns root directory if discovered or {@code null}.
+     * Root directory is detected, usually by the presence of {@code .mvn} directory, and is used to discover
+     * extensions and other configuration files. It usually represents the "project root" or "checkout root".
+     * Root directory may be equal to top directory or some parent of it (first directory where {@code .mvn} is found).
      *
      * @since 3.10.0
      */
