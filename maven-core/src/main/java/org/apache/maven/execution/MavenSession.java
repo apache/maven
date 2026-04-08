@@ -165,7 +165,7 @@ public class MavenSession implements Cloneable {
 
     /**
      * Returns top directory if discovered or {@code null}.
-     * Top directory is directory where top level POM resides with respect of any reactor limiting or shaping like use 
+     * Top directory is directory where top level POM resides with respect of any reactor limiting or shaping like use
      * of {@code -f} or alike CLI options.
      *
      * @since 3.10.0
