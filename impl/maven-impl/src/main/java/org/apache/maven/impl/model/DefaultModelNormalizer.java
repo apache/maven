@@ -29,6 +29,8 @@ import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.Exclusion;
+import org.apache.maven.api.model.Mixin;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.services.ModelBuilderRequest;
@@ -48,6 +50,9 @@ public class DefaultModelNormalizer implements ModelNormalizer {
     @Override
     public Model mergeDuplicates(Model model, ModelBuilderRequest request, ModelProblemCollector problems) {
         Model.Builder builder = Model.newBuilder(model);
+
+        // Expand id attributes on mixins
+        builder.mixins(injectList(model.getMixins(), this::expandMixinGav));
 
         Build build = model.getBuild();
         if (build != null) {
@@ -76,15 +81,20 @@ public class DefaultModelNormalizer implements ModelNormalizer {
          * the way 2.x works. When we're in strict mode, the removal of duplicates just saves other merging steps from
          * aftereffects and bogus error messages.
          */
+        // Expand id attributes on dependencies (and their exclusions), then deduplicate
         List<Dependency> dependencies = model.getDependencies();
-        Map<String, Dependency> normalized = new LinkedHashMap<>(dependencies.size() * 2);
-
-        for (Dependency dependency : dependencies) {
-            normalized.put(dependency.getManagementKey(), dependency);
+        List<Dependency> expanded = injectList(dependencies, this::expandDependencyId);
+        if (expanded != null) {
+            dependencies = expanded;
         }
 
-        if (dependencies.size() != normalized.size()) {
-            builder.dependencies(normalized.values());
+        Map<String, Dependency> normalizedDeps = new LinkedHashMap<>(dependencies.size() * 2);
+        for (Dependency dependency : dependencies) {
+            normalizedDeps.put(dependency.getManagementKey(), dependency);
+        }
+
+        if (expanded != null || dependencies.size() != normalizedDeps.size()) {
+            builder.dependencies(normalizedDeps.values());
         }
 
         return builder.build();
@@ -143,5 +153,93 @@ public class DefaultModelNormalizer implements ModelNormalizer {
             }
         }
         return newList;
+    }
+
+    /**
+     * Expands the {@code id} attribute on a dependency into its component fields.
+     * The id format is {@code groupId:artifactId:version}.
+     */
+    Dependency expandDependencyId(Dependency d) {
+        String id = d.getId();
+        if (id == null || id.isEmpty()) {
+            // No id attribute, but still expand exclusion ids
+            List<Exclusion> expanded = injectList(d.getExclusions(), this::expandExclusionId);
+            return expanded != null ? d.withExclusions(expanded) : d;
+        }
+        String[] parts = id.split(":");
+        if (parts.length != 3) {
+            // Invalid format — will be caught by the validator
+            return d;
+        }
+        Dependency.Builder builder = Dependency.newBuilder(d);
+        if (isBlank(d.getGroupId())) {
+            builder.groupId(parts[0]);
+        }
+        if (isBlank(d.getArtifactId())) {
+            builder.artifactId(parts[1]);
+        }
+        if (isBlank(d.getVersion())) {
+            builder.version(parts[2]);
+        }
+        List<Exclusion> expanded = injectList(d.getExclusions(), this::expandExclusionId);
+        if (expanded != null) {
+            builder.exclusions(expanded);
+        }
+        return builder.build();
+    }
+
+    /**
+     * Expands the {@code id} attribute on an exclusion into its component fields.
+     * The id format is {@code groupId:artifactId}.
+     */
+    Exclusion expandExclusionId(Exclusion e) {
+        String id = e.getId();
+        if (id == null || id.isEmpty()) {
+            return e;
+        }
+        String[] parts = id.split(":");
+        if (parts.length != 2) {
+            // Invalid format — will be caught by the validator
+            return e;
+        }
+        Exclusion.Builder builder = Exclusion.newBuilder(e);
+        if (isBlank(e.getGroupId())) {
+            builder.groupId(parts[0]);
+        }
+        if (isBlank(e.getArtifactId())) {
+            builder.artifactId(parts[1]);
+        }
+        return builder.build();
+    }
+
+    /**
+     * Expands the {@code id} (XML attribute) / {@code gav} (Java field) on a mixin
+     * into its component fields. The format is {@code groupId:artifactId:version}.
+     */
+    Mixin expandMixinGav(Mixin m) {
+        String gav = m.getGav();
+        if (gav == null || gav.isEmpty()) {
+            return m;
+        }
+        String[] parts = gav.split(":");
+        if (parts.length != 3) {
+            // Invalid format — will be caught by the validator
+            return m;
+        }
+        Mixin.Builder builder = Mixin.newBuilder(m);
+        if (isBlank(m.getGroupId())) {
+            builder.groupId(parts[0]);
+        }
+        if (isBlank(m.getArtifactId())) {
+            builder.artifactId(parts[1]);
+        }
+        if (isBlank(m.getVersion())) {
+            builder.version(parts[2]);
+        }
+        return builder.build();
+    }
+
+    private static boolean isBlank(String s) {
+        return s == null || s.isEmpty();
     }
 }

@@ -57,6 +57,7 @@ import org.apache.maven.api.model.DistributionManagement;
 import org.apache.maven.api.model.Exclusion;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputLocationTracker;
+import org.apache.maven.api.model.Mixin;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Plugin;
@@ -372,6 +373,54 @@ public class DefaultModelValidator implements ModelValidator {
 
             // Validate each mixin
             for (Parent mixin : model.getMixins()) {
+                // Validate id/gav attribute format and conflict with child elements
+                if (mixin instanceof Mixin m
+                        && m.getGav() != null
+                        && !m.getGav().isEmpty()) {
+                    String gav = m.getGav();
+                    String[] parts = gav.split(":");
+                    if (parts.length != 3) {
+                        addViolation(
+                                problems,
+                                Severity.ERROR,
+                                Version.V42,
+                                "mixins.mixin.id",
+                                null,
+                                "must have the format 'groupId:artifactId:version' but is '" + gav + "'.",
+                                mixin);
+                    }
+                    if (mixin.getGroupId() != null && !mixin.getGroupId().isEmpty()) {
+                        addViolation(
+                                problems,
+                                Severity.ERROR,
+                                Version.V42,
+                                "mixins.mixin.groupId",
+                                null,
+                                "must not be specified when the 'id' attribute is used.",
+                                mixin);
+                    }
+                    if (mixin.getArtifactId() != null && !mixin.getArtifactId().isEmpty()) {
+                        addViolation(
+                                problems,
+                                Severity.ERROR,
+                                Version.V42,
+                                "mixins.mixin.artifactId",
+                                null,
+                                "must not be specified when the 'id' attribute is used.",
+                                mixin);
+                    }
+                    if (mixin.getVersion() != null && !mixin.getVersion().isEmpty()) {
+                        addViolation(
+                                problems,
+                                Severity.ERROR,
+                                Version.V42,
+                                "mixins.mixin.version",
+                                null,
+                                "must not be specified when the 'id' attribute is used.",
+                                mixin);
+                    }
+                }
+
                 if (mixin.getRelativePath() != null
                         && !mixin.getRelativePath().isEmpty()
                         && (mixin.getGroupId() != null && !mixin.getGroupId().isEmpty()
@@ -1138,7 +1187,22 @@ public class DefaultModelValidator implements ModelValidator {
         Map<String, Dependency> index = new HashMap<>();
 
         for (Dependency dependency : dependencies) {
-            String key = dependency.getManagementKey();
+            // When 'id' attribute is set, use it for the key since groupId/artifactId
+            // have not yet been expanded (normalization runs after validation)
+            String key;
+            if (dependency.getId() != null && !dependency.getId().isEmpty()) {
+                key = dependency.getId();
+            } else {
+                key = dependency.getManagementKey();
+            }
+
+            // Validate id attribute format and conflict with child elements
+            validateDependencyIdAttribute(problems, dependency, prefix + prefix2);
+
+            // Validate id attribute on exclusions
+            for (Exclusion exclusion : dependency.getExclusions()) {
+                validateExclusionIdAttribute(problems, exclusion, prefix + prefix2 + "exclusions.exclusion.");
+            }
 
             if ("import".equals(dependency.getScope())) {
                 if (!"pom".equals(dependency.getType())) {
@@ -1252,6 +1316,102 @@ public class DefaultModelValidator implements ModelValidator {
             } else {
                 index.put(key, dependency);
             }
+        }
+    }
+
+    /**
+     * Validates the {@code id} attribute on a dependency element.
+     * The id must have the format {@code groupId:artifactId:version} and must not
+     * be specified alongside individual groupId, artifactId, or version child elements.
+     */
+    private void validateDependencyIdAttribute(ModelProblemCollector problems, Dependency dependency, String prefix) {
+        String id = dependency.getId();
+        if (id == null || id.isEmpty()) {
+            return;
+        }
+        String[] parts = id.split(":");
+        if (parts.length != 3) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "id",
+                    null,
+                    "must have the format 'groupId:artifactId:version' but is '" + id + "'.",
+                    dependency);
+        }
+        if (dependency.getGroupId() != null && !dependency.getGroupId().isEmpty()) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "groupId",
+                    null,
+                    "must not be specified when the 'id' attribute is used.",
+                    dependency);
+        }
+        if (dependency.getArtifactId() != null && !dependency.getArtifactId().isEmpty()) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "artifactId",
+                    null,
+                    "must not be specified when the 'id' attribute is used.",
+                    dependency);
+        }
+        if (dependency.getVersion() != null && !dependency.getVersion().isEmpty()) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "version",
+                    null,
+                    "must not be specified when the 'id' attribute is used.",
+                    dependency);
+        }
+    }
+
+    /**
+     * Validates the {@code id} attribute on an exclusion element.
+     * The id must have the format {@code groupId:artifactId} and must not
+     * be specified alongside individual groupId or artifactId child elements.
+     */
+    private void validateExclusionIdAttribute(ModelProblemCollector problems, Exclusion exclusion, String prefix) {
+        String id = exclusion.getId();
+        if (id == null || id.isEmpty()) {
+            return;
+        }
+        String[] parts = id.split(":");
+        if (parts.length != 2) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "id",
+                    null,
+                    "must have the format 'groupId:artifactId' but is '" + id + "'.",
+                    exclusion);
+        }
+        if (exclusion.getGroupId() != null && !exclusion.getGroupId().isEmpty()) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "groupId",
+                    null,
+                    "must not be specified when the 'id' attribute is used.",
+                    exclusion);
+        }
+        if (exclusion.getArtifactId() != null && !exclusion.getArtifactId().isEmpty()) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "artifactId",
+                    null,
+                    "must not be specified when the 'id' attribute is used.",
+                    exclusion);
         }
     }
 
