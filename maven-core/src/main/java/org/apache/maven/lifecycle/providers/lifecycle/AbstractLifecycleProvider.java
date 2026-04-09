@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.lifecycle.providers;
+package org.apache.maven.lifecycle.providers.lifecycle;
 
 import javax.inject.Provider;
 
@@ -34,19 +34,22 @@ import org.apache.maven.lifecycle.mapping.LifecyclePhase;
  * @since 3.10.0
  */
 public abstract class AbstractLifecycleProvider implements Provider<Lifecycle> {
+    // START SNIPPET: versions
+    protected static final String CLEAN_PLUGIN_VERSION = "3.5.0";
+
+    protected static final String SITE_PLUGIN_VERSION = "3.12.1";
+    // END SNIPPET: versions
+
     private final Lifecycle lifecycle;
 
     protected AbstractLifecycleProvider(String id, String[] phases, String[] pluginBindings) {
         HashMap<String, LifecyclePhase> defaultBindings = null;
         if (pluginBindings != null) {
             final int len = pluginBindings.length;
-
-            if (len < 2 || len % 2 != 0) {
-                throw new IllegalArgumentException("Plugin bindings must have more than 0, even count of elements");
+            if (len % 2 != 0) {
+                throw new IllegalArgumentException("Plugin bindings must have even count of elements");
             }
-
             defaultBindings = new LinkedHashMap<>(len / 2);
-
             for (int i = 0; i < len; i += 2) {
                 defaultBindings.put(pluginBindings[i], new LifecyclePhase(pluginBindings[i + 1]));
             }

@@ -18,7 +18,6 @@
  */
 package org.apache.maven.lifecycle.providers.packaging;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -45,7 +44,6 @@ public final class WarLifecycleMappingProvider extends AbstractLifecycleMappingP
     };
     // END SNIPPET: war
 
-    @Inject
     public WarLifecycleMappingProvider() {
         super(BINDINGS);
     }

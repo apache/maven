@@ -16,32 +16,50 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.lifecycle.providers.packaging;
+package org.apache.maven.lifecycle.providers.lifecycle;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 /**
- * {@code ear} packaging plugins bindings provider for {@code default} lifecycle.
+ * Default lifecycle provider.
  *
  * @since 3.10.0
  */
-@Named("ear")
 @Singleton
-public final class EarLifecycleMappingProvider extends AbstractLifecycleMappingProvider {
-    // START SNIPPET: ear
-    private static final String[] BINDINGS = {
-        "generate-resources",
-                "org.apache.maven.plugins:maven-ear-plugin:" + EAR_PLUGIN_VERSION + ":generate-application-xml",
-        "process-resources",
-                "org.apache.maven.plugins:maven-resources-plugin:" + RESOURCES_PLUGIN_VERSION + ":resources",
-        "package", "org.apache.maven.plugins:maven-ear-plugin:" + EAR_PLUGIN_VERSION + ":ear",
-        "install", "org.apache.maven.plugins:maven-install-plugin:" + INSTALL_PLUGIN_VERSION + ":install",
-        "deploy", "org.apache.maven.plugins:maven-deploy-plugin:" + DEPLOY_PLUGIN_VERSION + ":deploy"
-    };
-    // END SNIPPET: ear
+@Named(DefaultLifecycleProvider.NAME)
+public class DefaultLifecycleProvider extends AbstractLifecycleProvider {
+    public static final String NAME = "default";
 
-    public EarLifecycleMappingProvider() {
-        super(BINDINGS);
+    private static final String[] PHASES = {
+        "validate",
+        "initialize",
+        "generate-sources",
+        "process-sources",
+        "generate-resources",
+        "process-resources",
+        "compile",
+        "process-classes",
+        "generate-test-sources",
+        "process-test-sources",
+        "generate-test-resources",
+        "process-test-resources",
+        "test-compile",
+        "process-test-classes",
+        "test",
+        "prepare-package",
+        "package",
+        "pre-integration-test",
+        "integration-test",
+        "post-integration-test",
+        "verify",
+        "install",
+        "deploy"
+    };
+
+    private static final String[] PLUGIN_BINDINGS = {};
+
+    public DefaultLifecycleProvider() {
+        super(NAME, PHASES, PLUGIN_BINDINGS);
     }
 }

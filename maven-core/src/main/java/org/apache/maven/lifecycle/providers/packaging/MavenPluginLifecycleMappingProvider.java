@@ -18,7 +18,6 @@
  */
 package org.apache.maven.lifecycle.providers.packaging;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -46,7 +45,6 @@ public final class MavenPluginLifecycleMappingProvider extends AbstractLifecycle
     };
     // END SNIPPET: maven-plugin
 
-    @Inject
     public MavenPluginLifecycleMappingProvider() {
         super(BINDINGS);
     }

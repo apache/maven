@@ -70,16 +70,13 @@ public abstract class AbstractLifecycleMappingProvider implements Provider<Lifec
         if (len < 2 || len % 2 != 0) {
             throw new IllegalArgumentException("Plugin bindings must have more than 0, even count of elements");
         }
-
         HashMap<String, LifecyclePhase> lifecyclePhaseBindings = new HashMap<>(len / 2);
         for (int i = 0; i < len; i = i + 2) {
             lifecyclePhaseBindings.put(pluginBindings[i], new LifecyclePhase(pluginBindings[i + 1]));
         }
-
         Lifecycle lifecycle = new Lifecycle();
         lifecycle.setId("default");
         lifecycle.setLifecyclePhases(Collections.unmodifiableMap(lifecyclePhaseBindings));
-
         this.lifecycleMapping = new DefaultLifecycleMapping(Collections.singletonList(lifecycle));
     }
 

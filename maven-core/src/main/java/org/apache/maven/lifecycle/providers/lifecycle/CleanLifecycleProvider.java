@@ -16,27 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.lifecycle.providers.packaging;
+package org.apache.maven.lifecycle.providers.lifecycle;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 /**
- * {@code pom} packaging plugins bindings provider for {@code default} lifecycle.
+ * Clean lifecycle provider.
  *
  * @since 3.10.0
  */
-@Named("pom")
 @Singleton
-public final class PomLifecycleMappingProvider extends AbstractLifecycleMappingProvider {
-    // START SNIPPET: pom
-    private static final String[] BINDINGS = {
-        "install", "org.apache.maven.plugins:maven-install-plugin:" + INSTALL_PLUGIN_VERSION + ":install",
-        "deploy", "org.apache.maven.plugins:maven-deploy-plugin:" + DEPLOY_PLUGIN_VERSION + ":deploy"
-    };
-    // END SNIPPET: pom
+@Named(CleanLifecycleProvider.NAME)
+public class CleanLifecycleProvider extends AbstractLifecycleProvider {
+    public static final String NAME = "clean";
 
-    public PomLifecycleMappingProvider() {
-        super(BINDINGS);
+    private static final String[] PHASES = {"pre-clean", "clean", "post-clean"};
+
+    private static final String[] PLUGIN_BINDINGS = {
+        "clean", "org.apache.maven.plugins:maven-clean-plugin:" + CLEAN_PLUGIN_VERSION + ":clean"
+    };
+
+    public CleanLifecycleProvider() {
+        super(NAME, PHASES, PLUGIN_BINDINGS);
     }
 }
