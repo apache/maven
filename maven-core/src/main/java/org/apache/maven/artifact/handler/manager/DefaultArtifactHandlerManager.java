@@ -36,10 +36,14 @@ import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 @Named
 public class DefaultArtifactHandlerManager implements ArtifactHandlerManager {
 
-    @Inject
-    private Map<String, ArtifactHandler> artifactHandlers;
+    private final Map<String, ArtifactHandler> artifactHandlers;
 
     private Map<String, ArtifactHandler> allHandlers = new ConcurrentHashMap<>();
+
+    @Inject
+    public DefaultArtifactHandlerManager(Map<String, ArtifactHandler> artifactHandlers) {
+        this.artifactHandlers = artifactHandlers;
+    }
 
     public ArtifactHandler getArtifactHandler(String type) {
         ArtifactHandler handler = allHandlers.get(type);

@@ -16,30 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.repository;
+package org.apache.maven.artifact.handler.types;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.repository.RemoteRepository;
-import org.eclipse.aether.spi.connector.RepositoryConnector;
-import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
-import org.eclipse.aether.transfer.NoRepositoryConnectorException;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.handler.ArtifactHandlerImpl;
 
 /**
- * @author Benjamin Bentmann
+ * WAR Artifact Handler.
+ *
+ * @since 3.10.0
  */
 @Singleton
-@Named("test")
-public class TestRepositoryConnectorFactory implements RepositoryConnectorFactory {
+@Named(WarArtifactHandler.NAME)
+public final class WarArtifactHandler implements Provider<ArtifactHandler> {
+    public static final String NAME = "war";
 
-    public RepositoryConnector newInstance(RepositorySystemSession session, RemoteRepository repository)
-            throws NoRepositoryConnectorException {
-        return new TestRepositoryConnector(repository);
+    private final ArtifactHandler instance;
+
+    public WarArtifactHandler() {
+        this.instance = new ArtifactHandlerImpl(NAME, null, null, null, true, ArtifactHandlerImpl.LANGUAGE_JAVA, false);
     }
 
-    public float getPriority() {
-        return 0;
+    @Override
+    public ArtifactHandler get() {
+        return instance;
     }
 }

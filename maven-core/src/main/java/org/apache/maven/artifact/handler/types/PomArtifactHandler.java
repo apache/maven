@@ -16,30 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.repository;
+package org.apache.maven.artifact.handler.types;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.repository.RemoteRepository;
-import org.eclipse.aether.spi.connector.RepositoryConnector;
-import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
-import org.eclipse.aether.transfer.NoRepositoryConnectorException;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.handler.ArtifactHandlerImpl;
 
 /**
- * @author Benjamin Bentmann
+ * POM Artifact Handler.
+ *
+ * @since 3.10.0
  */
 @Singleton
-@Named("test")
-public class TestRepositoryConnectorFactory implements RepositoryConnectorFactory {
+@Named(PomArtifactHandler.NAME)
+public final class PomArtifactHandler implements Provider<ArtifactHandler> {
+    public static final String NAME = "pom";
 
-    public RepositoryConnector newInstance(RepositorySystemSession session, RemoteRepository repository)
-            throws NoRepositoryConnectorException {
-        return new TestRepositoryConnector(repository);
+    private final ArtifactHandler instance;
+
+    public PomArtifactHandler() {
+        this.instance = new ArtifactHandlerImpl(NAME, null, null, null, false, null, false);
     }
 
-    public float getPriority() {
-        return 0;
+    @Override
+    public ArtifactHandler get() {
+        return instance;
     }
 }

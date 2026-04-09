@@ -16,30 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.repository;
+package org.apache.maven.artifact.handler.types;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.repository.RemoteRepository;
-import org.eclipse.aether.spi.connector.RepositoryConnector;
-import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
-import org.eclipse.aether.transfer.NoRepositoryConnectorException;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.handler.ArtifactHandlerImpl;
 
 /**
- * @author Benjamin Bentmann
+ * Sources JAR Artifact Handler.
+ *
+ * @since 3.10.0
  */
 @Singleton
-@Named("test")
-public class TestRepositoryConnectorFactory implements RepositoryConnectorFactory {
+@Named(JavaSourceArtifactHandler.NAME)
+public final class JavaSourceArtifactHandler implements Provider<ArtifactHandler> {
+    public static final String NAME = "java-source";
 
-    public RepositoryConnector newInstance(RepositorySystemSession session, RemoteRepository repository)
-            throws NoRepositoryConnectorException {
-        return new TestRepositoryConnector(repository);
+    private final ArtifactHandler instance;
+
+    public JavaSourceArtifactHandler() {
+        this.instance =
+                new ArtifactHandlerImpl(NAME, "jar", "sources", null, false, ArtifactHandlerImpl.LANGUAGE_JAVA, false);
     }
 
-    public float getPriority() {
-        return 0;
+    @Override
+    public ArtifactHandler get() {
+        return instance;
     }
 }

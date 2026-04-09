@@ -16,30 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.repository;
+package org.apache.maven.artifact.handler.types;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.repository.RemoteRepository;
-import org.eclipse.aether.spi.connector.RepositoryConnector;
-import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
-import org.eclipse.aether.transfer.NoRepositoryConnectorException;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.handler.ArtifactHandlerImpl;
 
 /**
- * @author Benjamin Bentmann
+ * EJB Client Artifact Handler.
+ *
+ * @since 3.10.0
  */
 @Singleton
-@Named("test")
-public class TestRepositoryConnectorFactory implements RepositoryConnectorFactory {
+@Named(EjbClientArtifactHandler.NAME)
+public final class EjbClientArtifactHandler implements Provider<ArtifactHandler> {
+    public static final String NAME = "ejb-client";
 
-    public RepositoryConnector newInstance(RepositorySystemSession session, RemoteRepository repository)
-            throws NoRepositoryConnectorException {
-        return new TestRepositoryConnector(repository);
+    private final ArtifactHandler instance;
+
+    public EjbClientArtifactHandler() {
+        this.instance =
+                new ArtifactHandlerImpl(NAME, "jar", "client", "ejb", false, ArtifactHandlerImpl.LANGUAGE_JAVA, true);
     }
 
-    public float getPriority() {
-        return 0;
+    @Override
+    public ArtifactHandler get() {
+        return instance;
     }
 }
