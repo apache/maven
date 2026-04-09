@@ -143,6 +143,7 @@ public abstract class AbstractMavenProjectTestCase implements PlexusTestConfigur
     private void initRepoSession(ProjectBuildingRequest request) {
         File localRepo = new File(request.getLocalRepository().getBasedir());
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
+        session.setConfigProperty("aether.remoteRepositoryFilter.prefixes.resolvePrefixFiles", "false");
         session.setLocalRepositoryManager(new LegacyLocalRepositoryManager(localRepo));
         request.setRepositorySession(session);
     }

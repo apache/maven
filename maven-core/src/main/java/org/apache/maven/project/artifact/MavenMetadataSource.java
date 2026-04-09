@@ -19,7 +19,9 @@
 package org.apache.maven.project.artifact;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -90,6 +92,8 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Jason van Zyl
  */
+@Singleton
+@Named("maven")
 public class MavenMetadataSource implements ArtifactMetadataSource {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());

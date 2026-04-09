@@ -18,6 +18,9 @@
  */
 package org.apache.maven.project;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
@@ -25,9 +28,9 @@ import java.util.Collections;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.codehaus.plexus.component.annotations.Component;
 
-@Component(role = ProjectBuilder.class, hint = "classpath")
+@Singleton
+@Named("classpath")
 public class TestProjectBuilder extends DefaultProjectBuilder {
 
     @Override

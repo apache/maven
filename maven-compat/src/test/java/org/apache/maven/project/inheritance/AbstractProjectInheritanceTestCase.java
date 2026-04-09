@@ -21,6 +21,7 @@ package org.apache.maven.project.inheritance;
 import java.io.File;
 
 import org.apache.maven.project.AbstractMavenProjectTestCase;
+import org.codehaus.plexus.ContainerConfiguration;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
 
@@ -28,6 +29,11 @@ import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
  * @author Jason van Zyl
  */
 public abstract class AbstractProjectInheritanceTestCase extends AbstractMavenProjectTestCase {
+    @Override
+    public void customizeConfiguration(ContainerConfiguration containerConfiguration) {
+        super.customizeConfiguration(containerConfiguration);
+    }
+
     protected String getTestSeries() {
         String className = getClass().getPackage().getName();
 
