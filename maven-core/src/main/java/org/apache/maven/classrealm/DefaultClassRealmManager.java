@@ -44,10 +44,9 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.artifact.Artifact;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Manages the class realms used by Maven. <strong>Warning:</strong> This is an internal utility class that is only
@@ -71,7 +70,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
      */
     private static final ClassLoader PARENT_CLASSLOADER = ClassWorld.class.getClassLoader();
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger;
 
     private final ClassWorld world;
 
@@ -90,7 +89,8 @@ public class DefaultClassRealmManager implements ClassRealmManager {
 
     @Inject
     public DefaultClassRealmManager(
-            PlexusContainer container, List<ClassRealmManagerDelegate> delegates, CoreExports exports) {
+            Logger logger, PlexusContainer container, List<ClassRealmManagerDelegate> delegates, CoreExports exports) {
+        this.logger = logger;
         this.world = ((MutablePlexusContainer) container).getClassWorld();
         this.containerRealm = container.getContainerRealm();
         this.delegates = delegates;
