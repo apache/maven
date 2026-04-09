@@ -18,6 +18,10 @@
  */
 package org.apache.maven.settings;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -27,8 +31,6 @@ import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuilder;
 import org.apache.maven.settings.building.SettingsBuildingException;
 import org.apache.maven.settings.building.SettingsBuildingRequest;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -36,10 +38,11 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 /**
  * @author jdcasey
  */
-@Component(role = MavenSettingsBuilder.class)
+@Singleton
+@Named
 public class DefaultMavenSettingsBuilder extends AbstractLogEnabled implements MavenSettingsBuilder {
 
-    @Requirement
+    @Inject
     private SettingsBuilder settingsBuilder;
 
     public Settings buildSettings() throws IOException, XmlPullParserException {

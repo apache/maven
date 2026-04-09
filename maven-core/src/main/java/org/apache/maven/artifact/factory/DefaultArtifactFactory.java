@@ -18,22 +18,25 @@
  */
 package org.apache.maven.artifact.factory;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.versioning.VersionRange;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * DefaultArtifactFactory
  *
  */
-@Component(role = ArtifactFactory.class)
+@Singleton
+@Named
 @SuppressWarnings("checkstyle:parameternumber")
 public class DefaultArtifactFactory implements ArtifactFactory {
-    @Requirement
+    @Inject
     private ArtifactHandlerManager artifactHandlerManager;
 
     public Artifact createArtifact(String groupId, String artifactId, String version, String scope, String type) {

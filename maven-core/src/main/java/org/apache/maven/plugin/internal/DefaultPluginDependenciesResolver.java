@@ -18,6 +18,10 @@
  */
 package org.apache.maven.plugin.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,8 +34,6 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginResolutionException;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -69,18 +71,19 @@ import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
  * @since 3.0
  * @author Benjamin Bentmann
  */
-@Component(role = PluginDependenciesResolver.class)
+@Singleton
+@Named
 public class DefaultPluginDependenciesResolver implements PluginDependenciesResolver {
 
     private static final String REPOSITORY_CONTEXT = "plugin";
 
-    @Requirement
+    @Inject
     private Logger logger;
 
-    @Requirement
+    @Inject
     private RepositorySystem repoSystem;
 
-    @Requirement
+    @Inject
     private List<MavenPluginDependenciesValidator> dependenciesValidators;
 
     private Artifact toArtifact(Plugin plugin, RepositorySystemSession session) {

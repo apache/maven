@@ -18,6 +18,10 @@
  */
 package org.apache.maven.project;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -46,8 +50,6 @@ import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.util.filter.ExclusionsDependencyFilter;
@@ -59,25 +61,26 @@ import org.eclipse.aether.util.filter.ExclusionsDependencyFilter;
  *
  * @author Benjamin Bentmann
  */
-@Component(role = ProjectBuildingHelper.class)
+@Singleton
+@Named
 public class DefaultProjectBuildingHelper implements ProjectBuildingHelper {
 
-    @Requirement
+    @Inject
     private Logger logger;
 
-    @Requirement
+    @Inject
     private PlexusContainer container;
 
-    @Requirement
+    @Inject
     private ClassRealmManager classRealmManager;
 
-    @Requirement
+    @Inject
     private ProjectRealmCache projectRealmCache;
 
-    @Requirement
+    @Inject
     private MavenRepositorySystem repositorySystem;
 
-    @Requirement
+    @Inject
     private MavenPluginManager pluginManager;
 
     public List<ArtifactRepository> createArtifactRepositories(

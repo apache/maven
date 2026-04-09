@@ -18,6 +18,10 @@
  */
 package org.apache.maven.bridge;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -53,8 +57,6 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.repository.Proxy;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Mirror;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.AuthenticationContext;
@@ -68,7 +70,8 @@ import org.slf4j.LoggerFactory;
  * @author Jason van Zyl
  * @since 3.2.3
  */
-@Component(role = MavenRepositorySystem.class, hint = "default")
+@Singleton
+@Named("default")
 public class MavenRepositorySystem {
 
     // Singleton instance for static deprecated methods
@@ -76,10 +79,10 @@ public class MavenRepositorySystem {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MavenRepositorySystem.class);
 
-    @Requirement
+    @Inject
     private ArtifactHandlerManager artifactHandlerManager;
 
-    @Requirement(role = ArtifactRepositoryLayout.class)
+    @Inject
     private Map<String, ArtifactRepositoryLayout> layouts;
 
     MavenRepositorySystem() {

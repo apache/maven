@@ -18,6 +18,10 @@
  */
 package org.apache.maven.toolchain;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,19 +32,18 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.toolchain.model.ToolchainModel;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
 /**
  * @author mkleint
  */
-@Component(role = ToolchainManager.class)
+@Singleton
+@Named
 public class DefaultToolchainManager implements ToolchainManager {
-    @Requirement
+    @Inject
     Logger logger;
 
-    @Requirement(role = ToolchainFactory.class)
+    @Inject
     Map<String, ToolchainFactory> factories;
 
     @Override

@@ -18,6 +18,10 @@
  */
 package org.apache.maven.project;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.AbstractMap;
@@ -64,8 +68,6 @@ import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
 import org.apache.maven.repository.internal.DefaultModelCacheFactory;
 import org.apache.maven.repository.internal.ModelCacheFactory;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
@@ -81,37 +83,38 @@ import org.eclipse.aether.resolution.ArtifactResult;
 /**
  * DefaultProjectBuilder
  */
-@Component(role = ProjectBuilder.class)
+@Singleton
+@Named
 public class DefaultProjectBuilder implements ProjectBuilder {
 
     public static final String DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY =
             "maven.defaultProjectBuilder.disableGlobalModelCache";
 
-    @Requirement
+    @Inject
     private Logger logger;
 
-    @Requirement
+    @Inject
     private ModelBuilder modelBuilder;
 
-    @Requirement
+    @Inject
     private ModelProcessor modelProcessor;
 
-    @Requirement
+    @Inject
     private ProjectBuildingHelper projectBuildingHelper;
 
-    @Requirement
+    @Inject
     private MavenRepositorySystem repositorySystem;
 
-    @Requirement
+    @Inject
     private org.eclipse.aether.RepositorySystem repoSystem;
 
-    @Requirement
+    @Inject
     private RemoteRepositoryManager repositoryManager;
 
-    @Requirement
+    @Inject
     private ProjectDependenciesResolver dependencyResolver;
 
-    @Requirement
+    @Inject
     private ModelCacheFactory modelCacheFactory;
 
     // ----------------------------------------------------------------------

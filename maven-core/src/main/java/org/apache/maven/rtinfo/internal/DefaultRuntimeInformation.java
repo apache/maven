@@ -18,14 +18,16 @@
  */
 package org.apache.maven.rtinfo.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
 import java.util.Properties;
 
 import org.apache.maven.rtinfo.RuntimeInformation;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
@@ -36,10 +38,11 @@ import org.eclipse.aether.version.VersionScheme;
 /**
  * Provides information about the current Maven runtime.
  */
-@Component(role = RuntimeInformation.class)
+@Singleton
+@Named
 public class DefaultRuntimeInformation implements RuntimeInformation {
 
-    @Requirement
+    @Inject
     private Logger logger;
 
     private String mavenVersion;

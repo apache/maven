@@ -18,22 +18,25 @@
  */
 package org.apache.maven.artifact.handler.manager;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * @author Jason van Zyl
  */
-@Component(role = ArtifactHandlerManager.class)
+@Singleton
+@Named
 public class DefaultArtifactHandlerManager implements ArtifactHandlerManager {
 
-    @Requirement(role = ArtifactHandler.class)
+    @Inject
     private Map<String, ArtifactHandler> artifactHandlers;
 
     private Map<String, ArtifactHandler> allHandlers = new ConcurrentHashMap<>();

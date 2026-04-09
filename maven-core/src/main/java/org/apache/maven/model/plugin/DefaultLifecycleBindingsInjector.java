@@ -18,6 +18,10 @@
  */
 package org.apache.maven.model.plugin;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,20 +42,19 @@ import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.merge.MavenModelMerger;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * Handles injection of plugin executions induced by the lifecycle bindings for a packaging.
  *
  * @author Benjamin Bentmann
  */
-@Component(role = LifecycleBindingsInjector.class)
+@Singleton
+@Named
 public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInjector {
 
     private LifecycleBindingsMerger merger = new LifecycleBindingsMerger();
 
-    @Requirement
+    @Inject
     private LifeCyclePluginAnalyzer lifecycle;
 
     public void injectLifecycleBindings(Model model, ModelBuildingRequest request, ModelProblemCollector problems) {

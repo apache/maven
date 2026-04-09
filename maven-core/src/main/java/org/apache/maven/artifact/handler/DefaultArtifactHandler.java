@@ -18,13 +18,15 @@
  */
 package org.apache.maven.artifact.handler;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @author Jason van Zyl
  */
-@Component(role = ArtifactHandler.class)
+@Singleton
+@Named
 public class DefaultArtifactHandler implements ArtifactHandler {
     private String extension;
 

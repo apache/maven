@@ -18,6 +18,10 @@
  */
 package org.apache.maven.lifecycle.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.HashSet;
 import java.util.List;
 
@@ -31,8 +35,6 @@ import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * <p>
@@ -45,22 +47,23 @@ import org.codehaus.plexus.component.annotations.Requirement;
  * @author Jason van Zyl
  * @author Kristian Rosenvold (extracted class)
  */
-@Component(role = LifecycleModuleBuilder.class)
+@Singleton
+@Named
 public class LifecycleModuleBuilder {
 
-    @Requirement
+    @Inject
     private MojoExecutor mojoExecutor;
 
-    @Requirement
+    @Inject
     private BuilderCommon builderCommon;
 
-    @Requirement
+    @Inject
     private ExecutionEventCatapult eventCatapult;
 
     private ProjectExecutionListener projectExecutionListener;
 
-    // this tricks plexus-component-metadata generate required metadata
-    @Requirement
+    // TODO this tricks plexus-component-metadata generate required metadata
+    @Inject
     private List<ProjectExecutionListener> projectExecutionListeners;
 
     public void setProjectExecutionListeners(final List<ProjectExecutionListener> listeners) {

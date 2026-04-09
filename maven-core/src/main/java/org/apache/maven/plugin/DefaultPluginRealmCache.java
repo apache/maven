@@ -18,6 +18,9 @@
  */
 package org.apache.maven.plugin;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,19 +34,19 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.WorkspaceRepository;
+import org.eclipse.sisu.PreDestroy;
 
 /**
  * Default PluginCache implementation. Assumes cached data does not change.
  */
-@Component(role = PluginRealmCache.class)
-public class DefaultPluginRealmCache implements PluginRealmCache, Disposable {
+@Singleton
+@Named
+public class DefaultPluginRealmCache implements PluginRealmCache {
     /**
      * CacheKey
      */
@@ -208,6 +211,7 @@ public class DefaultPluginRealmCache implements PluginRealmCache, Disposable {
         // default cache does not track plugin usage
     }
 
+    @PreDestroy
     public void dispose() {
         flush();
     }

@@ -18,6 +18,10 @@
  */
 package org.apache.maven.plugin.version.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,8 +46,6 @@ import org.apache.maven.plugin.version.PluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolver;
 import org.apache.maven.plugin.version.PluginVersionResult;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositoryEvent;
@@ -69,23 +71,24 @@ import org.eclipse.aether.version.VersionScheme;
  * @since 3.0
  * @author Benjamin Bentmann
  */
-@Component(role = PluginVersionResolver.class)
+@Singleton
+@Named
 public class DefaultPluginVersionResolver implements PluginVersionResolver {
 
     private static final String REPOSITORY_CONTEXT = "plugin";
 
     private static final Object CACHE_KEY = new Object();
 
-    @Requirement
+    @Inject
     private Logger logger;
 
-    @Requirement
+    @Inject
     private RepositorySystem repositorySystem;
 
-    @Requirement
+    @Inject
     private MetadataReader metadataReader;
 
-    @Requirement
+    @Inject
     private MavenPluginManager pluginManager;
 
     public PluginVersionResult resolve(PluginVersionRequest request) throws PluginVersionResolutionException {
