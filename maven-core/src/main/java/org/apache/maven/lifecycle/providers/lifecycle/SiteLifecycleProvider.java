@@ -21,6 +21,8 @@ package org.apache.maven.lifecycle.providers.lifecycle;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.maven.lifecycle.providers.PluginVersions;
+
 /**
  * Site lifecycle provider.
  *
@@ -35,9 +37,9 @@ public class SiteLifecycleProvider extends AbstractLifecycleProvider {
 
     private static final String[] PLUGIN_BINDINGS = {
         "site",
-        "org.apache.maven.plugins:maven-site-plugin:" + SITE_PLUGIN_VERSION + ":site",
+        "org.apache.maven.plugins:maven-site-plugin:" + PluginVersions.SITE_PLUGIN_VERSION + ":site",
         "site-deploy",
-        "org.apache.maven.plugins:maven-site-plugin:" + SITE_PLUGIN_VERSION + ":deploy"
+        "org.apache.maven.plugins:maven-site-plugin:" + PluginVersions.SITE_PLUGIN_VERSION + ":deploy"
     };
 
     public SiteLifecycleProvider() {

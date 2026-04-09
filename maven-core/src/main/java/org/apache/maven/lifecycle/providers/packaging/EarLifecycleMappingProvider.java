@@ -21,6 +21,8 @@ package org.apache.maven.lifecycle.providers.packaging;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.maven.lifecycle.providers.PluginVersions;
+
 /**
  * {@code ear} packaging plugins bindings provider for {@code default} lifecycle.
  *
@@ -32,12 +34,15 @@ public final class EarLifecycleMappingProvider extends AbstractLifecycleMappingP
     // START SNIPPET: ear
     private static final String[] BINDINGS = {
         "generate-resources",
-                "org.apache.maven.plugins:maven-ear-plugin:" + EAR_PLUGIN_VERSION + ":generate-application-xml",
+                "org.apache.maven.plugins:maven-ear-plugin:" + PluginVersions.EAR_PLUGIN_VERSION
+                        + ":generate-application-xml",
         "process-resources",
-                "org.apache.maven.plugins:maven-resources-plugin:" + RESOURCES_PLUGIN_VERSION + ":resources",
-        "package", "org.apache.maven.plugins:maven-ear-plugin:" + EAR_PLUGIN_VERSION + ":ear",
-        "install", "org.apache.maven.plugins:maven-install-plugin:" + INSTALL_PLUGIN_VERSION + ":install",
-        "deploy", "org.apache.maven.plugins:maven-deploy-plugin:" + DEPLOY_PLUGIN_VERSION + ":deploy"
+                "org.apache.maven.plugins:maven-resources-plugin:" + PluginVersions.RESOURCES_PLUGIN_VERSION
+                        + ":resources",
+        "package", "org.apache.maven.plugins:maven-ear-plugin:" + PluginVersions.EAR_PLUGIN_VERSION + ":ear",
+        "install",
+                "org.apache.maven.plugins:maven-install-plugin:" + PluginVersions.INSTALL_PLUGIN_VERSION + ":install",
+        "deploy", "org.apache.maven.plugins:maven-deploy-plugin:" + PluginVersions.DEPLOY_PLUGIN_VERSION + ":deploy"
     };
     // END SNIPPET: ear
 

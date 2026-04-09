@@ -34,12 +34,6 @@ import org.apache.maven.lifecycle.mapping.LifecyclePhase;
  * @since 3.10.0
  */
 public abstract class AbstractLifecycleProvider implements Provider<Lifecycle> {
-    // START SNIPPET: versions
-    protected static final String CLEAN_PLUGIN_VERSION = "3.5.0";
-
-    protected static final String SITE_PLUGIN_VERSION = "3.12.1";
-    // END SNIPPET: versions
-
     private final Lifecycle lifecycle;
 
     protected AbstractLifecycleProvider(String id, String[] phases, String[] pluginBindings) {

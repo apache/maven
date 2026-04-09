@@ -21,6 +21,8 @@ package org.apache.maven.lifecycle.providers.packaging;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.maven.lifecycle.providers.PluginVersions;
+
 /**
  * {@code ejb} packaging plugins bindings provider for {@code default} lifecycle.
  *
@@ -32,15 +34,21 @@ public final class EjbLifecycleMappingProvider extends AbstractLifecycleMappingP
     // START SNIPPET: ejb
     private static final String[] BINDINGS = {
         "process-resources",
-                "org.apache.maven.plugins:maven-resources-plugin:" + RESOURCES_PLUGIN_VERSION + ":resources",
-        "compile", "org.apache.maven.plugins:maven-compiler-plugin:" + COMPILER_PLUGIN_VERSION + ":compile",
+                "org.apache.maven.plugins:maven-resources-plugin:" + PluginVersions.RESOURCES_PLUGIN_VERSION
+                        + ":resources",
+        "compile",
+                "org.apache.maven.plugins:maven-compiler-plugin:" + PluginVersions.COMPILER_PLUGIN_VERSION + ":compile",
         "process-test-resources",
-                "org.apache.maven.plugins:maven-resources-plugin:" + RESOURCES_PLUGIN_VERSION + ":testResources",
-        "test-compile", "org.apache.maven.plugins:maven-compiler-plugin:" + COMPILER_PLUGIN_VERSION + ":testCompile",
-        "test", "org.apache.maven.plugins:maven-surefire-plugin:" + SUREFIRE_PLUGIN_VERSION + ":test",
-        "package", "org.apache.maven.plugins:maven-ejb-plugin:" + EJB_PLUGIN_VERSION + ":ejb",
-        "install", "org.apache.maven.plugins:maven-install-plugin:" + INSTALL_PLUGIN_VERSION + ":install",
-        "deploy", "org.apache.maven.plugins:maven-deploy-plugin:" + DEPLOY_PLUGIN_VERSION + ":deploy"
+                "org.apache.maven.plugins:maven-resources-plugin:" + PluginVersions.RESOURCES_PLUGIN_VERSION
+                        + ":testResources",
+        "test-compile",
+                "org.apache.maven.plugins:maven-compiler-plugin:" + PluginVersions.COMPILER_PLUGIN_VERSION
+                        + ":testCompile",
+        "test", "org.apache.maven.plugins:maven-surefire-plugin:" + PluginVersions.SUREFIRE_PLUGIN_VERSION + ":test",
+        "package", "org.apache.maven.plugins:maven-ejb-plugin:" + PluginVersions.EJB_PLUGIN_VERSION + ":ejb",
+        "install",
+                "org.apache.maven.plugins:maven-install-plugin:" + PluginVersions.INSTALL_PLUGIN_VERSION + ":install",
+        "deploy", "org.apache.maven.plugins:maven-deploy-plugin:" + PluginVersions.DEPLOY_PLUGIN_VERSION + ":deploy"
     };
     // END SNIPPET: ejb
 

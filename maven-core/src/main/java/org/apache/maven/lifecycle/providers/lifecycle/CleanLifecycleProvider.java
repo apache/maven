@@ -21,6 +21,8 @@ package org.apache.maven.lifecycle.providers.lifecycle;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.maven.lifecycle.providers.PluginVersions;
+
 /**
  * Clean lifecycle provider.
  *
@@ -34,7 +36,7 @@ public class CleanLifecycleProvider extends AbstractLifecycleProvider {
     private static final String[] PHASES = {"pre-clean", "clean", "post-clean"};
 
     private static final String[] PLUGIN_BINDINGS = {
-        "clean", "org.apache.maven.plugins:maven-clean-plugin:" + CLEAN_PLUGIN_VERSION + ":clean"
+        "clean", "org.apache.maven.plugins:maven-clean-plugin:" + PluginVersions.CLEAN_PLUGIN_VERSION + ":clean"
     };
 
     public CleanLifecycleProvider() {
