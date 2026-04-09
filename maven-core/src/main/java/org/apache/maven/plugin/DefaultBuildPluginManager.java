@@ -59,12 +59,10 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
 
     private MojoExecutionListener mojoExecutionListener;
 
-    // TODO this tricks plexus-component-metadata generate required metadata
+    // TODO: this is hack here; old code was tricking plexus to call setter method; to preserve binary compat, not much
+    // can be done, but marking this
     @Inject
-    private List<MojoExecutionListener> mojoExecutionListeners;
-
     public void setMojoExecutionListeners(final List<MojoExecutionListener> listeners) {
-        this.mojoExecutionListeners = listeners;
         this.mojoExecutionListener = new CompoundMojoExecutionListener(listeners);
     }
 

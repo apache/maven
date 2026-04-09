@@ -44,7 +44,6 @@ import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.prefix.PluginPrefixRequest;
 import org.apache.maven.plugin.prefix.PluginPrefixResolver;
 import org.apache.maven.plugin.prefix.PluginPrefixResult;
-import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
@@ -58,6 +57,8 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.resolution.MetadataRequest;
 import org.eclipse.aether.resolution.MetadataResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Resolves a plugin prefix.
@@ -71,8 +72,7 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
 
     private static final String REPOSITORY_CONTEXT = "plugin";
 
-    @Inject
-    private Logger logger;
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Inject
     private BuildPluginManager pluginManager;

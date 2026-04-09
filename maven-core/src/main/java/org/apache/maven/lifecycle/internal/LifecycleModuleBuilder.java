@@ -62,12 +62,10 @@ public class LifecycleModuleBuilder {
 
     private ProjectExecutionListener projectExecutionListener;
 
-    // TODO this tricks plexus-component-metadata generate required metadata
+    // TODO: this is hack here; old code was tricking plexus to call setter method; to preserve binary compat, not much
+    // can be done, but marking this
     @Inject
-    private List<ProjectExecutionListener> projectExecutionListeners;
-
     public void setProjectExecutionListeners(final List<ProjectExecutionListener> listeners) {
-        this.projectExecutionListeners = listeners;
         this.projectExecutionListener = new CompoundProjectExecutionListener(listeners);
     }
 

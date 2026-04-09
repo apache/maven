@@ -57,10 +57,11 @@ import org.apache.maven.repository.LocalRepositoryNotAccessibleException;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.WorkspaceReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Jason van Zyl
@@ -69,8 +70,7 @@ import org.eclipse.aether.repository.WorkspaceReader;
 @Named
 public class DefaultMaven implements Maven {
 
-    @Inject
-    private Logger logger;
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Inject
     protected ProjectBuilder projectBuilder;

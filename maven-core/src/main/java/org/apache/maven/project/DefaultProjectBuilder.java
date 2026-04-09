@@ -68,7 +68,6 @@ import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
 import org.apache.maven.repository.internal.DefaultModelCacheFactory;
 import org.apache.maven.repository.internal.ModelCacheFactory;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositorySystemSession;
@@ -79,6 +78,8 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DefaultProjectBuilder
@@ -90,8 +91,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     public static final String DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY =
             "maven.defaultProjectBuilder.disableGlobalModelCache";
 
-    @Inject
-    private Logger logger;
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Inject
     private ModelBuilder modelBuilder;

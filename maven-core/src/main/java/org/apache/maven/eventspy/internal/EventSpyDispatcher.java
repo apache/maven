@@ -27,8 +27,9 @@ import java.util.List;
 
 import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.execution.ExecutionListener;
-import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.RepositoryListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Dispatches callbacks to all registered eventspies.
@@ -38,8 +39,7 @@ import org.eclipse.aether.RepositoryListener;
 @Named
 public class EventSpyDispatcher {
 
-    @Inject
-    private Logger logger;
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Inject
     private List<EventSpy> eventSpies;

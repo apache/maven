@@ -53,9 +53,10 @@ import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingResult;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Builds the {@link ProjectDependencyGraph inter-dependencies graph} between projects in the reactor.
@@ -64,8 +65,7 @@ import org.codehaus.plexus.util.dag.CycleDetectedException;
 @Named(GraphBuilder.HINT)
 public class DefaultGraphBuilder implements GraphBuilder {
 
-    @Inject
-    private Logger logger;
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Inject
     protected ProjectBuilder projectBuilder;

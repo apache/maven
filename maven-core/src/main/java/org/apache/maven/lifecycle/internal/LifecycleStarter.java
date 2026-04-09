@@ -34,7 +34,8 @@ import org.apache.maven.lifecycle.NoGoalSpecifiedException;
 import org.apache.maven.lifecycle.internal.builder.Builder;
 import org.apache.maven.lifecycle.internal.builder.BuilderNotFoundException;
 import org.apache.maven.session.scope.internal.SessionScope;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Starts the build life cycle
@@ -46,14 +47,13 @@ import org.codehaus.plexus.logging.Logger;
 @Singleton
 @Named
 public class LifecycleStarter {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Inject
     private ExecutionEventCatapult eventCatapult;
 
     @Inject
     private DefaultLifecycles defaultLifeCycles;
-
-    @Inject
-    private Logger logger;
 
     @Inject
     private BuildListCalculator buildListCalculator;

@@ -38,9 +38,10 @@ import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
@@ -55,14 +56,13 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 @Named
 public class DefaultLifecyclePluginAnalyzer implements LifeCyclePluginAnalyzer {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Inject
     private Map<String, LifecycleMapping> lifecycleMappings;
 
     @Inject
     private DefaultLifecycles defaultLifeCycles;
-
-    @Inject
-    private Logger logger;
 
     public DefaultLifecyclePluginAnalyzer() {}
 

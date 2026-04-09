@@ -80,16 +80,20 @@ import org.apache.maven.properties.internal.SystemProperties;
 import org.apache.maven.repository.internal.MavenWorkspaceReader;
 import org.apache.maven.repository.legacy.metadata.DefaultMetadataResolutionRequest;
 import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
-import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Jason van Zyl
  */
 public class MavenMetadataSource implements ArtifactMetadataSource {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Inject
     private RepositoryMetadataManager repositoryMetadataManager;
 
@@ -101,9 +105,6 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
 
     @Inject
     private Provider<ProjectBuilder> projectBuilderProvider;
-
-    @Inject
-    private Logger logger;
 
     @Inject
     private MavenMetadataCache cache;
