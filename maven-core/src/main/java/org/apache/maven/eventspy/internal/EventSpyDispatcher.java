@@ -22,7 +22,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.eventspy.EventSpy;
@@ -41,12 +40,11 @@ public class EventSpyDispatcher {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Inject
-    private List<EventSpy> eventSpies;
+    private final List<EventSpy> eventSpies;
 
-    public void setEventSpies(List<EventSpy> eventSpies) {
-        // make copy to get rid of needless overhead for dynamic lookups
-        this.eventSpies = new ArrayList<>(eventSpies);
+    @Inject
+    public EventSpyDispatcher(List<EventSpy> eventSpies) {
+        this.eventSpies = eventSpies;
     }
 
     public List<EventSpy> getEventSpies() {
