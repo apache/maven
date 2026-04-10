@@ -22,6 +22,7 @@ import java.io.File;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.repository.internal.DefaultArtifactDescriptorReader;
+import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.impl.ArtifactDescriptorReader;
 import org.eclipse.aether.impl.ArtifactResolver;
@@ -45,8 +46,12 @@ public class ProjectClasspathTest extends AbstractMavenProjectTestCase {
 
         projectBuilder = container.lookup(ProjectBuilder.class, "classpath");
 
+        // create fake project builder component descriptor
+        ComponentDescriptor<TestProjectBuilder> fakeProjectBuilder =
+                new ComponentDescriptor<>(TestProjectBuilder.class, container.getContainerRealm());
+        fakeProjectBuilder.setRoleClass(ProjectClasspathTest.class);
         // the metadata source looks up the default impl, so we have to trick it
-        container.addComponent(projectBuilder, ProjectBuilder.class, "default");
+        container.addComponentDescriptor(fakeProjectBuilder);
     }
 
     @Test

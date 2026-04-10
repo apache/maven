@@ -18,6 +18,10 @@
  */
 package org.apache.maven.lifecycle.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -29,8 +33,6 @@ import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -45,9 +47,10 @@ import org.codehaus.plexus.util.StringUtils;
  * @author Jason van Zyl
  * @author Kristian Rosenvold (extracted class only)
  */
-@Component(role = LifecycleDebugLogger.class)
+@Singleton
+@Named
 public class LifecycleDebugLogger {
-    @Requirement
+    @Inject
     private Logger logger;
 
     public LifecycleDebugLogger() {}

@@ -18,11 +18,13 @@
  */
 package org.apache.maven.plugin.internal;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.LegacySupport;
-import org.codehaus.plexus.component.annotations.Component;
 import org.eclipse.aether.RepositorySystemSession;
 
 /**
@@ -33,7 +35,8 @@ import org.eclipse.aether.RepositorySystemSession;
  * @since 3.0
  * @author Benjamin Bentmann
  */
-@Component(role = LegacySupport.class)
+@Singleton
+@Named
 public class DefaultLegacySupport implements LegacySupport {
 
     private static final ThreadLocal<AtomicReference<MavenSession>> SESSION = new InheritableThreadLocal<>();

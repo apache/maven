@@ -18,6 +18,9 @@
  */
 package org.apache.maven.project.artifact;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,7 +36,6 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Component;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
@@ -44,7 +46,8 @@ import org.eclipse.aether.repository.WorkspaceRepository;
  * @author Benjamin Bentmann
  * @author Anton Tanasenko
  */
-@Component(role = ProjectArtifactsCache.class)
+@Singleton
+@Named
 public class DefaultProjectArtifactsCache implements ProjectArtifactsCache {
     /**
      * CacheKey

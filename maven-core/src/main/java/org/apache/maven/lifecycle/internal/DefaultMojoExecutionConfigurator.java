@@ -18,6 +18,10 @@
  */
 package org.apache.maven.lifecycle.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
@@ -35,8 +39,6 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.slf4j.Logger;
@@ -47,11 +49,12 @@ import static java.util.Arrays.stream;
 /**
  * @since 3.3.1, MNG-5753
  */
-@Component(role = MojoExecutionConfigurator.class)
+@Singleton
+@Named
 public class DefaultMojoExecutionConfigurator implements MojoExecutionConfigurator {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Requirement
+    @Inject
     private MessageBuilderFactory messageBuilderFactory;
 
     @Override

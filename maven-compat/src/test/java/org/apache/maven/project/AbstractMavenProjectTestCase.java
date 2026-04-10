@@ -143,6 +143,8 @@ public abstract class AbstractMavenProjectTestCase implements PlexusTestConfigur
     private void initRepoSession(ProjectBuildingRequest request) {
         File localRepo = new File(request.getLocalRepository().getBasedir());
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
+        // many maven-compat tests use checkout as local repo; disable this feat to not create uncommited changes
+        session.setConfigProperty("aether.remoteRepositoryFilter.prefixes.resolvePrefixFiles", "false");
         session.setLocalRepositoryManager(new LegacyLocalRepositoryManager(localRepo));
         request.setRepositorySession(session);
     }

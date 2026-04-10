@@ -18,6 +18,9 @@
  */
 package org.apache.maven.artifact.repository.metadata.io;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +30,6 @@ import java.util.Objects;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -36,7 +38,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  *
  * @author Benjamin Bentmann
  */
-@Component(role = MetadataReader.class)
+@Singleton
+@Named
 public class DefaultMetadataReader implements MetadataReader {
 
     public Metadata read(File input, Map<String, ?> options) throws IOException {
