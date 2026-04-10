@@ -360,8 +360,13 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         // To align Maven with outcomes, we set here color enabled based on these premises.
         // Note: Maven3 suffers from similar thing: if you do `mvn3 foo > log.txt`, the output will
         // not be not colored (good), but Maven will print out "Message scheme: color".
-        MessageUtils.setColorEnabled(
-                context.coloredOutput != null ? context.coloredOutput : !Terminal.TYPE_DUMB.equals(terminal.getType()));
+        boolean colorEnabled;
+        if (context.coloredOutput != null) {
+            colorEnabled = context.coloredOutput;
+        } else {
+            colorEnabled = !Terminal.TYPE_DUMB.equals(terminal.getType()) && isConsoleTerminal();
+        }
+        MessageUtils.setColorEnabled(colorEnabled);
 
         // handle rawStreams: some would like to act on true, some on false
         if (context.options().rawStreams().orElse(false)) {
@@ -399,6 +404,32 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         System.setOut(psOut);
         System.setErr(psErr);
         // no need to set them back, this is already handled by MessageUtils.systemUninstall() above
+    }
+
+    /**
+     * Checks whether the JVM console is connected to a real terminal.
+     * On JDK 22+, {@code Console.isTerminal()} returns {@code false} when stdout is redirected
+     * to a pipe or file, even though {@code System.console()} returns non-null.
+     * On older JDKs (before 22), falls back to checking {@code System.console() != null},
+     * which is the pre-existing behavior.
+     */
+    static boolean isConsoleTerminal() {
+        java.io.Console console = System.console();
+        if (console == null) {
+            return false;
+        }
+        try {
+            // JDK 22+ provides Console.isTerminal() to distinguish a real terminal
+            // from a redirected console (pipe or file).
+            java.lang.reflect.Method isTerminal = console.getClass().getMethod("isTerminal");
+            return (Boolean) isTerminal.invoke(console);
+        } catch (NoSuchMethodException e) {
+            // JDK < 22: System.console() != null was the best heuristic
+            return true;
+        } catch (ReflectiveOperationException e) {
+            // Unexpected reflection error; fall back to assuming terminal
+            return true;
+        }
     }
 
     protected Consumer<String> determineWriter(C context) {

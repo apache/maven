@@ -532,6 +532,10 @@ public class MavenCli {
                             || commandLine.hasOption(CLIManager.NON_INTERACTIVE));
             if (isBatchMode || commandLine.hasOption(CLIManager.LOG_FILE)) {
                 MessageUtils.setColorEnabled(false);
+            } else if (!isConsoleTerminal()) {
+                // On JDK 22+, System.console() returns non-null even when stdout is
+                // redirected to a pipe or file. Use Console.isTerminal() to detect this.
+                MessageUtils.setColorEnabled(false);
             }
         }
 
@@ -625,6 +629,32 @@ public class MavenCli {
         }
         if (fail) {
             throw new ExitException(1);
+        }
+    }
+
+    /**
+     * Checks whether the JVM console is connected to a real terminal.
+     * On JDK 22+, {@code Console.isTerminal()} returns {@code false} when stdout is redirected
+     * to a pipe or file, even though {@code System.console()} returns non-null.
+     * On older JDKs (before 22), falls back to checking {@code System.console() != null},
+     * which is the pre-existing behavior.
+     */
+    static boolean isConsoleTerminal() {
+        Console cons = System.console();
+        if (cons == null) {
+            return false;
+        }
+        try {
+            // JDK 22+ provides Console.isTerminal() to distinguish a real terminal
+            // from a redirected console (pipe or file).
+            java.lang.reflect.Method isTerminal = cons.getClass().getMethod("isTerminal");
+            return (Boolean) isTerminal.invoke(cons);
+        } catch (NoSuchMethodException e) {
+            // JDK < 22: System.console() != null was the best heuristic
+            return true;
+        } catch (ReflectiveOperationException e) {
+            // Unexpected reflection error; fall back to assuming terminal
+            return true;
         }
     }
 
