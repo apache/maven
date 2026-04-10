@@ -944,6 +944,13 @@ class DefaultModelValidatorTest {
     }
 
     @Test
+    void profileRepositoryWithPropertyExpression() throws Exception {
+        SimpleProblemCollector result = validateRaw("raw-model/profile-with-property-in-repository-url.xml");
+        // Profile properties may resolve expressions in profile repository URLs; no errors expected
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
     void profileActivationWithAllowedExpression() throws Exception {
         SimpleProblemCollector result = validateRaw(
                 "raw-model/profile-activation-file-with-allowed-expressions.xml",
