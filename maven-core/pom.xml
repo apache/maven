@@ -31,6 +31,12 @@ under the License.
   <name>Maven Core</name>
   <description>Maven Core classes.</description>
 
+  <properties>
+    <!-- Used in filtering of property file defining the versions of the plugins used in lifecycles -->
+    <version.maven-ejb-plugin>3.3.0</version.maven-ejb-plugin>
+    <version.maven-rar-plugin>3.1.0</version.maven-rar-plugin>
+  </properties>
+
   <dependencies>
     <!--  Maven -->
     <dependency>
@@ -166,6 +172,11 @@ under the License.
       <artifactId>plexus-testing</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -192,10 +203,6 @@ under the License.
       </plugins>
     </pluginManagement>
     <plugins>
-      <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-      </plugin>
       <plugin>
         <groupId>org.eclipse.sisu</groupId>
         <artifactId>sisu-maven-plugin</artifactId>

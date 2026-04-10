@@ -18,6 +18,11 @@
  */
 package org.apache.maven.project.artifact;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -77,44 +82,38 @@ import org.apache.maven.properties.internal.SystemProperties;
 import org.apache.maven.repository.internal.MavenWorkspaceReader;
 import org.apache.maven.repository.legacy.metadata.DefaultMetadataResolutionRequest;
 import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Jason van Zyl
  */
-@Component(role = ArtifactMetadataSource.class, hint = "maven")
+@Singleton
+@Named("maven")
 public class MavenMetadataSource implements ArtifactMetadataSource {
-    @Requirement
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    @Inject
     private RepositoryMetadataManager repositoryMetadataManager;
 
-    @Requirement
+    @Inject
     private ArtifactFactory artifactFactory;
 
-    @Requirement
+    @Inject
     private MavenRepositorySystem repositorySystem;
 
-    // TODO This prevents a cycle in the composition which shows us another problem we need to deal with.
-    // @Requirement
-    private ProjectBuilder projectBuilder;
+    @Inject
+    private Provider<ProjectBuilder> projectBuilderProvider;
 
-    @Requirement
-    private PlexusContainer container;
-
-    @Requirement
-    private Logger logger;
-
-    @Requirement
+    @Inject
     private MavenMetadataCache cache;
 
-    @Requirement
+    @Inject
     private LegacySupport legacySupport;
 
     private void injectSession(MetadataResolutionRequest request) {
@@ -513,17 +512,7 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
     }
 
     private ProjectBuilder getProjectBuilder() {
-        if (projectBuilder != null) {
-            return projectBuilder;
-        }
-
-        try {
-            projectBuilder = container.lookup(ProjectBuilder.class);
-        } catch (ComponentLookupException e) {
-            // Won't happen
-        }
-
-        return projectBuilder;
+        return projectBuilderProvider.get();
     }
 
     @SuppressWarnings("checkstyle:methodlength")

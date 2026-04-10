@@ -18,6 +18,10 @@
  */
 package org.apache.maven.plugin.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -83,8 +87,6 @@ import org.apache.maven.session.scope.internal.SessionScopeModule;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
@@ -118,7 +120,8 @@ import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
  * @author Benjamin Bentmann
  * @since 3.0
  */
-@Component(role = MavenPluginManager.class)
+@Singleton
+@Named
 public class DefaultMavenPluginManager implements MavenPluginManager {
 
     /**
@@ -132,46 +135,46 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
      */
     public static final String KEY_EXTENSIONS_REALMS = DefaultMavenPluginManager.class.getName() + "/extensionsRealms";
 
-    @Requirement
+    @Inject
     private Logger logger;
 
-    @Requirement
+    @Inject
     private LoggerManager loggerManager;
 
-    @Requirement
+    @Inject
     private PlexusContainer container;
 
-    @Requirement
+    @Inject
     private ClassRealmManager classRealmManager;
 
-    @Requirement
+    @Inject
     private PluginDescriptorCache pluginDescriptorCache;
 
-    @Requirement
+    @Inject
     private PluginRealmCache pluginRealmCache;
 
-    @Requirement
+    @Inject
     private PluginDependenciesResolver pluginDependenciesResolver;
 
-    @Requirement
+    @Inject
     private RuntimeInformation runtimeInformation;
 
-    @Requirement
+    @Inject
     private ExtensionRealmCache extensionRealmCache;
 
-    @Requirement
+    @Inject
     private PluginVersionResolver pluginVersionResolver;
 
-    @Requirement
+    @Inject
     private PluginArtifactsCache pluginArtifactsCache;
 
-    @Requirement
+    @Inject
     private List<MavenPluginConfigurationValidator> configurationValidators;
 
-    @Requirement
+    @Inject
     private PluginValidationManager pluginValidationManager;
 
-    @Requirement
+    @Inject
     private List<MavenPluginPrerequisitesChecker> prerequisitesCheckers;
 
     private ExtensionDescriptorBuilder extensionDescriptorBuilder = new ExtensionDescriptorBuilder();

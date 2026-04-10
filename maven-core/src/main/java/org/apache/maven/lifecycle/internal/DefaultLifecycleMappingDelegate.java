@@ -18,6 +18,10 @@
  */
 package org.apache.maven.lifecycle.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -38,19 +42,19 @@ import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * Lifecycle mapping delegate component interface. Calculates project build execution plan given {@link Lifecycle} and
  * lifecycle phase. Standard lifecycles use plugin execution {@code <phase>} or mojo default lifecycle phase to
  * calculate the execution plan, but custom lifecycles can use alternative mapping strategies.
  */
-@Component(role = LifecycleMappingDelegate.class, hint = DefaultLifecycleMappingDelegate.HINT)
+@Singleton
+@Named
 public class DefaultLifecycleMappingDelegate implements LifecycleMappingDelegate {
+    @Deprecated
     public static final String HINT = "default";
 
-    @Requirement
+    @Inject
     private BuildPluginManager pluginManager;
 
     public Map<String, List<MojoExecution>> calculateLifecycleMappings(

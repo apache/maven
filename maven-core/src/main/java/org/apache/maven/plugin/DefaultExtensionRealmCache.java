@@ -18,6 +18,9 @@
  */
 package org.apache.maven.plugin;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,14 +33,14 @@ import org.apache.maven.project.ExtensionDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
+import org.eclipse.sisu.PreDestroy;
 
 /**
  * Default extension realm cache implementation. Assumes cached data does not change.
  */
-@Component(role = ExtensionRealmCache.class)
-public class DefaultExtensionRealmCache implements ExtensionRealmCache, Disposable {
+@Singleton
+@Named
+public class DefaultExtensionRealmCache implements ExtensionRealmCache {
     /**
      * CacheKey
      */
@@ -142,6 +145,7 @@ public class DefaultExtensionRealmCache implements ExtensionRealmCache, Disposab
         // default cache does not track extension usage
     }
 
+    @PreDestroy
     public void dispose() {
         flush();
     }

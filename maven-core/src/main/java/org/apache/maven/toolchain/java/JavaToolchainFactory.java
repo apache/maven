@@ -18,6 +18,10 @@
  */
 package org.apache.maven.toolchain.java;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.File;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -28,8 +32,6 @@ import org.apache.maven.toolchain.RequirementMatcherFactory;
 import org.apache.maven.toolchain.ToolchainFactory;
 import org.apache.maven.toolchain.ToolchainPrivate;
 import org.apache.maven.toolchain.model.ToolchainModel;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -42,10 +44,11 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * @author mkleint
  * @since 2.0.9, renamed from <code>DefaultJavaToolchainFactory</code> in 3.2.4
  */
-@Component(role = ToolchainFactory.class, hint = "jdk")
+@Singleton
+@Named("jdk")
 public class JavaToolchainFactory implements ToolchainFactory {
 
-    @Requirement
+    @Inject
     private Logger logger;
 
     public ToolchainPrivate createToolchain(ToolchainModel model) throws MisconfiguredToolchainException {

@@ -18,6 +18,10 @@
  */
 package org.apache.maven.lifecycle.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -53,8 +57,6 @@ import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.SessionData;
@@ -72,29 +74,30 @@ import org.slf4j.LoggerFactory;
  * @author Kristian Rosenvold
  * @since 3.0
  */
-@Component(role = MojoExecutor.class)
+@Singleton
+@Named
 public class MojoExecutor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MojoExecutor.class);
 
-    @Requirement
+    @Inject
     private BuildPluginManager pluginManager;
 
-    @Requirement
+    @Inject
     private MavenPluginManager mavenPluginManager;
 
-    @Requirement
+    @Inject
     private LifecycleDependencyResolver lifeCycleDependencyResolver;
 
-    @Requirement
+    @Inject
     private ExecutionEventCatapult eventCatapult;
 
-    @Requirement
+    @Inject
     private MessageBuilderFactory messageBuilderFactory;
 
     private final OwnerReentrantReadWriteLock aggregatorLock = new OwnerReentrantReadWriteLock();
 
-    @Requirement
+    @Inject
     private PlexusContainer container;
 
     private final Map<Thread, MojoDescriptor> mojos = new ConcurrentHashMap<>();

@@ -18,16 +18,18 @@
  */
 package org.apache.maven.artifact.resolver;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.codehaus.plexus.component.annotations.Component;
-
 /**
  * @author Benjamin Bentmann
  */
-@Component(role = ResolutionErrorHandler.class)
+@Singleton
+@Named
 public class DefaultResolutionErrorHandler implements ResolutionErrorHandler {
 
     public void throwErrors(ArtifactResolutionRequest request, ArtifactResolutionResult result)
