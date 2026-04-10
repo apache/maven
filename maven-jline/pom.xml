@@ -30,6 +30,10 @@ under the License.
   <name>Maven 3 JLine integration</name>
   <description>Provides the JLine integration in Maven</description>
 
+  <properties>
+    <moduleNameSuffix>jline</moduleNameSuffix>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.jline</groupId>

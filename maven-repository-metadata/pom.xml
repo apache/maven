@@ -31,6 +31,10 @@ under the License.
   <name>Maven Repository Metadata Model</name>
   <description>Per-directory local and remote repository metadata.</description>
 
+  <properties>
+    <moduleNameSuffix>repository.metadata</moduleNameSuffix>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>

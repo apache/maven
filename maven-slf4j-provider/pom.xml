@@ -32,6 +32,10 @@ under the License.
   <description>Maven SLF4J provider based on SLF4J's simple provider, extended to support Maven styled colors
     for levels and stacktraces rendering.</description>
 
+  <properties>
+    <moduleNameSuffix>slf4j.provider</moduleNameSuffix>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

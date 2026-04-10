@@ -37,6 +37,10 @@ under the License.
     </contributor>
   </contributors>
 
+  <properties>
+    <moduleNameSuffix>settings.builder</moduleNameSuffix>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>

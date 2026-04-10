@@ -158,6 +158,11 @@ under the License.
     <checkstyle.excludes>**/package-info.java</checkstyle.excludes>
     <project.build.outputTimestamp>2026-03-24T21:15:50Z</project.build.outputTimestamp>
     <jlineVersion>3.30.9</jlineVersion>
+
+    <!-- The JPMS module name elements used in the Automatic-Module-Name -->
+    <!-- Note: Maven 3 can never become "pure modular" thing, we leave that to Maven 4+ -->
+    <moduleNamePrefix>${project.groupId}.v3.</moduleNamePrefix>
+    <moduleNameSuffix>invalid</moduleNameSuffix>
   </properties>
 
   <!--bootstrap-start-comment-->
@@ -527,6 +532,21 @@ under the License.
   <build>
     <pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <configuration>
+            <archive>
+              <manifest>
+                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              </manifest>
+              <manifestEntries>
+                <Automatic-Module-Name>${moduleNamePrefix}${moduleNameSuffix}</Automatic-Module-Name>
+              </manifestEntries>
+            </archive>
+          </configuration>
+        </plugin>
         <plugin>
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-component-metadata</artifactId>

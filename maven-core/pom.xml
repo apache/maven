@@ -31,6 +31,10 @@ under the License.
   <name>Maven Core</name>
   <description>Maven Core classes.</description>
 
+  <properties>
+    <moduleNameSuffix>core</moduleNameSuffix>
+  </properties>
+
   <dependencies>
     <!--  Maven -->
     <dependency>
