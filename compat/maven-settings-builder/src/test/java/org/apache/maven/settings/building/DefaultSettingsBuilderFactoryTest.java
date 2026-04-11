@@ -24,10 +24,11 @@ import java.util.Properties;
 
 import org.apache.maven.api.settings.Server;
 import org.apache.maven.settings.Settings;
-import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  */
@@ -42,105 +43,96 @@ class DefaultSettingsBuilderFactoryTest {
         properties.setProperty("user.home", "/home/user");
 
         SettingsBuilder builder = new DefaultSettingsBuilderFactory().newInstance();
-        assertThat(builder).isNotNull();
+        assertNotNull(builder);
 
         DefaultSettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
         request.setSystemProperties(properties);
         request.setUserSettingsFile(getSettings(settingsName));
 
         SettingsBuildingResult result = builder.build(request);
-        return assertThat(result).isNotNull().actual();
+        assertNotNull(result);
+        return result;
     }
 
     @Test
     void testCompleteWiring() throws Exception {
-        Settings settings = assertThat(execute("simple"))
-                .extracting(SettingsBuildingResult::getEffectiveSettings)
-                .actual();
+        Settings settings = execute("simple").getEffectiveSettings();
 
-        assertThat(settings.getLocalRepository())
-                .satisfiesAnyOf(
-                        repo -> assertThat(repo).isEqualTo("/home/user/.m2/repository"),
-                        repo -> assertThat(repo).endsWith("\\home\\user\\.m2\\repository"));
+        String localRepository = settings.getLocalRepository();
+        assertTrue(localRepository.equals("/home/user/.m2/repository")
+                || localRepository.endsWith("\\home\\user\\.m2\\repository"));
     }
 
     @Test
     void testSettingsWithServers() throws Exception {
-        Settings settings = assertThat(execute("settings-servers-1"))
-                .extracting(SettingsBuildingResult::getEffectiveSettings)
-                .actual();
+        Settings settings = execute("settings-servers-1").getEffectiveSettings();
 
-        assertThat(settings.getDelegate().getServers())
-                .hasSize(2)
-                .usingRecursiveFieldByFieldElementComparator(RecursiveComparisonConfiguration.builder()
-                        .withIgnoredFields("locations")
-                        .build())
-                .containsExactlyInAnyOrder(
-                        Server.newBuilder()
-                                .id("server-1")
-                                .username("username1")
-                                .password("password1")
-                                .build(),
-                        Server.newBuilder()
-                                .id("server-2")
-                                .username("username2")
-                                .password("password2")
-                                .build());
+        List<Server> servers = settings.getDelegate().getServers();
+        assertEquals(2, servers.size());
+
+        Server server1 = getServerById(servers, "server-1");
+        assertEquals("username1", server1.getUsername());
+        assertEquals("password1", server1.getPassword());
+
+        Server server2 = getServerById(servers, "server-2");
+        assertEquals("username2", server2.getUsername());
+        assertEquals("password2", server2.getPassword());
     }
 
     @Test
     void testSettingsWithServersAndAliases() throws Exception {
-        Settings settings = assertThat(execute("settings-servers-2"))
-                .extracting(SettingsBuildingResult::getEffectiveSettings)
-                .actual();
+        Settings settings = execute("settings-servers-2").getEffectiveSettings();
 
-        assertThat(settings.getDelegate().getServers())
-                .hasSize(6)
-                .usingRecursiveFieldByFieldElementComparator(RecursiveComparisonConfiguration.builder()
-                        .withIgnoredFields("locations")
-                        .build())
-                .containsExactlyInAnyOrder(
-                        Server.newBuilder()
-                                .id("server-1")
-                                .username("username1")
-                                .password("password1")
-                                .ids(List.of("server-11", "server-12"))
-                                .build(),
-                        Server.newBuilder()
-                                .id("server-11")
-                                .username("username1")
-                                .password("password1")
-                                .build(),
-                        Server.newBuilder()
-                                .id("server-12")
-                                .username("username1")
-                                .password("password1")
-                                .build(),
-                        Server.newBuilder()
-                                .id("server-2")
-                                .username("username2")
-                                .password("password2")
-                                .ids(List.of("server-21"))
-                                .build(),
-                        Server.newBuilder()
-                                .id("server-21")
-                                .username("username2")
-                                .password("password2")
-                                .build(),
-                        Server.newBuilder()
-                                .id("server-3")
-                                .username("username3")
-                                .password("password3")
-                                .build());
+        List<Server> servers = settings.getDelegate().getServers();
+        assertEquals(6, servers.size());
+
+        Server server1 = getServerById(servers, "server-1");
+        assertEquals("username1", server1.getUsername());
+        assertEquals("password1", server1.getPassword());
+        assertEquals(List.of("server-11", "server-12"), server1.getAliases());
+
+        Server server11 = getServerById(servers, "server-11");
+        assertEquals("username1", server11.getUsername());
+        assertEquals("password1", server11.getPassword());
+        assertTrue(server11.getAliases().isEmpty());
+
+        Server server12 = getServerById(servers, "server-12");
+        assertEquals("username1", server12.getUsername());
+        assertEquals("password1", server12.getPassword());
+        assertTrue(server11.getAliases().isEmpty());
+
+        Server server2 = getServerById(servers, "server-2");
+        assertEquals("username2", server2.getUsername());
+        assertEquals("password2", server2.getPassword());
+        assertEquals(List.of("server-21"), server2.getAliases());
+
+        Server server21 = getServerById(servers, "server-21");
+        assertEquals("username2", server21.getUsername());
+        assertEquals("password2", server21.getPassword());
+        assertTrue(server21.getAliases().isEmpty());
+
+        Server server3 = getServerById(servers, "server-3");
+        assertEquals("username3", server3.getUsername());
+        assertEquals("password3", server3.getPassword());
+        assertTrue(server3.getAliases().isEmpty());
+    }
+
+    private Server getServerById(List<Server> servers, String id) {
+        return servers.stream()
+                .filter(s -> s.getId().equals(id))
+                .findFirst()
+                .orElseThrow(
+                        () -> new IllegalStateException("Server with id " + id + " not found on list: " + servers));
     }
 
     @Test
     void testSettingsWithDuplicateServersIds() throws Exception {
         SettingsBuildingResult result = execute("settings-servers-3");
 
-        assertThat(result.getProblems())
-                .hasSize(1)
-                .extracting(SettingsProblem::getMessage)
-                .containsExactly("'servers.server.id' must be unique but found duplicate server with id server-2");
+        List<SettingsProblem> problems = result.getProblems();
+        assertEquals(1, problems.size());
+        assertEquals(
+                "'servers.server.id' must be unique but found duplicate server with id server-2",
+                problems.get(0).getMessage());
     }
 }

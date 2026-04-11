@@ -24,9 +24,9 @@ under the License.
   <servers>
     <server>
       <id>server-1</id>
-      <ids>
-        <id>server-2</id>
-      </ids>
+      <aliases>
+        <alias>server-2</alias>
+      </aliases>
       <username>username1</username>
       <password>password1</password>
     </server>
