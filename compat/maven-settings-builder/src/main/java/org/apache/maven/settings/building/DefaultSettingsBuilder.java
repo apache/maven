@@ -258,14 +258,14 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
     private List<Server> serversByIds(List<Server> servers) {
         return servers.stream()
                 .flatMap(server -> Stream.concat(
-                        Stream.of(server), server.getIds().stream().map(id -> serverAlias(server, id))))
+                        Stream.of(server), server.getAliases().stream().map(id -> serverAlias(server, id))))
                 .toList();
     }
 
     private Server serverAlias(Server server, String id) {
         return new Server(org.apache.maven.api.settings.Server.newBuilder(server.getDelegate(), true)
                 .id(id)
-                .ids(List.of())
+                .aliases(List.of())
                 .build());
     }
 }
