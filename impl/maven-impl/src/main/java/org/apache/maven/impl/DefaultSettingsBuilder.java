@@ -235,12 +235,12 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
     private List<Server> serversByIds(List<Server> servers) {
         return servers.stream()
                 .flatMap(server -> Stream.concat(
-                        Stream.of(server), server.getIds().stream().map(id -> serverAlias(server, id))))
+                        Stream.of(server), server.getAliases().stream().map(id -> serverAlias(server, id))))
                 .toList();
     }
 
     private Server serverAlias(Server server, String id) {
-        return Server.newBuilder(server, true).id(id).ids(List.of()).build();
+        return Server.newBuilder(server, true).id(id).aliases(List.of()).build();
     }
 
     private Settings interpolate(

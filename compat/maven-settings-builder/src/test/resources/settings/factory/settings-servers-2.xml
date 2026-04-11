@@ -24,18 +24,18 @@ under the License.
   <servers>
     <server>
       <id>server-1</id>
-      <ids>
-        <id>server-11</id>
-        <id>server-12</id>
-      </ids>
+      <aliases>
+        <alias>server-11</alias>
+        <alias>server-12</alias>
+      </aliases>
       <username>username1</username>
       <password>password1</password>
     </server>
     <server>
       <id>server-2</id>
-      <ids>
-        <id>server-21</id>
-      </ids>
+      <aliases>
+        <alias>server-21</alias>
+      </aliases>
       <username>username2</username>
       <password>password2</password>
     </server>
