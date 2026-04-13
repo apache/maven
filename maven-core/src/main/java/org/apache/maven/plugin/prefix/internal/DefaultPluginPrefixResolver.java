@@ -105,18 +105,18 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
                         LinkedHashMap::new,
                         Collectors.mapping(Plugin::getArtifactId, Collectors.toSet())));
         request.getPluginGroups().forEach(g -> candidates.put(g, null));
-        PluginPrefixResult result = resolveFromRepository(request, candidates, false);
-
-        // If we haven't been able to resolve the plugin from the repository,
-        // as a last resort, we go through all declared plugins, load them
+        PluginPrefixResult result = null;
+        // First, we go through all declared plugins, load them
         // one by one, and try to find a matching prefix.
-        if (result == null && build != null) {
+        if (build != null) {
             result = resolveFromProject(request, build.getPlugins());
             if (result == null && management != null) {
                 result = resolveFromProject(request, management.getPlugins());
             }
         }
 
+        // Second, we go use G level metadata to discover prefix
+        // This order allows user managed clashing prefixes (they can declare them in POM)
         if (result == null) {
             result = resolveFromRepository(request, candidates, true);
         }
