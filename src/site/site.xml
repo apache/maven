@@ -23,9 +23,13 @@ under the License.
   xsi:schemaLocation="http://maven.apache.org/SITE/2.0.0 https://maven.apache.org/xsd/site-2.0.0.xsd"
   name="Apache Maven">
 
-  <bannerLeft href="https://maven.apache.org/">
-    <image src="https://maven.apache.org/images/apache-maven-project.png" alt="Apache Maven" />
+  <bannerLeft href="https://www.apache.org/">
+    <image src="https://maven.apache.org/images/apache-maven-project-light-theme.svg" width="489px" height="51px"/>
   </bannerLeft>
+
+  <bannerRight href="https://maven.apache.org/">
+    <image src="https://maven.apache.org/images/logos/MavenLogoLeafSmall.png"/>
+  </bannerRight>
 
   <edit>${project.scm.url}</edit>
 
