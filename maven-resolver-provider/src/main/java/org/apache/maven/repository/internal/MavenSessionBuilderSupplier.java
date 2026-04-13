@@ -59,8 +59,6 @@ import static java.util.Objects.requireNonNull;
  * of sessions, use {@link CloseableSession#close()} method on built instance(s).
  * <p>
  * Extend this class and override methods to customize, if needed.
- * <p>
- * Resolver created as this is NOT using {@link org.eclipse.aether.scope.ScopeManager}!
  *
  * @since 3.10.0
  */
