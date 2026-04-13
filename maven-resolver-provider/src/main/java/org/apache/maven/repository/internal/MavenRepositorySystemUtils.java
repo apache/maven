@@ -19,14 +19,11 @@
 package org.apache.maven.repository.internal;
 
 import org.eclipse.aether.DefaultRepositorySystemSession;
-import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.DefaultArtifactType;
 import org.eclipse.aether.collection.DependencyGraphTransformer;
 import org.eclipse.aether.collection.DependencyManager;
 import org.eclipse.aether.collection.DependencySelector;
 import org.eclipse.aether.collection.DependencyTraverser;
-import org.eclipse.aether.supplier.SessionBuilderSupplier;
 import org.eclipse.aether.util.artifact.DefaultArtifactTypeRegistry;
 import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
@@ -49,20 +46,13 @@ import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
  * always use regular dependency injection to acquire the repository system.
  *
  * @author Benjamin Bentmann
+ * @deprecated Use {@link org.eclipse.aether.supplier.SessionBuilderSupplier} instead.
  */
+@Deprecated
 public final class MavenRepositorySystemUtils {
 
     private MavenRepositorySystemUtils() {
         // hide constructor
-    }
-
-    /**
-     * Creates a new Maven repository system session builder.
-     *
-     * @return The new repository system session builder, never {@code null}.
-     */
-    public static RepositorySystemSession.SessionBuilder newSession(RepositorySystem repositorySystem) {
-        return new SessionBuilderSupplier(repositorySystem).get();
     }
 
     /**

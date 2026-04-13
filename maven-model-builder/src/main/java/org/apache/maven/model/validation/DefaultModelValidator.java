@@ -800,6 +800,7 @@ public class DefaultModelValidator implements ModelValidator {
                             d,
                             "provided",
                             "compile",
+                            "compile-only",
                             "runtime",
                             "test",
                             "system");
@@ -817,6 +818,7 @@ public class DefaultModelValidator implements ModelValidator {
                             d,
                             "provided",
                             "compile",
+                            "compile-only",
                             "runtime",
                             "test",
                             "system",

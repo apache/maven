@@ -39,7 +39,8 @@ import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.ModelBase;
-import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.apache.maven.repository.internal.MavenSessionBuilderSupplier;
+import org.apache.maven.repository.internal.scopes.Maven3ScopeManagerConfiguration;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
@@ -60,12 +61,15 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.DependencyCollectionContext;
 import org.eclipse.aether.collection.VersionFilter;
+import org.eclipse.aether.impl.scope.InternalScopeManager;
+import org.eclipse.aether.internal.impl.scope.ScopeManagerImpl;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.LocalRepositoryManager;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ResolutionErrorPolicy;
 import org.eclipse.aether.util.ConfigUtils;
+import org.eclipse.aether.util.graph.manager.TransitiveDependencyManager;
 import org.eclipse.aether.util.graph.version.ChainedVersionFilter;
 import org.eclipse.aether.util.graph.version.ContextualSnapshotVersionFilter;
 import org.eclipse.aether.util.graph.version.HighestVersionFilter;
@@ -149,6 +153,19 @@ public class DefaultRepositorySystemSessionFactory {
      */
     private static final String MAVEN_VERSION_FILTER = "maven.session.versionFilter";
 
+    /**
+     * User property for selecting dependency manager behavior regarding transitive dependencies and dependency
+     * management entries in their POMs. Maven 3 targeted full backward compatibility with Maven 2. Hence, it ignored
+     * dependency management entries in transitive dependency POMs. Maven 4 enables "transitivity" by default. Hence
+     * unlike Maven 3, it obeys dependency management entries deep in the dependency graph as well.
+     * <br/>
+     * Default (behave as whole Maven 3.x line): <code>"false"</code>.
+     *
+     * @since 3.10.0
+     */
+    public static final String MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY =
+            "maven.resolver.dependencyManagerTransitivity";
+
     private static final String MAVEN_RESOLVER_TRANSPORT_KEY = "maven.resolver.transport";
 
     private static final String MAVEN_RESOLVER_TRANSPORT_DEFAULT = "default";
@@ -195,11 +212,11 @@ public class DefaultRepositorySystemSessionFactory {
 
     private final GenericVersionScheme versionScheme = new GenericVersionScheme();
 
+    private final InternalScopeManager scopeManager = new ScopeManagerImpl(Maven3ScopeManagerConfiguration.INSTANCE);
+
     @SuppressWarnings("checkstyle:methodlength")
     public RepositorySystemSession.SessionBuilder newRepositorySession(MavenExecutionRequest request) {
-        RepositorySystemSession.SessionBuilder mainSessionBuilder = MavenRepositorySystemUtils.newSession(repoSystem);
-        mainSessionBuilder.setCache(request.getRepositoryCache());
-
+        // config
         Map<Object, Object> configProps = new LinkedHashMap<>();
         configProps.put(ConfigurationProperties.USER_AGENT, getUserAgent());
         configProps.put(ConfigurationProperties.INTERACTIVE, request.isInteractiveMode());
@@ -209,6 +226,10 @@ public class DefaultRepositorySystemSessionFactory {
         // Resolver's ConfigUtils solely rely on config properties, that is why we need to add both here as well.
         configProps.putAll(request.getSystemProperties());
         configProps.putAll(request.getUserProperties());
+
+        RepositorySystemSession.SessionBuilder mainSessionBuilder =
+                new MavenSessionBuilderSupplier(repoSystem, scopeManager).get();
+        mainSessionBuilder.setCache(request.getRepositoryCache());
 
         mainSessionBuilder.setOffline(request.isOffline());
         mainSessionBuilder.setChecksumPolicy(request.getGlobalChecksumPolicy());
@@ -252,6 +273,12 @@ public class DefaultRepositorySystemSessionFactory {
         VersionFilter versionFilter = buildVersionFilter((String) configProps.get(MAVEN_VERSION_FILTER));
         if (versionFilter != null) {
             mainSessionBuilder.setVersionFilter(versionFilter);
+        }
+
+        boolean dependencyManagerTransitivity =
+                ConfigUtils.getBoolean(configProps, false, MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY);
+        if (dependencyManagerTransitivity) {
+            mainSessionBuilder.setDependencyManager(new TransitiveDependencyManager(scopeManager));
         }
 
         DefaultMirrorSelector mirrorSelector = new DefaultMirrorSelector();
