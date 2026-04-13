@@ -24,8 +24,10 @@ import javax.inject.Singleton;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -109,10 +111,10 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
         // First, we go through all declared plugins, load them
         // one by one, and try to find a matching prefix.
         if (build != null) {
-            result = resolveFromProject(request, build.getPlugins());
-            if (result == null && management != null) {
-                result = resolveFromProject(request, management.getPlugins());
-            }
+            result = resolveFromProject(
+                    request,
+                    build.getPlugins(),
+                    management != null ? management.getPlugins() : Collections.emptyList());
         }
 
         // Second, we go use G level metadata to discover prefix
@@ -136,28 +138,30 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
         return result;
     }
 
-    private PluginPrefixResult resolveFromProject(PluginPrefixRequest request, List<Plugin> plugins) {
-        if (plugins.isEmpty()) {
+    private PluginPrefixResult resolveFromProject(
+            PluginPrefixRequest request, List<Plugin> plugins, List<Plugin> pluginMgmt) {
+        if (plugins.isEmpty() && pluginMgmt.isEmpty()) {
             return null;
         }
         PluginPrefixResult result = null;
         // try optimistically; first if A contains prefix?
-        List<Plugin> candidates = plugins.stream()
+        Set<Plugin> candidates = new LinkedHashSet<>();
+        Stream.concat(plugins.stream(), pluginMgmt.stream())
                 .filter(p -> p.getArtifactId().contains(request.getPrefix()))
-                .collect(Collectors.toList());
+                .forEach(candidates::add);
         if (!candidates.isEmpty()) {
             result = doResolveFromProject(request, candidates);
         }
         // if no luck; try the rest
         if (result == null) {
-            List<Plugin> remainder = new ArrayList<>(plugins);
+            Set<Plugin> remainder = new LinkedHashSet<>(plugins);
             remainder.removeAll(candidates);
             result = doResolveFromProject(request, remainder);
         }
         return result;
     }
 
-    private PluginPrefixResult doResolveFromProject(PluginPrefixRequest request, List<Plugin> plugins) {
+    private PluginPrefixResult doResolveFromProject(PluginPrefixRequest request, Collection<Plugin> plugins) {
         for (Plugin plugin : plugins) {
             try {
                 PluginDescriptor pluginDescriptor =
