@@ -118,7 +118,7 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
         // Second, we go use G level metadata to discover prefix
         // This order allows user managed clashing prefixes (they can declare them in POM)
         if (result == null) {
-            result = resolveFromRepository(request, candidates, true);
+            result = resolveFromRepository(request, candidates);
         }
 
         if (result == null) {
@@ -137,6 +137,27 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
     }
 
     private PluginPrefixResult resolveFromProject(PluginPrefixRequest request, List<Plugin> plugins) {
+        if (plugins.isEmpty()) {
+            return null;
+        }
+        PluginPrefixResult result = null;
+        // try optimistically; first if A contains prefix?
+        List<Plugin> candidates = plugins.stream()
+                .filter(p -> p.getArtifactId().contains(request.getPrefix()))
+                .collect(Collectors.toList());
+        if (!candidates.isEmpty()) {
+            result = doResolveFromProject(request, candidates);
+        }
+        // if no luck; try the rest
+        if (result == null) {
+            List<Plugin> remainder = new ArrayList<>(plugins);
+            remainder.removeAll(candidates);
+            result = doResolveFromProject(request, remainder);
+        }
+        return result;
+    }
+
+    private PluginPrefixResult doResolveFromProject(PluginPrefixRequest request, List<Plugin> plugins) {
         for (Plugin plugin : plugins) {
             try {
                 PluginDescriptor pluginDescriptor =
@@ -159,7 +180,7 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
     }
 
     private PluginPrefixResult resolveFromRepository(
-            PluginPrefixRequest request, LinkedHashMap<String, Set<String>> candidates, boolean force) {
+            PluginPrefixRequest request, LinkedHashMap<String, Set<String>> candidates) {
         RequestTrace trace = RequestTrace.newChild(null, request);
 
         List<MetadataRequest> requests = new ArrayList<>();
@@ -188,7 +209,7 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
 
         // second try, refetch all (possibly outdated) metadata that wasn't updated in the first attempt
 
-        if (force && !request.getRepositorySession().isOffline() && !requests.isEmpty()) {
+        if (!request.getRepositorySession().isOffline() && !requests.isEmpty()) {
             DefaultRepositorySystemSession session = new DefaultRepositorySystemSession(request.getRepositorySession());
             session.setUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_ALWAYS);
 
