@@ -18,17 +18,20 @@
  */
 package org.apache.maven.repository;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * @author jdcasey
  */
-@Component(role = ArtifactRepositoryLayout.class, hint = "legacy")
+@Singleton
+@Named("legacy")
 public class LegacyRepositoryLayout implements ArtifactRepositoryLayout {
     private static final String PATH_SEPARATOR = "/";
 

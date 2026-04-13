@@ -18,6 +18,9 @@
  */
 package org.apache.maven.project.artifact;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -34,12 +37,12 @@ import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * DefaultMavenMetadataCache
  */
-@Component(role = MavenMetadataCache.class)
+@Singleton
+@Named
 public class DefaultMavenMetadataCache implements MavenMetadataCache {
 
     protected final Map<CacheKey, CacheRecord> cache = new ConcurrentHashMap<>();

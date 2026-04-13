@@ -18,6 +18,10 @@
  */
 package org.apache.maven.plugin;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.List;
@@ -31,8 +35,6 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 
@@ -42,26 +44,25 @@ import org.eclipse.aether.repository.RemoteRepository;
 /**
  * DefaultBuildPluginManager
  */
-@Component(role = BuildPluginManager.class)
+@Singleton
+@Named
 public class DefaultBuildPluginManager implements BuildPluginManager {
 
-    @Requirement
+    @Inject
     private MavenPluginManager mavenPluginManager;
 
-    @Requirement
+    @Inject
     private LegacySupport legacySupport;
 
-    @Requirement
+    @Inject
     private MojoExecutionScope scope;
 
     private MojoExecutionListener mojoExecutionListener;
 
-    // this tricks plexus-component-metadata generate required metadata
-    @Requirement(role = MojoExecutionListener.class)
-    private List<MojoExecutionListener> mojoExecutionListeners;
-
+    // TODO: this is hack here; old code was tricking plexus to call setter method; to preserve binary compat, not much
+    // can be done, but marking this
+    @Inject
     public void setMojoExecutionListeners(final List<MojoExecutionListener> listeners) {
-        this.mojoExecutionListeners = listeners;
         this.mojoExecutionListener = new CompoundMojoExecutionListener(listeners);
     }
 

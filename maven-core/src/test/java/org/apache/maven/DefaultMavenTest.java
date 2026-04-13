@@ -19,6 +19,8 @@
 package org.apache.maven;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -32,7 +34,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.repository.internal.MavenWorkspaceReader;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.Test;
 
@@ -49,7 +50,8 @@ public class DefaultMavenTest extends AbstractCoreMavenComponentTestCase {
     @Inject
     private MavenProjectHelper mavenProjectHelper;
 
-    @Component(role = AbstractMavenLifecycleParticipant.class, hint = "WsrClassCatcher")
+    @Singleton
+    @Named("WsrClassCatcher")
     private static final class WsrClassCatcher extends AbstractMavenLifecycleParticipant {
         private final AtomicReference<Class<?>> wsrClassRef = new AtomicReference<>(null);
 

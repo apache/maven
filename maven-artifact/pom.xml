@@ -30,6 +30,10 @@ under the License.
 
   <name>Maven Artifact</name>
 
+  <properties>
+    <moduleNameSuffix>artifact</moduleNameSuffix>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>

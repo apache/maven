@@ -41,6 +41,8 @@ subject to the terms and conditions of the following licenses:
 #*      *##set ( $spdx = 'EPL-2.0' )
 #*    *##elseif ( $license.url.contains( "www.apache.org/licenses/LICENSE-2.0" ) )
 #*      *##set ( $spdx = 'Apache-2.0' )
+#*    *##elseif ( $license.name == "BSD-3-Clause" || $license.url.contains( "opensource.org/licenses/BSD-3-Clause" ) )
+#*      *##set ( $spdx = 'BSD-3-Clause' )
 #*    *##else
 #*      *### unrecognized license will require analysis to know obligations
 #*      *##set ( $spdx = 'unrecognized' )

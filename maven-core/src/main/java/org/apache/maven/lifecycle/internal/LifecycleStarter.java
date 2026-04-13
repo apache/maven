@@ -18,6 +18,10 @@
  */
 package org.apache.maven.lifecycle.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.List;
 import java.util.Map;
 
@@ -30,9 +34,8 @@ import org.apache.maven.lifecycle.NoGoalSpecifiedException;
 import org.apache.maven.lifecycle.internal.builder.Builder;
 import org.apache.maven.lifecycle.internal.builder.BuilderNotFoundException;
 import org.apache.maven.session.scope.internal.SessionScope;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Starts the build life cycle
@@ -41,30 +44,30 @@ import org.codehaus.plexus.logging.Logger;
  * @author Benjamin Bentmann
  * @author Kristian Rosenvold
  */
-@Component(role = LifecycleStarter.class)
+@Singleton
+@Named
 public class LifecycleStarter {
-    @Requirement
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    @Inject
     private ExecutionEventCatapult eventCatapult;
 
-    @Requirement
+    @Inject
     private DefaultLifecycles defaultLifeCycles;
 
-    @Requirement
-    private Logger logger;
-
-    @Requirement
+    @Inject
     private BuildListCalculator buildListCalculator;
 
-    @Requirement
+    @Inject
     private LifecycleDebugLogger lifecycleDebugLogger;
 
-    @Requirement
+    @Inject
     private LifecycleTaskSegmentCalculator lifecycleTaskSegmentCalculator;
 
-    @Requirement
+    @Inject
     private Map<String, Builder> builders;
 
-    @Requirement
+    @Inject
     private SessionScope sessionScope;
 
     public void execute(MavenSession session) {

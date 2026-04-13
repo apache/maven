@@ -18,6 +18,11 @@
  */
 package org.apache.maven.lifecycle.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -34,11 +39,12 @@ import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
@@ -49,17 +55,20 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * @author jdcasey
  * @author Kristian Rosenvold (extracted class only)
  */
-@Component(role = LifeCyclePluginAnalyzer.class)
+@Singleton
+@Named
 public class DefaultLifecyclePluginAnalyzer implements LifeCyclePluginAnalyzer {
 
-    @Requirement(role = LifecycleMapping.class)
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    @Inject
     private Map<String, LifecycleMapping> lifecycleMappings;
 
-    @Requirement
+    @Inject
     private DefaultLifecycles defaultLifeCycles;
 
-    @Requirement
-    private Logger logger;
+    @Inject
+    private PlexusContainer plexusContainer;
 
     public DefaultLifecyclePluginAnalyzer() {}
 
@@ -79,7 +88,22 @@ public class DefaultLifecyclePluginAnalyzer implements LifeCyclePluginAnalyzer {
                     + Thread.currentThread().getContextClassLoader());
         }
 
-        LifecycleMapping lifecycleMappingForPackaging = lifecycleMappings.get(packaging);
+        Map<String, LifecycleMapping> filtered = new HashMap<>();
+        // filter by visibility (plexus vs sisu diff; "realms" are plexus thing)
+        // in some tests container is not injected
+        if (this.plexusContainer != null) {
+            for (String name : this.lifecycleMappings.keySet()) {
+                try {
+                    filtered.put(name, plexusContainer.lookup(LifecycleMapping.class, name));
+                } catch (ComponentLookupException e) {
+                    // skip it
+                }
+            }
+        } else {
+            filtered.putAll(this.lifecycleMappings);
+        }
+
+        LifecycleMapping lifecycleMappingForPackaging = filtered.get(packaging);
 
         if (lifecycleMappingForPackaging == null) {
             return null;

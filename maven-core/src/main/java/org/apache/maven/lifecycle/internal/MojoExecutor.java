@@ -18,6 +18,10 @@
  */
 package org.apache.maven.lifecycle.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,6 +43,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.internal.MultilineMessageHelper;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.MissingProjectException;
+import org.apache.maven.message.MessageBuilderFactory;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.MojoExecution;
@@ -52,8 +57,6 @@ import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.SessionData;
@@ -71,26 +74,30 @@ import org.slf4j.LoggerFactory;
  * @author Kristian Rosenvold
  * @since 3.0
  */
-@Component(role = MojoExecutor.class)
+@Singleton
+@Named
 public class MojoExecutor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MojoExecutor.class);
 
-    @Requirement
+    @Inject
     private BuildPluginManager pluginManager;
 
-    @Requirement
+    @Inject
     private MavenPluginManager mavenPluginManager;
 
-    @Requirement
+    @Inject
     private LifecycleDependencyResolver lifeCycleDependencyResolver;
 
-    @Requirement
+    @Inject
     private ExecutionEventCatapult eventCatapult;
+
+    @Inject
+    private MessageBuilderFactory messageBuilderFactory;
 
     private final OwnerReentrantReadWriteLock aggregatorLock = new OwnerReentrantReadWriteLock();
 
-    @Requirement
+    @Inject
     private PlexusContainer container;
 
     private final Map<Thread, MojoDescriptor> mojos = new ConcurrentHashMap<>();
@@ -186,7 +193,7 @@ public class MojoExecutor {
         try {
             mavenPluginManager.checkPrerequisites(mojoDescriptor.getPluginDescriptor());
         } catch (PluginIncompatibleException e) {
-            throw new LifecycleExecutionException(mojoExecution, session.getCurrentProject(), e);
+            throw new LifecycleExecutionException(messageBuilderFactory, mojoExecution, session.getCurrentProject(), e);
         }
 
         if (mojoDescriptor.isProjectRequired() && !session.getRequest().isProjectPresent()) {
@@ -194,14 +201,15 @@ public class MojoExecutor {
                     "Goal requires a project to execute" + " but there is no POM in this directory ("
                             + session.getExecutionRootDirectory() + ")."
                             + " Please verify you invoked Maven from the correct directory.");
-            throw new LifecycleExecutionException(mojoExecution, null, cause);
+            throw new LifecycleExecutionException(messageBuilderFactory, mojoExecution, null, cause);
         }
 
         if (mojoDescriptor.isOnlineRequired() && session.isOffline()) {
             if (MojoExecution.Source.CLI.equals(mojoExecution.getSource())) {
                 Throwable cause = new IllegalStateException(
                         "Goal requires online mode for execution" + " but Maven is currently offline.");
-                throw new LifecycleExecutionException(mojoExecution, session.getCurrentProject(), cause);
+                throw new LifecycleExecutionException(
+                        messageBuilderFactory, mojoExecution, session.getCurrentProject(), cause);
             } else {
                 eventCatapult.fire(ExecutionEvent.Type.MojoSkipped, session, mojoExecution);
 
@@ -330,7 +338,8 @@ public class MojoExecutor {
                     | PluginManagerException
                     | PluginConfigurationException
                     | MojoExecutionException e) {
-                throw new LifecycleExecutionException(mojoExecution, session.getCurrentProject(), e);
+                throw new LifecycleExecutionException(
+                        messageBuilderFactory, mojoExecution, session.getCurrentProject(), e);
             }
 
             eventCatapult.fire(ExecutionEvent.Type.MojoSucceeded, session, mojoExecution);

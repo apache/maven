@@ -18,6 +18,10 @@
  */
 package org.apache.maven.lifecycle;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,8 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -39,17 +43,19 @@ import org.codehaus.plexus.util.StringUtils;
  */
 // TODO The configuration for the lifecycle needs to be externalized so that I can use the annotations properly for the
 // wiring and reference and external source for the lifecycle configuration.
-@Component(role = DefaultLifecycles.class)
+@Singleton
+@Named
 public class DefaultLifecycles {
     public static final String[] STANDARD_LIFECYCLES = {"clean", "default", "site"};
 
-    // @Configuration(source="org/apache/maven/lifecycle/lifecycles.xml")
-
-    @Requirement(role = Lifecycle.class)
+    @Inject
     private Map<String, Lifecycle> lifecycles;
 
-    @Requirement
+    @Inject
     private Logger logger;
+
+    @Inject
+    private PlexusContainer plexusContainer;
 
     public DefaultLifecycles() {}
 
@@ -100,7 +106,22 @@ public class DefaultLifecycles {
      */
     public List<Lifecycle> getLifeCycles() {
         // ensure canonical order of standard lifecycles
-        Map<String, Lifecycle> lifecycles = new LinkedHashMap<>(this.lifecycles);
+
+        Map<String, Lifecycle> lifecycles = new LinkedHashMap<>();
+
+        // filter by visibility (plexus vs sisu diff; "realms" are plexus thing)
+        // in some tests container is not injected
+        if (this.plexusContainer != null) {
+            for (String name : this.lifecycles.keySet()) {
+                try {
+                    lifecycles.put(name, plexusContainer.lookup(Lifecycle.class, name));
+                } catch (ComponentLookupException e) {
+                    // skip it
+                }
+            }
+        } else {
+            lifecycles.putAll(this.lifecycles);
+        }
 
         LinkedHashSet<String> lifecycleNames = new LinkedHashSet<>(Arrays.asList(STANDARD_LIFECYCLES));
         lifecycleNames.addAll(lifecycles.keySet());

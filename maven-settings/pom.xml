@@ -31,6 +31,10 @@ under the License.
   <name>Maven Settings</name>
   <description>Maven Settings model.</description>
 
+  <properties>
+    <moduleNameSuffix>settings</moduleNameSuffix>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>

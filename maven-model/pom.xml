@@ -33,6 +33,7 @@ under the License.
 
   <properties>
     <checkstyle.violation.ignore>FileLength</checkstyle.violation.ignore>
+    <moduleNameSuffix>model</moduleNameSuffix>
   </properties>
 
   <dependencies>

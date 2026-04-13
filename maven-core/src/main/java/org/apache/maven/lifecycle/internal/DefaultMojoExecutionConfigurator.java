@@ -18,6 +18,10 @@
  */
 package org.apache.maven.lifecycle.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
@@ -26,6 +30,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.lifecycle.MojoExecutionConfigurator;
+import org.apache.maven.message.MessageBuilder;
+import org.apache.maven.message.MessageBuilderFactory;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.MojoExecution;
@@ -33,9 +39,6 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.utils.logging.MessageBuilder;
-import org.apache.maven.shared.utils.logging.MessageUtils;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.slf4j.Logger;
@@ -46,9 +49,13 @@ import static java.util.Arrays.stream;
 /**
  * @since 3.3.1, MNG-5753
  */
-@Component(role = MojoExecutionConfigurator.class)
+@Singleton
+@Named
 public class DefaultMojoExecutionConfigurator implements MojoExecutionConfigurator {
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    @Inject
+    private MessageBuilderFactory messageBuilderFactory;
 
     @Override
     public void configure(MavenProject project, MojoExecution mojoExecution, boolean allowPluginLevelConfig) {
@@ -142,7 +149,8 @@ public class DefaultMojoExecutionConfigurator implements MojoExecutionConfigurat
         unknownParameters.stream()
                 .filter(parameterName -> isNotReportPluginsForMavenSite(parameterName, mojoExecution))
                 .forEach(name -> {
-                    MessageBuilder messageBuilder = MessageUtils.buffer()
+                    MessageBuilder messageBuilder = messageBuilderFactory
+                            .builder()
                             .warning("Parameter '")
                             .warning(name)
                             .warning("' is unknown for plugin '")

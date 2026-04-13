@@ -27,12 +27,13 @@ import java.nio.file.Paths;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.Maven;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
-import org.apache.maven.shared.utils.logging.MessageUtils;
+import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.toolchain.building.ToolchainsBuildingRequest;
 import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
 import org.codehaus.plexus.PlexusContainer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 
@@ -42,7 +43,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -258,58 +258,86 @@ public class MavenCliTest {
         assertEquals("-Dpom.xml", request.getCommandLine().getOptionValue(CLIManager.ALTERNATE_POM_FILE));
     }
 
-    @Test
-    public void testStyleColors() throws Exception {
-        assumeTrue(MessageUtils.isColorEnabled(), "ANSI not supported");
-        CliRequest request;
+    @Nested
+    class StyleColors {
 
-        MessageUtils.setColorEnabled(true);
-        request = new CliRequest(new String[] {"-B"}, null);
-        cli.cli(request);
-        cli.properties(request);
-        cli.logging(request);
-        assertFalse(MessageUtils.isColorEnabled());
+        @BeforeEach
+        public void setUp() {
+            MessageUtils.systemInstall();
+            MessageUtils.getTerminalWidth(); // wait for fast terminal initialize
+        }
 
-        MessageUtils.setColorEnabled(true);
-        request = new CliRequest(new String[] {"-l", "target/temp/mvn.log"}, null);
-        request.workingDirectory = "target/temp";
-        cli.cli(request);
-        cli.properties(request);
-        cli.logging(request);
-        assertFalse(MessageUtils.isColorEnabled());
+        @AfterEach
+        public void tearDown() {
+            MessageUtils.systemUninstall();
+        }
 
-        MessageUtils.setColorEnabled(false);
-        request = new CliRequest(new String[] {"-Dstyle.color=always"}, null);
-        cli.cli(request);
-        cli.properties(request);
-        cli.logging(request);
-        assertTrue(MessageUtils.isColorEnabled());
+        @Test
+        public void testStyleColors() throws Exception {
+            CliRequest request;
 
-        MessageUtils.setColorEnabled(true);
-        request = new CliRequest(new String[] {"-Dstyle.color=never"}, null);
-        cli.cli(request);
-        cli.properties(request);
-        cli.logging(request);
-        assertFalse(MessageUtils.isColorEnabled());
+            MessageUtils.setColorEnabled(true);
+            request = new CliRequest(new String[] {"-B"}, null);
+            cli.cli(request);
+            cli.properties(request);
+            cli.logging(request);
+            assertFalse(MessageUtils.isColorEnabled());
 
-        MessageUtils.setColorEnabled(false);
-        request = new CliRequest(new String[] {"-Dstyle.color=always", "-B", "-l", "target/temp/mvn.log"}, null);
-        request.workingDirectory = "target/temp";
-        cli.cli(request);
-        cli.properties(request);
-        cli.logging(request);
-        assertTrue(MessageUtils.isColorEnabled());
-
-        try {
-            MessageUtils.setColorEnabled(false);
-            request = new CliRequest(new String[] {"-Dstyle.color=maybe", "-B", "-l", "target/temp/mvn.log"}, null);
+            MessageUtils.setColorEnabled(true);
+            request = new CliRequest(new String[] {"-l", "target/temp/mvn.log"}, null);
             request.workingDirectory = "target/temp";
             cli.cli(request);
             cli.properties(request);
             cli.logging(request);
-            fail("maybe is not a valid option");
-        } catch (IllegalArgumentException e) {
-            // noop
+            assertFalse(MessageUtils.isColorEnabled());
+
+            MessageUtils.setColorEnabled(false);
+            request = new CliRequest(new String[] {"-Dstyle.color=always"}, null);
+            cli.cli(request);
+            cli.properties(request);
+            cli.logging(request);
+            assertTrue(MessageUtils.isColorEnabled());
+
+            MessageUtils.setColorEnabled(true);
+            request = new CliRequest(new String[] {"-Dstyle.color=never"}, null);
+            cli.cli(request);
+            cli.properties(request);
+            cli.logging(request);
+            assertFalse(MessageUtils.isColorEnabled());
+
+            MessageUtils.setColorEnabled(false);
+            request = new CliRequest(new String[] {"-Dstyle.color=always", "-B", "-l", "target/temp/mvn.log"}, null);
+            request.workingDirectory = "target/temp";
+            cli.cli(request);
+            cli.properties(request);
+            cli.logging(request);
+            assertTrue(MessageUtils.isColorEnabled());
+
+            try {
+                MessageUtils.setColorEnabled(false);
+                request = new CliRequest(new String[] {"-Dstyle.color=maybe", "-B", "-l", "target/temp/mvn.log"}, null);
+                request.workingDirectory = "target/temp";
+                cli.cli(request);
+                cli.properties(request);
+                cli.logging(request);
+                fail("maybe is not a valid option");
+            } catch (IllegalArgumentException e) {
+                // noop
+            }
+        }
+
+        @Test
+        void testDumpTerminal() throws Exception {
+            // test provide own sys out which is not a tty
+            // similar will be with redirected output
+            // check that colors are disabled
+
+            MessageUtils.setColorEnabled(true);
+            CliRequest request = new CliRequest(new String[] {}, null);
+            cli.cli(request);
+            cli.properties(request);
+            cli.logging(request);
+            assertFalse(MessageUtils.isColorEnabled());
         }
     }
 
@@ -357,16 +385,19 @@ public class MavenCliTest {
         PrintStream oldOut = System.out;
         System.setOut(new PrintStream(systemOut));
 
+        System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, ".");
+
         // when
         try {
-            cli.cli(cliRequest);
-        } catch (MavenCli.ExitException exitException) {
-            // expected
+            assertEquals(0, cli.doMain(cliRequest));
         } finally {
             // restore sysout
             System.setOut(oldOut);
+            System.clearProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY);
         }
         String versionOut = new String(systemOut.toByteArray(), StandardCharsets.UTF_8);
+
+        assertTrue(versionOut.contains("Apache Maven"));
 
         // then
         assertEquals(MessageUtils.stripAnsiCodes(versionOut), versionOut);

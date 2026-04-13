@@ -18,6 +18,9 @@
  */
 package org.apache.maven.exception;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.UnknownHostException;
@@ -37,7 +40,6 @@ import org.apache.maven.plugin.PluginContainerException;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingResult;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 
 /*
@@ -88,7 +90,8 @@ Plugins:
 /**
  * Transform an exception into useful end-user message.
  */
-@Component(role = ExceptionHandler.class)
+@Singleton
+@Named
 public class DefaultExceptionHandler implements ExceptionHandler {
     @Override
     public ExceptionSummary handleException(Throwable exception) {
