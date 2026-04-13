@@ -21,6 +21,7 @@ package org.apache.maven.project;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.file.Path;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -68,6 +69,7 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
@@ -181,6 +183,8 @@ public class MavenProject implements Cloneable {
     private DependencyFilter extensionDependencyFilter;
 
     private final Set<String> lifecyclePhases = Collections.synchronizedSet(new LinkedHashSet<String>());
+
+    private Path rootDirectory;
 
     public MavenProject() {
         Model model = new Model();
@@ -1505,6 +1509,30 @@ public class MavenProject implements Cloneable {
      */
     public void addLifecyclePhase(String lifecyclePhase) {
         lifecyclePhases.add(lifecyclePhase);
+    }
+
+    /**
+     * Gets the root directory of the project, which is the parent directory
+     * containing the {@code .mvn} directory.
+     *
+     * @return the root directory of the project
+     * @throws IllegalStateException if the root directory could not be found
+     * @see org.apache.maven.execution.MavenSession#getRootDirectory()
+     *
+     * @since 3.10.0
+     */
+    public Path getRootDirectory() {
+        if (rootDirectory == null) {
+            throw new IllegalStateException(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE);
+        }
+        return rootDirectory;
+    }
+
+    /**
+     * @since 3.10.0
+     */
+    public void setRootDirectory(Path rootDirectory) {
+        this.rootDirectory = rootDirectory;
     }
 
     // ----------------------------------------------------------------------------------------------------------------

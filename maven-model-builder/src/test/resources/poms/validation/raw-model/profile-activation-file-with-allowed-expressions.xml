@@ -61,6 +61,23 @@ under the License.
     </profile>
 
     <profile>
+      <id>exists-project-rootDirectory</id>
+      <activation>
+        <file>
+          <exists>${project.rootDirectory}/test.txt</exists>
+        </file>
+      </activation>
+    </profile>
+    <profile>
+      <id>missing-project-rootDirectory</id>
+      <activation>
+        <file>
+          <missing>${project.rootDirectory}/test.txt</missing>
+        </file>
+      </activation>
+    </profile>
+
+    <profile>
       <id>dynamic-property-available</id>
       <activation>
         <property>

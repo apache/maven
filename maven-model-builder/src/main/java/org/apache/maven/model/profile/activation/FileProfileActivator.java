@@ -38,7 +38,7 @@ import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Determines profile activation based on the existence/absence of some file.
- * File name interpolation support is limited to <code>${project.basedir}</code>
+ * File name interpolation support is limited to <code>${project.basedir}</code>, <code>${project.rootDirectory}</code>
  * system properties and user properties.
  *
  * @author Benjamin Bentmann

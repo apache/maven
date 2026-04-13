@@ -35,5 +35,6 @@ under the License.
     <!-- this is where we collect all the interpolated values for the POM dump -->
     <prop0>${basedir}</prop0>
     <prop1>${project.basedir}</prop1>
+    <prop2>${project.rootDirectory}</prop2>
   </properties>
 </project>

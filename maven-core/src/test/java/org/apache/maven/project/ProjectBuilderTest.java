@@ -132,6 +132,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         assertEquals(project.getArtifacts().size(), artifactsResultInAnotherThread.get());
     }
 
+    @Test
     public void testDontResolveDependencies() throws Exception {
         File pomFile = new File("src/test/resources/projects/basic-resolveDependencies.xml");
         MavenSession mavenSession = createMavenSession(null);
@@ -150,6 +151,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         assertEquals(0, mavenProject.getArtifacts().size());
     }
 
+    @Test
     public void testReadModifiedPoms() throws Exception {
         String initialValue = System.setProperty(
                 DefaultProjectBuilder.DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY, Boolean.toString(true));
@@ -185,6 +187,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         }
     }
 
+    @Test
     public void testReadErroneousMavenProjectContainsReference() throws Exception {
         File pomFile = new File("src/test/resources/projects/artifactMissingVersion.xml").getAbsoluteFile();
         MavenSession mavenSession = createMavenSession(null);
@@ -215,6 +218,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         }
     }
 
+    @Test
     public void testReadInvalidPom() throws Exception {
         File pomFile = new File("src/test/resources/projects/badPom.xml").getAbsoluteFile();
         MavenSession mavenSession = createMavenSession(null);
@@ -240,6 +244,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         }
     }
 
+    @Test
     public void testReadParentAndChildWithRegularVersionSetParentFile() throws Exception {
         List<File> toRead = new ArrayList<>(2);
         File parentPom = getProject("MNG-6723");
@@ -290,6 +295,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         }
     }
 
+    @Test
     public void testBuildProperties() throws Exception {
         File file = new File(getProject("MNG-6716").getParentFile(), "project/pom.xml");
         MavenSession mavenSession = createMavenSession(null);
@@ -305,6 +311,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         assertEquals(1, project.getResources().size());
     }
 
+    @Test
     public void testPropertyInPluginManagementGroupId() throws Exception {
         File pom = getProject("MNG-6983");
 
@@ -316,6 +323,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         }
     }
 
+    @Test
     public void testLocationTrackingResolution() throws Exception {
         File pom = getProject("MNG-7648");
 

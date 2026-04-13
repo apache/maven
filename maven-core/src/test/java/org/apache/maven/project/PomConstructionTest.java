@@ -912,6 +912,7 @@ public class PomConstructionTest {
         PomTestWrapper pom = buildPom("basedir-interpolation/pom-with-unusual-name.xml");
         assertEquals(pom.getBasedir(), new File(pom.getValue("properties/prop0").toString()));
         assertEquals(pom.getBasedir(), new File(pom.getValue("properties/prop1").toString()));
+        assertEquals(pom.getBasedir(), new File(pom.getValue("properties/prop2").toString()));
     }
 
     /* MNG-3979 */

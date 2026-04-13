@@ -28,6 +28,7 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.path.DefaultPathTranslator;
 import org.apache.maven.model.path.ProfileActivationFilePathInterpolator;
 import org.apache.maven.model.profile.DefaultProfileActivationContext;
+import org.apache.maven.model.root.DefaultRootLocator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -54,14 +55,20 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
     public void setUp() throws Exception {
         super.setUp();
 
-        activator.setProfileActivationFilePathInterpolator(
-                new ProfileActivationFilePathInterpolator().setPathTranslator(new DefaultPathTranslator()));
+        activator.setProfileActivationFilePathInterpolator(new ProfileActivationFilePathInterpolator()
+                .setPathTranslator(new DefaultPathTranslator())
+                .setRootLocator(new DefaultRootLocator()));
 
         context.setProjectDirectory(new File(tempDir.toString()));
 
         File file = new File(tempDir.resolve("file.txt").toString());
         if (!file.createNewFile()) {
             throw new IOException("Can't create " + file);
+        }
+
+        File dotMvn = new File(tempDir.resolve(".mvn").toString());
+        if (!dotMvn.mkdir()) {
+            throw new IOException("Can't create " + dotMvn);
         }
     }
 
@@ -70,10 +77,14 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
         assertActivation(false, newExistsProfile(null), context);
         assertActivation(false, newExistsProfile("someFile.txt"), context);
         assertActivation(false, newExistsProfile("${basedir}/someFile.txt"), context);
+        assertActivation(false, newExistsProfile("${project.basedir}/someFile.txt"), context);
+        assertActivation(false, newExistsProfile("${project.rootDirectory}/someFile.txt"), context);
 
         assertActivation(false, newMissingProfile(null), context);
         assertActivation(true, newMissingProfile("someFile.txt"), context);
         assertActivation(true, newMissingProfile("${basedir}/someFile.txt"), context);
+        assertActivation(true, newMissingProfile("${project.basedir}/someFile.txt"), context);
+        assertActivation(true, newMissingProfile("${project.rootDirectory}/someFile.txt"), context);
     }
 
     @Test
@@ -81,10 +92,14 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
         assertActivation(true, newExistsProfile("file.txt"), context);
         assertActivation(true, newExistsProfile("${basedir}"), context);
         assertActivation(true, newExistsProfile("${basedir}/" + "file.txt"), context);
+        assertActivation(true, newExistsProfile("${project.basedir}/" + "file.txt"), context);
+        assertActivation(true, newExistsProfile("${project.rootDirectory}/" + "file.txt"), context);
 
         assertActivation(false, newMissingProfile("file.txt"), context);
         assertActivation(false, newMissingProfile("${basedir}"), context);
         assertActivation(false, newMissingProfile("${basedir}/" + "file.txt"), context);
+        assertActivation(false, newMissingProfile("${project.basedir}/" + "file.txt"), context);
+        assertActivation(false, newMissingProfile("${project.rootDirectory}/" + "file.txt"), context);
     }
 
     @Test

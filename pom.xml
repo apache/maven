@@ -649,6 +649,7 @@ under the License.
               <exclude>**/*.odg</exclude>
               <exclude>**/*.svg</exclude>
               <exclude>.asf.yaml</exclude>
+              <exclude>src/main/resources/META-INF/services/**</exclude>
             </excludes>
           </configuration>
         </plugin>

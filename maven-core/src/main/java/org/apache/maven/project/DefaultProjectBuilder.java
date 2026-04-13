@@ -65,6 +65,7 @@ import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.building.StringModelSource;
 import org.apache.maven.model.resolution.ModelResolver;
+import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
 import org.apache.maven.repository.internal.DefaultModelCacheFactory;
 import org.apache.maven.repository.internal.ModelCacheFactory;
@@ -117,6 +118,9 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     @Inject
     private ModelCacheFactory modelCacheFactory;
 
+    @Inject
+    private RootLocator rootLocator;
+
     // ----------------------------------------------------------------------
     // MavenProjectBuilder Implementation
     // ----------------------------------------------------------------------
@@ -165,6 +169,11 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
                 project = new MavenProject();
                 project.setFile(pomFile);
+
+                if (pomFile != null) {
+                    project.setRootDirectory(
+                            rootLocator.findRoot(pomFile.toPath().getParent()));
+                }
 
                 DefaultModelBuildingListener listener =
                         new DefaultModelBuildingListener(project, projectBuildingHelper, projectBuildingRequest);
@@ -436,6 +445,10 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
         MavenProject project = new MavenProject();
         project.setFile(pomFile);
+
+        if (pomFile != null) {
+            project.setRootDirectory(rootLocator.findRoot(pomFile.toPath().getParent()));
+        }
 
         request.setPomFile(pomFile);
         request.setTwoPhaseBuilding(true);

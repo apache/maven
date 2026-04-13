@@ -33,6 +33,7 @@ import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.path.PathTranslator;
 import org.apache.maven.model.path.UrlNormalizer;
+import org.apache.maven.model.root.RootLocator;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
@@ -81,6 +82,9 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
     @Inject
     private ModelVersionProcessor versionProcessor;
 
+    @Inject
+    private RootLocator rootLocator;
+
     public AbstractStringBasedModelInterpolator setPathTranslator(PathTranslator pathTranslator) {
         this.pathTranslator = pathTranslator;
         return this;
@@ -93,6 +97,11 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
 
     public AbstractStringBasedModelInterpolator setVersionPropertiesProcessor(ModelVersionProcessor processor) {
         this.versionProcessor = processor;
+        return this;
+    }
+
+    public AbstractStringBasedModelInterpolator setRootLocator(RootLocator rootLocator) {
+        this.rootLocator = rootLocator;
         return this;
     }
 
@@ -130,6 +139,23 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
                     PROJECT_PREFIXES,
                     true);
             valueSources.add(basedirValueSource);
+
+            ValueSource rootDirectoryValueSource = new PrefixedValueSourceWrapper(
+                    new AbstractValueSource(false) {
+                        @Override
+                        public Object getValue(String expression) {
+                            if ("rootDirectory".equals(expression)) {
+                                return rootLocator
+                                        .findMandatoryRoot(projectDir.toPath())
+                                        .toAbsolutePath()
+                                        .toString();
+                            }
+                            return null;
+                        }
+                    },
+                    PROJECT_PREFIXES,
+                    true);
+            valueSources.add(rootDirectoryValueSource);
 
             ValueSource baseUriValueSource = new PrefixedValueSourceWrapper(
                     new AbstractValueSource(false) {

@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -88,6 +89,7 @@ import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.message.MessageBuilder;
 import org.apache.maven.model.building.ModelProcessor;
+import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.properties.internal.SystemProperties;
@@ -147,9 +149,6 @@ public class MavenCli {
     private static final String EXT_CLASS_PATH = "maven.ext.class.path";
 
     private static final String DOT_MVN = ".mvn";
-
-    private static final String UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE = "Unable to find the root directory. Create a "
-            + DOT_MVN + " directory in the project root directory to identify it.";
 
     private static final String PROJECT_EXTENSIONS_FILENAME = DOT_MVN + "/extensions.xml";
 
@@ -356,10 +355,13 @@ public class MavenCli {
         }
         topDirectory = getCanonicalPath(topDirectory);
         cliRequest.request.setTopDirectory(topDirectory);
-        // We're very early in the process and we don't have the container set up yet,
-        // so we on searchAcceptableRootDirectory method to find us acceptable directory.
-        // The method may return null if nothing acceptable found.
-        cliRequest.request.setRootDirectory(searchAcceptableRootDirectory(topDirectory));
+        // We're very early in the process, and we don't have the container set up yet,
+        // so we rely on the JDK services to eventually look up a custom RootLocator.
+        // This is used to compute {@code session.rootDirectory} but all {@code project.rootDirectory}
+        // properties will be computed through the RootLocator found in the container.
+        RootLocator rootLocator =
+                ServiceLoader.load(RootLocator.class).iterator().next();
+        cliRequest.request.setRootDirectory(rootLocator.findRoot(topDirectory));
 
         //
         // Make sure the Maven home directory is an absolute path to save us from confusion with say drive-relative
@@ -625,7 +627,7 @@ public class MavenCli {
             System.err.println(message);
             if (cliRequest.request.getRootDirectory() == null) {
                 System.err.println();
-                System.err.println(UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE);
+                System.err.println(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE);
             }
             throw new ExitException(1); // user error
         }
@@ -1635,20 +1637,6 @@ public class MavenCli {
 
         String mavenBuildVersion = CLIReportingUtils.createMavenVersionString(buildProperties);
         systemProperties.setProperty("maven.build.version", mavenBuildVersion);
-    }
-
-    protected boolean isAcceptableRootDirectory(Path path) {
-        return path != null && Files.isDirectory(path.resolve(DOT_MVN));
-    }
-
-    protected Path searchAcceptableRootDirectory(Path path) {
-        if (path == null) {
-            return null;
-        }
-        if (isAcceptableRootDirectory(path)) {
-            return path;
-        }
-        return searchAcceptableRootDirectory(path.getParent());
     }
 
     protected static StringSearchInterpolator createInterpolator(CliRequest cliRequest, Properties... properties) {

@@ -418,4 +418,13 @@ public class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase
 
         assertEquals("1.0-SNAPSHOT", mp.getVersion());
     }
+
+    @Test
+    public void rootDirectoryShouldBeDetected() throws Exception {
+        File f1 = getTestFile("src/test/resources/projects/root-directory/pom.xml");
+
+        MavenProject mp = getProject(f1);
+
+        assertEquals(f1.toPath().getParent(), mp.getRootDirectory());
+    }
 }

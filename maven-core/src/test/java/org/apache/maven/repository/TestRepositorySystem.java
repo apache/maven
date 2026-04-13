@@ -101,14 +101,14 @@ public class TestRepositorySystem implements RepositorySystem {
 
     public ArtifactRepository createDefaultLocalRepository() throws InvalidRepositoryException {
         return createLocalRepository(
-                new File(System.getProperty("basedir", ""), "target/local-repo").getAbsoluteFile());
+                new File(System.getProperty("basedir", "."), "target/local-repo").getAbsoluteFile());
     }
 
     public ArtifactRepository createDefaultRemoteRepository() throws InvalidRepositoryException {
         return new MavenArtifactRepository(
                 DEFAULT_REMOTE_REPO_ID,
                 "file://"
-                        + new File(System.getProperty("basedir", ""), "src/test/remote-repo")
+                        + new File(System.getProperty("basedir", "."), "src/test/remote-repo")
                                 .toURI()
                                 .getPath(),
                 new DefaultRepositoryLayout(),

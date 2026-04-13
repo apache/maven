@@ -168,6 +168,8 @@ Maven Model Builder
 <<<pom.basedir>>> (<deprecated>)\
 <<<basedir>>> (<deprecated>) | the directory containing the <<<pom.xml>>> file | <<<$\{project.basedir\}>>> |
 *----+------+------+
+| <<<project.rootDirectory>>> | the project's root directory (containing a <<<.mvn>>> directory) | <<<$\{project.rootDirectory\}>>> |
+*----+------+------+
 | <<<project.baseUri>>>\
 <<<pom.baseUri>>> (<deprecated>) | the directory containing the <<<pom.xml>>> file as URI | <<<$\{project.baseUri\}>>> |
 *----+------+------+

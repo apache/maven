@@ -62,6 +62,8 @@ import org.apache.maven.model.profile.activation.JdkVersionProfileActivator;
 import org.apache.maven.model.profile.activation.OperatingSystemProfileActivator;
 import org.apache.maven.model.profile.activation.ProfileActivator;
 import org.apache.maven.model.profile.activation.PropertyProfileActivator;
+import org.apache.maven.model.root.DefaultRootLocator;
+import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.model.superpom.DefaultSuperPomProvider;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.DefaultModelValidator;
@@ -113,7 +115,9 @@ public class DefaultModelBuilderFactory {
     }
 
     protected ProfileActivationFilePathInterpolator newProfileActivationFilePathInterpolator() {
-        return new ProfileActivationFilePathInterpolator().setPathTranslator(newPathTranslator());
+        return new ProfileActivationFilePathInterpolator()
+                .setPathTranslator(newPathTranslator())
+                .setRootLocator(newRootLocator());
     }
 
     protected UrlNormalizer newUrlNormalizer() {
@@ -124,13 +128,18 @@ public class DefaultModelBuilderFactory {
         return new DefaultPathTranslator();
     }
 
+    private RootLocator newRootLocator() {
+        return new DefaultRootLocator();
+    }
+
     protected ModelInterpolator newModelInterpolator() {
         UrlNormalizer normalizer = newUrlNormalizer();
         PathTranslator pathTranslator = newPathTranslator();
         return new StringVisitorModelInterpolator()
                 .setPathTranslator(pathTranslator)
                 .setUrlNormalizer(normalizer)
-                .setVersionPropertiesProcessor(newModelVersionPropertiesProcessor());
+                .setVersionPropertiesProcessor(newModelVersionPropertiesProcessor())
+                .setRootLocator(newRootLocator());
     }
 
     protected ModelVersionProcessor newModelVersionPropertiesProcessor() {

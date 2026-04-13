@@ -23,9 +23,11 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.profile.ProfileActivationContext;
+import org.apache.maven.model.root.RootLocator;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
@@ -43,8 +45,16 @@ public class ProfileActivationFilePathInterpolator {
     @Inject
     private PathTranslator pathTranslator;
 
+    @Inject
+    private RootLocator rootLocator;
+
     public ProfileActivationFilePathInterpolator setPathTranslator(PathTranslator pathTranslator) {
         this.pathTranslator = pathTranslator;
+        return this;
+    }
+
+    public ProfileActivationFilePathInterpolator setRootLocator(RootLocator rootLocator) {
+        this.rootLocator = rootLocator;
         return this;
     }
 
@@ -75,6 +85,18 @@ public class ProfileActivationFilePathInterpolator {
         } else if (path.contains("${basedir}")) {
             return null;
         }
+
+        interpolator.addValueSource(new AbstractValueSource(false) {
+            @Override
+            public Object getValue(String expression) {
+                if ("project.rootDirectory".equals(expression)) {
+                    Path base = basedir != null ? basedir.toPath() : null;
+                    Path root = rootLocator.findMandatoryRoot(base);
+                    return root.toFile().getAbsolutePath();
+                }
+                return null;
+            }
+        });
 
         interpolator.addValueSource(new MapBasedValueSource(context.getProjectProperties()));
 
