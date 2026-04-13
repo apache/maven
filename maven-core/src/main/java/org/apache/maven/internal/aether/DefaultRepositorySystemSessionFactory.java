@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -52,10 +53,12 @@ import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.ConfigurationProperties;
+import org.eclipse.aether.RepositoryException;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.collection.DependencyCollectionContext;
 import org.eclipse.aether.collection.VersionFilter;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.LocalRepositoryManager;
@@ -130,12 +133,12 @@ public class DefaultRepositorySystemSessionFactory {
      * <br/>
      * Supported filters:
      * <ul>
-     *     <li>"h" or "h(num)" - highest version or top list of highest ones filter</li>
-     *     <li>"l" or "l(num)" - lowest version or bottom list of lowest ones filter</li>
-     *     <li>"s" - contextual snapshot filter</li>
-     *     <li>"ns" - unconditional snapshot filter (no snapshots selected from ranges)</li>
-     *     <li>"e(G:A:V)" - predicate filter (excludes G:A:V from range, if hit, V can be version constraint)</li>
-     *     <li>"i(G:A:V)" - predicate filter (includes G:A:V from range, if hit, V can be version constraint)</li>
+     *     <li>{@code "h"} or {@code "h(num[@G[:A]])"} - highest version or top list of highest ones filter</li>
+     *     <li>{@code "l"} or {@code "l(num[@G[:A]])"} - lowest version or bottom list of lowest ones filter</li>
+     *     <li>{@code "s"} - contextual snapshot filter</li>
+     *     <li>{@code "ns"} - unconditional snapshot filter (no snapshots selected from ranges)</li>
+     *     <li>{@code "e(G:A:V)"} - predicate filter (excludes G:A:V from range, if hit, V can be version constraint)</li>
+     *     <li>{@code "i(G:A:V)"} - predicate filter (includes G:A:V from range, if hit, V can be version constraint)</li>
      * </ul>
      * Example filter expression: <code>"h(5);s;e(org.foo:bar:1)</code> will cause: ranges are filtered for "top 5" (instead
      * full range), snapshots are banned if root project is not a snapshot, and if range for <code>org.foo:bar</code> is
@@ -481,7 +484,10 @@ public class DefaultRepositorySystemSessionFactory {
         }
     }
 
-    private VersionFilter buildVersionFilter(String filterExpression) {
+    /**
+     * Visible for testing.
+     */
+    VersionFilter buildVersionFilter(String filterExpression) {
         ArrayList<VersionFilter> filters = new ArrayList<>();
         if (filterExpression != null) {
             List<String> expressions = Arrays.stream(filterExpression.split(";"))
@@ -490,36 +496,68 @@ public class DefaultRepositorySystemSessionFactory {
             for (String expression : expressions) {
                 if ("h".equals(expression)) {
                     filters.add(new HighestVersionFilter());
-                } else if (expression.startsWith("h(") && expression.endsWith(")")) {
-                    int num = Integer.parseInt(expression.substring(2, expression.length() - 1));
-                    filters.add(new HighestVersionFilter(num));
                 } else if ("l".equals(expression)) {
                     filters.add(new LowestVersionFilter());
-                } else if (expression.startsWith("l(") && expression.endsWith(")")) {
-                    int num = Integer.parseInt(expression.substring(2, expression.length() - 1));
-                    filters.add(new LowestVersionFilter(num));
+                } else if ((expression.startsWith("h(") || expression.startsWith("l(")) && expression.endsWith(")")) {
+                    Function<Integer, VersionFilter> filterSupplier =
+                            n -> expression.startsWith("h(") ? new HighestVersionFilter(n) : new LowestVersionFilter(n);
+                    String inner = expression.substring(2, expression.length() - 1);
+                    int num;
+                    String g;
+                    String a;
+                    if (inner.contains("@")) {
+                        num = Integer.parseInt(inner.substring(0, inner.indexOf('@')));
+                        String remainder = inner.substring(inner.indexOf('@') + 1);
+                        if (remainder.contains(":")) {
+                            g = remainder.substring(0, remainder.indexOf(':'));
+                            a = remainder.substring(remainder.indexOf(':') + 1);
+                        } else {
+                            g = remainder;
+                            a = null;
+                        }
+                    } else {
+                        num = Integer.parseInt(inner);
+                        g = null;
+                        a = null;
+                    }
+                    if (g == null) {
+                        filters.add(filterSupplier.apply(num));
+                    } else {
+                        VersionFilter versionFilter = filterSupplier.apply(num);
+                        filters.add(new VersionFilter() {
+                            @Override
+                            public void filterVersions(VersionFilterContext context) throws RepositoryException {
+                                Artifact dependencyArtifact =
+                                        context.getDependency().getArtifact();
+                                if (g.equals(dependencyArtifact.getGroupId())
+                                        && (a == null || a.equals(dependencyArtifact.getArtifactId()))) {
+                                    versionFilter.filterVersions(context);
+                                }
+                            }
+
+                            @Override
+                            public VersionFilter deriveChildFilter(DependencyCollectionContext context) {
+                                return this;
+                            }
+                        });
+                    }
                 } else if ("s".equals(expression)) {
                     filters.add(new ContextualSnapshotVersionFilter());
                 } else if ("ns".equals(expression)) {
                     filters.add(new SnapshotVersionFilter());
-                } else if (expression.startsWith("e(") && expression.endsWith(")")) {
+                } else if ((expression.startsWith("e(") || (expression.startsWith("i("))) && expression.endsWith(")")) {
                     Artifact artifact = new DefaultArtifact(expression.substring(2, expression.length() - 1));
                     VersionConstraint versionConstraint = parseVersionConstraint(artifact.getVersion());
                     Predicate<Artifact> predicate = a -> {
                         if (artifact.getGroupId().equals(a.getGroupId())
                                 && artifact.getArtifactId().equals(a.getArtifactId())) {
-                            return !versionConstraint.containsVersion(parseVersion(a.getVersion()));
-                        }
-                        return true;
-                    };
-                    filters.add(new PredicateVersionFilter(predicate));
-                } else if (expression.startsWith("i(") && expression.endsWith(")")) {
-                    Artifact artifact = new DefaultArtifact(expression.substring(2, expression.length() - 1));
-                    VersionConstraint versionConstraint = parseVersionConstraint(artifact.getVersion());
-                    Predicate<Artifact> predicate = a -> {
-                        if (artifact.getGroupId().equals(a.getGroupId())
-                                && artifact.getArtifactId().equals(a.getArtifactId())) {
-                            return versionConstraint.containsVersion(parseVersion(a.getVersion()));
+                            if (expression.startsWith("e(")) {
+                                // exclude
+                                return !versionConstraint.containsVersion(parseVersion(a.getVersion()));
+                            } else {
+                                // include
+                                return versionConstraint.containsVersion(parseVersion(a.getVersion()));
+                            }
                         }
                         return true;
                     };
