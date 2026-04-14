@@ -68,7 +68,6 @@ under the License.
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
-        <version>2.6.1-SNAPSHOT</version>
         <executions>
           <execution>
             <id>velocity-lifecycle</id>
