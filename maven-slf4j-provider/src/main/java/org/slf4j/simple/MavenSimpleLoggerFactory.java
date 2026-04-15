@@ -37,4 +37,9 @@ public class MavenSimpleLoggerFactory extends SimpleLoggerFactory {
             return oldInstance == null ? newInstance : oldInstance;
         }
     }
+
+    @Override
+    protected Logger createLogger(String name) {
+        return new MavenSimpleLogger(name);
+    }
 }
