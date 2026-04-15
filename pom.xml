@@ -148,7 +148,7 @@ under the License.
     <commonsCliVersion>1.11.0</commonsCliVersion>
     <domtripVersion>0.4.1</domtripVersion>
     <guiceVersion>5.1.0</guiceVersion>
-    <guavaVersion>33.5.0-jre</guavaVersion>
+    <guavaVersion>33.6.0-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
 
     <jakartaInjectApiVersion>2.0.1</jakartaInjectApiVersion>
