@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Binder;
+import com.google.inject.Provider;
 import com.google.inject.name.Names;
 import com.google.inject.spi.ProviderInstanceBinding;
 import jakarta.inject.Provider;
