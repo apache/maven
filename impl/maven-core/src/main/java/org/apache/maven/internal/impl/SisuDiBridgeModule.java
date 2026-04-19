@@ -19,7 +19,6 @@
 package org.apache.maven.internal.impl;
 
 import javax.inject.Named;
-import javax.inject.Provider;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -35,6 +34,7 @@ import java.util.stream.Collectors;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Binder;
+import com.google.inject.Provider;
 import com.google.inject.name.Names;
 import com.google.inject.spi.ProviderInstanceBinding;
 import org.apache.maven.api.di.MojoExecutionScoped;
@@ -177,9 +177,8 @@ public class SisuDiBridgeModule extends AbstractModule {
         }
 
         private <Q> Supplier<Q> getBeanSupplier(Dependency<Q> dep, Key<Q> key) {
-            List<Binding<?>> list = new ArrayList<>();
             // Add DI bindings
-            list.addAll(getBindings().getOrDefault(key, Set.of()));
+            List<Binding<?>> list = new ArrayList<>(getBindings().getOrDefault(key, Set.of()));
             // Add Plexus bindings
             for (var bean : locator.get().locate(toGuiceKey(key))) {
                 if (isPlexusBean(bean)) {
@@ -223,9 +222,8 @@ public class SisuDiBridgeModule extends AbstractModule {
         private <Q> Supplier<Q> getListSupplier(Key<Q> key) {
             Key<Object> elementType = key.getTypeParameter(0);
             return () -> {
-                List<Binding<?>> list = new ArrayList<>();
                 // Add DI bindings
-                list.addAll(getBindings().getOrDefault(elementType, Set.of()));
+                List<Binding<?>> list = new ArrayList<>(getBindings().getOrDefault(elementType, Set.of()));
                 // Add Plexus bindings
                 for (var bean : locator.get().locate(toGuiceKey(elementType))) {
                     if (isPlexusBean(bean)) {
