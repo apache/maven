@@ -29,6 +29,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.apache.maven.repository.internal.VersionFilterBuilder;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.collection.VersionFilter;
 import org.eclipse.aether.util.graph.version.ChainedVersionFilter;
@@ -79,7 +80,7 @@ import static java.util.Objects.requireNonNull;
  */
 @Singleton
 @Named
-public class VersionFilterBuilder {
+public class DefaultVersionFilterBuilder implements VersionFilterBuilder {
     /**
      * Builds a version filter based on the given filter expression.
      *
@@ -87,6 +88,7 @@ public class VersionFilterBuilder {
      * @param versionConstraintParser version constraint parts to be used during parsing, must not be {@code null}.
      * @return optional version filter, never {@code null}.
      */
+    @Override
     public Optional<VersionFilter> buildVersionFilter(
             String filterExpression, Function<String, VersionConstraint> versionConstraintParser) {
         requireNonNull(versionConstraintParser);

@@ -38,7 +38,7 @@ import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.ModelBase;
 import org.apache.maven.repository.internal.MavenSessionBuilderSupplier;
-import org.apache.maven.repository.internal.filters.VersionFilterBuilder;
+import org.apache.maven.repository.internal.VersionFilterBuilder;
 import org.apache.maven.repository.internal.scopes.Maven3ScopeManagerConfiguration;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.settings.Mirror;
@@ -120,7 +120,7 @@ public class DefaultRepositorySystemSessionFactory {
 
     /**
      * User property for version filter expression used in session, applied to resolving ranges.
-     * For syntax, see {@link VersionFilterBuilder}.
+     * For syntax, see {@link VersionFilterBuilder} implementation.
      *
      * @since 3.10.0
      * @see VersionFilterBuilder

@@ -44,15 +44,15 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
-public class VersionFilterBuilderTest {
+public class DefaultVersionFilterBuilderTest {
     final GenericVersionScheme versionScheme = new GenericVersionScheme();
     RepositorySystemSession session;
-    VersionFilterBuilder factory;
+    DefaultVersionFilterBuilder factory;
 
     @BeforeEach
     public void prepare() {
         session = mock(RepositorySystemSession.class);
-        factory = new VersionFilterBuilder();
+        factory = new DefaultVersionFilterBuilder();
     }
 
     private Version version(String spec) {
