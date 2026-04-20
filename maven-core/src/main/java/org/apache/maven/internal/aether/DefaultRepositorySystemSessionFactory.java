@@ -56,6 +56,7 @@ import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.ConfigurationProperties;
+import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositoryException;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -216,6 +217,15 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
     private final GenericVersionScheme versionScheme = new GenericVersionScheme();
 
     private final InternalScopeManager scopeManager = new ScopeManagerImpl(Maven3ScopeManagerConfiguration.INSTANCE);
+
+    /**
+     * For legacy consumers; hopefully nobody.
+     */
+    @Deprecated
+    public DefaultRepositorySystemSession newRepositorySession(MavenExecutionRequest request) {
+        return new DefaultRepositorySystemSession(
+                newRepositorySessionBuilder(request).build());
+    }
 
     @SuppressWarnings("checkstyle:methodlength")
     @Override
