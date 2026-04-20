@@ -23,9 +23,12 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.io.File;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.toolchain.MisconfiguredToolchainException;
 import org.apache.maven.toolchain.RequirementMatcher;
 import org.apache.maven.toolchain.RequirementMatcherFactory;
@@ -84,7 +87,7 @@ public class JavaToolchainFactory implements ToolchainFactory {
 
         // populate the configuration section
         Xpp3Dom dom = (Xpp3Dom) model.getConfiguration();
-        Xpp3Dom javahome = dom.getChild(JavaToolchainImpl.KEY_JAVAHOME);
+        Xpp3Dom javahome = dom != null ? dom.getChild(JavaToolchainImpl.KEY_JAVAHOME) : null;
         if (javahome == null) {
             throw new MisconfiguredToolchainException(
                     "Java toolchain without the " + JavaToolchainImpl.KEY_JAVAHOME + " configuration element.");
@@ -97,6 +100,14 @@ public class JavaToolchainFactory implements ToolchainFactory {
                     "Non-existing JDK home configuration at " + normal.getAbsolutePath());
         }
 
+        ArtifactVersion javaVersion = model.getProvides().entrySet().stream()
+                .filter(entry -> "version".equals(entry.getKey()))
+                .map(Map.Entry::getValue)
+                .map(v -> new DefaultArtifactVersion((String) v))
+                .findAny()
+                .orElse(null);
+
+        jtc.setJavaVersion(javaVersion);
         return jtc;
     }
 

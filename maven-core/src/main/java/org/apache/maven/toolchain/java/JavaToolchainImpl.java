@@ -20,6 +20,7 @@ package org.apache.maven.toolchain.java;
 
 import java.io.File;
 
+import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.toolchain.DefaultToolchain;
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.logging.Logger;
@@ -35,6 +36,8 @@ import org.codehaus.plexus.util.Os;
 public class JavaToolchainImpl extends DefaultToolchain implements JavaToolchain {
     private String javaHome;
 
+    private ArtifactVersion javaVersion;
+
     public static final String KEY_JAVAHOME = "jdkHome"; // NOI18N
 
     JavaToolchainImpl(ToolchainModel model, Logger logger) {
@@ -47,6 +50,15 @@ public class JavaToolchainImpl extends DefaultToolchain implements JavaToolchain
 
     public void setJavaHome(String javaHome) {
         this.javaHome = javaHome;
+    }
+
+    @Override
+    public ArtifactVersion getJavaVersion() {
+        return javaVersion;
+    }
+
+    public void setJavaVersion(ArtifactVersion javaVersion) {
+        this.javaVersion = javaVersion;
     }
 
     public String toString() {

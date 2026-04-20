@@ -63,6 +63,10 @@ public class CLIManager {
 
     public static final char UPDATE_SNAPSHOTS = 'U';
 
+    public static final String UPDATE_METADATA = "UM";
+
+    public static final String UPDATE_ARTIFACTS = "UA";
+
     public static final char ACTIVATE_PROFILES = 'P';
 
     public static final String SUPRESS_SNAPSHOT_UPDATES = "nsu";
@@ -109,7 +113,11 @@ public class CLIManager {
 
     public static final String IGNORE_TRANSITIVE_REPOSITORIES = "itr";
 
-    private static final String RAW_STREAMS = "raw-streams";
+    public static final String RAW_STREAMS = "raw-streams";
+
+    public static final String ARTIFACTS_UPDATE_POLICY = "artifacts-update-policy";
+
+    public static final String METADATA_UPDATE_POLICY = "metadata-update-policy";
 
     protected Options options;
 
@@ -157,6 +165,15 @@ public class CLIManager {
         options.addOption(Option.builder(Character.toString(UPDATE_SNAPSHOTS))
                 .longOpt("update-snapshots")
                 .desc("Forces a check for missing releases and updated snapshots on remote repositories")
+                .build());
+        options.addOption(Option.builder(UPDATE_METADATA)
+                .longOpt("update-metadata")
+                .desc(
+                        "Forces updates of remote repository metadata (updates plugin prefixes, version ranges and snapshots)")
+                .build());
+        options.addOption(Option.builder(UPDATE_ARTIFACTS)
+                .longOpt("update-artifacts")
+                .desc("Forces checks for missing artifacts (retries cached retrieval errors)")
                 .build());
         options.addOption(Option.builder(Character.toString(ACTIVATE_PROFILES))
                 .longOpt("activate-profiles")
@@ -268,6 +285,18 @@ public class CLIManager {
         options.addOption(Option.builder(IGNORE_TRANSITIVE_REPOSITORIES)
                 .longOpt("ignore-transitive-repositories")
                 .desc("If set, Maven will ignore remote repositories introduced by transitive dependencies.")
+                .build());
+        options.addOption(Option.builder()
+                .longOpt(ARTIFACTS_UPDATE_POLICY)
+                .hasArg(true)
+                .desc(
+                        "The update policy to apply onto artifacts ('always', 'daily', 'never'); The -UA option overrides this option with 'always'")
+                .build());
+        options.addOption(Option.builder()
+                .longOpt(METADATA_UPDATE_POLICY)
+                .hasArg(true)
+                .desc(
+                        "The update policy to apply onto metadata ('always', 'daily', 'never'); The -UM option overrides this option with 'always'")
                 .build());
 
         // Adding this back in for compatibility with the verifier that hard codes this option.

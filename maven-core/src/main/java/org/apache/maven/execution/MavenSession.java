@@ -19,6 +19,7 @@
 package org.apache.maven.execution;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -170,20 +171,22 @@ public class MavenSession implements Cloneable {
      *
      * @since 3.10.0
      */
-    public File getTopDirectory() {
-        return request.getTopDirectory() != null ? request.getTopDirectory().toFile() : null;
+    public Path getTopDirectory() {
+        return request.getTopDirectory();
     }
 
     /**
-     * Returns root directory if discovered or {@code null}.
+     * Returns root directory if discovered or throws {@link IllegalStateException} if it could not be found.
      * Root directory is detected, usually by the presence of {@code .mvn} directory, and is used to discover
      * extensions and other configuration files. It usually represents the "project root" or "checkout root".
      * Root directory may be equal to top directory or some parent of it (first directory where {@code .mvn} is found).
      *
+     *  @throws IllegalStateException if the root directory could not be found
+     *
      * @since 3.10.0
      */
-    public File getRootDirectory() {
-        return request.getRootDirectory() != null ? request.getRootDirectory().toFile() : null;
+    public Path getRootDirectory() {
+        return request.getRootDirectory();
     }
 
     // Backward compat

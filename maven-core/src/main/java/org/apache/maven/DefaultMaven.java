@@ -43,7 +43,7 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.graph.GraphBuilder;
-import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
+import org.apache.maven.internal.RepositorySystemSessionFactory;
 import org.apache.maven.internal.aether.MavenChainedWorkspaceReader;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
@@ -91,7 +91,7 @@ public class DefaultMaven implements Maven {
     private SessionScope sessionScope;
 
     @Inject
-    private DefaultRepositorySystemSessionFactory repositorySessionFactory;
+    private RepositorySystemSessionFactory repositorySessionFactory;
 
     @Inject
     @Named(GraphBuilder.HINT)
@@ -166,7 +166,8 @@ public class DefaultMaven implements Maven {
         // so that @SessionScoped components can be @Injected into AbstractLifecycleParticipants.
         //
         sessionScope.enter();
-        try (RepositorySystemSession.CloseableSession repoSession = newRepositorySession(request)) {
+        try (RepositorySystemSession.CloseableSession repoSession =
+                newRepositorySessionBuilder(request).build()) {
             DefaultRepositorySystemSession mutableSession = new DefaultRepositorySystemSession(repoSession);
             MavenSession session = new MavenSession(container, mutableSession, request, result);
 
@@ -313,8 +314,13 @@ public class DefaultMaven implements Maven {
         }
     }
 
-    public RepositorySystemSession.CloseableSession newRepositorySession(MavenExecutionRequest request) {
-        return repositorySessionFactory.newRepositorySession(request).build();
+    @Deprecated
+    public RepositorySystemSession newRepositorySession(MavenExecutionRequest request) {
+        return newRepositorySessionBuilder(request).build();
+    }
+
+    private RepositorySystemSession.SessionBuilder newRepositorySessionBuilder(MavenExecutionRequest request) {
+        return repositorySessionFactory.newRepositorySessionBuilder(request);
     }
 
     private void validateLocalRepository(MavenExecutionRequest request) throws LocalRepositoryNotAccessibleException {

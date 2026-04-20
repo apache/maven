@@ -31,6 +31,7 @@ import java.util.Properties;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.properties.internal.SystemProperties;
@@ -140,6 +141,10 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
 
     private boolean updateSnapshots = false;
 
+    private String artifactsUpdatePolicy = null;
+
+    private String metadataUpdatePolicy = null;
+
     private List<ArtifactRepository> remoteRepositories;
 
     private List<ArtifactRepository> pluginArtifactRepositories;
@@ -201,17 +206,23 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
         copy.setLoggingLevel(original.getLoggingLevel());
         copy.setGlobalChecksumPolicy(original.getGlobalChecksumPolicy());
         copy.setUpdateSnapshots(original.isUpdateSnapshots());
+        copy.setNoSnapshotUpdates(original.isNoSnapshotUpdates());
+        copy.setArtifactsUpdatePolicy(original.getArtifactsUpdatePolicy());
+        copy.setMetadataUpdatePolicy(original.getMetadataUpdatePolicy());
         copy.setRemoteRepositories(original.getRemoteRepositories());
         copy.setPluginArtifactRepositories(original.getPluginArtifactRepositories());
         copy.setRepositoryCache(original.getRepositoryCache());
         copy.setWorkspaceReader(original.getWorkspaceReader());
-        copy.setNoSnapshotUpdates(original.isNoSnapshotUpdates());
         copy.setExecutionListener(original.getExecutionListener());
         copy.setUseLegacyLocalRepository(original.isUseLegacyLocalRepository());
         copy.setBuilderId(original.getBuilderId());
 
         copy.setTopDirectory(original.getTopDirectory());
-        copy.setRootDirectory(original.getRootDirectory());
+        try {
+            copy.setRootDirectory(original.getRootDirectory());
+        } catch (IllegalStateException e) {
+            // ignore during copy
+        }
 
         return copy;
     }
@@ -401,6 +412,28 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
     @Override
     public boolean isNoSnapshotUpdates() {
         return noSnapshotUpdates;
+    }
+
+    @Override
+    public MavenExecutionRequest setArtifactsUpdatePolicy(String policy) {
+        this.artifactsUpdatePolicy = policy;
+        return this;
+    }
+
+    @Override
+    public String getArtifactsUpdatePolicy() {
+        return artifactsUpdatePolicy;
+    }
+
+    @Override
+    public MavenExecutionRequest setMetadataUpdatePolicy(String policy) {
+        this.metadataUpdatePolicy = policy;
+        return this;
+    }
+
+    @Override
+    public String getMetadataUpdatePolicy() {
+        return metadataUpdatePolicy;
     }
 
     @Override
@@ -1120,6 +1153,9 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
 
     @Override
     public Path getRootDirectory() {
+        if (rootDirectory == null) {
+            throw new IllegalStateException(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE);
+        }
         return rootDirectory;
     }
 
