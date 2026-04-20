@@ -168,11 +168,11 @@ public class CLIManager {
                 .build());
         options.addOption(Option.builder(UPDATE_METADATA)
                 .longOpt("update-metadata")
-                .desc("Forces updates of remote repository metadata")
+                .desc("Forces updates of remote repository metadata (plugin prefixes, version ranges and snapshots are updated)")
                 .build());
         options.addOption(Option.builder(UPDATE_ARTIFACTS)
                 .longOpt("update-artifacts")
-                .desc("Forces checks for missing artifacts")
+                .desc("Forces checks for missing artifacts (cached errors -- like 404s -- are retried)")
                 .build());
         options.addOption(Option.builder(Character.toString(ACTIVATE_PROFILES))
                 .longOpt("activate-profiles")
