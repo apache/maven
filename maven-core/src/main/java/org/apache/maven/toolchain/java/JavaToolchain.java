@@ -18,6 +18,7 @@
  */
 package org.apache.maven.toolchain.java;
 
+import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.toolchain.Toolchain;
 
 /**
@@ -61,4 +62,18 @@ public interface JavaToolchain extends Toolchain {
     //     * @return List
     //     */
     //    List getJavadocDirectories();
+
+    /**
+     * Returns the home directory of the JDK.
+     *
+     * @since 3.10.0
+     */
+    String getJavaHome();
+
+    /**
+     * Returns the version of the JDK.
+     *
+     * @since 3.10.0
+     */
+    ArtifactVersion getJavaVersion();
 }
