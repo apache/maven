@@ -14,12 +14,4 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-
-# key = Slf4j effective logger factory implementation
-# value = corresponding o.a.m.cli.logging.Slf4jConfiguration class
-org.slf4j.impl.SimpleLoggerFactory org.apache.maven.cli.logging.impl.Slf4jSimpleConfiguration
-org.slf4j.impl.MavenSimpleLoggerFactory org.apache.maven.cli.logging.impl.Slf4jSimpleConfiguration
-org.slf4j.simple.SimpleLoggerFactory org.apache.maven.cli.logging.impl.Slf4jSimpleConfiguration
-org.slf4j.simple.MavenSimpleLoggerFactory org.apache.maven.cli.logging.impl.Slf4jSimpleConfiguration
-org.apache.logging.slf4j.Log4jLoggerFactory org.apache.maven.cli.logging.impl.Log4j2Configuration
-ch.qos.logback.classic.LoggerContext org.apache.maven.cli.logging.impl.LogbackConfiguration
+org.slf4j.simple.MavenSimpleServiceProvider

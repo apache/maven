@@ -145,7 +145,7 @@ under the License.
     <cipherVersion>2.0</cipherVersion>
     <jxpathVersion>1.4.0</jxpathVersion>
     <resolverVersion>2.0.16</resolverVersion>
-    <slf4jVersion>1.7.36</slf4jVersion>
+    <slf4jVersion>2.0.17</slf4jVersion>
     <xmlunitVersion>2.11.0</xmlunitVersion>
     <powermockVersion>2.0.9</powermockVersion>
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
@@ -379,7 +379,6 @@ under the License.
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-simple</artifactId>
         <version>${slf4jVersion}</version>
-        <optional>true</optional>
       </dependency>
       <dependency>
         <groupId>ch.qos.logback</groupId>
@@ -570,7 +569,7 @@ under the License.
         <plugin>
           <groupId>org.codehaus.modello</groupId>
           <artifactId>modello-maven-plugin</artifactId>
-          <version>2.6.0</version>
+          <version>2.7.0</version>
           <executions>
             <execution>
               <id>modello-site-docs</id>

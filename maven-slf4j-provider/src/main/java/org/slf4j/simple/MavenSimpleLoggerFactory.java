@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.slf4j.impl;
+package org.slf4j.simple;
 
 import org.slf4j.Logger;
 
@@ -36,5 +36,10 @@ public class MavenSimpleLoggerFactory extends SimpleLoggerFactory {
             Logger oldInstance = loggerMap.putIfAbsent(name, newInstance);
             return oldInstance == null ? newInstance : oldInstance;
         }
+    }
+
+    @Override
+    protected Logger createLogger(String name) {
+        return new MavenSimpleLogger(name);
     }
 }
