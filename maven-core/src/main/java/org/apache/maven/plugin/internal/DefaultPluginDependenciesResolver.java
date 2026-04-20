@@ -34,6 +34,7 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginResolutionException;
+import org.apache.maven.repository.internal.VersionFilterBuilder;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -195,6 +196,8 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                     AndDependencySelector.newInstance(session.getDependencySelector(), new WagonExcluder());
 
             DefaultRepositorySystemSession pluginSession = new DefaultRepositorySystemSession(session);
+            pluginSession.setConfigProperty(
+                    VersionFilterBuilder.MAVEN_VERSION_FILTER_SUPPRESSED, Boolean.TRUE.toString());
             pluginSession.setDependencySelector(selector);
             pluginSession.setDependencyGraphTransformer(session.getDependencyGraphTransformer());
 

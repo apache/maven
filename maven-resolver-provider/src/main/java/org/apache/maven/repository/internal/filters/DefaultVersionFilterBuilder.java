@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 import org.apache.maven.repository.internal.VersionFilterBuilder;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.collection.VersionFilter;
+import org.eclipse.aether.util.ConfigUtils;
 import org.eclipse.aether.util.graph.version.ChainedVersionFilter;
 import org.eclipse.aether.util.graph.version.ContextPredicateDelegatingVersionFilter;
 import org.eclipse.aether.util.graph.version.ContextualSnapshotVersionFilter;
@@ -151,12 +152,7 @@ public class DefaultVersionFilterBuilder implements VersionFilterBuilder {
                     throw new IllegalArgumentException("Unsupported filter expression: " + expression);
                 }
 
-                if (scopePredicate == null) {
-                    filters.add(filter);
-                } else {
-                    filters.add(new ContextPredicateDelegatingVersionFilter(
-                            c -> scopePredicate.test(c.getDependency().getArtifact()), filter));
-                }
+                filters.add(contextPredicate(scopePredicate, filter));
             }
         }
         if (filters.isEmpty()) {
@@ -166,5 +162,15 @@ public class DefaultVersionFilterBuilder implements VersionFilterBuilder {
         } else {
             return Optional.of(ChainedVersionFilter.newInstance(filters));
         }
+    }
+
+    private VersionFilter contextPredicate(Predicate<Artifact> artifactPredicate, VersionFilter filter) {
+        Predicate<VersionFilter.VersionFilterContext> contextPredicate =
+                c -> !ConfigUtils.getBoolean(c.getSession(), false, MAVEN_VERSION_FILTER_SUPPRESSED);
+        if (artifactPredicate != null) {
+            contextPredicate = contextPredicate.and(
+                    c -> artifactPredicate.test(c.getDependency().getArtifact()));
+        }
+        return new ContextPredicateDelegatingVersionFilter(contextPredicate, filter);
     }
 }

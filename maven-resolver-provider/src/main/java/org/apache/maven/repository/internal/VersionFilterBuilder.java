@@ -31,6 +31,11 @@ import org.eclipse.aether.version.VersionConstraint;
  */
 public interface VersionFilterBuilder {
     /**
+     * User property for version filter suppression. Presence of this key will suppress filter created by this builder.
+     */
+    String MAVEN_VERSION_FILTER_SUPPRESSED = "maven.session.versionFilter.suppressed";
+
+    /**
      * Builds a version filter based on the given filter expression.
      *
      * @param filterExpression a string containing filter expressions, may be {@code null}.

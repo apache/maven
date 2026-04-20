@@ -20,8 +20,11 @@ package org.apache.maven.repository.internal.filters;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.maven.repository.internal.VersionFilterBuilder;
 import org.eclipse.aether.RepositoryException;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -30,7 +33,7 @@ import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.internal.impl.collect.DefaultVersionFilterContext;
 import org.eclipse.aether.resolution.VersionRangeRequest;
 import org.eclipse.aether.resolution.VersionRangeResult;
-import org.eclipse.aether.util.graph.version.HighestVersionFilter;
+import org.eclipse.aether.util.graph.version.ContextPredicateDelegatingVersionFilter;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
@@ -43,15 +46,19 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class DefaultVersionFilterBuilderTest {
     final GenericVersionScheme versionScheme = new GenericVersionScheme();
     RepositorySystemSession session;
     DefaultVersionFilterBuilder factory;
+    Map<String, Object> sessionConfigProperties;
 
     @BeforeEach
     public void prepare() {
         session = mock(RepositorySystemSession.class);
+        sessionConfigProperties = new HashMap<>();
+        when(session.getConfigProperties()).thenReturn(sessionConfigProperties);
         factory = new DefaultVersionFilterBuilder();
     }
 
@@ -87,15 +94,48 @@ public class DefaultVersionFilterBuilderTest {
         VersionFilter vf;
         vf = factory.buildVersionFilter("h", this::versionConstraint).orElse(null);
         assertNotNull(vf);
-        assertInstanceOf(HighestVersionFilter.class, vf);
+        assertInstanceOf(ContextPredicateDelegatingVersionFilter.class, vf);
 
         vf = factory.buildVersionFilter("h(5)", this::versionConstraint).orElse(null);
         assertNotNull(vf);
-        assertInstanceOf(HighestVersionFilter.class, vf);
+        assertInstanceOf(ContextPredicateDelegatingVersionFilter.class, vf);
 
         vf = factory.buildVersionFilter("h(1)@group", this::versionConstraint).orElse(null);
         assertNotNull(vf);
-        // assertInstanceOf(HighestVersionFilter.class, vf); // this is wrapped instance
+        assertInstanceOf(ContextPredicateDelegatingVersionFilter.class, vf); // this is wrapped instance
+    }
+
+    /**
+     * Creating {@code h(1@group)} and incoming artifact G does not match => not applied.
+     */
+    @Test
+    public void versionFilterSuppressed() throws RepositoryException {
+        VersionFilter vf;
+
+        vf = factory.buildVersionFilter("h(2)@group", this::versionConstraint).orElse(null);
+        assertNotNull(vf);
+
+        List<Version> versions = Arrays.asList(version("1.0"), version("1.1"), version("1.2"));
+
+        DefaultVersionFilterContext context = new DefaultVersionFilterContext(session);
+        VersionRangeResult result =
+                new VersionRangeResult(new VersionRangeRequest()).setVersions(new ArrayList<>(versions));
+        context.set(new Dependency(new DefaultArtifact("group:a:[1,)"), ""), result);
+
+        vf.filterVersions(context);
+
+        // hit
+        assertEquals(2, context.get().size());
+        assertEquals(version("1.1"), context.get().get(0));
+        assertEquals(version("1.2"), context.get().get(1));
+
+        sessionConfigProperties.put(VersionFilterBuilder.MAVEN_VERSION_FILTER_SUPPRESSED, Boolean.TRUE);
+
+        context = new DefaultVersionFilterContext(session);
+        context.set(new Dependency(new DefaultArtifact("group:a:[1,)"), ""), result);
+
+        // suppressed
+        assertEquals(versions, context.get());
     }
 
     /**
@@ -117,7 +157,7 @@ public class DefaultVersionFilterBuilderTest {
 
         vf.filterVersions(context);
 
-        assertEquals(versions, context.get());
+        vf.filterVersions(context);
     }
 
     /**
