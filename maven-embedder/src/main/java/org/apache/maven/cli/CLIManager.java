@@ -168,7 +168,8 @@ public class CLIManager {
                 .build());
         options.addOption(Option.builder(UPDATE_METADATA)
                 .longOpt("update-metadata")
-                .desc("Forces updates of remote repository metadata (plugin prefixes, version ranges and snapshots are updated)")
+                .desc(
+                        "Forces updates of remote repository metadata (plugin prefixes, version ranges and snapshots are updated)")
                 .build());
         options.addOption(Option.builder(UPDATE_ARTIFACTS)
                 .longOpt("update-artifacts")
