@@ -168,11 +168,11 @@ public class CLIManager {
                 .build());
         options.addOption(Option.builder(UPDATE_METADATA)
                 .longOpt("update-metadata")
-                .desc("Forces a check for missing remote repository metadata on remote repositories")
+                .desc("Forces updates of remote repository metadata")
                 .build());
         options.addOption(Option.builder(UPDATE_ARTIFACTS)
                 .longOpt("update-artifacts")
-                .desc("Forces a check for missing artifacts on remote repositories")
+                .desc("Forces checks for missing artifacts")
                 .build());
         options.addOption(Option.builder(Character.toString(ACTIVATE_PROFILES))
                 .longOpt("activate-profiles")
@@ -289,13 +289,13 @@ public class CLIManager {
                 .longOpt(ARTIFACTS_UPDATE_POLICY)
                 .hasArg(true)
                 .desc(
-                        "The update policy to apply onto artifacts ('always', 'daily', 'never'); The -UA option overrides this option")
+                        "The update policy to apply onto artifacts ('always', 'daily', 'never'); The -UA option overrides this option with 'always'")
                 .build());
         options.addOption(Option.builder()
                 .longOpt(METADATA_UPDATE_POLICY)
                 .hasArg(true)
                 .desc(
-                        "The update policy to apply onto metadata ('always', 'daily', 'never'); The -UM option overrides this option")
+                        "The update policy to apply onto metadata ('always', 'daily', 'never'); The -UM option overrides this option with 'always'")
                 .build());
 
         // Adding this back in for compatibility with the verifier that hard codes this option.
