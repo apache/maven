@@ -30,7 +30,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.apache.maven.lifecycle.providers.lifecycle.CleanLifecycleProvider;
+import org.apache.maven.lifecycle.providers.lifecycle.DefaultLifecycleProvider;
+import org.apache.maven.lifecycle.providers.lifecycle.SiteLifecycleProvider;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
@@ -46,7 +50,18 @@ import org.codehaus.plexus.util.StringUtils;
 @Singleton
 @Named
 public class DefaultLifecycles {
-    public static final String[] STANDARD_LIFECYCLES = {"clean", "default", "site"};
+    private static final List<String> BUILT_IN_LIFECYCLES =
+            Arrays.asList(CleanLifecycleProvider.NAME, DefaultLifecycleProvider.NAME, SiteLifecycleProvider.NAME);
+    private static final boolean SITE_ENABLED =
+            Boolean.parseBoolean(System.getProperty("maven.site.lifecycle.enabled", "true"));
+
+    /**
+     * @deprecated Use {@link #getStandardLifecycles()} instead.
+     */
+    @Deprecated
+    public static final String[] STANDARD_LIFECYCLES = {
+        CleanLifecycleProvider.NAME, DefaultLifecycleProvider.NAME, SiteLifecycleProvider.NAME
+    };
 
     @Inject
     private Map<String, Lifecycle> lifecycles;
@@ -60,9 +75,20 @@ public class DefaultLifecycles {
     public DefaultLifecycles() {}
 
     public DefaultLifecycles(Map<String, Lifecycle> lifecycles, Logger logger) {
-        this.lifecycles = new LinkedHashMap<>();
-        this.logger = logger;
         this.lifecycles = lifecycles;
+        this.logger = logger;
+    }
+
+    private boolean isEnabled(String lifecycleId) {
+        if (SiteLifecycleProvider.NAME.equals(lifecycleId)) {
+            return SITE_ENABLED;
+        } else {
+            return true;
+        }
+    }
+
+    public List<String> getStandardLifecycles() {
+        return BUILT_IN_LIFECYCLES.stream().filter(this::isEnabled).collect(Collectors.toList());
     }
 
     public Lifecycle get(String key) {
@@ -113,6 +139,9 @@ public class DefaultLifecycles {
         // in some tests container is not injected
         if (this.plexusContainer != null) {
             for (String name : this.lifecycles.keySet()) {
+                if (!isEnabled(name)) {
+                    continue;
+                }
                 try {
                     lifecycles.put(name, plexusContainer.lookup(Lifecycle.class, name));
                 } catch (ComponentLookupException e) {
@@ -123,7 +152,7 @@ public class DefaultLifecycles {
             lifecycles.putAll(this.lifecycles);
         }
 
-        LinkedHashSet<String> lifecycleNames = new LinkedHashSet<>(Arrays.asList(STANDARD_LIFECYCLES));
+        LinkedHashSet<String> lifecycleNames = new LinkedHashSet<>(getStandardLifecycles());
         lifecycleNames.addAll(lifecycles.keySet());
 
         ArrayList<Lifecycle> result = new ArrayList<>();

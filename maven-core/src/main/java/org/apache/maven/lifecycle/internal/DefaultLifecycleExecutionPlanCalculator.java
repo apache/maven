@@ -24,7 +24,6 @@ import javax.inject.Singleton;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -230,7 +229,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
         }
 
         LifecycleMappingDelegate delegate;
-        if (Arrays.binarySearch(DefaultLifecycles.STANDARD_LIFECYCLES, lifecycle.getId()) >= 0) {
+        if (defaultLifeCycles.getStandardLifecycles().contains(lifecycle.getId())) {
             delegate = standardDelegate;
         } else {
             delegate = delegates.get(lifecycle.getId());
