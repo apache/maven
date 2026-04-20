@@ -63,6 +63,10 @@ public class CLIManager {
 
     public static final char UPDATE_SNAPSHOTS = 'U';
 
+    public static final String UPDATE_METADATA = "UM";
+
+    public static final String UPDATE_ARTIFACTS = "UA";
+
     public static final char ACTIVATE_PROFILES = 'P';
 
     public static final String SUPRESS_SNAPSHOT_UPDATES = "nsu";
@@ -161,6 +165,14 @@ public class CLIManager {
         options.addOption(Option.builder(Character.toString(UPDATE_SNAPSHOTS))
                 .longOpt("update-snapshots")
                 .desc("Forces a check for missing releases and updated snapshots on remote repositories")
+                .build());
+        options.addOption(Option.builder(UPDATE_METADATA)
+                .longOpt("update-metadata")
+                .desc("Forces a check for missing remote repository metadata on remote repositories")
+                .build());
+        options.addOption(Option.builder(UPDATE_ARTIFACTS)
+                .longOpt("update-artifacts")
+                .desc("Forces a check for missing artifacts on remote repositories")
                 .build());
         options.addOption(Option.builder(Character.toString(ACTIVATE_PROFILES))
                 .longOpt("activate-profiles")
@@ -276,12 +288,12 @@ public class CLIManager {
         options.addOption(Option.builder()
                 .longOpt(ARTIFACTS_UPDATE_POLICY)
                 .hasArg(true)
-                .desc("The update policy to apply onto artifacts ('always', 'daily', 'never')")
+                .desc("The update policy to apply onto artifacts ('always', 'daily', 'never'); -U and -UA overrides this option")
                 .build());
         options.addOption(Option.builder()
                 .longOpt(METADATA_UPDATE_POLICY)
                 .hasArg(true)
-                .desc("The update policy to apply onto metadata ('always', 'daily', 'never')")
+                .desc("The update policy to apply onto metadata ('always', 'daily', 'never'); -U and -UM overrides this option")
                 .build());
 
         // Adding this back in for compatibility with the verifier that hard codes this option.

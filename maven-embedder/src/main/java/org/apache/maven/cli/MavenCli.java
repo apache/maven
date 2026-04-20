@@ -1318,20 +1318,23 @@ public class MavenCli {
         }
 
         boolean updateSnapshots = false;
-
         if (commandLine.hasOption(CLIManager.UPDATE_SNAPSHOTS)) {
             updateSnapshots = true;
         }
 
         String artifactsUpdatePolicy = null;
         String metadataUpdatePolicy = null;
-        if (commandLine.hasOption(CLIManager.ARTIFACTS_UPDATE_POLICY)) {
-            artifactsUpdatePolicy = commandLine.getOptionValue(
-                    CLIManager.ARTIFACTS_UPDATE_POLICY, RepositoryPolicy.UPDATE_POLICY_ALWAYS);
+        if (commandLine.hasOption(CLIManager.UPDATE_ARTIFACTS)) {
+            artifactsUpdatePolicy = RepositoryPolicy.UPDATE_POLICY_ALWAYS;
         }
-        if (commandLine.hasOption(CLIManager.METADATA_UPDATE_POLICY)) {
-            metadataUpdatePolicy = commandLine.getOptionValue(
-                    CLIManager.METADATA_UPDATE_POLICY, RepositoryPolicy.UPDATE_POLICY_ALWAYS);
+        if (artifactsUpdatePolicy == null && commandLine.hasOption(CLIManager.ARTIFACTS_UPDATE_POLICY)) {
+            artifactsUpdatePolicy = commandLine.getOptionValue(CLIManager.ARTIFACTS_UPDATE_POLICY);
+        }
+        if (commandLine.hasOption(CLIManager.UPDATE_METADATA)) {
+            metadataUpdatePolicy = RepositoryPolicy.UPDATE_POLICY_ALWAYS;
+        }
+        if (metadataUpdatePolicy == null && commandLine.hasOption(CLIManager.METADATA_UPDATE_POLICY)) {
+            metadataUpdatePolicy = commandLine.getOptionValue(CLIManager.METADATA_UPDATE_POLICY);
         }
 
         // ----------------------------------------------------------------------
