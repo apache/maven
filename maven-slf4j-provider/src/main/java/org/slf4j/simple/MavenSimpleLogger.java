@@ -29,24 +29,40 @@ import static org.apache.maven.jline.MessageUtils.builder;
  */
 public class MavenSimpleLogger extends SimpleLogger {
 
+    private String traceRenderedLevel;
+    private String debugRenderedLevel;
+    private String infoRenderedLevel;
+    private String warnRenderedLevel;
+    private String errorRenderedLevel;
+
     MavenSimpleLogger(String name) {
         super(name);
     }
 
     @Override
     protected String renderLevel(int level) {
+        // lazy initialization at first use
+        // cannot be done in constructor because ansi terminals are not configured yet
+        if (traceRenderedLevel == null) {
+            traceRenderedLevel = builder().trace("TRACE").build();
+            debugRenderedLevel = builder().debug("DEBUG").build();
+            infoRenderedLevel = builder().info("INFO").build();
+            warnRenderedLevel = builder().warning("WARNING").build();
+            errorRenderedLevel = builder().error("ERROR").build();
+        }
+
         switch (level) {
             case LOG_LEVEL_TRACE:
-                return builder().trace("TRACE").toString();
+                return traceRenderedLevel;
             case LOG_LEVEL_DEBUG:
-                return builder().debug("DEBUG").toString();
+                return debugRenderedLevel;
             case LOG_LEVEL_INFO:
-                return builder().info("INFO").toString();
+                return infoRenderedLevel;
             case LOG_LEVEL_WARN:
-                return builder().warning("WARNING").toString();
+                return warnRenderedLevel;
             case LOG_LEVEL_ERROR:
             default:
-                return builder().error("ERROR").toString();
+                return errorRenderedLevel;
         }
     }
 
