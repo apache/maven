@@ -52,8 +52,7 @@ import org.codehaus.plexus.util.StringUtils;
 public class DefaultLifecycles {
     private static final List<String> BUILT_IN_LIFECYCLES =
             Arrays.asList(CleanLifecycleProvider.NAME, DefaultLifecycleProvider.NAME, SiteLifecycleProvider.NAME);
-    private static final boolean SITE_ENABLED =
-            Boolean.parseBoolean(System.getProperty("maven.site.lifecycle.enabled", "true"));
+    private static final boolean SITE_DISABLED = Boolean.getBoolean("maven.site.lifecycle.disabled");
 
     /**
      * @deprecated Use {@link #getStandardLifecycles()} instead.
@@ -81,7 +80,7 @@ public class DefaultLifecycles {
 
     private boolean isEnabled(String lifecycleId) {
         if (SiteLifecycleProvider.NAME.equals(lifecycleId)) {
-            return SITE_ENABLED;
+            return !SITE_DISABLED;
         } else {
             return true;
         }
