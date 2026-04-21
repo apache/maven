@@ -21,6 +21,7 @@ package org.apache.maven.cli;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Properties;
@@ -68,6 +69,8 @@ public final class CLIReportingUtils {
                 .append(Locale.getDefault())
                 .append(", platform encoding: ")
                 .append(System.getProperty("file.encoding", "<unknown encoding>"))
+                .append(", time zone: ")
+                .append(ZoneId.systemDefault().getId())
                 .append(ls);
         version.append("OS name: \"")
                 .append(Os.OS_NAME)
