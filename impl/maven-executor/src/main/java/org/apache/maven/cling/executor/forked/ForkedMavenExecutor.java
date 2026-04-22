@@ -33,12 +33,12 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.maven.api.cli.Executor;
-import org.apache.maven.api.cli.ExecutorException;
-import org.apache.maven.api.cli.ExecutorRequest;
+import org.apache.maven.cling.executor.Executor;
+import org.apache.maven.cling.executor.ExecutorException;
+import org.apache.maven.cling.executor.ExecutorRequest;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.maven.api.cli.ExecutorRequest.getCanonicalPath;
+import static org.apache.maven.cling.executor.ExecutorRequest.getCanonicalPath;
 
 /**
  * Forked executor implementation, that spawns a subprocess with Maven from the installation directory. Very costly

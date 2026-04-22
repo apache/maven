@@ -45,8 +45,8 @@ import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.maven.api.cli.ExecutorException;
-import org.apache.maven.api.cli.ExecutorRequest;
+import org.apache.maven.cling.executor.ExecutorException;
+import org.apache.maven.cling.executor.ExecutorRequest;
 import org.apache.maven.cling.executor.ExecutorHelper;
 import org.apache.maven.cling.executor.ExecutorTool;
 import org.apache.maven.cling.executor.embedded.EmbeddedMavenExecutor;

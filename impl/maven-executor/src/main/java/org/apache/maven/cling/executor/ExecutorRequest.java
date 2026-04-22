@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.cli;
+package org.apache.maven.cling.executor;
 
 import java.io.InputStream;
 import java.io.OutputStream;
