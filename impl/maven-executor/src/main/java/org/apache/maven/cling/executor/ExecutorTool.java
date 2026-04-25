@@ -21,8 +21,6 @@ package org.apache.maven.cling.executor;
 import java.util.Map;
 
 import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.api.cli.ExecutorException;
-import org.apache.maven.api.cli.ExecutorRequest;
 
 /**
  * A tool implementing some common Maven operations.

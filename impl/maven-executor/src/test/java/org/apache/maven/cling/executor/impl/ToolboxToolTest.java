@@ -25,10 +25,10 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 import eu.maveniverse.maven.mimir.testing.MimirInfuser;
-import org.apache.maven.api.cli.Executor;
-import org.apache.maven.api.cli.ExecutorRequest;
 import org.apache.maven.cling.executor.Environment;
+import org.apache.maven.cling.executor.Executor;
 import org.apache.maven.cling.executor.ExecutorHelper;
+import org.apache.maven.cling.executor.ExecutorRequest;
 import org.apache.maven.cling.executor.embedded.EmbeddedMavenExecutor;
 import org.apache.maven.cling.executor.forked.ForkedMavenExecutor;
 import org.apache.maven.cling.executor.internal.HelperImpl;

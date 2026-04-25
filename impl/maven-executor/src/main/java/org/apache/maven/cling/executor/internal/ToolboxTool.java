@@ -26,9 +26,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import org.apache.maven.api.cli.ExecutorException;
-import org.apache.maven.api.cli.ExecutorRequest;
+import org.apache.maven.cling.executor.ExecutorException;
 import org.apache.maven.cling.executor.ExecutorHelper;
+import org.apache.maven.cling.executor.ExecutorRequest;
 import org.apache.maven.cling.executor.ExecutorTool;
 
 import static java.util.Objects.requireNonNull;

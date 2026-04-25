@@ -19,9 +19,6 @@
 package org.apache.maven.cling.executor;
 
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.cli.Executor;
-import org.apache.maven.api.cli.ExecutorException;
-import org.apache.maven.api.cli.ExecutorRequest;
 
 /**
  * Helper class for routing Maven execution based on preferences and/or issued execution requests.
