@@ -28,8 +28,6 @@ import java.util.List;
 
 import eu.maveniverse.maven.mimir.testing.MimirInfuser;
 import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.api.cli.Executor;
-import org.apache.maven.api.cli.ExecutorRequest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

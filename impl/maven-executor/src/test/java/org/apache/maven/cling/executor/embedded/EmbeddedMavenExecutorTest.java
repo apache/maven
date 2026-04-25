@@ -18,7 +18,7 @@
  */
 package org.apache.maven.cling.executor.embedded;
 
-import org.apache.maven.api.cli.Executor;
+import org.apache.maven.cling.executor.Executor;
 import org.apache.maven.cling.executor.MavenExecutorTestSupport;
 
 /**
