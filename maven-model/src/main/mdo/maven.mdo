@@ -2732,7 +2732,6 @@
       <fields>
         <field>
           <name>id</name>
-          <required>true</required>
           <version>4.0.0+</version>
           <type>String</type>
           <defaultValue>default</defaultValue>
