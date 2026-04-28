@@ -175,6 +175,9 @@ under the License.
             <configuration>
               <includeArtifactIds>jline-native</includeArtifactIds>
               <includes>org/jline/nativ/**</includes>
+              <!-- exclude Mac OS binaries to prevent them from being marked with quarantine flag (https://github.com/apache/maven/issues/10747) and therefore being protected via Gatekeeper
+                    see also https://www.cisa.gov/eviction-strategies-tool/info-attack/T1144 -->
+              <excludes>org/jline/nativ/Mac/**</excludes>
             </configuration>
           </execution>
         </executions>
