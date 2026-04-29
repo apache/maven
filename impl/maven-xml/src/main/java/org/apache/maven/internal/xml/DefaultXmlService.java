@@ -309,8 +309,9 @@ public class DefaultXmlService extends XmlService {
 
                     if (mergeChildren && childDom != null) {
                         String name = recessiveChild.name();
-                        Iterator<XmlNode> it =
-                                commonChildren.computeIfAbsent(name, n1 -> Stream.of(dominant.children().stream()
+                        Iterator<XmlNode> it = commonChildren.computeIfAbsent(
+                                name,
+                                n1 -> Stream.of(dominant.children().stream()
                                                 .filter(n2 -> n2.name().equals(n1))
                                                 .collect(Collectors.toList()))
                                         .filter(l -> !l.isEmpty())

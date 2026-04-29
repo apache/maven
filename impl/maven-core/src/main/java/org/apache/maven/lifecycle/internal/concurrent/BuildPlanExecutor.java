@@ -904,10 +904,12 @@ public class BuildPlanExecutor {
                         })
                         .collect(Collectors.toMap(n -> n.name, n -> n));
                 // for each phase, make sure children phases are executed between before and after steps
-                lifecycle.allPhases().forEach(phase -> phase.phases().forEach(child -> {
-                    steps.get(BEFORE + child.name()).executeAfter(steps.get(BEFORE + phase.name()));
-                    steps.get(AFTER + phase.name()).executeAfter(steps.get(AFTER + child.name()));
-                }));
+                lifecycle
+                        .allPhases()
+                        .forEach(phase -> phase.phases().forEach(child -> {
+                            steps.get(BEFORE + child.name()).executeAfter(steps.get(BEFORE + phase.name()));
+                            steps.get(AFTER + phase.name()).executeAfter(steps.get(AFTER + child.name()));
+                        }));
                 // for each phase, create links between this project phases
                 lifecycle.allPhases().forEach(phase -> {
                     phase.links().stream()
@@ -972,15 +974,16 @@ public class BuildPlanExecutor {
 
             // Go through all plugins
             List<Runnable> toResolve = new ArrayList<>();
-            projects.keySet().forEach(project -> project.getBuild().getPlugins().forEach(plugin -> {
-                MavenProject pluginProject = reactorGavs.get(gav(plugin));
-                if (pluginProject != null) {
-                    // In order to plan the project, we need all its plugins...
-                    plan.requiredStep(project, PLAN).executeAfter(plan.requiredStep(pluginProject, READY));
-                } else {
-                    toResolve.add(() -> resolvePlugin(session, project.getRemotePluginRepositories(), plugin));
-                }
-            }));
+            projects.keySet()
+                    .forEach(project -> project.getBuild().getPlugins().forEach(plugin -> {
+                        MavenProject pluginProject = reactorGavs.get(gav(plugin));
+                        if (pluginProject != null) {
+                            // In order to plan the project, we need all its plugins...
+                            plan.requiredStep(project, PLAN).executeAfter(plan.requiredStep(pluginProject, READY));
+                        } else {
+                            toResolve.add(() -> resolvePlugin(session, project.getRemotePluginRepositories(), plugin));
+                        }
+                    }));
 
             // Eagerly resolve all plugins in parallel
             toResolve.parallelStream().forEach(Runnable::run);

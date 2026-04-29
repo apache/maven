@@ -93,9 +93,11 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setRepositorySession(mavenSession.getRepositorySession());
 
-        ProjectBuildingException e = assertThrows(ProjectBuildingException.class, () -> getContainer()
-                .lookup(org.apache.maven.project.ProjectBuilder.class)
-                .build(pomFile, configuration));
+        ProjectBuildingException e = assertThrows(
+                ProjectBuildingException.class,
+                () -> getContainer()
+                        .lookup(org.apache.maven.project.ProjectBuilder.class)
+                        .build(pomFile, configuration));
         assertEquals(1, e.getResults().size());
         ProjectBuildingResultWithProblemMessageAssert.assertThat(e.getResults().get(0))
                 .hasProblemMessage(
@@ -643,10 +645,11 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         List<SourceRoot> mainResources = project.getEnabledSourceRoots(ProjectScope.MAIN, Language.RESOURCES)
                 .toList();
         assertTrue(
-                mainResources.stream().anyMatch(sr -> sr.directory()
-                        .toString()
-                        .replace(File.separatorChar, '/')
-                        .contains("src/main/custom-resources")),
+                mainResources.stream()
+                        .anyMatch(sr -> sr.directory()
+                                .toString()
+                                .replace(File.separatorChar, '/')
+                                .contains("src/main/custom-resources")),
                 "Should have custom main resources from <sources>");
 
         // Verify legacy Java directories are used as fallback
@@ -716,10 +719,11 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         List<SourceRoot> mainResources = project.getEnabledSourceRoots(ProjectScope.MAIN, Language.RESOURCES)
                 .toList();
         assertTrue(
-                mainResources.stream().anyMatch(sr -> sr.directory()
-                        .toString()
-                        .replace(File.separatorChar, '/')
-                        .contains("src/main/custom-resources")),
+                mainResources.stream()
+                        .anyMatch(sr -> sr.directory()
+                                .toString()
+                                .replace(File.separatorChar, '/')
+                                .contains("src/main/custom-resources")),
                 "Should have custom main resources from <sources>");
 
         // Verify NO Java source roots (legacy was rejected, none in <sources>)
@@ -890,14 +894,16 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         assertEquals(2, moduleCount, "Both main sources should be for com.example.app module");
 
         // One should be implicit directory, one should be generated-sources
-        boolean hasImplicitDir = mainJavaRoots.stream().anyMatch(sr -> sr.directory()
-                .toString()
-                .replace(File.separatorChar, '/')
-                .contains("src/com.example.app/main/java"));
-        boolean hasGeneratedDir = mainJavaRoots.stream().anyMatch(sr -> sr.directory()
-                .toString()
-                .replace(File.separatorChar, '/')
-                .contains("target/generated-sources/com.example.app/java"));
+        boolean hasImplicitDir = mainJavaRoots.stream()
+                .anyMatch(sr -> sr.directory()
+                        .toString()
+                        .replace(File.separatorChar, '/')
+                        .contains("src/com.example.app/main/java"));
+        boolean hasGeneratedDir = mainJavaRoots.stream()
+                .anyMatch(sr -> sr.directory()
+                        .toString()
+                        .replace(File.separatorChar, '/')
+                        .contains("target/generated-sources/com.example.app/java"));
 
         assertTrue(hasImplicitDir, "Should have implicit source directory for module");
         assertTrue(hasGeneratedDir, "Should have generated-sources directory for module");

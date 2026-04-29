@@ -173,9 +173,6 @@ under the License.
     <xmlunitVersion>2.11.0</xmlunitVersion>
     <jacocoArgLine />
 
-    <version.spotless-maven-plugin>3.0.0</version.spotless-maven-plugin>
-    <version.palantirJavaFormat>2.80.0</version.palantirJavaFormat>
-
     <!-- Set as system property in surefire/failsafe to propagate to tests and IT Verifier -->
     <toolboxVersion>0.14.1</toolboxVersion>
   </properties>
