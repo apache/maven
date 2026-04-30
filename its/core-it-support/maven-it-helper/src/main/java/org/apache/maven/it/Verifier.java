@@ -45,14 +45,15 @@ import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.maven.cling.executor.ExecutorException;
-import org.apache.maven.cling.executor.ExecutorRequest;
-import org.apache.maven.cling.executor.ExecutorHelper;
-import org.apache.maven.cling.executor.ExecutorTool;
-import org.apache.maven.cling.executor.embedded.EmbeddedMavenExecutor;
-import org.apache.maven.cling.executor.forked.ForkedMavenExecutor;
-import org.apache.maven.cling.executor.internal.HelperImpl;
-import org.apache.maven.cling.executor.internal.ToolboxTool;
+import org.apache.maven.executor.Executor;
+import org.apache.maven.executor.ExecutorException;
+import org.apache.maven.executor.ExecutorRequest;
+import org.apache.maven.executor.ExecutorHelper;
+import org.apache.maven.executor.ExecutorTool;
+import org.apache.maven.executor.embedded.EmbeddedMavenExecutor;
+import org.apache.maven.executor.forked.ForkedMavenExecutor;
+import org.apache.maven.executor.support.ExecutorHelperImpl;
+import org.apache.maven.executor.support.ToolboxExecutorTool;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -63,16 +64,20 @@ import static java.util.Objects.requireNonNull;
  */
 public class Verifier {
     /**
+     * The Maven home/installation directory we are testing/executing with Executor.
+     */
+    private static final Path MAVEN_HOME = Paths.get(System.getProperty("maven.home"));
+    /**
      * Keep executor alive, as long as Verifier is in classloader. Embedded classloader keeps embedded Maven
      * ClassWorld alive, instead to re-create it per invocation, making embedded execution fast(er).
+     *  Points to test subjected Maven home.
      */
-    private static final EmbeddedMavenExecutor EMBEDDED_MAVEN_EXECUTOR = new EmbeddedMavenExecutor();
+    private static final EmbeddedMavenExecutor EMBEDDED_MAVEN_EXECUTOR = new EmbeddedMavenExecutor(MAVEN_HOME);
     /**
      * Keep executor alive, as long as Verifier is in classloader. For forked this means nothing, but is
-     * at least "handled the same" as embedded counterpart. Later on, we could have some similar solution like
-     * mvnd has, and keep pool of "hot" processes maybe?
+     * at least "handled the same" as embedded counterpart. Points to test subjected Maven home.
      */
-    private static final ForkedMavenExecutor FORKED_MAVEN_EXECUTOR = new ForkedMavenExecutor();
+    private static final ForkedMavenExecutor FORKED_MAVEN_EXECUTOR = new ForkedMavenExecutor(MAVEN_HOME);
 
     /**
      * The "preferred" fork mode of Verifier, defaults to "auto". In fact, am unsure is any other fork mode usable,
@@ -164,13 +169,11 @@ public class Verifier {
             this.userHomeDirectory = Paths.get(System.getProperty("maven.test.user.home", "user.home"));
             Files.createDirectories(this.userHomeDirectory);
             this.outerLocalRepository = Paths.get(System.getProperty("maven.test.repo.outer", ".m2/repository"));
-            this.executorHelper = new HelperImpl(
+            this.executorHelper = new ExecutorHelperImpl(
                     VERIFIER_FORK_MODE,
-                    Paths.get(System.getProperty("maven.home")),
-                    this.userHomeDirectory,
                     EMBEDDED_MAVEN_EXECUTOR,
                     FORKED_MAVEN_EXECUTOR);
-            this.executorTool = new ToolboxTool(executorHelper, toolboxVersion);
+            this.executorTool = new ToolboxExecutorTool(executorHelper, toolboxVersion);
             this.defaultCliArguments =
                     new ArrayList<>(defaultCliArguments != null ? defaultCliArguments : DEFAULT_CLI_ARGUMENTS);
             this.logFile = this.basedir.resolve(logFileName);
@@ -476,12 +479,12 @@ public class Verifier {
 
         cmdLine.append("# Command line: ");
         // Add the Maven executable path
-        Path mavenExecutable = request.installationDirectory()
+        Path mavenExecutable = MAVEN_HOME
                 .resolve("bin")
-                .resolve(System.getProperty("os.name").toLowerCase().contains("windows")
+                .resolve(Executor.IS_WINDOWS
                     ? request.command() + ".cmd"
                     : request.command());
-        cmdLine.append(mavenExecutable.toString());
+        cmdLine.append(mavenExecutable);
 
         // Add MAVEN_ARGS if they would be used (only for forked mode)
         if (mode == ExecutorHelper.Mode.FORKED || mode == ExecutorHelper.Mode.AUTO) {
