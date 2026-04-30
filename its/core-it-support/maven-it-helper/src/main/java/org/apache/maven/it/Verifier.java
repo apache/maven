@@ -52,7 +52,6 @@ import org.apache.maven.executor.ExecutorHelper;
 import org.apache.maven.executor.ExecutorTool;
 import org.apache.maven.executor.embedded.EmbeddedMavenExecutor;
 import org.apache.maven.executor.forked.ForkedMavenExecutor;
-import org.apache.maven.executor.support.ExecutorHelperImpl;
 import org.apache.maven.executor.support.ToolboxExecutorTool;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
@@ -169,7 +168,7 @@ public class Verifier {
             this.userHomeDirectory = Paths.get(System.getProperty("maven.test.user.home", "user.home"));
             Files.createDirectories(this.userHomeDirectory);
             this.outerLocalRepository = Paths.get(System.getProperty("maven.test.repo.outer", ".m2/repository"));
-            this.executorHelper = new ExecutorHelperImpl(
+            this.executorHelper = ExecutorHelper.forExecutors(
                     VERIFIER_FORK_MODE,
                     EMBEDDED_MAVEN_EXECUTOR,
                     FORKED_MAVEN_EXECUTOR);
@@ -251,11 +250,9 @@ public class Verifier {
         args.add("-Daether.remoteRepositoryFilter.prefixes=false");
 
         try {
-            ExecutorRequest.Builder builder = executorHelper
-                    .executorRequest()
+            ExecutorRequest.Builder builder = executorRequest()
                     .command(executable)
                     .cwd(basedir)
-                    .userHomeDirectory(userHomeDirectory)
                     .jvmArguments(jvmArguments)
                     .arguments(args)
                     .skipMavenRc(skipMavenRc);
@@ -445,10 +442,8 @@ public class Verifier {
             if (!Files.isRegularFile(settingsFile)) {
                 throw new IllegalArgumentException("settings xml does not exist: " + settingsXml);
             }
-            return executorTool.localRepository(executorHelper
-                    .executorRequest()
+            return executorTool.localRepository(executorRequest()
                     .cwd(tempBasedir)
-                    .userHomeDirectory(userHomeDirectory)
                     .argument("-s")
                     .argument(settingsFile.toString()));
         } else {
@@ -457,7 +452,7 @@ public class Verifier {
                 return outerHead;
             } else {
                 return executorTool.localRepository(
-                        executorHelper.executorRequest().cwd(tempBasedir).userHomeDirectory(userHomeDirectory));
+                        executorRequest().cwd(tempBasedir));
             }
         }
     }
@@ -868,7 +863,11 @@ public class Verifier {
         }
         return getLocalRepository()
                 + File.separator
-                + executorTool.artifactPath(executorHelper.executorRequest(), gav, null);
+                + executorTool.artifactPath(executorRequest(), gav, null);
+    }
+
+    private ExecutorRequest.Builder executorRequest() {
+        return ExecutorRequest.mavenBuilder().userHomeDirectory(userHomeDirectory);
     }
 
     private String getSupportArtifactPath(String artifact) {
@@ -926,7 +925,7 @@ public class Verifier {
         }
         return outerLocalRepository
                 .resolve(executorTool.artifactPath(
-                        executorHelper.executorRequest().argument("-Dmaven.repo.local=" + outerLocalRepository),
+                        executorRequest().argument("-Dmaven.repo.local=" + outerLocalRepository),
                         gav,
                         null))
                 .toString();
@@ -1000,7 +999,7 @@ public class Verifier {
         gav += filename;
         return getLocalRepository()
                 + File.separator
-                + executorTool.metadataPath(executorHelper.executorRequest(), gav, repoId);
+                + executorTool.metadataPath(executorRequest(), gav, repoId);
     }
 
     /**
@@ -1030,7 +1029,7 @@ public class Verifier {
      * @since 1.2
      */
     public void deleteArtifacts(String gid) throws IOException {
-        String mdPath = executorTool.metadataPath(executorHelper.executorRequest(), gid, null);
+        String mdPath = executorTool.metadataPath(executorRequest(), gid, null);
         Path dir = Paths.get(getLocalRepository()).resolve(mdPath).getParent();
         FileUtils.deleteDirectory(dir.toFile());
     }
@@ -1050,7 +1049,7 @@ public class Verifier {
         requireNonNull(version, "version is null");
 
         String mdPath =
-                executorTool.metadataPath(executorHelper.executorRequest(), gid + ":" + aid + ":" + version, null);
+                executorTool.metadataPath(executorRequest(), gid + ":" + aid + ":" + version, null);
         Path dir = Paths.get(getLocalRepository()).resolve(mdPath).getParent();
         FileUtils.deleteDirectory(dir.toFile());
     }
