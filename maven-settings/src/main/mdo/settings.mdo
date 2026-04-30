@@ -98,7 +98,6 @@
           <version>1.0.0+</version>
           <type>String</type>
           <defaultValue>default</defaultValue>
-          <required>true</required>
           <description>Item identifier.</description>
         </field>
       </fields>
@@ -114,7 +113,6 @@
         <field>
           <name>localRepository</name>
           <version>1.0.0+</version>
-          <required>true</required>
           <description>
             <![CDATA[
             The local repository.<br><b>Default value is:</b> <code>${user.home}/.m2/repository</code>
