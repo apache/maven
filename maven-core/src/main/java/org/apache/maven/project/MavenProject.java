@@ -751,6 +751,10 @@ public class MavenProject implements Cloneable {
             pluginMgmt = build.getPluginManagement();
         }
 
+        if (pluginMgmt == null) {
+            pluginMgmt = new PluginManagement();
+        }
+
         return pluginMgmt;
     }
 
