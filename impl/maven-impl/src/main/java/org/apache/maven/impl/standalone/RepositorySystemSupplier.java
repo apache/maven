@@ -37,6 +37,7 @@ import org.eclipse.aether.impl.Installer;
 import org.eclipse.aether.impl.LocalRepositoryProvider;
 import org.eclipse.aether.impl.MetadataGeneratorFactory;
 import org.eclipse.aether.impl.MetadataResolver;
+import org.eclipse.aether.impl.NamedLockFactorySelector;
 import org.eclipse.aether.impl.OfflineController;
 import org.eclipse.aether.impl.RemoteRepositoryFilterManager;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
@@ -68,11 +69,11 @@ import org.eclipse.aether.internal.impl.DefaultRepositoryLayoutProvider;
 import org.eclipse.aether.internal.impl.DefaultRepositorySystem;
 import org.eclipse.aether.internal.impl.DefaultRepositorySystemLifecycle;
 import org.eclipse.aether.internal.impl.DefaultRepositorySystemValidator;
-import org.eclipse.aether.internal.impl.DefaultTrackingFileManager;
 import org.eclipse.aether.internal.impl.DefaultTransporterProvider;
 import org.eclipse.aether.internal.impl.DefaultUpdateCheckManager;
 import org.eclipse.aether.internal.impl.DefaultUpdatePolicyAnalyzer;
 import org.eclipse.aether.internal.impl.EnhancedLocalRepositoryManagerFactory;
+import org.eclipse.aether.internal.impl.LegacyTrackingFileManager;
 import org.eclipse.aether.internal.impl.LocalPathComposer;
 import org.eclipse.aether.internal.impl.LocalPathPrefixComposerFactory;
 import org.eclipse.aether.internal.impl.Maven2RepositoryLayoutFactory;
@@ -95,6 +96,7 @@ import org.eclipse.aether.internal.impl.filter.FilteringPipelineRepositoryConnec
 import org.eclipse.aether.internal.impl.filter.GroupIdRemoteRepositoryFilterSource;
 import org.eclipse.aether.internal.impl.filter.PrefixesLockingInhibitorFactory;
 import org.eclipse.aether.internal.impl.filter.PrefixesRemoteRepositoryFilterSource;
+import org.eclipse.aether.internal.impl.named.DefaultNamedLockFactorySelector;
 import org.eclipse.aether.internal.impl.offline.OfflinePipelineRepositoryConnectorFactory;
 import org.eclipse.aether.internal.impl.synccontext.DefaultSyncContextFactory;
 import org.eclipse.aether.internal.impl.synccontext.named.NameMapper;
@@ -189,7 +191,7 @@ public class RepositorySystemSupplier {
     @Singleton
     @Provides
     static TrackingFileManager newTrackingFileManager() {
-        return new DefaultTrackingFileManager();
+        return new LegacyTrackingFileManager();
     }
 
     @Singleton
@@ -378,12 +380,18 @@ public class RepositorySystemSupplier {
 
     @Singleton
     @Provides
+    static NamedLockFactorySelector newNamedLockFactorySelector(
+            Map<String, NamedLockFactory> factories, RepositorySystemLifecycle lifecycle) {
+        return new DefaultNamedLockFactorySelector(factories, lifecycle);
+    }
+
+    @Singleton
+    @Provides
     static NamedLockFactoryAdapterFactory newNamedLockFactoryAdapterFactory(
-            Map<String, NamedLockFactory> factories,
+            NamedLockFactorySelector namedLockFactorySelector,
             Map<String, NameMapper> nameMappers,
-            Map<String, LockingInhibitorFactory> lockingInhibitorFactories,
-            RepositorySystemLifecycle lifecycle) {
-        return new NamedLockFactoryAdapterFactoryImpl(factories, nameMappers, lockingInhibitorFactories, lifecycle);
+            Map<String, LockingInhibitorFactory> lockingInhibitorFactories) {
+        return new NamedLockFactoryAdapterFactoryImpl(namedLockFactorySelector, nameMappers, lockingInhibitorFactories);
     }
 
     @Singleton
