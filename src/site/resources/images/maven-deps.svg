@@ -1,0 +1,715 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.2" width="297mm" height="210mm" viewBox="0 0 29700 21000" preserveAspectRatio="xMidYMid" fill-rule="evenodd" stroke-width="28.222" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" xmlns:ooo="http://xml.openoffice.org/svg/export" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:presentation="http://sun.com/xmlns/staroffice/presentation" xmlns:smil="http://www.w3.org/2001/SMIL20/" xmlns:anim="urn:oasis:names:tc:opendocument:xmlns:animation:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xml:space="preserve">
+ <defs class="ClipPathGroup">
+  <clipPath id="presentation_clip_path" clipPathUnits="userSpaceOnUse">
+   <rect x="0" y="0" width="29700" height="21000"/>
+  </clipPath>
+  <clipPath id="presentation_clip_path_shrink" clipPathUnits="userSpaceOnUse">
+   <rect x="29" y="21" width="29641" height="20958"/>
+  </clipPath>
+ </defs>
+ <defs>
+  <font id="EmbeddedFont_1" horiz-adv-x="2048">
+   <font-face font-family="Arial embedded" units-per-em="2048" font-weight="normal" font-style="normal" ascent="1852" descent="441"/>
+   <missing-glyph horiz-adv-x="2048" d="M 0,0 L 2047,0 2047,2047 0,2047 0,0 Z "/>
+   <glyph unicode="y" horiz-adv-x="975" d="M 127,-409 L 107,-240 C 146,-251 181,-256 210,-256 250,-256 282,-249 306,-236 330,-223 350,-204 365,-180 376,-162 395,-117 420,-46 423,-36 429,-21 436,-2 L 33,1062 227,1062 448,447 C 477,369 502,287 525,201 546,284 570,364 599,443 L 826,1062 1006,1062 602,-18 C 559,-135 525,-215 501,-259 469,-318 432,-362 391,-389 350,-417 300,-431 243,-431 208,-431 170,-424 127,-409 Z "/>
+   <glyph unicode="x" horiz-adv-x="996" d="M 15,0 L 403,552 44,1062 269,1062 432,813 C 463,766 487,726 506,694 535,738 562,777 587,811 L 766,1062 981,1062 614,562 1009,0 788,0 570,330 512,419 233,0 15,0 Z "/>
+   <glyph unicode="w" horiz-adv-x="1458" d="M 331,0 L 6,1062 192,1062 361,449 424,221 C 427,232 445,305 479,440 L 648,1062 833,1062 992,446 1045,243 1106,448 1288,1062 1463,1062 1131,0 944,0 775,636 734,817 519,0 331,0 Z "/>
+   <glyph unicode="v" horiz-adv-x="976" d="M 430,0 L 26,1062 216,1062 444,426 C 469,357 491,286 512,212 528,268 550,335 579,414 L 815,1062 1000,1062 598,0 430,0 Z "/>
+   <glyph unicode="u" horiz-adv-x="863" d="M 831,0 L 831,156 C 748,36 636,-24 494,-24 431,-24 373,-12 319,12 264,36 224,66 198,103 171,139 153,183 142,236 135,271 131,327 131,404 L 131,1062 311,1062 311,473 C 311,379 315,316 322,283 333,236 357,199 394,172 431,145 476,131 530,131 584,131 635,145 682,173 729,200 763,238 783,286 802,333 812,402 812,493 L 812,1062 992,1062 992,0 831,0 Z "/>
+   <glyph unicode="t" horiz-adv-x="520" d="M 528,161 L 554,2 C 503,-9 458,-14 418,-14 353,-14 302,-4 266,17 230,38 205,65 190,99 175,132 168,203 168,311 L 168,922 36,922 36,1062 168,1062 168,1325 347,1433 347,1062 528,1062 528,922 347,922 347,301 C 347,250 350,217 357,202 363,187 373,176 388,167 402,158 422,154 449,154 469,154 495,156 528,161 Z "/>
+   <glyph unicode="s" horiz-adv-x="884" d="M 63,317 L 241,345 C 251,274 279,219 325,181 370,143 434,124 516,124 599,124 660,141 700,175 740,208 760,248 760,293 760,334 742,366 707,389 682,405 621,425 523,450 391,483 300,512 249,537 198,561 159,595 133,638 106,681 93,728 93,780 93,827 104,871 126,912 147,952 177,985 214,1012 242,1033 280,1050 329,1065 377,1079 429,1086 484,1086 567,1086 641,1074 704,1050 767,1026 813,994 843,953 873,912 894,857 905,788 L 729,764 C 721,819 698,861 660,892 621,923 567,938 497,938 414,938 355,924 320,897 285,870 267,838 267,801 267,778 274,757 289,738 304,719 327,703 358,690 376,683 429,668 517,644 644,610 733,582 784,561 834,539 873,507 902,466 931,425 945,373 945,312 945,252 928,196 893,143 858,90 807,49 741,20 675,-9 600,-24 517,-24 379,-24 274,5 202,62 129,119 83,204 63,317 Z "/>
+   <glyph unicode="r" horiz-adv-x="579" d="M 133,0 L 133,1062 295,1062 295,901 C 336,976 375,1026 410,1050 445,1074 483,1086 525,1086 586,1086 647,1067 710,1028 L 648,861 C 604,887 560,900 516,900 477,900 441,888 410,865 379,841 356,808 343,766 323,702 313,632 313,556 L 313,0 133,0 Z "/>
+   <glyph unicode="p" horiz-adv-x="924" d="M 135,-407 L 135,1062 299,1062 299,924 C 338,978 381,1019 430,1046 479,1073 538,1086 607,1086 698,1086 778,1063 847,1016 916,969 969,904 1004,819 1039,734 1057,640 1057,539 1057,430 1038,333 999,246 960,159 903,92 829,46 754,-1 676,-24 594,-24 534,-24 480,-11 433,14 385,39 346,71 315,110 L 315,-407 135,-407 Z M 298,525 C 298,388 326,287 381,222 436,157 503,124 582,124 662,124 731,158 788,226 845,293 873,398 873,540 873,675 845,777 790,844 734,911 667,945 590,945 513,945 446,909 387,838 328,766 298,662 298,525 Z "/>
+   <glyph unicode="o" horiz-adv-x="997" d="M 68,531 C 68,728 123,873 232,968 323,1047 435,1086 566,1086 712,1086 831,1038 924,943 1017,847 1063,715 1063,546 1063,409 1043,302 1002,224 961,145 901,84 823,41 744,-2 659,-24 566,-24 417,-24 297,24 206,119 114,214 68,352 68,531 Z M 253,531 C 253,395 283,293 342,226 401,158 476,124 566,124 655,124 730,158 789,226 848,294 878,398 878,537 878,668 848,768 789,836 729,903 655,937 566,937 476,937 401,903 342,836 283,769 253,667 253,531 Z "/>
+   <glyph unicode="n" horiz-adv-x="865" d="M 135,0 L 135,1062 297,1062 297,911 C 375,1028 488,1086 635,1086 699,1086 758,1075 812,1052 865,1029 905,998 932,961 959,924 977,879 988,828 995,795 998,736 998,653 L 998,0 818,0 818,646 C 818,719 811,774 797,811 783,847 758,876 723,898 687,919 645,930 597,930 520,930 454,906 399,857 343,808 315,716 315,580 L 315,0 135,0 Z "/>
+   <glyph unicode="m" horiz-adv-x="1440" d="M 135,0 L 135,1062 296,1062 296,913 C 329,965 374,1007 429,1039 484,1070 547,1086 618,1086 697,1086 761,1070 812,1037 862,1004 897,959 918,900 1002,1024 1111,1086 1246,1086 1351,1086 1432,1057 1489,999 1546,940 1574,850 1574,729 L 1574,0 1395,0 1395,669 C 1395,741 1389,793 1378,825 1366,856 1345,882 1314,901 1283,920 1247,930 1206,930 1131,930 1069,905 1020,856 971,806 946,726 946,617 L 946,0 766,0 766,690 C 766,770 751,830 722,870 693,910 645,930 578,930 527,930 481,917 438,890 395,863 363,824 344,773 325,722 315,648 315,551 L 315,0 135,0 Z "/>
+   <glyph unicode="l" horiz-adv-x="182" d="M 131,0 L 131,1466 311,1466 311,0 131,0 Z "/>
+   <glyph unicode="j" horiz-adv-x="409" d="M 134,1257 L 134,1466 314,1466 314,1257 134,1257 Z M -94,-412 L -60,-259 C -24,-268 4,-273 25,-273 62,-273 89,-261 107,-236 125,-212 134,-151 134,-54 L 134,1062 314,1062 314,-58 C 314,-189 297,-280 263,-331 220,-398 148,-431 47,-431 -2,-431 -49,-425 -94,-412 Z "/>
+   <glyph unicode="i" horiz-adv-x="182" d="M 136,1259 L 136,1466 316,1466 316,1259 136,1259 Z M 136,0 L 136,1062 316,1062 316,0 136,0 Z "/>
+   <glyph unicode="h" horiz-adv-x="867" d="M 135,0 L 135,1466 315,1466 315,940 C 399,1037 505,1086 633,1086 712,1086 780,1071 838,1040 896,1009 938,966 963,911 988,856 1000,777 1000,673 L 1000,0 820,0 820,673 C 820,763 801,829 762,870 723,911 667,931 596,931 543,931 493,917 446,890 399,862 365,824 345,777 325,730 315,664 315,581 L 315,0 135,0 Z "/>
+   <glyph unicode="g" horiz-adv-x="938" d="M 102,-88 L 277,-114 C 284,-168 305,-207 338,-232 383,-265 444,-282 521,-282 604,-282 669,-265 714,-232 759,-199 790,-152 806,-92 815,-55 820,22 819,139 740,46 642,0 525,0 379,0 266,53 186,158 106,263 66,390 66,537 66,638 84,732 121,818 158,903 211,969 281,1016 350,1063 432,1086 526,1086 651,1086 755,1035 836,934 L 836,1062 1002,1062 1002,144 C 1002,-21 985,-138 952,-207 918,-276 865,-331 792,-371 719,-411 629,-431 522,-431 395,-431 293,-402 215,-345 137,-288 99,-203 102,-88 Z M 251,550 C 251,411 279,309 334,245 389,181 459,149 542,149 625,149 694,181 750,245 806,308 834,408 834,544 834,674 805,772 748,838 690,904 620,937 539,937 459,937 391,905 335,840 279,775 251,678 251,550 Z "/>
+   <glyph unicode="f" horiz-adv-x="623" d="M 178,0 L 178,922 19,922 19,1062 178,1062 178,1175 C 178,1246 184,1299 197,1334 214,1381 245,1419 289,1448 332,1477 393,1491 472,1491 523,1491 579,1485 640,1473 L 613,1316 C 576,1323 540,1326 507,1326 452,1326 414,1314 391,1291 368,1268 357,1224 357,1160 L 357,1062 564,1062 564,922 357,922 357,0 178,0 Z "/>
+   <glyph unicode="e" horiz-adv-x="981" d="M 862,342 L 1048,319 C 1019,210 964,126 885,66 806,6 704,-24 581,-24 426,-24 303,24 212,120 121,215 75,349 75,522 75,701 121,839 213,938 305,1037 424,1086 571,1086 713,1086 829,1038 919,941 1009,844 1054,708 1054,533 1054,522 1054,506 1053,485 L 261,485 C 268,368 301,279 360,217 419,155 493,124 582,124 648,124 704,141 751,176 798,211 835,266 862,342 Z M 271,633 L 864,633 C 856,722 833,789 796,834 739,903 664,938 573,938 490,938 421,910 365,855 308,800 277,726 271,633 Z "/>
+   <glyph unicode="d" horiz-adv-x="923" d="M 824,0 L 824,134 C 757,29 658,-24 527,-24 442,-24 365,-1 294,46 223,93 168,158 129,242 90,325 70,421 70,530 70,636 88,732 123,819 158,905 211,971 282,1017 353,1063 432,1086 519,1086 583,1086 640,1073 690,1046 740,1019 781,983 812,940 L 812,1466 991,1466 991,0 824,0 Z M 255,530 C 255,394 284,292 341,225 398,158 466,124 544,124 623,124 690,156 745,221 800,285 827,383 827,515 827,660 799,767 743,835 687,903 618,937 536,937 456,937 389,904 336,839 282,774 255,671 255,530 Z "/>
+   <glyph unicode="c" horiz-adv-x="927" d="M 828,389 L 1005,366 C 986,244 936,149 857,80 777,11 679,-24 563,-24 418,-24 301,24 213,119 124,214 80,350 80,527 80,642 99,742 137,828 175,914 233,979 311,1022 388,1065 473,1086 564,1086 679,1086 774,1057 847,999 920,940 967,857 988,750 L 813,723 C 796,794 767,848 725,884 682,920 631,938 571,938 480,938 407,906 350,841 293,776 265,673 265,532 265,389 292,286 347,221 402,156 473,124 561,124 632,124 691,146 738,189 785,232 815,299 828,389 Z "/>
+   <glyph unicode="b" horiz-adv-x="923" d="M 301,0 L 134,0 134,1466 314,1466 314,943 C 390,1038 487,1086 605,1086 670,1086 732,1073 791,1047 849,1020 897,983 935,936 972,888 1002,830 1023,763 1044,696 1055,624 1055,547 1055,365 1010,224 920,125 830,26 722,-24 596,-24 471,-24 372,28 301,133 L 301,0 Z M 299,539 C 299,412 316,320 351,263 408,170 484,124 581,124 660,124 728,158 785,227 842,295 871,397 871,532 871,671 844,773 789,839 734,905 667,938 589,938 510,938 442,904 385,836 328,767 299,668 299,539 Z "/>
+   <glyph unicode="a" horiz-adv-x="980" d="M 828,131 C 761,74 697,34 636,11 574,-12 508,-24 437,-24 320,-24 231,5 168,62 105,119 74,191 74,280 74,332 86,380 110,423 133,466 164,500 203,526 241,552 284,572 332,585 367,594 421,603 492,612 637,629 744,650 813,674 814,699 814,714 814,721 814,794 797,846 763,876 717,917 649,937 558,937 473,937 411,922 371,893 330,863 300,810 281,735 L 105,759 C 121,834 147,895 184,942 221,988 274,1024 343,1049 412,1074 493,1086 584,1086 675,1086 748,1075 805,1054 862,1033 903,1006 930,974 957,941 975,900 986,851 992,820 995,765 995,685 L 995,445 C 995,278 999,172 1007,128 1014,83 1029,41 1052,0 L 864,0 C 845,37 833,81 828,131 Z M 813,533 C 748,506 650,484 519,465 445,454 393,442 362,429 331,416 308,396 291,371 274,345 266,316 266,285 266,237 284,197 321,165 357,133 410,117 480,117 549,117 611,132 665,163 719,193 759,234 784,287 803,328 813,388 813,467 L 813,533 Z "/>
+   <glyph unicode="4" horiz-adv-x="1016" d="M 662,0 L 662,351 26,351 26,516 695,1466 842,1466 842,516 1040,516 1040,351 842,351 842,0 662,0 Z M 662,516 L 662,1177 203,516 662,516 Z "/>
+   <glyph unicode="." horiz-adv-x="207" d="M 186,0 L 186,205 391,205 391,0 186,0 Z "/>
+   <glyph unicode="-" horiz-adv-x="555" d="M 65,440 L 65,621 618,621 618,440 65,440 Z "/>
+  </font>
+ </defs>
+ <defs class="TextShapeIndex">
+  <g ooo:slide="id1" ooo:id-list="id3 id4 id5 id6 id7 id8 id9 id10 id11 id12 id13 id14 id15 id16 id17 id18 id19 id20 id21 id22 id23 id24 id25 id26 id27 id28 id29 id30 id31 id32 id33 id34 id35 id36 id37 id38 id39 id40 id41 id42 id43 id44 id45 id46 id47 id48 id49 id50 id51 id52 id53 id54 id55 id56 id57 id58 id59 id60 id61 id62 id63 id64 id65 id66 id67 id68 id69 id70 id71 id72 id73 id74 id75"/>
+ </defs>
+ <defs class="EmbeddedBulletChars">
+  <g id="bullet-char-template-57356" transform="scale(0.00048828125,-0.00048828125)">
+   <path d="M 580,1141 L 1163,571 580,0 -4,571 580,1141 Z"/>
+  </g>
+  <g id="bullet-char-template-57354" transform="scale(0.00048828125,-0.00048828125)">
+   <path d="M 8,1128 L 1137,1128 1137,0 8,0 8,1128 Z"/>
+  </g>
+  <g id="bullet-char-template-10146" transform="scale(0.00048828125,-0.00048828125)">
+   <path d="M 174,0 L 602,739 174,1481 1456,739 174,0 Z M 1358,739 L 309,1346 659,739 1358,739 Z"/>
+  </g>
+  <g id="bullet-char-template-10132" transform="scale(0.00048828125,-0.00048828125)">
+   <path d="M 2015,739 L 1276,0 717,0 1260,543 174,543 174,936 1260,936 717,1481 1274,1481 2015,739 Z"/>
+  </g>
+  <g id="bullet-char-template-10007" transform="scale(0.00048828125,-0.00048828125)">
+   <path d="M 0,-2 C -7,14 -16,27 -25,37 L 356,567 C 262,823 215,952 215,954 215,979 228,992 255,992 264,992 276,990 289,987 310,991 331,999 354,1012 L 381,999 492,748 772,1049 836,1024 860,1049 C 881,1039 901,1025 922,1006 886,937 835,863 770,784 769,783 710,716 594,584 L 774,223 C 774,196 753,168 711,139 L 727,119 C 717,90 699,76 672,76 641,76 570,178 457,381 L 164,-76 C 142,-110 111,-127 72,-127 30,-127 9,-110 8,-76 1,-67 -2,-52 -2,-32 -2,-23 -1,-13 0,-2 Z"/>
+  </g>
+  <g id="bullet-char-template-10004" transform="scale(0.00048828125,-0.00048828125)">
+   <path d="M 285,-33 C 182,-33 111,30 74,156 52,228 41,333 41,471 41,549 55,616 82,672 116,743 169,778 240,778 293,778 328,747 346,684 L 369,508 C 377,444 397,411 428,410 L 1163,1116 C 1174,1127 1196,1133 1229,1133 1271,1133 1292,1118 1292,1087 L 1292,965 C 1292,929 1282,901 1262,881 L 442,47 C 390,-6 338,-33 285,-33 Z"/>
+  </g>
+  <g id="bullet-char-template-9679" transform="scale(0.00048828125,-0.00048828125)">
+   <path d="M 813,0 C 632,0 489,54 383,161 276,268 223,411 223,592 223,773 276,916 383,1023 489,1130 632,1184 813,1184 992,1184 1136,1130 1245,1023 1353,916 1407,772 1407,592 1407,412 1353,268 1245,161 1136,54 992,0 813,0 Z"/>
+  </g>
+  <g id="bullet-char-template-8226" transform="scale(0.00048828125,-0.00048828125)">
+   <path d="M 346,457 C 273,457 209,483 155,535 101,586 74,649 74,723 74,796 101,859 155,911 209,963 273,989 346,989 419,989 480,963 531,910 582,859 608,796 608,723 608,648 583,586 532,535 482,483 420,457 346,457 Z"/>
+  </g>
+  <g id="bullet-char-template-8211" transform="scale(0.00048828125,-0.00048828125)">
+   <path d="M -4,459 L 1135,459 1135,606 -4,606 -4,459 Z"/>
+  </g>
+  <g id="bullet-char-template-61548" transform="scale(0.00048828125,-0.00048828125)">
+   <path d="M 173,740 C 173,903 231,1043 346,1159 462,1274 601,1332 765,1332 928,1332 1067,1274 1183,1159 1299,1043 1357,903 1357,740 1357,577 1299,437 1183,322 1067,206 928,148 765,148 601,148 462,206 346,322 231,437 173,577 173,740 Z"/>
+  </g>
+ </defs>
+ <g>
+  <g id="id2" class="Master_Slide">
+   <g id="bg-id2" class="Background"/>
+   <g id="bo-id2" class="BackgroundObjects"/>
+  </g>
+ </g>
+ <g class="SlideGroup">
+  <g>
+   <g id="container-id1">
+    <g id="id1" class="Slide" clip-path="url(#presentation_clip_path)">
+     <g class="Page">
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id3">
+        <rect class="BoundingBox" stroke="none" fill="none" x="14599" y="4899" width="5503" height="2003"/>
+        <a xlink:href="https://projects.eclipse.org/projects/technology.sisu">
+         <path fill="rgb(255,255,204)" fill-opacity="0.502" stroke="none" d="M 17350,6900 L 14600,6900 14600,4900 20100,4900 20100,6900 17350,6900 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 17350,6900 L 14600,6900 14600,4900 20100,4900 20100,6900 17350,6900 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="14850" y="6669"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="881" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">sisu</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id4">
+        <rect class="BoundingBox" stroke="none" fill="none" x="14910" y="5198" width="2053" height="812"/>
+        <a xlink:href="https://github.com/eclipse/sisu.plexus">
+         <path fill="rgb(255,255,153)" stroke="none" d="M 15936,6008 L 14911,6008 14911,5199 16961,5199 16961,6008 15936,6008 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 15936,6008 L 14911,6008 14911,5199 16961,5199 16961,6008 15936,6008 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="15220" y="5775"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="1432" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">plexus</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id5">
+        <rect class="BoundingBox" stroke="none" fill="none" x="18077" y="5189" width="1718" height="812"/>
+        <a xlink:href="https://github.com/eclipse/sisu.inject">
+         <path fill="rgb(255,255,153)" stroke="none" d="M 18936,5999 L 18078,5999 18078,5190 19793,5190 19793,5999 18936,5999 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 18936,5999 L 18078,5999 18078,5190 19793,5190 19793,5999 18936,5999 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="18358" y="5766"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="1156" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">inject</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id6">
+        <rect class="BoundingBox" stroke="none" fill="none" x="21504" y="5189" width="1803" height="812"/>
+        <a xlink:href="https://github.com/google/guice">
+         <path fill="rgb(255,255,153)" stroke="none" d="M 22405,5999 L 21505,5999 21505,5190 23305,5190 23305,5999 22405,5999 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 22405,5999 L 21505,5999 21505,5190 23305,5190 23305,5999 22405,5999 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="21813" y="5766"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="1184" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">guice</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id7">
+        <rect class="BoundingBox" stroke="none" fill="none" x="16960" y="5448" width="1120" height="302"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 16961,5604 L 17680,5598 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 17684,5717 L 17661,5748 18079,5595 17659,5448 17681,5478 17700,5514 17712,5554 17717,5596 17714,5639 17702,5680 17684,5717 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id8">
+        <rect class="BoundingBox" stroke="none" fill="none" x="19793" y="5445" width="1713" height="301"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 19794,5595 L 21106,5595 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 21110,5714 L 21086,5745 21505,5595 21086,5445 21108,5475 21126,5511 21139,5551 21143,5593 21140,5636 21128,5677 21110,5714 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id9">
+        <rect class="BoundingBox" stroke="none" fill="none" x="14599" y="7599" width="9303" height="4803"/>
+        <a xlink:href="https://codehaus-plexus.github.io/">
+         <path fill="rgb(255,255,204)" fill-opacity="0.502" stroke="none" d="M 19250,12400 L 14600,12400 14600,7600 23900,7600 23900,12400 19250,12400 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 19250,12400 L 14600,12400 14600,7600 23900,7600 23900,12400 19250,12400 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="14850" y="12169"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="1432" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">plexus</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id10">
+        <rect class="BoundingBox" stroke="none" fill="none" x="6632" y="5190" width="3236" height="811"/>
+        <a xlink:href="file:///maven-core/">
+         <path fill="rgb(153,204,255)" stroke="none" d="M 8250,5999 L 6633,5999 6633,5191 9866,5191 9866,5999 8250,5999 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 8250,5999 L 6633,5999 6633,5191 9866,5191 9866,5999 8250,5999 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="7768" y="5767"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="964" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">core</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id11">
+        <rect class="BoundingBox" stroke="none" fill="none" x="6633" y="3790" width="3235" height="811"/>
+        <a xlink:href="file:///maven-compat/">
+         <path fill="rgb(153,204,255)" stroke="none" d="M 8250,4599 L 6634,4599 6634,3791 9866,3791 9866,4599 8250,4599 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 8250,4599 L 6634,4599 6634,3791 9866,3791 9866,4599 8250,4599 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="7438" y="4367"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="1624" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">compat</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id12">
+        <rect class="BoundingBox" stroke="none" fill="none" x="9866" y="5445" width="1836" height="302"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 9867,5595 L 11301,5596 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 11304,5714 L 11281,5746 11700,5596 11281,5446 11304,5476 11322,5512 11334,5551 11338,5594 11335,5637 11323,5677 11304,5714 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id13">
+        <rect class="BoundingBox" stroke="none" fill="none" x="6634" y="999" width="3233" height="813"/>
+        <a xlink:href="file:///apache-maven/">
+         <path fill="rgb(153,204,255)" stroke="none" d="M 8250,1810 L 6635,1810 6635,1000 9865,1000 9865,1810 8250,1810 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 8250,1810 L 6635,1810 6635,1000 9865,1000 9865,1810 8250,1810 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="7053" y="1577"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="2395" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">distribution</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id14">
+        <rect class="BoundingBox" stroke="none" fill="none" x="8100" y="1809" width="301" height="583"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 8250,1810 L 8250,1992 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 8131,1996 L 8100,1972 8250,2391 8400,1972 8370,1994 8334,2012 8294,2025 8252,2029 8209,2026 8168,2014 8131,1996 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id15">
+        <rect class="BoundingBox" stroke="none" fill="none" x="8100" y="4598" width="301" height="594"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 8250,4599 L 8250,4792 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 8131,4796 L 8100,4772 8250,5191 8400,4772 8370,4794 8334,4812 8294,4825 8252,4829 8209,4826 8168,4814 8131,4796 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id16">
+        <rect class="BoundingBox" stroke="none" fill="none" x="14799" y="9089" width="3403" height="812"/>
+        <a xlink:href="https://github.com/codehaus-plexus/plexus-sec-dispatcher">
+         <path fill="rgb(255,255,153)" stroke="none" d="M 16500,9899 L 14800,9899 14800,9090 18200,9090 18200,9899 16500,9899 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 16500,9899 L 14800,9899 14800,9090 18200,9090 18200,9899 16500,9899 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="14889" y="9666"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="3221" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">sec-dispatcher</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id17">
+        <rect class="BoundingBox" stroke="none" fill="none" x="12082" y="6995" width="2720" height="2501"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 12083,6996 L 14506,9225 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 14429,9315 L 14390,9322 14800,9495 14593,9101 14589,9138 14578,9177 14560,9214 14535,9249 14503,9278 14467,9300 14429,9315 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id18">
+        <rect class="BoundingBox" stroke="none" fill="none" x="14599" y="2390" width="3803" height="813"/>
+        <a xlink:href="https://commons.apache.org/proper/commons-cli/">
+         <path fill="rgb(255,255,153)" stroke="none" d="M 16500,3201 L 14600,3201 14600,2391 18400,2391 18400,3201 16500,3201 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 16500,3201 L 14600,3201 14600,2391 18400,2391 18400,3201 16500,3201 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="15110" y="2968"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="2780" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">commons-cli</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id19">
+        <rect class="BoundingBox" stroke="none" fill="none" x="6634" y="2646" width="7967" height="301"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 6635,2796 L 14201,2796 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 14205,2915 L 14181,2946 14600,2796 14181,2646 14203,2676 14221,2712 14234,2752 14238,2794 14235,2837 14223,2878 14205,2915 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id20">
+        <rect class="BoundingBox" stroke="none" fill="none" x="21199" y="10698" width="2203" height="812"/>
+        <a xlink:href="https://codehaus-plexus.github.io/plexus-utils/">
+         <path fill="rgb(255,255,153)" stroke="none" d="M 22300,11508 L 21200,11508 21200,10699 23400,10699 23400,11508 22300,11508 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 22300,11508 L 21200,11508 21200,10699 23400,10699 23400,11508 22300,11508 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="21860" y="11275"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="881" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">utils</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id21">
+        <rect class="BoundingBox" stroke="none" fill="none" x="11699" y="5191" width="2369" height="811"/>
+        <a xlink:href="file:///maven-plugin-api/">
+         <path fill="rgb(153,204,255)" stroke="none" d="M 12883,6000 L 11700,6000 11700,5192 14066,5192 14066,6000 12883,6000 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 12883,6000 L 11700,6000 11700,5192 14066,5192 14066,6000 12883,6000 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="11809" y="5768"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="2148" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">plugin-api</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id22">
+        <rect class="BoundingBox" stroke="none" fill="none" x="13199" y="13999" width="2003" height="811"/>
+        <a xlink:href="file:///maven-artifact/">
+         <path fill="rgb(153,204,255)" stroke="none" d="M 14200,14808 L 13200,14808 13200,14000 15200,14000 15200,14808 14200,14808 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 14200,14808 L 13200,14808 13200,14000 15200,14000 15200,14808 14200,14808 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="13457" y="14576"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="1486" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">artifact</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id23">
+        <rect class="BoundingBox" stroke="none" fill="none" x="6634" y="2390" width="3233" height="813"/>
+        <a xlink:href="file:///maven-embedder/">
+         <path fill="rgb(153,204,255)" stroke="none" d="M 8250,3201 L 6635,3201 6635,2391 9865,2391 9865,3201 8250,3201 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 8250,3201 L 6635,3201 6635,2391 9865,2391 9865,3201 8250,3201 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="7135" y="2968"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="2230" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">embedder</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id24">
+        <rect class="BoundingBox" stroke="none" fill="none" x="12882" y="5999" width="1399" height="8002"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 12883,6000 L 14135,13606 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 14019,13629 L 13984,13611 14200,14000 14280,13562 14254,13589 14221,13613 14184,13631 14143,13643 14100,13646 14058,13641 14019,13629 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id25">
+        <rect class="BoundingBox" stroke="none" fill="none" x="8100" y="3200" width="301" height="592"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 8250,3201 L 8250,3392 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 8131,3396 L 8100,3372 8250,3791 8400,3372 8370,3394 8334,3412 8294,3425 8252,3429 8209,3426 8168,3414 8131,3396 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id26">
+        <rect class="BoundingBox" stroke="none" fill="none" x="8516" y="6591" width="3569" height="811"/>
+        <a xlink:href="file:///maven-settings-builder/">
+         <path fill="rgb(153,204,255)" stroke="none" d="M 10300,7400 L 8517,7400 8517,6592 12083,6592 12083,7400 10300,7400 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 10300,7400 L 8517,7400 8517,6592 12083,6592 12083,7400 10300,7400 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="8620" y="7168"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="3359" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">settings-builder</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id27">
+        <rect class="BoundingBox" stroke="none" fill="none" x="8249" y="5998" width="2053" height="623"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 8250,5999 L 9917,6481 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 9887,6596 L 9856,6620 10300,6592 9939,6331 9952,6367 9960,6406 9960,6448 9953,6490 9938,6530 9915,6565 9887,6596 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id28">
+        <rect class="BoundingBox" stroke="none" fill="none" x="7783" y="12291" width="3235" height="811"/>
+        <a xlink:href="file:///maven-model-builder/">
+         <path fill="rgb(153,204,255)" stroke="none" d="M 9400,13100 L 7784,13100 7784,12292 11016,12292 11016,13100 9400,13100 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 9400,13100 L 7784,13100 7784,12292 11016,12292 11016,13100 9400,13100 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="7899" y="12868"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="3001" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">model-builder</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id29">
+        <rect class="BoundingBox" stroke="none" fill="none" x="10799" y="13989" width="2203" height="813"/>
+        <a xlink:href="file:///maven-model/">
+         <path fill="rgb(153,204,255)" stroke="none" d="M 11900,14800 L 10800,14800 10800,13990 13000,13990 13000,14800 11900,14800 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 11900,14800 L 10800,14800 10800,13990 13000,13990 13000,14800 11900,14800 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="11226" y="14567"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="1349" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">model</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id30">
+        <rect class="BoundingBox" stroke="none" fill="none" x="11015" y="12695" width="887" height="1296"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 11016,12696 L 11675,13660 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 11579,13730 L 11540,13729 11900,13990 11787,13559 11775,13595 11756,13630 11730,13662 11697,13690 11660,13712 11620,13724 11579,13730 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id31">
+        <rect class="BoundingBox" stroke="none" fill="none" x="11802" y="5999" width="1083" height="7993"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 12883,6000 L 11949,13594 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 11830,13583 L 11802,13556 11900,13990 12100,13592 12067,13611 12029,13625 11989,13632 11946,13631 11904,13622 11865,13605 11830,13583 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id32">
+        <rect class="BoundingBox" stroke="none" fill="none" x="18849" y="9098" width="1903" height="812"/>
+        <a xlink:href="https://github.com/codehaus-plexus/plexus-cipher">
+         <path fill="rgb(255,255,153)" stroke="none" d="M 19800,9908 L 18850,9908 18850,9099 20750,9099 20750,9908 19800,9908 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 19800,9908 L 18850,9908 18850,9099 20750,9099 20750,9908 19800,9908 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="19126" y="9675"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="1349" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">cipher</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id33">
+        <rect class="BoundingBox" stroke="none" fill="none" x="18199" y="9348" width="653" height="302"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 18200,9495 L 18451,9498 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 18453,9617 L 18429,9648 18850,9504 18433,9348 18455,9379 18473,9415 18484,9455 18488,9497 18484,9540 18471,9580 18453,9617 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id34">
+        <rect class="BoundingBox" stroke="none" fill="none" x="14899" y="10699" width="3103" height="813"/>
+        <a xlink:href="https://codehaus-plexus.github.io/plexus-interpolation/">
+         <path fill="rgb(255,255,153)" stroke="none" d="M 16450,11510 L 14900,11510 14900,10700 18000,10700 18000,11510 16450,11510 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 16450,11510 L 14900,11510 14900,10700 18000,10700 18000,11510 16450,11510 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="15100" y="11277"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="2699" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">interpolation</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id35">
+        <rect class="BoundingBox" stroke="none" fill="none" x="11015" y="11104" width="3886" height="1594"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 11016,12696 L 14531,11256 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 14579,11365 L 14569,11403 14900,11105 14455,11125 14488,11144 14518,11171 14544,11203 14565,11241 14578,11281 14582,11324 14579,11365 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id36">
+        <rect class="BoundingBox" stroke="none" fill="none" x="14799" y="7889" width="5503" height="812"/>
+        <a xlink:href="https://codehaus-plexus.github.io/plexus-containers/plexus-component-annotations/">
+         <path fill="rgb(255,255,153)" stroke="none" d="M 17550,8699 L 14800,8699 14800,7890 20300,7890 20300,8699 17550,8699 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 17550,8699 L 14800,8699 14800,7890 20300,7890 20300,8699 17550,8699 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="14961" y="8466"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="5177" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">component-annotations</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id37">
+        <rect class="BoundingBox" stroke="none" fill="none" x="14599" y="3789" width="4603" height="812"/>
+        <a xlink:href="https://maven.apache.org/wagon/wagon-provider-api/">
+         <path fill="rgb(255,255,153)" stroke="none" d="M 16900,4599 L 14600,4599 14600,3790 19200,3790 19200,4599 16900,4599 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 16900,4599 L 14600,4599 14600,3790 19200,3790 19200,4599 16900,4599 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="14780" y="4366"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="4240" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">wagon-provider-api</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id38">
+        <rect class="BoundingBox" stroke="none" fill="none" x="9865" y="4045" width="4736" height="301"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 9866,4195 L 14201,4195 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 14205,4314 L 14181,4345 14600,4195 14181,4045 14203,4075 14221,4111 14234,4151 14238,4193 14235,4236 14223,4277 14205,4314 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id39">
+        <rect class="BoundingBox" stroke="none" fill="none" x="20699" y="7898" width="2903" height="812"/>
+        <a xlink:href="https://codehaus-plexus.github.io/plexus-classworlds/">
+         <path fill="rgb(255,255,153)" stroke="none" d="M 22150,8708 L 20700,8708 20700,7899 23600,7899 23600,8708 22150,8708 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 22150,8708 L 20700,8708 20700,7899 23600,7899 23600,8708 22150,8708 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="20870" y="8475"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="2560" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">classworlds</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id40">
+        <rect class="BoundingBox" stroke="none" fill="none" x="15935" y="6008" width="6217" height="1915"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 15936,6009 L 21768,7784 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 21737,7898 L 21705,7921 22150,7900 21793,7634 21805,7670 21812,7710 21812,7751 21804,7793 21789,7833 21765,7868 21737,7898 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id41">
+        <rect class="BoundingBox" stroke="none" fill="none" x="14065" y="5450" width="848" height="302"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 14066,5596 L 14512,5600 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 14514,5719 L 14491,5750 14911,5604 14493,5450 14516,5480 14533,5517 14545,5556 14549,5599 14545,5642 14533,5682 14514,5719 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id42">
+        <rect class="BoundingBox" stroke="none" fill="none" x="5499" y="13999" width="4703" height="811"/>
+        <a xlink:href="file:///maven-repository-metadata/">
+         <path fill="rgb(153,204,255)" stroke="none" d="M 7850,14808 L 5500,14808 5500,14000 10200,14000 10200,14808 7850,14808 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 7850,14808 L 5500,14808 5500,14000 10200,14000 10200,14808 7850,14808 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="5647" y="14576"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="4405" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">repository-metadata</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id43">
+        <rect class="BoundingBox" stroke="none" fill="none" x="6250" y="5998" width="2002" height="3696"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 8250,5999 L 6440,9341 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 6334,9288 L 6318,9252 6250,9692 6581,9395 6544,9400 6504,9399 6464,9391 6424,9375 6388,9351 6358,9321 6334,9288 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id44">
+        <rect class="BoundingBox" stroke="none" fill="none" x="7999" y="7991" width="2003" height="811"/>
+        <a xlink:href="file:///maven-settings/">
+         <path fill="rgb(153,204,255)" stroke="none" d="M 9000,8800 L 8000,8800 8000,7992 10000,7992 10000,8800 9000,8800 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 9000,8800 L 8000,8800 8000,7992 10000,7992 10000,8800 9000,8800 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="8146" y="8568"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="1707" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">settings</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id45">
+        <rect class="BoundingBox" stroke="none" fill="none" x="9000" y="7399" width="1302" height="595"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 10300,7400 L 9363,7827 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 9311,7720 L 9319,7682 9000,7992 9444,7955 9411,7937 9379,7911 9352,7881 9330,7844 9315,7803 9310,7761 9311,7720 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id46">
+        <rect class="BoundingBox" stroke="none" fill="none" x="999" y="11399" width="4203" height="3403"/>
+        <a xlink:href="https://maven.apache.org/resolver/">
+         <path fill="rgb(192,227,252)" fill-opacity="0.251" stroke="none" d="M 3100,14800 L 1000,14800 1000,11400 5200,11400 5200,14800 3100,14800 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 3100,14800 L 1000,14800 1000,11400 5200,11400 5200,14800 3100,14800 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="1250" y="14569"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="1762" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">resolver</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id47">
+        <rect class="BoundingBox" stroke="none" fill="none" x="1275" y="12989" width="1490" height="812"/>
+        <a xlink:href="https://maven.apache.org/resolver/maven-resolver-api/">
+         <path fill="rgb(153,204,255)" fill-opacity="0.502" stroke="none" d="M 2020,13799 L 1276,13799 1276,12990 2763,12990 2763,13799 2020,13799 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 2020,13799 L 1276,13799 1276,12990 2763,12990 2763,13799 2020,13799 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="1689" y="13566"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="661" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">api</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id48">
+        <rect class="BoundingBox" stroke="none" fill="none" x="1275" y="11589" width="1490" height="812"/>
+        <a xlink:href="https://maven.apache.org/resolver/maven-resolver-spi/">
+         <path fill="rgb(153,204,255)" fill-opacity="0.502" stroke="none" d="M 2020,12399 L 1276,12399 1276,11590 2763,11590 2763,12399 2020,12399 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 2020,12399 L 1276,12399 1276,11590 2763,11590 2763,12399 2020,12399 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="1703" y="12166"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="633" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">spi</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id49">
+        <rect class="BoundingBox" stroke="none" fill="none" x="3405" y="11589" width="1490" height="812"/>
+        <a xlink:href="https://maven.apache.org/resolver/maven-resolver-impl/">
+         <path fill="rgb(153,204,255)" fill-opacity="0.502" stroke="none" d="M 4150,12399 L 3406,12399 3406,11590 4893,11590 4893,12399 4150,12399 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 4150,12399 L 3406,12399 3406,11590 4893,11590 4893,12399 4150,12399 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="3696" y="12166"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="908" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">impl</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id50">
+        <rect class="BoundingBox" stroke="none" fill="none" x="3405" y="12989" width="1490" height="812"/>
+        <a xlink:href="https://maven.apache.org/resolver/maven-resolver-util/">
+         <path fill="rgb(153,204,255)" fill-opacity="0.502" stroke="none" d="M 4150,13799 L 3406,13799 3406,12990 4893,12990 4893,13799 4150,13799 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 4150,13799 L 3406,13799 3406,12990 4893,12990 4893,13799 4150,13799 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="3833" y="13566"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="633" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">util</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id51">
+        <rect class="BoundingBox" stroke="none" fill="none" x="1870" y="12399" width="301" height="593"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 2020,12400 L 2020,12592 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 1901,12596 L 1870,12572 2020,12991 2170,12572 2140,12594 2104,12612 2064,12625 2022,12629 1979,12626 1938,12614 1901,12596 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id52">
+        <rect class="BoundingBox" stroke="none" fill="none" x="2764" y="11845" width="645" height="301"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 3407,11995 L 3163,11995 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 3159,11876 L 3183,11845 2764,11995 3183,12145 3161,12115 3143,12079 3130,12039 3126,11997 3129,11954 3141,11913 3159,11876 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id53">
+        <rect class="BoundingBox" stroke="none" fill="none" x="4000" y="12399" width="301" height="593"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 4150,12400 L 4150,12592 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 4031,12596 L 4000,12572 4150,12991 4300,12572 4270,12594 4234,12612 4194,12625 4152,12629 4109,12626 4068,12614 4031,12596 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id54">
+        <rect class="BoundingBox" stroke="none" fill="none" x="2764" y="13245" width="645" height="301"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 3407,13395 L 3163,13395 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 3159,13276 L 3183,13245 2764,13395 3183,13545 3161,13515 3143,13479 3130,13439 3126,13397 3129,13354 3141,13313 3159,13276 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id55">
+        <rect class="BoundingBox" stroke="none" fill="none" x="4334" y="9691" width="3833" height="813"/>
+        <a xlink:href="file:///maven-resolver-provider/">
+         <path fill="rgb(153,204,255)" stroke="none" d="M 6250,10502 L 4335,10502 4335,9692 8165,9692 8165,10502 6250,10502 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 6250,10502 L 4335,10502 4335,9692 8165,9692 8165,10502 6250,10502 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="4392" y="10269"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="3716" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">resolver-provider</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id56">
+        <rect class="BoundingBox" stroke="none" fill="none" x="4150" y="10501" width="2102" height="1092"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 6250,10502 L 4504,11407 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 4446,11304 L 4453,11265 4150,11591 4591,11531 4557,11515 4525,11491 4496,11462 4472,11426 4455,11386 4448,11345 4446,11304 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id57">
+        <rect class="BoundingBox" stroke="none" fill="none" x="6249" y="10501" width="1603" height="3500"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 6250,10502 L 7684,13637 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 7578,13690 L 7539,13681 7850,14000 7812,13556 7794,13590 7769,13621 7738,13648 7701,13670 7661,13685 7619,13691 7578,13690 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id58">
+        <rect class="BoundingBox" stroke="none" fill="none" x="6249" y="10501" width="1537" height="2196"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 6250,10502 L 7555,12369 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 7460,12440 L 7421,12438 7784,12696 7667,12267 7655,12302 7636,12338 7611,12370 7578,12398 7541,12420 7501,12433 7460,12440 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id59">
+        <rect class="BoundingBox" stroke="none" fill="none" x="12082" y="6995" width="2820" height="4111"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 12083,6996 L 14674,10776 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 14578,10846 L 14539,10844 14900,11105 14787,10675 14775,10710 14755,10745 14730,10778 14697,10806 14660,10827 14619,10840 14578,10846 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id60">
+        <rect class="BoundingBox" stroke="none" fill="none" x="15935" y="6008" width="1617" height="1884"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 15936,6009 L 17290,7588 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 17202,7668 L 17163,7671 17550,7891 17391,7475 17383,7512 17367,7549 17345,7584 17316,7615 17281,7640 17242,7658 17202,7668 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id61">
+        <rect class="BoundingBox" stroke="none" fill="none" x="8516" y="10899" width="3569" height="811"/>
+        <a xlink:href="file:///maven-builder-support/">
+         <path fill="rgb(153,204,255)" stroke="none" d="M 10300,11708 L 8517,11708 8517,10900 12083,10900 12083,11708 10300,11708 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 10300,11708 L 8517,11708 8517,10900 12083,10900 12083,11708 10300,11708 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="8648" y="11476"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="3304" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">builder-support</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id62">
+        <rect class="BoundingBox" stroke="none" fill="none" x="10150" y="7399" width="301" height="3502"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 10300,7400 L 10300,10501 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 10181,10505 L 10150,10481 10300,10900 10450,10481 10420,10503 10384,10521 10344,10534 10302,10538 10259,10535 10218,10523 10181,10505 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id63">
+        <rect class="BoundingBox" stroke="none" fill="none" x="9399" y="11707" width="902" height="587"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 9400,12292 L 9965,11925 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 10033,12023 L 10030,12062 10300,11708 9867,11810 9902,11823 9937,11844 9969,11870 9996,11903 10016,11941 10028,11982 10033,12023 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id64">
+        <rect class="BoundingBox" stroke="none" fill="none" x="20909" y="6489" width="2993" height="812"/>
+        <a xlink:href="https://docs.oracle.com/javaee/6/api/javax/inject/package-summary.html">
+         <path fill="rgb(255,255,153)" stroke="none" d="M 22405,7299 L 20910,7299 20910,6490 23900,6490 23900,7299 22405,7299 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 22405,7299 L 20910,7299 20910,6490 23900,6490 23900,7299 22405,7299 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="21180" y="7066"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="2450" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">javax.inject</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id65">
+        <rect class="BoundingBox" stroke="none" fill="none" x="22255" y="5999" width="301" height="493"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 22405,6000 L 22405,6092 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 22286,6096 L 22255,6072 22405,6491 22555,6072 22525,6094 22489,6112 22449,6125 22407,6129 22364,6126 22323,6114 22286,6096 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id66">
+        <rect class="BoundingBox" stroke="none" fill="none" x="3399" y="6589" width="1603" height="813"/>
+        <a xlink:href="https://fusesource.github.io/jansi/">
+         <path fill="rgb(255,255,153)" stroke="none" d="M 4200,7400 L 3400,7400 3400,6590 5000,6590 5000,7400 4200,7400 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 4200,7400 L 3400,7400 3400,6590 5000,6590 5000,7400 4200,7400 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="3760" y="7167"><tspan id="id76" font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="881" fill="rgb(0,102,204)" stroke="none" class="UrlField" xlink:href="https://jline.org/"><a xlink:href="https://jline.org/">jline</a></tspan></tspan></tspan></text>
+         <desc class="HyperlinkIdList">id76</desc>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id67">
+        <rect class="BoundingBox" stroke="none" fill="none" x="4050" y="5999" width="301" height="592"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 4200,6000 L 4200,6191 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 4081,6195 L 4050,6171 4200,6590 4350,6171 4320,6193 4284,6211 4244,6224 4202,6228 4159,6225 4118,6213 4081,6195 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id68">
+        <rect class="BoundingBox" stroke="none" fill="none" x="2734" y="2399" width="2503" height="813"/>
+        <a xlink:href="https://www.slf4j.org/manual.html">
+         <path fill="rgb(255,255,153)" stroke="none" d="M 3985,3210 L 2735,3210 2735,2400 5235,2400 5235,3210 3985,3210 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 3985,3210 L 2735,3210 2735,2400 5235,2400 5235,3210 3985,3210 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="3132" y="2977"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="1707" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">slf4j-api</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id69">
+        <rect class="BoundingBox" stroke="none" fill="none" x="5235" y="2652" width="1402" height="302"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 6635,2796 L 5634,2802 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 5630,2684 L 5653,2652 5235,2805 5655,2952 5632,2922 5614,2886 5602,2847 5597,2804 5600,2762 5612,2721 5630,2684 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id70">
+        <rect class="BoundingBox" stroke="none" fill="none" x="2699" y="5189" width="3003" height="813"/>
+        <a xlink:href="https://maven.apache.org/shared/maven-shared-utils/">
+         <path fill="rgb(255,255,153)" stroke="none" d="M 4200,6000 L 2700,6000 2700,5190 5700,5190 5700,6000 4200,6000 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 4200,6000 L 2700,6000 2700,5190 5700,5190 5700,6000 4200,6000 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="2920" y="5767"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="2560" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">shared-utils</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id71">
+        <rect class="BoundingBox" stroke="none" fill="none" x="5700" y="5445" width="936" height="301"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 6634,5595 L 6099,5595 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 6095,5476 L 6119,5445 5700,5595 6119,5745 6097,5715 6079,5679 6066,5639 6062,5597 6065,5554 6077,5513 6095,5476 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       <g id="id72">
+        <rect class="BoundingBox" stroke="none" fill="none" x="2069" y="999" width="3833" height="813"/>
+        <a xlink:href="file:///maven-slf4j-provider/">
+         <path fill="rgb(153,204,255)" stroke="none" d="M 3985,1810 L 2070,1810 2070,1000 5900,1000 5900,1810 3985,1810 Z "/>
+         <path fill="none" stroke="rgb(0,0,0)" d="M 3985,1810 L 2070,1810 2070,1000 5900,1000 5900,1810 3985,1810 Z "/>
+         <text class="SVGTextShape"><tspan class="TextParagraph"><tspan class="TextPosition" x="2568" y="1577"><tspan font-family="Arial, sans-serif" font-size="494px" font-weight="400" lengthAdjust="spacingAndGlyphs" textLength="2835" fill="rgb(0,0,0)" stroke="none" style="white-space: pre">slf4j-provider</tspan></tspan></tspan></text>
+        </a>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id73">
+        <rect class="BoundingBox" stroke="none" fill="none" x="3835" y="1809" width="301" height="592"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 3985,1810 L 3985,2001 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 3866,2005 L 3835,1981 3985,2400 4135,1981 4105,2003 4069,2021 4029,2034 3987,2038 3944,2035 3903,2023 3866,2005 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id74">
+        <rect class="BoundingBox" stroke="none" fill="none" x="5900" y="1255" width="737" height="301"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 6635,1405 L 6299,1405 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 6295,1286 L 6319,1255 5900,1405 6319,1555 6297,1525 6279,1489 6266,1449 6262,1407 6265,1364 6277,1323 6295,1286 Z "/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.ConnectorShape">
+       <g id="id75">
+        <rect class="BoundingBox" stroke="none" fill="none" x="11015" y="12695" width="3187" height="1306"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 11016,12696 L 13831,13849 "/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 13789,13960 L 13755,13980 14200,14000 13869,13702 13878,13739 13881,13779 13878,13820 13866,13861 13846,13899 13820,13932 13789,13960 Z "/>
+       </g>
+      </g>
+     </g>
+    </g>
+   </g>
+  </g>
+ </g>
+</svg>
