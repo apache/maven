@@ -23,6 +23,13 @@ under the License.
 <project>
   <modelVersion>4.0.0</modelVersion>
 
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <!-- Fixed date for reproducible build -->
+    <project.build.outputTimestamp>1980-02-01T00:00:00Z</project.build.outputTimestamp>
+  </properties>
+
   <repositories>
     <repository>
       <id>central</id>
