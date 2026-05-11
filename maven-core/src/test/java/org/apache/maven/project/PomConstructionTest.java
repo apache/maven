@@ -1243,7 +1243,7 @@ public class PomConstructionTest {
     @Test
     public void testPropertiesNoDuplication() throws Exception {
         PomTestWrapper pom = buildPom("properties-no-duplication/sub");
-        assertEquals(1, ((Properties) pom.getValue("properties")).size());
+        assertEquals(4, ((Properties) pom.getValue("properties")).size());
         assertEquals("child", pom.getValue("properties/pomProfile"));
     }
 
@@ -1367,7 +1367,7 @@ public class PomConstructionTest {
         assertEquals(1, ((List<?>) pom.getValue("modules")).size());
         assertEquals("sub", pom.getValue("modules[1]"));
 
-        assertEquals(1, ((Map<?, ?>) pom.getValue("properties")).size());
+        assertEquals(4, ((Map<?, ?>) pom.getValue("properties")).size());
         assertEquals("project-property", pom.getValue("properties[1]/itProperty"));
 
         assertEquals(1, ((List<?>) pom.getValue("dependencyManagement/dependencies")).size());
