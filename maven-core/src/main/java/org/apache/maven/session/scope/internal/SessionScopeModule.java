@@ -26,6 +26,7 @@ import org.apache.maven.SessionScoped;
 import org.apache.maven.execution.MavenSession;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.eclipse.aether.RepositorySystemSession;
 
 /**
  * SessionScopeModule
@@ -52,8 +53,9 @@ public class SessionScopeModule extends AbstractModule {
         bindScope(SessionScoped.class, scope);
         bind(SessionScope.class).toInstance(scope);
 
-        bind(MavenSession.class)
-                .toProvider(SessionScope.<MavenSession>seededKeyProvider())
+        bind(MavenSession.class).toProvider(SessionScope.seededKeyProvider()).in(scope);
+        bind(RepositorySystemSession.class)
+                .toProvider(SessionScope.seededKeyProvider())
                 .in(scope);
     }
 }
