@@ -129,17 +129,20 @@ public class ConditionParser {
                 }
                 quoteType = c;
                 sb.append(c);
-            } else if (c == ' ' || c == '(' || c == ')' || c == ',' || c == '+' || c == '>' || c == '<' || c == '='
-                    || c == '!') {
+            } else if (c == ' ' || c == '\n' || c == '\r' || c == '\t' || c == '(' || c == ')' || c == ',' || c == '+'
+                    || c == '>' || c == '<' || c == '=' || c == '!' || c == '&') {
                 if (!sb.isEmpty()) {
                     tokens.add(sb.toString());
                     sb.setLength(0);
                 }
-                if (c != ' ') {
-                    if ((c == '>' || c == '<' || c == '=' || c == '!')
+                if (c != ' ' && c != '\n' && c != '\r' && c != '\t') {
+                    if ((c == '>' || c == '<' || c == '=' || c == '!' || c == '&')
                             && i + 1 < expression.length()
                             && expression.charAt(i + 1) == '=') {
                         tokens.add(c + "=");
+                        i++; // Skip the next character
+                    } else if (c == '&' && i + 1 < expression.length() && expression.charAt(i + 1) == '&') {
+                        tokens.add("&&");
                         i++; // Skip the next character
                     } else {
                         tokens.add(String.valueOf(c));
