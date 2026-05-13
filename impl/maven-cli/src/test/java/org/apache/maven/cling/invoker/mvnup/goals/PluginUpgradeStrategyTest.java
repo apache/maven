@@ -526,6 +526,50 @@ class PluginUpgradeStrategyTest {
     }
 
     @Nested
+    @DisplayName("Inherited Plugin Detection")
+    class InheritedPluginDetectionTests {
+
+        @Test
+        @DisplayName("should detect inherited plugins from remote parent POM and add pluginManagement")
+        void shouldDetectInheritedPluginsFromRemoteParent() throws Exception {
+            // org.apache:apache:23 defines maven-enforcer-plugin:1.4.1 in pluginManagement.
+            // A child POM that inherits from this parent should get pluginManagement overrides
+            // added by mvnup for plugins that need Maven 4 compatibility upgrades.
+            // Uses an absolute path because the effective model analysis path resolution
+            // requires it to match between phases.
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <parent>
+                        <groupId>org.apache</groupId>
+                        <artifactId>apache</artifactId>
+                        <version>23</version>
+                    </parent>
+                    <groupId>org.example</groupId>
+                    <artifactId>test-child</artifactId>
+                    <version>1.0.0-SNAPSHOT</version>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Path pomPath = Paths.get("/project/pom.xml").toAbsolutePath();
+            Map<Path, Document> pomMap = Map.of(pomPath, document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Strategy should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have added plugin management for inherited plugins");
+
+            String xml = DomUtils.toXml(document);
+            assertTrue(
+                    xml.contains("<artifactId>maven-enforcer-plugin</artifactId>"),
+                    "Should add pluginManagement for maven-enforcer-plugin inherited from parent");
+        }
+    }
+
+    @Nested
     @DisplayName("Error Handling")
     class ErrorHandlingTests {
 
