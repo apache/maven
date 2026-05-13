@@ -38,7 +38,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -514,6 +517,43 @@ class PluginUpgradeStrategyTest {
     @Nested
     @DisplayName("Error Handling")
     class ErrorHandlingTests {
+
+        @Test
+        @DisplayName("should warn when effective model analysis fails for POM with remote parent")
+        void shouldWarnWhenEffectiveModelAnalysisFailsForRemoteParent() throws Exception {
+            // POM inherits from a remote parent that cannot be resolved in test environment.
+            // This simulates the scenario where plugins are inherited from remote parent POMs
+            // (e.g., org.apache:apache:23 defining maven-enforcer-plugin:1.4.1).
+            // The effective model analysis should warn (not silently swallow) the failure.
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <parent>
+                        <groupId>org.apache</groupId>
+                        <artifactId>apache</artifactId>
+                        <version>23</version>
+                    </parent>
+                    <artifactId>test-child</artifactId>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            // Strategy should complete successfully even when effective model analysis fails
+            assertNotNull(result, "Result should not be null");
+            assertTrue(result.success(), "Strategy should succeed even when effective model analysis fails");
+            assertTrue(result.processedPoms().contains(Paths.get("pom.xml")), "POM should be marked as processed");
+
+            // The warning should have been logged (not silently swallowed at debug level)
+            // Verify through the mock logger that warn was called
+            verify(context.logger, atLeastOnce())
+                    .warn(argThat(msg -> msg.contains("Failed to analyze effective model")));
+        }
 
         @Test
         @DisplayName("should handle malformed POM gracefully")

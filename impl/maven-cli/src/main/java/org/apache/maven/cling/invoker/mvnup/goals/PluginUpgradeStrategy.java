@@ -565,7 +565,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 }
 
             } catch (Exception e) {
-                context.debug("Failed to analyze effective model for " + originalPomPath + ": " + e.getMessage());
+                context.warning("Failed to analyze effective model for " + originalPomPath + ": " + e.getMessage());
             }
         }
 
