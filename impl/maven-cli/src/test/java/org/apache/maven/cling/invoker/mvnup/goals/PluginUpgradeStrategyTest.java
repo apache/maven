@@ -530,20 +530,18 @@ class PluginUpgradeStrategyTest {
     class ErrorHandlingTests {
 
         @Test
-        @DisplayName("should warn when effective model analysis fails for POM with remote parent")
-        void shouldWarnWhenEffectiveModelAnalysisFailsForRemoteParent() throws Exception {
-            // POM inherits from a remote parent that cannot be resolved in test environment.
-            // This simulates the scenario where plugins are inherited from remote parent POMs
-            // (e.g., org.apache:apache:23 defining maven-enforcer-plugin:1.4.1).
+        @DisplayName("should warn when effective model analysis fails for POM with unresolvable remote parent")
+        void shouldWarnWhenEffectiveModelAnalysisFailsForUnresolvableRemoteParent() throws Exception {
+            // POM inherits from a remote parent that does not exist.
             // The effective model analysis should warn (not silently swallow) the failure.
             String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
                     <modelVersion>4.0.0</modelVersion>
                     <parent>
-                        <groupId>org.apache</groupId>
-                        <artifactId>apache</artifactId>
-                        <version>23</version>
+                        <groupId>com.nonexistent.test</groupId>
+                        <artifactId>nonexistent-parent</artifactId>
+                        <version>1.0.0</version>
                     </parent>
                     <artifactId>test-child</artifactId>
                 </project>
@@ -561,7 +559,6 @@ class PluginUpgradeStrategyTest {
             assertTrue(result.processedPoms().contains(Paths.get("pom.xml")), "POM should be marked as processed");
 
             // The warning should have been logged (not silently swallowed at debug level)
-            // Verify through the mock logger that warn was called
             verify(context.logger, atLeastOnce())
                     .warn(argThat(msg -> msg.contains("Failed to analyze effective model")));
         }
