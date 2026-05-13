@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
@@ -99,6 +100,12 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     "maven-remote-resources-plugin",
                     "3.0.0",
                     MAVEN_4_COMPATIBILITY_REASON));
+
+    private static final List<PluginUpgrade> PLUGIN_DEPENDENCY_UPGRADES = List.of(new PluginUpgrade(
+            "org.codehaus.mojo",
+            "extra-enforcer-rules",
+            "1.4",
+            "Versions before 1.4 use a removed DependencyGraphBuilder API incompatible with Maven 4"));
 
     private Session session;
 
@@ -281,6 +288,8 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     }
                 }
             }
+
+            hasUpgrades |= upgradePluginDependencies(pluginElement, namespace, pomDocument, sectionName, context);
         }
 
         return hasUpgrades;
@@ -371,6 +380,57 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         }
 
         return false;
+    }
+
+    /**
+     * Upgrades plugin dependencies (e.g., extra-enforcer-rules inside maven-enforcer-plugin).
+     */
+    private boolean upgradePluginDependencies(
+            Element pluginElement,
+            Namespace namespace,
+            Document pomDocument,
+            String sectionName,
+            UpgradeContext context) {
+        Element dependenciesElement = pluginElement.getChild("dependencies", namespace);
+        if (dependenciesElement == null) {
+            return false;
+        }
+
+        Map<String, PluginUpgradeInfo> depUpgrades = getPluginDependencyUpgradesMap();
+        boolean hasUpgrades = false;
+
+        List<Element> depElements = dependenciesElement.getChildren("dependency", namespace);
+        for (Element depElement : depElements) {
+            String groupId = getChildText(depElement, GROUP_ID, namespace);
+            String artifactId = getChildText(depElement, ARTIFACT_ID, namespace);
+
+            if (groupId != null && artifactId != null) {
+                String depKey = groupId + ":" + artifactId;
+                PluginUpgradeInfo upgrade = depUpgrades.get(depKey);
+
+                if (upgrade != null) {
+                    if (upgradePluginVersion(
+                            depElement,
+                            namespace,
+                            upgrade,
+                            pomDocument,
+                            sectionName + "/plugin/dependencies",
+                            context)) {
+                        hasUpgrades = true;
+                    }
+                }
+            }
+        }
+
+        return hasUpgrades;
+    }
+
+    private Map<String, PluginUpgradeInfo> getPluginDependencyUpgradesMap() {
+        return PLUGIN_DEPENDENCY_UPGRADES.stream()
+                .collect(Collectors.toMap(
+                        upgrade -> upgrade.groupId() + ":" + upgrade.artifactId(),
+                        upgrade ->
+                                new PluginUpgradeInfo(upgrade.groupId(), upgrade.artifactId(), upgrade.minVersion())));
     }
 
     /**
