@@ -64,6 +64,8 @@ import org.eclipse.aether.transport.jdk.JdkTransporterFactory;
 
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.ARTIFACT_ID;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.BUILD;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.DEPENDENCIES;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.DEPENDENCY;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.GROUP_ID;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PARENT;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PLUGIN;
@@ -99,6 +101,12 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     "maven-remote-resources-plugin",
                     "3.0.0",
                     MAVEN_4_COMPATIBILITY_REASON));
+
+    private static final List<PluginUpgrade> PLUGIN_DEPENDENCY_UPGRADES = List.of(new PluginUpgrade(
+            "org.codehaus.mojo",
+            "extra-enforcer-rules",
+            "1.4",
+            "Versions before 1.4 use a removed DependencyGraphBuilder API incompatible with Maven 4"));
 
     private Session session;
 
@@ -262,6 +270,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         return pluginsElement
                 .children(PLUGIN)
                 .map(pluginElement -> {
+                    boolean upgraded = false;
                     String groupId = getChildText(pluginElement, GROUP_ID);
                     String artifactId = getChildText(pluginElement, ARTIFACT_ID);
 
@@ -275,10 +284,13 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                         PluginUpgradeInfo upgrade = pluginUpgrades.get(pluginKey);
 
                         if (upgrade != null) {
-                            return upgradePluginVersion(pluginElement, upgrade, pomDocument, sectionName, context);
+                            upgraded = upgradePluginVersion(pluginElement, upgrade, pomDocument, sectionName, context);
                         }
                     }
-                    return false;
+
+                    upgraded |= upgradePluginDependencies(pluginElement, pomDocument, sectionName, context);
+
+                    return upgraded;
                 })
                 .reduce(false, Boolean::logicalOr);
     }
@@ -368,6 +380,46 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         }
 
         return false;
+    }
+
+    /**
+     * Upgrades plugin dependencies (e.g., extra-enforcer-rules inside maven-enforcer-plugin).
+     */
+    private boolean upgradePluginDependencies(
+            Element pluginElement, Document pomDocument, String sectionName, UpgradeContext context) {
+        Element dependenciesElement = pluginElement.child(DEPENDENCIES).orElse(null);
+        if (dependenciesElement == null) {
+            return false;
+        }
+
+        Map<String, PluginUpgradeInfo> depUpgrades = getPluginDependencyUpgradesMap();
+
+        return dependenciesElement
+                .children(DEPENDENCY)
+                .map(depElement -> {
+                    String groupId = getChildText(depElement, GROUP_ID);
+                    String artifactId = getChildText(depElement, ARTIFACT_ID);
+
+                    if (groupId != null && artifactId != null) {
+                        String depKey = groupId + ":" + artifactId;
+                        PluginUpgradeInfo upgrade = depUpgrades.get(depKey);
+
+                        if (upgrade != null) {
+                            return upgradePluginVersion(
+                                    depElement, upgrade, pomDocument, sectionName + "/plugin/dependencies", context);
+                        }
+                    }
+                    return false;
+                })
+                .reduce(false, Boolean::logicalOr);
+    }
+
+    private Map<String, PluginUpgradeInfo> getPluginDependencyUpgradesMap() {
+        return PLUGIN_DEPENDENCY_UPGRADES.stream()
+                .collect(Collectors.toMap(
+                        upgrade -> upgrade.groupId() + ":" + upgrade.artifactId(),
+                        upgrade ->
+                                new PluginUpgradeInfo(upgrade.groupId(), upgrade.artifactId(), upgrade.minVersion())));
     }
 
     /**
