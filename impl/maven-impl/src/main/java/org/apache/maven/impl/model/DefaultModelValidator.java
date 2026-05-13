@@ -668,39 +668,42 @@ public class DefaultModelValidator implements ModelValidator {
 
         if (validationLevel > VALIDATION_LEVEL_MINIMAL) {
             validateRawRepositories(
-                    problems, model.getRepositories(), "repositories.repository.", EMPTY, validationLevel);
+                    problems, model.getRepositories(), "repositories.repository.", EMPTY, validationLevel, false);
 
             validateRawRepositories(
                     problems,
                     model.getPluginRepositories(),
                     "pluginRepositories.pluginRepository.",
                     EMPTY,
-                    validationLevel);
+                    validationLevel,
+                    false);
 
             for (Profile profile : model.getProfiles()) {
                 String prefix = "profiles.profile[" + profile.getId() + "].";
 
                 validateRawRepositories(
-                        problems, profile.getRepositories(), prefix, "repositories.repository.", validationLevel);
+                        problems, profile.getRepositories(), prefix, "repositories.repository.", validationLevel, true);
 
                 validateRawRepositories(
                         problems,
                         profile.getPluginRepositories(),
                         prefix,
                         "pluginRepositories.pluginRepository.",
-                        validationLevel);
+                        validationLevel,
+                        true);
             }
 
             DistributionManagement distMgmt = model.getDistributionManagement();
             if (distMgmt != null) {
                 validateRawRepository(
-                        problems, distMgmt.getRepository(), "distributionManagement.repository.", "", true);
+                        problems, distMgmt.getRepository(), "distributionManagement.repository.", "", true, false);
                 validateRawRepository(
                         problems,
                         distMgmt.getSnapshotRepository(),
                         "distributionManagement.snapshotRepository.",
                         "",
-                        true);
+                        true,
+                        false);
             }
         }
     }
@@ -1575,11 +1578,12 @@ public class DefaultModelValidator implements ModelValidator {
             List<Repository> repositories,
             String prefix,
             String prefix2,
-            int validationLevel) {
+            int validationLevel,
+            boolean skipExpressionCheck) {
         Map<String, Repository> index = new HashMap<>();
 
         for (Repository repository : repositories) {
-            validateRawRepository(problems, repository, prefix, prefix2, false);
+            validateRawRepository(problems, repository, prefix, prefix2, false, skipExpressionCheck);
 
             String key = repository.getId();
 
@@ -1608,23 +1612,25 @@ public class DefaultModelValidator implements ModelValidator {
             Repository repository,
             String prefix,
             String prefix2,
-            boolean allowEmptyUrl) {
+            boolean allowEmptyUrl,
+            boolean skipExpressionCheck) {
         if (repository == null) {
             return;
         }
         if (validateStringNotEmpty(
                 prefix, prefix2, "id", problems, Severity.ERROR, Version.V20, repository.getId(), null, repository)) {
-            // Check for uninterpolated expressions in ID - these should have been interpolated by now
-            Matcher matcher = EXPRESSION_NAME_PATTERN.matcher(repository.getId());
-            if (matcher.find()) {
-                addViolation(
-                        problems,
-                        Severity.ERROR,
-                        Version.V40,
-                        prefix + prefix2 + "[" + repository.getId() + "].id",
-                        null,
-                        "contains an uninterpolated expression.",
-                        repository);
+            if (!skipExpressionCheck) {
+                Matcher matcher = EXPRESSION_NAME_PATTERN.matcher(repository.getId());
+                if (matcher.find()) {
+                    addViolation(
+                            problems,
+                            Severity.ERROR,
+                            Version.V40,
+                            prefix + prefix2 + "[" + repository.getId() + "].id",
+                            null,
+                            "contains an uninterpolated expression.",
+                            repository);
+                }
             }
         }
 
@@ -1639,17 +1645,18 @@ public class DefaultModelValidator implements ModelValidator {
                         repository.getUrl(),
                         null,
                         repository)) {
-            // Check for uninterpolated expressions in URL - these should have been interpolated by now
-            Matcher matcher = EXPRESSION_NAME_PATTERN.matcher(repository.getUrl());
-            if (matcher.find()) {
-                addViolation(
-                        problems,
-                        Severity.ERROR,
-                        Version.V40,
-                        prefix + prefix2 + "[" + repository.getId() + "].url",
-                        null,
-                        "contains an uninterpolated expression.",
-                        repository);
+            if (!skipExpressionCheck) {
+                Matcher matcher = EXPRESSION_NAME_PATTERN.matcher(repository.getUrl());
+                if (matcher.find()) {
+                    addViolation(
+                            problems,
+                            Severity.ERROR,
+                            Version.V40,
+                            prefix + prefix2 + "[" + repository.getId() + "].url",
+                            null,
+                            "contains an uninterpolated expression.",
+                            repository);
+                }
             }
         }
     }
