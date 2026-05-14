@@ -110,73 +110,6 @@ public interface XmlNode {
     String DEFAULT_SELF_COMBINATION_MODE = XmlService.DEFAULT_SELF_COMBINATION_MODE;
 
     /**
-     * Returns the local name of this XML node.
-     *
-     * @return the node name, never {@code null}
-     */
-    @Nonnull
-    String name();
-
-    /**
-     * Returns the namespace URI of this XML node.
-     *
-     * @return the namespace URI, never {@code null} (empty string if no namespace)
-     */
-    @Nonnull
-    String namespaceUri();
-
-    /**
-     * Returns the namespace prefix of this XML node.
-     *
-     * @return the namespace prefix, never {@code null} (empty string if no prefix)
-     */
-    @Nonnull
-    String prefix();
-
-    /**
-     * Returns the text content of this XML node.
-     *
-     * @return the node's text value, or {@code null} if none exists
-     */
-    @Nullable
-    String value();
-
-    /**
-     * Returns an immutable map of all attributes defined on this XML node.
-     *
-     * @return map of attribute names to values, never {@code null}
-     */
-    @Nonnull
-    Map<String, String> attributes();
-
-    /**
-     * Returns the value of a specific attribute.
-     *
-     * @param name the name of the attribute to retrieve
-     * @return the attribute value, or {@code null} if the attribute doesn't exist
-     * @throws NullPointerException if name is null
-     */
-    @Nullable
-    String attribute(@Nonnull String name);
-
-    /**
-     * Returns an immutable list of all child nodes.
-     *
-     * @return list of child nodes, never {@code null}
-     */
-    @Nonnull
-    List<XmlNode> children();
-
-    /**
-     * Returns the first child node with the specified name.
-     *
-     * @param name the name of the child node to find
-     * @return the first matching child node, or {@code null} if none found
-     */
-    @Nullable
-    XmlNode child(String name);
-
-    /**
      * Returns the input location information for this node, if available.
      * This can be useful for error reporting and debugging.
      *
@@ -185,60 +118,32 @@ public interface XmlNode {
     @Nullable
     Object inputLocation();
 
-    // Deprecated methods that delegate to new ones
-    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
-    default String getName() {
-        return name();
-    }
+    String getName();
 
-    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
-    default String getNamespaceUri() {
-        return namespaceUri();
-    }
+    String getNamespaceUri();
 
-    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
-    default String getPrefix() {
-        return prefix();
-    }
+    String getPrefix();
 
-    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nullable
-    default String getValue() {
-        return value();
-    }
+    String getValue();
 
-    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
-    default Map<String, String> getAttributes() {
-        return attributes();
-    }
+    Map<String, String> getAttributes();
 
-    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nullable
-    default String getAttribute(@Nonnull String name) {
-        return attribute(name);
-    }
+    String getAttribute(@Nonnull String name);
 
-    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
-    default List<XmlNode> getChildren() {
-        return children();
-    }
+    List<XmlNode> getChildren();
 
-    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nullable
-    default XmlNode getChild(String name) {
-        return child(name);
-    }
+    XmlNode getChild(String name);
 
-    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nullable
-    default Object getInputLocation() {
-        return inputLocation();
-    }
+    Object getInputLocation();
 
     /**
      * @deprecated use {@link XmlService#merge(XmlNode, XmlNode, Boolean)} instead
@@ -477,17 +382,47 @@ public interface XmlNode {
             }
 
             @Override
-            public String attribute(@Nonnull String name) {
+            public String getName() {
+                return name();
+            }
+
+            @Override
+            public String getNamespaceUri() {
+                return namespaceUri();
+            }
+
+            @Override
+            public String getPrefix() {
+                return prefix();
+            }
+
+            @Override
+            public String getValue() {
+                return value();
+            }
+
+            @Override
+            public Map<String, String> getAttributes() {
+                return attributes();
+            }
+
+            @Override
+            public String getAttribute(@Nonnull String name) {
                 return attributes.get(name);
             }
 
             @Override
-            public XmlNode child(String name) {
+            public List<XmlNode> getChildren() {
+                return children();
+            }
+
+            @Override
+            public XmlNode getChild(String name) {
                 if (name != null) {
                     ListIterator<XmlNode> it = children.listIterator(children.size());
                     while (it.hasPrevious()) {
                         XmlNode child = it.previous();
-                        if (name.equals(child.name())) {
+                        if (name.equals(child.getName())) {
                             return child;
                         }
                     }
@@ -496,13 +431,18 @@ public interface XmlNode {
             }
 
             @Override
+            public Object getInputLocation() {
+                return inputLocation();
+            }
+
+            @Override
             public boolean equals(Object o) {
                 return this == o
                         || o instanceof XmlNode that
-                                && Objects.equals(this.name, that.name())
-                                && Objects.equals(this.value, that.value())
-                                && Objects.equals(this.attributes, that.attributes())
-                                && Objects.equals(this.children, that.children());
+                                && Objects.equals(this.name, that.getName())
+                                && Objects.equals(this.value, that.getValue())
+                                && Objects.equals(this.attributes, that.getAttributes())
+                                && Objects.equals(this.children, that.getChildren());
             }
 
             @Override
