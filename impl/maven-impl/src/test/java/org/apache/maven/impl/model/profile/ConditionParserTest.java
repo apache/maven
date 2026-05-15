@@ -266,8 +266,7 @@ class ConditionParserTest {
     void testAmpersandAmpersandTokenizerMultiline() {
         // Regression test for https://github.com/apache/maven/issues/11882
         // The && operator was not being tokenized correctly when a line break appeared before it.
-        // Uses ${os.name} and ${os.arch} which work reliably in the test environment.
-        // ${os.name} == 'windows' && ${os.arch} == 'amd64' evaluates to true.
+        // Uses ${os.name} and ${os.arch} which are set to 'windows' and 'amd64' in the mock context.
 
         // Case 1: Basic && without line breaks (baseline - always worked)
         assertTrue((Boolean) parser.parse("${os.arch} == 'amd64' && ${os.name} == 'windows'"));
