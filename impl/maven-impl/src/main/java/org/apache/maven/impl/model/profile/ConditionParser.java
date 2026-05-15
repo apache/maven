@@ -129,8 +129,8 @@ public class ConditionParser {
                 }
                 quoteType = c;
                 sb.append(c);
-            } else if (c == ' ' || c == '\n' || c == '\r' || c == '\t' || c == '(' || c == ')' || c == ',' || c == '+'
-                    || c == '>' || c == '<' || c == '=' || c == '!' || c == '&') {
+            } else if (Character.isWhitespace(c) || c == '(' || c == ')' || c == ',' || c == '+'
+                    || c == '>' || c == '<' || c == '=' || c == '!' || c == '&' || c == '|') {
                 if (!sb.isEmpty()) {
                     tokens.add(sb.toString());
                     sb.setLength(0);
