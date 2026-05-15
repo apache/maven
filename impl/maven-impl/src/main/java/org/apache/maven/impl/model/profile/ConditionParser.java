@@ -135,7 +135,7 @@ public class ConditionParser {
                     tokens.add(sb.toString());
                     sb.setLength(0);
                 }
-                if (c != ' ' && c != '\n' && c != '\r' && c != '\t') {
+                if (!Character.isWhitespace(c)) {
                     if ((c == '>' || c == '<' || c == '=' || c == '!' || c == '&')
                             && i + 1 < expression.length()
                             && expression.charAt(i + 1) == '=') {
