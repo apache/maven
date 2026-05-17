@@ -35,6 +35,7 @@ import org.apache.maven.api.cli.mvnup.UpgradeOptions;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Priority;
+import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Model;
@@ -52,10 +53,9 @@ import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
 import org.apache.maven.impl.standalone.ApiRunner;
 import org.codehaus.plexus.components.secdispatcher.Dispatcher;
 import org.codehaus.plexus.components.secdispatcher.internal.dispatchers.LegacyDispatcher;
-import org.eclipse.aether.internal.impl.DefaultPathProcessor;
-import org.eclipse.aether.internal.impl.DefaultTransporterProvider;
-import org.eclipse.aether.internal.impl.transport.http.DefaultChecksumExtractor;
-import org.eclipse.aether.spi.connector.transport.TransporterProvider;
+import org.eclipse.aether.spi.connector.transport.TransporterFactory;
+import org.eclipse.aether.spi.connector.transport.http.ChecksumExtractor;
+import org.eclipse.aether.spi.io.PathProcessor;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.eclipse.aether.transport.jdk.JdkTransporterFactory;
 import org.jdom2.Document;
@@ -441,15 +441,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
     private Session createMaven4Session() {
         Session session = ApiRunner.createSession(injector -> {
             injector.bindInstance(Dispatcher.class, new LegacyDispatcher());
-
-            injector.bindInstance(
-                    TransporterProvider.class,
-                    new DefaultTransporterProvider(Map.of(
-                            "https",
-                            new JdkTransporterFactory(
-                                    new DefaultChecksumExtractor(Map.of()), new DefaultPathProcessor()),
-                            "file",
-                            new FileTransporterFactory())));
+            injector.bindImplicit(TransporterFactoryConfig.class);
         });
 
         // Configure repositories
@@ -571,7 +563,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 }
 
             } catch (Exception e) {
-                context.debug("Failed to analyze effective model for " + originalPomPath + ": " + e.getMessage());
+                context.warning("Failed to analyze effective model for " + originalPomPath + ": " + e.getMessage());
             }
         }
 
@@ -895,6 +887,26 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             this.groupId = groupId;
             this.artifactId = artifactId;
             this.minVersion = minVersion;
+        }
+    }
+
+    /**
+     * DI configuration that registers transporter factories for the standalone Maven session.
+     * Uses {@code @Provides} methods so the factories are properly registered as named beans
+     * and feed into the {@code Map<String, TransporterFactory>} used by the TransporterProvider.
+     */
+    static class TransporterFactoryConfig {
+        @Provides
+        @Named(JdkTransporterFactory.NAME)
+        static TransporterFactory jdkTransporterFactory(
+                ChecksumExtractor checksumExtractor, PathProcessor pathProcessor) {
+            return new JdkTransporterFactory(checksumExtractor, pathProcessor);
+        }
+
+        @Provides
+        @Named(FileTransporterFactory.NAME)
+        static TransporterFactory fileTransporterFactory() {
+            return new FileTransporterFactory();
         }
     }
 }

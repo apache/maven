@@ -43,7 +43,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -523,8 +526,89 @@ class PluginUpgradeStrategyTest {
     }
 
     @Nested
+    @DisplayName("Inherited Plugin Detection")
+    class InheritedPluginDetectionTests {
+
+        @Test
+        @DisplayName("should detect inherited plugins from remote parent POM and add pluginManagement")
+        void shouldDetectInheritedPluginsFromRemoteParent() throws Exception {
+            // org.apache:apache:23 defines maven-enforcer-plugin:1.4.1 in pluginManagement.
+            // A child POM that inherits from this parent should get pluginManagement overrides
+            // added by mvnup for plugins that need Maven 4 compatibility upgrades.
+            // Uses an absolute path because the effective model analysis path resolution
+            // requires it to match between phases.
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <parent>
+                        <groupId>org.apache</groupId>
+                        <artifactId>apache</artifactId>
+                        <version>23</version>
+                    </parent>
+                    <groupId>org.example</groupId>
+                    <artifactId>test-child</artifactId>
+                    <version>1.0.0-SNAPSHOT</version>
+                </project>
+                """;
+
+            Document document = saxBuilder.build(new StringReader(pomXml));
+            Path pomPath = Paths.get("/project/pom.xml").toAbsolutePath();
+            Map<Path, Document> pomMap = Map.of(pomPath, document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.apply(context, pomMap);
+
+            assertTrue(result.success(), "Strategy should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have added plugin management for inherited plugins");
+
+            XMLOutputter out = new XMLOutputter(Format.getRawFormat());
+            StringWriter writer = new StringWriter();
+            out.output(document.getRootElement(), writer);
+            String xml = writer.toString();
+            assertTrue(
+                    xml.contains("<artifactId>maven-enforcer-plugin</artifactId>"),
+                    "Should add pluginManagement for maven-enforcer-plugin inherited from parent");
+        }
+    }
+
+    @Nested
     @DisplayName("Error Handling")
     class ErrorHandlingTests {
+
+        @Test
+        @DisplayName("should warn when effective model analysis fails for POM with unresolvable remote parent")
+        void shouldWarnWhenEffectiveModelAnalysisFailsForUnresolvableRemoteParent() throws Exception {
+            // POM inherits from a remote parent that does not exist.
+            // The effective model analysis should warn (not silently swallow) the failure.
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <parent>
+                        <groupId>com.nonexistent.test</groupId>
+                        <artifactId>nonexistent-parent</artifactId>
+                        <version>1.0.0</version>
+                    </parent>
+                    <artifactId>test-child</artifactId>
+                </project>
+                """;
+
+            Document document = saxBuilder.build(new StringReader(pomXml));
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.apply(context, pomMap);
+
+            // Strategy should complete successfully even when effective model analysis fails
+            assertNotNull(result, "Result should not be null");
+            assertTrue(result.success(), "Strategy should succeed even when effective model analysis fails");
+            assertTrue(result.processedPoms().contains(Paths.get("pom.xml")), "POM should be marked as processed");
+
+            // The warning should have been logged (not silently swallowed at debug level)
+            verify(context.logger, atLeastOnce())
+                    .warn(argThat(msg -> msg.contains("Failed to analyze effective model")));
+        }
 
         @Test
         @DisplayName("should handle malformed POM gracefully")
