@@ -413,10 +413,10 @@
   </g>
   <g>
    <path fill="none" d="M3399 6589h1603v813H3399z"/>
-   <a target="_parent" xlink:href="https://fusesource.github.io/jansi/">
+   <a target="_parent" xlink:href="https://jline.org/">
     <path fill="#FF9" d="M4200 7400h-800v-810h1600v810z"/>
     <path fill="none" stroke="#000" d="M4200 7400h-800v-810h1600v810z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="3690" y="7167" class="TextPosition"><tspan style="white-space:pre">jansi</tspan></tspan></tspan></text>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="3760" y="7167" class="TextPosition"><tspan style="white-space:pre">jline</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
@@ -439,16 +439,16 @@
   </g>
   <g>
    <path fill="none" d="M2699 5189h3003v813H2699z"/>
-   <a target="_parent" xlink:href="https://maven.apache.org/shared/maven-shared-utils/">
+   <a target="_parent" xlink:href="../maven-jline/">
     <path fill="#FF9" d="M4200 6000H2700v-810h3000v810z"/>
     <path fill="none" stroke="#000" d="M4200 6000H2700v-810h3000v810z"/>
-    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="2917" y="5767" class="TextPosition"><tspan style="white-space:pre">shared-utils</tspan></tspan></tspan></text>
+    <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Arial, sans-serif" font-size="494" font-weight="400"><tspan x="2933" y="5767" class="TextPosition"><tspan style="white-space:pre">maven-jline</tspan></tspan></tspan></text>
    </a>
   </g>
   <g>
    <path fill="none" d="M5700 5445h936v301h-936z"/>
-   <path fill="none" stroke="#000" d="M6634 5595h-535"/>
-   <path d="m6095 5476 24-31-419 150 419 150-22-30-18-36-13-40-4-42 3-43 12-41z"/>
+   <path fill="none" stroke="#000" d="M5700 5595h535"/>
+   <path d="m6239 5476-24-31 419 150-419 150 22-30 18-36 13-40 4-42-3-43-12-41z"/>
   </g>
   <g>
    <path fill="none" d="M2069 999h3833v813H2069z"/>
