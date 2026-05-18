@@ -113,6 +113,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
             }
 
             delegate.populateResult(InternalSession.from(session), result, model);
+            filterUninterpolatedDependencies(result);
         }
 
         return result;
@@ -330,5 +331,32 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
             return ArtifactDescriptorPolicy.STRICT;
         }
         return policy.getPolicy(session, new ArtifactDescriptorPolicyRequest(a, request.getRequestContext()));
+    }
+
+    private void filterUninterpolatedDependencies(ArtifactDescriptorResult result) {
+        result.getDependencies().removeIf(dep -> {
+            if (hasUninterpolatedExpression(dep.getArtifact())) {
+                logger.debug("Filtered dependency with uninterpolated expression: {}", dep);
+                return true;
+            }
+            return false;
+        });
+        result.getManagedDependencies().removeIf(dep -> {
+            if (hasUninterpolatedExpression(dep.getArtifact())) {
+                logger.debug("Filtered managed dependency with uninterpolated expression: {}", dep);
+                return true;
+            }
+            return false;
+        });
+    }
+
+    private static boolean hasUninterpolatedExpression(Artifact artifact) {
+        return containsPlaceholder(artifact.getGroupId())
+                || containsPlaceholder(artifact.getArtifactId())
+                || containsPlaceholder(artifact.getVersion());
+    }
+
+    private static boolean containsPlaceholder(String value) {
+        return value != null && value.contains("${");
     }
 }
