@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.jar.JarOutputStream;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -217,11 +218,41 @@ class ReactorReader implements MavenWorkspaceReader {
             if (projectHasOutputFromPreviousSession || projectCompiledDuringThisSession) {
                 return outputDirectory;
             }
+
+            if (hasSiteLifecyclePhase(project) && "jar".equals(artifact.getExtension()) && "jar".equals(type)) {
+                return ensureEmptyArtifactFile(artifact);
+            }
         }
 
         // The fall-through indicates that the artifact cannot be found;
         // for instance if package produced nothing or classifier problems.
         return null;
+    }
+
+    private File ensureEmptyArtifactFile(final Artifact artifact) {
+        Path target = getArtifactPath(artifact);
+        synchronized (this) {
+            if (Files.isRegularFile(target)) {
+                return target.toFile();
+            }
+            try {
+                Files.createDirectories(target.getParent());
+                try (JarOutputStream ignored = new JarOutputStream(Files.newOutputStream(target))) {
+                    // create an empty jar for site reports that inspect reactor artifacts before package
+                }
+                return target.toFile();
+            } catch (IOException e) {
+                LOGGER.warn("Unable to create empty reactor artifact for '{}'.", artifact, e);
+                return null;
+            }
+        }
+    }
+
+    private boolean hasSiteLifecyclePhase(MavenProject project) {
+        return project.hasLifecyclePhase("pre-site")
+                || project.hasLifecyclePhase("site")
+                || project.hasLifecyclePhase("post-site")
+                || project.hasLifecyclePhase("site-deploy");
     }
 
     private boolean isPackagedArtifactUpToDate(MavenProject project, File packagedArtifactFile) {
