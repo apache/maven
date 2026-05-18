@@ -587,4 +587,43 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         // The modules list should be empty since we explicitly defined an empty <modules /> element
         assertTrue(parent.getModel().getDelegate().getModules().isEmpty());
     }
+
+    @Test
+    void testVersionInheritedFromRemoteParent() throws Exception {
+        File f1 = getTestFile("src/test/resources/projects/parent-version-inherited-from-remote/pom.xml");
+        MavenProject project = getProject(f1);
+
+        assertNotNull(project, "project should not be null");
+        assertEquals("1.0", project.getVersion(), "version should be inherited from remote parent");
+        assertNotNull(project.getArtifact(), "project artifact should not be null");
+        assertEquals("1.0", project.getArtifact().getVersion(), "artifact version should match inherited version");
+        assertEquals("org.different.group", project.getGroupId(), "groupId should be from child POM");
+        assertEquals("child-project", project.getArtifactId(), "artifactId should be from child POM");
+    }
+
+    @Test
+    void testVersionInheritedFromRemoteParentMultiModule() throws Exception {
+        File pom = getTestFile("src/test/resources/projects/parent-version-inherited-from-remote-multimodule/pom.xml");
+        ProjectBuildingRequest configuration = newBuildingRequest();
+        InternalSession internalSession = InternalSession.from(configuration.getRepositorySession());
+        InternalMavenSession mavenSession = InternalMavenSession.from(internalSession);
+        mavenSession
+                .getMavenSession()
+                .getRequest()
+                .setRootDirectory(pom.toPath().getParent());
+
+        List<ProjectBuildingResult> results = projectBuilder.build(List.of(pom), true, configuration);
+        assertEquals(2, results.size());
+
+        MavenProject child = results.stream()
+                .map(ProjectBuildingResult::getProject)
+                .filter(p -> "child-project".equals(p.getArtifactId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(child, "child project should be found");
+        assertEquals("1.0", child.getVersion(), "version should be inherited from remote parent");
+        assertNotNull(child.getArtifact(), "child project artifact should not be null");
+        assertEquals("1.0", child.getArtifact().getVersion(), "artifact version should match inherited version");
+        assertEquals("org.different.group", child.getGroupId(), "groupId should be from child POM");
+    }
 }

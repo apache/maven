@@ -1,0 +1,10 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.test.aggregator</groupId>
+  <artifactId>aggregator</artifactId>
+  <version>1.0</version>
+  <packaging>pom</packaging>
+  <modules>
+    <module>child</module>
+  </modules>
+</project>
