@@ -350,12 +350,20 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
         }
 
         for (org.apache.maven.api.model.Dependency dependency : model.getDependencies()) {
+            if (hasUninterpolatedExpression(dependency)) {
+                logger.debug("Filtered dependency with uninterpolated expression: {}", dependency);
+                continue;
+            }
             result.addDependency(convert(dependency, stereotypes));
         }
 
         DependencyManagement dependencyManagement = model.getDependencyManagement();
         if (dependencyManagement != null) {
             for (org.apache.maven.api.model.Dependency dependency : dependencyManagement.getDependencies()) {
+                if (hasUninterpolatedExpression(dependency)) {
+                    logger.debug("Filtered managed dependency with uninterpolated expression: {}", dependency);
+                    continue;
+                }
                 result.addManagedDependency(convert(dependency, stereotypes));
             }
         }
@@ -420,6 +428,16 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
 
     private Exclusion convert(org.apache.maven.api.model.Exclusion exclusion) {
         return new Exclusion(exclusion.getGroupId(), exclusion.getArtifactId(), "*", "*");
+    }
+
+    private static boolean hasUninterpolatedExpression(org.apache.maven.api.model.Dependency dependency) {
+        return containsPlaceholder(dependency.getGroupId())
+                || containsPlaceholder(dependency.getArtifactId())
+                || containsPlaceholder(dependency.getVersion());
+    }
+
+    private static boolean containsPlaceholder(String value) {
+        return value != null && value.contains("${");
     }
 
     private void setArtifactProperties(ArtifactDescriptorResult result, Model model) {
