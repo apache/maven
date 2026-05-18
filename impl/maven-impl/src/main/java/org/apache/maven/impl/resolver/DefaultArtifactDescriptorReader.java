@@ -334,6 +334,13 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
     }
 
     private void filterUninterpolatedDependencies(ArtifactDescriptorResult result) {
+        result.getRepositories().removeIf(repo -> {
+            if (containsPlaceholder(repo.getId()) || containsPlaceholder(repo.getUrl())) {
+                logger.debug("Filtered repository with uninterpolated expression: {}", repo);
+                return true;
+            }
+            return false;
+        });
         result.getDependencies().removeIf(dep -> {
             if (hasUninterpolatedExpression(dep.getArtifact())) {
                 logger.debug("Filtered dependency with uninterpolated expression: {}", dep);
