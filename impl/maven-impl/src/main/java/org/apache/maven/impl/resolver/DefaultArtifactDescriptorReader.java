@@ -121,6 +121,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
         Model model = loadPom(session, request, result);
         if (model != null) {
             populateResult(InternalSession.from(session), result, model);
+            filterUninterpolated(result);
         }
 
         return result;
@@ -434,6 +435,36 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
         return containsPlaceholder(dependency.getGroupId())
                 || containsPlaceholder(dependency.getArtifactId())
                 || containsPlaceholder(dependency.getVersion());
+    }
+
+    private void filterUninterpolated(ArtifactDescriptorResult result) {
+        result.getRepositories().removeIf(repo -> {
+            if (containsPlaceholder(repo.getId()) || containsPlaceholder(repo.getUrl())) {
+                logger.debug("Filtered repository with uninterpolated expression: {}", repo);
+                return true;
+            }
+            return false;
+        });
+        result.getDependencies().removeIf(dep -> {
+            if (hasUninterpolatedExpression(dep.getArtifact())) {
+                logger.debug("Filtered dependency with uninterpolated expression: {}", dep);
+                return true;
+            }
+            return false;
+        });
+        result.getManagedDependencies().removeIf(dep -> {
+            if (hasUninterpolatedExpression(dep.getArtifact())) {
+                logger.debug("Filtered managed dependency with uninterpolated expression: {}", dep);
+                return true;
+            }
+            return false;
+        });
+    }
+
+    private static boolean hasUninterpolatedExpression(Artifact artifact) {
+        return containsPlaceholder(artifact.getGroupId())
+                || containsPlaceholder(artifact.getArtifactId())
+                || containsPlaceholder(artifact.getVersion());
     }
 
     private static boolean containsPlaceholder(String value) {
