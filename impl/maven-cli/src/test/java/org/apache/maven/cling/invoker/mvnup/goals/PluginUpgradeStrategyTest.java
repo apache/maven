@@ -196,6 +196,46 @@ class PluginUpgradeStrategyTest {
         }
 
         @Test
+        @DisplayName("should upgrade milestone version below release minimum")
+        void shouldUpgradeMilestoneVersionBelowRelease() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-enforcer-plugin</artifactId>
+                                <version>3.0.0-M1</version>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = saxBuilder.build(new StringReader(pomXml));
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.apply(context, pomMap);
+
+            assertTrue(result.success(), "Plugin upgrade should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have upgraded 3.0.0-M1 to 3.0.0");
+
+            Element root = document.getRootElement();
+            Namespace namespace = root.getNamespace();
+            Element build = root.getChild("build", namespace);
+            Element plugins = build.getChild("plugins", namespace);
+            Element plugin = plugins.getChild("plugin", namespace);
+            String version = plugin.getChildText("version", namespace);
+            assertEquals("3.0.0", version, "3.0.0-M1 should be upgraded to 3.0.0");
+        }
+
+        @Test
         @DisplayName("should upgrade plugin in pluginManagement")
         void shouldUpgradePluginInPluginManagement() throws Exception {
             String pomXml = """

@@ -381,33 +381,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         if (currentVersion == null || minVersion == null) {
             return false;
         }
-
-        // Remove any qualifiers like -SNAPSHOT, -alpha, etc. for comparison
-        String cleanCurrent = currentVersion.split("-")[0];
-        String cleanMin = minVersion.split("-")[0];
-
-        try {
-            String[] currentParts = cleanCurrent.split("\\.");
-            String[] minParts = cleanMin.split("\\.");
-
-            int maxLength = Math.max(currentParts.length, minParts.length);
-
-            for (int i = 0; i < maxLength; i++) {
-                int currentPart = i < currentParts.length ? Integer.parseInt(currentParts[i]) : 0;
-                int minPart = i < minParts.length ? Integer.parseInt(minParts[i]) : 0;
-
-                if (currentPart < minPart) {
-                    return true;
-                } else if (currentPart > minPart) {
-                    return false;
-                }
-            }
-
-            return false; // Versions are equal
-        } catch (NumberFormatException e) {
-            // Fallback to string comparison if parsing fails
-            return currentVersion.compareTo(minVersion) < 0;
-        }
+        return getSession().parseVersion(currentVersion).compareTo(getSession().parseVersion(minVersion)) < 0;
     }
 
     /**
