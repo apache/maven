@@ -479,6 +479,176 @@ class CompatibilityFixStrategyTest {
     }
 
     @Nested
+    @DisplayName("Undefined Property Expression Fixes")
+    class UndefinedPropertyExpressionFixesTests {
+
+        @Test
+        @DisplayName("should comment out dependency with undefined property expression")
+        void shouldCommentOutDependencyWithUndefinedProperty() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <dependencyManagement>
+                        <dependencies>
+                            <dependency>
+                                <groupId>com.google.guava</groupId>
+                                <artifactId>guava</artifactId>
+                                <version>${guava-version}</version>
+                            </dependency>
+                        </dependencies>
+                    </dependencyManagement>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Compatibility fix should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have commented out dependency");
+
+            String xml = DomUtils.toXml(document);
+            assertTrue(xml.contains("mvnup: commented out"), "Should contain comment-out marker");
+            assertTrue(xml.contains("guava-version"), "Should mention the undefined property");
+
+            Element root = document.root();
+            Element depMgmt = DomUtils.findChildElement(root, "dependencyManagement");
+            Element deps = DomUtils.findChildElement(depMgmt, "dependencies");
+            assertEquals(0, deps.childElements("dependency").count(), "Should have no dependency elements");
+        }
+
+        @Test
+        @DisplayName("should not comment out dependency with defined property")
+        void shouldNotCommentOutDependencyWithDefinedProperty() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <properties>
+                        <guava-version>30.0-jre</guava-version>
+                    </properties>
+                    <dependencyManagement>
+                        <dependencies>
+                            <dependency>
+                                <groupId>com.google.guava</groupId>
+                                <artifactId>guava</artifactId>
+                                <version>${guava-version}</version>
+                            </dependency>
+                        </dependencies>
+                    </dependencyManagement>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            strategy.doApply(context, pomMap);
+
+            Element root = document.root();
+            Element depMgmt = DomUtils.findChildElement(root, "dependencyManagement");
+            Element deps = DomUtils.findChildElement(depMgmt, "dependencies");
+            assertEquals(1, deps.childElements("dependency").count(), "Dependency should still be present");
+        }
+
+        @Test
+        @DisplayName("should not comment out dependency with well-known built-in property")
+        void shouldNotCommentOutDependencyWithBuiltinProperty() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>test</groupId>
+                            <artifactId>test-dep</artifactId>
+                            <version>${project.version}</version>
+                        </dependency>
+                    </dependencies>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            strategy.doApply(context, pomMap);
+
+            Element root = document.root();
+            Element deps = DomUtils.findChildElement(root, "dependencies");
+            assertEquals(
+                    1,
+                    deps.childElements("dependency").count(),
+                    "Dependency with built-in property should still be present");
+        }
+
+        @Test
+        @DisplayName("should recognize property defined in another module POM")
+        void shouldRecognizePropertyFromOtherPom() throws Exception {
+            String parentPom = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>parent</artifactId>
+                    <version>1.0.0</version>
+                    <properties>
+                        <guava-version>30.0-jre</guava-version>
+                    </properties>
+                </project>
+                """;
+
+            String childPom = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <parent>
+                        <groupId>test</groupId>
+                        <artifactId>parent</artifactId>
+                        <version>1.0.0</version>
+                    </parent>
+                    <artifactId>child</artifactId>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.google.guava</groupId>
+                            <artifactId>guava</artifactId>
+                            <version>${guava-version}</version>
+                        </dependency>
+                    </dependencies>
+                </project>
+                """;
+
+            Document parentDoc = Document.of(parentPom);
+            Document childDoc = Document.of(childPom);
+            Map<Path, Document> pomMap = Map.of(
+                    Paths.get("pom.xml"), parentDoc,
+                    Paths.get("child/pom.xml"), childDoc);
+
+            UpgradeContext context = createMockContext();
+            strategy.doApply(context, pomMap);
+
+            Element root = childDoc.root();
+            Element deps = DomUtils.findChildElement(root, "dependencies");
+            assertEquals(
+                    1,
+                    deps.childElements("dependency").count(),
+                    "Dependency should not be commented out when property is defined in another POM");
+        }
+    }
+
+    @Nested
     @DisplayName("Strategy Description")
     class StrategyDescriptionTests {
 
