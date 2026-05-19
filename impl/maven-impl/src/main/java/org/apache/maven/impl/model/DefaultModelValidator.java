@@ -372,7 +372,7 @@ public class DefaultModelValidator implements ModelValidator {
         } else if (validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_2_0) {
             validateStringNotEmpty("modelVersion", problems, Severity.ERROR, Version.V20, m.getModelVersion(), m);
 
-            validateModelVersion(problems, m.getModelVersion(), m, ModelBuilder.KNOWN_MODEL_VERSIONS);
+            validateModelVersion(s, problems, m.getModelVersion(), m, ModelBuilder.KNOWN_MODEL_VERSIONS);
 
             Set<String> modules = new HashSet<>();
             for (int i = 0, n = m.getModules().size(); i < n; i++) {
@@ -1238,12 +1238,12 @@ public class DefaultModelValidator implements ModelValidator {
                             d);
 
                     /*
-                     * TODO Extensions like Flex Mojos use custom scopes like "merged", "internal", "external", etc. In
-                     * order to don't break backward-compat with those, only warn but don't error out.
+                     * Extensions like Flex Mojos use custom scopes like "merged", "internal", "external", etc. In
+                     * order to not break backward-compat with those, only warn but don't error out.
                      */
                     ScopeManager scopeManager =
                             InternalSession.from(s).getSession().getScopeManager();
-                    validateEnum(
+                    validateDependencyScope(
                             prefix,
                             "scope",
                             problems,
@@ -1255,7 +1255,8 @@ public class DefaultModelValidator implements ModelValidator {
                             scopeManager.getDependencyScopeUniverse().stream()
                                     .map(DependencyScope::getId)
                                     .distinct()
-                                    .toArray(String[]::new));
+                                    .toArray(String[]::new),
+                            false);
 
                     validateEffectiveModelAgainstDependency(prefix, problems, m, d);
                 } else {
@@ -1265,7 +1266,7 @@ public class DefaultModelValidator implements ModelValidator {
                             .map(DependencyScope::getId)
                             .collect(Collectors.toCollection(HashSet::new));
                     scopes.add("import");
-                    validateEnum(
+                    validateDependencyScope(
                             prefix,
                             "scope",
                             problems,
@@ -1274,7 +1275,8 @@ public class DefaultModelValidator implements ModelValidator {
                             d.getScope(),
                             SourceHint.dependencyManagementKey(d),
                             d,
-                            scopes.toArray(new String[0]));
+                            scopes.toArray(new String[0]),
+                            true);
                 }
             }
         }
@@ -2024,20 +2026,70 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     @SuppressWarnings("checkstyle:parameternumber")
-    private boolean validateModelVersion(
-            ModelProblemCollector problems, String string, InputLocationTracker tracker, List<String> validVersions) {
-        if (string == null || string.isEmpty()) {
+    private boolean validateDependencyScope(
+            String prefix,
+            String fieldName,
+            ModelProblemCollector problems,
+            Severity severity,
+            Version version,
+            String scope,
+            @Nullable SourceHint sourceHint,
+            InputLocationTracker tracker,
+            String[] validScopes,
+            boolean isDependencyManagement) {
+        if (scope == null || scope.isEmpty()) {
             return true;
         }
 
-        if (validVersions.contains(string)) {
+        List<String> values = Arrays.asList(validScopes);
+
+        if (values.contains(scope)) {
+            return true;
+        }
+
+        // Provide a more helpful error message for the 'import' scope
+        if ("import".equals(scope) && !isDependencyManagement) {
+            addViolation(
+                    problems,
+                    severity,
+                    version,
+                    prefix + fieldName,
+                    sourceHint,
+                    "has scope 'import'. The 'import' scope is only valid in <dependencyManagement> sections.",
+                    tracker);
+        } else {
+            addViolation(
+                    problems,
+                    severity,
+                    version,
+                    prefix + fieldName,
+                    sourceHint,
+                    "must be one of " + values + " but is '" + scope + "'.",
+                    tracker);
+        }
+
+        return false;
+    }
+
+    @SuppressWarnings("checkstyle:parameternumber")
+    private boolean validateModelVersion(
+            Session session,
+            ModelProblemCollector problems,
+            String requestedModel,
+            InputLocationTracker tracker,
+            List<String> validVersions) {
+        if (requestedModel == null || requestedModel.isEmpty()) {
+            return true;
+        }
+
+        if (validVersions.contains(requestedModel)) {
             return true;
         }
 
         boolean newerThanAll = true;
         boolean olderThanAll = true;
         for (String validValue : validVersions) {
-            final int comparison = compareModelVersions(validValue, string);
+            final int comparison = compareModelVersions(validValue, requestedModel);
             newerThanAll = newerThanAll && comparison < 0;
             olderThanAll = olderThanAll && comparison > 0;
         }
@@ -2049,8 +2101,10 @@ public class DefaultModelValidator implements ModelValidator {
                     Version.V20,
                     "modelVersion",
                     null,
-                    "of '" + string + "' is newer than the versions supported by this version of Maven: "
-                            + validVersions + ". Building this project requires a newer version of Maven.",
+                    "of '" + requestedModel + "' is newer than the versions supported by this Maven version ("
+                            + getMavenVersionString(session)
+                            + "). Supported modelVersions are: " + validVersions
+                            + ". Building this project requires a newer version of Maven.",
                     tracker);
 
         } else if (olderThanAll) {
@@ -2061,8 +2115,10 @@ public class DefaultModelValidator implements ModelValidator {
                     Version.V20,
                     "modelVersion",
                     null,
-                    "of '" + string + "' is older than the versions supported by this version of Maven: "
-                            + validVersions + ". Building this project requires an older version of Maven.",
+                    "of '" + requestedModel + "' is older than the versions supported by this Maven version ("
+                            + getMavenVersionString(session)
+                            + "). Supported modelVersions are: " + validVersions
+                            + ". Building this project requires an older version of Maven.",
                     tracker);
 
         } else {
@@ -2072,11 +2128,20 @@ public class DefaultModelValidator implements ModelValidator {
                     Version.V20,
                     "modelVersion",
                     null,
-                    "must be one of " + validVersions + " but is '" + string + "'.",
+                    "must be one of " + validVersions + " but is '" + requestedModel + "'.",
                     tracker);
         }
 
         return false;
+    }
+
+    private String getMavenVersionString(Session session) {
+        try {
+            return session.getMavenVersion().toString();
+        } catch (Exception e) {
+            // Fallback for test contexts where RuntimeInformation might not be available
+            return "unknown";
+        }
     }
 
     /**

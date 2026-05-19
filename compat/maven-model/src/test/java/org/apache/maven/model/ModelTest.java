@@ -66,4 +66,17 @@ class ModelTest {
     void testToStringNullSafe() {
         assertNotNull(new Model().toString());
     }
+
+    @Test
+    void testPropertiesClear() {
+        // Test for issue #11552: NullPointerException when clearing properties
+        Model model = new Model();
+        model.addProperty("key1", "value1");
+        model.addProperty("key2", "value2");
+        assertEquals(2, model.getProperties().size());
+
+        // This should not throw NullPointerException
+        model.getProperties().clear();
+        assertEquals(0, model.getProperties().size());
+    }
 }
