@@ -282,6 +282,203 @@ class CompatibilityFixStrategyTest {
     }
 
     @Nested
+    @DisplayName("Repository Expression Fixes")
+    class RepositoryExpressionFixesTests {
+
+        @Test
+        @DisplayName("should replace ${basedir} with ${project.basedir} in repository URLs")
+        void shouldReplaceBasedirInRepositoryUrls() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <repositories>
+                        <repository>
+                            <id>local-repo</id>
+                            <url>file://${basedir}/internal-repository</url>
+                        </repository>
+                    </repositories>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Compatibility fix should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have fixed basedir expression");
+
+            Element root = document.root();
+            Element repositories = DomUtils.findChildElement(root, "repositories");
+            Element repository = DomUtils.findChildElement(repositories, "repository");
+            Element url = DomUtils.findChildElement(repository, "url");
+            assertEquals(
+                    "file://${project.basedir}/internal-repository",
+                    url.textContent().trim(),
+                    "Should have replaced ${basedir} with ${project.basedir}");
+        }
+
+        @Test
+        @DisplayName("should replace ${pom.basedir} with ${project.basedir} in repository URLs")
+        void shouldReplacePomBasedirInRepositoryUrls() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <repositories>
+                        <repository>
+                            <id>local-repo</id>
+                            <url>file://${pom.basedir}/lib</url>
+                        </repository>
+                    </repositories>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Compatibility fix should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have fixed pom.basedir expression");
+
+            Element root = document.root();
+            Element repositories = DomUtils.findChildElement(root, "repositories");
+            Element repository = DomUtils.findChildElement(repositories, "repository");
+            Element url = DomUtils.findChildElement(repository, "url");
+            assertEquals(
+                    "file://${project.basedir}/lib",
+                    url.textContent().trim(),
+                    "Should have replaced ${pom.basedir} with ${project.basedir}");
+        }
+
+        @Test
+        @DisplayName("should replace ${basedir} in pluginRepository URLs")
+        void shouldReplaceBasedirInPluginRepositoryUrls() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <pluginRepositories>
+                        <pluginRepository>
+                            <id>local-plugins</id>
+                            <url>file://${basedir}/plugin-repo</url>
+                        </pluginRepository>
+                    </pluginRepositories>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Compatibility fix should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have fixed basedir in pluginRepository");
+
+            Element root = document.root();
+            Element pluginRepositories = DomUtils.findChildElement(root, "pluginRepositories");
+            Element pluginRepository = DomUtils.findChildElement(pluginRepositories, "pluginRepository");
+            Element url = DomUtils.findChildElement(pluginRepository, "url");
+            assertEquals(
+                    "file://${project.basedir}/plugin-repo",
+                    url.textContent().trim(),
+                    "Should have replaced ${basedir} with ${project.basedir}");
+        }
+
+        @Test
+        @DisplayName("should replace ${basedir} in profile repository URLs")
+        void shouldReplaceBasedirInProfileRepositoryUrls() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <profiles>
+                        <profile>
+                            <id>local</id>
+                            <repositories>
+                                <repository>
+                                    <id>local-repo</id>
+                                    <url>file://${basedir}/repo</url>
+                                </repository>
+                            </repositories>
+                        </profile>
+                    </profiles>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Compatibility fix should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have fixed basedir in profile repository");
+
+            Element root = document.root();
+            Element profiles = DomUtils.findChildElement(root, "profiles");
+            Element profile = DomUtils.findChildElement(profiles, "profile");
+            Element repositories = DomUtils.findChildElement(profile, "repositories");
+            Element repository = DomUtils.findChildElement(repositories, "repository");
+            Element url = DomUtils.findChildElement(repository, "url");
+            assertEquals(
+                    "file://${project.basedir}/repo",
+                    url.textContent().trim(),
+                    "Should have replaced ${basedir} with ${project.basedir}");
+        }
+
+        @Test
+        @DisplayName("should not modify repository URLs without deprecated expressions")
+        void shouldNotModifyUrlsWithoutDeprecatedExpressions() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <repositories>
+                        <repository>
+                            <id>central</id>
+                            <url>https://repo.maven.apache.org/maven2</url>
+                        </repository>
+                        <repository>
+                            <id>local-repo</id>
+                            <url>file://${project.basedir}/repo</url>
+                        </repository>
+                    </repositories>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Compatibility fix should succeed");
+            assertEquals(0, result.modifiedCount(), "Should not have modified any POMs");
+        }
+    }
+
+    @Nested
     @DisplayName("Strategy Description")
     class StrategyDescriptionTests {
 
