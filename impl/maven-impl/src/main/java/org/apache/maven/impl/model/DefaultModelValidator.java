@@ -696,14 +696,14 @@ public class DefaultModelValidator implements ModelValidator {
             DistributionManagement distMgmt = model.getDistributionManagement();
             if (distMgmt != null) {
                 validateRawRepository(
-                        problems, distMgmt.getRepository(), "distributionManagement.repository.", "", true, false);
+                        problems, distMgmt.getRepository(), "distributionManagement.repository.", "", true, true);
                 validateRawRepository(
                         problems,
                         distMgmt.getSnapshotRepository(),
                         "distributionManagement.snapshotRepository.",
                         "",
                         true,
-                        false);
+                        true);
             }
         }
     }

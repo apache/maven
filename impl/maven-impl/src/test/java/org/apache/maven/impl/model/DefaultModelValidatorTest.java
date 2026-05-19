@@ -929,18 +929,23 @@ class DefaultModelValidatorTest {
     void repositoryWithUninterpolatedId() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/repository-with-uninterpolated-id.xml");
         // Uninterpolated expressions in repository IDs should cause validation errors
-        assertViolations(result, 0, 3, 0);
+        // distributionManagement repositories skip expression check since parent properties
+        // may not be available at file model validation stage
+        assertViolations(result, 0, 2, 0);
 
-        // Check that all three repository ID validation errors are present
+        // Check that repository ID validation errors are present for repositories and pluginRepositories
         assertTrue(result.getErrors().stream()
                 .anyMatch(error -> error.contains("repositories.repository.[${repository.id}].id")
                         && error.contains("contains an uninterpolated expression")));
         assertTrue(result.getErrors().stream()
                 .anyMatch(error -> error.contains("pluginRepositories.pluginRepository.[${plugin.repository.id}].id")
                         && error.contains("contains an uninterpolated expression")));
-        assertTrue(result.getErrors().stream()
-                .anyMatch(error -> error.contains("distributionManagement.repository.[${staging.repository.id}].id")
-                        && error.contains("contains an uninterpolated expression")));
+    }
+
+    @Test
+    void distributionManagementWithChainedPropertyInId() throws Exception {
+        SimpleProblemCollector result = validateRaw("raw-model/dm-with-chained-property-in-id.xml");
+        assertViolations(result, 0, 0, 0);
     }
 
     @Test
