@@ -209,21 +209,20 @@ class PluginUpgradeStrategyTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
 
             UpgradeContext context = createMockContext();
-            UpgradeResult result = strategy.apply(context, pomMap);
+            UpgradeResult result = strategy.doApply(context, pomMap);
 
             assertTrue(result.success(), "Plugin upgrade should succeed");
             assertTrue(result.modifiedCount() > 0, "Should have upgraded 3.0.0-M1 to 3.0.0");
 
-            Element root = document.getRootElement();
-            Namespace namespace = root.getNamespace();
-            Element build = root.getChild("build", namespace);
-            Element plugins = build.getChild("plugins", namespace);
-            Element plugin = plugins.getChild("plugin", namespace);
-            String version = plugin.getChildText("version", namespace);
+            Editor editor = new Editor(document);
+            Element root = editor.root();
+            String version = root.path("build", "plugins", "plugin", "version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
             assertEquals("3.0.0", version, "3.0.0-M1 should be upgraded to 3.0.0");
         }
 
