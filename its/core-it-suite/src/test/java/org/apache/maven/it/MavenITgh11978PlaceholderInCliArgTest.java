@@ -83,6 +83,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class MavenITgh11978PlaceholderInCliArgTest extends AbstractMavenIntegrationTestCase {
 
+    MavenITgh11978PlaceholderInCliArgTest() {
+        super("[4.0.0-rc-1,)");
+    }
+
     @Test
     void testIt() throws Exception {
         Path basedir = extractResources("/gh-11978-placeholder-in-cli-arg")
