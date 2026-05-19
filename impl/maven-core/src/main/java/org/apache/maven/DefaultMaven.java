@@ -217,6 +217,7 @@ public class DefaultMaven implements Maven {
             session.setSession(defaultSessionFactory.newSession(session));
 
             sessionScope.seed(MavenSession.class, session);
+            sessionScope.seed(RepositorySystemSession.class, closeableSession);
             sessionScope.seed(Session.class, session.getSession());
             sessionScope.seed(InternalMavenSession.class, InternalMavenSession.from(session.getSession()));
 

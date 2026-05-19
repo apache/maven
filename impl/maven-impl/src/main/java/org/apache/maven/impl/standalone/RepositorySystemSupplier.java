@@ -37,6 +37,7 @@ import org.eclipse.aether.impl.Installer;
 import org.eclipse.aether.impl.LocalRepositoryProvider;
 import org.eclipse.aether.impl.MetadataGeneratorFactory;
 import org.eclipse.aether.impl.MetadataResolver;
+import org.eclipse.aether.impl.NamedLockFactorySelector;
 import org.eclipse.aether.impl.OfflineController;
 import org.eclipse.aether.impl.RemoteRepositoryFilterManager;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
@@ -68,7 +69,6 @@ import org.eclipse.aether.internal.impl.DefaultRepositoryLayoutProvider;
 import org.eclipse.aether.internal.impl.DefaultRepositorySystem;
 import org.eclipse.aether.internal.impl.DefaultRepositorySystemLifecycle;
 import org.eclipse.aether.internal.impl.DefaultRepositorySystemValidator;
-import org.eclipse.aether.internal.impl.DefaultTrackingFileManager;
 import org.eclipse.aether.internal.impl.DefaultTransporterProvider;
 import org.eclipse.aether.internal.impl.DefaultUpdateCheckManager;
 import org.eclipse.aether.internal.impl.DefaultUpdatePolicyAnalyzer;
@@ -78,6 +78,7 @@ import org.eclipse.aether.internal.impl.LocalPathPrefixComposerFactory;
 import org.eclipse.aether.internal.impl.Maven2RepositoryLayoutFactory;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.internal.impl.TrackingFileManager;
+import org.eclipse.aether.internal.impl.TrackingFileManagerSupplier;
 import org.eclipse.aether.internal.impl.checksum.DefaultChecksumAlgorithmFactorySelector;
 import org.eclipse.aether.internal.impl.checksum.Md5ChecksumAlgorithmFactory;
 import org.eclipse.aether.internal.impl.checksum.Sha1ChecksumAlgorithmFactory;
@@ -95,6 +96,7 @@ import org.eclipse.aether.internal.impl.filter.FilteringPipelineRepositoryConnec
 import org.eclipse.aether.internal.impl.filter.GroupIdRemoteRepositoryFilterSource;
 import org.eclipse.aether.internal.impl.filter.PrefixesLockingInhibitorFactory;
 import org.eclipse.aether.internal.impl.filter.PrefixesRemoteRepositoryFilterSource;
+import org.eclipse.aether.internal.impl.named.DefaultNamedLockFactorySelector;
 import org.eclipse.aether.internal.impl.offline.OfflinePipelineRepositoryConnectorFactory;
 import org.eclipse.aether.internal.impl.synccontext.DefaultSyncContextFactory;
 import org.eclipse.aether.internal.impl.synccontext.named.NameMapper;
@@ -188,8 +190,8 @@ public class RepositorySystemSupplier {
 
     @Singleton
     @Provides
-    static TrackingFileManager newTrackingFileManager() {
-        return new DefaultTrackingFileManager();
+    static TrackingFileManager newTrackingFileManager(NamedLockFactorySelector namedLockFactorySelector) {
+        return new TrackingFileManagerSupplier(namedLockFactorySelector).get();
     }
 
     @Singleton
@@ -378,12 +380,18 @@ public class RepositorySystemSupplier {
 
     @Singleton
     @Provides
+    static NamedLockFactorySelector newNamedLockFactorySelector(
+            Map<String, NamedLockFactory> factories, RepositorySystemLifecycle lifecycle) {
+        return new DefaultNamedLockFactorySelector(factories, lifecycle);
+    }
+
+    @Singleton
+    @Provides
     static NamedLockFactoryAdapterFactory newNamedLockFactoryAdapterFactory(
-            Map<String, NamedLockFactory> factories,
+            NamedLockFactorySelector namedLockFactorySelector,
             Map<String, NameMapper> nameMappers,
-            Map<String, LockingInhibitorFactory> lockingInhibitorFactories,
-            RepositorySystemLifecycle lifecycle) {
-        return new NamedLockFactoryAdapterFactoryImpl(factories, nameMappers, lockingInhibitorFactories, lifecycle);
+            Map<String, LockingInhibitorFactory> lockingInhibitorFactories) {
+        return new NamedLockFactoryAdapterFactoryImpl(namedLockFactorySelector, nameMappers, lockingInhibitorFactories);
     }
 
     @Singleton
