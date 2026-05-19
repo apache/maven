@@ -291,7 +291,7 @@ cmd="\"$JAVACMD\" \
 
 # Add remaining arguments with proper quoting
 for arg in "$@"; do
-    cmd="$cmd \"$arg\""
+    cmd="$cmd '$arg'"
 done
 
 if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
