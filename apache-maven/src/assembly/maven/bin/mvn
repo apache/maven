@@ -291,7 +291,7 @@ cmd="\"$JAVACMD\" \
 
 if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
   echo "[DEBUG] Launching JVM with command:" >&2
-  echo "[DEBUG]   $cmd" "$@" >&2
+  printf '[DEBUG]   %s' "$cmd" >&2; printf ' "%s"' "$@" >&2; echo >&2
 fi
 
 # User arguments ("$@") are passed directly to preserve literal values
