@@ -107,12 +107,16 @@ class DefaultModelBuilderTest {
                         Repository.newBuilder()
                                 .id("third")
                                 .url("${thirdParentRepo}")
+                                .build(),
+                        Repository.newBuilder()
+                                .id("${uninterpolatedRepoId}")
+                                .url("https://valid.url")
                                 .build()))
                 .build();
 
         state.mergeRepositories(model, false);
 
-        // after merge
+        // after merge: "second" filtered (uninterpolated URL), "${uninterpolatedRepoId}" filtered (uninterpolated ID)
         repositories = (List<RemoteRepository>) repositoriesField.get(state);
         assertEquals(3, repositories.size());
         assertEquals("first", repositories.get(0).getId());
