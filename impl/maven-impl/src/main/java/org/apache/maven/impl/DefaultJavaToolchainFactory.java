@@ -87,7 +87,14 @@ public class DefaultJavaToolchainFactory implements ToolchainFactory {
         }
         String javaHome = normal.toString();
 
-        return new DefaultJavaToolchain(model, javaHome, matchers);
+        Version javaVersion = model.getProvides().entrySet().stream()
+                .filter(entry -> "version".equals(entry.getKey()))
+                .map(Map.Entry::getValue)
+                .map(versionParser::parseVersion)
+                .findAny()
+                .orElse(null);
+
+        return new DefaultJavaToolchain(model, javaHome, javaVersion, matchers);
     }
 
     @Nonnull
@@ -102,15 +109,24 @@ public class DefaultJavaToolchainFactory implements ToolchainFactory {
         final String javaHome;
         final Map<String, Predicate<String>> matchers;
 
-        DefaultJavaToolchain(ToolchainModel model, String javaHome, Map<String, Predicate<String>> matchers) {
+        private Version javaVersion;
+
+        DefaultJavaToolchain(
+                ToolchainModel model, String javaHome, Version javaVersion, Map<String, Predicate<String>> matchers) {
             this.model = model;
             this.javaHome = javaHome;
+            this.javaVersion = javaVersion;
             this.matchers = matchers;
         }
 
         @Override
         public String getJavaHome() {
             return javaHome;
+        }
+
+        @Override
+        public Version getJavaVersion() {
+            return javaVersion;
         }
 
         @Override

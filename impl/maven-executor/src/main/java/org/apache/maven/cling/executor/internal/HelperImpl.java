@@ -23,10 +23,10 @@ import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.api.cli.Executor;
-import org.apache.maven.api.cli.ExecutorException;
-import org.apache.maven.api.cli.ExecutorRequest;
+import org.apache.maven.cling.executor.Executor;
+import org.apache.maven.cling.executor.ExecutorException;
 import org.apache.maven.cling.executor.ExecutorHelper;
+import org.apache.maven.cling.executor.ExecutorRequest;
 
 import static java.util.Objects.requireNonNull;
 

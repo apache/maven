@@ -144,7 +144,7 @@ public class ReactorGraph {
             Files.write(Paths.get("target/graph/intermediary_graph.dot"), dotContent.getBytes());
             System.out.println("Intermediary graph written to intermediary_graph.dot");
 
-            // Render graph to SVF
+            // Render graph to SVG
             Graphviz.fromGraph(clusteredGraph)
                     .engine(Engine.FDP)
                     .render(Format.SVG).toFile(new File("target/graph/intermediary_graph.svg"));
@@ -185,40 +185,30 @@ public class ReactorGraph {
             MutableGraph cluster = entry.getValue();
 
             String headerColor = clusterName.startsWith("Maven") ? "black" : "#808080";  // #808080 is a middle gray
+            String prefix;
+            switch (clusterName) {
+                case "MavenAPI": prefix = "../api/"; break;
+                case "MavenImplementation": prefix = "../impl/"; break;
+                case "MavenCompatibility": prefix = "../compat/"; break;
+                case "MavenResolver": prefix = "https://maven.apache.org/resolver/"; break;
+                default: prefix = null;
+            }
+
             StringBuilder labelBuilder = new StringBuilder();
-            labelBuilder.append("<table border='0' cellborder='0' cellspacing='0'>");
-            labelBuilder.append("<tr><td bgcolor='")
+            labelBuilder.append("<table border='0' cellborder='0' cellspacing='0'>")
+                    .append("<th border='1'><td cellpadding='5' bgcolor='")
                     .append(headerColor)
-                    .append("'><font color='white'>")
+                    .append("'><font color='white'><b>&nbsp;")
                     .append(key)
-                    .append("</font></td></tr>");
+                    .append("&nbsp;</b></font></td></th>");
             cluster.nodes().stream().map(MutableNode::name).map(Label::toString).sorted()
                     .forEach(nodeName -> {
-                        labelBuilder.append("<tr>");
-                        String prefix = null;
-                        switch (clusterName) {
-                            case "MavenAPI": prefix = "../api/"; break;
-                            case "MavenImplementation": prefix = "../impl/"; break;
-                            case "MavenCompatibility": prefix = "../compat/"; break;
-                            case "MavenResolver": prefix = "https://maven.apache.org/resolver/"; break;
-                        }
+                        labelBuilder.append("<tr><td align='left'");
                         if (prefix != null) {
-                            labelBuilder.append("<td")
-                                    .append(" href=\"")
-                                    .append(prefix)
-                                    .append(nodeName)
-                                    .append("\"")
-                                    .append(" title=\"")
-                                    .append(nodeName)
-                                    .append("\"")
-                                    .append(" target=\"_parent\"")
-                                    .append(">")
-                                    .append(nodeName)
-                                    .append("</td>");
-                        } else {
-                            labelBuilder.append("<td>").append(nodeName).append("</td>");
+                            labelBuilder.append(" href='").append(prefix).append(nodeName)
+                                    .append("' title='").append(nodeName).append("' target='_parent'");
                         }
-                        labelBuilder.append("</tr>");
+                        labelBuilder.append(">").append(nodeName).append("</td></tr>");
                     });
             labelBuilder.append("</table>");
 
@@ -256,6 +246,17 @@ public class ReactorGraph {
                 }
             }
         }
+
+        // force top group
+        MutableGraph topGroup = mutGraph("top")
+                .setDirected(true)
+                .graphAttrs().add(Rank.inSubgraph(Rank.RankType.SAME))
+                .add(
+                        mutNode("MavenResolver"),
+                        mutNode("MavenAPI"),
+                        mutNode("MavenImplementation")
+                );
+        highLevelGraph.add(topGroup);
 
         return highLevelGraph;
     }

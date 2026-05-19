@@ -45,9 +45,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import org.apache.maven.api.cli.Executor;
-import org.apache.maven.api.cli.ExecutorException;
-import org.apache.maven.api.cli.ExecutorRequest;
+import org.apache.maven.cling.executor.Executor;
+import org.apache.maven.cling.executor.ExecutorException;
+import org.apache.maven.cling.executor.ExecutorRequest;
 
 import static java.util.Objects.requireNonNull;
 
@@ -267,7 +267,11 @@ public class EmbeddedMavenExecutor implements Executor {
                     throw new IllegalArgumentException(getClass().getSimpleName() + " w/ mvn3 does not support command "
                             + executorRequest.command());
                 }
-                keepAlive.add(cliClass.getClassLoader().loadClass("org.fusesource.jansi.internal.JansiLoader"));
+                // 3.9.x
+                mayAddToKeepAlive(keepAlive, cliClass, "org.fusesource.jansi.internal.JansiLoader");
+                // 3.10.x
+                mayAddToKeepAlive(keepAlive, cliClass, "org.jline.nativ.JLineNativeLoader");
+
                 Constructor<?> newMavenCli = cliClass.getConstructor(classWorld.getClass());
                 Object mavenCli = newMavenCli.newInstance(classWorld);
                 Class<?>[] parameterTypes = {String[].class, String.class, PrintStream.class, PrintStream.class};
@@ -292,7 +296,7 @@ public class EmbeddedMavenExecutor implements Executor {
                 });
             } else {
                 // assume 4.x
-                keepAlive.add(cliClass.getClassLoader().loadClass("org.jline.nativ.JLineNativeLoader"));
+                mayAddToKeepAlive(keepAlive, cliClass, "org.jline.nativ.JLineNativeLoader");
                 for (Map.Entry<String, String> cmdEntry : MVN4_MAIN_CLASSES.entrySet()) {
                     Class<?> cmdClass = cliClass.getClassLoader().loadClass(cmdEntry.getValue());
                     Method mainMethod = cmdClass.getMethod(
@@ -334,6 +338,15 @@ public class EmbeddedMavenExecutor implements Executor {
         } finally {
             Thread.currentThread().setContextClassLoader(originalClassLoader);
             System.setProperties(originalProperties);
+        }
+    }
+
+    private boolean mayAddToKeepAlive(List<Object> keepAlive, Class<?> cliClass, String className) {
+        try {
+            keepAlive.add(cliClass.getClassLoader().loadClass(className));
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
         }
     }
 

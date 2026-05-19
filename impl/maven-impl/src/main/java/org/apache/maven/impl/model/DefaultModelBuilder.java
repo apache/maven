@@ -541,7 +541,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                     // filter out transitive invalid repositories
                     // this should be safe because invalid repo coming from build POMs
                     // have been rejected earlier during validation
-                    .filter(repo -> repo.getUrl() != null && !repo.getUrl().contains("${"))
+                    .filter(repo -> repo.getUrl() != null
+                            && !repo.getUrl().contains("${")
+                            && (repo.getId() == null || !repo.getId().contains("${")))
                     .map(session::createRemoteRepository)
                     .toList();
             if (replace) {

@@ -59,10 +59,6 @@ public class MavenPropertiesTest {
                 test=test
                 """;
 
-    /*
-     * (non-Javadoc)
-     * @see junit.framework.TestCase#setUp()
-     */
     @BeforeEach
     public void setUp() throws Exception {
         properties = new MavenProperties();
