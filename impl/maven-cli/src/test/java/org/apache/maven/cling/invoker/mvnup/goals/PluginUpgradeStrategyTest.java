@@ -209,21 +209,20 @@ class PluginUpgradeStrategyTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
 
             UpgradeContext context = createMockContext();
-            UpgradeResult result = strategy.apply(context, pomMap);
+            UpgradeResult result = strategy.doApply(context, pomMap);
 
             assertTrue(result.success(), "Plugin upgrade should succeed");
             assertTrue(result.modifiedCount() > 0, "Should have upgraded 3.0.0-M1 to 3.0.0");
 
-            Element root = document.getRootElement();
-            Namespace namespace = root.getNamespace();
-            Element build = root.getChild("build", namespace);
-            Element plugins = build.getChild("plugins", namespace);
-            Element plugin = plugins.getChild("plugin", namespace);
-            String version = plugin.getChildText("version", namespace);
+            Editor editor = new Editor(document);
+            Element root = editor.root();
+            String version = root.path("build", "plugins", "plugin", "version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
             assertEquals("3.0.0", version, "3.0.0-M1 should be upgraded to 3.0.0");
         }
 
@@ -310,6 +309,84 @@ class PluginUpgradeStrategyTest {
                     .map(Element::textContentTrimmed)
                     .orElse(null);
             assertEquals("3.5.0", version);
+        }
+
+        @Test
+        @DisplayName("should upgrade surefire plugin when below minimum")
+        void shouldUpgradeSurefirePluginWhenBelowMinimum() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-surefire-plugin</artifactId>
+                                <version>3.1.2</version>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Plugin upgrade should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have upgraded maven-surefire-plugin");
+
+            Editor editor = new Editor(document);
+            Element root = editor.root();
+            String version = root.path("build", "plugins", "plugin", "version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals("3.5.2", version);
+        }
+
+        @Test
+        @DisplayName("should upgrade failsafe plugin when below minimum")
+        void shouldUpgradeFailsafePluginWhenBelowMinimum() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-failsafe-plugin</artifactId>
+                                <version>3.1.2</version>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Plugin upgrade should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have upgraded maven-failsafe-plugin");
+
+            Editor editor = new Editor(document);
+            Element root = editor.root();
+            String version = root.path("build", "plugins", "plugin", "version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals("3.5.2", version);
         }
 
         @Test
@@ -535,9 +612,15 @@ class PluginUpgradeStrategyTest {
                     upgrades.stream().anyMatch(upgrade -> "maven-compiler-plugin".equals(upgrade.artifactId()));
             boolean hasExecPlugin =
                     upgrades.stream().anyMatch(upgrade -> "maven-exec-plugin".equals(upgrade.artifactId()));
+            boolean hasSurefirePlugin =
+                    upgrades.stream().anyMatch(upgrade -> "maven-surefire-plugin".equals(upgrade.artifactId()));
+            boolean hasFailsafePlugin =
+                    upgrades.stream().anyMatch(upgrade -> "maven-failsafe-plugin".equals(upgrade.artifactId()));
 
             assertTrue(hasCompilerPlugin, "Should include maven-compiler-plugin upgrade");
             assertTrue(hasExecPlugin, "Should include maven-exec-plugin upgrade");
+            assertTrue(hasSurefirePlugin, "Should include maven-surefire-plugin upgrade");
+            assertTrue(hasFailsafePlugin, "Should include maven-failsafe-plugin upgrade");
         }
 
         @Test
