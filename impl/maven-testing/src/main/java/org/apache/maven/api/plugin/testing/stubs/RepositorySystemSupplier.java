@@ -112,7 +112,6 @@ import org.eclipse.aether.internal.impl.LocalPathPrefixComposerFactory;
 import org.eclipse.aether.internal.impl.Maven2RepositoryLayoutFactory;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.internal.impl.TrackingFileManager;
-import org.eclipse.aether.internal.impl.named.DefaultNamedLockFactorySelector;
 import org.eclipse.aether.internal.impl.checksum.DefaultChecksumAlgorithmFactorySelector;
 import org.eclipse.aether.internal.impl.checksum.Md5ChecksumAlgorithmFactory;
 import org.eclipse.aether.internal.impl.checksum.Sha1ChecksumAlgorithmFactory;
@@ -130,6 +129,7 @@ import org.eclipse.aether.internal.impl.filter.FilteringPipelineRepositoryConnec
 import org.eclipse.aether.internal.impl.filter.GroupIdRemoteRepositoryFilterSource;
 import org.eclipse.aether.internal.impl.filter.PrefixesLockingInhibitorFactory;
 import org.eclipse.aether.internal.impl.filter.PrefixesRemoteRepositoryFilterSource;
+import org.eclipse.aether.internal.impl.named.DefaultNamedLockFactorySelector;
 import org.eclipse.aether.internal.impl.offline.OfflinePipelineRepositoryConnectorFactory;
 import org.eclipse.aether.internal.impl.resolution.TrustedChecksumsArtifactResolverPostProcessor;
 import org.eclipse.aether.internal.impl.synccontext.DefaultSyncContextFactory;
@@ -446,8 +446,7 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
     }
 
     protected NamedLockFactoryAdapterFactory createNamedLockFactoryAdapterFactory() {
-        return new NamedLockFactoryAdapterFactoryImpl(
-                getNamedLockFactorySelector(), getNameMappers(), getLockingInhibitorFactories());
+        return new NamedLockFactoryAdapterFactoryImpl(getNamedLockFactorySelector(), getNameMappers(), getLockingInhibitorFactories());
     }
 
     private SyncContextFactory syncContextFactory;
