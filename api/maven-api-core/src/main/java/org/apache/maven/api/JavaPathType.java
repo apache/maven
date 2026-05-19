@@ -30,6 +30,7 @@ import java.util.StringJoiner;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
  * The option of a Java command-line tool where to place the paths to some dependencies.
@@ -170,6 +171,7 @@ public enum JavaPathType implements PathType {
      *
      * @see #location()
      */
+    @Nullable
     private final JavaFileManager.Location location;
 
     /**
@@ -177,6 +179,7 @@ public enum JavaPathType implements PathType {
      *
      * @see #option()
      */
+    @Nullable
     private final String option;
 
     /**
@@ -185,7 +188,7 @@ public enum JavaPathType implements PathType {
      * @param location the {@code javax.tool} enumeration value, or {@code null} if none.
      * @param option the Java tools option for this path, or {@code null} if none
      */
-    JavaPathType(JavaFileManager.Location location, String option) {
+    JavaPathType(@Nullable JavaFileManager.Location location, @Nullable String option) {
         this.location = location;
         this.option = option;
     }
@@ -260,7 +263,7 @@ public enum JavaPathType implements PathType {
     /**
      * Implementation shared with {@link Modular}.
      */
-    final String[] format(String moduleName, Iterable<? extends Path> paths) {
+    final String[] format(@Nullable String moduleName, Iterable<? extends Path> paths) {
         if (option == null) {
             throw new IllegalStateException("No option is associated to this path type.");
         }

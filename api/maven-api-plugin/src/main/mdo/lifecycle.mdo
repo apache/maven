@@ -120,6 +120,7 @@ under the License.
      *
      * @return String
      */
+    @Nullable
     public String getEffectiveId() {
         if (executionPoint == null) {
             if (priority == 0) {

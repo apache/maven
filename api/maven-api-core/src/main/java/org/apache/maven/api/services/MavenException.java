@@ -19,6 +19,7 @@
 package org.apache.maven.api.services;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
  * Base class for all maven exceptions.
@@ -30,15 +31,15 @@ public class MavenException extends RuntimeException {
 
     public MavenException() {}
 
-    public MavenException(String message) {
+    public MavenException(@Nullable String message) {
         super(message);
     }
 
-    public MavenException(String message, Throwable cause) {
+    public MavenException(@Nullable String message, @Nullable Throwable cause) {
         super(message, cause);
     }
 
-    public MavenException(Throwable cause) {
+    public MavenException(@Nullable Throwable cause) {
         super(cause);
     }
 }

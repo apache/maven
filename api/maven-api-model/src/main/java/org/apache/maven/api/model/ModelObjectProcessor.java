@@ -84,9 +84,12 @@ public interface ModelObjectProcessor {
 
         ModelObjectProcessor processor = ProcessorHolder.CACHED_PROCESSOR.get();
         if (processor == null) {
-            processor = loadProcessor();
-            ProcessorHolder.CACHED_PROCESSOR.compareAndSet(null, processor);
+            ModelObjectProcessor newProcessor = loadProcessor();
+            ProcessorHolder.CACHED_PROCESSOR.compareAndSet(null, newProcessor);
             processor = ProcessorHolder.CACHED_PROCESSOR.get();
+            if (processor == null) {
+                processor = newProcessor;
+            }
         }
         return processor.process(object);
     }

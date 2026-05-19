@@ -116,20 +116,29 @@ public interface ProtoSession {
     }
 
     class Builder {
+        @Nullable
         private Map<String, String> userProperties;
+
+        @Nullable
         private Map<String, String> systemProperties;
+
+        @Nullable
         private Instant startTime;
+
+        @Nullable
         private Path topDirectory;
+
+        @Nullable
         private Path rootDirectory;
 
         private Builder() {}
 
         private Builder(
-                Map<String, String> userProperties,
-                Map<String, String> systemProperties,
-                Instant startTime,
-                Path topDirectory,
-                Path rootDirectory) {
+                @Nullable Map<String, String> userProperties,
+                @Nullable Map<String, String> systemProperties,
+                @Nullable Instant startTime,
+                @Nullable Path topDirectory,
+                @Nullable Path rootDirectory) {
             this.userProperties = userProperties;
             this.systemProperties = systemProperties;
             this.startTime = startTime;
@@ -163,7 +172,12 @@ public interface ProtoSession {
         }
 
         public ProtoSession build() {
-            return new Impl(userProperties, systemProperties, startTime, topDirectory, rootDirectory);
+            return new Impl(
+                    requireNonNull(userProperties, "userProperties cannot be null"),
+                    requireNonNull(systemProperties, "systemProperties cannot be null"),
+                    requireNonNull(startTime, "startTime cannot be null"),
+                    requireNonNull(topDirectory, "topDirectory cannot be null"),
+                    rootDirectory);
         }
 
         private static class Impl implements ProtoSession {
@@ -172,14 +186,16 @@ public interface ProtoSession {
             private final Map<String, String> effectiveProperties;
             private final Instant startTime;
             private final Path topDirectory;
+
+            @Nullable
             private final Path rootDirectory;
 
             private Impl(
-                    Map<String, String> userProperties,
-                    Map<String, String> systemProperties,
-                    Instant startTime,
-                    Path topDirectory,
-                    Path rootDirectory) {
+                    @Nonnull Map<String, String> userProperties,
+                    @Nonnull Map<String, String> systemProperties,
+                    @Nonnull Instant startTime,
+                    @Nonnull Path topDirectory,
+                    @Nullable Path rootDirectory) {
                 this.userProperties = Map.copyOf(userProperties);
                 this.systemProperties = Map.copyOf(systemProperties);
                 Map<String, String> cp = new HashMap<>(systemProperties);

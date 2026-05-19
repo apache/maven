@@ -74,6 +74,7 @@ public interface ArtifactResolverResult extends Result<ArtifactResolverRequest> 
      * @param coordinates The {@link ArtifactCoordinates} identifying the artifact.
      * @return The corresponding {@link ResultItem}, or {@code null} if no result exists.
      */
+    @Nullable
     default ResultItem getResult(ArtifactCoordinates coordinates) {
         return getResults().get(coordinates);
     }

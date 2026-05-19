@@ -26,6 +26,7 @@ import java.util.Objects;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
  * Service for creating {@link PathMatcher} objects that can be used to filter files
@@ -66,8 +67,8 @@ public interface PathMatcherFactory extends Service {
     @Nonnull
     PathMatcher createPathMatcher(
             @Nonnull Path baseDirectory,
-            Collection<String> includes,
-            Collection<String> excludes,
+            @Nullable Collection<String> includes,
+            @Nullable Collection<String> excludes,
             boolean useDefaultExcludes);
 
     /**

@@ -191,18 +191,38 @@ public interface DependencyResolverRequest extends RepositoryAwareRequest {
     @NotThreadSafe
     class DependencyResolverRequestBuilder {
 
+        @Nullable
         Session session;
+
+        @Nullable
         RequestTrace trace;
+
+        @Nullable
         RequestType requestType;
+
+        @Nullable
         Project project;
+
+        @Nullable
         Artifact rootArtifact;
+
+        @Nullable
         DependencyCoordinates root;
+
         List<DependencyCoordinates> dependencies = Collections.emptyList();
         List<DependencyCoordinates> managedDependencies = Collections.emptyList();
         boolean verbose;
+
+        @Nullable
         PathScope pathScope;
+
+        @Nullable
         Predicate<PathType> pathTypeFilter;
+
+        @Nullable
         Version targetVersion;
+
+        @Nullable
         List<RemoteRepository> repositories;
 
         DependencyResolverRequestBuilder() {}
@@ -388,16 +408,16 @@ public interface DependencyResolverRequest extends RepositoryAwareRequest {
         @Nonnull
         public DependencyResolverRequest build() {
             return new DefaultDependencyResolverRequest(
-                    session,
+                    requireNonNull(session, "session cannot be null"),
                     trace,
-                    requestType,
+                    requireNonNull(requestType, "requestType cannot be null"),
                     project,
                     rootArtifact,
                     root,
                     dependencies,
                     managedDependencies,
                     verbose,
-                    pathScope,
+                    requireNonNull(pathScope, "pathScope cannot be null"),
                     pathTypeFilter,
                     targetVersion,
                     repositories);
@@ -431,15 +451,26 @@ public interface DependencyResolverRequest extends RepositoryAwareRequest {
             private static final Predicate<PathType> DEFAULT_FILTER = new AlwaysTrueFilter();
 
             private final RequestType requestType;
+
+            @Nullable
             private final Project project;
+
+            @Nullable
             private final Artifact rootArtifact;
+
+            @Nullable
             private final DependencyCoordinates root;
+
             private final Collection<DependencyCoordinates> dependencies;
             private final Collection<DependencyCoordinates> managedDependencies;
             private final boolean verbose;
             private final PathScope pathScope;
             private final Predicate<PathType> pathTypeFilter;
+
+            @Nullable
             private final Version targetVersion;
+
+            @Nullable
             private final List<RemoteRepository> repositories;
 
             /**
@@ -533,11 +564,13 @@ public interface DependencyResolverRequest extends RepositoryAwareRequest {
                 return pathTypeFilter;
             }
 
+            @Nullable
             @Override
             public Version getTargetVersion() {
                 return targetVersion;
             }
 
+            @Nullable
             @Override
             public List<RemoteRepository> getRepositories() {
                 return repositories;

@@ -279,12 +279,25 @@ public interface ParserRequest {
 
         private final Logger logger;
         private Lookup lookup = EMPTY_LOOKUP;
+
+        @Nullable
         private Path cwd;
+
+        @Nullable
         private Path mavenHome;
+
+        @Nullable
         private Path userHome;
+
+        @Nullable
         private InputStream stdIn;
+
+        @Nullable
         private OutputStream stdOut;
+
+        @Nullable
         private OutputStream stdErr;
+
         private boolean embedded = false;
 
         private Builder(
@@ -361,12 +374,25 @@ public interface ParserRequest {
             private final MessageBuilderFactory messageBuilderFactory;
             private final List<String> args;
             private final Lookup lookup;
+
+            @Nullable
             private final Path cwd;
+
+            @Nullable
             private final Path mavenHome;
+
+            @Nullable
             private final Path userHome;
+
+            @Nullable
             private final InputStream stdIn;
+
+            @Nullable
             private final OutputStream stdOut;
+
+            @Nullable
             private final OutputStream stdErr;
+
             private final boolean embedded;
 
             private ParserRequestImpl(
@@ -376,12 +402,12 @@ public interface ParserRequest {
                     Logger logger,
                     MessageBuilderFactory messageBuilderFactory,
                     Lookup lookup,
-                    Path cwd,
-                    Path mavenHome,
-                    Path userHome,
-                    InputStream stdIn,
-                    OutputStream stdOut,
-                    OutputStream stdErr,
+                    @Nullable Path cwd,
+                    @Nullable Path mavenHome,
+                    @Nullable Path userHome,
+                    @Nullable InputStream stdIn,
+                    @Nullable OutputStream stdOut,
+                    @Nullable OutputStream stdErr,
                     boolean embedded) {
                 this.command = requireNonNull(command, "command");
                 this.commandName = requireNonNull(commandName, "commandName");
@@ -428,31 +454,37 @@ public interface ParserRequest {
                 return lookup;
             }
 
+            @Nullable
             @Override
             public Path cwd() {
                 return cwd;
             }
 
+            @Nullable
             @Override
             public Path mavenHome() {
                 return mavenHome;
             }
 
+            @Nullable
             @Override
             public Path userHome() {
                 return userHome;
             }
 
+            @Nullable
             @Override
             public InputStream stdIn() {
                 return stdIn;
             }
 
+            @Nullable
             @Override
             public OutputStream stdOut() {
                 return stdOut;
             }
 
+            @Nullable
             @Override
             public OutputStream stdErr() {
                 return stdErr;

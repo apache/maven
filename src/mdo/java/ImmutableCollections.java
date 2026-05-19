@@ -31,6 +31,8 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import org.apache.maven.api.annotations.Nullable;
+
 /**
  * This should be removed when https://bugs.openjdk.org/browse/JDK-8323729
  * is released in our minimum JDK.
@@ -64,11 +66,11 @@ class ImmutableCollections {
         }
     };
 
-    static <E1, E2 extends E1> List<E1> copy(Collection<E2> collection) {
+    static <E1, E2 extends E1> List<E1> copy(@Nullable Collection<E2> collection) {
         return collection == null ? List.of() : List.copyOf(collection);
     }
 
-    static <K, V> Map<K, V> copy(Map<K, V> map) {
+    static <K, V> Map<K, V> copy(@Nullable Map<K, V> map) {
         if (map == null) {
             return emptyMap();
         } else if (map instanceof AbstractImmutableMap) {

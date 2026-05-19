@@ -88,7 +88,7 @@ public interface ModelBuilderRequest extends RepositoryAwareRequest {
         REQUEST_DOMINANT,
     }
 
-    @Nonnull
+    @Nullable
     ModelSource getSource();
 
     @Nonnull
@@ -130,7 +130,7 @@ public interface ModelBuilderRequest extends RepositoryAwareRequest {
     @Nonnull
     Map<String, String> getUserProperties();
 
-    @Nonnull
+    @Nullable
     RepositoryMerging getRepositoryMerging();
 
     @Nullable
@@ -171,19 +171,43 @@ public interface ModelBuilderRequest extends RepositoryAwareRequest {
 
     @NotThreadSafe
     class ModelBuilderRequestBuilder {
+        @Nullable
         Session session;
+
+        @Nullable
         RequestTrace trace;
+
+        @Nullable
         RequestType requestType;
+
         boolean locationTracking;
         boolean recursive;
+
+        @Nullable
         ModelSource source;
+
+        @Nullable
         Collection<Profile> profiles;
+
+        @Nullable
         List<String> activeProfileIds;
+
+        @Nullable
         List<String> inactiveProfileIds;
+
+        @Nullable
         Map<String, String> systemProperties;
+
+        @Nullable
         Map<String, String> userProperties;
+
+        @Nullable
         RepositoryMerging repositoryMerging;
+
+        @Nullable
         List<RemoteRepository> repositories;
+
+        @Nullable
         ModelTransformer lifecycleBindingsInjector;
 
         ModelBuilderRequestBuilder() {}
@@ -277,9 +301,9 @@ public interface ModelBuilderRequest extends RepositoryAwareRequest {
 
         public ModelBuilderRequest build() {
             return new DefaultModelBuilderRequest(
-                    session,
+                    requireNonNull(session, "session cannot be null"),
                     trace,
-                    requestType,
+                    requireNonNull(requestType, "requestType cannot be null"),
                     locationTracking,
                     recursive,
                     source,
@@ -297,14 +321,23 @@ public interface ModelBuilderRequest extends RepositoryAwareRequest {
             private final RequestType requestType;
             private final boolean locationTracking;
             private final boolean recursive;
+
+            @Nullable
             private final ModelSource source;
+
             private final Collection<Profile> profiles;
             private final List<String> activeProfileIds;
             private final List<String> inactiveProfileIds;
             private final Map<String, String> systemProperties;
             private final Map<String, String> userProperties;
+
+            @Nullable
             private final RepositoryMerging repositoryMerging;
+
+            @Nullable
             private final List<RemoteRepository> repositories;
+
+            @Nullable
             private final ModelTransformer lifecycleBindingsInjector;
 
             @SuppressWarnings("checkstyle:ParameterNumber")
@@ -314,16 +347,17 @@ public interface ModelBuilderRequest extends RepositoryAwareRequest {
                     @Nonnull RequestType requestType,
                     boolean locationTracking,
                     boolean recursive,
-                    @Nonnull ModelSource source,
-                    Collection<Profile> profiles,
-                    List<String> activeProfileIds,
-                    List<String> inactiveProfileIds,
-                    Map<String, String> systemProperties,
-                    Map<String, String> userProperties,
-                    RepositoryMerging repositoryMerging,
-                    List<RemoteRepository> repositories,
-                    ModelTransformer lifecycleBindingsInjector) {
+                    @Nullable ModelSource source,
+                    @Nullable Collection<Profile> profiles,
+                    @Nullable List<String> activeProfileIds,
+                    @Nullable List<String> inactiveProfileIds,
+                    @Nullable Map<String, String> systemProperties,
+                    @Nullable Map<String, String> userProperties,
+                    @Nullable RepositoryMerging repositoryMerging,
+                    @Nullable List<RemoteRepository> repositories,
+                    @Nullable ModelTransformer lifecycleBindingsInjector) {
                 super(session, trace);
+                Session s = getSession();
                 this.requestType = requireNonNull(requestType, "requestType cannot be null");
                 this.locationTracking = locationTracking;
                 this.recursive = recursive;
@@ -332,8 +366,8 @@ public interface ModelBuilderRequest extends RepositoryAwareRequest {
                 this.activeProfileIds = activeProfileIds != null ? List.copyOf(activeProfileIds) : List.of();
                 this.inactiveProfileIds = inactiveProfileIds != null ? List.copyOf(inactiveProfileIds) : List.of();
                 this.systemProperties =
-                        systemProperties != null ? Map.copyOf(systemProperties) : session.getSystemProperties();
-                this.userProperties = userProperties != null ? Map.copyOf(userProperties) : session.getUserProperties();
+                        systemProperties != null ? Map.copyOf(systemProperties) : s.getSystemProperties();
+                this.userProperties = userProperties != null ? Map.copyOf(userProperties) : s.getUserProperties();
                 this.repositoryMerging = repositoryMerging;
                 this.repositories = repositories != null ? List.copyOf(validate(repositories)) : null;
                 this.lifecycleBindingsInjector = lifecycleBindingsInjector;
@@ -354,7 +388,7 @@ public interface ModelBuilderRequest extends RepositoryAwareRequest {
                 return recursive;
             }
 
-            @Nonnull
+            @Nullable
             @Override
             public ModelSource getSource() {
                 return source;
@@ -385,16 +419,19 @@ public interface ModelBuilderRequest extends RepositoryAwareRequest {
                 return userProperties;
             }
 
+            @Nullable
             @Override
             public RepositoryMerging getRepositoryMerging() {
                 return repositoryMerging;
             }
 
+            @Nullable
             @Override
             public List<RemoteRepository> getRepositories() {
                 return repositories;
             }
 
+            @Nullable
             @Override
             public ModelTransformer getLifecycleBindingsInjector() {
                 return lifecycleBindingsInjector;

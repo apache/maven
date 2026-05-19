@@ -60,8 +60,12 @@ public interface ArtifactInstallerRequest extends Request<Session> {
 
     @NotThreadSafe
     class ArtifactInstallerRequestBuilder {
+        @Nullable
         Session session;
+
+        @Nullable
         RequestTrace trace;
+
         Collection<ProducedArtifact> artifacts = Collections.emptyList();
 
         ArtifactInstallerRequestBuilder() {}
@@ -86,7 +90,8 @@ public interface ArtifactInstallerRequest extends Request<Session> {
 
         @Nonnull
         public ArtifactInstallerRequest build() {
-            return new DefaultArtifactInstallerRequest(session, trace, artifacts);
+            return new DefaultArtifactInstallerRequest(
+                    requireNonNull(session, "session cannot be null"), trace, artifacts);
         }
 
         static class DefaultArtifactInstallerRequest extends BaseRequest<Session> implements ArtifactInstallerRequest {

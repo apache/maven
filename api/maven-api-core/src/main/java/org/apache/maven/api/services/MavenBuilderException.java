@@ -53,7 +53,7 @@ public abstract class MavenBuilderException extends MavenException {
      * @param problems the collection of problems associated with this exception
      */
     public MavenBuilderException(String message, ProblemCollector<BuilderProblem> problems) {
-        super(buildMessage(message, problems), null);
+        super(buildMessage(message, problems), (Throwable) null);
         this.problems = problems;
     }
 

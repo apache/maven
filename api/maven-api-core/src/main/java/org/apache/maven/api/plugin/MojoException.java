@@ -19,6 +19,7 @@
 package org.apache.maven.api.plugin;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.services.MavenException;
 
 /**
@@ -29,15 +30,17 @@ import org.apache.maven.api.services.MavenException;
 @Experimental
 public class MojoException extends MavenException {
 
+    @Nullable
     protected Object source;
 
+    @Nullable
     protected String longMessage;
 
     /**
      * Constructs a new {@code MojoException} providing the source and a short and long message.
      * These messages are used to improve the message written at the end of Maven build.
      */
-    public MojoException(Object source, String shortMessage, String longMessage) {
+    public MojoException(@Nullable Object source, String shortMessage, @Nullable String longMessage) {
         super(shortMessage);
         this.source = source;
         this.longMessage = longMessage;
@@ -68,10 +71,12 @@ public class MojoException extends MavenException {
         super(cause);
     }
 
+    @Nullable
     public String getLongMessage() {
         return longMessage;
     }
 
+    @Nullable
     public Object getSource() {
         return source;
     }

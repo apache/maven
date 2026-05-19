@@ -19,6 +19,7 @@
 package org.apache.maven.api.spi;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.services.MavenException;
 
 @Experimental
@@ -38,21 +39,21 @@ public class ModelParserException extends MavenException {
         this(null, null);
     }
 
-    public ModelParserException(String message) {
+    public ModelParserException(@Nullable String message) {
         this(message, null);
     }
 
-    public ModelParserException(String message, Throwable cause) {
+    public ModelParserException(@Nullable String message, @Nullable Throwable cause) {
         this(message, -1, -1, cause);
     }
 
-    public ModelParserException(String message, int lineNumber, int columnNumber, Throwable cause) {
+    public ModelParserException(@Nullable String message, int lineNumber, int columnNumber, @Nullable Throwable cause) {
         super(message, cause);
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
     }
 
-    public ModelParserException(Throwable cause) {
+    public ModelParserException(@Nullable Throwable cause) {
         this(null, cause);
     }
 

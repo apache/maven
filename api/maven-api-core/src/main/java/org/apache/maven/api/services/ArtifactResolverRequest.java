@@ -73,9 +73,16 @@ public interface ArtifactResolverRequest extends RepositoryAwareRequest {
 
     @NotThreadSafe
     class ArtifactResolverRequestBuilder {
+        @Nullable
         Session session;
+
+        @Nullable
         RequestTrace trace;
+
+        @Nullable
         Collection<? extends ArtifactCoordinates> coordinates;
+
+        @Nullable
         List<RemoteRepository> repositories;
 
         ArtifactResolverRequestBuilder() {}
@@ -106,7 +113,11 @@ public interface ArtifactResolverRequest extends RepositoryAwareRequest {
 
         @Nonnull
         public ArtifactResolverRequest build() {
-            return new DefaultArtifactResolverRequest(session, trace, coordinates, repositories);
+            return new DefaultArtifactResolverRequest(
+                    requireNonNull(session, "session cannot be null"),
+                    trace,
+                    requireNonNull(coordinates, "coordinates cannot be null"),
+                    repositories);
         }
 
         private static class DefaultArtifactResolverRequest extends BaseRequest<Session>
@@ -121,7 +132,7 @@ public interface ArtifactResolverRequest extends RepositoryAwareRequest {
                     @Nonnull Session session,
                     @Nullable RequestTrace trace,
                     @Nonnull Collection<? extends ArtifactCoordinates> coordinates,
-                    @Nonnull List<RemoteRepository> repositories) {
+                    @Nullable List<RemoteRepository> repositories) {
                 super(session, trace);
                 this.coordinates = List.copyOf(requireNonNull(coordinates, "coordinates cannot be null"));
                 this.repositories = validate(repositories);

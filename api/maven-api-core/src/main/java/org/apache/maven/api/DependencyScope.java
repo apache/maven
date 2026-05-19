@@ -26,6 +26,7 @@ import java.util.stream.Stream;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
  * Indicates when the dependency will be used.
@@ -106,6 +107,7 @@ public enum DependencyScope {
      *
      * @param id the identifier of the scope (case-sensitive)
      */
+    @Nullable
     public static DependencyScope forId(String id) {
         return IDS.get(id);
     }

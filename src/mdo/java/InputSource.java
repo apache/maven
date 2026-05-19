@@ -25,6 +25,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.maven.api.annotations.Nullable;
+
 /**
  * Represents the source of a model input, such as a POM file.
  * <p>
@@ -41,22 +43,22 @@ import java.util.stream.Stream;
 public final class InputSource implements Serializable {
 
 #if ( $isMavenModel )
-    private final String modelId;
+    @Nullable private final String modelId;
 #end
-    private final String location;
-    private final List<InputSource> inputs;
-    private final InputLocation importedFrom;
+    @Nullable private final String location;
+    @Nullable private final List<InputSource> inputs;
+    @Nullable private final InputLocation importedFrom;
 
 #if ( $isMavenModel )
     private volatile int hashCode = 0; // Cached hashCode for performance
 #end
 
 #if ( $isMavenModel )
-    public InputSource(String modelId, String location) {
+    public InputSource(@Nullable String modelId, @Nullable String location) {
         this(modelId, location, null);
     }
 
-    public InputSource(String modelId, String location, InputLocation importedFrom) {
+    public InputSource(@Nullable String modelId, @Nullable String location, @Nullable InputLocation importedFrom) {
         this.modelId = modelId;
         this.location = location;
         this.inputs = null;
@@ -69,7 +71,7 @@ public final class InputSource implements Serializable {
      *
      * @param location the path/URL of the input source, may be null
      */
-    InputSource(String location) {
+    InputSource(@Nullable String location) {
 #if ( $isMavenModel )
         this.modelId = null;
 #end
@@ -150,6 +152,7 @@ public final class InputSource implements Serializable {
      *
      * @return the location string, or null if unknown
      */
+    @Nullable
     public String getLocation() {
         return this.location;
     }
@@ -160,6 +163,7 @@ public final class InputSource implements Serializable {
      *
      * @return the model id
      */
+    @Nullable
     public String getModelId() {
         return this.modelId;
     }
@@ -172,6 +176,7 @@ public final class InputSource implements Serializable {
      * @return InputLocation
      * @since 4.0.0
      */
+    @Nullable
     public InputLocation getImportedFrom() {
         return importedFrom;
     }
@@ -237,9 +242,9 @@ public final class InputSource implements Serializable {
             return inputs.stream().map(InputSource::toString).collect(Collectors.joining(", ", "merged[", "]"));
         }
 #if ( $isMavenModel )
-        return getModelId() != null ? getModelId() + " " + getLocation() : getLocation();
+        return getModelId() != null ? getModelId() + " " + getLocation() : String.valueOf(getLocation());
 #else
-        return getLocation();
+        return String.valueOf(getLocation());
 #end
     }
 
@@ -251,7 +256,14 @@ public final class InputSource implements Serializable {
      * @param src2 the second input source to merge
      * @return a new merged InputSource containing all distinct sources from both inputs
      */
-    public static InputSource merge(InputSource src1, InputSource src2) {
+    @Nullable
+    public static InputSource merge(@Nullable InputSource src1, @Nullable InputSource src2) {
+        if (src1 == null) {
+            return src2;
+        }
+        if (src2 == null) {
+            return src1;
+        }
 #if ( $isMavenModel )
         return new InputSource(
                 Stream.concat(src1.sources(), src2.sources()).distinct().toList());

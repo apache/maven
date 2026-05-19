@@ -67,10 +67,18 @@ public interface ArtifactDeployerRequest extends Request<Session> {
     }
 
     class ArtifactDeployerRequestBuilder {
+        @Nullable
         Session session;
+
+        @Nullable
         RequestTrace trace;
+
+        @Nullable
         RemoteRepository repository;
+
+        @Nullable
         Collection<ProducedArtifact> artifacts;
+
         int retryFailedDeploymentCount;
 
         ArtifactDeployerRequestBuilder() {}
@@ -106,7 +114,11 @@ public interface ArtifactDeployerRequest extends Request<Session> {
         @Nonnull
         public ArtifactDeployerRequest build() {
             return new DefaultArtifactDeployerRequest(
-                    session, trace, repository, artifacts, retryFailedDeploymentCount);
+                    requireNonNull(session, "session cannot be null"),
+                    trace,
+                    requireNonNull(repository, "repository cannot be null"),
+                    requireNonNull(artifacts, "artifacts cannot be null"),
+                    retryFailedDeploymentCount);
         }
 
         private static class DefaultArtifactDeployerRequest extends BaseRequest<Session>
