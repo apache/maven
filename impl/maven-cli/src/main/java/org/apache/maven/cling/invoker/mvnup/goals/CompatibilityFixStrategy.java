@@ -466,12 +466,14 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
             Element urlElement = repository.child("url").orElse(null);
             if (urlElement != null) {
                 String url = urlElement.textContent().trim();
-                if (url.contains("${")) {
-                    // Allow repository URL interpolation; do not disable.
-                    // Keep a gentle warning to help users notice unresolved placeholders at build time.
+                String fixedUrl =
+                        url.replace("${basedir}", "${project.basedir}").replace("${pom.basedir}", "${project.basedir}");
+                if (!fixedUrl.equals(url)) {
+                    urlElement.textContent(fixedUrl);
                     String repositoryId = repository.childText("id");
-                    context.info("Detected interpolated expression in " + elementType + " URL (id: " + repositoryId
-                            + "): " + url);
+                    context.detail("Fixed: replaced deprecated expression in " + elementType + " URL (id: "
+                            + repositoryId + "): " + url + " → " + fixedUrl);
+                    fixed = true;
                 }
             }
         }
