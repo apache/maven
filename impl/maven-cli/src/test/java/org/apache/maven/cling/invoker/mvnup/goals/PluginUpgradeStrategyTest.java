@@ -458,6 +458,93 @@ class PluginUpgradeStrategyTest {
     }
 
     @Nested
+    @DisplayName("Plugin Dependency Upgrades")
+    class PluginDependencyUpgradeTests {
+
+        @Test
+        @DisplayName("should upgrade extra-enforcer-rules dependency when below minimum")
+        void shouldUpgradeExtraEnforcerRulesDependency() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-enforcer-plugin</artifactId>
+                                <version>3.5.0</version>
+                                <dependencies>
+                                    <dependency>
+                                        <groupId>org.codehaus.mojo</groupId>
+                                        <artifactId>extra-enforcer-rules</artifactId>
+                                        <version>1.0-beta-4</version>
+                                    </dependency>
+                                </dependencies>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Plugin dependency upgrade should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have upgraded extra-enforcer-rules");
+
+            String xml = document.toXml();
+            assertTrue(xml.contains("<version>1.4</version>"), "extra-enforcer-rules should be upgraded to 1.4");
+            assertFalse(xml.contains("1.0-beta-4"), "Old version should be gone");
+        }
+
+        @Test
+        @DisplayName("should not upgrade extra-enforcer-rules when version is already sufficient")
+        void shouldNotUpgradeExtraEnforcerRulesWhenSufficient() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-enforcer-plugin</artifactId>
+                                <version>3.5.0</version>
+                                <dependencies>
+                                    <dependency>
+                                        <groupId>org.codehaus.mojo</groupId>
+                                        <artifactId>extra-enforcer-rules</artifactId>
+                                        <version>1.8.0</version>
+                                    </dependency>
+                                </dependencies>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            strategy.doApply(context, pomMap);
+
+            String xml = document.toXml();
+            assertTrue(xml.contains("1.8.0"), "Version 1.8.0 should be preserved");
+        }
+    }
+
+    @Nested
     @DisplayName("Plugin Management")
     class PluginManagementTests {
 
