@@ -1116,6 +1116,21 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             try {
                 ModelBuilderSessionState derived = derive(candidateSource);
+
+                // Check GA match BEFORE readAsParentModel() which recursively resolves
+                // the candidate's parent chain and can trigger false cycle detection (GH-12074).
+                Model fileModel = derived.readFileModel();
+                String fileGroupId = getGroupId(fileModel);
+                String fileArtifactId = fileModel.getArtifactId();
+
+                if (fileGroupId == null
+                        || !fileGroupId.equals(parent.getGroupId())
+                        || fileArtifactId == null
+                        || !fileArtifactId.equals(parent.getArtifactId())) {
+                    mismatchRelativePathAndGA(childModel, fileGroupId, fileArtifactId);
+                    return null;
+                }
+
                 Model candidateModel = derived.readAsParentModel(profileActivationContext, parentChain);
                 // Add profiles from parent, preserving model ID tracking
                 for (Map.Entry<String, List<Profile>> entry :
@@ -1123,18 +1138,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     addActivePomProfiles(entry.getKey(), entry.getValue());
                 }
 
-                String groupId = getGroupId(candidateModel);
-                String artifactId = candidateModel.getArtifactId();
                 String version = getVersion(candidateModel);
-
-                // Ensure that relative path and GA match, if both are provided
-                if (groupId == null
-                        || !groupId.equals(parent.getGroupId())
-                        || artifactId == null
-                        || !artifactId.equals(parent.getArtifactId())) {
-                    mismatchRelativePathAndGA(childModel, groupId, artifactId);
-                    return null;
-                }
 
                 if (version != null && parent.getVersion() != null && !version.equals(parent.getVersion())) {
                     try {
