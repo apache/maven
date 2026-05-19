@@ -151,8 +151,13 @@ class DefaultExceptionHandlerTest {
 
         assertTrue(
                 summary.getMessage().contains("-Daether.remoteRepositoryFilter.prefixes=false"),
-                "Message should contain the workaround property");
-        assertTrue(summary.getMessage().contains("prefix file"), "Message should explain the prefix file cause");
+                "Message should contain the prefixes workaround property");
+        assertTrue(
+                summary.getMessage().contains("-Daether.remoteRepositoryFilter.groupId=false"),
+                "Message should contain the groupId workaround property");
+        assertTrue(
+                summary.getMessage().contains("remote repository filter"),
+                "Message should explain the filtering cause");
         assertEquals(
                 "https://maven.apache.org/resolver/remote-repository-filtering.html",
                 summary.getReference(),

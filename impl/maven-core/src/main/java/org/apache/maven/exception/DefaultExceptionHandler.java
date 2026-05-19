@@ -281,13 +281,16 @@ public class DefaultExceptionHandler implements ExceptionHandler {
         if (hasArtifactFilteredOut) {
             fullMessage += System.lineSeparator()
                     + System.lineSeparator()
-                    + "This error indicates that the remote repository's prefix file does not list"
-                    + " this artifact's group. This commonly happens with repository managers"
-                    + " using virtual/group repositories that do not properly aggregate prefix files."
+                    + "This error indicates that a remote repository filter has rejected this artifact."
+                    + " This commonly happens with repository managers using virtual/group repositories"
+                    + " that do not properly aggregate prefix files."
                     + System.lineSeparator()
-                    + "To disable prefix-based filtering, add"
-                    + " -Daether.remoteRepositoryFilter.prefixes=false"
-                    + " to your command line or to .mvn/maven.config."
+                    + "To disable remote repository filtering, add one or both of these"
+                    + " to your command line or to .mvn/maven.config:"
+                    + System.lineSeparator()
+                    + "  -Daether.remoteRepositoryFilter.prefixes=false"
+                    + System.lineSeparator()
+                    + "  -Daether.remoteRepositoryFilter.groupId=false"
                     + System.lineSeparator()
                     + "See https://maven.apache.org/resolver/remote-repository-filtering.html";
         }
