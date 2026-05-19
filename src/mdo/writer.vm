@@ -252,9 +252,7 @@ public class ${className} {
     private void writeDom(XmlNode dom, XmlSerializer serializer) throws IOException {
         if (dom != null) {
             serializer.startTag(NAMESPACE, dom.getName());
-            for (Map.Entry<String, String> attr : dom.getAttributes().entrySet()) {
-                serializer.attribute(NAMESPACE, attr.getKey(), attr.getValue());
-            }
+            writeXmlNodeAttributes(serializer, dom.getAttributes(), dom.namespaces());
             for (XmlNode child : dom.getChildren()) {
                 writeDom(child, serializer);
             }
@@ -263,6 +261,56 @@ public class ${className} {
                 serializer.text(value);
             }
             serializer.endTag(NAMESPACE, dom.getName());
+        }
+    }
+
+    /**
+     * Writes XmlNode attributes, properly handling namespace declarations
+     * ({@code xmlns:prefix}) and prefixed attributes ({@code prefix:localName}).
+     * The namespace context is used to resolve prefixes when the {@code xmlns:}
+     * declaration is not present in the attribute map.
+     */
+    private static void writeXmlNodeAttributes(XmlSerializer serializer, Map<String, String> attributes, Map<String, String> namespaces) throws IOException {
+        // Collect which namespace prefixes need to be declared on this element
+        Set<String> declaredPrefixes = new HashSet<>();
+        for (Map.Entry<String, String> attribute : attributes.entrySet()) {
+            String key = attribute.getKey();
+            if ("xmlns".equals(key)) {
+                serializer.setPrefix("", attribute.getValue());
+            } else if (key.startsWith("xmlns:")) {
+                String prefix = key.substring(6);
+                serializer.setPrefix(prefix, attribute.getValue());
+                declaredPrefixes.add(prefix);
+            }
+        }
+        // Write prefixed attributes, declaring their namespace if needed
+        for (Map.Entry<String, String> attribute : attributes.entrySet()) {
+            String key = attribute.getKey();
+            String value = attribute.getValue();
+            if ("xmlns".equals(key) || key.startsWith("xmlns:")) {
+                continue; // already handled above
+            } else if (key.startsWith("xml:")) {
+                serializer.attribute("http://www.w3.org/XML/1998/namespace", key.substring(4), value);
+            } else if (key.contains(":")) {
+                int colon = key.indexOf(':');
+                String prefix = key.substring(0, colon);
+                String localName = key.substring(colon + 1);
+                String nsUri = attributes.get("xmlns:" + prefix);
+                if (nsUri == null) {
+                    nsUri = namespaces.get(prefix);
+                }
+                if (nsUri != null) {
+                    if (declaredPrefixes.add(prefix)) {
+                        serializer.setPrefix(prefix, nsUri);
+                    }
+                    serializer.attribute(nsUri, localName, value);
+                } else {
+                    // No namespace declaration for this prefix; write as unprefixed
+                    serializer.attribute(NAMESPACE, localName, value);
+                }
+            } else {
+                serializer.attribute(NAMESPACE, key, value);
+            }
         }
     }
 
