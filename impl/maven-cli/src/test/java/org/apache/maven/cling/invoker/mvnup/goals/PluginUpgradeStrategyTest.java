@@ -18,22 +18,17 @@
  */
 package org.apache.maven.cling.invoker.mvnup.goals;
 
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import eu.maveniverse.domtrip.Document;
+import eu.maveniverse.domtrip.Editor;
+import eu.maveniverse.domtrip.Element;
 import org.apache.maven.api.cli.mvnup.UpgradeOptions;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.Namespace;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -57,12 +52,10 @@ import static org.mockito.Mockito.when;
 class PluginUpgradeStrategyTest {
 
     private PluginUpgradeStrategy strategy;
-    private SAXBuilder saxBuilder;
 
     @BeforeEach
     void setUp() {
         strategy = new PluginUpgradeStrategy();
-        saxBuilder = new SAXBuilder();
     }
 
     private UpgradeContext createMockContext() {
@@ -142,22 +135,21 @@ class PluginUpgradeStrategyTest {
                     .plugin("org.apache.maven.plugins", "maven-compiler-plugin", "3.8.1")
                     .build();
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
 
             UpgradeContext context = createMockContext();
-            UpgradeResult result = strategy.apply(context, pomMap);
+            UpgradeResult result = strategy.doApply(context, pomMap);
 
             assertTrue(result.success(), "Plugin upgrade should succeed");
             // Note: POM may or may not be modified depending on whether upgrades are needed
 
             // Verify the plugin version was upgraded
-            Element root = document.getRootElement();
-            Namespace namespace = root.getNamespace();
-            Element build = root.getChild("build", namespace);
-            Element plugins = build.getChild("plugins", namespace);
-            Element plugin = plugins.getChild("plugin", namespace);
-            String version = plugin.getChildText("version", namespace);
+            Editor editor = new Editor(document);
+            Element root = editor.root();
+            String version = root.path("build", "plugins", "plugin", "version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
 
             // The exact version depends on the plugin upgrades configuration
             assertNotNull(version, "Plugin should have a version");
@@ -185,11 +177,11 @@ class PluginUpgradeStrategyTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
 
             UpgradeContext context = createMockContext();
-            UpgradeResult result = strategy.apply(context, pomMap);
+            UpgradeResult result = strategy.doApply(context, pomMap);
 
             assertTrue(result.success(), "Plugin upgrade should succeed");
             // POM might still be marked as modified due to other plugin management additions
@@ -219,24 +211,22 @@ class PluginUpgradeStrategyTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
 
             UpgradeContext context = createMockContext();
-            UpgradeResult result = strategy.apply(context, pomMap);
+            UpgradeResult result = strategy.doApply(context, pomMap);
 
             assertTrue(result.success(), "Plugin upgrade should succeed");
             assertTrue(result.modifiedCount() > 0, "Should have upgraded maven-enforcer-plugin");
 
             // Verify the version was upgraded
-            Element root = document.getRootElement();
-            Namespace namespace = root.getNamespace();
-            Element pluginElement = root.getChild("build", namespace)
-                    .getChild("pluginManagement", namespace)
-                    .getChild("plugins", namespace)
-                    .getChild("plugin", namespace);
-            Element versionElement = pluginElement.getChild("version", namespace);
-            assertEquals("3.0.0", versionElement.getTextTrim());
+            Editor editor = new Editor(document);
+            Element root = editor.root();
+            String version = root.path("build", "pluginManagement", "plugins", "plugin", "version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals("3.0.0", version);
         }
 
         @Test
@@ -264,21 +254,22 @@ class PluginUpgradeStrategyTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
 
             UpgradeContext context = createMockContext();
-            UpgradeResult result = strategy.apply(context, pomMap);
+            UpgradeResult result = strategy.doApply(context, pomMap);
 
             assertTrue(result.success(), "Plugin upgrade should succeed");
             assertTrue(result.modifiedCount() > 0, "Should have upgraded shade plugin property");
 
             // Verify the property was upgraded
-            Element root = document.getRootElement();
-            Namespace namespace = root.getNamespace();
-            Element propertyElement =
-                    root.getChild("properties", namespace).getChild("shade.plugin.version", namespace);
-            assertEquals("3.5.0", propertyElement.getTextTrim());
+            Editor editor = new Editor(document);
+            Element root = editor.root();
+            String version = root.path("properties", "shade.plugin.version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals("3.5.0", version);
         }
 
         @Test
@@ -303,22 +294,21 @@ class PluginUpgradeStrategyTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
 
             UpgradeContext context = createMockContext();
-            UpgradeResult result = strategy.apply(context, pomMap);
+            UpgradeResult result = strategy.doApply(context, pomMap);
 
             assertTrue(result.success(), "Plugin upgrade should succeed");
 
             // Verify the version was not changed
-            Element root = document.getRootElement();
-            Namespace namespace = root.getNamespace();
-            Element pluginElement = root.getChild("build", namespace)
-                    .getChild("plugins", namespace)
-                    .getChild("plugin", namespace);
-            Element versionElement = pluginElement.getChild("version", namespace);
-            assertEquals("1.3.0", versionElement.getTextTrim());
+            Editor editor = new Editor(document);
+            Element root = editor.root();
+            String version = root.path("build", "plugins", "plugin", "version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals("1.3.0", version);
         }
 
         @Test
@@ -342,11 +332,11 @@ class PluginUpgradeStrategyTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
 
             UpgradeContext context = createMockContext();
-            UpgradeResult result = strategy.apply(context, pomMap);
+            UpgradeResult result = strategy.doApply(context, pomMap);
 
             assertTrue(result.success(), "Plugin upgrade should succeed");
             assertTrue(
@@ -354,13 +344,12 @@ class PluginUpgradeStrategyTest {
                     "Should have upgraded maven-shade-plugin even without explicit groupId");
 
             // Verify the version was upgraded
-            Element root = document.getRootElement();
-            Namespace namespace = root.getNamespace();
-            Element pluginElement = root.getChild("build", namespace)
-                    .getChild("plugins", namespace)
-                    .getChild("plugin", namespace);
-            Element versionElement = pluginElement.getChild("version", namespace);
-            assertEquals("3.5.0", versionElement.getTextTrim());
+            Editor editor = new Editor(document);
+            Element root = editor.root();
+            String version = root.path("build", "plugins", "plugin", "version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals("3.5.0", version);
         }
 
         @Test
@@ -385,11 +374,11 @@ class PluginUpgradeStrategyTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
 
             UpgradeContext context = createMockContext();
-            UpgradeResult result = strategy.apply(context, pomMap);
+            UpgradeResult result = strategy.doApply(context, pomMap);
 
             assertTrue(result.success(), "Plugin upgrade should succeed");
             // Note: POM might still be modified due to plugin management additions
@@ -417,11 +406,11 @@ class PluginUpgradeStrategyTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
 
             UpgradeContext context = createMockContext();
-            UpgradeResult result = strategy.apply(context, pomMap);
+            UpgradeResult result = strategy.doApply(context, pomMap);
 
             assertTrue(result.success(), "Plugin upgrade should succeed");
             // Note: POM might still be modified due to plugin management additions
@@ -454,19 +443,19 @@ class PluginUpgradeStrategyTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
 
             UpgradeContext context = createMockContext();
-            strategy.apply(context, pomMap);
+            strategy.doApply(context, pomMap);
 
             // Verify the structure
-            Element root = document.getRootElement();
-            Namespace namespace = root.getNamespace();
-            Element buildElement = root.getChild("build", namespace);
+            Editor editor = new Editor(document);
+            Element root = editor.root();
+            Element buildElement = root.child("build").orElse(null);
             assertNotNull(buildElement, "Build element should exist");
 
-            List<Element> buildChildren = buildElement.getChildren();
+            List<Element> buildChildren = buildElement.children().toList();
 
             // Find the indices of pluginManagement and plugins
             int pluginManagementIndex = -1;
@@ -474,9 +463,9 @@ class PluginUpgradeStrategyTest {
 
             for (int i = 0; i < buildChildren.size(); i++) {
                 Element child = buildChildren.get(i);
-                if ("pluginManagement".equals(child.getName())) {
+                if ("pluginManagement".equals(child.name())) {
                     pluginManagementIndex = i;
-                } else if ("plugins".equals(child.getName())) {
+                } else if ("plugins".equals(child.name())) {
                     pluginsIndex = i;
                 }
             }
@@ -552,20 +541,17 @@ class PluginUpgradeStrategyTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             Path pomPath = Paths.get("/project/pom.xml").toAbsolutePath();
             Map<Path, Document> pomMap = Map.of(pomPath, document);
 
             UpgradeContext context = createMockContext();
-            UpgradeResult result = strategy.apply(context, pomMap);
+            UpgradeResult result = strategy.doApply(context, pomMap);
 
             assertTrue(result.success(), "Strategy should succeed");
             assertTrue(result.modifiedCount() > 0, "Should have added plugin management for inherited plugins");
 
-            XMLOutputter out = new XMLOutputter(Format.getRawFormat());
-            StringWriter writer = new StringWriter();
-            out.output(document.getRootElement(), writer);
-            String xml = writer.toString();
+            String xml = DomUtils.toXml(document);
             assertTrue(
                     xml.contains("<artifactId>maven-enforcer-plugin</artifactId>"),
                     "Should add pluginManagement for maven-enforcer-plugin inherited from parent");
@@ -579,8 +565,6 @@ class PluginUpgradeStrategyTest {
         @Test
         @DisplayName("should warn when effective model analysis fails for POM with unresolvable remote parent")
         void shouldWarnWhenEffectiveModelAnalysisFailsForUnresolvableRemoteParent() throws Exception {
-            // POM inherits from a remote parent that does not exist.
-            // The effective model analysis should warn (not silently swallow) the failure.
             String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
@@ -594,18 +578,16 @@ class PluginUpgradeStrategyTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
 
             UpgradeContext context = createMockContext();
-            UpgradeResult result = strategy.apply(context, pomMap);
+            UpgradeResult result = strategy.doApply(context, pomMap);
 
-            // Strategy should complete successfully even when effective model analysis fails
             assertNotNull(result, "Result should not be null");
             assertTrue(result.success(), "Strategy should succeed even when effective model analysis fails");
             assertTrue(result.processedPoms().contains(Paths.get("pom.xml")), "POM should be marked as processed");
 
-            // The warning should have been logged (not silently swallowed at debug level)
             verify(context.logger, atLeastOnce())
                     .warn(argThat(msg -> msg.contains("Failed to analyze effective model")));
         }
@@ -630,11 +612,11 @@ class PluginUpgradeStrategyTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(malformedPomXml));
+            Document document = Document.of(malformedPomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
 
             UpgradeContext context = createMockContext();
-            UpgradeResult result = strategy.apply(context, pomMap);
+            UpgradeResult result = strategy.doApply(context, pomMap);
 
             // Strategy should handle malformed POMs gracefully
             assertNotNull(result, "Result should not be null");
@@ -683,19 +665,14 @@ class PluginUpgradeStrategyTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
 
             UpgradeContext context = createMockContext();
-            strategy.apply(context, pomMap);
+            strategy.doApply(context, pomMap);
 
             // Convert to string to check formatting
-            Format format = Format.getRawFormat();
-            format.setLineSeparator(System.lineSeparator());
-            XMLOutputter out = new XMLOutputter(format);
-            StringWriter writer = new StringWriter();
-            out.output(document.getRootElement(), writer);
-            String result = writer.toString();
+            String result = DomUtils.toXml(document);
 
             // Check that the plugin version was upgraded
             assertTrue(result.contains("<version>3.2</version>"), "Plugin version should be upgraded to 3.2");
@@ -733,19 +710,14 @@ class PluginUpgradeStrategyTest {
                 </project>
                 """;
 
-            Document document = saxBuilder.build(new StringReader(pomXml));
+            Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
 
             UpgradeContext context = createMockContext();
-            strategy.apply(context, pomMap);
+            strategy.doApply(context, pomMap);
 
             // Convert to string to check formatting
-            Format format = Format.getRawFormat();
-            format.setLineSeparator(System.lineSeparator());
-            XMLOutputter out = new XMLOutputter(format);
-            StringWriter writer = new StringWriter();
-            out.output(document.getRootElement(), writer);
-            String result = writer.toString();
+            String result = DomUtils.toXml(document);
 
             // If pluginManagement was added, verify proper formatting
             if (result.contains("<pluginManagement>")) {
