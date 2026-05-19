@@ -40,8 +40,6 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.internal.RepositorySystemSessionFactory;
 import org.apache.maven.model.ModelBase;
 import org.apache.maven.repository.internal.MavenSessionBuilderSupplier;
-import org.apache.maven.repository.internal.VersionFilterBuilder;
-import org.apache.maven.repository.internal.scopes.Maven3ScopeManagerConfiguration;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
@@ -58,8 +56,7 @@ import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.impl.scope.InternalScopeManager;
-import org.eclipse.aether.internal.impl.scope.ScopeManagerImpl;
+import org.eclipse.aether.collection.VersionFilterBuilder;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.LocalRepositoryManager;
 import org.eclipse.aether.repository.RepositoryPolicy;
@@ -193,8 +190,6 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
 
     private final GenericVersionScheme versionScheme = new GenericVersionScheme();
 
-    private final InternalScopeManager scopeManager = new ScopeManagerImpl(Maven3ScopeManagerConfiguration.INSTANCE);
-
     /**
      * For legacy consumers; hopefully nobody.
      */
@@ -218,8 +213,7 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         configProps.putAll(request.getSystemProperties());
         configProps.putAll(request.getUserProperties());
 
-        RepositorySystemSession.SessionBuilder mainSessionBuilder =
-                new MavenSessionBuilderSupplier(repoSystem, scopeManager).get();
+        RepositorySystemSession.SessionBuilder mainSessionBuilder = new MavenSessionBuilderSupplier(repoSystem).get();
         mainSessionBuilder.setCache(request.getRepositoryCache());
 
         mainSessionBuilder.setOffline(request.isOffline());
@@ -280,7 +274,7 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         boolean dependencyManagerTransitivity =
                 ConfigUtils.getBoolean(configProps, false, MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY);
         if (dependencyManagerTransitivity) {
-            mainSessionBuilder.setDependencyManager(new TransitiveDependencyManager(scopeManager));
+            mainSessionBuilder.setDependencyManager(new TransitiveDependencyManager());
         }
 
         DefaultMirrorSelector mirrorSelector = new DefaultMirrorSelector();

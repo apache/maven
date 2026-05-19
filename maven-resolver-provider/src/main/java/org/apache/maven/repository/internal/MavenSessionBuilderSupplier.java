@@ -32,10 +32,6 @@ import org.eclipse.aether.collection.DependencyGraphTransformer;
 import org.eclipse.aether.collection.DependencyManager;
 import org.eclipse.aether.collection.DependencySelector;
 import org.eclipse.aether.collection.DependencyTraverser;
-import org.eclipse.aether.impl.scope.InternalScopeManager;
-import org.eclipse.aether.internal.impl.scope.ManagedDependencyContextRefiner;
-import org.eclipse.aether.internal.impl.scope.ManagedScopeDeriver;
-import org.eclipse.aether.internal.impl.scope.ManagedScopeSelector;
 import org.eclipse.aether.internal.impl.scope.OptionalDependencySelector;
 import org.eclipse.aether.internal.impl.scope.ScopeDependencySelector;
 import org.eclipse.aether.resolution.ArtifactDescriptorPolicy;
@@ -47,6 +43,9 @@ import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
 import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
 import org.eclipse.aether.util.graph.transformer.ConfigurableVersionSelector;
 import org.eclipse.aether.util.graph.transformer.ConflictResolver;
+import org.eclipse.aether.util.graph.transformer.JavaDependencyContextRefiner;
+import org.eclipse.aether.util.graph.transformer.JavaScopeDeriver;
+import org.eclipse.aether.util.graph.transformer.JavaScopeSelector;
 import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
 import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
@@ -64,11 +63,9 @@ import static java.util.Objects.requireNonNull;
  */
 public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
     protected final RepositorySystem repositorySystem;
-    protected final InternalScopeManager scopeManager;
 
-    public MavenSessionBuilderSupplier(RepositorySystem repositorySystem, InternalScopeManager scopeManager) {
+    public MavenSessionBuilderSupplier(RepositorySystem repositorySystem) {
         this.repositorySystem = requireNonNull(repositorySystem);
-        this.scopeManager = requireNonNull(scopeManager);
     }
 
     protected void configureSessionBuilder(SessionBuilder session) {
@@ -78,7 +75,6 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
             key = "env." + (caseSensitive ? key : key.toUpperCase(Locale.ENGLISH));
             session.setSystemProperty(key, value);
         });
-        session.setScopeManager(scopeManager);
         session.setDependencyTraverser(getDependencyTraverser());
         session.setDependencyManager(getDependencyManager());
         session.setDependencySelector(getDependencySelector());
@@ -87,16 +83,12 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
         session.setArtifactDescriptorPolicy(getArtifactDescriptorPolicy());
     }
 
-    protected InternalScopeManager getScopeManager() {
-        return this.scopeManager;
-    }
-
     protected DependencyTraverser getDependencyTraverser() {
         return new FatArtifactTraverser();
     }
 
     protected DependencyManager getDependencyManager() {
-        return new ClassicDependencyManager(getScopeManager());
+        return new ClassicDependencyManager();
     }
 
     protected DependencySelector getDependencySelector() {
@@ -110,10 +102,10 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
         return new ChainedDependencyGraphTransformer(
                 new ConflictResolver(
                         new ConfigurableVersionSelector(),
-                        new ManagedScopeSelector(getScopeManager()),
+                        new JavaScopeSelector(),
                         new SimpleOptionalitySelector(),
-                        new ManagedScopeDeriver(getScopeManager())),
-                new ManagedDependencyContextRefiner(getScopeManager()));
+                        new JavaScopeDeriver()),
+                new JavaDependencyContextRefiner());
     }
 
     protected ArtifactTypeRegistry getArtifactTypeRegistry() {

@@ -34,7 +34,6 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginResolutionException;
-import org.apache.maven.repository.internal.VersionFilterBuilder;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -45,6 +44,7 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.collection.DependencyCollectionException;
 import org.eclipse.aether.collection.DependencySelector;
+import org.eclipse.aether.collection.VersionFilterBuilder;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.graph.DependencyVisitor;
@@ -196,8 +196,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                     AndDependencySelector.newInstance(session.getDependencySelector(), new WagonExcluder());
 
             DefaultRepositorySystemSession pluginSession = new DefaultRepositorySystemSession(session);
-            pluginSession.setConfigProperty(
-                    VersionFilterBuilder.MAVEN_VERSION_FILTER_SUPPRESSED, Boolean.TRUE.toString());
+            pluginSession.setConfigProperty(VersionFilterBuilder.VERSION_FILTER_SUPPRESSED, Boolean.TRUE.toString());
             pluginSession.setDependencySelector(selector);
             pluginSession.setDependencyGraphTransformer(session.getDependencyGraphTransformer());
 
