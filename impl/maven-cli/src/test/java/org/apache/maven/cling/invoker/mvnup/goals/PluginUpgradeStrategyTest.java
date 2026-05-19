@@ -390,6 +390,45 @@ class PluginUpgradeStrategyTest {
         }
 
         @Test
+        @DisplayName("should upgrade surefire-report plugin when below minimum")
+        void shouldUpgradeSurefireReportPluginWhenBelowMinimum() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-surefire-report-plugin</artifactId>
+                                <version>3.1.2</version>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Plugin upgrade should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have upgraded maven-surefire-report-plugin");
+
+            Editor editor = new Editor(document);
+            Element root = editor.root();
+            String version = root.path("build", "plugins", "plugin", "version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals("3.5.2", version);
+        }
+
+        @Test
         @DisplayName("should not upgrade when version is already higher")
         void shouldNotUpgradeWhenVersionAlreadyHigher() throws Exception {
             String pomXml = """
@@ -703,11 +742,14 @@ class PluginUpgradeStrategyTest {
                     upgrades.stream().anyMatch(upgrade -> "maven-surefire-plugin".equals(upgrade.artifactId()));
             boolean hasFailsafePlugin =
                     upgrades.stream().anyMatch(upgrade -> "maven-failsafe-plugin".equals(upgrade.artifactId()));
+            boolean hasSurefireReportPlugin =
+                    upgrades.stream().anyMatch(upgrade -> "maven-surefire-report-plugin".equals(upgrade.artifactId()));
 
             assertTrue(hasCompilerPlugin, "Should include maven-compiler-plugin upgrade");
             assertTrue(hasExecPlugin, "Should include maven-exec-plugin upgrade");
             assertTrue(hasSurefirePlugin, "Should include maven-surefire-plugin upgrade");
             assertTrue(hasFailsafePlugin, "Should include maven-failsafe-plugin upgrade");
+            assertTrue(hasSurefireReportPlugin, "Should include maven-surefire-report-plugin upgrade");
         }
 
         @Test
