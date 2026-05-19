@@ -31,6 +31,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  */
@@ -108,8 +110,72 @@ class DefaultBeanConfiguratorTest {
         assertEquals(new File("test"), bean.file);
     }
 
+    @Test
+    void testSealedTypeImplementationHintCanUseSimpleName() throws BeanConfigurationException {
+        SealedBean bean = new SealedBean();
+
+        Xpp3Dom config = toConfig("<artifact implementation=\"LocalArtifact\"><name>local</name></artifact>");
+
+        DefaultBeanConfigurationRequest request = new DefaultBeanConfigurationRequest();
+        request.setBean(bean).setConfiguration(config);
+
+        configurator.configureBean(request);
+
+        LocalArtifact artifact = assertInstanceOf(LocalArtifact.class, bean.artifact);
+        assertEquals("local", artifact.name);
+    }
+
+    @Test
+    void testSealedTypeImplementationHintCanStillUseClassName() throws BeanConfigurationException {
+        SealedBean bean = new SealedBean();
+
+        Xpp3Dom config = toConfig("<artifact implementation=\"" + RemoteArtifact.class.getName()
+                + "\"><url>https://example.invalid/artifact</url></artifact>");
+
+        DefaultBeanConfigurationRequest request = new DefaultBeanConfigurationRequest();
+        request.setBean(bean).setConfiguration(config);
+
+        configurator.configureBean(request);
+
+        RemoteArtifact artifact = assertInstanceOf(RemoteArtifact.class, bean.artifact);
+        assertEquals("https://example.invalid/artifact", artifact.url);
+    }
+
+    @Test
+    void testSealedTypeImplementationHintMustMatchPermittedSubclass() {
+        SealedBean bean = new SealedBean();
+
+        Xpp3Dom config = toConfig("<artifact implementation=\"MissingArtifact\"><name>missing</name></artifact>");
+
+        DefaultBeanConfigurationRequest request = new DefaultBeanConfigurationRequest();
+        request.setBean(bean).setConfiguration(config);
+
+        BeanConfigurationException e =
+                assertThrows(BeanConfigurationException.class, () -> configurator.configureBean(request));
+        assertEquals(
+                "Cannot find permitted subclass 'MissingArtifact' for sealed type " + SealedArtifact.class.getName(),
+                e.getMessage());
+    }
+
     static class SomeBean {
 
         File file;
+    }
+
+    static class SealedBean {
+
+        SealedArtifact artifact;
+    }
+
+    public sealed interface SealedArtifact permits LocalArtifact, RemoteArtifact {}
+
+    public static final class LocalArtifact implements SealedArtifact {
+
+        String name;
+    }
+
+    public static final class RemoteArtifact implements SealedArtifact {
+
+        String url;
     }
 }
