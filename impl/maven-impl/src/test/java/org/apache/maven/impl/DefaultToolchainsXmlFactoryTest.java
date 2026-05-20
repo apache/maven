@@ -24,85 +24,85 @@ import java.util.function.Function;
 
 import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.services.xml.XmlWriterRequest;
-import org.apache.maven.api.settings.Settings;
+import org.apache.maven.api.toolchain.PersistedToolchains;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class DefaultSettingsXmlFactoryTest {
+class DefaultToolchainsXmlFactoryTest {
 
-    private DefaultSettingsXmlFactory factory;
+    private DefaultToolchainsXmlFactory factory;
 
     @BeforeEach
     void setUp() {
-        factory = new DefaultSettingsXmlFactory();
+        factory = new DefaultToolchainsXmlFactory();
     }
 
     @Test
     void testWriteWithoutFormatterDisablesLocationTracking() throws Exception {
         String xml = """
-                <settings xmlns="http://maven.apache.org/SETTINGS/1.2.0">
-                  <localRepository>/path/to/local/repo</localRepository>
-                  <mirrors>
-                    <mirror>
-                      <mirrorOf>external:http:*</mirrorOf>
-                      <name>Pseudo repository</name>
-                      <url>http://0.0.0.0/</url>
-                      <id>pseudo</id>
-                    </mirror>
-                  </mirrors>
-                </settings>""";
+                <toolchains xmlns="http://maven.apache.org/TOOLCHAINS/1.1.0">
+                  <toolchain>
+                    <type>jdk</type>
+                    <provides>
+                      <version>17</version>
+                    </provides>
+                    <configuration>
+                      <jdkHome>/usr/lib/jvm/java-17</jdkHome>
+                    </configuration>
+                  </toolchain>
+                </toolchains>""";
 
-        Settings settings = factory.read(XmlReaderRequest.builder()
+        PersistedToolchains toolchains = factory.read(XmlReaderRequest.builder()
                 .reader(new StringReader(xml))
                 .strict(true)
                 .build());
 
         StringWriter out = new StringWriter();
-        factory.write(XmlWriterRequest.<Settings>builder()
+        factory.write(XmlWriterRequest.<PersistedToolchains>builder()
                 .writer(out)
-                .content(settings)
+                .content(toolchains)
                 .build());
 
         String result = out.toString();
-        assertTrue(result.contains("<localRepository>"), "Expected settings content to be written to output");
+        assertTrue(result.contains("<type>jdk</type>"), "Expected toolchains content to be written to output");
         assertFalse(result.contains("<!--"), "No XML comments should be present when no formatter is provided");
     }
 
     @Test
     void testWriteWithFormatterEnablesLocationTracking() throws Exception {
         String xml = """
-                <settings xmlns="http://maven.apache.org/SETTINGS/1.2.0">
-                  <localRepository>/path/to/local/repo</localRepository>
-                  <mirrors>
-                    <mirror>
-                      <mirrorOf>external:http:*</mirrorOf>
-                      <name>Pseudo repository</name>
-                      <url>http://0.0.0.0/</url>
-                      <id>pseudo</id>
-                    </mirror>
-                  </mirrors>
-                </settings>""";
+                <toolchains xmlns="http://maven.apache.org/TOOLCHAINS/1.1.0">
+                  <toolchain>
+                    <type>jdk</type>
+                    <provides>
+                      <version>17</version>
+                    </provides>
+                    <configuration>
+                      <jdkHome>/usr/lib/jvm/java-17</jdkHome>
+                    </configuration>
+                  </toolchain>
+                </toolchains>""";
 
-        Settings settings = factory.read(XmlReaderRequest.builder()
+        PersistedToolchains toolchains = factory.read(XmlReaderRequest.builder()
                 .reader(new StringReader(xml))
-                .location("settings.xml")
+                .location("toolchains.xml")
                 .strict(true)
                 .build());
 
         StringWriter out = new StringWriter();
         Function<Object, String> formatter = o -> "LOC_MARK";
 
-        factory.write(XmlWriterRequest.<Settings>builder()
+        factory.write(XmlWriterRequest.<PersistedToolchains>builder()
                 .writer(out)
-                .content(settings)
+                .content(toolchains)
                 .inputLocationFormatter(formatter)
                 .build());
 
         String result = out.toString();
-        assertTrue(result.contains("<localRepository>"), "Expected settings content to be written to output");
+        assertTrue(result.contains("<type>jdk</type>"), "Expected toolchains content to be written to output");
         assertTrue(result.contains("LOC_MARK"), "Expected formatter marker in output when tracking is enabled");
     }
 }
