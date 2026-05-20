@@ -275,7 +275,7 @@ handle_args() {
 handle_args "$@"
 MAVEN_MAIN_CLASS=${MAVEN_MAIN_CLASS:=org.apache.maven.cling.MavenCling}
 
-# Build command string for eval
+# Build base command string for eval (only contains Maven-controlled values)
 cmd="\"$JAVACMD\" \
   $MAVEN_OPTS \
   $MAVEN_DEBUG_OPTS \
@@ -289,14 +289,12 @@ cmd="\"$JAVACMD\" \
   $LAUNCHER_CLASS \
   $MAVEN_ARGS"
 
-# Add remaining arguments with proper quoting
-for arg in "$@"; do
-    cmd="$cmd \"$arg\""
-done
-
 if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
   echo "[DEBUG] Launching JVM with command:" >&2
-  echo "[DEBUG]   $cmd" >&2
+  printf '[DEBUG]   %s' "$cmd" >&2; printf ' "%s"' "$@" >&2; echo >&2
 fi
 
-eval exec "$cmd"
+# User arguments ("$@") are passed directly to preserve literal values
+# like ${...} Maven property placeholders without shell expansion.
+# Only the base command uses eval for MAVEN_OPTS word splitting.
+eval exec "$cmd" '"$@"'

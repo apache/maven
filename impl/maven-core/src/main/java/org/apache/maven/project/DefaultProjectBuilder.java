@@ -46,7 +46,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.maven.ProjectCycleException;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.Language;
@@ -504,10 +503,14 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                         .findAny()
                         .orElse(null);
                 if (cycle != null) {
-                    throw new RuntimeException(new ProjectCycleException(
+                    final CycleDetectedException cde = (CycleDetectedException) cycle.getException();
+                    throw new ProjectBuildingException(
+                            null,
                             "The projects in the reactor contain a cyclic reference: " + cycle.getMessage(),
-                            (CycleDetectedException) cycle.getException()));
+                            null,
+                            cde);
                 }
+
                 throw new ProjectBuildingException(results);
             }
 
@@ -770,6 +773,14 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     // Handle main and test resources using unified source handling
                     sourceContext.handleResourceConfiguration(ProjectScope.MAIN);
                     sourceContext.handleResourceConfiguration(ProjectScope.TEST);
+                }
+
+                // When resources are defined via <sources> (4.1.0 model), sync them to
+                // the model's Build so project.getBuild().getResources() is consistent.
+                // For legacy <resources>, the model already has the correct resources.
+                if (sourceContext.hasSources(Language.RESOURCES, ProjectScope.MAIN)
+                        || sourceContext.hasSources(Language.RESOURCES, ProjectScope.TEST)) {
+                    project.syncBuildResources();
                 }
             }
 
