@@ -344,22 +344,37 @@ public final class Constants {
     public static final String MAVEN_RELOCATIONS_ENTRIES = "maven.relocations.entries";
 
     /**
-     * User property for version filter expression used in session, applied to resolving ranges: a semicolon separated
-     * list of filters to apply. By default, no version filter is applied (like in Maven 3).
+     * Builds <code>org.eclipse.aether.collection.VersionFilter</code> instances out of input expression string.
+     * <br/>
+     * Expression is a semicolon separated list of filters to apply. By default, no version filter is applied (like in Maven 3).
      * <br/>
      * Supported filters:
      * <ul>
-     *     <li>"h" or "h(num)" - highest version or top list of highest ones filter</li>
-     *     <li>"l" or "l(num)" - lowest version or bottom list of lowest ones filter</li>
-     *     <li>"s" - contextual snapshot filter</li>
-     *     <li>"e(G:A:V)" - predicate filter (leaves out G:A:V from range, if hit, V can be range)</li>
+     *     <li><code>"s"</code> - contextual snapshot filter (project version decides are snapshots allowed or not)</li>
+     *     <li><code>"nosnapshot"</code> - unconditional snapshot filter (no snapshot versions selected from ranges)</li>
+     *     <li><code>"norelease"</code> - unconditional release filter (no release versions selected from ranges)</li>
+     *     <li><code>"nopreview"</code> - unconditional preview filter (no preview versions selected from ranges)</li>
+     *     <li><code>"noprerelease"</code> - unconditional pre-release filter (no preview and rc/cr versions selected from ranges)</li>
+     *     <li><code>"noqualifier"</code> - unconditional any-qualifier filter (no version with any qualifier selected from ranges)</li>
+     *     <li><code>"h"</code> (shorthand of <code>h(1)</code>) or <code>"h(num)"</code> - highest N version (based on version ordering)</li>
+     *     <li><code>"l"</code> (shorthand of <code>l(1)</code>) or <code>"l(num)"</code> - lowest N version (based on version ordering)</li>
+     *     <li><code>"e(V)"</code> - exclusion filter (excludes versions matching V version constraint)</li>
+     *     <li><code>"i(V)"</code> - inclusion filter (includes versions matching V version constraint)</li>
      * </ul>
-     * Example filter expression: <code>"h(5);s;e(org.foo:bar:1)</code> will cause: ranges are filtered for "top 5" (instead
-     * full range), snapshots are banned if root project is not a snapshot, and if range for <code>org.foo:bar</code> is
-     * being processed, version 1 is omitted. Value in this property builds
-     * <code>org.eclipse.aether.collection.VersionFilter</code> instance.
+     * Every filter expression may have "scope" applied, in form of <code>@G[:A]</code>. Presence of "scope" narrows the
+     * application of filter to given G or G:A.
+     * <br/>
+     * In case of multiple "similar" rule scopes, user should enlist rules from "most specific" to "least specific".
+     * <br/>
+     * Example filter expression: <code>"h(5);s;e(1)@org.foo:bar"</code> will cause:
+     * <ul>
+     *     <li>ranges are filtered for "top 5" (instead of full range)</li>
+     *     <li>snapshots are banned if root project is not a snapshot</li>
+     *     <li>if range for <code>org.foo:bar</code> is being processed, version 1 is omitted</li>
+     * </ul>
+     * Values in this property builds <code>org.eclipse.aether.collection.VersionFilter</code> instance.
      *
-     * @since 4.0.0
+     * @since 3.10.0
      */
     @Config
     public static final String MAVEN_VERSION_FILTER = "maven.session.versionFilter";
