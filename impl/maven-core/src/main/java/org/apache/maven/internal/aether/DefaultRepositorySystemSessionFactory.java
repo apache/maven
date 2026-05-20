@@ -27,7 +27,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.Constants;
@@ -53,16 +52,9 @@ import org.eclipse.aether.RepositoryListener;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession.SessionBuilder;
-import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.collection.VersionFilter;
+import org.eclipse.aether.collection.VersionFilterBuilder;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.resolution.ResolutionErrorPolicy;
-import org.eclipse.aether.util.graph.version.ChainedVersionFilter;
-import org.eclipse.aether.util.graph.version.ContextualSnapshotVersionFilter;
-import org.eclipse.aether.util.graph.version.HighestVersionFilter;
-import org.eclipse.aether.util.graph.version.LowestVersionFilter;
-import org.eclipse.aether.util.graph.version.PredicateVersionFilter;
 import org.eclipse.aether.util.listener.ChainedRepositoryListener;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
 import org.eclipse.aether.util.repository.ChainedLocalRepositoryManager;
@@ -72,8 +64,7 @@ import org.eclipse.aether.util.repository.DefaultProxySelector;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 import org.eclipse.aether.util.repository.SimpleResolutionErrorPolicy;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
-import org.eclipse.aether.version.Version;
-import org.eclipse.aether.version.VersionRange;
+import org.eclipse.aether.version.VersionConstraint;
 import org.eclipse.aether.version.VersionScheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,6 +120,8 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
 
     private final Map<String, RepositorySystemSessionExtender> sessionExtenders;
 
+    private final VersionFilterBuilder versionFilterBuilder;
+
     @SuppressWarnings("checkstyle:ParameterNumber")
     @Inject
     DefaultRepositorySystemSessionFactory(
@@ -137,13 +130,15 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
             RuntimeInformation runtimeInformation,
             TypeRegistry typeRegistry,
             VersionScheme versionScheme,
-            Map<String, RepositorySystemSessionExtender> sessionExtenders) {
+            Map<String, RepositorySystemSessionExtender> sessionExtenders,
+            VersionFilterBuilder versionFilterBuilder) {
         this.repoSystem = repoSystem;
         this.eventSpyDispatcher = eventSpyDispatcher;
         this.runtimeInformation = runtimeInformation;
         this.typeRegistry = typeRegistry;
         this.versionScheme = versionScheme;
         this.sessionExtenders = sessionExtenders;
+        this.versionFilterBuilder = versionFilterBuilder;
     }
 
     @Deprecated
@@ -192,10 +187,9 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         sessionBuilder.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(
                 request.isIgnoreMissingArtifactDescriptor(), request.isIgnoreInvalidArtifactDescriptor()));
 
-        VersionFilter versionFilter = buildVersionFilter(mergedProps.get(Constants.MAVEN_VERSION_FILTER));
-        if (versionFilter != null) {
-            sessionBuilder.setVersionFilter(versionFilter);
-        }
+        versionFilterBuilder
+                .buildVersionFilter(mergedProps.get(Constants.MAVEN_VERSION_FILTER), this::parseVersionConstraint)
+                .ifPresent(sessionBuilder::setVersionFilter);
 
         DefaultMirrorSelector mirrorSelector = new DefaultMirrorSelector();
         for (Mirror mirror : request.getMirrors()) {
@@ -403,6 +397,14 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         return sessionBuilder;
     }
 
+    private VersionConstraint parseVersionConstraint(String spec) {
+        try {
+            return versionScheme.parseVersionConstraint(spec);
+        } catch (InvalidVersionSpecificationException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
     private Path resolve(String string) {
         if (string.startsWith("~/") || string.startsWith("~\\")) {
             // resolve based on $HOME
@@ -413,72 +415,6 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         } else {
             // resolve based on $CWD
             return Paths.get(string).normalize().toAbsolutePath();
-        }
-    }
-
-    private VersionFilter buildVersionFilter(String filterExpression) {
-        ArrayList<VersionFilter> filters = new ArrayList<>();
-        if (filterExpression != null) {
-            List<String> expressions = Arrays.stream(filterExpression.split(";"))
-                    .filter(s -> s != null && !s.trim().isEmpty())
-                    .toList();
-            for (String expression : expressions) {
-                if ("h".equals(expression)) {
-                    filters.add(new HighestVersionFilter());
-                } else if (expression.startsWith("h(") && expression.endsWith(")")) {
-                    int num = Integer.parseInt(expression.substring(2, expression.length() - 1));
-                    filters.add(new HighestVersionFilter(num));
-                } else if ("l".equals(expression)) {
-                    filters.add(new LowestVersionFilter());
-                } else if (expression.startsWith("l(") && expression.endsWith(")")) {
-                    int num = Integer.parseInt(expression.substring(2, expression.length() - 1));
-                    filters.add(new LowestVersionFilter(num));
-                } else if ("s".equals(expression)) {
-                    filters.add(new ContextualSnapshotVersionFilter());
-                } else if (expression.startsWith("e(") && expression.endsWith(")")) {
-                    Artifact artifact = new DefaultArtifact(expression.substring(2, expression.length() - 1));
-                    VersionRange versionRange =
-                            artifact.getVersion().contains(",") ? parseVersionRange(artifact.getVersion()) : null;
-                    Predicate<Artifact> predicate = a -> {
-                        if (artifact.getGroupId().equals(a.getGroupId())
-                                && artifact.getArtifactId().equals(a.getArtifactId())) {
-                            if (versionRange != null) {
-                                Version v = parseVersion(a.getVersion());
-                                return !versionRange.containsVersion(v);
-                            } else {
-                                return !artifact.getVersion().equals(a.getVersion());
-                            }
-                        }
-                        return true;
-                    };
-                    filters.add(new PredicateVersionFilter(predicate));
-                } else {
-                    throw new IllegalArgumentException("Unsupported filter expression: " + expression);
-                }
-            }
-        }
-        if (filters.isEmpty()) {
-            return null;
-        } else if (filters.size() == 1) {
-            return filters.get(0);
-        } else {
-            return ChainedVersionFilter.newInstance(filters);
-        }
-    }
-
-    private Version parseVersion(String spec) {
-        try {
-            return versionScheme.parseVersion(spec);
-        } catch (InvalidVersionSpecificationException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private VersionRange parseVersionRange(String spec) {
-        try {
-            return versionScheme.parseVersionRange(spec);
-        } catch (InvalidVersionSpecificationException e) {
-            throw new RuntimeException(e);
         }
     }
 
