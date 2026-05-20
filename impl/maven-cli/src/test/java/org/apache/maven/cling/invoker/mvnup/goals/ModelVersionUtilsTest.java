@@ -279,7 +279,7 @@ class ModelVersionUtilsTest {
             Document document = new Parser().parse(pomXml);
             ModelVersionUtils.updateModelVersion(document, targetVersion);
             Element root = document.root();
-            Element modelVersionElement = root.child("modelVersion").orElse(null);
+            Element modelVersionElement = root.childElement("modelVersion").orElse(null);
             assertEquals(targetVersion, modelVersionElement.textContentTrimmed());
         }
 
@@ -299,7 +299,7 @@ class ModelVersionUtilsTest {
             Document document = Document.of(pomXml);
             ModelVersionUtils.updateModelVersion(document, targetVersion);
             Element root = document.root();
-            Element modelVersionElement = root.child("modelVersion").orElse(null);
+            Element modelVersionElement = root.childElement("modelVersion").orElse(null);
             assertNotNull(modelVersionElement);
             assertEquals(targetVersion, modelVersionElement.textContentTrimmed());
         }
@@ -322,7 +322,7 @@ class ModelVersionUtilsTest {
 
             assertTrue(result);
             Element root = document.root();
-            Element modelVersionElement = root.child(MODEL_VERSION).orElse(null);
+            Element modelVersionElement = root.childElement(MODEL_VERSION).orElse(null);
             assertNull(modelVersionElement);
         }
 
