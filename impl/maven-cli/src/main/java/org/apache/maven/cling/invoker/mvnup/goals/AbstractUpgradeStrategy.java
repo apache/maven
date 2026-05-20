@@ -19,6 +19,7 @@
 package org.apache.maven.cling.invoker.mvnup.goals;
 
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -129,7 +130,7 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
 
         // If groupId or version is missing, try to get from parent
         if (groupId == null || version == null) {
-            Element parentElement = root.child(PARENT).orElse(null);
+            Element parentElement = root.childElement(PARENT).orElse(null);
             if (parentElement != null) {
                 if (groupId == null) {
                     groupId = parentElement.childTextTrimmed(MavenPomElements.Elements.GROUP_ID);
@@ -164,7 +165,7 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
      * @return set of all Artifacts in the project
      */
     public static Set<Coordinates> computeAllArtifactCoordinates(UpgradeContext context, Map<Path, Document> pomMap) {
-        Set<Coordinates> coordinates = new HashSet<>();
+        Map<String, Coordinates> coordinatesByGAV = new HashMap<>();
 
         context.info("Computing artifacts for inference from " + pomMap.size() + " POM(s)...");
 
@@ -176,12 +177,12 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
             Coordinates coordinate =
                     AbstractUpgradeStrategy.extractArtifactCoordinatesWithParentResolution(context, pomDocument);
             if (coordinate != null) {
-                coordinates.add(coordinate);
+                coordinatesByGAV.putIfAbsent(coordinate.toGAV(), coordinate);
                 context.debug("Found artifact: " + coordinate.toGAV() + " from " + pomPath);
             }
         }
 
-        context.info("Computed " + coordinates.size() + " unique artifact(s) for inference");
-        return coordinates;
+        context.info("Computed " + coordinatesByGAV.size() + " unique artifact(s) for inference");
+        return new HashSet<>(coordinatesByGAV.values());
     }
 }
