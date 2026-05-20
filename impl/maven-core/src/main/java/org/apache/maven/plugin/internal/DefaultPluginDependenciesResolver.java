@@ -44,6 +44,7 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.collection.DependencyCollectionException;
+import org.eclipse.aether.collection.VersionFilterBuilder;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
@@ -237,6 +238,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
 
         try {
             DefaultRepositorySystemSession pluginSession = new DefaultRepositorySystemSession(session);
+            pluginSession.setConfigProperty(VersionFilterBuilder.VERSION_FILTER_SUPPRESSED, Boolean.TRUE.toString());
             pluginSession.setDependencySelector(session.getDependencySelector());
             pluginSession.setDependencyGraphTransformer(session.getDependencyGraphTransformer());
 
