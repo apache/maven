@@ -148,7 +148,7 @@ public class ModelUpgradeStrategy extends AbstractUpgradeStrategy {
 
         // Update model version element
         Element root = editor.root();
-        Element modelVersionElement = root.child(MODEL_VERSION).orElse(null);
+        Element modelVersionElement = root.childElement(MODEL_VERSION).orElse(null);
         if (modelVersionElement != null) {
             editor.setTextContent(modelVersionElement, targetModelVersion);
             context.detail("Updated modelVersion to " + targetModelVersion);
@@ -207,7 +207,7 @@ public class ModelUpgradeStrategy extends AbstractUpgradeStrategy {
         }
 
         // Convert modules element to subprojects
-        Element modulesElement = root.child(MODULES).orElse(null);
+        Element modulesElement = root.childElement(MODULES).orElse(null);
         if (modulesElement != null) {
             // domtrip makes this much simpler - just change the element name
             // The formatting and structure are preserved automatically
@@ -215,7 +215,7 @@ public class ModelUpgradeStrategy extends AbstractUpgradeStrategy {
             context.detail("Converted <modules> to <subprojects>");
 
             // Convert all module children to subproject
-            var moduleElements = modulesElement.children(MODULE).toList();
+            var moduleElements = modulesElement.childElements(MODULE).toList();
             for (Element moduleElement : moduleElements) {
                 moduleElement.name(SUBPROJECT);
             }
@@ -226,16 +226,17 @@ public class ModelUpgradeStrategy extends AbstractUpgradeStrategy {
         }
 
         // Also check inside profiles
-        Element profilesElement = root.child(PROFILES).orElse(null);
+        Element profilesElement = root.childElement(PROFILES).orElse(null);
         if (profilesElement != null) {
-            var profileElements = profilesElement.children(PROFILE).toList();
+            var profileElements = profilesElement.childElements(PROFILE).toList();
             for (Element profileElement : profileElements) {
-                Element profileModulesElement = profileElement.child(MODULES).orElse(null);
+                Element profileModulesElement =
+                        profileElement.childElement(MODULES).orElse(null);
                 if (profileModulesElement != null) {
                     profileModulesElement.name(SUBPROJECTS);
 
                     var profileModuleElements =
-                            profileModulesElement.children(MODULE).toList();
+                            profileModulesElement.childElements(MODULE).toList();
                     for (Element moduleElement : profileModuleElements) {
                         moduleElement.name(SUBPROJECT);
                     }
@@ -293,17 +294,17 @@ public class ModelUpgradeStrategy extends AbstractUpgradeStrategy {
         int totalUpgrades = 0;
 
         // Upgrade phases in main build section
-        Element buildElement = root.child(BUILD).orElse(null);
+        Element buildElement = root.childElement(BUILD).orElse(null);
         if (buildElement != null) {
             totalUpgrades += upgradePhaseElements(buildElement, phaseUpgrades, context);
         }
 
         // Upgrade phases in profiles
-        Element profilesElement = root.child(PROFILES).orElse(null);
+        Element profilesElement = root.childElement(PROFILES).orElse(null);
         if (profilesElement != null) {
-            var profileElements = profilesElement.children(PROFILE).toList();
+            var profileElements = profilesElement.childElements(PROFILE).toList();
             for (Element profileElement : profileElements) {
-                Element profileBuildElement = profileElement.child(BUILD).orElse(null);
+                Element profileBuildElement = profileElement.childElement(BUILD).orElse(null);
                 if (profileBuildElement != null) {
                     totalUpgrades += upgradePhaseElements(profileBuildElement, phaseUpgrades, context);
                 }
@@ -348,16 +349,17 @@ public class ModelUpgradeStrategy extends AbstractUpgradeStrategy {
         int upgrades = 0;
 
         // Check plugins section
-        Element pluginsElement = buildElement.child(PLUGINS).orElse(null);
+        Element pluginsElement = buildElement.childElement(PLUGINS).orElse(null);
         if (pluginsElement != null) {
             upgrades += upgradePhaseElementsInPlugins(pluginsElement, phaseUpgrades, context);
         }
 
         // Check pluginManagement section
-        Element pluginManagementElement = buildElement.child(PLUGIN_MANAGEMENT).orElse(null);
+        Element pluginManagementElement =
+                buildElement.childElement(PLUGIN_MANAGEMENT).orElse(null);
         if (pluginManagementElement != null) {
             Element managedPluginsElement =
-                    pluginManagementElement.child(PLUGINS).orElse(null);
+                    pluginManagementElement.childElement(PLUGINS).orElse(null);
             if (managedPluginsElement != null) {
                 upgrades += upgradePhaseElementsInPlugins(managedPluginsElement, phaseUpgrades, context);
             }
@@ -373,16 +375,16 @@ public class ModelUpgradeStrategy extends AbstractUpgradeStrategy {
             Element pluginsElement, Map<String, String> phaseUpgrades, UpgradeContext context) {
         int upgrades = 0;
 
-        var pluginElements = pluginsElement.children(PLUGIN).toList();
+        var pluginElements = pluginsElement.childElements(PLUGIN).toList();
         for (Element pluginElement : pluginElements) {
-            Element executionsElement = pluginElement.child(EXECUTIONS).orElse(null);
+            Element executionsElement = pluginElement.childElement(EXECUTIONS).orElse(null);
             if (executionsElement != null) {
                 var executionElements = executionsElement
-                        .children(MavenPomElements.Elements.EXECUTION)
+                        .childElements(MavenPomElements.Elements.EXECUTION)
                         .toList();
                 for (Element executionElement : executionElements) {
                     Element phaseElement = executionElement
-                            .child(MavenPomElements.Elements.PHASE)
+                            .childElement(MavenPomElements.Elements.PHASE)
                             .orElse(null);
                     if (phaseElement != null) {
                         String currentPhase = phaseElement.textContent().trim();
