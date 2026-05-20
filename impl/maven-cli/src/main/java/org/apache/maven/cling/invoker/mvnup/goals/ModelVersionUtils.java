@@ -59,7 +59,7 @@ public final class ModelVersionUtils {
         }
 
         // First try to get from modelVersion element
-        Element modelVersionElement = root.child(MODEL_VERSION).orElse(null);
+        Element modelVersionElement = root.childElement(MODEL_VERSION).orElse(null);
         if (modelVersionElement != null) {
             String modelVersion = modelVersionElement.textContentTrimmed();
             if (!modelVersion.isEmpty()) {
@@ -196,7 +196,7 @@ public final class ModelVersionUtils {
             return;
         }
 
-        Element modelVersionElement = root.child(MODEL_VERSION).orElse(null);
+        Element modelVersionElement = root.childElement(MODEL_VERSION).orElse(null);
         if (modelVersionElement != null) {
             editor.setTextContent(modelVersionElement, newVersion);
         } else {
@@ -219,9 +219,9 @@ public final class ModelVersionUtils {
             return false;
         }
 
-        Element modelVersionElement = root.child(MODEL_VERSION).orElse(null);
+        Element modelVersionElement = root.childElement(MODEL_VERSION).orElse(null);
         if (modelVersionElement != null) {
-            return root.removeNode(modelVersionElement);
+            return root.removeChild(modelVersionElement);
         }
         return false;
     }
