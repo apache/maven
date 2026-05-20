@@ -310,7 +310,7 @@ public abstract class AbstractUpgradeGoal implements Goal {
             boolean modified = false;
             boolean needsNisseCompat = false;
 
-            List<Element> extensions = root.children("extension").toList();
+            List<Element> extensions = root.childElements("extension").toList();
             List<Element> toRemove = new ArrayList<>();
 
             for (Element ext : extensions) {
