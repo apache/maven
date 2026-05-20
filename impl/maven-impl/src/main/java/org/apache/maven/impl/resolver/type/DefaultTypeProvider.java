@@ -60,6 +60,7 @@ public class DefaultTypeProvider implements TypeProvider {
                 new DefaultType(Type.TEST_JAVA_SOURCE, Language.JAVA_FAMILY, "jar", "test-sources", false),
                 new DefaultType(Type.MODULAR_JAR, Language.JAVA_FAMILY, "jar", null, false, JavaPathType.MODULES),
                 new DefaultType(Type.CLASSPATH_JAR, Language.JAVA_FAMILY, "jar", null, false, JavaPathType.CLASSES),
+                new DefaultType(Type.FATJAR, Language.JAVA_FAMILY, "jar", null, true, JavaPathType.CLASSES),
                 new DefaultType(
                         Type.PROCESSOR,
                         Language.JAVA_FAMILY,
