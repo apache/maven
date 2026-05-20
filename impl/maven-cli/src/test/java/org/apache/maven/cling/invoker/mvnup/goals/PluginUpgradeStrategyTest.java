@@ -216,14 +216,14 @@ class PluginUpgradeStrategyTest {
             UpgradeResult result = strategy.doApply(context, pomMap);
 
             assertTrue(result.success(), "Plugin upgrade should succeed");
-            assertTrue(result.modifiedCount() > 0, "Should have upgraded 3.0.0-M1 to 3.0.0");
+            assertTrue(result.modifiedCount() > 0, "Should have upgraded 3.0.0-M1 to 3.5.2");
 
             Editor editor = new Editor(document);
             String version = editor.root()
                     .path("build", "plugins", "plugin", "version")
                     .map(Element::textContentTrimmed)
                     .orElse(null);
-            assertEquals("3.0.0", version, "3.0.0-M1 should be upgraded to 3.0.0");
+            assertEquals("3.5.2", version, "3.0.0-M1 should be upgraded to 3.5.2");
         }
 
         @Test
@@ -265,7 +265,7 @@ class PluginUpgradeStrategyTest {
             String version = root.path("build", "pluginManagement", "plugins", "plugin", "version")
                     .map(Element::textContentTrimmed)
                     .orElse(null);
-            assertEquals("3.0.0", version);
+            assertEquals("3.5.2", version);
         }
 
         @Test
