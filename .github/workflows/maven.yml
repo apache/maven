@@ -32,7 +32,8 @@ concurrency:
 permissions: {}
 
 env:
-  MIMIR_VERSION: 0.11.2
+  # Keep in sync with mimir testing version in pom.xml
+  MIMIR_VERSION: 0.11.4
   MIMIR_BASEDIR: ~/.mimir
   MIMIR_LOCAL: ~/.mimir/local
   MAVEN_OPTS: -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./target/java_heapdump.hprof
@@ -52,6 +53,15 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
+
+      - name: Verify Mimir version alignment
+        shell: bash
+        run: |
+          POM_VERSION=$(grep -A2 'eu.maveniverse.maven.mimir' pom.xml | grep '<version>' | sed 's/.*<version>\(.*\)<\/version>.*/\1/')
+          if [ "$POM_VERSION" != "${{ env.MIMIR_VERSION }}" ]; then
+            echo "::error::MIMIR_VERSION (${{ env.MIMIR_VERSION }}) does not match pom.xml ($POM_VERSION) — update MIMIR_VERSION in this workflow"
+            exit 1
+          fi
 
       - name: Prepare Mimir for Maven 3.x
         shell: bash
