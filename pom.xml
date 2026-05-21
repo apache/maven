@@ -690,6 +690,7 @@ under the License.
         <artifactId>jmh-generator-annprocess</artifactId>
         <version>${jmhVersion}</version>
       </dependency>
+      <!-- Keep version in sync with MIMIR_VERSION in .github/workflows/maven.yml -->
       <dependency>
         <groupId>eu.maveniverse.maven.mimir</groupId>
         <artifactId>testing</artifactId>
