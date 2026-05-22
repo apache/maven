@@ -31,6 +31,7 @@ under the License.
   <description>Provides the implementation classes for the Maven API</description>
 
   <properties>
+    <javaModuleName>org.apache.maven.impl</javaModuleName>
     <!-- in: DefaultModelValidator, DefaultModelBuilder -->
     <checkstyle.violation.ignore>FileLength</checkstyle.violation.ignore>
   </properties>
@@ -176,8 +177,22 @@ under the License.
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.apache.maven</groupId>
+              <artifactId>maven-api-di</artifactId>
+              <version>${project.version}</version>
+            </path>
+          </annotationProcessorPaths>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
+          <useModulePath>false</useModulePath>
           <systemPropertyVariables>
             <localRepository>${settings.localRepository}</localRepository>
           </systemPropertyVariables>
