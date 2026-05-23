@@ -146,19 +146,19 @@ class EnhancedConfigurationConverter extends ObjectWithFieldsConverter {
         if (matches.size() == 1) {
             return matches.get(0);
         }
-        matches.sort(Comparator.comparing(Class::getName));
-
         if (matches.isEmpty()) {
             throw new ComponentConfigurationException(
                     configuration,
                     "Cannot find permitted subclass '" + implementation + "' for sealed type " + type.getName(),
                     cause);
         }
+        matches.sort(Comparator.comparing(Class::getName));
 
         throw new ComponentConfigurationException(
                 configuration,
                 "Implementation hint '" + implementation + "' is ambiguous for sealed type " + type.getName() + ": "
-                        + matches.stream().map(Class::getName).toList());
+                        + matches.stream().map(Class::getName).toList(),
+                cause);
     }
 
     public void processConfiguration(

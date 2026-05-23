@@ -33,6 +33,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  */
@@ -152,9 +153,23 @@ class DefaultBeanConfiguratorTest {
 
         BeanConfigurationException e =
                 assertThrows(BeanConfigurationException.class, () -> configurator.configureBean(request));
-        assertEquals(
-                "Cannot find permitted subclass 'MissingArtifact' for sealed type " + SealedArtifact.class.getName(),
-                e.getMessage());
+        assertTrue(e.getMessage()
+                .contains("Cannot find permitted subclass 'MissingArtifact' for sealed type "
+                        + SealedArtifact.class.getName()));
+    }
+
+    @Test
+    void testSealedTypeAmbiguousSimpleNameThrowsError() {
+        AmbiguousBean bean = new AmbiguousBean();
+
+        Xpp3Dom config = toConfig("<value implementation=\"Ambiguous\"/>");
+
+        DefaultBeanConfigurationRequest request = new DefaultBeanConfigurationRequest();
+        request.setBean(bean).setConfiguration(config);
+
+        BeanConfigurationException e =
+                assertThrows(BeanConfigurationException.class, () -> configurator.configureBean(request));
+        assertTrue(e.getMessage().contains("is ambiguous for sealed type " + AmbiguousSealedType.class.getName()));
     }
 
     static class SomeBean {
@@ -167,7 +182,14 @@ class DefaultBeanConfiguratorTest {
         SealedArtifact artifact;
     }
 
+    static class AmbiguousBean {
+
+        AmbiguousSealedType value;
+    }
+
     public sealed interface SealedArtifact permits LocalArtifact, RemoteArtifact {}
+
+    public sealed interface AmbiguousSealedType permits Holder1.Ambiguous, Holder2.Ambiguous {}
 
     public static final class LocalArtifact implements SealedArtifact {
 
@@ -177,5 +199,15 @@ class DefaultBeanConfiguratorTest {
     public static final class RemoteArtifact implements SealedArtifact {
 
         String url;
+    }
+
+    public static final class Holder1 {
+
+        public static final class Ambiguous implements AmbiguousSealedType {}
+    }
+
+    public static final class Holder2 {
+
+        public static final class Ambiguous implements AmbiguousSealedType {}
     }
 }
