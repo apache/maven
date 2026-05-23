@@ -151,7 +151,7 @@ public class ConditionParser {
                         tokens.add(c + "=");
                         i++; // Skip the next character
                     } else if ((c == '&' || c == '|') && i + 1 < expression.length() && expression.charAt(i + 1) == c) {
-                        tokens.add(String.valueOf(c) + c);
+                        tokens.add("" + c + c);
                         i++; // Skip the next character
                     } else {
                         tokens.add(String.valueOf(c));
