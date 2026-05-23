@@ -44,5 +44,12 @@ class MavenITgh12064SiteReactorDependenciesTest extends AbstractMavenIntegration
 
         verifier.verifyFilePresent("consumer/target/site/dependencies.html");
         assertFalse(new File(testDir, "producer/target/classes").exists(), "site must not require compile first");
+        assertFalse(
+                new File(
+                                testDir,
+                                "target/project-local-repo/org.apache.maven.its.gh12064/producer/1.0-SNAPSHOT/"
+                                        + "producer-1.0-SNAPSHOT.jar")
+                        .exists(),
+                "site must not leave synthetic artifacts in the project-local-repo");
     }
 }

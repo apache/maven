@@ -81,6 +81,8 @@ class ReactorReader implements MavenWorkspaceReader {
     private Map<String, Map<String, Map<String, MavenProject>>> projects;
     private Map<String, Map<String, Map<String, MavenProject>>> allProjects;
     private Path projectLocalRepository;
+    private Path emptyArtifactRepository;
+    private final ConcurrentHashMap<Path, File> emptyArtifactCache = new ConcurrentHashMap<>();
     // projectId -> Deque<lifecycle>
     private final Map<String, Deque<String>> lifecycles = new ConcurrentHashMap<>();
 
@@ -219,7 +221,7 @@ class ReactorReader implements MavenWorkspaceReader {
                 return outputDirectory;
             }
 
-            if (hasSiteLifecyclePhase(project) && "jar".equals(artifact.getExtension()) && "jar".equals(type)) {
+            if (isSiteGoalRequested() && "jar".equals(artifact.getExtension()) && "jar".equals(type)) {
                 return ensureEmptyArtifactFile(artifact);
             }
         }
@@ -230,29 +232,35 @@ class ReactorReader implements MavenWorkspaceReader {
     }
 
     private File ensureEmptyArtifactFile(final Artifact artifact) {
-        Path target = getArtifactPath(artifact);
-        synchronized (this) {
-            if (Files.isRegularFile(target)) {
-                return target.toFile();
+        Path target = getEmptyArtifactPath(artifact);
+        return emptyArtifactCache.computeIfAbsent(target, path -> {
+            if (Files.isRegularFile(path)) {
+                return path.toFile();
             }
             try {
-                Files.createDirectories(target.getParent());
-                try (JarOutputStream ignored = new JarOutputStream(Files.newOutputStream(target))) {
+                Files.createDirectories(path.getParent());
+                try (JarOutputStream ignored = new JarOutputStream(Files.newOutputStream(path))) {
                     // create an empty jar for site reports that inspect reactor artifacts before package
                 }
-                return target.toFile();
+                return path.toFile();
             } catch (IOException e) {
                 LOGGER.warn("Unable to create empty reactor artifact for '{}'.", artifact, e);
                 return null;
             }
-        }
+        });
     }
 
-    private boolean hasSiteLifecyclePhase(MavenProject project) {
-        return project.hasLifecyclePhase("pre-site")
-                || project.hasLifecyclePhase("site")
-                || project.hasLifecyclePhase("post-site")
-                || project.hasLifecyclePhase("site-deploy");
+    private boolean isSiteGoalRequested() {
+        return session.getGoals().stream().anyMatch(ReactorReader::isSiteGoal);
+    }
+
+    private static boolean isSiteGoal(String goal) {
+        return "pre-site".equals(goal)
+                || "site".equals(goal)
+                || "post-site".equals(goal)
+                || "site-deploy".equals(goal)
+                || goal.endsWith(":site")
+                || goal.endsWith(":site-deploy");
     }
 
     private boolean isPackagedArtifactUpToDate(MavenProject project, File packagedArtifactFile) {
@@ -516,12 +524,26 @@ class ReactorReader implements MavenWorkspaceReader {
         String version = artifact.getBaseVersion();
         String classifier = artifact.getClassifier();
         String extension = artifact.getExtension();
-        return getArtifactPath(groupId, artifactId, version, classifier, extension);
+        return getArtifactPath(getProjectLocalRepo(), groupId, artifactId, version, classifier, extension);
     }
 
     private Path getArtifactPath(
             String groupId, String artifactId, String version, String classifier, String extension) {
-        Path repo = getProjectLocalRepo();
+        return getArtifactPath(getProjectLocalRepo(), groupId, artifactId, version, classifier, extension);
+    }
+
+    private Path getEmptyArtifactPath(Artifact artifact) {
+        return getArtifactPath(
+                getEmptyArtifactRepo(),
+                artifact.getGroupId(),
+                artifact.getArtifactId(),
+                artifact.getBaseVersion(),
+                artifact.getClassifier(),
+                artifact.getExtension());
+    }
+
+    private Path getArtifactPath(
+            Path repo, String groupId, String artifactId, String version, String classifier, String extension) {
         return repo.resolve(groupId)
                 .resolve(artifactId)
                 .resolve(version)
@@ -531,6 +553,13 @@ class ReactorReader implements MavenWorkspaceReader {
                         + (classifier != null && !classifier.isEmpty() ? "-" + classifier : "")
                         + '.'
                         + extension);
+    }
+
+    private Path getEmptyArtifactRepo() {
+        if (emptyArtifactRepository == null) {
+            emptyArtifactRepository = getProjectLocalRepo().resolveSibling("reactor-empty-artifacts");
+        }
+        return emptyArtifactRepository;
     }
 
     private Path getProjectLocalRepo() {
