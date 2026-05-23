@@ -234,12 +234,15 @@ final class PathModularization {
     }
 
     /**
-     * If the module has no name, adds the filename of the JAR file in the given collection.
-     * This method should be invoked for dependencies placed on {@link JavaPathType#MODULES}
-     * for preparing a warning saying that this project may fail to resolve these modules.
-     * If the module has an explicit name either with a {@code module-info.class} file or with
-     * an {@code "Automatic-Module-Name"} attribute in the {@code META-INF/MANIFEST.MF} file,
-     * then this method does nothing.
+     * If the JAR has no {@code module-info.class} entry and no {@code Automatic-Module-Name}
+     * attribute in JAR's manifest, adds the filename of the JAR file in the given collection.
+     * This method should be invoked for all dependencies placed on the module-path,
+     * e.g. all dependencies of type {@link JavaPathType#MODULES}.
+     * If the module described by the {@code PathModularization} instance has an explicit name
+     * either with a {@code module-info.class} file or with an {@code "Automatic-Module-Name"}
+     * attribute in the {@code META-INF/MANIFEST.MF} file, then this method does nothing.
+     * Otherwise, this method adds an element in the given {@code automodulesDetected} collection.
+     * That collection will be used later for preparing a warning message.
      */
     public void addIfFilenameBasedAutomodules(Collection<String> automodulesDetected) {
         if (descriptors.isEmpty()) {

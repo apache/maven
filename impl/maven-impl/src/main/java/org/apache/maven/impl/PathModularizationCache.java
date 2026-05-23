@@ -193,8 +193,8 @@ final class PathModularizationCache {
         var joiner = new StringJoiner(
                 fileSeparator,
                 "Filename-based automodules detected on the module path: " + fileSeparator,
-                lineSeparator + "This project may not work in applications that do not use "
-                        + "these dependencies with exactly the same filenames as listed above.");
+                lineSeparator + "This project may not work if consumers use "
+                        + "these dependencies with different filenames.");
         automodulesDetected.forEach(joiner::add);
         return Optional.of(joiner.toString());
     }
