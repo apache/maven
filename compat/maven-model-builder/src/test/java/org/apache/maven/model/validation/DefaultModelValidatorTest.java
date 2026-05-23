@@ -22,6 +22,9 @@ import java.io.InputStream;
 import java.io.Serial;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.UnaryOperator;
 
 import org.apache.maven.model.Model;
@@ -920,14 +923,14 @@ class DefaultModelValidatorTest {
     void testConcurrentValidation() throws Exception {
         int threadCount = 10;
         int iterationsPerThread = 100;
-        java.util.concurrent.CountDownLatch startLatch = new java.util.concurrent.CountDownLatch(1);
-        java.util.concurrent.CountDownLatch doneLatch = new java.util.concurrent.CountDownLatch(threadCount);
-        java.util.concurrent.atomic.AtomicReference<Throwable> failure = new java.util.concurrent.atomic.AtomicReference<>();
+        CountDownLatch startLatch = new CountDownLatch(1);
+        CountDownLatch doneLatch = new CountDownLatch(threadCount);
+        AtomicReference<Throwable> failure = new AtomicReference<>();
 
         // Create multiple threads that will validate models concurrently
         for (int t = 0; t < threadCount; t++) {
             final int threadId = t;
-            new Thread(() -> {
+            Thread thread = new Thread(() -> {
                 try {
                     startLatch.await(); // Wait for all threads to be ready
                     for (int i = 0; i < iterationsPerThread; i++) {
@@ -945,14 +948,17 @@ class DefaultModelValidatorTest {
                 } finally {
                     doneLatch.countDown();
                 }
-            }).start();
+            });
+            thread.setName("validator-test-" + threadId);
+            thread.setDaemon(true);
+            thread.start();
         }
 
         // Start all threads simultaneously
         startLatch.countDown();
 
         // Wait for all threads to complete
-        assertTrue(doneLatch.await(30, java.util.concurrent.TimeUnit.SECONDS), "Threads did not complete in time");
+        assertTrue(doneLatch.await(30, TimeUnit.SECONDS), "Threads did not complete in time");
 
         // Check if any thread encountered an error
         if (failure.get() != null) {
