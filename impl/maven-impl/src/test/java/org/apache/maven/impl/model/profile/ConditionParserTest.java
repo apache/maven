@@ -288,6 +288,29 @@ class ConditionParserTest {
     }
 
     @Test
+    void testPipePipeTokenizerMultiline() {
+        // Regression test for https://github.com/apache/maven/issues/11882
+        // The || operator was not being tokenized correctly when a line break appeared before it.
+        // Uses ${os.name} which is set to 'windows' in the mock context.
+
+        // Case 1: Basic || without line breaks (baseline)
+        assertTrue((Boolean) parser.parse("${os.arch} == 'amd64' || ${os.name} == 'windows'"));
+
+        // Case 2: Line break BEFORE ||
+        assertTrue((Boolean) parser.parse("${os.arch} == 'amd64'\n|| ${os.name} == 'windows'"));
+
+        // Case 3: Line break AFTER ||
+        assertTrue((Boolean) parser.parse("${os.arch} == 'amd64' ||\n${os.name} == 'windows'"));
+
+        // Case 4: Line breaks on both sides
+        assertTrue((Boolean) parser.parse("${os.arch} == 'amd64'\n||\n${os.name} == 'windows'"));
+
+        // Case 5: Mixed && and || with line breaks
+        assertTrue(
+                (Boolean) parser.parse("${os.arch} == 'amd64'\n&& ${os.name} == 'windows' || ${os.name} == 'windows'"));
+    }
+
+    @Test
     void testNestedPropertyAlias() {
         functions.put("property", args -> {
             if (args.get(0).equals("project.rootDirectory")) {
