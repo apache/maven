@@ -107,6 +107,8 @@ public class MavenProject implements Cloneable {
 
     private File file;
 
+    private File consumerPomFile;
+
     private File basedir;
 
     private Set<Artifact> resolvedArtifacts;
@@ -258,6 +260,17 @@ public class MavenProject implements Cloneable {
      */
     public void setPomFile(File file) {
         this.file = file;
+    }
+
+    public void setConsumerPomFile(File file) {
+        this.consumerPomFile = file;
+    }
+
+    public File getConsumerPomFile() {
+        if (consumerPomFile == null) {
+            return getFile();
+        }
+        return consumerPomFile;
     }
 
     public File getBasedir() {
@@ -852,6 +865,7 @@ public class MavenProject implements Cloneable {
      * @deprecated Please use {@link MavenProjectHelper}
      * @throws DuplicateArtifactAttachmentException will never happen but leave it for backward compatibility
      */
+    @Deprecated
     public void addAttachedArtifact(Artifact artifact) throws DuplicateArtifactAttachmentException {
         // if already there we remove it and add again
         int index = attachedArtifacts.indexOf(artifact);
@@ -1094,6 +1108,7 @@ public class MavenProject implements Cloneable {
 
         // copy fields
         file = project.file;
+        this.consumerPomFile = project.consumerPomFile;
         basedir = project.basedir;
 
         // don't need a deep copy, they don't get modified or added/removed to/from - but make them unmodifiable to be
