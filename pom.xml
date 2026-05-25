@@ -127,7 +127,7 @@ under the License.
   <properties>
     <javaVersion>8</javaVersion>
     <version.sisu-maven-plugin>1.0.0</version.sisu-maven-plugin>
-    <asmVersion>9.10</asmVersion>
+    <asmVersion>9.10.1</asmVersion>
     <classWorldsVersion>2.12.0</classWorldsVersion>
     <commonsCliVersion>1.11.0</commonsCliVersion>
     <commonsIoVersion>2.22.0</commonsIoVersion>
