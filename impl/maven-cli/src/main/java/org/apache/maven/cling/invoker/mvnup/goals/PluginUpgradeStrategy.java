@@ -18,10 +18,7 @@
  */
 package org.apache.maven.cling.invoker.mvnup.goals;
 
-import java.io.File;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -32,35 +29,17 @@ import java.util.stream.Collectors;
 import eu.maveniverse.domtrip.Document;
 import eu.maveniverse.domtrip.Editor;
 import eu.maveniverse.domtrip.Element;
-import org.apache.maven.api.RemoteRepository;
-import org.apache.maven.api.Session;
 import org.apache.maven.api.cli.mvnup.UpgradeOptions;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Priority;
-import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.model.PluginManagement;
-import org.apache.maven.api.model.Repository;
-import org.apache.maven.api.model.RepositoryPolicy;
-import org.apache.maven.api.services.ModelBuilder;
-import org.apache.maven.api.services.ModelBuilderRequest;
-import org.apache.maven.api.services.ModelBuilderResult;
-import org.apache.maven.api.services.RepositoryFactory;
-import org.apache.maven.api.services.Sources;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
-import org.apache.maven.impl.standalone.ApiRunner;
-import org.codehaus.plexus.components.secdispatcher.Dispatcher;
-import org.codehaus.plexus.components.secdispatcher.internal.dispatchers.LegacyDispatcher;
-import org.eclipse.aether.spi.connector.transport.TransporterFactory;
-import org.eclipse.aether.spi.connector.transport.http.ChecksumExtractor;
-import org.eclipse.aether.spi.io.PathProcessor;
-import org.eclipse.aether.transport.file.FileTransporterFactory;
-import org.eclipse.aether.transport.jdk.JdkTransporterFactory;
 
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.ARTIFACT_ID;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.BUILD;
@@ -129,8 +108,6 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             "extra-enforcer-rules",
             "1.4",
             "Versions before 1.4 use a removed DependencyGraphBuilder API incompatible with Maven 4"));
-
-    private Session session;
 
     @Inject
     public PluginUpgradeStrategy() {}
@@ -487,104 +464,6 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
     }
 
     /**
-     * Gets or creates the cached Maven 4 session.
-     */
-    private Session getSession() {
-        if (session == null) {
-            session = createMaven4Session();
-        }
-        return session;
-    }
-
-    /**
-     * Creates a new Maven 4 session for effective POM computation.
-     */
-    private Session createMaven4Session() {
-        Session session = ApiRunner.createSession(injector -> {
-            injector.bindInstance(Dispatcher.class, new LegacyDispatcher());
-            injector.bindImplicit(TransporterFactoryConfig.class);
-        });
-
-        // Configure repositories
-        // TODO: we should read settings
-        RemoteRepository central =
-                session.createRemoteRepository(RemoteRepository.CENTRAL_ID, "https://repo.maven.apache.org/maven2");
-        RemoteRepository snapshots = session.getService(RepositoryFactory.class)
-                .createRemote(Repository.newBuilder()
-                        .id("apache-snapshots")
-                        .url("https://repository.apache.org/content/repositories/snapshots/")
-                        .releases(RepositoryPolicy.newBuilder().enabled("false").build())
-                        .snapshots(RepositoryPolicy.newBuilder().enabled("true").build())
-                        .build());
-
-        return session.withRemoteRepositories(List.of(central, snapshots));
-    }
-
-    /**
-     * Creates a temporary project structure with all POMs written to preserve relative paths.
-     * This allows Maven 4 API to properly resolve the project hierarchy.
-     */
-    private Path createTempProjectStructure(UpgradeContext context, Map<Path, Document> pomMap) throws Exception {
-        Path tempDir = Files.createTempDirectory("mvnup-project-");
-        context.debug("Created temp project directory: " + tempDir);
-
-        // Find the common root of all POM paths to preserve relative structure
-        Path commonRoot = findCommonRoot(pomMap.keySet());
-        context.debug("Common root: " + commonRoot);
-
-        // Write each POM to the temp directory, preserving relative structure
-        for (Map.Entry<Path, Document> entry : pomMap.entrySet()) {
-            Path originalPath = entry.getKey();
-            Document document = entry.getValue();
-
-            // Calculate the relative path from common root
-            Path relativePath = commonRoot.relativize(originalPath);
-            Path tempPomPath = tempDir.resolve(relativePath);
-
-            // Ensure parent directories exist
-            Files.createDirectories(tempPomPath.getParent());
-
-            // Write POM to temp location
-            writePomToFile(document, tempPomPath);
-            context.debug("Wrote POM to temp location: " + tempPomPath);
-        }
-
-        return tempDir;
-    }
-
-    /**
-     * Finds the common root directory of all POM paths.
-     */
-    private Path findCommonRoot(Set<Path> pomPaths) {
-        Path commonRoot = null;
-        for (Path pomPath : pomPaths) {
-            Path parent = pomPath.getParent();
-            if (parent == null) {
-                parent = Path.of(".");
-            }
-            if (commonRoot == null) {
-                commonRoot = parent;
-            } else {
-                // Find common ancestor
-                while (!parent.startsWith(commonRoot)) {
-                    commonRoot = commonRoot.getParent();
-                    if (commonRoot == null) {
-                        break;
-                    }
-                }
-            }
-        }
-        return commonRoot;
-    }
-
-    /**
-     * Writes a Document to a file using the same format as the existing codebase.
-     */
-    private void writePomToFile(Document document, Path filePath) throws Exception {
-        Files.writeString(filePath, document.toXml());
-    }
-
-    /**
      * Analyzes plugins using effective models built from the temp directory.
      * Returns a map of POM path to the set of plugin keys that need management.
      */
@@ -637,28 +516,9 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                         upgrade -> upgrade.groupId() + ":" + upgrade.artifactId(), upgrade -> upgrade));
     }
 
-    /**
-     * Analyzes the effective model for a single POM to find plugins that need upgrades.
-     */
     private Set<String> analyzeEffectiveModelForPlugins(
             UpgradeContext context, Path tempPomPath, Map<String, PluginUpgrade> pluginUpgrades) {
-
-        // Use the cached Maven 4 session
-        Session session = getSession();
-        ModelBuilder modelBuilder = session.getService(ModelBuilder.class);
-
-        // Build effective model
-        ModelBuilderRequest request = ModelBuilderRequest.builder()
-                .session(session)
-                .source(Sources.buildSource(tempPomPath))
-                .requestType(ModelBuilderRequest.RequestType.BUILD_EFFECTIVE)
-                .recursive(false) // We only want this POM, not its modules
-                .build();
-
-        ModelBuilderResult result = modelBuilder.newSession().build(request);
-        Model effectiveModel = result.getEffectiveModel();
-
-        // Analyze plugins from effective model
+        Model effectiveModel = buildEffectiveModel(tempPomPath);
         return analyzePluginsFromEffectiveModel(context, effectiveModel, pluginUpgrades);
     }
 
@@ -729,19 +589,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
     private Path findLastLocalParentForPluginManagement(
             UpgradeContext context, Path tempPomPath, Map<Path, Document> pomMap, Path tempDir, Path commonRoot) {
 
-        // Build effective model to get parent information
-        Session session = getSession();
-        ModelBuilder modelBuilder = session.getService(ModelBuilder.class);
-
-        ModelBuilderRequest request = ModelBuilderRequest.builder()
-                .session(session)
-                .source(Sources.buildSource(tempPomPath))
-                .requestType(ModelBuilderRequest.RequestType.BUILD_EFFECTIVE)
-                .recursive(false)
-                .build();
-
-        ModelBuilderResult result = modelBuilder.newSession().build(request);
-        Model effectiveModel = result.getEffectiveModel();
+        Model effectiveModel = buildEffectiveModel(tempPomPath);
 
         // Convert the temp path back to the original path
         Path relativePath = tempDir.relativize(tempPomPath);
@@ -761,17 +609,8 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 // Parent is local, so it becomes our new candidate
                 lastLocalParent = parentPath;
 
-                // Load the parent model to continue walking up
                 Path parentTempPath = tempDir.resolve(commonRoot.relativize(parentPath));
-                ModelBuilderRequest parentRequest = ModelBuilderRequest.builder()
-                        .session(session)
-                        .source(Sources.buildSource(parentTempPath))
-                        .requestType(ModelBuilderRequest.RequestType.BUILD_EFFECTIVE)
-                        .recursive(false)
-                        .build();
-
-                ModelBuilderResult parentResult = modelBuilder.newSession().build(parentRequest);
-                currentModel = parentResult.getEffectiveModel();
+                currentModel = buildEffectiveModel(parentTempPath);
             } else {
                 // Parent is external, stop here
                 break;
@@ -897,20 +736,6 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
     }
 
     /**
-     * Cleans up the temporary directory.
-     */
-    private void cleanupTempDirectory(Path tempDir) {
-        try {
-            Files.walk(tempDir)
-                    .sorted(Comparator.reverseOrder())
-                    .map(Path::toFile)
-                    .forEach(File::delete);
-        } catch (Exception e) {
-            // Best effort cleanup - don't fail the whole operation
-        }
-    }
-
-    /**
      * Holds plugin upgrade information for Maven 4 compatibility.
      * This class contains the minimum version requirements for plugins
      * that need to be upgraded to work properly with Maven 4.
@@ -936,26 +761,6 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             this.groupId = groupId;
             this.artifactId = artifactId;
             this.minVersion = minVersion;
-        }
-    }
-
-    /**
-     * DI configuration that registers transporter factories for the standalone Maven session.
-     * Uses {@code @Provides} methods so the factories are properly registered as named beans
-     * and feed into the {@code Map<String, TransporterFactory>} used by the TransporterProvider.
-     */
-    static class TransporterFactoryConfig {
-        @Provides
-        @Named(JdkTransporterFactory.NAME)
-        static TransporterFactory jdkTransporterFactory(
-                ChecksumExtractor checksumExtractor, PathProcessor pathProcessor) {
-            return new JdkTransporterFactory(checksumExtractor, pathProcessor);
-        }
-
-        @Provides
-        @Named(FileTransporterFactory.NAME)
-        static TransporterFactory fileTransporterFactory() {
-            return new FileTransporterFactory();
         }
     }
 }
