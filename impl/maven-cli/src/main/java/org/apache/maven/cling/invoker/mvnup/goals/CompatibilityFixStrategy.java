@@ -125,6 +125,7 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
         Set<Path> errorPoms = new HashSet<>();
 
         Set<String> allDefinedProperties = collectAllDefinedProperties(pomMap);
+        allDefinedProperties.addAll(collectEffectiveProperties(context, pomMap));
 
         for (Map.Entry<Path, Document> entry : pomMap.entrySet()) {
             Path pomPath = entry.getKey();
@@ -373,6 +374,19 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
                         .forEach(profile -> profile.childElement(PROPERTIES)
                                 .ifPresent(propsElement ->
                                         propsElement.childElements().forEach(child -> properties.add(child.name())))));
+    }
+
+    private Set<String> collectEffectiveProperties(UpgradeContext context, Map<Path, Document> pomMap) {
+        Set<String> properties = new HashSet<>();
+        for (Path pomPath : pomMap.keySet()) {
+            try {
+                org.apache.maven.api.model.Model effectiveModel = buildEffectiveModel(pomPath);
+                properties.addAll(effectiveModel.getProperties().keySet());
+            } catch (Exception e) {
+                context.debug("Failed to build effective model for " + pomPath + ": " + e.getMessage());
+            }
+        }
+        return properties;
     }
 
     /**
