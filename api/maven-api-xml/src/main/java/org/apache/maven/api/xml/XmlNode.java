@@ -228,6 +228,9 @@ public interface XmlNode {
     @Nullable
     Object inputLocation();
 
+    /**
+     * @deprecated Use {@link #name()} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
     default String getName() {
@@ -251,6 +254,7 @@ public interface XmlNode {
     default String getPrefix() {
         return prefix();
     }
+
     /**
      * @deprecated Use {@link #value()} instead.
      */
@@ -330,7 +334,8 @@ public interface XmlNode {
      * @param recessive if {@code null}, nothing will happen
      * @return the merged node
      *
-     * @deprecated Use {@link XmlService#merge(XmlNode, XmlNode, Boolean)} instead.
+     * @deprecated Use {@link XmlService#merge(XmlNode, XmlNode, Boolean)}
+     * with an appropriate {@code childMergeOverride} value instead.
      */
     @Deprecated(since = "4.0.0", forRemoval = true)
     @Nullable
