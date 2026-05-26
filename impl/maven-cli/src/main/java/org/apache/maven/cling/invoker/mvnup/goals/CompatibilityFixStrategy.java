@@ -25,9 +25,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import eu.maveniverse.domtrip.Comment;
 import eu.maveniverse.domtrip.Document;
+import eu.maveniverse.domtrip.Editor;
 import eu.maveniverse.domtrip.Element;
 import eu.maveniverse.domtrip.maven.Coordinates;
 import eu.maveniverse.domtrip.maven.MavenPomElements;
@@ -54,6 +58,7 @@ import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PLUGIN_REPO
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PLUGIN_REPOSITORY;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PROFILE;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PROFILES;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PROPERTIES;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.RELATIVE_PATH;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.REPOSITORIES;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.REPOSITORY;
@@ -69,6 +74,8 @@ import static eu.maveniverse.domtrip.maven.MavenPomElements.Plugins.MAVEN_PLUGIN
 @Singleton
 @Priority(20)
 public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
+
+    private static final Pattern EXPRESSION_PATTERN = Pattern.compile("\\$\\{([^}]+)}");
 
     @Override
     public boolean isApplicable(UpgradeContext context) {
@@ -117,6 +124,8 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
         Set<Path> modifiedPoms = new HashSet<>();
         Set<Path> errorPoms = new HashSet<>();
 
+        Set<String> allDefinedProperties = collectAllDefinedProperties(pomMap);
+
         for (Map.Entry<Path, Document> entry : pomMap.entrySet()) {
             Path pomPath = entry.getKey();
             Document pomDocument = entry.getValue();
@@ -128,13 +137,13 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
             try {
                 boolean hasIssues = false;
 
-                // Apply all compatibility fixes
                 hasIssues |= fixUnsupportedCombineChildrenAttributes(pomDocument, context);
                 hasIssues |= fixUnsupportedCombineSelfAttributes(pomDocument, context);
                 hasIssues |= fixDuplicateDependencies(pomDocument, context);
                 hasIssues |= fixDuplicatePlugins(pomDocument, context);
                 hasIssues |= fixUnsupportedRepositoryExpressions(pomDocument, context);
                 hasIssues |= fixIncorrectParentRelativePaths(pomDocument, pomPath, pomMap, context);
+                hasIssues |= fixUndefinedPropertyExpressions(pomDocument, allDefinedProperties, context);
 
                 if (hasIssues) {
                     context.success("Maven 4 compatibility issues fixed");
@@ -343,6 +352,151 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
         }
 
         return false;
+    }
+
+    private Set<String> collectAllDefinedProperties(Map<Path, Document> pomMap) {
+        Set<String> properties = new HashSet<>();
+        for (Map.Entry<Path, Document> entry : pomMap.entrySet()) {
+            collectPropertiesFromDom(entry.getValue(), properties);
+        }
+        return properties;
+    }
+
+    private void collectPropertiesFromDom(Document document, Set<String> properties) {
+        Element root = document.root();
+
+        root.childElement(PROPERTIES)
+                .ifPresent(propsElement -> propsElement.childElements().forEach(child -> properties.add(child.name())));
+
+        root.childElement(PROFILES)
+                .ifPresent(profiles -> profiles.childElements(PROFILE)
+                        .forEach(profile -> profile.childElement(PROPERTIES)
+                                .ifPresent(propsElement ->
+                                        propsElement.childElements().forEach(child -> properties.add(child.name())))));
+    }
+
+    /**
+     * Fixes dependencies with undefined property expressions by commenting them out.
+     */
+    private boolean fixUndefinedPropertyExpressions(
+            Document pomDocument, Set<String> allDefinedProperties, UpgradeContext context) {
+        Element root = pomDocument.root();
+
+        Stream<DependencyContainer> dependencyContainers = Stream.concat(
+                Stream.of(
+                                new DependencyContainer(
+                                        root.childElement(DEPENDENCIES).orElse(null), DEPENDENCIES),
+                                new DependencyContainer(
+                                        root.childElement(DEPENDENCY_MANAGEMENT)
+                                                .flatMap(dm -> dm.childElement(DEPENDENCIES))
+                                                .orElse(null),
+                                        DEPENDENCY_MANAGEMENT))
+                        .filter(container -> container.element != null),
+                root.childElement(PROFILES).stream()
+                        .flatMap(profiles -> profiles.childElements(PROFILE))
+                        .flatMap(profile -> Stream.of(
+                                        new DependencyContainer(
+                                                profile.childElement(DEPENDENCIES)
+                                                        .orElse(null),
+                                                "profile dependencies"),
+                                        new DependencyContainer(
+                                                profile.childElement(DEPENDENCY_MANAGEMENT)
+                                                        .flatMap(dm -> dm.childElement(DEPENDENCIES))
+                                                        .orElse(null),
+                                                "profile dependencyManagement"))
+                                .filter(container -> container.element != null)));
+
+        return dependencyContainers
+                .map(container -> fixUndefinedPropertyExpressionsInSection(
+                        container.element, allDefinedProperties, pomDocument, context, container.sectionName))
+                .reduce(false, Boolean::logicalOr);
+    }
+
+    /**
+     * Fixes undefined property expressions in a specific dependencies section.
+     */
+    private boolean fixUndefinedPropertyExpressionsInSection(
+            Element dependenciesElement,
+            Set<String> allDefinedProperties,
+            Document pomDocument,
+            UpgradeContext context,
+            String sectionName) {
+        boolean fixed = false;
+        List<Element> dependencies =
+                dependenciesElement.childElements(DEPENDENCY).toList();
+        Editor editor = new Editor(pomDocument);
+
+        for (Element dependency : dependencies) {
+            Set<String> undefinedProps = findUndefinedProperties(dependency, allDefinedProperties);
+            if (!undefinedProps.isEmpty()) {
+                String propLabel = undefinedProps.size() > 1 ? "properties" : "property";
+                String propsStr = "'" + String.join("', '", undefinedProps) + "'";
+
+                Comment comment = editor.commentOutElement(dependency);
+                String elementXml = comment.content().trim();
+                comment.content(
+                        " mvnup: commented out - undefined " + propLabel + " " + propsStr + "\n" + elementXml + " ");
+
+                context.detail("Fixed: Commented out dependency with undefined " + propLabel + " " + propsStr + " in "
+                        + sectionName);
+                fixed = true;
+            }
+        }
+
+        return fixed;
+    }
+
+    /**
+     * Finds undefined property expressions in a dependency's coordinate fields.
+     */
+    private Set<String> findUndefinedProperties(Element dependency, Set<String> allDefinedProperties) {
+        Set<String> undefinedProperties = new HashSet<>();
+
+        String groupId = dependency.childText(MavenPomElements.Elements.GROUP_ID);
+        String artifactId = dependency.childText(MavenPomElements.Elements.ARTIFACT_ID);
+        String version = dependency.childText(MavenPomElements.Elements.VERSION);
+
+        collectUndefinedExpressions(groupId, allDefinedProperties, undefinedProperties);
+        collectUndefinedExpressions(artifactId, allDefinedProperties, undefinedProperties);
+        collectUndefinedExpressions(version, allDefinedProperties, undefinedProperties);
+
+        return undefinedProperties;
+    }
+
+    private void collectUndefinedExpressions(String value, Set<String> allDefinedProperties, Set<String> result) {
+        if (value == null) {
+            return;
+        }
+        Matcher matcher = EXPRESSION_PATTERN.matcher(value);
+        while (matcher.find()) {
+            String propertyName = matcher.group(1);
+            if (!isWellKnownProperty(propertyName) && !allDefinedProperties.contains(propertyName)) {
+                result.add(propertyName);
+            }
+        }
+    }
+
+    private static boolean isWellKnownProperty(String propertyName) {
+        if (propertyName.startsWith("project.")
+                || propertyName.startsWith("pom.")
+                || propertyName.startsWith("env.")
+                || propertyName.startsWith("settings.")
+                || propertyName.startsWith("maven.")) {
+            return true;
+        }
+        if (propertyName.startsWith("java.")
+                || propertyName.startsWith("os.")
+                || propertyName.startsWith("user.")
+                || propertyName.startsWith("file.")
+                || propertyName.startsWith("line.")
+                || propertyName.startsWith("path.")
+                || propertyName.startsWith("sun.")) {
+            return true;
+        }
+        return "basedir".equals(propertyName)
+                || "revision".equals(propertyName)
+                || "sha1".equals(propertyName)
+                || "changelist".equals(propertyName);
     }
 
     /**
