@@ -808,6 +808,133 @@ class PluginUpgradeStrategyTest {
                     xml.contains("<artifactId>maven-enforcer-plugin</artifactId>"),
                     "Should add pluginManagement for maven-enforcer-plugin inherited from parent");
         }
+
+        @Test
+        @DisplayName("should add direct build/plugins override for inherited plugins from remote parent")
+        void shouldAddDirectBuildPluginsOverrideForInheritedPlugins() throws Exception {
+            // When a remote parent declares a plugin in build/plugins (not just pluginManagement),
+            // adding a pluginManagement entry in the child is insufficient to override the version.
+            // mvnup should also add the plugin directly in the child's build/plugins section.
+            // org.apache:apache:23 has maven-enforcer-plugin in its effective build/plugins,
+            // so the child should get BOTH pluginManagement AND build/plugins entries.
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <parent>
+                        <groupId>org.apache</groupId>
+                        <artifactId>apache</artifactId>
+                        <version>23</version>
+                    </parent>
+                    <groupId>org.example</groupId>
+                    <artifactId>test-child</artifactId>
+                    <version>1.0.0-SNAPSHOT</version>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Path pomPath = Paths.get("/project/pom.xml").toAbsolutePath();
+            Map<Path, Document> pomMap = Map.of(pomPath, document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Strategy should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have added overrides for inherited plugins");
+
+            Editor editor = new Editor(document);
+            Element root = editor.root();
+
+            // Verify pluginManagement entry exists
+            Element pmPlugin =
+                    root.path("build", "pluginManagement", "plugins", "plugin").orElse(null);
+            assertNotNull(pmPlugin, "Should have a pluginManagement/plugins/plugin entry");
+
+            // Verify build/plugins entry exists (direct override for inherited plugin)
+            Element buildPluginsElement = root.childElement("build")
+                    .flatMap(b -> b.childElement("plugins"))
+                    .orElse(null);
+            assertNotNull(buildPluginsElement, "Should have a build/plugins section");
+
+            boolean hasEnforcerInBuildPlugins = buildPluginsElement
+                    .childElements("plugin")
+                    .anyMatch(p -> p.childElement("artifactId")
+                            .map(Element::textContentTrimmed)
+                            .orElse("")
+                            .equals("maven-enforcer-plugin"));
+            assertTrue(
+                    hasEnforcerInBuildPlugins,
+                    "Should add maven-enforcer-plugin in build/plugins to override inherited version");
+        }
+
+        @Test
+        @DisplayName("should not duplicate plugin in build/plugins when already locally declared")
+        void shouldNotDuplicatePluginInBuildPluginsWhenAlreadyDeclared() throws Exception {
+            // When the child POM already declares the plugin in build/plugins,
+            // the strategy should NOT add a duplicate entry.
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <parent>
+                        <groupId>org.apache</groupId>
+                        <artifactId>apache</artifactId>
+                        <version>23</version>
+                    </parent>
+                    <groupId>org.example</groupId>
+                    <artifactId>test-child</artifactId>
+                    <version>1.0.0-SNAPSHOT</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-enforcer-plugin</artifactId>
+                                <version>3.0.0</version>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Path pomPath = Paths.get("/project/pom.xml").toAbsolutePath();
+            Map<Path, Document> pomMap = Map.of(pomPath, document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Strategy should succeed");
+
+            // Count enforcer-plugin entries in build/plugins - should be exactly 1
+            Editor editor = new Editor(document);
+            Element root = editor.root();
+            Element buildPluginsElement = root.childElement("build")
+                    .flatMap(b -> b.childElement("plugins"))
+                    .orElse(null);
+            assertNotNull(buildPluginsElement, "Should have build/plugins section");
+
+            long enforcerCount = buildPluginsElement
+                    .childElements("plugin")
+                    .filter(p -> p.childElement("artifactId")
+                            .map(Element::textContentTrimmed)
+                            .orElse("")
+                            .equals("maven-enforcer-plugin"))
+                    .count();
+            assertEquals(1, enforcerCount, "Should have exactly one maven-enforcer-plugin in build/plugins");
+
+            // Verify the version was upgraded (not the original 3.0.0)
+            String version = buildPluginsElement
+                    .childElements("plugin")
+                    .filter(p -> p.childElement("artifactId")
+                            .map(Element::textContentTrimmed)
+                            .orElse("")
+                            .equals("maven-enforcer-plugin"))
+                    .findFirst()
+                    .flatMap(p -> p.childElement("version"))
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals("3.5.0", version, "Existing enforcer-plugin version should be upgraded to 3.5.0");
+        }
     }
 
     @Nested
