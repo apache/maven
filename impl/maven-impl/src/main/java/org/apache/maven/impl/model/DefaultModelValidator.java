@@ -1705,7 +1705,7 @@ public class DefaultModelValidator implements ModelValidator {
             String id,
             @Nullable SourceHint sourceHint,
             InputLocationTracker tracker) {
-        if (id != null && validProfileIds.contains(id)) {
+        if (validProfileIds.contains(id)) {
             return true;
         }
         if (!validateStringNotEmpty(prefix, fieldName, problems, severity, version, id, sourceHint, tracker)) {

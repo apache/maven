@@ -311,6 +311,11 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected final void createTerminal(C context) {
         if (context.terminal == null) {
+            // Create the build log appender; also sets MavenSimpleLogger sink
+            ProjectBuildLogAppender projectBuildLogAppender =
+                    new ProjectBuildLogAppender(determineBuildEventListener(context));
+            context.closeables.add(projectBuildLogAppender);
+
             MessageUtils.systemInstall(
                     builder -> doCreateTerminal(context, builder),
                     terminal -> doConfigureWithTerminal(context, terminal));
@@ -318,11 +323,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             context.terminal = MessageUtils.getTerminal();
             context.closeables.add(MessageUtils::systemUninstall);
             MessageUtils.registerShutdownHook(); // safety belt
-
-            // Create the build log appender; also sets MavenSimpleLogger sink
-            ProjectBuildLogAppender projectBuildLogAppender =
-                    new ProjectBuildLogAppender(determineBuildEventListener(context));
-            context.closeables.add(projectBuildLogAppender);
         } else {
             doConfigureWithTerminal(context, context.terminal);
         }
