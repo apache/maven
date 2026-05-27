@@ -19,7 +19,7 @@
 package org.apache.maven.impl.cache;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -85,7 +85,7 @@ public abstract class AbstractRequestCache implements RequestCache {
     @SuppressWarnings("unchecked")
     public <REQ extends Request<?>, REP extends Result<REQ>> List<REP> requests(
             List<REQ> reqs, Function<List<REQ>, List<REP>> supplier) {
-        final Map<REQ, Object> nonCachedResults = new HashMap<>();
+        final Map<REQ, Object> nonCachedResults = new IdentityHashMap<>();
         List<RequestResult<REQ, REP>> allResults = new ArrayList<>(reqs.size());
 
         Function<REQ, REP> individualSupplier = req -> {
