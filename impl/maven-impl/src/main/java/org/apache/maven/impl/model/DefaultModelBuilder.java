@@ -723,8 +723,10 @@ public class DefaultModelBuilder implements ModelBuilder {
                 logger.debug("Profile activation failure details", e);
             }
 
-            // User properties override everything
-            properties.putAll(session.getEffectiveProperties());
+            // System and user properties override everything (use request properties
+            // to ensure consistency with model interpolation, which also uses request properties)
+            properties.putAll(request.getSystemProperties());
+            properties.putAll(request.getUserProperties());
 
             return properties;
         }
@@ -1651,12 +1653,14 @@ public class DefaultModelBuilder implements ModelBuilder {
                         .profiles(map(model.getProfiles(), this::interpolateRepository, callback))
                         .distributionManagement(interpolateRepository(model.getDistributionManagement(), callback))
                         .build();
-                // Override model properties with user properties
-                Map<String, String> newProps = merge(model.getProperties(), session.getUserProperties());
+                // Override model properties with user properties (use request properties
+                // to ensure consistency with model interpolation)
+                Map<String, String> userProps = request.getUserProperties();
+                Map<String, String> newProps = merge(model.getProperties(), userProps);
                 if (newProps != null) {
                     model = model.withProperties(newProps);
                 }
-                model = model.withProfiles(merge(model.getProfiles(), session.getUserProperties()));
+                model = model.withProfiles(merge(model.getProfiles(), userProps));
             }
 
             for (var transformer : transformers) {
