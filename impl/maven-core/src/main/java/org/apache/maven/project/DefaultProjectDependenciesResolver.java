@@ -103,13 +103,7 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
 
         if (project.getDependencyArtifacts() == null) {
             for (Dependency dependency : project.getDependencies()) {
-                if (dependency.getGroupId() == null
-                        || dependency.getGroupId().isEmpty()
-                        || dependency.getArtifactId() == null
-                        || dependency.getArtifactId().isEmpty()
-                        || dependency.getVersion() == null
-                        || dependency.getVersion().isEmpty()) {
-                    // guard against case where best-effort resolution for invalid models is requested
+                if (isInvalidDependency(dependency)) {
                     continue;
                 }
                 collect.addDependency(RepositoryUtils.toDependency(dependency, stereotypes));
@@ -147,6 +141,10 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
         DependencyManagement depMgmt = project.getDependencyManagement();
         if (depMgmt != null) {
             for (Dependency dependency : depMgmt.getDependencies()) {
+                if (isInvalidDependency(dependency)) {
+                    logger.debug("Filtered managed dependency with uninterpolated expression: {}", dependency);
+                    continue;
+                }
                 collect.addManagedDependency(RepositoryUtils.toDependency(dependency, stereotypes));
             }
         }
@@ -206,5 +204,22 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
                 result.setResolutionErrors(node.getDependency(), ar.getExceptions());
             }
         }
+    }
+
+    private static boolean isInvalidDependency(Dependency dependency) {
+        return isNullOrEmpty(dependency.getGroupId())
+                || isNullOrEmpty(dependency.getArtifactId())
+                || isNullOrEmpty(dependency.getVersion())
+                || containsPlaceholder(dependency.getGroupId())
+                || containsPlaceholder(dependency.getArtifactId())
+                || containsPlaceholder(dependency.getVersion());
+    }
+
+    private static boolean isNullOrEmpty(String value) {
+        return value == null || value.isEmpty();
+    }
+
+    private static boolean containsPlaceholder(String value) {
+        return value != null && value.contains("${");
     }
 }
