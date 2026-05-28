@@ -147,11 +147,15 @@ public class DefaultDependencyResolver implements DependencyResolver {
                         .getResolutionScope(request.getPathScope().id())
                         .orElseThrow();
             }
+            List<org.eclipse.aether.graph.Dependency> aetherDeps =
+                    filterUninterpolated(session.toDependencies(dependencies, false));
+            List<org.eclipse.aether.graph.Dependency> aetherManagedDeps =
+                    filterUninterpolated(session.toDependencies(managedDependencies, true));
             CollectRequest collectRequest = new CollectRequest()
                     .setRootArtifact(rootArtifact != null ? session.toArtifact(rootArtifact) : null)
                     .setRoot(root != null ? session.toDependency(root, false) : null)
-                    .setDependencies(session.toDependencies(dependencies, false))
-                    .setManagedDependencies(session.toDependencies(managedDependencies, true))
+                    .setDependencies(aetherDeps)
+                    .setManagedDependencies(aetherManagedDeps)
                     .setRepositories(session.toResolvingRepositories(remoteRepositories))
                     .setRequestContext(trace.context())
                     .setTrace(trace.trace());
@@ -276,8 +280,47 @@ public class DefaultDependencyResolver implements DependencyResolver {
         return new DependencyResolverException("Cannot read module information of " + path, cause);
     }
 
+    static List<org.eclipse.aether.graph.Dependency> filterUninterpolated(
+            List<org.eclipse.aether.graph.Dependency> dependencies) {
+        if (dependencies == null || dependencies.isEmpty()) {
+            return dependencies;
+        }
+        return dependencies.stream()
+                .filter(dep -> {
+                    if (dep == null || dep.getArtifact() == null) {
+                        return true;
+                    }
+                    org.eclipse.aether.artifact.Artifact a = dep.getArtifact();
+                    return !containsPlaceholder(a.getGroupId())
+                            && !containsPlaceholder(a.getArtifactId())
+                            && !containsPlaceholder(a.getVersion());
+                })
+                .collect(Collectors.toList());
+    }
+
+    static boolean containsPlaceholder(String value) {
+        return value != null && value.contains("${");
+    }
+
     private static boolean containsUnresolvedExpression(String value) {
         return value != null && value.contains("${") && value.contains("}");
+    }
+
+    private static String findUnresolvedExpression(List<org.eclipse.aether.graph.Dependency> dependencies) {
+        for (org.eclipse.aether.graph.Dependency dep : dependencies) {
+            if (dep != null && dep.getArtifact() != null) {
+                org.eclipse.aether.artifact.Artifact artifact = dep.getArtifact();
+                String groupId = artifact.getGroupId();
+                String artifactId = artifact.getArtifactId();
+                String version = artifact.getVersion();
+                if (containsUnresolvedExpression(groupId)
+                        || containsUnresolvedExpression(artifactId)
+                        || containsUnresolvedExpression(version)) {
+                    return groupId + ":" + artifactId + ":" + version;
+                }
+            }
+        }
+        return null;
     }
 
     private static String enhanceCollectionError(DependencyCollectionException e, CollectRequest request) {
@@ -307,27 +350,16 @@ public class DefaultDependencyResolver implements DependencyResolver {
                 }
             }
 
-            for (org.eclipse.aether.graph.Dependency dep : request.getDependencies()) {
-                if (dep != null && dep.getArtifact() != null) {
-                    org.eclipse.aether.artifact.Artifact artifact = dep.getArtifact();
-                    String groupId = artifact.getGroupId();
-                    String artifactId = artifact.getArtifactId();
-                    String version = artifact.getVersion();
-
-                    if (containsUnresolvedExpression(groupId)
-                            || containsUnresolvedExpression(artifactId)
-                            || containsUnresolvedExpression(version)) {
-                        enhanced.append(" due to unresolved expression(s) in dependency: ")
-                                .append(groupId)
-                                .append(":")
-                                .append(artifactId)
-                                .append(":")
-                                .append(version)
-                                .append(".\n")
-                                .append("Please check that all properties are defined in your POM or settings.xml.");
-                        return enhanced.toString();
-                    }
-                }
+            String found = findUnresolvedExpression(request.getDependencies());
+            if (found == null) {
+                found = findUnresolvedExpression(request.getManagedDependencies());
+            }
+            if (found != null) {
+                enhanced.append(" due to unresolved expression(s) in dependency: ")
+                        .append(found)
+                        .append(".\n")
+                        .append("Please check that all properties are defined in your POM or settings.xml.");
+                return enhanced.toString();
             }
         }
         return e.getMessage();
