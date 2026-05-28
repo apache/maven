@@ -668,7 +668,7 @@ public class DefaultModelValidator implements ModelValidator {
 
         if (validationLevel > VALIDATION_LEVEL_MINIMAL) {
             validateRawRepositories(
-                    problems, model.getRepositories(), "repositories.repository.", EMPTY, validationLevel, false);
+                    problems, model.getRepositories(), "repositories.repository.", EMPTY, validationLevel, true);
 
             validateRawRepositories(
                     problems,
@@ -676,7 +676,7 @@ public class DefaultModelValidator implements ModelValidator {
                     "pluginRepositories.pluginRepository.",
                     EMPTY,
                     validationLevel,
-                    false);
+                    true);
 
             for (Profile profile : model.getProfiles()) {
                 String prefix = "profiles.profile[" + profile.getId() + "].";
@@ -1676,6 +1676,28 @@ public class DefaultModelValidator implements ModelValidator {
                     null,
                     repository,
                     ILLEGAL_REPO_ID_CHARS);
+
+            if (hasExpression(repository.getId())) {
+                addViolation(
+                        problems,
+                        Severity.ERROR,
+                        Version.V40,
+                        prefix + "[" + repository.getId() + "].id",
+                        null,
+                        "contains an uninterpolated expression.",
+                        repository);
+            }
+
+            if (hasExpression(repository.getUrl())) {
+                addViolation(
+                        problems,
+                        Severity.ERROR,
+                        Version.V40,
+                        prefix + "[" + repository.getId() + "].url",
+                        null,
+                        "contains an uninterpolated expression.",
+                        repository);
+            }
 
             if ("local".equals(repository.getId())) {
                 addViolation(
