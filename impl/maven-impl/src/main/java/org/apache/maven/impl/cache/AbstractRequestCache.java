@@ -60,7 +60,14 @@ public abstract class AbstractRequestCache implements RequestCache {
     @SuppressWarnings("all")
     public <REQ extends Request<?>, REP extends Result<REQ>> REP request(REQ req, Function<REQ, REP> supplier) {
         CachingSupplier<REQ, REP> cs = doCache(req, supplier);
-        return cs.apply(req);
+        try {
+            return cs.apply(req);
+        } catch (CachingSupplier.CyclicCacheAccessException e) {
+            // Re-entrant access from the same thread (e.g., a batch requests() computation
+            // triggered a singular request() that found the same cached entry). Compute
+            // directly with the caller's supplier to break the cycle.
+            return supplier.apply(req);
+        }
     }
 
     /**
