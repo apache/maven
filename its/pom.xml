@@ -263,10 +263,11 @@ under the License.
         <artifactId>maven-compat</artifactId>
         <version>${maven-version}</version>
       </dependency>
+
       <dependency>
-        <groupId>org.apache.maven</groupId>
+        <groupId>org.apache.maven.executor</groupId>
         <artifactId>maven-executor</artifactId>
-        <version>${maven-version}</version>
+        <version>1.0.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>
