@@ -80,11 +80,14 @@ public class Lifecycle {
 
     static Map<String, LifecyclePhase> getDefaultPhases(org.apache.maven.api.Lifecycle lifecycle) {
         Map<String, List<String>> goals = new HashMap<>();
-        lifecycle.allPhases().forEach(phase -> phase.plugins()
-                .forEach(plugin -> plugin.getExecutions().forEach(exec -> exec.getGoals()
-                        .forEach(goal -> goals.computeIfAbsent(phase.name(), n -> new ArrayList<>())
-                                .add(plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion()
-                                        + ":" + goal)))));
+        lifecycle
+                .allPhases()
+                .forEach(phase -> phase.plugins()
+                        .forEach(plugin -> plugin.getExecutions()
+                                .forEach(exec -> exec.getGoals()
+                                        .forEach(goal -> goals.computeIfAbsent(phase.name(), n -> new ArrayList<>())
+                                                .add(plugin.getGroupId() + ":" + plugin.getArtifactId() + ":"
+                                                        + plugin.getVersion() + ":" + goal)))));
         return goals.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> new LifecyclePhase(String.join(",", e.getValue()))));
     }

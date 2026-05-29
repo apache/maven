@@ -709,9 +709,10 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
      * TODO find out where this is probably done elsewhere
      */
     private static String resolveFromRootThenParent(Xpp3Dom pluginPomDom, String element) throws Exception {
-        return Optional.ofNullable(child(pluginPomDom, element).orElseGet(() -> child(pluginPomDom, "parent")
-                        .flatMap(e -> child(e, element))
-                        .orElse(null)))
+        return Optional.ofNullable(child(pluginPomDom, element)
+                        .orElseGet(() -> child(pluginPomDom, "parent")
+                                .flatMap(e -> child(e, element))
+                                .orElse(null)))
                 .map(Xpp3Dom::getValue)
                 .orElseThrow(() -> new Exception("unable to determine " + element));
     }

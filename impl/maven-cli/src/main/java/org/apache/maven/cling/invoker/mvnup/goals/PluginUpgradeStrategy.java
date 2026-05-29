@@ -18,10 +18,7 @@
  */
 package org.apache.maven.cling.invoker.mvnup.goals;
 
-import java.io.File;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -32,8 +29,6 @@ import java.util.stream.Collectors;
 import eu.maveniverse.domtrip.Document;
 import eu.maveniverse.domtrip.Editor;
 import eu.maveniverse.domtrip.Element;
-import org.apache.maven.api.RemoteRepository;
-import org.apache.maven.api.Session;
 import org.apache.maven.api.cli.mvnup.UpgradeOptions;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
@@ -44,26 +39,12 @@ import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.model.PluginManagement;
-import org.apache.maven.api.model.Repository;
-import org.apache.maven.api.model.RepositoryPolicy;
-import org.apache.maven.api.services.ModelBuilder;
-import org.apache.maven.api.services.ModelBuilderRequest;
-import org.apache.maven.api.services.ModelBuilderResult;
-import org.apache.maven.api.services.RepositoryFactory;
-import org.apache.maven.api.services.Sources;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
-import org.apache.maven.impl.standalone.ApiRunner;
-import org.codehaus.plexus.components.secdispatcher.Dispatcher;
-import org.codehaus.plexus.components.secdispatcher.internal.dispatchers.LegacyDispatcher;
-import org.eclipse.aether.internal.impl.DefaultPathProcessor;
-import org.eclipse.aether.internal.impl.DefaultTransporterProvider;
-import org.eclipse.aether.internal.impl.transport.http.DefaultChecksumExtractor;
-import org.eclipse.aether.spi.connector.transport.TransporterProvider;
-import org.eclipse.aether.transport.file.FileTransporterFactory;
-import org.eclipse.aether.transport.jdk.JdkTransporterFactory;
 
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.ARTIFACT_ID;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.BUILD;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.DEPENDENCIES;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.DEPENDENCY;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.GROUP_ID;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PARENT;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PLUGIN;
@@ -90,7 +71,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             new PluginUpgrade(
                     DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-exec-plugin", "3.2.0", MAVEN_4_COMPATIBILITY_REASON),
             new PluginUpgrade(
-                    DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-enforcer-plugin", "3.0.0", MAVEN_4_COMPATIBILITY_REASON),
+                    DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-enforcer-plugin", "3.5.0", MAVEN_4_COMPATIBILITY_REASON),
             new PluginUpgrade("org.codehaus.mojo", "flatten-maven-plugin", "1.2.7", MAVEN_4_COMPATIBILITY_REASON),
             new PluginUpgrade(
                     DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-shade-plugin", "3.5.0", MAVEN_4_COMPATIBILITY_REASON),
@@ -98,9 +79,32 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     DEFAULT_MAVEN_PLUGIN_GROUP_ID,
                     "maven-remote-resources-plugin",
                     "3.0.0",
-                    MAVEN_4_COMPATIBILITY_REASON));
+                    MAVEN_4_COMPATIBILITY_REASON),
+            new PluginUpgrade(
+                    DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-surefire-plugin", "3.5.2", MAVEN_4_COMPATIBILITY_REASON),
+            new PluginUpgrade(
+                    DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-failsafe-plugin", "3.5.2", MAVEN_4_COMPATIBILITY_REASON),
+            new PluginUpgrade(
+                    DEFAULT_MAVEN_PLUGIN_GROUP_ID,
+                    "maven-surefire-report-plugin",
+                    "3.5.2",
+                    MAVEN_4_COMPATIBILITY_REASON),
+            new PluginUpgrade(
+                    "net.alchim31.maven",
+                    "scala-maven-plugin",
+                    "4.9.2",
+                    "Versions before 4.9.2 call add() on immutable lists returned by Maven 4 API"),
+            new PluginUpgrade(
+                    DEFAULT_MAVEN_PLUGIN_GROUP_ID,
+                    "maven-resources-plugin",
+                    "3.3.1",
+                    "Beta/RC versions compiled against different Maven 4 API signatures"));
 
-    private Session session;
+    private static final List<PluginUpgrade> PLUGIN_DEPENDENCY_UPGRADES = List.of(new PluginUpgrade(
+            "org.codehaus.mojo",
+            "extra-enforcer-rules",
+            "1.4",
+            "Versions before 1.4 use a removed DependencyGraphBuilder API incompatible with Maven 4"));
 
     @Inject
     public PluginUpgradeStrategy() {}
@@ -195,9 +199,9 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         Map<String, PluginUpgradeInfo> pluginUpgrades = getPluginUpgradesMap();
 
         // Check build/plugins
-        Element buildElement = root.child(BUILD).orElse(null);
+        Element buildElement = root.childElement(BUILD).orElse(null);
         if (buildElement != null) {
-            Element pluginsElement = buildElement.child(PLUGINS).orElse(null);
+            Element pluginsElement = buildElement.childElement(PLUGINS).orElse(null);
             if (pluginsElement != null) {
                 hasUpgrades |= upgradePluginsInSection(
                         pluginsElement, pluginUpgrades, pomDocument, BUILD + "/" + PLUGINS, context);
@@ -205,10 +209,10 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
 
             // Check build/pluginManagement/plugins
             Element pluginManagementElement =
-                    buildElement.child(PLUGIN_MANAGEMENT).orElse(null);
+                    buildElement.childElement(PLUGIN_MANAGEMENT).orElse(null);
             if (pluginManagementElement != null) {
                 Element managedPluginsElement =
-                        pluginManagementElement.child(PLUGINS).orElse(null);
+                        pluginManagementElement.childElement(PLUGINS).orElse(null);
                 if (managedPluginsElement != null) {
                     hasUpgrades |= upgradePluginsInSection(
                             managedPluginsElement,
@@ -236,7 +240,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 new PluginUpgradeInfo("org.codehaus.mojo", "exec-maven-plugin", "3.2.0"));
         upgrades.put(
                 DEFAULT_MAVEN_PLUGIN_GROUP_ID + ":maven-enforcer-plugin",
-                new PluginUpgradeInfo(DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-enforcer-plugin", "3.0.0"));
+                new PluginUpgradeInfo(DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-enforcer-plugin", "3.5.0"));
         upgrades.put(
                 "org.codehaus.mojo:flatten-maven-plugin",
                 new PluginUpgradeInfo("org.codehaus.mojo", "flatten-maven-plugin", "1.2.7"));
@@ -246,6 +250,21 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         upgrades.put(
                 DEFAULT_MAVEN_PLUGIN_GROUP_ID + ":maven-remote-resources-plugin",
                 new PluginUpgradeInfo(DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-remote-resources-plugin", "3.0.0"));
+        upgrades.put(
+                DEFAULT_MAVEN_PLUGIN_GROUP_ID + ":maven-surefire-plugin",
+                new PluginUpgradeInfo(DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-surefire-plugin", "3.5.2"));
+        upgrades.put(
+                DEFAULT_MAVEN_PLUGIN_GROUP_ID + ":maven-failsafe-plugin",
+                new PluginUpgradeInfo(DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-failsafe-plugin", "3.5.2"));
+        upgrades.put(
+                DEFAULT_MAVEN_PLUGIN_GROUP_ID + ":maven-surefire-report-plugin",
+                new PluginUpgradeInfo(DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-surefire-report-plugin", "3.5.2"));
+        upgrades.put(
+                "net.alchim31.maven:scala-maven-plugin",
+                new PluginUpgradeInfo("net.alchim31.maven", "scala-maven-plugin", "4.9.2"));
+        upgrades.put(
+                DEFAULT_MAVEN_PLUGIN_GROUP_ID + ":maven-resources-plugin",
+                new PluginUpgradeInfo(DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-resources-plugin", "3.3.1"));
         return upgrades;
     }
 
@@ -260,8 +279,9 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             UpgradeContext context) {
 
         return pluginsElement
-                .children(PLUGIN)
+                .childElements(PLUGIN)
                 .map(pluginElement -> {
+                    boolean upgraded = false;
                     String groupId = getChildText(pluginElement, GROUP_ID);
                     String artifactId = getChildText(pluginElement, ARTIFACT_ID);
 
@@ -275,10 +295,13 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                         PluginUpgradeInfo upgrade = pluginUpgrades.get(pluginKey);
 
                         if (upgrade != null) {
-                            return upgradePluginVersion(pluginElement, upgrade, pomDocument, sectionName, context);
+                            upgraded = upgradePluginVersion(pluginElement, upgrade, pomDocument, sectionName, context);
                         }
                     }
-                    return false;
+
+                    upgraded |= upgradePluginDependencies(pluginElement, pomDocument, sectionName, context);
+
+                    return upgraded;
                 })
                 .reduce(false, Boolean::logicalOr);
     }
@@ -292,7 +315,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             Document pomDocument,
             String sectionName,
             UpgradeContext context) {
-        Element versionElement = pluginElement.child(VERSION).orElse(null);
+        Element versionElement = pluginElement.childElement(VERSION).orElse(null);
         String currentVersion;
         boolean isProperty = false;
         String propertyName = null;
@@ -342,10 +365,11 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             UpgradeContext context) {
         Editor editor = new Editor(pomDocument);
         Element root = editor.root();
-        Element propertiesElement = root.child(PROPERTIES).orElse(null);
+        Element propertiesElement = root.childElement(PROPERTIES).orElse(null);
 
         if (propertiesElement != null) {
-            Element propertyElement = propertiesElement.child(propertyName).orElse(null);
+            Element propertyElement =
+                    propertiesElement.childElement(propertyName).orElse(null);
             if (propertyElement != null) {
                 String currentVersion = propertyElement.textContentTrimmed();
                 if (isVersionBelow(currentVersion, upgrade.minVersion)) {
@@ -371,6 +395,46 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
     }
 
     /**
+     * Upgrades plugin dependencies (e.g., extra-enforcer-rules inside maven-enforcer-plugin).
+     */
+    private boolean upgradePluginDependencies(
+            Element pluginElement, Document pomDocument, String sectionName, UpgradeContext context) {
+        Element dependenciesElement = pluginElement.childElement(DEPENDENCIES).orElse(null);
+        if (dependenciesElement == null) {
+            return false;
+        }
+
+        Map<String, PluginUpgradeInfo> depUpgrades = getPluginDependencyUpgradesMap();
+
+        return dependenciesElement
+                .childElements(DEPENDENCY)
+                .map(depElement -> {
+                    String groupId = getChildText(depElement, GROUP_ID);
+                    String artifactId = getChildText(depElement, ARTIFACT_ID);
+
+                    if (groupId != null && artifactId != null) {
+                        String depKey = groupId + ":" + artifactId;
+                        PluginUpgradeInfo upgrade = depUpgrades.get(depKey);
+
+                        if (upgrade != null) {
+                            return upgradePluginVersion(
+                                    depElement, upgrade, pomDocument, sectionName + "/plugin/dependencies", context);
+                        }
+                    }
+                    return false;
+                })
+                .reduce(false, Boolean::logicalOr);
+    }
+
+    private Map<String, PluginUpgradeInfo> getPluginDependencyUpgradesMap() {
+        return PLUGIN_DEPENDENCY_UPGRADES.stream()
+                .collect(Collectors.toMap(
+                        upgrade -> upgrade.groupId() + ":" + upgrade.artifactId(),
+                        upgrade ->
+                                new PluginUpgradeInfo(upgrade.groupId(), upgrade.artifactId(), upgrade.minVersion())));
+    }
+
+    /**
      * Simple version comparison to check if current version is below minimum version.
      * This is a basic implementation that works for most Maven plugin versions.
      */
@@ -378,40 +442,14 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         if (currentVersion == null || minVersion == null) {
             return false;
         }
-
-        // Remove any qualifiers like -SNAPSHOT, -alpha, etc. for comparison
-        String cleanCurrent = currentVersion.split("-")[0];
-        String cleanMin = minVersion.split("-")[0];
-
-        try {
-            String[] currentParts = cleanCurrent.split("\\.");
-            String[] minParts = cleanMin.split("\\.");
-
-            int maxLength = Math.max(currentParts.length, minParts.length);
-
-            for (int i = 0; i < maxLength; i++) {
-                int currentPart = i < currentParts.length ? Integer.parseInt(currentParts[i]) : 0;
-                int minPart = i < minParts.length ? Integer.parseInt(minParts[i]) : 0;
-
-                if (currentPart < minPart) {
-                    return true;
-                } else if (currentPart > minPart) {
-                    return false;
-                }
-            }
-
-            return false; // Versions are equal
-        } catch (NumberFormatException e) {
-            // Fallback to string comparison if parsing fails
-            return currentVersion.compareTo(minVersion) < 0;
-        }
+        return getSession().parseVersion(currentVersion).compareTo(getSession().parseVersion(minVersion)) < 0;
     }
 
     /**
      * Helper method to get child element text.
      */
     private String getChildText(Element parent, String childName) {
-        Element child = parent.child(childName).orElse(null);
+        Element child = parent.childElement(childName).orElse(null);
         return child != null ? child.textContentTrimmed() : null;
     }
 
@@ -420,112 +458,6 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
      */
     public static List<PluginUpgrade> getPluginUpgrades() {
         return PLUGIN_UPGRADES;
-    }
-
-    /**
-     * Gets or creates the cached Maven 4 session.
-     */
-    private Session getSession() {
-        if (session == null) {
-            session = createMaven4Session();
-        }
-        return session;
-    }
-
-    /**
-     * Creates a new Maven 4 session for effective POM computation.
-     */
-    private Session createMaven4Session() {
-        Session session = ApiRunner.createSession(injector -> {
-            injector.bindInstance(Dispatcher.class, new LegacyDispatcher());
-
-            injector.bindInstance(
-                    TransporterProvider.class,
-                    new DefaultTransporterProvider(Map.of(
-                            "https",
-                            new JdkTransporterFactory(
-                                    new DefaultChecksumExtractor(Map.of()), new DefaultPathProcessor()),
-                            "file",
-                            new FileTransporterFactory())));
-        });
-
-        // Configure repositories
-        // TODO: we should read settings
-        RemoteRepository central =
-                session.createRemoteRepository(RemoteRepository.CENTRAL_ID, "https://repo.maven.apache.org/maven2");
-        RemoteRepository snapshots = session.getService(RepositoryFactory.class)
-                .createRemote(Repository.newBuilder()
-                        .id("apache-snapshots")
-                        .url("https://repository.apache.org/content/repositories/snapshots/")
-                        .releases(RepositoryPolicy.newBuilder().enabled("false").build())
-                        .snapshots(RepositoryPolicy.newBuilder().enabled("true").build())
-                        .build());
-
-        return session.withRemoteRepositories(List.of(central, snapshots));
-    }
-
-    /**
-     * Creates a temporary project structure with all POMs written to preserve relative paths.
-     * This allows Maven 4 API to properly resolve the project hierarchy.
-     */
-    private Path createTempProjectStructure(UpgradeContext context, Map<Path, Document> pomMap) throws Exception {
-        Path tempDir = Files.createTempDirectory("mvnup-project-");
-        context.debug("Created temp project directory: " + tempDir);
-
-        // Find the common root of all POM paths to preserve relative structure
-        Path commonRoot = findCommonRoot(pomMap.keySet());
-        context.debug("Common root: " + commonRoot);
-
-        // Write each POM to the temp directory, preserving relative structure
-        for (Map.Entry<Path, Document> entry : pomMap.entrySet()) {
-            Path originalPath = entry.getKey();
-            Document document = entry.getValue();
-
-            // Calculate the relative path from common root
-            Path relativePath = commonRoot.relativize(originalPath);
-            Path tempPomPath = tempDir.resolve(relativePath);
-
-            // Ensure parent directories exist
-            Files.createDirectories(tempPomPath.getParent());
-
-            // Write POM to temp location
-            writePomToFile(document, tempPomPath);
-            context.debug("Wrote POM to temp location: " + tempPomPath);
-        }
-
-        return tempDir;
-    }
-
-    /**
-     * Finds the common root directory of all POM paths.
-     */
-    private Path findCommonRoot(Set<Path> pomPaths) {
-        Path commonRoot = null;
-        for (Path pomPath : pomPaths) {
-            Path parent = pomPath.getParent();
-            if (parent == null) {
-                parent = Path.of(".");
-            }
-            if (commonRoot == null) {
-                commonRoot = parent;
-            } else {
-                // Find common ancestor
-                while (!parent.startsWith(commonRoot)) {
-                    commonRoot = commonRoot.getParent();
-                    if (commonRoot == null) {
-                        break;
-                    }
-                }
-            }
-        }
-        return commonRoot;
-    }
-
-    /**
-     * Writes a Document to a file using the same format as the existing codebase.
-     */
-    private void writePomToFile(Document document, Path filePath) throws Exception {
-        Files.writeString(filePath, document.toXml());
     }
 
     /**
@@ -565,7 +497,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 }
 
             } catch (Exception e) {
-                context.debug("Failed to analyze effective model for " + originalPomPath + ": " + e.getMessage());
+                context.warning("Failed to analyze effective model for " + originalPomPath + ": " + e.getMessage());
             }
         }
 
@@ -581,28 +513,9 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                         upgrade -> upgrade.groupId() + ":" + upgrade.artifactId(), upgrade -> upgrade));
     }
 
-    /**
-     * Analyzes the effective model for a single POM to find plugins that need upgrades.
-     */
     private Set<String> analyzeEffectiveModelForPlugins(
             UpgradeContext context, Path tempPomPath, Map<String, PluginUpgrade> pluginUpgrades) {
-
-        // Use the cached Maven 4 session
-        Session session = getSession();
-        ModelBuilder modelBuilder = session.getService(ModelBuilder.class);
-
-        // Build effective model
-        ModelBuilderRequest request = ModelBuilderRequest.builder()
-                .session(session)
-                .source(Sources.buildSource(tempPomPath))
-                .requestType(ModelBuilderRequest.RequestType.BUILD_EFFECTIVE)
-                .recursive(false) // We only want this POM, not its modules
-                .build();
-
-        ModelBuilderResult result = modelBuilder.newSession().build(request);
-        Model effectiveModel = result.getEffectiveModel();
-
-        // Analyze plugins from effective model
+        Model effectiveModel = buildEffectiveModel(tempPomPath);
         return analyzePluginsFromEffectiveModel(context, effectiveModel, pluginUpgrades);
     }
 
@@ -673,19 +586,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
     private Path findLastLocalParentForPluginManagement(
             UpgradeContext context, Path tempPomPath, Map<Path, Document> pomMap, Path tempDir, Path commonRoot) {
 
-        // Build effective model to get parent information
-        Session session = getSession();
-        ModelBuilder modelBuilder = session.getService(ModelBuilder.class);
-
-        ModelBuilderRequest request = ModelBuilderRequest.builder()
-                .session(session)
-                .source(Sources.buildSource(tempPomPath))
-                .requestType(ModelBuilderRequest.RequestType.BUILD_EFFECTIVE)
-                .recursive(false)
-                .build();
-
-        ModelBuilderResult result = modelBuilder.newSession().build(request);
-        Model effectiveModel = result.getEffectiveModel();
+        Model effectiveModel = buildEffectiveModel(tempPomPath);
 
         // Convert the temp path back to the original path
         Path relativePath = tempDir.relativize(tempPomPath);
@@ -705,17 +606,8 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 // Parent is local, so it becomes our new candidate
                 lastLocalParent = parentPath;
 
-                // Load the parent model to continue walking up
                 Path parentTempPath = tempDir.resolve(commonRoot.relativize(parentPath));
-                ModelBuilderRequest parentRequest = ModelBuilderRequest.builder()
-                        .session(session)
-                        .source(Sources.buildSource(parentTempPath))
-                        .requestType(ModelBuilderRequest.RequestType.BUILD_EFFECTIVE)
-                        .recursive(false)
-                        .build();
-
-                ModelBuilderResult parentResult = modelBuilder.newSession().build(parentRequest);
-                currentModel = parentResult.getEffectiveModel();
+                currentModel = buildEffectiveModel(parentTempPath);
             } else {
                 // Parent is external, stop here
                 break;
@@ -744,7 +636,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             String version = getChildText(root, VERSION);
 
             // Handle inheritance from parent
-            Element parentElement = root.child(PARENT).orElse(null);
+            Element parentElement = root.childElement(PARENT).orElse(null);
             if (parentElement != null) {
                 if (groupId == null) {
                     groupId = getChildText(parentElement, GROUP_ID);
@@ -775,17 +667,19 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         Element root = pomDocument.root();
 
         // Ensure build/pluginManagement/plugins structure exists
-        Element buildElement = root.child(BUILD).orElse(null);
+        Element buildElement = root.childElement(BUILD).orElse(null);
         if (buildElement == null) {
             buildElement = DomUtils.insertNewElement(BUILD, root);
         }
 
-        Element pluginManagementElement = buildElement.child(PLUGIN_MANAGEMENT).orElse(null);
+        Element pluginManagementElement =
+                buildElement.childElement(PLUGIN_MANAGEMENT).orElse(null);
         if (pluginManagementElement == null) {
             pluginManagementElement = DomUtils.insertNewElement(PLUGIN_MANAGEMENT, buildElement);
         }
 
-        Element managedPluginsElement = pluginManagementElement.child(PLUGINS).orElse(null);
+        Element managedPluginsElement =
+                pluginManagementElement.childElement(PLUGINS).orElse(null);
         if (managedPluginsElement == null) {
             managedPluginsElement = DomUtils.insertNewElement(PLUGINS, pluginManagementElement);
         }
@@ -809,7 +703,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
      * Checks if a plugin is already managed in the given plugins element.
      */
     private boolean isPluginAlreadyManagedInElement(Element pluginsElement, PluginUpgrade upgrade) {
-        List<Element> pluginElements = pluginsElement.children(PLUGIN).toList();
+        List<Element> pluginElements = pluginsElement.childElements(PLUGIN).toList();
         for (Element pluginElement : pluginElements) {
             String groupId = getChildText(pluginElement, GROUP_ID);
             String artifactId = getChildText(pluginElement, ARTIFACT_ID);
@@ -836,20 +730,6 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
 
         context.detail("Added plugin management for " + upgrade.groupId() + ":" + upgrade.artifactId() + " version "
                 + upgrade.minVersion() + " (found through effective model analysis)");
-    }
-
-    /**
-     * Cleans up the temporary directory.
-     */
-    private void cleanupTempDirectory(Path tempDir) {
-        try {
-            Files.walk(tempDir)
-                    .sorted(Comparator.reverseOrder())
-                    .map(Path::toFile)
-                    .forEach(File::delete);
-        } catch (Exception e) {
-            // Best effort cleanup - don't fail the whole operation
-        }
     }
 
     /**

@@ -552,7 +552,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                     // filter out transitive invalid repositories
                     // this should be safe because invalid repo coming from build POMs
                     // have been rejected earlier during validation
-                    .filter(repo -> repo.getUrl() != null && !repo.getUrl().contains("${"))
+                    .filter(repo -> repo.getUrl() != null
+                            && !repo.getUrl().contains("${")
+                            && (repo.getId() == null || !repo.getId().contains("${")))
                     .map(session::createRemoteRepository)
                     .toList();
             if (replace) {
@@ -1132,6 +1134,20 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             try {
                 ModelBuilderSessionState derived = derive(candidateSource);
+
+                // Check GA match BEFORE readAsParentModel() which recursively resolves
+                // the candidate's parent chain and can trigger false cycle detection (GH-12074).
+                Model fileModel = derived.readFileModel();
+                String fileGroupId = getGroupId(fileModel);
+                String fileArtifactId = fileModel.getArtifactId();
+
+                if (parent.getGroupId() != null && (fileGroupId == null || !fileGroupId.equals(parent.getGroupId()))
+                        || parent.getArtifactId() != null
+                                && (fileArtifactId == null || !fileArtifactId.equals(parent.getArtifactId()))) {
+                    mismatchRelativePathAndGA(childModel, parent, fileGroupId, fileArtifactId);
+                    return null;
+                }
+
                 Model candidateModel = derived.readAsParentModel(profileActivationContext, parentChain);
                 // Add profiles from parent, preserving model ID tracking
                 for (Map.Entry<String, List<Profile>> entry :
@@ -1139,17 +1155,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     addActivePomProfiles(entry.getKey(), entry.getValue());
                 }
 
-                String groupId = getGroupId(candidateModel);
-                String artifactId = candidateModel.getArtifactId();
                 String version = getVersion(candidateModel);
-
-                // Ensure that relative path and GA match, if both are provided
-                if (parent.getGroupId() != null && (groupId == null || !groupId.equals(parent.getGroupId()))
-                        || parent.getArtifactId() != null
-                                && (artifactId == null || !artifactId.equals(parent.getArtifactId()))) {
-                    mismatchRelativePathAndGA(childModel, parent, groupId, artifactId);
-                    return null;
-                }
 
                 if (version != null && parent.getVersion() != null && !version.equals(parent.getVersion())) {
                     try {
