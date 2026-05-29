@@ -49,6 +49,7 @@ import org.apache.maven.executor.Executor;
 import org.apache.maven.executor.ExecutorException;
 import org.apache.maven.executor.ExecutorRequest;
 import org.apache.maven.executor.ExecutorHelper;
+import org.apache.maven.executor.ExecutorResult;
 import org.apache.maven.executor.ExecutorTool;
 import org.apache.maven.executor.embedded.EmbeddedMavenExecutor;
 import org.apache.maven.executor.forked.ForkedMavenExecutor;
@@ -283,7 +284,7 @@ public class Verifier {
                 }
             }
 
-            int ret = executorHelper.execute(mode, request);
+            ExecutorResult result = executorHelper.execute(mode, request);
 
             // After execution, prepend the command line to the log file
             if (commandLineHeader != null && Files.exists(logFile)) {
@@ -320,14 +321,14 @@ public class Verifier {
                 }
             }
 
-            if (ret > 0) {
+            if (!result.success()) {
                 String dump;
                 try {
                     dump = executorTool.dump(request.toBuilder()).toString();
                 } catch (Exception e) {
                     dump = "FAILED: " + e.getMessage();
                 }
-                throw new VerificationException("Exit code was non-zero: " + ret + "; command line and log = \n"
+                throw new VerificationException("Exit code was non-zero: " + result.exitCode().orElse(-1) + "; command line and log = \n"
                         + getExecutable() + " "
                         + "\nstdout: " + stdout
                         + "\nstderr: " + stderr
