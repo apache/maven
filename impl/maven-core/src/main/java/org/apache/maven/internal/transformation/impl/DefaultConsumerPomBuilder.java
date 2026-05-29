@@ -153,19 +153,18 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                 if (POM_PACKAGING.equals(packaging)
                         && !model.isPreserveModelVersion()
                         && !ModelBuilder.MODEL_VERSION_4_0_0.equals(result.getModelVersion())) {
-                    throw new MavenException("The consumer POM for " + project.getId()
-                            + " cannot be downgraded to model version 4.0.0 because it contains"
-                            + " features that require a newer model version."
-                            + " Since consumer POM flattening is disabled, the parent reference is"
-                            + " preserved, which requires consumers to resolve the parent POM." + System.lineSeparator()
-                            + "You have the following options to resolve this:" + System.lineSeparator()
-                            + "  1. Enable flattening by setting the property 'maven.consumer.pom.flatten=true'"
-                            + " to inline parent content and produce a self-contained 4.0.0 consumer POM"
-                            + System.lineSeparator()
-                            + "  2. Preserve the model version by setting 'preserve.model.version=true'"
-                            + " on the <project> element (Maven 4 consumers only)"
-                            + System.lineSeparator()
-                            + "  3. Remove the features that require a newer model version");
+                    throw new MavenException("""
+                            The consumer POM for %s cannot be downgraded to model version 4.0.0 because it contains\
+                             features that require a newer model version.\
+                             Since consumer POM flattening is disabled, the parent reference is\
+                             preserved, which requires consumers to resolve the parent POM.
+                            You have the following options to resolve this:
+                              1. Enable flattening by setting the property 'maven.consumer.pom.flatten=true'\
+                             to inline parent content and produce a self-contained 4.0.0 consumer POM
+                              2. Preserve the model version by setting 'preserve.model.version=true'\
+                             on the <project> element (Maven 4 consumers only)
+                              3. Remove the features that require a newer model version"""
+                            .formatted(project.getId()));
                 }
                 return result;
             }
