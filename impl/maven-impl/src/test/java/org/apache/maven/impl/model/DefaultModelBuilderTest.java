@@ -215,6 +215,69 @@ class DefaultModelBuilderTest {
     }
 
     @Test
+    public void testCiFriendlyDependencyVersionInterpolation() {
+        // Test that ${revision} in dependency versions is interpolated using model properties
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("ci-friendly-deps")))
+                .build();
+        ModelBuilderResult result = builder.newSession().build(request);
+        assertNotNull(result);
+        Model effective = result.getEffectiveModel();
+        assertEquals("1.0.0-SNAPSHOT", effective.getVersion());
+        assertEquals(1, effective.getDependencies().size());
+        assertEquals(
+                "1.0.0-SNAPSHOT",
+                effective.getDependencies().get(0).getVersion(),
+                "${revision} in dependency version should be interpolated");
+        assertNotNull(effective.getDistributionManagement());
+        assertEquals(
+                "releases-1.0.0-SNAPSHOT",
+                effective.getDistributionManagement().getRepository().getId(),
+                "${revision} in distributionManagement repository id should be interpolated");
+    }
+
+    @Test
+    public void testCiFriendlyDependencyVersionWithUserProperties() {
+        // Test that ${revision} in dependency versions is interpolated using user properties override
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .userProperties(Map.of("revision", "2.0.0"))
+                .source(Sources.buildSource(getPom("ci-friendly-deps")))
+                .build();
+        ModelBuilderResult result = builder.newSession().build(request);
+        assertNotNull(result);
+        Model effective = result.getEffectiveModel();
+        assertEquals("2.0.0", effective.getVersion());
+        assertEquals(1, effective.getDependencies().size());
+        assertEquals(
+                "2.0.0",
+                effective.getDependencies().get(0).getVersion(),
+                "${revision} in dependency version should be interpolated with user property");
+    }
+
+    @Test
+    public void testCiFriendlyDependencyVersionWithUserPropertiesOnly() {
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .userProperties(Map.of("revision", "3.0.0"))
+                .source(Sources.buildSource(getPom("ci-friendly-deps-no-prop")))
+                .build();
+        ModelBuilderResult result = builder.newSession().build(request);
+        assertNotNull(result);
+        Model effective = result.getEffectiveModel();
+        assertEquals("3.0.0", effective.getVersion(), "project version should use user property");
+        assertEquals(1, effective.getDependencies().size());
+        assertEquals(
+                "3.0.0",
+                effective.getDependencies().get(0).getVersion(),
+                "${revision} in dependency version should be interpolated with user-only property");
+    }
+
+    @Test
     public void testMissingDependencyGroupIdInference() throws Exception {
         // Test that dependencies with missing groupId but present version are inferred correctly in model 4.1.0
 
