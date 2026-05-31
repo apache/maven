@@ -240,9 +240,11 @@ public class MavenCli {
 
         try {
             if (stdout != null) {
+                MessageUtils.awaitTerminalInitialization();
                 System.setOut(stdout);
             }
             if (stderr != null) {
+                MessageUtils.awaitTerminalInitialization();
                 System.setErr(stderr);
             }
 
@@ -540,6 +542,11 @@ public class MavenCli {
         if (cliRequest.commandLine.hasOption(CLIManager.LOG_FILE)) {
             File logFile = new File(cliRequest.commandLine.getOptionValue(CLIManager.LOG_FILE));
             logFile = resolveFile(logFile, cliRequest.workingDirectory);
+
+            // make sure the terminal has finished installing before we grab the streams, otherwise it
+            // could later overwrite our redirection and logs would leak back to the console
+            // (see https://github.com/apache/maven/issues/12188)
+            MessageUtils.awaitTerminalInitialization();
 
             // redirect stdout and stderr to file
             try {

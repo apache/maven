@@ -64,6 +64,20 @@ public class MessageUtils {
                 });
     }
 
+    /**
+     * Waits for the terminal to finish installing on its background thread.
+     * <p>
+     * Terminal setup runs asynchronously and replaces {@code System.out}/{@code System.err} along
+     * the way. Call this before you redirect those streams yourself (for example for the {@code -l}
+     * log file), otherwise the late terminal install can overwrite your redirection and logs end up
+     * back on the console.
+     */
+    public static void awaitTerminalInitialization() {
+        if (terminal instanceof FastTerminal) {
+            ((FastTerminal) terminal).getTerminal();
+        }
+    }
+
     public static void registerShutdownHook() {
         if (shutdownHook == null) {
             shutdownHook = new Thread(() -> {
