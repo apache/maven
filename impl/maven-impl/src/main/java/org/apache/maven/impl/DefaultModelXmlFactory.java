@@ -193,6 +193,7 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
         String parentGroupId = null;
         String parentVersion = null;
 
+        int depth = 0;
         boolean inProject = false;
         boolean inParent = false;
         String currentElement = null;
@@ -201,13 +202,15 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
             int event = reader.next();
 
             if (event == XMLStreamConstants.START_ELEMENT) {
+                depth++;
                 String localName = reader.getLocalName();
 
-                if ("project".equals(localName)) {
+                if (depth == 1 && "project".equals(localName)) {
                     inProject = true;
-                } else if ("parent".equals(localName) && inProject) {
+                } else if (inProject && depth == 2 && "parent".equals(localName)) {
                     inParent = true;
                 } else if (inProject
+                        && (depth == 2 || (depth == 3 && inParent))
                         && ("groupId".equals(localName)
                                 || "artifactId".equals(localName)
                                 || "version".equals(localName))) {
@@ -222,6 +225,7 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
                     break;
                 }
                 currentElement = null;
+                depth--;
             } else if (event == XMLStreamConstants.CHARACTERS && currentElement != null) {
                 String text = reader.getText().trim();
                 if (!text.isEmpty()) {
@@ -254,7 +258,9 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
                 }
             }
 
-            if (artifactId != null && groupId != null && version != null) {
+            if (artifactId != null
+                    && (groupId != null || parentGroupId != null)
+                    && (version != null || parentVersion != null)) {
                 break;
             }
         }
