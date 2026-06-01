@@ -18,8 +18,10 @@
  */
 package org.apache.maven.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
 
 import org.apache.maven.api.model.InputSource;
@@ -160,6 +162,37 @@ class DefaultModelXmlFactoryTest {
 
         Model model = factory.read(XmlReaderRequest.builder()
                 .reader(new StringReader(xml))
+                .location("pom.xml")
+                .strict(true)
+                .build());
+
+        InputSource source = model.getLocation("").getSource();
+        assertNotNull(source);
+        assertEquals("org.example:child:1", source.getModelId());
+    }
+
+    @Test
+    void testExtractsParentModelIdWithoutUsingDependencyCoordinates() throws Exception {
+        String xml = """
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                  <modelVersion>4.0.0</modelVersion>
+                  <parent>
+                    <groupId>org.example</groupId>
+                    <artifactId>parent</artifactId>
+                    <version>1</version>
+                  </parent>
+                  <artifactId>child</artifactId>
+                  <dependencies>
+                    <dependency>
+                      <groupId>dep.group</groupId>
+                      <artifactId>dep-art</artifactId>
+                      <version>2.0</version>
+                    </dependency>
+                  </dependencies>
+                </project>""";
+
+        Model model = factory.read(XmlReaderRequest.builder()
+                .inputStream(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)))
                 .location("pom.xml")
                 .strict(true)
                 .build());
