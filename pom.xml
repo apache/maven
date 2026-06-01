@@ -682,7 +682,7 @@ under the License.
       <dependency>
         <groupId>eu.maveniverse.maven.mimir</groupId>
         <artifactId>testing</artifactId>
-        <version>0.11.4</version>
+        <version>0.12.0</version>
       </dependency>
     </dependencies>
     <!--bootstrap-start-comment-->
