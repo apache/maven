@@ -1423,7 +1423,14 @@ public class DefaultModelBuilder implements ModelBuilder {
             // Mixins
             for (Mixin mixin : model.getMixins()) {
                 Model parent = resolveParent(model, mixin, profileActivationContext, parentChain);
+                // Merge mixin into model
                 model = inheritanceAssembler.assembleModelInheritance(model, parent, request, this);
+                // Ensure mixin properties override any previously inherited properties
+                // This is necessary because normal inheritance gives child precedence, but for mixins
+                // we want the mixin to take precedence over inherited parent properties
+                Map<String, String> mergedProperties = new java.util.HashMap<>(model.getProperties());
+                mergedProperties.putAll(parent.getProperties());
+                model = model.withProperties(mergedProperties);
             }
 
             // model normalization
@@ -1901,7 +1908,12 @@ public class DefaultModelBuilder implements ModelBuilder {
             Model parent = defaultInheritanceAssembler.assembleModelInheritance(raw, parentData, request, this);
             for (Mixin mixin : parent.getMixins()) {
                 Model parentModel = resolveParent(parent, mixin, childProfileActivationContext, parentChain);
+                // Merge mixin into parent
                 parent = defaultInheritanceAssembler.assembleModelInheritance(parent, parentModel, request, this);
+                // Ensure mixin properties override any previously inherited properties
+                Map<String, String> mergedProperties = new java.util.HashMap<>(parent.getProperties());
+                mergedProperties.putAll(parentModel.getProperties());
+                parent = parent.withProperties(mergedProperties);
             }
 
             // Profile injection SHOULD be performed on parent models to ensure
