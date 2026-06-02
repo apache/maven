@@ -28,9 +28,6 @@ under the License.
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>Source TargetPath Test</name>
-  <description>Test that targetPath in source elements remains relative to output directory</description>
-
   <build>
     <sources>
       <source>

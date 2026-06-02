@@ -28,9 +28,6 @@ under the License.
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>Resource TargetPath Compat Test</name>
-  <description>Test that targetPath in legacy resource elements remains relative through the compat layer</description>
-
   <build>
     <resources>
       <resource>

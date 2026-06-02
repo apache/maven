@@ -45,15 +45,6 @@ import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import static org.apache.maven.project.ProjectBuildingResultWithLocationMatcher.projectBuildingResultWithLocation;
-import static org.apache.maven.project.ProjectBuildingResultWithProblemMessageMatcher.projectBuildingResultWithProblemMessage;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -102,15 +93,17 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setRepositorySession(mavenSession.getRepositorySession());
 
-        ProjectBuildingException e = assertThrows(ProjectBuildingException.class, () -> getContainer()
-                .lookup(org.apache.maven.project.ProjectBuilder.class)
-                .build(pomFile, configuration));
-        assertThat(
-                e.getResults(),
-                contains(
-                        projectBuildingResultWithProblemMessage(
-                                "'dependencies.dependency.version' for groupId='org.apache.maven.its', artifactId='a', type='jar' is missing")));
-        assertThat(e.getResults(), contains(projectBuildingResultWithLocation(5, 9)));
+        ProjectBuildingException e = assertThrows(
+                ProjectBuildingException.class,
+                () -> getContainer()
+                        .lookup(org.apache.maven.project.ProjectBuilder.class)
+                        .build(pomFile, configuration));
+        assertEquals(1, e.getResults().size());
+        ProjectBuildingResultWithProblemMessageAssert.assertThat(e.getResults().get(0))
+                .hasProblemMessage(
+                        "'dependencies.dependency.version' for groupId='org.apache.maven.its', artifactId='a', type='jar' is missing");
+        ProjectBuildingResultWithLocationAssert.assertThat(e.getResults().get(0))
+                .hasLocation(5, 9);
     }
 
     @Test
@@ -194,7 +187,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         Files.write(parent.toPath(), parentContent.getBytes(StandardCharsets.UTF_8));
         // re-build pom with modified parent
         ProjectBuildingResult result = projectBuilder.build(child, configuration);
-        assertThat(result.getProject().getProperties(), hasKey((Object) "addedProperty"));
+        assertTrue(result.getProject().getProperties().containsKey("addedProperty"));
     }
 
     @Test
@@ -242,7 +235,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
 
         // single project build entry point
         Exception ex = assertThrows(Exception.class, () -> projectBuilder.build(pomFile, configuration));
-        assertThat(ex.getMessage(), containsString("Received non-all-whitespace CHARACTERS or CDATA event"));
+        assertTrue(ex.getMessage().contains("Received non-all-whitespace CHARACTERS or CDATA event"));
 
         // multi projects build entry point
         ProjectBuildingException pex = assertThrows(
@@ -250,11 +243,10 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
                 () -> projectBuilder.build(Collections.singletonList(pomFile), false, configuration));
         assertEquals(1, pex.getResults().size());
         assertNotNull(pex.getResults().get(0).getPomFile());
-        assertThat(pex.getResults().get(0).getProblems().size(), greaterThan(0));
-        assertThat(
-                pex.getResults(),
-                contains(projectBuildingResultWithProblemMessage(
-                        "Received non-all-whitespace CHARACTERS or CDATA event in nextTag()")));
+        assertTrue(pex.getResults().get(0).getProblems().size() > 0);
+        ProjectBuildingResultWithProblemMessageAssert.assertThat(
+                        pex.getResults().get(0))
+                .hasProblemMessage("Received non-all-whitespace CHARACTERS or CDATA event in nextTag()");
     }
 
     @Test
@@ -305,7 +297,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
 
     private void assertResultShowNoError(List<ProjectBuildingResult> results) {
         for (ProjectBuildingResult result : results) {
-            assertThat(result.getProblems(), is(empty()));
+            assertTrue(result.getProblems().isEmpty());
             assertNotNull(result.getProject());
         }
     }
@@ -653,10 +645,11 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         List<SourceRoot> mainResources = project.getEnabledSourceRoots(ProjectScope.MAIN, Language.RESOURCES)
                 .toList();
         assertTrue(
-                mainResources.stream().anyMatch(sr -> sr.directory()
-                        .toString()
-                        .replace(File.separatorChar, '/')
-                        .contains("src/main/custom-resources")),
+                mainResources.stream()
+                        .anyMatch(sr -> sr.directory()
+                                .toString()
+                                .replace(File.separatorChar, '/')
+                                .contains("src/main/custom-resources")),
                 "Should have custom main resources from <sources>");
 
         // Verify legacy Java directories are used as fallback
@@ -726,10 +719,11 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         List<SourceRoot> mainResources = project.getEnabledSourceRoots(ProjectScope.MAIN, Language.RESOURCES)
                 .toList();
         assertTrue(
-                mainResources.stream().anyMatch(sr -> sr.directory()
-                        .toString()
-                        .replace(File.separatorChar, '/')
-                        .contains("src/main/custom-resources")),
+                mainResources.stream()
+                        .anyMatch(sr -> sr.directory()
+                                .toString()
+                                .replace(File.separatorChar, '/')
+                                .contains("src/main/custom-resources")),
                 "Should have custom main resources from <sources>");
 
         // Verify NO Java source roots (legacy was rejected, none in <sources>)
@@ -900,14 +894,16 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         assertEquals(2, moduleCount, "Both main sources should be for com.example.app module");
 
         // One should be implicit directory, one should be generated-sources
-        boolean hasImplicitDir = mainJavaRoots.stream().anyMatch(sr -> sr.directory()
-                .toString()
-                .replace(File.separatorChar, '/')
-                .contains("src/com.example.app/main/java"));
-        boolean hasGeneratedDir = mainJavaRoots.stream().anyMatch(sr -> sr.directory()
-                .toString()
-                .replace(File.separatorChar, '/')
-                .contains("target/generated-sources/com.example.app/java"));
+        boolean hasImplicitDir = mainJavaRoots.stream()
+                .anyMatch(sr -> sr.directory()
+                        .toString()
+                        .replace(File.separatorChar, '/')
+                        .contains("src/com.example.app/main/java"));
+        boolean hasGeneratedDir = mainJavaRoots.stream()
+                .anyMatch(sr -> sr.directory()
+                        .toString()
+                        .replace(File.separatorChar, '/')
+                        .contains("target/generated-sources/com.example.app/java"));
 
         assertTrue(hasImplicitDir, "Should have implicit source directory for module");
         assertTrue(hasGeneratedDir, "Should have generated-sources directory for module");
@@ -1002,6 +998,62 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
+    void testResourceTargetPathRemainsRelativeInCompatLayer() throws Exception {
+        File pom = getProject("resource-target-path");
+
+        MavenSession mavenSession = createMavenSession(null);
+        ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
+        configuration.setRepositorySession(mavenSession.getRepositorySession());
+
+        ProjectBuildingResult result = getContainer()
+                .lookup(org.apache.maven.project.ProjectBuilder.class)
+                .build(pom, configuration);
+
+        MavenProject project = result.getProject();
+
+        // Verify main resources via SourceRoot API
+        List<SourceRoot> mainResources = project.getEnabledSourceRoots(ProjectScope.MAIN, Language.RESOURCES)
+                .toList();
+        assertEquals(1, mainResources.size());
+        assertTrue(mainResources.get(0).targetPath().isPresent(), "Main resource should have a targetPath");
+        assertFalse(
+                mainResources.get(0).targetPath().get().isAbsolute(),
+                "SourceRoot targetPath must be relative, got: "
+                        + mainResources.get(0).targetPath().get());
+        assertEquals(
+                Path.of("META-INF/tags/rdc"), mainResources.get(0).targetPath().get());
+
+        // Verify test resources via SourceRoot API
+        List<SourceRoot> testResources = project.getEnabledSourceRoots(ProjectScope.TEST, Language.RESOURCES)
+                .toList();
+        assertEquals(1, testResources.size());
+        assertTrue(testResources.get(0).targetPath().isPresent(), "Test resource should have a targetPath");
+        assertFalse(
+                testResources.get(0).targetPath().get().isAbsolute(),
+                "SourceRoot targetPath must be relative, got: "
+                        + testResources.get(0).targetPath().get());
+        assertEquals(
+                Path.of("org/apache/maven/messages"),
+                testResources.get(0).targetPath().get());
+
+        // Verify compat layer: MavenProject.getResources() must return relative targetPath
+        List<org.apache.maven.model.Resource> resources = project.getResources();
+        assertEquals(1, resources.size());
+        assertFalse(
+                Path.of(resources.get(0).getTargetPath()).isAbsolute(),
+                "Resource targetPath from getResources() must be relative, got: "
+                        + resources.get(0).getTargetPath());
+
+        // Verify compat layer: MavenProject.getTestResources() must return relative targetPath
+        List<org.apache.maven.model.Resource> testResourceList = project.getTestResources();
+        assertEquals(1, testResourceList.size());
+        assertFalse(
+                Path.of(testResourceList.get(0).getTargetPath()).isAbsolute(),
+                "Test resource targetPath from getTestResources() must be relative, got: "
+                        + testResourceList.get(0).getTargetPath());
+    }
+
+    @Test
     void testSourceTargetPathRemainsRelative() throws Exception {
         File pom = getProject("source-target-path");
 
@@ -1038,61 +1090,5 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         assertEquals(1, testResourceList.size());
         assertEquals(
                 "META-INF" + File.separator + "test", testResourceList.get(0).getTargetPath());
-    }
-
-    @Test
-    void testResourceTargetPathRemainsRelativeInCompatLayer() throws Exception {
-        File pom = getProject("resource-target-path");
-
-        MavenSession mavenSession = createMavenSession(null);
-        ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
-        configuration.setRepositorySession(mavenSession.getRepositorySession());
-
-        ProjectBuildingResult result = getContainer()
-                .lookup(org.apache.maven.project.ProjectBuilder.class)
-                .build(pom, configuration);
-
-        MavenProject project = result.getProject();
-
-        // Verify main resources via SourceRoot API
-        List<SourceRoot> mainResources = project.getEnabledSourceRoots(ProjectScope.MAIN, Language.RESOURCES)
-                .toList();
-        assertEquals(1, mainResources.size());
-        assertTrue(mainResources.get(0).targetPath().isPresent());
-        assertFalse(
-                mainResources.get(0).targetPath().get().isAbsolute(),
-                "SourceRoot targetPath must be relative, got: "
-                        + mainResources.get(0).targetPath().get());
-        assertEquals(
-                Path.of("META-INF/tags/rdc"), mainResources.get(0).targetPath().get());
-
-        // Verify test resources via SourceRoot API
-        List<SourceRoot> testResources = project.getEnabledSourceRoots(ProjectScope.TEST, Language.RESOURCES)
-                .toList();
-        assertEquals(1, testResources.size());
-        assertTrue(testResources.get(0).targetPath().isPresent());
-        assertFalse(
-                testResources.get(0).targetPath().get().isAbsolute(),
-                "SourceRoot targetPath must be relative, got: "
-                        + testResources.get(0).targetPath().get());
-        assertEquals(
-                Path.of("org/apache/maven/messages"),
-                testResources.get(0).targetPath().get());
-
-        // Verify compat layer: MavenProject.getResources() must return relative targetPath
-        List<org.apache.maven.model.Resource> resources = project.getResources();
-        assertEquals(1, resources.size());
-        assertEquals(
-                "META-INF" + File.separator + "tags" + File.separator + "rdc",
-                resources.get(0).getTargetPath(),
-                "Resource targetPath from getResources() must remain relative");
-
-        // Verify compat layer: MavenProject.getTestResources() must return relative targetPath
-        List<org.apache.maven.model.Resource> testResourceList = project.getTestResources();
-        assertEquals(1, testResourceList.size());
-        assertEquals(
-                "org" + File.separator + "apache" + File.separator + "maven" + File.separator + "messages",
-                testResourceList.get(0).getTargetPath(),
-                "Test resource targetPath from getTestResources() must remain relative");
     }
 }
