@@ -18,6 +18,8 @@
  */
 package org.apache.maven.cling.invoker.mvnup.goals;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -776,8 +778,6 @@ class PluginUpgradeStrategyTest {
             // org.apache:apache:23 defines maven-enforcer-plugin:1.4.1 in pluginManagement.
             // A child POM that inherits from this parent should get pluginManagement overrides
             // added by mvnup for plugins that need Maven 4 compatibility upgrades.
-            // Uses an absolute path because the effective model analysis path resolution
-            // requires it to match between phases.
             String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
@@ -793,20 +793,35 @@ class PluginUpgradeStrategyTest {
                 </project>
                 """;
 
-            Document document = Document.of(pomXml);
-            Path pomPath = Paths.get("/project/pom.xml").toAbsolutePath();
-            Map<Path, Document> pomMap = Map.of(pomPath, document);
+            Path tempDir = Files.createTempDirectory("mvnup-test-");
+            try {
+                Files.createDirectories(tempDir.resolve(".mvn"));
+                Path pomPath = tempDir.resolve("pom.xml");
+                Files.writeString(pomPath, pomXml);
 
-            UpgradeContext context = createMockContext();
-            UpgradeResult result = strategy.doApply(context, pomMap);
+                Document document = Document.of(pomXml);
+                Map<Path, Document> pomMap = Map.of(pomPath, document);
 
-            assertTrue(result.success(), "Strategy should succeed");
-            assertTrue(result.modifiedCount() > 0, "Should have added plugin management for inherited plugins");
+                UpgradeContext context = createMockContext();
+                UpgradeResult result = strategy.doApply(context, pomMap);
 
-            String xml = DomUtils.toXml(document);
-            assertTrue(
-                    xml.contains("<artifactId>maven-enforcer-plugin</artifactId>"),
-                    "Should add pluginManagement for maven-enforcer-plugin inherited from parent");
+                assertTrue(result.success(), "Strategy should succeed");
+                assertTrue(result.modifiedCount() > 0, "Should have added plugin management for inherited plugins");
+
+                String xml = DomUtils.toXml(document);
+                assertTrue(
+                        xml.contains("<artifactId>maven-enforcer-plugin</artifactId>"),
+                        "Should add pluginManagement for maven-enforcer-plugin inherited from parent");
+            } finally {
+                try (var walk = Files.walk(tempDir)) {
+                    walk.sorted(java.util.Comparator.reverseOrder()).forEach(p -> {
+                        try {
+                            Files.delete(p);
+                        } catch (IOException ignored) {
+                        }
+                    });
+                }
+            }
         }
 
         @Test
