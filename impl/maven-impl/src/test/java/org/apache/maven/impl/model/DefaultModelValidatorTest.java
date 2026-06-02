@@ -915,31 +915,33 @@ class DefaultModelValidatorTest {
         SimpleProblemCollector result = validateRaw("raw-model/repository-with-basedir-expression.xml");
         // This test runs on raw model without interpolation, so all expressions appear uninterpolated
         // In the real flow, supported expressions would be interpolated before validation
-        assertViolations(result, 0, 3, 0);
+        assertViolations(result, 0, 0, 3);
     }
 
     @Test
     void repositoryWithUnsupportedExpression() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/repository-with-unsupported-expression.xml");
-        // Unsupported expressions should cause validation errors
-        assertViolations(result, 0, 1, 0);
+        // Unsupported expressions should cause validation warnings (repos will be skipped at build time)
+        assertViolations(result, 0, 0, 1);
     }
 
     @Test
     void repositoryWithUninterpolatedId() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/repository-with-uninterpolated-id.xml");
-        // Uninterpolated expressions in repository IDs should cause validation errors
+        // Uninterpolated expressions in repository IDs should cause validation warnings
+        // (repos will be skipped at build time)
         // distributionManagement repositories skip expression check since parent properties
         // may not be available at file model validation stage
-        assertViolations(result, 0, 2, 0);
+        assertViolations(result, 0, 0, 2);
 
-        // Check that repository ID validation errors are present for repositories and pluginRepositories
-        assertTrue(result.getErrors().stream()
-                .anyMatch(error -> error.contains("repositories.repository.[${repository.id}].id")
-                        && error.contains("contains an uninterpolated expression")));
-        assertTrue(result.getErrors().stream()
-                .anyMatch(error -> error.contains("pluginRepositories.pluginRepository.[${plugin.repository.id}].id")
-                        && error.contains("contains an uninterpolated expression")));
+        // Check that repository ID validation warnings are present for repositories and pluginRepositories
+        assertTrue(result.getWarnings().stream()
+                .anyMatch(warning -> warning.contains("repositories.repository.[${repository.id}].id")
+                        && warning.contains("contains an uninterpolated expression")));
+        assertTrue(result.getWarnings().stream()
+                .anyMatch(
+                        warning -> warning.contains("pluginRepositories.pluginRepository.[${plugin.repository.id}].id")
+                                && warning.contains("contains an uninterpolated expression")));
     }
 
     @Test
