@@ -163,8 +163,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                              to inline parent content and produce a self-contained 4.0.0 consumer POM
                               2. Preserve the model version by setting 'preserve.model.version=true'\
                              on the <project> element (Maven 4 consumers only)
-                              3. Remove the features that require a newer model version"""
-                            .formatted(project.getId()));
+                              3. Remove the features that require a newer model version""".formatted(project.getId()));
                 }
                 return result;
             }
