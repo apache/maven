@@ -1598,8 +1598,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                             pomPath = modelProcessor.locateExistingPom(pomPath);
                         }
                         if (pomPath != null && Files.isRegularFile(pomPath)) {
-                            if (rootDirectoryFromSession
-                                    && !isParentWithinRootDirectory(pomPath, rootDirectory)) {
+                            if (rootDirectoryFromSession && !isParentWithinRootDirectory(pomPath, rootDirectory)) {
                                 add(
                                         Severity.FATAL,
                                         Version.BASE,
