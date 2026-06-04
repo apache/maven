@@ -144,6 +144,7 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
                 hasIssues |= fixUnsupportedRepositoryExpressions(pomDocument, context);
                 hasIssues |= fixIncorrectParentRelativePaths(pomDocument, pomPath, pomMap, context);
                 hasIssues |= fixUndefinedPropertyExpressions(pomDocument, allDefinedProperties, context);
+                hasIssues |= fixUndefinedPropertyExpressionsInRepositories(pomDocument, allDefinedProperties, context);
 
                 if (hasIssues) {
                     context.success("Maven 4 compatibility issues fixed");
@@ -410,6 +411,89 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
                 .map(container -> fixUndefinedPropertyExpressionsInSection(
                         container.element, allDefinedProperties, pomDocument, context, container.sectionName))
                 .reduce(false, Boolean::logicalOr);
+    }
+
+    /**
+     * Fixes repositories with undefined property expressions by commenting them out.
+     */
+    private boolean fixUndefinedPropertyExpressionsInRepositories(
+            Document pomDocument, Set<String> allDefinedProperties, UpgradeContext context) {
+        Element root = pomDocument.root();
+
+        Stream<RepositoryContainer> repositoryContainers = Stream.concat(
+                Stream.of(
+                                new RepositoryContainer(
+                                        root.childElement(REPOSITORIES).orElse(null), REPOSITORY, REPOSITORIES),
+                                new RepositoryContainer(
+                                        root.childElement(PLUGIN_REPOSITORIES).orElse(null),
+                                        PLUGIN_REPOSITORY,
+                                        PLUGIN_REPOSITORIES))
+                        .filter(c -> c.element != null),
+                root.childElement(PROFILES).stream()
+                        .flatMap(profiles -> profiles.childElements(PROFILE))
+                        .flatMap(profile -> Stream.of(
+                                        new RepositoryContainer(
+                                                profile.childElement(REPOSITORIES)
+                                                        .orElse(null),
+                                                REPOSITORY,
+                                                "profile repositories"),
+                                        new RepositoryContainer(
+                                                profile.childElement(PLUGIN_REPOSITORIES)
+                                                        .orElse(null),
+                                                PLUGIN_REPOSITORY,
+                                                "profile pluginRepositories"))
+                                .filter(c -> c.element != null)));
+
+        return repositoryContainers
+                .map(c -> fixUndefinedPropertyExpressionsInRepositorySection(
+                        c.element, c.elementType, allDefinedProperties, pomDocument, context, c.sectionName))
+                .reduce(false, Boolean::logicalOr);
+    }
+
+    private record RepositoryContainer(Element element, String elementType, String sectionName) {}
+
+    private boolean fixUndefinedPropertyExpressionsInRepositorySection(
+            Element repositoriesElement,
+            String elementType,
+            Set<String> allDefinedProperties,
+            Document pomDocument,
+            UpgradeContext context,
+            String sectionName) {
+        boolean fixed = false;
+        List<Element> repositories =
+                repositoriesElement.childElements(elementType).toList();
+        Editor editor = new Editor(pomDocument);
+
+        for (Element repository : repositories) {
+            Set<String> undefinedProps = findUndefinedPropertiesInRepository(repository, allDefinedProperties);
+            if (!undefinedProps.isEmpty()) {
+                String propLabel = undefinedProps.size() > 1 ? "properties" : "property";
+                String propsStr = "'" + String.join("', '", undefinedProps) + "'";
+
+                Comment comment = editor.commentOutElement(repository);
+                String elementXml = comment.content().trim();
+                comment.content(
+                        " mvnup: commented out - undefined " + propLabel + " " + propsStr + "\n" + elementXml + " ");
+
+                context.detail("Fixed: Commented out " + elementType + " with undefined " + propLabel + " " + propsStr
+                        + " in " + sectionName);
+                fixed = true;
+            }
+        }
+
+        return fixed;
+    }
+
+    private Set<String> findUndefinedPropertiesInRepository(Element repository, Set<String> allDefinedProperties) {
+        Set<String> undefinedProperties = new HashSet<>();
+
+        String id = repository.childText("id");
+        String url = repository.childText("url");
+
+        collectUndefinedExpressions(id, allDefinedProperties, undefinedProperties);
+        collectUndefinedExpressions(url, allDefinedProperties, undefinedProperties);
+
+        return undefinedProperties;
     }
 
     /**
