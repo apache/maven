@@ -91,8 +91,8 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             new PluginUpgrade(
                     "net.alchim31.maven",
                     "scala-maven-plugin",
-                    "4.9.2",
-                    "Versions before 4.9.2 call add() on immutable lists returned by Maven 4 API"),
+                    "4.9.5",
+                    "Versions before 4.9.5 call add() on immutable lists returned by Maven 4 API"),
             new PluginUpgrade(
                     DEFAULT_MAVEN_PLUGIN_GROUP_ID,
                     "maven-resources-plugin",
@@ -260,7 +260,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 new PluginUpgradeInfo(DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-surefire-report-plugin", "3.5.2"));
         upgrades.put(
                 "net.alchim31.maven:scala-maven-plugin",
-                new PluginUpgradeInfo("net.alchim31.maven", "scala-maven-plugin", "4.9.2"));
+                new PluginUpgradeInfo("net.alchim31.maven", "scala-maven-plugin", "4.9.5"));
         upgrades.put(
                 DEFAULT_MAVEN_PLUGIN_GROUP_ID + ":maven-resources-plugin",
                 new PluginUpgradeInfo(DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-resources-plugin", "3.3.1"));
