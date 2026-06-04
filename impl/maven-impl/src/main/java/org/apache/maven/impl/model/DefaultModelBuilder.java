@@ -1135,7 +1135,16 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             try {
-                ModelBuilderSessionState derived = derive(candidateSource);
+                ModelBuilderSessionState derived;
+                if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_CONSUMER) {
+                    ModelBuilderRequest parentRequest = ModelBuilderRequest.builder(request)
+                            .requestType(ModelBuilderRequest.RequestType.CONSUMER_PARENT)
+                            .source(candidateSource)
+                            .build();
+                    derived = derive(parentRequest);
+                } else {
+                    derived = derive(candidateSource);
+                }
 
                 // Check GA match BEFORE readAsParentModel() which recursively resolves
                 // the candidate's parent chain and can trigger false cycle detection (GH-12074).
