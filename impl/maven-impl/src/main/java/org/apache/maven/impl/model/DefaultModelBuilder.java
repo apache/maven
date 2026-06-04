@@ -1464,12 +1464,14 @@ public class DefaultModelBuilder implements ModelBuilder {
             ModelSource modelSource = request.getSource();
             Model model;
             Path rootDirectory;
+            boolean rootDirectoryFromSession = false;
             setSource(modelSource.getLocation());
             logger.debug("Reading file model from " + modelSource.getLocation());
             try {
                 boolean strict = isBuildRequest();
                 try {
                     rootDirectory = request.getSession().getRootDirectory();
+                    rootDirectoryFromSession = true;
                 } catch (IllegalStateException ignore) {
                     rootDirectory = modelSource.getPath();
                     while (rootDirectory != null && !Files.isDirectory(rootDirectory)) {
@@ -1559,7 +1561,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                     String artifactId = parent.getArtifactId();
                     String version = parent.getVersion();
                     String path = parent.getRelativePath();
-                    if ((groupId == null || artifactId == null || version == null)
+                    boolean versionContainsExpression = version != null && version.contains("${");
+                    if ((groupId == null || artifactId == null || version == null || versionContainsExpression)
                             && (path == null || !path.isEmpty())) {
                         Path pomFile = model.getPomFile();
                         Path relativePath = Paths.get(path != null ? path : "..");
@@ -1568,8 +1571,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                             pomPath = modelProcessor.locateExistingPom(pomPath);
                         }
                         if (pomPath != null && Files.isRegularFile(pomPath)) {
-                            // Check if parent POM is above the root directory
-                            if (!isParentWithinRootDirectory(pomPath, rootDirectory)) {
+                            if (rootDirectoryFromSession && !isParentWithinRootDirectory(pomPath, rootDirectory)) {
                                 add(
                                         Severity.FATAL,
                                         Version.BASE,
@@ -1587,7 +1589,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                             String parentVersion = getVersion(parentModel);
                             if ((groupId == null || groupId.equals(parentGroupId))
                                     && (artifactId == null || artifactId.equals(parentArtifactId))
-                                    && (version == null || version.equals(parentVersion))) {
+                                    && (version == null
+                                            || version.equals(parentVersion)
+                                            || versionContainsExpression)) {
                                 model = model.withParent(parent.with()
                                         .groupId(parentGroupId)
                                         .artifactId(parentArtifactId)
