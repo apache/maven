@@ -32,17 +32,14 @@ class MavenITgh11140RepoDmUnresolvedTest extends AbstractMavenIntegrationTestCas
     }
 
     @Test
-    void testFailsOnUnresolvedPlaceholders() throws Exception {
+    void testWarnsOnUnresolvedPlaceholders() throws Exception {
         File testDir = extractResources("/gh-11140-repo-dm-unresolved");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
-        try {
-            verifier.addCliArgument("validate");
-            verifier.execute();
-        } catch (VerificationException expected) {
-            // Expected to fail due to unresolved placeholders during model validation
-        }
-        // We expect error mentioning uninterpolated expression
+        verifier.addCliArgument("validate");
+        verifier.execute();
+        // Build should succeed, but warn about uninterpolated expressions (repos are skipped)
+        verifier.verifyErrorFreeLog();
         verifier.verifyTextInLog("contains an uninterpolated expression");
     }
 }
