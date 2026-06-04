@@ -1329,6 +1329,132 @@ class CompatibilityFixStrategyTest {
                     deps.childElements("dependency").count(),
                     "Dependency should not be commented out when property is inherited from grandparent");
         }
+
+        @Test
+        @DisplayName("should not comment out when property is defined in external parent not in reactor")
+        void shouldNotCommentOutWhenPropertyFromExternalParentNotInReactor() throws Exception {
+            String externalParentPom = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0"
+                         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>com.example</groupId>
+                    <artifactId>external-parent</artifactId>
+                    <version>1.0.0</version>
+                    <packaging>pom</packaging>
+                    <properties>
+                        <oak.version>1.62.0</oak.version>
+                    </properties>
+                </project>
+                """;
+
+            String childPom = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0"
+                         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+                    <modelVersion>4.0.0</modelVersion>
+                    <parent>
+                        <groupId>com.example</groupId>
+                        <artifactId>external-parent</artifactId>
+                        <version>1.0.0</version>
+                        <relativePath>../external/pom.xml</relativePath>
+                    </parent>
+                    <artifactId>child</artifactId>
+                    <dependencyManagement>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.apache.jackrabbit</groupId>
+                                <artifactId>oak-core</artifactId>
+                                <version>${oak.version}</version>
+                            </dependency>
+                        </dependencies>
+                    </dependencyManagement>
+                </project>
+                """;
+
+            Path externalDir = Files.createDirectories(tempDir.resolve("external"));
+            Path externalParentPath = externalDir.resolve("pom.xml");
+            Path childDir = Files.createDirectories(tempDir.resolve("child"));
+            Path childPomPath = childDir.resolve("pom.xml");
+
+            Files.writeString(externalParentPath, externalParentPom);
+            Files.writeString(childPomPath, childPom);
+
+            Document childDoc = Document.of(childPom);
+            Map<Path, Document> pomMap = Map.of(childPomPath, childDoc);
+
+            UpgradeContext context = createMockContext(childDir);
+            strategy.doApply(context, pomMap);
+
+            Element root = childDoc.root();
+            Element depMgmt = DomUtils.findChildElement(root, "dependencyManagement");
+            Element deps = DomUtils.findChildElement(depMgmt, "dependencies");
+            assertEquals(
+                    1,
+                    deps.childElements("dependency").count(),
+                    "Managed dependency should not be commented out when property is inherited from external parent");
+        }
+
+        @Test
+        @DisplayName("should comment out when property is truly undefined even in effective model")
+        void shouldCommentOutWhenPropertyTrulyUndefinedInEffectiveModel() throws Exception {
+            String parentPom = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0"
+                         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>com.example</groupId>
+                    <artifactId>parent</artifactId>
+                    <version>1.0.0</version>
+                    <packaging>pom</packaging>
+                </project>
+                """;
+
+            String childPom = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0"
+                         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+                    <modelVersion>4.0.0</modelVersion>
+                    <parent>
+                        <groupId>com.example</groupId>
+                        <artifactId>parent</artifactId>
+                        <version>1.0.0</version>
+                        <relativePath>../pom.xml</relativePath>
+                    </parent>
+                    <artifactId>child</artifactId>
+                    <dependencyManagement>
+                        <dependencies>
+                            <dependency>
+                                <groupId>com.google.guava</groupId>
+                                <artifactId>guava</artifactId>
+                                <version>${truly.undefined.prop}</version>
+                            </dependency>
+                        </dependencies>
+                    </dependencyManagement>
+                </project>
+                """;
+
+            Path parentPath = tempDir.resolve("pom.xml");
+            Path childDir = Files.createDirectories(tempDir.resolve("child"));
+            Path childPomPath = childDir.resolve("pom.xml");
+
+            Files.writeString(parentPath, parentPom);
+            Files.writeString(childPomPath, childPom);
+
+            Document childDoc = Document.of(childPom);
+            Map<Path, Document> pomMap = Map.of(childPomPath, childDoc);
+
+            UpgradeContext context = createMockContext(childDir);
+            strategy.doApply(context, pomMap);
+
+            String xml = DomUtils.toXml(childDoc);
+            assertTrue(xml.contains("mvnup: commented out"), "Should contain comment-out marker");
+            assertTrue(xml.contains("truly.undefined.prop"), "Should mention the undefined property");
+        }
     }
 
     @Nested
