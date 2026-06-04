@@ -131,10 +131,9 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             Path tempDir = createTempProjectStructure(context, pomMap);
 
             // Phase 2: For each POM, build effective model using the session and analyze plugins
-            Map<Path, Set<String>> pluginsNeedingManagement =
-                    analyzePluginsUsingEffectiveModels(context, pomMap, tempDir);
+            PluginAnalysisResults analysisResults = analyzePluginsUsingEffectiveModels(context, pomMap, tempDir);
 
-            // Phase 3: Add plugin management to the last local parent in hierarchy
+            // Phase 3: Add plugin management and direct overrides to the last local parent in hierarchy
             for (Map.Entry<Path, Document> entry : pomMap.entrySet()) {
                 Path pomPath = entry.getKey();
                 Document pomDocument = entry.getValue();
@@ -150,14 +149,21 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     hasUpgrades |= upgradePluginsInDocument(pomDocument, context);
 
                     // Add plugin management based on effective model analysis
-                    // Note: pluginsNeedingManagement only contains entries for POMs that should receive plugin
-                    // management
-                    // (i.e., the "last local parent" for each plugin that needs management)
-                    Set<String> pluginsForThisPom = pluginsNeedingManagement.get(pomPath);
-                    if (pluginsForThisPom != null && !pluginsForThisPom.isEmpty()) {
-                        hasUpgrades |= addPluginManagementForEffectivePlugins(context, pomDocument, pluginsForThisPom);
+                    Set<String> pluginsForManagement =
+                            analysisResults.pluginsNeedingManagement().get(pomPath);
+                    if (pluginsForManagement != null && !pluginsForManagement.isEmpty()) {
+                        hasUpgrades |=
+                                addPluginManagementForEffectivePlugins(context, pomDocument, pluginsForManagement);
                         context.detail("Added plugin management to " + pomPath + " (target parent for "
-                                + pluginsForThisPom.size() + " plugins)");
+                                + pluginsForManagement.size() + " plugins)");
+                    }
+
+                    // Add direct plugin overrides in build/plugins for inherited plugins
+                    // whose versions cannot be overridden via pluginManagement alone
+                    Set<String> pluginsForDirectOverride =
+                            analysisResults.pluginsNeedingDirectOverride().get(pomPath);
+                    if (pluginsForDirectOverride != null && !pluginsForDirectOverride.isEmpty()) {
+                        hasUpgrades |= addDirectPluginOverrides(context, pomDocument, pluginsForDirectOverride);
                     }
 
                     if (hasUpgrades) {
@@ -462,11 +468,13 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
 
     /**
      * Analyzes plugins using effective models built from the temp directory.
-     * Returns a map of POM path to the set of plugin keys that need management.
+     * Returns analysis results with two maps: plugins needing pluginManagement entries
+     * and plugins needing direct build/plugins overrides.
      */
-    private Map<Path, Set<String>> analyzePluginsUsingEffectiveModels(
+    private PluginAnalysisResults analyzePluginsUsingEffectiveModels(
             UpgradeContext context, Map<Path, Document> pomMap, Path tempDir) {
-        Map<Path, Set<String>> result = new HashMap<>();
+        Map<Path, Set<String>> managementResult = new HashMap<>();
+        Map<Path, Set<String>> directOverrideResult = new HashMap<>();
         Map<String, PluginUpgrade> pluginUpgrades = getPluginUpgradesAsMap();
 
         for (Map.Entry<Path, Document> entry : pomMap.entrySet()) {
@@ -479,20 +487,27 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 Path tempPomPath = tempDir.resolve(relativePath);
 
                 // Build effective model using Maven 4 API
-                Set<String> pluginsNeedingUpgrade =
-                        analyzeEffectiveModelForPlugins(context, tempPomPath, pluginUpgrades);
+                PluginAnalysis analysis = analyzeEffectiveModelForPlugins(context, tempPomPath, pluginUpgrades);
 
                 // Determine where to add plugin management (last local parent)
-                Path targetPomForManagement =
+                Path targetPom =
                         findLastLocalParentForPluginManagement(context, tempPomPath, pomMap, tempDir, commonRoot);
 
-                if (targetPomForManagement != null) {
-                    result.computeIfAbsent(targetPomForManagement, k -> new HashSet<>())
-                            .addAll(pluginsNeedingUpgrade);
+                if (targetPom != null) {
+                    managementResult
+                            .computeIfAbsent(targetPom, k -> new HashSet<>())
+                            .addAll(analysis.needsManagement());
+                    directOverrideResult
+                            .computeIfAbsent(targetPom, k -> new HashSet<>())
+                            .addAll(analysis.needsDirectOverride());
 
-                    if (!pluginsNeedingUpgrade.isEmpty()) {
-                        context.debug("Will add plugin management to " + targetPomForManagement + " for plugins: "
-                                + pluginsNeedingUpgrade);
+                    if (!analysis.needsManagement().isEmpty()) {
+                        context.debug("Will add plugin management to " + targetPom + " for plugins: "
+                                + analysis.needsManagement());
+                    }
+                    if (!analysis.needsDirectOverride().isEmpty()) {
+                        context.debug("Will add direct plugin overrides to " + targetPom + " for plugins: "
+                                + analysis.needsDirectOverride());
                     }
                 }
 
@@ -501,7 +516,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             }
         }
 
-        return result;
+        return new PluginAnalysisResults(managementResult, directOverrideResult);
     }
 
     /**
@@ -513,7 +528,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                         upgrade -> upgrade.groupId() + ":" + upgrade.artifactId(), upgrade -> upgrade));
     }
 
-    private Set<String> analyzeEffectiveModelForPlugins(
+    private PluginAnalysis analyzeEffectiveModelForPlugins(
             UpgradeContext context, Path tempPomPath, Map<String, PluginUpgrade> pluginUpgrades) {
         Model effectiveModel = buildEffectiveModel(tempPomPath);
         return analyzePluginsFromEffectiveModel(context, effectiveModel, pluginUpgrades);
@@ -521,13 +536,27 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
 
     /**
      * Analyzes plugins from the effective model and determines which ones need upgrades.
+     * Separates plugins into those overridable via pluginManagement and those requiring
+     * a direct build/plugins entry (because the version is set explicitly in an inherited
+     * parent's build/plugins, not via pluginManagement).
      */
-    private Set<String> analyzePluginsFromEffectiveModel(
+    private PluginAnalysis analyzePluginsFromEffectiveModel(
             UpgradeContext context, Model effectiveModel, Map<String, PluginUpgrade> pluginUpgrades) {
-        Set<String> pluginsNeedingUpgrade = new HashSet<>();
+        Set<String> needsManagement = new HashSet<>();
+        Set<String> needsDirectOverride = new HashSet<>();
 
         Build build = effectiveModel.getBuild();
         if (build != null) {
+            // Collect managed plugin versions for comparison
+            Map<String, String> managedVersions = new HashMap<>();
+            PluginManagement pluginManagement = build.getPluginManagement();
+            if (pluginManagement != null) {
+                for (Plugin plugin : pluginManagement.getPlugins()) {
+                    String pluginKey = getPluginKey(plugin);
+                    managedVersions.put(pluginKey, plugin.getVersion());
+                }
+            }
+
             // Check build/plugins - these are the actual plugins used in the build
             for (Plugin plugin : build.getPlugins()) {
                 String pluginKey = getPluginKey(plugin);
@@ -535,23 +564,33 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 if (upgrade != null) {
                     String effectiveVersion = plugin.getVersion();
                     if (isVersionBelow(effectiveVersion, upgrade.minVersion())) {
-                        pluginsNeedingUpgrade.add(pluginKey);
-                        context.debug("Plugin " + pluginKey + " version " + effectiveVersion + " needs upgrade to "
-                                + upgrade.minVersion());
+                        needsManagement.add(pluginKey);
+                        String managedVersion = managedVersions.get(pluginKey);
+                        if (managedVersion == null || !managedVersion.equals(effectiveVersion)) {
+                            // Version differs from pluginManagement (or not in PM at all):
+                            // the parent sets an explicit version in build/plugins that
+                            // pluginManagement alone cannot override
+                            needsDirectOverride.add(pluginKey);
+                            context.debug("Plugin " + pluginKey + " version " + effectiveVersion
+                                    + " has explicit version in inherited build/plugins"
+                                    + " — needs direct override to " + upgrade.minVersion());
+                        } else {
+                            context.debug("Plugin " + pluginKey + " version " + effectiveVersion
+                                    + " is managed via pluginManagement — needs upgrade to " + upgrade.minVersion());
+                        }
                     }
                 }
             }
 
-            // Check build/pluginManagement/plugins - these provide version management
-            PluginManagement pluginManagement = build.getPluginManagement();
+            // Check build/pluginManagement/plugins for managed-only plugins
             if (pluginManagement != null) {
                 for (Plugin plugin : pluginManagement.getPlugins()) {
                     String pluginKey = getPluginKey(plugin);
                     PluginUpgrade upgrade = pluginUpgrades.get(pluginKey);
-                    if (upgrade != null) {
+                    if (upgrade != null && !needsManagement.contains(pluginKey)) {
                         String effectiveVersion = plugin.getVersion();
                         if (isVersionBelow(effectiveVersion, upgrade.minVersion())) {
-                            pluginsNeedingUpgrade.add(pluginKey);
+                            needsManagement.add(pluginKey);
                             context.debug("Managed plugin " + pluginKey + " version " + effectiveVersion
                                     + " needs upgrade to " + upgrade.minVersion());
                         }
@@ -560,7 +599,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             }
         }
 
-        return pluginsNeedingUpgrade;
+        return new PluginAnalysis(needsManagement, needsDirectOverride);
     }
 
     /**
@@ -731,6 +770,49 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         context.detail("Added plugin management for " + upgrade.groupId() + ":" + upgrade.artifactId() + " version "
                 + upgrade.minVersion() + " (found through effective model analysis)");
     }
+
+    /**
+     * Adds direct plugin entries in build/plugins for plugins inherited from remote parents.
+     * This is necessary when a parent POM sets an explicit version in its build/plugins
+     * that pluginManagement alone cannot override.
+     */
+    private boolean addDirectPluginOverrides(UpgradeContext context, Document pomDocument, Set<String> pluginKeys) {
+        Map<String, PluginUpgrade> pluginUpgrades = getPluginUpgradesAsMap();
+        boolean hasUpgrades = false;
+
+        Element root = pomDocument.root();
+
+        Element buildElement = root.childElement(BUILD).orElse(null);
+        if (buildElement == null) {
+            buildElement = DomUtils.insertNewElement(BUILD, root);
+        }
+
+        Element pluginsElement = buildElement.childElement(PLUGINS).orElse(null);
+        if (pluginsElement == null) {
+            pluginsElement = DomUtils.insertNewElement(PLUGINS, buildElement);
+        }
+
+        for (String pluginKey : pluginKeys) {
+            PluginUpgrade upgrade = pluginUpgrades.get(pluginKey);
+            if (upgrade != null) {
+                if (!isPluginAlreadyManagedInElement(pluginsElement, upgrade)) {
+                    DomUtils.createPlugin(
+                            pluginsElement, upgrade.groupId(), upgrade.artifactId(), upgrade.minVersion());
+                    hasUpgrades = true;
+                    context.detail("Added " + upgrade.groupId() + ":" + upgrade.artifactId() + " version "
+                            + upgrade.minVersion()
+                            + " in build/plugins (overrides version locked by parent)");
+                }
+            }
+        }
+
+        return hasUpgrades;
+    }
+
+    private record PluginAnalysis(Set<String> needsManagement, Set<String> needsDirectOverride) {}
+
+    private record PluginAnalysisResults(
+            Map<Path, Set<String>> pluginsNeedingManagement, Map<Path, Set<String>> pluginsNeedingDirectOverride) {}
 
     /**
      * Holds plugin upgrade information for Maven 4 compatibility.
