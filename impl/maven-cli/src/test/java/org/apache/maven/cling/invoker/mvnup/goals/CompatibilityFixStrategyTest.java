@@ -1458,6 +1458,181 @@ class CompatibilityFixStrategyTest {
     }
 
     @Nested
+    @DisplayName("Undefined Property Expression in Repositories Fixes")
+    class UndefinedPropertyExpressionInRepositoriesTests {
+
+        @Test
+        @DisplayName("should comment out repository with undefined property in id")
+        void shouldCommentOutRepositoryWithUndefinedPropertyInId() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <repositories>
+                        <repository>
+                            <id>${eclipseP2RepoId}</id>
+                            <url>https://repo.example.com</url>
+                        </repository>
+                    </repositories>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Compatibility fix should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have commented out repository");
+
+            String xml = DomUtils.toXml(document);
+            assertTrue(xml.contains("mvnup: commented out"), "Should contain comment-out marker");
+            assertTrue(xml.contains("eclipseP2RepoId"), "Should mention the undefined property");
+
+            Element root = document.root();
+            Element repos = DomUtils.findChildElement(root, "repositories");
+            assertEquals(0, repos.childElements("repository").count(), "Should have no repository elements");
+        }
+
+        @Test
+        @DisplayName("should comment out repository with undefined property in url")
+        void shouldCommentOutRepositoryWithUndefinedPropertyInUrl() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <repositories>
+                        <repository>
+                            <id>my-repo</id>
+                            <url>${undefinedBaseUrl}/releases</url>
+                        </repository>
+                    </repositories>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Compatibility fix should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have commented out repository");
+
+            String xml = DomUtils.toXml(document);
+            assertTrue(xml.contains("mvnup: commented out"), "Should contain comment-out marker");
+            assertTrue(xml.contains("undefinedBaseUrl"), "Should mention the undefined property");
+        }
+
+        @Test
+        @DisplayName("should not comment out repository with defined property")
+        void shouldNotCommentOutRepositoryWithDefinedProperty() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <properties>
+                        <repoId>my-custom-repo</repoId>
+                    </properties>
+                    <repositories>
+                        <repository>
+                            <id>${repoId}</id>
+                            <url>https://repo.example.com</url>
+                        </repository>
+                    </repositories>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            strategy.doApply(context, pomMap);
+
+            Element root = document.root();
+            Element repos = DomUtils.findChildElement(root, "repositories");
+            assertEquals(1, repos.childElements("repository").count(), "Repository should still be present");
+        }
+
+        @Test
+        @DisplayName("should comment out plugin repository with undefined property")
+        void shouldCommentOutPluginRepositoryWithUndefinedProperty() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <pluginRepositories>
+                        <pluginRepository>
+                            <id>${eclipseP2RepoId}</id>
+                            <url>https://plugins.example.com</url>
+                        </pluginRepository>
+                    </pluginRepositories>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Compatibility fix should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have commented out plugin repository");
+
+            String xml = DomUtils.toXml(document);
+            assertTrue(xml.contains("mvnup: commented out"), "Should contain comment-out marker");
+
+            Element root = document.root();
+            Element repos = DomUtils.findChildElement(root, "pluginRepositories");
+            assertEquals(
+                    0, repos.childElements("pluginRepository").count(), "Should have no pluginRepository elements");
+        }
+
+        @Test
+        @DisplayName("should not comment out repository with well-known property")
+        void shouldNotCommentOutRepositoryWithWellKnownProperty() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <repositories>
+                        <repository>
+                            <id>local-repo</id>
+                            <url>file://${project.basedir}/repo</url>
+                        </repository>
+                    </repositories>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            strategy.doApply(context, pomMap);
+
+            Element root = document.root();
+            Element repos = DomUtils.findChildElement(root, "repositories");
+            assertEquals(1, repos.childElements("repository").count(), "Repository should still be present");
+        }
+    }
+
+    @Nested
     @DisplayName("Strategy Description")
     class StrategyDescriptionTests {
 
