@@ -141,6 +141,416 @@ class CompatibilityFixStrategyTest {
     }
 
     @Nested
+    @DisplayName("Unsupported combine.children Attribute Fixes")
+    class UnsupportedCombineChildrenFixesTests {
+
+        @Test
+        @DisplayName("should remove combine.children='override' attribute")
+        void shouldRemoveCombineChildrenOverride() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-compiler-plugin</artifactId>
+                                <configuration>
+                                    <compilerArgs combine.children="override">
+                                        <arg>-Xlint:all</arg>
+                                    </compilerArgs>
+                                </configuration>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Compatibility fix should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have fixed combine.children attribute");
+
+            String xml = DomUtils.toXml(document);
+            assertFalse(xml.contains("combine.children"), "combine.children attribute should be removed entirely");
+            assertTrue(xml.contains("compilerArgs"), "Element should still exist");
+        }
+
+        @Test
+        @DisplayName("should remove any invalid combine.children value")
+        void shouldRemoveAnyCombineChildrenInvalidValue() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-compiler-plugin</artifactId>
+                                <configuration>
+                                    <compilerArgs combine.children="invalid_value">
+                                        <arg>-Xlint:all</arg>
+                                    </compilerArgs>
+                                </configuration>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Compatibility fix should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have fixed combine.children attribute");
+
+            String xml = DomUtils.toXml(document);
+            assertFalse(xml.contains("combine.children"), "combine.children attribute should be removed entirely");
+        }
+
+        @Test
+        @DisplayName("should not remove valid combine.children values")
+        void shouldNotRemoveValidCombineChildrenValues() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-compiler-plugin</artifactId>
+                                <configuration>
+                                    <compilerArgs combine.children="append">
+                                        <arg>-Xlint:all</arg>
+                                    </compilerArgs>
+                                    <includes combine.children="merge">
+                                        <include>**/*.java</include>
+                                    </includes>
+                                </configuration>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Compatibility fix should succeed");
+            assertEquals(0, result.modifiedCount(), "Should not have modified any POMs");
+
+            String xml = DomUtils.toXml(document);
+            assertTrue(xml.contains("combine.children=\"append\""), "append should be preserved");
+            assertTrue(xml.contains("combine.children=\"merge\""), "merge should be preserved");
+        }
+
+        @Test
+        @DisplayName("should remove invalid combine.children in profile plugin configuration")
+        void shouldRemoveInvalidCombineChildrenInProfile() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <profiles>
+                        <profile>
+                            <id>release</id>
+                            <build>
+                                <plugins>
+                                    <plugin>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-assembly-plugin</artifactId>
+                                        <configuration>
+                                            <descriptorRefs combine.children="override">
+                                                <descriptorRef>src</descriptorRef>
+                                            </descriptorRefs>
+                                        </configuration>
+                                    </plugin>
+                                </plugins>
+                            </build>
+                        </profile>
+                    </profiles>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Compatibility fix should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have fixed combine.children in profile");
+
+            String xml = DomUtils.toXml(document);
+            assertFalse(xml.contains("combine.children"), "combine.children attribute should be removed from profile");
+        }
+    }
+
+    @Nested
+    @DisplayName("Unsupported combine.self Attribute Fixes")
+    class UnsupportedCombineSelfFixesTests {
+
+        @Test
+        @DisplayName("should remove combine.self='append' attribute")
+        void shouldRemoveCombineSelfAppend() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-assembly-plugin</artifactId>
+                                <configuration>
+                                    <descriptorRefs combine.self="append">
+                                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                                    </descriptorRefs>
+                                </configuration>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Compatibility fix should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have fixed combine.self attribute");
+
+            String xml = DomUtils.toXml(document);
+            assertFalse(xml.contains("combine.self"), "combine.self attribute should be removed entirely");
+            assertTrue(xml.contains("descriptorRefs"), "Element should still exist");
+        }
+
+        @Test
+        @DisplayName("should remove any invalid combine.self value")
+        void shouldRemoveAnyCombineSelfInvalidValue() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-compiler-plugin</artifactId>
+                                <configuration>
+                                    <compilerArgs combine.self="invalid_value">
+                                        <arg>-Xlint:all</arg>
+                                    </compilerArgs>
+                                </configuration>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Compatibility fix should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have fixed combine.self attribute");
+
+            String xml = DomUtils.toXml(document);
+            assertFalse(xml.contains("combine.self"), "combine.self attribute should be removed entirely");
+        }
+
+        @Test
+        @DisplayName("should not remove valid combine.self values")
+        void shouldNotRemoveValidCombineSelfValues() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-compiler-plugin</artifactId>
+                                <configuration>
+                                    <source combine.self="override">11</source>
+                                    <target combine.self="merge">11</target>
+                                    <compilerArgs combine.self="remove"/>
+                                </configuration>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Compatibility fix should succeed");
+            assertEquals(0, result.modifiedCount(), "Should not have modified any POMs");
+
+            String xml = DomUtils.toXml(document);
+            assertTrue(xml.contains("combine.self=\"override\""), "override should be preserved");
+            assertTrue(xml.contains("combine.self=\"merge\""), "merge should be preserved");
+            assertTrue(xml.contains("combine.self=\"remove\""), "remove should be preserved");
+        }
+
+        @Test
+        @DisplayName("should remove invalid combine.self in profile plugin configuration")
+        void shouldRemoveInvalidCombineSelfInProfile() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <profiles>
+                        <profile>
+                            <id>release</id>
+                            <build>
+                                <plugins>
+                                    <plugin>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-assembly-plugin</artifactId>
+                                        <configuration>
+                                            <descriptorRefs combine.self="append">
+                                                <descriptorRef>src</descriptorRef>
+                                            </descriptorRefs>
+                                        </configuration>
+                                    </plugin>
+                                </plugins>
+                            </build>
+                        </profile>
+                    </profiles>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Compatibility fix should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have fixed combine.self in profile");
+
+            String xml = DomUtils.toXml(document);
+            assertFalse(xml.contains("combine.self"), "combine.self attribute should be removed from profile");
+        }
+
+        @Test
+        @DisplayName("should remove all occurrences of invalid combine.self across the POM")
+        void shouldRemoveAllOccurrencesOfInvalidCombineSelf() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <pluginManagement>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-compiler-plugin</artifactId>
+                                    <configuration>
+                                        <compilerArgs combine.self="append">
+                                            <arg>-Xlint:all</arg>
+                                        </compilerArgs>
+                                    </configuration>
+                                </plugin>
+                            </plugins>
+                        </pluginManagement>
+                        <plugins>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-assembly-plugin</artifactId>
+                                <configuration>
+                                    <descriptorRefs combine.self="append">
+                                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                                    </descriptorRefs>
+                                </configuration>
+                            </plugin>
+                        </plugins>
+                    </build>
+                    <profiles>
+                        <profile>
+                            <id>release</id>
+                            <build>
+                                <plugins>
+                                    <plugin>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-assembly-plugin</artifactId>
+                                        <configuration>
+                                            <descriptorRefs combine.self="append">
+                                                <descriptorRef>src</descriptorRef>
+                                            </descriptorRefs>
+                                        </configuration>
+                                    </plugin>
+                                </plugins>
+                            </build>
+                        </profile>
+                    </profiles>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Compatibility fix should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have fixed combine.self attributes");
+
+            String xml = DomUtils.toXml(document);
+            assertFalse(xml.contains("combine.self"), "All combine.self attributes should be removed");
+        }
+    }
+
+    @Nested
     @DisplayName("Duplicate Dependency Fixes")
     class DuplicateDependencyFixesTests {
 
