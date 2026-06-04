@@ -249,8 +249,8 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         request.session(iSession);
         request.source(src);
         request.locationTracking(false);
-        request.systemProperties(session.getSystemProperties());
-        request.userProperties(session.getUserProperties());
+        request.systemProperties(iSession.getSystemProperties());
+        request.userProperties(iSession.getUserProperties());
         request.lifecycleBindingsInjector(lifecycleBindingsInjector::injectLifecycleBindings);
         ModelBuilder.ModelBuilderSession mbSession =
                 iSession.getData().get(SessionData.key(ModelBuilder.ModelBuilderSession.class));
