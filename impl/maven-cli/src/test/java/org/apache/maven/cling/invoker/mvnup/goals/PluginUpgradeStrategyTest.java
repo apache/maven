@@ -521,8 +521,8 @@ class PluginUpgradeStrategyTest {
                     <build>
                         <plugins>
                             <plugin>
-                                <groupId>org.apache.maven.plugins</groupId>
-                                <artifactId>maven-exec-plugin</artifactId>
+                                <groupId>org.codehaus.mojo</groupId>
+                                <artifactId>exec-maven-plugin</artifactId>
                                 <!-- No version - inherited from parent or pluginManagement -->
                             </plugin>
                         </plugins>
@@ -553,8 +553,8 @@ class PluginUpgradeStrategyTest {
                     <build>
                         <plugins>
                             <plugin>
-                                <groupId>org.apache.maven.plugins</groupId>
-                                <artifactId>maven-exec-plugin</artifactId>
+                                <groupId>org.codehaus.mojo</groupId>
+                                <artifactId>exec-maven-plugin</artifactId>
                                 <version>${exec.plugin.version}</version>
                             </plugin>
                         </plugins>
@@ -737,7 +737,7 @@ class PluginUpgradeStrategyTest {
             boolean hasCompilerPlugin =
                     upgrades.stream().anyMatch(upgrade -> "maven-compiler-plugin".equals(upgrade.artifactId()));
             boolean hasExecPlugin =
-                    upgrades.stream().anyMatch(upgrade -> "maven-exec-plugin".equals(upgrade.artifactId()));
+                    upgrades.stream().anyMatch(upgrade -> "exec-maven-plugin".equals(upgrade.artifactId()));
             boolean hasSurefirePlugin =
                     upgrades.stream().anyMatch(upgrade -> "maven-surefire-plugin".equals(upgrade.artifactId()));
             boolean hasFailsafePlugin =
