@@ -77,6 +77,10 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
 
     private static final Pattern EXPRESSION_PATTERN = Pattern.compile("\\$\\{([^}]+)}");
 
+    private static final Set<String> VALID_COMBINE_SELF_VALUES = Set.of(COMBINE_OVERRIDE, COMBINE_MERGE, "remove");
+
+    private static final Set<String> VALID_COMBINE_CHILDREN_VALUES = Set.of(COMBINE_APPEND, COMBINE_MERGE);
+
     @Override
     public boolean isApplicable(UpgradeContext context) {
         UpgradeOptions options = getOptions(context);
@@ -165,44 +169,44 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
 
     /**
      * Fixes unsupported combine.children attribute values.
-     * Maven 4 only supports 'append' and 'merge', not 'override'.
+     * Maven 4 only supports 'append' and 'merge' (default is merge).
+     * Invalid values are removed entirely since Maven 3 silently ignored them.
      */
     private boolean fixUnsupportedCombineChildrenAttributes(Document pomDocument, UpgradeContext context) {
-        boolean fixed = false;
         Element root = pomDocument.root();
 
-        // Find all elements with combine.children="override" and change to "merge"
-        long fixedCombineChildrenCount = findElementsWithAttribute(root, COMBINE_CHILDREN, COMBINE_OVERRIDE)
-                .peek(element -> {
-                    element.attributeObject(COMBINE_CHILDREN).value(COMBINE_MERGE);
-                    context.detail("Fixed: " + COMBINE_CHILDREN + "='" + COMBINE_OVERRIDE + "' → '" + COMBINE_MERGE
-                            + "' in " + element.name());
-                })
-                .count();
-        fixed |= fixedCombineChildrenCount > 0;
+        List<Element> invalidElements = findElementsWithInvalidAttribute(
+                        root, COMBINE_CHILDREN, VALID_COMBINE_CHILDREN_VALUES)
+                .toList();
 
-        return fixed;
+        for (Element element : invalidElements) {
+            String invalidValue = element.attribute(COMBINE_CHILDREN);
+            element.removeAttribute(COMBINE_CHILDREN);
+            context.detail(
+                    "Fixed: removed invalid " + COMBINE_CHILDREN + "='" + invalidValue + "' from " + element.name());
+        }
+
+        return !invalidElements.isEmpty();
     }
 
     /**
      * Fixes unsupported combine.self attribute values.
-     * Maven 4 only supports 'override', 'merge', and 'remove' (default is merge), not 'append'.
+     * Maven 4 only supports 'override', 'merge', and 'remove' (default is merge).
+     * Invalid values are removed entirely since Maven 3 silently ignored them.
      */
     private boolean fixUnsupportedCombineSelfAttributes(Document pomDocument, UpgradeContext context) {
-        boolean fixed = false;
         Element root = pomDocument.root();
 
-        // Find all elements with combine.self="append" and change to "merge"
-        long fixedCombineSelfCount = findElementsWithAttribute(root, COMBINE_SELF, COMBINE_APPEND)
-                .peek(element -> {
-                    element.attributeObject(COMBINE_SELF).value(COMBINE_MERGE);
-                    context.detail("Fixed: " + COMBINE_SELF + "='" + COMBINE_APPEND + "' → '" + COMBINE_MERGE + "' in "
-                            + element.name());
-                })
-                .count();
-        fixed |= fixedCombineSelfCount > 0;
+        List<Element> invalidElements = findElementsWithInvalidAttribute(root, COMBINE_SELF, VALID_COMBINE_SELF_VALUES)
+                .toList();
 
-        return fixed;
+        for (Element element : invalidElements) {
+            String invalidValue = element.attribute(COMBINE_SELF);
+            element.removeAttribute(COMBINE_SELF);
+            context.detail("Fixed: removed invalid " + COMBINE_SELF + "='" + invalidValue + "' from " + element.name());
+        }
+
+        return !invalidElements.isEmpty();
     }
 
     /**
@@ -525,6 +529,20 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
                 // Recursively check children
                 element.childElements()
                         .flatMap(child -> findElementsWithAttribute(child, attributeName, attributeValue)));
+    }
+
+    /**
+     * Recursively finds all elements with an attribute whose value is not in the set of valid values.
+     */
+    private Stream<Element> findElementsWithInvalidAttribute(
+            Element element, String attributeName, Set<String> validValues) {
+        return Stream.concat(
+                Stream.of(element).filter(e -> {
+                    String attr = e.attribute(attributeName);
+                    return attr != null && !validValues.contains(attr);
+                }),
+                element.childElements()
+                        .flatMap(child -> findElementsWithInvalidAttribute(child, attributeName, validValues)));
     }
 
     /**
