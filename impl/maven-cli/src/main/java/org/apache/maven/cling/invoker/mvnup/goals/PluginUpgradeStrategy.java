@@ -67,9 +67,8 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
 
     private static final List<PluginUpgrade> PLUGIN_UPGRADES = List.of(
             new PluginUpgrade(
-                    DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-compiler-plugin", "3.2.0", MAVEN_4_COMPATIBILITY_REASON),
-            new PluginUpgrade(
-                    DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-exec-plugin", "3.2.0", MAVEN_4_COMPATIBILITY_REASON),
+                    DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-compiler-plugin", "3.2", MAVEN_4_COMPATIBILITY_REASON),
+            new PluginUpgrade("org.codehaus.mojo", "exec-maven-plugin", "3.5.0", MAVEN_4_COMPATIBILITY_REASON),
             new PluginUpgrade(
                     DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-enforcer-plugin", "3.5.0", MAVEN_4_COMPATIBILITY_REASON),
             new PluginUpgrade("org.codehaus.mojo", "flatten-maven-plugin", "1.2.7", MAVEN_4_COMPATIBILITY_REASON),
@@ -243,7 +242,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 new PluginUpgradeInfo(DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-compiler-plugin", "3.2"));
         upgrades.put(
                 "org.codehaus.mojo:exec-maven-plugin",
-                new PluginUpgradeInfo("org.codehaus.mojo", "exec-maven-plugin", "3.2.0"));
+                new PluginUpgradeInfo("org.codehaus.mojo", "exec-maven-plugin", "3.5.0"));
         upgrades.put(
                 DEFAULT_MAVEN_PLUGIN_GROUP_ID + ":maven-enforcer-plugin",
                 new PluginUpgradeInfo(DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-enforcer-plugin", "3.5.0"));
