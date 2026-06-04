@@ -29,6 +29,10 @@ import org.junit.jupiter.api.Test;
  */
 class MavenITgh12184CIFriendlyParentVersionTest extends AbstractMavenIntegrationTestCase {
 
+    MavenITgh12184CIFriendlyParentVersionTest() {
+        super("[4.0.0-rc-1,)");
+    }
+
     /**
      * Verify that a multi-module project with {@code ${revision}} in parent version
      * builds successfully when the property is defined in the parent POM properties.
