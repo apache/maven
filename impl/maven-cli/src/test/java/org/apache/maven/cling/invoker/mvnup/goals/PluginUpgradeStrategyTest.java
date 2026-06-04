@@ -746,7 +746,7 @@ class PluginUpgradeStrategyTest {
                     upgrades.stream().anyMatch(upgrade -> "maven-surefire-report-plugin".equals(upgrade.artifactId()));
 
             assertTrue(hasCompilerPlugin, "Should include maven-compiler-plugin upgrade");
-            assertTrue(hasExecPlugin, "Should include maven-exec-plugin upgrade");
+            assertTrue(hasExecPlugin, "Should include exec-maven-plugin upgrade");
             assertTrue(hasSurefirePlugin, "Should include maven-surefire-plugin upgrade");
             assertTrue(hasFailsafePlugin, "Should include maven-failsafe-plugin upgrade");
             assertTrue(hasSurefireReportPlugin, "Should include maven-surefire-report-plugin upgrade");
