@@ -847,12 +847,10 @@ class PluginUpgradeStrategyTest {
             Element pmPlugins =
                     root.path("build", "pluginManagement", "plugins").orElse(null);
             assertNotNull(pmPlugins, "Should have pluginManagement/plugins");
-            boolean hasEnforcerInPM = pmPlugins
-                    .childElements("plugin")
-                    .anyMatch(p -> "maven-enforcer-plugin"
-                            .equals(p.childElement("artifactId")
-                                    .map(Element::textContentTrimmed)
-                                    .orElse("")));
+            boolean hasEnforcerInPM = pmPlugins.childElements("plugin").anyMatch(p -> "maven-enforcer-plugin"
+                    .equals(p.childElement("artifactId")
+                            .map(Element::textContentTrimmed)
+                            .orElse("")));
             assertTrue(hasEnforcerInPM, "Should have enforcer in pluginManagement");
 
             // Verify NO direct build/plugins entry for enforcer (PM override is sufficient)
