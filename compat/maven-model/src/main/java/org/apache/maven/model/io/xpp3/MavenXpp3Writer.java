@@ -26,6 +26,7 @@ import java.io.Writer;
 
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.model.v4.MavenStaxWriter;
 
 /**
@@ -33,13 +34,9 @@ import org.apache.maven.model.v4.MavenStaxWriter;
  */
 @Deprecated
 public class MavenXpp3Writer {
-    private static final String NAMESPACE_PREFIX = "http://maven.apache.org/POM/";
+    private static final String NAMESPACE_FORMAT = "http://maven.apache.org/POM/%s";
 
-    private static final String SCHEMA_LOCATION_PREFIX = "https://maven.apache.org/xsd/maven-";
-
-    private static final String SCHEMA_LOCATION_SUFFIX = ".xsd";
-
-    private static final String DEFAULT_MODEL_VERSION = "4.0.0";
+    private static final String SCHEMA_LOCATION_FORMAT = "https://maven.apache.org/xsd/maven-%s.xsd";
 
     // --------------------------/
     // - Class/Member Variables -/
@@ -111,20 +108,8 @@ public class MavenXpp3Writer {
     } // -- void write( OutputStream, Model )
 
     private void configureDelegate(Model model) {
-        String version = model.getModelVersion();
-        if (version != null) {
-            version = version.trim();
-        }
-        if (version == null || version.isBlank()) {
-            String namespaceUri = model.getDelegate().getNamespaceUri();
-            if (namespaceUri != null && namespaceUri.startsWith(NAMESPACE_PREFIX)) {
-                version = namespaceUri.substring(NAMESPACE_PREFIX.length()).trim();
-            }
-        }
-        if (version == null || version.isBlank()) {
-            version = DEFAULT_MODEL_VERSION;
-        }
-        delegate.setNamespace(NAMESPACE_PREFIX + version);
-        delegate.setSchemaLocation(SCHEMA_LOCATION_PREFIX + version + SCHEMA_LOCATION_SUFFIX);
+        String version = new MavenModelVersion().getModelVersion(model.getDelegate());
+        delegate.setNamespace(String.format(NAMESPACE_FORMAT, version));
+        delegate.setSchemaLocation(String.format(SCHEMA_LOCATION_FORMAT, version));
     }
 }

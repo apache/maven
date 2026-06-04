@@ -72,12 +72,14 @@ class ModelTest {
     }
 
     @Test
-    void testWritePreservesModelVersionNamespace() throws Exception {
-        Model model = new Model();
-        model.setModelVersion("4.1.0");
-        model.setGroupId("g");
-        model.setArtifactId("a");
-        model.setVersion("1");
+    void testWriteUsesMinimumModelVersionNamespace() throws Exception {
+        Model model = new Model(org.apache.maven.api.model.Model.newBuilder()
+                .modelVersion("4.1.0")
+                .root(true)
+                .groupId("g")
+                .artifactId("a")
+                .version("1")
+                .build());
 
         StringWriter output = new StringWriter();
         new MavenXpp3Writer().write(output, model);
@@ -87,6 +89,23 @@ class ModelTest {
         assertTrue(
                 xml.contains(
                         "xsi:schemaLocation=\"http://maven.apache.org/POM/4.1.0 https://maven.apache.org/xsd/maven-4.1.0.xsd\""));
+    }
+
+    @Test
+    void testWriteDefaultsTo400Namespace() throws Exception {
+        Model model = new Model();
+        model.setGroupId("g");
+        model.setArtifactId("a");
+        model.setVersion("1");
+
+        StringWriter output = new StringWriter();
+        new MavenXpp3Writer().write(output, model);
+
+        String xml = output.toString();
+        assertTrue(xml.contains("xmlns=\"http://maven.apache.org/POM/4.0.0\""));
+        assertTrue(
+                xml.contains(
+                        "xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd\""));
     }
 
     @Test
