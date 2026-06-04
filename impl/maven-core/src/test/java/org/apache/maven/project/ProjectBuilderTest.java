@@ -996,4 +996,99 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
                 testJavaRoots.get(0).module().orElse(null),
                 "Test source root should be for com.example.dup module");
     }
+
+    @Test
+    void testResourceTargetPathRemainsRelativeInCompatLayer() throws Exception {
+        File pom = getProject("resource-target-path");
+
+        MavenSession mavenSession = createMavenSession(null);
+        ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
+        configuration.setRepositorySession(mavenSession.getRepositorySession());
+
+        ProjectBuildingResult result = getContainer()
+                .lookup(org.apache.maven.project.ProjectBuilder.class)
+                .build(pom, configuration);
+
+        MavenProject project = result.getProject();
+
+        // Verify main resources via SourceRoot API
+        List<SourceRoot> mainResources = project.getEnabledSourceRoots(ProjectScope.MAIN, Language.RESOURCES)
+                .toList();
+        assertEquals(1, mainResources.size());
+        assertTrue(mainResources.get(0).targetPath().isPresent(), "Main resource should have a targetPath");
+        assertFalse(
+                mainResources.get(0).targetPath().get().isAbsolute(),
+                "SourceRoot targetPath must be relative, got: "
+                        + mainResources.get(0).targetPath().get());
+        assertEquals(
+                Path.of("META-INF/tags/rdc"), mainResources.get(0).targetPath().get());
+
+        // Verify test resources via SourceRoot API
+        List<SourceRoot> testResources = project.getEnabledSourceRoots(ProjectScope.TEST, Language.RESOURCES)
+                .toList();
+        assertEquals(1, testResources.size());
+        assertTrue(testResources.get(0).targetPath().isPresent(), "Test resource should have a targetPath");
+        assertFalse(
+                testResources.get(0).targetPath().get().isAbsolute(),
+                "SourceRoot targetPath must be relative, got: "
+                        + testResources.get(0).targetPath().get());
+        assertEquals(
+                Path.of("org/apache/maven/messages"),
+                testResources.get(0).targetPath().get());
+
+        // Verify compat layer: MavenProject.getResources() must return relative targetPath
+        List<org.apache.maven.model.Resource> resources = project.getResources();
+        assertEquals(1, resources.size());
+        assertEquals(
+                "META-INF" + File.separator + "tags" + File.separator + "rdc",
+                resources.get(0).getTargetPath(),
+                "Resource targetPath from getResources() must remain relative");
+
+        // Verify compat layer: MavenProject.getTestResources() must return relative targetPath
+        List<org.apache.maven.model.Resource> testResourceList = project.getTestResources();
+        assertEquals(1, testResourceList.size());
+        assertEquals(
+                "org" + File.separator + "apache" + File.separator + "maven" + File.separator + "messages",
+                testResourceList.get(0).getTargetPath(),
+                "Test resource targetPath from getTestResources() must remain relative");
+    }
+
+    @Test
+    void testSourceTargetPathRemainsRelative() throws Exception {
+        File pom = getProject("source-target-path");
+
+        MavenSession mavenSession = createMavenSession(null);
+        ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
+        configuration.setRepositorySession(mavenSession.getRepositorySession());
+
+        ProjectBuildingResult result = getContainer()
+                .lookup(org.apache.maven.project.ProjectBuilder.class)
+                .build(pom, configuration);
+
+        MavenProject project = result.getProject();
+
+        // Verify main resources have relative targetPath preserved
+        List<SourceRoot> mainResources = project.getEnabledSourceRoots(ProjectScope.MAIN, Language.RESOURCES)
+                .toList();
+        assertEquals(1, mainResources.size());
+        assertTrue(mainResources.get(0).targetPath().isPresent());
+        assertEquals(Path.of(".grammar"), mainResources.get(0).targetPath().get());
+
+        // Verify test resources have relative targetPath preserved
+        List<SourceRoot> testResources = project.getEnabledSourceRoots(ProjectScope.TEST, Language.RESOURCES)
+                .toList();
+        assertEquals(1, testResources.size());
+        assertTrue(testResources.get(0).targetPath().isPresent());
+        assertEquals(Path.of("META-INF/test"), testResources.get(0).targetPath().get());
+
+        // Verify the compat layer also returns relative targetPath
+        List<org.apache.maven.model.Resource> resources = project.getResources();
+        assertEquals(1, resources.size());
+        assertEquals(".grammar", resources.get(0).getTargetPath());
+
+        List<org.apache.maven.model.Resource> testResourceList = project.getTestResources();
+        assertEquals(1, testResourceList.size());
+        assertEquals(
+                "META-INF" + File.separator + "test", testResourceList.get(0).getTargetPath());
+    }
 }
