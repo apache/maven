@@ -18,9 +18,12 @@
  */
 package org.apache.maven.toolchain;
 
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.artifact.versioning.VersionRange;
+import java.util.Locale;
+import java.util.Objects;
+
+import org.eclipse.aether.util.version.GenericVersionScheme;
+import org.eclipse.aether.version.InvalidVersionSpecificationException;
+import org.eclipse.aether.version.VersionScheme;
 
 /**
  *
@@ -38,8 +41,7 @@ public final class RequirementMatcherFactory {
     }
 
     private static final class ExactMatcher implements RequirementMatcher {
-
-        private String provides;
+        private final String provides;
 
         private ExactMatcher(String provides) {
             this.provides = provides;
@@ -47,7 +49,9 @@ public final class RequirementMatcherFactory {
 
         @Override
         public boolean matches(String requirement) {
-            return provides.equalsIgnoreCase(requirement);
+            return Objects.equals(
+                    provides != null ? provides.toLowerCase(Locale.ENGLISH) : null,
+                    requirement != null ? requirement.toLowerCase(Locale.ENGLISH) : null);
         }
 
         @Override
@@ -57,31 +61,76 @@ public final class RequirementMatcherFactory {
     }
 
     private static final class VersionMatcher implements RequirementMatcher {
-        DefaultArtifactVersion version;
+        private final String version;
 
         private VersionMatcher(String version) {
-            this.version = new DefaultArtifactVersion(version);
+            this.version = version;
         }
 
         @Override
         public boolean matches(String requirement) {
-            try {
-                VersionRange range = VersionRange.createFromVersionSpec(requirement);
-                if (range.hasRestrictions()) {
-                    return range.containsVersion(version);
-                } else {
-                    return range.getRecommendedVersion().compareTo(version) == 0;
+            String r = requirement != null ? requirement.toLowerCase(Locale.ENGLISH) : null;
+            String v = version != null ? version.toLowerCase(Locale.ENGLISH) : null;
+            if (v == null && r == null) {
+                return true; // null == null
+            }
+            if (v == null || r == null) {
+                return false; // null != non-null
+            }
+            if (v.equals(r)) {
+                return true; // str == str (ignoring case)
+            }
+            return matchesRequirement(v, r);
+        }
+
+        private static final VersionScheme VERSION_SCHEME = new GenericVersionScheme();
+
+        private static boolean matchesRequirement(String version, String requirement) {
+            // if requirement is not a version range itself
+            if (!requirement.contains("[") && !requirement.contains("(") && !requirement.contains(",")) {
+                boolean interval = false;
+                boolean included = false;
+                if (requirement.endsWith("+")) {
+                    interval = true;
+                    included = true;
+                    requirement = requirement.substring(0, requirement.length() - 1);
+                } else if (requirement.endsWith("-")) {
+                    interval = true;
+                    requirement = requirement.substring(0, requirement.length() - 1);
                 }
-            } catch (InvalidVersionSpecificationException ex) {
-                // TODO error reporting
-                ex.printStackTrace();
-                return false;
+                if (!interval) {
+                    return version.startsWith(requirement + "."); // "11" -> "11.xxx"
+                } else {
+                    try {
+                        if (included) {
+                            return VERSION_SCHEME
+                                    .parseVersionRange("[" + requirement + ",)")
+                                    .containsVersion(VERSION_SCHEME.parseVersion(version)); // "11+" -> "[11,)"
+                        } else {
+                            return VERSION_SCHEME
+                                    .parseVersionRange("(," + requirement + ")")
+                                    .containsVersion(VERSION_SCHEME.parseVersion(version)); // "11-" -> "(,11)"
+                        }
+                    } catch (InvalidVersionSpecificationException e) {
+                        // nope; GenericVersionScheme never throes but we need to make compiler happy
+                        throw new RuntimeException(e);
+                    }
+                }
+            } else {
+                try {
+                    return VERSION_SCHEME
+                            .parseVersionRange(requirement)
+                            .containsVersion(VERSION_SCHEME.parseVersion(version)); // "range" -> "range"
+                } catch (InvalidVersionSpecificationException e) {
+                    // nope; GenericVersionScheme never throes but we need to make compiler happy
+                    throw new RuntimeException(e);
+                }
             }
         }
 
         @Override
         public String toString() {
-            return version.toString();
+            return version;
         }
     }
 }
