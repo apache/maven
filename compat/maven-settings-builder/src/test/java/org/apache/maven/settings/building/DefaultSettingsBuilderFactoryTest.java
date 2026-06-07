@@ -99,7 +99,7 @@ class DefaultSettingsBuilderFactoryTest {
         Server server12 = getServerById(servers, "server-12");
         assertEquals("username1", server12.getUsername());
         assertEquals("password1", server12.getPassword());
-        assertTrue(server11.getAliases().isEmpty());
+        assertTrue(server12.getAliases().isEmpty());
 
         Server server2 = getServerById(servers, "server-2");
         assertEquals("username2", server2.getUsername());
