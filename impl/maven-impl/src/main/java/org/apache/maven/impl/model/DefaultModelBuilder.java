@@ -277,6 +277,14 @@ public class DefaultModelBuilder implements ModelBuilder {
         List<RemoteRepository> externalRepositories;
         List<RemoteRepository> repositories;
 
+        List<RemoteRepository> getRepositories() {
+            return repositories;
+        }
+
+        List<RemoteRepository> getExternalRepositories() {
+            return externalRepositories;
+        }
+
         // Cycle detection chain shared across all derived sessions
         // Contains both GAV coordinates (groupId:artifactId:version) and file paths
         final Set<String> parentChain;
@@ -345,6 +353,23 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
             // Create a new parentChain for each derived session to prevent cycle detection issues
             // The parentChain now contains both GAV coordinates and file paths
+            // For BUILD_CONSUMER requests, use the request's explicit repositories so that
+            // BOM imports can be resolved from non-central repos (e.g., settings.xml profiles).
+            // This is scoped to BUILD_CONSUMER to avoid unintended side effects on other
+            // derived sessions (e.g., parent POM resolution during project builds).
+            List<RemoteRepository> derivedExtRepos = externalRepositories;
+            List<RemoteRepository> derivedRepos = repositories;
+            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_CONSUMER
+                    && request.getRepositories() != null
+                    && !request.getRepositories().isEmpty()) {
+                derivedExtRepos = List.copyOf(request.getRepositories());
+                if (pomRepositories.isEmpty()) {
+                    derivedRepos = derivedExtRepos;
+                } else {
+                    RepositoryFactory repositoryFactory = session.getService(RepositoryFactory.class);
+                    derivedRepos = repositoryFactory.aggregate(session, pomRepositories, derivedExtRepos, false);
+                }
+            }
             return new ModelBuilderSessionState(
                     session,
                     request,
@@ -352,8 +377,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                     dag,
                     mappedSources,
                     pomRepositories,
-                    externalRepositories,
-                    repositories,
+                    derivedExtRepos,
+                    derivedRepos,
                     new LinkedHashSet<>());
         }
 
