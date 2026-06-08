@@ -215,6 +215,6 @@ public class DefaultPluginRealmCache implements PluginRealmCache, Disposable {
 
     @Override
     public void dispose() {
-        cache.clear();
+        flush();
     }
 }

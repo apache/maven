@@ -31,6 +31,11 @@ under the License.
   <name>Maven 4 Core</name>
   <description>Maven Core classes.</description>
 
+  <properties>
+    <!-- in: PomConstructionTest -->
+    <checkstyle.violation.ignore>FileLength</checkstyle.violation.ignore>
+  </properties>
+
   <dependencies>
     <!--  Maven4 API -->
     <dependency>

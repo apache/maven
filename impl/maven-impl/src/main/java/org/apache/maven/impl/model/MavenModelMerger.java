@@ -599,7 +599,7 @@ public class MavenModelMerger extends MavenMerger {
                 Object key = getReportSetKey().apply(element);
                 ReportSet existing = merged.get(key);
                 if (existing != null) {
-                    element = mergeReportSet(element, existing, sourceDominant, context);
+                    mergeReportSet(element, existing, sourceDominant, context);
                 }
                 merged.put(key, element);
             }

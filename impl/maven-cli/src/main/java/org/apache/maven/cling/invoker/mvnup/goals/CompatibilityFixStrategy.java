@@ -77,10 +77,6 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
 
     private static final Pattern EXPRESSION_PATTERN = Pattern.compile("\\$\\{([^}]+)}");
 
-    private static final Set<String> VALID_COMBINE_SELF_VALUES = Set.of(COMBINE_OVERRIDE, COMBINE_MERGE, "remove");
-
-    private static final Set<String> VALID_COMBINE_CHILDREN_VALUES = Set.of(COMBINE_APPEND, COMBINE_MERGE);
-
     @Override
     public boolean isApplicable(UpgradeContext context) {
         UpgradeOptions options = getOptions(context);
@@ -129,7 +125,6 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
         Set<Path> errorPoms = new HashSet<>();
 
         Set<String> allDefinedProperties = collectAllDefinedProperties(pomMap);
-        allDefinedProperties.addAll(collectEffectiveProperties(context, pomMap));
 
         for (Map.Entry<Path, Document> entry : pomMap.entrySet()) {
             Path pomPath = entry.getKey();
@@ -149,7 +144,6 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
                 hasIssues |= fixUnsupportedRepositoryExpressions(pomDocument, context);
                 hasIssues |= fixIncorrectParentRelativePaths(pomDocument, pomPath, pomMap, context);
                 hasIssues |= fixUndefinedPropertyExpressions(pomDocument, allDefinedProperties, context);
-                hasIssues |= fixUndefinedPropertyExpressionsInRepositories(pomDocument, allDefinedProperties, context);
 
                 if (hasIssues) {
                     context.success("Maven 4 compatibility issues fixed");
@@ -170,44 +164,44 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
 
     /**
      * Fixes unsupported combine.children attribute values.
-     * Maven 4 only supports 'append' and 'merge' (default is merge).
-     * Invalid values are removed entirely since Maven 3 silently ignored them.
+     * Maven 4 only supports 'append' and 'merge', not 'override'.
      */
     private boolean fixUnsupportedCombineChildrenAttributes(Document pomDocument, UpgradeContext context) {
+        boolean fixed = false;
         Element root = pomDocument.root();
 
-        List<Element> invalidElements = findElementsWithInvalidAttribute(
-                        root, COMBINE_CHILDREN, VALID_COMBINE_CHILDREN_VALUES)
-                .toList();
+        // Find all elements with combine.children="override" and change to "merge"
+        long fixedCombineChildrenCount = findElementsWithAttribute(root, COMBINE_CHILDREN, COMBINE_OVERRIDE)
+                .peek(element -> {
+                    element.attributeObject(COMBINE_CHILDREN).value(COMBINE_MERGE);
+                    context.detail("Fixed: " + COMBINE_CHILDREN + "='" + COMBINE_OVERRIDE + "' → '" + COMBINE_MERGE
+                            + "' in " + element.name());
+                })
+                .count();
+        fixed |= fixedCombineChildrenCount > 0;
 
-        for (Element element : invalidElements) {
-            String invalidValue = element.attribute(COMBINE_CHILDREN);
-            element.removeAttribute(COMBINE_CHILDREN);
-            context.detail(
-                    "Fixed: removed invalid " + COMBINE_CHILDREN + "='" + invalidValue + "' from " + element.name());
-        }
-
-        return !invalidElements.isEmpty();
+        return fixed;
     }
 
     /**
      * Fixes unsupported combine.self attribute values.
-     * Maven 4 only supports 'override', 'merge', and 'remove' (default is merge).
-     * Invalid values are removed entirely since Maven 3 silently ignored them.
+     * Maven 4 only supports 'override', 'merge', and 'remove' (default is merge), not 'append'.
      */
     private boolean fixUnsupportedCombineSelfAttributes(Document pomDocument, UpgradeContext context) {
+        boolean fixed = false;
         Element root = pomDocument.root();
 
-        List<Element> invalidElements = findElementsWithInvalidAttribute(root, COMBINE_SELF, VALID_COMBINE_SELF_VALUES)
-                .toList();
+        // Find all elements with combine.self="append" and change to "merge"
+        long fixedCombineSelfCount = findElementsWithAttribute(root, COMBINE_SELF, COMBINE_APPEND)
+                .peek(element -> {
+                    element.attributeObject(COMBINE_SELF).value(COMBINE_MERGE);
+                    context.detail("Fixed: " + COMBINE_SELF + "='" + COMBINE_APPEND + "' → '" + COMBINE_MERGE + "' in "
+                            + element.name());
+                })
+                .count();
+        fixed |= fixedCombineSelfCount > 0;
 
-        for (Element element : invalidElements) {
-            String invalidValue = element.attribute(COMBINE_SELF);
-            element.removeAttribute(COMBINE_SELF);
-            context.detail("Fixed: removed invalid " + COMBINE_SELF + "='" + invalidValue + "' from " + element.name());
-        }
-
-        return !invalidElements.isEmpty();
+        return fixed;
     }
 
     /**
@@ -381,19 +375,6 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
                                         propsElement.childElements().forEach(child -> properties.add(child.name())))));
     }
 
-    private Set<String> collectEffectiveProperties(UpgradeContext context, Map<Path, Document> pomMap) {
-        Set<String> properties = new HashSet<>();
-        for (Path pomPath : pomMap.keySet()) {
-            try {
-                org.apache.maven.api.model.Model effectiveModel = buildEffectiveModel(pomPath);
-                properties.addAll(effectiveModel.getProperties().keySet());
-            } catch (Exception e) {
-                context.debug("Failed to build effective model for " + pomPath + ": " + e.getMessage());
-            }
-        }
-        return properties;
-    }
-
     /**
      * Fixes dependencies with undefined property expressions by commenting them out.
      */
@@ -429,89 +410,6 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
                 .map(container -> fixUndefinedPropertyExpressionsInSection(
                         container.element, allDefinedProperties, pomDocument, context, container.sectionName))
                 .reduce(false, Boolean::logicalOr);
-    }
-
-    /**
-     * Fixes repositories with undefined property expressions by commenting them out.
-     */
-    private boolean fixUndefinedPropertyExpressionsInRepositories(
-            Document pomDocument, Set<String> allDefinedProperties, UpgradeContext context) {
-        Element root = pomDocument.root();
-
-        Stream<RepositoryContainer> repositoryContainers = Stream.concat(
-                Stream.of(
-                                new RepositoryContainer(
-                                        root.childElement(REPOSITORIES).orElse(null), REPOSITORY, REPOSITORIES),
-                                new RepositoryContainer(
-                                        root.childElement(PLUGIN_REPOSITORIES).orElse(null),
-                                        PLUGIN_REPOSITORY,
-                                        PLUGIN_REPOSITORIES))
-                        .filter(c -> c.element != null),
-                root.childElement(PROFILES).stream()
-                        .flatMap(profiles -> profiles.childElements(PROFILE))
-                        .flatMap(profile -> Stream.of(
-                                        new RepositoryContainer(
-                                                profile.childElement(REPOSITORIES)
-                                                        .orElse(null),
-                                                REPOSITORY,
-                                                "profile repositories"),
-                                        new RepositoryContainer(
-                                                profile.childElement(PLUGIN_REPOSITORIES)
-                                                        .orElse(null),
-                                                PLUGIN_REPOSITORY,
-                                                "profile pluginRepositories"))
-                                .filter(c -> c.element != null)));
-
-        return repositoryContainers
-                .map(c -> fixUndefinedPropertyExpressionsInRepositorySection(
-                        c.element, c.elementType, allDefinedProperties, pomDocument, context, c.sectionName))
-                .reduce(false, Boolean::logicalOr);
-    }
-
-    private record RepositoryContainer(Element element, String elementType, String sectionName) {}
-
-    private boolean fixUndefinedPropertyExpressionsInRepositorySection(
-            Element repositoriesElement,
-            String elementType,
-            Set<String> allDefinedProperties,
-            Document pomDocument,
-            UpgradeContext context,
-            String sectionName) {
-        boolean fixed = false;
-        List<Element> repositories =
-                repositoriesElement.childElements(elementType).toList();
-        Editor editor = new Editor(pomDocument);
-
-        for (Element repository : repositories) {
-            Set<String> undefinedProps = findUndefinedPropertiesInRepository(repository, allDefinedProperties);
-            if (!undefinedProps.isEmpty()) {
-                String propLabel = undefinedProps.size() > 1 ? "properties" : "property";
-                String propsStr = "'" + String.join("', '", undefinedProps) + "'";
-
-                Comment comment = editor.commentOutElement(repository);
-                String elementXml = comment.content().trim();
-                comment.content(
-                        " mvnup: commented out - undefined " + propLabel + " " + propsStr + "\n" + elementXml + " ");
-
-                context.detail("Fixed: Commented out " + elementType + " with undefined " + propLabel + " " + propsStr
-                        + " in " + sectionName);
-                fixed = true;
-            }
-        }
-
-        return fixed;
-    }
-
-    private Set<String> findUndefinedPropertiesInRepository(Element repository, Set<String> allDefinedProperties) {
-        Set<String> undefinedProperties = new HashSet<>();
-
-        String id = repository.childText("id");
-        String url = repository.childText("url");
-
-        collectUndefinedExpressions(id, allDefinedProperties, undefinedProperties);
-        collectUndefinedExpressions(url, allDefinedProperties, undefinedProperties);
-
-        return undefinedProperties;
     }
 
     /**
@@ -614,20 +512,6 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
                 // Recursively check children
                 element.childElements()
                         .flatMap(child -> findElementsWithAttribute(child, attributeName, attributeValue)));
-    }
-
-    /**
-     * Recursively finds all elements with an attribute whose value is not in the set of valid values.
-     */
-    private Stream<Element> findElementsWithInvalidAttribute(
-            Element element, String attributeName, Set<String> validValues) {
-        return Stream.concat(
-                Stream.of(element).filter(e -> {
-                    String attr = e.attribute(attributeName);
-                    return attr != null && !validValues.contains(attr);
-                }),
-                element.childElements()
-                        .flatMap(child -> findElementsWithInvalidAttribute(child, attributeName, validValues)));
     }
 
     /**
