@@ -20,6 +20,7 @@ package org.apache.maven.it;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,6 +33,7 @@ import org.junit.jupiter.api.Test;
  * The test confirms that the dominant repository definition (child) wins while resolving the import POMs.
  *
  */
+@Disabled // This IT has been disabled until it is decided how the solution shall look like
 public class MavenITmng6772NestedImportScopeRepositoryOverride extends AbstractMavenIntegrationTestCase {
 
     // This will test the behavior using ProjectModelResolver

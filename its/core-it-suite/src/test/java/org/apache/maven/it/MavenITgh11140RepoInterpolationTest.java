@@ -71,15 +71,18 @@ class MavenITgh11140RepoInterpolationTest extends AbstractMavenIntegrationTestCa
     }
 
     @Test
-    void testUnresolvedPlaceholderWarnsAndSkipsRepository() throws Exception {
+    void testUnresolvedPlaceholderFailsResolution() throws Exception {
         File testDir = extractResources("/gh-11140-repo-interpolation");
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
 
         // Do NOT set env vars, so placeholders stay
         verifier.addCliArgument("validate");
-        verifier.execute();
-        // Build should succeed, but warn about uninterpolated expressions
-        verifier.verifyErrorFreeLog();
+        try {
+            verifier.execute();
+        } catch (VerificationException expected) {
+            // Expected to fail due to unresolved placeholders during model validation
+        }
+        // We expect error mentioning uninterpolated expression
         verifier.verifyTextInLog("contains an uninterpolated expression");
     }
 }

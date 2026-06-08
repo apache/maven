@@ -58,20 +58,4 @@ under the License.
       </plugin>
     </plugins>
   </build>
-
-  <reporting>
-    <plugins>
-      <plugin>
-        <artifactId>MNG-5115-2</artifactId>
-        <reportSets>
-          <reportSet>
-            <id>inherited-append</id>
-            <reports>
-              <report>from-child</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-      </plugin>
-    </plugins>
-  </reporting>
 </project>

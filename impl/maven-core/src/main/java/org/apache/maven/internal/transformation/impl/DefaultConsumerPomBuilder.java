@@ -48,9 +48,7 @@ import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.model.LifecycleBindingsInjector;
-import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.impl.InternalSession;
-import org.apache.maven.internal.impl.InternalMavenSession;
 import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.SourceQueries;
@@ -146,28 +144,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
             if (isBom) {
                 return buildBomWithoutFlatten(session, project, src);
             } else {
-                Model result = buildPom(session, project, src);
-                // Validate POM-packaged projects (parent POMs): if the consumer POM cannot be
-                // downgraded to 4.0.0, Maven 3 / Gradle cannot resolve the parent.
-                // Non-POM projects are consumed as dependencies where unknown elements are
-                // ignored, so a higher model version is acceptable (only a warning is logged
-                // by transformNonPom/transformPom).
-                if (POM_PACKAGING.equals(packaging)
-                        && !model.isPreserveModelVersion()
-                        && !ModelBuilder.MODEL_VERSION_4_0_0.equals(result.getModelVersion())) {
-                    throw new MavenException("""
-                            The consumer POM for %s cannot be downgraded to model version 4.0.0 because it contains\
-                             features that require a newer model version.\
-                             Since consumer POM flattening is disabled, the parent reference is\
-                             preserved, which requires consumers to resolve the parent POM.
-                            You have the following options to resolve this:
-                              1. Enable flattening by setting the property 'maven.consumer.pom.flatten=true'\
-                             to inline parent content and produce a self-contained 4.0.0 consumer POM
-                              2. Preserve the model version by setting 'preserve.model.version=true'\
-                             on the <project> element (Maven 4 consumers only)
-                              3. Remove the features that require a newer model version""".formatted(project.getId()));
-                }
-                return result;
+                return buildPom(session, project, src);
             }
         }
         // Default behavior: flatten the consumer POM
@@ -184,14 +161,14 @@ class DefaultConsumerPomBuilder implements PomBuilder {
 
     protected Model buildPom(RepositorySystemSession session, MavenProject project, ModelSource src)
             throws ModelBuilderException {
-        ModelBuilderResult result = buildModel(session, project, src);
+        ModelBuilderResult result = buildModel(session, src);
         Model model = result.getRawModel();
         return transformPom(model, project);
     }
 
     protected Model buildBomWithoutFlatten(RepositorySystemSession session, MavenProject project, ModelSource src)
             throws ModelBuilderException {
-        ModelBuilderResult result = buildModel(session, project, src);
+        ModelBuilderResult result = buildModel(session, src);
         Model model = result.getRawModel();
         // For BOMs without flattening, we just need to transform the packaging from "bom" to "pom"
         // but keep everything else from the raw model (including unresolved versions)
@@ -200,24 +177,21 @@ class DefaultConsumerPomBuilder implements PomBuilder {
 
     protected Model buildBom(RepositorySystemSession session, MavenProject project, ModelSource src)
             throws ModelBuilderException {
-        ModelBuilderResult result = buildModel(session, project, src);
+        ModelBuilderResult result = buildModel(session, src);
         Model model = result.getEffectiveModel();
         return transformBom(model, project);
     }
 
     protected Model buildNonPom(RepositorySystemSession session, MavenProject project, ModelSource src)
             throws ModelBuilderException {
-        Model model = buildEffectiveModel(session, project, src);
+        Model model = buildEffectiveModel(session, src);
         return transformNonPom(model, project);
     }
 
-    private Model buildEffectiveModel(RepositorySystemSession session, MavenProject project, ModelSource src)
-            throws ModelBuilderException {
+    private Model buildEffectiveModel(RepositorySystemSession session, ModelSource src) throws ModelBuilderException {
         InternalSession iSession = InternalSession.from(session);
-        ModelBuilderResult result = buildModel(session, project, src);
+        ModelBuilderResult result = buildModel(session, src);
         Model model = result.getEffectiveModel();
-        boolean removeUnusedManagedDeps =
-                Features.consumerPomRemoveUnusedManagedDependencies(session.getConfigProperties());
 
         if (model.getDependencyManagement() != null
                 && !model.getDependencyManagement().getDependencies().isEmpty()) {
@@ -236,13 +210,19 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                             this::merge,
                             LinkedHashMap::new));
             Map<String, Dependency> managedDependencies = model.getDependencyManagement().getDependencies().stream()
-                    .filter(dependency -> !"import".equals(dependency.getScope())
-                            && (!removeUnusedManagedDeps || nodes.containsKey(getDependencyKey(dependency))))
+                    .filter(dependency ->
+                            nodes.containsKey(getDependencyKey(dependency)) && !"import".equals(dependency.getScope()))
                     .collect(Collectors.toMap(
                             DefaultConsumerPomBuilder::getDependencyKey,
                             Function.identity(),
                             this::merge,
                             LinkedHashMap::new));
+
+            // for each managed dep in the model:
+            // * if there is no corresponding node in the tree, discard the managed dep
+            // * if there's a direct dependency, apply the managed dependency to it and discard the managed dep
+            // * else keep the managed dep
+            managedDependencies.keySet().retainAll(nodes.keySet());
 
             directDependencies.replaceAll((key, dependency) -> {
                 var managedDependency = managedDependencies.get(key);
@@ -315,7 +295,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                 + (dependency.getClassifier() != null ? dependency.getClassifier() : "");
     }
 
-    private ModelBuilderResult buildModel(RepositorySystemSession session, MavenProject project, ModelSource src)
+    private ModelBuilderResult buildModel(RepositorySystemSession session, ModelSource src)
             throws ModelBuilderException {
         InternalSession iSession = InternalSession.from(session);
         ModelBuilderRequest.ModelBuilderRequestBuilder request = ModelBuilderRequest.builder();
@@ -323,41 +303,9 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         request.session(iSession);
         request.source(src);
         request.locationTracking(false);
-        request.systemProperties(iSession.getSystemProperties());
-        request.userProperties(iSession.getUserProperties());
+        request.systemProperties(session.getSystemProperties());
+        request.userProperties(session.getUserProperties());
         request.lifecycleBindingsInjector(lifecycleBindingsInjector::injectLifecycleBindings);
-        // Pass remote repositories so that the model builder can resolve BOM imports
-        // from non-central repositories (e.g., repositories defined in settings.xml profiles).
-        // Prefer project repositories, but fall back to session repositories if the project's
-        // remote repository list is not populated (e.g., during install/deploy phases).
-        if (project != null
-                && project.getRemoteProjectRepositories() != null
-                && !project.getRemoteProjectRepositories().isEmpty()) {
-            request.repositories(project.getRemoteProjectRepositories().stream()
-                    .map(iSession::getRemoteRepository)
-                    .toList());
-        } else {
-            request.repositories(iSession.getRemoteRepositories());
-        }
-        // Pass profiles and active/inactive profile IDs from the execution request
-        // so that settings.xml profiles are applied during consumer POM model building.
-        if (iSession instanceof InternalMavenSession mavenSession) {
-            MavenExecutionRequest executionRequest =
-                    mavenSession.getMavenSession().getRequest();
-            if (executionRequest.getProfiles() != null) {
-                request.profiles(executionRequest.getProfiles().stream()
-                        .map(org.apache.maven.model.Profile::getDelegate)
-                        .toList());
-            }
-            request.activeProfileIds(executionRequest.getActiveProfiles());
-            request.inactiveProfileIds(executionRequest.getInactiveProfiles());
-        } else {
-            LOGGER.debug(
-                    "Session is not an InternalMavenSession ({}); settings.xml profiles will not be "
-                            + "passed to the consumer POM model builder. BOM imports from repositories "
-                            + "defined only in settings.xml profiles may fail to resolve.",
-                    iSession.getClass().getName());
-        }
         ModelBuilder.ModelBuilderSession mbSession =
                 iSession.getData().get(SessionData.key(ModelBuilder.ModelBuilderSession.class));
         return mbSession.build(request.build());

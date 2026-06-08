@@ -26,7 +26,6 @@ import java.util.Properties;
 
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Default abstract toolchain implementation, to be used as base class for any toolchain implementation
@@ -67,27 +66,6 @@ implements Toolchain, ToolchainPrivate {
     protected DefaultToolchain(ToolchainModel model, String type, Logger logger) {
         this(model, logger);
         this.type = type;
-    }
-
-    /**
-     * @param model the model, must not be {@code null}
-     * @param logger the logger (ignored, an SLF4J logger is used instead)
-     * @deprecated Use {@link #DefaultToolchain(ToolchainModel, Logger)} with an SLF4J logger instead.
-     */
-    @Deprecated(since = "4.0.0")
-    protected DefaultToolchain(ToolchainModel model, org.codehaus.plexus.logging.Logger logger) {
-        this(model, LoggerFactory.getLogger(DefaultToolchain.class));
-    }
-
-    /**
-     * @param model the model, must not be {@code null}
-     * @param type the type
-     * @param logger the logger (ignored, an SLF4J logger is used instead)
-     * @deprecated Use {@link #DefaultToolchain(ToolchainModel, String, Logger)} with an SLF4J logger instead.
-     */
-    @Deprecated(since = "4.0.0")
-    protected DefaultToolchain(ToolchainModel model, String type, org.codehaus.plexus.logging.Logger logger) {
-        this(model, type, LoggerFactory.getLogger(DefaultToolchain.class));
     }
 
     @Override

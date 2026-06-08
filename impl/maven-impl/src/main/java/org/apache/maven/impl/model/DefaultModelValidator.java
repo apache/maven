@@ -1624,11 +1624,11 @@ public class DefaultModelValidator implements ModelValidator {
                 if (matcher.find()) {
                     addViolation(
                             problems,
-                            Severity.WARNING,
+                            Severity.ERROR,
                             Version.V40,
                             prefix + prefix2 + "[" + repository.getId() + "].id",
                             null,
-                            "contains an uninterpolated expression; the repository will be skipped.",
+                            "contains an uninterpolated expression.",
                             repository);
                 }
             }
@@ -1650,11 +1650,11 @@ public class DefaultModelValidator implements ModelValidator {
                 if (matcher.find()) {
                     addViolation(
                             problems,
-                            Severity.WARNING,
+                            Severity.ERROR,
                             Version.V40,
                             prefix + prefix2 + "[" + repository.getId() + "].url",
                             null,
-                            "contains an uninterpolated expression; the repository will be skipped.",
+                            "contains an uninterpolated expression.",
                             repository);
                 }
             }

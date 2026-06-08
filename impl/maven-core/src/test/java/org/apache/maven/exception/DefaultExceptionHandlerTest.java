@@ -29,15 +29,9 @@ import org.apache.maven.plugin.PluginContainerException;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.repository.RemoteRepository;
-import org.eclipse.aether.resolution.ArtifactResolutionException;
-import org.eclipse.aether.resolution.ArtifactResult;
-import org.eclipse.aether.transfer.ArtifactFilteredOutException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  */
@@ -128,40 +122,6 @@ class DefaultExceptionHandlerTest {
 
         String expectedReference = "http://cwiki.apache.org/confluence/display/MAVEN/PluginContainerException";
         assertEquals(expectedReference, summary.getReference());
-    }
-
-    @Test
-    void testArtifactFilteredOutException() {
-        RemoteRepository repo =
-                new RemoteRepository.Builder("my-repo", "default", "https://repo.example.com/maven").build();
-        ArtifactFilteredOutException filterEx = new ArtifactFilteredOutException(
-                new DefaultArtifact("com.example:my-lib:jar:1.0"),
-                repo,
-                "Prefix com/example/my-lib/1.0/my-lib-1.0.jar NOT allowed from my-repo"
-                        + " (https://repo.example.com/maven, default, releases)");
-        ArtifactResult artifactResult = new ArtifactResult(new org.eclipse.aether.resolution.ArtifactRequest(
-                new DefaultArtifact("com.example:my-lib:jar:1.0"), java.util.List.of(repo), null));
-        artifactResult.addException(filterEx);
-        ArtifactResolutionException resolutionEx =
-                new ArtifactResolutionException(java.util.List.of(artifactResult), "Could not resolve artifact");
-        MojoExecutionException mojoEx = new MojoExecutionException("Resolution failed", resolutionEx);
-
-        DefaultExceptionHandler handler = new DefaultExceptionHandler();
-        ExceptionSummary summary = handler.handleException(mojoEx);
-
-        assertTrue(
-                summary.getMessage().contains("-Daether.remoteRepositoryFilter.prefixes=false"),
-                "Message should contain the prefixes workaround property");
-        assertTrue(
-                summary.getMessage().contains("-Daether.remoteRepositoryFilter.groupId=false"),
-                "Message should contain the groupId workaround property");
-        assertTrue(
-                summary.getMessage().contains("remote repository filter"),
-                "Message should explain the filtering cause");
-        assertEquals(
-                "https://maven.apache.org/resolver/remote-repository-filtering.html",
-                summary.getReference(),
-                "Reference should point to the RRF documentation");
     }
 
     @Test

@@ -84,17 +84,6 @@ under the License.
           </reportSet>
         </reportSets>
       </plugin>
-      <plugin>
-        <artifactId>MNG-5115-2</artifactId>
-        <reportSets>
-          <reportSet>
-            <id>inherited-append</id>
-            <reports>
-              <report>to-be-inherited</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-      </plugin>
     </plugins>
   </reporting>
 </project>

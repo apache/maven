@@ -76,6 +76,16 @@ public class PropertyProfileActivator implements ProfileActivator {
         if (sysValue == null) {
             sysValue = context.getSystemProperty(name);
         }
+        // Check model properties last (for cascading profile activation)
+        // ONLY for POM profiles - settings profiles should not use model properties
+        if (sysValue == null && Profile.SOURCE_POM.equals(profile.getSource())) {
+            // Use getModelPropertyForActivation to include cascaded profile properties
+            if (context instanceof org.apache.maven.impl.model.DefaultProfileActivationContext dctx) {
+                sysValue = dctx.getModelPropertyForActivation(name);
+            } else {
+                sysValue = context.getModelProperty(name);
+            }
+        }
 
         String propValue = property.getValue();
         if (propValue != null && !propValue.isEmpty()) {

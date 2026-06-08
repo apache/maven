@@ -92,13 +92,6 @@ public class DefaultProjectBuildingHelper implements ProjectBuildingHelper {
         List<ArtifactRepository> internalRepositories = new ArrayList<>();
 
         for (Repository repository : pomRepositories) {
-            if (containsExpression(repository.getId()) || containsExpression(repository.getUrl())) {
-                logger.warn(
-                        "Skipping repository '{}' (url: '{}') containing an uninterpolated property expression",
-                        repository.getId(),
-                        repository.getUrl());
-                continue;
-            }
             internalRepositories.add(MavenRepositorySystem.buildArtifactRepository(repository));
         }
 
@@ -272,10 +265,6 @@ public class DefaultProjectBuildingHelper implements ProjectBuildingHelper {
         }
 
         Thread.currentThread().setContextClassLoader(projectRealm);
-    }
-
-    private static boolean containsExpression(String value) {
-        return value != null && value.contains("${");
     }
 
     private List<org.eclipse.aether.artifact.Artifact> toAetherArtifacts(final List<Artifact> pluginArtifacts) {
