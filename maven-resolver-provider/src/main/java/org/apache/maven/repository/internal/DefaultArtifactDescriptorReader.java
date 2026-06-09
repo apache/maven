@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -95,13 +96,18 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
 
     private ModelCacheFactory modelCacheFactory;
 
-    private Map<String, MavenArtifactRelocationSource> artifactRelocationSources;
+    private Map<String, MavenArtifactRelocationSource> artifactRelocationSources = Collections.emptyMap();
+
+    private Map<String, ArtifactDescriptorDecorator> artifactDescriptorDecorators = Collections.emptyMap();
 
     private final ArtifactDescriptorReaderDelegate artifactDescriptorReaderDelegate =
             new ArtifactDescriptorReaderDelegate();
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    /**
+     * Just here for "static" resolver providers.
+     */
     @Deprecated
     public DefaultArtifactDescriptorReader() {
         // enable no-arg constructor
@@ -135,8 +141,11 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
         setArtifactRelocationSources(artifactRelocationSources);
     }
 
+    /**
+     * Just here for "static" resolver providers.
+     */
     @SuppressWarnings("checkstyle:parameternumber")
-    @Inject
+    @Deprecated
     public DefaultArtifactDescriptorReader(
             RemoteRepositoryManager remoteRepositoryManager,
             VersionResolver versionResolver,
@@ -154,6 +163,29 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
         setRepositoryEventDispatcher(repositoryEventDispatcher);
         setModelCacheFactory(modelCacheFactory);
         setArtifactRelocationSources(artifactRelocationSources);
+    }
+
+    @SuppressWarnings("checkstyle:parameternumber")
+    @Inject
+    public DefaultArtifactDescriptorReader(
+            RemoteRepositoryManager remoteRepositoryManager,
+            VersionResolver versionResolver,
+            VersionRangeResolver versionRangeResolver,
+            ArtifactResolver artifactResolver,
+            ModelBuilder modelBuilder,
+            RepositoryEventDispatcher repositoryEventDispatcher,
+            ModelCacheFactory modelCacheFactory,
+            Map<String, MavenArtifactRelocationSource> artifactRelocationSources,
+            Map<String, ArtifactDescriptorDecorator> artifactDescriptorDecorators) {
+        setRemoteRepositoryManager(remoteRepositoryManager);
+        setVersionResolver(versionResolver);
+        setVersionRangeResolver(versionRangeResolver);
+        setArtifactResolver(artifactResolver);
+        setModelBuilder(modelBuilder);
+        setRepositoryEventDispatcher(repositoryEventDispatcher);
+        setModelCacheFactory(modelCacheFactory);
+        setArtifactRelocationSources(artifactRelocationSources);
+        setArtifactDescriptorDecorators(artifactDescriptorDecorators);
     }
 
     @Deprecated
@@ -216,6 +248,13 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
         return this;
     }
 
+    public DefaultArtifactDescriptorReader setArtifactDescriptorDecorators(
+            Map<String, ArtifactDescriptorDecorator> artifactDescriptorDecorators) {
+        this.artifactDescriptorDecorators =
+                Objects.requireNonNull(artifactDescriptorDecorators, "artifactDescriptorDecorators cannot be null");
+        return this;
+    }
+
     @Override
     public ArtifactDescriptorResult readArtifactDescriptor(
             RepositorySystemSession session, ArtifactDescriptorRequest request) throws ArtifactDescriptorException {
@@ -232,6 +271,10 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
             }
 
             delegate.populateResult(session, result, model);
+
+            for (ArtifactDescriptorDecorator decorator : artifactDescriptorDecorators.values()) {
+                decorator.populateArtifactDescriptor(session, result, model);
+            }
         }
 
         return result;

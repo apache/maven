@@ -39,7 +39,6 @@ import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.internal.RepositorySystemSessionFactory;
 import org.apache.maven.model.ModelBase;
-import org.apache.maven.repository.internal.MavenSessionBuilderSupplier;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
@@ -62,6 +61,7 @@ import org.eclipse.aether.repository.LocalRepositoryManager;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ResolutionErrorPolicy;
+import org.eclipse.aether.supplier.SessionBuilderSupplier;
 import org.eclipse.aether.util.ConfigUtils;
 import org.eclipse.aether.util.graph.manager.TransitiveDependencyManager;
 import org.eclipse.aether.util.listener.ChainedRepositoryListener;
@@ -213,7 +213,7 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         configProps.putAll(request.getSystemProperties());
         configProps.putAll(request.getUserProperties());
 
-        RepositorySystemSession.SessionBuilder mainSessionBuilder = new MavenSessionBuilderSupplier(repoSystem).get();
+        RepositorySystemSession.SessionBuilder mainSessionBuilder = new SessionBuilderSupplier(repoSystem).get();
         mainSessionBuilder.setCache(request.getRepositoryCache());
 
         mainSessionBuilder.setOffline(request.isOffline());
@@ -269,7 +269,7 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
 
         versionFilterBuilder
                 .buildVersionFilter((String) configProps.get(MAVEN_VERSION_FILTER), this::parseVersionConstraint)
-                .map(mainSessionBuilder::setVersionFilter);
+                .ifPresent(mainSessionBuilder::setVersionFilter);
 
         boolean dependencyManagerTransitivity =
                 ConfigUtils.getBoolean(configProps, false, MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY);
