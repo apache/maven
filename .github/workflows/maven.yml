@@ -33,7 +33,7 @@ permissions: {}
 
 env:
   # Keep in sync with mimir testing version in pom.xml
-  MIMIR_VERSION: 0.11.4
+  MIMIR_VERSION: 0.12.0
   MIMIR_BASEDIR: ~/.mimir
   MIMIR_LOCAL: ~/.mimir/local
   MAVEN_OPTS: -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./target/java_heapdump.hprof
