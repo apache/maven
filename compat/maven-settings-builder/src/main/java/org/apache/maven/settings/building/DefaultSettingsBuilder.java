@@ -183,8 +183,8 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             return new Settings();
         }
 
-        settings.setServers(serversByIds(settings.getServers()));
         settingsValidator.validate(settings, problems);
+        settings.setServers(serversByIds(settings.getServers()));
 
         return settings;
     }
