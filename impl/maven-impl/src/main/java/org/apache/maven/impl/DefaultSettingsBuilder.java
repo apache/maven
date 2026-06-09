@@ -203,11 +203,11 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         settings = interpolate(settings, request, problems);
         settings = decrypt(settingsSource, settings, request, problems);
 
+        settingsValidator.validate(settings, isProjectSettings, problems);
+
         if (!isProjectSettings) {
             settings = settings.withServers(serversByIds(settings.getServers()));
         }
-
-        settingsValidator.validate(settings, isProjectSettings, problems);
 
         if (isProjectSettings) {
             settings = Settings.newBuilder(settings, true)
@@ -224,6 +224,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                                     .password(null)
                                     .filePermissions(null)
                                     .directoryPermissions(null)
+                                    .aliases(List.of())
                                     .build())
                             .toList())
                     .build();

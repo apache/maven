@@ -26,6 +26,7 @@ import org.apache.maven.api.services.ProblemCollector;
 import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.api.settings.Profile;
 import org.apache.maven.api.settings.Repository;
+import org.apache.maven.api.settings.Server;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.impl.model.DefaultInterpolator;
 import org.junit.jupiter.api.BeforeEach;
@@ -69,5 +70,38 @@ class DefaultSettingsValidatorTest {
                 .build();
         problems = validator.validate(model2);
         assertEquals(0, problems.totalProblemsReported());
+    }
+
+    @Test
+    void testValidateServerIdAlias() {
+        Server server =
+                Server.newBuilder().id("server-1").aliases(List.of("server-1")).build();
+
+        Settings settings = Settings.newBuilder().servers(List.of(server)).build();
+
+        ProblemCollector<BuilderProblem> problems = validator.validate(settings);
+        assertEquals(1, problems.totalProblemsReported());
+        assertEquals(
+                "'servers.server[0].aliases' for server-1 must be unique for all servers id but found duplicate alias server-1",
+                problems.problems().findFirst().orElseThrow().getMessage());
+    }
+
+    @Test
+    void testMultipleUsageOfAliases() {
+
+        Server server1 =
+                Server.newBuilder().id("server-1").aliases(List.of("alias-1")).build();
+
+        Server server2 =
+                Server.newBuilder().id("server-2").aliases(List.of("alias-1")).build();
+
+        Settings settings =
+                Settings.newBuilder().servers(List.of(server1, server2)).build();
+
+        ProblemCollector<BuilderProblem> problems = validator.validate(settings);
+        assertEquals(1, problems.totalProblemsReported());
+        assertEquals(
+                "'servers.server[1].aliases' for server-2 must be unique for all servers id but found duplicate alias alias-1",
+                problems.problems().findFirst().orElseThrow().getMessage());
     }
 }
