@@ -156,7 +156,7 @@ class DefaultSettingsBuilderFactoryTest {
         ProblemCollector<BuilderProblem> problems = result.getProblems();
         assertEquals(1, problems.problems().count());
         assertEquals(
-                "'servers.server.id' must be unique but found duplicate server with id server-2",
+                "'servers.server[0].aliases' for server-1 must be unique for all servers id but found duplicate alias server-2",
                 problems.problems().findFirst().orElseThrow().getMessage());
     }
 

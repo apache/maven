@@ -219,6 +219,44 @@ class DefaultSettingsValidatorTest {
         assertContains(problems.messages.get(0), "'proxies.proxy.host' for default is missing");
     }
 
+    @Test
+    void testValidateServerIdAlias() {
+        Settings settings = new Settings();
+        Server server = new Server();
+        server.setId("server-1");
+        server.addAliase("server-1");
+        settings.addServer(server);
+
+        SimpleProblemCollector problems = new SimpleProblemCollector();
+        validator.validate(settings, problems);
+        assertEquals(1, problems.messages.size());
+        assertContains(
+                problems.messages.get(0),
+                "servers.server[0].aliases' for server-1 must be unique for all servers id but found duplicate alias server-1");
+    }
+
+    @Test
+    void testMultipleUsageOfAliases() {
+        Settings settings = new Settings();
+
+        Server server1 = new Server();
+        server1.setId("server-1");
+        server1.addAliase("alias-1");
+        settings.addServer(server1);
+
+        Server server2 = new Server();
+        server2.setId("server-2");
+        server2.addAliase("alias-1");
+        settings.addServer(server2);
+
+        SimpleProblemCollector problems = new SimpleProblemCollector();
+        validator.validate(settings, problems);
+        assertEquals(1, problems.messages.size());
+        assertContains(
+                problems.messages.get(0),
+                "'servers.server[1].aliases' for server-2 must be unique for all servers id but found duplicate alias alias-1");
+    }
+
     private static class SimpleProblemCollector implements SettingsProblemCollector {
 
         List<String> messages = new ArrayList<>();
