@@ -32,7 +32,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.maven.model.Model;
-import org.apache.maven.model.building.DefaultModelBuilderFactory;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelBuilder;
@@ -70,8 +69,6 @@ import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.VersionRequest;
 import org.eclipse.aether.resolution.VersionResolutionException;
 import org.eclipse.aether.resolution.VersionResult;
-import org.eclipse.aether.spi.locator.Service;
-import org.eclipse.aether.spi.locator.ServiceLocator;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +78,7 @@ import org.slf4j.LoggerFactory;
  */
 @Named
 @Singleton
-public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader, Service {
+public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader {
     private RemoteRepositoryManager remoteRepositoryManager;
 
     private VersionResolver versionResolver;
@@ -186,20 +183,6 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
         setModelCacheFactory(modelCacheFactory);
         setArtifactRelocationSources(artifactRelocationSources);
         setArtifactDescriptorDecorators(artifactDescriptorDecorators);
-    }
-
-    @Deprecated
-    public void initService(ServiceLocator locator) {
-        setRemoteRepositoryManager(locator.getService(RemoteRepositoryManager.class));
-        setVersionResolver(locator.getService(VersionResolver.class));
-        setVersionRangeResolver(locator.getService(VersionRangeResolver.class));
-        setArtifactResolver(locator.getService(ArtifactResolver.class));
-        modelBuilder = locator.getService(ModelBuilder.class);
-        if (modelBuilder == null) {
-            setModelBuilder(new DefaultModelBuilderFactory().newInstance());
-        }
-        setRepositoryEventDispatcher(locator.getService(RepositoryEventDispatcher.class));
-        setModelCacheFactory(locator.getService(ModelCacheFactory.class));
     }
 
     public DefaultArtifactDescriptorReader setRemoteRepositoryManager(RemoteRepositoryManager remoteRepositoryManager) {
