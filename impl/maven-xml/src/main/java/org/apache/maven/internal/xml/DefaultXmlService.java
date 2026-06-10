@@ -53,7 +53,7 @@ public class DefaultXmlService extends XmlService {
     @Override
     public XmlNode doRead(InputStream input, @Nullable XmlService.InputLocationBuilder locationBuilder)
             throws XMLStreamException {
-        XMLStreamReader parser = XMLInputFactory.newFactory().createXMLStreamReader(input);
+        XMLStreamReader parser = newInputFactory().createXMLStreamReader(input);
         return doRead(parser, locationBuilder);
     }
 
@@ -61,8 +61,15 @@ public class DefaultXmlService extends XmlService {
     @Override
     public XmlNode doRead(Reader reader, @Nullable XmlService.InputLocationBuilder locationBuilder)
             throws XMLStreamException {
-        XMLStreamReader parser = XMLInputFactory.newFactory().createXMLStreamReader(reader);
+        XMLStreamReader parser = newInputFactory().createXMLStreamReader(reader);
         return doRead(parser, locationBuilder);
+    }
+
+    private static XMLInputFactory newInputFactory() {
+        XMLInputFactory factory = XMLInputFactory.newFactory();
+        factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+        return factory;
     }
 
     @Nonnull

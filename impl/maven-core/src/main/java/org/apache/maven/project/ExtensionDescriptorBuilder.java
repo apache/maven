@@ -88,7 +88,7 @@ public class ExtensionDescriptorBuilder {
 
         XmlNode dom;
         try {
-            XMLStreamReader reader = XMLInputFactory.newFactory().createXMLStreamReader(is);
+            XMLStreamReader reader = newInputFactory().createXMLStreamReader(is);
             dom = XmlService.read(reader);
         } catch (XMLStreamException e) {
             throw new IOException(e.getMessage(), e);
@@ -123,5 +123,12 @@ public class ExtensionDescriptorBuilder {
         }
 
         return strings;
+    }
+
+    private static XMLInputFactory newInputFactory() {
+        XMLInputFactory factory = XMLInputFactory.newFactory();
+        factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+        return factory;
     }
 }
