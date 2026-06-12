@@ -46,7 +46,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.maven.ProjectCycleException;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.Language;
@@ -504,10 +503,14 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                         .findAny()
                         .orElse(null);
                 if (cycle != null) {
-                    throw new RuntimeException(new ProjectCycleException(
+                    final CycleDetectedException cde = (CycleDetectedException) cycle.getException();
+                    throw new ProjectBuildingException(
+                            null,
                             "The projects in the reactor contain a cyclic reference: " + cycle.getMessage(),
-                            (CycleDetectedException) cycle.getException()));
+                            null,
+                            cde);
                 }
+
                 throw new ProjectBuildingException(results);
             }
 
@@ -649,7 +652,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             // only set those on 2nd phase, ignore on 1st pass
             if (project.getFile() != null) {
                 Build build = project.getBuild().getDelegate();
-                List<org.apache.maven.api.model.Source> sources = build.getSources();
                 Path baseDir = project.getBaseDirectory();
                 Function<ProjectScope, String> outputDirectory = (scope) -> {
                     if (scope == ProjectScope.MAIN) {
@@ -660,23 +662,11 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                         return build.getDirectory();
                     }
                 };
-                // Extract modules from sources to detect modular projects
-                Set<String> modules = extractModules(sources);
-                boolean isModularProject = !modules.isEmpty();
-
-                logger.trace(
-                        "Module detection for project {}: found {} module(s) {} - modular project: {}.",
-                        project.getId(),
-                        modules.size(),
-                        modules,
-                        isModularProject);
-
                 // Create source handling context for unified tracking of all lang/scope combinations
-                SourceHandlingContext sourceContext =
-                        new SourceHandlingContext(project, baseDir, modules, isModularProject, result);
+                final SourceHandlingContext sourceContext = new SourceHandlingContext(project, result);
 
                 // Process all sources, tracking enabled ones and detecting duplicates
-                for (var source : sources) {
+                for (org.apache.maven.api.model.Source source : sourceContext.sources) {
                     var sourceRoot = DefaultSourceRoot.fromModel(session, baseDir, outputDirectory, source);
                     // Track enabled sources for duplicate detection and hasSources() queries
                     // Only add source if it's not a duplicate enabled source (first enabled wins)
@@ -705,7 +695,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                        implicit fallback (only if they match the default, e.g., inherited)
                      - This allows incremental adoption (e.g., custom resources + default Java)
                 */
-                if (sources.isEmpty()) {
+                if (sourceContext.sources.isEmpty()) {
                     // Classic fallback: no <sources> configured, use legacy directories
                     project.addScriptSourceRoot(build.getScriptSourceDirectory());
                     project.addCompileSourceRoot(build.getSourceDirectory());
@@ -718,8 +708,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     if (!sourceContext.hasSources(Language.SCRIPT, ProjectScope.MAIN)) {
                         project.addScriptSourceRoot(build.getScriptSourceDirectory());
                     }
-
-                    if (isModularProject) {
+                    if (sourceContext.usesModuleSourceHierarchy()) {
                         // Modular: reject ALL legacy directory configurations
                         failIfLegacyDirectoryPresent(
                                 build.getSourceDirectory(),
@@ -784,6 +773,14 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     // Handle main and test resources using unified source handling
                     sourceContext.handleResourceConfiguration(ProjectScope.MAIN);
                     sourceContext.handleResourceConfiguration(ProjectScope.TEST);
+                }
+
+                // When resources are defined via <sources> (4.1.0 model), sync them to
+                // the model's Build so project.getBuild().getResources() is consistent.
+                // For legacy <resources>, the model already has the correct resources.
+                if (sourceContext.hasSources(Language.RESOURCES, ProjectScope.MAIN)
+                        || sourceContext.hasSources(Language.RESOURCES, ProjectScope.TEST)) {
+                    project.syncBuildResources();
                 }
             }
 
@@ -1235,22 +1232,6 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             }
             return delegate.entrySet();
         }
-    }
-
-    /**
-     * Extracts unique module names from the given list of source elements.
-     * A project is considered modular if it has at least one module name.
-     *
-     * @param sources list of source elements from the build
-     * @return set of non-blank module names
-     */
-    private static Set<String> extractModules(List<org.apache.maven.api.model.Source> sources) {
-        return sources.stream()
-                .map(org.apache.maven.api.model.Source::getModule)
-                .filter(Objects::nonNull)
-                .map(String::trim)
-                .filter(s -> !s.isBlank())
-                .collect(Collectors.toSet());
     }
 
     private Model injectLifecycleBindings(

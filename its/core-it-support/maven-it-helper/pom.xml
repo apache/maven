@@ -32,9 +32,8 @@ under the License.
 
   <dependencies>
     <dependency>
-      <groupId>org.apache.maven</groupId>
+      <groupId>org.apache.maven.executor</groupId>
       <artifactId>maven-executor</artifactId>
-      <version>${maven-version}</version>
     </dependency>
 
     <!-- needed for VersionRange and Version -->

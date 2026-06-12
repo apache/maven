@@ -45,14 +45,15 @@ import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.maven.api.cli.ExecutorException;
-import org.apache.maven.api.cli.ExecutorRequest;
-import org.apache.maven.cling.executor.ExecutorHelper;
-import org.apache.maven.cling.executor.ExecutorTool;
-import org.apache.maven.cling.executor.embedded.EmbeddedMavenExecutor;
-import org.apache.maven.cling.executor.forked.ForkedMavenExecutor;
-import org.apache.maven.cling.executor.internal.HelperImpl;
-import org.apache.maven.cling.executor.internal.ToolboxTool;
+import org.apache.maven.executor.Executor;
+import org.apache.maven.executor.ExecutorException;
+import org.apache.maven.executor.ExecutorRequest;
+import org.apache.maven.executor.ExecutorHelper;
+import org.apache.maven.executor.ExecutorResult;
+import org.apache.maven.executor.ExecutorTool;
+import org.apache.maven.executor.embedded.EmbeddedMavenExecutor;
+import org.apache.maven.executor.forked.ForkedMavenExecutor;
+import org.apache.maven.executor.support.ToolboxExecutorTool;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -63,16 +64,20 @@ import static java.util.Objects.requireNonNull;
  */
 public class Verifier {
     /**
+     * The Maven home/installation directory we are testing/executing with Executor.
+     */
+    private static final Path MAVEN_HOME = Paths.get(System.getProperty("maven.home"));
+    /**
      * Keep executor alive, as long as Verifier is in classloader. Embedded classloader keeps embedded Maven
      * ClassWorld alive, instead to re-create it per invocation, making embedded execution fast(er).
+     *  Points to test subjected Maven home.
      */
-    private static final EmbeddedMavenExecutor EMBEDDED_MAVEN_EXECUTOR = new EmbeddedMavenExecutor();
+    private static final EmbeddedMavenExecutor EMBEDDED_MAVEN_EXECUTOR = new EmbeddedMavenExecutor(MAVEN_HOME);
     /**
      * Keep executor alive, as long as Verifier is in classloader. For forked this means nothing, but is
-     * at least "handled the same" as embedded counterpart. Later on, we could have some similar solution like
-     * mvnd has, and keep pool of "hot" processes maybe?
+     * at least "handled the same" as embedded counterpart. Points to test subjected Maven home.
      */
-    private static final ForkedMavenExecutor FORKED_MAVEN_EXECUTOR = new ForkedMavenExecutor();
+    private static final ForkedMavenExecutor FORKED_MAVEN_EXECUTOR = new ForkedMavenExecutor(MAVEN_HOME);
 
     /**
      * The "preferred" fork mode of Verifier, defaults to "auto". In fact, am unsure is any other fork mode usable,
@@ -164,13 +169,11 @@ public class Verifier {
             this.userHomeDirectory = Paths.get(System.getProperty("maven.test.user.home", "user.home"));
             Files.createDirectories(this.userHomeDirectory);
             this.outerLocalRepository = Paths.get(System.getProperty("maven.test.repo.outer", ".m2/repository"));
-            this.executorHelper = new HelperImpl(
+            this.executorHelper = ExecutorHelper.forExecutors(
                     VERIFIER_FORK_MODE,
-                    Paths.get(System.getProperty("maven.home")),
-                    this.userHomeDirectory,
                     EMBEDDED_MAVEN_EXECUTOR,
                     FORKED_MAVEN_EXECUTOR);
-            this.executorTool = new ToolboxTool(executorHelper, toolboxVersion);
+            this.executorTool = new ToolboxExecutorTool(executorHelper, toolboxVersion);
             this.defaultCliArguments =
                     new ArrayList<>(defaultCliArguments != null ? defaultCliArguments : DEFAULT_CLI_ARGUMENTS);
             this.logFile = this.basedir.resolve(logFileName);
@@ -215,8 +218,8 @@ public class Verifier {
 
             String itTail = args.stream()
                     .filter(s -> s.startsWith("-Dmaven.repo.local.tail="))
-                    .map(s -> s.substring(24).trim())
                     .findFirst()
+                    .map(s -> s.substring(24).trim())
                     .orElse("");
             if (!itTail.isEmpty()) {
                 // remove it
@@ -248,11 +251,9 @@ public class Verifier {
         args.add("-Daether.remoteRepositoryFilter.prefixes=false");
 
         try {
-            ExecutorRequest.Builder builder = executorHelper
-                    .executorRequest()
+            ExecutorRequest.Builder builder = executorRequest()
                     .command(executable)
                     .cwd(basedir)
-                    .userHomeDirectory(userHomeDirectory)
                     .jvmArguments(jvmArguments)
                     .arguments(args)
                     .skipMavenRc(skipMavenRc);
@@ -270,7 +271,32 @@ public class Verifier {
             stdout = new ByteArrayOutputStream();
             stderr = new ByteArrayOutputStream();
             ExecutorRequest request = builder.stdOut(stdout).stdErr(stderr).build();
-            int ret = executorHelper.execute(mode, request);
+
+            // Store the command line to prepend to log file after execution
+            // Skip adding command line info if quiet logging is enabled (respects -q flag)
+            String commandLineHeader = null;
+            if (logFileName != null && !isQuietLogging(args)) {
+                try {
+                    commandLineHeader = formatCommandLine(request, mode);
+                } catch (Exception e) {
+                    // Don't fail the execution if we can't format the command line, just log it
+                    System.err.println("Warning: Could not format command line: " + e.getMessage());
+                }
+            }
+
+            ExecutorResult result = executorHelper.execute(mode, request);
+
+            // After execution, prepend the command line to the log file
+            if (commandLineHeader != null && Files.exists(logFile)) {
+                try {
+                    String existingContent = Files.readString(logFile, StandardCharsets.UTF_8);
+                    String newContent = commandLineHeader + existingContent;
+                    Files.writeString(logFile, newContent, StandardCharsets.UTF_8);
+                } catch (IOException e) {
+                    // Don't fail the execution if we can't write the command line, just log it
+                    System.err.println("Warning: Could not prepend command line to log file: " + e.getMessage());
+                }
+            }
 
             // Save stdout/stderr to files if not empty (captures shell script debug output)
             if (logFileName != null) {
@@ -295,14 +321,14 @@ public class Verifier {
                 }
             }
 
-            if (ret > 0) {
+            if (!result.success()) {
                 String dump;
                 try {
                     dump = executorTool.dump(request.toBuilder()).toString();
                 } catch (Exception e) {
                     dump = "FAILED: " + e.getMessage();
                 }
-                throw new VerificationException("Exit code was non-zero: " + ret + "; command line and log = \n"
+                throw new VerificationException("Exit code was non-zero: " + result.exitCode().orElse(-1) + "; command line and log = \n"
                         + getExecutable() + " "
                         + "\nstdout: " + stdout
                         + "\nstderr: " + stderr
@@ -417,10 +443,8 @@ public class Verifier {
             if (!Files.isRegularFile(settingsFile)) {
                 throw new IllegalArgumentException("settings xml does not exist: " + settingsXml);
             }
-            return executorTool.localRepository(executorHelper
-                    .executorRequest()
+            return executorTool.localRepository(executorRequest()
                     .cwd(tempBasedir)
-                    .userHomeDirectory(userHomeDirectory)
                     .argument("-s")
                     .argument(settingsFile.toString()));
         } else {
@@ -429,7 +453,7 @@ public class Verifier {
                 return outerHead;
             } else {
                 return executorTool.localRepository(
-                        executorHelper.executorRequest().cwd(tempBasedir).userHomeDirectory(userHomeDirectory));
+                        executorRequest().cwd(tempBasedir));
             }
         }
     }
@@ -440,6 +464,103 @@ public class Verifier {
         } catch (IOException e) {
             return "(Error reading log contents: " + e.getMessage() + ")";
         }
+    }
+
+    /**
+     * Formats the command line that would be executed for the given ExecutorRequest and mode.
+     * This provides a human-readable representation of the Maven command for debugging purposes.
+     */
+    private String formatCommandLine(ExecutorRequest request, ExecutorHelper.Mode mode) {
+        StringBuilder cmdLine = new StringBuilder();
+
+        cmdLine.append("# Command line: ");
+        // Add the Maven executable path
+        Path mavenExecutable = MAVEN_HOME
+                .resolve("bin")
+                .resolve(Executor.IS_WINDOWS
+                    ? request.command() + ".cmd"
+                    : request.command());
+        cmdLine.append(mavenExecutable);
+
+        // Add MAVEN_ARGS if they would be used (only for forked mode)
+        if (mode == ExecutorHelper.Mode.FORKED || mode == ExecutorHelper.Mode.AUTO) {
+            String mavenArgsEnv = System.getenv("MAVEN_ARGS");
+            if (mavenArgsEnv != null && !mavenArgsEnv.isEmpty()) {
+                cmdLine.append(" ").append(mavenArgsEnv);
+            }
+        }
+
+        // Add the arguments
+        for (String arg : request.arguments()) {
+            cmdLine.append(" ");
+            // Quote arguments that contain spaces
+            if (arg.contains(" ")) {
+                cmdLine.append("\"").append(arg).append("\"");
+            } else {
+                cmdLine.append(arg);
+            }
+        }
+
+        // Add environment variables that would be set (excluding MAVEN_OPTS which is handled separately)
+        if (request.environmentVariables().isPresent() && !request.environmentVariables().get().isEmpty()) {
+            cmdLine.append("\n# Environment variables:");
+            for (Map.Entry<String, String> entry : request.environmentVariables().get().entrySet()) {
+                if (!"MAVEN_OPTS".equals(entry.getKey())) {
+                    cmdLine.append("\n# ").append(entry.getKey()).append("=").append(entry.getValue());
+                }
+            }
+        }
+
+        // Compute the final MAVEN_OPTS value (combining env var + jvmArgs)
+        // This matches what ForkedMavenExecutor does
+        List<String> jvmArgs = new ArrayList<>();
+        if (!request.userHomeDirectory().equals(ExecutorRequest.getCanonicalPath(Paths.get(System.getProperty("user.home"))))) {
+            jvmArgs.add("-Duser.home=" + request.userHomeDirectory().toString());
+        }
+        if (request.jvmArguments().isPresent()) {
+            jvmArgs.addAll(request.jvmArguments().get());
+        }
+        if (request.jvmSystemProperties().isPresent()) {
+            jvmArgs.addAll(request.jvmSystemProperties().get().entrySet().stream()
+                    .map(e -> "-D" + e.getKey() + "=" + e.getValue())
+                    .toList());
+        }
+
+        // Build the final MAVEN_OPTS value
+        StringBuilder mavenOpts = new StringBuilder();
+        if (request.environmentVariables().isPresent()) {
+            String existingMavenOpts = request.environmentVariables().get().get("MAVEN_OPTS");
+            if (existingMavenOpts != null && !existingMavenOpts.isEmpty()) {
+                mavenOpts.append(existingMavenOpts);
+            }
+        }
+        if (!jvmArgs.isEmpty()) {
+            if (mavenOpts.length() > 0) {
+                mavenOpts.append(" ");
+            }
+            mavenOpts.append(String.join(" ", jvmArgs));
+        }
+
+        if (mavenOpts.length() > 0) {
+            cmdLine.append("\n# MAVEN_OPTS=").append(mavenOpts.toString());
+        }
+
+        if (request.skipMavenRc()) {
+            cmdLine.append("\n# MAVEN_SKIP_RC=true");
+        }
+
+        cmdLine.append("\n# Working directory: ").append(request.cwd().toString());
+        cmdLine.append("\n# Execution mode: ").append(mode.toString());
+
+        cmdLine.append("\n");
+        return cmdLine.toString();
+    }
+
+    /**
+     * Checks if quiet logging is enabled by looking for the -q or --quiet flag in the arguments.
+     */
+    private boolean isQuietLogging(List<String> args) {
+        return args.contains("-q") || args.contains("--quiet");
     }
 
     public String getLogFileName() {
@@ -472,23 +593,31 @@ public class Verifier {
     }
 
     public static void verifyTextNotInLog(List<String> lines, String text) throws VerificationException {
-        if (textOccurencesInLog(lines, text) > 0) {
+        if (textOccurrencesInLog(lines, text) > 0) {
             throw new VerificationException("Text found in log: " + text);
         }
     }
 
     public static void verifyTextInLog(List<String> lines, String text) throws VerificationException {
-        if (textOccurencesInLog(lines, text) <= 0) {
+        if (textOccurrencesInLog(lines, text) <= 0) {
             throw new VerificationException("Text not found in log: " + text);
         }
     }
 
     public long textOccurrencesInLog(String text) throws IOException {
-        return textOccurencesInLog(loadLogLines(), text);
+        return textOccurrencesInLog(loadLogLines(), text);
     }
 
-    public static long textOccurencesInLog(List<String> lines, String text) {
+    public static long textOccurrencesInLog(List<String> lines, String text) {
         return lines.stream().filter(line -> stripAnsi(line).contains(text)).count();
+    }
+
+    /**
+     * @deprecated Use {@link #textOccurrencesInLog(List, String)} instead
+     */
+    @Deprecated
+    public static long textOccurencesInLog(List<String> lines, String text) {
+        return textOccurrencesInLog(lines, text);
     }
 
     /**
@@ -735,7 +864,11 @@ public class Verifier {
         }
         return getLocalRepository()
                 + File.separator
-                + executorTool.artifactPath(executorHelper.executorRequest(), gav, null);
+                + executorTool.artifactPath(executorRequest(), gav, null);
+    }
+
+    private ExecutorRequest.Builder executorRequest() {
+        return ExecutorRequest.mavenBuilder().userHomeDirectory(userHomeDirectory);
     }
 
     private String getSupportArtifactPath(String artifact) {
@@ -793,7 +926,7 @@ public class Verifier {
         }
         return outerLocalRepository
                 .resolve(executorTool.artifactPath(
-                        executorHelper.executorRequest().argument("-Dmaven.repo.local=" + outerLocalRepository),
+                        executorRequest().argument("-Dmaven.repo.local=" + outerLocalRepository),
                         gav,
                         null))
                 .toString();
@@ -867,7 +1000,7 @@ public class Verifier {
         gav += filename;
         return getLocalRepository()
                 + File.separator
-                + executorTool.metadataPath(executorHelper.executorRequest(), gav, repoId);
+                + executorTool.metadataPath(executorRequest(), gav, repoId);
     }
 
     /**
@@ -897,7 +1030,7 @@ public class Verifier {
      * @since 1.2
      */
     public void deleteArtifacts(String gid) throws IOException {
-        String mdPath = executorTool.metadataPath(executorHelper.executorRequest(), gid, null);
+        String mdPath = executorTool.metadataPath(executorRequest(), gid, null);
         Path dir = Paths.get(getLocalRepository()).resolve(mdPath).getParent();
         FileUtils.deleteDirectory(dir.toFile());
     }
@@ -917,7 +1050,7 @@ public class Verifier {
         requireNonNull(version, "version is null");
 
         String mdPath =
-                executorTool.metadataPath(executorHelper.executorRequest(), gid + ":" + aid + ":" + version, null);
+                executorTool.metadataPath(executorRequest(), gid + ":" + aid + ":" + version, null);
         Path dir = Paths.get(getLocalRepository()).resolve(mdPath).getParent();
         FileUtils.deleteDirectory(dir.toFile());
     }

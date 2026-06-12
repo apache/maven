@@ -204,7 +204,11 @@ public class ${class.name}
         }
       #elseif( $field.type == "java.util.Properties" )
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
-        ${field.name}.forEach((key, value) -> map.put(key.toString(), value.toString()));
+        ${field.name}.forEach((key, value) -> {
+            if (value != null) {
+                map.put(key.toString(), value.toString());
+            }
+        });
         if (!Objects.equals(map, getDelegate().get${cap}())) {
             update(getDelegate().with${cap}(map));
         }

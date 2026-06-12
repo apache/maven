@@ -19,24 +19,26 @@
 package org.apache.maven.cling.invoker.mvnup.goals;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
+import eu.maveniverse.domtrip.Document;
 import org.apache.maven.api.cli.mvnup.UpgradeOptions;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
-import org.jdom2.Document;
 
 /**
- * Orchestrates the execution of different upgrade strategies.
- * Determines which strategies to apply based on options and executes them in priority order.
+ * domtrip-based orchestrator for executing different upgrade strategies.
+ *
+ * <p>This class provides the same functionality as StrategyOrchestrator but works
+ * with domtrip-based strategies for superior formatting preservation.
+ *
+ * <p>Determines which strategies to apply based on options and executes them in priority order.
  * The DI container automatically sorts the injected strategies by their @Priority annotations.
  */
-@Named
+@Named("strategy-orchestrator")
 @Singleton
 public class StrategyOrchestrator {
 
@@ -49,7 +51,8 @@ public class StrategyOrchestrator {
     }
 
     /**
-     * Executes all applicable strategies for the given context and POM map.
+     * Executes all applicable upgrade strategies in priority order.
+     * Each strategy is checked for applicability before execution.
      *
      * @param context the upgrade context
      * @param pomMap map of all POM files in the project
@@ -61,119 +64,131 @@ public class StrategyOrchestrator {
         logUpgradeOptions(context);
 
         UpgradeResult overallResult = UpgradeResult.empty();
-        List<String> executedStrategies = new ArrayList<>();
 
-        // Execute each applicable strategy
-        for (UpgradeStrategy strategy : strategies) {
-            context.indent();
-            if (strategy.isApplicable(context)) {
-                context.info("");
-                context.action("Executing strategy: " + strategy.getDescription());
-                context.indent();
-                executedStrategies.add(strategy.getDescription());
+        // Filter and execute applicable strategies
+        List<UpgradeStrategy> applicableStrategies = strategies.stream()
+                .filter(strategy -> strategy.isApplicable(context))
+                .toList();
 
-                try {
-                    UpgradeResult result = strategy.apply(context, pomMap);
-
-                    // Merge results using the smart merge functionality
-                    overallResult = overallResult.merge(result);
-
-                    if (result.success()) {
-                        context.success("Strategy completed successfully");
-                    } else {
-                        context.warning("Strategy completed with " + result.errorCount() + " error(s)");
-                    }
-                } catch (Exception e) {
-                    context.failure("Strategy execution failed: " + e.getMessage());
-                    // Create a failure result for this strategy and merge it
-                    Set<Path> allPoms = pomMap.keySet();
-                    UpgradeResult failureResult = UpgradeResult.failure(allPoms, Set.of());
-                    overallResult = overallResult.merge(failureResult);
-                } finally {
-                    context.unindent();
-                }
-            } else {
-                context.detail("Skipping strategy: " + strategy.getDescription() + " (not applicable)");
-            }
-            context.unindent();
+        if (applicableStrategies.isEmpty()) {
+            context.warning("No applicable upgrade strategies found");
+            return overallResult;
         }
 
-        // Log overall summary
-        logOverallSummary(context, overallResult, executedStrategies);
+        context.info("Executing " + applicableStrategies.size() + " upgrade strategy(ies):");
+        for (UpgradeStrategy strategy : applicableStrategies) {
+            context.info("  - " + strategy.getDescription());
+        }
+        context.println();
+
+        // Execute each applicable strategy
+        for (UpgradeStrategy strategy : applicableStrategies) {
+            context.info("=== " + strategy.getDescription() + " ===");
+            context.indent();
+
+            try {
+                UpgradeResult strategyResult = strategy.apply(context, pomMap);
+                overallResult = overallResult.merge(strategyResult);
+
+                // Log strategy results
+                logStrategyResult(context, strategy, strategyResult);
+
+            } catch (Exception e) {
+                context.failure("Strategy failed: " + e.getMessage());
+                // Mark all POMs as having errors for this strategy
+                UpgradeResult errorResult = new UpgradeResult(pomMap.keySet(), java.util.Set.of(), pomMap.keySet());
+                overallResult = overallResult.merge(errorResult);
+            } finally {
+                context.unindent();
+                context.println();
+            }
+        }
+
+        // Log overall results
+        logOverallResult(context, overallResult);
 
         return overallResult;
     }
 
     /**
-     * Logs the upgrade options that are enabled.
+     * Logs the upgrade options being used.
      */
     private void logUpgradeOptions(UpgradeContext context) {
         UpgradeOptions options = context.options();
 
-        context.action("Upgrade options:");
+        context.info("Options:");
         context.indent();
 
         if (options.all().orElse(false)) {
-            context.detail("--all (enables all upgrade options)");
-        } else {
-            if (options.modelVersion().isPresent()) {
-                context.detail("--model-version " + options.modelVersion().get());
-            }
-            if (options.model().orElse(false)) {
-                context.detail("--model");
-            }
-            if (options.plugins().orElse(false)) {
-                context.detail("--plugins");
-            }
-            if (options.infer().orElse(false)) {
-                context.detail("--infer");
-            }
+            context.info("all: true (applying all available upgrades)");
+        }
 
-            // Show defaults if no options specified
-            if (options.modelVersion().isEmpty()
-                    && options.model().isEmpty()
-                    && options.plugins().isEmpty()
-                    && options.infer().isEmpty()) {
-                context.detail("(using defaults: --model --plugins --infer)");
-            }
+        if (options.modelVersion().isPresent()) {
+            context.info("modelVersion: " + options.modelVersion().get());
+        }
+
+        if (options.plugins().orElse(false)) {
+            context.info("plugins: true");
+        }
+
+        if (options.plugins().orElse(false)) {
+            context.info("plugins: true");
+        }
+
+        if (options.directory().isPresent()) {
+            context.info("directory: " + options.directory().get());
         }
 
         context.unindent();
+        context.println();
     }
 
     /**
-     * Logs the overall summary of all strategy executions.
+     * Logs the result of a single strategy execution.
      */
-    private void logOverallSummary(
-            UpgradeContext context, UpgradeResult overallResult, List<String> executedStrategies) {
-
-        context.println();
-        context.info("Overall Upgrade Summary:");
-        context.indent();
-        context.info(overallResult.processedCount() + " POM(s) processed");
-        context.info(overallResult.modifiedCount() + " POM(s) modified");
-        context.info(overallResult.unmodifiedCount() + " POM(s) needed no changes");
-        context.info(overallResult.errorCount() + " error(s) encountered");
-        context.unindent();
-
-        if (!executedStrategies.isEmpty()) {
-            context.println();
-            context.info("Executed Strategies:");
+    private void logStrategyResult(UpgradeContext context, UpgradeStrategy strategy, UpgradeResult result) {
+        if (!result.errorPoms().isEmpty()) {
+            context.failure("Strategy completed with errors");
             context.indent();
-            for (String strategy : executedStrategies) {
-                context.detail(strategy);
-            }
+            context.info("Processed: " + result.processedPoms().size() + " POMs");
+            context.info("Modified: " + result.modifiedPoms().size() + " POMs");
+            context.failure("Errors: " + result.errorPoms().size() + " POMs");
+            context.unindent();
+        } else if (!result.modifiedPoms().isEmpty()) {
+            context.success("Strategy completed successfully");
+            context.indent();
+            context.info("Processed: " + result.processedPoms().size() + " POMs");
+            context.success("Modified: " + result.modifiedPoms().size() + " POMs");
+            context.unindent();
+        } else {
+            context.info("Strategy completed (no changes needed)");
+            context.indent();
+            context.info("Processed: " + result.processedPoms().size() + " POMs");
             context.unindent();
         }
+    }
 
-        if (overallResult.modifiedCount() > 0 && overallResult.errorCount() == 0) {
-            context.success("All upgrades completed successfully!");
-        } else if (overallResult.modifiedCount() > 0 && overallResult.errorCount() > 0) {
-            context.warning("Upgrades completed with some errors");
-        } else if (overallResult.modifiedCount() == 0 && overallResult.errorCount() == 0) {
-            context.success("No upgrades needed - all POMs are up to date");
+    /**
+     * Logs the overall result of all strategy executions.
+     */
+    private void logOverallResult(UpgradeContext context, UpgradeResult overallResult) {
+        context.info("=== Overall Results ===");
+        context.indent();
+
+        context.info("Total POMs processed: " + overallResult.processedPoms().size());
+
+        if (!overallResult.modifiedPoms().isEmpty()) {
+            context.success(
+                    "Total POMs modified: " + overallResult.modifiedPoms().size());
         } else {
-            context.failure("Upgrade process failed");
+            context.info("No POMs required modifications");
         }
+
+        if (!overallResult.errorPoms().isEmpty()) {
+            context.failure(
+                    "Total POMs with errors: " + overallResult.errorPoms().size());
+        }
+
+        context.unindent();
     }
 }

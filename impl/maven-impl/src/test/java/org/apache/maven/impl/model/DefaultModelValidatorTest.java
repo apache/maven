@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.maven.api.Version;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.model.ModelValidator;
 import org.apache.maven.impl.InternalSession;
@@ -130,6 +131,11 @@ class DefaultModelValidatorTest {
         when(repoSession.getScopeManager()).thenReturn(scopeManager);
         session = mock(InternalSession.class);
         when(session.getSession()).thenReturn(repoSession);
+
+        // Mock Maven version for error message testing
+        Version mavenVersion = mock(Version.class);
+        when(mavenVersion.toString()).thenReturn("4.0.0-test");
+        when(session.getMavenVersion()).thenReturn(mavenVersion);
     }
 
     @AfterEach
@@ -168,6 +174,21 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 1, 0);
 
         assertTrue(result.getErrors().get(0).contains("'modelVersion' must be one of"));
+    }
+
+    @Test
+    void testModelVersionMessageIncludesMavenVersion() throws Exception {
+        SimpleProblemCollector result = validateFile("bad-modelVersion.xml");
+
+        assertViolations(result, 1, 0, 0);
+
+        String errorMessage = result.getFatals().get(0);
+        assertTrue(errorMessage.contains("modelVersion"));
+        // Should include Maven version (either "4.0.0-test" from mock or "unknown" as fallback)
+        assertTrue(
+                errorMessage.contains("4.0.0-test") || errorMessage.contains("unknown"),
+                "Error message should include Maven version: " + errorMessage);
+        assertTrue(errorMessage.contains("newer than the versions supported by this Maven version"));
     }
 
     @Test
@@ -391,6 +412,10 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 0, 2);
 
         assertTrue(result.getWarnings().get(0).contains("groupId='test', artifactId='f'"));
+        // Check that the import scope error message is more helpful
+        assertTrue(result.getWarnings()
+                .get(0)
+                .contains("has scope 'import'. The 'import' scope is only valid in <dependencyManagement> sections"));
 
         assertTrue(result.getWarnings().get(1).contains("groupId='test', artifactId='g'"));
     }
@@ -882,32 +907,45 @@ class DefaultModelValidatorTest {
         SimpleProblemCollector result = validateRaw("raw-model/repository-with-basedir-expression.xml");
         // This test runs on raw model without interpolation, so all expressions appear uninterpolated
         // In the real flow, supported expressions would be interpolated before validation
-        assertViolations(result, 0, 3, 0);
+        assertViolations(result, 0, 0, 3);
     }
 
     @Test
     void repositoryWithUnsupportedExpression() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/repository-with-unsupported-expression.xml");
-        // Unsupported expressions should cause validation errors
-        assertViolations(result, 0, 1, 0);
+        // Unsupported expressions should cause validation warnings (repos will be skipped at build time)
+        assertViolations(result, 0, 0, 1);
     }
 
     @Test
     void repositoryWithUninterpolatedId() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/repository-with-uninterpolated-id.xml");
-        // Uninterpolated expressions in repository IDs should cause validation errors
-        assertViolations(result, 0, 3, 0);
+        // Uninterpolated expressions in repository IDs should cause validation warnings
+        // (repos will be skipped at build time)
+        // distributionManagement repositories skip expression check since parent properties
+        // may not be available at file model validation stage
+        assertViolations(result, 0, 0, 2);
 
-        // Check that all three repository ID validation errors are present
-        assertTrue(result.getErrors().stream()
-                .anyMatch(error -> error.contains("repositories.repository.[${repository.id}].id")
-                        && error.contains("contains an uninterpolated expression")));
-        assertTrue(result.getErrors().stream()
-                .anyMatch(error -> error.contains("pluginRepositories.pluginRepository.[${plugin.repository.id}].id")
-                        && error.contains("contains an uninterpolated expression")));
-        assertTrue(result.getErrors().stream()
-                .anyMatch(error -> error.contains("distributionManagement.repository.[${staging.repository.id}].id")
-                        && error.contains("contains an uninterpolated expression")));
+        // Check that repository ID validation warnings are present for repositories and pluginRepositories
+        assertTrue(result.getWarnings().stream()
+                .anyMatch(warning -> warning.contains("repositories.repository.[${repository.id}].id")
+                        && warning.contains("contains an uninterpolated expression")));
+        assertTrue(result.getWarnings().stream()
+                .anyMatch(
+                        warning -> warning.contains("pluginRepositories.pluginRepository.[${plugin.repository.id}].id")
+                                && warning.contains("contains an uninterpolated expression")));
+    }
+
+    @Test
+    void distributionManagementWithChainedPropertyInId() throws Exception {
+        SimpleProblemCollector result = validateRaw("raw-model/dm-with-chained-property-in-id.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void profileWithPropertyInRepositoryUrl() throws Exception {
+        SimpleProblemCollector result = validateRaw("raw-model/profile-with-property-in-repository-url.xml");
+        assertViolations(result, 0, 0, 0);
     }
 
     @Test

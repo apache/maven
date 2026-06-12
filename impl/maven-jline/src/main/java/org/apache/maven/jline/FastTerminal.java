@@ -34,6 +34,7 @@ import org.jline.terminal.Attributes;
 import org.jline.terminal.Cursor;
 import org.jline.terminal.MouseEvent;
 import org.jline.terminal.Size;
+import org.jline.terminal.Sized;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.spi.SystemStream;
 import org.jline.terminal.spi.TerminalExt;
@@ -168,6 +169,11 @@ public class FastTerminal implements TerminalExt {
     @Override
     public void setSize(Size size) {
         getTerminal().setSize(size);
+    }
+
+    @Override
+    public void setSize(Sized sized) {
+        getTerminal().setSize(sized);
     }
 
     @Override

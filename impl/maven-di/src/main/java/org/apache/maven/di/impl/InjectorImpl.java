@@ -99,8 +99,11 @@ public class InjectorImpl implements Injector {
                     try (InputStream is = url.openStream();
                             BufferedReader reader =
                                     new BufferedReader(new InputStreamReader(Objects.requireNonNull(is)))) {
-                        for (String line :
-                                reader.lines().filter(l -> !l.startsWith("#")).toList()) {
+                        for (String line : reader.lines()
+                                .map(String::trim)
+                                .filter(l -> !l.isEmpty())
+                                .filter(l -> !l.startsWith("#"))
+                                .toList()) {
                             Class<?> clazz = classLoader.loadClass(line);
                             bindImplicit(clazz);
                         }

@@ -27,6 +27,7 @@ import org.apache.maven.api.Language;
 import org.apache.maven.api.ProjectScope;
 import org.apache.maven.api.SourceRoot;
 import org.apache.maven.api.model.Resource;
+import org.apache.maven.api.model.Source;
 import org.apache.maven.api.services.BuilderProblem.Severity;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelProblem.Version;
@@ -37,9 +38,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Handles source configuration for Maven projects with unified tracking for all language/scope combinations.
- * <p>
- * This class replaces the previous approach of hardcoded boolean flags (hasMain, hasTest, etc.)
- * with a flexible set-based tracking mechanism that works for any language and scope combination.
+ * This class uses a flexible set-based tracking mechanism that works for any language and scope combination.
  * <p>
  * Key features:
  * <ul>
@@ -51,7 +50,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0.0
  */
-class SourceHandlingContext {
+final class SourceHandlingContext {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SourceHandlingContext.class);
 
@@ -60,26 +59,38 @@ class SourceHandlingContext {
      */
     record SourceKey(Language language, ProjectScope scope, String module, Path directory) {}
 
+    /**
+     * The {@code <source>} elements declared in the {@code <build>} elements.
+     */
+    final List<Source> sources;
+
     private final MavenProject project;
-    private final Path baseDir;
     private final Set<String> modules;
-    private final boolean modularProject;
     private final ModelBuilderResult result;
     private final Set<SourceKey> declaredSources;
 
-    SourceHandlingContext(
-            MavenProject project,
-            Path baseDir,
-            Set<String> modules,
-            boolean modularProject,
-            ModelBuilderResult result) {
+    SourceHandlingContext(MavenProject project, ModelBuilderResult result) {
         this.project = project;
-        this.baseDir = baseDir;
-        this.modules = modules;
-        this.modularProject = modularProject;
+        this.sources = project.getBuild().getDelegate().getSources();
+        this.modules = SourceQueries.getModuleNames(sources);
         this.result = result;
         // Each module typically has main, test, main resources, test resources = 4 sources
         this.declaredSources = new HashSet<>(4 * modules.size());
+        if (usesModuleSourceHierarchy()) {
+            LOGGER.trace("Found {} module(s) in the \"{}\" project: {}.", project.getId(), modules.size(), modules);
+        } else {
+            LOGGER.trace("Project \"{}\" is non-modular.", project.getId());
+        }
+    }
+
+    /**
+     * Whether the project uses module source hierarchy.
+     * Note that this is not synonymous of whether the project is modular,
+     * because it is possible to create a single Java module in a classic Maven project
+     * (i.e., using package hierarchy).
+     */
+    boolean usesModuleSourceHierarchy() {
+        return !modules.isEmpty();
     }
 
     /**
@@ -112,7 +123,7 @@ class SourceHandlingContext {
         SourceKey key = new SourceKey(
                 sourceRoot.language(), sourceRoot.scope(), sourceRoot.module().orElse(null), normalizedDir);
 
-        if (declaredSources.contains(key)) {
+        if (!declaredSources.add(key)) {
             String message = String.format(
                     "Duplicate enabled source detected: lang=%s, scope=%s, module=%s, directory=%s. "
                             + "First enabled source wins, this duplicate is ignored.",
@@ -130,7 +141,6 @@ class SourceHandlingContext {
             return false; // Don't add duplicate enabled source
         }
 
-        declaredSources.add(key);
         LOGGER.debug(
                 "Adding and tracking enabled source: lang={}, scope={}, module={}, dir={}",
                 key.language(),
@@ -152,6 +162,13 @@ class SourceHandlingContext {
     }
 
     /**
+     * {@return the source directory as defined by Maven conventions}
+     */
+    private Path getStandardSourceDirectory() {
+        return project.getBaseDirectory().resolve("src");
+    }
+
+    /**
      * Fails the build if modular and classic (non-modular) sources are mixed within {@code <sources>}.
      * <p>
      * A project must be either fully modular (all sources have a module) or fully classic
@@ -164,30 +181,32 @@ class SourceHandlingContext {
     void failIfMixedModularAndClassicSources() {
         for (ProjectScope scope : List.of(ProjectScope.MAIN, ProjectScope.TEST)) {
             for (Language language : List.of(Language.JAVA_FAMILY, Language.RESOURCES)) {
-                boolean hasModular = declaredSources.stream()
-                        .anyMatch(key ->
-                                language.equals(key.language()) && scope.equals(key.scope()) && key.module() != null);
-                boolean hasClassic = declaredSources.stream()
-                        .anyMatch(key ->
-                                language.equals(key.language()) && scope.equals(key.scope()) && key.module() == null);
-
-                if (hasModular && hasClassic) {
-                    String message = String.format(
-                            "Mixed modular and classic sources detected for lang=%s, scope=%s. "
-                                    + "A project must be either fully modular (all sources have a module) "
-                                    + "or fully classic (no sources have a module). "
-                                    + "The compiler plugin cannot handle mixed configurations.",
-                            language.id(), scope.id());
-                    LOGGER.error(message);
-                    result.getProblemCollector()
-                            .reportProblem(new DefaultModelProblem(
-                                    message,
-                                    Severity.ERROR,
-                                    Version.V41,
-                                    project.getModel().getDelegate(),
-                                    -1,
-                                    -1,
-                                    null));
+                boolean hasModular = false;
+                boolean hasClassic = false;
+                for (SourceKey key : declaredSources) {
+                    if (language.equals(key.language()) && scope.equals(key.scope())) {
+                        String module = key.module();
+                        hasModular |= (module != null);
+                        hasClassic |= (module == null);
+                        if (hasModular && hasClassic) {
+                            String message = String.format(
+                                    "Mixed modular and classic sources detected for lang=%s, scope=%s. "
+                                            + "A project must be either fully modular (all sources have a module) "
+                                            + "or fully classic (no sources have a module).",
+                                    language.id(), scope.id());
+                            LOGGER.error(message);
+                            result.getProblemCollector()
+                                    .reportProblem(new DefaultModelProblem(
+                                            message,
+                                            Severity.ERROR,
+                                            Version.V41,
+                                            project.getModel().getDelegate(),
+                                            -1,
+                                            -1,
+                                            null));
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -219,7 +238,7 @@ class SourceHandlingContext {
                 ? "<source><lang>resources</lang></source>"
                 : "<source><lang>resources</lang><scope>test</scope></source>";
 
-        if (modularProject) {
+        if (usesModuleSourceHierarchy()) {
             if (hasResourcesInSources) {
                 // Modular project with resources configured via <sources> - already added above
                 if (hasExplicitLegacyResources(resources, scopeId)) {
@@ -298,6 +317,7 @@ class SourceHandlingContext {
                 // Use legacy resources element
                 LOGGER.debug(
                         "Using explicit or default {} resources ({} resources configured).", scopeId, resources.size());
+                Path baseDir = project.getBaseDirectory();
                 for (Resource resource : resources) {
                     project.addSourceRoot(new DefaultSourceRoot(baseDir, scope, resource));
                 }
@@ -315,7 +335,7 @@ class SourceHandlingContext {
      */
     private DefaultSourceRoot createModularResourceRoot(String module, ProjectScope scope) {
         Path resourceDir =
-                baseDir.resolve("src").resolve(module).resolve(scope.id()).resolve("resources");
+                getStandardSourceDirectory().resolve(module).resolve(scope.id()).resolve("resources");
 
         return new DefaultSourceRoot(
                 scope,
@@ -345,12 +365,10 @@ class SourceHandlingContext {
         }
 
         // Super POM default paths
-        String defaultPath =
-                baseDir.resolve("src").resolve(scope).resolve("resources").toString();
-        String defaultFilteredPath = baseDir.resolve("src")
-                .resolve(scope)
-                .resolve("resources-filtered")
-                .toString();
+        Path srcDir = getStandardSourceDirectory();
+        String defaultPath = srcDir.resolve(scope).resolve("resources").toString();
+        String defaultFilteredPath =
+                srcDir.resolve(scope).resolve("resources-filtered").toString();
 
         // Check if any resource differs from Super POM defaults
         for (Resource resource : resources) {

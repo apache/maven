@@ -55,8 +55,7 @@ public class SimpleDITest {
     @Test
     void testSetupContainerWithNullContext() {
         MavenDIExtension extension = new MavenDIExtension();
-        MavenDIExtension.context = null;
-        assertThrows(IllegalStateException.class, extension::setupContainer);
+        assertThrows(IllegalStateException.class, () -> extension.setupContainer(null));
     }
 
     @Test
@@ -65,10 +64,9 @@ public class SimpleDITest {
         final ExtensionContext context = mock(ExtensionContext.class);
         when(context.getRequiredTestClass()).thenReturn(null); // Mock null test class
         when(context.getRequiredTestInstance()).thenReturn(new TestClass()); // Valid instance
-        MavenDIExtension.context = context;
         assertThrows(
                 IllegalStateException.class,
-                extension::setupContainer,
+                () -> extension.setupContainer(context),
                 "Should throw IllegalStateException for null test class");
     }
 

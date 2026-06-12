@@ -19,7 +19,6 @@
 package org.apache.maven.api.feature;
 
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.annotations.Nullable;
@@ -55,8 +54,11 @@ public final class Features {
         return doGet(userProperties, Constants.MAVEN_CONSUMER_POM_FLATTEN, false);
     }
 
-    private static boolean doGet(Properties userProperties, String key, boolean def) {
-        return doGet(userProperties != null ? userProperties.get(key) : null, def);
+    /**
+     * Check if unused managed dependency removal is enabled during consumer POM flattening.
+     */
+    public static boolean consumerPomRemoveUnusedManagedDependencies(@Nullable Map<String, ?> userProperties) {
+        return doGet(userProperties, Constants.MAVEN_CONSUMER_POM_REMOVE_UNUSED_MANAGED_DEPENDENCIES, true);
     }
 
     private static boolean doGet(Map<String, ?> userProperties, String key, boolean def) {
