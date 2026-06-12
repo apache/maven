@@ -108,7 +108,10 @@ public class MavenXpp3Writer {
     } // -- void write( OutputStream, Model )
 
     private void configureDelegate(Model model) {
-        String version = new MavenModelVersion().getModelVersion(model.getDelegate());
+        String version = model.getModelVersion();
+        if (version == null || version.isBlank()) {
+            version = new MavenModelVersion().getModelVersion(model.getDelegate());
+        }
         delegate.setNamespace(String.format(NAMESPACE_FORMAT, version));
         delegate.setSchemaLocation(String.format(SCHEMA_LOCATION_FORMAT, version));
     }
