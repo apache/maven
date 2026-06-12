@@ -98,7 +98,6 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
         }
         try {
             String modelId = request.getModelId();
-            String location = request.getLocation();
 
             if (modelId == null) {
                 if (inputStream != null) {
@@ -116,16 +115,13 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
                 } else if (path != null) {
                     try (InputStream is = Files.newInputStream(path)) {
                         modelId = extractModelId(is);
-                        if (location == null) {
-                            location = path.toUri().toString();
-                        }
                     }
                 }
             }
 
             InputSource source = null;
-            if (modelId != null || location != null) {
-                source = new InputSource(modelId, location);
+            if (modelId != null || request.getLocation() != null) {
+                source = new InputSource(modelId, path != null ? path.toUri().toString() : null);
             }
             MavenStaxReader xml = request.getTransformer() != null
                     ? new MavenStaxReader(request.getTransformer()::transform)
