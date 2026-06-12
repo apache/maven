@@ -149,20 +149,9 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
         }
     }
 
-    static class InputFactoryHolder {
-        static final XMLInputFactory XML_INPUT_FACTORY;
-
-        static {
-            XMLInputFactory factory = XMLInputFactory.newFactory();
-            factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, true);
-            factory.setProperty(XMLInputFactory.IS_COALESCING, true);
-            XML_INPUT_FACTORY = factory;
-        }
-    }
-
-    private String extractModelId(InputStream inputStream) {
+    private static String extractModelId(InputStream inputStream) {
         try {
-            XMLStreamReader reader = InputFactoryHolder.XML_INPUT_FACTORY.createXMLStreamReader(inputStream);
+            XMLStreamReader reader = XMLInputFactory.newFactory().createXMLStreamReader(inputStream);
             try {
                 return extractModelId(reader);
             } finally {
@@ -173,9 +162,9 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
         }
     }
 
-    private String extractModelId(Reader reader) {
+    private static String extractModelId(Reader reader) {
         try {
-            XMLStreamReader xmlReader = InputFactoryHolder.XML_INPUT_FACTORY.createXMLStreamReader(reader);
+            XMLStreamReader xmlReader = XMLInputFactory.newFactory().createXMLStreamReader(reader);
             try {
                 return extractModelId(xmlReader);
             } finally {
@@ -258,9 +247,7 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
                 }
             }
 
-            if (artifactId != null
-                    && (groupId != null || parentGroupId != null)
-                    && (version != null || parentVersion != null)) {
+            if (groupId != null && artifactId != null && version != null) {
                 break;
             }
         }
