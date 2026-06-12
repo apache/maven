@@ -151,11 +151,11 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
 
     private static String extractModelId(InputStream inputStream) {
         try {
-            XMLStreamReader reader = XMLInputFactory.newFactory().createXMLStreamReader(inputStream);
+            XMLStreamReader xmlReader = XMLInputFactory.newFactory().createXMLStreamReader(inputStream);
             try {
-                return extractModelId(reader);
+                return extractModelId(xmlReader);
             } finally {
-                reader.close();
+                xmlReader.close();
             }
         } catch (Exception e) {
             return null;
