@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.1.0</modelVersion>
+
+    <groupId>test</groupId>
+    <artifactId>test</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <profiles>
+        <profile>
+            <id>multiline-condition</id>
+            <activation>
+                <condition><![CDATA[
+                    ${gh11882.left} == 'true'
+                    && ${gh11882.right} == 'true'
+                ]]></condition>
+            </activation>
+            <properties>
+                <profile.condition>activated</profile.condition>
+            </properties>
+        </profile>
+    </profiles>
+</project>

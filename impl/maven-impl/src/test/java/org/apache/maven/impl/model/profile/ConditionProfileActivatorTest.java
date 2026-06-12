@@ -285,6 +285,25 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
+    void testMultilineLogicalAndCondition() {
+        Profile profile = newProfile("""
+                ${os.name} == 'windows'
+                && ${os.arch} != 'amd64'
+                && inrange(${os.version}, '[99,)')""");
+
+        assertActivation(false, profile, newContext(null, newOsProperties("linux", "6.5.0-1014-aws", "amd64")));
+        assertActivation(false, profile, newContext(null, newOsProperties("windows", "1", "aarch64")));
+        assertActivation(false, profile, newContext(null, newOsProperties("windows", "99", "amd64")));
+        assertActivation(true, profile, newContext(null, newOsProperties("windows", "99", "aarch64")));
+    }
+
+    @Test
+    void testLogicalOperatorsWithWhitespace() {
+        assertActivation(true, newProfile("false\r\n||\ttrue"), newContext(null, null));
+        assertActivation(false, newProfile("true\r\n&&\tfalse"), newContext(null, null));
+    }
+
+    @Test
     public void testOsCapitalName() {
         Profile profile = newProfile("lower(${os.name}) == 'mac os x'");
 
