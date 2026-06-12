@@ -64,8 +64,6 @@ abstract class TransformerSupport implements PomArtifactTransformer {
         throw new IllegalStateException("This transformer does not use this call.");
     }
 
-    protected static final String NAMESPACE_FORMAT = "http://maven.apache.org/POM/%s";
-
     protected static final String SCHEMA_LOCATION_FORMAT = "https://maven.apache.org/xsd/maven-%s.xsd";
 
     protected Model read(Path src) throws IOException, XMLStreamException {
@@ -79,7 +77,7 @@ abstract class TransformerSupport implements PomArtifactTransformer {
         Files.createDirectories(dest.getParent());
         try (Writer w = Files.newBufferedWriter(dest)) {
             MavenStaxWriter writer = new MavenStaxWriter();
-            writer.setNamespace(String.format(NAMESPACE_FORMAT, version));
+            writer.setNamespace("http://maven.apache.org/POM/4.0.0");
             writer.setSchemaLocation(String.format(SCHEMA_LOCATION_FORMAT, version));
             writer.setAddLocationInformation(false);
             writer.write(w, model);
