@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.Optional;
 import java.util.ServiceLoader;
 
 import org.apache.maven.api.annotations.Nonnull;
@@ -246,7 +247,7 @@ public abstract class XmlService {
                     return contextClassLoader != null
                             ? ServiceLoader.load(XmlService.class, contextClassLoader)
                                     .findFirst()
-                            : java.util.Optional.empty();
+                            : Optional.empty();
                 })
                 .orElseThrow(() -> new IllegalStateException("No XmlService implementation found"));
 
