@@ -31,10 +31,6 @@ import org.junit.jupiter.api.Test;
  */
 class MavenITgh11715EffectivePomNamespaceTest extends AbstractMavenIntegrationTestCase {
 
-    MavenITgh11715EffectivePomNamespaceTest() {
-        super("(4.0.0-rc-5,)");
-    }
-
     @Test
     void testIt() throws Exception {
         Path basedir = extractResources("/gh-11715").getAbsoluteFile().toPath();
