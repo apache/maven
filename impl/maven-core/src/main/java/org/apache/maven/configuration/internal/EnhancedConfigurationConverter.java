@@ -18,6 +18,9 @@
  */
 package org.apache.maven.configuration.internal;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -87,7 +90,7 @@ class EnhancedConfigurationConverter extends ObjectWithFieldsConverter {
             return value;
         }
         try {
-            final Class<?> implType = getClassForImplementationHint(type, configuration, loader);
+            final Class<?> implType = resolveClassForImplementationHint(type, configuration, loader);
             if (null == value && implType.isInterface() && configuration.getChildCount() == 0) {
                 return null; // nothing to process
             }
@@ -108,6 +111,56 @@ class EnhancedConfigurationConverter extends ObjectWithFieldsConverter {
         }
     }
 
+    private Class<?> resolveClassForImplementationHint(
+            final Class<?> type, final PlexusConfiguration configuration, final ClassLoader loader)
+            throws ComponentConfigurationException {
+        try {
+            return super.getClassForImplementationHint(type, configuration, loader);
+        } catch (final ComponentConfigurationException e) {
+            if (type == null || !type.isSealed()) {
+                throw e;
+            }
+            final String implementation = configuration.getAttribute("implementation");
+            if (implementation == null || implementation.isEmpty()) {
+                throw e;
+            }
+            return getPermittedSubclass(type, implementation, configuration, e);
+        }
+    }
+
+    private Class<?> getPermittedSubclass(
+            final Class<?> type,
+            final String implementation,
+            final PlexusConfiguration configuration,
+            final ComponentConfigurationException cause)
+            throws ComponentConfigurationException {
+        final List<Class<?>> matches = new ArrayList<>();
+        for (Class<?> permittedSubclass : type.getPermittedSubclasses()) {
+            if (implementation.equals(permittedSubclass.getName())
+                    || implementation.equals(permittedSubclass.getCanonicalName())
+                    || implementation.equals(permittedSubclass.getSimpleName())) {
+                matches.add(permittedSubclass);
+            }
+        }
+
+        if (matches.size() == 1) {
+            return matches.get(0);
+        }
+        if (matches.isEmpty()) {
+            throw new ComponentConfigurationException(
+                    configuration,
+                    "Cannot find permitted subclass '" + implementation + "' for sealed type " + type.getName(),
+                    cause);
+        }
+        matches.sort(Comparator.comparing(Class::getName));
+
+        throw new ComponentConfigurationException(
+                configuration,
+                "Implementation hint '" + implementation + "' is ambiguous for sealed type " + type.getName() + ": "
+                        + matches.stream().map(Class::getName).toList(),
+                cause);
+    }
+
     public void processConfiguration(
             final ConverterLookup lookup,
             final Object bean,
@@ -122,7 +175,7 @@ class EnhancedConfigurationConverter extends ObjectWithFieldsConverter {
             final String propertyName = fromXML(element.getName());
             Class<?> valueType;
             try {
-                valueType = getClassForImplementationHint(null, element, loader);
+                valueType = resolveClassForImplementationHint(null, element, loader);
             } catch (final ComponentConfigurationException e) {
                 valueType = null;
             }
