@@ -1,0 +1,14 @@
+<project>
+  <modelVersion>4.2.0</modelVersion>
+  <artifactId>aid</artifactId>
+  <groupId>gid</groupId>
+  <version>0.1</version>
+
+  <dependencies>
+    <dependency id="org.postgresql:postgresql:42.7.3">
+      <exclusions>
+        <exclusion id="bad-format-no-colon"/>
+      </exclusions>
+    </dependency>
+  </dependencies>
+</project>

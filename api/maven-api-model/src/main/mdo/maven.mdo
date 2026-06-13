@@ -1205,6 +1205,20 @@
         ]]>
       </description>
       <fields>
+        <field xml.attribute="true">
+          <name>id</name>
+          <version>4.2.0+</version>
+          <description>
+            <![CDATA[
+            Combined coordinates as {@code groupId:artifactId:version}.
+            When specified, it is split into the {@code groupId}, {@code artifactId},
+            and {@code version} fields during model normalization.
+            The individual child elements should not be specified when using this attribute.
+            @since Maven 4.2
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
         <field>
           <name>groupId</name>
           <version>3.0.0+</version>
@@ -1441,6 +1455,20 @@
         ]]>
       </description>
       <fields>
+        <field xml.attribute="true">
+          <name>id</name>
+          <version>4.2.0+</version>
+          <description>
+            <![CDATA[
+            Combined coordinates as {@code groupId:artifactId}.
+            When specified, it is split into the {@code groupId} and {@code artifactId}
+            fields during model normalization.
+            The individual child elements should not be specified when using this attribute.
+            @since Maven 4.2
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
         <field>
           <name>groupId</name>
           <version>4.0.0+</version>
@@ -1864,6 +1892,20 @@
         <version>4.1.0+</version>
         <superClass>Parent</superClass>
         <fields>
+            <field xml.attribute="true" xml.tagName="id">
+                <name>gav</name>
+                <version>4.2.0+</version>
+                <description>
+                    <![CDATA[
+                    Combined coordinates as {@code groupId:artifactId:version}.
+                    When specified, it is split into the {@code groupId}, {@code artifactId},
+                    and {@code version} fields during model normalization.
+                    The individual child elements should not be specified when using this attribute.
+                    @since Maven 4.2
+                    ]]>
+                </description>
+                <type>String</type>
+            </field>
             <field>
                 <name>classifier</name>
                 <version>4.1.0+</version>

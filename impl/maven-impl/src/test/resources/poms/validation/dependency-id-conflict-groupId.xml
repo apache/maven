@@ -1,0 +1,12 @@
+<project>
+  <modelVersion>4.2.0</modelVersion>
+  <artifactId>aid</artifactId>
+  <groupId>gid</groupId>
+  <version>0.1</version>
+
+  <dependencies>
+    <dependency id="org.slf4j:slf4j-api:2.0.17">
+      <groupId>org.slf4j</groupId>
+    </dependency>
+  </dependencies>
+</project>
