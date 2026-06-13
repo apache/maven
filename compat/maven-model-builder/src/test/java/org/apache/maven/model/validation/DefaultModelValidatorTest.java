@@ -22,6 +22,9 @@ import java.io.InputStream;
 import java.io.Serial;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.UnaryOperator;
 
 import org.apache.maven.model.Model;
@@ -901,5 +904,65 @@ class DefaultModelValidatorTest {
                         + "Failed to interpolate profile activation property ${project.version}: "
                         + "${project.version} expressions are not supported during profile activation.",
                 result.getWarnings().get(1));
+    }
+
+    /**
+     * Validates thread-safety of DefaultModelValidator during concurrent model validation.
+     *
+     * <p>This test addresses GitHub issue #11618 where concurrent access to a shared
+     * {@code HashSet} in {@code DefaultModelValidator} could cause {@code ClassCastException}.
+     * The underlying issue occurs when multiple threads access a non-thread-safe {@code HashSet}
+     * (backed by {@code HashMap}) during internal restructuring operations.
+     *
+     * <p>The fix replaces {@code HashSet} with {@code ConcurrentHashMap.newKeySet()} to provide
+     * thread-safe concurrent access without external synchronization.
+     *
+     * @see <a href="https://github.com/apache/maven/issues/11618">GitHub #11618</a>
+     */
+    @Test
+    void testConcurrentValidation() throws Exception {
+        int threadCount = 10;
+        int iterationsPerThread = 100;
+        CountDownLatch startLatch = new CountDownLatch(1);
+        CountDownLatch doneLatch = new CountDownLatch(threadCount);
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+
+        // Create multiple threads that will validate models concurrently
+        for (int t = 0; t < threadCount; t++) {
+            final int threadId = t;
+            Thread thread = new Thread(() -> {
+                try {
+                    startLatch.await(); // Wait for all threads to be ready
+                    for (int i = 0; i < iterationsPerThread; i++) {
+                        Model model = new Model();
+                        model.setModelVersion("4.0.0");
+                        model.setGroupId("test.group" + threadId);
+                        model.setArtifactId("test-artifact-" + threadId + "-" + i);
+                        model.setVersion("1.0.0");
+
+                        SimpleProblemCollector problems = new SimpleProblemCollector(model);
+                        validator.validateEffectiveModel(model, new DefaultModelBuildingRequest(), problems);
+                    }
+                } catch (Throwable e) {
+                    failure.compareAndSet(null, e);
+                } finally {
+                    doneLatch.countDown();
+                }
+            });
+            thread.setName("validator-test-" + threadId);
+            thread.setDaemon(true);
+            thread.start();
+        }
+
+        // Start all threads simultaneously
+        startLatch.countDown();
+
+        // Wait for all threads to complete
+        assertTrue(doneLatch.await(30, TimeUnit.SECONDS), "Threads did not complete in time");
+
+        // Check if any thread encountered an error
+        if (failure.get() != null) {
+            throw new AssertionError("Concurrent validation failed: " + failure.get().getMessage(), failure.get());
+        }
     }
 }
