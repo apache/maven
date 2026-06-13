@@ -18,12 +18,16 @@
  */
 package org.apache.maven.model;
 
+import java.io.StringWriter;
+
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@code Model}.
@@ -65,6 +69,43 @@ class ModelTest {
     @Test
     void testToStringNullSafe() {
         assertNotNull(new Model().toString());
+    }
+
+    @Test
+    void testWriteUsesMinimumModelVersionNamespace() throws Exception {
+        Model model = new Model(org.apache.maven.api.model.Model.newBuilder()
+                .modelVersion("4.1.0")
+                .root(true)
+                .groupId("g")
+                .artifactId("a")
+                .version("1")
+                .build());
+
+        StringWriter output = new StringWriter();
+        new MavenXpp3Writer().write(output, model);
+
+        String xml = output.toString();
+        assertTrue(xml.contains("xmlns=\"http://maven.apache.org/POM/4.1.0\""));
+        assertTrue(
+                xml.contains(
+                        "xsi:schemaLocation=\"http://maven.apache.org/POM/4.1.0 https://maven.apache.org/xsd/maven-4.1.0.xsd\""));
+    }
+
+    @Test
+    void testWriteDefaultsTo400Namespace() throws Exception {
+        Model model = new Model();
+        model.setGroupId("g");
+        model.setArtifactId("a");
+        model.setVersion("1");
+
+        StringWriter output = new StringWriter();
+        new MavenXpp3Writer().write(output, model);
+
+        String xml = output.toString();
+        assertTrue(xml.contains("xmlns=\"http://maven.apache.org/POM/4.0.0\""));
+        assertTrue(
+                xml.contains(
+                        "xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd\""));
     }
 
     @Test
