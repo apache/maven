@@ -88,7 +88,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
     private static final String MAVEN_PLUGINS = "org.apache.maven.plugins:";
 
     public static final String DEFAULT_LIFECYCLE_MODELID = "org.apache.maven:maven-core:"
-            + DefaultLifecycleRegistry.class.getPackage().getImplementationVersion()
+            + getImplementationVersion(DefaultLifecycleRegistry.class)
             + ":default-lifecycle-bindings";
 
     public static final InputLocation DEFAULT_LIFECYCLE_INPUT_LOCATION =
@@ -120,6 +120,11 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
                 }
             });
         }
+    }
+
+    static String getImplementationVersion(Class<?> clazz) {
+        Package packageInfo = clazz.getPackage();
+        return packageInfo != null ? packageInfo.getImplementationVersion() : null;
     }
 
     @Override
