@@ -25,7 +25,7 @@
 
 Lifecycles Reference
 
-  Maven defines 3 lifecycles in {{{./apidocs/org/apache/maven/lifecycle/providers/package-summary.html}<<<org.apache.maven.lifecycle.providers>>>}} package:
+  Maven defines 3 lifecycles, which are registered in {{{./apidocs/org/apache/maven/api/services/LifecycleRegistry.html}<<<LifecycleRegistry>>>}}:
 
 %{toc|fromDepth=2}
 
