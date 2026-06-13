@@ -416,7 +416,7 @@ class DefaultModelBuilderTest {
         assertEquals(
                 "1.2.3",
                 managedDep.getVersion(),
-                "Managed dependency version should be interpolated, not ${managed.version}")
+                "Managed dependency version should be interpolated, not ${managed.version}");
     }
 
     private Path getPom(String name) {
