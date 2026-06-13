@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.Optional;
 import java.util.ServiceLoader;
 
 import org.apache.maven.api.annotations.Nonnull;
@@ -239,8 +240,15 @@ public abstract class XmlService {
 
     /** Holder class for lazy initialization of the default instance */
     private static final class Holder {
-        static final XmlService INSTANCE = ServiceLoader.load(XmlService.class)
+        static final XmlService INSTANCE = ServiceLoader.load(XmlService.class, XmlService.class.getClassLoader())
                 .findFirst()
+                .or(() -> {
+                    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+                    return contextClassLoader != null
+                            ? ServiceLoader.load(XmlService.class, contextClassLoader)
+                                    .findFirst()
+                            : Optional.empty();
+                })
                 .orElseThrow(() -> new IllegalStateException("No XmlService implementation found"));
 
         private Holder() {}
