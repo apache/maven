@@ -263,6 +263,54 @@ class ConditionParserTest {
     }
 
     @Test
+    void testAmpersandAmpersandTokenizerMultiline() {
+        // Regression test for https://github.com/apache/maven/issues/11882
+        // The && operator was not being tokenized correctly when a line break appeared before it.
+        // Uses ${os.name} and ${os.arch} which are set to 'windows' and 'amd64' in the mock context.
+
+        // Case 1: Basic && without line breaks (baseline - always worked)
+        assertTrue((Boolean) parser.parse("${os.arch} == 'amd64' && ${os.name} == 'windows'"));
+
+        // Case 2: Line break BEFORE && - this was the bug from issue #11882
+        // In the issue, CDATA content had a line break before &&:
+        // <condition><![CDATA[exists( '.profile-2' )\n&& missing( '.profile-1' )]]></condition>
+        assertTrue((Boolean) parser.parse("${os.arch} == 'amd64'\n&& ${os.name} == 'windows'"));
+
+        // Case 3: Line break AFTER &&
+        assertTrue((Boolean) parser.parse("${os.arch} == 'amd64' &&\n${os.name} == 'windows'"));
+
+        // Case 4: Line breaks on both sides
+        assertTrue((Boolean) parser.parse("${os.arch} == 'amd64'\n&&\n${os.name} == 'windows'"));
+
+        // Case 5: Multiple && with line break before first && (like bad-profile-2d in issue)
+        assertTrue(
+                (Boolean) parser.parse("${os.arch} == 'amd64'\n&& ${os.name} == 'windows' && ${os.name} == 'windows'"));
+    }
+
+    @Test
+    void testPipePipeTokenizerMultiline() {
+        // Regression test for https://github.com/apache/maven/issues/11882
+        // The || operator was not being tokenized correctly when a line break appeared before it.
+        // Uses ${os.name} which is set to 'windows' in the mock context.
+
+        // Case 1: Basic || without line breaks (baseline)
+        assertTrue((Boolean) parser.parse("${os.arch} == 'amd64' || ${os.name} == 'windows'"));
+
+        // Case 2: Line break BEFORE ||
+        assertTrue((Boolean) parser.parse("${os.arch} == 'amd64'\n|| ${os.name} == 'windows'"));
+
+        // Case 3: Line break AFTER ||
+        assertTrue((Boolean) parser.parse("${os.arch} == 'amd64' ||\n${os.name} == 'windows'"));
+
+        // Case 4: Line breaks on both sides
+        assertTrue((Boolean) parser.parse("${os.arch} == 'amd64'\n||\n${os.name} == 'windows'"));
+
+        // Case 5: Mixed && and || with line breaks
+        assertTrue(
+                (Boolean) parser.parse("${os.arch} == 'amd64'\n&& ${os.name} == 'windows' || ${os.name} == 'windows'"));
+    }
+
+    @Test
     void testNestedPropertyAlias() {
         functions.put("property", args -> {
             if (args.get(0).equals("project.rootDirectory")) {
