@@ -18,10 +18,13 @@
  */
 package org.apache.maven.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
 
+import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
@@ -31,6 +34,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -120,6 +125,128 @@ class DefaultModelXmlFactoryTest {
 
         Model model = factory.read(request);
         assertEquals("invalid.version", model.getModelVersion());
+    }
+
+    @Test
+    void testExtractsModelIdIntoInputSource() throws Exception {
+        String xml = """
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                  <modelVersion>4.0.0</modelVersion>
+                  <groupId>org.example</groupId>
+                  <artifactId>child</artifactId>
+                  <version>1</version>
+                </project>""";
+
+        Model model = factory.read(XmlReaderRequest.builder()
+                .reader(new StringReader(xml))
+                .location("pom.xml")
+                .strict(true)
+                .build());
+
+        InputSource source = model.getLocation("").getSource();
+        assertNotNull(source);
+        assertEquals("org.example:child:1", source.getModelId());
+    }
+
+    @Test
+    void testExtractsModelIdUsingParentFallback() throws Exception {
+        String xml = """
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                  <modelVersion>4.0.0</modelVersion>
+                  <parent>
+                    <groupId>org.example</groupId>
+                    <artifactId>parent</artifactId>
+                    <version>1</version>
+                  </parent>
+                  <artifactId>child</artifactId>
+                </project>""";
+
+        Model model = factory.read(XmlReaderRequest.builder()
+                .reader(new StringReader(xml))
+                .location("pom.xml")
+                .strict(true)
+                .build());
+
+        InputSource source = model.getLocation("").getSource();
+        assertNotNull(source);
+        assertEquals("org.example:child:1", source.getModelId());
+    }
+
+    @Test
+    void testExtractsParentModelIdWithoutUsingDependencyCoordinates() throws Exception {
+        String xml = """
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                  <modelVersion>4.0.0</modelVersion>
+                  <parent>
+                    <groupId>org.example</groupId>
+                    <artifactId>parent</artifactId>
+                    <version>1</version>
+                  </parent>
+                  <artifactId>child</artifactId>
+                  <dependencies>
+                    <dependency>
+                      <groupId>dep.group</groupId>
+                      <artifactId>dep-art</artifactId>
+                      <version>2.0</version>
+                    </dependency>
+                  </dependencies>
+                </project>""";
+
+        Model model = factory.read(XmlReaderRequest.builder()
+                .inputStream(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)))
+                .location("pom.xml")
+                .strict(true)
+                .build());
+
+        InputSource source = model.getLocation("").getSource();
+        assertNotNull(source);
+        assertEquals("org.example:child:1", source.getModelId());
+    }
+
+    @Test
+    void testExtractsDirectCoordinatesOverParent() throws Exception {
+        String xml = """
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                  <modelVersion>4.0.0</modelVersion>
+                  <parent>
+                    <groupId>org.parent</groupId>
+                    <artifactId>parent</artifactId>
+                    <version>1.0</version>
+                  </parent>
+                  <artifactId>child</artifactId>
+                  <groupId>org.child</groupId>
+                  <version>2.0</version>
+                </project>""";
+
+        Model model = factory.read(XmlReaderRequest.builder()
+                .reader(new StringReader(xml))
+                .location("pom.xml")
+                .strict(true)
+                .build());
+
+        InputSource source = model.getLocation("").getSource();
+        assertNotNull(source);
+        assertEquals("org.child:child:2.0", source.getModelId());
+    }
+
+    @Test
+    void testMissingArtifactIdProducesNullModelId() throws Exception {
+        String xml = """
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                  <modelVersion>4.0.0</modelVersion>
+                  <groupId>org.example</groupId>
+                  <version>1</version>
+                </project>""";
+
+        Model model = factory.read(XmlReaderRequest.builder()
+                .reader(new StringReader(xml))
+                .location("pom.xml")
+                .strict(true)
+                .build());
+
+        InputSource source = model.getLocation("").getSource();
+        assertNotNull(source);
+        assertNull(source.getModelId());
     }
 
     @Test

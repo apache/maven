@@ -18,6 +18,15 @@
  */
 package org.apache.maven.impl;
 
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.CharArrayReader;
+import java.io.CharArrayWriter;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
@@ -88,10 +97,31 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
             throw new IllegalArgumentException("path, url, reader or inputStream must be non null");
         }
         try {
+            String modelId = request.getModelId();
+
+            if (modelId == null) {
+                if (inputStream != null) {
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    inputStream.transferTo(baos);
+                    byte[] buf = baos.toByteArray();
+                    modelId = extractModelId(new ByteArrayInputStream(buf));
+                    inputStream = new ByteArrayInputStream(buf);
+                } else if (reader != null) {
+                    CharArrayWriter caw = new CharArrayWriter();
+                    reader.transferTo(caw);
+                    char[] buf = caw.toCharArray();
+                    modelId = extractModelId(new CharArrayReader(buf));
+                    reader = new CharArrayReader(buf);
+                } else if (path != null) {
+                    try (InputStream is = Files.newInputStream(path)) {
+                        modelId = extractModelId(is);
+                    }
+                }
+            }
+
             InputSource source = null;
-            if (request.getModelId() != null || request.getLocation() != null) {
-                source = new InputSource(
-                        request.getModelId(), path != null ? path.toUri().toString() : null);
+            if (modelId != null || request.getLocation() != null) {
+                source = new InputSource(modelId, path != null ? path.toUri().toString() : null);
             }
             MavenStaxReader xml = request.getTransformer() != null
                     ? new MavenStaxReader(request.getTransformer()::transform)
@@ -113,6 +143,123 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
         } catch (Exception e) {
             throw new XmlReaderException("Unable to read model: " + getMessage(e), getLocation(e), e);
         }
+    }
+
+    private static String extractModelId(InputStream inputStream) {
+        try {
+            XMLStreamReader xmlReader = XMLInputFactory.newFactory().createXMLStreamReader(inputStream);
+            try {
+                return extractModelId(xmlReader);
+            } finally {
+                xmlReader.close();
+            }
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static String extractModelId(Reader reader) {
+        try {
+            XMLStreamReader xmlReader = XMLInputFactory.newFactory().createXMLStreamReader(reader);
+            try {
+                return extractModelId(xmlReader);
+            } finally {
+                xmlReader.close();
+            }
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static String extractModelId(XMLStreamReader reader) throws XMLStreamException {
+        String groupId = null;
+        String artifactId = null;
+        String version = null;
+        String parentGroupId = null;
+        String parentVersion = null;
+
+        int depth = 0;
+        boolean inProject = false;
+        boolean inParent = false;
+        String currentElement = null;
+
+        while (reader.hasNext()) {
+            int event = reader.next();
+
+            if (event == XMLStreamConstants.START_ELEMENT) {
+                depth++;
+                String localName = reader.getLocalName();
+
+                if (depth == 1 && "project".equals(localName)) {
+                    inProject = true;
+                } else if (inProject && depth == 2 && "parent".equals(localName)) {
+                    inParent = true;
+                } else if (inProject
+                        && (depth == 2 || (depth == 3 && inParent))
+                        && ("groupId".equals(localName)
+                                || "artifactId".equals(localName)
+                                || "version".equals(localName))) {
+                    currentElement = localName;
+                }
+            } else if (event == XMLStreamConstants.END_ELEMENT) {
+                String localName = reader.getLocalName();
+
+                if ("parent".equals(localName)) {
+                    inParent = false;
+                } else if ("project".equals(localName)) {
+                    break;
+                }
+                currentElement = null;
+                depth--;
+            } else if (event == XMLStreamConstants.CHARACTERS && currentElement != null) {
+                String text = reader.getText().trim();
+                if (!text.isEmpty()) {
+                    if (inParent) {
+                        switch (currentElement) {
+                            case "groupId":
+                                parentGroupId = text;
+                                break;
+                            case "version":
+                                parentVersion = text;
+                                break;
+                            default:
+                                break;
+                        }
+                    } else {
+                        switch (currentElement) {
+                            case "groupId":
+                                groupId = text;
+                                break;
+                            case "artifactId":
+                                artifactId = text;
+                                break;
+                            case "version":
+                                version = text;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+
+            if (groupId != null && artifactId != null && version != null) {
+                break;
+            }
+        }
+
+        if (groupId == null) {
+            groupId = parentGroupId;
+        }
+        if (version == null) {
+            version = parentVersion;
+        }
+
+        if (groupId != null && artifactId != null && version != null) {
+            return groupId + ":" + artifactId + ":" + version;
+        }
+
+        return null;
     }
 
     @Override
