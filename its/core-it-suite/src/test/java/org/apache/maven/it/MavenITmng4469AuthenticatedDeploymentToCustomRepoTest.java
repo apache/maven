@@ -18,28 +18,23 @@
  */
 package org.apache.maven.it;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import java.io.File;
 
-import org.eclipse.jetty.security.ConstraintMapping;
-import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.Constraint;
 import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.security.UserStore;
+import org.eclipse.jetty.security.authentication.BasicAuthenticator;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.Callback;
 import org.eclipse.jetty.util.security.Password;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.eclipse.jetty.util.security.Constraint.__BASIC_AUTH;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -57,31 +52,22 @@ public class MavenITmng4469AuthenticatedDeploymentToCustomRepoTest extends Abstr
 
     @BeforeEach
     protected void setUp() throws Exception {
-        Handler repoHandler = new AbstractHandler() {
+        Handler repoHandler = new Handler.Abstract() {
             @Override
-            public void handle(
-                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
-                System.out.println("Handling " + request.getMethod() + " " + request.getRequestURL());
+            public boolean handle(Request request, Response response, Callback callback) {
+                System.out.println("Handling " + request.getMethod() + " " + request.getHttpURI());
 
                 if ("PUT".equalsIgnoreCase(request.getMethod())) {
-                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.setStatus(200);
                     deployed = true;
                 } else {
-                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    response.setStatus(404);
                 }
 
-                ((Request) request).setHandled(true);
+                callback.succeeded();
+                return true;
             }
         };
-
-        Constraint constraint = new Constraint();
-        constraint.setName(Constraint.__BASIC_AUTH);
-        constraint.setRoles(new String[] {"deployer"});
-        constraint.setAuthenticate(true);
-
-        ConstraintMapping constraintMapping = new ConstraintMapping();
-        constraintMapping.setConstraint(constraint);
-        constraintMapping.setPathSpec("/*");
 
         HashLoginService userRealm = new HashLoginService("TestRealm");
         UserStore userStore = new UserStore();
@@ -89,16 +75,13 @@ public class MavenITmng4469AuthenticatedDeploymentToCustomRepoTest extends Abstr
         userRealm.setUserStore(userStore);
 
         server = new Server(0);
-        ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
+        SecurityHandler.PathMapped securityHandler = new SecurityHandler.PathMapped();
         securityHandler.setLoginService(userRealm);
-        securityHandler.setAuthMethod(__BASIC_AUTH);
-        securityHandler.setConstraintMappings(new ConstraintMapping[] {constraintMapping});
+        securityHandler.setAuthenticator(new BasicAuthenticator());
+        securityHandler.put("/*", Constraint.from("auth", Constraint.Authorization.ANY_USER));
 
-        HandlerList handlerList = new HandlerList();
-        handlerList.addHandler(securityHandler);
-        handlerList.addHandler(repoHandler);
-
-        server.setHandler(handlerList);
+        securityHandler.setHandler(repoHandler);
+        server.setHandler(securityHandler);
         server.start();
         if (server.isFailed()) {
             fail("Couldn't bind the server socket to a free port!");

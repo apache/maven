@@ -18,25 +18,24 @@
  */
 package org.apache.maven.it;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jetty.io.Content;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
-import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.util.Callback;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.junit.jupiter.api.Test;
 
@@ -139,7 +138,8 @@ public class MavenITmng4428FollowHttpRedirectTest extends AbstractMavenIntegrati
     }
 
     private void addHttpsConnector(Server server, String keyStorePath, String keyStorePassword, String keyPassword) {
-        SslContextFactory sslContextFactory = new SslContextFactory(keyStorePath);
+        SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
+        sslContextFactory.setKeyStorePath(keyStorePath);
         sslContextFactory.setKeyStorePassword(keyStorePassword);
         sslContextFactory.setKeyManagerPassword(keyPassword);
         HttpConfiguration httpConfiguration = new HttpConfiguration();
@@ -153,7 +153,7 @@ public class MavenITmng4428FollowHttpRedirectTest extends AbstractMavenIntegrati
         server.addConnector(httpsConnector);
     }
 
-    static class RedirectHandler extends AbstractHandler {
+    static class RedirectHandler extends Handler.Abstract {
         private final String protocol;
 
         private final NetworkConnector connector;
@@ -163,40 +163,42 @@ public class MavenITmng4428FollowHttpRedirectTest extends AbstractMavenIntegrati
             this.connector = connector;
         }
 
-        public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
-                throws IOException {
-            System.out.println("Handling " + request.getMethod() + " " + request.getRequestURL());
+        public boolean handle(Request request, Response response, Callback callback) throws Exception {
+            System.out.println("Handling " + request.getMethod() + " " + request.getHttpURI().toString());
 
-            PrintWriter writer = response.getWriter();
-
-            String uri = request.getRequestURI();
+            String uri = Request.getPathInContext(request);
             if (uri.startsWith("/repo/")) {
                 String location = "/redirected/" + uri.substring(6);
                 if (protocol != null && connector != null) {
                     location = protocol + "://localhost:" + connector.getLocalPort() + location;
                 }
                 if (uri.endsWith(".pom")) {
-                    response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
+                    response.setStatus(302);
                 } else {
-                    response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+                    response.setStatus(301);
                 }
-                response.setHeader("Location", location);
+                response.getHeaders().put("Location", location);
             } else if (uri.endsWith(".pom")) {
+                PrintWriter writer = new PrintWriter(Content.Sink.asOutputStream(response));
                 writer.println("<project xmlns=\"http://maven.apache.org/POM/4.0.0\">");
                 writer.println("  <modelVersion>4.0.0</modelVersion>");
                 writer.println("  <groupId>org.apache.maven.its.mng4428</groupId>");
                 writer.println("  <artifactId>dep</artifactId>");
                 writer.println("  <version>0.1</version>");
                 writer.println("</project>");
-                response.setStatus(HttpServletResponse.SC_OK);
+                writer.flush();
+                response.setStatus(200);
             } else if (uri.endsWith(".jar")) {
+                PrintWriter writer = new PrintWriter(Content.Sink.asOutputStream(response));
                 writer.println("empty");
-                response.setStatus(HttpServletResponse.SC_OK);
+                writer.flush();
+                response.setStatus(200);
             } else {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.setStatus(404);
             }
 
-            ((Request) request).setHandled(true);
+            callback.succeeded();
+            return true;
         }
     }
 }

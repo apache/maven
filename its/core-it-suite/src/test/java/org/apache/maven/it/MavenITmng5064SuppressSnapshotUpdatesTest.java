@@ -18,22 +18,21 @@
  */
 package org.apache.maven.it;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.util.Callback;
+import org.eclipse.jetty.util.resource.ResourceFactory;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -60,25 +59,27 @@ public class MavenITmng5064SuppressSnapshotUpdatesTest extends AbstractMavenInte
 
         final List<String> requestedUris = Collections.synchronizedList(new ArrayList<>());
 
-        AbstractHandler logHandler = new AbstractHandler() {
+        Handler.Abstract logHandler = new Handler.Abstract() {
             @Override
-            public void handle(
-                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
-                if (request.getRequestURI().startsWith("/repo/")) {
-                    requestedUris.add(request.getRequestURI().substring(6));
+            public boolean handle(Request request, Response response, Callback callback) throws Exception {
+                String uri = Request.getPathInContext(request);
+                if (uri.startsWith("/repo/")) {
+                    requestedUris.add(uri.substring(6));
                 }
+                return false;
             }
         };
 
-        ResourceHandler repoHandler = new ResourceHandler();
-        repoHandler.setResourceBase(testDir.getAbsolutePath());
+        Server server = new Server(0);
 
-        HandlerList handlerList = new HandlerList();
+        ResourceHandler repoHandler = new ResourceHandler();
+        repoHandler.setBaseResource(ResourceFactory.of(server).newResource(testDir.toPath()));
+
+        Handler.Sequence handlerList = new Handler.Sequence();
         handlerList.addHandler(logHandler);
         handlerList.addHandler(repoHandler);
         handlerList.addHandler(new DefaultHandler());
 
-        Server server = new Server(0);
         server.setHandler(handlerList);
         server.start();
 
