@@ -98,7 +98,6 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
             throw new IllegalArgumentException("path, url, reader or inputStream must be non null");
         }
         try {
-            // If modelId is not provided and we're reading from a file, try to extract it
             String modelId = request.getModelId();
             String location = request.getLocation();
 
@@ -206,33 +205,28 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
      * @param inputStream the input stream to read from
      * @return the modelId in format "groupId:artifactId:version" or null if not determinable
      */
-    private String extractModelId(InputStream inputStream) {
+    private static String extractModelId(InputStream inputStream) {
         try {
-            XMLStreamReader reader = InputFactoryHolder.XML_INPUT_FACTORY.createXMLStreamReader(inputStream);
-            try {
-                return extractModelId(reader);
-            } finally {
-                reader.close();
-            }
-        } catch (Exception e) {
-            // If extraction fails, return null and let the normal parsing handle it
-            // This is not a critical failure
-            return null;
-        }
-    }
-
-    private String extractModelId(Reader reader) {
-        try {
-            // Use a buffered stream to allow efficient reading
-            XMLStreamReader xmlReader = InputFactoryHolder.XML_INPUT_FACTORY.createXMLStreamReader(reader);
+            XMLStreamReader xmlReader = XMLInputFactory.newFactory().createXMLStreamReader(inputStream);
             try {
                 return extractModelId(xmlReader);
             } finally {
                 xmlReader.close();
             }
         } catch (Exception e) {
-            // If extraction fails, return null and let the normal parsing handle it
-            // This is not a critical failure
+            return null;
+        }
+    }
+
+    private static String extractModelId(Reader reader) {
+        try {
+            XMLStreamReader xmlReader = XMLInputFactory.newFactory().createXMLStreamReader(reader);
+            try {
+                return extractModelId(xmlReader);
+            } finally {
+                xmlReader.close();
+            }
+        } catch (Exception e) {
             return null;
         }
     }
@@ -244,6 +238,7 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
         String parentGroupId = null;
         String parentVersion = null;
 
+        int depth = 0;
         boolean inProject = false;
         boolean inParent = false;
         String currentElement = null;
@@ -252,13 +247,15 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
             int event = reader.next();
 
             if (event == XMLStreamConstants.START_ELEMENT) {
+                depth++;
                 String localName = reader.getLocalName();
 
-                if ("project".equals(localName)) {
+                if (depth == 1 && "project".equals(localName)) {
                     inProject = true;
-                } else if ("parent".equals(localName) && inProject) {
+                } else if (inProject && depth == 2 && "parent".equals(localName)) {
                     inParent = true;
                 } else if (inProject
+                        && (depth == 2 || (depth == 3 && inParent))
                         && ("groupId".equals(localName)
                                 || "artifactId".equals(localName)
                                 || "version".equals(localName))) {
@@ -270,9 +267,10 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
                 if ("parent".equals(localName)) {
                     inParent = false;
                 } else if ("project".equals(localName)) {
-                    break; // We've processed the main project element
+                    break;
                 }
                 currentElement = null;
+                depth--;
             } else if (event == XMLStreamConstants.CHARACTERS && currentElement != null) {
                 String text = reader.getText().trim();
                 if (!text.isEmpty()) {
@@ -285,7 +283,6 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
                                 parentVersion = text;
                                 break;
                             default:
-                                // Ignore other elements
                                 break;
                         }
                     } else {
@@ -300,20 +297,17 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
                                 version = text;
                                 break;
                             default:
-                                // Ignore other elements
                                 break;
                         }
                     }
                 }
             }
 
-            // Early exit if we have enough information
-            if (artifactId != null && groupId != null && version != null) {
+            if (groupId != null && artifactId != null && version != null) {
                 break;
             }
         }
 
-        // Use parent values as fallback
         if (groupId == null) {
             groupId = parentGroupId;
         }
@@ -321,7 +315,6 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
             version = parentVersion;
         }
 
-        // Return modelId if we have all required components
         if (groupId != null && artifactId != null && version != null) {
             return groupId + ":" + artifactId + ":" + version;
         }
