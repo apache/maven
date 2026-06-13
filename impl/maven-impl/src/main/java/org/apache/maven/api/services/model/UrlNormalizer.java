@@ -18,6 +18,17 @@
  */
 package org.apache.maven.api.services.model;
 
+/**
+ * Simplifies URLs by removing parent directory references ("/../") and collapsing path segments.
+ * This performs purely string-based normalization without full URL parsing or validation.
+ *
+ * <p>The normalization process iteratively removes "/../" segments by eliminating the preceding path segment,
+ * effectively resolving relative path traversals.
+ *
+ * <p>This does not guarantee that the resulting URL is valid or reachable; it simply
+ * produces a more canonical representation of the input string.
+ *
+ */
 public interface UrlNormalizer {
 
     /**
