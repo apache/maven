@@ -264,6 +264,14 @@ public class DefaultModelBuilder implements ModelBuilder {
         List<RemoteRepository> externalRepositories;
         List<RemoteRepository> repositories;
 
+        List<RemoteRepository> getRepositories() {
+            return repositories;
+        }
+
+        List<RemoteRepository> getExternalRepositories() {
+            return externalRepositories;
+        }
+
         // Cycle detection chain shared across all derived sessions
         // Contains both GAV coordinates (groupId:artifactId:version) and file paths
         final Set<String> parentChain;
@@ -332,6 +340,23 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
             // Create a new parentChain for each derived session to prevent cycle detection issues
             // The parentChain now contains both GAV coordinates and file paths
+            // For BUILD_CONSUMER requests, use the request's explicit repositories so that
+            // BOM imports can be resolved from non-central repos (e.g., settings.xml profiles).
+            // This is scoped to BUILD_CONSUMER to avoid unintended side effects on other
+            // derived sessions (e.g., parent POM resolution during project builds).
+            List<RemoteRepository> derivedExtRepos = externalRepositories;
+            List<RemoteRepository> derivedRepos = repositories;
+            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_CONSUMER
+                    && request.getRepositories() != null
+                    && !request.getRepositories().isEmpty()) {
+                derivedExtRepos = List.copyOf(request.getRepositories());
+                if (pomRepositories.isEmpty()) {
+                    derivedRepos = derivedExtRepos;
+                } else {
+                    RepositoryFactory repositoryFactory = session.getService(RepositoryFactory.class);
+                    derivedRepos = repositoryFactory.aggregate(session, pomRepositories, derivedExtRepos, false);
+                }
+            }
             return new ModelBuilderSessionState(
                     session,
                     request,
@@ -339,8 +364,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                     dag,
                     mappedSources,
                     pomRepositories,
-                    externalRepositories,
-                    repositories,
+                    derivedExtRepos,
+                    derivedRepos,
                     new LinkedHashSet<>());
         }
 
@@ -721,8 +746,10 @@ public class DefaultModelBuilder implements ModelBuilder {
                 logger.debug("Profile activation failure details", e);
             }
 
-            // User properties override everything
-            properties.putAll(session.getEffectiveProperties());
+            // System and user properties override everything (use request properties
+            // to ensure consistency with model interpolation, which also uses request properties)
+            properties.putAll(request.getSystemProperties());
+            properties.putAll(request.getUserProperties());
 
             return properties;
         }
@@ -1460,12 +1487,14 @@ public class DefaultModelBuilder implements ModelBuilder {
             ModelSource modelSource = request.getSource();
             Model model;
             Path rootDirectory;
+            boolean rootDirectoryFromSession = false;
             setSource(modelSource.getLocation());
             logger.debug("Reading file model from " + modelSource.getLocation());
             try {
                 boolean strict = isBuildRequest();
                 try {
                     rootDirectory = request.getSession().getRootDirectory();
+                    rootDirectoryFromSession = true;
                 } catch (IllegalStateException ignore) {
                     rootDirectory = modelSource.getPath();
                     while (rootDirectory != null && !Files.isDirectory(rootDirectory)) {
@@ -1542,7 +1571,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                     String artifactId = parent.getArtifactId();
                     String version = parent.getVersion();
                     String path = parent.getRelativePath();
-                    if ((groupId == null || artifactId == null || version == null)
+                    boolean versionContainsExpression = version != null && version.contains("${");
+                    if ((groupId == null || artifactId == null || version == null || versionContainsExpression)
                             && (path == null || !path.isEmpty())) {
                         Path pomFile = model.getPomFile();
                         Path relativePath = Paths.get(path != null ? path : "..");
@@ -1551,8 +1581,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                             pomPath = modelProcessor.locateExistingPom(pomPath);
                         }
                         if (pomPath != null && Files.isRegularFile(pomPath)) {
-                            // Check if parent POM is above the root directory
-                            if (!isParentWithinRootDirectory(pomPath, rootDirectory)) {
+                            if (rootDirectoryFromSession && !isParentWithinRootDirectory(pomPath, rootDirectory)) {
                                 add(
                                         Severity.FATAL,
                                         Version.BASE,
@@ -1570,7 +1599,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                             String parentVersion = getVersion(parentModel);
                             if ((groupId == null || groupId.equals(parentGroupId))
                                     && (artifactId == null || artifactId.equals(parentArtifactId))
-                                    && (version == null || version.equals(parentVersion))) {
+                                    && (version == null
+                                            || version.equals(parentVersion)
+                                            || versionContainsExpression)) {
                                 model = model.withParent(parent.with()
                                         .groupId(parentGroupId)
                                         .artifactId(parentArtifactId)
@@ -1636,12 +1667,14 @@ public class DefaultModelBuilder implements ModelBuilder {
                         .profiles(map(model.getProfiles(), this::interpolateRepository, callback))
                         .distributionManagement(interpolateRepository(model.getDistributionManagement(), callback))
                         .build();
-                // Override model properties with user properties
-                Map<String, String> newProps = merge(model.getProperties(), session.getUserProperties());
+                // Override model properties with user properties (use request properties
+                // to ensure consistency with model interpolation)
+                Map<String, String> userProps = request.getUserProperties();
+                Map<String, String> newProps = merge(model.getProperties(), userProps);
                 if (newProps != null) {
                     model = model.withProperties(newProps);
                 }
-                model = model.withProfiles(merge(model.getProfiles(), session.getUserProperties()));
+                model = model.withProfiles(merge(model.getProfiles(), userProps));
             }
 
             for (var transformer : transformers) {

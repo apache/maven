@@ -1535,11 +1535,11 @@ public class DefaultModelValidator implements ModelValidator {
                 if (matcher.find()) {
                     addViolation(
                             problems,
-                            Severity.ERROR,
+                            Severity.WARNING,
                             Version.V40,
                             prefix + prefix2 + "[" + repository.getId() + "].id",
                             null,
-                            "contains an uninterpolated expression.",
+                            "contains an uninterpolated expression; the repository will be skipped.",
                             repository);
                 }
             }
@@ -1561,11 +1561,11 @@ public class DefaultModelValidator implements ModelValidator {
                 if (matcher.find()) {
                     addViolation(
                             problems,
-                            Severity.ERROR,
+                            Severity.WARNING,
                             Version.V40,
                             prefix + prefix2 + "[" + repository.getId() + "].url",
                             null,
-                            "contains an uninterpolated expression.",
+                            "contains an uninterpolated expression; the repository will be skipped.",
                             repository);
                 }
             }
@@ -1705,7 +1705,7 @@ public class DefaultModelValidator implements ModelValidator {
             String id,
             @Nullable SourceHint sourceHint,
             InputLocationTracker tracker) {
-        if (id != null && validProfileIds.contains(id)) {
+        if (validProfileIds.contains(id)) {
             return true;
         }
         if (!validateStringNotEmpty(prefix, fieldName, problems, severity, version, id, sourceHint, tracker)) {

@@ -30,6 +30,8 @@ import java.util.function.Function;
 public class CachingSupplier<REQ, REP> implements Function<REQ, REP> {
     protected final Function<REQ, REP> supplier;
     protected volatile Object value;
+    // Guarded by synchronized(this) — tracks which thread is currently computing
+    private Thread computingThread;
 
     public CachingSupplier(Function<REQ, REP> supplier) {
         this.supplier = supplier;
@@ -46,10 +48,18 @@ public class CachingSupplier<REQ, REP> implements Function<REQ, REP> {
         if ((v = value) == null) {
             synchronized (this) {
                 if ((v = value) == null) {
+                    if (computingThread == Thread.currentThread()) {
+                        throw new CyclicCacheAccessException();
+                    }
+                    computingThread = Thread.currentThread();
                     try {
                         v = value = supplier.apply(req);
+                    } catch (CyclicCacheAccessException e) {
+                        throw e;
                     } catch (Exception e) {
                         v = value = new AltRes(e);
+                    } finally {
+                        computingThread = null;
                     }
                 }
             }
@@ -58,6 +68,16 @@ public class CachingSupplier<REQ, REP> implements Function<REQ, REP> {
             DefaultRequestCache.uncheckedThrow(altRes.throwable);
         }
         return (REP) v;
+    }
+
+    /**
+     * Thrown when a re-entrant call is detected on the same thread that is already
+     * computing this supplier's value. Prevents self-deadlock when a batch
+     * {@code requests()} computation triggers a singular {@code request()} that
+     * finds the same CachingSupplier in the cache.
+     */
+    public static class CyclicCacheAccessException extends RuntimeException {
+        CyclicCacheAccessException() {}
     }
 
     /**

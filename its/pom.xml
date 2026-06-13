@@ -83,7 +83,7 @@ under the License.
     <maven.compiler.release>17</maven.compiler.release>
 
     <wagonVersion>3.5.3</wagonVersion>
-    <asmVersion>9.10</asmVersion>
+    <asmVersion>9.10.1</asmVersion>
     <plexusUtilsVersion>4.0.2</plexusUtilsVersion>
     <plexusXmlVersion>4.1.1</plexusXmlVersion>
 
@@ -261,6 +261,11 @@ under the License.
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-compat</artifactId>
         <version>${maven-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.executor</groupId>
+        <artifactId>maven-executor</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>

@@ -332,8 +332,8 @@ public interface ModelBuilderRequest extends RepositoryAwareRequest {
                 this.activeProfileIds = activeProfileIds != null ? List.copyOf(activeProfileIds) : List.of();
                 this.inactiveProfileIds = inactiveProfileIds != null ? List.copyOf(inactiveProfileIds) : List.of();
                 this.systemProperties =
-                        systemProperties != null ? Map.copyOf(systemProperties) : session.getSystemProperties();
-                this.userProperties = userProperties != null ? Map.copyOf(userProperties) : session.getUserProperties();
+                        Map.copyOf(systemProperties != null ? systemProperties : session.getSystemProperties());
+                this.userProperties = Map.copyOf(userProperties != null ? userProperties : session.getUserProperties());
                 this.repositoryMerging = repositoryMerging;
                 this.repositories = repositories != null ? List.copyOf(validate(repositories)) : null;
                 this.lifecycleBindingsInjector = lifecycleBindingsInjector;
