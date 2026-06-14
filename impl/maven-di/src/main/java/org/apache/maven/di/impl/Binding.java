@@ -19,6 +19,7 @@
 package org.apache.maven.di.impl;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -72,6 +73,15 @@ public abstract class Binding<T> {
     public static <R> Binding<R> to(
             Key<R> originalKey, TupleConstructorN<R> constructor, Dependency<?>[] dependencies, int priority) {
         return new BindingToConstructor<>(originalKey, constructor, dependencies, priority);
+    }
+
+    public static <R> Binding<R> toMethod(
+            Key<R> originalKey,
+            TupleConstructorN<R> constructor,
+            Dependency<?>[] dependencies,
+            Method method,
+            int priority) {
+        return new BindingToMethod<>(originalKey, constructor, dependencies, method, priority);
     }
 
     // endregion
@@ -214,6 +224,42 @@ public abstract class Binding<T> {
         @Override
         public String toString() {
             return "BindingToConstructor[" + getOriginalKey() + "]" + getDependencies();
+        }
+    }
+
+    public static class BindingToMethod<T> extends Binding<T> {
+        final TupleConstructorN<T> constructor;
+        final Dependency<?>[] args;
+        final Method method;
+
+        BindingToMethod(
+                Key<? extends T> key,
+                TupleConstructorN<T> constructor,
+                Dependency<?>[] dependencies,
+                Method method,
+                int priority) {
+            super(key, new HashSet<>(Arrays.asList(dependencies)), null, priority);
+            this.constructor = constructor;
+            this.args = dependencies;
+            this.method = method;
+        }
+
+        @Override
+        public Supplier<T> compile(Function<Dependency<?>, Supplier<?>> compiler) {
+            return () -> {
+                Object[] args =
+                        Stream.of(this.args).map(compiler).map(Supplier::get).toArray();
+                return constructor.create(args);
+            };
+        }
+
+        public Method getMethod() {
+            return method;
+        }
+
+        @Override
+        public String toString() {
+            return "BindingToMethod[" + method + "]" + getDependencies();
         }
     }
 }
