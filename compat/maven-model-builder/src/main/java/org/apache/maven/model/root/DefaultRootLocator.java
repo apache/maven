@@ -43,7 +43,7 @@ public class DefaultRootLocator implements RootLocator {
         // we're too early to use the modelProcessor ...
         Path pom = dir.resolve("pom.xml");
         try (InputStream is = Files.newInputStream(pom)) {
-            XMLStreamReader parser = XMLInputFactory.newFactory().createXMLStreamReader(is);
+            XMLStreamReader parser = newInputFactory().createXMLStreamReader(is);
             if (parser.nextTag() == XMLStreamReader.START_ELEMENT
                     && parser.getLocalName().equals("project")) {
                 for (int i = 0; i < parser.getAttributeCount(); i++) {
@@ -60,5 +60,12 @@ public class DefaultRootLocator implements RootLocator {
             // displayed to the user, so just bail out and return false.
         }
         return false;
+    }
+
+    private static XMLInputFactory newInputFactory() {
+        XMLInputFactory factory = XMLInputFactory.newFactory();
+        factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+        return factory;
     }
 }

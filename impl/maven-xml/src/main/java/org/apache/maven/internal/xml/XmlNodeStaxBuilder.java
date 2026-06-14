@@ -40,13 +40,20 @@ public class XmlNodeStaxBuilder {
 
     public static XmlNode build(InputStream stream, InputLocationBuilderStax locationBuilder)
             throws XMLStreamException {
-        XMLStreamReader parser = XMLInputFactory.newFactory().createXMLStreamReader(stream);
+        XMLStreamReader parser = newInputFactory().createXMLStreamReader(stream);
         return build(parser, DEFAULT_TRIM, locationBuilder);
     }
 
     public static XmlNode build(Reader reader, InputLocationBuilderStax locationBuilder) throws XMLStreamException {
-        XMLStreamReader parser = XMLInputFactory.newFactory().createXMLStreamReader(reader);
+        XMLStreamReader parser = newInputFactory().createXMLStreamReader(reader);
         return build(parser, DEFAULT_TRIM, locationBuilder);
+    }
+
+    private static XMLInputFactory newInputFactory() {
+        XMLInputFactory factory = XMLInputFactory.newFactory();
+        factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+        return factory;
     }
 
     public static XmlNode build(XMLStreamReader parser) throws XMLStreamException {
