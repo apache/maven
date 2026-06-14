@@ -51,7 +51,7 @@ under the License.
 
   <profiles>
     <profile>
-      <id>test</id>
+      <id>test-profile</id>
       <build>
         <pluginManagement>
           <plugins>

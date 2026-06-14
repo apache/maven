@@ -482,6 +482,18 @@ class DefaultModelValidatorTest {
     }
 
     @Test
+    void testLifecyclePhaseProfileId() throws Exception {
+        SimpleProblemCollector result = validateFile("lifecycle-phase-profile-id.xml");
+
+        assertViolations(result, 0, 0, 2);
+
+        assertTrue(result.getWarnings().get(0).contains("integration-test"));
+        assertTrue(result.getWarnings().get(0).contains("lifecycle phase"));
+        assertTrue(result.getWarnings().get(1).contains("deploy"));
+        assertTrue(result.getWarnings().get(1).contains("lifecycle phase"));
+    }
+
+    @Test
     void testBadPluginVersion() throws Exception {
         SimpleProblemCollector result = validate("bad-plugin-version.xml");
 

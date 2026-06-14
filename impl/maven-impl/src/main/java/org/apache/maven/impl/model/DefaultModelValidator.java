@@ -99,6 +99,34 @@ public class DefaultModelValidator implements ModelValidator {
 
     private static final String EMPTY = "";
 
+    private static final Set<String> LIFECYCLE_PHASES = Set.of(
+            "clean",
+            "validate",
+            "initialize",
+            "generate-sources",
+            "process-sources",
+            "generate-resources",
+            "process-resources",
+            "compile",
+            "process-classes",
+            "generate-test-sources",
+            "process-test-sources",
+            "generate-test-resources",
+            "process-test-resources",
+            "test-compile",
+            "process-test-classes",
+            "test",
+            "prepare-package",
+            "package",
+            "pre-integration-test",
+            "integration-test",
+            "post-integration-test",
+            "verify",
+            "install",
+            "deploy",
+            "site",
+            "site-deploy");
+
     private record ActivationFrame(String location, Optional<? extends InputLocationTracker> parent) {}
 
     private static class ActivationWalker extends MavenTransformer {
@@ -563,6 +591,20 @@ public class DefaultModelValidator implements ModelValidator {
                 String prefix = "profiles.profile[" + profile.getId() + "].";
 
                 validateProfileId(prefix, "id", problems, Severity.ERROR, Version.V40, profile.getId(), null, model);
+
+                if (profile.getId() != null && LIFECYCLE_PHASES.contains(profile.getId())) {
+                    addViolation(
+                            problems,
+                            Severity.WARNING,
+                            Version.BASE,
+                            "profiles.profile.id",
+                            null,
+                            "Profile has the same id '"
+                                    + profile.getId() + "' as a Maven lifecycle phase. "
+                                    + "This can accidentally trigger the lifecycle phase "
+                                    + "when the profile name is misused on the command line.",
+                            profile);
+                }
 
                 if (!profileIds.add(profile.getId())) {
                     addViolation(
