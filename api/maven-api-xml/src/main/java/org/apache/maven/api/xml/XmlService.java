@@ -109,7 +109,7 @@ public abstract class XmlService {
      * The returned factory has DTD support and external entity resolution disabled.
      *
      * @return a hardened XMLInputFactory
-     * @since 4.1.0
+     * @since 4.0.0-rc-6
      */
     public static XMLInputFactory newXMLInputFactory() {
         XMLInputFactory factory = XMLInputFactory.newFactory();
