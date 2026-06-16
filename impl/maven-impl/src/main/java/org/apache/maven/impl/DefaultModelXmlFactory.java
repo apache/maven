@@ -18,7 +18,6 @@
  */
 package org.apache.maven.impl;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -47,6 +46,7 @@ import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.services.xml.XmlWriterException;
 import org.apache.maven.api.services.xml.XmlWriterRequest;
+import org.apache.maven.api.xml.XmlService;
 import org.apache.maven.model.v4.MavenStaxReader;
 import org.apache.maven.model.v4.MavenStaxWriter;
 
@@ -147,7 +147,7 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
 
     private static String extractModelId(InputStream inputStream) {
         try {
-            XMLStreamReader xmlReader = XMLInputFactory.newFactory().createXMLStreamReader(inputStream);
+            XMLStreamReader xmlReader = XmlService.newXMLInputFactory().createXMLStreamReader(inputStream);
             try {
                 return extractModelId(xmlReader);
             } finally {
@@ -160,7 +160,7 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
 
     private static String extractModelId(Reader reader) {
         try {
-            XMLStreamReader xmlReader = XMLInputFactory.newFactory().createXMLStreamReader(reader);
+            XMLStreamReader xmlReader = XmlService.newXMLInputFactory().createXMLStreamReader(reader);
             try {
                 return extractModelId(xmlReader);
             } finally {
