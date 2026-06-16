@@ -277,6 +277,14 @@ public class DefaultModelBuilder implements ModelBuilder {
         List<RemoteRepository> externalRepositories;
         List<RemoteRepository> repositories;
 
+        List<RemoteRepository> getRepositories() {
+            return repositories;
+        }
+
+        List<RemoteRepository> getExternalRepositories() {
+            return externalRepositories;
+        }
+
         // Cycle detection chain shared across all derived sessions
         // Contains both GAV coordinates (groupId:artifactId:version) and file paths
         final Set<String> parentChain;
@@ -345,6 +353,23 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
             // Create a new parentChain for each derived session to prevent cycle detection issues
             // The parentChain now contains both GAV coordinates and file paths
+            // For BUILD_CONSUMER requests, use the request's explicit repositories so that
+            // BOM imports can be resolved from non-central repos (e.g., settings.xml profiles).
+            // This is scoped to BUILD_CONSUMER to avoid unintended side effects on other
+            // derived sessions (e.g., parent POM resolution during project builds).
+            List<RemoteRepository> derivedExtRepos = externalRepositories;
+            List<RemoteRepository> derivedRepos = repositories;
+            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_CONSUMER
+                    && request.getRepositories() != null
+                    && !request.getRepositories().isEmpty()) {
+                derivedExtRepos = List.copyOf(request.getRepositories());
+                if (pomRepositories.isEmpty()) {
+                    derivedRepos = derivedExtRepos;
+                } else {
+                    RepositoryFactory repositoryFactory = session.getService(RepositoryFactory.class);
+                    derivedRepos = repositoryFactory.aggregate(session, pomRepositories, derivedExtRepos, false);
+                }
+            }
             return new ModelBuilderSessionState(
                     session,
                     request,
@@ -352,8 +377,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                     dag,
                     mappedSources,
                     pomRepositories,
-                    externalRepositories,
-                    repositories,
+                    derivedExtRepos,
+                    derivedRepos,
                     new LinkedHashSet<>());
         }
 
@@ -552,7 +577,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                     // filter out transitive invalid repositories
                     // this should be safe because invalid repo coming from build POMs
                     // have been rejected earlier during validation
-                    .filter(repo -> repo.getUrl() != null && !repo.getUrl().contains("${"))
+                    .filter(repo -> repo.getUrl() != null
+                            && !repo.getUrl().contains("${")
+                            && (repo.getId() == null || !repo.getId().contains("${")))
                     .map(session::createRemoteRepository)
                     .toList();
             if (replace) {
@@ -732,8 +759,10 @@ public class DefaultModelBuilder implements ModelBuilder {
                 logger.debug("Profile activation failure details", e);
             }
 
-            // User properties override everything
-            properties.putAll(session.getEffectiveProperties());
+            // System and user properties override everything (use request properties
+            // to ensure consistency with model interpolation, which also uses request properties)
+            properties.putAll(request.getSystemProperties());
+            properties.putAll(request.getUserProperties());
 
             return properties;
         }
@@ -1132,6 +1161,20 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             try {
                 ModelBuilderSessionState derived = derive(candidateSource);
+
+                // Check GA match BEFORE readAsParentModel() which recursively resolves
+                // the candidate's parent chain and can trigger false cycle detection (GH-12074).
+                Model fileModel = derived.readFileModel();
+                String fileGroupId = getGroupId(fileModel);
+                String fileArtifactId = fileModel.getArtifactId();
+
+                if (parent.getGroupId() != null && (fileGroupId == null || !fileGroupId.equals(parent.getGroupId()))
+                        || parent.getArtifactId() != null
+                                && (fileArtifactId == null || !fileArtifactId.equals(parent.getArtifactId()))) {
+                    mismatchRelativePathAndGA(childModel, parent, fileGroupId, fileArtifactId);
+                    return null;
+                }
+
                 Model candidateModel = derived.readAsParentModel(profileActivationContext, parentChain);
                 // Add profiles from parent, preserving model ID tracking
                 for (Map.Entry<String, List<Profile>> entry :
@@ -1139,17 +1182,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     addActivePomProfiles(entry.getKey(), entry.getValue());
                 }
 
-                String groupId = getGroupId(candidateModel);
-                String artifactId = candidateModel.getArtifactId();
                 String version = getVersion(candidateModel);
-
-                // Ensure that relative path and GA match, if both are provided
-                if (parent.getGroupId() != null && (groupId == null || !groupId.equals(parent.getGroupId()))
-                        || parent.getArtifactId() != null
-                                && (artifactId == null || !artifactId.equals(parent.getArtifactId()))) {
-                    mismatchRelativePathAndGA(childModel, parent, groupId, artifactId);
-                    return null;
-                }
 
                 if (version != null && parent.getVersion() != null && !version.equals(parent.getVersion())) {
                     try {
@@ -1417,7 +1450,14 @@ public class DefaultModelBuilder implements ModelBuilder {
             // Mixins
             for (Mixin mixin : model.getMixins()) {
                 Model parent = resolveParent(model, mixin, profileActivationContext, parentChain);
+                // Merge mixin into model
                 model = inheritanceAssembler.assembleModelInheritance(model, parent, request, this);
+                // Ensure mixin properties override any previously inherited properties
+                // This is necessary because normal inheritance gives child precedence, but for mixins
+                // we want the mixin to take precedence over inherited parent properties
+                Map<String, String> mergedProperties = new java.util.HashMap<>(model.getProperties());
+                mergedProperties.putAll(parent.getProperties());
+                model = model.withProperties(mergedProperties);
             }
 
             // model normalization
@@ -1494,12 +1534,14 @@ public class DefaultModelBuilder implements ModelBuilder {
             ModelSource modelSource = request.getSource();
             Model model;
             Path rootDirectory;
+            boolean rootDirectoryFromSession = false;
             setSource(modelSource.getLocation());
             logger.debug("Reading file model from " + modelSource.getLocation());
             try {
                 boolean strict = isBuildRequest();
                 try {
                     rootDirectory = request.getSession().getRootDirectory();
+                    rootDirectoryFromSession = true;
                 } catch (IllegalStateException ignore) {
                     rootDirectory = modelSource.getPath();
                     while (rootDirectory != null && !Files.isDirectory(rootDirectory)) {
@@ -1578,7 +1620,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                     String artifactId = parent.getArtifactId();
                     String version = parent.getVersion();
                     String path = parent.getRelativePath();
-                    if ((groupId == null || artifactId == null || version == null)
+                    boolean versionContainsExpression = version != null && version.contains("${");
+                    if ((groupId == null || artifactId == null || version == null || versionContainsExpression)
                             && (path == null || !path.isEmpty())) {
                         Path pomFile = model.getPomFile();
                         Path relativePath = Paths.get(path != null ? path : "..");
@@ -1587,8 +1630,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                             pomPath = modelProcessor.locateExistingPom(pomPath);
                         }
                         if (pomPath != null && Files.isRegularFile(pomPath)) {
-                            // Check if parent POM is above the root directory
-                            if (!isParentWithinRootDirectory(pomPath, rootDirectory)) {
+                            if (rootDirectoryFromSession && !isParentWithinRootDirectory(pomPath, rootDirectory)) {
                                 add(
                                         Severity.FATAL,
                                         Version.BASE,
@@ -1606,7 +1648,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                             String parentVersion = getVersion(parentModel);
                             if ((groupId == null || groupId.equals(parentGroupId))
                                     && (artifactId == null || artifactId.equals(parentArtifactId))
-                                    && (version == null || version.equals(parentVersion))) {
+                                    && (version == null
+                                            || version.equals(parentVersion)
+                                            || versionContainsExpression)) {
                                 model = model.withParent(parent.with()
                                         .groupId(parentGroupId)
                                         .artifactId(parentArtifactId)
@@ -1672,12 +1716,14 @@ public class DefaultModelBuilder implements ModelBuilder {
                         .profiles(map(model.getProfiles(), this::interpolateRepository, callback))
                         .distributionManagement(interpolateRepository(model.getDistributionManagement(), callback))
                         .build();
-                // Override model properties with user properties
-                Map<String, String> newProps = merge(model.getProperties(), session.getUserProperties());
+                // Override model properties with user properties (use request properties
+                // to ensure consistency with model interpolation)
+                Map<String, String> userProps = request.getUserProperties();
+                Map<String, String> newProps = merge(model.getProperties(), userProps);
                 if (newProps != null) {
                     model = model.withProperties(newProps);
                 }
-                model = model.withProfiles(merge(model.getProfiles(), session.getUserProperties()));
+                model = model.withProfiles(merge(model.getProfiles(), userProps));
             }
 
             for (var transformer : transformers) {
@@ -1895,7 +1941,12 @@ public class DefaultModelBuilder implements ModelBuilder {
             Model parent = defaultInheritanceAssembler.assembleModelInheritance(raw, parentData, request, this);
             for (Mixin mixin : parent.getMixins()) {
                 Model parentModel = resolveParent(parent, mixin, childProfileActivationContext, parentChain);
+                // Merge mixin into parent
                 parent = defaultInheritanceAssembler.assembleModelInheritance(parent, parentModel, request, this);
+                // Ensure mixin properties override any previously inherited properties
+                Map<String, String> mergedProperties = new java.util.HashMap<>(parent.getProperties());
+                mergedProperties.putAll(parentModel.getProperties());
+                parent = parent.withProperties(mergedProperties);
             }
 
             // Profile injection SHOULD be performed on parent models to ensure

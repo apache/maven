@@ -26,6 +26,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.apache.maven.internal.impl.DefaultLifecycleRegistry;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.Test;
@@ -129,41 +130,41 @@ class BuildPlanCreatorTest {
         return context.calculateLifecycleMappings(projects, phase);
     }
 
-    /*
     @Test
-    void testPlugins() {
-        DefaultLifecycleRegistry lifecycles =
-                new DefaultLifecycleRegistry(Collections.emptyList(), Collections.emptyMap());
-        BuildPlanCreator builder = new BuildPlanCreator(null, null, null, null, null, lifecycles);
+    void testReactorPlugin() {
         MavenProject p1 = new MavenProject();
         p1.setGroupId("g");
         p1.setArtifactId("p1");
-        p1.getBuild().getPlugins().add(new Plugin(org.apache.maven.api.model.Plugin.newBuilder()
-                .groupId("g").artifactId("p2")
-                .
-                .build()))
+        p1.setVersion("1.0");
+        p1.setCollectedProjects(List.of());
+        Plugin plugin = new Plugin();
+        plugin.setGroupId("g");
+        plugin.setArtifactId("p2");
+        plugin.setVersion("1.0");
+        p1.getBuild().addPlugin(plugin);
+
         MavenProject p2 = new MavenProject();
         p2.setGroupId("g");
         p2.setArtifactId("p2");
+        p2.setVersion("1.0");
+        p2.setCollectedProjects(List.of());
 
         Map<MavenProject, List<MavenProject>> projects = new HashMap<>();
         projects.put(p1, Collections.emptyList());
         projects.put(p2, Collections.singletonList(p1));
-        Lifecycle lifecycle = lifecycles.require("default");
-        BuildPlan plan = builder.calculateLifecycleMappings(null, projects, lifecycle, "verify");
-        plan.then(builder.calculateLifecycleMappings(null, projects, lifecycle, "install"));
+
+        BuildPlan plan = calculateLifecycleMappings(projects, "verify");
+        plan.then(calculateLifecycleMappings(projects, "install"));
 
         Stream.of(p1, p2).forEach(project -> {
-            plan.requiredStep(project, "post:resources").addMojo(new MojoExecution(null), 0);
-            plan.requiredStep(project, "post:test-resources").addMojo(new MojoExecution(null), 0);
+            plan.requiredStep(project, "after:resources").addMojo(new MojoExecution(null), 0);
+            plan.requiredStep(project, "after:test-resources").addMojo(new MojoExecution(null), 0);
             plan.requiredStep(project, "compile").addMojo(new MojoExecution(null), 0);
             plan.requiredStep(project, "test-compile").addMojo(new MojoExecution(null), 0);
             plan.requiredStep(project, "test").addMojo(new MojoExecution(null), 0);
             plan.requiredStep(project, "package").addMojo(new MojoExecution(null), 0);
             plan.requiredStep(project, "install").addMojo(new MojoExecution(null), 0);
         });
-
-        plan.condense();
 
         new BuildPlanLogger() {
             @Override
@@ -175,5 +176,4 @@ class BuildPlanCreatorTest {
                     pred -> assertTrue(plan.step(pred.project, pred.name).isPresent(), "Phase not present: " + pred));
         });
     }
-     */
 }

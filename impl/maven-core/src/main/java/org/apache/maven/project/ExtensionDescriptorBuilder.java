@@ -18,7 +18,6 @@
  */
 package org.apache.maven.project;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -88,7 +87,7 @@ public class ExtensionDescriptorBuilder {
 
         XmlNode dom;
         try {
-            XMLStreamReader reader = XMLInputFactory.newFactory().createXMLStreamReader(is);
+            XMLStreamReader reader = XmlService.newXMLInputFactory().createXMLStreamReader(is);
             dom = XmlService.read(reader);
         } catch (XMLStreamException e) {
             throw new IOException(e.getMessage(), e);

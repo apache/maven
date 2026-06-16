@@ -268,6 +268,21 @@ public class BuildPlanExecutor {
                 Stream.of(pplan, setup, teardown).forEach(step -> plan.addStep(project, step.name, step));
             }
 
+            // Handle reactor plugins: if a project uses a plugin that is also a reactor module,
+            // the project's PLAN step must wait for the plugin project's READY step.
+            // This must be done after PLAN/READY steps are created above.
+            Map<String, MavenProject> reactorGavs =
+                    plan.getAllProjects().keySet().stream().collect(Collectors.toMap(BuildPlanExecutor::gav, p -> p));
+            for (MavenProject project : plan.getAllProjects().keySet()) {
+                for (Plugin plugin : project.getBuild().getPlugins()) {
+                    MavenProject pluginProject = reactorGavs.get(gav(plugin));
+                    if (pluginProject != null && pluginProject != project) {
+                        plan.step(project, PLAN)
+                                .ifPresent(pp -> plan.step(pluginProject, READY).ifPresent(pp::executeAfter));
+                    }
+                }
+            }
+
             return plan;
         }
 
@@ -904,10 +919,12 @@ public class BuildPlanExecutor {
                         })
                         .collect(Collectors.toMap(n -> n.name, n -> n));
                 // for each phase, make sure children phases are executed between before and after steps
-                lifecycle.allPhases().forEach(phase -> phase.phases().forEach(child -> {
-                    steps.get(BEFORE + child.name()).executeAfter(steps.get(BEFORE + phase.name()));
-                    steps.get(AFTER + phase.name()).executeAfter(steps.get(AFTER + child.name()));
-                }));
+                lifecycle
+                        .allPhases()
+                        .forEach(phase -> phase.phases().forEach(child -> {
+                            steps.get(BEFORE + child.name()).executeAfter(steps.get(BEFORE + phase.name()));
+                            steps.get(AFTER + phase.name()).executeAfter(steps.get(AFTER + child.name()));
+                        }));
                 // for each phase, create links between this project phases
                 lifecycle.allPhases().forEach(phase -> {
                     phase.links().stream()
@@ -966,23 +983,16 @@ public class BuildPlanExecutor {
                 });
             });
 
-            // Keep projects in reactors by GAV
+            // Eagerly resolve all non-reactor plugins in parallel
             Map<String, MavenProject> reactorGavs =
                     projects.keySet().stream().collect(Collectors.toMap(BuildPlanExecutor::gav, p -> p));
-
-            // Go through all plugins
             List<Runnable> toResolve = new ArrayList<>();
-            projects.keySet().forEach(project -> project.getBuild().getPlugins().forEach(plugin -> {
-                MavenProject pluginProject = reactorGavs.get(gav(plugin));
-                if (pluginProject != null) {
-                    // In order to plan the project, we need all its plugins...
-                    plan.requiredStep(project, PLAN).executeAfter(plan.requiredStep(pluginProject, READY));
-                } else {
-                    toResolve.add(() -> resolvePlugin(session, project.getRemotePluginRepositories(), plugin));
-                }
-            }));
-
-            // Eagerly resolve all plugins in parallel
+            projects.keySet()
+                    .forEach(project -> project.getBuild().getPlugins().forEach(plugin -> {
+                        if (reactorGavs.get(gav(plugin)) == null) {
+                            toResolve.add(() -> resolvePlugin(session, project.getRemotePluginRepositories(), plugin));
+                        }
+                    }));
             toResolve.parallelStream().forEach(Runnable::run);
 
             // Keep track of phase aliases

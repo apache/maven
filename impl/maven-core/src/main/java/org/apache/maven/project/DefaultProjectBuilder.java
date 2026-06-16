@@ -777,6 +777,14 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     sourceContext.handleResourceConfiguration(ProjectScope.MAIN);
                     sourceContext.handleResourceConfiguration(ProjectScope.TEST);
                 }
+
+                // When resources are defined via <sources> (4.1.0 model), sync them to
+                // the model's Build so project.getBuild().getResources() is consistent.
+                // For legacy <resources>, the model already has the correct resources.
+                if (sourceContext.hasSources(Language.RESOURCES, ProjectScope.MAIN)
+                        || sourceContext.hasSources(Language.RESOURCES, ProjectScope.TEST)) {
+                    project.syncBuildResources();
+                }
             }
 
             project.setActiveProfiles(

@@ -149,6 +149,6 @@ public class DefaultExtensionRealmCache implements ExtensionRealmCache, Disposab
 
     @Override
     public void dispose() {
-        flush();
+        cache.clear();
     }
 }
