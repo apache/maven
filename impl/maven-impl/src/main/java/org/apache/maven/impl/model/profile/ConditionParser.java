@@ -150,8 +150,11 @@ public class ConditionParser {
                             && expression.charAt(i + 1) == '=') {
                         tokens.add(c + "=");
                         i++; // Skip the next character
-                    } else if ((c == '&' || c == '|') && i + 1 < expression.length() && expression.charAt(i + 1) == c) {
-                        tokens.add("" + c + c);
+                    } else if (c == '&' && i + 1 < expression.length() && expression.charAt(i + 1) == '&') {
+                        tokens.add("&&");
+                        i++; // Skip the next character
+                    } else if (c == '|' && i + 1 < expression.length() && expression.charAt(i + 1) == '|') {
+                        tokens.add("||");
                         i++; // Skip the next character
                     } else {
                         tokens.add(String.valueOf(c));

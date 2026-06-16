@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -52,6 +53,13 @@ class GAVUtilsTest {
 
     private UpgradeContext createMockContext() {
         return TestUtils.createMockContext();
+    }
+
+    private static boolean containsGAV(Set<Coordinates> gavs, String groupId, String artifactId, String version) {
+        return gavs.stream()
+                .anyMatch(c -> Objects.equals(c.groupId(), groupId)
+                        && Objects.equals(c.artifactId(), artifactId)
+                        && Objects.equals(c.version(), version));
     }
 
     @Nested
@@ -210,8 +218,8 @@ class GAVUtilsTest {
             Set<Coordinates> gavs = InferenceStrategy.computeAllArtifactCoordinates(context, pomMap);
 
             assertEquals(2, gavs.size());
-            assertTrue(gavs.contains(Coordinates.of("com.example", "parent-project", "1.0.0")));
-            assertTrue(gavs.contains(Coordinates.of("com.example", "child-project", "1.0.0")));
+            assertTrue(containsGAV(gavs, "com.example", "parent-project", "1.0.0"));
+            assertTrue(containsGAV(gavs, "com.example", "child-project", "1.0.0"));
         }
 
         @Test
@@ -251,7 +259,7 @@ class GAVUtilsTest {
             Set<Coordinates> gavs = InferenceStrategy.computeAllArtifactCoordinates(context, pomMap);
 
             assertEquals(1, gavs.size());
-            assertTrue(gavs.contains(Coordinates.of("com.example", "duplicate-project", "1.0.0")));
+            assertTrue(containsGAV(gavs, "com.example", "duplicate-project", "1.0.0"));
         }
 
         @Test
@@ -288,7 +296,7 @@ class GAVUtilsTest {
             Set<Coordinates> gavs = InferenceStrategy.computeAllArtifactCoordinates(context, pomMap);
 
             assertEquals(1, gavs.size());
-            assertTrue(gavs.contains(Coordinates.of("com.example", "valid-project", "1.0.0")));
+            assertTrue(containsGAV(gavs, "com.example", "valid-project", "1.0.0"));
         }
     }
 

@@ -168,11 +168,10 @@ import static java.util.Objects.requireNonNull;
  */
 public class MojoExtension extends MavenDIExtension implements ParameterResolver, BeforeEachCallback {
 
-    /** The base directory of the plugin being tested */
-    protected static String pluginBasedir;
+    private static final ExtensionContext.Namespace MOJO_EXTENSION =
+            ExtensionContext.Namespace.create("mojo-extension");
 
-    /** The base directory for test resources */
-    protected static String basedir;
+    private static final String BASEDIR_KEY = "basedir";
 
     /**
      * Gets the identifier for the current test method.
@@ -181,6 +180,8 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
      * @return the test identifier
      */
     public static String getTestId() {
+        ExtensionContext context =
+                getContext().orElseThrow(() -> new IllegalStateException("ExtensionContext must not be null"));
         return context.getRequiredTestClass().getSimpleName() + "-"
                 + context.getRequiredTestMethod().getName();
     }
@@ -193,7 +194,10 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
      * @throws NullPointerException if neither basedir nor plugin basedir is set
      */
     public static String getBasedir() {
-        return requireNonNull(basedir != null ? basedir : MavenDIExtension.basedir);
+        String basedir = getContext()
+                .map(context -> context.getStore(MOJO_EXTENSION).get(BASEDIR_KEY, String.class))
+                .orElse(null);
+        return requireNonNull(basedir != null ? basedir : MavenDIExtension.getBasedir());
     }
 
     /**
@@ -203,7 +207,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
      * @throws NullPointerException if plugin basedir is not set
      */
     public static String getPluginBasedir() {
-        return requireNonNull(pluginBasedir);
+        return MavenDIExtension.getBasedir();
     }
 
     /**
@@ -227,11 +231,9 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             throws ParameterResolutionException {
         try {
             Class<?> holder = parameterContext.getTarget().orElseThrow().getClass();
-            PluginDescriptor descriptor = extensionContext
-                    .getStore(ExtensionContext.Namespace.GLOBAL)
-                    .get(PluginDescriptor.class, PluginDescriptor.class);
-            Model model =
-                    extensionContext.getStore(ExtensionContext.Namespace.GLOBAL).get(Model.class, Model.class);
+            PluginDescriptor descriptor =
+                    extensionContext.getStore(MOJO_EXTENSION).get(PluginDescriptor.class, PluginDescriptor.class);
+            Model model = extensionContext.getStore(MOJO_EXTENSION).get(Model.class, Model.class);
             InjectMojo parameterInjectMojo =
                     parameterContext.getAnnotatedElement().getAnnotation(InjectMojo.class);
             String goal;
@@ -331,23 +333,22 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
     @Override
     @SuppressWarnings("checkstyle:MethodLength")
     public void beforeEach(ExtensionContext context) throws Exception {
-        if (pluginBasedir == null) {
-            pluginBasedir = MavenDIExtension.getBasedir();
-        }
-        basedir = AnnotationSupport.findAnnotation(context.getElement().orElseThrow(), Basedir.class)
+        setContext(context);
+
+        String pluginBasedir = MavenDIExtension.getBasedir();
+
+        String basedir = AnnotationSupport.findAnnotation(context.getElement().orElseThrow(), Basedir.class)
                 .map(Basedir::value)
                 .orElse(pluginBasedir);
-        if (basedir != null) {
-            if (basedir.isEmpty()) {
-                basedir = pluginBasedir + "/target/tests/"
-                        + context.getRequiredTestClass().getSimpleName() + "/"
-                        + context.getRequiredTestMethod().getName();
-            } else {
-                basedir = basedir.replace("${basedir}", pluginBasedir);
-            }
+        if (basedir.isEmpty()) {
+            basedir = pluginBasedir + "/target/tests/"
+                    + context.getRequiredTestClass().getSimpleName() + "/"
+                    + context.getRequiredTestMethod().getName();
+        } else {
+            basedir = basedir.replace("${basedir}", pluginBasedir);
         }
 
-        setContext(context);
+        context.getStore(MOJO_EXTENSION).put(BASEDIR_KEY, basedir);
 
         /*
            binder.install(ProviderMethodsModule.forObject(context.getRequiredTestInstance()));
@@ -438,7 +439,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
         }
         tmodel = new DefaultModelPathTranslator(new DefaultPathTranslator())
                 .alignToBaseDirectory(tmodel, Paths.get(getBasedir()), null);
-        context.getStore(ExtensionContext.Namespace.GLOBAL).put(Model.class, tmodel);
+        context.getStore(MOJO_EXTENSION).put(Model.class, tmodel);
 
         // mojo execution
         // Map<Object, Object> map = getInjector().getContext().getContextData();
@@ -451,7 +452,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             // new InterpolationFilterReader(reader, map, "${", "}");
             pluginDescriptor = new PluginDescriptorStaxReader().read(reader);
         }
-        context.getStore(ExtensionContext.Namespace.GLOBAL).put(PluginDescriptor.class, pluginDescriptor);
+        context.getStore(MOJO_EXTENSION).put(PluginDescriptor.class, pluginDescriptor);
         // for (ComponentDescriptor<?> desc : pluginDescriptor.getComponents()) {
         //    getContainer().addComponentDescriptor(desc);
         // }

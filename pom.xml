@@ -142,35 +142,35 @@ under the License.
     <maven.site.path>ref/4-LATEST</maven.site.path>
     <project.build.outputTimestamp>2025-06-24T20:18:00Z</project.build.outputTimestamp>
     <!-- various versions -->
-    <asmVersion>9.9.1</asmVersion>
-    <byteBuddyVersion>1.18.8</byteBuddyVersion>
-    <classWorldsVersion>2.11.0</classWorldsVersion>
+    <asmVersion>9.10.1</asmVersion>
+    <byteBuddyVersion>1.18.10</byteBuddyVersion>
+    <classWorldsVersion>2.12.0</classWorldsVersion>
     <commonsCliVersion>1.11.0</commonsCliVersion>
-    <domtripVersion>0.4.1</domtripVersion>
+    <domtripVersion>1.5.2</domtripVersion>
     <guiceVersion>5.1.0</guiceVersion>
     <guavaVersion>33.6.0-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
 
     <jakartaInjectApiVersion>2.0.1</jakartaInjectApiVersion>
     <javaxAnnotationApiVersion>1.3.2</javaxAnnotationApiVersion>
-    <jlineVersion>4.0.14</jlineVersion>
+    <jlineVersion>4.1.3</jlineVersion>
     <jmhVersion>1.37</jmhVersion>
-    <junitVersion>6.0.3</junitVersion>
+    <junitVersion>6.1.0</junitVersion>
     <jxpathVersion>1.4.0</jxpathVersion>
-    <logbackClassicVersion>1.5.32</logbackClassicVersion>
+    <logbackClassicVersion>1.5.34</logbackClassicVersion>
     <mockitoVersion>5.23.0</mockitoVersion>
     <plexusInteractivityVersion>1.5.1</plexusInteractivityVersion>
     <plexusInterpolationVersion>1.29</plexusInterpolationVersion>
     <plexusTestingVersion>2.1.0</plexusTestingVersion>
     <plexusXmlVersion>4.1.1</plexusXmlVersion>
-    <resolverVersion>2.0.16</resolverVersion>
+    <resolverVersion>2.0.18</resolverVersion>
     <securityDispatcherVersion>4.1.0</securityDispatcherVersion>
     <sisuVersion>1.0.0</sisuVersion>
     <slf4jVersion>2.0.18</slf4jVersion>
     <stax2ApiVersion>4.3.0</stax2ApiVersion>
     <wagonVersion>3.5.3</wagonVersion>
-    <woodstoxVersion>7.1.1</woodstoxVersion>
-    <xmlunitVersion>2.11.0</xmlunitVersion>
+    <woodstoxVersion>7.2.1</woodstoxVersion>
+    <xmlunitVersion>2.12.0</xmlunitVersion>
     <jacocoArgLine />
 
     <!-- Set as system property in surefire/failsafe to propagate to tests and IT Verifier -->
@@ -678,10 +678,11 @@ under the License.
         <artifactId>jmh-generator-annprocess</artifactId>
         <version>${jmhVersion}</version>
       </dependency>
+      <!-- Keep version in sync with MIMIR_VERSION in .github/workflows/maven.yml -->
       <dependency>
         <groupId>eu.maveniverse.maven.mimir</groupId>
         <artifactId>testing</artifactId>
-        <version>0.11.3</version>
+        <version>0.12.0</version>
       </dependency>
     </dependencies>
     <!--bootstrap-start-comment-->
@@ -717,7 +718,7 @@ under the License.
         <plugin>
           <groupId>com.github.siom79.japicmp</groupId>
           <artifactId>japicmp-maven-plugin</artifactId>
-          <version>0.25.7</version>
+          <version>0.26.1</version>
           <executions>
             <execution>
               <goals>
@@ -766,7 +767,7 @@ under the License.
         <plugin>
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
-          <version>0.8.14</version>
+          <version>0.8.15</version>
           <configuration>
             <excludes>
               <exclude>**/org/apache/maven/it/**</exclude>
@@ -785,7 +786,7 @@ under the License.
             <dependency>
               <groupId>net.sourceforge.pmd</groupId>
               <artifactId>pmd-core</artifactId>
-              <version>7.24.0</version>
+              <version>7.25.0</version>
             </dependency>
           </dependencies>
         </plugin>
