@@ -66,10 +66,10 @@ class MojoExtensionModelTest {
         assertEquals("2.0", model.getVersion());
         assertNotNull(model.getBuild());
         assertTrue(
-                model.getBuild().getDirectory().endsWith("target"),
+                Paths.get(model.getBuild().getDirectory()).endsWith(Paths.get("target")),
                 "Build directory from defaultModel should be present after merge");
         assertTrue(
-                model.getBuild().getOutputDirectory().endsWith("target" + "/classes"),
+                Paths.get(model.getBuild().getOutputDirectory()).endsWith(Paths.get("target", "classes")),
                 "Output directory from defaultModel should be present after merge");
     }
 
