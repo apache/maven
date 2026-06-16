@@ -243,6 +243,18 @@ class ConditionParserTest {
     }
 
     @Test
+    void testArithmeticWithoutSpaces() {
+        assertEquals(5.0, parser.parse("2+3"));
+        assertEquals(10.0, parser.parse("15-5"));
+        assertEquals(24.0, parser.parse("6*4"));
+        assertEquals(3.0, parser.parse("9/3"));
+        assertEquals(14.0, parser.parse("2+3*4"));
+        assertEquals(20.0, parser.parse("(2+3)*4"));
+        assertEquals(-5.0, parser.parse("-5"));
+        assertEquals(-5.0, parser.parse("-(2+3)"));
+    }
+
+    @Test
     void testCombinedArithmeticAndLogic() {
         assertTrue((Boolean) parser.parse("(5 > 3) && (10 / 2 == 5)"));
         assertFalse((Boolean) parser.parse("(5 < 3) || (10 / 2 != 5)"));
