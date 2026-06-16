@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.plugin.testing;
+package org.apache.maven.testing.plugin;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -25,8 +25,47 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/** @deprecated Use {@link org.apache.maven.testing.plugin.MojoParameter} instead */
-@Deprecated(since = "4.0.0-rc-6", forRemoval = true)
+/**
+ * Specifies a parameter value for a Mojo in a Maven plugin test.
+ * This annotation can be used to configure individual Mojo parameters
+ * without requiring a full POM file.
+ *
+ * <p>The annotation is repeatable, allowing multiple parameters to be set
+ * on a single test method or parameter. For multiple parameters, you can
+ * either use multiple {@code @MojoParameter} annotations or a single
+ * {@link MojoParameters} annotation.</p>
+ *
+ * <p>Example usage with a single parameter:</p>
+ * <pre>
+ * {@code
+ * @Test
+ * @InjectMojo(goal = "compile")
+ * @MojoParameter(name = "source", value = "1.8")
+ * void testCompilation(CompileMojo mojo) {
+ *     mojo.execute();
+ * }
+ * }
+ * </pre>
+ *
+ * <p>Example usage with multiple parameters:</p>
+ * <pre>
+ * {@code
+ * @Test
+ * @InjectMojo(goal = "compile")
+ * @MojoParameter(name = "source", value = "1.8")
+ * @MojoParameter(name = "target", value = "1.8")
+ * @MojoParameter(name = "debug", value = "true")
+ * void testCompilation(CompileMojo mojo) {
+ *     mojo.execute();
+ * }
+ * }
+ * </pre>
+ *
+ * @see MojoParameters
+ * @see InjectMojo
+ * @see MojoTest
+ * @since 4.0.0
+ */
 @Target({ElementType.METHOD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited

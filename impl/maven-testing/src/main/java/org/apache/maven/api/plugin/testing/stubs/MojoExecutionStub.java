@@ -18,109 +18,14 @@
  */
 package org.apache.maven.api.plugin.testing.stubs;
 
-import java.util.Optional;
-
-import org.apache.maven.api.MojoExecution;
-import org.apache.maven.api.Plugin;
-import org.apache.maven.api.model.PluginExecution;
-import org.apache.maven.api.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.api.xml.XmlNode;
-
-/**
- * A stub implementation of {@link MojoExecution} for testing Maven plugins.
- * This class provides a simplified representation of a Mojo execution context,
- * allowing tests to simulate plugin executions without a full Maven environment.
- *
- * <p>Example usage:</p>
- * <pre>
- * MojoExecutionStub execution = new MojoExecutionStub("myExecution", "myGoal");
- * execution.setPlugin(new PluginStub());
- * execution.setDescriptor(mojoDescriptor);
- * </pre>
- *
- * @see MojoExecution
- * @see PluginStub
- * @since 4.0.0
- */
-public class MojoExecutionStub implements MojoExecution {
-    private String executionId;
-    private String goal;
-    private XmlNode dom;
-    private Plugin plugin = new PluginStub();
-    private PluginExecution model;
-    private MojoDescriptor descriptor;
-    private String lifecyclePhase;
-
+/** @deprecated Use {@link org.apache.maven.testing.plugin.stubs.MojoExecutionStub} instead */
+@Deprecated(since = "4.0.0-rc-6", forRemoval = true)
+public class MojoExecutionStub extends org.apache.maven.testing.plugin.stubs.MojoExecutionStub {
     public MojoExecutionStub(String executionId, String goal) {
-        this(executionId, goal, null);
+        super(executionId, goal);
     }
 
-    public MojoExecutionStub(String executionId, String goal, XmlNode dom) {
-        this.executionId = executionId;
-        this.goal = goal;
-        this.dom = dom;
-    }
-
-    @Override
-    public Plugin getPlugin() {
-        return plugin;
-    }
-
-    @Override
-    public PluginExecution getModel() {
-        return model;
-    }
-
-    @Override
-    public MojoDescriptor getDescriptor() {
-        return descriptor;
-    }
-
-    @Override
-    public String getLifecyclePhase() {
-        return lifecyclePhase;
-    }
-
-    @Override
-    public String getExecutionId() {
-        return executionId;
-    }
-
-    @Override
-    public String getGoal() {
-        return goal;
-    }
-
-    @Override
-    public Optional<XmlNode> getConfiguration() {
-        return Optional.ofNullable(dom);
-    }
-
-    public void setExecutionId(String executionId) {
-        this.executionId = executionId;
-    }
-
-    public void setGoal(String goal) {
-        this.goal = goal;
-    }
-
-    public void setDom(XmlNode dom) {
-        this.dom = dom;
-    }
-
-    public void setPlugin(Plugin plugin) {
-        this.plugin = plugin;
-    }
-
-    public void setModel(PluginExecution model) {
-        this.model = model;
-    }
-
-    public void setDescriptor(MojoDescriptor descriptor) {
-        this.descriptor = descriptor;
-    }
-
-    public void setLifecyclePhase(String lifecyclePhase) {
-        this.lifecyclePhase = lifecyclePhase;
+    public MojoExecutionStub(String executionId, String goal, org.apache.maven.api.xml.XmlNode dom) {
+        super(executionId, goal, dom);
     }
 }
