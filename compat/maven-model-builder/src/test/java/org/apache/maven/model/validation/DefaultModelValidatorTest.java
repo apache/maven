@@ -962,7 +962,8 @@ class DefaultModelValidatorTest {
 
         // Check if any thread encountered an error
         if (failure.get() != null) {
-            throw new AssertionError("Concurrent validation failed: " + failure.get().getMessage(), failure.get());
+            throw new AssertionError(
+                    "Concurrent validation failed: " + failure.get().getMessage(), failure.get());
         }
     }
 }
