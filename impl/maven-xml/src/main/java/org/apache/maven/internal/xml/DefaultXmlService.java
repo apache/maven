@@ -18,7 +18,6 @@
  */
 package org.apache.maven.internal.xml;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -53,7 +52,7 @@ public class DefaultXmlService extends XmlService {
     @Override
     public XmlNode doRead(InputStream input, @Nullable XmlService.InputLocationBuilder locationBuilder)
             throws XMLStreamException {
-        XMLStreamReader parser = XMLInputFactory.newFactory().createXMLStreamReader(input);
+        XMLStreamReader parser = XmlService.newXMLInputFactory().createXMLStreamReader(input);
         return doRead(parser, locationBuilder);
     }
 
@@ -61,7 +60,7 @@ public class DefaultXmlService extends XmlService {
     @Override
     public XmlNode doRead(Reader reader, @Nullable XmlService.InputLocationBuilder locationBuilder)
             throws XMLStreamException {
-        XMLStreamReader parser = XMLInputFactory.newFactory().createXMLStreamReader(reader);
+        XMLStreamReader parser = XmlService.newXMLInputFactory().createXMLStreamReader(reader);
         return doRead(parser, locationBuilder);
     }
 

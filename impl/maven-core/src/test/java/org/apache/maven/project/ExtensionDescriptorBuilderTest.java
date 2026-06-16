@@ -19,8 +19,11 @@
 package org.apache.maven.project;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.AfterEach;
@@ -31,6 +34,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
@@ -81,5 +85,25 @@ class ExtensionDescriptorBuilderTest {
         assertNotNull(ed);
         assertEquals(Arrays.asList("a", "b", "c"), ed.getExportedPackages());
         assertEquals(Arrays.asList("x", "y", "z"), ed.getExportedArtifacts());
+    }
+
+    @Test
+    void testExternalEntityIsNotResolved() throws Exception {
+        Path secret = Files.createTempFile("extension-xxe", ".txt");
+        Files.writeString(secret, "TOPSECRET");
+        try {
+            String xml = "<?xml version='1.0'?>\n" + "<!DOCTYPE extension [ <!ENTITY xxe SYSTEM \""
+                    + secret.toUri() + "\"> ]>\n"
+                    + "<extension><exportedPackages><exportedPackage>&xxe;</exportedPackage></exportedPackages></extension>";
+
+            try {
+                ExtensionDescriptor ed = builder.build(toStream(xml));
+                assertFalse(ed.getExportedPackages().contains("TOPSECRET"));
+            } catch (IOException expected) {
+                // doctype / external entities rejected at parse time
+            }
+        } finally {
+            Files.deleteIfExists(secret);
+        }
     }
 }

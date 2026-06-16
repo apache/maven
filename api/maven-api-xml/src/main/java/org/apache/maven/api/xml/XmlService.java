@@ -18,6 +18,7 @@
  */
 package org.apache.maven.api.xml;
 
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -102,6 +103,20 @@ public abstract class XmlService {
      * Value should be a comma-separated list of attribute names.
      */
     public static final String KEYS_COMBINATION_MODE_ATTRIBUTE = "combine.keys";
+
+    /**
+     * Creates a new {@link XMLInputFactory} hardened against XXE attacks.
+     * The returned factory has DTD support and external entity resolution disabled.
+     *
+     * @return a hardened XMLInputFactory
+     * @since 4.0.0-rc-6
+     */
+    public static XMLInputFactory newXMLInputFactory() {
+        XMLInputFactory factory = XMLInputFactory.newFactory();
+        factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+        return factory;
+    }
 
     /**
      * Convenience method to merge two XML nodes using default settings.
