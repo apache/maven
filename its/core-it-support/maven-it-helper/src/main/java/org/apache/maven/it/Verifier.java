@@ -868,10 +868,7 @@ public class Verifier {
     }
 
     private ExecutorRequest.Builder executorRequest() {
-        return ExecutorRequest.mavenBuilder()
-                .userHomeDirectory(userHomeDirectory)
-                .argument("-Daether.remoteRepositoryFilter.groupId=false")
-                .argument("-Daether.remoteRepositoryFilter.prefixes=false");
+        return ExecutorRequest.mavenBuilder().userHomeDirectory(userHomeDirectory);
     }
 
     private String getSupportArtifactPath(String artifact) {
