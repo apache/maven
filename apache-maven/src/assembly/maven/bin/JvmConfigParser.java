@@ -94,14 +94,7 @@ public class JvmConfigParser {
     static String parseJvmConfig(Path jvmConfigPath, String mavenProjectBasedir) throws IOException {
         StringBuilder result = new StringBuilder();
 
-        boolean firstLine = true;
         for (String line : Files.readAllLines(jvmConfigPath, StandardCharsets.UTF_8)) {
-            if (firstLine) {
-                if (line.startsWith("\uFEFF")) {
-                    line = line.substring(1);
-                }
-                firstLine = false;
-            }
             line = processLine(line, mavenProjectBasedir);
             if (line.isEmpty()) {
                 continue;
