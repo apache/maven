@@ -23,17 +23,29 @@ import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblemCollector;
 
 /**
- * Handles expansion of general build plugin configuration into individual executions.
+ * Handles normalization of a model. In this context, normalization is the process of producing a canonical
+ * representation for models that physically look different but are semantically equivalent.
  *
+ * @since 4.0.0
  */
-public interface PluginConfigurationExpander {
+public interface ModelNormalizer {
 
     /**
-     * Merges values from general build plugin configuration into the individual plugin executions of the given model.
+     * Merges duplicate elements like multiple declarations of the same build plugin in the specified model.
      *
-     * @param model The model whose build plugin configuration should be expanded, must not be <code>null</code>.
+     * @param model The model whose duplicate elements should be merged, must not be {@code null}.
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    Model expandPluginConfiguration(Model model, ModelBuilderRequest request, ModelProblemCollector problems);
+    Model mergeDuplicates(Model model, ModelBuilderRequest request, ModelProblemCollector problems);
+
+    /**
+     * Sets default values in the specified model that for technical reasons cannot be set directly in the Modello
+     * definition.
+     *
+     * @param model The model in which to set the default values, must not be {@code null}.
+     * @param request The model building request that holds further settings, must not be {@code null}.
+     * @param problems The container used to collect problems that were encountered, must not be {@code null}.
+     */
+    Model injectDefaultValues(Model model, ModelBuilderRequest request, ModelProblemCollector problems);
 }

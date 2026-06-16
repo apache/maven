@@ -23,28 +23,23 @@ import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblemCollector;
 
 /**
- * Handles normalization of a model. In this context, normalization is the process of producing a canonical
- * representation for models that physically look different but are semantically equivalent.
+ * Handles inheritance of model values.
  *
+ * @since 4.0.0
  */
-public interface ModelNormalizer {
+public interface InheritanceAssembler {
 
     /**
-     * Merges duplicate elements like multiple declarations of the same build plugin in the specified model.
+     * Merges values from the specified parent model into the given child model. Implementations are expected to keep
+     * parent and child completely decoupled by injecting deep copies of objects into the child rather than the original
+     * objects from the parent.
      *
-     * @param model The model whose duplicate elements should be merged, must not be {@code null}.
+     * @param child The child model into which to merge the values inherited from the parent, must not be
+     *            <code>null</code>.
+     * @param parent The (read-only) parent model from which to inherit the values, may be <code>null</code>.
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    Model mergeDuplicates(Model model, ModelBuilderRequest request, ModelProblemCollector problems);
-
-    /**
-     * Sets default values in the specified model that for technical reasons cannot be set directly in the Modello
-     * definition.
-     *
-     * @param model The model in which to set the default values, must not be {@code null}.
-     * @param request The model building request that holds further settings, must not be {@code null}.
-     * @param problems The container used to collect problems that were encountered, must not be {@code null}.
-     */
-    Model injectDefaultValues(Model model, ModelBuilderRequest request, ModelProblemCollector problems);
+    Model assembleModelInheritance(
+            Model child, Model parent, ModelBuilderRequest request, ModelProblemCollector problems);
 }

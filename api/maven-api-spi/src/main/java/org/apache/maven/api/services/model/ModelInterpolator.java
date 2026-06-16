@@ -18,25 +18,37 @@
  */
 package org.apache.maven.api.services.model;
 
+import java.nio.file.Path;
+
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblemCollector;
 
 /**
- * Handles injection of plugin executions induced by the lifecycle bindings for a packaging.
+ * Replaces expressions of the form <code>${token}</code> with their effective values. Effective values are basically
+ * calculated from the elements of the model itself and the execution properties from the building request.
  *
+ * @since 4.0.0
  */
-public interface LifecycleBindingsInjector {
+public interface ModelInterpolator {
 
     /**
-     * Injects plugin executions induced by lifecycle bindings into the specified model. The model has already undergone
-     * injection of plugin management so any plugins that are injected by lifecycle bindings and are not already present
-     * in the model's plugin section need to be subjected to the model's plugin management.
+     * Interpolates expressions in the specified model.
      *
-     * @param model The model into which to inject the default plugin executions for its packaging, must not be
-     *            <code>null</code>.
+     * @param model The model to interpolate, must not be {@code null}.
+     * @param projectDir The project directory, may be {@code null} if the model does not belong to a local project but
+     *            to some artifact's metadata.
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
+     * @return The interpolated model, never {@code null}.
+     * @since 4.0.0
      */
-    Model injectLifecycleBindings(Model model, ModelBuilderRequest request, ModelProblemCollector problems);
+    @Nonnull
+    Model interpolateModel(
+            @Nonnull Model model,
+            @Nullable Path projectDir,
+            @Nonnull ModelBuilderRequest request,
+            @Nonnull ModelProblemCollector problems);
 }

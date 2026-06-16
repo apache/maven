@@ -23,16 +23,17 @@ import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblemCollector;
 
 /**
- * Handles injection of dependency management into the model.
+ * Handles injection of plugin management into the model.
  *
+ * @since 4.0.0
  */
-public interface DependencyManagementInjector {
+public interface PluginManagementInjector {
 
     /**
-     * Merges default values from the dependency management section of the given model into itself.
+     * Merges default values from the plugin management section of the given model into itself.
      *
-     * @param model The model into which to merge the values specified by its dependency management sections, must not
-     *            be <code>null</code>.
+     * @param model The model into which to merge the values specified by its plugin management section, must not be
+     *            <code>null</code>.
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */

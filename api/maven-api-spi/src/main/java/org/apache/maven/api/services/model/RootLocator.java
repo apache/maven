@@ -25,15 +25,17 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 
 /**
- * Interface used to locate the root directory for a given project.
- *
+ * Locates the root directory for a given project.
+ * <p>
  * The root locator is usually looked up from the DI container.
  * One notable exception is the computation of the early {@code session.rootDirectory}
  * property which happens very early.  The implementation used in this case
  * will be discovered using the JDK service mechanism.
- *
+ * <p>
  * The default implementation will look for a {@code .mvn} child directory
  * or a {@code pom.xml} containing the {@code root="true"} attribute.
+ *
+ * @since 4.0.0
  */
 public interface RootLocator extends Service {
 

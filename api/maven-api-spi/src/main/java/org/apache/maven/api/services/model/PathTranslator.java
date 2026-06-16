@@ -23,6 +23,7 @@ import java.nio.file.Path;
 /**
  * Resolves relative paths against a specific base directory.
  *
+ * @since 4.0.0
  */
 public interface PathTranslator {
 
