@@ -18,13 +18,22 @@
  */
 package org.apache.maven.api.services.model;
 
-import java.nio.file.Path;
-
-import org.apache.maven.api.Service;
+import org.apache.maven.api.model.Model;
+import org.apache.maven.api.services.ModelBuilderRequest;
 
 /**
- * Interface used to detect is a given directory "root directory".
+ * Normalizes URLs to remove the ugly parent references "../" that got potentially inserted by URL adjustment during
+ * model inheritance.
+ *
+ * @since 4.0.0
  */
-public interface RootDetector extends Service {
-    boolean isRootDirectory(Path dir);
+public interface ModelUrlNormalizer {
+
+    /**
+     * Normalizes the well-known URLs of the specified model.
+     *
+     * @param model The model whose URLs should be normalized, may be {@code null}.
+     * @param request The model building request that holds further settings, must not be {@code null}.
+     */
+    Model normalize(Model model, ModelBuilderRequest request);
 }

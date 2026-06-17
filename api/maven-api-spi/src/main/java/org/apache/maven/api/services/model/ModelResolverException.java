@@ -23,6 +23,7 @@ import org.apache.maven.api.services.MavenException;
 /**
  * Signals an error when resolving the path to an external model.
  *
+ * @since 4.0.0
  */
 public class ModelResolverException extends MavenException {
 
