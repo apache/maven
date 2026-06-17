@@ -36,6 +36,8 @@ import org.apache.maven.api.services.Result;
 
 /**
  * Resolves a POM from its coordinates.
+ *
+ * @since 4.0.0
  */
 public interface ModelResolver extends Service {
 

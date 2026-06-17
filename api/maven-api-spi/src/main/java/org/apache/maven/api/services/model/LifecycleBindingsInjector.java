@@ -18,25 +18,26 @@
  */
 package org.apache.maven.api.services.model;
 
-import java.nio.file.Path;
-
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.ModelBuilderRequest;
+import org.apache.maven.api.services.ModelProblemCollector;
 
 /**
- * Resolves relative paths of a model against a specific base directory.
+ * Handles injection of plugin executions induced by the lifecycle bindings for a packaging.
  *
+ * @since 4.0.0
  */
-public interface ModelPathTranslator {
+public interface LifecycleBindingsInjector {
 
     /**
-     * Resolves the well-known paths of the specified model against the given base directory. Paths within plugin
-     * configuration are not processed.
+     * Injects plugin executions induced by lifecycle bindings into the specified model. The model has already undergone
+     * injection of plugin management so any plugins that are injected by lifecycle bindings and are not already present
+     * in the model's plugin section need to be subjected to the model's plugin management.
      *
-     * @param model The model whose paths should be resolved, may be {@code null}.
-     * @param basedir The base directory to resolve relative paths against, may be {@code null}.
+     * @param model The model into which to inject the default plugin executions for its packaging, must not be
+     *            <code>null</code>.
      * @param request The model building request that holds further settings, must not be {@code null}.
-     * @since 4.0.0
+     * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    Model alignToBaseDirectory(Model model, Path basedir, ModelBuilderRequest request);
+    Model injectLifecycleBindings(Model model, ModelBuilderRequest request, ModelProblemCollector problems);
 }

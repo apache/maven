@@ -25,6 +25,7 @@ import org.apache.maven.api.services.ModelProblemCollector;
 /**
  * Checks the model for missing or invalid values.
  *
+ * @since 4.0.0
  */
 public interface ModelValidator {
     /**

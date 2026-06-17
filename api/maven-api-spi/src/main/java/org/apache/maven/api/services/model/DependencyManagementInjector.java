@@ -18,30 +18,24 @@
  */
 package org.apache.maven.api.services.model;
 
-import java.util.List;
-
-import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblemCollector;
 
 /**
- * Handles the import of dependency management from other models into the target model.
+ * Handles injection of dependency management into the model.
  *
+ * @since 4.0.0
  */
-public interface DependencyManagementImporter {
+public interface DependencyManagementInjector {
 
     /**
-     * Imports the specified dependency management sections into the given target model.
+     * Merges default values from the dependency management section of the given model into itself.
      *
-     * @param target The model into which to import the dependency management section, must not be <code>null</code>.
-     * @param sources The dependency management sections to import, may be <code>null</code>.
+     * @param model The model into which to merge the values specified by its dependency management sections, must not
+     *            be <code>null</code>.
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    Model importManagement(
-            Model target,
-            List<? extends DependencyManagement> sources,
-            ModelBuilderRequest request,
-            ModelProblemCollector problems);
+    Model injectManagement(Model model, ModelBuilderRequest request, ModelProblemCollector problems);
 }

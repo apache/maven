@@ -28,7 +28,9 @@ import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
 
 /**
- * ModelProcessor
+ * Locates and reads POM files from the filesystem.
+ *
+ * @since 4.0.0
  */
 public interface ModelProcessor {
 

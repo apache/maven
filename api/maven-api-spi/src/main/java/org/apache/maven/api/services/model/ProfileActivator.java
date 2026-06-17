@@ -24,6 +24,7 @@ import org.apache.maven.api.services.ModelProblemCollector;
 /**
  * Determines whether a profile should be activated.
  *
+ * @since 4.0.0
  */
 public interface ProfileActivator {
 

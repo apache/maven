@@ -26,10 +26,11 @@ import org.apache.maven.api.services.ModelBuilderException;
 
 /**
  * Describes the environmental context used to determine the activation status of profiles.
- *
+ * <p>
  * The {@link Model} is available from the activation context, but only static parts of it
  * are allowed to be used, i.e. those that do not change between file model and effective model.
  *
+ * @since 4.0.0
  */
 public interface ProfileActivationContext {
 
