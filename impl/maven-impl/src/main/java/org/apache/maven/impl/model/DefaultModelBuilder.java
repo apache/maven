@@ -1400,7 +1400,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             // path correctly if it was not set in the input model
             if (inputModel.getParent() != null && inputModel.getParent().getRelativePath() == null) {
                 String relPath;
-                if (parentModel.getPomFile() != null && isBuildRequest()) {
+                if (isBuildRequest() && parentModel.getPomFile() != null && inputModel.getPomFile() != null) {
                     relPath = inputModel
                             .getPomFile()
                             .getParent()
