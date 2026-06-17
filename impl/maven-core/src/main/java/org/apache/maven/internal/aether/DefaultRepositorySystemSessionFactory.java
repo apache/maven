@@ -433,14 +433,16 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         HashSet<String> activeProfileId =
                 new HashSet<>(request.getProfileActivation().getRequiredActiveProfileIds());
         activeProfileId.addAll(request.getProfileActivation().getOptionalActiveProfileIds());
-        // Also include profiles activated via settings.xml <activeProfiles> so that their
-        // properties (notably aether.* configuration) reach the resolver session config in
-        // time for LocalRepositoryManager initialization.
-        activeProfileId.addAll(request.getActiveProfiles());
+        // Profiles explicitly deactivated via -P !id must be excluded even if they
+        // declare activeByDefault=true.
+        HashSet<String> inactiveProfileId =
+                new HashSet<>(request.getProfileActivation().getRequiredInactiveProfileIds());
+        inactiveProfileId.addAll(request.getProfileActivation().getOptionalInactiveProfileIds());
 
         return request.getProfiles().stream()
                 .filter(profile -> activeProfileId.contains(profile.getId())
-                        || (profile.getActivation() != null
+                        || (!inactiveProfileId.contains(profile.getId())
+                                && profile.getActivation() != null
                                 && profile.getActivation().isActiveByDefault()))
                 .map(ModelBase::getProperties)
                 .flatMap(properties -> properties.entrySet().stream())

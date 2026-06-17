@@ -53,7 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * settings.xml activation channels fail, which is what these tests guard
  * against.
  */
-public class MavenITSettingsProfileAetherPropertiesTest extends AbstractMavenIntegrationTestCase {
+public class MavenITgh12288SettingsProfileAetherPropertiesTest extends AbstractMavenIntegrationTestCase {
 
     @Test
     public void testActiveByDefaultProfile() throws Exception {
