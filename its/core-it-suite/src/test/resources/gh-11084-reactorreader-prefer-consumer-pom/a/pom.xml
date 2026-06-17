@@ -17,7 +17,8 @@
     specific language governing permissions and limitations
     under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.1.0">
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.1.0</modelVersion>
   <parent />
 
   <artifactId>a</artifactId>

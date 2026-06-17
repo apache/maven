@@ -45,7 +45,7 @@
 -->
 <model xmlns="http://codehaus-plexus.github.io/MODELLO/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/2.0.0 https://codehaus-plexus.github.io/modello/xsd/modello-2.0.0.xsd"
-  xml.namespace="http://maven.apache.org/POM/${version}"
+  xml.namespace="http://maven.apache.org/POM/4.0.0"
   xml.schemaLocation="https://maven.apache.org/xsd/maven-${version}.xsd">
   <id>maven</id>
   <name>Maven</name>
