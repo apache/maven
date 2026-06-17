@@ -19,6 +19,8 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.util.Comparator;
 
 import org.junit.jupiter.api.Test;
 
@@ -63,6 +65,52 @@ public class MavenITgh12288SettingsProfileAetherPropertiesTest extends AbstractM
     @Test
     public void testActiveProfilesList() throws Exception {
         runAndAssertCustomPrefix("settings-active-profiles-list.xml");
+    }
+
+    @Test
+    public void testActiveByDefaultDeactivatedViaCli() throws Exception {
+        File testDir = extractResources("/settings-profile-aether-properties");
+
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setAutoclean(false);
+        verifier.setLogFileName("log-deactivation.txt");
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.settings.profile.aether");
+
+        // Sibling tests in this class install under the same custom prefix; clear it to
+        // avoid false positives if those tests ran first.
+        File customPrefixSubtree = new File(verifier.getLocalRepository(), "it-custom-prefix");
+        deleteRecursivelyIfExists(customPrefixSubtree);
+
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings-active-by-default.xml");
+        verifier.addCliArgument("-P!aether-split-via-settings");
+        verifier.addCliArgument("install");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+
+        File localRepo = new File(verifier.getLocalRepository());
+        String gavRelativePath = "org/apache/maven/its/settings/profile/aether/test-artifact/1.0/test-artifact-1.0.pom";
+        File flatLayout = new File(localRepo, gavRelativePath);
+        File customPrefix = new File(localRepo, "it-custom-prefix/" + gavRelativePath);
+
+        assertTrue(
+                flatLayout.exists(),
+                "Expected artifact at flat layout (profile deactivated via -P !), but not found at " + flatLayout);
+
+        assertFalse(
+                customPrefix.exists(),
+                "Found artifact at custom prefix " + customPrefix + " — deactivation via -P ! was ignored.");
+    }
+
+    private static void deleteRecursivelyIfExists(File path) throws Exception {
+        if (!path.exists()) {
+            return;
+        }
+        Files.walk(path.toPath())
+                .sorted(Comparator.reverseOrder())
+                .map(java.nio.file.Path::toFile)
+                .forEach(File::delete);
     }
 
     private void runAndAssertCustomPrefix(String settingsFile) throws Exception {
