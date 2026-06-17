@@ -418,9 +418,9 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
         } else {
             model = new MavenMerger().merge(tmodel, defaultModel, false, null);
         }
-        tmodel = new DefaultModelPathTranslator(new DefaultPathTranslator())
-                .alignToBaseDirectory(tmodel, Paths.get(getBasedir()), null);
-        context.getStore(MOJO_EXTENSION).put(Model.class, tmodel);
+        final Model alignedModel = new DefaultModelPathTranslator(new DefaultPathTranslator())
+                .alignToBaseDirectory(model, Paths.get(getBasedir()), null);
+        context.getStore(MOJO_EXTENSION).put(Model.class, alignedModel);
 
         // mojo execution
         // Map<Object, Object> map = getInjector().getContext().getContextData();
@@ -466,12 +466,16 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             @Priority(-10)
             private Project createProject(InternalSession s) {
                 ProjectStub stub = new ProjectStub();
-                if (!"pom".equals(model.getPackaging())) {
+                if (!"pom".equals(alignedModel.getPackaging())) {
                     ProducedArtifactStub artifact = new ProducedArtifactStub(
-                            model.getGroupId(), model.getArtifactId(), "", model.getVersion(), model.getPackaging());
+                            alignedModel.getGroupId(),
+                            alignedModel.getArtifactId(),
+                            "",
+                            alignedModel.getVersion(),
+                            alignedModel.getPackaging());
                     stub.setMainArtifact(artifact);
                 }
-                stub.setModel(model);
+                stub.setModel(alignedModel);
                 stub.setBasedir(Paths.get(MojoExtension.getBasedir()));
                 stub.setPomPath(modelPath[0]);
                 s.getService(ArtifactManager.class).setPath(stub.getPomArtifact(), modelPath[0]);
