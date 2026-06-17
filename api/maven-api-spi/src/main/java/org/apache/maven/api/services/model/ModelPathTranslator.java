@@ -20,34 +20,24 @@ package org.apache.maven.api.services.model;
 
 import java.nio.file.Path;
 
-import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.ModelBuilderRequest;
-import org.apache.maven.api.services.ModelProblemCollector;
 
 /**
- * Replaces expressions of the form <code>${token}</code> with their effective values. Effective values are basically
- * calculated from the elements of the model itself and the execution properties from the building request.
+ * Resolves relative paths of a model against a specific base directory.
  *
+ * @since 4.0.0
  */
-public interface ModelInterpolator {
+public interface ModelPathTranslator {
 
     /**
-     * Interpolates expressions in the specified model.
+     * Resolves the well-known paths of the specified model against the given base directory. Paths within plugin
+     * configuration are not processed.
      *
-     * @param model The model to interpolate, must not be {@code null}.
-     * @param projectDir The project directory, may be {@code null} if the model does not belong to a local project but
-     *            to some artifact's metadata.
+     * @param model The model whose paths should be resolved, may be {@code null}.
+     * @param basedir The base directory to resolve relative paths against, may be {@code null}.
      * @param request The model building request that holds further settings, must not be {@code null}.
-     * @param problems The container used to collect problems that were encountered, must not be {@code null}.
-     * @return The interpolated model, never {@code null}.
      * @since 4.0.0
      */
-    @Nonnull
-    Model interpolateModel(
-            @Nonnull Model model,
-            @Nullable Path projectDir,
-            @Nonnull ModelBuilderRequest request,
-            @Nonnull ModelProblemCollector problems);
+    Model alignToBaseDirectory(Model model, Path basedir, ModelBuilderRequest request);
 }

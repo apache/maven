@@ -18,27 +18,29 @@
  */
 package org.apache.maven.api.services.model;
 
-import org.apache.maven.api.model.Model;
-import org.apache.maven.api.services.ModelBuilderRequest;
+import java.util.Collection;
+import java.util.List;
+
+import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.services.ModelProblemCollector;
 
 /**
- * Handles inheritance of model values.
+ * Calculates the active profiles among a given collection of profiles.
  *
+ * @since 4.0.0
  */
-public interface InheritanceAssembler {
+public interface ProfileSelector {
 
     /**
-     * Merges values from the specified parent model into the given child model. Implementations are expected to keep
-     * parent and child completely decoupled by injecting deep copies of objects into the child rather than the original
-     * objects from the parent.
+     * Determines the profiles which are active in the specified activation context. Active profiles will eventually be
+     * injected into the model.
      *
-     * @param child The child model into which to merge the values inherited from the parent, must not be
-     *            <code>null</code>.
-     * @param parent The (read-only) parent model from which to inherit the values, may be <code>null</code>.
-     * @param request The model building request that holds further settings, must not be {@code null}.
+     * @param profiles The profiles whose activation status should be determined, must not be {@code null}.
+     * @param context The environmental context used to determine the activation status of a profile, must not be
+     *            {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
+     * @return The profiles that have been activated, never {@code null}.
      */
-    Model assembleModelInheritance(
-            Model child, Model parent, ModelBuilderRequest request, ModelProblemCollector problems);
+    List<Profile> getActiveProfiles(
+            Collection<Profile> profiles, ProfileActivationContext context, ModelProblemCollector problems);
 }

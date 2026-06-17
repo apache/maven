@@ -18,6 +18,11 @@
  */
 package org.apache.maven.api.services.model;
 
+/**
+ * Normalizes URLs by resolving relative references.
+ *
+ * @since 4.0.0
+ */
 public interface UrlNormalizer {
 
     /**

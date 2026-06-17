@@ -23,18 +23,18 @@ import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblemCollector;
 
 /**
- * Handles injection of plugin management into the model.
+ * Handles expansion of general build plugin configuration into individual executions.
  *
+ * @since 4.0.0
  */
-public interface PluginManagementInjector {
+public interface PluginConfigurationExpander {
 
     /**
-     * Merges default values from the plugin management section of the given model into itself.
+     * Merges values from general build plugin configuration into the individual plugin executions of the given model.
      *
-     * @param model The model into which to merge the values specified by its plugin management section, must not be
-     *            <code>null</code>.
+     * @param model The model whose build plugin configuration should be expanded, must not be <code>null</code>.
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    Model injectManagement(Model model, ModelBuilderRequest request, ModelProblemCollector problems);
+    Model expandPluginConfiguration(Model model, ModelBuilderRequest request, ModelProblemCollector problems);
 }
