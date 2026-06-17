@@ -55,6 +55,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class MavenITgh12288SettingsProfileAetherPropertiesTest extends AbstractMavenIntegrationTestCase {
 
+    MavenITgh12288SettingsProfileAetherPropertiesTest() {
+        super("(4.0.0-rc-5,)");
+    }
+
     @Test
     public void testActiveByDefaultProfile() throws Exception {
         runAndAssertCustomPrefix("settings-active-by-default.xml");
