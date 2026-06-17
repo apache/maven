@@ -323,6 +323,31 @@ class DefaultModelBuilderTest {
     }
 
     /**
+     * Verify that building a model from a resolved source (null pomFile) does not throw
+     * a NullPointerException. This simulates the scenario from GH-11919 where the
+     * cyclonedx-maven-plugin resolves a dependency POM from the repository, which
+     * produces a ModelSource whose {@code getPath()} returns {@code null}.
+     */
+    @Test
+    public void testResolvedSourceWithNullPomFile() {
+        Path pomPath = getPom("resolved-dependency");
+        // resolvedSource returns null for getPath(), simulating a dependency POM
+        // resolved from a remote repository (not a local project build)
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                .source(Sources.resolvedSource(pomPath, "org.example:resolved-dep:1.0.0"))
+                .build();
+        ModelBuilderResult result = builder.newSession().build(request);
+        assertNotNull(result);
+        assertNotNull(result.getEffectiveModel());
+        assertNull(result.getEffectiveModel().getPomFile(), "pomFile should be null for resolved sources");
+        assertEquals("org.example", result.getEffectiveModel().getGroupId());
+        assertEquals("resolved-dep", result.getEffectiveModel().getArtifactId());
+        assertEquals("1.0.0", result.getEffectiveModel().getVersion());
+    }
+
+    /**
      * Verifies that when a BUILD_CONSUMER derived session is created with explicit
      * repositories, those repositories are propagated to the derived session's
      * {@code repositories} and {@code externalRepositories}.
