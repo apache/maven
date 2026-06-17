@@ -38,6 +38,7 @@ import org.apache.maven.impl.standalone.ApiRunner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -395,6 +396,52 @@ class DefaultModelBuilderTest {
         assertTrue(
                 derived.getExternalRepositories().stream().anyMatch(r -> "custom-repo".equals(r.getId())),
                 "Derived session externalRepositories should include the custom repo from the request");
+    }
+
+    /**
+     * Verifies that BUILD_CONSUMER resolves properties defined in parent POM profiles
+     * when the parent is found via reactor model resolution (mappedSources).
+     */
+    @Test
+    public void testBuildConsumerResolvesParentProfileProperties() {
+        Path parentPom = getPom("consumer-profile-property-parent");
+        Path childPom = getPom("consumer-profile-property-child");
+
+        ModelBuilder.ModelBuilderSession mbs = builder.newSession();
+
+        mbs.build(ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(parentPom))
+                .build());
+
+        ModelBuilderResult consumerResult = assertDoesNotThrow(
+                () -> mbs.build(ModelBuilderRequest.builder()
+                        .session(session)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_CONSUMER)
+                        .source(Sources.buildSource(childPom))
+                        .build()),
+                "BUILD_CONSUMER should not fail when parent defines properties in profiles");
+
+        assertNotNull(consumerResult);
+        Model effectiveModel = consumerResult.getEffectiveModel();
+        assertNotNull(effectiveModel);
+
+        assertEquals(
+                "1.2.3",
+                effectiveModel.getProperties().get("managed.version"),
+                "Property from parent's profile should be resolved in BUILD_CONSUMER effective model");
+
+        assertNotNull(effectiveModel.getDependencyManagement());
+        Dependency managedDep = effectiveModel.getDependencyManagement().getDependencies().stream()
+                .filter(d -> "managed-lib".equals(d.getArtifactId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(managedDep, "Managed dependency from parent should be inherited");
+        assertEquals(
+                "1.2.3",
+                managedDep.getVersion(),
+                "Managed dependency version should be interpolated, not ${managed.version}");
     }
 
     private Path getPom(String name) {
