@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.plugin.testing;
+package org.apache.maven.testing.plugin;
 
 import java.util.Map;
 

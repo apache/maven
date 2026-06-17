@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.plugin.testing;
+package org.apache.maven.testing.plugin;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,8 +25,8 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.di.Singleton;
-import org.apache.maven.api.plugin.testing.stubs.SessionMock;
 import org.apache.maven.impl.standalone.ApiRunner;
+import org.apache.maven.testing.plugin.stubs.SessionMock;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

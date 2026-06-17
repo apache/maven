@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.plugin.testing;
+package org.apache.maven.testing.plugin;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -52,7 +52,6 @@ import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Priority;
 import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.di.Singleton;
-import org.apache.maven.api.di.testing.MavenDIExtension;
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.ConfigurationContainer;
 import org.apache.maven.api.model.Model;
@@ -62,12 +61,6 @@ import org.apache.maven.api.plugin.Mojo;
 import org.apache.maven.api.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.api.plugin.descriptor.Parameter;
 import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.api.plugin.testing.stubs.MojoExecutionStub;
-import org.apache.maven.api.plugin.testing.stubs.PluginStub;
-import org.apache.maven.api.plugin.testing.stubs.ProducedArtifactStub;
-import org.apache.maven.api.plugin.testing.stubs.ProjectStub;
-import org.apache.maven.api.plugin.testing.stubs.RepositorySystemSupplier;
-import org.apache.maven.api.plugin.testing.stubs.SessionMock;
 import org.apache.maven.api.services.ArtifactDeployer;
 import org.apache.maven.api.services.ArtifactFactory;
 import org.apache.maven.api.services.ArtifactInstaller;
@@ -95,6 +88,13 @@ import org.apache.maven.model.v4.MavenMerger;
 import org.apache.maven.model.v4.MavenStaxReader;
 import org.apache.maven.plugin.PluginParameterExpressionEvaluatorV4;
 import org.apache.maven.plugin.descriptor.io.PluginDescriptorStaxReader;
+import org.apache.maven.testing.di.MavenDIExtension;
+import org.apache.maven.testing.plugin.stubs.MojoExecutionStub;
+import org.apache.maven.testing.plugin.stubs.PluginStub;
+import org.apache.maven.testing.plugin.stubs.ProducedArtifactStub;
+import org.apache.maven.testing.plugin.stubs.ProjectStub;
+import org.apache.maven.testing.plugin.stubs.RepositorySystemSupplier;
+import org.apache.maven.testing.plugin.stubs.SessionMock;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.component.configurator.expression.TypeAwareExpressionEvaluator;

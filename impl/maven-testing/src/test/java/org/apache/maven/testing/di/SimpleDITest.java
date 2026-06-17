@@ -16,18 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.di.testing;
+package org.apache.maven.testing.di;
 
 import java.io.File;
 
 import org.apache.maven.api.Session;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Provides;
-import org.apache.maven.api.plugin.testing.stubs.SessionMock;
+import org.apache.maven.testing.plugin.stubs.SessionMock;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-import static org.apache.maven.api.di.testing.MavenDIExtension.getBasedir;
+import static org.apache.maven.testing.di.MavenDIExtension.getBasedir;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;

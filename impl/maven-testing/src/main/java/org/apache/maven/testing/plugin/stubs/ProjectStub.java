@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.plugin.testing.stubs;
+package org.apache.maven.testing.plugin.stubs;
 
 import java.nio.file.Path;
 import java.util.Arrays;
