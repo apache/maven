@@ -1160,7 +1160,13 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             try {
-                ModelBuilderSessionState derived = derive(candidateSource);
+                ModelBuilderSessionState derived = derive(
+                        request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_CONSUMER
+                                ? ModelBuilderRequest.builder(request)
+                                        .requestType(ModelBuilderRequest.RequestType.CONSUMER_PARENT)
+                                        .source(candidateSource)
+                                        .build()
+                                : ModelBuilderRequest.build(request, candidateSource));
 
                 // Check GA match BEFORE readAsParentModel() which recursively resolves
                 // the candidate's parent chain and can trigger false cycle detection (GH-12074).
@@ -1174,7 +1180,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                     mismatchRelativePathAndGA(childModel, parent, fileGroupId, fileArtifactId);
                     return null;
                 }
-
                 Model candidateModel = derived.readAsParentModel(profileActivationContext, parentChain);
                 // Add profiles from parent, preserving model ID tracking
                 for (Map.Entry<String, List<Profile>> entry :
