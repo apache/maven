@@ -78,4 +78,20 @@ public class DefaultUrlNormalizerTest {
     public void leadingParentDirectoryNotRemovedFromRelativeUriReference() {
         assertEquals("../", normalize("../"));
     }
+
+    @Test
+    public void testMultipleParentRefsInRelativePath() {
+        assertEquals("b", normalize("a/../b"));
+        assertEquals("b/d", normalize("a/../b/c/../d"));
+        assertEquals("b/c/d", normalize("a/../b/c/d"));
+        assertEquals("b/c", normalize("a/../b/c"));
+        assertEquals("b/", normalize("a/../b/c/../"));
+    }
+
+    @Test
+    public void testPreservationOfEncodedAndMalformedUrls() {
+        assertEquals("https://example.com/a%20b/c%20d", normalize("https://example.com/a%20b/c%20d"));
+        assertEquals("https://example.com/a b/c d", normalize("https://example.com/a b/c d"));
+        assertEquals("ht!tps:/bad_url", normalize("ht!tps:/bad_url"));
+    }
 }
