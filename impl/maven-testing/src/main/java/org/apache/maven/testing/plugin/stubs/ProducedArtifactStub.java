@@ -16,8 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.plugin.testing.stubs;
+package org.apache.maven.testing.plugin.stubs;
 
-/** @deprecated Use {@link org.apache.maven.testing.plugin.stubs.RepositorySystemSupplier} instead */
-@Deprecated(since = "4.0.0-rc-6", forRemoval = true)
-public class RepositorySystemSupplier extends org.apache.maven.testing.plugin.stubs.RepositorySystemSupplier {}
+import org.apache.maven.api.ProducedArtifact;
+
+/**
+ * A stub implementation of {@link ProducedArtifact} for testing purposes.
+ * Represents artifacts produced during the build process.
+ *
+ * @since 4.0.0
+ */
+public class ProducedArtifactStub extends ArtifactStub implements ProducedArtifact {
+    public ProducedArtifactStub() {}
+
+    public ProducedArtifactStub(
+            String groupId, String artifactId, String classifier, String version, String extension) {
+        super(groupId, artifactId, classifier, version, extension);
+    }
+}

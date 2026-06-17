@@ -18,19 +18,6 @@
  */
 package org.apache.maven.api.plugin.testing.stubs;
 
-import org.apache.maven.api.ProducedArtifact;
-
-/**
- * A stub implementation of {@link ProducedArtifact} for testing purposes.
- * Represents artifacts produced during the build process.
- *
- * @since 4.0.0
- */
-public class ProducedArtifactStub extends ArtifactStub implements ProducedArtifact {
-    public ProducedArtifactStub() {}
-
-    public ProducedArtifactStub(
-            String groupId, String artifactId, String classifier, String version, String extension) {
-        super(groupId, artifactId, classifier, version, extension);
-    }
-}
+/** @deprecated Use {@link org.apache.maven.testing.plugin.stubs.ProducedArtifactStub} instead */
+@Deprecated(since = "4.0.0-rc-6", forRemoval = true)
+public class ProducedArtifactStub extends org.apache.maven.testing.plugin.stubs.ProducedArtifactStub {}

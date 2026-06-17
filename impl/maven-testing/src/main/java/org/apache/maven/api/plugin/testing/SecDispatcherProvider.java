@@ -18,68 +18,7 @@
  */
 package org.apache.maven.api.plugin.testing;
 
-import java.util.Map;
-
-import org.apache.maven.api.di.Named;
-import org.apache.maven.api.di.Provides;
-import org.codehaus.plexus.components.secdispatcher.Cipher;
-import org.codehaus.plexus.components.secdispatcher.Dispatcher;
-import org.codehaus.plexus.components.secdispatcher.MasterSource;
-import org.codehaus.plexus.components.secdispatcher.internal.cipher.AESGCMNoPadding;
-import org.codehaus.plexus.components.secdispatcher.internal.dispatchers.LegacyDispatcher;
-import org.codehaus.plexus.components.secdispatcher.internal.dispatchers.MasterDispatcher;
-import org.codehaus.plexus.components.secdispatcher.internal.sources.EnvMasterSource;
-import org.codehaus.plexus.components.secdispatcher.internal.sources.GpgAgentMasterSource;
-import org.codehaus.plexus.components.secdispatcher.internal.sources.PinEntryMasterSource;
-import org.codehaus.plexus.components.secdispatcher.internal.sources.SystemPropertyMasterSource;
-
-/**
- * Delegate that offers just the minimal surface needed to decrypt settings.
- */
+/** @deprecated Use {@link org.apache.maven.testing.plugin.SecDispatcherProvider} instead */
 @SuppressWarnings("unused")
-@Named
-public class SecDispatcherProvider {
-
-    @Provides
-    @Named(LegacyDispatcher.NAME)
-    public static Dispatcher legacyDispatcher() {
-        return new LegacyDispatcher();
-    }
-
-    @Provides
-    @Named(MasterDispatcher.NAME)
-    public static Dispatcher masterDispatcher(
-            Map<String, Cipher> masterCiphers, Map<String, MasterSource> masterSources) {
-        return new MasterDispatcher(masterCiphers, masterSources);
-    }
-
-    @Provides
-    @Named(AESGCMNoPadding.CIPHER_ALG)
-    public static Cipher aesGcmNoPaddingCipher() {
-        return new AESGCMNoPadding();
-    }
-
-    @Provides
-    @Named(EnvMasterSource.NAME)
-    public static MasterSource envMasterSource() {
-        return new EnvMasterSource();
-    }
-
-    @Provides
-    @Named(GpgAgentMasterSource.NAME)
-    public static MasterSource gpgAgentMasterSource() {
-        return new GpgAgentMasterSource();
-    }
-
-    @Provides
-    @Named(PinEntryMasterSource.NAME)
-    public static MasterSource pinEntryMasterSource() {
-        return new PinEntryMasterSource();
-    }
-
-    @Provides
-    @Named(SystemPropertyMasterSource.NAME)
-    public static MasterSource systemPropertyMasterSource() {
-        return new SystemPropertyMasterSource();
-    }
-}
+@Deprecated(since = "4.0.0-rc-6", forRemoval = true)
+public class SecDispatcherProvider extends org.apache.maven.testing.plugin.SecDispatcherProvider {}

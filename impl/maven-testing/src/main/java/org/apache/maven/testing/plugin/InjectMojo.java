@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.plugin.testing;
+package org.apache.maven.testing.plugin;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -24,8 +24,62 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/** @deprecated Use {@link org.apache.maven.testing.plugin.InjectMojo} instead */
-@Deprecated(since = "4.0.0-rc-6", forRemoval = true)
+/**
+ * Annotation used in Maven plugin tests to inject and configure a Mojo instance.
+ * This annotation can be applied to either test methods or parameters to specify
+ * which Mojo should be instantiated and how it should be configured.
+ *
+ * <p>The annotation requires a {@code goal} attribute to specify which Mojo goal
+ * should be instantiated. Optionally, a custom {@code pom} file can be specified
+ * to provide specific configuration for the test.</p>
+ *
+ * <p>Example usage on a test method:</p>
+ * <pre>
+ * {@code
+ * @Test
+ * @InjectMojo(goal = "compile")
+ * void testCompileMojo(CompileMojo mojo) {
+ *     mojo.execute();
+ *     // verify compilation results
+ * }
+ * }
+ * </pre>
+ *
+ * <p>Example usage with a custom POM:</p>
+ * <pre>
+ * {@code
+ * @Test
+ * @InjectMojo(
+ *     goal = "compile",
+ *     pom = "src/test/resources/test-pom.xml"
+ * )
+ * void testCompileMojoWithCustomConfig(CompileMojo mojo) {
+ *     mojo.execute();
+ *     // verify compilation results
+ * }
+ * }
+ * </pre>
+ *
+ * <p>The annotation can be used in conjunction with {@link MojoParameter} to provide
+ * specific parameter values for the Mojo:</p>
+ * <pre>
+ * {@code
+ * @Test
+ * @InjectMojo(goal = "compile")
+ * @MojoParameter(name = "source", value = "1.8")
+ * @MojoParameter(name = "target", value = "1.8")
+ * void testCompileMojoWithParameters(CompileMojo mojo) {
+ *     mojo.execute();
+ *     // verify compilation results
+ * }
+ * }
+ * </pre>
+ *
+ * @see MojoTest
+ * @see MojoParameter
+ * @see MojoExtension
+ * @since 4.0.0
+ */
 @Target({ElementType.METHOD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited

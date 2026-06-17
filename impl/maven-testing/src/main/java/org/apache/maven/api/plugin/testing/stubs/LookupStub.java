@@ -18,55 +18,6 @@
  */
 package org.apache.maven.api.plugin.testing.stubs;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import org.apache.maven.api.services.Lookup;
-import org.apache.maven.api.services.LookupException;
-
-/**
- * A stub implementation of {@link Lookup} for testing purposes.
- * Provides a simple service lookup mechanism for tests.
- *
- * @since 4.0.0
- */
-public class LookupStub implements Lookup {
-
-    public static final Lookup EMPTY = new LookupStub();
-
-    /**
-     * For sub-class constructors.
-     */
-    protected LookupStub() {}
-
-    @Override
-    public <T> T lookup(Class<T> type) {
-        throw new LookupException("This is only a stub.");
-    }
-
-    @Override
-    public <T> T lookup(Class<T> type, String string) {
-        throw new LookupException("This is only a stub.");
-    }
-
-    @Override
-    public <T> Optional<T> lookupOptional(Class<T> type) {
-        return Optional.empty();
-    }
-
-    @Override
-    public <T> Optional<T> lookupOptional(Class<T> type, String string) {
-        return Optional.empty();
-    }
-
-    @Override
-    public <T> List<T> lookupList(Class<T> type) {
-        return List.of();
-    }
-
-    @Override
-    public <T> Map<String, T> lookupMap(Class<T> type) {
-        return Map.of();
-    }
-}
+/** @deprecated Use {@link org.apache.maven.testing.plugin.stubs.LookupStub} instead */
+@Deprecated(since = "4.0.0-rc-6", forRemoval = true)
+public class LookupStub extends org.apache.maven.testing.plugin.stubs.LookupStub {}
