@@ -433,9 +433,17 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         HashSet<String> activeProfileId =
                 new HashSet<>(request.getProfileActivation().getRequiredActiveProfileIds());
         activeProfileId.addAll(request.getProfileActivation().getOptionalActiveProfileIds());
+        // Profiles explicitly deactivated via -P !id must be excluded even if they
+        // declare activeByDefault=true.
+        HashSet<String> inactiveProfileId =
+                new HashSet<>(request.getProfileActivation().getRequiredInactiveProfileIds());
+        inactiveProfileId.addAll(request.getProfileActivation().getOptionalInactiveProfileIds());
 
         return request.getProfiles().stream()
-                .filter(profile -> activeProfileId.contains(profile.getId()))
+                .filter(profile -> activeProfileId.contains(profile.getId())
+                        || (!inactiveProfileId.contains(profile.getId())
+                                && profile.getActivation() != null
+                                && profile.getActivation().isActiveByDefault()))
                 .map(ModelBase::getProperties)
                 .flatMap(properties -> properties.entrySet().stream())
                 .filter(e -> e.getValue() != null)
