@@ -1633,6 +1633,203 @@ class CompatibilityFixStrategyTest {
     }
 
     @Nested
+    @DisplayName("Deprecated Property Expression Fixes")
+    class DeprecatedPropertyExpressionFixesTests {
+
+        @Test
+        @DisplayName("should replace ${version} with ${project.version} in dependency version")
+        void shouldReplaceVersionExpression() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <dependencyManagement>
+                        <dependencies>
+                            <dependency>
+                                <groupId>test</groupId>
+                                <artifactId>test-dep</artifactId>
+                                <version>${version}</version>
+                            </dependency>
+                        </dependencies>
+                    </dependencyManagement>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-jar-plugin</artifactId>
+                                <version>${version}</version>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Compatibility fix should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have fixed deprecated ${version}");
+
+            String xml = DomUtils.toXml(document);
+            assertFalse(xml.contains("${version}"), "Should not contain deprecated ${version}");
+            assertTrue(xml.contains("${project.version}"), "Should contain ${project.version}");
+        }
+
+        @Test
+        @DisplayName("should replace ${groupId} and ${artifactId} expressions")
+        void shouldReplaceGroupIdAndArtifactIdExpressions() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>com.example</groupId>
+                    <artifactId>my-project</artifactId>
+                    <version>1.0.0</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>${groupId}</groupId>
+                            <artifactId>my-lib</artifactId>
+                            <version>1.0.0</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>com.example</groupId>
+                            <artifactId>${artifactId}-core</artifactId>
+                            <version>1.0.0</version>
+                        </dependency>
+                    </dependencies>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Compatibility fix should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have fixed deprecated expressions");
+
+            String xml = DomUtils.toXml(document);
+            assertFalse(xml.contains("${groupId}"), "Should not contain deprecated ${groupId}");
+            assertFalse(xml.contains("${artifactId}"), "Should not contain deprecated ${artifactId}");
+            assertTrue(xml.contains("${project.groupId}"), "Should contain ${project.groupId}");
+            assertTrue(xml.contains("${project.artifactId}"), "Should contain ${project.artifactId}");
+        }
+
+        @Test
+        @DisplayName("should replace all three deprecated expressions in one POM")
+        void shouldReplaceAllThreeDeprecatedExpressions() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>com.example</groupId>
+                    <artifactId>my-project</artifactId>
+                    <version>2.0.0</version>
+                    <properties>
+                        <selfCoords>${groupId}:${artifactId}:${version}</selfCoords>
+                    </properties>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Compatibility fix should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have fixed deprecated expressions");
+
+            String xml = DomUtils.toXml(document);
+            assertFalse(xml.contains("${version}"), "Should not contain ${version}");
+            assertFalse(xml.contains("${groupId}"), "Should not contain ${groupId}");
+            assertFalse(xml.contains("${artifactId}"), "Should not contain ${artifactId}");
+            assertTrue(xml.contains("${project.version}"), "Should contain ${project.version}");
+            assertTrue(xml.contains("${project.groupId}"), "Should contain ${project.groupId}");
+            assertTrue(xml.contains("${project.artifactId}"), "Should contain ${project.artifactId}");
+        }
+
+        @Test
+        @DisplayName("should not modify POMs without deprecated expressions")
+        void shouldNotModifyPomsWithoutDeprecatedExpressions() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>com.example</groupId>
+                    <artifactId>my-project</artifactId>
+                    <version>1.0.0</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.example</groupId>
+                            <artifactId>my-lib</artifactId>
+                            <version>${project.version}</version>
+                        </dependency>
+                    </dependencies>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Compatibility fix should succeed");
+            assertEquals(0, result.modifiedCount(), "Should not have modified POM without deprecated expressions");
+        }
+
+        @Test
+        @DisplayName("should replace deprecated expressions in plugin configuration")
+        void shouldReplaceDeprecatedExpressionsInPluginConfiguration() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>com.example</groupId>
+                    <artifactId>my-project</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-jar-plugin</artifactId>
+                                <configuration>
+                                    <archive>
+                                        <manifestEntries>
+                                            <Implementation-Version>${version}</Implementation-Version>
+                                        </manifestEntries>
+                                    </archive>
+                                </configuration>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Compatibility fix should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have fixed deprecated ${version} in plugin config");
+
+            String xml = DomUtils.toXml(document);
+            assertFalse(xml.contains("${version}"), "Should not contain deprecated ${version}");
+            assertTrue(xml.contains("${project.version}"), "Should contain ${project.version}");
+        }
+    }
+
+    @Nested
     @DisplayName("Strategy Description")
     class StrategyDescriptionTests {
 
