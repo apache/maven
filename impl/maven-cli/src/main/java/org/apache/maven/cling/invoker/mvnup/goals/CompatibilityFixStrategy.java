@@ -147,6 +147,7 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
                 hasIssues |= fixDuplicateDependencies(pomDocument, context);
                 hasIssues |= fixDuplicatePlugins(pomDocument, context);
                 hasIssues |= fixUnsupportedRepositoryExpressions(pomDocument, context);
+                hasIssues |= fixDeprecatedPropertyExpressions(pomDocument, context);
                 hasIssues |= fixIncorrectParentRelativePaths(pomDocument, pomPath, pomMap, context);
                 hasIssues |= fixUndefinedPropertyExpressions(pomDocument, allDefinedProperties, context);
                 hasIssues |= fixUndefinedPropertyExpressionsInRepositories(pomDocument, allDefinedProperties, context);
@@ -758,6 +759,46 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
         }
 
         return fixed;
+    }
+
+    /**
+     * Fixes deprecated Maven 2/3 shorthand property expressions throughout the POM.
+     * Replaces ${version}, ${groupId}, and ${artifactId} with their ${project.*} equivalents,
+     * which are the only forms supported in Maven 4.
+     */
+    private boolean fixDeprecatedPropertyExpressions(Document pomDocument, UpgradeContext context) {
+        return fixDeprecatedPropertyExpressionsInElement(pomDocument.root(), context);
+    }
+
+    private boolean fixDeprecatedPropertyExpressionsInElement(Element element, UpgradeContext context) {
+        boolean fixed = false;
+
+        List<Element> children = element.childElements().toList();
+
+        if (children.isEmpty()) {
+            String text = element.textContent();
+            if (text != null && !text.isEmpty()) {
+                String fixedText = replaceDeprecatedExpressions(text);
+                if (!fixedText.equals(text)) {
+                    element.textContent(fixedText);
+                    context.detail("Fixed: replaced deprecated property expression in <" + element.name() + ">: "
+                            + text.trim() + " → " + fixedText.trim());
+                    fixed = true;
+                }
+            }
+        } else {
+            for (Element child : children) {
+                fixed |= fixDeprecatedPropertyExpressionsInElement(child, context);
+            }
+        }
+
+        return fixed;
+    }
+
+    private static String replaceDeprecatedExpressions(String text) {
+        return text.replace("${version}", "${project.version}")
+                .replace("${groupId}", "${project.groupId}")
+                .replace("${artifactId}", "${project.artifactId}");
     }
 
     private Path findParentPomInMap(
