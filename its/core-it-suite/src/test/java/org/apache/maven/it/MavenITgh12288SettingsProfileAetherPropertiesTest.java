@@ -19,9 +19,8 @@
 package org.apache.maven.it;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.util.Comparator;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -80,7 +79,7 @@ public class MavenITgh12288SettingsProfileAetherPropertiesTest extends AbstractM
         // Sibling tests in this class install under the same custom prefix; clear it to
         // avoid false positives if those tests ran first.
         File customPrefixSubtree = new File(verifier.getLocalRepository(), "it-custom-prefix");
-        deleteRecursivelyIfExists(customPrefixSubtree);
+        FileUtils.deleteDirectory(customPrefixSubtree);
 
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings-active-by-default.xml");
@@ -101,16 +100,6 @@ public class MavenITgh12288SettingsProfileAetherPropertiesTest extends AbstractM
         assertFalse(
                 customPrefix.exists(),
                 "Found artifact at custom prefix " + customPrefix + " — deactivation via -P ! was ignored.");
-    }
-
-    private static void deleteRecursivelyIfExists(File path) throws Exception {
-        if (!path.exists()) {
-            return;
-        }
-        Files.walk(path.toPath())
-                .sorted(Comparator.reverseOrder())
-                .map(java.nio.file.Path::toFile)
-                .forEach(File::delete);
     }
 
     private void runAndAssertCustomPrefix(String settingsFile) throws Exception {
