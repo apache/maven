@@ -107,10 +107,11 @@ public class MavenITgh12288SettingsProfileAetherPropertiesTest extends AbstractM
         if (!path.exists()) {
             return;
         }
-        Files.walk(path.toPath())
-                .sorted(Comparator.reverseOrder())
-                .map(java.nio.file.Path::toFile)
-                .forEach(File::delete);
+        try (var paths = Files.walk(path.toPath())) {
+            paths.sorted(Comparator.reverseOrder())
+                    .map(java.nio.file.Path::toFile)
+                    .forEach(File::delete);
+        }
     }
 
     private void runAndAssertCustomPrefix(String settingsFile) throws Exception {
