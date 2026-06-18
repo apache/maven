@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -39,10 +39,10 @@ public class MavenITmng3314OfflineSnapshotsTest extends AbstractMavenIntegration
      */
     @Test
     public void testitMNG3314() throws Exception {
-        File testDir = extractResources("/mng-3314");
+        Path testDir = extractResources("mng-3314");
 
         // phase 1: run build in online mode to fill local repo
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.deleteArtifacts("org.apache.maven.its.mng3314");
         verifier.setLogFileName("log1.txt");
         verifier.filterFile("settings-template.xml", "settings.xml");
@@ -54,7 +54,7 @@ public class MavenITmng3314OfflineSnapshotsTest extends AbstractMavenIntegration
         verifier.verifyErrorFreeLog();
 
         // phase 2: run build in offline mode to check it still passes
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir);
         verifier.setLogFileName("log2.txt");
         verifier.addCliArgument("-o");
         verifier.addCliArgument("--settings");

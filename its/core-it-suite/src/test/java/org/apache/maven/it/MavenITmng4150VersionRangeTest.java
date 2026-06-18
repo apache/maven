@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Collection;
 
 import org.junit.jupiter.api.Test;
@@ -41,9 +41,9 @@ public class MavenITmng4150VersionRangeTest extends AbstractMavenIntegrationTest
      */
     @Test
     public void testitMNG4150() throws Exception {
-        File testDir = extractResources("/mng-4150");
+        Path testDir = extractResources("mng-4150");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4150");

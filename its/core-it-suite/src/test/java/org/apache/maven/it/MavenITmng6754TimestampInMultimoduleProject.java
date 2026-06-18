@@ -18,34 +18,31 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
-
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MavenITmng6754TimestampInMultimoduleProject extends AbstractMavenIntegrationTestCase {
-    private static final String RESOURCE_PATH = "/mng-6754-version-timestamp-in-multimodule-build";
+    private static final String RESOURCE_PATH = "mng-6754-version-timestamp-in-multimodule-build";
     private static final String VERSION = "1.0-SNAPSHOT";
 
     @Test
     @SuppressWarnings("checkstyle:MethodLength")
     public void testArtifactsHaveSameTimestamp() throws Exception {
-        final File testDir = extractResources(RESOURCE_PATH);
-        final Verifier verifier = newVerifier(testDir.getAbsolutePath());
-        final Path localRepoDir = Paths.get(verifier.getLocalRepository());
-        final Path remoteRepoDir = Paths.get(verifier.getBasedir(), "repo");
+        final Path testDir = extractResources(RESOURCE_PATH);
+        final Verifier verifier = newVerifier(testDir);
+        final Path localRepoDir = verifier.getLocalRepository();
+        final Path remoteRepoDir = verifier.getBasedir().resolve("repo");
 
         verifier.deleteDirectory("repo");
         verifier.deleteArtifacts("org.apache.maven.its.mng6754");

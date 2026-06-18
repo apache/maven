@@ -18,10 +18,9 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Locale;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,9 +41,9 @@ public class MavenITmng3892ReleaseDeploymentTest extends AbstractMavenIntegratio
      */
     @Test
     public void testitMNG3892() throws Exception {
-        File testDir = extractResources("/mng-3892");
+        Path testDir = extractResources("mng-3892");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("repo");
         verifier.deleteArtifacts("org.apache.maven.its.mng3892");
@@ -75,12 +74,12 @@ public class MavenITmng3892ReleaseDeploymentTest extends AbstractMavenIntegratio
         verify(testDir, groupDir + "1.0/test-1.0-it.jar.sha1", "0b0717ff89d3cbadc3564270bf8930163753bf71");
     }
 
-    private void verify(File testDir, String file, String checksum) throws Exception {
-        assertEquals(checksum, readChecksum(new File(testDir, file)), file);
+    private void verify(Path testDir, String file, String checksum) throws Exception {
+        assertEquals(checksum, readChecksum(testDir.resolve(file)), file);
     }
 
-    private String readChecksum(File checksumFile) throws Exception {
-        String checksum = Files.readString(checksumFile.toPath()).trim();
+    private String readChecksum(Path checksumFile) throws Exception {
+        String checksum = Files.readString(checksumFile).trim();
         if (checksum.indexOf(' ') >= 0) {
             checksum = checksum.substring(0, checksum.indexOf(' '));
         }

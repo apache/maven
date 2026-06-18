@@ -18,9 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Files;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,26 +28,26 @@ public class MavenITmng5742BuildExtensionClassloaderTest extends AbstractMavenIn
 
     @Test
     public void testBuildExtensionClassloader() throws Exception {
-        File testDir = extractResources("/mng-5742-build-extension-classloader");
-        File pluginDir = new File(testDir, "plugin");
-        File projectDir = new File(testDir, "project");
+        Path testDir = extractResources("mng-5742-build-extension-classloader");
+        Path pluginDir = testDir.resolve("plugin");
+        Path projectDir = testDir.resolve("project");
 
         Verifier verifier;
 
         // install the test plugin
-        verifier = newVerifier(pluginDir.getAbsolutePath());
+        verifier = newVerifier(pluginDir);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // build the test project
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
         verifier.verifyFilePresent("target/execution-success.txt");
 
-        String actual = Files.readString(new File(projectDir, "target/execution-success.txt").toPath());
+        String actual = Files.readString(projectDir.resolve("target/execution-success.txt"));
         assertEquals("executed", actual);
     }
 }

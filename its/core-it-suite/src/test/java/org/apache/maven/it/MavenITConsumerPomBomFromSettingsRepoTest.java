@@ -57,11 +57,9 @@ class MavenITConsumerPomBomFromSettingsRepoTest extends AbstractMavenIntegration
      */
     @Test
     void testConsumerPomWithBomFromSettingsProfileRepo() throws Exception {
-        Path basedir = extractResources("/gh-11767-consumer-pom-bom-from-settings-repo")
-                .toPath()
-                .toAbsolutePath();
+        Path basedir = extractResources("gh-11767-consumer-pom-bom-from-settings-repo");
 
-        Verifier verifier = newVerifier(basedir.toString());
+        Verifier verifier = newVerifier(basedir);
         verifier.deleteArtifacts("org.apache.maven.its.cpbom");
 
         // Apply settings template with the custom repository URL

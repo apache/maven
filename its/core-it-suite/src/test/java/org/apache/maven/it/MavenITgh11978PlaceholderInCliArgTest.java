@@ -37,11 +37,9 @@ class MavenITgh11978PlaceholderInCliArgTest extends AbstractMavenIntegrationTest
 
     @Test
     void testIt() throws Exception {
-        Path basedir = extractResources("/gh-11978-placeholder-in-cli-arg")
-                .getAbsoluteFile()
-                .toPath();
+        Path basedir = extractResources("/gh-11978-placeholder-in-cli-arg");
 
-        Verifier verifier = newVerifier(basedir.toString());
+        Verifier verifier = newVerifier(basedir);
         verifier.setForkJvm(true); // NOTE: We want to go through the launcher script
         // The placeholder name contains dots, which is invalid as a shell variable name.
         // Without the fix, the shell's `eval exec` aborts with "bad substitution".

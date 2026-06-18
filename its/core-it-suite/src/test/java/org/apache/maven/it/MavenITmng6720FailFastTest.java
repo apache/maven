@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -38,9 +38,9 @@ class MavenITmng6720FailFastTest extends AbstractMavenIntegrationTestCase {
 
     @Test
     void testItShouldWaitForConcurrentModulesToFinish() throws Exception {
-        File testDir = extractResources("/mng-6720-fail-fast");
+        Path testDir = extractResources("mng-6720-fail-fast");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.addCliArguments("-T", "2");
         verifier.addCliArgument("-Dmaven.test.redirectTestOutputToFile=true");
@@ -53,13 +53,13 @@ class MavenITmng6720FailFastTest extends AbstractMavenIntegrationTestCase {
         }
 
         List<String> module1Lines = verifier.loadFile(
-                new File(testDir, "module-1/target/surefire-reports/mng6720.Module1Test-output.txt"), false);
+                testDir.resolve("module-1/target/surefire-reports/mng6720.Module1Test-output.txt"));
         assertTrue(module1Lines.contains("Module1"), "module-1 should be executed");
         List<String> module2Lines = verifier.loadFile(
-                new File(testDir, "module-2/target/surefire-reports/mng6720.Module2Test-output.txt"), false);
+                testDir.resolve("module-2/target/surefire-reports/mng6720.Module2Test-output.txt"));
         assertTrue(module2Lines.contains("Module2"), "module-2 should be executed");
         List<String> module3Lines = verifier.loadFile(
-                new File(testDir, "module-3/target/surefire-reports/mng6720.Module3Test-output.txt"), false);
+                testDir.resolve("module-3/target/surefire-reports/mng6720.Module3Test-output.txt"));
         assertTrue(module3Lines.isEmpty(), "module-3 should be skipped");
     }
 }

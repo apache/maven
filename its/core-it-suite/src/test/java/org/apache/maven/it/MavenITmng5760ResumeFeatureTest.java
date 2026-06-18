@@ -18,9 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.io.IOException;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -39,17 +38,17 @@ import org.junit.jupiter.api.Test;
  * @since 4.0.0-alpha-1
  */
 public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTestCase {
-    private final File parentDependentTestDir;
-    private final File parentIndependentTestDir;
-    private final File noProjectTestDir;
-    private final File fourModulesTestDir;
+    private final Path parentDependentTestDir;
+    private final Path parentIndependentTestDir;
+    private final Path noProjectTestDir;
+    private final Path fourModulesTestDir;
 
     public MavenITmng5760ResumeFeatureTest() throws IOException {
         super();
-        this.parentDependentTestDir = extractResources("/mng-5760-resume-feature/parent-dependent");
-        this.parentIndependentTestDir = extractResources("/mng-5760-resume-feature/parent-independent");
-        this.noProjectTestDir = extractResources("/mng-5760-resume-feature/no-project");
-        this.fourModulesTestDir = extractResources("/mng-5760-resume-feature/four-modules");
+        this.parentDependentTestDir = extractResources("mng-5760-resume-feature/parent-dependent");
+        this.parentIndependentTestDir = extractResources("mng-5760-resume-feature/parent-independent");
+        this.noProjectTestDir = extractResources("mng-5760-resume-feature/no-project");
+        this.fourModulesTestDir = extractResources("mng-5760-resume-feature/four-modules");
     }
 
     /**
@@ -59,7 +58,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
      */
     @Test
     public void testShouldSuggestToResumeWithoutArgs() throws Exception {
-        Verifier verifier = newVerifier(parentDependentTestDir.getAbsolutePath());
+        Verifier verifier = newVerifier(parentDependentTestDir);
         verifier.addCliArgument("-Dmodule-b.fail=true");
 
         try {
@@ -72,7 +71,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         }
 
         // New build with -r should resume the build from module-b, skipping module-a since it has succeeded already.
-        verifier = newVerifier(parentDependentTestDir.getAbsolutePath());
+        verifier = newVerifier(parentDependentTestDir);
         verifier.addCliArgument("-r");
         verifier.addCliArgument("test");
         verifier.execute();
@@ -83,7 +82,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
 
     @Test
     public void testShouldSkipSuccessfulProjects() throws Exception {
-        Verifier verifier = newVerifier(parentDependentTestDir.getAbsolutePath());
+        Verifier verifier = newVerifier(parentDependentTestDir);
         verifier.addCliArgument("-Dmodule-a.fail=true");
         verifier.addCliArgument("--fail-at-end");
 
@@ -96,7 +95,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         }
 
         // Let module-b and module-c fail, if they would have been built...
-        verifier = newVerifier(parentDependentTestDir.getAbsolutePath());
+        verifier = newVerifier(parentDependentTestDir);
         verifier.addCliArgument("-Dmodule-b.fail=true");
         verifier.addCliArgument("-Dmodule-c.fail=true");
         // ... but adding -r should exclude those two from the build because the previous Maven invocation
@@ -111,7 +110,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         // In this multi-module project, the submodules are not dependent on the parent.
         // This results in the parent to be built last, and module-a to be built first.
         // This enables us to let the first module in the reactor (module-a) fail.
-        Verifier verifier = newVerifier(parentIndependentTestDir.getAbsolutePath());
+        Verifier verifier = newVerifier(parentIndependentTestDir);
         verifier.addCliArgument("-Dmodule-a.fail=true");
         verifier.addCliArgument("--fail-at-end");
 
@@ -123,7 +122,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
             verifier.verifyTextInLog("mvn [args] -r");
         }
 
-        verifier = newVerifier(parentIndependentTestDir.getAbsolutePath());
+        verifier = newVerifier(parentIndependentTestDir);
         verifier.addCliArgument("-r");
         verifier.addCliArgument("test");
         verifier.execute();
@@ -137,7 +136,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         // As reported in JIRA this would previously break with a NullPointerException.
         // (see
         // https://issues.apache.org/jira/browse/MNG-5760?focusedCommentId=17143795&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-17143795)
-        final Verifier verifier = newVerifier(noProjectTestDir.getAbsolutePath());
+        final Verifier verifier = newVerifier(noProjectTestDir);
         try {
             verifier.addCliArgument("org.apache.maven.plugins:maven-resources-plugin:resources");
             verifier.execute();
@@ -158,7 +157,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         //   b : success
         //   c : failure
         //   d : skipped
-        Verifier verifier = newVerifier(fourModulesTestDir.getAbsolutePath());
+        Verifier verifier = newVerifier(fourModulesTestDir);
         verifier.addCliArgument("-T2");
         verifier.addCliArgument("-Dmodule-a.delay=1000");
         verifier.addCliArgument("-Dmodule-a.fail=true");
@@ -172,7 +171,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         }
 
         // Let module-b fail, if it would have been built...
-        verifier = newVerifier(fourModulesTestDir.getAbsolutePath());
+        verifier = newVerifier(fourModulesTestDir);
         verifier.addCliArgument("-T2");
         verifier.addCliArgument("-Dmodule-b.fail=true");
         // ... but adding -r should exclude it from the build because the previous Maven invocation
@@ -199,7 +198,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         //   b : success, slow
         //   c : skipped
         //   d : failure
-        Verifier verifier = newVerifier(fourModulesTestDir.getAbsolutePath());
+        Verifier verifier = newVerifier(fourModulesTestDir);
         verifier.addCliArgument("-T2");
         verifier.addCliArgument("-Dmodule-b.delay=2000");
         verifier.addCliArgument("-Dmodule-d.fail=true");
@@ -212,7 +211,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         }
 
         // Let module-a and module-b fail, if they would have been built...
-        verifier = newVerifier(fourModulesTestDir.getAbsolutePath());
+        verifier = newVerifier(fourModulesTestDir);
         verifier.addCliArgument("-T2");
         verifier.addCliArgument("-Dmodule-a.fail=true");
         verifier.addCliArgument("-Dmodule-b.fail=true");

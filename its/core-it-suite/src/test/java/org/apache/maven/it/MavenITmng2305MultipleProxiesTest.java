@@ -18,15 +18,13 @@
  */
 package org.apache.maven.it;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.NetworkConnector;
@@ -57,16 +55,16 @@ public class MavenITmng2305MultipleProxiesTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-2305");
+        Path testDir = extractResources("mng-2305");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
 
         // NOTE: trust store cannot be reliably configured for the current JVM
         verifier.setForkJvm(true);
 
         // keytool -genkey -alias https.mngit -keypass key-passwd -keystore keystore -storepass store-passwd \
         //   -validity 4096 -dname "cn=https.mngit, ou=None, L=Seattle, ST=Washington, o=ExampleOrg, c=US" -keyalg RSA
-        String storePath = new File(testDir, "keystore").getAbsolutePath();
+        Path storePath = testDir.resolve("keystore");
         String storePwd = "store-passwd";
         String keyPwd = "key-passwd";
 
@@ -117,8 +115,8 @@ public class MavenITmng2305MultipleProxiesTest extends AbstractMavenIntegrationT
         assertTrue(cp.contains("https-0.1.jar"), cp.toString());
     }
 
-    private void addHttpsConnector(Server server, String keyStorePath, String keyStorePassword, String keyPassword) {
-        SslContextFactory sslContextFactory = new SslContextFactory(keyStorePath);
+    private void addHttpsConnector(Server server, Path keyStorePath, String keyStorePassword, String keyPassword) {
+        SslContextFactory sslContextFactory = new SslContextFactory(keyStorePath.toString());
         sslContextFactory.setKeyStorePassword(keyStorePassword);
         sslContextFactory.setKeyManagerPassword(keyPassword);
         HttpConfiguration httpConfiguration = new HttpConfiguration();

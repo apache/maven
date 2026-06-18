@@ -34,9 +34,9 @@ class MavenITgh11798ConsumerPomProfileActivationTest extends AbstractMavenIntegr
 
     @Test
     void testConsumerPomResolvesParentProfileProperties() throws Exception {
-        Path basedir = extractResources("/gh-11798-consumer-pom-profile-activation").toPath();
+        Path basedir = extractResources("/gh-11798-consumer-pom-profile-activation");
 
-        Verifier verifier = newVerifier(basedir.toString());
+        Verifier verifier = newVerifier(basedir);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();

@@ -18,18 +18,18 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng7255InferredGroupIdTest extends AbstractMavenIntegrationTestCase {
-    private static final String PROJECT_PATH = "/mng-7255-inferred-groupid";
+    private static final String PROJECT_PATH = "mng-7255-inferred-groupid";
 
     @Test
     public void testInferredGroupId() throws IOException, VerificationException {
-        final File projectDir = extractResources(PROJECT_PATH);
-        final Verifier verifier = newVerifier(projectDir.getAbsolutePath());
+        final Path projectDir = extractResources(PROJECT_PATH);
+        final Verifier verifier = newVerifier(projectDir);
 
         verifier.addCliArgument("validate");
         verifier.execute();

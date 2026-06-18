@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -26,14 +26,14 @@ public class MavenITmng8133RootDirectoryInParentTest extends AbstractMavenIntegr
 
     @Test
     public void testRootDirectoryInParent() throws Exception {
-        File testDir = extractResources("/mng-8133-root-directory-in-parent");
+        Path testDir = extractResources("mng-8133-root-directory-in-parent");
 
-        Verifier verifier = newVerifier(new File(testDir, "parent").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("parent"));
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(new File(testDir, "child").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("child"));
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();

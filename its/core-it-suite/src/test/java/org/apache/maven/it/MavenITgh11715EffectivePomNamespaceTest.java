@@ -33,9 +33,9 @@ class MavenITgh11715EffectivePomNamespaceTest extends AbstractMavenIntegrationTe
 
     @Test
     void testIt() throws Exception {
-        Path basedir = extractResources("/gh-11715").getAbsoluteFile().toPath();
+        Path basedir = extractResources("/gh-11715");
 
-        Verifier verifier = newVerifier(basedir.toString());
+        Verifier verifier = newVerifier(basedir);
         verifier.addCliArgument("help:effective-pom");
         verifier.execute();
         verifier.verifyErrorFreeLog();

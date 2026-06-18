@@ -21,7 +21,7 @@ package org.apache.maven.it;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -52,9 +52,9 @@ public class MavenITmng4348NoUnnecessaryRepositoryAccessTest extends AbstractMav
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4348");
+        Path testDir = extractResources("mng-4348");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
 
         final List<String> requestedUris = Collections.synchronizedList(new ArrayList<>());
 

@@ -18,9 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,10 +39,10 @@ public class MavenIT0139InterpolationWithProjectPrefixTest extends AbstractMaven
      */
     @Test
     public void testit0139() throws Exception {
-        File testDir = extractResources("/it0139");
-        File child = new File(testDir, "child");
+        Path testDir = extractResources("it0139");
+        Path child = testDir.resolve("child");
 
-        Verifier verifier = newVerifier(child.getAbsolutePath());
+        Verifier verifier = newVerifier(child);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("initialize");
@@ -53,7 +52,7 @@ public class MavenIT0139InterpolationWithProjectPrefixTest extends AbstractMaven
         Properties props = verifier.loadProperties("target/interpolated.properties");
         String prefix = "project.properties.";
 
-        assertEquals(child.getCanonicalFile(), new File(props.getProperty(prefix + "projectDir")).getCanonicalFile());
+        ItUtils.assertCanonicalFileEquals(child, Path.of(props.getProperty(prefix + "projectDir")));
 
         assertEquals("org.apache.maven.its.it0139.child", props.getProperty(prefix + "projectGroupId"));
         assertEquals("child", props.getProperty(prefix + "projectArtifactId"));

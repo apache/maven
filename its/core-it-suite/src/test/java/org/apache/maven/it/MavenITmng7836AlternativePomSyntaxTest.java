@@ -18,13 +18,10 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -38,25 +35,25 @@ class MavenITmng7836AlternativePomSyntaxTest extends AbstractMavenIntegrationTes
 
     @Test
     void testAlternativeSyntax() throws Exception {
-        File testDir = extractResources("/mng-7836-alternative-pom-syntax");
+        Path testDir = extractResources("mng-7836-alternative-pom-syntax");
 
-        final Verifier pluginVerifier = newVerifier(new File(testDir, "maven-hocon-extension").getPath());
+        final Verifier pluginVerifier = newVerifier(testDir.resolve("maven-hocon-extension"));
         pluginVerifier.addCliArgument("clean");
         pluginVerifier.addCliArgument("install");
         pluginVerifier.addCliArgument("-V");
         pluginVerifier.execute();
         pluginVerifier.verifyErrorFreeLog();
 
-        final Verifier consumerVerifier = newVerifier(new File(testDir, "simple").getPath());
+        final Verifier consumerVerifier = newVerifier(testDir.resolve("simple"));
         consumerVerifier.addCliArgument("clean");
         consumerVerifier.addCliArgument("install");
         consumerVerifier.addCliArgument("-Drat.skip=true");
         consumerVerifier.addCliArgument("-V");
 
-        Path consumerPom = Paths.get(consumerVerifier.getArtifactPath(
-                "org.apache.maven.its.mng-7836", "hocon-simple", "1.0.0-SNAPSHOT", "pom", ""));
-        Path buildPom = Paths.get(consumerVerifier.getArtifactPath(
-                "org.apache.maven.its.mng-7836", "hocon-simple", "1.0.0-SNAPSHOT", "pom", "build"));
+        Path consumerPom = consumerVerifier.getArtifactPath(
+                "org.apache.maven.its.mng-7836", "hocon-simple", "1.0.0-SNAPSHOT", "pom", "");
+        Path buildPom = consumerVerifier.getArtifactPath(
+                "org.apache.maven.its.mng-7836", "hocon-simple", "1.0.0-SNAPSHOT", "pom", "build");
         consumerVerifier.deleteArtifacts("org.apache.maven.its.mng-7836", "hocon-simple", "1.0.0-SNAPSHOT");
 
         consumerVerifier.execute();

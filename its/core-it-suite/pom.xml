@@ -356,6 +356,12 @@ under the License.
       <artifactId>maven-it-plugin-plexus-lifecycle</artifactId>
       <version>${core-it-support-version}</version>
     </dependency>
+      <dependency>
+          <groupId>commons-jxpath</groupId>
+          <artifactId>commons-jxpath</artifactId>
+          <version>1.4.0</version>
+          <scope>test</scope>
+      </dependency>
   </dependencies>
 
   <build>

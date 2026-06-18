@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -26,9 +26,9 @@ public class MavenITmng8123BuildCacheTest extends AbstractMavenIntegrationTestCa
 
     @Test
     public void testBuildCacheExtension() throws Exception {
-        File testDir = extractResources("/mng-8123-build-cache");
+        Path testDir = extractResources("mng-8123-build-cache");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();

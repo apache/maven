@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -34,9 +34,9 @@ class MavenITgh11055DIServiceInjectionTest extends AbstractMavenIntegrationTestC
 
     @Test
     void testGetServiceSucceeds() throws Exception {
-        File testDir = extractResources("/gh-11055-di-service-injection");
+        Path testDir = extractResources("gh-11055-di-service-injection");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument("verify");
         verifier.execute();
         verifier.verifyErrorFreeLog();

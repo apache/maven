@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -39,9 +39,9 @@ public class MavenITgh12305InvalidCollectRequestUninterpolatedManagedDepsTest ex
 
     @Test
     public void testUninterpolatedManagedDepsFromImportedBom() throws Exception {
-        File testDir = extractResources("/gh-12305-invalid-collect-request");
+        Path testDir = extractResources("/gh-12305-invalid-collect-request");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.deleteArtifacts("org.apache.maven.its.gh12305");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");

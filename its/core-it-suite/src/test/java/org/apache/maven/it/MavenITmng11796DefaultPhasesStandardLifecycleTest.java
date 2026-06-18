@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -38,16 +38,16 @@ class MavenITmng11796DefaultPhasesStandardLifecycleTest extends AbstractMavenInt
      */
     @Test
     void testDefaultPhasesBindToStandardLifecyclePhases() throws Exception {
-        File testDir = extractResources("/mng-11796-default-phases-standard-lifecycle");
+        Path testDir = extractResources("/mng-11796-default-phases-standard-lifecycle");
 
         // Install the extension plugin
-        Verifier verifier = newVerifier(new File(testDir, "extension-plugin").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("extension-plugin"));
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // Run compile on the consumer project - the touch goal should execute at process-sources
-        verifier = newVerifier(new File(testDir, "consumer-project").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("consumer-project"));
         verifier.addCliArgument("compile");
         verifier.execute();
         verifier.verifyErrorFreeLog();

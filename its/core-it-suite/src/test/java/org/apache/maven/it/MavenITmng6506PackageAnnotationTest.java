@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -26,18 +26,18 @@ public class MavenITmng6506PackageAnnotationTest extends AbstractMavenIntegratio
 
     @Test
     public void testGetPackageAnnotation() throws Exception {
-        File testDir = extractResources("/mng-6506-package-annotation");
-        File pluginDir = new File(testDir, "plugin");
-        File projectDir = new File(testDir, "project");
+        Path testDir = extractResources("mng-6506-package-annotation");
+        Path pluginDir = testDir.resolve("plugin");
+        Path projectDir = testDir.resolve("project");
 
         Verifier verifier;
 
-        verifier = newVerifier(pluginDir.getAbsolutePath());
+        verifier = newVerifier(pluginDir);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir);
         verifier.addCliArgument("verify");
         verifier.execute();
         verifier.verifyErrorFreeLog();

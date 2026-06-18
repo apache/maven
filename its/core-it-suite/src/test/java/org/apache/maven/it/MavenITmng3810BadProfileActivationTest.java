@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -32,9 +32,9 @@ public class MavenITmng3810BadProfileActivationTest extends AbstractMavenIntegra
 
     @Test
     public void testitMNG3810Property() throws Exception {
-        File testDir = extractResources("/mng-3810/property");
+        Path testDir = extractResources("mng-3810/property");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         try {

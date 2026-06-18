@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -40,9 +40,9 @@ public class MavenITmng2309ProfileInjectionOrderTest extends AbstractMavenIntegr
      */
     @Test
     public void testitMNG2309() throws Exception {
-        File testDir = extractResources("/mng-2309");
+        Path testDir = extractResources("mng-2309");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

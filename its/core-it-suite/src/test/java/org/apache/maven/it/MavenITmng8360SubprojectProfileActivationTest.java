@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -34,9 +34,9 @@ class MavenITmng8360SubprojectProfileActivationTest extends AbstractMavenIntegra
      */
     @Test
     void testDeadlock() throws Exception {
-        File testDir = extractResources("/mng-8360");
+        Path testDir = extractResources("mng-8360");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArguments("-s", "settings.xml");
         verifier.addCliArguments("-f", "module1");
         verifier.addCliArgument("org.apache.maven.plugins:maven-help-plugin:3.3.0:active-profiles");
