@@ -101,7 +101,6 @@ public class MavenITgh12288SettingsProfileAetherPropertiesTest extends AbstractM
                 customPrefix.exists(),
                 "Found artifact at custom prefix " + customPrefix + " — deactivation via -P ! was ignored.");
     }
-    }
 
     private void runAndAssertCustomPrefix(String settingsFile) throws Exception {
         File testDir = extractResources("/settings-profile-aether-properties");
