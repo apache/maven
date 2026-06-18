@@ -145,6 +145,11 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
         DependencyManagement depMgmt = project.getDependencyManagement();
         if (depMgmt != null) {
             for (Dependency dependency : depMgmt.getDependencies()) {
+                if (containsPlaceholder(dependency.getGroupId())
+                        || containsPlaceholder(dependency.getArtifactId())
+                        || containsPlaceholder(dependency.getVersion())) {
+                    continue;
+                }
                 collect.addManagedDependency(RepositoryUtils.toDependency(dependency, stereotypes));
             }
         }
@@ -193,6 +198,10 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
         }
 
         return result;
+    }
+
+    private static boolean containsPlaceholder(String value) {
+        return value != null && value.contains("${");
     }
 
     private void process(DefaultDependencyResolutionResult result, Collection<ArtifactResult> results) {
