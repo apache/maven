@@ -26,9 +26,7 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: Settings Profile Aether Properties</name>
-  <description>
-    Minimal project for proving that aether.enhancedLocalRepository.*
+  <description>Minimal project for proving that aether.enhancedLocalRepository.*
     properties set in an active-by-default settings.xml profile are honored
-    by the resolver at local repository manager initialization.
-  </description>
+    by the resolver at local repository manager initialization.</description>
 </project>

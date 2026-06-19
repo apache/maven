@@ -57,4 +57,3 @@ class MavenITgh11381ResourceTargetPathTest extends AbstractMavenIntegrationTestC
         verifier.verifyFileNotPresent("target-dir/subdir/another.yml");
     }
 }
-
