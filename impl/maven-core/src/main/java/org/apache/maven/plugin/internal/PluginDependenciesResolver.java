@@ -35,7 +35,6 @@ import org.eclipse.aether.resolution.DependencyResult;
  * changed or deleted without prior notice.
  *
  * @since 3.0
- * @author Benjamin Bentmann
  */
 public interface PluginDependenciesResolver {
 

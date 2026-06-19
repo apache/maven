@@ -213,7 +213,7 @@ public class BootstrapCoreExtensionManager {
             throws ExtensionResolutionException {
         try {
             /* TODO: Enhance the PluginDependenciesResolver to provide a
-             * resolveCoreExtension method which uses a CoreExtension
+             * resolveCoreExtensionAndFlatten method which uses a CoreExtension
              * object instead of a Plugin as this makes no sense.
              */
             Plugin plugin = Plugin.newBuilder()
