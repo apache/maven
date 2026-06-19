@@ -94,6 +94,7 @@ under the License.
     <core-it-support-version>2.1-SNAPSHOT</core-it-support-version>
 
     <version.palantirJavaFormat>2.90.0</version.palantirJavaFormat>
+    <version.maven-shared-resources>6</version.maven-shared-resources>
     <its.forkCount>0.75C</its.forkCount>
     <its.test />
   </properties>
@@ -423,7 +424,7 @@ under the License.
             <dependency>
               <groupId>org.apache.maven.shared</groupId>
               <artifactId>maven-shared-resources</artifactId>
-              <version>6</version>
+              <version>${version.maven-shared-resources}</version>
             </dependency>
           </dependencies>
         </plugin>
