@@ -49,4 +49,3 @@ class MavenITgh11384RecursiveVariableReferenceTest extends AbstractMavenIntegrat
         verifier.verifyTextInLog("<url>https://github.com/slackapi/java-slack-sdk</url>");
     }
 }
-

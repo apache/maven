@@ -85,4 +85,3 @@ public class MavenITgh11485AtSignInJvmConfigTest extends AbstractMavenIntegratio
                 "Command-line value with @ character should be preserved");
     }
 }
-

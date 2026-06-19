@@ -26,7 +26,6 @@ import org.apache.maven.api.model.Model;
 import org.apache.maven.model.v4.MavenStaxReader;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -100,8 +99,8 @@ class MavenITConsumerPomBomFromSettingsRepoTest extends AbstractMavenIntegration
                         && "2.0".equals(d.getVersion()));
         assertTrue(
                 hasLibA,
-                "Consumer POM should contain lib-a with version 2.0 resolved from the BOM. "
-                        + "Actual dependencies: " + consumerPomModel.getDependencies());
+                "Consumer POM should contain lib-a with version 2.0 resolved from the BOM. " + "Actual dependencies: "
+                        + consumerPomModel.getDependencies());
 
         // The BOM import should NOT appear in the consumer POM (it's been flattened)
         if (consumerPomModel.getDependencyManagement() != null) {

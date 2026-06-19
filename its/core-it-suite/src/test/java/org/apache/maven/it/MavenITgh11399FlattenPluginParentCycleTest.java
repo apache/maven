@@ -57,4 +57,3 @@ class MavenITgh11399FlattenPluginParentCycleTest extends AbstractMavenIntegratio
         verifier.verifyFilePresent("target/.flattened-pom.xml");
     }
 }
-
