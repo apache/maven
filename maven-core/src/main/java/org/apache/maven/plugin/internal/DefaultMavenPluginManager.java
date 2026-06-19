@@ -32,9 +32,7 @@ import java.io.PrintStream;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -107,10 +105,10 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.graph.DependencyFilter;
-import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.resolution.DependencyResult;
 import org.eclipse.aether.util.filter.AndDependencyFilter;
-import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 
 /**
  * Provides basic services to manage Maven plugins and their mojos. This component is kept general in its design such
@@ -389,17 +387,17 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         DependencyFilter dependencyFilter = project.getExtensionDependencyFilter();
         dependencyFilter = AndDependencyFilter.newInstance(dependencyFilter, filter);
 
-        DependencyNode root = pluginDependenciesResolver.resolve(
+        DependencyResult result = pluginDependenciesResolver.resolvePluginAndFlatten(
                 plugin,
                 RepositoryUtils.toArtifact(pluginArtifact),
                 dependencyFilter,
                 project.getRemotePluginRepositories(),
                 repositorySession);
 
-        PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
-        root.accept(nlg);
-
-        pluginArtifacts = toMavenArtifacts(root, nlg);
+        pluginArtifacts = result.getArtifactResults().stream()
+                .filter(ArtifactResult::isResolved)
+                .map(r -> RepositoryUtils.toArtifact(r.getArtifact()))
+                .collect(Collectors.toList());
 
         pluginRealm = classRealmManager.createPluginRealm(
                 plugin, parent, null, foreignImports, toAetherArtifacts(pluginArtifacts));
@@ -435,18 +433,6 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
 
     private List<org.eclipse.aether.artifact.Artifact> toAetherArtifacts(final List<Artifact> pluginArtifacts) {
         return new ArrayList<>(RepositoryUtils.toArtifacts(pluginArtifacts));
-    }
-
-    private List<Artifact> toMavenArtifacts(DependencyNode root, PreorderNodeListGenerator nlg) {
-        List<Artifact> artifacts = new ArrayList<>(nlg.getNodes().size());
-        RepositoryUtils.toArtifacts(artifacts, Collections.singleton(root), Collections.<String>emptyList(), null);
-        for (Iterator<Artifact> it = artifacts.iterator(); it.hasNext(); ) {
-            Artifact artifact = it.next();
-            if (artifact.getFile() == null) {
-                it.remove();
-            }
-        }
-        return Collections.unmodifiableList(artifacts);
     }
 
     private Map<String, ClassLoader> calcImports(MavenProject project, ClassLoader parent, List<String> imports) {
@@ -841,9 +827,11 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
     private List<Artifact> resolveExtensionArtifacts(
             Plugin extensionPlugin, List<RemoteRepository> repositories, RepositorySystemSession session)
             throws PluginResolutionException {
-        DependencyNode root = pluginDependenciesResolver.resolve(extensionPlugin, null, null, repositories, session);
-        PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
-        root.accept(nlg);
-        return toMavenArtifacts(root, nlg);
+        DependencyResult result =
+                pluginDependenciesResolver.resolvePluginAndFlatten(extensionPlugin, null, null, repositories, session);
+        return result.getArtifactResults().stream()
+                .filter(ArtifactResult::isResolved)
+                .map(r -> RepositoryUtils.toArtifact(r.getArtifact()))
+                .collect(Collectors.toList());
     }
 }
