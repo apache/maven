@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -39,9 +39,9 @@ public class MavenITmng4385LifecycleMappingFromExtensionInReactorTest extends Ab
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4385");
+        Path testDir = extractResources("mng-4385");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         try {
             verifier.addCliArgument("validate");

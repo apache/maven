@@ -18,12 +18,11 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -43,24 +42,24 @@ public class MavenITmng2790LastUpdatedMetadataTest extends AbstractMavenIntegrat
      */
     @Test
     public void testitMNG2790() throws Exception {
-        File testDir = extractResources("/mng-2790");
+        Path testDir = extractResources("mng-2790");
 
         Date now = new Date();
 
         /*
          * Phase 1: Install initial snapshot into local repo.
          */
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.deleteArtifacts("org.apache.maven.its.mng2790");
         verifier.setAutoclean(false);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        File metadataArtifactVersionFile =
-                new File(verifier.getArtifactMetadataPath("org.apache.maven.its.mng2790", "project", "1.0-SNAPSHOT"));
-        File metadataArtifactFile =
-                new File(verifier.getArtifactMetadataPath("org.apache.maven.its.mng2790", "project"));
+        Path metadataArtifactVersionFile =
+                verifier.getArtifactMetadataPath("org.apache.maven.its.mng2790", "project", "1.0-SNAPSHOT");
+        Path metadataArtifactFile =
+                verifier.getArtifactMetadataPath("org.apache.maven.its.mng2790", "project");
 
         Date artifactVersionLastUpdated1 = getLastUpdated(metadataArtifactVersionFile);
         Date artifactLastUpdated1 = getLastUpdated(metadataArtifactFile);
@@ -79,7 +78,7 @@ public class MavenITmng2790LastUpdatedMetadataTest extends AbstractMavenIntegrat
         /*
          * Phase 2: Re-install snapshot and check for proper timestamp update in local metadata.
          */
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.addCliArgument("validate");
         verifier.execute();
@@ -96,8 +95,8 @@ public class MavenITmng2790LastUpdatedMetadataTest extends AbstractMavenIntegrat
                 artifactLastUpdated2.after(artifactLastUpdated1), artifactLastUpdated1 + " < " + artifactLastUpdated2);
     }
 
-    private Date getLastUpdated(File metadataFile) throws Exception {
-        String xml = Files.readString(metadataFile.toPath());
+    private Date getLastUpdated(Path metadataFile) throws Exception {
+        String xml = Files.readString(metadataFile);
         String timestamp = xml.replaceAll("(?s)\\A.*<lastUpdated>\\s*([0-9]++)\\s*</lastUpdated>.*\\z", "$1");
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
         format.setTimeZone(TimeZone.getTimeZone("UTC"));

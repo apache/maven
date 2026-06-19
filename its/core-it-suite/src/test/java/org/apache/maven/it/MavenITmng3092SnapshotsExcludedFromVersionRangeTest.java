@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Disabled;
@@ -43,9 +43,9 @@ public class MavenITmng3092SnapshotsExcludedFromVersionRangeTest extends Abstrac
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-3092");
+        Path testDir = extractResources("mng-3092");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3092");

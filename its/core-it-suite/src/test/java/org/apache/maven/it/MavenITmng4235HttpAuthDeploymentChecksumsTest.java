@@ -18,11 +18,11 @@
  */
 package org.apache.maven.it;
 
+import java.nio.file.Path;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Deque;
@@ -60,7 +60,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  */
 public class MavenITmng4235HttpAuthDeploymentChecksumsTest extends AbstractMavenIntegrationTestCase {
-    private File testDir;
+    private Path testDir;
 
     private Server server;
 
@@ -70,9 +70,9 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest extends AbstractMaven
 
     @BeforeEach
     protected void setUp() throws Exception {
-        testDir = extractResources("/mng-4235");
+        testDir = extractResources("mng-4235");
 
-        repoHandler.setResourceBase(testDir.getAbsolutePath());
+        repoHandler.setResourceBase(testDir.toString());
 
         Constraint constraint = new Constraint();
         constraint.setName(Constraint.__BASIC_AUTH);
@@ -129,7 +129,7 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest extends AbstractMaven
         Map<String, String> filterProps = new HashMap<>();
         filterProps.put("@port@", Integer.toString(port));
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.filterFile("pom-template.xml", "pom.xml", filterProps);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4235");
@@ -158,7 +158,7 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest extends AbstractMaven
     }
 
     private void assertHash(Verifier verifier, String dataFile, String hashExt, String algo) throws Exception {
-        String actualHash = ItUtils.calcHash(new File(verifier.getBasedir(), dataFile), algo);
+        String actualHash = ItUtils.calcHash(verifier.getBasedir().resolve( dataFile), algo);
 
         String expectedHash = verifier.loadLines(dataFile + hashExt).get(0).trim();
 
@@ -177,9 +177,9 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest extends AbstractMaven
                 Resource resource = getResource(request.getPathInfo());
 
                 // NOTE: This can get called concurrently but File.mkdirs() isn't thread-safe in all JREs
-                File dir = resource.getFile().getParentFile();
-                for (int i = 0; i < 10 && !dir.exists(); i++) {
-                    dir.mkdirs();
+                Path dir = resource.getFile().toPath().getParent();
+                for (int i = 0; i < 10 && !Files.exists(dir); i++) {
+                    Files.createDirectories(dir);
                 }
 
                 Files.copy(request.getInputStream(), resource.getFile().toPath(), REPLACE_EXISTING);

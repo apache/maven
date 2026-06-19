@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -37,9 +37,9 @@ public class MavenIT0038AlternatePomFileDifferentDirTest extends AbstractMavenIn
      */
     @Test
     public void testit0038() throws Exception {
-        File testDir = extractResources("/it0038");
+        Path testDir = extractResources("it0038");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("project/target");
         verifier.addCliArgument("-f");

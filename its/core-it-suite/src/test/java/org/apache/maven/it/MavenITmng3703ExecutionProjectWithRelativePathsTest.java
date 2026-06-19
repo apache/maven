@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -36,20 +36,20 @@ public class MavenITmng3703ExecutionProjectWithRelativePathsTest extends Abstrac
 
     @Test
     public void testForkFromMojo() throws Exception {
-        File testDir = extractResources("/mng-3703");
-        File pluginDir = new File(testDir, "maven-mng3703-plugin");
-        File projectDir = new File(testDir, "project");
+        Path testDir = extractResources("mng-3703");
+        Path pluginDir = testDir.resolve("maven-mng3703-plugin");
+        Path projectDir = testDir.resolve("project");
 
         Verifier verifier;
 
-        verifier = newVerifier(pluginDir.getAbsolutePath());
+        verifier = newVerifier(pluginDir);
 
         verifier.addCliArgument("install");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir);
         verifier.setLogFileName("log-mojo.txt");
 
         verifier.addCliArgument("package");
@@ -60,20 +60,20 @@ public class MavenITmng3703ExecutionProjectWithRelativePathsTest extends Abstrac
 
     @Test
     public void testForkFromReport() throws Exception {
-        File testDir = extractResources("/mng-3703");
-        File pluginDir = new File(testDir, "maven-mng3703-plugin");
-        File projectDir = new File(testDir, "project");
+        Path testDir = extractResources("mng-3703");
+        Path pluginDir = testDir.resolve("maven-mng3703-plugin");
+        Path projectDir = testDir.resolve("project");
 
         Verifier verifier;
 
-        verifier = newVerifier(pluginDir.getAbsolutePath());
+        verifier = newVerifier(pluginDir);
 
         verifier.addCliArgument("install");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir);
         verifier.setLogFileName("log-report.txt");
 
         verifier.addCliArgument("site");

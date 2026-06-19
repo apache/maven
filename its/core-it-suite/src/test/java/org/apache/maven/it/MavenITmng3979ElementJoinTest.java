@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -38,11 +38,11 @@ public class MavenITmng3979ElementJoinTest extends AbstractMavenIntegrationTestC
      */
     @Test
     public void testitMNG3979() throws Exception {
-        File testDir = extractResources("/mng-3979");
+        Path testDir = extractResources("mng-3979");
 
-        testDir = new File(testDir, "sub");
+        testDir = testDir.resolve("sub");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.addCliArgument("validate");
         verifier.execute();

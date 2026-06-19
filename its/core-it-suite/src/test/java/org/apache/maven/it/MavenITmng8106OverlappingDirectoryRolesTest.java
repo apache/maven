@@ -18,9 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-import java.io.FileReader;
-
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.junit.jupiter.api.Test;
@@ -35,11 +34,11 @@ public class MavenITmng8106OverlappingDirectoryRolesTest extends AbstractMavenIn
 
     @Test
     public void testDirectoryOverlap() throws Exception {
-        File testDir = extractResources("/mng-8106");
-        String repo = new File(testDir, "repo").getAbsolutePath();
-        String tailRepo = System.getProperty("user.home") + File.separator + ".m2" + File.separator + "repository";
+        Path testDir = extractResources("mng-8106");
+        String repo = testDir.resolve("repo").toString();
+        String tailRepo = Path.of(System.getProperty("user.home"), ".m2", "repository").toString();
 
-        Verifier verifier = newVerifier(new File(testDir, "plugin").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("plugin"));
         verifier.addCliArgument("-X");
         verifier.addCliArgument("-Dmaven.repo.local=" + repo);
         verifier.addCliArgument("-Dmaven.repo.local.tail=" + tailRepo);
@@ -47,7 +46,7 @@ public class MavenITmng8106OverlappingDirectoryRolesTest extends AbstractMavenIn
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(new File(testDir, "jar").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("jar"));
         verifier.addCliArgument("-X");
         verifier.addCliArgument("-Dmaven.repo.local=" + repo);
         verifier.addCliArgument("-Dmaven.repo.local.tail=" + tailRepo);
@@ -55,9 +54,9 @@ public class MavenITmng8106OverlappingDirectoryRolesTest extends AbstractMavenIn
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        File metadataFile = new File(new File(repo), "mng-8106/it/maven-metadata-local.xml");
+        Path metadataFile = Path.of(repo, "mng-8106/it/maven-metadata-local.xml");
         Xpp3Dom dom;
-        try (FileReader reader = new FileReader(metadataFile)) {
+        try (var reader = Files.newBufferedReader(metadataFile)) {
             dom = Xpp3DomBuilder.build(reader);
         }
         assertTrue(dom.getChild("versioning") != null, "metadata missing A level data");

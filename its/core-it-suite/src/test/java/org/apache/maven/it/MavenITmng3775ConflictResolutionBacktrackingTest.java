@@ -18,9 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -68,9 +67,9 @@ public class MavenITmng3775ConflictResolutionBacktrackingTest extends AbstractMa
      * be revised.
      */
     private void testit(String project) throws Exception {
-        File testDir = extractResources("/mng-3775");
+        Path testDir = extractResources("mng-3775");
 
-        Verifier verifier = newVerifier(new File(testDir, project).getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve(project));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3775");

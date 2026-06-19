@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -41,9 +41,9 @@ public class MavenITmng4281PreferLocalSnapshotTest extends AbstractMavenIntegrat
     public void testit() throws Exception {
         // NOTE: It's crucial to build the two projects in isolation to disable reactor resolution
 
-        File testDir = extractResources("/mng-4281");
+        Path testDir = extractResources("mng-4281");
 
-        Verifier verifier = newVerifier(new File(testDir, "dependency").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("dependency"));
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4281");
         verifier.addCliArgument("validate");
@@ -53,7 +53,7 @@ public class MavenITmng4281PreferLocalSnapshotTest extends AbstractMavenIntegrat
         verifier.verifyArtifactPresent("org.apache.maven.its.mng4281", "dependency", "0.1-SNAPSHOT", "jar");
         verifier.verifyArtifactPresent("org.apache.maven.its.mng4281", "dependency", "0.1-SNAPSHOT", "pom");
 
-        verifier = newVerifier(new File(testDir, "project").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("project"));
         verifier.setAutoclean(false);
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");

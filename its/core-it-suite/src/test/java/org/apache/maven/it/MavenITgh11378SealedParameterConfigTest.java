@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -29,16 +29,15 @@ public class MavenITgh11378SealedParameterConfigTest extends AbstractMavenIntegr
 
     @Test
     public void testSealedParameterImplementationCanUseSimpleName() throws Exception {
-        File testDir = extractResources("/gh-11378-sealed-parameter-config");
+        Path testDir = extractResources("/gh-11378-sealed-parameter-config");
 
-        Verifier parentVerifier = newVerifier(testDir.getAbsolutePath(), false);
+        Verifier parentVerifier = newVerifier(testDir, false);
         parentVerifier.addCliArgument("-N");
         parentVerifier.addCliArgument("install");
         parentVerifier.execute();
         parentVerifier.verifyErrorFreeLog();
 
-        File pluginDir = new File(testDir, "plugin");
-        Verifier pluginVerifier = newVerifier(pluginDir.getAbsolutePath(), false);
+        Verifier pluginVerifier = newVerifier(testDir.resolve("plugin"), false);
         pluginVerifier.getSystemProperties().put("maven.compiler.source", "17");
         pluginVerifier.getSystemProperties().put("maven.compiler.target", "17");
         pluginVerifier.getSystemProperties().put("maven.compiler.release", "17");
@@ -46,8 +45,7 @@ public class MavenITgh11378SealedParameterConfigTest extends AbstractMavenIntegr
         pluginVerifier.execute();
         pluginVerifier.verifyErrorFreeLog();
 
-        File consumerDir = new File(testDir, "consumer");
-        Verifier verifier = newVerifier(consumerDir.getAbsolutePath(), false);
+        Verifier verifier = newVerifier(testDir.resolve("consumer"), false);
         verifier.addCliArgument("test:test-goal");
         verifier.execute();
         verifier.verifyErrorFreeLog();

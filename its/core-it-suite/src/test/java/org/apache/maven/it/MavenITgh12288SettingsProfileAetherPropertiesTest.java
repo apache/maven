@@ -18,9 +18,9 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -68,18 +68,16 @@ public class MavenITgh12288SettingsProfileAetherPropertiesTest extends AbstractM
 
     @Test
     public void testActiveByDefaultDeactivatedViaCli() throws Exception {
-        File testDir = extractResources("/settings-profile-aether-properties");
+        Path testDir = extractResources("settings-profile-aether-properties");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.setLogFileName("log-deactivation.txt");
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.settings.profile.aether");
 
-        // Sibling tests in this class install under the same custom prefix; clear it to
-        // avoid false positives if those tests ran first.
-        File customPrefixSubtree = new File(verifier.getLocalRepository(), "it-custom-prefix");
-        FileUtils.deleteDirectory(customPrefixSubtree);
+        Path customPrefixSubtree = verifier.getLocalRepository().resolve("it-custom-prefix");
+        ItUtils.deleteDirectory(customPrefixSubtree);
 
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings-active-by-default.xml");
@@ -88,24 +86,24 @@ public class MavenITgh12288SettingsProfileAetherPropertiesTest extends AbstractM
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        File localRepo = new File(verifier.getLocalRepository());
+        Path localRepo = verifier.getLocalRepository();
         String gavRelativePath = "org/apache/maven/its/settings/profile/aether/test-artifact/1.0/test-artifact-1.0.pom";
-        File flatLayout = new File(localRepo, gavRelativePath);
-        File customPrefix = new File(localRepo, "it-custom-prefix/" + gavRelativePath);
+        Path flatLayout = localRepo.resolve(gavRelativePath);
+        Path customPrefix = localRepo.resolve("it-custom-prefix/" + gavRelativePath);
 
         assertTrue(
-                flatLayout.exists(),
+                Files.exists(flatLayout),
                 "Expected artifact at flat layout (profile deactivated via -P !), but not found at " + flatLayout);
 
         assertFalse(
-                customPrefix.exists(),
+                Files.exists(customPrefix),
                 "Found artifact at custom prefix " + customPrefix + " — deactivation via -P ! was ignored.");
     }
 
     private void runAndAssertCustomPrefix(String settingsFile) throws Exception {
-        File testDir = extractResources("/settings-profile-aether-properties");
+        Path testDir = extractResources("settings-profile-aether-properties");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.settings.profile.aether");
@@ -116,29 +114,29 @@ public class MavenITgh12288SettingsProfileAetherPropertiesTest extends AbstractM
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        File localRepo = new File(verifier.getLocalRepository());
+        Path localRepo = verifier.getLocalRepository();
         String gavRelativePath = "org/apache/maven/its/settings/profile/aether/test-artifact/1.0/test-artifact-1.0.pom";
 
-        File expectedAtCustomPrefix = new File(localRepo, "it-custom-prefix/" + gavRelativePath);
-        File flatLayout = new File(localRepo, gavRelativePath);
-        File defaultSplitPrefix = new File(localRepo, "installed/" + gavRelativePath);
+        Path expectedAtCustomPrefix = localRepo.resolve("it-custom-prefix/" + gavRelativePath);
+        Path flatLayout = localRepo.resolve(gavRelativePath);
+        Path defaultSplitPrefix = localRepo.resolve("installed/" + gavRelativePath);
 
         assertTrue(
-                expectedAtCustomPrefix.exists(),
+                Files.exists(expectedAtCustomPrefix),
                 "Expected install to use custom localPrefix 'it-custom-prefix' from "
                         + settingsFile
                         + ", but artifact not found at "
                         + expectedAtCustomPrefix);
 
         assertFalse(
-                flatLayout.exists(),
+                Files.exists(flatLayout),
                 "Found artifact at flat layout "
                         + flatLayout
                         + " — indicates the settings.xml profile properties did not reach the resolver"
                         + " session config in time for LRM init.");
 
         assertFalse(
-                defaultSplitPrefix.exists(),
+                Files.exists(defaultSplitPrefix),
                 "Found artifact at default split-LRM prefix "
                         + defaultSplitPrefix
                         + " — indicates split=true was honored but localPrefix was silently dropped.");

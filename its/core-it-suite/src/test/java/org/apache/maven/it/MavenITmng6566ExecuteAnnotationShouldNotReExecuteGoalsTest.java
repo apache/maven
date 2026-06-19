@@ -18,26 +18,25 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.io.IOException;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MavenITmng6566ExecuteAnnotationShouldNotReExecuteGoalsTest extends AbstractMavenIntegrationTestCase {
-    private static final String RESOURCE_PATH = "/mng-6566-execute-annotation-should-not-re-execute-goals";
+    private static final String RESOURCE_PATH = "mng-6566-execute-annotation-should-not-re-execute-goals";
     private static final String PLUGIN_KEY = "org.apache.maven.its.mng6566:plugin:1.0-SNAPSHOT";
 
-    private File testDir;
+    private Path testDir;
 
     @BeforeEach
     public void setUp() throws Exception {
         testDir = extractResources(RESOURCE_PATH);
 
-        File pluginDir = new File(testDir, "plugin");
-        Verifier verifier = newVerifier(pluginDir.getAbsolutePath());
+        Path pluginDir = testDir.resolve("plugin");
+        Verifier verifier = newVerifier(pluginDir);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -45,9 +44,9 @@ public class MavenITmng6566ExecuteAnnotationShouldNotReExecuteGoalsTest extends 
 
     @Test
     public void testRunsCompileGoalOnceWithDirectPluginInvocation() throws Exception {
-        File consumerDir = new File(testDir, "consumer");
+        Path consumerDir = testDir.resolve("consumer");
 
-        Verifier verifier = newVerifier(consumerDir.getAbsolutePath());
+        Verifier verifier = newVerifier(consumerDir);
         verifier.setLogFileName("log-direct-plugin-invocation.txt");
         verifier.addCliArgument(PLUGIN_KEY + ":require-compile-phase");
         verifier.execute();
@@ -64,9 +63,9 @@ public class MavenITmng6566ExecuteAnnotationShouldNotReExecuteGoalsTest extends 
      */
     @Test
     public void testRunsCompileGoalOnceWithPhaseExecution() throws Exception {
-        File consumerDir = new File(testDir, "consumer");
+        Path consumerDir = testDir.resolve("consumer");
 
-        Verifier verifier = newVerifier(consumerDir.getAbsolutePath());
+        Verifier verifier = newVerifier(consumerDir);
         verifier.setLogFileName("log-phase-execution.txt");
         verifier.addCliArgument("compile");
         verifier.execute();

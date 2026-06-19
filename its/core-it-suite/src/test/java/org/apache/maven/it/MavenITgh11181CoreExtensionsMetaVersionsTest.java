@@ -35,11 +35,9 @@ class MavenITgh11181CoreExtensionsMetaVersionsTest extends AbstractMavenIntegrat
      */
     @Test
     void pwMetaVersionIsInvalid() throws Exception {
-        Path testDir = extractResources("/gh-11181-core-extensions-meta-versions")
-                .toPath()
-                .toAbsolutePath()
+        Path testDir = extractResources("gh-11181-core-extensions-meta-versions")
                 .resolve("pw-metaversion-is-invalid");
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setUserHomeDirectory(testDir.resolve("HOME"));
         verifier.setAutoclean(false);
         verifier.addCliArgument("validate");
@@ -57,11 +55,9 @@ class MavenITgh11181CoreExtensionsMetaVersionsTest extends AbstractMavenIntegrat
      */
     @Test
     void uwMetaVersionIsValid() throws Exception {
-        Path testDir = extractResources("/gh-11181-core-extensions-meta-versions")
-                .toPath()
-                .toAbsolutePath()
+        Path testDir = extractResources("gh-11181-core-extensions-meta-versions")
                 .resolve("uw-metaversion-is-valid");
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setUserHomeDirectory(testDir.resolve("HOME"));
         verifier.setHandleLocalRepoTail(false);
         verifier.setAutoclean(false);
@@ -76,11 +72,9 @@ class MavenITgh11181CoreExtensionsMetaVersionsTest extends AbstractMavenIntegrat
      */
     @Test
     void uwPwDifferentVersionIsConflict() throws Exception {
-        Path testDir = extractResources("/gh-11181-core-extensions-meta-versions")
-                .toPath()
-                .toAbsolutePath()
+        Path testDir = extractResources("gh-11181-core-extensions-meta-versions")
                 .resolve("uw-pw-different-version-is-conflict");
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setUserHomeDirectory(testDir.resolve("HOME"));
         verifier.setHandleLocalRepoTail(false);
         verifier.setAutoclean(false);
@@ -97,11 +91,9 @@ class MavenITgh11181CoreExtensionsMetaVersionsTest extends AbstractMavenIntegrat
      */
     @Test
     void uwPwSameVersionIsNotConflict() throws Exception {
-        Path testDir = extractResources("/gh-11181-core-extensions-meta-versions")
-                .toPath()
-                .toAbsolutePath()
+        Path testDir = extractResources("gh-11181-core-extensions-meta-versions")
                 .resolve("uw-pw-same-version-is-not-conflict");
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir);
         verifier.setUserHomeDirectory(testDir.resolve("HOME"));
         verifier.setHandleLocalRepoTail(false);
         verifier.setAutoclean(false);

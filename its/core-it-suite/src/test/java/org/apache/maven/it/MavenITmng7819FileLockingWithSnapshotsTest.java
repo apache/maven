@@ -18,11 +18,9 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Server;
@@ -45,12 +43,12 @@ class MavenITmng7819FileLockingWithSnapshotsTest extends AbstractMavenIntegratio
 
     @BeforeEach
     protected void setUp() throws Exception {
-        File testDir = extractResources("/mng-7819-file-locking-with-snapshots");
+        Path testDir = extractResources("mng-7819-file-locking-with-snapshots");
         server = new Server(0);
         ResourceHandler resourceHandler = new ResourceHandler();
         resourceHandler.setWelcomeFiles(new String[] {"index.html"});
         resourceHandler.setDirectoriesListed(true);
-        resourceHandler.setResourceBase(new File(testDir, "repo").getAbsolutePath());
+        resourceHandler.setResourceBase(testDir.resolve("repo").toString());
         HandlerList handlerList = new HandlerList();
         handlerList.setHandlers(new Handler[] {resourceHandler});
         server.setHandler(handlerList);
@@ -72,15 +70,15 @@ class MavenITmng7819FileLockingWithSnapshotsTest extends AbstractMavenIntegratio
 
     @Test
     void testFileLockingAndSnapshots() throws Exception {
-        File testDir = extractResources("/mng-7819-file-locking-with-snapshots");
+        Path testDir = extractResources("mng-7819-file-locking-with-snapshots");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
 
         // produce required precondition state: local repository must not have any of the org.apache.maven.its.mng7819
         // artifacts
-        String path = verifier.getArtifactPath("org.apache.maven.its.mng7819", "dependency", "1.0.0-SNAPSHOT", "pom");
-        File groupDirectory = new File(path).getParentFile().getParentFile().getParentFile();
-        FileUtils.deleteDirectory(groupDirectory);
+        Path path = verifier.getArtifactPath("org.apache.maven.its.mng7819", "dependency", "1.0.0-SNAPSHOT", "pom");
+        Path groupDirectory = path.getParent().getParent().getParent();
+        ItUtils.deleteDirectory(groupDirectory);
 
         Map<String, String> properties = new HashMap<>();
         properties.put("@port@", Integer.toString(port));
@@ -88,7 +86,7 @@ class MavenITmng7819FileLockingWithSnapshotsTest extends AbstractMavenIntegratio
 
         verifier.addCliArgument("-e");
         verifier.addCliArgument("-s");
-        verifier.addCliArgument(new File(testDir, "settings.xml").getAbsolutePath());
+        verifier.addCliArgument(testDir.resolve("settings.xml").toString());
         verifier.addCliArgument("-Pmaven-core-it-repo");
 
         verifier.addCliArgument("-Daether.syncContext.named.nameMapper=file-gav");

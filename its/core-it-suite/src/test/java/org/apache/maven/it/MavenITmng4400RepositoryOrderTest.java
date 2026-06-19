@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -39,9 +39,9 @@ public class MavenITmng4400RepositoryOrderTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testitSettingsRepos() throws Exception {
-        File testDir = extractResources("/mng-4400");
+        Path testDir = extractResources("mng-4400");
 
-        Verifier verifier = newVerifier(new File(testDir, "settings").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("settings"));
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4400");
         verifier.filterFile("settings-template.xml", "settings.xml");
@@ -62,9 +62,9 @@ public class MavenITmng4400RepositoryOrderTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testitPomRepos() throws Exception {
-        File testDir = extractResources("/mng-4400");
+        Path testDir = extractResources("mng-4400");
 
-        Verifier verifier = newVerifier(new File(testDir, "pom").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("pom"));
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4400");
         verifier.filterFile("pom-template.xml", "pom.xml");

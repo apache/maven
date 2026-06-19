@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -41,9 +41,9 @@ public class MavenITmng4973ExtensionVisibleToPluginInReactorTest extends Abstrac
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4973");
+        Path testDir = extractResources("mng-4973");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("sub-b/target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4973");

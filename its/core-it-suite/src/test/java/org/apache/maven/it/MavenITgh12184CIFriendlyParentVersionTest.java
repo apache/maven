@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -35,9 +35,9 @@ class MavenITgh12184CIFriendlyParentVersionTest extends AbstractMavenIntegration
      */
     @Test
     void testCiFriendlyParentVersionFromProperties() throws Exception {
-        File testDir = extractResources("/gh-12184-ci-friendly-parent-version");
+        Path testDir = extractResources("/gh-12184-ci-friendly-parent-version");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -49,9 +49,9 @@ class MavenITgh12184CIFriendlyParentVersionTest extends AbstractMavenIntegration
      */
     @Test
     void testCiFriendlyParentVersionFromCli() throws Exception {
-        File testDir = extractResources("/gh-12184-ci-friendly-parent-version");
+        Path testDir = extractResources("/gh-12184-ci-friendly-parent-version");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument("-Drevision=2.0.0");
         verifier.addCliArgument("validate");
         verifier.execute();

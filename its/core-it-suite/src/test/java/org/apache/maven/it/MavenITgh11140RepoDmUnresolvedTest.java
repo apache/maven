@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -31,8 +31,8 @@ class MavenITgh11140RepoDmUnresolvedTest extends AbstractMavenIntegrationTestCas
 
     @Test
     void testWarnsOnUnresolvedPlaceholders() throws Exception {
-        File testDir = extractResources("/gh-11140-repo-dm-unresolved");
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Path testDir = extractResources("gh-11140-repo-dm-unresolved");
+        Verifier verifier = newVerifier(testDir);
 
         verifier.addCliArgument("validate");
         verifier.execute();

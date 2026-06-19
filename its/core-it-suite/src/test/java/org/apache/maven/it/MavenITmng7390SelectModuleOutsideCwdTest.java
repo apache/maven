@@ -18,8 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -33,14 +32,14 @@ import org.junit.jupiter.api.Test;
  */
 public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenIntegrationTestCase {
 
-    private File moduleADir;
+    private Path moduleADir;
 
     @BeforeEach
     protected void setUp() throws Exception {
-        moduleADir = extractResources("/mng-7390-pl-outside-cwd/module-a");
+        moduleADir = extractResources("mng-7390-pl-outside-cwd/module-a");
 
         // Clean up target files from earlier runs (verifier.setAutoClean does not work, as we are reducing the reactor)
-        final Verifier verifier = newVerifier(moduleADir.getAbsolutePath(), false);
+        final Verifier verifier = newVerifier(moduleADir.toString(), false);
         verifier.addCliArgument("-f");
         verifier.addCliArgument("..");
         verifier.addCliArgument("clean");
@@ -49,7 +48,7 @@ public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenInteg
 
     @Test
     public void testSelectModuleByCoordinate() throws Exception {
-        final Verifier verifier = newVerifier(moduleADir.getAbsolutePath(), false);
+        final Verifier verifier = newVerifier(moduleADir.toString(), false);
 
         verifier.addCliArgument("-pl");
         verifier.addCliArgument(":module-b");
@@ -63,7 +62,7 @@ public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenInteg
 
     @Test
     public void testSelectMultipleModulesByCoordinate() throws Exception {
-        final Verifier verifier = newVerifier(moduleADir.getAbsolutePath(), false);
+        final Verifier verifier = newVerifier(moduleADir.toString(), false);
 
         verifier.addCliArgument("-pl");
         verifier.addCliArgument(":module-b,:module-a");
@@ -77,7 +76,7 @@ public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenInteg
 
     @Test
     public void testSelectModuleByRelativePath() throws Exception {
-        final Verifier verifier = newVerifier(moduleADir.getAbsolutePath(), false);
+        final Verifier verifier = newVerifier(moduleADir.toString(), false);
 
         verifier.addCliArgument("-pl");
         verifier.addCliArgument("../module-b");
@@ -91,7 +90,7 @@ public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenInteg
 
     @Test
     public void testSelectModulesByRelativePath() throws Exception {
-        final Verifier verifier = newVerifier(moduleADir.getAbsolutePath(), false);
+        final Verifier verifier = newVerifier(moduleADir.toString(), false);
 
         verifier.addCliArgument("-pl");
         verifier.addCliArgument("../module-b,.");
@@ -110,8 +109,8 @@ public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenInteg
     @Test
     public void testSelectModulesOutsideCwdDoesNotWorkWhenDotMvnIsNotPresent() throws Exception {
         final String noDotMvnPath = "/mng-7390-pl-outside-cwd-no-dotmvn/module-a";
-        final File noDotMvnDir = extractResources(noDotMvnPath);
-        final Verifier verifier = newVerifier(noDotMvnDir.getAbsolutePath(), false);
+        final Path noDotMvnDir = extractResources(noDotMvnPath);
+        final Verifier verifier = newVerifier(noDotMvnDir.toString(), false);
 
         verifier.addCliArgument("-pl");
         verifier.addCliArgument("../module-b");

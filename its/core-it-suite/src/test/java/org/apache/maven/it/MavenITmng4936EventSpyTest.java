@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -39,9 +39,9 @@ public class MavenITmng4936EventSpyTest extends AbstractMavenIntegrationTestCase
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4936");
+        Path testDir = extractResources("mng-4936");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setForkJvm(true); // maven.ext.class.path is not unloaded
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");

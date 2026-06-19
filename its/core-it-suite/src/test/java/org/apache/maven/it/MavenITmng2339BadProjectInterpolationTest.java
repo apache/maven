@@ -18,8 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -34,11 +34,11 @@ public class MavenITmng2339BadProjectInterpolationTest extends AbstractMavenInte
 
     @Test
     public void testitMNG2339a() throws Exception {
-        File testDir = extractResources("/mng-2339/a");
+        Path testDir = extractResources("mng-2339/a");
 
         Verifier verifier;
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
 
         verifier.addCliArgument("-Dversion=foo");
@@ -53,11 +53,11 @@ public class MavenITmng2339BadProjectInterpolationTest extends AbstractMavenInte
     @Disabled("Requires Maven version: (2.0.8,4.0.0-alpha-1)")
     public void testitMNG2339b() throws Exception {
         // requiresMavenVersion("(2.0.8,4.0.0-alpha-1)");
-        File testDir = extractResources("/mng-2339/b");
+        Path testDir = extractResources("mng-2339/b");
 
         Verifier verifier;
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
 
@@ -66,12 +66,12 @@ public class MavenITmng2339BadProjectInterpolationTest extends AbstractMavenInte
         verifier.execute();
 
         assertTrue(
-                new File(testDir, "target/touch-1.txt").exists(),
+                Files.exists(testDir.resolve("target/touch-1.txt")),
                 "Touchfile using ${project.version} for ${version} does not exist.");
 
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
 
@@ -83,7 +83,7 @@ public class MavenITmng2339BadProjectInterpolationTest extends AbstractMavenInte
         verifier.verifyErrorFreeLog();
 
         assertTrue(
-                new File(testDir, "target/touch-2.txt").exists(),
+                Files.exists(testDir.resolve("target/touch-2.txt")),
                 "Touchfile using CLI-specified ${version} does not exist.");
     }
 }

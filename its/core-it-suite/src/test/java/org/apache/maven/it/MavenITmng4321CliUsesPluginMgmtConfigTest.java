@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -38,9 +38,9 @@ public class MavenITmng4321CliUsesPluginMgmtConfigTest extends AbstractMavenInte
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4321");
+        Path testDir = extractResources("mng-4321");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-log-file:2.1-SNAPSHOT:reset");

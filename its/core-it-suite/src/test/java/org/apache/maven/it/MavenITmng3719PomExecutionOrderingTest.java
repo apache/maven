@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,9 +44,9 @@ public class MavenITmng3719PomExecutionOrderingTest extends AbstractMavenIntegra
      */
     @Test
     public void testitMNG3719() throws Exception {
-        File testDir = extractResources("/mng-3719");
+        Path testDir = extractResources("mng-3719");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
