@@ -82,7 +82,7 @@ class DefaultSettingsValidatorTest {
         ProblemCollector<BuilderProblem> problems = validator.validate(settings);
         assertEquals(1, problems.totalProblemsReported());
         assertEquals(
-                "'servers.server[0].aliases' for server-1 must be unique for all servers id but found duplicate alias server-1",
+                "'servers.server[0].aliases[0]' for server-1 must be unique across all server ids and aliases but found duplicate alias server-1",
                 problems.problems().findFirst().orElseThrow().getMessage());
     }
 
@@ -101,7 +101,20 @@ class DefaultSettingsValidatorTest {
         ProblemCollector<BuilderProblem> problems = validator.validate(settings);
         assertEquals(1, problems.totalProblemsReported());
         assertEquals(
-                "'servers.server[1].aliases' for server-2 must be unique for all servers id but found duplicate alias alias-1",
+                "'servers.server[1].aliases[0]' for server-2 must be unique across all server ids and aliases but found duplicate alias alias-1",
+                problems.problems().findFirst().orElseThrow().getMessage());
+    }
+
+    @Test
+    void testValidateServerIdAliasesWithEmptyValue() {
+        Server server = Server.newBuilder().id("server-1").aliases(List.of("")).build();
+
+        Settings settings = Settings.newBuilder().servers(List.of(server)).build();
+
+        ProblemCollector<BuilderProblem> problems = validator.validate(settings);
+        assertEquals(1, problems.totalProblemsReported());
+        assertEquals(
+                "'servers.server[0].aliases[0]' for server-1 is missing",
                 problems.problems().findFirst().orElseThrow().getMessage());
     }
 }
