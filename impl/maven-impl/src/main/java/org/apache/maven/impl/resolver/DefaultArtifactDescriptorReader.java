@@ -18,6 +18,7 @@
  */
 package org.apache.maven.impl.resolver;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -28,6 +29,8 @@ import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
+import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderException;
@@ -242,7 +245,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                                 RequestTraceHelper.interpretTrace(false, request.getTrace()));
                     }
                 }
-                model = modelResult.getEffectiveModel();
+                model = stripInheritedDependencyManagement(modelResult);
             } catch (ModelBuilderException e) {
                 for (ModelProblem problem :
                         e.getResult().getProblemCollector().problems().toList()) {
@@ -279,6 +282,45 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
         return Objects.equals(a1.getGroupId(), a2.getGroupId())
                 && Objects.equals(a1.getArtifactId(), a2.getArtifactId())
                 && Objects.equals(a1.getVersion(), a2.getVersion());
+    }
+
+    /**
+     * Strips parent-inherited {@code <dependencyManagement>} entries from the effective model.
+     * Only entries directly declared in the POM (or from its own BOM imports) are kept.
+     * This prevents {@code TransitiveDependencyManager} from propagating parent-inherited
+     * management rules through the transitive dependency graph (gh-12302).
+     */
+    private Model stripInheritedDependencyManagement(ModelBuilderResult modelResult) {
+        Model model = modelResult.getEffectiveModel();
+        DependencyManagement effectiveDm = model.getDependencyManagement();
+        if (effectiveDm == null || effectiveDm.getDependencies().isEmpty()) {
+            return model;
+        }
+
+        Model parentModel = modelResult.getParentModel();
+        DependencyManagement parentDm = parentModel != null ? parentModel.getDependencyManagement() : null;
+        if (parentDm == null || parentDm.getDependencies().isEmpty()) {
+            return model;
+        }
+
+        Map<String, String> parentManagedVersions = new HashMap<>();
+        for (Dependency d : parentDm.getDependencies()) {
+            parentManagedVersions.put(d.getManagementKey(), d.getVersion());
+        }
+
+        List<Dependency> ownDeps = new ArrayList<>();
+        for (Dependency d : effectiveDm.getDependencies()) {
+            String parentVersion = parentManagedVersions.get(d.getManagementKey());
+            if (parentVersion == null || !parentVersion.equals(d.getVersion())) {
+                ownDeps.add(d);
+            }
+        }
+
+        if (ownDeps.size() == effectiveDm.getDependencies().size()) {
+            return model;
+        }
+
+        return model.withDependencyManagement(effectiveDm.withDependencies(ownDeps));
     }
 
     private Map<String, String> toProperties(Map<String, String> dominant, Map<String, String> recessive) {
