@@ -27,6 +27,7 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.DependencyResult;
 
 /**
  * Assists in resolving the dependencies of a plugin. <strong>Warning:</strong> This is an internal utility interface
@@ -61,8 +62,30 @@ public interface PluginDependenciesResolver {
      * @param session The repository session to use for resolving the plugin artifacts, must not be {@code null}.
      * @return The dependency tree denoting the resolved plugin class path, never {@code null}.
      * @throws PluginResolutionException If any dependency could not be resolved.
+     * @deprecated This method should be avoided, as it needs manual flattening, instead to let Resolver do it. Use {@link #resolveAndFlatten(Plugin, Artifact, DependencyFilter, List, RepositorySystemSession)} instead.
      */
+    @Deprecated
     DependencyNode resolve(
+            Plugin plugin,
+            Artifact pluginArtifact,
+            DependencyFilter dependencyFilter,
+            List<RemoteRepository> repositories,
+            RepositorySystemSession session)
+            throws PluginResolutionException;
+
+    /**
+     * Resolves the runtime dependencies of the specified plugin.
+     *
+     * @param plugin The plugin for which to resolve the dependencies, must not be {@code null}.
+     * @param pluginArtifact The plugin's main artifact, may be {@code null}.
+     * @param dependencyFilter A filter to exclude artifacts from resolution (but not collection), may be {@code null}.
+     * @param repositories The plugin repositories to use for resolving the plugin artifacts, must not be {@code null}.
+     * @param session The repository session to use for resolving the plugin artifacts, must not be {@code null}.
+     * @return The dependency tree denoting the resolved plugin class path, never {@code null}.
+     * @throws PluginResolutionException If any dependency could not be resolved.
+     * @since 3.10.0
+     */
+    DependencyResult resolveAndFlatten(
             Plugin plugin,
             Artifact pluginArtifact,
             DependencyFilter dependencyFilter,

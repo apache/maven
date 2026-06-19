@@ -57,6 +57,7 @@ import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.resolution.DependencyResolutionException;
+import org.eclipse.aether.resolution.DependencyResult;
 import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.filter.AndDependencyFilter;
 import org.eclipse.aether.util.filter.ScopeDependencyFilter;
@@ -98,6 +99,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                 session.getArtifactTypeRegistry().get("maven-plugin"));
     }
 
+    @Override
     public Artifact resolve(Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session)
             throws PluginResolutionException {
         RequestTrace trace = RequestTrace.newChild(null, plugin);
@@ -161,10 +163,36 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             List<RemoteRepository> repositories,
             RepositorySystemSession session)
             throws PluginResolutionException {
+        return resolveInternal(plugin, null /* pluginArtifact */, dependencyFilter, repositories, session)
+                .getRoot();
+    }
+
+    /**
+     * @since 3.10.0
+     */
+    public DependencyResult resolveCoreExtensionAndFlatten(
+            Plugin plugin,
+            DependencyFilter dependencyFilter,
+            List<RemoteRepository> repositories,
+            RepositorySystemSession session)
+            throws PluginResolutionException {
         return resolveInternal(plugin, null /* pluginArtifact */, dependencyFilter, repositories, session);
     }
 
+    @Override
     public DependencyNode resolve(
+            Plugin plugin,
+            Artifact pluginArtifact,
+            DependencyFilter dependencyFilter,
+            List<RemoteRepository> repositories,
+            RepositorySystemSession session)
+            throws PluginResolutionException {
+        return resolveInternal(plugin, pluginArtifact, dependencyFilter, repositories, session)
+                .getRoot();
+    }
+
+    @Override
+    public DependencyResult resolveAndFlatten(
             Plugin plugin,
             Artifact pluginArtifact,
             DependencyFilter dependencyFilter,
@@ -174,7 +202,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
         return resolveInternal(plugin, pluginArtifact, dependencyFilter, repositories, session);
     }
 
-    private DependencyNode resolveInternal(
+    private DependencyResult resolveInternal(
             Plugin plugin,
             Artifact pluginArtifact,
             DependencyFilter dependencyFilter,
@@ -189,8 +217,6 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
 
         DependencyFilter collectionFilter = new ScopeDependencyFilter("provided", "test");
         DependencyFilter resolutionFilter = AndDependencyFilter.newInstance(collectionFilter, dependencyFilter);
-
-        DependencyNode node;
 
         try {
             DependencySelector selector =
@@ -221,14 +247,16 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
 
             request.setTrace(RequestTrace.newChild(trace, depRequest));
 
-            node = repoSystem.collectDependencies(pluginSession, request).getRoot();
+            DependencyNode node =
+                    repoSystem.collectDependencies(pluginSession, request).getRoot();
 
             if (logger.isDebugEnabled()) {
                 node.accept(new GraphLogger());
             }
 
             depRequest.setRoot(node);
-            repoSystem.resolveDependencies(session, depRequest);
+            return repoSystem.resolveDependencies(session, depRequest);
+
         } catch (DependencyCollectionException e) {
             throw new PluginResolutionException(
                     plugin, e.getResult().getExceptions(), logger.isDebugEnabled() ? e : null);
@@ -241,8 +269,6 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                     .collect(Collectors.toList());
             throw new PluginResolutionException(plugin, exceptions, logger.isDebugEnabled() ? e : null);
         }
-
-        return node;
     }
 
     // Keep this class in sync with org.apache.maven.project.DefaultProjectDependenciesResolver.GraphLogger

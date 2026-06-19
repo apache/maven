@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.cli.internal.extension.model.CoreExtension;
@@ -48,10 +49,10 @@ import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.DependencyFilter;
-import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.resolution.DependencyResult;
 import org.eclipse.aether.util.filter.ExclusionsDependencyFilter;
-import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 
 /**
  * BootstrapCoreExtensionManager
@@ -174,13 +175,12 @@ public class BootstrapCoreExtensionManager {
             plugin.setArtifactId(interpolator.interpolate(extension.getArtifactId()));
             plugin.setVersion(interpolator.interpolate(extension.getVersion()));
 
-            DependencyNode root = pluginDependenciesResolver.resolveCoreExtension(
+            DependencyResult result = pluginDependenciesResolver.resolveCoreExtensionAndFlatten(
                     plugin, dependencyFilter, repositories, repoSession);
-            PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
-            root.accept(nlg);
-            List<Artifact> artifacts = nlg.getArtifacts(false);
-
-            return artifacts;
+            return result.getArtifactResults().stream()
+                    .filter(ArtifactResult::isResolved)
+                    .map(ArtifactResult::getArtifact)
+                    .collect(Collectors.toList());
         } catch (PluginResolutionException | InterpolationException e) {
             throw new ExtensionResolutionException(extension, e);
         }
