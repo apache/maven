@@ -59,7 +59,7 @@ import org.apache.maven.impl.model.DefaultInterpolator;
 import org.apache.maven.internal.impl.DefaultArtifactManager;
 import org.apache.maven.internal.impl.DefaultSession;
 import org.apache.maven.plugin.PluginResolutionException;
-import org.apache.maven.plugin.internal.DefaultPluginDependenciesResolver;
+import org.apache.maven.plugin.internal.PluginDependenciesResolver;
 import org.apache.maven.resolver.MavenChainedWorkspaceReader;
 import org.apache.maven.resolver.RepositorySystemSessionFactory;
 import org.codehaus.plexus.DefaultPlexusContainer;
@@ -97,7 +97,7 @@ public class BootstrapCoreExtensionManager {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    private final DefaultPluginDependenciesResolver pluginDependenciesResolver;
+    private final PluginDependenciesResolver pluginDependenciesResolver;
 
     private final RepositorySystemSessionFactory repositorySystemSessionFactory;
 
@@ -113,7 +113,7 @@ public class BootstrapCoreExtensionManager {
 
     @Inject
     public BootstrapCoreExtensionManager(
-            DefaultPluginDependenciesResolver pluginDependenciesResolver,
+            PluginDependenciesResolver pluginDependenciesResolver,
             RepositorySystemSessionFactory repositorySystemSessionFactory,
             CoreExports coreExports,
             PlexusContainer container,
@@ -222,7 +222,7 @@ public class BootstrapCoreExtensionManager {
                     .version(interpolator.apply(extension.getVersion()))
                     .build();
 
-            DependencyResult result = pluginDependenciesResolver.resolveCoreExtension(
+            DependencyResult result = pluginDependenciesResolver.resolveCoreExtensionAndFlatten(
                     new org.apache.maven.model.Plugin(plugin), dependencyFilter, repositories, repoSession);
             return result.getArtifactResults().stream()
                     .filter(ArtifactResult::isResolved)
