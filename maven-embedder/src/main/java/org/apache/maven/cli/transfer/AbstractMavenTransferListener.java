@@ -236,7 +236,7 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
         message.append(darkOff).append(resource.getResourceName());
         message.append(darkOn).append(" (").append(format.format(contentLength));
 
-        long duration = System.currentTimeMillis() - resource.getTransferStartTime();
+        long duration = System.currentTimeMillis() - resource.getStartTime().toEpochMilli();
         if (duration > 0L) {
             double bytesPerSecond = contentLength / (duration / 1000.0);
             message.append(" at ").append(format.format((long) bytesPerSecond)).append("/s");

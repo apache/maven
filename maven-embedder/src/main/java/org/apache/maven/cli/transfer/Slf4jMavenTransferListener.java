@@ -84,7 +84,7 @@ public class Slf4jMavenTransferListener extends AbstractTransferListener {
         message.append(resource.getRepositoryUrl()).append(resource.getResourceName());
         message.append(" (").append(format.format(contentLength));
 
-        long duration = System.currentTimeMillis() - resource.getTransferStartTime();
+        long duration = System.currentTimeMillis() - resource.getStartTime().toEpochMilli();
         if (duration > 0L) {
             double bytesPerSecond = contentLength / (duration / 1000.0);
             message.append(" at ").append(format.format((long) bytesPerSecond)).append("/s");

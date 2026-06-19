@@ -81,7 +81,7 @@ public interface PluginDependenciesResolver {
      * @param dependencyFilter A filter to exclude artifacts from resolution (but not collection), may be {@code null}.
      * @param repositories The plugin repositories to use for resolving the plugin artifacts, must not be {@code null}.
      * @param session The repository session to use for resolving the plugin artifacts, must not be {@code null}.
-     * @return The dependency tree denoting the resolved plugin class path, never {@code null}.
+     * @return The dependency resolution result having the resolved plugin class path but also the tree, never {@code null}.
      * @throws PluginResolutionException If any dependency could not be resolved.
      * @since 3.10.0
      */
