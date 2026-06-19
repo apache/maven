@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -184,7 +185,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         }
 
         settingsValidator.validate(settings, problems);
-        settings.setServers(serversByIds(settings.getServers()));
+        settings.setServers(new ArrayList<>(serversByIds(settings.getServers())));
 
         return settings;
     }

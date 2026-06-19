@@ -232,7 +232,7 @@ class DefaultSettingsValidatorTest {
         assertEquals(1, problems.messages.size());
         assertContains(
                 problems.messages.get(0),
-                "servers.server[0].aliases' for server-1 must be unique for all servers id but found duplicate alias server-1");
+                "'servers.server[0].aliases[0]' for server-1 must be unique across all server ids and aliases but found duplicate alias server-1");
     }
 
     @Test
@@ -254,7 +254,21 @@ class DefaultSettingsValidatorTest {
         assertEquals(1, problems.messages.size());
         assertContains(
                 problems.messages.get(0),
-                "'servers.server[1].aliases' for server-2 must be unique for all servers id but found duplicate alias alias-1");
+                "'servers.server[1].aliases[0]' for server-2 must be unique across all server ids and aliases but found duplicate alias alias-1");
+    }
+
+    @Test
+    void testValidateServerIdAliasesWithEmptyValue() {
+        Settings settings = new Settings();
+        Server server = new Server();
+        server.setId("server-1");
+        server.addAliase("");
+        settings.addServer(server);
+
+        SimpleProblemCollector problems = new SimpleProblemCollector();
+        validator.validate(settings, problems);
+        assertEquals(1, problems.messages.size());
+        assertContains(problems.messages.get(0), "'servers.server[0].aliases[0]' for server-1 is missing");
     }
 
     private static class SimpleProblemCollector implements SettingsProblemCollector {
