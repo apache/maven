@@ -195,7 +195,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
     }
 
     @Override
-    public DependencyResult resolveAndFlatten(
+    public DependencyResult resolvePluginAndFlatten(
             Plugin plugin,
             Artifact pluginArtifact,
             DependencyFilter dependencyFilter,

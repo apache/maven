@@ -62,7 +62,7 @@ public interface PluginDependenciesResolver {
      * @param session The repository session to use for resolving the plugin artifacts, must not be {@code null}.
      * @return The dependency tree denoting the resolved plugin class path, never {@code null}.
      * @throws PluginResolutionException If any dependency could not be resolved.
-     * @deprecated This method should be avoided, as it requires manual flattening; use {@link #resolveAndFlatten(Plugin, Artifact, DependencyFilter, List, RepositorySystemSession)} instead to let Resolver handle it.
+     * @deprecated This method should be avoided, as it requires manual flattening; use {@link #resolvePluginAndFlatten(Plugin, Artifact, DependencyFilter, List, RepositorySystemSession)} instead to let Resolver handle it.
      */
     @Deprecated
     DependencyNode resolve(
@@ -74,7 +74,7 @@ public interface PluginDependenciesResolver {
             throws PluginResolutionException;
 
     /**
-     * Resolves the runtime dependencies of the specified core extension.
+     * Resolves the runtime dependencies of the specified core extension (as {@link Plugin} as GAV carrier).
      *
      * @param plugin The plugin for which to resolve the dependencies, must not be {@code null}.
      * @param dependencyFilter A filter to exclude artifacts from resolution (but not collection), may be {@code null}.
@@ -103,7 +103,7 @@ public interface PluginDependenciesResolver {
      * @throws PluginResolutionException If any dependency could not be resolved.
      * @since 3.10.0
      */
-    DependencyResult resolveAndFlatten(
+    DependencyResult resolvePluginAndFlatten(
             Plugin plugin,
             Artifact pluginArtifact,
             DependencyFilter dependencyFilter,
