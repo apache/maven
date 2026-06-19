@@ -162,7 +162,8 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             List<RemoteRepository> repositories,
             RepositorySystemSession session)
             throws PluginResolutionException {
-        return resolveCoreExtensionAndFlatten(plugin, dependencyFilter, repositories, session).getRoot();
+        return resolveCoreExtensionAndFlatten(plugin, dependencyFilter, repositories, session)
+                .getRoot();
     }
 
     @Override
@@ -204,6 +205,18 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
         } catch (ArtifactDescriptorException e) {
             throw new PluginResolutionException(plugin, e.getResult().getExceptions(), e);
         }
+    }
+
+    @Deprecated
+    @Override
+    public DependencyResult resolvePlugin(
+            Plugin plugin,
+            Artifact artifact,
+            DependencyFilter dependencyFilter,
+            List<RemoteRepository> repositories,
+            RepositorySystemSession session)
+            throws PluginResolutionException {
+        return resolvePluginAndFlatten(plugin, artifact, dependencyFilter, repositories, session);
     }
 
     @Override
