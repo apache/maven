@@ -289,12 +289,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         // Contains both GAV coordinates (groupId:artifactId:version) and file paths
         final Set<String> parentChain;
 
-        // Per-thread tracking of file paths currently being read by doReadFileModel.
-        // Shared across all derived sessions. Uses ThreadLocal so that parallel threads
-        // (e.g. from PhasingExecutor in loadFilePom) each track their own call stack,
-        // preventing false cycle detection across threads (GH-12301).
-        final ThreadLocal<Set<Path>> activeModelReads;
-
         ModelBuilderSessionState(ModelBuilderRequest request) {
             this(
                     request.getSession(),
@@ -305,8 +299,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     List.of(),
                     repos(request),
                     repos(request),
-                    new LinkedHashSet<>(),
-                    ThreadLocal.withInitial(HashSet::new));
+                    new LinkedHashSet<>());
         }
 
         static List<RemoteRepository> repos(ModelBuilderRequest request) {
@@ -326,8 +319,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 List<RemoteRepository> pomRepositories,
                 List<RemoteRepository> externalRepositories,
                 List<RemoteRepository> repositories,
-                Set<String> parentChain,
-                ThreadLocal<Set<Path>> activeModelReads) {
+                Set<String> parentChain) {
             this.session = session;
             this.request = request;
             this.result = result;
@@ -337,7 +329,6 @@ public class DefaultModelBuilder implements ModelBuilder {
             this.externalRepositories = externalRepositories;
             this.repositories = repositories;
             this.parentChain = parentChain;
-            this.activeModelReads = activeModelReads;
             this.result.setSource(this.request.getSource());
         }
 
@@ -388,8 +379,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     pomRepositories,
                     derivedExtRepos,
                     derivedRepos,
-                    new LinkedHashSet<>(),
-                    activeModelReads);
+                    new LinkedHashSet<>());
         }
 
         @Override
@@ -696,7 +686,7 @@ public class DefaultModelBuilder implements ModelBuilder {
          * are available for CI-friendly version processing and repository URL interpolation.
          * It also includes directory-related properties that may be needed during profile activation.
          */
-        private Map<String, String> getEnhancedProperties(Model model, Path rootDirectory) {
+        private Map<String, String> getEnhancedProperties(Model model, Path rootDirectory, Set<Path> activeModelReads) {
             Map<String, String> properties = new HashMap<>();
 
             // Add directory-specific properties first, as they may be needed for profile activation
@@ -723,13 +713,13 @@ public class DefaultModelBuilder implements ModelBuilder {
                     // Check if the root model path is within the root directory to prevent infinite loops
                     // This can happen when a .mvn directory exists in a subdirectory and parent inference
                     // tries to read models above the discovered root directory.
-                    // Also skip if the root model is already being read on this thread's call stack
+                    // Also skip if the root model is already being read in an outer call frame
                     // to prevent StackOverflowError when a project has an internal parent in a
                     // subdirectory with CI-friendly ${revision} and a .mvn/ root marker (GH-12301).
                     if (isParentWithinRootDirectory(rootModelPath, rootDirectory)
-                            && !activeModelReads.get().contains(rootModelPath.normalize())) {
+                            && !activeModelReads.contains(rootModelPath.normalize())) {
                         Model rootModel =
-                                derive(Sources.buildSource(rootModelPath)).readFileModel();
+                                derive(Sources.buildSource(rootModelPath)).readFileModel(activeModelReads);
                         properties.putAll(getPropertiesWithProfiles(rootModel, properties));
                     }
                 }
@@ -1542,14 +1532,18 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         Model readFileModel() throws ModelBuilderException {
-            Model model = cache(request.getSource(), FILE, this::doReadFileModel);
+            return readFileModel(new HashSet<>());
+        }
+
+        Model readFileModel(Set<Path> activeModelReads) throws ModelBuilderException {
+            Model model = cache(request.getSource(), FILE, () -> doReadFileModel(activeModelReads));
             // set the file model in the result outside the cache
             result.setFileModel(model);
             return model;
         }
 
         @SuppressWarnings("checkstyle:methodlength")
-        Model doReadFileModel() throws ModelBuilderException {
+        Model doReadFileModel(Set<Path> activeModelReads) throws ModelBuilderException {
             ModelSource modelSource = request.getSource();
             Model model;
             Path rootDirectory;
@@ -1558,7 +1552,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             logger.debug("Reading file model from " + modelSource.getLocation());
             Path sourcePath = modelSource.getPath();
             Path normalizedPath = sourcePath != null ? sourcePath.normalize() : null;
-            boolean trackRead = normalizedPath != null && activeModelReads.get().add(normalizedPath);
+            boolean trackRead = normalizedPath != null && activeModelReads.add(normalizedPath);
             try {
                 try {
                     boolean strict = isBuildRequest();
@@ -1665,7 +1659,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                                 }
 
                                 Model parentModel =
-                                        derive(Sources.buildSource(pomPath)).readFileModel();
+                                        derive(Sources.buildSource(pomPath)).readFileModel(activeModelReads);
                                 String parentGroupId = getGroupId(parentModel);
                                 String parentArtifactId = parentModel.getArtifactId();
                                 String parentVersion = getVersion(parentModel);
@@ -1717,7 +1711,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
                     // Enhanced property resolution with profile activation for CI-friendly versions and repository URLs
                     // This includes directory properties, profile properties, and user properties
-                    Map<String, String> properties = getEnhancedProperties(model, rootDirectory);
+                    Map<String, String> properties = getEnhancedProperties(model, rootDirectory, activeModelReads);
 
                     // CI friendly version processing with profile-aware properties
                     model = model.with()
@@ -1773,7 +1767,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 return model;
             } finally {
                 if (trackRead) {
-                    activeModelReads.get().remove(normalizedPath);
+                    activeModelReads.remove(normalizedPath);
                 }
             }
         }
