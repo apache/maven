@@ -62,7 +62,7 @@ public interface PluginDependenciesResolver {
      * @param session The repository session to use for resolving the plugin artifacts, must not be {@code null}.
      * @return The dependency tree denoting the resolved plugin class path, never {@code null}.
      * @throws PluginResolutionException If any dependency could not be resolved.
-     * @deprecated This method should be avoided, as it needs manual flattening, instead to let Resolver do it. Use {@link #resolveAndFlatten(Plugin, Artifact, DependencyFilter, List, RepositorySystemSession)} instead.
+     * @deprecated This method should be avoided, as it requires manual flattening; use {@link #resolveAndFlatten(Plugin, Artifact, DependencyFilter, List, RepositorySystemSession)} instead to let Resolver handle it.
      */
     @Deprecated
     DependencyNode resolve(
