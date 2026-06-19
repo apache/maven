@@ -74,6 +74,24 @@ public interface PluginDependenciesResolver {
             throws PluginResolutionException;
 
     /**
+     * Resolves the runtime dependencies of the specified core extension.
+     *
+     * @param plugin The plugin for which to resolve the dependencies, must not be {@code null}.
+     * @param dependencyFilter A filter to exclude artifacts from resolution (but not collection), may be {@code null}.
+     * @param repositories The plugin repositories to use for resolving the plugin artifacts, must not be {@code null}.
+     * @param session The repository session to use for resolving the plugin artifacts, must not be {@code null}.
+     * @return The dependency resolution result having the resolved extension class path but also the tree, never {@code null}.
+     * @throws PluginResolutionException If any dependency could not be resolved.
+     * @since 3.10.0
+     */
+    DependencyResult resolveCoreExtensionAndFlatten(
+            Plugin plugin,
+            DependencyFilter dependencyFilter,
+            List<RemoteRepository> repositories,
+            RepositorySystemSession session)
+            throws PluginResolutionException;
+
+    /**
      * Resolves the runtime dependencies of the specified plugin.
      *
      * @param plugin The plugin for which to resolve the dependencies, must not be {@code null}.

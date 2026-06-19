@@ -156,7 +156,9 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
 
     /**
      * @since 3.3.0
+     * @deprecated Is unused since 3.10.0
      */
+    @Deprecated
     public DependencyNode resolveCoreExtension(
             Plugin plugin,
             DependencyFilter dependencyFilter,
@@ -170,6 +172,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
     /**
      * @since 3.10.0
      */
+    @Override
     public DependencyResult resolveCoreExtensionAndFlatten(
             Plugin plugin,
             DependencyFilter dependencyFilter,

@@ -36,7 +36,7 @@ import org.apache.maven.extension.internal.CoreExtensionEntry;
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginResolutionException;
-import org.apache.maven.plugin.internal.DefaultPluginDependenciesResolver;
+import org.apache.maven.plugin.internal.PluginDependenciesResolver;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
@@ -65,7 +65,7 @@ public class BootstrapCoreExtensionManager {
 
     private final Logger log;
 
-    private final DefaultPluginDependenciesResolver pluginDependenciesResolver;
+    private final PluginDependenciesResolver pluginDependenciesResolver;
 
     private final DefaultRepositorySystemSessionFactory repositorySystemSessionFactory;
 
@@ -78,7 +78,7 @@ public class BootstrapCoreExtensionManager {
     @Inject
     public BootstrapCoreExtensionManager(
             Logger log,
-            DefaultPluginDependenciesResolver pluginDependenciesResolver,
+            PluginDependenciesResolver pluginDependenciesResolver,
             DefaultRepositorySystemSessionFactory repositorySystemSessionFactory,
             CoreExports coreExports,
             PlexusContainer container) {
