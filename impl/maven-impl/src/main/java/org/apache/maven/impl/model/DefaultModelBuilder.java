@@ -1692,6 +1692,32 @@ public class DefaultModelBuilder implements ModelBuilder {
                         model = model.withProperties(newProps);
                     }
                     model = model.withProfiles(merge(model.getProfiles(), userProps));
+                } else {
+                    if (modelSource.getPath() != null) {
+                        model = model.withPomFile(modelSource.getPath());
+                    }
+                    if (rootDirectory != null) {
+                        try {
+                            Map<String, String> properties =
+                                    getEnhancedProperties(model, rootDirectory, activeModelReads);
+                            model = model.with()
+                                    .version(replaceCiFriendlyVersion(properties, model.getVersion()))
+                                    .parent(
+                                            model.getParent() != null
+                                                    ? model.getParent()
+                                                            .withVersion(replaceCiFriendlyVersion(
+                                                                    properties,
+                                                                    model.getParent()
+                                                                            .getVersion()))
+                                                    : null)
+                                    .build();
+                        } catch (ModelBuilderException e) {
+                            logger.debug(
+                                    "Could not read root model properties for CI-friendly"
+                                            + " version interpolation",
+                                    e);
+                        }
+                    }
                 }
 
                 for (var transformer : transformers) {
