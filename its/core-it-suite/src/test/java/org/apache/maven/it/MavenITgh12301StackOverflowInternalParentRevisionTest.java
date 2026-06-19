@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -31,9 +31,9 @@ public class MavenITgh12301StackOverflowInternalParentRevisionTest extends Abstr
 
     @Test
     public void testNoStackOverflowWithInternalParentAndRevision() throws Exception {
-        File testDir = extractResources("/gh-12301-stackoverflow-internal-parent");
+        Path testDir = extractResources("/gh-12301-stackoverflow-internal-parent");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.gh12301");
         verifier.addCliArgument("-Drevision=1.0-SNAPSHOT");
