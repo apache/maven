@@ -93,6 +93,7 @@ under the License.
     <!-- Support artifacts version - kept separate from Maven version -->
     <core-it-support-version>2.1-SNAPSHOT</core-it-support-version>
 
+    <version.palantirJavaFormat>2.90.0</version.palantirJavaFormat>
     <its.forkCount>0.75C</its.forkCount>
     <its.test />
   </properties>
@@ -382,7 +383,7 @@ under the License.
           <configuration>
             <java>
               <palantirJavaFormat>
-                <version>2.90.0</version>
+                <version>${version.palantirJavaFormat}</version>
               </palantirJavaFormat>
               <removeUnusedImports />
               <importOrder>
@@ -391,13 +392,13 @@ under the License.
               <licenseHeader>
                 <file>config/maven-header-plain.txt</file>
               </licenseHeader>
-              <includes combine.children="append">
+              <includes>
                 <include>src/main/java/**/*.java</include>
                 <include>src/test/java/**/*.java</include>
                 <include>src/test/resources/**/src/main/java/**/*.java</include>
                 <include>src/test/resources/**/src/test/java/**/*.java</include>
               </includes>
-              <excludes combine.children="append">
+              <excludes>
                 <exclude>src/test/resources/mng-5208/project/sub-2/src/main/java/Bad.java</exclude>
               </excludes>
             </java>
@@ -407,11 +408,11 @@ under the License.
                 <spaceBeforeCloseEmptyElement>true</spaceBeforeCloseEmptyElement>
                 <quiet>true</quiet>
               </sortPom>
-              <includes combine.children="append">
+              <includes>
                 <include>pom.xml</include>
                 <include>src/test/resources/**/pom.xml</include>
               </includes>
-              <excludes combine.children="append">
+              <excludes>
                 <exclude>src/test/resources/mng-2254/latin-1/pom.xml</exclude>
                 <exclude>src/test/resources/mng-2362/latin-1/pom.xml</exclude>
                 <exclude>src/test/resources/mng-3839/pom.xml</exclude>
