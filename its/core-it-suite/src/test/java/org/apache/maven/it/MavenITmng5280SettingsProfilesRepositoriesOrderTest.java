@@ -18,9 +18,6 @@
  */
 package org.apache.maven.it;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -29,10 +26,13 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Map;
 
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.io.Content;
+import org.eclipse.jetty.util.Callback;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -131,17 +131,16 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest extends Abstrac
         assertTrue(pluginRepoHandler.pluginRequestedFromRepo1Last);
     }
 
-    private static final class RepoHandler extends AbstractHandler {
+    private static final class RepoHandler extends Handler.Abstract {
         private volatile boolean artifactRequestedFromRepo1Last;
 
         private volatile boolean artifactRequestedFromRepo2;
 
-        public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
-                throws IOException {
-            String uri = request.getRequestURI();
+        public boolean handle(Request request, Response response, Callback callback) throws Exception {
+            String uri = Request.getPathInContext(request);
 
             if (uri.startsWith("/repo1/org/apache/maven/its/mng5280/fake-artifact/1.0/")) {
-                PrintWriter writer = response.getWriter();
+                PrintWriter writer = new PrintWriter(Content.Sink.asOutputStream(response));
 
                 if (uri.endsWith(".pom")) {
                     writer.println("<project xmlns=\"http://maven.apache.org/POM/4.0.0\">");
@@ -151,68 +150,70 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest extends Abstrac
                     writer.println("  <version>1.0</version>");
                     writer.println("</project>");
 
-                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.setStatus(200);
                 } else if (uri.endsWith(".jar")) {
                     writer.println("empty");
 
-                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.setStatus(200);
                     artifactRequestedFromRepo1Last = true;
                 } else {
-                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    response.setStatus(404);
                 }
+                writer.flush();
             } else if (uri.startsWith("/repo2/org/apache/maven/its/mng5280/fake-artifact/1.0/")) {
                 if (uri.endsWith(".jar")) {
                     artifactRequestedFromRepo1Last = false;
                     artifactRequestedFromRepo2 = true;
                 }
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.setStatus(404);
             } else {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.setStatus(404);
             }
 
-            ((Request) request).setHandled(true);
+            callback.succeeded();
+            return true;
         }
     }
 
-    private class PluginRepoHandler extends AbstractHandler {
+    private class PluginRepoHandler extends Handler.Abstract {
         private volatile boolean pluginRequestedFromRepo1Last;
 
         private volatile boolean pluginRequestedFromRepo2;
 
-        public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
-                throws IOException {
-            String uri = request.getRequestURI();
+        public boolean handle(Request request, Response response, Callback callback) throws Exception {
+            String uri = Request.getPathInContext(request);
 
             if (uri.startsWith("/pluginRepo1/org/apache/maven/its/mng5280/fake-maven-plugin/1.0/")) {
-                OutputStream outStream = response.getOutputStream();
+                OutputStream outStream = Content.Sink.asOutputStream(response);
 
                 if (uri.endsWith(".pom")) {
                     File pluginPom = new File(testDir, "fake-maven-plugin/fake-maven-plugin-1.0.pom");
                     InputStream inStream = new FileInputStream(pluginPom);
                     copy(inStream, outStream);
 
-                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.setStatus(200);
                 } else if (uri.endsWith(".jar")) {
                     File pluginJar = new File(testDir, "fake-maven-plugin/fake-maven-plugin-1.0.jar");
                     InputStream inStream = new FileInputStream(pluginJar);
                     copy(inStream, outStream);
 
-                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.setStatus(200);
                     pluginRequestedFromRepo1Last = true;
                 } else {
-                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    response.setStatus(404);
                 }
             } else if (uri.startsWith("/pluginRepo2/org/apache/maven/its/mng5280/fake-maven-plugin/1.0/")) {
                 if (uri.endsWith(".jar")) {
                     pluginRequestedFromRepo1Last = false;
                     pluginRequestedFromRepo2 = true;
                 }
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.setStatus(404);
             } else {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.setStatus(404);
             }
 
-            ((Request) request).setHandled(true);
+            callback.succeeded();
+            return true;
         }
 
         private long copy(InputStream input, OutputStream output) throws IOException {
