@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cli.event;
+package org.apache.maven.cling.event;
 
 import java.io.File;
 import java.util.Arrays;
@@ -54,7 +54,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@Deprecated
 class ExecutionEventLoggerTest {
 
     private MockitoSession mockitoSession;

@@ -201,7 +201,34 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
 
         StringBuilder buffer = new StringBuilder(128);
 
+        String skippedMessage = builder().warning("SKIPPED").build();
+        String successMessage = builder().success("SUCCESS").build();
+        String failureMessage = builder().failure("FAILURE").build();
+        String unknownMessage = builder().warning("UNKNOWN").build();
+
         for (MavenProject project : projects) {
+            BuildSummary buildSummary = result.getBuildSummary(project);
+
+            String statusMessage;
+            boolean shouldSkip = result.hasExceptions();
+            if (buildSummary == null) {
+                statusMessage = skippedMessage;
+            } else if (buildSummary instanceof BuildSuccess) {
+                statusMessage = successMessage;
+            } else if (buildSummary instanceof BuildFailure) {
+                statusMessage = failureMessage;
+                shouldSkip = false;
+            } else {
+                statusMessage = unknownMessage;
+            }
+
+            if (shouldSkip) {
+                if (project.isExecutionRoot()) {
+                    logger.info("...");
+                }
+                continue;
+            }
+
             buffer.append(project.getName());
             buffer.append(' ');
 
@@ -217,35 +244,29 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
                 buffer.append(' ');
             }
 
-            BuildSummary buildSummary = result.getBuildSummary(project);
-
-            if (buildSummary == null) {
-                buffer.append(builder().warning("SKIPPED"));
-            } else if (buildSummary instanceof BuildSuccess) {
-                buffer.append(builder().success("SUCCESS"));
-                buffer.append(" [");
-                String buildTimeDuration = formatDuration(buildSummary.getTime());
-                int padSize = MAX_PADDED_BUILD_TIME_DURATION_LENGTH - buildTimeDuration.length();
-                if (padSize > 0) {
-                    buffer.append(chars(' ', padSize));
-                }
-                buffer.append(buildTimeDuration);
-                buffer.append(']');
-            } else if (buildSummary instanceof BuildFailure) {
-                buffer.append(builder().failure("FAILURE"));
-                buffer.append(" [");
-                String buildTimeDuration = formatDuration(buildSummary.getTime());
-                int padSize = MAX_PADDED_BUILD_TIME_DURATION_LENGTH - buildTimeDuration.length();
-                if (padSize > 0) {
-                    buffer.append(chars(' ', padSize));
-                }
-                buffer.append(buildTimeDuration);
-                buffer.append(']');
+            buffer.append(statusMessage);
+            if (buildSummary != null) {
+                formatBuildTime(buffer, buildSummary);
             }
 
             logger.info(buffer.toString());
             buffer.setLength(0);
         }
+
+        if (result.hasExceptions()) {
+            logger.info("...");
+        }
+    }
+
+    private void formatBuildTime(StringBuilder buffer, BuildSummary buildSummary) {
+        buffer.append(" [");
+        String buildTimeDuration = formatDuration(buildSummary.getTime());
+        int padSize = MAX_PADDED_BUILD_TIME_DURATION_LENGTH - buildTimeDuration.length();
+        if (padSize > 0) {
+            buffer.append(chars(' ', padSize));
+        }
+        buffer.append(buildTimeDuration);
+        buffer.append(']');
     }
 
     private void logResult(MavenSession session) {
