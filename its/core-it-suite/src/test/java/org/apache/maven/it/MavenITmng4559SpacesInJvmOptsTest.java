@@ -49,6 +49,12 @@ class MavenITmng4559SpacesInJvmOptsTest extends AbstractMavenIntegrationTestCase
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties("target/pom.properties");
+        // On Windows, mvn.cmd parses jvm.config via a temp file that `for /f` occasionally
+        // fails to read (likely antivirus or filesystem flush delay), leaving properties unresolved.
+        if ("${prop.jvm-opts}".equals(props.getProperty("project.properties.pom.prop.jvm-opts"))) {
+            verifier.execute();
+            props = verifier.loadProperties("target/pom.properties");
+        }
         assertEquals("foo bar", props.getProperty("project.properties.pom.prop.jvm-opts"));
         assertEquals("foo bar", props.getProperty("project.properties.pom.prop.maven-opts"));
     }
