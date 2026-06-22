@@ -20,6 +20,7 @@ package org.apache.maven.it;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+
 import org.junit.jupiter.api.Test;
 
 /**
@@ -47,12 +48,15 @@ public class MavenITmng2926PluginPrefixOrderTest extends AbstractMavenIntegratio
         verifier.deleteArtifacts("org.apache.maven.plugins", "mng-2926", "0.1");
         verifier.deleteArtifacts("org.apache.maven.plugins", "mng-2926", "0.1");
         Files.deleteIfExists(verifier.getArtifactMetadataPath(
-                        "org.apache.maven.plugins", null, null, "maven-metadata-maven-core-it.xml"));
-        Files.deleteIfExists(verifier.getArtifactMetadataPath("org.apache.maven.plugins", null, null, "resolver-status.properties"));
+                "org.apache.maven.plugins", null, null, "maven-metadata-maven-core-it.xml"));
+        Files.deleteIfExists(
+                verifier.getArtifactMetadataPath("org.apache.maven.plugins", null, null, "resolver-status.properties"));
         verifier.deleteArtifacts("org.codehaus.mojo", "mng-2926", "0.1");
         verifier.deleteArtifacts("org.codehaus.mojo", "mng-2926", "0.1");
-        Files.deleteIfExists(verifier.getArtifactMetadataPath("org.codehaus.mojo", null, null, "maven-metadata-maven-core-it.xml"));
-        Files.deleteIfExists(verifier.getArtifactMetadataPath("org.codehaus.mojo", null, null, "resolver-status.properties"));
+        Files.deleteIfExists(
+                verifier.getArtifactMetadataPath("org.codehaus.mojo", null, null, "maven-metadata-maven-core-it.xml"));
+        Files.deleteIfExists(
+                verifier.getArtifactMetadataPath("org.codehaus.mojo", null, null, "resolver-status.properties"));
 
         verifier = newVerifier(testDir);
         verifier.setAutoclean(false);

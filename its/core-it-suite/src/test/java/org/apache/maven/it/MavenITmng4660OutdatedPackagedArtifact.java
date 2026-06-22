@@ -25,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
+
 import org.junit.jupiter.api.Test;
 
 import static java.nio.file.FileVisitResult.CONTINUE;
@@ -58,8 +59,7 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
         verifier1.addCliArgument("package");
         verifier1.execute();
 
-        Path module1Jar =
-                testDir.resolve("module-a/target/module-a-1.0.jar").toAbsolutePath();
+        Path module1Jar = testDir.resolve("module-a/target/module-a-1.0.jar").toAbsolutePath();
         verifier1.verifyErrorFreeLog();
         verifier1.verifyFilePresent(module1Jar.toString());
 
@@ -83,16 +83,14 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
         verifier2.addCliArgument("compile");
         verifier2.execute();
 
-        Path module1PropertiesFile = testDir
-                .resolve("module-a/target/classes/example.properties")
-                .toAbsolutePath();
+        Path module1PropertiesFile =
+                testDir.resolve("module-a/target/classes/example.properties").toAbsolutePath();
 
         verifier2.verifyFilePresent(module1PropertiesFile.toString());
         assertTrue(
                 Files.getLastModifiedTime(module1PropertiesFile).compareTo(Files.getLastModifiedTime(module1Jar)) >= 0);
 
-        Path module1Class = testDir
-                .resolve("module-a/target/classes/org/apache/maven/it/Example.class")
+        Path module1Class = testDir.resolve("module-a/target/classes/org/apache/maven/it/Example.class")
                 .toAbsolutePath();
         verifier2.verifyErrorFreeLog();
         verifier2.verifyFilePresent(module1Class.toString());

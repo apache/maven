@@ -20,6 +20,7 @@ package org.apache.maven.it;
 
 import java.net.URI;
 import java.nio.file.Path;
+
 import org.junit.jupiter.api.Test;
 
 /**
@@ -41,8 +42,7 @@ public class MavenITmng6759TransitiveDependencyRepositoriesTest extends Abstract
         Path testDir = extractResources(RESOURCE_PATH);
 
         // First, build the test plugin
-        Verifier verifier =
-                newVerifier(testDir.resolve("mng6759-plugin-resolves-project-dependencies"));
+        Verifier verifier = newVerifier(testDir.resolve("mng6759-plugin-resolves-project-dependencies"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -59,7 +59,8 @@ public class MavenITmng6759TransitiveDependencyRepositoriesTest extends Abstract
 
     private void installDependencyCInCustomRepo() throws Exception {
         Path dependencyCProjectDir = extractResources(RESOURCE_PATH + "/dependency-in-custom-repo");
-        URI customRepoUri = dependencyCProjectDir.resolve("target").resolve("repo").toUri();
+        URI customRepoUri =
+                dependencyCProjectDir.resolve("target").resolve("repo").toUri();
         Verifier verifier = newVerifier(dependencyCProjectDir);
 
         verifier.deleteDirectory("target");

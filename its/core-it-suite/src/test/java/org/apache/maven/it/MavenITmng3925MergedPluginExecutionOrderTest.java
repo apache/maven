@@ -21,6 +21,7 @@ package org.apache.maven.it;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -58,7 +59,7 @@ public class MavenITmng3925MergedPluginExecutionOrderTest extends AbstractMavenI
     private void testitMNG3925(String project) throws Exception {
         Path testDir = extractResources("mng-3925");
 
-        Verifier verifier = newVerifier(testDir.resolve(project).resolve( "sub"));
+        Verifier verifier = newVerifier(testDir.resolve(project).resolve("sub"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

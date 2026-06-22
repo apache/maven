@@ -42,8 +42,7 @@ class MavenITmng8414ConsumerPomWithNewFeaturesTest extends AbstractMavenIntegrat
      */
     @Test
     void testNotPreserving() throws Exception {
-        Path basedir =
-                extractResources("mng-8414-consumer-pom-with-new-features");
+        Path basedir = extractResources("mng-8414-consumer-pom-with-new-features");
 
         Verifier verifier = newVerifier(basedir.toString(), null);
         verifier.addCliArguments("package", "-Dmaven.consumer.pom.flatten=true");
@@ -73,8 +72,7 @@ class MavenITmng8414ConsumerPomWithNewFeaturesTest extends AbstractMavenIntegrat
      */
     @Test
     void testPreserving() throws Exception {
-        Path basedir =
-                extractResources("mng-8414-consumer-pom-with-new-features");
+        Path basedir = extractResources("mng-8414-consumer-pom-with-new-features");
 
         Verifier verifier = newVerifier(basedir.toString(), null);
         verifier.setLogFileName("log-preserving.txt");

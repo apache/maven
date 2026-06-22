@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Properties;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -69,7 +70,7 @@ public class MavenITmng3714ToolchainsCliOptionTest extends AbstractMavenIntegrat
         if (tool.endsWith(".exe")) {
             tool = tool.substring(0, tool.length() - 4);
         }
-        assertEquals(javaHome.resolve( "bin/javac"), Path.of(tool));
+        assertEquals(javaHome.resolve("bin/javac"), Path.of(tool));
 
         verifier.verifyFilePresent("target/tool.properties");
         Properties toolProps = verifier.loadProperties("target/tool.properties");

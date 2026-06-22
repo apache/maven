@@ -21,6 +21,7 @@ package org.apache.maven.it;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;

@@ -20,6 +20,7 @@ package org.apache.maven.it;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -65,7 +66,8 @@ public class MavenITmng3710PollutedClonedPluginsTest extends AbstractMavenIntegr
         assertTrue(Files.exists(midLevelTouchFile), "Mid-level touch file should have been created in projects tree.");
 
         Path childLevelTouchFile = projectsDir.resolve("middle/child/target/touch.txt");
-        assertTrue(Files.exists(childLevelTouchFile), "Child-level touch file should have been created in projects tree.");
+        assertTrue(
+                Files.exists(childLevelTouchFile), "Child-level touch file should have been created in projects tree.");
     }
 
     @Test

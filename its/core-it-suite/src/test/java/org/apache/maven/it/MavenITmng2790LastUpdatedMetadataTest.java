@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -58,8 +59,7 @@ public class MavenITmng2790LastUpdatedMetadataTest extends AbstractMavenIntegrat
 
         Path metadataArtifactVersionFile =
                 verifier.getArtifactMetadataPath("org.apache.maven.its.mng2790", "project", "1.0-SNAPSHOT");
-        Path metadataArtifactFile =
-                verifier.getArtifactMetadataPath("org.apache.maven.its.mng2790", "project");
+        Path metadataArtifactFile = verifier.getArtifactMetadataPath("org.apache.maven.its.mng2790", "project");
 
         Date artifactVersionLastUpdated1 = getLastUpdated(metadataArtifactVersionFile);
         Date artifactLastUpdated1 = getLastUpdated(metadataArtifactFile);

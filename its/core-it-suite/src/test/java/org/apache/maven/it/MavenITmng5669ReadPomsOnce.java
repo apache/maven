@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -45,7 +46,8 @@ public class MavenITmng5669ReadPomsOnce extends AbstractMavenIntegrationTestCase
         Verifier verifier = newVerifier(testDir);
         Map<String, String> filterProperties = Collections.singletonMap(
                 "${javaAgentJar}",
-                verifier.getArtifactPath("org.apache.maven.its", "core-it-javaagent", "2.1-SNAPSHOT", "jar").toString());
+                verifier.getArtifactPath("org.apache.maven.its", "core-it-javaagent", "2.1-SNAPSHOT", "jar")
+                        .toString());
         verifier.filterFile(".mvn/jvm.config", ".mvn/jvm.config", null, filterProperties);
 
         verifier.setForkJvm(true); // pick up agent
@@ -80,7 +82,8 @@ public class MavenITmng5669ReadPomsOnce extends AbstractMavenIntegrationTestCase
         Verifier verifier = newVerifier(testDir);
         Map<String, String> filterProperties = Collections.singletonMap(
                 "${javaAgentJar}",
-                verifier.getArtifactPath("org.apache.maven.its", "core-it-javaagent", "2.1-SNAPSHOT", "jar").toString());
+                verifier.getArtifactPath("org.apache.maven.its", "core-it-javaagent", "2.1-SNAPSHOT", "jar")
+                        .toString());
         verifier.filterFile(".mvn/jvm.config", ".mvn/jvm.config", null, filterProperties);
 
         verifier.setLogFileName("log-bc.txt");

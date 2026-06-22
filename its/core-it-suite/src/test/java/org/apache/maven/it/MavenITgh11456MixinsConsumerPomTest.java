@@ -122,4 +122,3 @@ class MavenITgh11456MixinsConsumerPomTest extends AbstractMavenIntegrationTestCa
                 "Mixins should be kept in consumer POM when preserveModelVersion is enabled");
     }
 }
-

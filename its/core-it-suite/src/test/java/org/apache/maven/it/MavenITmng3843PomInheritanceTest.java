@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Properties;
 import java.util.TreeSet;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -65,7 +66,7 @@ class MavenITmng3843PomInheritanceTest extends AbstractMavenIntegrationTestCase 
         Properties props;
         Path basedir;
 
-        basedir = verifier.getBasedir().resolve( "test-1");
+        basedir = verifier.getBasedir().resolve("test-1");
         props = verifier.loadProperties("test-1/target/pom.properties");
         assertEquals("org.apache.maven.its.mng3843", props.getProperty("project.groupId"));
         assertEquals("test-1", props.getProperty("project.artifactId"));

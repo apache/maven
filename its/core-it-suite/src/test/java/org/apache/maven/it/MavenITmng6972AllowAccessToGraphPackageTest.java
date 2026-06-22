@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.nio.file.Path;
+
 import org.junit.jupiter.api.Test;
 
 /**
@@ -45,13 +46,13 @@ public class MavenITmng6972AllowAccessToGraphPackageTest extends AbstractMavenIn
         verifier.deleteArtifact("mng-6972-allow-access-to-graph-package", "build-plugin", "1.0", "jar");
         verifier.deleteArtifact("mng-6972-allow-access-to-graph-package", "using-module", "1.0", "jar");
 
-        verifier = newVerifier(testDir.resolve( "build-plugin"));
+        verifier = newVerifier(testDir.resolve("build-plugin"));
         verifier.getSystemProperties().put("maven.multiModuleProjectDirectory", testDir.toString());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.resolve( "using-module"));
+        verifier = newVerifier(testDir.resolve("using-module"));
         verifier.getSystemProperties().put("maven.multiModuleProjectDirectory", testDir.toString());
         verifier.addCliArgument("install");
         verifier.execute();

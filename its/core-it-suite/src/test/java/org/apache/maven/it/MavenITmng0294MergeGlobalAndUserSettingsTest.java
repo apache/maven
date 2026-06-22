@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.nio.file.Path;
 
-import java.nio.file.Paths;
 import org.junit.jupiter.api.Test;
 
 /**

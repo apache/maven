@@ -26,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -93,9 +94,7 @@ public class MavenIT0108SnapshotUpdateTest extends AbstractMavenIntegrationTestC
     @Test
     public void testSnapshotUpdatedWithMetadata() throws Exception {
         Path metadata = repository.resolve("org/apache/maven/maven-core-it-support/1.0-SNAPSHOT/maven-metadata.xml");
-        Files.writeString(
-                metadata,
-                constructMetadata("1", System.currentTimeMillis() - TIME_OFFSET, true));
+        Files.writeString(metadata, constructMetadata("1", System.currentTimeMillis() - TIME_OFFSET, true));
 
         verifier.addCliArgument("package");
         verifier.execute();
@@ -106,8 +105,7 @@ public class MavenIT0108SnapshotUpdateTest extends AbstractMavenIntegrationTestC
 
         Files.writeString(artifact, "updatedArtifact");
         metadata = repository.resolve("org/apache/maven/maven-core-it-support/1.0-SNAPSHOT/maven-metadata.xml");
-        Files.writeString(
-                metadata, constructMetadata("2", System.currentTimeMillis(), true));
+        Files.writeString(metadata, constructMetadata("2", System.currentTimeMillis(), true));
 
         verifier.addCliArgument("package");
         verifier.execute();
@@ -126,9 +124,7 @@ public class MavenIT0108SnapshotUpdateTest extends AbstractMavenIntegrationTestC
         Files.createDirectories(localMetadata.getParent());
 
         Path metadata = repository.resolve("org/apache/maven/maven-core-it-support/1.0-SNAPSHOT/maven-metadata.xml");
-        Files.writeString(
-                metadata,
-                constructMetadata("1", System.currentTimeMillis() - TIME_OFFSET, true));
+        Files.writeString(metadata, constructMetadata("1", System.currentTimeMillis() - TIME_OFFSET, true));
 
         verifier.addCliArgument("package");
         verifier.execute();
@@ -157,8 +153,7 @@ public class MavenIT0108SnapshotUpdateTest extends AbstractMavenIntegrationTestC
         Files.writeString(
                 localMetadata,
                 constructLocalMetadata("org.apache.maven", "maven-core-it-support", cal.getTimeInMillis(), true));
-        Files.writeString(
-                metadata, constructMetadata("2", System.currentTimeMillis() - 2000, true));
+        Files.writeString(metadata, constructMetadata("2", System.currentTimeMillis() - 2000, true));
         Files.setLastModifiedTime(artifact, FileTime.fromMillis(System.currentTimeMillis()));
 
         verifier.addCliArgument("package");
@@ -172,9 +167,7 @@ public class MavenIT0108SnapshotUpdateTest extends AbstractMavenIntegrationTestC
     @Test
     public void testSnapshotUpdatedWithMetadataUsingFileTimestamp() throws Exception {
         Path metadata = repository.resolve("org/apache/maven/maven-core-it-support/1.0-SNAPSHOT/maven-metadata.xml");
-        Files.writeString(
-                metadata,
-                constructMetadata("1", System.currentTimeMillis() - TIME_OFFSET, false));
+        Files.writeString(metadata, constructMetadata("1", System.currentTimeMillis() - TIME_OFFSET, false));
         Files.setLastModifiedTime(metadata, FileTime.fromMillis(System.currentTimeMillis() - TIME_OFFSET));
 
         verifier.addCliArgument("package");
@@ -186,8 +179,7 @@ public class MavenIT0108SnapshotUpdateTest extends AbstractMavenIntegrationTestC
 
         Files.writeString(artifact, "updatedArtifact");
         metadata = repository.resolve("org/apache/maven/maven-core-it-support/1.0-SNAPSHOT/maven-metadata.xml");
-        Files.writeString(
-                metadata, constructMetadata("2", System.currentTimeMillis(), false));
+        Files.writeString(metadata, constructMetadata("2", System.currentTimeMillis(), false));
 
         verifier.addCliArgument("package");
         verifier.execute();
