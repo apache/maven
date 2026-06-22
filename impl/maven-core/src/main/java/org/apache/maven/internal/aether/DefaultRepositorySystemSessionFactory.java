@@ -312,7 +312,9 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         Object transport =
                 mergedProps.getOrDefault(Constants.MAVEN_RESOLVER_TRANSPORT, MAVEN_RESOLVER_TRANSPORT_DEFAULT);
         if (MAVEN_RESOLVER_TRANSPORT_DEFAULT.equals(transport)) {
-            // The "default" mode (user did not set anything) from now on defaults to AUTO
+            // Default transport is Apache HTTP client; JDK transport available via -Dmaven.resolver.transport=jdk
+            configProps.put(FILE_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
+            configProps.put(APACHE_HTTP_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
         } else if (MAVEN_RESOLVER_TRANSPORT_JDK.equals(transport)) {
             // Make sure (whatever extra priority is set) that resolver file/jdk is selected
             configProps.put(FILE_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);

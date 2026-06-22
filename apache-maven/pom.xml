@@ -91,12 +91,12 @@ under the License.
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-transport-wagon</artifactId>
     </dependency>
-    <!-- HTTP/1.1, medium priority, Java8+ -->
+    <!-- HTTP/1.1, default transport, Java8+ -->
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-transport-apache</artifactId>
     </dependency>
-    <!-- HTTP/1.1 and HTTP/2, high priority, Java11+ -->
+    <!-- HTTP/1.1 and HTTP/2, optional (use -Dmaven.resolver.transport=jdk), Java11+ -->
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-transport-jdk</artifactId>

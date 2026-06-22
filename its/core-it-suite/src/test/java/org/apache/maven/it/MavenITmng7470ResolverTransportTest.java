@@ -98,7 +98,7 @@ public class MavenITmng7470ResolverTransportTest extends AbstractMavenIntegratio
 
     @Test
     public void testResolverTransportDefault() throws Exception {
-        performTest(null, JDK_LOG_SNIPPET);
+        performTest(null, APACHE_LOG_SNIPPET);
     }
 
     @Test
