@@ -412,7 +412,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         DependencyFilter dependencyFilter = project.getExtensionDependencyFilter();
         dependencyFilter = AndDependencyFilter.newInstance(dependencyFilter, filter);
 
-        DependencyResult result = pluginDependenciesResolver.resolvePlugin(
+        DependencyResult result = pluginDependenciesResolver.resolvePluginAndFlatten(
                 plugin,
                 RepositoryUtils.toArtifact(pluginArtifact),
                 dependencyFilter,
@@ -1036,7 +1036,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             Plugin extensionPlugin, List<RemoteRepository> repositories, RepositorySystemSession session)
             throws PluginResolutionException {
         DependencyResult root =
-                pluginDependenciesResolver.resolvePlugin(extensionPlugin, null, null, repositories, session);
+                pluginDependenciesResolver.resolvePluginAndFlatten(extensionPlugin, null, null, repositories, session);
         return toMavenArtifacts(root);
     }
 }

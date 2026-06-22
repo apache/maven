@@ -452,8 +452,8 @@ public class InjectorImpl implements Injector {
         @Override
         public <T> java.util.function.Supplier<T> scope(
                 @Nonnull Key<T> key, @Nonnull java.util.function.Supplier<T> unscoped) {
-            return (java.util.function.Supplier<T>)
-                    cache.computeIfAbsent(key, k -> new java.util.function.Supplier<T>() {
+            return (java.util.function.Supplier<T>) cache.computeIfAbsent(
+                    key, k -> new java.util.function.Supplier<T>() {
                         volatile T instance;
 
                         @Override

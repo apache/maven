@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -32,14 +32,14 @@ class MavenITmng8299CustomLifecycleTest extends AbstractMavenIntegrationTestCase
      */
     @Test
     void testPhaseOrdering() throws Exception {
-        File testDir = extractResources("/mng-8299-custom-lifecycle");
+        Path testDir = extractResources("mng-8299-custom-lifecycle");
 
-        Verifier verifier = newVerifier(new File(testDir, "CustomLifecyclePlugin").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("CustomLifecyclePlugin"));
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(new File(testDir, "CustomLifecycleProject").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("CustomLifecycleProject"));
         verifier.addCliArgument("phase3");
         verifier.execute();
         verifier.verifyErrorFreeLog();

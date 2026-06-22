@@ -55,15 +55,20 @@ import org.apache.maven.api.annotations.ThreadSafe;
 public interface XmlNode {
 
     /**
-     * @deprecated since 4.0.0.
-     *             Use {@link XmlService#CHILDREN_COMBINATION_MODE_ATTRIBUTE} instead.
+     * @deprecated Use {@link XmlService#CHILDREN_COMBINATION_MODE_ATTRIBUTE} instead.
      */
     @Deprecated(since = "4.0.0", forRemoval = true)
     String CHILDREN_COMBINATION_MODE_ATTRIBUTE = XmlService.CHILDREN_COMBINATION_MODE_ATTRIBUTE;
 
+    /**
+     * @deprecated Use {@link XmlService#CHILDREN_COMBINATION_MERGE} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     String CHILDREN_COMBINATION_MERGE = XmlService.CHILDREN_COMBINATION_MERGE;
 
+    /**
+     * @deprecated Use {@link XmlService#CHILDREN_COMBINATION_APPEND} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     String CHILDREN_COMBINATION_APPEND = XmlService.CHILDREN_COMBINATION_APPEND;
 
@@ -71,24 +76,40 @@ public interface XmlNode {
      * This default mode for combining children DOMs during merge means that where element names match, the process will
      * try to merge the element data, rather than putting the dominant and recessive elements (which share the same
      * element name) as siblings in the resulting DOM.
+     *
+     * @deprecated Use {@link XmlService#DEFAULT_CHILDREN_COMBINATION_MODE} instead.
      */
     @Deprecated(since = "4.0.0", forRemoval = true)
     String DEFAULT_CHILDREN_COMBINATION_MODE = XmlService.DEFAULT_CHILDREN_COMBINATION_MODE;
 
+    /**
+     * @deprecated Use {@link XmlService#SELF_COMBINATION_MODE_ATTRIBUTE} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     String SELF_COMBINATION_MODE_ATTRIBUTE = XmlService.SELF_COMBINATION_MODE_ATTRIBUTE;
 
+    /**
+     * @deprecated Use {@link XmlService#SELF_COMBINATION_OVERRIDE} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     String SELF_COMBINATION_OVERRIDE = XmlService.SELF_COMBINATION_OVERRIDE;
 
+    /**
+     * @deprecated Use {@link XmlService#SELF_COMBINATION_MERGE} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     String SELF_COMBINATION_MERGE = XmlService.SELF_COMBINATION_MERGE;
 
+    /**
+     * @deprecated Use {@link XmlService#SELF_COMBINATION_REMOVE} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     String SELF_COMBINATION_REMOVE = XmlService.SELF_COMBINATION_REMOVE;
 
     /**
      * In case of complex XML structures, combining can be done based on id.
+     *
+     * @deprecated Use {@link XmlService#ID_COMBINATION_MODE_ATTRIBUTE} instead.
      */
     @Deprecated(since = "4.0.0", forRemoval = true)
     String ID_COMBINATION_MODE_ATTRIBUTE = XmlService.ID_COMBINATION_MODE_ATTRIBUTE;
@@ -96,6 +117,8 @@ public interface XmlNode {
     /**
      * In case of complex XML structures, combining can be done based on keys.
      * This is a comma separated list of attribute names.
+     *
+     * @deprecated Use {@link XmlService#KEYS_COMBINATION_MODE_ATTRIBUTE} instead.
      */
     @Deprecated(since = "4.0.0", forRemoval = true)
     String KEYS_COMBINATION_MODE_ATTRIBUTE = XmlService.KEYS_COMBINATION_MODE_ATTRIBUTE;
@@ -105,6 +128,8 @@ public interface XmlNode {
      * try to merge the element attributes and values, rather than overriding the recessive element completely with the
      * dominant one. This means that wherever the dominant element doesn't provide the value or a particular attribute,
      * that value or attribute will be set from the recessive DOM node.
+     *
+     * @deprecated Use {@link XmlService#DEFAULT_SELF_COMBINATION_MODE} instead.
      */
     @Deprecated(since = "4.0.0", forRemoval = true)
     String DEFAULT_SELF_COMBINATION_MODE = XmlService.DEFAULT_SELF_COMBINATION_MODE;
@@ -160,6 +185,24 @@ public interface XmlNode {
     String attribute(@Nonnull String name);
 
     /**
+     * Returns the namespace context for this node — a map of namespace prefix to URI
+     * for all namespace bindings in scope, including those declared on this element
+     * and those inherited from ancestor elements.
+     * <p>
+     * This is used by the write side to properly resolve prefixed attributes.
+     * For example, if an attribute {@code mvn:combine.children} exists on a child element
+     * but {@code xmlns:mvn} was declared on the root element, this map will contain
+     * the {@code mvn → http://maven.apache.org/POM/4.0.0} binding.
+     *
+     * @return map of namespace prefix to URI, never {@code null}
+     * @since 4.1.0
+     */
+    @Nonnull
+    default Map<String, String> namespaces() {
+        return Map.of();
+    }
+
+    /**
      * Returns an immutable list of all child nodes.
      *
      * @return list of child nodes, never {@code null}
@@ -185,55 +228,81 @@ public interface XmlNode {
     @Nullable
     Object inputLocation();
 
-    // Deprecated methods that delegate to new ones
+    /**
+     * @deprecated Use {@link #name()} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
     default String getName() {
         return name();
     }
 
+    /**
+     * @deprecated Use {@link #namespaceUri()} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
     default String getNamespaceUri() {
         return namespaceUri();
     }
 
+    /**
+     * @deprecated Use {@link #prefix()} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
     default String getPrefix() {
         return prefix();
     }
 
+    /**
+     * @deprecated Use {@link #value()} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     @Nullable
     default String getValue() {
         return value();
     }
 
+    /**
+     * @deprecated Use {@link #attributes()} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
     default Map<String, String> getAttributes() {
         return attributes();
     }
 
+    /**
+     * @deprecated Use {@link #attribute(String)} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     @Nullable
     default String getAttribute(@Nonnull String name) {
         return attribute(name);
     }
 
+    /**
+     * @deprecated Use {@link #children()} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
     default List<XmlNode> getChildren() {
         return children();
     }
 
+    /**
+     * @deprecated Use {@link #child(String)} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     @Nullable
     default XmlNode getChild(String name) {
         return child(name);
     }
 
+    /**
+     * @deprecated Use {@link #inputLocation()} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     @Nullable
     default Object getInputLocation() {
@@ -241,7 +310,7 @@ public interface XmlNode {
     }
 
     /**
-     * @deprecated use {@link XmlService#merge(XmlNode, XmlNode, Boolean)} instead
+     * @deprecated Use {@link XmlService#merge(XmlNode, XmlNode, Boolean)} instead.
      */
     @Deprecated(since = "4.0.0", forRemoval = true)
     default XmlNode merge(@Nullable XmlNode source) {
@@ -249,7 +318,7 @@ public interface XmlNode {
     }
 
     /**
-     * @deprecated use {@link XmlService#merge(XmlNode, XmlNode, Boolean)} instead
+     * @deprecated Use {@link XmlService#merge(XmlNode, XmlNode, Boolean)} instead.
      */
     @Deprecated(since = "4.0.0", forRemoval = true)
     default XmlNode merge(@Nullable XmlNode source, @Nullable Boolean childMergeOverride) {
@@ -265,7 +334,8 @@ public interface XmlNode {
      * @param recessive if {@code null}, nothing will happen
      * @return the merged node
      *
-     * @deprecated use {@link XmlService#merge(XmlNode, XmlNode, Boolean)} instead
+     * @deprecated Use {@link XmlService#merge(XmlNode, XmlNode, Boolean)}
+     * with an appropriate {@code childMergeOverride} value instead.
      */
     @Deprecated(since = "4.0.0", forRemoval = true)
     @Nullable
@@ -358,6 +428,7 @@ public interface XmlNode {
         private String namespaceUri;
         private String prefix;
         private Map<String, String> attributes;
+        private Map<String, String> namespaces;
         private List<XmlNode> children;
         private Object inputLocation;
 
@@ -422,6 +493,21 @@ public interface XmlNode {
         }
 
         /**
+         * Sets the namespace context for this node.
+         * <p>
+         * This map contains all namespace prefix to URI bindings in scope,
+         * including inherited ones from ancestor elements.
+         *
+         * @param namespaces the map of namespace prefix to URI
+         * @return this builder instance
+         * @since 4.1.0
+         */
+        public Builder namespaces(Map<String, String> namespaces) {
+            this.namespaces = namespaces;
+            return this;
+        }
+
+        /**
          * Sets the child nodes of the XML node.
          * <p>
          * The provided list will be copied to ensure immutability.
@@ -454,7 +540,7 @@ public interface XmlNode {
          * @throws NullPointerException if name has not been set
          */
         public XmlNode build() {
-            return new Impl(prefix, namespaceUri, name, value, attributes, children, inputLocation);
+            return new Impl(prefix, namespaceUri, name, value, attributes, namespaces, children, inputLocation);
         }
 
         private record Impl(
@@ -463,6 +549,7 @@ public interface XmlNode {
                 @Nonnull String name,
                 String value,
                 @Nonnull Map<String, String> attributes,
+                @Nonnull Map<String, String> namespaces,
                 @Nonnull List<XmlNode> children,
                 Object inputLocation)
                 implements XmlNode, Serializable {
@@ -473,6 +560,7 @@ public interface XmlNode {
                 namespaceUri = namespaceUri == null ? "" : namespaceUri;
                 name = Objects.requireNonNull(name);
                 attributes = ImmutableCollections.copy(attributes);
+                namespaces = ImmutableCollections.copy(namespaces);
                 children = ImmutableCollections.copy(children);
             }
 

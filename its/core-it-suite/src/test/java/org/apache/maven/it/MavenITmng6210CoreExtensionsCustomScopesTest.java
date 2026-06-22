@@ -18,8 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,16 +31,16 @@ public class MavenITmng6210CoreExtensionsCustomScopesTest extends AbstractMavenI
 
     @Test
     public void testCoreExtensionCustomScopes() throws Exception {
-        File testDir = extractResources("/mng-6210-core-extensions-scopes");
+        Path testDir = extractResources("mng-6210-core-extensions-scopes");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.filterFile("settings-template.xml", "settings.xml");
 
-        verifier = newVerifier(new File(testDir, "client").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("client"));
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.it-core-extensions-custom-scopes");
         verifier.addCliArgument("-s");
-        verifier.addCliArgument(new File(testDir, "settings.xml").getAbsolutePath());
+        verifier.addCliArgument(testDir.resolve("settings.xml").toString());
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

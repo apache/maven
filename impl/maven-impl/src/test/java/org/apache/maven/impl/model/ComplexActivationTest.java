@@ -68,6 +68,20 @@ class ComplexActivationTest {
     }
 
     @Test
+    void testMultilineConditionInActivation() throws Exception {
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("multilineCondition")))
+                .systemProperties(Map.of("gh11882.left", "true", "gh11882.right", "true"))
+                .build();
+        ModelBuilderResult result = builder.newSession().build(request);
+        assertNotNull(result);
+        assertNotNull(result.getEffectiveModel());
+        assertEquals("activated", result.getEffectiveModel().getProperties().get("profile.condition"));
+    }
+
+    @Test
     public void testConditionExistingAndMissingInActivation() throws Exception {
         ModelBuilderRequest request = ModelBuilderRequest.builder()
                 .session(session)

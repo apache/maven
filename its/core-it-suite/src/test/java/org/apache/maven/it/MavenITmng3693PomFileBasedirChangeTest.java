@@ -18,9 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-
-import org.codehaus.plexus.util.FileUtils;
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -36,27 +34,26 @@ public class MavenITmng3693PomFileBasedirChangeTest extends AbstractMavenIntegra
 
     @Test
     public void testitMNG3693() throws Exception {
-        File testDir = extractResources("/mng-3693");
+        Path testDir = extractResources("mng-3693");
 
-        File pluginDir = new File(testDir, "maven-mng3693-plugin");
-        File projectsDir = new File(testDir, "projects");
+        Path pluginDir = testDir.resolve("maven-mng3693-plugin");
+        Path projectsDir = testDir.resolve("projects");
 
-        Verifier verifier = newVerifier(pluginDir.getAbsolutePath());
+        Verifier verifier = newVerifier(pluginDir);
 
         verifier.addCliArgument("install");
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        String depPath = verifier.getArtifactPath("org.apache.maven.its.mng3693", "dep", "1", "pom");
+        Path depPath = verifier.getArtifactPath("org.apache.maven.its.mng3693", "dep", "1", "pom");
 
-        File dep = new File(depPath);
-        dep = dep.getParentFile().getParentFile();
+        Path dep = depPath.getParent().getParent();
 
         // remove the dependency from the local repository.
-        FileUtils.deleteDirectory(dep);
+        ItUtils.deleteDirectory(dep);
 
-        verifier = newVerifier(projectsDir.getAbsolutePath());
+        verifier = newVerifier(projectsDir);
 
         verifier.addCliArgument("package");
         verifier.execute();

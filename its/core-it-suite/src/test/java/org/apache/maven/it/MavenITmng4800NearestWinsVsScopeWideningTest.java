@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -49,9 +49,9 @@ public class MavenITmng4800NearestWinsVsScopeWideningTest extends AbstractMavenI
      * its subtree (x) but in the wider scope (compile).
      */
     private void testit(String test) throws Exception {
-        File testDir = extractResources("/mng-4800");
+        Path testDir = extractResources("mng-4800");
 
-        Verifier verifier = newVerifier(new File(testDir, test).getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve(test));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4800");

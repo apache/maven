@@ -18,8 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,12 +32,12 @@ public class MavenITmng3372DirectInvocationOfPluginsTest extends AbstractMavenIn
     public void testitMNG3372() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        File testBaseDir = extractResources("/mng-3372/direct-using-prefix");
-        File plugin = new File(testBaseDir, "plugin");
-        File project = new File(testBaseDir, "project");
-        File settingsFile = new File(testBaseDir, "settings.xml");
+        Path testBaseDir = extractResources("mng-3372/direct-using-prefix");
+        Path plugin = testBaseDir.resolve("plugin");
+        Path project = testBaseDir.resolve("project");
+        Path settingsFile = testBaseDir.resolve("settings.xml");
 
-        Verifier verifier = newVerifier(plugin.getAbsolutePath());
+        Verifier verifier = newVerifier(plugin);
 
         verifier.deleteArtifacts("org.apache.maven.its.mng3372");
 
@@ -47,10 +46,10 @@ public class MavenITmng3372DirectInvocationOfPluginsTest extends AbstractMavenIn
         verifier.addCliArguments("clean", "install");
         verifier.execute();
 
-        verifier = newVerifier(project.getAbsolutePath());
+        verifier = newVerifier(project);
 
         verifier.addCliArgument("-s");
-        verifier.addCliArgument("\"" + settingsFile.getAbsolutePath() + "\"");
+        verifier.addCliArgument("\"" + settingsFile + "\"");
 
         verifier.addCliArgument("mng3372:test");
         verifier.execute();
@@ -62,9 +61,9 @@ public class MavenITmng3372DirectInvocationOfPluginsTest extends AbstractMavenIn
     public void testDependencyTreeInvocation() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        File testBaseDir = extractResources("/mng-3372/dependency-tree");
+        Path testBaseDir = extractResources("mng-3372/dependency-tree");
 
-        Verifier verifier = newVerifier(testBaseDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testBaseDir);
 
         verifier.addCliArgument("-U");
 

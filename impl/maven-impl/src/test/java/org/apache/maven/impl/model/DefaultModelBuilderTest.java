@@ -38,9 +38,11 @@ import org.apache.maven.impl.standalone.ApiRunner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
@@ -107,12 +109,16 @@ class DefaultModelBuilderTest {
                         Repository.newBuilder()
                                 .id("third")
                                 .url("${thirdParentRepo}")
+                                .build(),
+                        Repository.newBuilder()
+                                .id("${uninterpolatedRepoId}")
+                                .url("https://valid.url")
                                 .build()))
                 .build();
 
         state.mergeRepositories(model, false);
 
-        // after merge
+        // after merge: "second" filtered (uninterpolated URL), "${uninterpolatedRepoId}" filtered (uninterpolated ID)
         repositories = (List<RemoteRepository>) repositoriesField.get(state);
         assertEquals(3, repositories.size());
         assertEquals("first", repositories.get(0).getId());
@@ -211,6 +217,69 @@ class DefaultModelBuilderTest {
     }
 
     @Test
+    public void testCiFriendlyDependencyVersionInterpolation() {
+        // Test that ${revision} in dependency versions is interpolated using model properties
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("ci-friendly-deps")))
+                .build();
+        ModelBuilderResult result = builder.newSession().build(request);
+        assertNotNull(result);
+        Model effective = result.getEffectiveModel();
+        assertEquals("1.0.0-SNAPSHOT", effective.getVersion());
+        assertEquals(1, effective.getDependencies().size());
+        assertEquals(
+                "1.0.0-SNAPSHOT",
+                effective.getDependencies().get(0).getVersion(),
+                "${revision} in dependency version should be interpolated");
+        assertNotNull(effective.getDistributionManagement());
+        assertEquals(
+                "releases-1.0.0-SNAPSHOT",
+                effective.getDistributionManagement().getRepository().getId(),
+                "${revision} in distributionManagement repository id should be interpolated");
+    }
+
+    @Test
+    public void testCiFriendlyDependencyVersionWithUserProperties() {
+        // Test that ${revision} in dependency versions is interpolated using user properties override
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .userProperties(Map.of("revision", "2.0.0"))
+                .source(Sources.buildSource(getPom("ci-friendly-deps")))
+                .build();
+        ModelBuilderResult result = builder.newSession().build(request);
+        assertNotNull(result);
+        Model effective = result.getEffectiveModel();
+        assertEquals("2.0.0", effective.getVersion());
+        assertEquals(1, effective.getDependencies().size());
+        assertEquals(
+                "2.0.0",
+                effective.getDependencies().get(0).getVersion(),
+                "${revision} in dependency version should be interpolated with user property");
+    }
+
+    @Test
+    public void testCiFriendlyDependencyVersionWithUserPropertiesOnly() {
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .userProperties(Map.of("revision", "3.0.0"))
+                .source(Sources.buildSource(getPom("ci-friendly-deps-no-prop")))
+                .build();
+        ModelBuilderResult result = builder.newSession().build(request);
+        assertNotNull(result);
+        Model effective = result.getEffectiveModel();
+        assertEquals("3.0.0", effective.getVersion(), "project version should use user property");
+        assertEquals(1, effective.getDependencies().size());
+        assertEquals(
+                "3.0.0",
+                effective.getDependencies().get(0).getVersion(),
+                "${revision} in dependency version should be interpolated with user-only property");
+    }
+
+    @Test
     public void testMissingDependencyGroupIdInference() throws Exception {
         // Test that dependencies with missing groupId but present version are inferred correctly in model 4.1.0
 
@@ -252,6 +321,127 @@ class DefaultModelBuilderTest {
             assertEquals("service", model.getDependencies().get(0).getArtifactId());
             assertEquals("${project.version}", model.getDependencies().get(0).getVersion());
         }
+    }
+
+    /**
+     * Verify that building a model from a resolved source (null pomFile) does not throw
+     * a NullPointerException. This simulates the scenario from GH-11919 where the
+     * cyclonedx-maven-plugin resolves a dependency POM from the repository, which
+     * produces a ModelSource whose {@code getPath()} returns {@code null}.
+     */
+    @Test
+    public void testResolvedSourceWithNullPomFile() {
+        Path pomPath = getPom("resolved-dependency");
+        // resolvedSource returns null for getPath(), simulating a dependency POM
+        // resolved from a remote repository (not a local project build)
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                .source(Sources.resolvedSource(pomPath, "org.example:resolved-dep:1.0.0"))
+                .build();
+        ModelBuilderResult result = builder.newSession().build(request);
+        assertNotNull(result);
+        assertNotNull(result.getEffectiveModel());
+        assertNull(result.getEffectiveModel().getPomFile(), "pomFile should be null for resolved sources");
+        assertEquals("org.example", result.getEffectiveModel().getGroupId());
+        assertEquals("resolved-dep", result.getEffectiveModel().getArtifactId());
+        assertEquals("1.0.0", result.getEffectiveModel().getVersion());
+    }
+
+    /**
+     * Verifies that when a BUILD_CONSUMER derived session is created with explicit
+     * repositories, those repositories are propagated to the derived session's
+     * {@code repositories} and {@code externalRepositories}.
+     * <p>
+     * This is critical for consumer POM building: the consumer POM builder reuses the
+     * existing {@code ModelBuilderSession} and calls {@code build()} with a request
+     * containing the project's repositories (which may include non-central repos from
+     * settings.xml profiles). Without this, BOM imports from non-central repositories fail.
+     */
+    @Test
+    public void testBuildConsumerWithExplicitRepositories() {
+        // First build to create the mainSession (simulates project build phase)
+        ModelBuilderRequest firstRequest = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("simple-standalone")))
+                .build();
+        ModelBuilder.ModelBuilderSession mbs = builder.newSession();
+        mbs.build(firstRequest);
+
+        // Access the mainSession (package-private) to call derive() and verify state
+        DefaultModelBuilder.ModelBuilderSessionState mainState =
+                ((DefaultModelBuilder.ModelBuilderSessionImpl) mbs).mainSession;
+
+        // Verify the main session only has central
+        assertEquals(1, mainState.getRepositories().size());
+        assertEquals("central", mainState.getRepositories().get(0).getId());
+
+        // Derive a BUILD_CONSUMER session with explicit repositories
+        RemoteRepository customRepo = session.createRemoteRepository("custom-repo", "https://repo.example.com/maven2");
+        ModelBuilderRequest consumerRequest = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_CONSUMER)
+                .source(Sources.buildSource(getPom("simple-standalone")))
+                .repositories(List.of(
+                        customRepo, session.createRemoteRepository("central", "https://repo.maven.apache.org/maven2")))
+                .build();
+
+        DefaultModelBuilder.ModelBuilderSessionState derived = mainState.derive(consumerRequest);
+
+        // Verify the derived session includes the custom repository
+        assertTrue(
+                derived.getRepositories().stream().anyMatch(r -> "custom-repo".equals(r.getId())),
+                "Derived session repositories should include the custom repo from the request");
+        assertTrue(
+                derived.getExternalRepositories().stream().anyMatch(r -> "custom-repo".equals(r.getId())),
+                "Derived session externalRepositories should include the custom repo from the request");
+    }
+
+    /**
+     * Verifies that BUILD_CONSUMER resolves properties defined in parent POM profiles
+     * when the parent is found via reactor model resolution (mappedSources).
+     */
+    @Test
+    public void testBuildConsumerResolvesParentProfileProperties() {
+        Path parentPom = getPom("consumer-profile-property-parent");
+        Path childPom = getPom("consumer-profile-property-child");
+
+        ModelBuilder.ModelBuilderSession mbs = builder.newSession();
+
+        mbs.build(ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(parentPom))
+                .build());
+
+        ModelBuilderResult consumerResult = assertDoesNotThrow(
+                () -> mbs.build(ModelBuilderRequest.builder()
+                        .session(session)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_CONSUMER)
+                        .source(Sources.buildSource(childPom))
+                        .build()),
+                "BUILD_CONSUMER should not fail when parent defines properties in profiles");
+
+        assertNotNull(consumerResult);
+        Model effectiveModel = consumerResult.getEffectiveModel();
+        assertNotNull(effectiveModel);
+
+        assertEquals(
+                "1.2.3",
+                effectiveModel.getProperties().get("managed.version"),
+                "Property from parent's profile should be resolved in BUILD_CONSUMER effective model");
+
+        assertNotNull(effectiveModel.getDependencyManagement());
+        Dependency managedDep = effectiveModel.getDependencyManagement().getDependencies().stream()
+                .filter(d -> "managed-lib".equals(d.getArtifactId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(managedDep, "Managed dependency from parent should be inherited");
+        assertEquals(
+                "1.2.3",
+                managedDep.getVersion(),
+                "Managed dependency version should be interpolated, not ${managed.version}");
     }
 
     private Path getPom(String name) {

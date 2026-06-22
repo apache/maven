@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.io.IOException;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -55,15 +55,15 @@ public class MavenITmng5482AetherNotFoundTest extends AbstractMavenIntegrationTe
     }*/
 
     public void check(String dir) throws IOException, VerificationException {
-        File testDir = extractResources("/mng-5482/" + dir);
+        Path testDir = extractResources("mng-5482/" + dir);
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
 
         verifier.addCliArgument("validate");
         assertThrows(VerificationException.class, verifier::execute, "should throw an error during execution.");
 
-        List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
+        List<String> lines = verifier.loadFile(testDir.resolve("log.txt"));
 
         int msg = indexOf(lines, "Caused by: java.lang.ClassNotFoundException: org.sonatype.aether.+");
         assertTrue(msg >= 0, "ClassNotFoundException message was not found in output.");

@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -39,8 +39,8 @@ public class MavenITmng0985NonExecutedPluginMgmtGoalsTest extends AbstractMavenI
      */
     @Test
     public void testitMNG0985() throws Exception {
-        File testDir = extractResources("/mng-0985");
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Path testDir = extractResources("mng-0985");
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("initialize");

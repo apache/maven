@@ -488,8 +488,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                 nt.performFor(pa.getName(), "name", pa::setName);
                 nt.performFor(pa.getValue(), "value", pa::setValue);
             });
-            a.map(Activation::getJdk).ifPresent(ja -> new Interpolation(activation, interpolator::interpolate)
-                    .performFor(ja, "jdk", activation::setJdk));
+            a.map(Activation::getJdk)
+                    .ifPresent(ja -> new Interpolation(activation, interpolator::interpolate)
+                            .performFor(ja, "jdk", activation::setJdk));
         }
         return interpolatedActivations;
     }
@@ -795,9 +796,10 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         // restore profiles with any activation to their value before full interpolation
         List<Profile> interpolatedProfiles = model.getProfiles();
-        IntStream.range(0, interpolatedProfiles.size()).forEach(i -> interpolatedProfiles
-                .get(i)
-                .setActivation(originalProfiles.get(i).getActivation()));
+        IntStream.range(0, interpolatedProfiles.size())
+                .forEach(i -> interpolatedProfiles
+                        .get(i)
+                        .setActivation(originalProfiles.get(i).getActivation()));
 
         return interpolatedModel;
     }

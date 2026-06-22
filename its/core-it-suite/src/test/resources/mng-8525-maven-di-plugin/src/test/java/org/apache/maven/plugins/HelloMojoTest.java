@@ -22,9 +22,9 @@ import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Priority;
 import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.di.Singleton;
-import org.apache.maven.api.plugin.testing.InjectMojo;
-import org.apache.maven.api.plugin.testing.MojoParameter;
-import org.apache.maven.api.plugin.testing.MojoTest;
+import org.apache.maven.testing.plugin.InjectMojo;
+import org.apache.maven.testing.plugin.MojoParameter;
+import org.apache.maven.testing.plugin.MojoTest;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 

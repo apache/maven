@@ -26,6 +26,7 @@ import org.apache.maven.SessionScoped;
 import org.apache.maven.api.Session;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.internal.impl.InternalMavenSession;
+import org.eclipse.aether.RepositorySystemSession;
 
 /**
  * SessionScopeModule
@@ -51,6 +52,9 @@ public class SessionScopeModule extends AbstractModule {
 
         bind(MavenSession.class)
                 .toProvider(SessionScope.seededKeyProvider(MavenSession.class))
+                .in(scope);
+        bind(RepositorySystemSession.class)
+                .toProvider(SessionScope.seededKeyProvider(RepositorySystemSession.class))
                 .in(scope);
         bind(Session.class)
                 .toProvider(SessionScope.seededKeyProvider(Session.class))

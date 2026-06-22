@@ -18,8 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledForJreRange;
 import org.junit.jupiter.api.condition.JRE;
@@ -32,15 +31,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class MavenITgh10312TerminallyDeprecatedMethodInGuiceTest extends AbstractMavenIntegrationTestCase {
 
+    private static final String RESOURCE_PATH = "gh-10312-terminally-deprecated-method-in-guice";
+
     MavenITgh10312TerminallyDeprecatedMethodInGuiceTest() {}
 
     @Test
     @EnabledForJreRange(min = JRE.JAVA_24)
     void worryingShouldNotBePrinted() throws Exception {
-        File testDir = extractResources("/gh-10312-terminally-deprecated-method-in-guice");
+        Path testDir = extractResources(RESOURCE_PATH);
 
-        Verifier verifier = new Verifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir, null);
         verifier.setForkJvm(true);
+        verifier.setLogFileName("log-no-warning.txt");
         verifier.addCliArgument("validate");
         verifier.execute();
 
@@ -56,10 +58,11 @@ class MavenITgh10312TerminallyDeprecatedMethodInGuiceTest extends AbstractMavenI
     @Test
     @EnabledForJreRange(min = JRE.JAVA_24, max = JRE.JAVA_25)
     void allowOverwriteByUser() throws Exception {
-        File testDir = extractResources("/gh-10312-terminally-deprecated-method-in-guice");
+        Path testDir = extractResources(RESOURCE_PATH);
 
-        Verifier verifier = new Verifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir, null);
         verifier.setForkJvm(true);
+        verifier.setLogFileName("log-warning.txt");
         verifier.addCliArgument("validate");
         verifier.addCliArgument("-Dguice_custom_class_loading=BRIDGE");
         verifier.execute();

@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -26,16 +26,16 @@ public class MavenITmng8648ProjectEventsTest extends AbstractMavenIntegrationTes
 
     @Test
     public void test() throws Exception {
-        File extensionDir = extractResources("/mng-8648/extension");
+        Path extensionDir = extractResources("mng-8648/extension");
 
-        Verifier verifier = newVerifier(extensionDir.getAbsolutePath());
+        Verifier verifier = newVerifier(extensionDir);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        File projectDir = extractResources("/mng-8648/project");
+        Path projectDir = extractResources("mng-8648/project");
 
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir);
         verifier.addCliArguments("compile", "-b", "concurrent", "-T5");
         try {
             verifier.execute();

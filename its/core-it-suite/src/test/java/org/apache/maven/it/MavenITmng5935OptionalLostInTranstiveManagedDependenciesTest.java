@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -33,9 +33,9 @@ public class MavenITmng5935OptionalLostInTranstiveManagedDependenciesTest extend
 
     @Test
     public void testitMNG5935() throws Exception {
-        File testDir = extractResources("/mng-5935-optional-lost-in-transtive-managed-dependencies");
+        Path testDir = extractResources("mng-5935-optional-lost-in-transtive-managed-dependencies");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

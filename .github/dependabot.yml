@@ -48,6 +48,9 @@ updates:
     labels:
       - "mvn3"
       - "dependencies"
+    ignore:
+      - dependency-name: "org.jline:*"
+        versions: [ "[4.0.0,)" ]
 
   - package-ecosystem: "github-actions"
     directory: "/"

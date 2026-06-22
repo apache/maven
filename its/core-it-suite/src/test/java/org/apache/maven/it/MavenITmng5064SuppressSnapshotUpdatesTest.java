@@ -21,7 +21,7 @@ package org.apache.maven.it;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -54,7 +54,7 @@ public class MavenITmng5064SuppressSnapshotUpdatesTest extends AbstractMavenInte
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-5064");
+        Path testDir = extractResources("mng-5064");
 
         String metadataUri = "org/apache/maven/its/mng5064/dep/0.1-SNAPSHOT/maven-metadata.xml";
 
@@ -71,7 +71,7 @@ public class MavenITmng5064SuppressSnapshotUpdatesTest extends AbstractMavenInte
         };
 
         ResourceHandler repoHandler = new ResourceHandler();
-        repoHandler.setResourceBase(testDir.getAbsolutePath());
+        repoHandler.setResourceBase(testDir.toString());
 
         HandlerList handlerList = new HandlerList();
         handlerList.addHandler(logHandler);
@@ -82,7 +82,7 @@ public class MavenITmng5064SuppressSnapshotUpdatesTest extends AbstractMavenInte
         server.setHandler(handlerList);
         server.start();
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         try {
             if (server.isFailed()) {
                 fail("Couldn't bind the server socket to a free port!");

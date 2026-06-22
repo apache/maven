@@ -18,8 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -45,9 +44,9 @@ class MavenITgh11399FlattenPluginParentCycleTest extends AbstractMavenIntegratio
      */
     @Test
     void testFlattenPluginWithParentExpansionDoesNotCauseCycle() throws Exception {
-        File testDir = extractResources("/gh-11399-flatten-plugin-parent-cycle");
+        Path testDir = extractResources("gh-11399-flatten-plugin-parent-cycle");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng8750");
         verifier.addCliArgument("install");

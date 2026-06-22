@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -41,8 +41,8 @@ public class MavenITmng3012CoreClassImportTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testitMNG3012() throws Exception {
-        File testDir = extractResources("/mng-3012");
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Path testDir = extractResources("mng-3012");
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifact("org.codehaus.plexus", "plexus-utils", "0.1-mng3012", "jar");

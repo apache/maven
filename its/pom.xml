@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache</groupId>
     <artifactId>apache</artifactId>
-    <version>37</version>
+    <version>38</version>
     <relativePath />
   </parent>
 
@@ -84,7 +84,7 @@ under the License.
     <maven.compiler.release>17</maven.compiler.release>
 
     <wagonVersion>3.5.3</wagonVersion>
-    <asmVersion>9.9.1</asmVersion>
+    <asmVersion>9.10.1</asmVersion>
     <plexusUtilsVersion>4.0.3</plexusUtilsVersion>
     <plexusXmlVersion>4.1.1</plexusXmlVersion>
 
@@ -98,7 +98,7 @@ under the License.
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
-        <version>6.0.3</version>
+        <version>6.1.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -263,16 +263,17 @@ under the License.
         <artifactId>maven-compat</artifactId>
         <version>${maven-version}</version>
       </dependency>
+
       <dependency>
-        <groupId>org.apache.maven</groupId>
+        <groupId>org.apache.maven.executor</groupId>
         <artifactId>maven-executor</artifactId>
-        <version>${maven-version}</version>
+        <version>1.0.0</version>
       </dependency>
 
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>2.0.17</version>
+        <version>2.0.18</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>

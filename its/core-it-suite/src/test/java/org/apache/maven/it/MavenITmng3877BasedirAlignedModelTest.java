@@ -18,10 +18,9 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Properties;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -41,9 +40,9 @@ public class MavenITmng3877BasedirAlignedModelTest extends AbstractMavenIntegrat
      */
     @Test
     public void testitMNG3877() throws Exception {
-        File testDir = extractResources("/mng-3877");
+        Path testDir = extractResources("mng-3877");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
@@ -79,9 +78,9 @@ public class MavenITmng3877BasedirAlignedModelTest extends AbstractMavenIntegrat
         assertPathEquals(testDir, "target/site", modelProps.getProperty("project.reporting.outputDirectory"));
     }
 
-    private void assertPathEquals(File basedir, String expected, String actual) throws IOException {
-        File actualFile = new File(actual);
+    private void assertPathEquals(Path basedir, String expected, String actual) throws IOException {
+        Path actualFile = Path.of(actual);
         assertTrue(actualFile.isAbsolute(), "path not absolute: " + actualFile);
-        ItUtils.assertCanonicalFileEquals(new File(basedir, expected), actualFile);
+        ItUtils.assertCanonicalFileEquals(basedir.resolve(expected), actualFile);
     }
 }

@@ -18,10 +18,9 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Properties;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,18 +34,18 @@ public class MavenITmng4559MultipleJvmArgsTest extends AbstractMavenIntegrationT
 
     @Test
     void testMultipleJvmArgs() throws Exception {
-        File testDir = extractResources("/mng-4559-multiple-jvm-args");
-        File mvnDir = new File(testDir, ".mvn");
-        File jvmConfig = new File(mvnDir, "jvm.config");
+        Path testDir = extractResources("mng-4559-multiple-jvm-args");
+        Path mvnDir = testDir.resolve(".mvn");
+        Path jvmConfig = mvnDir.resolve("jvm.config");
 
-        mvnDir.mkdirs();
+        Files.createDirectories(mvnDir);
         Files.writeString(
-                jvmConfig.toPath(),
+                jvmConfig,
                 "# This is a comment\n" + "-Xmx2048m -Xms1024m -Dtest.prop1=value1 # end of line comment\n"
                         + "# Another comment\n"
                         + "-Dtest.prop2=\"value 2\"");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setForkJvm(true);
         verifier.addCliArgument("validate");
         verifier.execute();
