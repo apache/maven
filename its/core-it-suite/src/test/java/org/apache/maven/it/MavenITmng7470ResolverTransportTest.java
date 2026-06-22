@@ -25,7 +25,6 @@ import java.util.Map;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -40,9 +39,7 @@ public class MavenITmng7470ResolverTransportTest extends AbstractMavenIntegratio
 
     private int port;
 
-    private static final ArtifactVersion JDK_TRANSPORT_USABLE_ON_JDK_SINCE = new DefaultArtifactVersion("11");
-
-    private static final ArtifactVersion JDK_TRANSPORT_IN_MAVEN_SINCE =
+    private static final ArtifactVersion APACHE_TRANSPORT_RENAMED_SINCE =
             new DefaultArtifactVersion("4.0.0-alpha-9-SNAPSHOT");
 
     public MavenITmng7470ResolverTransportTest() {
@@ -108,33 +105,18 @@ public class MavenITmng7470ResolverTransportTest extends AbstractMavenIntegratio
 
     private static final String APACHE_LOG_SNIPPET = "[DEBUG] Using transporter ApacheTransporter";
 
-    private static final String JDK_LOG_SNIPPET = "[DEBUG] Using transporter JdkTransporter";
-
     /**
-     * Returns {@code true} if JDK HttpClient transport is usable (Java11 or better).
+     * Returns {@code true} if the Apache transport uses the new class name (ApacheTransporter)
+     * rather than the old one (HttpTransporter). This changed in 4.0.0-alpha-9 with the
+     * Resolver 2.0.0 upgrade.
      */
-    private boolean isJdkTransportUsable() {
-        return JDK_TRANSPORT_USABLE_ON_JDK_SINCE.compareTo(getJavaVersion()) < 1;
-    }
-
-    /**
-     * Returns {@code true} if JDK HttpClient transport is present in Maven (since 4.0.0-alpha-9, the Resolver 2.0.0
-     * upgrade).
-     */
-    private boolean isJdkTransportPresent() {
-        return JDK_TRANSPORT_IN_MAVEN_SINCE.compareTo(getMavenVersion()) < 1;
-    }
-
-    private String defaultLogSnippet() {
-        if (isJdkTransportUsable() && isJdkTransportPresent()) {
-            return JDK_LOG_SNIPPET;
-        }
-        return isJdkTransportPresent() ? APACHE_LOG_SNIPPET : APACHE_LOG_SNIPPET_OLD;
+    private boolean isApacheTransportRenamed() {
+        return APACHE_TRANSPORT_RENAMED_SINCE.compareTo(getMavenVersion()) < 1;
     }
 
     @Test
     public void testResolverTransportDefault() throws Exception {
-        performTest(null, defaultLogSnippet());
+        performTest(null, isApacheTransportRenamed() ? APACHE_LOG_SNIPPET : APACHE_LOG_SNIPPET_OLD);
     }
 
     @Test
@@ -145,13 +127,7 @@ public class MavenITmng7470ResolverTransportTest extends AbstractMavenIntegratio
     @Test
     public void testResolverTransportApache() throws Exception {
         performTest(
-                isJdkTransportPresent() ? "apache" : "native",
-                isJdkTransportPresent() ? APACHE_LOG_SNIPPET : APACHE_LOG_SNIPPET_OLD);
-    }
-
-    @Test
-    public void testResolverTransportJdk() throws Exception {
-        Assumptions.assumeTrue(isJdkTransportUsable() && isJdkTransportPresent());
-        performTest("jdk", JDK_LOG_SNIPPET);
+                isApacheTransportRenamed() ? "apache" : "native",
+                isApacheTransportRenamed() ? APACHE_LOG_SNIPPET : APACHE_LOG_SNIPPET_OLD);
     }
 }
