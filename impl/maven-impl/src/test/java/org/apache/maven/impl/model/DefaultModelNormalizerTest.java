@@ -18,9 +18,14 @@
  */
 package org.apache.maven.impl.model;
 
+import java.util.List;
+
 import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Exclusion;
 import org.apache.maven.api.model.Mixin;
+import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Profile;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -150,7 +155,7 @@ class DefaultModelNormalizerTest {
         Exclusion exc = Exclusion.newBuilder().id("com.example:unwanted").build();
         Dependency dep = Dependency.newBuilder()
                 .id("org.slf4j:slf4j-api:2.0.17")
-                .exclusions(java.util.List.of(exc))
+                .exclusions(List.of(exc))
                 .build();
 
         Dependency result = normalizer.expandDependencyId(dep);
@@ -161,5 +166,67 @@ class DefaultModelNormalizerTest {
         assertEquals(1, result.getExclusions().size());
         assertEquals("com.example", result.getExclusions().get(0).getGroupId());
         assertEquals("unwanted", result.getExclusions().get(0).getArtifactId());
+    }
+
+    @Test
+    void testMergeDuplicatesExpandsDependencyManagement() {
+        Dependency dep =
+                Dependency.newBuilder().id("org.slf4j:slf4j-api:2.0.17").build();
+        Model model = Model.newBuilder()
+                .dependencyManagement(DependencyManagement.newBuilder()
+                        .dependencies(List.of(dep))
+                        .build())
+                .build();
+
+        Model result = normalizer.mergeDuplicates(model, null, null);
+
+        assertEquals(1, result.getDependencyManagement().getDependencies().size());
+        Dependency expanded = result.getDependencyManagement().getDependencies().get(0);
+        assertEquals("org.slf4j", expanded.getGroupId());
+        assertEquals("slf4j-api", expanded.getArtifactId());
+        assertEquals("2.0.17", expanded.getVersion());
+    }
+
+    @Test
+    void testMergeDuplicatesExpandsProfileDependencies() {
+        Dependency dep =
+                Dependency.newBuilder().id("org.slf4j:slf4j-api:2.0.17").build();
+        Profile profile = Profile.newBuilder()
+                .id("test-profile")
+                .dependencies(List.of(dep))
+                .build();
+        Model model = Model.newBuilder().profiles(List.of(profile)).build();
+
+        Model result = normalizer.mergeDuplicates(model, null, null);
+
+        assertEquals(1, result.getProfiles().size());
+        assertEquals(1, result.getProfiles().get(0).getDependencies().size());
+        Dependency expanded = result.getProfiles().get(0).getDependencies().get(0);
+        assertEquals("org.slf4j", expanded.getGroupId());
+        assertEquals("slf4j-api", expanded.getArtifactId());
+        assertEquals("2.0.17", expanded.getVersion());
+    }
+
+    @Test
+    void testMergeDuplicatesExpandsProfileDependencyManagement() {
+        Dependency dep =
+                Dependency.newBuilder().id("org.slf4j:slf4j-api:2.0.17").build();
+        Profile profile = Profile.newBuilder()
+                .id("test-profile")
+                .dependencyManagement(DependencyManagement.newBuilder()
+                        .dependencies(List.of(dep))
+                        .build())
+                .build();
+        Model model = Model.newBuilder().profiles(List.of(profile)).build();
+
+        Model result = normalizer.mergeDuplicates(model, null, null);
+
+        assertEquals(1, result.getProfiles().size());
+        DependencyManagement mgmt = result.getProfiles().get(0).getDependencyManagement();
+        assertEquals(1, mgmt.getDependencies().size());
+        Dependency expanded = mgmt.getDependencies().get(0);
+        assertEquals("org.slf4j", expanded.getGroupId());
+        assertEquals("slf4j-api", expanded.getArtifactId());
+        assertEquals("2.0.17", expanded.getVersion());
     }
 }

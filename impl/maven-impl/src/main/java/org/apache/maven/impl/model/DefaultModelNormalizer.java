@@ -29,10 +29,12 @@ import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Exclusion;
 import org.apache.maven.api.model.Mixin;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Plugin;
+import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.model.ModelNormalizer;
@@ -82,19 +84,23 @@ public class DefaultModelNormalizer implements ModelNormalizer {
          * aftereffects and bogus error messages.
          */
         // Expand id attributes on dependencies (and their exclusions), then deduplicate
-        List<Dependency> dependencies = model.getDependencies();
-        List<Dependency> expanded = injectList(dependencies, this::expandDependencyId);
-        if (expanded != null) {
-            dependencies = expanded;
+        builder.dependencies(expandAndDeduplicateDependencies(model.getDependencies()));
+
+        // Expand id attributes on dependency management dependencies
+        DependencyManagement mgmt = model.getDependencyManagement();
+        if (mgmt != null) {
+            List<Dependency> expandedMgmt = expandAndDeduplicateDependencies(mgmt.getDependencies());
+            if (expandedMgmt != null) {
+                builder.dependencyManagement(DependencyManagement.newBuilder(mgmt)
+                        .dependencies(expandedMgmt)
+                        .build());
+            }
         }
 
-        Map<String, Dependency> normalizedDeps = new LinkedHashMap<>(dependencies.size() * 2);
-        for (Dependency dependency : dependencies) {
-            normalizedDeps.put(dependency.getManagementKey(), dependency);
-        }
-
-        if (expanded != null || dependencies.size() != normalizedDeps.size()) {
-            builder.dependencies(normalizedDeps.values());
+        // Expand id attributes in profile dependencies and dependency management
+        List<Profile> profiles = injectList(model.getProfiles(), this::expandProfileDependencyIds);
+        if (profiles != null) {
+            builder.profiles(profiles);
         }
 
         return builder.build();
@@ -155,6 +161,46 @@ public class DefaultModelNormalizer implements ModelNormalizer {
         return newList;
     }
 
+    private List<Dependency> expandAndDeduplicateDependencies(List<Dependency> dependencies) {
+        List<Dependency> expanded = injectList(dependencies, this::expandDependencyId);
+        if (expanded != null) {
+            dependencies = expanded;
+        }
+        Map<String, Dependency> normalized = new LinkedHashMap<>(dependencies.size() * 2);
+        for (Dependency dependency : dependencies) {
+            normalized.put(dependency.getManagementKey(), dependency);
+        }
+        if (expanded != null || dependencies.size() != normalized.size()) {
+            return new ArrayList<>(normalized.values());
+        }
+        return null;
+    }
+
+    private Profile expandProfileDependencyIds(Profile profile) {
+        Profile.Builder pb = null;
+
+        List<Dependency> deps = expandAndDeduplicateDependencies(profile.getDependencies());
+        if (deps != null) {
+            pb = Profile.newBuilder(profile);
+            pb.dependencies(deps);
+        }
+
+        DependencyManagement mgmt = profile.getDependencyManagement();
+        if (mgmt != null) {
+            List<Dependency> mgmtDeps = expandAndDeduplicateDependencies(mgmt.getDependencies());
+            if (mgmtDeps != null) {
+                if (pb == null) {
+                    pb = Profile.newBuilder(profile);
+                }
+                pb.dependencyManagement(DependencyManagement.newBuilder(mgmt)
+                        .dependencies(mgmtDeps)
+                        .build());
+            }
+        }
+
+        return pb != null ? pb.build() : profile;
+    }
+
     /**
      * Expands the {@code id} attribute on a dependency into its component fields.
      * The id format is {@code groupId:artifactId:version}.
@@ -172,13 +218,13 @@ public class DefaultModelNormalizer implements ModelNormalizer {
             return d;
         }
         Dependency.Builder builder = Dependency.newBuilder(d);
-        if (isBlank(d.getGroupId())) {
+        if (isNullOrEmpty(d.getGroupId())) {
             builder.groupId(parts[0]);
         }
-        if (isBlank(d.getArtifactId())) {
+        if (isNullOrEmpty(d.getArtifactId())) {
             builder.artifactId(parts[1]);
         }
-        if (isBlank(d.getVersion())) {
+        if (isNullOrEmpty(d.getVersion())) {
             builder.version(parts[2]);
         }
         List<Exclusion> expanded = injectList(d.getExclusions(), this::expandExclusionId);
@@ -203,10 +249,10 @@ public class DefaultModelNormalizer implements ModelNormalizer {
             return e;
         }
         Exclusion.Builder builder = Exclusion.newBuilder(e);
-        if (isBlank(e.getGroupId())) {
+        if (isNullOrEmpty(e.getGroupId())) {
             builder.groupId(parts[0]);
         }
-        if (isBlank(e.getArtifactId())) {
+        if (isNullOrEmpty(e.getArtifactId())) {
             builder.artifactId(parts[1]);
         }
         return builder.build();
@@ -227,19 +273,19 @@ public class DefaultModelNormalizer implements ModelNormalizer {
             return m;
         }
         Mixin.Builder builder = Mixin.newBuilder(m);
-        if (isBlank(m.getGroupId())) {
+        if (isNullOrEmpty(m.getGroupId())) {
             builder.groupId(parts[0]);
         }
-        if (isBlank(m.getArtifactId())) {
+        if (isNullOrEmpty(m.getArtifactId())) {
             builder.artifactId(parts[1]);
         }
-        if (isBlank(m.getVersion())) {
+        if (isNullOrEmpty(m.getVersion())) {
             builder.version(parts[2]);
         }
         return builder.build();
     }
 
-    private static boolean isBlank(String s) {
+    private static boolean isNullOrEmpty(String s) {
         return s == null || s.isEmpty();
     }
 }
