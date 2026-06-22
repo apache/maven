@@ -18,13 +18,13 @@
  */
 package org.apache.maven.it;
 
-import java.nio.file.Path;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
@@ -158,7 +158,7 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest extends AbstractMaven
     }
 
     private void assertHash(Verifier verifier, String dataFile, String hashExt, String algo) throws Exception {
-        String actualHash = ItUtils.calcHash(verifier.getBasedir().resolve( dataFile), algo);
+        String actualHash = ItUtils.calcHash(verifier.getBasedir().resolve(dataFile), algo);
 
         String expectedHash = verifier.loadLines(dataFile + hashExt).get(0).trim();
 

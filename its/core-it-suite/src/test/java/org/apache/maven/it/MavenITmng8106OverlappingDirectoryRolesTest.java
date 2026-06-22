@@ -20,6 +20,7 @@ package org.apache.maven.it;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.junit.jupiter.api.Test;
@@ -36,7 +37,8 @@ public class MavenITmng8106OverlappingDirectoryRolesTest extends AbstractMavenIn
     public void testDirectoryOverlap() throws Exception {
         Path testDir = extractResources("mng-8106");
         String repo = testDir.resolve("repo").toString();
-        String tailRepo = Path.of(System.getProperty("user.home"), ".m2", "repository").toString();
+        String tailRepo =
+                Path.of(System.getProperty("user.home"), ".m2", "repository").toString();
 
         Verifier verifier = newVerifier(testDir.resolve("plugin"));
         verifier.addCliArgument("-X");

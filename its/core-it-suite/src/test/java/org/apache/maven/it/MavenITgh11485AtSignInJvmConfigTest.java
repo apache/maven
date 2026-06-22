@@ -37,8 +37,7 @@ public class MavenITgh11485AtSignInJvmConfigTest extends AbstractMavenIntegratio
         Path testDir = extractResources("/gh-11485-at-sign");
 
         Verifier verifier = newVerifier(testDir);
-        verifier.addCliArgument(
-                "-Dexpression.outputFile=" + testDir.resolve("target/pom.properties"));
+        verifier.addCliArgument("-Dexpression.outputFile=" + testDir.resolve("target/pom.properties"));
         verifier.setForkJvm(true); // custom .mvn/jvm.config
         // Enable debug logging for launcher script to diagnose jvm.config parsing issues
         verifier.setEnvironmentVariable("MAVEN_DEBUG_SCRIPT", "1");
@@ -63,8 +62,7 @@ public class MavenITgh11485AtSignInJvmConfigTest extends AbstractMavenIntegratio
         Path testDir = extractResources("/gh-11485-at-sign");
 
         Verifier verifier = newVerifier(testDir);
-        verifier.addCliArgument(
-                "-Dexpression.outputFile=" + testDir.resolve("target/pom.properties"));
+        verifier.addCliArgument("-Dexpression.outputFile=" + testDir.resolve("target/pom.properties"));
         verifier.setForkJvm(true); // custom .mvn/jvm.config
         // Pass a path with @ character via command line (simulating Jenkins workspace)
         String jenkinsPath = testDir.toString().replace('\\', '/') + "/jenkins.workspace/proj@2";

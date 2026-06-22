@@ -21,6 +21,7 @@ package org.apache.maven.it;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Server;

@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -38,8 +39,7 @@ class MavenITmng8523ModelPropertiesTest extends AbstractMavenIntegrationTestCase
      */
     @Test
     void testIt() throws Exception {
-        Path basedir =
-                extractResources("mng-8523-model-properties");
+        Path basedir = extractResources("mng-8523-model-properties");
 
         Verifier verifier = newVerifier(basedir);
         verifier.addCliArguments("install", "-DmavenVersion=4.0.0-rc-2", "-Dmaven.consumer.pom.flatten=true");

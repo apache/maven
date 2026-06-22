@@ -21,6 +21,7 @@ package org.apache.maven.it;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
+
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -77,8 +78,8 @@ class MavenITmng6255FixConcatLines extends AbstractMavenIntegrationTestCase {
 
         Verifier verifier = newVerifier(baseDir);
         verifier.setLogFileName("log-" + test + ".txt");
-        verifier.addCliArgument(
-                "-Dexpression.outputFile=" + baseDir.resolve("expression-" + test + ".properties").toAbsolutePath());
+        verifier.addCliArgument("-Dexpression.outputFile="
+                + baseDir.resolve("expression-" + test + ".properties").toAbsolutePath());
         verifier.setForkJvm(true); // custom .mvn/jvm.config
         verifier.addCliArgument("validate");
         verifier.execute();

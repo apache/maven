@@ -18,6 +18,9 @@
  */
 package org.apache.maven.it;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,8 +28,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Deque;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -240,9 +242,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
     private void assertMetadataMissing(Verifier verifier) {
         Path metadata = getMetadataFile(verifier);
 
-        assertFalse(
-                Files.exists(metadata),
-                "Metadata file should NOT be present in local repository: " + metadata);
+        assertFalse(Files.exists(metadata), "Metadata file should NOT be present in local repository: " + metadata);
     }
 
     private void setupDummyDependency(Verifier verifier, Path testDir, boolean resetUpdateInterval) throws IOException {

@@ -21,6 +21,7 @@ package org.apache.maven.it;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -77,8 +78,7 @@ public class MavenITmng1021EqualAttachmentBuildNumberTest extends AbstractMavenI
 
     private String getSnapshotVersion(Path artifactDir) throws IOException {
         try (var stream = Files.list(artifactDir)) {
-            return stream
-                    .filter(Files::isRegularFile)
+            return stream.filter(Files::isRegularFile)
                     .map(Path::getFileName)
                     .map(Path::toString)
                     .filter(name -> name.endsWith(".pom"))
@@ -86,4 +86,5 @@ public class MavenITmng1021EqualAttachmentBuildNumberTest extends AbstractMavenI
                     .map(pomName -> pomName.substring("test-".length(), pomName.length() - ".pom".length()))
                     .orElseThrow(() -> new IllegalStateException("POM not found in " + artifactDir));
         }
-    }}
+    }
+}

@@ -115,8 +115,6 @@ class MavenITgh11427BomConsumerPomTest extends AbstractMavenIntegrationTestCase 
                 content.contains("<version>1.0.0-SNAPSHOT</version>") || content.contains("<version>${"),
                 "Consumer pom should have version for module dependency");
         assertTrue(
-                content.contains("<version>4.13.2</version>"),
-                "Consumer pom should have version for junit dependency");
+                content.contains("<version>4.13.2</version>"), "Consumer pom should have version for junit dependency");
     }
 }
-

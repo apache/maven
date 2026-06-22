@@ -43,8 +43,7 @@ public class MavenITmng4381ExtensionSingletonComponentTest extends AbstractMaven
         Path testDir = extractResources("mng-4381");
 
         // First, build the test plugin
-        Verifier verifier =
-                newVerifier(testDir.resolve("sub-a/maven-it-plugin-extension-consumer"));
+        Verifier verifier = newVerifier(testDir.resolve("sub-a/maven-it-plugin-extension-consumer"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");

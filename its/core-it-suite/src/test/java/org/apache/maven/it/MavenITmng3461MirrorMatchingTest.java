@@ -21,8 +21,8 @@ package org.apache.maven.it;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.nio.file.Path;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Map;
 
 import org.eclipse.jetty.server.Handler;

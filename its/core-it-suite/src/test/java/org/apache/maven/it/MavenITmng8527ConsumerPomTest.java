@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,8 +40,7 @@ class MavenITmng8527ConsumerPomTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void testIt() throws Exception {
-        Path basedir =
-                extractResources("mng-8527-consumer-pom");
+        Path basedir = extractResources("mng-8527-consumer-pom");
 
         Verifier verifier = newVerifier(basedir);
         verifier.addCliArguments("install", "-Dmaven.consumer.pom.flatten=true");
