@@ -713,6 +713,17 @@ public class DefaultModelValidator implements ModelValidator {
             return;
         }
 
+        if (activation.getCondition() != null && activation.getCondition().contains("executable(")) {
+            addViolation(
+                    problems,
+                    Severity.WARNING,
+                    Version.V40,
+                    prefix + "activation.condition",
+                    null,
+                    "Profile activation relies on the 'executable' function, which makes the profile activation environment-dependent. This means the published POM will not be reproducible. Consider using this function only in local build profiles or stripping it before publication.",
+                    activation.getLocation("condition"));
+        }
+
         final Deque<ActivationFrame> stk = new LinkedList<>();
 
         final Supplier<String> pathSupplier = () -> {

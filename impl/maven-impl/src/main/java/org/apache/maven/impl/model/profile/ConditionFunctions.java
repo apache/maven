@@ -242,6 +242,10 @@ public class ConditionFunctions {
      * Checks whether a given executable can be found in the system PATH, or – if an
      * absolute / relative path is supplied – whether that path itself is an executable file.
      *
+     * <p><strong>Warning:</strong> relying on local system environment variables like PATH makes
+     * profile activation non-reproducible. This function should typically be used only in local
+     * build profiles and not in consumer POMs that are published to a remote repository.</p>
+     *
      * <p>Usage examples in a profile {@code <condition>}:
      * <pre>
      *   executable('musl-gcc')

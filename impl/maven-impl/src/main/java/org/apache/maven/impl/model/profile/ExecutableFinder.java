@@ -21,9 +21,6 @@ package org.apache.maven.impl.model.profile;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import org.apache.maven.api.services.model.ProfileActivationContext;
@@ -63,11 +60,11 @@ class ExecutableFinder {
      * @return {@code true} if the executable is found and is a regular, executable file
      */
     static boolean isExecutableInPath(String name, ProfileActivationContext context) {
-        boolean isWindows = isWindows();
+        boolean isWindows = isWindows(context);
 
         // If the name already contains a path separator treat it as a direct path.
         if (name.contains("/") || name.contains(File.separator)) {
-            Path candidate = Paths.get(name);
+            Path candidate = Path.of(name);
             return isExecutableFile(candidate, isWindows);
         }
 
@@ -82,14 +79,14 @@ class ExecutableFinder {
             if (dir.isBlank()) {
                 continue;
             }
-            Path base = Paths.get(dir).resolve(name);
+            Path base = Path.of(dir).resolve(name);
             if (isExecutableFile(base, isWindows)) {
                 return true;
             }
             // On Windows also try known executable extensions (unless already present).
             if (isWindows && !hasWindowsExtension(name)) {
                 for (String ext : WINDOWS_EXTENSIONS) {
-                    Path withExt = Paths.get(dir).resolve(name + ext);
+                    Path withExt = Path.of(dir).resolve(name + ext);
                     if (isExecutableFile(withExt, isWindows)) {
                         return true;
                     }
@@ -106,49 +103,23 @@ class ExecutableFinder {
     /**
      * Retrieves the PATH value from the activation context.
      *
-     * <p>Maven places env vars in system properties as {@code env.<NAME>}.  On Windows, env var names
-     * are normalised to upper-case, so we first try {@code env.PATH} and fall back to a direct
-     * {@link System#getenv(String)} call to handle edge cases.
+     * <p>Maven places env vars in system properties as {@code env.<NAME>}.
+     * On Windows, env var names are normalised to upper-case (e.g. {@code env.PATH}).
      *
      * @param context the profile activation context
      * @return the raw PATH string, or {@code null} if not available
      */
     static String getPathValue(ProfileActivationContext context) {
-        // Maven stores env vars as "env.<NAME>" (upper-cased on Windows)
-        String pathValue = context.getSystemProperty(ENV_PATH_KEY);
-        if (pathValue == null) {
-            // Fallback: try the OS environment directly (works in tests that do not populate
-            // env-based system properties).
-            pathValue = System.getenv("PATH");
-        }
-        return pathValue;
-    }
-
-    /**
-     * Returns the list of candidate names to probe for a given executable name on the current OS.
-     * On Windows the known executable extensions are appended when the name has none.
-     *
-     * @param name      the bare executable name (no directory part)
-     * @param isWindows whether the current OS is Windows
-     * @return ordered list of candidate file names to probe in each PATH directory
-     */
-    static List<String> candidateNames(String name, boolean isWindows) {
-        List<String> candidates = new ArrayList<>();
-        candidates.add(name);
-        if (isWindows && !hasWindowsExtension(name)) {
-            for (String ext : WINDOWS_EXTENSIONS) {
-                candidates.add(name + ext);
-            }
-        }
-        return candidates;
+        return context.getSystemProperty(ENV_PATH_KEY);
     }
 
     // -----------------------------------------------------------------------
     // Private utilities
     // -----------------------------------------------------------------------
 
-    private static boolean isWindows() {
-        return System.getProperty("os.name", "").toLowerCase(Locale.ROOT).contains("windows");
+    private static boolean isWindows(ProfileActivationContext context) {
+        String osName = context.getSystemProperty("os.name");
+        return osName != null && osName.toLowerCase(Locale.ROOT).contains("windows");
     }
 
     /**

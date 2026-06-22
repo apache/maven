@@ -21,11 +21,12 @@ package org.apache.maven.impl.model.profile;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.api.services.model.ProfileActivationContext;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -105,29 +106,6 @@ class ExecutableFinderTest {
     }
 
     // -----------------------------------------------------------------------
-    // candidateNames()
-    // -----------------------------------------------------------------------
-
-    @Test
-    void candidateNamesUnixNoExtension() {
-        List<String> names = ExecutableFinder.candidateNames("musl-gcc", false);
-        assertEquals(List.of("musl-gcc"), names);
-    }
-
-    @Test
-    void candidateNamesWindowsNoExtension() {
-        List<String> names = ExecutableFinder.candidateNames("musl-gcc", true);
-        assertEquals(List.of("musl-gcc", "musl-gcc.exe", "musl-gcc.cmd", "musl-gcc.bat", "musl-gcc.com"), names);
-    }
-
-    @Test
-    void candidateNamesWindowsAlreadyHasExtension() {
-        // When the name already has a Windows extension, no extras should be added.
-        List<String> names = ExecutableFinder.candidateNames("myapp.exe", true);
-        assertEquals(List.of("myapp.exe"), names);
-    }
-
-    // -----------------------------------------------------------------------
     // getPathValue()
     // -----------------------------------------------------------------------
 
@@ -136,14 +114,6 @@ class ExecutableFinderTest {
         String expected = "/usr/bin" + File.pathSeparator + "/usr/local/bin";
         ProfileActivationContext ctx = contextWithPath(expected);
         assertEquals(expected, ExecutableFinder.getPathValue(ctx));
-    }
-
-    @Test
-    void getPathValueFallsBackToSystemEnv() {
-        // No env.PATH in context -> should fall back to System.getenv("PATH")
-        ProfileActivationContext ctx = contextWithPath(null);
-        String fromEnv = System.getenv("PATH");
-        assertEquals(fromEnv, ExecutableFinder.getPathValue(ctx));
     }
 
     // -----------------------------------------------------------------------
@@ -160,16 +130,14 @@ class ExecutableFinderTest {
     }
 
     @Test
+    @DisabledOnOs(OS.WINDOWS)
     void returnsFalseWhenFileIsNotExecutable() throws Exception {
         Path exec = tempDir.resolve("non-exec-tool");
         Files.createFile(exec);
         exec.toFile().setExecutable(false);
 
         // Only meaningful on POSIX; on Windows the execute bit is not enforced by the JVM.
-        String os = System.getProperty("os.name", "").toLowerCase();
-        if (!os.contains("windows")) {
-            assertFalse(ExecutableFinder.isExecutableInPath("non-exec-tool", contextWithPath(tempDir.toString())));
-        }
+        assertFalse(ExecutableFinder.isExecutableInPath("non-exec-tool", contextWithPath(tempDir.toString())));
     }
 
     @Test
