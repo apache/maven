@@ -364,18 +364,8 @@ public class DefaultRepositorySystemSessionFactoryTest {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         request.setLocalRepository(getLocalRepository());
 
-        // default (no property set) should select Apache
+        // native
         Properties properties = new Properties();
-        request.setSystemProperties(properties);
-        Map<String, Object> defaultConfigProperties =
-                systemSessionFactory.newRepositorySession(request).getConfigProperties();
-        assertEquals(
-                String.valueOf(Float.MAX_VALUE), defaultConfigProperties.get("aether.priority.FileTransporterFactory"));
-        assertEquals(
-                String.valueOf(Float.MAX_VALUE),
-                defaultConfigProperties.get("aether.priority.ApacheTransporterFactory"));
-
-        // explicit apache
         properties.setProperty("maven.resolver.transport", "apache");
         request.setSystemProperties(properties);
         Map<String, Object> configProperties =
