@@ -51,8 +51,8 @@ import org.codehaus.plexus.components.secdispatcher.internal.dispatchers.LegacyD
 import org.eclipse.aether.spi.connector.transport.TransporterFactory;
 import org.eclipse.aether.spi.connector.transport.http.ChecksumExtractor;
 import org.eclipse.aether.spi.io.PathProcessor;
+import org.eclipse.aether.transport.apache.ApacheTransporterFactory;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
-import org.eclipse.aether.transport.jdk.JdkTransporterFactory;
 
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PARENT;
 
@@ -309,10 +309,10 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
 
     static class TransporterFactoryConfig {
         @Provides
-        @Named(JdkTransporterFactory.NAME)
-        static TransporterFactory jdkTransporterFactory(
+        @Named(ApacheTransporterFactory.NAME)
+        static TransporterFactory apacheTransporterFactory(
                 ChecksumExtractor checksumExtractor, PathProcessor pathProcessor) {
-            return new JdkTransporterFactory(checksumExtractor, pathProcessor);
+            return new ApacheTransporterFactory(checksumExtractor, pathProcessor);
         }
 
         @Provides
