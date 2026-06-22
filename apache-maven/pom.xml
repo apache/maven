@@ -96,11 +96,6 @@ under the License.
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-transport-apache</artifactId>
     </dependency>
-    <!-- HTTP/1.1 and HTTP/2, optional (use -Dmaven.resolver.transport=jdk), Java11+ -->
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-transport-jdk</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-logging</artifactId>

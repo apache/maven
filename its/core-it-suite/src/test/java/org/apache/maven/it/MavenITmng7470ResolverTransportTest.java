@@ -94,8 +94,6 @@ public class MavenITmng7470ResolverTransportTest extends AbstractMavenIntegratio
 
     private static final String APACHE_LOG_SNIPPET = "[DEBUG] Using transporter ApacheTransporter";
 
-    private static final String JDK_LOG_SNIPPET = "[DEBUG] Using transporter JdkTransporter";
-
     @Test
     public void testResolverTransportDefault() throws Exception {
         performTest(null, APACHE_LOG_SNIPPET);
@@ -109,10 +107,5 @@ public class MavenITmng7470ResolverTransportTest extends AbstractMavenIntegratio
     @Test
     public void testResolverTransportApache() throws Exception {
         performTest("apache", APACHE_LOG_SNIPPET);
-    }
-
-    @Test
-    public void testResolverTransportJdk() throws Exception {
-        performTest("jdk", JDK_LOG_SNIPPET);
     }
 }
