@@ -191,6 +191,7 @@ set "INTERNAL_MAVEN_OPTS=--enable-native-access=ALL-UNNAMED %INTERNAL_MAVEN_OPTS
   "-Dclassworlds.conf=%MAVEN_HOME%\bin\m2.conf" ^
   "-Dmaven.home=%MAVEN_HOME%" ^
   "-Dlibrary.jline.path=%MAVEN_HOME%\lib\jline-native" ^
+  "-Dorg.jline.terminal.exec.redirectPipeCreationMode=native" ^
   "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" ^
   %CLASSWORLDS_LAUNCHER% %MAVEN_ARGS% %MAVEN_CMD_LINE_ARGS%
 if ERRORLEVEL 1 goto error

@@ -212,5 +212,6 @@ exec "$JAVACMD" \
   "-Dclassworlds.conf=${MAVEN_HOME}/bin/m2.conf" \
   "-Dmaven.home=${MAVEN_HOME}" \
   "-Dlibrary.jline.path=${MAVEN_HOME}/lib/jline-native" \
+  "-Dorg.jline.terminal.exec.redirectPipeCreationMode=native" \
   "-Dmaven.multiModuleProjectDirectory=${MAVEN_PROJECTBASEDIR}" \
   ${CLASSWORLDS_LAUNCHER} ${MAVEN_ARGS} "$@"
