@@ -958,4 +958,16 @@ class DefaultModelValidatorTest {
                     "Concurrent validation failed: " + failure.get().getMessage(), failure.get());
         }
     }
+
+    @Test
+    void testMinimalWithParent() throws Exception {
+        SimpleProblemCollector result = validateRaw("raw-model/minimal-with-parent.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void testMinimalWithoutParent() throws Exception {
+        SimpleProblemCollector result = validateRaw("raw-model/minimal-without-parent.xml");
+        assertViolations(result, 0, 0, 0);
+    }
 }
