@@ -70,6 +70,13 @@ under the License.
       <version>${slf4jVersion}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- bridge from java.util.logging (JUL) to SLF4J -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jul-to-slf4j</artifactId>
+      <version>${slf4jVersion}</version>
+      <scope>runtime</scope>
+    </dependency>
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-connector-basic</artifactId>
