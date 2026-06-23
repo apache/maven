@@ -199,11 +199,15 @@ public class DefaultModelNormalizer implements ModelNormalizer {
 
     /**
      * Expands the {@code id} attribute on a dependency into its component fields.
-     * Supported formats:
+     * Supported formats (trailing {@code :} means version is managed):
      * <ul>
-     *   <li>{@code groupId:artifactId:version} (3 parts)</li>
-     *   <li>{@code groupId:artifactId:type:version} (4 parts)</li>
-     *   <li>{@code groupId:artifactId:type:classifier:version} (5 parts)</li>
+     *   <li>{@code groupId:artifactId} (version managed)</li>
+     *   <li>{@code groupId:artifactId:} (version managed, explicit trailing colon)</li>
+     *   <li>{@code groupId:artifactId:version}</li>
+     *   <li>{@code groupId:artifactId:type:} (version managed, with type)</li>
+     *   <li>{@code groupId:artifactId:type:version}</li>
+     *   <li>{@code groupId:artifactId:type:classifier:} (version managed, with type and classifier)</li>
+     *   <li>{@code groupId:artifactId:type:classifier:version}</li>
      * </ul>
      */
     Dependency expandDependencyId(Dependency d) {
@@ -212,8 +216,8 @@ public class DefaultModelNormalizer implements ModelNormalizer {
             List<Exclusion> expanded = injectList(d.getExclusions(), this::expandExclusionId);
             return expanded != null ? d.withExclusions(expanded) : d;
         }
-        String[] parts = id.split(":");
-        if (parts.length < 3 || parts.length > 5) {
+        String[] parts = id.split(":", -1);
+        if (parts.length < 2 || parts.length > 5) {
             return d;
         }
         Dependency.Builder builder = Dependency.newBuilder(d, true);
@@ -225,30 +229,33 @@ public class DefaultModelNormalizer implements ModelNormalizer {
             builder.artifactId(parts[1]);
         }
         switch (parts.length) {
+            case 2:
+                // g:a (version managed)
+                break;
             case 3:
-                // g:a:v
-                if (isNullOrEmpty(d.getVersion())) {
+                // g:a:v or g:a: (managed)
+                if (!parts[2].isEmpty() && isNullOrEmpty(d.getVersion())) {
                     builder.version(parts[2]);
                 }
                 break;
             case 4:
-                // g:a:type:v
+                // g:a:type:v or g:a:type: (managed)
                 if (isNullOrEmptyOrDefault(d.getType())) {
                     builder.type(parts[2]);
                 }
-                if (isNullOrEmpty(d.getVersion())) {
+                if (!parts[3].isEmpty() && isNullOrEmpty(d.getVersion())) {
                     builder.version(parts[3]);
                 }
                 break;
             case 5:
-                // g:a:type:classifier:v
+                // g:a:type:classifier:v or g:a:type:classifier: (managed)
                 if (isNullOrEmptyOrDefault(d.getType())) {
                     builder.type(parts[2]);
                 }
                 if (isNullOrEmpty(d.getClassifier())) {
                     builder.classifier(parts[3]);
                 }
-                if (isNullOrEmpty(d.getVersion())) {
+                if (!parts[4].isEmpty() && isNullOrEmpty(d.getVersion())) {
                     builder.version(parts[4]);
                 }
                 break;

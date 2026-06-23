@@ -342,8 +342,8 @@ class DependencyIdStrategyTest {
         }
 
         @Test
-        @DisplayName("should skip dependency without version")
-        void shouldSkipDependencyWithoutVersion() {
+        @DisplayName("should collapse dependency without version to g:a")
+        void shouldCollapseDependencyWithoutVersion() {
             String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.2.0">
@@ -370,9 +370,83 @@ class DependencyIdStrategyTest {
                     .childElement("dependency")
                     .orElseThrow();
 
-            assertNull(dependency.attribute("id"));
-            assertNotNull(DomUtils.findChildElement(dependency, "groupId"));
-            assertNotNull(DomUtils.findChildElement(dependency, "artifactId"));
+            assertEquals("org.example:lib", dependency.attribute("id"));
+            assertNull(DomUtils.findChildElement(dependency, "groupId"));
+            assertNull(DomUtils.findChildElement(dependency, "artifactId"));
+        }
+
+        @Test
+        @DisplayName("should collapse managed-version dependency with non-default type to g:a:type:")
+        void shouldCollapseManagedWithType() {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.2.0">
+                    <modelVersion>4.2.0</modelVersion>
+                    <groupId>com.example</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.example</groupId>
+                            <artifactId>lib</artifactId>
+                            <type>pom</type>
+                        </dependency>
+                    </dependencies>
+                </project>
+                """;
+
+            Document doc = Document.of(pomXml);
+            UpgradeContext context = TestUtils.createMockContext(TestUtils.createOptionsWithModelVersion("4.2.0"));
+            strategy.doApply(context, new HashMap<>(Map.of(Paths.get("pom.xml"), doc)));
+
+            Element dependency = doc.root()
+                    .childElement("dependencies")
+                    .orElseThrow()
+                    .childElement("dependency")
+                    .orElseThrow();
+
+            assertEquals("org.example:lib:pom:", dependency.attribute("id"));
+            assertNull(DomUtils.findChildElement(dependency, "groupId"));
+            assertNull(DomUtils.findChildElement(dependency, "artifactId"));
+            assertNull(DomUtils.findChildElement(dependency, "type"));
+        }
+
+        @Test
+        @DisplayName("should collapse managed-version dependency with classifier to g:a:type:classifier:")
+        void shouldCollapseManagedWithClassifier() {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.2.0">
+                    <modelVersion>4.2.0</modelVersion>
+                    <groupId>com.example</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.example</groupId>
+                            <artifactId>lib</artifactId>
+                            <type>jar</type>
+                            <classifier>sources</classifier>
+                        </dependency>
+                    </dependencies>
+                </project>
+                """;
+
+            Document doc = Document.of(pomXml);
+            UpgradeContext context = TestUtils.createMockContext(TestUtils.createOptionsWithModelVersion("4.2.0"));
+            strategy.doApply(context, new HashMap<>(Map.of(Paths.get("pom.xml"), doc)));
+
+            Element dependency = doc.root()
+                    .childElement("dependencies")
+                    .orElseThrow()
+                    .childElement("dependency")
+                    .orElseThrow();
+
+            assertEquals("org.example:lib:jar:sources:", dependency.attribute("id"));
+            assertNull(DomUtils.findChildElement(dependency, "groupId"));
+            assertNull(DomUtils.findChildElement(dependency, "artifactId"));
+            assertNull(DomUtils.findChildElement(dependency, "type"));
+            assertNull(DomUtils.findChildElement(dependency, "classifier"));
         }
 
         @Test
@@ -840,6 +914,11 @@ class DependencyIdStrategyTest {
     class BuildIdValueTests {
 
         @Test
+        void twoPartFormat() {
+            assertEquals("g:a", DependencyIdStrategy.buildIdValue("g", "a", null, null, null));
+        }
+
+        @Test
         void threePartFormat() {
             assertEquals("g:a:1.0", DependencyIdStrategy.buildIdValue("g", "a", "1.0", null, null));
         }
@@ -868,6 +947,21 @@ class DependencyIdStrategyTest {
         @Test
         void fivePartFormatClassifierNoType() {
             assertEquals("g:a:jar:sources:1.0", DependencyIdStrategy.buildIdValue("g", "a", "1.0", null, "sources"));
+        }
+
+        @Test
+        void fourPartTrailingColon() {
+            assertEquals("g:a:pom:", DependencyIdStrategy.buildIdValue("g", "a", null, "pom", null));
+        }
+
+        @Test
+        void fivePartTrailingColon() {
+            assertEquals("g:a:jar:sources:", DependencyIdStrategy.buildIdValue("g", "a", null, "jar", "sources"));
+        }
+
+        @Test
+        void fivePartTrailingColonClassifierNoType() {
+            assertEquals("g:a:jar:sources:", DependencyIdStrategy.buildIdValue("g", "a", null, null, "sources"));
         }
     }
 }

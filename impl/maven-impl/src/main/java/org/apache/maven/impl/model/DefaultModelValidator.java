@@ -1269,16 +1269,17 @@ public class DefaultModelValidator implements ModelValidator {
             return;
         }
         int colonCount = id.length() - id.replace(":", "").length();
-        if (colonCount < 2 || colonCount > 4) {
+        if (colonCount < 1 || colonCount > 4) {
             addViolation(
                     problems,
                     Severity.ERROR,
                     Version.V42,
                     prefix + "id",
                     null,
-                    "has invalid format '" + id + "', must be 'groupId:artifactId:version', "
-                            + "'groupId:artifactId:type:version', or "
-                            + "'groupId:artifactId:type:classifier:version'.",
+                    "has invalid format '" + id + "', must be 'groupId:artifactId[:]', "
+                            + "'groupId:artifactId:version', "
+                            + "'groupId:artifactId:type:[version]', or "
+                            + "'groupId:artifactId:type:classifier:[version]'.",
                     dependency);
             return;
         }

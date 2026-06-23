@@ -36,6 +36,30 @@ class DefaultModelNormalizerTest {
     private final DefaultModelNormalizer normalizer = new DefaultModelNormalizer();
 
     @Test
+    void testExpandDependencyId2parts() {
+        Dependency dep = Dependency.newBuilder(false).id("org.example:lib").build();
+
+        Dependency result = normalizer.expandDependencyId(dep);
+
+        assertEquals("org.example", result.getGroupId());
+        assertEquals("lib", result.getArtifactId());
+        assertNull(result.getVersion());
+        assertNull(result.getId());
+    }
+
+    @Test
+    void testExpandDependencyId2partsTrailingColon() {
+        Dependency dep = Dependency.newBuilder(false).id("org.example:lib:").build();
+
+        Dependency result = normalizer.expandDependencyId(dep);
+
+        assertEquals("org.example", result.getGroupId());
+        assertEquals("lib", result.getArtifactId());
+        assertNull(result.getVersion());
+        assertNull(result.getId());
+    }
+
+    @Test
     void testExpandDependencyId3parts() {
         Dependency dep =
                 Dependency.newBuilder(false).id("org.slf4j:slf4j-api:2.0.17").build();
@@ -63,6 +87,20 @@ class DefaultModelNormalizerTest {
     }
 
     @Test
+    void testExpandDependencyId4partsTrailingColon() {
+        Dependency dep =
+                Dependency.newBuilder(false).id("org.example:lib-b:pom:").build();
+
+        Dependency result = normalizer.expandDependencyId(dep);
+
+        assertEquals("org.example", result.getGroupId());
+        assertEquals("lib-b", result.getArtifactId());
+        assertEquals("pom", result.getType());
+        assertNull(result.getVersion());
+        assertNull(result.getId());
+    }
+
+    @Test
     void testExpandDependencyId5parts() {
         Dependency dep = Dependency.newBuilder(false)
                 .id("org.example:lib-c:jar:sources:1.0")
@@ -75,6 +113,22 @@ class DefaultModelNormalizerTest {
         assertEquals("jar", result.getType());
         assertEquals("sources", result.getClassifier());
         assertEquals("1.0", result.getVersion());
+        assertNull(result.getId());
+    }
+
+    @Test
+    void testExpandDependencyId5partsTrailingColon() {
+        Dependency dep = Dependency.newBuilder(false)
+                .id("org.example:lib-c:jar:sources:")
+                .build();
+
+        Dependency result = normalizer.expandDependencyId(dep);
+
+        assertEquals("org.example", result.getGroupId());
+        assertEquals("lib-c", result.getArtifactId());
+        assertEquals("jar", result.getType());
+        assertEquals("sources", result.getClassifier());
+        assertNull(result.getVersion());
         assertNull(result.getId());
     }
 

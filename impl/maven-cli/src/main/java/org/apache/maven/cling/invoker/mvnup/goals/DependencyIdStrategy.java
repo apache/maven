@@ -66,11 +66,14 @@ import static eu.maveniverse.domtrip.maven.MavenPomElements.ModelVersions.MODEL_
  * <dependency id="org.example:lib:1.0"/>
  * }</pre>
  *
- * <p>Supports three formats:
+ * <p>Supported formats (trailing {@code :} means version is managed):
  * <ul>
- *   <li>{@code g:a:v} (3-part, default type "jar")</li>
- *   <li>{@code g:a:type:v} (4-part, non-default type)</li>
- *   <li>{@code g:a:type:classifier:v} (5-part, with classifier)</li>
+ *   <li>{@code g:a} — version managed</li>
+ *   <li>{@code g:a:v} — default type "jar"</li>
+ *   <li>{@code g:a:type:} — non-default type, version managed</li>
+ *   <li>{@code g:a:type:v} — non-default type</li>
+ *   <li>{@code g:a:type:classifier:} — with classifier, version managed</li>
+ *   <li>{@code g:a:type:classifier:v} — with classifier</li>
  * </ul>
  *
  * <p>Also collapses exclusions from {@code <groupId>}/{@code <artifactId>} into {@code id="g:a"}.
@@ -210,7 +213,7 @@ public class DependencyIdStrategy extends AbstractUpgradeStrategy {
         String artifactId = dependency.childText(ARTIFACT_ID);
         String version = dependency.childText(VERSION);
 
-        if (groupId == null || artifactId == null || version == null) {
+        if (groupId == null || artifactId == null) {
             return false;
         }
 
@@ -222,7 +225,9 @@ public class DependencyIdStrategy extends AbstractUpgradeStrategy {
 
         removeChildElement(dependency, GROUP_ID);
         removeChildElement(dependency, ARTIFACT_ID);
-        removeChildElement(dependency, VERSION);
+        if (version != null) {
+            removeChildElement(dependency, VERSION);
+        }
 
         if (classifier != null) {
             removeChildElement(dependency, CLASSIFIER);
@@ -230,7 +235,6 @@ public class DependencyIdStrategy extends AbstractUpgradeStrategy {
         } else if (type != null && !DEFAULT_TYPE.equals(type)) {
             removeChildElement(dependency, TYPE);
         } else if (type != null) {
-            // default type "jar" — remove it as it's implied
             removeChildElement(dependency, TYPE);
         }
 
@@ -280,11 +284,21 @@ public class DependencyIdStrategy extends AbstractUpgradeStrategy {
     static String buildIdValue(String groupId, String artifactId, String version, String type, String classifier) {
         if (classifier != null && !classifier.isEmpty()) {
             String effectiveType = (type != null && !type.isEmpty()) ? type : DEFAULT_TYPE;
-            return groupId + ":" + artifactId + ":" + effectiveType + ":" + classifier + ":" + version;
+            if (version != null) {
+                return groupId + ":" + artifactId + ":" + effectiveType + ":" + classifier + ":" + version;
+            } else {
+                return groupId + ":" + artifactId + ":" + effectiveType + ":" + classifier + ":";
+            }
         } else if (type != null && !type.isEmpty() && !DEFAULT_TYPE.equals(type)) {
-            return groupId + ":" + artifactId + ":" + type + ":" + version;
-        } else {
+            if (version != null) {
+                return groupId + ":" + artifactId + ":" + type + ":" + version;
+            } else {
+                return groupId + ":" + artifactId + ":" + type + ":";
+            }
+        } else if (version != null) {
             return groupId + ":" + artifactId + ":" + version;
+        } else {
+            return groupId + ":" + artifactId;
         }
     }
 

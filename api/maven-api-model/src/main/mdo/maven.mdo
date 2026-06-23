@@ -1211,9 +1211,13 @@
           <description>
             <![CDATA[
             Combined coordinates in one of the following formats:
+            {@code groupId:artifactId} (version managed),
             {@code groupId:artifactId:version},
-            {@code groupId:artifactId:type:version}, or
-            {@code groupId:artifactId:type:classifier:version}.
+            {@code groupId:artifactId:type:version},
+            {@code groupId:artifactId:type:classifier:version},
+            {@code groupId:artifactId:type:} (version managed, with type), or
+            {@code groupId:artifactId:type:classifier:} (version managed, with type and classifier).
+            A trailing {@code :} indicates the version is managed (i.e. provided by dependencyManagement).
             When specified, it is split into the corresponding fields during model normalization.
             The individual child elements should not be specified when using this attribute.
             @since Maven 4.2

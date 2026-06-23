@@ -1024,6 +1024,12 @@ class DefaultModelValidatorTest {
     }
 
     @Test
+    void testDependencyId2partsValid() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-2parts-valid.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
     void testDependencyId3partsValid() throws Exception {
         SimpleProblemCollector result = validateFile("dependency-id-3parts-valid.xml");
         assertViolations(result, 0, 0, 0);
@@ -1038,6 +1044,24 @@ class DefaultModelValidatorTest {
     @Test
     void testDependencyId5partsValid() throws Exception {
         SimpleProblemCollector result = validateFile("dependency-id-5parts-valid.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void testDependencyIdTrailingColon3partsValid() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-trailing-colon-3parts-valid.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void testDependencyIdTrailingColon4partsValid() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-trailing-colon-4parts-valid.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void testDependencyIdTrailingColon5partsValid() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-trailing-colon-5parts-valid.xml");
         assertViolations(result, 0, 0, 0);
     }
 
