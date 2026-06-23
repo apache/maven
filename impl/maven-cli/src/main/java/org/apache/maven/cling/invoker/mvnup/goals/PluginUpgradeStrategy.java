@@ -475,6 +475,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         Map<Path, Set<String>> managementResult = new HashMap<>();
         Map<Path, Set<String>> directOverrideResult = new HashMap<>();
         Map<String, PluginUpgrade> pluginUpgrades = getPluginUpgradesAsMap();
+        Set<String> localPluginKeys = collectLocallyDeclaredPluginKeys(pomMap);
 
         for (Map.Entry<Path, Document> entry : pomMap.entrySet()) {
             Path originalPomPath = entry.getKey();
@@ -486,7 +487,8 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 Path tempPomPath = tempDir.resolve(relativePath);
 
                 // Build effective model using Maven 4 API
-                PluginAnalysis analysis = analyzeEffectiveModelForPlugins(context, tempPomPath, pluginUpgrades);
+                PluginAnalysis analysis =
+                        analyzeEffectiveModelForPlugins(context, tempPomPath, pluginUpgrades, localPluginKeys);
 
                 // Determine where to add plugin management (last local parent)
                 Path targetPom =
@@ -528,9 +530,12 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
     }
 
     private PluginAnalysis analyzeEffectiveModelForPlugins(
-            UpgradeContext context, Path tempPomPath, Map<String, PluginUpgrade> pluginUpgrades) {
+            UpgradeContext context,
+            Path tempPomPath,
+            Map<String, PluginUpgrade> pluginUpgrades,
+            Set<String> localPluginKeys) {
         Model effectiveModel = buildEffectiveModel(tempPomPath);
-        return analyzePluginsFromEffectiveModel(context, effectiveModel, pluginUpgrades);
+        return analyzePluginsFromEffectiveModel(context, effectiveModel, pluginUpgrades, localPluginKeys);
     }
 
     /**
@@ -540,7 +545,10 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
      * parent's build/plugins, not via pluginManagement).
      */
     private PluginAnalysis analyzePluginsFromEffectiveModel(
-            UpgradeContext context, Model effectiveModel, Map<String, PluginUpgrade> pluginUpgrades) {
+            UpgradeContext context,
+            Model effectiveModel,
+            Map<String, PluginUpgrade> pluginUpgrades,
+            Set<String> localPluginKeys) {
         Set<String> needsManagement = new HashSet<>();
         Set<String> needsDirectOverride = new HashSet<>();
 
@@ -561,6 +569,13 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 String pluginKey = getPluginKey(plugin);
                 PluginUpgrade upgrade = pluginUpgrades.get(pluginKey);
                 if (upgrade != null) {
+                    // Skip plugins not declared in any local POM — they are inherited
+                    // from a remote parent POM that the project does not control
+                    if (!localPluginKeys.contains(pluginKey)) {
+                        context.debug(
+                                "Plugin " + pluginKey + " is inherited from a remote parent POM — skipping upgrade");
+                        continue;
+                    }
                     String effectiveVersion = plugin.getVersion();
                     if (isVersionBelow(effectiveVersion, upgrade.minVersion())) {
                         needsManagement.add(pluginKey);
@@ -587,6 +602,10 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     String pluginKey = getPluginKey(plugin);
                     PluginUpgrade upgrade = pluginUpgrades.get(pluginKey);
                     if (upgrade != null && !needsManagement.contains(pluginKey)) {
+                        // Skip plugins not declared in any local POM
+                        if (!localPluginKeys.contains(pluginKey)) {
+                            continue;
+                        }
                         String effectiveVersion = plugin.getVersion();
                         if (isVersionBelow(effectiveVersion, upgrade.minVersion())) {
                             needsManagement.add(pluginKey);
@@ -806,6 +825,42 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         }
 
         return hasUpgrades;
+    }
+
+    private Set<String> collectLocallyDeclaredPluginKeys(Map<Path, Document> pomMap) {
+        Set<String> localPluginKeys = new HashSet<>();
+        for (Document doc : pomMap.values()) {
+            Element root = doc.root();
+            Element buildElement = root.childElement(BUILD).orElse(null);
+            if (buildElement != null) {
+                Element pluginsElement = buildElement.childElement(PLUGINS).orElse(null);
+                if (pluginsElement != null) {
+                    collectPluginKeysFromElement(pluginsElement, localPluginKeys);
+                }
+                Element pmElement = buildElement.childElement(PLUGIN_MANAGEMENT).orElse(null);
+                if (pmElement != null) {
+                    Element managedPluginsElement =
+                            pmElement.childElement(PLUGINS).orElse(null);
+                    if (managedPluginsElement != null) {
+                        collectPluginKeysFromElement(managedPluginsElement, localPluginKeys);
+                    }
+                }
+            }
+        }
+        return localPluginKeys;
+    }
+
+    private void collectPluginKeysFromElement(Element pluginsElement, Set<String> keys) {
+        pluginsElement.childElements(PLUGIN).forEach(pluginElement -> {
+            String groupId = getChildText(pluginElement, GROUP_ID);
+            String artifactId = getChildText(pluginElement, ARTIFACT_ID);
+            if (groupId == null && artifactId != null && artifactId.startsWith(MAVEN_PLUGIN_PREFIX)) {
+                groupId = DEFAULT_MAVEN_PLUGIN_GROUP_ID;
+            }
+            if (groupId != null && artifactId != null) {
+                keys.add(groupId + ":" + artifactId);
+            }
+        });
     }
 
     private record PluginAnalysis(Set<String> needsManagement, Set<String> needsDirectOverride) {}
