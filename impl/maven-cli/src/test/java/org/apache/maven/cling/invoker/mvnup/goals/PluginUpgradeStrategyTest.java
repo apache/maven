@@ -773,12 +773,12 @@ class PluginUpgradeStrategyTest {
     class InheritedPluginDetectionTests {
 
         @Test
-        @DisplayName("should not inject pluginManagement for plugins only inherited from remote parent")
-        void shouldNotInjectPluginManagementForPluginsOnlyInRemoteParent() throws Exception {
+        @DisplayName("should inject pluginManagement with comment for plugins inherited from remote parent")
+        void shouldInjectPluginManagementWithCommentForRemoteParentPlugins() throws Exception {
             // org.apache:apache:23 defines maven-enforcer-plugin in pluginManagement and
-            // build/plugins. A child POM that does NOT itself declare the plugin should NOT
-            // get pluginManagement overrides — the version is locked by the remote parent
-            // that the project does not control.
+            // build/plugins. A child POM that does NOT itself declare the plugin should
+            // still get a pluginManagement override with a comment explaining it overrides
+            // the parent, so that Maven 4 incompatible plugin versions get upgraded.
             String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
@@ -807,15 +807,18 @@ class PluginUpgradeStrategyTest {
                 UpgradeResult result = strategy.doApply(context, pomMap);
 
                 assertTrue(result.success(), "Strategy should succeed");
-                assertEquals(
-                        0,
-                        result.modifiedCount(),
-                        "Should not modify POM when plugins are only inherited from remote parent");
+                assertTrue(result.modifiedCount() > 0, "Should have modified POM for remote parent plugin upgrade");
 
                 String xml = DomUtils.toXml(document);
-                assertFalse(
+                assertTrue(
                         xml.contains("<pluginManagement>"),
-                        "Should not inject pluginManagement for plugins only from remote parent");
+                        "Should inject pluginManagement for plugins from remote parent");
+                assertTrue(
+                        xml.contains("Override version inherited from parent"),
+                        "Should add comment explaining the override");
+                assertTrue(
+                        xml.contains("<artifactId>maven-enforcer-plugin</artifactId>"),
+                        "Should add pluginManagement for maven-enforcer-plugin");
             } finally {
                 try (var walk = Files.walk(tempDir)) {
                     walk.sorted(java.util.Comparator.reverseOrder()).forEach(p -> {
@@ -829,12 +832,12 @@ class PluginUpgradeStrategyTest {
         }
 
         @Test
-        @DisplayName("should not inject any overrides for plugins only from remote parent")
-        void shouldNotInjectAnyOverridesForPluginsOnlyFromRemoteParent() throws Exception {
-            // org.apache:apache:23 has maven-enforcer-plugin in build/plugins and
-            // pluginManagement. Since the child POM does not declare the plugin itself,
-            // mvnup should not inject any overrides — neither pluginManagement nor
-            // direct build/plugins entries.
+        @DisplayName("should override remote parent plugin via pluginManagement with comment, not direct build/plugins")
+        void shouldOverrideRemoteParentPluginViaPluginManagementWithComment() throws Exception {
+            // org.apache:apache:23 has maven-enforcer-plugin in build/plugins WITHOUT
+            // an explicit version — the version (1.4.1) comes from pluginManagement.
+            // In this case, adding a pluginManagement override with a comment in the child
+            // is sufficient; no direct build/plugins entry should be added for enforcer.
             String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
@@ -859,9 +862,39 @@ class PluginUpgradeStrategyTest {
 
             assertTrue(result.success(), "Strategy should succeed");
 
+            Editor editor = new Editor(document);
+            Element root = editor.root();
+
+            // Verify pluginManagement entry exists for enforcer
+            Element pmPlugins =
+                    root.path("build", "pluginManagement", "plugins").orElse(null);
+            assertNotNull(pmPlugins, "Should have pluginManagement/plugins");
+            boolean hasEnforcerInPM = pmPlugins.childElements("plugin").anyMatch(p -> "maven-enforcer-plugin"
+                    .equals(p.childElement("artifactId")
+                            .map(Element::textContentTrimmed)
+                            .orElse("")));
+            assertTrue(hasEnforcerInPM, "Should have enforcer in pluginManagement");
+
             String xml = DomUtils.toXml(document);
-            assertFalse(
-                    xml.contains("<build>"), "Should not add any build elements for plugins only from remote parent");
+            assertTrue(
+                    xml.contains("Override version inherited from parent"),
+                    "Should add comment explaining the override");
+
+            // Verify NO direct build/plugins entry for enforcer (PM override is sufficient)
+            Element buildPlugins = root.childElement("build")
+                    .flatMap(b -> b.childElement("plugins"))
+                    .orElse(null);
+            if (buildPlugins != null) {
+                boolean hasEnforcerInPlugins = buildPlugins
+                        .childElements("plugin")
+                        .anyMatch(p -> "maven-enforcer-plugin"
+                                .equals(p.childElement("artifactId")
+                                        .map(Element::textContentTrimmed)
+                                        .orElse("")));
+                assertFalse(
+                        hasEnforcerInPlugins,
+                        "Should NOT add enforcer in build/plugins when pluginManagement override suffices");
+            }
         }
 
         @Test
