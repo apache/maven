@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -31,15 +31,11 @@ import org.junit.jupiter.api.Test;
  */
 class MavenITgh12303CIFriendlyRevisionRemoteResourcesTest extends AbstractMavenIntegrationTestCase {
 
-    MavenITgh12303CIFriendlyRevisionRemoteResourcesTest() {
-        super("[4.0.0-rc-3,)");
-    }
-
     @Test
     void testCiFriendlyRevisionWithRemoteResources() throws Exception {
-        File testDir = extractResources("/gh-12303-ci-friendly-revision-remote-resources");
+        Path testDir = extractResources("/gh-12303-ci-friendly-revision-remote-resources");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.toAbsolutePath());
         verifier.deleteArtifacts("org.apache.maven.its.gh12303");
         verifier.filterFile("settings-template.xml", "settings.xml");
         verifier.addCliArgument("--settings");
