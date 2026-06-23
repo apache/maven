@@ -90,6 +90,7 @@ import org.jline.terminal.TerminalBuilder;
 import org.jline.terminal.impl.AbstractPosixTerminal;
 import org.jline.terminal.spi.TerminalExt;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.slf4j.spi.LocationAwareLogger;
 
 import static java.util.Objects.requireNonNull;
@@ -428,6 +429,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected void activateLogging(C context) throws Exception {
+        // Route java.util.logging (JUL) through SLF4J
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
         context.slf4jConfiguration.activate();
         if (context.options().failOnSeverity().isPresent()) {
             String logLevelThreshold = context.options().failOnSeverity().get();
