@@ -369,6 +369,42 @@ class SourceStrategyTest {
 
             assertEquals(1, sources.size());
             assertEquals("21", sources.get(0).childTextTrimmed("targetVersion"));
+            assertFalse(doc.root().path("build", "plugins").isPresent());
+        }
+
+        @Test
+        @DisplayName("should migrate compiler plugin from pluginManagement")
+        void shouldMigrateFromPluginManagement() {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.1.0">
+                    <modelVersion>4.1.0</modelVersion>
+                    <groupId>com.example</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0</version>
+                    <build>
+                        <pluginManagement>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-compiler-plugin</artifactId>
+                                    <configuration>
+                                        <release>17</release>
+                                    </configuration>
+                                </plugin>
+                            </plugins>
+                        </pluginManagement>
+                    </build>
+                </project>
+                """;
+
+            Document doc = Document.of(pomXml);
+            UpgradeContext context = TestUtils.createMockContext(TestUtils.createOptionsWithModelVersion("4.1.0"));
+            strategy.doApply(context, new HashMap<>(Map.of(Paths.get("pom.xml"), doc)));
+
+            Element source = doc.root().path("build", "sources", "source").orElseThrow();
+            assertEquals("17", source.childTextTrimmed("targetVersion"));
+            assertFalse(doc.root().path("build", "pluginManagement").isPresent());
         }
     }
 
@@ -448,8 +484,7 @@ class SourceStrategyTest {
             UpgradeContext context = TestUtils.createMockContext(TestUtils.createOptionsWithModelVersion("4.1.0"));
             UpgradeResult result = strategy.doApply(context, new HashMap<>(Map.of(Paths.get("pom.xml"), doc)));
 
-            assertFalse(doc.root().path("build", "sourceDirectory").isPresent());
-            assertFalse(doc.root().path("build", "sources").isPresent());
+            assertFalse(doc.root().childElement("build").isPresent());
             assertEquals(1, result.modifiedCount());
         }
     }
@@ -614,8 +649,7 @@ class SourceStrategyTest {
             UpgradeContext context = TestUtils.createMockContext(TestUtils.createOptionsWithModelVersion("4.1.0"));
             UpgradeResult result = strategy.doApply(context, new HashMap<>(Map.of(Paths.get("pom.xml"), doc)));
 
-            assertFalse(doc.root().path("build", "resources").isPresent());
-            assertFalse(doc.root().path("build", "sources").isPresent());
+            assertFalse(doc.root().childElement("build").isPresent());
             assertEquals(1, result.modifiedCount());
         }
     }

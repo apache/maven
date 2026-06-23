@@ -35,6 +35,7 @@ import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.ARTIFACT_ID;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.BUILD;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.CONFIGURATION;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.GROUP_ID;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PLUGIN;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PLUGINS;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PLUGIN_MANAGEMENT;
@@ -42,6 +43,7 @@ import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PROPERTIES;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.SOURCE_DIRECTORY;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.TEST_SOURCE_DIRECTORY;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.ModelVersions.MODEL_VERSION_4_1_0;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Plugins.DEFAULT_MAVEN_PLUGIN_GROUP_ID;
 
 /**
  * Strategy for migrating legacy source configuration to Maven 4.1.0+ {@code <source>} elements.
@@ -136,6 +138,8 @@ public class SourceStrategy extends AbstractUpgradeStrategy {
 
         if (targetVersion == null) {
             targetVersion = extractTargetVersionFromCompilerPlugin(context, root);
+        } else {
+            cleanupCompilerPluginConfig(context, root);
         }
 
         if (targetVersion != null) {
@@ -148,6 +152,8 @@ public class SourceStrategy extends AbstractUpgradeStrategy {
 
         hasChanges |= migrateSourceDirectories(context, root);
         hasChanges |= migrateResources(context, root);
+
+        cleanupEmptyBuild(root);
 
         return hasChanges;
     }
@@ -278,25 +284,76 @@ public class SourceStrategy extends AbstractUpgradeStrategy {
         return pluginsElement.childElements(PLUGIN).toList().stream()
                 .filter(plugin -> {
                     String artifactId = plugin.childTextTrimmed(ARTIFACT_ID);
-                    return MAVEN_COMPILER_PLUGIN.equals(artifactId);
+                    String groupId = plugin.childTextTrimmed(GROUP_ID);
+                    return MAVEN_COMPILER_PLUGIN.equals(artifactId)
+                            && (groupId == null || groupId.isEmpty() || DEFAULT_MAVEN_PLUGIN_GROUP_ID.equals(groupId));
                 })
                 .findFirst()
                 .orElse(null);
     }
 
-    private void cleanupCompilerPlugin(Element compilerPlugin, Element configuration, Element pluginsElement) {
-        if (!configuration.childElements().findAny().isPresent()) {
-            DomUtils.removeElement(configuration);
+    private void cleanupCompilerPluginConfig(UpgradeContext context, Element root) {
+        cleanupPluginSectionConfig(
+                context,
+                root.childElement(BUILD).flatMap(b -> b.childElement(PLUGINS)).orElse(null));
+        cleanupPluginSectionConfig(
+                context,
+                root.childElement(BUILD)
+                        .flatMap(b -> b.childElement(PLUGIN_MANAGEMENT))
+                        .flatMap(pm -> pm.childElement(PLUGINS))
+                        .orElse(null));
+    }
+
+    private void cleanupPluginSectionConfig(UpgradeContext context, Element pluginsElement) {
+        if (pluginsElement == null) {
+            return;
         }
+        Element compilerPlugin = findCompilerPlugin(pluginsElement);
+        if (compilerPlugin == null) {
+            return;
+        }
+        Element configuration = compilerPlugin.childElement(CONFIGURATION).orElse(null);
+        if (configuration == null) {
+            return;
+        }
+        configuration.childElement("release").ifPresent(e -> {
+            DomUtils.removeElement(e);
+            context.detail("Removed compiler plugin <release> (properties take precedence)");
+        });
+        configuration.childElement("source").ifPresent(e -> {
+            DomUtils.removeElement(e);
+            context.detail("Removed compiler plugin <source> (properties take precedence)");
+        });
+        configuration.childElement("target").ifPresent(e -> {
+            DomUtils.removeElement(e);
+            context.detail("Removed compiler plugin <target> (properties take precedence)");
+        });
+        cleanupCompilerPlugin(compilerPlugin, configuration, pluginsElement);
+    }
+
+    private void cleanupCompilerPlugin(Element compilerPlugin, Element configuration, Element pluginsElement) {
+        removeIfEmpty(configuration);
 
         boolean hasConfig = compilerPlugin.childElement(CONFIGURATION).isPresent();
         boolean hasExecutions = compilerPlugin.childElement("executions").isPresent();
         boolean hasDeps = compilerPlugin.childElement("dependencies").isPresent();
 
         if (!hasConfig && !hasExecutions && !hasDeps) {
+            Element pluginsParent = pluginsElement.parent() instanceof Element parent ? parent : null;
             DomUtils.removeElement(compilerPlugin);
             removeIfEmpty(pluginsElement);
+            if (pluginsParent != null && PLUGIN_MANAGEMENT.equals(pluginsParent.name())) {
+                removeIfEmpty(pluginsParent);
+            }
         }
+    }
+
+    private static void cleanupEmptyBuild(Element root) {
+        root.childElement(BUILD).ifPresent(build -> {
+            if (!build.childElements().findAny().isPresent()) {
+                DomUtils.removeElement(build);
+            }
+        });
     }
 
     boolean migrateSourceDirectories(UpgradeContext context, Element root) {
@@ -486,7 +543,7 @@ public class SourceStrategy extends AbstractUpgradeStrategy {
     }
 
     private static void removeIfEmpty(Element element) {
-        if (!element.childElements().findAny().isPresent()) {
+        if (element != null && !element.childElements().findAny().isPresent()) {
             DomUtils.removeElement(element);
         }
     }
