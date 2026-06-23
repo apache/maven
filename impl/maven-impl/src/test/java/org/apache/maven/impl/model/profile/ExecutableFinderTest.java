@@ -21,6 +21,7 @@ package org.apache.maven.impl.model.profile;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.maven.api.services.model.ProfileActivationContext;
@@ -47,6 +48,75 @@ class ExecutableFinderTest {
      */
     private static ProfileActivationContext contextWithPath(String pathValue) {
         Map<String, String> props = pathValue != null ? Map.of("env.PATH", pathValue) : Map.of();
+        return new ProfileActivationContext() {
+            @Override
+            public boolean isProfileActive(String profileId) {
+                return false;
+            }
+
+            @Override
+            public boolean isProfileInactive(String profileId) {
+                return false;
+            }
+
+            @Override
+            public String getSystemProperty(String key) {
+                return props.get(key);
+            }
+
+            @Override
+            public String getUserProperty(String key) {
+                return null;
+            }
+
+            @Override
+            public String getModelProperty(String key) {
+                return null;
+            }
+
+            @Override
+            public String getModelArtifactId() {
+                return null;
+            }
+
+            @Override
+            public String getModelPackaging() {
+                return null;
+            }
+
+            @Override
+            public String getModelRootDirectory() {
+                return null;
+            }
+
+            @Override
+            public String getModelBaseDirectory() {
+                return null;
+            }
+
+            @Override
+            public String interpolatePath(String path) {
+                return path;
+            }
+
+            @Override
+            public boolean exists(String path, boolean glob) {
+                return false;
+            }
+        };
+    }
+
+    /**
+     * Extended stub that also allows setting {@code os.name} for simulating Windows behaviour.
+     */
+    private static ProfileActivationContext contextWithPathAndOs(String pathValue, String osName) {
+        Map<String, String> props = new HashMap<>();
+        if (pathValue != null) {
+            props.put("env.PATH", pathValue);
+        }
+        if (osName != null) {
+            props.put("os.name", osName);
+        }
         return new ProfileActivationContext() {
             @Override
             public boolean isProfileActive(String profileId) {
@@ -175,5 +245,40 @@ class ExecutableFinderTest {
     void returnsFalseForDirectoryPath() throws Exception {
         // Directories must not be accepted even if they exist.
         assertFalse(ExecutableFinder.isExecutableInPath(tempDir.toAbsolutePath().toString(), contextWithPath("")));
+    }
+
+    // -----------------------------------------------------------------------
+    // Windows extension probing (simulated via os.name in context)
+    // -----------------------------------------------------------------------
+
+    @Test
+    void findsExecutableWithWindowsExtensionInPath() throws Exception {
+        // Simulate Windows: create my-tool.exe and search for "my-tool"
+        Path exec = tempDir.resolve("my-tool.exe");
+        Files.createFile(exec);
+
+        ProfileActivationContext ctx = contextWithPathAndOs(tempDir.toString(), "Windows 10");
+        assertTrue(ExecutableFinder.isExecutableInPath("my-tool", ctx));
+    }
+
+    @Test
+    void findsExecutableWithWindowsExtensionByDirectPath() throws Exception {
+        // Simulate Windows: create tool.exe and search for the direct path without extension
+        Path exec = tempDir.resolve("tool.exe");
+        Files.createFile(exec);
+
+        String directPath = tempDir.resolve("tool").toAbsolutePath().toString();
+        ProfileActivationContext ctx = contextWithPathAndOs("", "Windows 10");
+        assertTrue(ExecutableFinder.isExecutableInPath(directPath, ctx));
+    }
+
+    @Test
+    void doesNotAppendExtensionOnNonWindows() throws Exception {
+        // On non-Windows, searching for "my-tool" must NOT find "my-tool.exe"
+        Path exec = tempDir.resolve("my-tool.exe");
+        Files.createFile(exec);
+
+        ProfileActivationContext ctx = contextWithPathAndOs(tempDir.toString(), "Linux");
+        assertFalse(ExecutableFinder.isExecutableInPath("my-tool", ctx));
     }
 }

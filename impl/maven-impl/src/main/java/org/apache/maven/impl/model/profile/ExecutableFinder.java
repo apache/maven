@@ -65,7 +65,18 @@ class ExecutableFinder {
         // If the name already contains a path separator treat it as a direct path.
         if (name.contains("/") || name.contains(File.separator)) {
             Path candidate = Path.of(name);
-            return isExecutableFile(candidate, isWindows);
+            if (isExecutableFile(candidate, isWindows)) {
+                return true;
+            }
+            // On Windows also try known executable extensions for direct paths.
+            if (isWindows && !hasWindowsExtension(name)) {
+                for (String ext : WINDOWS_EXTENSIONS) {
+                    if (isExecutableFile(Path.of(name + ext), isWindows)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         // --- plain name: search PATH ---
@@ -124,17 +135,19 @@ class ExecutableFinder {
 
     /**
      * Returns {@code true} if {@code path} is a regular file that the JVM considers executable.
-     * On Windows, any regular file is treated as potentially executable (the OS itself uses the
-     * extension to decide); the {@link Files#isExecutable} check is still applied so that
-     * read-only / locked files are excluded.
+     *
+     * <p>On Windows, {@link Files#isExecutable(Path)} always returns {@code true} for regular
+     * files, so this method simply checks that the file exists and is regular.  The caller is
+     * responsible for probing Windows executable extensions ({@code .exe}, {@code .cmd}, etc.)
+     * when the user-supplied name does not already carry one.  On Unix/POSIX systems the
+     * execute permission bit is checked via {@link Files#isExecutable(Path)}.</p>
      */
     private static boolean isExecutableFile(Path path, boolean isWindows) {
         if (!Files.isRegularFile(path)) {
             return false;
         }
-        // On Windows Files.isExecutable() always returns true for regular files – that is fine
-        // because we are already filtering by extension in the caller. On Unix we rely on the
-        // execute bit.
+        // On Windows Files.isExecutable() always returns true for regular files.
+        // On Unix we rely on the execute permission bit.
         return isWindows || Files.isExecutable(path);
     }
 

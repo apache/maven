@@ -535,7 +535,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
         Files.createFile(fakeExec);
         fakeExec.toFile().setExecutable(true);
 
-        String absPath = fakeExec.toAbsolutePath().toString().replace('\\', '/');
+        String absPath = fakeExec.toAbsolutePath().toString();
         Profile profile = newProfile("executable('" + absPath + "')");
 
         // PATH content does not matter for absolute paths
