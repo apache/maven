@@ -1022,4 +1022,55 @@ class DefaultModelValidatorTest {
                 "raw-model/profile-activation-condition-with-basedir.xml", ModelValidator.VALIDATION_LEVEL_STRICT);
         assertViolations(result, 0, 0, 0);
     }
+
+    @Test
+    void testDependencyId3partsValid() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-3parts-valid.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void testDependencyId4partsValid() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-4parts-valid.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void testDependencyId5partsValid() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-5parts-valid.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void testDependencyIdBadFormat() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-bad-format.xml");
+        assertViolations(result, 0, 1, 0);
+        assertContains(result.getErrors().get(0), "invalid format");
+    }
+
+    @Test
+    void testDependencyIdConflictGroupId() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-conflict-groupId.xml");
+        assertViolations(result, 0, 1, 0);
+        assertContains(result.getErrors().get(0), "must not be specified when 'id' attribute is used");
+    }
+
+    @Test
+    void testDependencyIdConflictType() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-conflict-type.xml");
+        assertViolations(result, 0, 1, 0);
+        assertContains(result.getErrors().get(0), "must not be specified when 'id' attribute includes type");
+    }
+
+    @Test
+    void testExclusionIdValid() throws Exception {
+        SimpleProblemCollector result = validateFile("exclusion-id-valid.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void testExclusionIdBadFormat() throws Exception {
+        SimpleProblemCollector result = validateFile("exclusion-id-bad-format.xml");
+        assertViolations(result, 0, 1, 0);
+    }
 }

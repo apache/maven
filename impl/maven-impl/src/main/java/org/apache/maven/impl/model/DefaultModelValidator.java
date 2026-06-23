@@ -1143,6 +1143,11 @@ public class DefaultModelValidator implements ModelValidator {
         for (Dependency dependency : dependencies) {
             String key = dependency.getManagementKey();
 
+            validateDependencyIdAttribute(problems, dependency, prefix + prefix2);
+            for (Exclusion exclusion : dependency.getExclusions()) {
+                validateExclusionIdAttribute(problems, exclusion, prefix + prefix2);
+            }
+
             if ("import".equals(dependency.getScope())) {
                 if (!"pom".equals(dependency.getType())) {
                     addViolation(
@@ -1255,6 +1260,116 @@ public class DefaultModelValidator implements ModelValidator {
             } else {
                 index.put(key, dependency);
             }
+        }
+    }
+
+    private void validateDependencyIdAttribute(ModelProblemCollector problems, Dependency dependency, String prefix) {
+        String id = dependency.getId();
+        if (id == null || id.isEmpty()) {
+            return;
+        }
+        int colonCount = id.length() - id.replace(":", "").length();
+        if (colonCount < 2 || colonCount > 4) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "id",
+                    null,
+                    "has invalid format '" + id + "', must be 'groupId:artifactId:version', "
+                            + "'groupId:artifactId:type:version', or "
+                            + "'groupId:artifactId:type:classifier:version'.",
+                    dependency);
+            return;
+        }
+        if (!isNullOrEmpty(dependency.getGroupId())) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "groupId",
+                    null,
+                    "must not be specified when 'id' attribute is used.",
+                    dependency);
+        }
+        if (!isNullOrEmpty(dependency.getArtifactId())) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "artifactId",
+                    null,
+                    "must not be specified when 'id' attribute is used.",
+                    dependency);
+        }
+        if (!isNullOrEmpty(dependency.getVersion())) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "version",
+                    null,
+                    "must not be specified when 'id' attribute is used.",
+                    dependency);
+        }
+        if (colonCount >= 3 && !isNullOrEmpty(dependency.getType()) && !"jar".equals(dependency.getType())) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "type",
+                    null,
+                    "must not be specified when 'id' attribute includes type.",
+                    dependency);
+        }
+        if (colonCount >= 4 && !isNullOrEmpty(dependency.getClassifier())) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "classifier",
+                    null,
+                    "must not be specified when 'id' attribute includes classifier.",
+                    dependency);
+        }
+    }
+
+    private void validateExclusionIdAttribute(ModelProblemCollector problems, Exclusion exclusion, String prefix) {
+        String id = exclusion.getId();
+        if (id == null || id.isEmpty()) {
+            return;
+        }
+        int colonCount = id.length() - id.replace(":", "").length();
+        if (colonCount != 1) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "exclusions.exclusion.id",
+                    null,
+                    "has invalid format '" + id + "', must be 'groupId:artifactId'.",
+                    exclusion);
+            return;
+        }
+        if (!isNullOrEmpty(exclusion.getGroupId())) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "exclusions.exclusion.groupId",
+                    null,
+                    "must not be specified when 'id' attribute is used.",
+                    exclusion);
+        }
+        if (!isNullOrEmpty(exclusion.getArtifactId())) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "exclusions.exclusion.artifactId",
+                    null,
+                    "must not be specified when 'id' attribute is used.",
+                    exclusion);
         }
     }
 
@@ -1513,6 +1628,7 @@ public class DefaultModelValidator implements ModelValidator {
 
         if (validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_2_0) {
             for (Exclusion exclusion : dependency.getExclusions()) {
+                validateExclusionIdAttribute(problems, exclusion, prefix);
                 if (validationLevel < ModelValidator.VALIDATION_LEVEL_MAVEN_3_0) {
                     validateCoordinatesId(
                             prefix,
@@ -2508,5 +2624,9 @@ public class DefaultModelValidator implements ModelValidator {
         static SourceHint resourceDirectory(Resource resource) {
             return resource::getDirectory;
         }
+    }
+
+    private static boolean isNullOrEmpty(String s) {
+        return s == null || s.isEmpty();
     }
 }

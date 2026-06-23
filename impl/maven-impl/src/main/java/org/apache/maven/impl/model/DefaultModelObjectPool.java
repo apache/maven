@@ -237,7 +237,8 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
          */
         private static boolean dependenciesEqual(
                 org.apache.maven.api.model.Dependency dep1, org.apache.maven.api.model.Dependency dep2) {
-            return Objects.equals(dep1.getGroupId(), dep2.getGroupId())
+            return Objects.equals(dep1.getId(), dep2.getId())
+                    && Objects.equals(dep1.getGroupId(), dep2.getGroupId())
                     && Objects.equals(dep1.getArtifactId(), dep2.getArtifactId())
                     && Objects.equals(dep1.getVersion(), dep2.getVersion())
                     && Objects.equals(dep1.getType(), dep2.getType())
@@ -286,6 +287,7 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
          */
         private static int dependencyHashCode(org.apache.maven.api.model.Dependency dep) {
             return Objects.hash(
+                    dep.getId(),
                     dep.getGroupId(),
                     dep.getArtifactId(),
                     dep.getVersion(),
