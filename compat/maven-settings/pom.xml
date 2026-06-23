@@ -68,6 +68,9 @@ under the License.
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
         <configuration>
+          <pluralExceptions>
+            <aliases>alias</aliases>
+          </pluralExceptions>
           <version>2.0.0</version>
           <basedir>${project.basedir}/../../api/maven-api-settings</basedir>
           <velocityBasedir>${project.basedir}/../../src/mdo</velocityBasedir>

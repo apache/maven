@@ -224,7 +224,7 @@ class DefaultSettingsValidatorTest {
         Settings settings = new Settings();
         Server server = new Server();
         server.setId("server-1");
-        server.addAliase("server-1");
+        server.addAlias("server-1");
         settings.addServer(server);
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
@@ -241,12 +241,12 @@ class DefaultSettingsValidatorTest {
 
         Server server1 = new Server();
         server1.setId("server-1");
-        server1.addAliase("alias-1");
+        server1.addAlias("alias-1");
         settings.addServer(server1);
 
         Server server2 = new Server();
         server2.setId("server-2");
-        server2.addAliase("alias-1");
+        server2.addAlias("alias-1");
         settings.addServer(server2);
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
@@ -262,7 +262,7 @@ class DefaultSettingsValidatorTest {
         Settings settings = new Settings();
         Server server = new Server();
         server.setId("server-1");
-        server.addAliase("");
+        server.addAlias("");
         settings.addServer(server);
 
         SimpleProblemCollector problems = new SimpleProblemCollector();

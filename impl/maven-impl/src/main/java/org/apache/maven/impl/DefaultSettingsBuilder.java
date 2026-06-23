@@ -207,9 +207,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
         if (!isProjectSettings) {
             settings = settings.withServers(serversByIds(settings.getServers()));
-        }
-
-        if (isProjectSettings) {
+        } else {
             settings = Settings.newBuilder(settings, true)
                     .localRepository(null)
                     .interactiveMode(false)
