@@ -32,8 +32,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("SourceStrategy")
@@ -110,16 +108,10 @@ class SourceStrategyTest {
             UpgradeContext context = TestUtils.createMockContext(TestUtils.createOptionsWithModelVersion("4.1.0"));
             strategy.doApply(context, new HashMap<>(Map.of(Paths.get("pom.xml"), doc)));
 
-            Element source = doc.root()
-                    .childElement("build")
-                    .orElseThrow()
-                    .childElement("sources")
-                    .orElseThrow()
-                    .childElement("source")
-                    .orElseThrow();
+            Element source = doc.root().path("build", "sources", "source").orElseThrow();
 
             assertEquals("17", source.childTextTrimmed("targetVersion"));
-            assertNull(DomUtils.findChildElement(doc.root(), "properties"));
+            assertFalse(doc.root().childElement("properties").isPresent());
         }
 
         @Test
@@ -143,16 +135,10 @@ class SourceStrategyTest {
             UpgradeContext context = TestUtils.createMockContext(TestUtils.createOptionsWithModelVersion("4.1.0"));
             strategy.doApply(context, new HashMap<>(Map.of(Paths.get("pom.xml"), doc)));
 
-            Element source = doc.root()
-                    .childElement("build")
-                    .orElseThrow()
-                    .childElement("sources")
-                    .orElseThrow()
-                    .childElement("source")
-                    .orElseThrow();
+            Element source = doc.root().path("build", "sources", "source").orElseThrow();
 
             assertEquals("11", source.childTextTrimmed("targetVersion"));
-            assertNull(DomUtils.findChildElement(doc.root(), "properties"));
+            assertFalse(doc.root().childElement("properties").isPresent());
         }
 
         @Test
@@ -177,7 +163,7 @@ class SourceStrategyTest {
             UpgradeResult result = strategy.doApply(context, new HashMap<>(Map.of(Paths.get("pom.xml"), doc)));
 
             assertFalse(doc.root().childElement("build").isPresent());
-            assertNotNull(DomUtils.findChildElement(doc.root(), "properties"));
+            assertTrue(doc.root().childElement("properties").isPresent());
             assertEquals(0, result.modifiedCount());
         }
 
@@ -203,16 +189,10 @@ class SourceStrategyTest {
             UpgradeContext context = TestUtils.createMockContext(TestUtils.createOptionsWithModelVersion("4.1.0"));
             strategy.doApply(context, new HashMap<>(Map.of(Paths.get("pom.xml"), doc)));
 
-            Element source = doc.root()
-                    .childElement("build")
-                    .orElseThrow()
-                    .childElement("sources")
-                    .orElseThrow()
-                    .childElement("source")
-                    .orElseThrow();
+            Element source = doc.root().path("build", "sources", "source").orElseThrow();
 
             assertEquals("21", source.childTextTrimmed("targetVersion"));
-            assertNull(DomUtils.findChildElement(doc.root(), "properties"));
+            assertFalse(doc.root().childElement("properties").isPresent());
         }
 
         @Test
@@ -236,10 +216,9 @@ class SourceStrategyTest {
             UpgradeContext context = TestUtils.createMockContext(TestUtils.createOptionsWithModelVersion("4.1.0"));
             strategy.doApply(context, new HashMap<>(Map.of(Paths.get("pom.xml"), doc)));
 
-            Element properties = DomUtils.findChildElement(doc.root(), "properties");
-            assertNotNull(properties);
+            Element properties = doc.root().childElement("properties").orElseThrow();
             assertEquals("UTF-8", properties.childTextTrimmed("project.build.sourceEncoding"));
-            assertNull(DomUtils.findChildElement(properties, "maven.compiler.release"));
+            assertFalse(properties.childElement("maven.compiler.release").isPresent());
         }
     }
 
@@ -274,22 +253,12 @@ class SourceStrategyTest {
             UpgradeContext context = TestUtils.createMockContext(TestUtils.createOptionsWithModelVersion("4.1.0"));
             strategy.doApply(context, new HashMap<>(Map.of(Paths.get("pom.xml"), doc)));
 
-            Element source = doc.root()
-                    .childElement("build")
-                    .orElseThrow()
-                    .childElement("sources")
-                    .orElseThrow()
-                    .childElement("source")
-                    .orElseThrow();
+            Element source = doc.root().path("build", "sources", "source").orElseThrow();
 
             assertEquals("17", source.childTextTrimmed("targetVersion"));
 
             // Plugin should be removed since it has no remaining config
-            assertFalse(doc.root()
-                    .childElement("build")
-                    .orElseThrow()
-                    .childElement("plugins")
-                    .isPresent());
+            assertFalse(doc.root().path("build", "plugins").isPresent());
         }
 
         @Test
@@ -320,13 +289,7 @@ class SourceStrategyTest {
             UpgradeContext context = TestUtils.createMockContext(TestUtils.createOptionsWithModelVersion("4.1.0"));
             strategy.doApply(context, new HashMap<>(Map.of(Paths.get("pom.xml"), doc)));
 
-            Element source = doc.root()
-                    .childElement("build")
-                    .orElseThrow()
-                    .childElement("sources")
-                    .orElseThrow()
-                    .childElement("source")
-                    .orElseThrow();
+            Element source = doc.root().path("build", "sources", "source").orElseThrow();
 
             assertEquals("11", source.childTextTrimmed("targetVersion"));
         }
@@ -363,16 +326,7 @@ class SourceStrategyTest {
             UpgradeContext context = TestUtils.createMockContext(TestUtils.createOptionsWithModelVersion("4.1.0"));
             strategy.doApply(context, new HashMap<>(Map.of(Paths.get("pom.xml"), doc)));
 
-            // Plugin should still exist (has executions)
-            Element plugin = doc.root()
-                    .childElement("build")
-                    .orElseThrow()
-                    .childElement("plugins")
-                    .orElseThrow()
-                    .childElement("plugin")
-                    .orElseThrow();
-
-            assertNotNull(plugin);
+            Element plugin = doc.root().path("build", "plugins", "plugin").orElseThrow();
             assertFalse(plugin.childElement("configuration").isPresent());
             assertTrue(plugin.childElement("executions").isPresent());
         }
@@ -407,11 +361,8 @@ class SourceStrategyTest {
             UpgradeContext context = TestUtils.createMockContext(TestUtils.createOptionsWithModelVersion("4.1.0"));
             strategy.doApply(context, new HashMap<>(Map.of(Paths.get("pom.xml"), doc)));
 
-            // Should have exactly one <source> element with targetVersion from properties
             var sources = doc.root()
-                    .childElement("build")
-                    .orElseThrow()
-                    .childElement("sources")
+                    .path("build", "sources")
                     .orElseThrow()
                     .childElements("source")
                     .toList();
@@ -445,17 +396,10 @@ class SourceStrategyTest {
             UpgradeContext context = TestUtils.createMockContext(TestUtils.createOptionsWithModelVersion("4.1.0"));
             strategy.doApply(context, new HashMap<>(Map.of(Paths.get("pom.xml"), doc)));
 
-            Element source = doc.root()
-                    .childElement("build")
-                    .orElseThrow()
-                    .childElement("sources")
-                    .orElseThrow()
-                    .childElement("source")
-                    .orElseThrow();
+            Element source = doc.root().path("build", "sources", "source").orElseThrow();
 
             assertEquals("src/main/java-custom", source.childTextTrimmed("directory"));
-            assertNull(
-                    DomUtils.findChildElement(doc.root().childElement("build").orElseThrow(), "sourceDirectory"));
+            assertFalse(doc.root().path("build", "sourceDirectory").isPresent());
         }
 
         @Test
@@ -478,13 +422,7 @@ class SourceStrategyTest {
             UpgradeContext context = TestUtils.createMockContext(TestUtils.createOptionsWithModelVersion("4.1.0"));
             strategy.doApply(context, new HashMap<>(Map.of(Paths.get("pom.xml"), doc)));
 
-            Element source = doc.root()
-                    .childElement("build")
-                    .orElseThrow()
-                    .childElement("sources")
-                    .orElseThrow()
-                    .childElement("source")
-                    .orElseThrow();
+            Element source = doc.root().path("build", "sources", "source").orElseThrow();
 
             assertEquals("test", source.childTextTrimmed("scope"));
             assertEquals("src/test/java-custom", source.childTextTrimmed("directory"));
@@ -510,13 +448,8 @@ class SourceStrategyTest {
             UpgradeContext context = TestUtils.createMockContext(TestUtils.createOptionsWithModelVersion("4.1.0"));
             UpgradeResult result = strategy.doApply(context, new HashMap<>(Map.of(Paths.get("pom.xml"), doc)));
 
-            assertNull(
-                    DomUtils.findChildElement(doc.root().childElement("build").orElseThrow(), "sourceDirectory"));
-            assertFalse(doc.root()
-                    .childElement("build")
-                    .orElseThrow()
-                    .childElement("sources")
-                    .isPresent());
+            assertFalse(doc.root().path("build", "sourceDirectory").isPresent());
+            assertFalse(doc.root().path("build", "sources").isPresent());
             assertEquals(1, result.modifiedCount());
         }
     }
@@ -550,18 +483,11 @@ class SourceStrategyTest {
             UpgradeContext context = TestUtils.createMockContext(TestUtils.createOptionsWithModelVersion("4.1.0"));
             strategy.doApply(context, new HashMap<>(Map.of(Paths.get("pom.xml"), doc)));
 
-            Element source = doc.root()
-                    .childElement("build")
-                    .orElseThrow()
-                    .childElement("sources")
-                    .orElseThrow()
-                    .childElement("source")
-                    .orElseThrow();
+            Element source = doc.root().path("build", "sources", "source").orElseThrow();
 
             assertEquals("resources", source.childTextTrimmed("lang"));
             assertEquals("true", source.childTextTrimmed("stringFiltering"));
-            assertNull(
-                    DomUtils.findChildElement(doc.root().childElement("build").orElseThrow(), "resources"));
+            assertFalse(doc.root().path("build", "resources").isPresent());
         }
 
         @Test
@@ -594,21 +520,11 @@ class SourceStrategyTest {
             UpgradeContext context = TestUtils.createMockContext(TestUtils.createOptionsWithModelVersion("4.1.0"));
             strategy.doApply(context, new HashMap<>(Map.of(Paths.get("pom.xml"), doc)));
 
-            Element source = doc.root()
-                    .childElement("build")
-                    .orElseThrow()
-                    .childElement("sources")
-                    .orElseThrow()
-                    .childElement("source")
-                    .orElseThrow();
+            Element source = doc.root().path("build", "sources", "source").orElseThrow();
 
             assertEquals("resources", source.childTextTrimmed("lang"));
-
-            Element includes = source.childElement("includes").orElseThrow();
-            assertEquals("**/*.xml", includes.childTextTrimmed("include"));
-
-            Element excludes = source.childElement("excludes").orElseThrow();
-            assertEquals("**/*.bak", excludes.childTextTrimmed("exclude"));
+            assertEquals("**/*.xml", source.path("includes").orElseThrow().childTextTrimmed("include"));
+            assertEquals("**/*.bak", source.path("excludes").orElseThrow().childTextTrimmed("exclude"));
         }
 
         @Test
@@ -636,13 +552,7 @@ class SourceStrategyTest {
             UpgradeContext context = TestUtils.createMockContext(TestUtils.createOptionsWithModelVersion("4.1.0"));
             strategy.doApply(context, new HashMap<>(Map.of(Paths.get("pom.xml"), doc)));
 
-            Element source = doc.root()
-                    .childElement("build")
-                    .orElseThrow()
-                    .childElement("sources")
-                    .orElseThrow()
-                    .childElement("source")
-                    .orElseThrow();
+            Element source = doc.root().path("build", "sources", "source").orElseThrow();
 
             assertEquals("resources", source.childTextTrimmed("lang"));
             assertEquals("META-INF", source.childTextTrimmed("targetPath"));
@@ -673,13 +583,7 @@ class SourceStrategyTest {
             UpgradeContext context = TestUtils.createMockContext(TestUtils.createOptionsWithModelVersion("4.1.0"));
             strategy.doApply(context, new HashMap<>(Map.of(Paths.get("pom.xml"), doc)));
 
-            Element source = doc.root()
-                    .childElement("build")
-                    .orElseThrow()
-                    .childElement("sources")
-                    .orElseThrow()
-                    .childElement("source")
-                    .orElseThrow();
+            Element source = doc.root().path("build", "sources", "source").orElseThrow();
 
             assertEquals("test", source.childTextTrimmed("scope"));
             assertEquals("resources", source.childTextTrimmed("lang"));
@@ -710,13 +614,8 @@ class SourceStrategyTest {
             UpgradeContext context = TestUtils.createMockContext(TestUtils.createOptionsWithModelVersion("4.1.0"));
             UpgradeResult result = strategy.doApply(context, new HashMap<>(Map.of(Paths.get("pom.xml"), doc)));
 
-            assertNull(
-                    DomUtils.findChildElement(doc.root().childElement("build").orElseThrow(), "resources"));
-            assertFalse(doc.root()
-                    .childElement("build")
-                    .orElseThrow()
-                    .childElement("sources")
-                    .isPresent());
+            assertFalse(doc.root().path("build", "resources").isPresent());
+            assertFalse(doc.root().path("build", "sources").isPresent());
             assertEquals(1, result.modifiedCount());
         }
     }
@@ -745,7 +644,7 @@ class SourceStrategyTest {
             UpgradeContext context = TestUtils.createMockContext(TestUtils.createOptionsWithModelVersion("4.1.0"));
             UpgradeResult result = strategy.doApply(context, new HashMap<>(Map.of(Paths.get("pom.xml"), doc)));
 
-            assertNotNull(DomUtils.findChildElement(doc.root(), "properties"));
+            assertTrue(doc.root().childElement("properties").isPresent());
             assertEquals(0, result.modifiedCount());
         }
 
@@ -801,9 +700,7 @@ class SourceStrategyTest {
             strategy.doApply(context, new HashMap<>(Map.of(Paths.get("pom.xml"), doc)));
 
             var sources = doc.root()
-                    .childElement("build")
-                    .orElseThrow()
-                    .childElement("sources")
+                    .path("build", "sources")
                     .orElseThrow()
                     .childElements("source")
                     .toList();
@@ -842,9 +739,7 @@ class SourceStrategyTest {
             strategy.doApply(context, new HashMap<>(Map.of(Paths.get("pom.xml"), doc)));
 
             var sources = doc.root()
-                    .childElement("build")
-                    .orElseThrow()
-                    .childElement("sources")
+                    .path("build", "sources")
                     .orElseThrow()
                     .childElements("source")
                     .toList();
