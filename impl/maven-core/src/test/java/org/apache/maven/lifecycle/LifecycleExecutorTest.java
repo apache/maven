@@ -316,6 +316,24 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
+    void testCleanLifecycleBindingRunsBeforePomExecution() throws Exception {
+        File pom = getProject("project-with-clean-phase-execution");
+        MavenSession session = createMavenSession(pom);
+        assertEquals(
+                "project-with-clean-phase-execution",
+                session.getCurrentProject().getArtifactId());
+        List<MojoExecution> executionPlan = getExecutions(calculateExecutionPlan(session, "clean"));
+        assertEquals(2, executionPlan.size());
+        assertListEquals(
+                List.of("clean:clean", "it:it"),
+                executionPlan.stream()
+                        .map(e -> e.getMojoDescriptor().getFullGoalName())
+                        .toList());
+        assertEquals("default-clean", executionPlan.get(0).getExecutionId());
+        assertEquals("user-clean-execution", executionPlan.get(1).getExecutionId());
+    }
+
+    @Test
     void testInvalidGoalName() throws Exception {
         File pom = getProject("project-basic");
         MavenSession session = createMavenSession(pom);
