@@ -47,63 +47,7 @@ class ExecutableFinderTest {
      * by {@link ExecutableFinder#getPathValue}.
      */
     private static ProfileActivationContext contextWithPath(String pathValue) {
-        Map<String, String> props = pathValue != null ? Map.of("env.PATH", pathValue) : Map.of();
-        return new ProfileActivationContext() {
-            @Override
-            public boolean isProfileActive(String profileId) {
-                return false;
-            }
-
-            @Override
-            public boolean isProfileInactive(String profileId) {
-                return false;
-            }
-
-            @Override
-            public String getSystemProperty(String key) {
-                return props.get(key);
-            }
-
-            @Override
-            public String getUserProperty(String key) {
-                return null;
-            }
-
-            @Override
-            public String getModelProperty(String key) {
-                return null;
-            }
-
-            @Override
-            public String getModelArtifactId() {
-                return null;
-            }
-
-            @Override
-            public String getModelPackaging() {
-                return null;
-            }
-
-            @Override
-            public String getModelRootDirectory() {
-                return null;
-            }
-
-            @Override
-            public String getModelBaseDirectory() {
-                return null;
-            }
-
-            @Override
-            public String interpolatePath(String path) {
-                return path;
-            }
-
-            @Override
-            public boolean exists(String path, boolean glob) {
-                return false;
-            }
-        };
+        return contextWithPathAndOs(pathValue, null);
     }
 
     /**
