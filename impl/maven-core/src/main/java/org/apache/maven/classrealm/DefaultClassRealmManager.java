@@ -22,10 +22,16 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -207,6 +213,8 @@ public class DefaultClassRealmManager implements ClassRealmManager {
 
         populateRealm(classRealm, constituents);
 
+        applyModuleAccessDescriptors(classRealm);
+
         return classRealm;
     }
 
@@ -364,5 +372,60 @@ public class DefaultClassRealmManager implements ClassRealmManager {
             return classRealm.getId();
         }
         return classLoader;
+    }
+
+    private static final String MODULE_ACCESS_DESCRIPTOR = "META-INF/maven/module-access";
+
+    private void applyModuleAccessDescriptors(ClassRealm classRealm) {
+        var implRealm = (org.codehaus.plexus.classworlds.realm.ClassRealm) classRealm;
+        try {
+            Enumeration<URL> resources = implRealm.getResources(MODULE_ACCESS_DESCRIPTOR);
+            while (resources.hasMoreElements()) {
+                URL resource = resources.nextElement();
+                try (BufferedReader reader =
+                        new BufferedReader(new InputStreamReader(resource.openStream(), StandardCharsets.UTF_8))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        line = line.trim();
+                        if (line.isEmpty() || line.startsWith("#")) {
+                            continue;
+                        }
+                        applyModuleAccessDirective(implRealm, line);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            logger.debug("Failed to read module-access descriptors for realm {}", classRealm.getId(), e);
+        }
+    }
+
+    private void applyModuleAccessDirective(org.codehaus.plexus.classworlds.realm.ClassRealm realm, String line) {
+        if (line.startsWith("add-exports ")) {
+            String spec = line.substring("add-exports ".length()).trim();
+            int slash = spec.indexOf('/');
+            if (slash > 0) {
+                String module = spec.substring(0, slash);
+                String pkg = spec.substring(slash + 1);
+                int eq = pkg.indexOf('=');
+                if (eq > 0) {
+                    pkg = pkg.substring(0, eq);
+                }
+                realm.addExports(module, pkg);
+            }
+        } else if (line.startsWith("add-opens ")) {
+            String spec = line.substring("add-opens ".length()).trim();
+            int slash = spec.indexOf('/');
+            if (slash > 0) {
+                String module = spec.substring(0, slash);
+                String pkg = spec.substring(slash + 1);
+                int eq = pkg.indexOf('=');
+                if (eq > 0) {
+                    pkg = pkg.substring(0, eq);
+                }
+                realm.addOpens(module, pkg);
+            }
+        } else {
+            logger.debug("Unknown module-access directive: {}", line);
+        }
     }
 }
