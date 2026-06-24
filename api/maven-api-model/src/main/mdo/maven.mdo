@@ -1210,10 +1210,9 @@
           <version>4.2.0+</version>
           <description>
             <![CDATA[
-            Combined coordinates in compact form. The format uses the standard Maven coordinate
-            order {@code groupId:artifactId:type:classifier:version}, with segments omitted
-            from right to left:
-            {@code groupId:artifactId},
+            Combined coordinates in compact form:
+            {@code groupId:artifactId[[:type[:classifier]]:version][@scope][?]}.
+            Examples:
             {@code groupId:artifactId:version},
             {@code groupId:artifactId:type:version}, or
             {@code groupId:artifactId:type:classifier:version}.
