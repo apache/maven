@@ -226,25 +226,34 @@ fi
 if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
   echo "[DEBUG] Final MAVEN_OPTS: $MAVEN_OPTS" >&2
 fi
-LAUNCHER_JAR="$MAVEN_HOME/boot/*"
+LAUNCHER_JAR=""
+for _jar in "$MAVEN_HOME"/boot/*.jar; do
+  [ -f "$_jar" ] && LAUNCHER_JAR="${LAUNCHER_JAR:+$LAUNCHER_JAR:}$_jar"
+done
 LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
 MODULES_DIR="$MAVEN_HOME/lib/modules"
 
 # Module-path and native access flags require a JDK that can read the module jars.
 # The probe includes --module-path so it fails on JDKs that cannot read the module descriptors.
-MAVEN_MODULE_OPTS=""
+USE_MODULE_PATH=false
 if "$JAVACMD" --module-path "$MODULES_DIR" --add-modules ALL-MODULE-PATH --enable-native-access=org.jline.terminal.ffm -version >/dev/null 2>&1; then
-  MAVEN_MODULE_OPTS="--module-path \"$MODULES_DIR\" --add-modules ALL-MODULE-PATH --enable-native-access=org.jline.terminal.ffm,org.jline.nativ"
+  USE_MODULE_PATH=true
 fi
 
 # For Cygwin and MinGW, switch paths to Windows format before running java(1) command
 if $cygwin || $mingw ; then
   [ -n "$JAVA_HOME" ] &&
     JAVA_HOME=`cygpath --windows "$JAVA_HOME"`
-  LAUNCHER_JAR=`cygpath --windows "$LAUNCHER_JAR"`
+  LAUNCHER_JAR=`cygpath --windows --path "$LAUNCHER_JAR"`
   CLASSWORLDS_CONF=`cygpath --windows "$CLASSWORLDS_CONF"`
   MAVEN_HOME=`cygpath --windows "$MAVEN_HOME"`
   MAVEN_PROJECTBASEDIR=`cygpath --windows "$MAVEN_PROJECTBASEDIR"`
+  MODULES_DIR=`cygpath --windows "$MODULES_DIR"`
+fi
+
+MAVEN_MODULE_OPTS=""
+if $USE_MODULE_PATH; then
+  MAVEN_MODULE_OPTS="--module-path \"$MODULES_DIR\" --add-modules ALL-MODULE-PATH --enable-native-access=org.jline.terminal.ffm,org.jline.nativ"
 fi
 
 handle_args() {
