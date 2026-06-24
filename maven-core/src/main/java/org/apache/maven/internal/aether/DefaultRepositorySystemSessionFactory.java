@@ -518,9 +518,13 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
     private Map<?, ?> getPropertiesFromRequestedProfiles(MavenExecutionRequest request) {
 
         List<String> activeProfileId = request.getActiveProfiles();
+        List<String> inactiveProfileId = request.getInactiveProfiles();
 
         return request.getProfiles().stream()
-                .filter(profile -> activeProfileId.contains(profile.getId()))
+                .filter(profile -> activeProfileId.contains(profile.getId())
+                        || (!inactiveProfileId.contains(profile.getId())
+                                && profile.getActivation() != null
+                                && profile.getActivation().isActiveByDefault()))
                 .map(ModelBase::getProperties)
                 .flatMap(properties -> properties.entrySet().stream())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (k1, k2) -> k2));
