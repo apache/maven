@@ -1210,14 +1210,14 @@
           <version>4.2.0+</version>
           <description>
             <![CDATA[
-            Combined coordinates in compact form:
-            {@code groupId:artifactId[:version[:type[:classifier]]]}[@scope][?]}.
-            Any segment may be left empty to be inferred (e.g., from {@code dependencyManagement}).
-            Examples:
-            {@code groupId:artifactId} (version managed),
+            Combined coordinates in compact form. The format uses the standard Maven coordinate
+            order {@code groupId:artifactId:type:classifier:version}, with segments omitted
+            from right to left:
+            {@code groupId:artifactId},
             {@code groupId:artifactId:version},
-            {@code groupId:artifactId:type:version},
-            {@code groupId:artifactId:type:classifier:version},
+            {@code groupId:artifactId:type:version}, or
+            {@code groupId:artifactId:type:classifier:version}.
+            Any segment may be left empty to be inferred (e.g., from {@code dependencyManagement}):
             {@code :artifactId} (groupId inferred, version managed),
             {@code :artifactId:version} (groupId inferred),
             {@code groupId:artifactId:type:} (version managed, with type), or
