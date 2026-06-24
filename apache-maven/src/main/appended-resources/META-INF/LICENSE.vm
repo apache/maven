@@ -273,6 +273,10 @@ subject to the terms and conditions of the following licenses:
 #*    *##if ( $project.artifact.artifactId == "maven-classworlds" )
 #*      *##set ( $directory = 'boot' ) ##
 #*    *##end ##
+#*    *### JLine modules are in lib/modules directory
+#*    *##if ( $groupId == "org.jline" )
+#*      *##set ( $directory = 'lib/modules' ) ##
+#*    *##end ##
 #*    *###
 #*    *### copy license file to lib/$artifactId.license
 #*    *##set ( $licFile = $directory + '/' + $project.artifact.artifactId + '.license' ) ##
