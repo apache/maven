@@ -40,7 +40,6 @@ under the License.
       <outputDirectory>lib</outputDirectory>
       <excludes>
         <exclude>org.apache.maven:maven-classworlds</exclude>
-        <exclude>org.jline:*</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>
