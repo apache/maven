@@ -1190,11 +1190,11 @@ public class DefaultModelValidator implements ModelValidator {
         Map<String, Dependency> index = new HashMap<>();
 
         for (Dependency dependency : dependencies) {
-            // When 'id' attribute is set, use it for the key since groupId/artifactId
-            // have not yet been expanded (normalization runs after validation)
+            // When 'id' attribute is set, extract the GAV portion (stripping @scope and ?)
+            // for deduplication, since normalization has not yet run
             String key;
             if (dependency.getId() != null && !dependency.getId().isEmpty()) {
-                key = dependency.getId();
+                key = stripScopeAndOptional(dependency.getId());
             } else {
                 key = dependency.getManagementKey();
             }
@@ -1324,15 +1324,31 @@ public class DefaultModelValidator implements ModelValidator {
 
     /**
      * Validates the {@code id} attribute on a dependency element.
-     * The id must have the format {@code groupId:artifactId:version} and must not
-     * be specified alongside individual groupId, artifactId, or version child elements.
+     * The id must have the format {@code groupId:artifactId:version[@scope][?]} and must not
+     * be specified alongside individual groupId, artifactId, version, scope, or optional child elements
+     * when those values are encoded in the id.
      */
     private void validateDependencyIdAttribute(ModelProblemCollector problems, Dependency dependency, String prefix) {
         String id = dependency.getId();
         if (id == null || id.isEmpty()) {
             return;
         }
-        String[] parts = id.split(":");
+
+        String remaining = id;
+        boolean hasOptionalMarker = false;
+        if (remaining.endsWith("?")) {
+            hasOptionalMarker = true;
+            remaining = remaining.substring(0, remaining.length() - 1);
+        }
+
+        boolean hasScopeMarker = false;
+        int atIndex = remaining.lastIndexOf('@');
+        if (atIndex >= 0) {
+            hasScopeMarker = true;
+            remaining = remaining.substring(0, atIndex);
+        }
+
+        String[] parts = remaining.split(":");
         if (parts.length != 3) {
             addViolation(
                     problems,
@@ -1340,7 +1356,7 @@ public class DefaultModelValidator implements ModelValidator {
                     Version.V42,
                     prefix + "id",
                     null,
-                    "must have the format 'groupId:artifactId:version' but is '" + id + "'.",
+                    "must have the format 'groupId:artifactId:version[@scope][?]' but is '" + id + "'.",
                     dependency);
         }
         if (dependency.getGroupId() != null && !dependency.getGroupId().isEmpty()) {
@@ -1373,6 +1389,46 @@ public class DefaultModelValidator implements ModelValidator {
                     "must not be specified when the 'id' attribute is used.",
                     dependency);
         }
+        if (hasScopeMarker
+                && dependency.getScope() != null
+                && !dependency.getScope().isEmpty()) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "scope",
+                    null,
+                    "must not be specified when the 'id' attribute contains '@scope'.",
+                    dependency);
+        }
+        if (hasOptionalMarker
+                && dependency.getOptional() != null
+                && !dependency.getOptional().isEmpty()) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "optional",
+                    null,
+                    "must not be specified when the 'id' attribute contains '?'.",
+                    dependency);
+        }
+    }
+
+    /**
+     * Strips the optional {@code @scope} and {@code ?} suffixes from a dependency id string,
+     * returning just the {@code groupId:artifactId:version} portion.
+     */
+    private static String stripScopeAndOptional(String id) {
+        String remaining = id;
+        if (remaining.endsWith("?")) {
+            remaining = remaining.substring(0, remaining.length() - 1);
+        }
+        int atIndex = remaining.lastIndexOf('@');
+        if (atIndex >= 0) {
+            remaining = remaining.substring(0, atIndex);
+        }
+        return remaining;
     }
 
     /**

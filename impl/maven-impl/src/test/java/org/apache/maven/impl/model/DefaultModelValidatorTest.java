@@ -1126,4 +1126,40 @@ class DefaultModelValidatorTest {
                 result.getErrors().stream().anyMatch(e -> e.contains("must not be specified when the 'id' attribute")),
                 "Expected error about format. Errors: " + result.getErrors());
     }
+
+    @Test
+    void testValidDependencyIdWithScope() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-with-scope-valid.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void testValidDependencyIdWithOptional() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-with-optional-valid.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void testValidDependencyIdWithScopeAndOptional() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-with-scope-optional-valid.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void testDependencyIdScopeConflict() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-scope-conflict.xml");
+        assertTrue(
+                result.getErrors().stream()
+                        .anyMatch(e -> e.contains("must not be specified when the 'id' attribute contains '@scope'")),
+                "Expected scope conflict error. Errors: " + result.getErrors());
+    }
+
+    @Test
+    void testDependencyIdOptionalConflict() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-optional-conflict.xml");
+        assertTrue(
+                result.getErrors().stream()
+                        .anyMatch(e -> e.contains("must not be specified when the 'id' attribute contains '?'")),
+                "Expected optional conflict error. Errors: " + result.getErrors());
+    }
 }

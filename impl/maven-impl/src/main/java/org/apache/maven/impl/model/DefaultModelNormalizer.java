@@ -203,7 +203,7 @@ public class DefaultModelNormalizer implements ModelNormalizer {
 
     /**
      * Expands the {@code id} attribute on a dependency into its component fields.
-     * The id format is {@code groupId:artifactId:version}.
+     * The id format is {@code groupId:artifactId:version[@scope][?]}.
      */
     Dependency expandDependencyId(Dependency d) {
         String id = d.getId();
@@ -212,7 +212,22 @@ public class DefaultModelNormalizer implements ModelNormalizer {
             List<Exclusion> expanded = injectList(d.getExclusions(), this::expandExclusionId);
             return expanded != null ? d.withExclusions(expanded) : d;
         }
-        String[] parts = id.split(":");
+
+        String remaining = id;
+        boolean optional = false;
+        if (remaining.endsWith("?")) {
+            optional = true;
+            remaining = remaining.substring(0, remaining.length() - 1);
+        }
+
+        String scope = null;
+        int atIndex = remaining.lastIndexOf('@');
+        if (atIndex >= 0) {
+            scope = remaining.substring(atIndex + 1);
+            remaining = remaining.substring(0, atIndex);
+        }
+
+        String[] parts = remaining.split(":");
         if (parts.length != 3) {
             // Invalid format — will be caught by the validator
             return d;
@@ -226,6 +241,12 @@ public class DefaultModelNormalizer implements ModelNormalizer {
         }
         if (isNullOrEmpty(d.getVersion())) {
             builder.version(parts[2]);
+        }
+        if (scope != null && isNullOrEmpty(d.getScope())) {
+            builder.scope(scope);
+        }
+        if (optional && isNullOrEmpty(d.getOptional())) {
+            builder.optional("true");
         }
         List<Exclusion> expanded = injectList(d.getExclusions(), this::expandExclusionId);
         if (expanded != null) {

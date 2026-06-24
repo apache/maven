@@ -1210,10 +1210,14 @@
           <version>4.2.0+</version>
           <description>
             <![CDATA[
-            Combined coordinates as {@code groupId:artifactId:version}.
+            Combined coordinates in compact form: {@code groupId:artifactId:version[@scope][?]}.
             When specified, it is split into the {@code groupId}, {@code artifactId},
             and {@code version} fields during model normalization.
-            The individual child elements should not be specified when using this attribute.
+            An optional {@code @scope} suffix sets the dependency scope
+            (e.g., {@code @test}, {@code @provided}, {@code @runtime}, {@code @import}).
+            A trailing {@code ?} marks the dependency as optional.
+            The individual child elements should not be specified when the corresponding
+            value is already encoded in this attribute.
             @since Maven 4.2
             ]]>
           </description>

@@ -169,6 +169,99 @@ class DefaultModelNormalizerTest {
     }
 
     @Test
+    void testExpandDependencyIdWithScope() {
+        Dependency dep = Dependency.newBuilder()
+                .id("org.junit.jupiter:junit-jupiter-api:5.0@test")
+                .build();
+
+        Dependency result = normalizer.expandDependencyId(dep);
+
+        assertEquals("org.junit.jupiter", result.getGroupId());
+        assertEquals("junit-jupiter-api", result.getArtifactId());
+        assertEquals("5.0", result.getVersion());
+        assertEquals("test", result.getScope());
+    }
+
+    @Test
+    void testExpandDependencyIdWithOptional() {
+        Dependency dep =
+                Dependency.newBuilder().id("commons-io:commons-io:2.11.0?").build();
+
+        Dependency result = normalizer.expandDependencyId(dep);
+
+        assertEquals("commons-io", result.getGroupId());
+        assertEquals("commons-io", result.getArtifactId());
+        assertEquals("2.11.0", result.getVersion());
+        assertEquals("true", result.getOptional());
+    }
+
+    @Test
+    void testExpandDependencyIdWithScopeAndOptional() {
+        Dependency dep = Dependency.newBuilder()
+                .id("org.apache.maven:maven-core:3.9.0@provided?")
+                .build();
+
+        Dependency result = normalizer.expandDependencyId(dep);
+
+        assertEquals("org.apache.maven", result.getGroupId());
+        assertEquals("maven-core", result.getArtifactId());
+        assertEquals("3.9.0", result.getVersion());
+        assertEquals("provided", result.getScope());
+        assertEquals("true", result.getOptional());
+    }
+
+    @Test
+    void testExpandDependencyIdWithImportScope() {
+        Dependency dep =
+                Dependency.newBuilder().id("org.junit:junit-bom:5.12.0@import").build();
+
+        Dependency result = normalizer.expandDependencyId(dep);
+
+        assertEquals("org.junit", result.getGroupId());
+        assertEquals("junit-bom", result.getArtifactId());
+        assertEquals("5.12.0", result.getVersion());
+        assertEquals("import", result.getScope());
+    }
+
+    @Test
+    void testExpandDependencyIdScopeDoesNotOverrideExisting() {
+        Dependency dep = Dependency.newBuilder()
+                .id("org.junit.jupiter:junit-jupiter-api:5.0@test")
+                .scope("compile")
+                .build();
+
+        Dependency result = normalizer.expandDependencyId(dep);
+
+        assertEquals("compile", result.getScope());
+    }
+
+    @Test
+    void testExpandDependencyIdOptionalDoesNotOverrideExisting() {
+        Dependency dep = Dependency.newBuilder()
+                .id("commons-io:commons-io:2.11.0?")
+                .optional("false")
+                .build();
+
+        Dependency result = normalizer.expandDependencyId(dep);
+
+        assertEquals("false", result.getOptional());
+    }
+
+    @Test
+    void testExpandDependencyIdPlainGavNoScopeOrOptional() {
+        Dependency dep =
+                Dependency.newBuilder().id("org.slf4j:slf4j-api:2.0.17").build();
+
+        Dependency result = normalizer.expandDependencyId(dep);
+
+        assertEquals("org.slf4j", result.getGroupId());
+        assertEquals("slf4j-api", result.getArtifactId());
+        assertEquals("2.0.17", result.getVersion());
+        assertNull(result.getScope());
+        assertNull(result.getOptional());
+    }
+
+    @Test
     void testMergeDuplicatesExpandsDependencyManagement() {
         Dependency dep =
                 Dependency.newBuilder().id("org.slf4j:slf4j-api:2.0.17").build();
