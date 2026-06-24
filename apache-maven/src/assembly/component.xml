@@ -42,7 +42,6 @@ under the License.
       <excludes>
         <exclude>org.apache.maven:maven-api-classworlds</exclude>
         <exclude>org.apache.maven:maven-classworlds</exclude>
-        <exclude>org.jline:*</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>
