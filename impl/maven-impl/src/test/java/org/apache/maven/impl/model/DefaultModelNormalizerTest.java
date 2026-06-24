@@ -324,6 +324,123 @@ class DefaultModelNormalizerTest {
         assertNull(result.getId());
     }
 
+    // ===== Empty segment (inference) tests =====
+
+    @Test
+    void testExpandDependencyIdEmptyGroupId() {
+        Dependency dep = Dependency.newBuilder(false).id(":my-lib:1.0").build();
+
+        Dependency result = normalizer.expandDependencyId(dep);
+
+        assertNull(result.getGroupId());
+        assertEquals("my-lib", result.getArtifactId());
+        assertEquals("1.0", result.getVersion());
+        assertNull(result.getId());
+    }
+
+    @Test
+    void testExpandDependencyIdEmptyGroupIdManaged() {
+        Dependency dep = Dependency.newBuilder(false).id(":my-lib").build();
+
+        Dependency result = normalizer.expandDependencyId(dep);
+
+        assertNull(result.getGroupId());
+        assertEquals("my-lib", result.getArtifactId());
+        assertNull(result.getVersion());
+        assertNull(result.getId());
+    }
+
+    @Test
+    void testExpandDependencyIdEmptyGroupIdWithScope() {
+        Dependency dep = Dependency.newBuilder(false).id(":my-lib@test").build();
+
+        Dependency result = normalizer.expandDependencyId(dep);
+
+        assertNull(result.getGroupId());
+        assertEquals("my-lib", result.getArtifactId());
+        assertEquals("test", result.getScope());
+        assertNull(result.getId());
+    }
+
+    @Test
+    void testExpandDependencyIdEmptyVersion() {
+        Dependency dep = Dependency.newBuilder(false).id("org.example:my-lib:").build();
+
+        Dependency result = normalizer.expandDependencyId(dep);
+
+        assertEquals("org.example", result.getGroupId());
+        assertEquals("my-lib", result.getArtifactId());
+        assertNull(result.getVersion());
+        assertNull(result.getId());
+    }
+
+    @Test
+    void testExpandDependencyIdEmptyGroupIdAndVersion() {
+        Dependency dep = Dependency.newBuilder(false).id(":my-lib:").build();
+
+        Dependency result = normalizer.expandDependencyId(dep);
+
+        assertNull(result.getGroupId());
+        assertEquals("my-lib", result.getArtifactId());
+        assertNull(result.getVersion());
+        assertNull(result.getId());
+    }
+
+    @Test
+    void testExpandDependencyIdEmptyTypeSkipped() {
+        Dependency dep =
+                Dependency.newBuilder(false).id("org.example:my-lib::1.0").build();
+
+        Dependency result = normalizer.expandDependencyId(dep);
+
+        assertEquals("org.example", result.getGroupId());
+        assertEquals("my-lib", result.getArtifactId());
+        assertNull(result.getType());
+        assertEquals("1.0", result.getVersion());
+        assertNull(result.getId());
+    }
+
+    @Test
+    void testExpandDependencyIdEmptyClassifierSkipped() {
+        Dependency dep =
+                Dependency.newBuilder(false).id("org.example:my-lib:jar::1.0").build();
+
+        Dependency result = normalizer.expandDependencyId(dep);
+
+        assertEquals("org.example", result.getGroupId());
+        assertEquals("my-lib", result.getArtifactId());
+        assertEquals("jar", result.getType());
+        assertNull(result.getClassifier());
+        assertEquals("1.0", result.getVersion());
+        assertNull(result.getId());
+    }
+
+    @Test
+    void testExpandDependencyIdAllEmptyExceptArtifactId() {
+        Dependency dep = Dependency.newBuilder(false).id(":my-lib::").build();
+
+        Dependency result = normalizer.expandDependencyId(dep);
+
+        assertNull(result.getGroupId());
+        assertEquals("my-lib", result.getArtifactId());
+        assertNull(result.getType());
+        assertNull(result.getVersion());
+        assertNull(result.getId());
+    }
+
+    @Test
+    void testExpandDependencyIdEmptyGroupIdWithTypeAndVersion() {
+        Dependency dep = Dependency.newBuilder(false).id(":my-lib:pom:1.0").build();
+
+        Dependency result = normalizer.expandDependencyId(dep);
+
+        assertNull(result.getGroupId());
+        assertEquals("my-lib", result.getArtifactId());
+        assertEquals("pom", result.getType());
+        assertEquals("1.0", result.getVersion());
+        assertNull(result.getId());
+    }
+
     // ===== Exclusion tests =====
 
     @Test

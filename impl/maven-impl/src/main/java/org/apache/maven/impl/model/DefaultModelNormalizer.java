@@ -239,10 +239,10 @@ public class DefaultModelNormalizer implements ModelNormalizer {
         }
         Dependency.Builder builder = Dependency.newBuilder(d, true);
         builder.id(null);
-        if (isNullOrEmpty(d.getGroupId())) {
+        if (!parts[0].isEmpty() && isNullOrEmpty(d.getGroupId())) {
             builder.groupId(parts[0]);
         }
-        if (isNullOrEmpty(d.getArtifactId())) {
+        if (!parts[1].isEmpty() && isNullOrEmpty(d.getArtifactId())) {
             builder.artifactId(parts[1]);
         }
         switch (parts.length) {
@@ -257,7 +257,7 @@ public class DefaultModelNormalizer implements ModelNormalizer {
                 break;
             case 4:
                 // g:a:type:v or g:a:type: (managed)
-                if (isNullOrEmptyOrDefault(d.getType())) {
+                if (!parts[2].isEmpty() && isNullOrEmptyOrDefault(d.getType())) {
                     builder.type(parts[2]);
                 }
                 if (!parts[3].isEmpty() && isNullOrEmpty(d.getVersion())) {
@@ -266,10 +266,10 @@ public class DefaultModelNormalizer implements ModelNormalizer {
                 break;
             case 5:
                 // g:a:type:classifier:v or g:a:type:classifier: (managed)
-                if (isNullOrEmptyOrDefault(d.getType())) {
+                if (!parts[2].isEmpty() && isNullOrEmptyOrDefault(d.getType())) {
                     builder.type(parts[2]);
                 }
-                if (isNullOrEmpty(d.getClassifier())) {
+                if (!parts[3].isEmpty() && isNullOrEmpty(d.getClassifier())) {
                     builder.classifier(parts[3]);
                 }
                 if (!parts[4].isEmpty() && isNullOrEmpty(d.getVersion())) {
