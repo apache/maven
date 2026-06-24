@@ -271,9 +271,10 @@ set LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
 set MODULES_DIR="%MAVEN_HOME%\lib\modules"
 if "%MAVEN_MAIN_CLASS%"=="" @set MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenCling
 
-@rem Module-path and native access flags require Java 21+ (FFM API)
+@rem Module-path and native access flags require a JDK that can read the module jars.
+@rem The probe includes --module-path so it fails on JDKs that cannot read the module descriptors.
 set MAVEN_MODULE_OPTS=
-"%JAVACMD%" --enable-native-access=org.jline.terminal.ffm -version >NUL 2>&1
+"%JAVACMD%" --module-path %MODULES_DIR% --add-modules ALL-MODULE-PATH --enable-native-access=org.jline.terminal.ffm -version >NUL 2>&1
 if not ERRORLEVEL 1 (
   set MAVEN_MODULE_OPTS=--module-path %MODULES_DIR% --add-modules ALL-MODULE-PATH --enable-native-access=org.jline.terminal.ffm,org.jline.nativ
 )

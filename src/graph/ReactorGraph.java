@@ -42,7 +42,7 @@ public class ReactorGraph {
         CLUSTER_PATTERNS.put("JLine", Pattern.compile("^org\\.jline:.*"));
         CLUSTER_PATTERNS.put("Maven API", Pattern.compile("^org\\.apache\\.maven:maven-api-(?!impl).*"));
         CLUSTER_PATTERNS.put("Maven Resolver", Pattern.compile("^org\\.apache\\.maven\\.resolver:.*"));
-        CLUSTER_PATTERNS.put("Maven Implementation", Pattern.compile("^org\\.apache\\.maven:maven-(support|impl|di|core|cli|xml|jline|logging|executor|testing):.*"));
+        CLUSTER_PATTERNS.put("Maven Implementation", Pattern.compile("^org\\.apache\\.maven:maven-(support|impl|di|core|cli|xml|jline|logging|executor|testing|classworlds):.*"));
         CLUSTER_PATTERNS.put("Maven Compatibility", Pattern.compile("^org\\.apache\\.maven:maven-(artifact|builder-support|compat|embedder|model|model-builder|plugin-api|repository-metadata|resolver-provider|settings|settings-builder|toolchain-builder|toolchain-model):.*"));
         CLUSTER_PATTERNS.put("Sisu", Pattern.compile("(^org\\.eclipse\\.sisu:.*)|(.*:guice:.*)|(.*:javax.inject:.*)|(.*:javax.annotation-api:.*)|(.*:aopalliance:.*)"));
         CLUSTER_PATTERNS.put("Plexus", Pattern.compile("^org\\.codehaus\\.plexus:.*"));

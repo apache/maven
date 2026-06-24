@@ -230,9 +230,10 @@ LAUNCHER_JAR="$MAVEN_HOME/boot/*"
 LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
 MODULES_DIR="$MAVEN_HOME/lib/modules"
 
-# Module-path and native access flags require Java 21+ (FFM API)
+# Module-path and native access flags require a JDK that can read the module jars.
+# The probe includes --module-path so it fails on JDKs that cannot read the module descriptors.
 MAVEN_MODULE_OPTS=""
-if "$JAVACMD" --enable-native-access=org.jline.terminal.ffm -version >/dev/null 2>&1; then
+if "$JAVACMD" --module-path "$MODULES_DIR" --add-modules ALL-MODULE-PATH --enable-native-access=org.jline.terminal.ffm -version >/dev/null 2>&1; then
   MAVEN_MODULE_OPTS="--module-path \"$MODULES_DIR\" --add-modules ALL-MODULE-PATH --enable-native-access=org.jline.terminal.ffm,org.jline.nativ"
 fi
 
