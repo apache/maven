@@ -494,23 +494,18 @@ public class SourceStrategy extends AbstractUpgradeStrategy {
         return true;
     }
 
-    private void copyIncludesExcludes(Element source, Element target) {
-        source.childElement("includes").ifPresent(includes -> {
-            Element newIncludes = DomUtils.insertNewElement("includes", target);
-            includes.childElements("include").forEach(include -> {
-                String value = include.textContent();
-                if (value != null && !value.trim().isEmpty()) {
-                    DomUtils.insertContentElement(newIncludes, "include", value.trim());
-                }
-            });
-        });
+    private static void copyIncludesExcludes(Element source, Element target) {
+        copyPatternList(source, target, "includes", "include");
+        copyPatternList(source, target, "excludes", "exclude");
+    }
 
-        source.childElement("excludes").ifPresent(excludes -> {
-            Element newExcludes = DomUtils.insertNewElement("excludes", target);
-            excludes.childElements("exclude").forEach(exclude -> {
-                String value = exclude.textContent();
+    private static void copyPatternList(Element source, Element target, String containerName, String elementName) {
+        source.childElement(containerName).ifPresent(container -> {
+            Element newContainer = DomUtils.insertNewElement(containerName, target);
+            container.childElements(elementName).forEach(element -> {
+                String value = element.textContent();
                 if (value != null && !value.trim().isEmpty()) {
-                    DomUtils.insertContentElement(newExcludes, "exclude", value.trim());
+                    DomUtils.insertContentElement(newContainer, elementName, value.trim());
                 }
             });
         });
