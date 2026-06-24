@@ -87,4 +87,27 @@ public interface ConfigurationHandler {
      * @param file the jar file to add to the module path
      */
     default void addModuleFile(File file) {}
+
+    /**
+     * Export a package from a module to a target module.
+     * @param module the source module name
+     * @param pkg the package to export
+     * @param target the target module name, or {@code ALL-UNNAMED} for the unnamed module
+     */
+    default void addExports(String module, String pkg, String target) {}
+
+    /**
+     * Open a package from a module to a target module for deep reflection.
+     * @param module the source module name
+     * @param pkg the package to open
+     * @param target the target module name, or {@code ALL-UNNAMED} for the unnamed module
+     */
+    default void addOpens(String module, String pkg, String target) {}
+
+    /**
+     * Add a reads edge from a source module to a target module.
+     * @param source the source module name
+     * @param target the target module name
+     */
+    default void addReads(String source, String target) {}
 }

@@ -59,6 +59,10 @@ public class ClassWorld implements org.apache.maven.api.classworlds.ClassWorld, 
 
     private final List<ClassWorldListener> listeners = new ArrayList<>();
 
+    private ModuleLayer moduleLayer;
+
+    private ModuleLayer.Controller moduleLayerController;
+
     public ClassWorld(String realmId, ClassLoader classLoader) {
         this();
 
@@ -155,6 +159,19 @@ public class ClassWorld implements org.apache.maven.api.classworlds.ClassWorld, 
 
     public synchronized Collection<ClassRealm> getRealms() {
         return Collections.unmodifiableList(new ArrayList<>(realms.values()));
+    }
+
+    public void setModuleLayer(ModuleLayer moduleLayer, ModuleLayer.Controller controller) {
+        this.moduleLayer = moduleLayer;
+        this.moduleLayerController = controller;
+    }
+
+    public ModuleLayer getModuleLayer() {
+        return moduleLayer;
+    }
+
+    public ModuleLayer.Controller getModuleLayerController() {
+        return moduleLayerController;
     }
 
     // from exports branch

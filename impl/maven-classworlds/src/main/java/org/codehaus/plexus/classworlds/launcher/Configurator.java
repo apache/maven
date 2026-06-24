@@ -37,6 +37,8 @@ package org.codehaus.plexus.classworlds.launcher;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.module.Configuration;
+import java.lang.module.ModuleFinder;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -44,6 +46,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
@@ -77,6 +81,12 @@ public class Configurator implements ConfigurationHandler {
     private ClassLoader foreignClassLoader = null;
 
     private List<Path> modulePaths = new ArrayList<>();
+
+    private List<String[]> exportDirectives = new ArrayList<>();
+
+    private List<String[]> openDirectives = new ArrayList<>();
+
+    private List<String[]> readDirectives = new ArrayList<>();
 
     /**
      * Construct.
@@ -135,6 +145,9 @@ public class Configurator implements ConfigurationHandler {
 
         foreignClassLoader = null;
         modulePaths = new ArrayList<>();
+        exportDirectives = new ArrayList<>();
+        openDirectives = new ArrayList<>();
+        readDirectives = new ArrayList<>();
 
         if (this.launcher != null) {
             foreignClassLoader = this.launcher.getSystemClassLoader();
@@ -143,6 +156,8 @@ public class Configurator implements ConfigurationHandler {
         ConfigurationParser parser = new ConfigurationParser(this, System.getProperties());
 
         parser.parse(is);
+
+        createModuleLayer();
 
         // Associate child realms to their parents.
         associateRealms();
@@ -218,6 +233,91 @@ public class Configurator implements ConfigurationHandler {
 
     public List<Path> getModulePaths() {
         return modulePaths;
+    }
+
+    public void addExports(String module, String pkg, String target) {
+        exportDirectives.add(new String[] {module, pkg, target});
+    }
+
+    public void addOpens(String module, String pkg, String target) {
+        openDirectives.add(new String[] {module, pkg, target});
+    }
+
+    public void addReads(String source, String target) {
+        readDirectives.add(new String[] {source, target});
+    }
+
+    private void createModuleLayer() {
+        if (modulePaths.isEmpty()
+                && exportDirectives.isEmpty()
+                && openDirectives.isEmpty()
+                && readDirectives.isEmpty()) {
+            return;
+        }
+
+        Set<String> bootModuleNames =
+                ModuleLayer.boot().modules().stream().map(Module::getName).collect(Collectors.toSet());
+
+        ModuleLayer.Controller controller = null;
+        ModuleLayer layer = ModuleLayer.boot();
+
+        if (!modulePaths.isEmpty()) {
+            ModuleFinder finder = ModuleFinder.of(modulePaths.toArray(new Path[0]));
+            Set<String> newModules = finder.findAll().stream()
+                    .map(ref -> ref.descriptor().name())
+                    .filter(name -> !bootModuleNames.contains(name))
+                    .collect(Collectors.toSet());
+
+            if (!newModules.isEmpty()) {
+                Configuration cf = ModuleLayer.boot().configuration().resolve(finder, ModuleFinder.of(), newModules);
+                ClassLoader parent =
+                        foreignClassLoader != null ? foreignClassLoader : ClassLoader.getSystemClassLoader();
+                controller = ModuleLayer.defineModulesWithOneLoader(cf, List.of(ModuleLayer.boot()), parent);
+                layer = controller.layer();
+                foreignClassLoader = layer.findLoader(newModules.iterator().next());
+            }
+        }
+
+        Module unnamedTarget = getClass().getModule();
+
+        applyExportOpenDirectives(layer, controller, bootModuleNames, unnamedTarget);
+
+        for (String[] directive : readDirectives) {
+            Module source = layer.findModule(directive[0]).orElse(null);
+            Module target = "ALL-UNNAMED".equals(directive[1])
+                    ? unnamedTarget
+                    : layer.findModule(directive[1]).orElse(null);
+            if (source != null && target != null && controller != null && !bootModuleNames.contains(source.getName())) {
+                controller.addReads(source, target);
+            }
+        }
+
+        if (controller != null) {
+            world.setModuleLayer(layer, controller);
+        }
+    }
+
+    private void applyExportOpenDirectives(
+            ModuleLayer layer, ModuleLayer.Controller controller, Set<String> bootModuleNames, Module unnamedTarget) {
+        for (boolean open : new boolean[] {false, true}) {
+            for (String[] directive : open ? openDirectives : exportDirectives) {
+                Module source = layer.findModule(directive[0]).orElse(null);
+                if (source == null || bootModuleNames.contains(source.getName())) {
+                    continue;
+                }
+                Module target = "ALL-UNNAMED".equals(directive[2])
+                        ? unnamedTarget
+                        : layer.findModule(directive[2]).orElse(null);
+                if (target == null || controller == null) {
+                    continue;
+                }
+                if (open) {
+                    controller.addOpens(source, directive[1], target);
+                } else {
+                    controller.addExports(source, directive[1], target);
+                }
+            }
+        }
     }
 
     public void setAppMain(String mainClassName, String mainRealmName) {

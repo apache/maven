@@ -69,6 +69,12 @@ public class ConfigurationParser {
 
     public static final String MODULE_PREFIX = "module";
 
+    public static final String ADD_EXPORTS_PREFIX = "add-exports";
+
+    public static final String ADD_OPENS_PREFIX = "add-opens";
+
+    public static final String ADD_READS_PREFIX = "add-reads";
+
     /**
      * Optionally spec prefix.
      */
@@ -143,6 +149,9 @@ public class ConfigurationParser {
                         break;
                     case 'l':
                         handleLoadConfiguration(line, lineNo);
+                        break;
+                    case 'a':
+                        handleAddDirective(line, lineNo);
                         break;
                     case 'o':
                         handleOptionallyConfiguration(line, lineNo);
@@ -442,6 +451,53 @@ public class ConfigurationParser {
             return;
         }
         throw new ConfigurationException("Unhandled configuration", lineNo, line);
+    }
+
+    private void handleAddDirective(String line, int lineNo) throws ConfigurationException {
+        if (line.startsWith(ADD_EXPORTS_PREFIX)) {
+            String spec = line.substring(ADD_EXPORTS_PREFIX.length()).trim();
+            parseModulePackageDirective(spec, lineNo, line, handler::addExports);
+        } else if (line.startsWith(ADD_OPENS_PREFIX)) {
+            String spec = line.substring(ADD_OPENS_PREFIX.length()).trim();
+            parseModulePackageDirective(spec, lineNo, line, handler::addOpens);
+        } else if (line.startsWith(ADD_READS_PREFIX)) {
+            String spec = line.substring(ADD_READS_PREFIX.length()).trim();
+            int eqLoc = spec.indexOf('=');
+            if (eqLoc < 0) {
+                throw new ConfigurationException("Missing '=' in add-reads directive", lineNo, line);
+            }
+            String source = spec.substring(0, eqLoc).trim();
+            String target = spec.substring(eqLoc + 1).trim();
+            handler.addReads(source, target);
+        } else {
+            throw new ConfigurationException("Unhandled configuration", lineNo, line);
+        }
+    }
+
+    private void parseModulePackageDirective(String spec, int lineNo, String line, ModulePackageHandler mph)
+            throws ConfigurationException {
+        int slashLoc = spec.indexOf('/');
+        if (slashLoc < 0) {
+            throw new ConfigurationException("Missing '/' in module/package directive", lineNo, line);
+        }
+        String module = spec.substring(0, slashLoc).trim();
+        String rest = spec.substring(slashLoc + 1).trim();
+        String pkg;
+        String target;
+        int eqLoc = rest.indexOf('=');
+        if (eqLoc >= 0) {
+            pkg = rest.substring(0, eqLoc).trim();
+            target = rest.substring(eqLoc + 1).trim();
+        } else {
+            pkg = rest;
+            target = "ALL-UNNAMED";
+        }
+        mph.handle(module, pkg, target);
+    }
+
+    @FunctionalInterface
+    private interface ModulePackageHandler {
+        void handle(String module, String pkg, String target);
     }
 
     protected void moduleGlob(String line) throws MalformedURLException, FileNotFoundException {
