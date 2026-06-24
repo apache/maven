@@ -18,7 +18,7 @@
  */
 package org.apache.maven.classrealm;
 
-import org.apache.maven.api.classworlds.ClassRealm;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 /**
  * ClassRealmManagerDelegate is used to perform addition configuration of

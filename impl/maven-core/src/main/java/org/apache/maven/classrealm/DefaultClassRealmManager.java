@@ -311,7 +311,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
 
             for (ClassRealmManagerDelegate delegate : delegates) {
                 try {
-                    delegate.setupRealm(classRealm, request);
+                    delegate.setupRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) classRealm, request);
                 } catch (Exception e) {
                     logger.error(
                             delegate.getClass().getName() + " failed to setup class realm " + classRealm + ": "
