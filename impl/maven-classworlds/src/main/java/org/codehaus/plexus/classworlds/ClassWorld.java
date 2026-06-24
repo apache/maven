@@ -183,10 +183,9 @@ public class ClassWorld implements org.apache.maven.api.classworlds.ClassWorld, 
      * @param moduleName the source module name
      * @param packageName the package to export
      * @param target the target module to export to
-     * @return {@code true} if the export was applied successfully
      */
-    public synchronized boolean addExports(String moduleName, String packageName, Module target) {
-        return applyModuleAccess(moduleName, packageName, target, false);
+    public synchronized void addExports(String moduleName, String packageName, Module target) {
+        applyModuleAccess(moduleName, packageName, target, false);
     }
 
     /**
@@ -198,10 +197,9 @@ public class ClassWorld implements org.apache.maven.api.classworlds.ClassWorld, 
      * @param moduleName the source module name
      * @param packageName the package to open
      * @param target the target module to open to
-     * @return {@code true} if the open was applied successfully
      */
-    public synchronized boolean addOpens(String moduleName, String packageName, Module target) {
-        return applyModuleAccess(moduleName, packageName, target, true);
+    public synchronized void addOpens(String moduleName, String packageName, Module target) {
+        applyModuleAccess(moduleName, packageName, target, true);
     }
 
     /**
@@ -210,34 +208,25 @@ public class ClassWorld implements org.apache.maven.api.classworlds.ClassWorld, 
      *
      * @param sourceModuleName the source module name
      * @param target the target module to read
-     * @return {@code true} if the reads edge was added successfully
      */
-    public synchronized boolean addReads(String sourceModuleName, Module target) {
+    public synchronized void addReads(String sourceModuleName, Module target) {
         Module source = findModule(sourceModuleName);
-        if (source == null || moduleLayerController == null) {
-            return false;
-        }
-        if (isBootLayerModule(source)) {
-            return false;
+        if (source == null || moduleLayerController == null || isBootLayerModule(source)) {
+            return;
         }
         moduleLayerController.addReads(source, target);
-        return true;
     }
 
-    private boolean applyModuleAccess(String moduleName, String packageName, Module target, boolean open) {
+    private void applyModuleAccess(String moduleName, String packageName, Module target, boolean open) {
         Module source = findModule(moduleName);
-        if (source == null || moduleLayerController == null) {
-            return false;
-        }
-        if (isBootLayerModule(source)) {
-            return false;
+        if (source == null || moduleLayerController == null || isBootLayerModule(source)) {
+            return;
         }
         if (open) {
             moduleLayerController.addOpens(source, packageName, target);
         } else {
             moduleLayerController.addExports(source, packageName, target);
         }
-        return true;
     }
 
     private Module findModule(String moduleName) {

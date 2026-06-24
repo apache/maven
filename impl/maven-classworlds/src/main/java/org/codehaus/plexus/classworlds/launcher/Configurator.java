@@ -256,24 +256,30 @@ public class Configurator implements ConfigurationHandler {
         }
 
         if (!modulePaths.isEmpty()) {
-            Set<String> bootModuleNames =
-                    ModuleLayer.boot().modules().stream().map(Module::getName).collect(Collectors.toSet());
+            try {
+                Set<String> bootModuleNames = ModuleLayer.boot().modules().stream()
+                        .map(Module::getName)
+                        .collect(Collectors.toSet());
 
-            ModuleFinder finder = ModuleFinder.of(modulePaths.toArray(new Path[0]));
-            Set<String> newModules = finder.findAll().stream()
-                    .map(ref -> ref.descriptor().name())
-                    .filter(name -> !bootModuleNames.contains(name))
-                    .collect(Collectors.toSet());
+                ModuleFinder finder = ModuleFinder.of(modulePaths.toArray(new Path[0]));
+                Set<String> newModules = finder.findAll().stream()
+                        .map(ref -> ref.descriptor().name())
+                        .filter(name -> !bootModuleNames.contains(name))
+                        .collect(Collectors.toSet());
 
-            if (!newModules.isEmpty()) {
-                Configuration cf = ModuleLayer.boot().configuration().resolve(finder, ModuleFinder.of(), newModules);
-                ClassLoader parent =
-                        foreignClassLoader != null ? foreignClassLoader : ClassLoader.getSystemClassLoader();
-                ModuleLayer.Controller controller =
-                        ModuleLayer.defineModulesWithOneLoader(cf, List.of(ModuleLayer.boot()), parent);
-                ModuleLayer layer = controller.layer();
-                foreignClassLoader = layer.findLoader(newModules.iterator().next());
-                world.setModuleLayer(layer, controller);
+                if (!newModules.isEmpty()) {
+                    Configuration cf =
+                            ModuleLayer.boot().configuration().resolve(finder, ModuleFinder.of(), newModules);
+                    ClassLoader parent =
+                            foreignClassLoader != null ? foreignClassLoader : ClassLoader.getSystemClassLoader();
+                    ModuleLayer.Controller controller =
+                            ModuleLayer.defineModulesWithOneLoader(cf, List.of(ModuleLayer.boot()), parent);
+                    ModuleLayer layer = controller.layer();
+                    foreignClassLoader = layer.findLoader(newModules.iterator().next());
+                    world.setModuleLayer(layer, controller);
+                }
+            } catch (Exception e) {
+                addModulePathsToClasspath();
             }
         }
 
@@ -295,6 +301,18 @@ public class Configurator implements ConfigurationHandler {
             Module target = resolveTargetModule(directive[1], unnamedTarget);
             if (target != null) {
                 world.addReads(directive[0], target);
+            }
+        }
+    }
+
+    private void addModulePathsToClasspath() {
+        if (curRealm != null) {
+            for (Path path : modulePaths) {
+                try {
+                    curRealm.addURL(path.toUri().toURL());
+                } catch (MalformedURLException e) {
+                    // ignore
+                }
             }
         }
     }

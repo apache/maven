@@ -271,9 +271,16 @@ set LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
 set MODULES_DIR="%MAVEN_HOME%\lib\modules"
 if "%MAVEN_MAIN_CLASS%"=="" @set MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenCling
 
+@rem Module-path and native access flags require Java 21+ (FFM API)
+set MAVEN_MODULE_OPTS=
+"%JAVACMD%" --enable-native-access=org.jline.terminal.ffm -version >NUL 2>&1
+if not ERRORLEVEL 1 (
+  set MAVEN_MODULE_OPTS=--module-path %MODULES_DIR% --add-modules ALL-MODULE-PATH --enable-native-access=org.jline.terminal.ffm,org.jline.nativ
+)
+
 if defined MAVEN_DEBUG_SCRIPT (
   echo [DEBUG] Launching JVM with command:
-  echo [DEBUG]   "%JAVACMD%" %INTERNAL_MAVEN_OPTS% %MAVEN_OPTS% %JVM_CONFIG_MAVEN_OPTS% %MAVEN_DEBUG_OPTS% --module-path %MODULES_DIR% --add-modules ALL-MODULE-PATH --enable-native-access=org.jline.terminal.ffm,org.jline.nativ -classpath %LAUNCHER_JAR% "-Dclassworlds.conf=%CLASSWORLDS_CONF%" "-Dmaven.home=%MAVEN_HOME%" "-Dmaven.mainClass=%MAVEN_MAIN_CLASS%" "-Dlibrary.jline.path=%MAVEN_HOME%\lib\jline-native" "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" %LAUNCHER_CLASS% %MAVEN_ARGS% %*
+  echo [DEBUG]   "%JAVACMD%" %INTERNAL_MAVEN_OPTS% %MAVEN_OPTS% %JVM_CONFIG_MAVEN_OPTS% %MAVEN_DEBUG_OPTS% %MAVEN_MODULE_OPTS% -classpath %LAUNCHER_JAR% "-Dclassworlds.conf=%CLASSWORLDS_CONF%" "-Dmaven.home=%MAVEN_HOME%" "-Dmaven.mainClass=%MAVEN_MAIN_CLASS%" "-Dlibrary.jline.path=%MAVEN_HOME%\lib\jline-native" "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" %LAUNCHER_CLASS% %MAVEN_ARGS% %*
 )
 
 "%JAVACMD%" ^
@@ -281,9 +288,7 @@ if defined MAVEN_DEBUG_SCRIPT (
   %MAVEN_OPTS% ^
   %JVM_CONFIG_MAVEN_OPTS% ^
   %MAVEN_DEBUG_OPTS% ^
-  --module-path %MODULES_DIR% ^
-  --add-modules ALL-MODULE-PATH ^
-  --enable-native-access=org.jline.terminal.ffm,org.jline.nativ ^
+  %MAVEN_MODULE_OPTS% ^
   -classpath %LAUNCHER_JAR% ^
   "-Dclassworlds.conf=%CLASSWORLDS_CONF%" ^
   "-Dmaven.home=%MAVEN_HOME%" ^

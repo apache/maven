@@ -406,9 +406,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
             applyExportOrOpen(realm, line.substring("add-opens ".length()).trim(), true);
         } else if (line.startsWith("add-reads ")) {
             String module = line.substring("add-reads ".length()).trim();
-            if (!realm.addReads(module)) {
-                logger.debug("  Failed to add-reads {} for realm {}", module, realm.getId());
-            }
+            realm.addReads(module);
         } else {
             logger.debug("Unknown module-access directive: {}", line);
         }
@@ -430,14 +428,10 @@ public class DefaultClassRealmManager implements ClassRealmManager {
                 logger.warn("module-access directive target '{}' ignored, only ALL-UNNAMED is supported", target);
             }
         }
-        boolean applied = open ? realm.addOpens(module, pkg) : realm.addExports(module, pkg);
-        if (!applied) {
-            logger.debug(
-                    "  Failed to {} {}/{} for realm {}",
-                    open ? "add-opens" : "add-exports",
-                    module,
-                    pkg,
-                    realm.getId());
+        if (open) {
+            realm.addOpens(module, pkg);
+        } else {
+            realm.addExports(module, pkg);
         }
     }
 }
