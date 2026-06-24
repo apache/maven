@@ -161,7 +161,7 @@ public class ClassWorld implements org.apache.maven.api.classworlds.ClassWorld, 
         return Collections.unmodifiableList(new ArrayList<>(realms.values()));
     }
 
-    public void setModuleLayer(ModuleLayer moduleLayer, ModuleLayer.Controller controller) {
+    public synchronized void setModuleLayer(ModuleLayer moduleLayer, ModuleLayer.Controller controller) {
         this.moduleLayer = moduleLayer;
         this.moduleLayerController = controller;
     }
@@ -172,6 +172,86 @@ public class ClassWorld implements org.apache.maven.api.classworlds.ClassWorld, 
 
     public ModuleLayer.Controller getModuleLayerController() {
         return moduleLayerController;
+    }
+
+    /**
+     * Exports a package from a named module to the given target module.
+     * Looks up the source module in the runtime layer first, then the boot layer.
+     * Only runtime layer modules can be modified via the Controller; boot layer
+     * modules require {@code --add-exports} in the launcher script.
+     *
+     * @param moduleName the source module name
+     * @param packageName the package to export
+     * @param target the target module to export to
+     * @return {@code true} if the export was applied successfully
+     */
+    public synchronized boolean addExports(String moduleName, String packageName, Module target) {
+        return applyModuleAccess(moduleName, packageName, target, false);
+    }
+
+    /**
+     * Opens a package from a named module to the given target module for deep reflection.
+     * Looks up the source module in the runtime layer first, then the boot layer.
+     * Only runtime layer modules can be modified via the Controller; boot layer
+     * modules require {@code --add-opens} in the launcher script.
+     *
+     * @param moduleName the source module name
+     * @param packageName the package to open
+     * @param target the target module to open to
+     * @return {@code true} if the open was applied successfully
+     */
+    public synchronized boolean addOpens(String moduleName, String packageName, Module target) {
+        return applyModuleAccess(moduleName, packageName, target, true);
+    }
+
+    /**
+     * Adds a reads edge from the named source module to the given target module.
+     * Only runtime layer modules can be modified via the Controller.
+     *
+     * @param sourceModuleName the source module name
+     * @param target the target module to read
+     * @return {@code true} if the reads edge was added successfully
+     */
+    public synchronized boolean addReads(String sourceModuleName, Module target) {
+        Module source = findModule(sourceModuleName);
+        if (source == null || moduleLayerController == null) {
+            return false;
+        }
+        if (isBootLayerModule(source)) {
+            return false;
+        }
+        moduleLayerController.addReads(source, target);
+        return true;
+    }
+
+    private boolean applyModuleAccess(String moduleName, String packageName, Module target, boolean open) {
+        Module source = findModule(moduleName);
+        if (source == null || moduleLayerController == null) {
+            return false;
+        }
+        if (isBootLayerModule(source)) {
+            return false;
+        }
+        if (open) {
+            moduleLayerController.addOpens(source, packageName, target);
+        } else {
+            moduleLayerController.addExports(source, packageName, target);
+        }
+        return true;
+    }
+
+    private Module findModule(String moduleName) {
+        if (moduleLayer != null) {
+            Module m = moduleLayer.findModule(moduleName).orElse(null);
+            if (m != null) {
+                return m;
+            }
+        }
+        return ModuleLayer.boot().findModule(moduleName).orElse(null);
+    }
+
+    private boolean isBootLayerModule(Module module) {
+        return module.getLayer() == ModuleLayer.boot();
     }
 
     // from exports branch

@@ -255,13 +255,10 @@ public class Configurator implements ConfigurationHandler {
             return;
         }
 
-        Set<String> bootModuleNames =
-                ModuleLayer.boot().modules().stream().map(Module::getName).collect(Collectors.toSet());
-
-        ModuleLayer.Controller controller = null;
-        ModuleLayer layer = ModuleLayer.boot();
-
         if (!modulePaths.isEmpty()) {
+            Set<String> bootModuleNames =
+                    ModuleLayer.boot().modules().stream().map(Module::getName).collect(Collectors.toSet());
+
             ModuleFinder finder = ModuleFinder.of(modulePaths.toArray(new Path[0]));
             Set<String> newModules = finder.findAll().stream()
                     .map(ref -> ref.descriptor().name())
@@ -272,52 +269,48 @@ public class Configurator implements ConfigurationHandler {
                 Configuration cf = ModuleLayer.boot().configuration().resolve(finder, ModuleFinder.of(), newModules);
                 ClassLoader parent =
                         foreignClassLoader != null ? foreignClassLoader : ClassLoader.getSystemClassLoader();
-                controller = ModuleLayer.defineModulesWithOneLoader(cf, List.of(ModuleLayer.boot()), parent);
-                layer = controller.layer();
+                ModuleLayer.Controller controller =
+                        ModuleLayer.defineModulesWithOneLoader(cf, List.of(ModuleLayer.boot()), parent);
+                ModuleLayer layer = controller.layer();
                 foreignClassLoader = layer.findLoader(newModules.iterator().next());
+                world.setModuleLayer(layer, controller);
             }
         }
 
         Module unnamedTarget = getClass().getModule();
 
-        applyExportOpenDirectives(layer, controller, bootModuleNames, unnamedTarget);
-
-        for (String[] directive : readDirectives) {
-            Module source = layer.findModule(directive[0]).orElse(null);
-            Module target = "ALL-UNNAMED".equals(directive[1])
-                    ? unnamedTarget
-                    : layer.findModule(directive[1]).orElse(null);
-            if (source != null && target != null && controller != null && !bootModuleNames.contains(source.getName())) {
-                controller.addReads(source, target);
+        for (String[] directive : exportDirectives) {
+            Module target = resolveTargetModule(directive[2], unnamedTarget);
+            if (target != null) {
+                world.addExports(directive[0], directive[1], target);
             }
         }
-
-        if (controller != null) {
-            world.setModuleLayer(layer, controller);
+        for (String[] directive : openDirectives) {
+            Module target = resolveTargetModule(directive[2], unnamedTarget);
+            if (target != null) {
+                world.addOpens(directive[0], directive[1], target);
+            }
+        }
+        for (String[] directive : readDirectives) {
+            Module target = resolveTargetModule(directive[1], unnamedTarget);
+            if (target != null) {
+                world.addReads(directive[0], target);
+            }
         }
     }
 
-    private void applyExportOpenDirectives(
-            ModuleLayer layer, ModuleLayer.Controller controller, Set<String> bootModuleNames, Module unnamedTarget) {
-        for (boolean open : new boolean[] {false, true}) {
-            for (String[] directive : open ? openDirectives : exportDirectives) {
-                Module source = layer.findModule(directive[0]).orElse(null);
-                if (source == null || bootModuleNames.contains(source.getName())) {
-                    continue;
-                }
-                Module target = "ALL-UNNAMED".equals(directive[2])
-                        ? unnamedTarget
-                        : layer.findModule(directive[2]).orElse(null);
-                if (target == null || controller == null) {
-                    continue;
-                }
-                if (open) {
-                    controller.addOpens(source, directive[1], target);
-                } else {
-                    controller.addExports(source, directive[1], target);
-                }
+    private Module resolveTargetModule(String targetName, Module unnamedTarget) {
+        if ("ALL-UNNAMED".equals(targetName)) {
+            return unnamedTarget;
+        }
+        ModuleLayer layer = world.getModuleLayer();
+        if (layer != null) {
+            Module m = layer.findModule(targetName).orElse(null);
+            if (m != null) {
+                return m;
             }
         }
+        return ModuleLayer.boot().findModule(targetName).orElse(null);
     }
 
     public void setAppMain(String mainClassName, String mainRealmName) {
