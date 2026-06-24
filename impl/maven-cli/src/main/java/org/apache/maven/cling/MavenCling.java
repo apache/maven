@@ -64,7 +64,7 @@ public class MavenCling extends ClingSupport {
      * This makes {@code MavenCling} the default entry point that external tools (such as the Maven Wrapper
      * or IDEs) can rely on without needing to set the {@code maven.mainClass} property.
      */
-    public static int main(String[] args, ClassWorld world) throws IOException {
+    public static int main(String[] args, org.codehaus.plexus.classworlds.ClassWorld world) throws IOException {
         String mainClass = System.getProperty(MAVEN_MAIN_CLASS_PROPERTY);
         if (mainClass != null && !MavenCling.class.getName().equals(mainClass)) {
             return delegateMain(mainClass, args, world);
@@ -103,7 +103,7 @@ public class MavenCling extends ClingSupport {
      */
     public static int main(
             String[] args,
-            ClassWorld world,
+            org.codehaus.plexus.classworlds.ClassWorld world,
             @Nullable InputStream stdIn,
             @Nullable OutputStream stdOut,
             @Nullable OutputStream stdErr)
