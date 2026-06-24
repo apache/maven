@@ -67,6 +67,8 @@ public class ConfigurationParser {
 
     public static final String LOAD_PREFIX = "load";
 
+    public static final String MODULE_PREFIX = "module";
+
     /**
      * Optionally spec prefix.
      */
@@ -122,7 +124,11 @@ public class ConfigurationParser {
                 char lineFirstChar = line.charAt(0);
                 switch (lineFirstChar) {
                     case 'm':
-                        mainSet = handleMainConfiguration(line, lineNo, mainSet);
+                        if (line.startsWith(MODULE_PREFIX)) {
+                            handleModuleConfiguration(line, lineNo);
+                        } else {
+                            mainSet = handleMainConfiguration(line, lineNo, mainSet);
+                        }
                         break;
                     case 's':
                         if (handleSetConfiguration(line, lineNo)) {
@@ -414,6 +420,50 @@ public class ConfigurationParser {
             return;
         }
         throw new ConfigurationException("Unhandled configuration", lineNo, line);
+    }
+
+    private void handleModuleConfiguration(String line, int lineNo)
+            throws ConfigurationException, FileNotFoundException, MalformedURLException {
+        if (line.startsWith(MODULE_PREFIX)) {
+            String constituent = line.substring(MODULE_PREFIX.length()).trim();
+            constituent = filter(constituent);
+
+            if (constituent.contains("*")) {
+                moduleGlob(constituent);
+            } else {
+                File file = new File(constituent);
+
+                if (file.exists()) {
+                    handler.addModuleFile(file);
+                } else {
+                    throw new FileNotFoundException(constituent);
+                }
+            }
+            return;
+        }
+        throw new ConfigurationException("Unhandled configuration", lineNo, line);
+    }
+
+    protected void moduleGlob(String line) throws MalformedURLException, FileNotFoundException {
+        File globFile = new File(line);
+
+        File dir = globFile.getParentFile();
+        if (!dir.exists()) {
+            return;
+        }
+
+        String localName = globFile.getName();
+        int starLoc = localName.indexOf("*");
+        final String prefix = localName.substring(0, starLoc);
+        final String suffix = localName.substring(starLoc + 1);
+
+        File[] matches = dir.listFiles((dir1, name) -> name.startsWith(prefix) && name.endsWith(suffix));
+
+        if (matches != null) {
+            for (File match : matches) {
+                handler.addModuleFile(match);
+            }
+        }
     }
 
     private void handleOptionallyConfiguration(String line, int lineNo)

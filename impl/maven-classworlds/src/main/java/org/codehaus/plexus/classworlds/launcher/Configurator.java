@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -74,6 +75,8 @@ public class Configurator implements ConfigurationHandler {
     private ClassRealm curRealm;
 
     private ClassLoader foreignClassLoader = null;
+
+    private List<Path> modulePaths = new ArrayList<>();
 
     /**
      * Construct.
@@ -131,6 +134,7 @@ public class Configurator implements ConfigurationHandler {
         curRealm = null;
 
         foreignClassLoader = null;
+        modulePaths = new ArrayList<>();
 
         if (this.launcher != null) {
             foreignClassLoader = this.launcher.getSystemClassLoader();
@@ -206,6 +210,14 @@ public class Configurator implements ConfigurationHandler {
 
         // Stash the configured realm for subsequent association processing.
         configuredRealms.put(realmName, curRealm);
+    }
+
+    public void addModuleFile(File file) {
+        modulePaths.add(file.toPath());
+    }
+
+    public List<Path> getModulePaths() {
+        return modulePaths;
     }
 
     public void setAppMain(String mainClassName, String mainRealmName) {

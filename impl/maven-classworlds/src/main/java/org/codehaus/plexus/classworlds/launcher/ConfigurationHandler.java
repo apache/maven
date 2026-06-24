@@ -80,4 +80,11 @@ public interface ConfigurationHandler {
      * @param url the url to load content from
      */
     void addLoadURL(URL url);
+
+    /**
+     * Add a file to the module path. Jars added via this method will be loaded
+     * as JPMS named modules in a {@link ModuleLayer}, rather than on the classpath.
+     * @param file the jar file to add to the module path
+     */
+    default void addModuleFile(File file) {}
 }

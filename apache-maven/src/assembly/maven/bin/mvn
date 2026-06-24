@@ -226,8 +226,9 @@ fi
 if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
   echo "[DEBUG] Final MAVEN_OPTS: $MAVEN_OPTS" >&2
 fi
-LAUNCHER_JAR=`echo "$MAVEN_HOME"/boot/maven-classworlds-*.jar`
+LAUNCHER_JAR="$MAVEN_HOME/boot/*"
 LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
+MODULES_DIR="$MAVEN_HOME/lib/modules"
 
 # For Cygwin and MinGW, switch paths to Windows format before running java(1) command
 if $cygwin || $mingw ; then
@@ -279,7 +280,9 @@ MAVEN_MAIN_CLASS=${MAVEN_MAIN_CLASS:=org.apache.maven.cling.MavenCling}
 cmd="\"$JAVACMD\" \
   $MAVEN_OPTS \
   $MAVEN_DEBUG_OPTS \
-  --enable-native-access=ALL-UNNAMED \
+  --module-path \"$MODULES_DIR\" \
+  --add-modules ALL-MODULE-PATH \
+  --enable-native-access=org.jline.terminal.ffm,org.jline.nativ \
   -classpath \"$LAUNCHER_JAR\" \
   \"-Dclassworlds.conf=$CLASSWORLDS_CONF\" \
   \"-Dmaven.home=$MAVEN_HOME\" \
