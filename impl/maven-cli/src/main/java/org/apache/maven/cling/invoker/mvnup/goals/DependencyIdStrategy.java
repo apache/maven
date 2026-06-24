@@ -118,10 +118,6 @@ public class DependencyIdStrategy extends AbstractUpgradeStrategy {
             context.indent();
 
             try {
-                if (!MODEL_VERSION_4_2_0.equals(currentVersion) && !ModelVersionUtils.isNewerThan410(currentVersion)) {
-                    context.success("Skipping (model version " + currentVersion + " < 4.2.0)");
-                    continue;
-                }
                 if (!MODEL_VERSION_4_2_0.equals(currentVersion)) {
                     context.success("Skipping (model version " + currentVersion + " is not 4.2.0)");
                     continue;
@@ -231,8 +227,6 @@ public class DependencyIdStrategy extends AbstractUpgradeStrategy {
 
         if (classifier != null) {
             removeChildElement(dependency, CLASSIFIER);
-            removeChildElement(dependency, TYPE);
-        } else if (type != null && !DEFAULT_TYPE.equals(type)) {
             removeChildElement(dependency, TYPE);
         } else if (type != null) {
             removeChildElement(dependency, TYPE);

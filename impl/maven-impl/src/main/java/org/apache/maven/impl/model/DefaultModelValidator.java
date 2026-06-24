@@ -1736,7 +1736,6 @@ public class DefaultModelValidator implements ModelValidator {
 
         if (validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_2_0) {
             for (Exclusion exclusion : dependency.getExclusions()) {
-                validateExclusionIdAttribute(problems, exclusion, prefix);
                 if (validationLevel < ModelValidator.VALIDATION_LEVEL_MAVEN_3_0) {
                     validateCoordinatesId(
                             prefix,
