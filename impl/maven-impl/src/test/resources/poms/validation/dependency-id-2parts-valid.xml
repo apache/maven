@@ -6,10 +6,6 @@
   <artifactId>test</artifactId>
   <version>1.0</version>
   <dependencies>
-    <dependency id="org.example:lib-a:1.0">
-      <exclusions>
-        <exclusion id="only-one-part"/>
-      </exclusions>
-    </dependency>
+    <dependency id="org.example:lib-a"/>
   </dependencies>
 </project>

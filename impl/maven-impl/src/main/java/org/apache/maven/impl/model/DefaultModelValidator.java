@@ -1204,7 +1204,7 @@ public class DefaultModelValidator implements ModelValidator {
 
             // Validate id attribute on exclusions
             for (Exclusion exclusion : dependency.getExclusions()) {
-                validateExclusionIdAttribute(problems, exclusion, prefix + prefix2 + "exclusions.exclusion.");
+                validateExclusionIdAttribute(problems, exclusion, prefix + prefix2);
             }
 
             if ("import".equals(dependency.getScope())) {
@@ -1322,12 +1322,6 @@ public class DefaultModelValidator implements ModelValidator {
         }
     }
 
-    /**
-     * Validates the {@code id} attribute on a dependency element.
-     * The id must have the format {@code groupId:artifactId:version[@scope][?]} and must not
-     * be specified alongside individual groupId, artifactId, version, scope, or optional child elements
-     * when those values are encoded in the id.
-     */
     private void validateDependencyIdAttribute(ModelProblemCollector problems, Dependency dependency, String prefix) {
         String id = dependency.getId();
         if (id == null || id.isEmpty()) {
@@ -1348,77 +1342,94 @@ public class DefaultModelValidator implements ModelValidator {
             remaining = remaining.substring(0, atIndex);
         }
 
-        String[] parts = remaining.split(":");
-        if (parts.length != 3) {
+        int colonCount = remaining.length() - remaining.replace(":", "").length();
+        if (colonCount < 1 || colonCount > 4) {
             addViolation(
                     problems,
                     Severity.ERROR,
                     Version.V42,
                     prefix + "id",
                     null,
-                    "must have the format 'groupId:artifactId:version[@scope][?]' but is '" + id + "'.",
+                    "has invalid format '" + id + "', must be 'groupId:artifactId[:]', "
+                            + "'groupId:artifactId:version', "
+                            + "'groupId:artifactId:type:[version]', or "
+                            + "'groupId:artifactId:type:classifier:[version]'. "
+                            + "An optional '@scope' suffix and/or trailing '?' may be appended.",
                     dependency);
+            return;
         }
-        if (dependency.getGroupId() != null && !dependency.getGroupId().isEmpty()) {
+        if (!isNullOrEmpty(dependency.getGroupId())) {
             addViolation(
                     problems,
                     Severity.ERROR,
                     Version.V42,
                     prefix + "groupId",
                     null,
-                    "must not be specified when the 'id' attribute is used.",
+                    "must not be specified when 'id' attribute is used.",
                     dependency);
         }
-        if (dependency.getArtifactId() != null && !dependency.getArtifactId().isEmpty()) {
+        if (!isNullOrEmpty(dependency.getArtifactId())) {
             addViolation(
                     problems,
                     Severity.ERROR,
                     Version.V42,
                     prefix + "artifactId",
                     null,
-                    "must not be specified when the 'id' attribute is used.",
+                    "must not be specified when 'id' attribute is used.",
                     dependency);
         }
-        if (dependency.getVersion() != null && !dependency.getVersion().isEmpty()) {
+        if (!isNullOrEmpty(dependency.getVersion())) {
             addViolation(
                     problems,
                     Severity.ERROR,
                     Version.V42,
                     prefix + "version",
                     null,
-                    "must not be specified when the 'id' attribute is used.",
+                    "must not be specified when 'id' attribute is used.",
                     dependency);
         }
-        if (hasScopeMarker
-                && dependency.getScope() != null
-                && !dependency.getScope().isEmpty()) {
+        if (colonCount >= 3 && !isNullOrEmpty(dependency.getType()) && !"jar".equals(dependency.getType())) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "type",
+                    null,
+                    "must not be specified when 'id' attribute includes type.",
+                    dependency);
+        }
+        if (colonCount >= 4 && !isNullOrEmpty(dependency.getClassifier())) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "classifier",
+                    null,
+                    "must not be specified when 'id' attribute includes classifier.",
+                    dependency);
+        }
+        if (hasScopeMarker && !isNullOrEmpty(dependency.getScope())) {
             addViolation(
                     problems,
                     Severity.ERROR,
                     Version.V42,
                     prefix + "scope",
                     null,
-                    "must not be specified when the 'id' attribute contains '@scope'.",
+                    "must not be specified when 'id' attribute contains '@scope'.",
                     dependency);
         }
-        if (hasOptionalMarker
-                && dependency.getOptional() != null
-                && !dependency.getOptional().isEmpty()) {
+        if (hasOptionalMarker && !isNullOrEmpty(dependency.getOptional())) {
             addViolation(
                     problems,
                     Severity.ERROR,
                     Version.V42,
                     prefix + "optional",
                     null,
-                    "must not be specified when the 'id' attribute contains '?'.",
+                    "must not be specified when 'id' attribute contains '?'.",
                     dependency);
         }
     }
 
-    /**
-     * Strips the optional {@code @scope} and {@code ?} suffixes from a dependency id string,
-     * returning just the {@code groupId:artifactId:version} portion.
-     */
     private static String stripScopeAndOptional(String id) {
         String remaining = id;
         if (remaining.endsWith("?")) {
@@ -1431,45 +1442,41 @@ public class DefaultModelValidator implements ModelValidator {
         return remaining;
     }
 
-    /**
-     * Validates the {@code id} attribute on an exclusion element.
-     * The id must have the format {@code groupId:artifactId} and must not
-     * be specified alongside individual groupId or artifactId child elements.
-     */
     private void validateExclusionIdAttribute(ModelProblemCollector problems, Exclusion exclusion, String prefix) {
         String id = exclusion.getId();
         if (id == null || id.isEmpty()) {
             return;
         }
-        String[] parts = id.split(":");
-        if (parts.length != 2) {
+        int colonCount = id.length() - id.replace(":", "").length();
+        if (colonCount != 1) {
             addViolation(
                     problems,
                     Severity.ERROR,
                     Version.V42,
-                    prefix + "id",
+                    prefix + "exclusions.exclusion.id",
                     null,
-                    "must have the format 'groupId:artifactId' but is '" + id + "'.",
+                    "has invalid format '" + id + "', must be 'groupId:artifactId'.",
+                    exclusion);
+            return;
+        }
+        if (!isNullOrEmpty(exclusion.getGroupId())) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "exclusions.exclusion.groupId",
+                    null,
+                    "must not be specified when 'id' attribute is used.",
                     exclusion);
         }
-        if (exclusion.getGroupId() != null && !exclusion.getGroupId().isEmpty()) {
+        if (!isNullOrEmpty(exclusion.getArtifactId())) {
             addViolation(
                     problems,
                     Severity.ERROR,
                     Version.V42,
-                    prefix + "groupId",
+                    prefix + "exclusions.exclusion.artifactId",
                     null,
-                    "must not be specified when the 'id' attribute is used.",
-                    exclusion);
-        }
-        if (exclusion.getArtifactId() != null && !exclusion.getArtifactId().isEmpty()) {
-            addViolation(
-                    problems,
-                    Severity.ERROR,
-                    Version.V42,
-                    prefix + "artifactId",
-                    null,
-                    "must not be specified when the 'id' attribute is used.",
+                    "must not be specified when 'id' attribute is used.",
                     exclusion);
         }
     }
@@ -1729,6 +1736,7 @@ public class DefaultModelValidator implements ModelValidator {
 
         if (validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_2_0) {
             for (Exclusion exclusion : dependency.getExclusions()) {
+                validateExclusionIdAttribute(problems, exclusion, prefix);
                 if (validationLevel < ModelValidator.VALIDATION_LEVEL_MAVEN_3_0) {
                     validateCoordinatesId(
                             prefix,
@@ -2724,5 +2732,9 @@ public class DefaultModelValidator implements ModelValidator {
         static SourceHint resourceDirectory(Resource resource) {
             return resource::getDirectory;
         }
+    }
+
+    private static boolean isNullOrEmpty(String s) {
+        return s == null || s.isEmpty();
     }
 }

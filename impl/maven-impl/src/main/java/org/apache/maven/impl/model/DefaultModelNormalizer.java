@@ -53,7 +53,6 @@ public class DefaultModelNormalizer implements ModelNormalizer {
     public Model mergeDuplicates(Model model, ModelBuilderRequest request, ModelProblemCollector problems) {
         Model.Builder builder = Model.newBuilder(model);
 
-        // Expand id attributes on mixins
         builder.mixins(injectList(model.getMixins(), this::expandMixinGav));
 
         Build build = model.getBuild();
@@ -83,10 +82,8 @@ public class DefaultModelNormalizer implements ModelNormalizer {
          * the way 2.x works. When we're in strict mode, the removal of duplicates just saves other merging steps from
          * aftereffects and bogus error messages.
          */
-        // Expand id attributes on dependencies (and their exclusions), then deduplicate
         builder.dependencies(expandAndDeduplicateDependencies(model.getDependencies()));
 
-        // Expand id attributes on dependency management dependencies
         DependencyManagement mgmt = model.getDependencyManagement();
         if (mgmt != null) {
             List<Dependency> expandedMgmt = expandAndDeduplicateDependencies(mgmt.getDependencies());
@@ -97,7 +94,6 @@ public class DefaultModelNormalizer implements ModelNormalizer {
             }
         }
 
-        // Expand id attributes in profile dependencies and dependency management
         List<Profile> profiles = injectList(model.getProfiles(), this::expandProfileDependencyIds);
         if (profiles != null) {
             builder.profiles(profiles);
@@ -203,12 +199,22 @@ public class DefaultModelNormalizer implements ModelNormalizer {
 
     /**
      * Expands the {@code id} attribute on a dependency into its component fields.
-     * The id format is {@code groupId:artifactId:version[@scope][?]}.
+     * Supported formats (trailing {@code :} means version is managed,
+     * {@code @scope} sets the scope, trailing {@code ?} marks as optional):
+     * <ul>
+     *   <li>{@code groupId:artifactId} (version managed)</li>
+     *   <li>{@code groupId:artifactId:} (version managed, explicit trailing colon)</li>
+     *   <li>{@code groupId:artifactId:version}</li>
+     *   <li>{@code groupId:artifactId:type:} (version managed, with type)</li>
+     *   <li>{@code groupId:artifactId:type:version}</li>
+     *   <li>{@code groupId:artifactId:type:classifier:} (version managed, with type and classifier)</li>
+     *   <li>{@code groupId:artifactId:type:classifier:version}</li>
+     * </ul>
+     * All formats may be suffixed with {@code @scope} and/or {@code ?}.
      */
     Dependency expandDependencyId(Dependency d) {
         String id = d.getId();
         if (id == null || id.isEmpty()) {
-            // No id attribute, but still expand exclusion ids
             List<Exclusion> expanded = injectList(d.getExclusions(), this::expandExclusionId);
             return expanded != null ? d.withExclusions(expanded) : d;
         }
@@ -227,20 +233,51 @@ public class DefaultModelNormalizer implements ModelNormalizer {
             remaining = remaining.substring(0, atIndex);
         }
 
-        String[] parts = remaining.split(":");
-        if (parts.length != 3) {
-            // Invalid format — will be caught by the validator
+        String[] parts = remaining.split(":", -1);
+        if (parts.length < 2 || parts.length > 5) {
             return d;
         }
-        Dependency.Builder builder = Dependency.newBuilder(d);
+        Dependency.Builder builder = Dependency.newBuilder(d, true);
+        builder.id(null);
         if (isNullOrEmpty(d.getGroupId())) {
             builder.groupId(parts[0]);
         }
         if (isNullOrEmpty(d.getArtifactId())) {
             builder.artifactId(parts[1]);
         }
-        if (isNullOrEmpty(d.getVersion())) {
-            builder.version(parts[2]);
+        switch (parts.length) {
+            case 2:
+                // g:a (version managed)
+                break;
+            case 3:
+                // g:a:v or g:a: (managed)
+                if (!parts[2].isEmpty() && isNullOrEmpty(d.getVersion())) {
+                    builder.version(parts[2]);
+                }
+                break;
+            case 4:
+                // g:a:type:v or g:a:type: (managed)
+                if (isNullOrEmptyOrDefault(d.getType())) {
+                    builder.type(parts[2]);
+                }
+                if (!parts[3].isEmpty() && isNullOrEmpty(d.getVersion())) {
+                    builder.version(parts[3]);
+                }
+                break;
+            case 5:
+                // g:a:type:classifier:v or g:a:type:classifier: (managed)
+                if (isNullOrEmptyOrDefault(d.getType())) {
+                    builder.type(parts[2]);
+                }
+                if (isNullOrEmpty(d.getClassifier())) {
+                    builder.classifier(parts[3]);
+                }
+                if (!parts[4].isEmpty() && isNullOrEmpty(d.getVersion())) {
+                    builder.version(parts[4]);
+                }
+                break;
+            default:
+                break;
         }
         if (scope != null && isNullOrEmpty(d.getScope())) {
             builder.scope(scope);
@@ -255,10 +292,6 @@ public class DefaultModelNormalizer implements ModelNormalizer {
         return builder.build();
     }
 
-    /**
-     * Expands the {@code id} attribute on an exclusion into its component fields.
-     * The id format is {@code groupId:artifactId}.
-     */
     Exclusion expandExclusionId(Exclusion e) {
         String id = e.getId();
         if (id == null || id.isEmpty()) {
@@ -266,10 +299,10 @@ public class DefaultModelNormalizer implements ModelNormalizer {
         }
         String[] parts = id.split(":");
         if (parts.length != 2) {
-            // Invalid format — will be caught by the validator
             return e;
         }
-        Exclusion.Builder builder = Exclusion.newBuilder(e);
+        Exclusion.Builder builder = Exclusion.newBuilder(e, true);
+        builder.id(null);
         if (isNullOrEmpty(e.getGroupId())) {
             builder.groupId(parts[0]);
         }
@@ -279,10 +312,6 @@ public class DefaultModelNormalizer implements ModelNormalizer {
         return builder.build();
     }
 
-    /**
-     * Expands the {@code id} (XML attribute) / {@code gav} (Java field) on a mixin
-     * into its component fields. The format is {@code groupId:artifactId:version}.
-     */
     Mixin expandMixinGav(Mixin m) {
         String gav = m.getGav();
         if (gav == null || gav.isEmpty()) {
@@ -290,10 +319,10 @@ public class DefaultModelNormalizer implements ModelNormalizer {
         }
         String[] parts = gav.split(":");
         if (parts.length != 3) {
-            // Invalid format — will be caught by the validator
             return m;
         }
-        Mixin.Builder builder = Mixin.newBuilder(m);
+        Mixin.Builder builder = Mixin.newBuilder(m, true);
+        builder.gav(null);
         if (isNullOrEmpty(m.getGroupId())) {
             builder.groupId(parts[0]);
         }
@@ -308,5 +337,9 @@ public class DefaultModelNormalizer implements ModelNormalizer {
 
     private static boolean isNullOrEmpty(String s) {
         return s == null || s.isEmpty();
+    }
+
+    private static boolean isNullOrEmptyOrDefault(String type) {
+        return type == null || type.isEmpty() || "jar".equals(type);
     }
 }

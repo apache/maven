@@ -1,13 +1,14 @@
-<project>
+<project xmlns="http://maven.apache.org/POM/4.2.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.2.0 https://maven.apache.org/xsd/maven-4.2.0.xsd">
   <modelVersion>4.2.0</modelVersion>
-  <artifactId>aid</artifactId>
-  <groupId>gid</groupId>
-  <version>0.1</version>
-
+  <groupId>test</groupId>
+  <artifactId>test</artifactId>
+  <version>1.0</version>
   <dependencies>
-    <dependency id="org.postgresql:postgresql:42.7.3">
+    <dependency id="org.example:lib-a:1.0">
       <exclusions>
-        <exclusion id="*:*"/>
+        <exclusion id="org.unwanted:bad-lib"/>
       </exclusions>
     </dependency>
   </dependencies>

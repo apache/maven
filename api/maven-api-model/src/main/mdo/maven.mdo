@@ -1210,12 +1210,18 @@
           <version>4.2.0+</version>
           <description>
             <![CDATA[
-            Combined coordinates in compact form: {@code groupId:artifactId:version[@scope][?]}.
-            When specified, it is split into the {@code groupId}, {@code artifactId},
-            and {@code version} fields during model normalization.
+            Combined coordinates in one of the following formats:
+            {@code groupId:artifactId} (version managed),
+            {@code groupId:artifactId:version},
+            {@code groupId:artifactId:type:version},
+            {@code groupId:artifactId:type:classifier:version},
+            {@code groupId:artifactId:type:} (version managed, with type), or
+            {@code groupId:artifactId:type:classifier:} (version managed, with type and classifier).
+            A trailing {@code :} indicates the version is managed (i.e. provided by dependencyManagement).
             An optional {@code @scope} suffix sets the dependency scope
             (e.g., {@code @test}, {@code @provided}, {@code @runtime}, {@code @import}).
             A trailing {@code ?} marks the dependency as optional.
+            When specified, it is split into the corresponding fields during model normalization.
             The individual child elements should not be specified when the corresponding
             value is already encoded in this attribute.
             @since Maven 4.2

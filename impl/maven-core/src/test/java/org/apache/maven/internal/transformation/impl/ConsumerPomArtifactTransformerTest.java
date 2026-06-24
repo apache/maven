@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.services.Sources;
+import org.apache.maven.impl.model.DefaultModelNormalizer;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.v4.MavenStaxReader;
 import org.apache.maven.project.MavenProject;
@@ -101,6 +102,44 @@ class ConsumerPomArtifactTransformerTest {
             ConsumerPomArtifactTransformer t = new ConsumerPomArtifactTransformer((s, p, f) -> {
                 try (InputStream is = f.openStream()) {
                     return DefaultConsumerPomBuilder.transformNonPom(new MavenStaxReader().read(is), project);
+                }
+            });
+
+            t.transform(project, systemSessionMock, Sources.buildSource(beforePomFile), tempFile);
+        }
+        Diff diff = DiffBuilder.compare(afterPomFile.toFile())
+                .withTest(tempFile.toFile())
+                .ignoreComments()
+                .ignoreWhitespace()
+                .build();
+        assertFalse(diff.hasDifferences(), "XML files should be identical: " + diff.toString());
+    }
+
+    @Test
+    void transformJarConsumerPomWithDependencyId() throws Exception {
+        RepositorySystemSession systemSessionMock = Mockito.mock(RepositorySystemSession.class);
+        SessionData sessionDataMock = Mockito.mock(SessionData.class);
+        when(systemSessionMock.getData()).thenReturn(sessionDataMock);
+
+        Path beforePomFile = Paths.get("src/test/resources/projects/transform/jar-with-id/before.pom")
+                .toAbsolutePath();
+        Path afterPomFile = Paths.get("src/test/resources/projects/transform/jar-with-id/after.pom")
+                .toAbsolutePath();
+        Path tempFile = Files.createTempFile("", ".pom");
+        Files.delete(tempFile);
+        DefaultModelNormalizer normalizer = new DefaultModelNormalizer();
+        try (InputStream expected = Files.newInputStream(beforePomFile)) {
+            org.apache.maven.api.model.Model rawModel = new MavenStaxReader().read(expected);
+            // Normalize: expand id attributes and clear them
+            rawModel = normalizer.mergeDuplicates(rawModel, null, null);
+            Model model = new Model(rawModel);
+            MavenProject project = new MavenProject(model);
+            project.setOriginalModel(model);
+            ConsumerPomArtifactTransformer t = new ConsumerPomArtifactTransformer((s, p, f) -> {
+                try (InputStream is = f.openStream()) {
+                    org.apache.maven.api.model.Model m = new MavenStaxReader().read(is);
+                    m = normalizer.mergeDuplicates(m, null, null);
+                    return DefaultConsumerPomBuilder.transformNonPom(m, project);
                 }
             });
 
