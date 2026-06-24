@@ -194,4 +194,45 @@ public interface ClassRealm extends Closeable {
      */
     @Nullable
     URL loadResourceFromParent(@Nonnull String name);
+
+    /**
+     * Exports a package from a named JPMS module to this realm's unnamed module,
+     * making the package's public types accessible to classes loaded by this realm.
+     *
+     * @param moduleName the source module name
+     * @param packageName the package to export
+     * @return {@code true} if the export was applied, {@code false} if the module was not found
+     *         or is in the boot layer (which requires {@code --add-exports} in the launcher)
+     * @since 4.1.0
+     */
+    default boolean addExports(@Nonnull String moduleName, @Nonnull String packageName) {
+        return false;
+    }
+
+    /**
+     * Opens a package from a named JPMS module to this realm's unnamed module for deep reflection,
+     * making the package's types accessible via reflection (including non-public members).
+     *
+     * @param moduleName the source module name
+     * @param packageName the package to open
+     * @return {@code true} if the open was applied, {@code false} if the module was not found
+     *         or is in the boot layer (which requires {@code --add-opens} in the launcher)
+     * @since 4.1.0
+     */
+    default boolean addOpens(@Nonnull String moduleName, @Nonnull String packageName) {
+        return false;
+    }
+
+    /**
+     * Adds a reads edge from a named JPMS module to this realm's unnamed module,
+     * allowing the named module to access types in this realm.
+     *
+     * @param moduleName the source module that should read this realm's unnamed module
+     * @return {@code true} if the reads edge was added, {@code false} if the module was not found
+     *         or is in the boot layer
+     * @since 4.1.0
+     */
+    default boolean addReads(@Nonnull String moduleName) {
+        return false;
+    }
 }

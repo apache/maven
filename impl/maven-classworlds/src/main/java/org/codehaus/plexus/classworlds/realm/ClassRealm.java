@@ -227,57 +227,16 @@ public class ClassRealm extends URLClassLoader implements org.apache.maven.api.c
         super.addURL(url);
     }
 
-    /**
-     * Export a package from a named module to this realm's unnamed module.
-     * Uses the {@link ModuleLayer.Controller} from the {@link ClassWorld} for runtime layer modules.
-     *
-     * @param moduleName the source module name
-     * @param packageName the package to export
-     */
-    public void addExports(String moduleName, String packageName) {
-        applyModuleAccess(moduleName, packageName, false);
+    public boolean addExports(String moduleName, String packageName) {
+        return world.addExports(moduleName, packageName, getUnnamedModule());
     }
 
-    /**
-     * Open a package from a named module to this realm's unnamed module for deep reflection.
-     * Uses the {@link ModuleLayer.Controller} from the {@link ClassWorld} for runtime layer modules.
-     *
-     * @param moduleName the source module name
-     * @param packageName the package to open
-     */
-    public void addOpens(String moduleName, String packageName) {
-        applyModuleAccess(moduleName, packageName, true);
+    public boolean addOpens(String moduleName, String packageName) {
+        return world.addOpens(moduleName, packageName, getUnnamedModule());
     }
 
-    private void applyModuleAccess(String moduleName, String packageName, boolean open) {
-        Module target = getUnnamedModule();
-
-        ModuleLayer runtimeLayer = world.getModuleLayer();
-        ModuleLayer.Controller controller = world.getModuleLayerController();
-
-        Module source = null;
-        boolean isRuntimeModule = false;
-
-        if (runtimeLayer != null) {
-            source = runtimeLayer.findModule(moduleName).orElse(null);
-            if (source != null) {
-                isRuntimeModule = true;
-            }
-        }
-        if (source == null) {
-            source = ModuleLayer.boot().findModule(moduleName).orElse(null);
-        }
-        if (source == null) {
-            return;
-        }
-
-        if (isRuntimeModule && controller != null) {
-            if (open) {
-                controller.addOpens(source, packageName, target);
-            } else {
-                controller.addExports(source, packageName, target);
-            }
-        }
+    public boolean addReads(String moduleName) {
+        return world.addReads(moduleName, getUnnamedModule());
     }
 
     // ----------------------------------------------------------------------

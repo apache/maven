@@ -401,31 +401,43 @@ public class DefaultClassRealmManager implements ClassRealmManager {
 
     private void applyModuleAccessDirective(org.codehaus.plexus.classworlds.realm.ClassRealm realm, String line) {
         if (line.startsWith("add-exports ")) {
-            String spec = line.substring("add-exports ".length()).trim();
-            int slash = spec.indexOf('/');
-            if (slash > 0) {
-                String module = spec.substring(0, slash);
-                String pkg = spec.substring(slash + 1);
-                int eq = pkg.indexOf('=');
-                if (eq > 0) {
-                    pkg = pkg.substring(0, eq);
-                }
-                realm.addExports(module, pkg);
-            }
+            applyExportOrOpen(realm, line.substring("add-exports ".length()).trim(), false);
         } else if (line.startsWith("add-opens ")) {
-            String spec = line.substring("add-opens ".length()).trim();
-            int slash = spec.indexOf('/');
-            if (slash > 0) {
-                String module = spec.substring(0, slash);
-                String pkg = spec.substring(slash + 1);
-                int eq = pkg.indexOf('=');
-                if (eq > 0) {
-                    pkg = pkg.substring(0, eq);
-                }
-                realm.addOpens(module, pkg);
+            applyExportOrOpen(realm, line.substring("add-opens ".length()).trim(), true);
+        } else if (line.startsWith("add-reads ")) {
+            String module = line.substring("add-reads ".length()).trim();
+            if (!realm.addReads(module)) {
+                logger.debug("  Failed to add-reads {} for realm {}", module, realm.getId());
             }
         } else {
             logger.debug("Unknown module-access directive: {}", line);
+        }
+    }
+
+    private void applyExportOrOpen(org.codehaus.plexus.classworlds.realm.ClassRealm realm, String spec, boolean open) {
+        int slash = spec.indexOf('/');
+        if (slash <= 0) {
+            logger.debug("Invalid module-access directive (missing '/'): {}", spec);
+            return;
+        }
+        String module = spec.substring(0, slash);
+        String pkg = spec.substring(slash + 1);
+        int eq = pkg.indexOf('=');
+        if (eq > 0) {
+            String target = pkg.substring(eq + 1).trim();
+            pkg = pkg.substring(0, eq).trim();
+            if (!"ALL-UNNAMED".equals(target)) {
+                logger.warn("module-access directive target '{}' ignored, only ALL-UNNAMED is supported", target);
+            }
+        }
+        boolean applied = open ? realm.addOpens(module, pkg) : realm.addExports(module, pkg);
+        if (!applied) {
+            logger.debug(
+                    "  Failed to {} {}/{} for realm {}",
+                    open ? "add-opens" : "add-exports",
+                    module,
+                    pkg,
+                    realm.getId());
         }
     }
 }
