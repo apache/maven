@@ -450,6 +450,12 @@ LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
 JLINE_NATIVE_PATH="$MAVEN_HOME/lib/jline-native"
 MODULES_DIR="$MAVEN_HOME/lib/modules"
 
+# Module-path and native access flags require Java 21+ (FFM API)
+MAVEN_MODULE_OPTS=""
+if "$JAVACMD" --enable-native-access=org.jline.terminal.ffm -version >/dev/null 2>&1; then
+  MAVEN_MODULE_OPTS="--module-path \"$MODULES_DIR\" --add-modules ALL-MODULE-PATH --enable-native-access=org.jline.terminal.ffm,org.jline.nativ"
+fi
+
 # For Cygwin and MinGW, switch paths to Windows format before running java(1) command
 if $cygwin || $mingw ; then
   [ -n "$JAVA_HOME" ] &&
@@ -503,9 +509,7 @@ MAVEN_MAIN_CLASS=${MAVEN_MAIN_CLASS:=org.apache.maven.cling.MavenCling}
 cmd="\"$JAVACMD\" \
   $MAVEN_OPTS \
   $MAVEN_DEBUG_OPTS \
-  --module-path \"$MODULES_DIR\" \
-  --add-modules ALL-MODULE-PATH \
-  --enable-native-access=org.jline.terminal.ffm,org.jline.nativ \
+  $MAVEN_MODULE_OPTS \
   -classpath \"$LAUNCHER_JAR\" \
   \"-Dclassworlds.conf=$CLASSWORLDS_CONF\" \
   \"-Dmaven.home=$MAVEN_HOME\" \

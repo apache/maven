@@ -227,16 +227,16 @@ public class ClassRealm extends URLClassLoader implements org.apache.maven.api.c
         super.addURL(url);
     }
 
-    public boolean addExports(String moduleName, String packageName) {
-        return world.addExports(moduleName, packageName, getUnnamedModule());
+    public void addExports(String moduleName, String packageName) {
+        world.addExports(moduleName, packageName, getUnnamedModule());
     }
 
-    public boolean addOpens(String moduleName, String packageName) {
-        return world.addOpens(moduleName, packageName, getUnnamedModule());
+    public void addOpens(String moduleName, String packageName) {
+        world.addOpens(moduleName, packageName, getUnnamedModule());
     }
 
-    public boolean addReads(String moduleName) {
-        return world.addReads(moduleName, getUnnamedModule());
+    public void addReads(String moduleName) {
+        world.addReads(moduleName, getUnnamedModule());
     }
 
     // ----------------------------------------------------------------------
