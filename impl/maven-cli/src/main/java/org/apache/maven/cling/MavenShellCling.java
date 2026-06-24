@@ -47,7 +47,7 @@ public class MavenShellCling extends ClingSupport {
     /**
      * ClassWorld Launcher "enhanced" entry point: returning exitCode and accepts Class World.
      */
-    public static int main(String[] args, ClassWorld world) throws IOException {
+    public static int main(String[] args, org.codehaus.plexus.classworlds.ClassWorld world) throws IOException {
         return new MavenShellCling(world).run(args, null, null, null, false);
     }
 
@@ -56,7 +56,7 @@ public class MavenShellCling extends ClingSupport {
      */
     public static int main(
             String[] args,
-            ClassWorld world,
+            org.codehaus.plexus.classworlds.ClassWorld world,
             @Nullable InputStream stdIn,
             @Nullable OutputStream stdOut,
             @Nullable OutputStream stdErr)
