@@ -1205,6 +1205,36 @@
         ]]>
       </description>
       <fields>
+        <field xml.attribute="true">
+          <name>id</name>
+          <version>4.2.0+</version>
+          <description>
+            <![CDATA[
+            Combined coordinates in compact form:
+            {@code groupId:artifactId[[:type[:classifier]]:version][@scope][?]}.
+            Examples:
+            {@code groupId:artifactId:version},
+            {@code groupId:artifactId:type:version}, or
+            {@code groupId:artifactId:type:classifier:version}.
+            Any segment may be left empty to be inferred (e.g., from {@code dependencyManagement}):
+            {@code :artifactId} (groupId inferred, version managed),
+            {@code :artifactId:version} (groupId inferred),
+            {@code groupId:artifactId:type:} (version managed, with type), or
+            {@code groupId:artifactId:type:classifier:} (version managed, with type and classifier).
+            A trailing or empty {@code version} segment indicates the version is managed
+            (i.e. provided by {@code dependencyManagement}).
+            An optional {@code @scope} suffix sets the dependency scope
+            (e.g., {@code @test}, {@code @provided}, {@code @runtime}, {@code @import}).
+            A trailing {@code ?} marks the dependency as optional.
+            When specified, it is split into the corresponding fields during model normalization.
+            Empty segments are skipped, leaving the corresponding field unset for later inference.
+            The individual child elements should not be specified when the corresponding
+            value is already encoded in this attribute.
+            @since Maven 4.2
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
         <field>
           <name>groupId</name>
           <version>3.0.0+</version>
@@ -1441,6 +1471,20 @@
         ]]>
       </description>
       <fields>
+        <field xml.attribute="true">
+          <name>id</name>
+          <version>4.2.0+</version>
+          <description>
+            <![CDATA[
+            Combined coordinates as {@code groupId:artifactId}.
+            When specified, it is split into the {@code groupId} and {@code artifactId}
+            fields during model normalization.
+            The individual child elements should not be specified when using this attribute.
+            @since Maven 4.2
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
         <field>
           <name>groupId</name>
           <version>4.0.0+</version>
@@ -1864,6 +1908,20 @@
         <version>4.1.0+</version>
         <superClass>Parent</superClass>
         <fields>
+            <field xml.attribute="true" xml.tagName="id">
+                <name>gav</name>
+                <version>4.2.0+</version>
+                <description>
+                    <![CDATA[
+                    Combined coordinates as {@code groupId:artifactId:version}.
+                    When specified, it is split into the {@code groupId}, {@code artifactId},
+                    and {@code version} fields during model normalization.
+                    The individual child elements should not be specified when using this attribute.
+                    @since Maven 4.2
+                    ]]>
+                </description>
+                <type>String</type>
+            </field>
             <field>
                 <name>classifier</name>
                 <version>4.1.0+</version>

@@ -1,0 +1,10 @@
+<project>
+  <modelVersion>4.2.0</modelVersion>
+  <artifactId>aid</artifactId>
+  <groupId>gid</groupId>
+  <version>0.1</version>
+
+  <dependencies>
+    <dependency id="org.junit.jupiter:junit-jupiter-api:5.0@test"/>
+  </dependencies>
+</project>

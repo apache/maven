@@ -1022,4 +1022,157 @@ class DefaultModelValidatorTest {
                 "raw-model/profile-activation-condition-with-basedir.xml", ModelValidator.VALIDATION_LEVEL_STRICT);
         assertViolations(result, 0, 0, 0);
     }
+
+    // ===== dependency id attribute tests =====
+
+    @Test
+    void testDependencyId2partsValid() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-2parts-valid.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void testDependencyId3partsValid() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-3parts-valid.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void testDependencyId4partsValid() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-4parts-valid.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void testDependencyId5partsValid() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-5parts-valid.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void testDependencyIdTrailingColon3partsValid() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-trailing-colon-3parts-valid.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void testDependencyIdTrailingColon4partsValid() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-trailing-colon-4parts-valid.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void testDependencyIdTrailingColon5partsValid() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-trailing-colon-5parts-valid.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void testDependencyIdBadFormat() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-bad-format.xml");
+        assertViolations(result, 0, 1, 0);
+        assertContains(result.getErrors().get(0), "invalid format");
+    }
+
+    @Test
+    void testDependencyIdConflictGroupId() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-conflict-groupId.xml");
+        assertViolations(result, 0, 1, 0);
+        assertContains(result.getErrors().get(0), "must not be specified when 'id' attribute is used");
+    }
+
+    @Test
+    void testDependencyIdConflictArtifactId() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-conflict-artifactId.xml");
+        assertViolations(result, 0, 1, 0);
+        assertContains(result.getErrors().get(0), "must not be specified when 'id' attribute is used");
+    }
+
+    @Test
+    void testDependencyIdConflictVersion() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-conflict-version.xml");
+        assertViolations(result, 0, 1, 0);
+        assertContains(result.getErrors().get(0), "must not be specified when 'id' attribute is used");
+    }
+
+    @Test
+    void testDependencyIdConflictType() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-conflict-type.xml");
+        assertViolations(result, 0, 1, 0);
+        assertContains(result.getErrors().get(0), "must not be specified when 'id' attribute includes type");
+    }
+
+    @Test
+    void testDependencyIdConflictMultiple() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-conflict-multiple.xml");
+        assertViolations(result, 0, 2, 0);
+        assertContains(result.getErrors().get(0), "must not be specified when 'id' attribute is used");
+    }
+
+    @Test
+    void testValidDependencyIdWithScope() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-with-scope-valid.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void testValidDependencyIdWithOptional() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-with-optional-valid.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void testValidDependencyIdWithScopeAndOptional() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-with-scope-optional-valid.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void testDependencyIdScopeConflict() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-scope-conflict.xml");
+        assertViolations(result, 0, 1, 0);
+        assertContains(result.getErrors().get(0), "must not be specified when 'id' attribute contains '@scope'");
+    }
+
+    @Test
+    void testDependencyIdOptionalConflict() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-optional-conflict.xml");
+        assertViolations(result, 0, 1, 0);
+        assertContains(result.getErrors().get(0), "must not be specified when 'id' attribute contains '?'");
+    }
+
+    // ===== exclusion id attribute tests =====
+
+    @Test
+    void testExclusionIdValid() throws Exception {
+        SimpleProblemCollector result = validateFile("exclusion-id-valid.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void testExclusionIdBadFormat() throws Exception {
+        SimpleProblemCollector result = validateFile("exclusion-id-bad-format.xml");
+        assertViolations(result, 0, 1, 0);
+    }
+
+    @Test
+    void testExclusionIdConflictGroupId() throws Exception {
+        SimpleProblemCollector result = validateFile("exclusion-id-conflict-groupId.xml");
+        assertViolations(result, 0, 1, 0);
+        assertContains(result.getErrors().get(0), "must not be specified when 'id' attribute is used");
+    }
+
+    @Test
+    void testExclusionIdConflictArtifactId() throws Exception {
+        SimpleProblemCollector result = validateFile("exclusion-id-conflict-artifactId.xml");
+        assertViolations(result, 0, 1, 0);
+        assertContains(result.getErrors().get(0), "must not be specified when 'id' attribute is used");
+    }
+
+    @Test
+    void testExclusionIdConflictMultiple() throws Exception {
+        SimpleProblemCollector result = validateFile("exclusion-id-conflict-multiple.xml");
+        assertViolations(result, 0, 2, 0);
+        assertContains(result.getErrors().get(0), "must not be specified when 'id' attribute is used");
+    }
 }
