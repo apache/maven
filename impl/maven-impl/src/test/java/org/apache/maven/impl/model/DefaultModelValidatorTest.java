@@ -1022,4 +1022,26 @@ class DefaultModelValidatorTest {
                 "raw-model/profile-activation-condition-with-basedir.xml", ModelValidator.VALIDATION_LEVEL_STRICT);
         assertViolations(result, 0, 0, 0);
     }
+
+    @Test
+    void testMissingExtensionCoordinates() throws Exception {
+        SimpleProblemCollector result = validate("missing-extension-coordinates.xml");
+
+        assertViolations(result, 0, 0, 2);
+
+        assertContains(result.getWarnings().get(0), "'build.extensions.extension.groupId' is missing.");
+        assertContains(result.getWarnings().get(1), "'build.extensions.extension.artifactId' is missing.");
+    }
+
+    @Test
+    void minimalWithParent() throws Exception {
+        SimpleProblemCollector result = validateRaw("raw-model/minimal-with-parent.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void minimalWithoutParent() throws Exception {
+        SimpleProblemCollector result = validateRaw("raw-model/minimal-without-parent.xml");
+        assertViolations(result, 0, 0, 0);
+    }
 }

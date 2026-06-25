@@ -55,6 +55,7 @@ import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.DistributionManagement;
 import org.apache.maven.api.model.Exclusion;
+import org.apache.maven.api.model.Extension;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputLocationTracker;
 import org.apache.maven.api.model.Model;
@@ -1066,6 +1067,24 @@ public class DefaultModelValidator implements ModelValidator {
                             plugin);
 
                     validate20EffectivePluginDependencies(problems, plugin, validationLevel);
+                }
+
+                for (Extension extension : build.getExtensions()) {
+                    validateStringNotEmpty(
+                            "build.extensions.extension.groupId",
+                            problems,
+                            Severity.WARNING,
+                            Version.V20,
+                            extension.getGroupId(),
+                            extension);
+
+                    validateStringNotEmpty(
+                            "build.extensions.extension.artifactId",
+                            problems,
+                            Severity.WARNING,
+                            Version.V20,
+                            extension.getArtifactId(),
+                            extension);
                 }
 
                 validate20RawResources(problems, build.getResources(), "build.resources.resource.", validationLevel);
