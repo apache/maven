@@ -429,9 +429,10 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected void activateLogging(C context) throws Exception {
-        // Route java.util.logging (JUL) through SLF4J
-        SLF4JBridgeHandler.removeHandlersForRootLogger();
-        SLF4JBridgeHandler.install();
+        if (!SLF4JBridgeHandler.isInstalled()) {
+            SLF4JBridgeHandler.removeHandlersForRootLogger();
+            SLF4JBridgeHandler.install();
+        }
 
         context.slf4jConfiguration.activate();
         if (context.options().failOnSeverity().isPresent()) {
