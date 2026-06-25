@@ -1713,8 +1713,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                                     .build();
                         } catch (ModelBuilderException e) {
                             logger.debug(
-                                    "Could not read root model properties for CI-friendly"
-                                            + " version interpolation",
+                                    "Could not read root model properties for CI-friendly" + " version interpolation",
                                     e);
                         }
                     }
