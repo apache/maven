@@ -18,6 +18,8 @@
  */
 package org.apache.maven.toolchain;
 
+import java.util.regex.Pattern;
+
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -66,7 +68,7 @@ public final class RequirementMatcherFactory {
         @Override
         public boolean matches(String requirement) {
             try {
-                VersionRange range = VersionRange.createFromVersionSpec(requirement);
+                VersionRange range = convertRequirementToVersionRange(requirement);
                 if (range.hasRestrictions()) {
                     return range.containsVersion(version);
                 } else {
@@ -77,6 +79,29 @@ public final class RequirementMatcherFactory {
                 ex.printStackTrace();
                 return false;
             }
+        }
+
+        private VersionRange convertRequirementToVersionRange(String requirement)
+                throws InvalidVersionSpecificationException {
+            // Specific for Version _requirement_ matching;
+            // If the version is a simple integer (like "25")
+            // then treat this as the requirement "the major version is 25"
+            if (Pattern.matches("^[0-9]+$", requirement)) {
+                int majorVersion = Integer.parseInt(requirement);
+                return VersionRange.createFromVersionSpec("[" + majorVersion + "," + (majorVersion + 1) + ")");
+            }
+
+            // If the version is a major.minor (like "1.5")
+            // then treat this as the requirement "the major version is 1 and the minor is 5"
+            if (Pattern.matches("^[0-9]\\.[0-9]+$", requirement)) {
+                String[] split = requirement.split("\\.", 2);
+                int majorVersion = Integer.parseInt(split[0]);
+                int minorVersion = Integer.parseInt(split[1]);
+                return VersionRange.createFromVersionSpec(
+                        "[" + majorVersion + "." + minorVersion + "," + majorVersion + "." + (minorVersion + 1) + ")");
+            }
+
+            return VersionRange.createFromVersionSpec(requirement);
         }
 
         @Override

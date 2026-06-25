@@ -50,11 +50,18 @@ public class RequirementMatcherFactoryTest {
     public void testCreateVersionMatcher() {
         RequirementMatcher matcher;
         matcher = RequirementMatcherFactory.createVersionMatcher("1.5.2");
-        assertFalse(matcher.matches("1.5"));
-        assertTrue(matcher.matches("1.5.2"));
+        assertTrue(matcher.matches("1")); // Major matches
+        assertTrue(matcher.matches("1.5")); // Major.Minor matches
+        assertTrue(matcher.matches("1.5.2")); // Full match
+        assertFalse(matcher.matches("1.6")); // Wrong minor
+        assertFalse(matcher.matches("2")); // Wrong major
+        assertFalse(matcher.matches("2.5")); // Wrong major, right minor
         assertFalse(matcher.matches("[1.4,1.5)"));
         assertFalse(matcher.matches("[1.5,1.5.2)"));
+        assertTrue(matcher.matches("[1.5,1.5.3)"));
+        assertTrue(matcher.matches("(1.5.1,1.6)"));
         assertFalse(matcher.matches("(1.5.2,1.6)"));
+        assertTrue(matcher.matches("[1.5.2,1.6)"));
         assertTrue(matcher.matches("(1.4,1.5.2]"));
         assertTrue(matcher.matches("(1.5,)"));
         assertEquals("1.5.2", matcher.toString());
