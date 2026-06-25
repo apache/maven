@@ -119,7 +119,6 @@
         <field xdoc.separator="blank">
           <name>groupId</name>
           <version>3.0.0+</version>
-          <required>true</required>
           <description>
             A universally unique identifier for a project. It is normal to
             use a fully-qualified package name to distinguish it from other
@@ -140,7 +139,6 @@
         <field>
           <name>version</name>
           <version>4.0.0+</version>
-          <required>true</required>
           <description>The current version of the artifact produced by this project.</description>
           <type>String</type>
         </field>
@@ -167,7 +165,6 @@
         <field xdoc.separator="blank">
           <name>name</name>
           <version>3.0.0+</version>
-          <required>true</required>
           <description>The full name of the project.</description>
           <type>String</type>
         </field>
@@ -233,7 +230,6 @@
         <field>
           <name>inceptionYear</name>
           <version>3.0.0+</version>
-          <required>true</required>
           <description>The year of the project's inception, specified with 4 digits. This value is
             used when generating copyright notices as well as being informational.</description>
           <type>String</type>
@@ -355,7 +351,6 @@
         <field xdoc.separator="blank" xml.insertParentFieldsUpTo="pluginRepositories">
           <name>build</name>
           <version>3.0.0+</version>
-          <required>true</required>
           <description>Information required to build the project.</description>
           <association>
             <type>Build</type>
@@ -887,7 +882,6 @@
         <field>
           <name>sourceDirectory</name>
           <version>3.0.0+</version>
-          <required>true</required>
           <description>
             This element specifies a directory containing the source of the project. The
             generated build system will compile the sources from this directory when the project is
@@ -904,7 +898,6 @@
         <field>
           <name>scriptSourceDirectory</name>
           <version>4.0.0+</version>
-          <required>true</required>
           <description>
             This element specifies a directory containing the script sources of the
             project. This directory is meant to be different from the sourceDirectory, in that its
@@ -922,7 +915,6 @@
         <field>
           <name>testSourceDirectory</name>
           <version>4.0.0+</version>
-          <required>true</required>
           <description>
             This element specifies a directory containing the unit test source of the
             project. The generated build system will compile these directories when the project is
@@ -2931,7 +2923,6 @@
       <fields>
         <field>
           <name>id</name>
-          <required>true</required>
           <version>4.0.0+</version>
           <type>String</type>
           <defaultValue>default</defaultValue>
@@ -2951,7 +2942,6 @@
         <field xml.tagName="build">
           <name>build</name>
           <version>4.0.0+</version>
-          <required>true</required>
           <description>Information required to build the project.</description>
           <association>
             <type>BuildBase</type>
@@ -3290,7 +3280,6 @@
           <name>groupId</name>
           <version>4.0.0+</version>
           <type>String</type>
-          <required>true</required>
           <defaultValue>org.apache.maven.plugins</defaultValue>
           <description>The group ID of the reporting plugin in the repository.</description>
         </field>
@@ -3384,7 +3373,6 @@
         <field>
           <name>id</name>
           <type>String</type>
-          <required>true</required>
           <description>The unique id for this report set, to be used during POM inheritance and profile injection
             for merging of report sets.
           </description>
@@ -3393,7 +3381,6 @@
         <field>
           <name>reports</name>
           <version>4.0.0+</version>
-          <required>true</required>
           <description>The list of reports from this plugin which should be generated from this set.</description>
           <association>
             <type>String</type>
