@@ -166,7 +166,7 @@ under the License.
     <plexusXmlVersion>4.1.1</plexusXmlVersion>
     <resolverVersion>2.0.18</resolverVersion>
     <securityDispatcherVersion>4.1.0</securityDispatcherVersion>
-    <sisuVersion>1.0.0</sisuVersion>
+    <sisuVersion>1.0.1</sisuVersion>
     <slf4jVersion>2.0.18</slf4jVersion>
     <stax2ApiVersion>4.3.0</stax2ApiVersion>
     <wagonVersion>3.5.3</wagonVersion>
