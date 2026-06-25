@@ -373,6 +373,44 @@ class SourceStrategyTest {
         }
 
         @Test
+        @DisplayName("should preserve plugin config when it differs from migrated property value")
+        void shouldPreservePluginConfigWhenDifferent() {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.1.0">
+                    <modelVersion>4.1.0</modelVersion>
+                    <groupId>com.example</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0</version>
+                    <properties>
+                        <maven.compiler.release>17</maven.compiler.release>
+                    </properties>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <artifactId>maven-compiler-plugin</artifactId>
+                                <configuration>
+                                    <release>21</release>
+                                </configuration>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document doc = Document.of(pomXml);
+            UpgradeContext context = TestUtils.createMockContext(TestUtils.createOptionsWithModelVersion("4.1.0"));
+            strategy.doApply(context, new HashMap<>(Map.of(Paths.get("pom.xml"), doc)));
+
+            Element plugin = doc.root().path("build", "plugins", "plugin").orElseThrow();
+            Element configuration = plugin.childElement("configuration").orElseThrow();
+            assertEquals("21", configuration.childTextTrimmed("release"));
+
+            Element source = doc.root().path("build", "sources", "source").orElseThrow();
+            assertEquals("17", source.childTextTrimmed("targetVersion"));
+        }
+
+        @Test
         @DisplayName("should migrate compiler plugin from pluginManagement")
         void shouldMigrateFromPluginManagement() {
             String pomXml = """
@@ -725,6 +763,44 @@ class SourceStrategyTest {
                     </properties>
                     <build>
                         <sourceDirectory>src/main/java-custom</sourceDirectory>
+                    </build>
+                </project>
+                """;
+
+            Document doc = Document.of(pomXml);
+            UpgradeContext context = TestUtils.createMockContext(TestUtils.createOptionsWithModelVersion("4.1.0"));
+            strategy.doApply(context, new HashMap<>(Map.of(Paths.get("pom.xml"), doc)));
+
+            var sources = doc.root()
+                    .path("build", "sources")
+                    .orElseThrow()
+                    .childElements("source")
+                    .toList();
+
+            assertEquals(1, sources.size());
+            assertEquals("17", sources.get(0).childTextTrimmed("targetVersion"));
+            assertEquals("src/main/java-custom", sources.get(0).childTextTrimmed("directory"));
+        }
+
+        @Test
+        @DisplayName("should reuse existing source element when adding targetVersion")
+        void shouldReuseExistingSourceElement() {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.1.0">
+                    <modelVersion>4.1.0</modelVersion>
+                    <groupId>com.example</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0</version>
+                    <properties>
+                        <maven.compiler.release>17</maven.compiler.release>
+                    </properties>
+                    <build>
+                        <sources>
+                            <source>
+                                <directory>src/main/java-custom</directory>
+                            </source>
+                        </sources>
                     </build>
                 </project>
                 """;

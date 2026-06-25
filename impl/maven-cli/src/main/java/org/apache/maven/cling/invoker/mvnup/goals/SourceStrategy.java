@@ -139,12 +139,12 @@ public class SourceStrategy extends AbstractUpgradeStrategy {
         if (targetVersion == null) {
             targetVersion = extractTargetVersionFromCompilerPlugin(context, root);
         } else {
-            cleanupCompilerPluginConfig(context, root);
+            cleanupCompilerPluginConfig(context, root, targetVersion);
         }
 
         if (targetVersion != null) {
             Element sourcesElement = ensureSourcesElement(root);
-            Element sourceElement = DomUtils.insertNewElement("source", sourcesElement);
+            Element sourceElement = findOrCreateMainJavaSource(sourcesElement);
             DomUtils.insertContentElement(sourceElement, "targetVersion", targetVersion);
             context.detail("Set targetVersion: " + targetVersion);
             hasChanges = true;
@@ -292,19 +292,21 @@ public class SourceStrategy extends AbstractUpgradeStrategy {
                 .orElse(null);
     }
 
-    private void cleanupCompilerPluginConfig(UpgradeContext context, Element root) {
+    private void cleanupCompilerPluginConfig(UpgradeContext context, Element root, String migratedValue) {
         cleanupPluginSectionConfig(
                 context,
-                root.childElement(BUILD).flatMap(b -> b.childElement(PLUGINS)).orElse(null));
+                root.childElement(BUILD).flatMap(b -> b.childElement(PLUGINS)).orElse(null),
+                migratedValue);
         cleanupPluginSectionConfig(
                 context,
                 root.childElement(BUILD)
                         .flatMap(b -> b.childElement(PLUGIN_MANAGEMENT))
                         .flatMap(pm -> pm.childElement(PLUGINS))
-                        .orElse(null));
+                        .orElse(null),
+                migratedValue);
     }
 
-    private void cleanupPluginSectionConfig(UpgradeContext context, Element pluginsElement) {
+    private void cleanupPluginSectionConfig(UpgradeContext context, Element pluginsElement, String migratedValue) {
         if (pluginsElement == null) {
             return;
         }
@@ -316,19 +318,31 @@ public class SourceStrategy extends AbstractUpgradeStrategy {
         if (configuration == null) {
             return;
         }
-        configuration.childElement("release").ifPresent(e -> {
-            DomUtils.removeElement(e);
-            context.detail("Removed compiler plugin <release> (properties take precedence)");
-        });
-        configuration.childElement("source").ifPresent(e -> {
-            DomUtils.removeElement(e);
-            context.detail("Removed compiler plugin <source> (properties take precedence)");
-        });
-        configuration.childElement("target").ifPresent(e -> {
-            DomUtils.removeElement(e);
-            context.detail("Removed compiler plugin <target> (properties take precedence)");
-        });
-        cleanupCompilerPlugin(compilerPlugin, configuration, pluginsElement);
+        boolean removed = false;
+        Element releaseElement = configuration.childElement("release").orElse(null);
+        if (releaseElement != null
+                && migratedValue.equals(releaseElement.textContent().trim())) {
+            DomUtils.removeElement(releaseElement);
+            context.detail("Removed compiler plugin <release> (matches migrated value)");
+            removed = true;
+        }
+        Element sourceElement = configuration.childElement("source").orElse(null);
+        if (sourceElement != null
+                && migratedValue.equals(sourceElement.textContent().trim())) {
+            DomUtils.removeElement(sourceElement);
+            context.detail("Removed compiler plugin <source> (matches migrated value)");
+            removed = true;
+        }
+        Element targetElement = configuration.childElement("target").orElse(null);
+        if (targetElement != null
+                && migratedValue.equals(targetElement.textContent().trim())) {
+            DomUtils.removeElement(targetElement);
+            context.detail("Removed compiler plugin <target> (matches migrated value)");
+            removed = true;
+        }
+        if (removed) {
+            cleanupCompilerPlugin(compilerPlugin, configuration, pluginsElement);
+        }
     }
 
     private void cleanupCompilerPlugin(Element compilerPlugin, Element configuration, Element pluginsElement) {
