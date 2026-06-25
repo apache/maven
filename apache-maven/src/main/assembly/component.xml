@@ -74,6 +74,7 @@ under the License.
       <outputDirectory>bin</outputDirectory>
       <includes>
         <include>*.cmd</include>
+        <include>*.ps1</include>
         <include>*.conf</include>
       </includes>
       <lineEnding>dos</lineEnding>
