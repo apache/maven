@@ -165,7 +165,7 @@
         <field xdoc.separator="blank">
           <name>name</name>
           <version>3.0.0+</version>
-          <description>The full name of the project. If not specified, the artifactId will be used.</description>
+          <description>The full name of the project.</description>
           <type>String</type>
         </field>
         <field>
