@@ -60,11 +60,15 @@ public class CLIManagerDocumentationTest {
                 "<table border='1' class='zebra-striped'><tr class='a'><th><b>Options</b></th><th><b>Description</b></th></tr>");
         for (Option option : new CLIManagerExtension().getOptions()) {
             a = !a;
-            sb.append("<tr class='").append(a ? 'a' : 'b').append("'><td><code>-<a name='");
-            sb.append(option.getOpt());
-            sb.append("'>");
-            sb.append(option.getOpt());
-            sb.append("</a>,--<a name='");
+            sb.append("<tr class='").append(a ? 'a' : 'b').append("'><td><code>");
+            if (option.getOpt() != null) {
+                sb.append("-<a name='");
+                sb.append(option.getOpt());
+                sb.append("'>");
+                sb.append(option.getOpt());
+                sb.append("</a>, ");
+            }
+            sb.append(" --<a name='");
             sb.append(option.getLongOpt());
             sb.append("'>");
             sb.append(option.getLongOpt());
