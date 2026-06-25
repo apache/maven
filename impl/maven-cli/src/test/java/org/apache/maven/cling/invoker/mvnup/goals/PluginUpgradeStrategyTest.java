@@ -431,6 +431,45 @@ class PluginUpgradeStrategyTest {
         }
 
         @Test
+        @DisplayName("should upgrade jaxb2-maven-plugin when below minimum")
+        void shouldUpgradeJaxb2MavenPluginWhenBelowMinimum() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>org.codehaus.mojo</groupId>
+                                <artifactId>jaxb2-maven-plugin</artifactId>
+                                <version>3.1.0</version>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Plugin upgrade should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have upgraded jaxb2-maven-plugin");
+
+            Editor editor = new Editor(document);
+            Element root = editor.root();
+            String version = root.path("build", "plugins", "plugin", "version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals("3.2.0", version);
+        }
+
+        @Test
         @DisplayName("should not upgrade when version is already higher")
         void shouldNotUpgradeWhenVersionAlreadyHigher() throws Exception {
             String pomXml = """

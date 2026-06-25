@@ -98,7 +98,12 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     DEFAULT_MAVEN_PLUGIN_GROUP_ID,
                     "maven-resources-plugin",
                     "3.3.1",
-                    "Beta/RC versions compiled against different Maven 4 API signatures"));
+                    "Beta/RC versions compiled against different Maven 4 API signatures"),
+            new PluginUpgrade(
+                    "org.codehaus.mojo",
+                    "jaxb2-maven-plugin",
+                    "3.2.0",
+                    "Versions before 3.2.0 depend on jaxb-parent:3.0.0 which contains invalid XML rejected by Maven 4"));
 
     private static final List<PluginUpgrade> PLUGIN_DEPENDENCY_UPGRADES = List.of(new PluginUpgrade(
             "org.codehaus.mojo",
@@ -275,6 +280,9 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         upgrades.put(
                 DEFAULT_MAVEN_PLUGIN_GROUP_ID + ":maven-resources-plugin",
                 new PluginUpgradeInfo(DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-resources-plugin", "3.3.1"));
+        upgrades.put(
+                "org.codehaus.mojo:jaxb2-maven-plugin",
+                new PluginUpgradeInfo("org.codehaus.mojo", "jaxb2-maven-plugin", "3.2.0"));
         return upgrades;
     }
 
