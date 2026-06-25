@@ -31,6 +31,7 @@ import javax.inject.Singleton;
 public class DefaultLifecycleProvider extends AbstractLifecycleProvider {
     public static final String NAME = "default";
 
+    // START SNIPPET: default
     private static final String[] PHASES = {
         "validate",
         "initialize",
@@ -58,6 +59,7 @@ public class DefaultLifecycleProvider extends AbstractLifecycleProvider {
     };
 
     private static final String[] PLUGIN_BINDINGS = {};
+    // END SNIPPET: default
 
     public DefaultLifecycleProvider() {
         super(NAME, PHASES, PLUGIN_BINDINGS);

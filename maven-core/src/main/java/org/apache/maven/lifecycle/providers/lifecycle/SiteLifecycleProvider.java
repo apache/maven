@@ -32,7 +32,7 @@ import org.apache.maven.lifecycle.providers.PluginVersions;
 @Named(SiteLifecycleProvider.NAME)
 public class SiteLifecycleProvider extends AbstractLifecycleProvider {
     public static final String NAME = "site";
-
+    // START SNIPPET: site
     private static final String[] PHASES = {"pre-site", "site", "post-site", "site-deploy"};
 
     private static final String[] PLUGIN_BINDINGS = {
@@ -41,6 +41,7 @@ public class SiteLifecycleProvider extends AbstractLifecycleProvider {
         "site-deploy",
         "org.apache.maven.plugins:maven-site-plugin:" + PluginVersions.SITE_PLUGIN_VERSION + ":deploy"
     };
+    // END SNIPPET: site
 
     public SiteLifecycleProvider() {
         super(NAME, PHASES, PLUGIN_BINDINGS);

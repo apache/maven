@@ -47,15 +47,7 @@ public class ArtifactHandlerTest {
             if (line.startsWith("||")) {
                 String[] cols = line.split("\\|\\|");
                 String[] expected = new String[] {
-                    "",
-                    "type",
-                    "classifier",
-                    "extension",
-                    "packaging",
-                    "language",
-                    "added to classpath",
-                    "includesDependencies",
-                    ""
+                    "", "type", "classifier", "extension", "language", "added to classpath", "includesDependencies", ""
                 };
 
                 int i = 0;
@@ -68,15 +60,13 @@ public class ArtifactHandlerTest {
                 String type = trimApt(cols[1]);
                 String classifier = trimApt(cols[2]);
                 String extension = trimApt(cols[3], type);
-                String packaging = trimApt(cols[4], type);
-                String language = trimApt(cols[5]);
-                String addedToClasspath = trimApt(cols[6]);
-                String includesDependencies = trimApt(cols[7]);
+                String language = trimApt(cols[4]);
+                String addedToClasspath = trimApt(cols[5]);
+                String includesDependencies = trimApt(cols[6]);
 
                 ArtifactHandler handler = container.lookup(ArtifactHandler.class, type);
 
                 assertEquals(handler.getExtension(), extension, type + " extension");
-                assertEquals(handler.getPackaging(), packaging, type + " packaging");
                 assertEquals(handler.getClassifier(), classifier, type + " classifier");
                 assertEquals(handler.getLanguage(), language, type + " language");
                 assertEquals(
