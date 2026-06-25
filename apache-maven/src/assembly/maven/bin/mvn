@@ -286,15 +286,14 @@ cmd="\"$JAVACMD\" \
   \"-Dmaven.mainClass=$MAVEN_MAIN_CLASS\" \
   \"-Dlibrary.jline.path=${MAVEN_HOME}/lib/jline-native\" \
   \"-Dmaven.multiModuleProjectDirectory=$MAVEN_PROJECTBASEDIR\" \
-  $LAUNCHER_CLASS \
-  $MAVEN_ARGS"
+  $LAUNCHER_CLASS"
 
 if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
   echo "[DEBUG] Launching JVM with command:" >&2
-  printf '[DEBUG]   %s' "$cmd" >&2; printf ' "%s"' "$@" >&2; echo >&2
+  printf '[DEBUG]   %s' "$cmd" >&2; printf ' %s' "$MAVEN_ARGS" >&2; printf ' "%s"' "$@" >&2; echo >&2
 fi
 
-# User arguments ("$@") are passed directly to preserve literal values
-# like ${...} Maven property placeholders without shell expansion.
-# Only the base command uses eval for MAVEN_OPTS word splitting.
-eval exec "$cmd" '"$@"'
+# User arguments ("$@") and MAVEN_ARGS are passed outside the eval'd string
+# to preserve literal values (backslashes, ${...} placeholders) without
+# shell re-parsing. Only the base command uses eval for MAVEN_OPTS word splitting.
+eval exec "$cmd" '$MAVEN_ARGS' '"$@"'
