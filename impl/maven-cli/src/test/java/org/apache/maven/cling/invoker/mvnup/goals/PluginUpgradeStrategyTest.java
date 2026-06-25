@@ -773,11 +773,12 @@ class PluginUpgradeStrategyTest {
     class InheritedPluginDetectionTests {
 
         @Test
-        @DisplayName("should detect inherited plugins from remote parent POM and add pluginManagement")
-        void shouldDetectInheritedPluginsFromRemoteParent() throws Exception {
-            // org.apache:apache:23 defines maven-enforcer-plugin:1.4.1 in pluginManagement.
-            // A child POM that inherits from this parent should get pluginManagement overrides
-            // added by mvnup for plugins that need Maven 4 compatibility upgrades.
+        @DisplayName("should inject pluginManagement with comment for plugins inherited from remote parent")
+        void shouldInjectPluginManagementWithCommentForRemoteParentPlugins() throws Exception {
+            // org.apache:apache:23 defines maven-enforcer-plugin in pluginManagement and
+            // build/plugins. A child POM that does NOT itself declare the plugin should
+            // still get a pluginManagement override with a comment explaining it overrides
+            // the parent, so that Maven 4 incompatible plugin versions get upgraded.
             String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
@@ -806,12 +807,18 @@ class PluginUpgradeStrategyTest {
                 UpgradeResult result = strategy.doApply(context, pomMap);
 
                 assertTrue(result.success(), "Strategy should succeed");
-                assertTrue(result.modifiedCount() > 0, "Should have added plugin management for inherited plugins");
+                assertTrue(result.modifiedCount() > 0, "Should have modified POM for remote parent plugin upgrade");
 
                 String xml = DomUtils.toXml(document);
                 assertTrue(
+                        xml.contains("<pluginManagement>"),
+                        "Should inject pluginManagement for plugins from remote parent");
+                assertTrue(
+                        xml.contains("Override version inherited from parent"),
+                        "Should add comment explaining the override");
+                assertTrue(
                         xml.contains("<artifactId>maven-enforcer-plugin</artifactId>"),
-                        "Should add pluginManagement for maven-enforcer-plugin inherited from parent");
+                        "Should add pluginManagement for maven-enforcer-plugin");
             } finally {
                 try (var walk = Files.walk(tempDir)) {
                     walk.sorted(java.util.Comparator.reverseOrder()).forEach(p -> {
@@ -825,12 +832,12 @@ class PluginUpgradeStrategyTest {
         }
 
         @Test
-        @DisplayName("should not add direct build/plugins override when plugin version comes from pluginManagement")
-        void shouldNotAddDirectOverrideWhenVersionFromPluginManagement() throws Exception {
+        @DisplayName("should override remote parent plugin via pluginManagement with comment, not direct build/plugins")
+        void shouldOverrideRemoteParentPluginViaPluginManagementWithComment() throws Exception {
             // org.apache:apache:23 has maven-enforcer-plugin in build/plugins WITHOUT
             // an explicit version — the version (1.4.1) comes from pluginManagement.
-            // In this case, adding a pluginManagement override in the child is sufficient;
-            // no direct build/plugins entry should be added for enforcer.
+            // In this case, adding a pluginManagement override with a comment in the child
+            // is sufficient; no direct build/plugins entry should be added for enforcer.
             String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
@@ -869,6 +876,11 @@ class PluginUpgradeStrategyTest {
                                     .map(Element::textContentTrimmed)
                                     .orElse("")));
             assertTrue(hasEnforcerInPM, "Should have enforcer in pluginManagement");
+
+            String xml = DomUtils.toXml(document);
+            assertTrue(
+                    xml.contains("Override version inherited from parent"),
+                    "Should add comment explaining the override");
 
             // Verify NO direct build/plugins entry for enforcer (PM override is sufficient)
             Element buildPlugins = root.childElement("build")
@@ -950,6 +962,70 @@ class PluginUpgradeStrategyTest {
                     .map(Element::textContentTrimmed)
                     .orElse(null);
             assertEquals("3.5.0", version, "Existing enforcer-plugin version should be upgraded to 3.5.0");
+        }
+
+        @Test
+        @DisplayName("should inject pluginManagement when plugin is locally declared without version")
+        void shouldInjectPluginManagementForLocallyDeclaredPluginWithoutVersion() throws Exception {
+            // Child POM explicitly declares maven-enforcer-plugin in build/plugins without
+            // a version. The version comes from the remote parent's pluginManagement.
+            // Since the child does declare the plugin, mvnup should add a pluginManagement
+            // entry to override the inherited version.
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <parent>
+                        <groupId>org.apache</groupId>
+                        <artifactId>apache</artifactId>
+                        <version>23</version>
+                    </parent>
+                    <groupId>org.example</groupId>
+                    <artifactId>test-child</artifactId>
+                    <version>1.0.0-SNAPSHOT</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-enforcer-plugin</artifactId>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Path tempDir = Files.createTempDirectory("mvnup-test-");
+            try {
+                Files.createDirectories(tempDir.resolve(".mvn"));
+                Path pomPath = tempDir.resolve("pom.xml");
+                Files.writeString(pomPath, pomXml);
+
+                Document document = Document.of(pomXml);
+                Map<Path, Document> pomMap = Map.of(pomPath, document);
+
+                UpgradeContext context = createMockContext();
+                UpgradeResult result = strategy.doApply(context, pomMap);
+
+                assertTrue(result.success(), "Strategy should succeed");
+                assertTrue(
+                        result.modifiedCount() > 0, "Should have added pluginManagement for locally declared plugin");
+
+                String xml = DomUtils.toXml(document);
+                assertTrue(
+                        xml.contains("<pluginManagement>"), "Should add pluginManagement for locally declared plugin");
+                assertTrue(
+                        xml.contains("<artifactId>maven-enforcer-plugin</artifactId>"),
+                        "Should add pluginManagement for maven-enforcer-plugin");
+            } finally {
+                try (var walk = Files.walk(tempDir)) {
+                    walk.sorted(java.util.Comparator.reverseOrder()).forEach(p -> {
+                        try {
+                            Files.delete(p);
+                        } catch (IOException ignored) {
+                        }
+                    });
+                }
+            }
         }
     }
 
