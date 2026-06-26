@@ -123,8 +123,9 @@ public class DefaultProfileSelector implements ProfileSelector {
 
     /**
      * Determines whether the given profile originates from a POM file
-     * by checking if the profile's {@link InputSource} has a non-null model id.
-     * Profiles from settings.xml or other external sources will not have a model id.
+     * by checking if the profile's {@link InputSource} has a non-empty model id.
+     * Profiles from settings.xml or other external sources will have
+     * a {@code null} or empty model id.
      * Defaults to {@code true} if no location information is available,
      * matching the previous default behavior.
      */
@@ -133,7 +134,7 @@ public class DefaultProfileSelector implements ProfileSelector {
         if (location != null) {
             InputSource source = location.getSource();
             if (source != null) {
-                return source.getModelId() != null;
+                return source.getModelId() != null && !source.getModelId().isEmpty();
             }
         }
         return true;
