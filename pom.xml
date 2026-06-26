@@ -172,6 +172,8 @@ under the License.
     <woodstoxVersion>7.2.1</woodstoxVersion>
     <xmlunitVersion>2.12.0</xmlunitVersion>
     <jacocoArgLine />
+    <argLine.xmx>-Xmx256m</argLine.xmx>
+    <argLine.mockito />
 
     <!-- Set as system property in surefire/failsafe to propagate to tests and IT Verifier -->
     <toolboxVersion>0.14.1</toolboxVersion>
@@ -697,7 +699,7 @@ under the License.
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
             <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory" />
-            <argLine>-Xmx256m @{jacocoArgLine}</argLine>
+            <argLine>${argLine.xmx} @{jacocoArgLine} ${argLine.mockito}</argLine>
             <systemPropertyVariables combine.children="append">
               <version.toolbox>${toolboxVersion}</version.toolbox>
             </systemPropertyVariables>
@@ -708,7 +710,7 @@ under the License.
           <artifactId>maven-failsafe-plugin</artifactId>
           <configuration>
             <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory" />
-            <argLine>-Xmx256m @{jacocoArgLine}</argLine>
+            <argLine>${argLine.xmx} @{jacocoArgLine} ${argLine.mockito}</argLine>
             <systemPropertyVariables combine.children="append">
               <version.toolbox>${toolboxVersion}</version.toolbox>
             </systemPropertyVariables>
@@ -945,26 +947,9 @@ under the License.
           <name>org.mockito:mockito-core:jar</name>
         </property>
       </activation>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-surefire-plugin</artifactId>
-              <configuration>
-                <argLine>-Xmx256m @{jacocoArgLine} -javaagent:@{org.mockito:mockito-core:jar}</argLine>
-              </configuration>
-            </plugin>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-failsafe-plugin</artifactId>
-              <configuration>
-                <argLine>-Xmx256m @{jacocoArgLine} -javaagent:@{org.mockito:mockito-core:jar}</argLine>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
+      <properties>
+        <argLine.mockito>-javaagent:@{org.mockito:mockito-core:jar}</argLine.mockito>
+      </properties>
     </profile>
     <profile>
       <id>graph</id>
@@ -1218,13 +1203,15 @@ under the License.
     </profile>
     <profile>
       <id>jacoco</id>
+      <properties>
+        <argLine.xmx>-Xmx1G</argLine.xmx>
+      </properties>
       <build>
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
-              <argLine>-Xmx1G @{jacocoArgLine}</argLine>
               <reportsDirectory>${project.build.directory}/test-results-surefire</reportsDirectory>
             </configuration>
           </plugin>
