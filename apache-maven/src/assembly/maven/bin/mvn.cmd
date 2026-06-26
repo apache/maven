@@ -184,7 +184,20 @@ if not exist "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" goto endReadJvmConfig
 
 rem Use Java source-launch mode (JDK 11+) to parse jvm.config
 rem This avoids batch script parsing issues with special characters (pipes, quotes, @, etc.)
-rem Use temp file approach with cmd /c to ensure proper file handle release
+rem Java writes parsed output to a temp file; we read it with 'set /p' + input redirect.
+rem
+rem Why 'set /p <file' instead of 'for /f ... in (file)':
+rem   - 'for /f' silently produces no output when the file is briefly locked
+rem     (e.g. by Windows Defender real-time scanning), leaving JVM_CONFIG_MAVEN_OPTS empty
+rem     and causing hard-to-diagnose Maven startup failures.
+rem   - 'set /p <file' uses a transient input-redirect open with different sharing flags,
+rem     making it far less susceptible to lock contention. If the file IS locked, it
+rem     emits a visible error to stderr rather than failing silently.
+rem
+rem Why not capture stdout directly ('for /f ... in (`command`)')?
+rem   - cmd.exe's child shell interprets special characters (pipes |, ampersands &, etc.)
+rem     in the captured output, which breaks jvm.config values like
+rem     -Dhttp.nonProxyHosts=de|*.de  (the core use case for JvmConfigParser).
 
 set "JVM_CONFIG_TEMP=%TEMP%\mvn-jvm-config-%RANDOM%-%RANDOM%.txt"
 
@@ -196,7 +209,7 @@ if defined MAVEN_DEBUG_SCRIPT (
   echo [DEBUG] Parser arguments: "%MAVEN_HOME%\bin\JvmConfigParser.java" "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" "%MAVEN_PROJECTBASEDIR%" "%JVM_CONFIG_TEMP%"
 )
 
-rem Run parser with output file as third argument - Java writes directly to file to avoid Windows file locking issues
+rem Run parser with output file as third argument - Java writes directly to file
 "%JAVACMD%" "%MAVEN_HOME%\bin\JvmConfigParser.java" "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" "%MAVEN_PROJECTBASEDIR%" "%JVM_CONFIG_TEMP%"
 set JVM_CONFIG_EXIT=%ERRORLEVEL%
 
@@ -215,13 +228,21 @@ if %JVM_CONFIG_EXIT% neq 0 (
   exit /b 1
 )
 
-rem Read the output file
+rem Read the output file using 'set /p' with input redirect (see comment above)
 if exist "%JVM_CONFIG_TEMP%" (
   if defined MAVEN_DEBUG_SCRIPT (
     echo [DEBUG] Temp file contents:
     type "%JVM_CONFIG_TEMP%"
   )
-  for /f "usebackq tokens=*" %%i in ("%JVM_CONFIG_TEMP%") do set "JVM_CONFIG_MAVEN_OPTS=%%i"
+  set /p JVM_CONFIG_MAVEN_OPTS=<"%JVM_CONFIG_TEMP%" 2>nul
+  rem Retry once after a brief delay if the read failed (Windows Defender file lock)
+  if not defined JVM_CONFIG_MAVEN_OPTS (
+    if defined MAVEN_DEBUG_SCRIPT (
+      echo [DEBUG] First read returned empty, retrying after delay...
+    )
+    ping -n 2 127.0.0.1 >nul 2>nul
+    set /p JVM_CONFIG_MAVEN_OPTS=<"%JVM_CONFIG_TEMP%" 2>nul
+  )
   del "%JVM_CONFIG_TEMP%" 2>nul
 )
 
