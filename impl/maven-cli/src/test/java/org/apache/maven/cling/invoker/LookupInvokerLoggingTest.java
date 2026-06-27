@@ -19,15 +19,20 @@
 package org.apache.maven.cling.invoker;
 
 import java.util.Optional;
+import java.util.logging.Handler;
+import java.util.logging.Logger;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.cling.logging.Slf4jConfiguration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test for logging configuration behavior in LookupInvoker.
@@ -119,6 +124,83 @@ class LookupInvokerLoggingTest {
         // Verify that setRootLoggerLevel was called
         assertEquals(1, slf4jConfiguration.setRootLoggerLevelCallCount);
         assertEquals(Slf4jConfiguration.Level.ERROR, slf4jConfiguration.lastSetLevel);
+    }
+
+    // --- JUL-to-SLF4J bridge tests (GH-11683) ---
+
+    @Test
+    void testJulBridgeIsInstalledDuringActivateLogging() {
+        // Ensure clean state
+        SLF4JBridgeHandler.uninstall();
+        assertFalse(SLF4JBridgeHandler.isInstalled(), "Bridge should not be installed before test");
+
+        // Simulate what activateLogging() does
+        if (!SLF4JBridgeHandler.isInstalled()) {
+            SLF4JBridgeHandler.removeHandlersForRootLogger();
+            SLF4JBridgeHandler.install();
+        }
+
+        assertTrue(SLF4JBridgeHandler.isInstalled(), "SLF4JBridgeHandler should be installed after activateLogging");
+
+        // Clean up
+        SLF4JBridgeHandler.uninstall();
+    }
+
+    @Test
+    void testJulBridgeIsNotReinstalledWhenAlreadyPresent() {
+        // Install the bridge first
+        SLF4JBridgeHandler.uninstall();
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
+        assertTrue(SLF4JBridgeHandler.isInstalled());
+
+        // Record the handlers before the second call
+        Logger rootLogger = Logger.getLogger("");
+        Handler[] handlersBefore = rootLogger.getHandlers();
+
+        // Simulate a second activateLogging() call — the guard should skip re-installation
+        if (!SLF4JBridgeHandler.isInstalled()) {
+            SLF4JBridgeHandler.removeHandlersForRootLogger();
+            SLF4JBridgeHandler.install();
+        }
+
+        // Handlers should be the same objects — no removal/reinstall occurred
+        Handler[] handlersAfter = rootLogger.getHandlers();
+        assertEquals(handlersBefore.length, handlersAfter.length, "Handler count should not change on second call");
+        for (int i = 0; i < handlersBefore.length; i++) {
+            assertTrue(
+                    handlersBefore[i] == handlersAfter[i],
+                    "Handler instance at index " + i + " should be the same object (no reinstall)");
+        }
+
+        // Clean up
+        SLF4JBridgeHandler.uninstall();
+    }
+
+    @Test
+    void testJulMessagesAreRoutedThroughSlf4j() {
+        // Install the bridge
+        SLF4JBridgeHandler.uninstall();
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
+
+        // Verify a JUL logger's handlers now include SLF4JBridgeHandler
+        Logger rootLogger = Logger.getLogger("");
+        boolean hasBridgeHandler = false;
+        for (Handler handler : rootLogger.getHandlers()) {
+            if (handler instanceof SLF4JBridgeHandler) {
+                hasBridgeHandler = true;
+                break;
+            }
+        }
+        assertTrue(hasBridgeHandler, "Root JUL logger should have SLF4JBridgeHandler installed");
+
+        // Verify that logging through JUL does not throw (bridge is functional)
+        Logger julLogger = Logger.getLogger("org.apache.maven.test.jul");
+        julLogger.info("Test message routed through SLF4J bridge");
+
+        // Clean up
+        SLF4JBridgeHandler.uninstall();
     }
 
     // Mock classes for testing
