@@ -32,12 +32,13 @@ import org.apache.maven.lifecycle.providers.PluginVersions;
 @Named(CleanLifecycleProvider.NAME)
 public class CleanLifecycleProvider extends AbstractLifecycleProvider {
     public static final String NAME = "clean";
-
+    // START SNIPPET: clean
     private static final String[] PHASES = {"pre-clean", "clean", "post-clean"};
 
     private static final String[] PLUGIN_BINDINGS = {
         "clean", "org.apache.maven.plugins:maven-clean-plugin:" + PluginVersions.CLEAN_PLUGIN_VERSION + ":clean"
     };
+    // END SNIPPET: clean
 
     public CleanLifecycleProvider() {
         super(NAME, PHASES, PLUGIN_BINDINGS);
