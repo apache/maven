@@ -30,6 +30,8 @@ Plugin Bindings for <<<default>>> Lifecycle Reference
 
 %{toc|fromDepth=2}
 
+  Versions of the plugins are based on {{{.//plugin-management.html} Project Plugin Management}}.
+
 * Plugin bindings for <<<pom>>> packaging
 
 %{snippet|id=pom|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/packaging/PomLifecycleMappingProvider.java}

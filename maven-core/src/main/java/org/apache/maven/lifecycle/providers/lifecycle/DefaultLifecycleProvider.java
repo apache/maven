@@ -57,9 +57,9 @@ public class DefaultLifecycleProvider extends AbstractLifecycleProvider {
         "install",
         "deploy"
     };
+    // END SNIPPET: default
 
     private static final String[] PLUGIN_BINDINGS = {};
-    // END SNIPPET: default
 
     public DefaultLifecycleProvider() {
         super(NAME, PHASES, PLUGIN_BINDINGS);
