@@ -62,7 +62,7 @@ jobs:
           cp .github/ci-extensions.xml .mvn/extensions.xml
 
       - name: Restore Mimir caches
-        uses: actions/cache/restore@2c8a9bd7457de244a408f35966fab2fb45fda9c8 # v6.0.0
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ env.MIMIR_LOCAL }}
           key: mvn40-${{ runner.os }}-${{ github.run_id }}
@@ -167,7 +167,7 @@ jobs:
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
 
       - name: Restore Mimir caches
-        uses: actions/cache/restore@2c8a9bd7457de244a408f35966fab2fb45fda9c8 # v6.0.0
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ env.MIMIR_LOCAL }}
           key: mvn40-${{ runner.os }}-${{ github.run_id }}
@@ -268,7 +268,7 @@ jobs:
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
 
       - name: Restore Mimir caches
-        uses: actions/cache/restore@2c8a9bd7457de244a408f35966fab2fb45fda9c8 # v6.0.0
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ env.MIMIR_LOCAL }}
           key: mvn40-${{ runner.os }}-${{ github.run_id }}
