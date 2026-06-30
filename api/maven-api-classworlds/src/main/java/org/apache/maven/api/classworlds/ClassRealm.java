@@ -196,6 +196,36 @@ public interface ClassRealm extends Closeable {
     URL loadResourceFromParent(@Nonnull String name);
 
     /**
+     * Returns whether this realm is loaded as a JPMS module in its own {@link ModuleLayer}.
+     * <p>
+     * When {@code true}, the plugin was loaded via the module path and has its own
+     * {@link ModuleLayer}. When {@code false}, the plugin is loaded on the classpath
+     * via a URLClassLoader as usual.
+     * </p>
+     *
+     * @return true if this realm has an associated ModuleLayer
+     * @since 4.1.0
+     */
+    default boolean isModular() {
+        return false;
+    }
+
+    /**
+     * Returns the {@link ModuleLayer} for this realm, if it was loaded as a JPMS module.
+     * <p>
+     * Returns {@code null} for classpath-based realms. When non-null, the layer contains
+     * the plugin module and all its dependencies as resolved JPMS modules.
+     * </p>
+     *
+     * @return the module layer for this realm, or null for classpath-based realms
+     * @since 4.1.0
+     */
+    @Nullable
+    default ModuleLayer getModuleLayer() {
+        return null;
+    }
+
+    /**
      * Exports a package from a named JPMS module to this realm's unnamed module,
      * making the package's public types accessible to classes loaded by this realm.
      *

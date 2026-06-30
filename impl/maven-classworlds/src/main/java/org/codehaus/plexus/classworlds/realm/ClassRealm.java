@@ -78,6 +78,10 @@ public class ClassRealm extends URLClassLoader implements org.apache.maven.api.c
 
     private ClassLoader parentClassLoader;
 
+    private ModuleLayer moduleLayer;
+
+    private ModuleLayer.Controller moduleLayerController;
+
     private static final boolean IS_PARALLEL_CAPABLE = Closeable.class.isAssignableFrom(URLClassLoader.class);
 
     private final ConcurrentMap<String, Object> lockMap;
@@ -237,6 +241,29 @@ public class ClassRealm extends URLClassLoader implements org.apache.maven.api.c
 
     public void addReads(String moduleName) {
         world.addReads(moduleName, getUnnamedModule());
+    }
+
+    /**
+     * Sets the ModuleLayer and Controller for this realm.
+     * Called when the plugin is loaded as a JPMS module.
+     */
+    public void setModuleLayer(ModuleLayer moduleLayer, ModuleLayer.Controller controller) {
+        this.moduleLayer = moduleLayer;
+        this.moduleLayerController = controller;
+    }
+
+    @Override
+    public ModuleLayer getModuleLayer() {
+        return moduleLayer;
+    }
+
+    public ModuleLayer.Controller getModuleLayerController() {
+        return moduleLayerController;
+    }
+
+    @Override
+    public boolean isModular() {
+        return moduleLayer != null;
     }
 
     // ----------------------------------------------------------------------
@@ -499,6 +526,25 @@ public class ClassRealm extends URLClassLoader implements org.apache.maven.api.c
         }
 
         return null;
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (moduleLayer != null) {
+            // Close the module layer's classloader to release JAR file handles
+            for (Module module : moduleLayer.modules()) {
+                ClassLoader loader = module.getClassLoader();
+                if (loader instanceof Closeable && loader != this) {
+                    try {
+                        ((Closeable) loader).close();
+                    } catch (IOException e) {
+                        // best effort
+                    }
+                }
+                break; // defineModulesWithOneLoader uses a single loader for all modules
+            }
+        }
+        super.close();
     }
 
     static {
