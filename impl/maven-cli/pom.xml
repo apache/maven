@@ -31,6 +31,10 @@ under the License.
   <name>Maven 4 CLI</name>
   <description>Maven 4 CLI component, with CLI and logging support.</description>
 
+  <properties>
+    <javaModuleName>org.apache.maven.cling</javaModuleName>
+  </properties>
+
   <dependencies>
     <!--  Maven4 API -->
     <dependency>
