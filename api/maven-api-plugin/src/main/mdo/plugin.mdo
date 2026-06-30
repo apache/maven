@@ -80,6 +80,21 @@ under the License.
           <defaultValue>false</defaultValue>
         </field>
         <field>
+          <name>modular</name>
+          <version>1.2.0+</version>
+          <description>
+            Whether this plugin should be loaded as a JPMS module in its own ModuleLayer.
+            When true, the plugin JAR must contain a module-info.class and all its
+            dependencies must be loadable on the module path. There is no fallback to
+            classpath loading — a modular plugin that cannot be loaded as a module will
+            cause a hard build error. When false or absent, the plugin is loaded on the
+            classpath via ClassRealm as usual.
+            @since Maven 4.1.0
+          </description>
+          <type>boolean</type>
+          <defaultValue>false</defaultValue>
+        </field>
+        <field>
           <name>inheritedByDefault</name>
           <version>1.0.0+</version>
           <description></description>

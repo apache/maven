@@ -26,9 +26,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.module.Configuration;
+import java.lang.module.FindException;
+import java.lang.module.ModuleFinder;
+import java.lang.module.ResolutionException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -266,6 +271,101 @@ public class DefaultClassRealmManager implements ClassRealmManager {
         }
 
         return createRealm(getKey(plugin, false), RealmType.Plugin, parent, parentImports, foreignImports, artifacts);
+    }
+
+    @Override
+    public ClassRealm createModularPluginRealm(Plugin plugin, ClassLoader parent, List<Artifact> artifacts)
+            throws ModuleLayerCreationException {
+        Objects.requireNonNull(plugin, "plugin cannot be null");
+
+        if (parent == null) {
+            parent = PARENT_CLASSLOADER;
+        }
+
+        String realmId = getKey(plugin, false);
+        ClassRealm classRealm = newRealm(realmId);
+        classRealm.setParentClassLoader(parent);
+
+        // Collect all artifact paths for the module finder
+        List<Path> modulePaths = new ArrayList<>();
+        if (artifacts != null) {
+            for (Artifact artifact : artifacts) {
+                if (artifact.getFile() != null && !isProvidedArtifact(artifact, true)) {
+                    modulePaths.add(artifact.getFile().toPath());
+                } else if (logger.isDebugEnabled() && artifact.getFile() != null) {
+                    logger.debug("  Excluded from module path: {}", getId(artifact));
+                }
+            }
+        }
+
+        if (modulePaths.isEmpty()) {
+            throw new ModuleLayerCreationException("Plugin " + plugin.getId()
+                    + " declares <modular>true</modular> but has no artifacts" + " to place on the module path");
+        }
+
+        try {
+            ModuleFinder finder = ModuleFinder.of(modulePaths.toArray(new Path[0]));
+            Set<String> moduleNames = finder.findAll().stream()
+                    .map(ref -> ref.descriptor().name())
+                    .collect(Collectors.toSet());
+
+            if (moduleNames.isEmpty()) {
+                throw new ModuleLayerCreationException(
+                        "Plugin " + plugin.getId() + " declares <modular>true</modular> but none of its"
+                                + " artifacts contain module descriptors (module-info.class)."
+                                + " Ensure the plugin JAR is compiled with a module-info.java.");
+            }
+
+            // Parent layer: use the runtime layer from ClassWorld if available (has Maven API
+            // modules + JLine), otherwise fall back to the boot layer.
+            // Flat hierarchy — all plugin layers are siblings under this parent.
+            org.codehaus.plexus.classworlds.ClassWorld implWorld = (org.codehaus.plexus.classworlds.ClassWorld) world;
+            ModuleLayer parentLayer =
+                    implWorld.getModuleLayer() != null ? implWorld.getModuleLayer() : ModuleLayer.boot();
+
+            // resolveAndBind: resolves modules and binds service providers,
+            // enabling ServiceLoader discovery within the plugin layer
+            Configuration cfg = parentLayer.configuration().resolveAndBind(ModuleFinder.of(), finder, moduleNames);
+
+            // One loader per plugin — isolation between plugins
+            ModuleLayer.Controller controller =
+                    ModuleLayer.defineModulesWithOneLoader(cfg, List.of(parentLayer), parent);
+
+            ModuleLayer pluginLayer = controller.layer();
+
+            // Store per-realm, not per-world
+            var implRealm = (org.codehaus.plexus.classworlds.realm.ClassRealm) classRealm;
+            implRealm.setModuleLayer(pluginLayer, controller);
+
+            // Also populate the realm's classpath with the same artifacts
+            // so that ClassRealm.getURLs() returns meaningful results
+            // and resource loading works through the realm
+            populateRealm(
+                    classRealm,
+                    artifacts == null
+                            ? List.of()
+                            : artifacts.stream()
+                                    .filter(a -> a.getFile() != null && !isProvidedArtifact(a, true))
+                                    .map(ArtifactClassRealmConstituent::new)
+                                    .collect(Collectors.toList()));
+
+            // Apply META-INF/maven/module-access descriptors for access to
+            // boot-layer modules (e.g. java.base internals)
+            applyModuleAccessDescriptors(classRealm);
+
+            logger.debug(
+                    "Created modular plugin realm {} with ModuleLayer containing modules: {}", realmId, moduleNames);
+
+            return classRealm;
+
+        } catch (FindException | ResolutionException e) {
+            throw new ModuleLayerCreationException(
+                    "Failed to create module layer for plugin " + plugin.getId()
+                            + " which declares <modular>true</modular>."
+                            + " Ensure all dependencies are module-path compatible"
+                            + " (no split packages, valid module descriptors): " + e.getMessage(),
+                    e);
+        }
     }
 
     private static String getKey(Plugin plugin, boolean extension) {
