@@ -50,6 +50,7 @@ import org.apache.maven.api.PathType;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.classworlds.ClassRealm;
 import org.apache.maven.api.plugin.descriptor.Resolution;
 import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.DependencyResolverResult;
@@ -57,6 +58,7 @@ import org.apache.maven.api.services.PathScopeRegistry;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.classrealm.ClassRealmManager;
+import org.apache.maven.classrealm.ModuleLayerCreationException;
 import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
 import org.apache.maven.execution.MavenSession;
@@ -105,7 +107,6 @@ import org.apache.maven.session.scope.internal.SessionScope;
 import org.apache.maven.session.scope.internal.SessionScopeModule;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
@@ -357,10 +358,10 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             List<Artifact> pluginArtifacts = extensionRecord.getArtifacts();
 
             for (ComponentDescriptor<?> componentDescriptor : pluginDescriptor.getComponents()) {
-                componentDescriptor.setRealm(pluginRealm);
+                componentDescriptor.setRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm);
             }
 
-            pluginDescriptor.setClassRealm(pluginRealm);
+            pluginDescriptor.setClassRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm);
             pluginDescriptor.setArtifacts(pluginArtifacts);
         } else {
             boolean v4api = pluginDescriptor.getMojos().stream().anyMatch(MojoDescriptor::isV4Api);
@@ -381,10 +382,10 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                         pluginDescriptor.getClassRealm(), pluginDescriptor.getArtifacts());
             });
 
-            pluginDescriptor.setClassRealm(cacheRecord.getRealm());
+            pluginDescriptor.setClassRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) cacheRecord.getRealm());
             pluginDescriptor.setArtifacts(new ArrayList<>(cacheRecord.getArtifacts()));
             for (ComponentDescriptor<?> componentDescriptor : pluginDescriptor.getComponents()) {
-                componentDescriptor.setRealm(cacheRecord.getRealm());
+                componentDescriptor.setRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) cacheRecord.getRealm());
             }
 
             pluginRealmCache.register(project, cacheKey, cacheRecord);
@@ -421,13 +422,30 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
 
         pluginArtifacts = toMavenArtifacts(result);
 
-        pluginRealm = classRealmManager.createPluginRealm(
-                plugin, parent, null, foreignImports, toAetherArtifacts(pluginArtifacts));
+        if (pluginDescriptor.isModular()) {
+            // Modular plugin: load in its own JPMS ModuleLayer.
+            // No Sisu/Plexus discovery — DI only via maven-di Injector.
+            try {
+                pluginRealm =
+                        classRealmManager.createModularPluginRealm(plugin, parent, toAetherArtifacts(pluginArtifacts));
+            } catch (ModuleLayerCreationException e) {
+                throw new PluginContainerException(
+                        plugin,
+                        null,
+                        "Failed to create modular plugin realm for " + plugin.getId() + ": " + e.getMessage(),
+                        e);
+            }
+            // No discoverPluginComponents() — modular plugins use maven-di only
+        } else {
+            // Classic classpath-based plugin
+            pluginRealm = classRealmManager.createPluginRealm(
+                    plugin, parent, null, foreignImports, toAetherArtifacts(pluginArtifacts));
 
-        discoverPluginComponents(pluginRealm, plugin, pluginDescriptor);
+            discoverPluginComponents(pluginRealm, plugin, pluginDescriptor);
+        }
 
         pluginDescriptor.setDependencyNode(result.getRoot());
-        pluginDescriptor.setClassRealm(pluginRealm);
+        pluginDescriptor.setClassRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm);
         pluginDescriptor.setArtifacts(pluginArtifacts);
     }
 
@@ -439,16 +457,16 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             if (pluginDescriptor != null) {
                 for (MojoDescriptor mojo : pluginDescriptor.getMojos()) {
                     if (!mojo.isV4Api()) {
-                        mojo.setRealm(pluginRealm);
+                        mojo.setRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm);
                         container.addComponentDescriptor(mojo);
                     }
                 }
             }
 
-            Thread.currentThread().setContextClassLoader(pluginRealm);
+            Thread.currentThread().setContextClassLoader(pluginRealm.getClassLoader());
             ((DefaultPlexusContainer) container)
                     .discoverComponents(
-                            pluginRealm,
+                            (org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm,
                             new SessionScopeModule(container.lookup(SessionScope.class)),
                             new MojoExecutionScopeModule(container.lookup(MojoExecutionScope.class)),
                             new PluginConfigurationModule(plugin.getDelegate()),
@@ -479,12 +497,14 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             MavenProject project, ClassLoader parent, List<String> imports, boolean v4api) {
         Map<String, ClassLoader> foreignImports = new HashMap<>();
 
-        ClassLoader projectRealm = project.getClassRealm();
+        ClassRealm projectRealm = project.getClassRealm();
         if (projectRealm != null) {
-            foreignImports.put("", projectRealm);
+            foreignImports.put("", projectRealm.getClassLoader());
         } else {
             foreignImports.put(
-                    "", v4api ? classRealmManager.getMaven4ApiRealm() : classRealmManager.getMavenApiRealm());
+                    "",
+                    (v4api ? classRealmManager.getMaven4ApiRealm() : classRealmManager.getMavenApiRealm())
+                            .getClassLoader());
         }
 
         if (parent != null && imports != null) {
@@ -523,21 +543,41 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         // We are forcing the use of the plugin realm for all lookups that might occur during
         // the lifecycle that is part of the lookup. Here we are specifically trying to keep
         // lookups that occur in contextualize calls in line with the right realm.
-        ClassRealm oldLookupRealm = container.setLookupRealm(pluginRealm);
+        ClassRealm oldLookupRealm =
+                container.setLookupRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm);
 
+        // For modular plugins, set TCCL to the ModuleLayer's classloader
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader(pluginRealm);
+        ClassLoader effectiveLoader = getEffectiveClassLoader(pluginRealm);
+        Thread.currentThread().setContextClassLoader(effectiveLoader);
 
         try {
-            if (mojoDescriptor.isV4Api()) {
+            if (pluginDescriptor.isModular()) {
+                // Modular plugins always use the v4 Mojo loading path with maven-di
+                return loadV4Mojo(mojoInterface, session, mojoExecution, mojoDescriptor, pluginDescriptor, pluginRealm);
+            } else if (mojoDescriptor.isV4Api()) {
                 return loadV4Mojo(mojoInterface, session, mojoExecution, mojoDescriptor, pluginDescriptor, pluginRealm);
             } else {
                 return loadV3Mojo(mojoInterface, session, mojoExecution, mojoDescriptor, pluginDescriptor, pluginRealm);
             }
         } finally {
             Thread.currentThread().setContextClassLoader(oldClassLoader);
-            container.setLookupRealm(oldLookupRealm);
+            container.setLookupRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) oldLookupRealm);
         }
+    }
+
+    /**
+     * Returns the effective classloader for a plugin realm.
+     * For modular plugins, returns the ModuleLayer's classloader;
+     * for classic plugins, returns the realm's own classloader.
+     */
+    private static ClassLoader getEffectiveClassLoader(ClassRealm pluginRealm) {
+        if (pluginRealm.isModular()) {
+            ModuleLayer layer = pluginRealm.getModuleLayer();
+            // defineModulesWithOneLoader uses a single loader for all modules in the layer
+            return layer.modules().iterator().next().getClassLoader();
+        }
+        return pluginRealm.getClassLoader();
     }
 
     private <T> T loadV4Mojo(
@@ -557,8 +597,10 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         org.apache.maven.api.plugin.Log log = new DefaultLog(
                 LoggerFactory.getLogger(mojoExecution.getMojoDescriptor().getFullGoalName()));
         try {
+            // For modular plugins, discover from the ModuleLayer's classloader
+            ClassLoader discoveryLoader = getEffectiveClassLoader(pluginRealm);
             Injector injector = Injector.create();
-            injector.discover(pluginRealm);
+            injector.discover(discoveryLoader);
             // Add known classes
             // TODO: get those from the existing plexus scopes ?
             injector.bindInstance(Session.class, sessionV4);
@@ -703,7 +745,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                 ps.println("Unable to load the mojo '" + mojoDescriptor.getGoal() + "' in the plugin '"
                         + pluginDescriptor.getId() + "'. A required class is missing: "
                         + cause.getMessage());
-                pluginRealm.display(ps);
+                ((org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm).display(ps);
 
                 throw new PluginContainerException(mojoDescriptor, pluginRealm, os.toString(), cause);
             } else if (cause instanceof LinkageError) {
@@ -712,7 +754,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                 ps.println("Unable to load the mojo '" + mojoDescriptor.getGoal() + "' in the plugin '"
                         + pluginDescriptor.getId() + "' due to an API incompatibility: "
                         + e.getClass().getName() + ": " + cause.getMessage());
-                pluginRealm.display(ps);
+                ((org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm).display(ps);
 
                 throw new PluginContainerException(mojoDescriptor, pluginRealm, os.toString(), cause);
             }
@@ -814,7 +856,12 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                         + configuratorId + " configurator -->");
             }
 
-            configurator.configureComponent(mojo, configuration, expressionEvaluator, pluginRealm, validator);
+            configurator.configureComponent(
+                    mojo,
+                    configuration,
+                    expressionEvaluator,
+                    (org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm,
+                    validator);
 
             logger.debug("-- end configuration --");
 
@@ -850,7 +897,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             PrintStream ps = new PrintStream(os);
             ps.println("A required class was missing during configuration of mojo " + mojoDescriptor.getId() + ": "
                     + e.getMessage());
-            pluginRealm.display(ps);
+            ((org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm).display(ps);
 
             throw new PluginConfigurationException(mojoDescriptor.getPluginDescriptor(), os.toString(), e);
         } catch (LinkageError e) {
@@ -858,7 +905,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             PrintStream ps = new PrintStream(os);
             ps.println("An API incompatibility was encountered during configuration of mojo " + mojoDescriptor.getId()
                     + ": " + e.getClass().getName() + ": " + e.getMessage());
-            pluginRealm.display(ps);
+            ((org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm).display(ps);
 
             throw new PluginConfigurationException(mojoDescriptor.getPluginDescriptor(), os.toString(), e);
         } finally {

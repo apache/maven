@@ -144,7 +144,6 @@ under the License.
     <!-- various versions -->
     <asmVersion>9.10.1</asmVersion>
     <byteBuddyVersion>1.18.10</byteBuddyVersion>
-    <classWorldsVersion>2.12.0</classWorldsVersion>
     <commonsCliVersion>1.11.0</commonsCliVersion>
     <domtripVersion>1.5.2</domtripVersion>
     <guiceVersion>5.1.0</guiceVersion>
@@ -236,6 +235,11 @@ under the License.
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-api-annotations</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-api-classworlds</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -398,6 +402,10 @@ under the License.
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-xml-impl</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-classworlds</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
@@ -421,9 +429,9 @@ under the License.
         <version>1</version>
       </dependency>
       <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-classworlds</artifactId>
-        <version>${classWorldsVersion}</version>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-classworlds</artifactId>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
@@ -645,6 +653,10 @@ under the License.
           <exclusion>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-classworlds</artifactId>
           </exclusion>
         </exclusions>
       </dependency>

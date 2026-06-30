@@ -58,7 +58,11 @@ public class DefaultProject implements Project {
         this.project = project;
         ClassLoader ttcl = Thread.currentThread().getContextClassLoader();
         try {
-            Thread.currentThread().setContextClassLoader(project.getClassRealm());
+            Thread.currentThread()
+                    .setContextClassLoader(
+                            project.getClassRealm() != null
+                                    ? project.getClassRealm().getClassLoader()
+                                    : null);
             this.packaging = session.requirePackaging(project.getPackaging());
         } finally {
             Thread.currentThread().setContextClassLoader(ttcl);
