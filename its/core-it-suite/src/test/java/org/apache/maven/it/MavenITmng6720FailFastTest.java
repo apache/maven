@@ -52,14 +52,14 @@ class MavenITmng6720FailFastTest extends AbstractMavenIntegrationTestCase {
             // expected
         }
 
-        List<String> module1Lines = verifier.loadFile(
-                testDir.resolve("module-1/target/surefire-reports/mng6720.Module1Test-output.txt"));
+        List<String> module1Lines =
+                verifier.loadFile(testDir.resolve("module-1/target/surefire-reports/mng6720.Module1Test-output.txt"));
         assertTrue(module1Lines.contains("Module1"), "module-1 should be executed");
-        List<String> module2Lines = verifier.loadFile(
-                testDir.resolve("module-2/target/surefire-reports/mng6720.Module2Test-output.txt"));
+        List<String> module2Lines =
+                verifier.loadFile(testDir.resolve("module-2/target/surefire-reports/mng6720.Module2Test-output.txt"));
         assertTrue(module2Lines.contains("Module2"), "module-2 should be executed");
-        List<String> module3Lines = verifier.loadFile(
-                testDir.resolve("module-3/target/surefire-reports/mng6720.Module3Test-output.txt"));
+        List<String> module3Lines =
+                verifier.loadFile(testDir.resolve("module-3/target/surefire-reports/mng6720.Module3Test-output.txt"));
         assertTrue(module3Lines.isEmpty(), "module-3 should be skipped");
     }
 }

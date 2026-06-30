@@ -20,6 +20,7 @@ package org.apache.maven.it;
 
 import java.nio.file.Path;
 import java.util.Properties;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,8 +47,7 @@ public class MavenITmng2136ActiveByDefaultProfileTest extends AbstractMavenInteg
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
 
-        verifier.addCliArgument(
-                "-Dexpression.outputFile=" + testDir.resolve("target/expression.properties"));
+        verifier.addCliArgument("-Dexpression.outputFile=" + testDir.resolve("target/expression.properties"));
         verifier.addCliArgument("-Dexpression.expressions=project/properties");
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

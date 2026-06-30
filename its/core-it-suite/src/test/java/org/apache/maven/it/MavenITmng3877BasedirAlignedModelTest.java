@@ -21,6 +21,7 @@ package org.apache.maven.it;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Properties;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;

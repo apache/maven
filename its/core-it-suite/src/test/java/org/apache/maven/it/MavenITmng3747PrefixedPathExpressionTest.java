@@ -50,8 +50,6 @@ public class MavenITmng3747PrefixedPathExpressionTest extends AbstractMavenInteg
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties("target/config.properties");
-        assertEquals(
-                "path is: " + testDir.resolve("relative") + "/somepath",
-                props.getProperty("stringParam"));
+        assertEquals("path is: " + testDir.resolve("relative") + "/somepath", props.getProperty("stringParam"));
     }
 }

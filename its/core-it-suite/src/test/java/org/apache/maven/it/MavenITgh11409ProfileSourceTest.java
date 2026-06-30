@@ -53,4 +53,3 @@ class MavenITgh11409ProfileSourceTest extends AbstractMavenIntegrationTestCase {
         verifier.verifyTextInLog("child-profile (source: test.gh11409:subproject:1.0-SNAPSHOT)");
     }
 }
-

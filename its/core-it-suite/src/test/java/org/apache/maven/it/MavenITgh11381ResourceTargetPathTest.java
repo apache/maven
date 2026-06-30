@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.nio.file.Path;
+
 import org.junit.jupiter.api.Test;
 
 /**
@@ -57,4 +58,3 @@ class MavenITgh11381ResourceTargetPathTest extends AbstractMavenIntegrationTestC
         verifier.verifyFileNotPresent("target-dir/subdir/another.yml");
     }
 }
-

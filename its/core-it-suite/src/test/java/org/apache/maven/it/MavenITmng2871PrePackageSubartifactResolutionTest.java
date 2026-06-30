@@ -20,6 +20,7 @@ package org.apache.maven.it;
 
 import java.nio.file.Path;
 import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -50,8 +51,6 @@ public class MavenITmng2871PrePackageSubartifactResolutionTest extends AbstractM
 
         List<String> compileClassPath = verifier.loadLines("consumer/target/compile.txt");
         assertEquals(2, compileClassPath.size());
-        ItUtils.assertCanonicalFileEquals(
-                testDir.resolve("ejbs/target/classes"),
-                Path.of(compileClassPath.get(1)));
+        ItUtils.assertCanonicalFileEquals(testDir.resolve("ejbs/target/classes"), Path.of(compileClassPath.get(1)));
     }
 }

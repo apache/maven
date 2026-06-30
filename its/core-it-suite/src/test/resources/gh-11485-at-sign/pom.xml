@@ -17,9 +17,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.its.gh11485</groupId>
@@ -28,10 +26,8 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Test @ character in jvm.config</name>
-  <description>
-    Verify that @ character in jvm.config values is handled correctly.
-    This is important for Jenkins workspaces like workspace/project_PR-350@2
-  </description>
+  <description>Verify that @ character in jvm.config values is handled correctly.
+    This is important for Jenkins workspaces like workspace/project_PR-350@2</description>
 
   <properties>
     <pathWithAtProp>${path.with.at}</pathWithAtProp>
@@ -48,10 +44,10 @@ under the License.
         <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
-            <phase>validate</phase>
             <goals>
               <goal>eval</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <outputFile>target/pom.properties</outputFile>
               <expressions>
@@ -67,4 +63,3 @@ under the License.
     </plugins>
   </build>
 </project>
-

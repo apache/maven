@@ -21,6 +21,7 @@ package org.apache.maven.it;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -90,8 +91,7 @@ public class MavenITmng6223FindBasedir extends AbstractMavenIntegrationTestCase 
         }
 
         Verifier verifier = newVerifier(basedir);
-        verifier.addCliArgument(
-                "-Dexpression.outputFile=" + basedir.resolve("expression.properties"));
+        verifier.addCliArgument("-Dexpression.outputFile=" + basedir.resolve("expression.properties"));
         verifier.addCliArgument(option); // -f/--file client/pom.xml
         verifier.addCliArgument((pom ? testDir.resolve("pom.xml") : testDir).toString());
         verifier.setForkJvm(true); // force forked JVM since we need the shell script to detect .mvn/ location

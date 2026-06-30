@@ -93,6 +93,8 @@ under the License.
     <!-- Support artifacts version - kept separate from Maven version -->
     <core-it-support-version>2.1-SNAPSHOT</core-it-support-version>
 
+    <version.palantirJavaFormat>2.90.0</version.palantirJavaFormat>
+    <version.maven-shared-resources>6</version.maven-shared-resources>
     <its.forkCount>0.75C</its.forkCount>
     <its.test />
   </properties>
@@ -356,12 +358,12 @@ under the License.
       <artifactId>maven-it-plugin-plexus-lifecycle</artifactId>
       <version>${core-it-support-version}</version>
     </dependency>
-      <dependency>
-          <groupId>commons-jxpath</groupId>
-          <artifactId>commons-jxpath</artifactId>
-          <version>1.4.0</version>
-          <scope>test</scope>
-      </dependency>
+    <dependency>
+      <groupId>commons-jxpath</groupId>
+      <artifactId>commons-jxpath</artifactId>
+      <version>1.4.0</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -381,6 +383,16 @@ under the License.
           <artifactId>spotless-maven-plugin</artifactId>
           <configuration>
             <java>
+              <palantirJavaFormat>
+                <version>${version.palantirJavaFormat}</version>
+              </palantirJavaFormat>
+              <removeUnusedImports />
+              <importOrder>
+                <file>config/maven-eclipse-importorder.txt</file>
+              </importOrder>
+              <licenseHeader>
+                <file>config/maven-header-plain.txt</file>
+              </licenseHeader>
               <includes>
                 <include>src/main/java/**/*.java</include>
                 <include>src/test/java/**/*.java</include>
@@ -392,6 +404,11 @@ under the License.
               </excludes>
             </java>
             <pom>
+              <sortPom>
+                <expandEmptyElements>false</expandEmptyElements>
+                <spaceBeforeCloseEmptyElement>true</spaceBeforeCloseEmptyElement>
+                <quiet>true</quiet>
+              </sortPom>
               <includes>
                 <include>pom.xml</include>
                 <include>src/test/resources/**/pom.xml</include>
@@ -403,6 +420,13 @@ under the License.
               </excludes>
             </pom>
           </configuration>
+          <dependencies>
+            <dependency>
+              <groupId>org.apache.maven.shared</groupId>
+              <artifactId>maven-shared-resources</artifactId>
+              <version>${version.maven-shared-resources}</version>
+            </dependency>
+          </dependencies>
         </plugin>
       </plugins>
     </pluginManagement>

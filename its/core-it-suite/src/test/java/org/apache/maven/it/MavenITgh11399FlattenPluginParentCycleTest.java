@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.nio.file.Path;
+
 import org.junit.jupiter.api.Test;
 
 /**
@@ -57,4 +58,3 @@ class MavenITgh11399FlattenPluginParentCycleTest extends AbstractMavenIntegratio
         verifier.verifyFilePresent("target/.flattened-pom.xml");
     }
 }
-

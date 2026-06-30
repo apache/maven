@@ -21,6 +21,7 @@ package org.apache.maven.it;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 

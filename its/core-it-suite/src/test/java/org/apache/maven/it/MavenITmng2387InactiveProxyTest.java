@@ -21,6 +21,7 @@ package org.apache.maven.it;
 import java.net.InetAddress;
 import java.nio.file.Path;
 import java.util.Map;
+
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Server;
@@ -68,7 +69,8 @@ public class MavenITmng2387InactiveProxyTest extends AbstractMavenIntegrationTes
         System.out.println("Bound server socket to the HTTP port " + port);
 
         resourceHandler = new ResourceHandler();
-        resourceHandler.setResourceBase(testDir.resolve("proxy").toAbsolutePath().toString());
+        resourceHandler.setResourceBase(
+                testDir.resolve("proxy").toAbsolutePath().toString());
 
         handlers = new HandlerList();
         handlers.setHandlers(new Handler[] {resourceHandler, new DefaultHandler()});

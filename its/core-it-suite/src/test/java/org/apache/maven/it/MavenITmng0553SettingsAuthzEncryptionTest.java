@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
@@ -160,8 +161,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
         // NOTE: The selection of the Turkish language for the JVM locale is essential part of the test
         verifier.setEnvironmentVariable(
                 "MAVEN_OPTS",
-                "-Dsettings.security=" + testDir.resolve("settings~security.xml")
-                        + " -Duser.language=tr");
+                "-Dsettings.security=" + testDir.resolve("settings~security.xml") + " -Duser.language=tr");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

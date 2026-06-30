@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.nio.file.Path;
+
 import org.junit.jupiter.api.Test;
 
 public class MavenITmng7051OptionalProfileActivationTest extends AbstractMavenIntegrationTestCase {
