@@ -810,25 +810,29 @@ under the License.
         <plugin>
           <groupId>org.apache.rat</groupId>
           <artifactId>apache-rat-plugin</artifactId>
+          <version>0.18</version><!-- Remove if correct version comes from parent -->
           <configuration>
-            <excludes>
+            <inputExcludeStds>
+              <exclude>ALL</exclude>
+            </inputExcludeStds>
+            <inputExcludeParsedScm>GIT</inputExcludeParsedScm>
+            <inputExcludes>
               <exclude>Jenkinsfile</exclude>
               <exclude>**/.gitattributes</exclude>
-              <exclude>src/main/resources/META-INF/services/**</exclude>
+              <exclude>src/main/resources/META-INF/services</exclude>
               <exclude>src/test/resources*/**</exclude>
-              <exclude>src/test/projects/**</exclude>
-              <exclude>src/test/remote-repo/**</exclude>
-              <exclude>its/**</exclude>
+              <exclude>src/test/projects</exclude>
+              <exclude>src/test/remote-repo</exclude>
+              <exclude>its</exclude>
               <exclude>**/*.odg</exclude>
               <exclude>**/*.svg</exclude>
               <exclude>.asf.yaml</exclude>
-              <exclude>.mvn/**</exclude>
-              <exclude>.jbang/**</exclude>
+              <exclude>.jbang</exclude>
               <!--
                 ! Excluded the license files itself cause they do not have a license of themselves.
               -->
               <exclude>src/main/appended-resources/licenses/**</exclude>
-            </excludes>
+            </inputExcludes>
           </configuration>
         </plugin>
       </plugins>
