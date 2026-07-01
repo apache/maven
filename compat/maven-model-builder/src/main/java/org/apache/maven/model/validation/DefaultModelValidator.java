@@ -1151,6 +1151,9 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     private boolean isValidId(String id) {
+        if (isPathTraversalSegment(id)) {
+            return false;
+        }
         for (int i = 0; i < id.length(); i++) {
             char c = id.charAt(i);
             if (!isValidIdCharacter(c)) {
@@ -1158,6 +1161,15 @@ public class DefaultModelValidator implements ModelValidator {
             }
         }
         return true;
+    }
+
+    /**
+     * An id or version made up only of {@code .} or {@code ..} is a filesystem path-traversal segment. The dotted
+     * characters pass the allowed-character checks yet map straight to a directory component when the value is turned
+     * into a local repository path, so such values are rejected here.
+     */
+    private static boolean isPathTraversalSegment(String id) {
+        return ".".equals(id) || "..".equals(id);
     }
 
     private boolean isValidIdCharacter(char c) {
@@ -1193,6 +1205,9 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     private boolean isValidIdWithWildCards(String id) {
+        if (isPathTraversalSegment(id)) {
+            return false;
+        }
         for (int i = 0; i < id.length(); i++) {
             char c = id.charAt(i);
             if (!isValidIdWithWildCardCharacter(c)) {
@@ -1633,6 +1648,18 @@ public class DefaultModelValidator implements ModelValidator {
         }
 
         if (hasExpression(string)) {
+            addViolation(
+                    problems,
+                    severity,
+                    version,
+                    prefix + fieldName,
+                    sourceHint,
+                    "must be a valid version but is '" + string + "'.",
+                    tracker);
+            return false;
+        }
+
+        if (isPathTraversalSegment(string)) {
             addViolation(
                     problems,
                     severity,
