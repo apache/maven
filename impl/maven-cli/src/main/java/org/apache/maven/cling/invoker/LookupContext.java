@@ -105,7 +105,7 @@ public class LookupContext implements AutoCloseable {
     public Settings effectiveSettings;
     public PersistedToolchains effectiveToolchains;
 
-    public final List<AutoCloseable> closeables = new ArrayList<>();
+    public final List<AutoCloseable> closeables = Collections.synchronizedList(new ArrayList<>());
 
     @Override
     public void close() throws InvokerException {
