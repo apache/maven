@@ -1489,6 +1489,13 @@ public class DefaultModelBuilder implements ModelBuilder {
             // Use ModelProblemUtils.toId() to get groupId:artifactId:version format (without packaging)
             addActivePomProfiles(ModelProblemUtils.toId(model), localActivePomProfiles);
 
+            // [MNG-8432] Import BOM properties BEFORE interpolation so they are available
+            // during the single interpolation pass (avoids double-interpolation issues).
+            // This is opt-in via the maven.bom.import.properties user property.
+            if (isBomPropertyImportEnabled()) {
+                model = importBomProperties(model);
+            }
+
             // model interpolation
             Model resultModel = model;
             resultModel = interpolateModel(resultModel, request, this);
@@ -2017,6 +2024,113 @@ public class DefaultModelBuilder implements ModelBuilder {
             return new ParentModelWithProfiles(injectedParentModel.withParent(null), parentActivePomProfiles);
         }
 
+        /**
+         * Checks whether BOM property import is enabled via the
+         * {@code maven.bom.import.properties} user property.
+         */
+        private boolean isBomPropertyImportEnabled() {
+            return Boolean.parseBoolean(
+                    request.getUserProperties().getOrDefault(Constants.MAVEN_BOM_IMPORT_PROPERTIES, "false"));
+        }
+
+        /**
+         * [MNG-8432] Imports properties from BOMs declared in dependencyManagement with
+         * {@code type=pom, scope=import}. This is called BEFORE interpolation so that
+         * the imported properties are available during the single interpolation pass.
+         * <p>
+         * Property precedence (highest to lowest):
+         * <ol>
+         *   <li>Project's own properties (including parent-inherited)</li>
+         *   <li>First-declared BOM's properties</li>
+         *   <li>Later-declared BOM's properties</li>
+         * </ol>
+         * Conflicts between BOMs produce a warning.
+         */
+        private Model importBomProperties(Model model) {
+            DependencyManagement depMgmt = model.getDependencyManagement();
+            if (depMgmt == null) {
+                return model;
+            }
+
+            // We need to resolve BOM coordinates that may contain ${...} expressions.
+            // At this point in the pipeline the model is not yet interpolated, so we
+            // use a lightweight interpolation callback on the model's own properties
+            // plus system/user properties.
+            Map<String, String> props = new HashMap<>();
+            props.putAll(model.getProperties());
+            props.putAll(request.getSystemProperties());
+            props.putAll(request.getUserProperties());
+
+            Map<String, String> importedProperties = new LinkedHashMap<>();
+
+            for (Dependency dependency : depMgmt.getDependencies()) {
+                if (!("pom".equals(dependency.getType()) && "import".equals(dependency.getScope()))
+                        || "bom".equals(dependency.getType())) {
+                    continue;
+                }
+
+                // Resolve BOM coordinates (version may be a ${property})
+                String groupId = interpolator.interpolate(dependency.getGroupId(), props::get);
+                String artifactId = interpolator.interpolate(dependency.getArtifactId(), props::get);
+                String version = interpolator.interpolate(dependency.getVersion(), props::get);
+                if (groupId == null || artifactId == null || version == null || version.contains("${")) {
+                    // Cannot resolve coordinates yet; skip this BOM
+                    continue;
+                }
+
+                // Resolve the BOM model
+                Model bomModel;
+                try {
+                    Dependency resolved = dependency
+                            .withGroupId(groupId)
+                            .withArtifactId(artifactId)
+                            .withVersion(version);
+                    bomModel = cache(
+                            repositories,
+                            groupId,
+                            artifactId,
+                            version,
+                            null,
+                            IMPORT,
+                            () -> doLoadBomModel(resolved, groupId, artifactId, version, new HashSet<>()));
+                } catch (Exception e) {
+                    // If resolution fails, skip — the later importDependencyManagement
+                    // call will report the proper error.
+                    continue;
+                }
+                if (bomModel == null) {
+                    continue;
+                }
+
+                // Merge BOM properties (first BOM wins for conflicts between BOMs)
+                for (Map.Entry<String, String> entry : bomModel.getProperties().entrySet()) {
+                    String key = entry.getKey();
+                    String existing = importedProperties.get(key);
+                    if (existing != null && !existing.equals(entry.getValue())) {
+                        logger.warn(
+                                "[MNG-8432] BOM property '{}' from {}:{}:{} conflicts with an earlier BOM "
+                                        + "(value '{}' vs '{}'); using the earlier BOM's value.",
+                                key,
+                                groupId,
+                                artifactId,
+                                version,
+                                entry.getValue(),
+                                existing);
+                    }
+                    importedProperties.putIfAbsent(key, entry.getValue());
+                }
+            }
+
+            if (importedProperties.isEmpty()) {
+                return model;
+            }
+
+            // Model's own properties take precedence over imported BOM properties
+            Map<String, String> mergedProperties = new LinkedHashMap<>(importedProperties);
+            mergedProperties.putAll(model.getProperties());
+            return model.withProperties(mergedProperties);
+        }
+
         private Model importDependencyManagement(Model model, Collection<String> importIds) {
             DependencyManagement depMgmt = model.getDependencyManagement();
 
@@ -2047,7 +2161,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                     if (importMgmts == null) {
                         importMgmts = new ArrayList<>();
                     }
-
                     importMgmts.add(importMgmt);
                 }
             }
@@ -2113,7 +2226,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     version,
                     null,
                     IMPORT,
-                    () -> doLoadDependencyManagement(dependency, groupId, artifactId, version, importIds));
+                    () -> doLoadBomModel(dependency, groupId, artifactId, version, importIds));
             DependencyManagement importMgmt = importModel != null ? importModel.getDependencyManagement() : null;
             if (importMgmt == null) {
                 importMgmt = DependencyManagement.newInstance();
@@ -2134,7 +2247,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         @SuppressWarnings("checkstyle:parameternumber")
-        private Model doLoadDependencyManagement(
+        private Model doLoadBomModel(
                 Dependency dependency,
                 String groupId,
                 String artifactId,

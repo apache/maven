@@ -771,5 +771,26 @@ public final class Constants {
      */
     public static final String MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE_PREFIX = "maven.model.processor.referenceType.";
 
+    /**
+     * User property for enabling property inheritance from imported BOMs.
+     * When set to {@code true}, properties defined in imported BOMs (dependencies with
+     * {@code type=pom} and {@code scope=import} in {@code dependencyManagement}) will be
+     * merged into the importing project's properties with lower precedence — the project's
+     * own properties, parent-inherited properties, and profile properties all take priority.
+     * <p>
+     * This is an opt-in feature because Maven's {@code <scope>import</scope>} is traditionally
+     * specified to import <strong>only</strong> the dependency management section, not properties.
+     * Property inheritance is normally the role of parent POMs.
+     * <p>
+     * When multiple BOMs define the same property key, the first-declared BOM's value wins
+     * and a warning is logged for each conflict.
+     * <p>
+     * Default: {@code "false"}.
+     *
+     * @since 4.1.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "false")
+    public static final String MAVEN_BOM_IMPORT_PROPERTIES = "maven.bom.import.properties";
+
     private Constants() {}
 }
