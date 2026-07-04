@@ -1,5 +1,0 @@
-# Security-model scaffold (carries an SPDX header; exempted
-# from RAT for setups that don't scan Markdown headers).
-THREAT_MODEL.md
-SECURITY.md
-AGENTS.md
