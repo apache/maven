@@ -242,6 +242,29 @@ class DefaultModelValidatorTest {
     }
 
     @Test
+    void testCoordinateIdsWithSingleDotPathTraversal() throws Exception {
+        SimpleProblemCollector result = validate("coordinate-ids-path-traversal-dot-pom.xml");
+
+        assertTrue(
+                result.getErrors().stream()
+                        .anyMatch(m ->
+                                m.contains("'groupId'") && m.contains("does not match a valid coordinate id pattern")),
+                "groupId '..' must be rejected: " + result.getErrors());
+
+        assertTrue(
+                result.getErrors().stream()
+                        .anyMatch(m -> m.contains("'artifactId'")
+                                && m.contains("does not match a valid coordinate id pattern")),
+                "artifactId '.' must be rejected: " + result.getErrors());
+
+        assertTrue(
+                result.getErrors().stream()
+                        .anyMatch(m ->
+                                m.contains("dependencies.dependency.version") && m.contains("must be a valid version")),
+                "dependency version '.' must be rejected: " + result.getErrors());
+    }
+
+    @Test
     void testMissingType() throws Exception {
         SimpleProblemCollector result = validate("missing-type-pom.xml");
 
