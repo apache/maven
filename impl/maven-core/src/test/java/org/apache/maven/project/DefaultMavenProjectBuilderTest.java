@@ -739,4 +739,59 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
         assertEquals("1.0", child.getArtifact().getVersion(), "artifact version should match inherited version");
         assertEquals("org.different.group", child.getGroupId(), "groupId should be from child POM");
     }
+
+    /**
+     * Tests that parent profile source keys use consistent GAV format (groupId:artifactId:version)
+     * across both cache-miss and cache-hit paths in DefaultModelBuilder.readAsParentModel().
+     *
+     * <p>Before the fix, the cache-miss path used ModelProblemUtils.toId() (GAV) while the cache-hit
+     * path used Model.getId() (GAPV, which includes packaging). This meant the same parent's profiles
+     * could appear under different keys depending on build order.
+     */
+    @Test
+    void testParentProfileSourceKeyConsistentAcrossModules() throws Exception {
+        File pom = getTestFile("src/test/resources/projects/multimodule-parent-profiles/pom.xml");
+        ProjectBuildingRequest configuration = newBuildingRequest();
+        configuration.setLocalRepository(getLocalRepository());
+        InternalSession internalSession = InternalSession.from(configuration.getRepositorySession());
+        InternalMavenSession mavenSession = InternalMavenSession.from(internalSession);
+        mavenSession
+                .getMavenSession()
+                .getRequest()
+                .setRootDirectory(pom.toPath().getParent());
+
+        List<ProjectBuildingResult> results = projectBuilder.build(List.of(pom), true, configuration);
+        assertEquals(3, results.size());
+
+        // The parent GAV key (without packaging) that all children should use
+        String parentGav = "org.apache.maven.test:multimodule-parent-profiles:1.0-SNAPSHOT";
+
+        for (ProjectBuildingResult result : results) {
+            MavenProject project = result.getProject();
+            if ("pom".equals(project.getPackaging()) && "multimodule-parent-profiles".equals(project.getArtifactId())) {
+                continue; // skip the parent itself
+            }
+
+            // Verify that the parent profile source key uses GAV format (no packaging component)
+            assertTrue(
+                    project.getInjectedProfileIds().containsKey(parentGav),
+                    "Profile source key for " + project.getArtifactId()
+                            + " should use GAV format '" + parentGav
+                            + "', but found keys: "
+                            + project.getInjectedProfileIds().keySet());
+
+            // Verify the parent-profile was actually tracked
+            assertTrue(
+                    project.getInjectedProfileIds().get(parentGav).contains("parent-profile"),
+                    "parent-profile should be listed under GAV key for " + project.getArtifactId());
+
+            // Verify no GAPV key exists (would include ":pom:" packaging)
+            for (String key : project.getInjectedProfileIds().keySet()) {
+                assertFalse(
+                        key.contains(":pom:"),
+                        "Profile source key for " + project.getArtifactId()
+                                + " should not contain packaging, but found: " + key);
+            }
+        }
+    }
 }

@@ -1941,7 +1941,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                         replayRecordIntoContext(e.getKey(), profileActivationContext);
                     }
                     // Add the activated profiles from cache to the result
-                    addActivePomProfiles(cached.model().getId(), cached.activatedProfiles());
+                    // Use ModelProblemUtils.toId() to get groupId:artifactId:version format (without packaging)
+                    addActivePomProfiles(ModelProblemUtils.toId(cached.model()), cached.activatedProfiles());
                     return cached.model();
                 }
             }
