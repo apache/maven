@@ -1397,7 +1397,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             setSource(inputModel);
             inputModel = modelNormalizer.mergeDuplicates(inputModel, request, this);
 
-            Map<String, Activation> interpolatedActivations = getProfileActivations(inputModel);
+            List<Activation> interpolatedActivations = getProfileActivations(inputModel);
             inputModel = injectProfileActivations(inputModel, interpolatedActivations);
 
             // profile injection
@@ -2367,20 +2367,21 @@ public class DefaultModelBuilder implements ModelBuilder {
                 model);
     }
 
-    private Map<String, Activation> getProfileActivations(Model model) {
+    private List<Activation> getProfileActivations(Model model) {
         return model.getProfiles().stream()
-                .filter(p -> p.getActivation() != null)
-                .collect(Collectors.toMap(Profile::getId, Profile::getActivation));
+                .map(Profile::getActivation)
+                .collect(Collectors.toList());
     }
 
-    private Model injectProfileActivations(Model model, Map<String, Activation> activations) {
+    private Model injectProfileActivations(Model model, List<Activation> activations) {
         List<Profile> profiles = new ArrayList<>();
         boolean modified = false;
-        for (Profile profile : model.getProfiles()) {
+        for (int i = 0; i < model.getProfiles().size(); i++) {
+            Profile profile = model.getProfiles().get(i);
             Activation activation = profile.getActivation();
             if (activation != null) {
                 // restore activation
-                profile = profile.withActivation(activations.get(profile.getId()));
+                profile = profile.withActivation(activations.get(i));
                 modified = true;
             }
             profiles.add(profile);
