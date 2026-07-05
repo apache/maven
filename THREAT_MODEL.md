@@ -85,8 +85,10 @@ under the License.
 | 28 | `maven-filtering` | `master` | line-agnostic | interpolates `${...}` into resource files (used by resources/war plugins) | **yes** |
 | 29 | `maven-shared-utils` | `master` | line-agnostic | shared IO / process-exec / CLI helpers used across plugins | **yes** |
 | 30 | `maven-archiver` | `master` | line-agnostic | shared archive + JAR/WAR manifest assembly used by packaging plugins | **yes** |
+| 31 | `maven-dependency-analyzer` | `master` | line-agnostic | bytecode analysis of used-vs-declared dependencies (engine behind `dependency:analyze`) | **yes** |
+| 32 | `maven-shared-io` | `master` | line-agnostic | shared file/resource IO helpers; low activity, likely near-defunct but still resolved by some plugins | **yes** |
 
-Counting the two targets each for rows 1, 2, and 21–27 yields ~39 branch-targets across ~30 repositories. `mvnup` and `mvnenc` ship inside the Maven 4 core distribution (row 1, `master`) and are in model. See §14 Q3.
+Counting the two targets each for rows 1, 2, and 21–27 yields ~41 branch-targets across ~32 repositories. `mvnup` and `mvnenc` ship inside the Maven 4 core distribution (row 1, `master`) and are in model. See §14 Q3.
 
 ---
 
