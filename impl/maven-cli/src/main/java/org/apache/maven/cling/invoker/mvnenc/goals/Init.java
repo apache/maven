@@ -143,7 +143,20 @@ public class Init extends InteractiveGoalSupport {
                         if (editMap.isEmpty()) {
                             throw new InterruptedException();
                         }
-                        dispatcherConfigResult.put(editable.getKey(), editMap.get("edit"));
+                        String userInput = editMap.get("edit").getResult();
+                        if (template.contains("$")) {
+                            String prefix = template.substring(0, template.indexOf('$'));
+                            if (!prefix.isEmpty() && !userInput.startsWith(prefix)) {
+                                userInput = prefix + userInput;
+                            }
+                        }
+                        final String finalResult = userInput;
+                        dispatcherConfigResult.put(editable.getKey(), new PromptResultItemIF() {
+                            @Override
+                            public String getResult() {
+                                return finalResult;
+                            }
+                        });
                     }
                 }
 
