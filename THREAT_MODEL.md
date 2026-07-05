@@ -71,16 +71,22 @@ under the License.
 | 16 | `maven-archetype` | `master` | 3.x | scaffolds projects from templates | **yes** |
 | 17 | `maven-resolver-ant-tasks` | `master` | 3.x | Ant-side resolution/transport | **yes** |
 | 18 | `maven-indexer` | `master` | 3.x | parses repository index metadata | **yes** |
+| 19 | `maven-war-plugin` | `master` | 3.x | assembles WAR archives (overlays, resource filtering) | **yes** |
+| 20 | `maven-ear-plugin` | `master` | 3.x | assembles EAR archives from module artifacts | **yes** |
 | **Split plugins — master on Maven 4 API + `*-3.x` maintenance** | | | | | |
-| 19 | `maven-compiler-plugin` | `master` (M4); `*-3.x` | **both (two targets)** | forks/embeds compiler, reads source | **yes** |
-| 20 | `maven-jar-plugin` | `master` (M4); `*-3.x` | **both** | writes JARs | **yes** |
-| 21 | `maven-clean-plugin` | `master` (M4); `*-3.x` | **both** | deletes filesystem paths | **yes** |
-| 22 | `maven-deploy-plugin` | `master` (M4); `*-3.x` | **both** | uploads artifacts to remote repo | **yes** |
-| 23 | `maven-install-plugin` | `master` (M4); `*-3.x` | **both** | writes to local repo | **yes** |
-| 24 | `maven-resources-plugin` | `master` (M4); `*-3.x` | **both** | copies/filters resource files | **yes** |
-| 25 | `maven-source-plugin` | `master` (M4); `*-3.x` | **both** | packages source JARs | **yes** |
+| 21 | `maven-compiler-plugin` | `master` (M4); `*-3.x` | **both (two targets)** | forks/embeds compiler, reads source | **yes** |
+| 22 | `maven-jar-plugin` | `master` (M4); `*-3.x` | **both** | writes JARs | **yes** |
+| 23 | `maven-clean-plugin` | `master` (M4); `*-3.x` | **both** | deletes filesystem paths | **yes** |
+| 24 | `maven-deploy-plugin` | `master` (M4); `*-3.x` | **both** | uploads artifacts to remote repo | **yes** |
+| 25 | `maven-install-plugin` | `master` (M4); `*-3.x` | **both** | writes to local repo | **yes** |
+| 26 | `maven-resources-plugin` | `master` (M4); `*-3.x` | **both** | copies/filters resource files | **yes** |
+| 27 | `maven-source-plugin` | `master` (M4); `*-3.x` | **both** | packages source JARs | **yes** |
+| **Shared libraries (build/release path; no standalone CLI)** | | | | | |
+| 28 | `maven-filtering` | `master` | line-agnostic | interpolates `${...}` into resource files (used by resources/war plugins) | **yes** |
+| 29 | `maven-shared-utils` | `master` | line-agnostic | shared IO / process-exec / CLI helpers used across plugins | **yes** |
+| 30 | `maven-archiver` | `master` | line-agnostic | shared archive + JAR/WAR manifest assembly used by packaging plugins | **yes** |
 
-Counting the two targets each for rows 1, 2, and 19–25 yields ~34 branch-targets across ~25 repositories. `mvnup` and `mvnenc` ship inside the Maven 4 core distribution (row 1, `master`) and are in model. See §14 Q3.
+Counting the two targets each for rows 1, 2, and 21–27 yields ~39 branch-targets across ~30 repositories. `mvnup` and `mvnenc` ship inside the Maven 4 core distribution (row 1, `master`) and are in model. See §14 Q3.
 
 ---
 
