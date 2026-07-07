@@ -338,4 +338,169 @@ class CompatibilityWarningTest {
                     .warn(argThat(msg -> msg.contains("spark-${spark.version}") && msg.contains("profile")));
         }
     }
+
+    @Nested
+    @DisplayName("CI-Friendly Missing Dependency Version Warnings (#12435)")
+    class CiFriendlyDependencyVersionTests {
+
+        @Test
+        @DisplayName("should warn about versionless dependencies in CI-friendly project")
+        void shouldWarnAboutVersionlessDependenciesInCiFriendlyProject() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <parent>
+                        <groupId>org.example</groupId>
+                        <artifactId>parent</artifactId>
+                        <version>${revision}</version>
+                    </parent>
+                    <artifactId>child</artifactId>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.springframework</groupId>
+                            <artifactId>spring-context</artifactId>
+                        </dependency>
+                        <dependency>
+                            <groupId>io.protostuff</groupId>
+                            <artifactId>protostuff-core</artifactId>
+                        </dependency>
+                    </dependencies>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            strategy.doApply(context, pomMap);
+
+            verify(context.logger, atLeastOnce())
+                    .warn(argThat(msg -> msg.contains("CI-friendly")
+                            && msg.contains("${revision}")
+                            && msg.contains("2 dependencies")));
+        }
+
+        @Test
+        @DisplayName("should not warn when parent version is not CI-friendly")
+        void shouldNotWarnWhenParentVersionNotCiFriendly() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <parent>
+                        <groupId>org.example</groupId>
+                        <artifactId>parent</artifactId>
+                        <version>1.0.0</version>
+                    </parent>
+                    <artifactId>child</artifactId>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.springframework</groupId>
+                            <artifactId>spring-context</artifactId>
+                        </dependency>
+                    </dependencies>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            strategy.doApply(context, pomMap);
+
+            verify(context.logger, never()).warn(argThat(msg -> msg.contains("CI-friendly")));
+        }
+
+        @Test
+        @DisplayName("should not warn when dependencies have explicit versions")
+        void shouldNotWarnWhenDependenciesHaveVersions() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <parent>
+                        <groupId>org.example</groupId>
+                        <artifactId>parent</artifactId>
+                        <version>${revision}</version>
+                    </parent>
+                    <artifactId>child</artifactId>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.springframework</groupId>
+                            <artifactId>spring-context</artifactId>
+                            <version>6.0.0</version>
+                        </dependency>
+                    </dependencies>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            strategy.doApply(context, pomMap);
+
+            verify(context.logger, never()).warn(argThat(msg -> msg.contains("CI-friendly")));
+        }
+
+        @Test
+        @DisplayName("should handle ${changelist} as CI-friendly expression")
+        void shouldHandleChangelistAsCiFriendly() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <parent>
+                        <groupId>org.example</groupId>
+                        <artifactId>parent</artifactId>
+                        <version>1.0.0${changelist}</version>
+                    </parent>
+                    <artifactId>child</artifactId>
+                    <dependencies>
+                        <dependency>
+                            <groupId>commons-io</groupId>
+                            <artifactId>commons-io</artifactId>
+                        </dependency>
+                    </dependencies>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            strategy.doApply(context, pomMap);
+
+            verify(context.logger, atLeastOnce()).warn(argThat(msg -> msg.contains("CI-friendly")));
+        }
+
+        @Test
+        @DisplayName("should not warn when no parent element exists")
+        void shouldNotWarnWhenNoParentExists() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.springframework</groupId>
+                            <artifactId>spring-context</artifactId>
+                        </dependency>
+                    </dependencies>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            strategy.doApply(context, pomMap);
+
+            verify(context.logger, never()).warn(argThat(msg -> msg.contains("CI-friendly")));
+        }
+    }
 }
