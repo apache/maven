@@ -82,6 +82,16 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
 
     private static final Set<String> VALID_COMBINE_CHILDREN_VALUES = Set.of(COMBINE_APPEND, COMBINE_MERGE);
 
+    /**
+     * Known incompatible plugins where even the latest version fails with Maven 4.
+     * Maps plugin key (groupId:artifactId) to a description of the incompatibility.
+     */
+    private static final Map<String, String> KNOWN_INCOMPATIBLE_PLUGINS = Map.of(
+            "org.codehaus.gmavenplus:gmavenplus-plugin",
+            "gmavenplus-plugin calls mutating methods on immutable lists returned by the Maven 4 API. "
+                    + "Even the latest version (4.1.1) fails with UnsupportedOperationException on "
+                    + "goals like removeStubs. Track https://github.com/groovy/GMavenPlus for a fix.");
+
     @Override
     public boolean isApplicable(UpgradeContext context) {
         UpgradeOptions options = getOptions(context);
@@ -152,6 +162,10 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
                 hasIssues |= fixIncorrectParentRelativePaths(pomDocument, pomPath, pomMap, context);
                 hasIssues |= fixUndefinedPropertyExpressions(pomDocument, allDefinedProperties, context);
                 hasIssues |= fixUndefinedPropertyExpressionsInRepositories(pomDocument, allDefinedProperties, context);
+
+                // Warning-only checks: emit warnings for issues that cannot be auto-fixed
+                // These do not modify the POM and do not affect hasIssues
+                warnAboutIncompatiblePlugins(pomDocument, context);
 
                 if (hasIssues) {
                     context.success("Maven 4 compatibility issues fixed");
@@ -820,5 +834,53 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
                 .findFirst()
                 .map(Map.Entry::getKey)
                 .orElse(null);
+    }
+
+    // ---- Warning-only checks for Maven 4 compatibility issues that cannot be auto-fixed ----
+
+    /**
+     * Warns about plugins known to be incompatible with Maven 4 even at their latest version.
+     * These plugins call methods on immutable API objects or use removed internal APIs
+     * and require upstream fixes before they can work with Maven 4.
+     *
+     * @see <a href="https://github.com/apache/maven/issues/12432">#12432</a>
+     */
+    private void warnAboutIncompatiblePlugins(Document pomDocument, UpgradeContext context) {
+        Element root = pomDocument.root();
+
+        Stream<Element> pluginContainers = Stream.concat(
+                // Root level build
+                root.childElement(BUILD).stream()
+                        .flatMap(build -> Stream.concat(
+                                build.childElement(PLUGINS).stream(),
+                                build.childElement(PLUGIN_MANAGEMENT).stream()
+                                        .flatMap(pm -> pm.childElement(PLUGINS).stream()))),
+                // Profile builds
+                root.childElement(PROFILES).stream()
+                        .flatMap(profiles -> profiles.childElements(PROFILE))
+                        .flatMap(profile -> profile.childElement(BUILD).stream())
+                        .flatMap(build -> Stream.concat(
+                                build.childElement(PLUGINS).stream(),
+                                build.childElement(PLUGIN_MANAGEMENT).stream()
+                                        .flatMap(pm -> pm.childElement(PLUGINS).stream()))));
+
+        pluginContainers.forEach(pluginsElement -> pluginsElement
+                .childElements(PLUGIN)
+                .forEach(pluginElement -> {
+                    String groupId = pluginElement.childText(MavenPomElements.Elements.GROUP_ID);
+                    String artifactId = pluginElement.childText(MavenPomElements.Elements.ARTIFACT_ID);
+
+                    if (groupId == null && artifactId != null && artifactId.startsWith(MAVEN_PLUGIN_PREFIX)) {
+                        groupId = DEFAULT_MAVEN_PLUGIN_GROUP_ID;
+                    }
+
+                    if (groupId != null && artifactId != null) {
+                        String pluginKey = groupId + ":" + artifactId;
+                        String warning = KNOWN_INCOMPATIBLE_PLUGINS.get(pluginKey);
+                        if (warning != null) {
+                            context.warning("Known Maven 4 incompatibility: " + pluginKey + " — " + warning);
+                        }
+                    }
+                }));
     }
 }
