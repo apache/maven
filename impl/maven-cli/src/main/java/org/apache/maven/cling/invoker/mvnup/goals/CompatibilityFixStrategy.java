@@ -51,6 +51,8 @@ import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.BUILD;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.DEPENDENCIES;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.DEPENDENCY;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.DEPENDENCY_MANAGEMENT;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.MODULE;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.MODULES;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PARENT;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PLUGIN;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PLUGINS;
@@ -63,6 +65,8 @@ import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PROPERTIES;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.RELATIVE_PATH;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.REPOSITORIES;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.REPOSITORY;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.SUBPROJECT;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.SUBPROJECTS;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Files.DEFAULT_PARENT_RELATIVE_PATH;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Plugins.DEFAULT_MAVEN_PLUGIN_GROUP_ID;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Plugins.MAVEN_PLUGIN_PREFIX;
@@ -176,6 +180,7 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
                 // Warning-only checks: emit warnings for issues that cannot be auto-fixed
                 // These do not modify the POM and do not affect hasIssues
                 warnAboutIncompatiblePlugins(pomDocument, context);
+                warnAboutPropertyInterpolatedModulePaths(pomDocument, context);
                 warnAboutThirdPartyRepositoryPrefixFiltering(pomDocument, context);
 
                 if (hasIssues) {
@@ -938,5 +943,49 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
                 }
             });
         });
+    }
+
+    /**
+     * Warns about {@code <module>} (or {@code <subproject>}) elements that contain property
+     * expressions ({@code ${...}}). Maven 4 validates module paths during POM parsing,
+     * before profiles can set property values, so these paths are rejected as non-existent.
+     *
+     * @see <a href="https://github.com/apache/maven/issues/12434">#12434</a>
+     */
+    private void warnAboutPropertyInterpolatedModulePaths(Document pomDocument, UpgradeContext context) {
+        Element root = pomDocument.root();
+
+        // Check root-level modules/subprojects
+        Stream.concat(
+                        root.childElement(MODULES).stream().flatMap(m -> m.childElements(MODULE)),
+                        root.childElement(SUBPROJECTS).stream().flatMap(s -> s.childElements(SUBPROJECT)))
+                .forEach(moduleElement -> {
+                    String path = moduleElement.textContentTrimmed();
+                    if (path != null && EXPRESSION_PATTERN.matcher(path).find()) {
+                        context.warning("Module path '" + path
+                                + "' contains a property expression. Maven 4 validates module paths"
+                                + " before property interpolation, which will cause a build failure"
+                                + " if the expression cannot be resolved at parse time.");
+                    }
+                });
+
+        // Check profile-level modules/subprojects
+        root.childElement(PROFILES)
+                .ifPresent(profiles -> profiles.childElements(PROFILE).forEach(profile -> {
+                    Stream.concat(
+                                    profile.childElement(MODULES).stream().flatMap(m -> m.childElements(MODULE)),
+                                    profile.childElement(SUBPROJECTS).stream()
+                                            .flatMap(s -> s.childElements(SUBPROJECT)))
+                            .forEach(moduleElement -> {
+                                String path = moduleElement.textContentTrimmed();
+                                if (path != null
+                                        && EXPRESSION_PATTERN.matcher(path).find()) {
+                                    context.warning("Profile module path '" + path
+                                            + "' contains a property expression. Maven 4 validates module"
+                                            + " paths before profile-driven property interpolation, which"
+                                            + " will cause a build failure when no profile is active.");
+                                }
+                            });
+                }));
     }
 }
