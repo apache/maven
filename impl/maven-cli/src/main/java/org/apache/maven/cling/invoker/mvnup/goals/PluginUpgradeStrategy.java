@@ -46,6 +46,7 @@ import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.ARTIFACT_ID
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.BUILD;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.DEPENDENCIES;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.DEPENDENCY;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.DEPENDENCY_MANAGEMENT;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.GROUP_ID;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PARENT;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PLUGIN;
@@ -103,7 +104,14 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     "org.codehaus.mojo",
                     "jaxb2-maven-plugin",
                     "3.2.0",
-                    "Versions before 3.2.0 depend on jaxb-parent:3.0.0 which contains invalid XML rejected by Maven 4"));
+                    "Versions before 3.2.0 depend on jaxb-parent:3.0.0 which contains invalid XML rejected by Maven 4"),
+            new PluginUpgrade(
+                    "io.quarkus", "quarkus-maven-plugin", "3.26.0", "Maven 4 compatibility (Aether API changes)"),
+            new PluginUpgrade(
+                    "io.quarkus.platform",
+                    "quarkus-maven-plugin",
+                    "3.26.0",
+                    "Maven 4 compatibility (Aether API changes)"));
 
     private static final List<PluginUpgrade> PLUGIN_DEPENDENCY_UPGRADES = List.of(new PluginUpgrade(
             "org.codehaus.mojo",
@@ -283,6 +291,12 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         upgrades.put(
                 "org.codehaus.mojo:jaxb2-maven-plugin",
                 new PluginUpgradeInfo("org.codehaus.mojo", "jaxb2-maven-plugin", "3.2.0"));
+        upgrades.put(
+                "io.quarkus:quarkus-maven-plugin",
+                new PluginUpgradeInfo("io.quarkus", "quarkus-maven-plugin", "3.26.0"));
+        upgrades.put(
+                "io.quarkus.platform:quarkus-maven-plugin",
+                new PluginUpgradeInfo("io.quarkus.platform", "quarkus-maven-plugin", "3.26.0"));
         return upgrades;
     }
 
@@ -353,6 +367,12 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         }
 
         if (isProperty) {
+            // For Quarkus plugins, check if the property is shared with a Quarkus BOM
+            if (isQuarkusPlugin(upgrade.groupId, upgrade.artifactId)
+                    && isPropertyUsedByQuarkusBom(pomDocument, propertyName)) {
+                return decoupleQuarkusPluginVersion(
+                        pomDocument, versionElement, propertyName, upgrade, sectionName, context);
+            }
             // Update property value if it's below minimum version
             return upgradePropertyVersion(pomDocument, propertyName, upgrade, sectionName, context);
         } else {
@@ -873,6 +893,138 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
 
     private record PluginAnalysisResults(
             Map<Path, Set<String>> pluginsNeedingManagement, Map<Path, Set<String>> pluginsNeedingDirectOverride) {}
+
+    /**
+     * Checks if the given plugin is a Quarkus Maven plugin.
+     */
+    private boolean isQuarkusPlugin(String groupId, String artifactId) {
+        return "quarkus-maven-plugin".equals(artifactId)
+                && ("io.quarkus".equals(groupId) || "io.quarkus.platform".equals(groupId));
+    }
+
+    /**
+     * Checks if a property is used as the version of a Quarkus BOM in dependencyManagement.
+     * Quarkus BOMs are identified by having groupId io.quarkus or io.quarkus.platform,
+     * type "pom", and scope "import".
+     */
+    private boolean isPropertyUsedByQuarkusBom(Document pomDocument, String propertyName) {
+        Element root = pomDocument.root();
+        String propertyRef = "${" + propertyName + "}";
+
+        Element depManagement = root.childElement(DEPENDENCY_MANAGEMENT).orElse(null);
+        if (depManagement == null) {
+            return false;
+        }
+        Element dependencies = depManagement.childElement(DEPENDENCIES).orElse(null);
+        if (dependencies == null) {
+            return false;
+        }
+
+        return dependencies.childElements(DEPENDENCY).anyMatch(dep -> {
+            String groupId = getChildText(dep, GROUP_ID);
+            String version = getChildText(dep, VERSION);
+            String type = getChildText(dep, "type");
+            String scope = getChildText(dep, "scope");
+            return ("io.quarkus".equals(groupId) || "io.quarkus.platform".equals(groupId))
+                    && "pom".equals(type)
+                    && "import".equals(scope)
+                    && propertyRef.equals(version);
+        });
+    }
+
+    /**
+     * Decouples the Quarkus plugin version from a shared BOM property.
+     * Introduces a new property for the plugin version and updates the plugin's version element,
+     * leaving the BOM property unchanged.
+     */
+    private boolean decoupleQuarkusPluginVersion(
+            Document pomDocument,
+            Element versionElement,
+            String sharedPropertyName,
+            PluginUpgradeInfo upgrade,
+            String sectionName,
+            UpgradeContext context) {
+
+        // Resolve the current version from the shared property
+        Editor editor = new Editor(pomDocument);
+        Element root = editor.root();
+        Element propertiesElement = root.childElement(PROPERTIES).orElse(null);
+        String currentVersion = null;
+        if (propertiesElement != null) {
+            Element sharedProp =
+                    propertiesElement.childElement(sharedPropertyName).orElse(null);
+            if (sharedProp != null) {
+                currentVersion = sharedProp.textContentTrimmed();
+            }
+        }
+
+        if (currentVersion != null && !isVersionBelow(currentVersion, upgrade.minVersion)) {
+            context.debug("Quarkus plugin version (via shared property " + sharedPropertyName + ") " + currentVersion
+                    + " is already >= " + upgrade.minVersion);
+            return false;
+        }
+
+        // Introduce a new property for the plugin version
+        String newPropertyName = "quarkus-plugin.version";
+        if (propertiesElement == null) {
+            propertiesElement = DomUtils.insertNewElement(PROPERTIES, root);
+        }
+
+        // Add the new property if it doesn't already exist
+        Element existingProp = propertiesElement.childElement(newPropertyName).orElse(null);
+        if (existingProp != null) {
+            // Property already exists — update its value
+            editor.setTextContent(existingProp, upgrade.minVersion);
+        } else {
+            DomUtils.insertContentElement(propertiesElement, newPropertyName, upgrade.minVersion);
+        }
+
+        // Update the plugin's version element to reference the new property
+        editor.setTextContent(versionElement, "${" + newPropertyName + "}");
+
+        context.detail("Decoupled " + upgrade.groupId + ":" + upgrade.artifactId + " version from shared property "
+                + sharedPropertyName + ": introduced " + newPropertyName + "=" + upgrade.minVersion + " in "
+                + sectionName);
+
+        // Emit version gap warning
+        if (currentVersion != null) {
+            emitVersionGapWarning(context, currentVersion, upgrade.minVersion);
+        }
+
+        return true;
+    }
+
+    /**
+     * Emits a warning if the Quarkus platform BOM version is significantly older than the plugin version.
+     * The plugin can be bumped ahead of the platform up to 3.31.x; versions >= 3.32.0 are
+     * binary-incompatible with older platform/runtime libraries.
+     */
+    private void emitVersionGapWarning(UpgradeContext context, String platformVersion, String pluginVersion) {
+        // Only warn when there's a meaningful gap (different minor version)
+        String platformMinor = extractMinorVersion(platformVersion);
+        String pluginMinor = extractMinorVersion(pluginVersion);
+
+        if (platformMinor != null && pluginMinor != null && !platformMinor.equals(pluginMinor)) {
+            context.warning("quarkus-maven-plugin upgraded to " + pluginVersion
+                    + " for Maven 4 compatibility. Your Quarkus platform is still at " + platformVersion
+                    + ". Consider upgrading the platform to match, as the plugin cannot be upgraded "
+                    + "beyond 3.31.x without a corresponding platform upgrade.");
+        }
+    }
+
+    /**
+     * Extracts the minor version component (e.g., "26" from "3.26.0").
+     */
+    private String extractMinorVersion(String version) {
+        if (version == null) {
+            return null;
+        }
+        String[] parts = version.split("\\.");
+        if (parts.length >= 2) {
+            return parts[1];
+        }
+        return null;
+    }
 
     /**
      * Holds plugin upgrade information for Maven 4 compatibility.
