@@ -244,4 +244,98 @@ class CompatibilityWarningTest {
             verify(context.logger, never()).warn(argThat(msg -> msg.contains("internal") && msg.contains("prefix")));
         }
     }
+
+    @Nested
+    @DisplayName("Property-Interpolated Module Path Warnings (#12434)")
+    class PropertyInterpolatedModulePathTests {
+
+        @Test
+        @DisplayName("should warn about property expressions in module paths")
+        void shouldWarnAboutPropertyExpressionsInModulePaths() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <packaging>pom</packaging>
+                    <modules>
+                        <module>core</module>
+                        <module>spark-${spark.compat.version}</module>
+                        <module>v${spark.major.version}/mixed-spark</module>
+                    </modules>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            strategy.doApply(context, pomMap);
+
+            verify(context.logger, atLeastOnce())
+                    .warn(argThat(msg ->
+                            msg.contains("spark-${spark.compat.version}") && msg.contains("property expression")));
+        }
+
+        @Test
+        @DisplayName("should not warn about static module paths")
+        void shouldNotWarnAboutStaticModulePaths() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <packaging>pom</packaging>
+                    <modules>
+                        <module>core</module>
+                        <module>web</module>
+                    </modules>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            strategy.doApply(context, pomMap);
+
+            verify(context.logger, never()).warn(argThat(msg -> msg.contains("property expression")));
+        }
+
+        @Test
+        @DisplayName("should warn about property expressions in profile module paths")
+        void shouldWarnAboutPropertyExpressionsInProfileModulePaths() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <packaging>pom</packaging>
+                    <profiles>
+                        <profile>
+                            <id>spark-3.5</id>
+                            <modules>
+                                <module>spark-${spark.version}</module>
+                            </modules>
+                        </profile>
+                    </profiles>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            strategy.doApply(context, pomMap);
+
+            verify(context.logger, atLeastOnce())
+                    .warn(argThat(msg -> msg.contains("spark-${spark.version}") && msg.contains("profile")));
+        }
+    }
 }
