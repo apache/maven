@@ -18,10 +18,14 @@
  */
 package org.apache.maven.cling.invoker.mvnenc.goals;
 
+import java.io.PrintWriter;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.mvnenc.EncryptOptions;
@@ -32,10 +36,15 @@ import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 import org.codehaus.plexus.components.secdispatcher.model.Config;
 import org.codehaus.plexus.components.secdispatcher.model.ConfigProperty;
 import org.codehaus.plexus.components.secdispatcher.model.SettingsSecurity;
+import org.jline.consoleui.elements.ConfirmChoice;
+import org.jline.consoleui.prompt.ConfirmResult;
 import org.jline.consoleui.prompt.ConsolePrompt;
 import org.jline.consoleui.prompt.PromptResultItemIF;
 import org.jline.consoleui.prompt.builder.PromptBuilder;
-import org.junit.jupiter.api.Test;
+import org.jline.terminal.Terminal;
+import org.jline.utils.AttributedStyle;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
 
@@ -46,8 +55,15 @@ import static org.mockito.Mockito.when;
 
 class InitTest {
 
-    @Test
-    void testPrefixPrependedToUserInput() throws Exception {
+    @ParameterizedTest
+    @CsvSource({
+        "env:$MVN_PASSWORD, my_password_var, env:my_password_var",
+        "env:$MVN_PASSWORD, env:my_password_var, env:my_password_var",
+        "system-property:$systemproperty, my_prop, system-property:my_prop",
+        "system-property:$systemproperty, system-property:my_prop, system-property:my_prop",
+        "$VAR, my_var, my_var"
+    })
+    void testPrefixPrependedToUserInput(String template, String userInput, String expectedValue) throws Exception {
         MessageBuilderFactory messageBuilderFactory = mock(MessageBuilderFactory.class, Mockito.RETURNS_DEEP_STUBS);
         SecDispatcher secDispatcher = mock(SecDispatcher.class);
 
@@ -65,18 +81,18 @@ class InitTest {
         Init init = new Init(messageBuilderFactory, secDispatcher);
 
         InvokerRequest invokerRequest = mock(InvokerRequest.class, Mockito.RETURNS_DEEP_STUBS);
-        when(invokerRequest.cwd()).thenReturn(java.nio.file.Paths.get(""));
-        when(invokerRequest.installationDirectory()).thenReturn(java.nio.file.Paths.get(""));
-        when(invokerRequest.userHomeDirectory()).thenReturn(java.nio.file.Paths.get(""));
-        when(invokerRequest.topDirectory()).thenReturn(java.nio.file.Paths.get(""));
-        when(invokerRequest.rootDirectory()).thenReturn(java.util.Optional.empty());
+        when(invokerRequest.cwd()).thenReturn(Paths.get(""));
+        when(invokerRequest.installationDirectory()).thenReturn(Paths.get(""));
+        when(invokerRequest.userHomeDirectory()).thenReturn(Paths.get(""));
+        when(invokerRequest.topDirectory()).thenReturn(Paths.get(""));
+        when(invokerRequest.rootDirectory()).thenReturn(Optional.empty());
         EncryptOptions options = mock(EncryptOptions.class);
         EncryptContext context = new EncryptContext(invokerRequest, options);
         // avoid null pointers for lists
-        context.header = new java.util.ArrayList<>();
-        context.style = new org.jline.utils.AttributedStyle();
-        org.jline.terminal.Terminal terminal = mock(org.jline.terminal.Terminal.class);
-        java.io.PrintWriter printWriter = mock(java.io.PrintWriter.class);
+        context.header = new ArrayList<>();
+        context.style = new AttributedStyle();
+        Terminal terminal = mock(Terminal.class);
+        PrintWriter printWriter = mock(PrintWriter.class);
         when(terminal.writer()).thenReturn(printWriter);
         context.terminal = terminal;
 
@@ -89,20 +105,17 @@ class InitTest {
                     dispatcherResult.put("defaultDispatcher", createResult("master"));
 
                     Map<String, PromptResultItemIF> configureResult = new HashMap<>();
-                    configureResult.put("password", createResult("env:$MVN_PASSWORD"));
+                    configureResult.put("password", createResult(template));
 
                     Map<String, PromptResultItemIF> editResult = new HashMap<>();
-                    editResult.put(
-                            "edit", createResult("my_password_var")); // User inputs "my_password_var" without prefix
+                    editResult.put("edit", createResult(userInput));
 
                     Map<String, PromptResultItemIF> confirmResult = new HashMap<>();
-                    org.jline.consoleui.prompt.ConfirmResult confirm =
-                            mock(org.jline.consoleui.prompt.ConfirmResult.class);
-                    when(confirm.getConfirmed())
-                            .thenReturn(org.jline.consoleui.elements.ConfirmChoice.ConfirmationValue.YES);
+                    ConfirmResult confirm = mock(ConfirmResult.class);
+                    when(confirm.getConfirmed()).thenReturn(ConfirmChoice.ConfirmationValue.YES);
                     confirmResult.put("confirm", confirm);
 
-                    when(mock.prompt(any(java.util.List.class), any(java.util.List.class)))
+                    when(mock.prompt(any(List.class), any(List.class)))
                             .thenReturn(dispatcherResult, configureResult, editResult, confirmResult);
                 })) {
             init.doExecute(context);
@@ -116,16 +129,10 @@ class InitTest {
         assertEquals(1, config.getProperties().size());
         ConfigProperty prop = config.getProperties().get(0);
         assertEquals("password", prop.getName());
-        // The expected value should be env:my_password_var because the template was env:$MVN_PASSWORD
-        assertEquals("env:my_password_var", prop.getValue());
+        assertEquals(expectedValue, prop.getValue());
     }
 
     private PromptResultItemIF createResult(String value) {
-        return new PromptResultItemIF() {
-            @Override
-            public String getResult() {
-                return value;
-            }
-        };
+        return () -> value;
     }
 }
