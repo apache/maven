@@ -66,6 +66,7 @@ import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.REPOSITORIE
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.REPOSITORY;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.SUBPROJECT;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.SUBPROJECTS;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.VERSION;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Files.DEFAULT_PARENT_RELATIVE_PATH;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Plugins.DEFAULT_MAVEN_PLUGIN_GROUP_ID;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Plugins.MAVEN_PLUGIN_PREFIX;
@@ -181,6 +182,7 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
                 warnAboutIncompatiblePlugins(pomDocument, context);
                 warnAboutPropertyInterpolatedModulePaths(pomDocument, context);
                 warnAboutThirdPartyRepositoryPrefixFiltering(pomDocument, context);
+                warnAboutCiFriendlyMissingDependencyVersions(pomDocument, context);
 
                 if (hasIssues) {
                     context.success("Maven 4 compatibility issues fixed");
@@ -982,5 +984,57 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
                                 }
                             });
                 }));
+    }
+
+    /**
+     * Warns about CI-friendly projects using {@code ${revision}} (or {@code ${sha1}},
+     * {@code ${changelist}}) where child module dependencies lack explicit {@code <version>}
+     * elements and rely on {@code dependencyManagement} inherited from the parent.
+     * Maven 4 validates dependency completeness before fully resolving the parent's
+     * {@code dependencyManagement} chain when the parent's own version is a CI-friendly
+     * expression.
+     *
+     * @see <a href="https://github.com/apache/maven/issues/12435">#12435</a>
+     */
+    private void warnAboutCiFriendlyMissingDependencyVersions(Document pomDocument, UpgradeContext context) {
+        Element root = pomDocument.root();
+
+        // Only check if this POM has a parent with a CI-friendly version
+        Element parentElement = root.childElement(PARENT).orElse(null);
+        if (parentElement == null) {
+            return;
+        }
+        String parentVersion = parentElement.childText(VERSION);
+        if (parentVersion == null || !isCiFriendlyExpression(parentVersion)) {
+            return;
+        }
+
+        // Check for dependencies without explicit versions
+        List<String> versionlessDeps = root.childElement(DEPENDENCIES).stream()
+                .flatMap(deps -> deps.childElements(DEPENDENCY))
+                .filter(dep -> dep.childElement(VERSION).isEmpty())
+                .map(dep -> {
+                    String gid = dep.childText(MavenPomElements.Elements.GROUP_ID);
+                    String aid = dep.childText(MavenPomElements.Elements.ARTIFACT_ID);
+                    return (gid != null ? gid : "?") + ":" + (aid != null ? aid : "?");
+                })
+                .toList();
+
+        if (!versionlessDeps.isEmpty()) {
+            context.warning("This module uses CI-friendly version '" + parentVersion
+                    + "' in its parent and has " + versionlessDeps.size()
+                    + " dependencies without explicit <version> elements (e.g., "
+                    + versionlessDeps.get(0)
+                    + "). Maven 4 may fail with 'dependencies.dependency.version is missing'"
+                    + " because dependency management inheritance is validated before the"
+                    + " CI-friendly parent version is fully resolved.");
+        }
+    }
+
+    /**
+     * Checks if a version string is a CI-friendly expression.
+     */
+    private static boolean isCiFriendlyExpression(String version) {
+        return version.contains("${revision}") || version.contains("${sha1}") || version.contains("${changelist}");
     }
 }
