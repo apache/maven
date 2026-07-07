@@ -87,16 +87,6 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
     private static final Set<String> VALID_COMBINE_CHILDREN_VALUES = Set.of(COMBINE_APPEND, COMBINE_MERGE);
 
     /**
-     * Well-known Maven Central repository URLs. Repositories not matching these
-     * may be affected by Maven 4's prefix-based artifact filtering.
-     */
-    private static final Set<String> WELL_KNOWN_REPO_URLS = Set.of(
-            "https://repo.maven.apache.org/maven2",
-            "https://repo1.maven.org/maven2",
-            "https://repository.apache.org/content/repositories/snapshots",
-            "https://repository.apache.org/snapshots");
-
-    /**
      * Known incompatible plugins where even the latest version fails with Maven 4.
      * Maps plugin key (groupId:artifactId) to a description of the incompatibility.
      */
@@ -181,7 +171,6 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
                 // These do not modify the POM and do not affect hasIssues
                 warnAboutIncompatiblePlugins(pomDocument, context);
                 warnAboutPropertyInterpolatedModulePaths(pomDocument, context);
-                warnAboutThirdPartyRepositoryPrefixFiltering(pomDocument, context);
                 warnAboutCiFriendlyMissingDependencyVersions(pomDocument, context);
 
                 if (hasIssues) {
@@ -895,51 +884,6 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
                         }
                     }
                 }));
-    }
-
-    /**
-     * Warns about third-party repositories (non-Maven-Central) that may be affected by
-     * Maven 4's prefix-based artifact filtering. When a repository does not publish a
-     * {@code prefixes.txt} file, Maven 4 may auto-generate an incomplete prefix list
-     * that blocks legitimate artifact resolution.
-     *
-     * @see <a href="https://github.com/apache/maven/issues/12433">#12433</a>
-     */
-    private void warnAboutThirdPartyRepositoryPrefixFiltering(Document pomDocument, UpgradeContext context) {
-        Element root = pomDocument.root();
-
-        Stream<Element> repositoryContainers = Stream.concat(
-                Stream.of(
-                                root.childElement(REPOSITORIES).orElse(null),
-                                root.childElement(PLUGIN_REPOSITORIES).orElse(null))
-                        .filter(Objects::nonNull),
-                root.childElement(PROFILES).stream()
-                        .flatMap(profiles -> profiles.childElements(PROFILE))
-                        .flatMap(profile -> Stream.of(
-                                        profile.childElement(REPOSITORIES).orElse(null),
-                                        profile.childElement(PLUGIN_REPOSITORIES)
-                                                .orElse(null))
-                                .filter(Objects::nonNull)));
-
-        repositoryContainers.forEach(container -> {
-            String elementType = container.name().equals(REPOSITORIES) ? REPOSITORY : PLUGIN_REPOSITORY;
-            container.childElements(elementType).forEach(repository -> {
-                String url = repository.childText("url");
-                String id = repository.childText("id");
-
-                if (url != null && !url.contains("${")) {
-                    String normalizedUrl = url.trim().replaceAll("/+$", "");
-                    if (!WELL_KNOWN_REPO_URLS.contains(normalizedUrl)) {
-                        context.warning("Repository '" + (id != null ? id : normalizedUrl)
-                                + "' is a third-party repository. Maven 4's prefix-based artifact"
-                                + " filtering may block resolution if the repository does not"
-                                + " publish a prefixes.txt file. If builds fail with"
-                                + " 'ArtifactFilteredOutException', check repository"
-                                + " prefix configuration.");
-                    }
-                }
-            });
-        });
     }
 
     /**
