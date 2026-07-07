@@ -56,6 +56,7 @@ import org.apache.maven.api.Project;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.classworlds.ClassRealm;
+import org.apache.maven.api.classworlds.NoSuchRealmException;
 import org.apache.maven.api.plugin.descriptor.Resolution;
 import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.DependencyResolverResult;
@@ -112,7 +113,6 @@ import org.apache.maven.session.scope.internal.SessionScope;
 import org.apache.maven.session.scope.internal.SessionScopeModule;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
-
 import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
@@ -379,7 +379,8 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                     foreignImports,
                     filter,
                     project.getRemotePluginRepositories(),
-                    session.getRepositorySession());
+                    session.getRepositorySession(),
+                    pluginDescriptor.isModular());
 
             PluginRealmCache.CacheRecord cacheRecord = pluginRealmCache.get(cacheKey, () -> {
                 createPluginRealm(pluginDescriptor, session, parent, foreignImports, filter);
@@ -580,8 +581,12 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
     private static ClassLoader getEffectiveClassLoader(ClassRealm pluginRealm) {
         if (pluginRealm.isModular()) {
             ModuleLayer layer = pluginRealm.getModuleLayer();
-            // defineModulesWithOneLoader uses a single loader for all modules in the layer
-            return layer.modules().iterator().next().getClassLoader();
+            // defineModulesWithOneLoader guarantees a single shared ClassLoader for all
+            // modules in the layer; any module's getClassLoader() returns the same instance.
+            // We find by name rather than iterating to make the intent unambiguous.
+            String anyModuleName =
+                    layer.modules().stream().findFirst().orElseThrow().getName();
+            return layer.findLoader(anyModuleName);
         }
         return pluginRealm.getClassLoader();
     }

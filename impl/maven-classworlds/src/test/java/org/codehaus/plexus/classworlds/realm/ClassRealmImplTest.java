@@ -18,21 +18,6 @@
  */
 package org.codehaus.plexus.classworlds.realm;
 
-/*
- * Copyright 2001-2006 Codehaus Foundation.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,151 +51,100 @@ class ClassRealmImplTest extends AbstractClassWorldsTestCase {
     @Test
     void testNewRealm() throws Exception {
         ClassRealm realm = this.world.newRealm("foo");
-
         assertNotNull(realm);
-
         assertSame(this.world, realm.getWorld());
-
         assertEquals("foo", realm.getId());
     }
 
     @Test
     void testLocateSourceRealmNoImports() {
         ClassRealm realm = new ClassRealm(this.world, "foo", null);
-
         assertSame(null, realm.getImportClassLoader("com.werken.Stuff"));
     }
 
     @Test
     void testLocateSourceRealmSimpleImport() throws Exception {
         ClassRealm mainRealm = this.world.newRealm("main");
-
         ClassRealm werkflowRealm = this.world.newRealm("werkflow");
-
         mainRealm.importFrom("werkflow", "com.werken.werkflow");
 
         assertSame(werkflowRealm, mainRealm.getImportClassLoader("com.werken.werkflow.WerkflowEngine"));
-
         assertSame(werkflowRealm, mainRealm.getImportClassLoader("com/werken/werkflow/some.properties"));
-
         assertSame(werkflowRealm, mainRealm.getImportClassLoader("com.werken.werkflow.process.ProcessManager"));
-
         assertSame(null, mainRealm.getImportClassLoader("com.werken.blissed.Process"));
-
         assertSame(null, mainRealm.getImportClassLoader("java.lang.Object"));
-
         assertSame(null, mainRealm.getImportClassLoader("NoviceProgrammerClass"));
     }
 
     @Test
     void testLocateSourceRealmMultipleImport() throws Exception {
         ClassRealm mainRealm = this.world.newRealm("main");
-
         ClassRealm werkflowRealm = this.world.newRealm("werkflow");
-
         ClassRealm blissedRealm = this.world.newRealm("blissed");
-
         mainRealm.importFrom("werkflow", "com.werken.werkflow");
-
         mainRealm.importFrom("blissed", "com.werken.blissed");
 
         assertSame(werkflowRealm, mainRealm.getImportClassLoader("com.werken.werkflow.WerkflowEngine"));
-
         assertSame(werkflowRealm, mainRealm.getImportClassLoader("com.werken.werkflow.process.ProcessManager"));
-
         assertSame(blissedRealm, mainRealm.getImportClassLoader("com.werken.blissed.Process"));
-
         assertSame(blissedRealm, mainRealm.getImportClassLoader("com.werken.blissed.guard.BooleanGuard"));
-
         assertSame(null, mainRealm.getImportClassLoader("java.lang.Object"));
-
         assertSame(null, mainRealm.getImportClassLoader("NoviceProgrammerClass"));
     }
 
     @Test
     void testLocateSourceRealmHierachy() throws Exception {
         ClassRealm mainRealm = this.world.newRealm("main");
-
         ClassRealm fooRealm = this.world.newRealm("foo");
-
         ClassRealm fooBarRealm = this.world.newRealm("fooBar");
-
         ClassRealm fooBarBazRealm = this.world.newRealm("fooBarBaz");
-
         mainRealm.importFrom("foo", "foo");
-
         mainRealm.importFrom("fooBar", "foo.bar");
-
         mainRealm.importFrom("fooBarBaz", "foo.bar.baz");
 
         assertSame(fooRealm, mainRealm.getImportClassLoader("foo.Goober"));
-
         assertSame(fooRealm, mainRealm.getImportClassLoader("foo.cheese.Goober"));
-
         assertSame(fooBarRealm, mainRealm.getImportClassLoader("foo.bar.Goober"));
-
         assertSame(fooBarRealm, mainRealm.getImportClassLoader("foo.bar.cheese.Goober"));
-
         assertSame(fooBarBazRealm, mainRealm.getImportClassLoader("foo.bar.baz.Goober"));
-
         assertSame(fooBarBazRealm, mainRealm.getImportClassLoader("foo.bar.baz.cheese.Goober"));
-
         assertSame(null, mainRealm.getImportClassLoader("java.lang.Object"));
-
         assertSame(null, mainRealm.getImportClassLoader("NoviceProgrammerClass"));
     }
 
     @Test
     void testLocateSourceRealmHierachyReverse() throws Exception {
         ClassRealm fooBarBazRealm = this.world.newRealm("fooBarBaz");
-
         ClassRealm fooBarRealm = this.world.newRealm("fooBar");
-
         ClassRealm fooRealm = this.world.newRealm("foo");
-
         ClassRealm mainRealm = this.world.newRealm("main");
-
         mainRealm.importFrom("fooBarBaz", "foo.bar.baz");
-
         mainRealm.importFrom("fooBar", "foo.bar");
-
         mainRealm.importFrom("foo", "foo");
 
         assertSame(fooRealm, mainRealm.getImportClassLoader("foo.Goober"));
-
         assertSame(fooRealm, mainRealm.getImportClassLoader("foo.cheese.Goober"));
-
         assertSame(fooBarRealm, mainRealm.getImportClassLoader("foo.bar.Goober"));
-
         assertSame(fooBarRealm, mainRealm.getImportClassLoader("foo.bar.cheese.Goober"));
-
         assertSame(fooBarBazRealm, mainRealm.getImportClassLoader("foo.bar.baz.Goober"));
-
         assertSame(fooBarBazRealm, mainRealm.getImportClassLoader("foo.bar.baz.cheese.Goober"));
-
         assertSame(null, mainRealm.getImportClassLoader("java.lang.Object"));
-
         assertSame(null, mainRealm.getImportClassLoader("NoviceProgrammerClass"));
     }
 
     @Test
     void testLoadClassSystemClass() throws Exception {
         ClassRealm mainRealm = this.world.newRealm("main");
-
         Class<?> cls = mainRealm.loadClass("java.lang.Object");
-
         assertNotNull(cls);
     }
 
     @Test
     void testLoadClassNonSystemClass() throws Exception {
         ClassRealm mainRealm = this.world.newRealm("main");
-
         try {
             Class<?> c = mainRealm.loadClass("com.werken.projectz.UberThing");
-
             System.out.println("c = " + c);
-
             fail("A ClassNotFoundException should be thrown!");
         } catch (ClassNotFoundException e) {
             // expected and correct
@@ -220,18 +154,14 @@ class ClassRealmImplTest extends AbstractClassWorldsTestCase {
     @Test
     void testLoadClassClassWorldsClass() throws Exception {
         ClassRealm mainRealm = this.world.newRealm("main");
-
         Class<?> cls = mainRealm.loadClass("org.codehaus.plexus.classworlds.ClassWorld");
-
         assertNotNull(cls);
-
         assertSame(ClassWorld.class, cls);
     }
 
     @Test
     void testLoadClassLocal() throws Exception {
         ClassRealm mainRealm = this.world.newRealm("main");
-
         try {
             mainRealm.loadClass("a.A");
         } catch (ClassNotFoundException e) {
@@ -239,13 +169,10 @@ class ClassRealmImplTest extends AbstractClassWorldsTestCase {
         }
 
         mainRealm.addURL(getJarUrl("a.jar"));
-
         Class<?> classA = mainRealm.loadClass("a.A");
-
         assertNotNull(classA);
 
         ClassRealm otherRealm = this.world.newRealm("other");
-
         try {
             otherRealm.loadClass("a.A");
         } catch (ClassNotFoundException e) {
@@ -256,12 +183,10 @@ class ClassRealmImplTest extends AbstractClassWorldsTestCase {
     @Test
     void testLoadClassImported() throws Exception {
         ClassRealm mainRealm = this.world.newRealm("main");
-
         ClassRealm realmA = this.world.newRealm("realmA");
 
         try {
             realmA.loadClass("a.A");
-
             fail("realmA.loadClass(a.A) should have thrown a ClassNotFoundException");
         } catch (ClassNotFoundException e) {
             // expected and correct
@@ -271,7 +196,6 @@ class ClassRealmImplTest extends AbstractClassWorldsTestCase {
 
         try {
             mainRealm.loadClass("a.A");
-
             fail("mainRealm.loadClass(a.A) should have thrown a ClassNotFoundException");
         } catch (ClassNotFoundException e) {
             // expected and correct
@@ -280,17 +204,12 @@ class ClassRealmImplTest extends AbstractClassWorldsTestCase {
         mainRealm.importFrom("realmA", "a");
 
         Class<?> classA = realmA.loadClass("a.A");
-
         assertNotNull(classA);
-
         assertEquals(realmA, classA.getClassLoader());
 
         Class<?> classMain = mainRealm.loadClass("a.A");
-
         assertNotNull(classMain);
-
         assertEquals(realmA, classMain.getClassLoader());
-
         assertSame(classA, classMain);
     }
 
@@ -313,57 +232,38 @@ class ClassRealmImplTest extends AbstractClassWorldsTestCase {
         ClassRealm realmA = this.world.newRealm("realmA");
         ClassRealm realmB = this.world.newRealm("realmB");
         ClassRealm realmC = this.world.newRealm("realmC");
-
         realmA.addURL(getJarUrl("a.jar"));
         realmB.addURL(getJarUrl("b.jar"));
         realmC.addURL(getJarUrl("c.jar"));
-
         realmC.importFrom("realmA", "a");
-
         realmC.importFrom("realmB", "b");
-
         realmA.importFrom("realmC", "c");
 
         Class<?> classAA = realmA.loadClass("a.A");
         Class<?> classBB = realmB.loadClass("b.B");
         Class<?> classCC = realmC.loadClass("c.C");
-
         assertNotNull(classAA);
         assertNotNull(classBB);
         assertNotNull(classCC);
-
         assertEquals(realmA, classAA.getClassLoader());
-
         assertEquals(realmB, classBB.getClassLoader());
-
         assertEquals(realmC, classCC.getClassLoader());
 
         // load from C
-
         Class<?> classAC = realmC.loadClass("a.A");
-
         assertNotNull(classAC);
-
         assertSame(classAA, classAC);
-
         assertEquals(realmA, classAC.getClassLoader());
 
         Class<?> classBC = realmC.loadClass("b.B");
-
         assertNotNull(classBC);
-
         assertSame(classBB, classBC);
-
         assertEquals(realmB, classBC.getClassLoader());
 
         // load from A
-
         Class<?> classCA = realmA.loadClass("c.C");
-
         assertNotNull(classCA);
-
         assertSame(classCC, classCA);
-
         assertEquals(realmC, classCA.getClassLoader());
 
         try {
@@ -374,7 +274,6 @@ class ClassRealmImplTest extends AbstractClassWorldsTestCase {
         }
 
         // load from B
-
         try {
             realmB.loadClass("a.A");
             fail("throw ClassNotFoundException");
@@ -393,12 +292,9 @@ class ClassRealmImplTest extends AbstractClassWorldsTestCase {
     @Test
     void testLoadClassClassWorldsClassRepeatedly() throws Exception {
         ClassRealm mainRealm = this.world.newRealm("main");
-
         for (int i = 0; i < 100; i++) {
             Class<?> cls = mainRealm.loadClass("org.codehaus.plexus.classworlds.ClassWorld");
-
             assertNotNull(cls);
-
             assertSame(ClassWorld.class, cls);
         }
     }
@@ -416,16 +312,13 @@ class ClassRealmImplTest extends AbstractClassWorldsTestCase {
 
         ClassRealm base = this.world.newRealm("realmA");
         base.addURL(getJarUrl("a.jar"));
-
         URL baseUrl = base.getResource(resource);
         assertNotNull(baseUrl);
 
         ClassRealm sub = this.world.newRealm("realmB", base);
         sub.addURL(getJarUrl("b.jar"));
-
         URL subUrl = sub.getResource(resource);
         assertNotNull(subUrl);
-
         assertEquals(baseUrl, subUrl);
 
         List<String> urls = new ArrayList<>();
@@ -443,13 +336,11 @@ class ClassRealmImplTest extends AbstractClassWorldsTestCase {
 
         ClassRealm parent = this.world.newRealm("realmA");
         parent.addURL(getJarUrl("a.jar"));
-
         URL parentUrl = parent.getResource(resource);
         assertNotNull(parentUrl);
 
         ClassRealm child = parent.createChildRealm("realmB");
         child.addURL(getJarUrl("b.jar"));
-
         URL childUrl = child.getResource(resource);
         assertNotNull(childUrl);
 

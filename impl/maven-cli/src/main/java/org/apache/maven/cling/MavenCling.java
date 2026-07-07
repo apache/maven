@@ -72,10 +72,11 @@ public class MavenCling extends ClingSupport {
         return new MavenCling(world).run(args, null, null, null, false);
     }
 
-    private static int delegateMain(String mainClass, String[] args, ClassWorld world) throws IOException {
+    private static int delegateMain(String mainClass, String[] args, org.codehaus.plexus.classworlds.ClassWorld world)
+            throws IOException {
         try {
             Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(mainClass);
-            Method method = clazz.getMethod("main", String[].class, ClassWorld.class);
+            Method method = clazz.getMethod("main", String[].class, org.codehaus.plexus.classworlds.ClassWorld.class);
             return (int) method.invoke(null, args, world);
         } catch (ClassNotFoundException e) {
             throw new IOException("Cannot find maven.mainClass: " + mainClass, e);

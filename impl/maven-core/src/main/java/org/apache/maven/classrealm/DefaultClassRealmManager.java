@@ -476,6 +476,57 @@ public class DefaultClassRealmManager implements ClassRealmManager {
 
     private static final String MODULE_ACCESS_DESCRIPTOR = "META-INF/maven/module-access";
 
+    /**
+     * Reads {@code META-INF/maven/module-access} descriptors from the plugin realm's classpath and
+     * applies the access directives they contain.
+     *
+     * <h4>Purpose</h4>
+     * <p>
+     * When a plugin (or extension) runs on the <em>classpath</em> (unnamed module) it may need to
+     * call into packages of a <em>named</em> module that lives in Maven's boot/runtime layer —
+     * for example JLine modules in {@code lib/modules/}, or any future Maven API module that ships
+     * as a named module.  Named modules do not export their internals to the unnamed module by
+     * default; the JVM enforces this at runtime via strong encapsulation.
+     * </p>
+     * <p>
+     * The {@code META-INF/maven/module-access} file is a plugin-side escape hatch: it lets the
+     * plugin declare which packages of which boot-layer modules it needs opened or exported
+     * <strong>to itself</strong> (always {@code ALL-UNNAMED} as the target).  Maven applies these
+     * directives programmatically via {@link Module#addExports}/{@link Module#addOpens} on startup
+     * of the plugin realm, before any plugin class is loaded.
+     * </p>
+     *
+     * <h4>Direction of access</h4>
+     * <p>
+     * Directives go from an <em>existing</em> named module in the boot/runtime layer
+     * <strong>to</strong> the unnamed-module classloader of the plugin.  In other words:
+     * a plugin cannot use this mechanism to export its <em>own</em> packages; it can only
+     * widen access from modules that Maven already owns (and that are loaded before the plugin).
+     * </p>
+     *
+     * <h4>File format</h4>
+     * <p>Each non-blank, non-comment line is one of:</p>
+     * <pre>
+     *   add-exports &lt;module&gt;/&lt;package&gt;=ALL-UNNAMED
+     *   add-opens   &lt;module&gt;/&lt;package&gt;=ALL-UNNAMED
+     *   add-reads   &lt;module&gt;
+     * </pre>
+     * <p>
+     * These mirror the JVM flags {@code --add-exports}, {@code --add-opens}, and
+     * {@code --add-reads} respectively.  Lines starting with {@code #} are comments.
+     * </p>
+     *
+     * <h4>Why not {@code module-info.java}?</h4>
+     * <p>
+     * The boot-layer modules (e.g. JLine) are compiled independently and cannot reference
+     * the plugin's module name at compile time.  Adding {@code exports … to plugin.module} in
+     * their {@code module-info} would create an unacceptable coupling.  Programmatic
+     * {@code addExports}/{@code addOpens} is the standard JDK-endorsed workaround for
+     * this exact scenario (see {@link java.lang.Module#addExports}).
+     * </p>
+     *
+     * @param classRealm the plugin class realm whose JAR(s) are scanned for descriptors
+     */
     private void applyModuleAccessDescriptors(ClassRealm classRealm) {
         var implRealm = (org.codehaus.plexus.classworlds.realm.ClassRealm) classRealm;
         try {

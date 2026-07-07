@@ -263,7 +263,7 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
                 // chain alone. Without this import, Sisu 1.1.0's FilteredBeans (enabled by
                 // jsr330ComponentVisibilityFollowsPlexusVisibility) would hide container-sourced
                 // beans when TCCL is set to an extension realm during lifecycle callbacks.
-                realm.importFrom(extRealm, extRealm.getId());
+                realm.importFrom(extRealm.getClassLoader(), extRealm.getId());
             }
 
             return extRealm;

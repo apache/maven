@@ -24,6 +24,7 @@ under the License.
       <outputDirectory>boot</outputDirectory>
       <includes>
         <include>org.apache.maven:maven-classworlds</include>
+        <include>org.apache.maven:maven-api-classworlds</include>
       </includes>
     </dependencySet>
 
@@ -40,6 +41,8 @@ under the License.
       <outputDirectory>lib</outputDirectory>
       <excludes>
         <exclude>org.apache.maven:maven-classworlds</exclude>
+        <exclude>org.apache.maven:maven-api-classworlds</exclude>
+        <exclude>org.jline:*</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>

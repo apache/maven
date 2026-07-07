@@ -78,6 +78,27 @@ public interface PluginRealmCache {
             List<RemoteRepository> repositories,
             RepositorySystemSession session);
 
+    /**
+     * Creates a cache key that also encodes whether the plugin realm should be a modular
+     * (JPMS {@code ModuleLayer}) realm or a classic classpath realm.
+     * <p>
+     * The default implementation delegates to
+     * {@link #createKey(Plugin, ClassLoader, Map, DependencyFilter, List, RepositorySystemSession)}
+     * and ignores the {@code modular} flag; override in implementations that support modular plugins.
+     *
+     * @param modular {@code true} if the plugin is loaded as a JPMS module layer
+     */
+    default Key createKey(
+            Plugin plugin,
+            ClassLoader parentRealm,
+            Map<String, ClassLoader> foreignImports,
+            DependencyFilter dependencyFilter,
+            List<RemoteRepository> repositories,
+            RepositorySystemSession session,
+            boolean modular) {
+        return createKey(plugin, parentRealm, foreignImports, dependencyFilter, repositories, session);
+    }
+
     CacheRecord get(Key key);
 
     default CacheRecord get(Key key, PluginRealmSupplier supplier)

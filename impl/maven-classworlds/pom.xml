@@ -81,7 +81,7 @@ under the License.
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
-          <argLine>-ea:org.codehaus.classworlds:org.codehaus.plexus.classworlds</argLine>
+          <argLine>-ea:org.codehaus.classworlds... -ea:org.codehaus.plexus.classworlds...</argLine>
           <forkCount>1</forkCount>
         </configuration>
       </plugin>

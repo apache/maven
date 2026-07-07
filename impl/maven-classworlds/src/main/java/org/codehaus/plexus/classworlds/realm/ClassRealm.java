@@ -531,9 +531,10 @@ public class ClassRealm extends URLClassLoader implements org.apache.maven.api.c
     @Override
     public void close() throws IOException {
         if (moduleLayer != null) {
-            // Close the module layer's classloader to release JAR file handles
-            for (Module module : moduleLayer.modules()) {
-                ClassLoader loader = module.getClassLoader();
+            // defineModulesWithOneLoader uses a single shared ClassLoader for all modules in the layer.
+            // Close it once to release JAR file handles.
+            moduleLayer.modules().stream().findFirst().ifPresent(m -> {
+                ClassLoader loader = m.getClassLoader();
                 if (loader instanceof Closeable && loader != this) {
                     try {
                         ((Closeable) loader).close();
@@ -541,8 +542,7 @@ public class ClassRealm extends URLClassLoader implements org.apache.maven.api.c
                         // best effort
                     }
                 }
-                break; // defineModulesWithOneLoader uses a single loader for all modules
-            }
+            });
         }
         super.close();
     }

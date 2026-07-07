@@ -269,8 +269,8 @@ subject to the terms and conditions of the following licenses:
 #*      *##set ( $project.url = 'https://github.com/google/guice/' ) ##
 #*    *##end ##
 #*    *###
-#*    *### Classworlds is in boot directory, not in lib
-#*    *##if ( $project.artifact.artifactId == "maven-classworlds" )
+#*    *### Classworlds and its API are in boot directory, not in lib
+#*    *##if ( $project.artifact.artifactId == "maven-classworlds" || $project.artifact.artifactId == "maven-api-classworlds" )
 #*      *##set ( $directory = 'boot' ) ##
 #*    *##end ##
 #*    *### JLine modules are in lib/modules directory
