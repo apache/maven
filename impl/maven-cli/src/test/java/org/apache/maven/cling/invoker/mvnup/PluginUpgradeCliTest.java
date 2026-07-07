@@ -197,6 +197,46 @@ class PluginUpgradeCliTest {
     }
 
     @Test
+    void testUnrecognizedOptionFromMavenConfig() throws ParseException {
+        // Simulates .mvn/maven.config containing -ntp (no transfer progress)
+        String[] args = {"apply", "--plugins", "-ntp"};
+        CommonsCliUpgradeOptions options = CommonsCliUpgradeOptions.parse(args);
+
+        assertTrue(options.plugins().isPresent(), "--plugins option should be present");
+        assertTrue(options.plugins().get(), "--plugins option should be true");
+        assertTrue(options.goals().isPresent(), "Goals should be present");
+        assertEquals("apply", options.goals().get().get(0), "Goal should be 'apply'");
+    }
+
+    @Test
+    void testMultipleUnrecognizedOptionsFromMavenConfig() throws ParseException {
+        // Simulates .mvn/maven.config containing multiple Maven build options
+        String[] args = {"apply", "-ntp", "-U", "--plugins", "-T4"};
+        CommonsCliUpgradeOptions options = CommonsCliUpgradeOptions.parse(args);
+
+        assertTrue(options.plugins().isPresent(), "--plugins option should be present");
+        assertTrue(options.plugins().get(), "--plugins option should be true");
+    }
+
+    @Test
+    void testUnrecognizedOptionsWithSystemProperties() throws ParseException {
+        // -D is a recognized base option, -ntp is not
+        String[] args = {"apply", "-Dproperty=value", "-ntp", "--plugins"};
+        CommonsCliUpgradeOptions options = CommonsCliUpgradeOptions.parse(args);
+
+        assertTrue(options.plugins().isPresent(), "--plugins option should be present");
+    }
+
+    @Test
+    void testUnrecognizedLongOptionFromMavenConfig() throws ParseException {
+        // --no-transfer-progress is the long form that may appear in maven.config
+        String[] args = {"apply", "--no-transfer-progress", "--plugins"};
+        CommonsCliUpgradeOptions options = CommonsCliUpgradeOptions.parse(args);
+
+        assertTrue(options.plugins().isPresent(), "--plugins option should be present");
+    }
+
+    @Test
     void helpMentionsInferInDefault() throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ByteArrayOutputStream err = new ByteArrayOutputStream();
