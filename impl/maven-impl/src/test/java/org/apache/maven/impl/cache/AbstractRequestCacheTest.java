@@ -19,9 +19,10 @@
 package org.apache.maven.impl.cache;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -227,6 +228,77 @@ class AbstractRequestCacheTest {
     }
 
     /**
+     * Tests that a concurrent singular {@code request()} call waits for an
+     * in-progress batch resolution instead of invoking the supplier independently.
+     * <p>
+     * Thread A starts a batch resolution via {@code requests()} (which marks the
+     * CachingSupplier as {@code batchResolving} and registers it on the current thread).
+     * While Thread A is still inside its batch supplier, Thread B calls {@code request()}
+     * for the same key. Thread B's {@code cs.apply()} should see {@code batchResolving == true},
+     * wait for {@code complete()}, and return the batch result without running its own supplier.
+     */
+    @Test
+    void testConcurrentRequestDoesNotDuplicateResolution() throws Exception {
+        CachingTestRequestCache cachingCache = new CachingTestRequestCache();
+
+        TestRequest sharedReq = createTestRequest("shared");
+
+        java.util.concurrent.atomic.AtomicInteger resolutionCount = new java.util.concurrent.atomic.AtomicInteger(0);
+        CountDownLatch batchStarted = new CountDownLatch(1);
+        CountDownLatch proceedWithBatch = new CountDownLatch(1);
+
+        // Thread A's batch supplier: signals when it starts, then waits before completing
+        Function<List<TestRequest>, List<TestResult>> slowBatchSupplier = reqs -> {
+            resolutionCount.incrementAndGet();
+            batchStarted.countDown();
+            try {
+                proceedWithBatch.await(5, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            return reqs.stream().map(TestResult::new).toList();
+        };
+
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        try {
+            // Thread A: starts batch resolution via requests(), pauses inside the supplier
+            Future<List<TestResult>> futureA =
+                    executor.submit(() -> cachingCache.requests(List.of(sharedReq), slowBatchSupplier));
+
+            // Wait for Thread A's batch supplier to start
+            assertTrue(batchStarted.await(5, TimeUnit.SECONDS), "Thread A's batch should have started");
+
+            // Thread B: calls request() (singular) for the same key.
+            // It gets the same CachingSupplier from the cache, sees batchResolving == true,
+            // and should wait for Thread A's complete() instead of invoking its own supplier.
+            Future<TestResult> futureB = executor.submit(() -> cachingCache.request(sharedReq, req -> {
+                resolutionCount.incrementAndGet();
+                return new TestResult(req);
+            }));
+
+            // Give Thread B time to enter apply() and start waiting
+            Thread.sleep(200);
+
+            // Let Thread A's batch complete — this calls complete() which wakes Thread B
+            proceedWithBatch.countDown();
+
+            // Both should complete
+            List<TestResult> resultsA = futureA.get(5, TimeUnit.SECONDS);
+            TestResult resultB = futureB.get(5, TimeUnit.SECONDS);
+
+            assertEquals(1, resultsA.size());
+            assertNotNull(resultB);
+
+            // The shared request should have been resolved only once (by Thread A's batch).
+            // Thread B should have waited for Thread A's complete() call, not invoked its
+            // own supplier.
+            assertEquals(1, resolutionCount.get(), "Request should be resolved only once, not duplicated");
+        } finally {
+            executor.shutdownNow();
+        }
+    }
+
+    /**
      * Tests that batch results are properly cached in CachingSupplier instances
      * so subsequent calls return the cached values.
      */
@@ -331,7 +403,7 @@ class AbstractRequestCacheTest {
      * can be returned for the same request key across different requests() calls.
      */
     static class CachingTestRequestCache extends AbstractRequestCache {
-        private final Map<TestRequest, CachingSupplier<?, ?>> cache = new HashMap<>();
+        private final Map<TestRequest, CachingSupplier<?, ?>> cache = new ConcurrentHashMap<>();
 
         @Override
         @SuppressWarnings("unchecked")
