@@ -1164,9 +1164,10 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     /**
-     * An id or version made up only of {@code .} or {@code ..} is a filesystem path-traversal segment. The dotted
-     * characters pass the allowed-character checks yet map straight to a directory component when the value is turned
-     * into a local repository path, so such values are rejected here.
+     * {@code .} and {@code ..} pass the allowed-character checks, but the default local repository layout uses
+     * ids and versions verbatim as directory names, so these values map onto the {@code .} and {@code ..}
+     * filesystem path segments and escape the coordinate's directory. They are rejected because of that mapping,
+     * not because the names themselves are otherwise invalid.
      */
     private static boolean isPathTraversalSegment(String id) {
         return ".".equals(id) || "..".equals(id);
