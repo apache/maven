@@ -399,6 +399,57 @@ under the License.
       </build>
     </profile>
     <profile>
+      <id>push-to-atr</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.tooling</groupId>
+            <artifactId>atr-maven-plugin</artifactId>
+            <configuration>
+              <project>maven</project>
+              <runOnlyAtExecutionRoot>false</runOnlyAtExecutionRoot>
+            </configuration>
+            <executions>
+              <execution>
+                <id>upload-src-to-atr</id>
+                <goals>
+                  <goal>upload</goal>
+                </goals>
+                <configuration>
+                  <directory>${project.version}/source</directory>
+                  <files>
+                    <file>${project.build.directory}/${project.artifactId}-${project.version}-src.tar.gz</file>
+                    <file>${project.build.directory}/${project.artifactId}-${project.version}-src.tar.gz.sha512</file>
+                    <file>${project.build.directory}/${project.artifactId}-${project.version}-src.tar.gz.asc</file>
+                    <file>${project.build.directory}/${project.artifactId}-${project.version}-src.zip</file>
+                    <file>${project.build.directory}/${project.artifactId}-${project.version}-src.zip.sha512</file>
+                    <file>${project.build.directory}/${project.artifactId}-${project.version}-src.zip.asc</file>
+                  </files>
+                </configuration>
+              </execution>
+              <execution>
+                <id>upload-bin-to-atr</id>
+                <goals>
+                  <goal>upload</goal>
+                </goals>
+                <configuration>
+                  <directory>${project.version}/binaries</directory>
+                  <files>
+                    <file>${project.build.directory}/${project.artifactId}-${project.version}-bin.tar.gz</file>
+                    <file>${project.build.directory}/${project.artifactId}-${project.version}-bin.tar.gz.sha512</file>
+                    <file>${project.build.directory}/${project.artifactId}-${project.version}-bin.tar.gz.asc</file>
+                    <file>${project.build.directory}/${project.artifactId}-${project.version}-bin.zip</file>
+                    <file>${project.build.directory}/${project.artifactId}-${project.version}-bin.zip.sha512</file>
+                    <file>${project.build.directory}/${project.artifactId}-${project.version}-bin.zip.asc</file>
+                  </files>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
       <id>versionlessMavenDist</id>
       <build>
         <finalName>${project.artifactId}</finalName>

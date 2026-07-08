@@ -1097,6 +1097,26 @@ under the License.
       </build>
     </profile>
     <profile>
+      <id>push-to-atr</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.tooling</groupId>
+            <artifactId>atr-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>upload-to-atr</id>
+                <configuration>
+                  <!-- we have a dedicated distribution module -->
+                  <skip>true</skip>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
       <id>reporting</id>
       <reporting>
         <plugins>
