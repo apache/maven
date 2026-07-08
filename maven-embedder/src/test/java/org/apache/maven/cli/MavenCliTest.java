@@ -436,4 +436,25 @@ public class MavenCliTest {
                 new String[] {"prefix:3.0.0:bar", "validate"},
                 request.getCommandLine().getArgs());
     }
+
+    @Test
+    public void testDistinguishedEnvVariableTransformation() throws Exception {
+        try {
+            // Arrange
+            String url = "https://testDistinguishedEnvVariableTransformation/something";
+            System.setProperty("env.MAVEN_REPO_CENTRAL", url);
+            CliRequest request = new CliRequest(new String[] {}, null);
+            request.request.setRootDirectory(Paths.get("myRootDirectory"));
+            request.request.setTopDirectory(Paths.get("myTopDirectory"));
+
+            // Act
+            cli.cli(request);
+            cli.properties(request);
+
+            // Assert
+            assertEquals(url, request.getSystemProperties().getProperty("maven.repo.central"));
+        } finally {
+            System.clearProperty("env.MAVEN_REPO_CENTRAL");
+        }
+    }
 }
