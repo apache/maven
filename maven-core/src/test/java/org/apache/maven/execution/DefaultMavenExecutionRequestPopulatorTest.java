@@ -61,4 +61,18 @@ public class DefaultMavenExecutionRequestPopulatorTest {
         assertEquals(r.getId(), repositories.get(0).getId());
         assertEquals(r.getUrl(), repositories.get(0).getUrl());
     }
+
+    @Test
+    public void testPopulateDefaultsWithRepoUrlOverride() throws Exception {
+        final String url = "https://testPopulateDefaultsWithRepoUrlOverride/something";
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        request.getUserProperties().setProperty("maven.repo.central", url);
+
+        testee.populateDefaults(request);
+
+        assertEquals(1, request.getRemoteRepositories().size());
+        assertEquals(url, request.getRemoteRepositories().get(0).getUrl());
+        assertEquals(1, request.getPluginArtifactRepositories().size());
+        assertEquals(url, request.getPluginArtifactRepositories().get(0).getUrl());
+    }
 }
