@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.maven.RepositoryUtils;
@@ -54,6 +55,7 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
+import org.apache.maven.model.interpolation.ModelInterpolator;
 import org.apache.maven.repository.Proxy;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Mirror;
@@ -561,13 +563,21 @@ public class MavenRepositorySystem {
 
     public ArtifactRepository createDefaultRemoteRepository(MavenExecutionRequest request) throws Exception {
         return createRepository(
-                RepositorySystem.DEFAULT_REMOTE_REPO_URL,
+                determineDefaultRemoteRepositoryUrl(request),
                 RepositorySystem.DEFAULT_REMOTE_REPO_ID,
                 true,
                 ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY,
                 false,
                 ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY,
                 ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN);
+    }
+
+    private String determineDefaultRemoteRepositoryUrl(MavenExecutionRequest request) {
+        Properties effective = new Properties();
+        effective.putAll(request.getSystemProperties());
+        effective.putAll(request.getUserProperties());
+        return effective.getProperty(
+                ModelInterpolator.MAVEN_REPO_CENTRAL_KEY, ModelInterpolator.DEFAULT_MAVEN_REPO_CENTRAL_URL);
     }
 
     public ArtifactRepository createRepository(

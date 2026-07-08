@@ -31,6 +31,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
+import org.apache.maven.model.interpolation.ModelInterpolator;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Server;
 import org.eclipse.aether.RepositorySystemSession;
@@ -56,7 +57,7 @@ public interface RepositorySystem {
 
     String DEFAULT_REMOTE_REPO_ID = "central";
 
-    String DEFAULT_REMOTE_REPO_URL = "https://repo.maven.apache.org/maven2";
+    String DEFAULT_REMOTE_REPO_URL = ModelInterpolator.DEFAULT_MAVEN_REPO_CENTRAL_URL;
 
     Artifact createArtifact(String groupId, String artifactId, String version, String packaging);
 

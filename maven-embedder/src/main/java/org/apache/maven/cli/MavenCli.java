@@ -89,6 +89,7 @@ import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.message.MessageBuilder;
 import org.apache.maven.model.building.ModelProcessor;
+import org.apache.maven.model.interpolation.ModelInterpolator;
 import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.properties.internal.EnvironmentUtils;
@@ -158,6 +159,14 @@ public class MavenCli {
     public static final File GLOBAL_EXTENSIONS_FILE = new File(System.getProperty("maven.conf"), "extensions.xml");
 
     private static final String MVN_MAVEN_CONFIG = DOT_MVN + "/maven.config";
+
+    /**
+     * One "distinguished" env variable that we want to make into non-prefixed property, if present.
+     *
+     * @see ModelInterpolator
+     * @since 3.10.0
+     */
+    private static final String MAVEN_REPO_CENTRAL_ENV = "env.MAVEN_REPO_CENTRAL";
 
     public static final String STYLE_COLOR_PROPERTY = "style.color";
 
@@ -1635,6 +1644,12 @@ public class MavenCli {
 
         EnvironmentUtils.addEnvVars(systemProperties);
         SystemProperties.addSystemProperties(systemProperties);
+
+        // one distinguished env variable: MAVEN_REPO_CENTRAL; if present, we make it into property
+        if (systemProperties.contains(MAVEN_REPO_CENTRAL_ENV)) {
+            systemProperties.put(
+                    ModelInterpolator.MAVEN_REPO_CENTRAL_KEY, systemProperties.getProperty(MAVEN_REPO_CENTRAL_ENV));
+        }
 
         StringSearchInterpolator interpolator = createInterpolator(cliRequest, cliProperties, systemProperties);
         for (Map.Entry<Object, Object> e : cliProperties.entrySet()) {

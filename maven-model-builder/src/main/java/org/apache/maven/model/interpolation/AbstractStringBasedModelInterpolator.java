@@ -42,6 +42,7 @@ import org.codehaus.plexus.interpolation.PrefixAwareRecursionInterceptor;
 import org.codehaus.plexus.interpolation.PrefixedObjectValueSource;
 import org.codehaus.plexus.interpolation.PrefixedValueSourceWrapper;
 import org.codehaus.plexus.interpolation.RecursionInterceptor;
+import org.codehaus.plexus.interpolation.SingleResponseValueSource;
 import org.codehaus.plexus.interpolation.ValueSource;
 
 /**
@@ -123,7 +124,7 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
         }
 
         // NOTE: Order counts here!
-        List<ValueSource> valueSources = new ArrayList<>(9);
+        List<ValueSource> valueSources = new ArrayList<>(11);
 
         if (projectDir != null) {
             ValueSource basedirValueSource = new PrefixedValueSourceWrapper(
@@ -196,6 +197,9 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
         });
 
         valueSources.add(modelValueSource2);
+
+        // last source: make sure Maven Repo Central is present (if is present anywhere else, it will prevail this one)
+        valueSources.add(new SingleResponseValueSource(MAVEN_REPO_CENTRAL_KEY, DEFAULT_MAVEN_REPO_CENTRAL_URL));
 
         return valueSources;
     }

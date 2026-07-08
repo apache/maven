@@ -33,6 +33,21 @@ import org.apache.maven.model.building.ModelProblemCollector;
 public interface ModelInterpolator {
 
     /**
+     * Property key that may contain default Maven repository URL.
+     * This key is used in super POM.
+     *
+     * @since 3.10.0
+     */
+    String MAVEN_REPO_CENTRAL_KEY = "maven.repo.central";
+
+    /**
+     * Default value of Maven repository Central URL.
+     *
+     * @since 3.10.0
+     */
+    String DEFAULT_MAVEN_REPO_CENTRAL_URL = "https://repo.maven.apache.org/maven2";
+
+    /**
      * Interpolates expressions in the specified model. Note that implementations are free to either interpolate the
      * provided model directly or to create a clone of the model and interpolate the clone. Callers should always use
      * the returned model and must not rely on the input model being updated.
