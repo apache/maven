@@ -858,6 +858,9 @@ class PluginUpgradeStrategyTest {
                 assertTrue(
                         xml.contains("<artifactId>maven-enforcer-plugin</artifactId>"),
                         "Should add pluginManagement for maven-enforcer-plugin");
+                // Verify the comment is on its own line, not appended to the previous closing tag
+                assertFalse(
+                        xml.contains("</plugin><!--"), "Comment should be on its own line, not appended to </plugin>");
             } finally {
                 try (var walk = Files.walk(tempDir)) {
                     walk.sorted(java.util.Comparator.reverseOrder()).forEach(p -> {
@@ -920,6 +923,8 @@ class PluginUpgradeStrategyTest {
             assertTrue(
                     xml.contains("Override version inherited from parent"),
                     "Should add comment explaining the override");
+            // Verify the comment is on its own line, not appended to the previous closing tag
+            assertFalse(xml.contains("</plugin><!--"), "Comment should be on its own line, not appended to </plugin>");
 
             // Verify NO direct build/plugins entry for enforcer (PM override is sufficient)
             Element buildPlugins = root.childElement("build")
