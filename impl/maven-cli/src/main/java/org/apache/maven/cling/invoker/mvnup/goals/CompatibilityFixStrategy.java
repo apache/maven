@@ -90,12 +90,11 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
     /**
      * Known incompatible plugins where even the latest version fails with Maven 4.
      * Maps plugin key (groupId:artifactId) to a description of the incompatibility.
+     * <p>
+     * Note: plugins that have a fixed version available should be added to
+     * {@link PluginUpgradeStrategy} instead, so mvnup can auto-upgrade them.
      */
-    private static final Map<String, String> KNOWN_INCOMPATIBLE_PLUGINS = Map.of(
-            "org.codehaus.gmavenplus:gmavenplus-plugin",
-            "gmavenplus-plugin calls mutating methods on immutable lists returned by the Maven 4 API. "
-                    + "Even the latest version (4.1.1) fails with UnsupportedOperationException on "
-                    + "goals like removeStubs. Track https://github.com/groovy/GMavenPlus for a fix.");
+    private static final Map<String, String> KNOWN_INCOMPATIBLE_PLUGINS = Map.of();
 
     @Override
     public boolean isApplicable(UpgradeContext context) {

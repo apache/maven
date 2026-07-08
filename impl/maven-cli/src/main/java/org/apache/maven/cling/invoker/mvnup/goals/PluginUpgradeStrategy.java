@@ -111,7 +111,12 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     "io.quarkus.platform",
                     "quarkus-maven-plugin",
                     "3.26.0",
-                    "Maven 4 compatibility (Aether API changes)"));
+                    "Maven 4 compatibility (Aether API changes)"),
+            new PluginUpgrade(
+                    "org.codehaus.gmavenplus",
+                    "gmavenplus-plugin",
+                    "4.2.0",
+                    "Versions before 4.2.0 call mutating methods on immutable lists returned by Maven 4 API"));
 
     private static final List<PluginUpgrade> PLUGIN_DEPENDENCY_UPGRADES = List.of(new PluginUpgrade(
             "org.codehaus.mojo",
@@ -297,6 +302,9 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         upgrades.put(
                 "io.quarkus.platform:quarkus-maven-plugin",
                 new PluginUpgradeInfo("io.quarkus.platform", "quarkus-maven-plugin", "3.26.0"));
+        upgrades.put(
+                "org.codehaus.gmavenplus:gmavenplus-plugin",
+                new PluginUpgradeInfo("org.codehaus.gmavenplus", "gmavenplus-plugin", "4.2.0"));
         return upgrades;
     }
 
@@ -1005,8 +1013,8 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
 
     /**
      * Emits a warning if the Quarkus platform BOM version is significantly older than the plugin version.
-     * The plugin can be bumped ahead of the platform up to 3.31.x; versions >= 3.32.0 are
-     * binary-incompatible with older platform/runtime libraries.
+     * Mismatched plugin and platform versions may cause unexpected behavior because the plugin
+     * is designed and tested against a specific platform version.
      */
     private void emitVersionGapWarning(UpgradeContext context, String platformVersion, String pluginVersion) {
         // Only warn when there's a meaningful gap (different minor version)
@@ -1016,8 +1024,8 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         if (platformMinor != null && pluginMinor != null && !platformMinor.equals(pluginMinor)) {
             context.warning("quarkus-maven-plugin upgraded to " + pluginVersion
                     + " for Maven 4 compatibility. Your Quarkus platform is still at " + platformVersion
-                    + ". Consider upgrading the platform to match, as the plugin cannot be upgraded "
-                    + "beyond 3.31.x without a corresponding platform upgrade.");
+                    + ". Consider upgrading the platform to match — mismatched plugin and platform"
+                    + " versions may cause unexpected behavior.");
         }
     }
 
