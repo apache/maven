@@ -1546,6 +1546,68 @@ class PluginUpgradeStrategyTest {
                     .orElse(null);
             assertEquals("3.26.0", version, "quarkus-maven-plugin in pluginManagement should be upgraded to 3.26.0");
         }
+
+        @Test
+        @DisplayName("should not decouple when shared property is inherited from parent POM")
+        void shouldNotDecoupleWhenSharedPropertyIsInherited() throws Exception {
+            // The shared property is NOT declared in this POM — it's inherited from a parent.
+            // We cannot resolve its value, so decoupling should be skipped to avoid
+            // introducing a quarkus-plugin.version=3.26.0 that might downgrade an already-sufficient version.
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <parent>
+                        <groupId>org.example</groupId>
+                        <artifactId>parent</artifactId>
+                        <version>1.0.0</version>
+                    </parent>
+                    <artifactId>child</artifactId>
+                    <dependencyManagement>
+                        <dependencies>
+                            <dependency>
+                                <groupId>io.quarkus.platform</groupId>
+                                <artifactId>quarkus-bom</artifactId>
+                                <version>${quarkus.platform.version}</version>
+                                <type>pom</type>
+                                <scope>import</scope>
+                            </dependency>
+                        </dependencies>
+                    </dependencyManagement>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>io.quarkus</groupId>
+                                <artifactId>quarkus-maven-plugin</artifactId>
+                                <version>${quarkus.platform.version}</version>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            strategy.doApply(context, pomMap);
+
+            Editor editor = new Editor(document);
+            Element newProp =
+                    editor.root().path("properties", "quarkus-plugin.version").orElse(null);
+            assertTrue(
+                    newProp == null, "Should not introduce quarkus-plugin.version when shared property is inherited");
+
+            // The plugin version reference should remain unchanged
+            String pluginVersion = editor.root()
+                    .path("build", "plugins", "plugin", "version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals(
+                    "${quarkus.platform.version}",
+                    pluginVersion,
+                    "Plugin version should remain as the inherited property reference");
+        }
     }
 
     @Nested

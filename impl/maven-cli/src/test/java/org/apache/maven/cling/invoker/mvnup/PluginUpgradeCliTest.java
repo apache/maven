@@ -228,6 +228,19 @@ class PluginUpgradeCliTest {
     }
 
     @Test
+    void testUnrecognizedOptionWithSeparateArgument() throws ParseException {
+        // -T 4 uses two tokens: the option and its value argument
+        // Both must be removed to avoid "4" being treated as a spurious goal
+        String[] args = {"apply", "-T", "4", "--plugins"};
+        CommonsCliUpgradeOptions options = CommonsCliUpgradeOptions.parse(args);
+
+        assertTrue(options.plugins().isPresent(), "--plugins option should be present");
+        assertTrue(options.goals().isPresent(), "Goals should be present");
+        assertEquals(1, options.goals().get().size(), "Should have exactly one goal (not '4' as extra)");
+        assertEquals("apply", options.goals().get().get(0), "Goal should be 'apply'");
+    }
+
+    @Test
     void testUnrecognizedLongOptionFromMavenConfig() throws ParseException {
         // --no-transfer-progress is the long form that may appear in maven.config
         String[] args = {"apply", "--no-transfer-progress", "--plugins"};
