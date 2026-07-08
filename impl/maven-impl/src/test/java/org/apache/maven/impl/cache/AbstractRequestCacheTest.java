@@ -347,6 +347,76 @@ class AbstractRequestCacheTest {
     }
 
     /**
+     * Tests that a concurrent {@code request()} call does not hang when the batch
+     * supplier returns fewer results than expected (partial batch).
+     * <p>
+     * In this scenario, {@link CachingSupplier#complete} is never called for one
+     * of the CachingSuppliers. The waiting thread in {@code apply()} must still
+     * be unblocked when {@code setBatchResolving(false)} is called in the
+     * {@code finally} block, which calls {@code notifyAll()} to wake any waiters.
+     * The unblocked thread then falls through to the fallback supplier.
+     */
+    @Test
+    void testConcurrentRequestUnblockedOnPartialBatchResult() throws Exception {
+        CachingTestRequestCache cachingCache = new CachingTestRequestCache();
+
+        TestRequest req1 = createTestRequest("req1");
+        TestRequest req2 = createTestRequest("req2");
+
+        CountDownLatch batchStarted = new CountDownLatch(1);
+        CountDownLatch proceedWithBatch = new CountDownLatch(1);
+
+        // Batch supplier that only resolves req1, "forgetting" req2
+        Function<List<TestRequest>, List<TestResult>> partialBatchSupplier = reqs -> {
+            batchStarted.countDown();
+            try {
+                proceedWithBatch.await(5, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            // Return only the first result — req2's CachingSupplier never gets complete()
+            return List.of(new TestResult(reqs.get(0)));
+        };
+
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        try {
+            // Thread A: starts batch resolution for [req1, req2]
+            Future<List<TestResult>> futureA =
+                    executor.submit(() -> cachingCache.requests(List.of(req1, req2), partialBatchSupplier));
+
+            // Wait for Thread A's batch supplier to start
+            assertTrue(batchStarted.await(5, TimeUnit.SECONDS), "Batch should have started");
+
+            // Thread B: calls request() for req2 — gets the same CachingSupplier,
+            // sees batchResolving == true, and waits in apply()
+            Future<TestResult> futureB = executor.submit(() -> cachingCache.request(req2, req -> {
+                // Fallback supplier — should be invoked after setBatchResolving(false)
+                return new TestResult(req);
+            }));
+
+            // Give Thread B time to enter apply() and start waiting
+            Thread.sleep(200);
+
+            // Let Thread A's batch complete — only resolves req1
+            proceedWithBatch.countDown();
+
+            // Thread A should complete (req2 gets resolved via fallback in collection loop)
+            List<TestResult> resultsA = futureA.get(5, TimeUnit.SECONDS);
+            assertNotNull(resultsA);
+
+            // Thread B should also complete — setBatchResolving(false) + notifyAll()
+            // unblocks it, and it falls through to its fallback supplier
+            TestResult resultB = futureB.get(5, TimeUnit.SECONDS);
+            assertNotNull(resultB);
+            assertEquals(req2, resultB.getRequest());
+        } catch (TimeoutException e) {
+            throw new AssertionError("Thread hung: setBatchResolving(false) did not unblock waiting thread", e);
+        } finally {
+            executor.shutdownNow();
+        }
+    }
+
+    /**
      * Tests that batch results are properly cached in CachingSupplier instances
      * so subsequent calls return the cached values.
      */

@@ -176,7 +176,10 @@ public abstract class AbstractRequestCache implements RequestCache {
                         }
                     }
                 } catch (Throwable e) {
-                    // Ensure waiting concurrent threads are unblocked on unexpected errors
+                    // Ensure waiting concurrent threads are unblocked on unexpected errors.
+                    // We mark all non-cached requests as failed and fall through to the
+                    // collection loop, which produces a consistent BatchRequestException
+                    // with per-request RequestResult details — same as MavenExecutionException.
                     CachingSupplier.AltRes failure = new CachingSupplier.AltRes(e);
                     for (REQ req : nonCached) {
                         Integer idx = reqToIndex.get(req);
@@ -184,7 +187,6 @@ public abstract class AbstractRequestCache implements RequestCache {
                             suppliers.get(idx).complete(failure);
                         }
                     }
-                    uncheckedThrow(e);
                 }
             } finally {
                 for (CachingSupplier<REQ, REP> cs : nonCachedSuppliers) {

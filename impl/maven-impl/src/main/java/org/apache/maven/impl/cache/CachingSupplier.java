@@ -100,11 +100,21 @@ public class CachingSupplier<REQ, REP> implements Function<REQ, REP> {
      * Marks this supplier as having a batch resolution in progress.
      * Concurrent threads calling {@link #apply} will wait for {@link #complete}
      * instead of invoking the supplier independently.
+     * <p>
+     * When clearing the flag ({@code resolving = false}), any threads still blocked
+     * in {@link #apply(Object)} are notified so they can proceed to the fallback
+     * supplier. This handles edge cases where {@link #complete} was never called
+     * (e.g., batch supplier returned fewer results than expected).
      *
      * @param resolving {@code true} when batch resolution starts, {@code false} when it ends
      */
     void setBatchResolving(boolean resolving) {
         this.batchResolving = resolving;
+        if (!resolving) {
+            synchronized (this) {
+                this.notifyAll();
+            }
+        }
     }
 
     private volatile boolean batchResolving;
