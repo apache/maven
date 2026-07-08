@@ -19,8 +19,8 @@
 package org.apache.maven.impl.cache;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -138,8 +138,10 @@ public abstract class AbstractRequestCache implements RequestCache {
 
         // Resolve non-cached requests in batch and directly set results on CachingSuppliers
         if (!nonCached.isEmpty()) {
-            // Build a map from request to its CachingSupplier index for efficient lookup
-            Map<REQ, Integer> reqToIndex = new HashMap<>();
+            // Use IdentityHashMap: request objects may have unstable hashCode() due to
+            // mutable RequestTrace/ModelBuilderRequest data that changes during batch resolution.
+            // Since we always use the same object references for put and get, identity is safe.
+            Map<REQ, Integer> reqToIndex = new IdentityHashMap<>();
             List<CachingSupplier<REQ, REP>> nonCachedSuppliers = new ArrayList<>(nonCached.size());
             for (int i = 0; i < reqs.size(); i++) {
                 if (suppliers.get(i).getValue() == null) {
