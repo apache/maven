@@ -19,7 +19,14 @@
 package org.apache.maven.impl.cache;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 
 import org.apache.maven.api.ProtoSession;
@@ -159,6 +166,96 @@ class AbstractRequestCacheTest {
         assertEquals(request2, results.get(1).getRequest());
     }
 
+    /**
+     * Tests that re-entrant calls to {@code requests()} do not deadlock.
+     * <p>
+     * This reproduces the scenario from issue #12445: an outer {@code requests()} call
+     * creates CachingSupplier instances that are stored in the cache. During batch resolution
+     * (inside the outer call's batch supplier), a nested {@code requests()} call is triggered
+     * (e.g., parent POM resolution during artifact resolution). If the inner call hits the
+     * same cache entry (same request key), it gets back the CachingSupplier from the outer call.
+     * <p>
+     * Before the fix, the CachingSupplier wrapped a wait-based supplier that referenced the
+     * outer call's {@code nonCachedResults} HashMap. The inner call would wait on that HashMap
+     * forever, since the outer call couldn't populate it until the inner call completed.
+     */
+    @Test
+    void testReentrantRequestsDoesNotDeadlock() throws Exception {
+        // Use a caching implementation that stores CachingSuppliers in a shared map
+        CachingTestRequestCache cachingCache = new CachingTestRequestCache();
+
+        // "parentPom" is the request that will be resolved by both the outer and inner calls
+        TestRequest artifact = createTestRequest("artifact");
+        TestRequest parentPom = createTestRequest("parentPom");
+
+        // The outer batch supplier resolves requests, but during resolution of "artifact",
+        // it triggers a nested requests() call for "parentPom"
+        Function<List<TestRequest>, List<TestResult>> outerBatchSupplier = reqs -> {
+            List<TestResult> results = new java.util.ArrayList<>();
+            for (TestRequest req : reqs) {
+                if (req.equals(artifact)) {
+                    // Simulate parent POM resolution: re-entrant call for "parentPom"
+                    List<TestResult> innerResults = cachingCache.requests(
+                            List.of(parentPom),
+                            innerReqs -> innerReqs.stream().map(TestResult::new).toList());
+                    // After inner call completes, outer resolution succeeds
+                    assertEquals(1, innerResults.size());
+                }
+                results.add(new TestResult(req));
+            }
+            return results;
+        };
+
+        // Execute with a timeout to detect deadlock
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        try {
+            Future<List<TestResult>> future =
+                    executor.submit(() -> cachingCache.requests(List.of(artifact, parentPom), outerBatchSupplier));
+
+            // If this deadlocks, the future will time out
+            List<TestResult> results = future.get(5, TimeUnit.SECONDS);
+
+            assertEquals(2, results.size());
+            assertEquals(artifact, results.get(0).getRequest());
+            assertEquals(parentPom, results.get(1).getRequest());
+        } catch (TimeoutException e) {
+            throw new AssertionError(
+                    "Deadlock detected: re-entrant requests() call did not complete within 5 seconds", e);
+        } finally {
+            executor.shutdownNow();
+        }
+    }
+
+    /**
+     * Tests that batch results are properly cached in CachingSupplier instances
+     * so subsequent calls return the cached values.
+     */
+    @Test
+    void testBatchResultsAreCached() {
+        CachingTestRequestCache cachingCache = new CachingTestRequestCache();
+
+        TestRequest req1 = createTestRequest("req1");
+        TestRequest req2 = createTestRequest("req2");
+
+        java.util.concurrent.atomic.AtomicInteger supplierCallCount = new java.util.concurrent.atomic.AtomicInteger(0);
+
+        Function<List<TestRequest>, List<TestResult>> batchSupplier = reqs -> {
+            supplierCallCount.incrementAndGet();
+            return reqs.stream().map(TestResult::new).toList();
+        };
+
+        // First call should invoke the batch supplier
+        List<TestResult> results1 = cachingCache.requests(List.of(req1, req2), batchSupplier);
+        assertEquals(2, results1.size());
+        assertEquals(1, supplierCallCount.get());
+
+        // Second call with same requests should use cached values
+        List<TestResult> results2 = cachingCache.requests(List.of(req1, req2), batchSupplier);
+        assertEquals(2, results2.size());
+        // Supplier should not have been called again
+        assertEquals(1, supplierCallCount.get());
+    }
+
     // Helper methods and test classes
 
     private TestRequest createTestRequest(String id) {
@@ -225,6 +322,23 @@ class AbstractRequestCacheTest {
         @Nonnull
         public TestRequest getRequest() {
             return request;
+        }
+    }
+
+    /**
+     * A cache implementation that stores CachingSupplier instances in a shared map,
+     * simulating the real DefaultRequestCache behavior where the same CachingSupplier
+     * can be returned for the same request key across different requests() calls.
+     */
+    static class CachingTestRequestCache extends AbstractRequestCache {
+        private final Map<TestRequest, CachingSupplier<?, ?>> cache = new HashMap<>();
+
+        @Override
+        @SuppressWarnings("unchecked")
+        protected <REQ extends Request<?>, REP extends Result<REQ>> CachingSupplier<REQ, REP> doCache(
+                REQ req, Function<REQ, REP> supplier) {
+            return (CachingSupplier<REQ, REP>)
+                    cache.computeIfAbsent((TestRequest) req, r -> new CachingSupplier<>(supplier));
         }
     }
 

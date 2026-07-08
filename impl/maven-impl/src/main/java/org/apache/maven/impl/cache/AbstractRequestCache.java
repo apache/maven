@@ -81,61 +81,73 @@ public abstract class AbstractRequestCache implements RequestCache {
      * @return List of results corresponding to the input requests
      * @throws BatchRequestException if any request in the batch fails
      */
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This implementation avoids the use of {@code Object.wait()/notify()} to prevent deadlocks
+     * in re-entrant scenarios. When batch resolution triggers nested calls (e.g., parent POM
+     * resolution during artifact resolution), a cached {@link CachingSupplier} from an outer call
+     * could reference a stale wait-based supplier, causing the thread to wait on a
+     * {@code HashMap} that will never be notified.
+     * <p>
+     * Instead, this method:
+     * <ol>
+     *   <li>Passes a single-item fallback supplier to {@link #doCache} so any newly created
+     *       {@link CachingSupplier} can independently resolve its request</li>
+     *   <li>Performs batch resolution for efficiency</li>
+     *   <li>Directly sets results on {@link CachingSupplier} instances via {@link CachingSupplier#complete}</li>
+     * </ol>
+     */
     @Override
     @SuppressWarnings("unchecked")
     public <REQ extends Request<?>, REP extends Result<REQ>> List<REP> requests(
             List<REQ> reqs, Function<List<REQ>, List<REP>> supplier) {
-        final Map<REQ, Object> nonCachedResults = new HashMap<>();
-        List<RequestResult<REQ, REP>> allResults = new ArrayList<>(reqs.size());
-
-        Function<REQ, REP> individualSupplier = req -> {
-            synchronized (nonCachedResults) {
-                while (!nonCachedResults.containsKey(req)) {
-                    try {
-                        nonCachedResults.wait();
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        throw new RuntimeException(e);
-                    }
-                }
-                Object val = nonCachedResults.get(req);
-                if (val instanceof CachingSupplier.AltRes altRes) {
-                    uncheckedThrow(altRes.throwable);
-                }
-                return (REP) val;
-            }
-        };
+        // Create a fallback supplier that can resolve individual requests independently.
+        // This is stored in newly created CachingSupplier instances and ensures that
+        // re-entrant calls can resolve without deadlocking on a shared wait/notify map.
+        Function<REQ, REP> singleSupplier = req -> supplier.apply(List.of(req)).get(0);
 
         List<CachingSupplier<REQ, REP>> suppliers = new ArrayList<>(reqs.size());
         List<REQ> nonCached = new ArrayList<>();
         for (REQ req : reqs) {
-            CachingSupplier<REQ, REP> cs = doCache(req, individualSupplier);
+            CachingSupplier<REQ, REP> cs = doCache(req, singleSupplier);
             suppliers.add(cs);
             if (cs.getValue() == null) {
                 nonCached.add(req);
             }
         }
 
+        // Resolve non-cached requests in batch and directly set results on CachingSuppliers
         if (!nonCached.isEmpty()) {
-            synchronized (nonCachedResults) {
-                try {
-                    List<REP> reps = supplier.apply(nonCached);
-                    for (int i = 0; i < reps.size(); i++) {
-                        nonCachedResults.put(nonCached.get(i), reps.get(i));
+            // Build a map from request to its CachingSupplier index for efficient lookup
+            Map<REQ, Integer> reqToIndex = new HashMap<>();
+            for (int i = 0; i < reqs.size(); i++) {
+                if (suppliers.get(i).getValue() == null) {
+                    reqToIndex.put(reqs.get(i), i);
+                }
+            }
+            try {
+                List<REP> reps = supplier.apply(nonCached);
+                for (int i = 0; i < reps.size(); i++) {
+                    Integer idx = reqToIndex.get(nonCached.get(i));
+                    if (idx != null) {
+                        suppliers.get(idx).complete(reps.get(i));
                     }
-                } catch (MavenExecutionException e) {
-                    // If batch request fails, mark all non-cached requests as failed
-                    for (REQ req : nonCached) {
-                        nonCachedResults.put(
-                                req, new CachingSupplier.AltRes(e.getCause())); // Mark as processed but failed
+                }
+            } catch (MavenExecutionException e) {
+                // If batch request fails, mark all non-cached requests as failed
+                CachingSupplier.AltRes failure = new CachingSupplier.AltRes(e.getCause());
+                for (REQ req : nonCached) {
+                    Integer idx = reqToIndex.get(req);
+                    if (idx != null) {
+                        suppliers.get(idx).complete(failure);
                     }
-                } finally {
-                    nonCachedResults.notifyAll();
                 }
             }
         }
 
         // Collect results in original order
+        List<RequestResult<REQ, REP>> allResults = new ArrayList<>(reqs.size());
         boolean hasFailures = false;
         for (int i = 0; i < reqs.size(); i++) {
             REQ req = reqs.get(i);

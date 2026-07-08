@@ -39,6 +39,26 @@ public class CachingSupplier<REQ, REP> implements Function<REQ, REP> {
         return value;
     }
 
+    /**
+     * Directly sets the cached value without invoking the supplier.
+     * This is used by {@link AbstractRequestCache#requests} to set batch-resolved results
+     * on CachingSupplier instances, avoiding the need for the supplier to be invoked later.
+     * <p>
+     * Uses double-checked locking consistent with {@link #apply(Object)} to ensure
+     * thread-safety. The value is only set if it hasn't been set yet.
+     *
+     * @param result the result to cache (may be a normal result or an {@link AltRes} for errors)
+     */
+    public void complete(Object result) {
+        if (value == null) {
+            synchronized (this) {
+                if (value == null) {
+                    value = result;
+                }
+            }
+        }
+    }
+
     @Override
     @SuppressWarnings({"unchecked", "checkstyle:InnerAssignment"})
     public REP apply(REQ req) {
