@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import eu.maveniverse.domtrip.Comment;
 import eu.maveniverse.domtrip.Document;
 import eu.maveniverse.domtrip.Editor;
 import eu.maveniverse.domtrip.Element;
@@ -58,8 +57,8 @@ import static eu.maveniverse.domtrip.maven.MavenPomElements.Plugins.MAVEN_4_COMP
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Plugins.MAVEN_PLUGIN_PREFIX;
 
 /**
- * Strategy for upgrading Maven plugins to recommended versions.
- * Handles plugin version upgrades in build/plugins and build/pluginManagement sections.
+ * Strategy for upgrading Maven plugins to recommended versions. Handles plugin version upgrades in build/plugins and
+ * build/pluginManagement sections.
  */
 @Named
 @Singleton
@@ -202,9 +201,8 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
     }
 
     /**
-     * Upgrades plugins in the document.
-     * Checks both build/plugins and build/pluginManagement/plugins sections.
-     * Only processes plugins explicitly defined in the current POM document.
+     * Upgrades plugins in the document. Checks both build/plugins and build/pluginManagement/plugins sections. Only
+     * processes plugins explicitly defined in the current POM document.
      */
     private boolean upgradePluginsInDocument(Document pomDocument, UpgradeContext context) {
         Element root = pomDocument.root();
@@ -392,11 +390,9 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 String currentVersion = propertyElement.textContentTrimmed();
                 if (isVersionBelow(currentVersion, upgrade.minVersion)) {
                     editor.setTextContent(propertyElement, upgrade.minVersion);
-                    context.detail("Upgraded property " + propertyName + " (for " + upgrade.groupId
-                            + ":"
-                            + upgrade.artifactId + ") from " + currentVersion + " to " + upgrade.minVersion
-                            + " in "
-                            + sectionName);
+                    context.detail(
+                            "Upgraded property " + propertyName + " (for " + upgrade.groupId + ":" + upgrade.artifactId
+                                    + ") from " + currentVersion + " to " + upgrade.minVersion + " in " + sectionName);
                     return true;
                 } else {
                     context.debug("Property " + propertyName + " version " + currentVersion + " is already >= "
@@ -453,8 +449,8 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
     }
 
     /**
-     * Simple version comparison to check if current version is below minimum version.
-     * This is a basic implementation that works for most Maven plugin versions.
+     * Simple version comparison to check if current version is below minimum version. This is a basic implementation
+     * that works for most Maven plugin versions.
      */
     private boolean isVersionBelow(String currentVersion, String minVersion) {
         if (currentVersion == null || minVersion == null) {
@@ -479,9 +475,8 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
     }
 
     /**
-     * Analyzes plugins using effective models built from the temp directory.
-     * Returns analysis results with two maps: plugins needing pluginManagement entries
-     * and plugins needing direct build/plugins overrides.
+     * Analyzes plugins using effective models built from the temp directory. Returns analysis results with two maps:
+     * plugins needing pluginManagement entries and plugins needing direct build/plugins overrides.
      */
     private PluginAnalysisResults analyzePluginsUsingEffectiveModels(
             UpgradeContext context, Map<Path, Document> pomMap, Path tempDir) {
@@ -547,10 +542,9 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
     }
 
     /**
-     * Analyzes plugins from the effective model and determines which ones need upgrades.
-     * Separates plugins into those overridable via pluginManagement and those requiring
-     * a direct build/plugins entry (because the version is set explicitly in an inherited
-     * parent's build/plugins, not via pluginManagement).
+     * Analyzes plugins from the effective model and determines which ones need upgrades. Separates plugins into those
+     * overridable via pluginManagement and those requiring a direct build/plugins entry (because the version is set
+     * explicitly in an inherited parent's build/plugins, not via pluginManagement).
      */
     private PluginAnalysis analyzePluginsFromEffectiveModel(
             UpgradeContext context, Model effectiveModel, Map<String, PluginUpgrade> pluginUpgrades) {
@@ -630,9 +624,9 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
     }
 
     /**
-     * Finds the last local parent in the hierarchy where plugin management should be added.
-     * This implements the algorithm: start with the effective model, check if parent is in pomMap,
-     * if so continue to its parent, else that's the target.
+     * Finds the last local parent in the hierarchy where plugin management should be added. This implements the
+     * algorithm: start with the effective model, check if parent is in pomMap, if so continue to its parent, else
+     * that's the target.
      */
     private Path findLastLocalParentForPluginManagement(
             UpgradeContext context, Path tempPomPath, Map<Path, Document> pomMap, Path tempDir, Path commonRoot) {
@@ -781,10 +775,8 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 managedPluginsElement, upgrade.groupId(), upgrade.artifactId(), upgrade.minVersion());
 
         if (fromRemoteParent) {
-            managedPluginsElement.insertChildBefore(
-                    plugin,
-                    Comment.of(" Override version inherited from parent ")
-                            .precedingWhitespace(plugin.precedingWhitespace()));
+            new Editor(managedPluginsElement.document())
+                    .insertCommentBefore(plugin, " Override version inherited from parent ");
             context.detail("Added plugin management for " + upgrade.groupId() + ":" + upgrade.artifactId() + " version "
                     + upgrade.minVersion() + " (overrides version inherited from parent)");
         } else {
@@ -794,9 +786,8 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
     }
 
     /**
-     * Adds direct plugin entries in build/plugins for plugins inherited from remote parents.
-     * This is necessary when a parent POM sets an explicit version in its build/plugins
-     * that pluginManagement alone cannot override.
+     * Adds direct plugin entries in build/plugins for plugins inherited from remote parents. This is necessary when a
+     * parent POM sets an explicit version in its build/plugins that pluginManagement alone cannot override.
      */
     private boolean addDirectPluginOverrides(
             UpgradeContext context, Document pomDocument, Set<String> pluginKeys, Set<String> localPluginKeys) {
@@ -822,15 +813,12 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     Element plugin = DomUtils.createPlugin(
                             pluginsElement, upgrade.groupId(), upgrade.artifactId(), upgrade.minVersion());
                     if (!localPluginKeys.contains(pluginKey)) {
-                        pluginsElement.insertChildBefore(
-                                plugin,
-                                Comment.of(" Override version inherited from parent ")
-                                        .precedingWhitespace(plugin.precedingWhitespace()));
+                        new Editor(pluginsElement.document())
+                                .insertCommentBefore(plugin, " Override version inherited from parent ");
                     }
                     hasUpgrades = true;
                     context.detail("Added " + upgrade.groupId() + ":" + upgrade.artifactId() + " version "
-                            + upgrade.minVersion()
-                            + " in build/plugins (overrides version locked by parent)");
+                            + upgrade.minVersion() + " in build/plugins (overrides version locked by parent)");
                 }
             }
         }
@@ -880,9 +868,8 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             Map<Path, Set<String>> pluginsNeedingManagement, Map<Path, Set<String>> pluginsNeedingDirectOverride) {}
 
     /**
-     * Holds plugin upgrade information for Maven 4 compatibility.
-     * This class contains the minimum version requirements for plugins
-     * that need to be upgraded to work properly with Maven 4.
+     * Holds plugin upgrade information for Maven 4 compatibility. This class contains the minimum version requirements
+     * for plugins that need to be upgraded to work properly with Maven 4.
      */
     public static class PluginUpgradeInfo {
         /** The Maven groupId of the plugin */
@@ -897,9 +884,12 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         /**
          * Creates a new plugin upgrade information holder.
          *
-         * @param groupId the Maven groupId of the plugin
-         * @param artifactId the Maven artifactId of the plugin
-         * @param minVersion the minimum version required for Maven 4 compatibility
+         * @param groupId
+         *            the Maven groupId of the plugin
+         * @param artifactId
+         *            the Maven artifactId of the plugin
+         * @param minVersion
+         *            the minimum version required for Maven 4 compatibility
          */
         PluginUpgradeInfo(String groupId, String artifactId, String minVersion) {
             this.groupId = groupId;
