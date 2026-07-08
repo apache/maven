@@ -809,7 +809,10 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 managedPluginsElement, upgrade.groupId(), upgrade.artifactId(), upgrade.minVersion());
 
         if (fromRemoteParent) {
-            managedPluginsElement.insertChildBefore(plugin, Comment.of(" Override version inherited from parent "));
+            managedPluginsElement.insertChildBefore(
+                    plugin,
+                    Comment.of(" Override version inherited from parent ")
+                            .precedingWhitespace(plugin.precedingWhitespace()));
             context.detail("Added plugin management for " + upgrade.groupId() + ":" + upgrade.artifactId() + " version "
                     + upgrade.minVersion() + " (overrides version inherited from parent)");
         } else {
@@ -848,7 +851,9 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                             pluginsElement, upgrade.groupId(), upgrade.artifactId(), upgrade.minVersion());
                     if (!localPluginKeys.contains(pluginKey)) {
                         pluginsElement.insertChildBefore(
-                                plugin, Comment.of(" Override version inherited from parent "));
+                                plugin,
+                                Comment.of(" Override version inherited from parent ")
+                                        .precedingWhitespace(plugin.precedingWhitespace()));
                     }
                     hasUpgrades = true;
                     context.detail("Added " + upgrade.groupId() + ":" + upgrade.artifactId() + " version "
