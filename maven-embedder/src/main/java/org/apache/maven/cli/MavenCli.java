@@ -1646,7 +1646,7 @@ public class MavenCli {
         SystemProperties.addSystemProperties(systemProperties);
 
         // one distinguished env variable: MAVEN_REPO_CENTRAL; if present, we make it into property
-        if (systemProperties.contains(MAVEN_REPO_CENTRAL_ENV)) {
+        if (systemProperties.containsKey(MAVEN_REPO_CENTRAL_ENV)) {
             systemProperties.put(
                     ModelInterpolator.MAVEN_REPO_CENTRAL_KEY, systemProperties.getProperty(MAVEN_REPO_CENTRAL_ENV));
         }
