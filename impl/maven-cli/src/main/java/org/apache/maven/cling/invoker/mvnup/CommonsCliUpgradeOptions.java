@@ -165,9 +165,21 @@ public class CommonsCliUpgradeOptions extends CommonsCliOptions implements Upgra
                     return super.parse(currentArgs.toArray(new String[0]));
                 } catch (UnrecognizedOptionException e) {
                     String badOption = e.getOption();
-                    if (removed.contains(badOption) || !currentArgs.remove(badOption)) {
-                        // Already tried removing this option or can't find it — give up
+                    if (removed.contains(badOption)) {
+                        // Already tried removing this option — give up
                         throw e;
+                    }
+                    int idx = currentArgs.indexOf(badOption);
+                    if (idx < 0) {
+                        throw e;
+                    }
+                    currentArgs.remove(idx);
+                    // Also remove a trailing argument value (e.g. "-T" "4" → remove both)
+                    if (idx < currentArgs.size()) {
+                        String next = currentArgs.get(idx);
+                        if (!next.startsWith("-")) {
+                            currentArgs.remove(idx);
+                        }
                     }
                     removed.add(badOption);
                 }

@@ -958,7 +958,16 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             }
         }
 
-        if (currentVersion != null && !isVersionBelow(currentVersion, upgrade.minVersion)) {
+        if (currentVersion == null) {
+            // Property is inherited from parent — we cannot resolve its actual value here,
+            // so skip decoupling to avoid introducing a potentially unnecessary property
+            // that could downgrade an already-sufficient inherited version.
+            context.debug("Shared property " + sharedPropertyName
+                    + " not found in current POM (may be inherited) — skipping version decoupling");
+            return false;
+        }
+
+        if (!isVersionBelow(currentVersion, upgrade.minVersion)) {
             context.debug("Quarkus plugin version (via shared property " + sharedPropertyName + ") " + currentVersion
                     + " is already >= " + upgrade.minVersion);
             return false;
