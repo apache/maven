@@ -1480,7 +1480,7 @@ class PluginUpgradeStrategyTest {
             verify(context.logger, atLeastOnce())
                     .warn(argThat(msg -> msg.contains("quarkus-maven-plugin upgraded to 3.26.0")
                             && msg.contains("3.16.3")
-                            && msg.contains("beyond 3.31.x")));
+                            && msg.contains("mismatched plugin and platform")));
         }
 
         @Test

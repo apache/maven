@@ -58,8 +58,10 @@ class CompatibilityWarningTest {
     class IncompatiblePluginWarningTests {
 
         @Test
-        @DisplayName("should warn about gmavenplus-plugin in build/plugins")
-        void shouldWarnAboutGmavenplusPlugin() throws Exception {
+        @DisplayName("should not warn about gmavenplus-plugin (now handled by PluginUpgradeStrategy)")
+        void shouldNotWarnAboutGmavenplusPlugin() throws Exception {
+            // gmavenplus-plugin was fixed in 4.2.0 (groovy/GMavenPlus#328) and is now
+            // handled as a plugin upgrade rather than a permanent incompatibility warning
             String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
@@ -85,42 +87,7 @@ class CompatibilityWarningTest {
             UpgradeContext context = createMockContext();
             strategy.doApply(context, pomMap);
 
-            verify(context.logger, atLeastOnce())
-                    .warn(argThat(
-                            msg -> msg.contains("gmavenplus-plugin") && msg.contains("UnsupportedOperationException")));
-        }
-
-        @Test
-        @DisplayName("should warn about gmavenplus-plugin in pluginManagement")
-        void shouldWarnAboutGmavenplusPluginInPluginManagement() throws Exception {
-            String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                    <build>
-                        <pluginManagement>
-                            <plugins>
-                                <plugin>
-                                    <groupId>org.codehaus.gmavenplus</groupId>
-                                    <artifactId>gmavenplus-plugin</artifactId>
-                                    <version>4.1.1</version>
-                                </plugin>
-                            </plugins>
-                        </pluginManagement>
-                    </build>
-                </project>
-                """;
-
-            Document document = Document.of(pomXml);
-            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
-
-            UpgradeContext context = createMockContext();
-            strategy.doApply(context, pomMap);
-
-            verify(context.logger, atLeastOnce()).warn(argThat(msg -> msg.contains("gmavenplus-plugin")));
+            verify(context.logger, never()).warn(argThat(msg -> msg.contains("Known Maven 4 incompatibility")));
         }
 
         @Test
