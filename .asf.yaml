@@ -31,3 +31,30 @@ notifications:
   commits: commits@maven.apache.org
   issues: issues@maven.apache.org
   pullrequests: issues@maven.apache.org
+
+# https://release-test.apache.org/projects/maven
+project:
+  metadata:
+    key: maven
+    committee: maven
+    name: Apache Maven
+    description: "Maven is a project development management and comprehension tool.
+      Based on the concept of a project object model: builds, dependency management,
+      documentation creation, site publication, and distribution publication are all controlled from the declarative file.
+      Maven can be extended by plugins to utilise a number of other development tools for reporting or the build process."
+    short_description: Maven is a project development management and comprehension tool.
+    homepage: https://maven.apache.org/
+    download_page: https://maven.apache.org/download.html
+    bug_database: https://github.com/apache/maven/issues
+    mailing_lists: https://maven.apache.org/mailing-lists.html
+    repositories:
+      - https://github.com/apache/maven.git
+    categories:
+      - build-management
+    programming_languages:
+      - Java
+  policy:
+    github_repository_name: maven
+    download_path_suffix: maven-{{MAJOR}}/{{VERSION}}
+  features:
+    atr_sync: true
