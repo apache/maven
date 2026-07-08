@@ -299,6 +299,54 @@ class AbstractRequestCacheTest {
     }
 
     /**
+     * Tests that batch resolution is resilient to requests whose {@code hashCode()} changes
+     * during resolution (e.g., because {@code RequestTrace} includes mutable
+     * {@code ModelBuilderRequest} data).
+     * <p>
+     * The {@code reqToIndex} map inside {@code requests()} uses {@code IdentityHashMap}
+     * specifically to handle this: after the batch supplier mutates request data,
+     * lookups still succeed because they compare by reference identity, not by
+     * {@code equals()/hashCode()}.
+     */
+    @Test
+    void testBatchResolutionWithUnstableHashCode() {
+        // Use identity-based cache to match real DefaultRequestCache behavior
+        IdentityCachingTestRequestCache cachingCache = new IdentityCachingTestRequestCache();
+
+        // Create requests with mutable trace data that affects hashCode()
+        MutableHashCodeRequest req1 = new MutableHashCodeRequest("req1", "traceA");
+        MutableHashCodeRequest req2 = new MutableHashCodeRequest("req2", "traceB");
+
+        int originalHash1 = req1.hashCode();
+        int originalHash2 = req2.hashCode();
+
+        java.util.concurrent.atomic.AtomicInteger supplierCallCount = new java.util.concurrent.atomic.AtomicInteger(0);
+
+        Function<List<MutableHashCodeRequest>, List<MutableHashCodeResult>> batchSupplier = reqs -> {
+            supplierCallCount.incrementAndGet();
+            // Mutate trace data during resolution — this changes hashCode()
+            for (MutableHashCodeRequest r : reqs) {
+                r.setTraceData(r.getTraceData() + "-mutated");
+            }
+            return reqs.stream().map(MutableHashCodeResult::new).toList();
+        };
+
+        // Resolve the batch — hashCode changes inside the supplier
+        List<MutableHashCodeResult> results = cachingCache.requests(List.of(req1, req2), batchSupplier);
+
+        // Verify results were delivered despite hashCode mutation
+        assertEquals(2, results.size());
+        assertEquals(req1, results.get(0).getRequest());
+        assertEquals(req2, results.get(1).getRequest());
+        assertEquals(1, supplierCallCount.get());
+
+        // Verify hashCode actually changed
+        assertTrue(
+                req1.hashCode() != originalHash1 || req2.hashCode() != originalHash2,
+                "hashCode should have changed after mutation");
+    }
+
+    /**
      * Tests that batch results are properly cached in CachingSupplier instances
      * so subsequent calls return the cached values.
      */
@@ -411,6 +459,93 @@ class AbstractRequestCacheTest {
                 REQ req, Function<REQ, REP> supplier) {
             return (CachingSupplier<REQ, REP>)
                     cache.computeIfAbsent((TestRequest) req, r -> new CachingSupplier<>(supplier));
+        }
+    }
+
+    /**
+     * A request implementation whose hashCode() depends on mutable trace data,
+     * simulating ResolverRequest with mutable RequestTrace/ModelBuilderRequest data.
+     */
+    static class MutableHashCodeRequest implements Request<ProtoSession> {
+        private final String id;
+        private String traceData;
+
+        MutableHashCodeRequest(String id, String traceData) {
+            this.id = id;
+            this.traceData = traceData;
+        }
+
+        String getTraceData() {
+            return traceData;
+        }
+
+        void setTraceData(String traceData) {
+            this.traceData = traceData;
+        }
+
+        @Override
+        @Nonnull
+        public ProtoSession getSession() {
+            return mock(ProtoSession.class);
+        }
+
+        @Override
+        public RequestTrace getTrace() {
+            return null;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null || getClass() != obj.getClass()) {
+                return false;
+            }
+            MutableHashCodeRequest that = (MutableHashCodeRequest) obj;
+            return java.util.Objects.equals(id, that.id) && java.util.Objects.equals(traceData, that.traceData);
+        }
+
+        @Override
+        public int hashCode() {
+            return java.util.Objects.hash(id, traceData);
+        }
+
+        @Override
+        @Nonnull
+        public String toString() {
+            return "MutableHashCodeRequest[" + id + ", " + traceData + "]";
+        }
+    }
+
+    static class MutableHashCodeResult implements Result<MutableHashCodeRequest> {
+        private final MutableHashCodeRequest request;
+
+        MutableHashCodeResult(MutableHashCodeRequest request) {
+            this.request = request;
+        }
+
+        @Override
+        @Nonnull
+        public MutableHashCodeRequest getRequest() {
+            return request;
+        }
+    }
+
+    /**
+     * Cache implementation using identity-based storage (IdentityHashMap).
+     * Simulates real DefaultRequestCache behavior where request identity —
+     * not equals/hashCode — determines cache hits.
+     */
+    static class IdentityCachingTestRequestCache extends AbstractRequestCache {
+        private final java.util.IdentityHashMap<Object, CachingSupplier<?, ?>> cache =
+                new java.util.IdentityHashMap<>();
+
+        @Override
+        @SuppressWarnings("unchecked")
+        protected <REQ extends Request<?>, REP extends Result<REQ>> CachingSupplier<REQ, REP> doCache(
+                REQ req, Function<REQ, REP> supplier) {
+            return (CachingSupplier<REQ, REP>) cache.computeIfAbsent(req, r -> new CachingSupplier<>(supplier));
         }
     }
 
