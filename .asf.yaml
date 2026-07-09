@@ -55,6 +55,6 @@ project:
       - Java
   policy:
     github_repository_name: maven
-    download_path_suffix: maven-MAJOR/{{VERSION}}
+    download_path_suffix: maven-{{MAJOR_VERSION}}/{{VERSION}}
   features:
     atr_sync: true
