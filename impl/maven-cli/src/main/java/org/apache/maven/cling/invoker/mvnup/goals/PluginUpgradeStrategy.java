@@ -372,6 +372,25 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             return false;
         }
 
+        // For Quarkus plugins, check the platform version before upgrading.
+        // Upgrading quarkus-maven-plugin to 3.x when the project uses Quarkus 2.x
+        // causes NoSuchMethodError and build failures.
+        if (isQuarkusPlugin(upgrade.groupId, upgrade.artifactId)) {
+            String platformVersion = detectQuarkusPlatformVersion(pomDocument);
+            if (platformVersion != null) {
+                int majorVersion = extractMajorVersion(platformVersion);
+                if (majorVersion >= 0 && majorVersion < 3) {
+                    context.warning("Skipping quarkus-maven-plugin upgrade: project uses Quarkus platform "
+                            + majorVersion + ".x (" + platformVersion
+                            + ") which is incompatible with plugin 3.x");
+                    return false;
+                }
+            } else {
+                context.warning("Could not determine Quarkus platform version — if the project uses "
+                        + "Quarkus 2.x, the plugin upgrade may cause build failures");
+            }
+        }
+
         if (isProperty) {
             // For Quarkus plugins, check if the property is shared with a Quarkus BOM
             if (isQuarkusPlugin(upgrade.groupId, upgrade.artifactId)
@@ -901,6 +920,111 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
     private boolean isQuarkusPlugin(String groupId, String artifactId) {
         return "quarkus-maven-plugin".equals(artifactId)
                 && ("io.quarkus".equals(groupId) || "io.quarkus.platform".equals(groupId));
+    }
+
+    /**
+     * Detects the Quarkus platform version used by the project.
+     *
+     * <p>Checks the following sources in order:
+     * <ol>
+     *   <li>{@code <dependencyManagement>} for {@code io.quarkus.platform:quarkus-bom}
+     *       or {@code io.quarkus:quarkus-bom} — extracts the version (resolving property references)</li>
+     *   <li>Properties: {@code quarkus.platform.version}, {@code quarkus.version},
+     *       {@code quarkus-plugin.version}</li>
+     * </ol>
+     *
+     * @param pomDocument the POM document to inspect
+     * @return the detected Quarkus platform version string, or {@code null} if not found
+     */
+    String detectQuarkusPlatformVersion(Document pomDocument) {
+        Element root = pomDocument.root();
+
+        // 1. Check dependencyManagement for Quarkus BOM
+        Element depManagement = root.childElement(DEPENDENCY_MANAGEMENT).orElse(null);
+        if (depManagement != null) {
+            Element dependencies = depManagement.childElement(DEPENDENCIES).orElse(null);
+            if (dependencies != null) {
+                String bomVersion = dependencies
+                        .childElements(DEPENDENCY)
+                        .filter(dep -> {
+                            String gid = getChildText(dep, GROUP_ID);
+                            String aid = getChildText(dep, ARTIFACT_ID);
+                            return ("io.quarkus.platform".equals(gid) || "io.quarkus".equals(gid))
+                                    && "quarkus-bom".equals(aid);
+                        })
+                        .map(dep -> getChildText(dep, VERSION))
+                        .filter(v -> v != null && !v.isEmpty())
+                        .findFirst()
+                        .orElse(null);
+
+                if (bomVersion != null) {
+                    // Resolve property reference if needed
+                    String resolved = resolvePropertyValue(root, bomVersion);
+                    if (resolved != null) {
+                        return resolved;
+                    }
+                }
+            }
+        }
+
+        // 2. Check well-known properties
+        Element propertiesElement = root.childElement(PROPERTIES).orElse(null);
+        if (propertiesElement != null) {
+            for (String propName : List.of("quarkus.platform.version", "quarkus.version", "quarkus-plugin.version")) {
+                Element prop = propertiesElement.childElement(propName).orElse(null);
+                if (prop != null) {
+                    String value = prop.textContentTrimmed();
+                    if (value != null && !value.isEmpty() && !value.startsWith("${")) {
+                        return value;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Resolves a version string that may be a property reference (e.g., {@code ${quarkus.version}}).
+     * Returns the resolved value, or the original string if not a property reference,
+     * or {@code null} if the property cannot be resolved.
+     */
+    private String resolvePropertyValue(Element root, String value) {
+        if (value == null || value.isEmpty()) {
+            return null;
+        }
+        if (!value.startsWith("${") || !value.endsWith("}")) {
+            return value;
+        }
+        String propertyName = value.substring(2, value.length() - 1);
+        Element propertiesElement = root.childElement(PROPERTIES).orElse(null);
+        if (propertiesElement != null) {
+            Element prop = propertiesElement.childElement(propertyName).orElse(null);
+            if (prop != null) {
+                String resolved = prop.textContentTrimmed();
+                if (resolved != null && !resolved.isEmpty() && !resolved.startsWith("${")) {
+                    return resolved;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Extracts the major version number from a version string (e.g., "2" from "2.16.7.Final").
+     *
+     * @return the major version number, or -1 if it cannot be parsed
+     */
+    private int extractMajorVersion(String version) {
+        if (version == null || version.isEmpty()) {
+            return -1;
+        }
+        String[] parts = version.split("\\.");
+        try {
+            return Integer.parseInt(parts[0]);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
     }
 
     /**
