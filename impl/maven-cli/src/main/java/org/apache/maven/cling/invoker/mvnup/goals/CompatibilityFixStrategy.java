@@ -19,6 +19,7 @@
 package org.apache.maven.cling.invoker.mvnup.goals;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -639,19 +640,21 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
         List<Element> dependencies =
                 dependenciesElement.childElements(DEPENDENCY).toList();
         Map<String, Element> seenDependencies = new HashMap<>();
+        List<Element> duplicates = new ArrayList<>();
 
-        List<Element> duplicates = dependencies.stream()
-                .filter(dependency -> {
-                    String key = createDependencyKey(dependency);
-                    if (seenDependencies.containsKey(key)) {
-                        context.detail("Fixed: Removed duplicate dependency: " + key + " in " + sectionName);
-                        return true; // This is a duplicate
-                    } else {
-                        seenDependencies.put(key, dependency);
-                        return false; // This is the first occurrence
-                    }
-                })
-                .toList();
+        // Last-wins: when a duplicate is found, mark the earlier occurrence for removal
+        // and keep the later one (which is what Maven 3 does at runtime)
+        for (Element dependency : dependencies) {
+            String key = createDependencyKey(dependency);
+            Element previous = seenDependencies.put(key, dependency);
+            if (previous != null) {
+                duplicates.add(previous);
+                String keptVersion = dependency.childText(MavenPomElements.Elements.VERSION);
+                String versionInfo = keptVersion != null ? " (keeping version " + keptVersion + ")" : "";
+                context.detail(
+                        "Removed duplicate dependency declaration for " + key + versionInfo + " in " + sectionName);
+            }
+        }
 
         // Remove duplicates while preserving formatting
         duplicates.forEach(DomUtils::removeElement);
@@ -697,21 +700,23 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
     private boolean fixDuplicatePluginsInSection(Element pluginsElement, UpgradeContext context, String sectionName) {
         List<Element> plugins = pluginsElement.childElements(PLUGIN).toList();
         Map<String, Element> seenPlugins = new HashMap<>();
+        List<Element> duplicates = new ArrayList<>();
 
-        List<Element> duplicates = plugins.stream()
-                .filter(plugin -> {
-                    String key = createPluginKey(plugin);
-                    if (key != null) {
-                        if (seenPlugins.containsKey(key)) {
-                            context.detail("Fixed: Removed duplicate plugin: " + key + " in " + sectionName);
-                            return true; // This is a duplicate
-                        } else {
-                            seenPlugins.put(key, plugin);
-                        }
-                    }
-                    return false; // This is the first occurrence or invalid plugin
-                })
-                .toList();
+        // Last-wins: when a duplicate is found, mark the earlier occurrence for removal
+        // and keep the later one (which is what Maven 3 does at runtime)
+        for (Element plugin : plugins) {
+            String key = createPluginKey(plugin);
+            if (key != null) {
+                Element previous = seenPlugins.put(key, plugin);
+                if (previous != null) {
+                    duplicates.add(previous);
+                    String keptVersion = plugin.childText(MavenPomElements.Elements.VERSION);
+                    String versionInfo = keptVersion != null ? " (keeping version " + keptVersion + ")" : "";
+                    context.detail(
+                            "Removed duplicate plugin declaration for " + key + versionInfo + " in " + sectionName);
+                }
+            }
+        }
 
         // Remove duplicates while preserving formatting
         duplicates.forEach(DomUtils::removeElement);

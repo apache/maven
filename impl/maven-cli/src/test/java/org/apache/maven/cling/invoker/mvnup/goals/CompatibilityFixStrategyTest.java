@@ -555,7 +555,7 @@ class CompatibilityFixStrategyTest {
     class DuplicateDependencyFixesTests {
 
         @Test
-        @DisplayName("should remove duplicate dependencies in dependencyManagement")
+        @DisplayName("should remove duplicate dependencies in dependencyManagement keeping last occurrence")
         void shouldRemoveDuplicateDependenciesInDependencyManagement() throws Exception {
             String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
@@ -590,13 +590,17 @@ class CompatibilityFixStrategyTest {
             assertTrue(result.success(), "Compatibility fix should succeed");
             assertTrue(result.modifiedCount() > 0, "Should have removed duplicate dependency");
 
-            // Verify only one dependency remains
+            // Verify only one dependency remains and it's the last one (3.13.0)
             Editor editor = new Editor(document);
             Element root = editor.root();
             Element dependencyManagement = DomUtils.findChildElement(root, "dependencyManagement");
             Element dependencies = DomUtils.findChildElement(dependencyManagement, "dependencies");
             var dependencyElements = dependencies.childElements("dependency").toList();
             assertEquals(1, dependencyElements.size(), "Should have only one dependency after duplicate removal");
+
+            // Last-wins: the last occurrence (3.13.0) should be kept
+            String keptVersion = dependencyElements.get(0).childText("version");
+            assertEquals("3.13.0", keptVersion, "Should keep the last occurrence (last-wins semantics)");
         }
 
         @Test
@@ -642,6 +646,57 @@ class CompatibilityFixStrategyTest {
             var dependencyElements = dependencies.childElements("dependency").toList();
             assertEquals(1, dependencyElements.size(), "Should have only one dependency after duplicate removal");
         }
+
+        @Test
+        @DisplayName("should keep last occurrence when multiple duplicates have different versions")
+        void shouldKeepLastOccurrenceWithDifferentVersions() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.example</groupId>
+                            <artifactId>lib-a</artifactId>
+                            <version>1.0</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>com.example</groupId>
+                            <artifactId>lib-a</artifactId>
+                            <version>2.0</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>com.example</groupId>
+                            <artifactId>lib-a</artifactId>
+                            <version>3.0</version>
+                        </dependency>
+                    </dependencies>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Compatibility fix should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have removed duplicate dependencies");
+
+            // Verify only one dependency remains and it's the LAST one (version 3.0)
+            Editor editor = new Editor(document);
+            Element root = editor.root();
+            Element dependencies = DomUtils.findChildElement(root, "dependencies");
+            var dependencyElements = dependencies.childElements("dependency").toList();
+            assertEquals(1, dependencyElements.size(), "Should have only one dependency after duplicate removal");
+            assertEquals(
+                    "3.0",
+                    dependencyElements.get(0).childText("version"),
+                    "Should keep the last occurrence (version 3.0) using last-wins semantics");
+        }
     }
 
     @Nested
@@ -649,7 +704,7 @@ class CompatibilityFixStrategyTest {
     class DuplicatePluginFixesTests {
 
         @Test
-        @DisplayName("should remove duplicate plugins in pluginManagement")
+        @DisplayName("should remove duplicate plugins in pluginManagement keeping last occurrence")
         void shouldRemoveDuplicatePluginsInPluginManagement() throws Exception {
             String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
@@ -686,7 +741,7 @@ class CompatibilityFixStrategyTest {
             assertTrue(result.success(), "Compatibility fix should succeed");
             assertTrue(result.modifiedCount() > 0, "Should have removed duplicate plugin");
 
-            // Verify only one plugin remains
+            // Verify only one plugin remains and it's the last one (3.12.0)
             Editor editor = new Editor(document);
             Element root = editor.root();
             Element build = DomUtils.findChildElement(root, "build");
@@ -694,6 +749,10 @@ class CompatibilityFixStrategyTest {
             Element plugins = DomUtils.findChildElement(pluginManagement, "plugins");
             var pluginElements = plugins.childElements("plugin").toList();
             assertEquals(1, pluginElements.size(), "Should have only one plugin after duplicate removal");
+
+            // Last-wins: the last occurrence (3.12.0) should be kept
+            String keptVersion = pluginElements.get(0).childText("version");
+            assertEquals("3.12.0", keptVersion, "Should keep the last occurrence (last-wins semantics)");
         }
     }
 
