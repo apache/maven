@@ -596,7 +596,7 @@ class ResourceFilteringStrategyTest {
         }
 
         @Test
-        @DisplayName("should include all 23 binary extensions")
+        @DisplayName("should include all binary extensions")
         void shouldIncludeAllBinaryExtensions() throws Exception {
             String pomXml = """
                 <?xml version="1.0" encoding="UTF-8"?>
@@ -629,7 +629,7 @@ class ResourceFilteringStrategyTest {
                         "Should include extension: " + ext);
             }
 
-            assertEquals(23, ResourceFilteringStrategy.BINARY_EXTENSIONS.size(), "Should have exactly 23 extensions");
+            assertEquals(33, ResourceFilteringStrategy.BINARY_EXTENSIONS.size(), "Should have exactly 33 extensions");
         }
     }
 

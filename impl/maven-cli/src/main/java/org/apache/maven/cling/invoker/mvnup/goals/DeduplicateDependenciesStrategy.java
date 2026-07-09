@@ -54,11 +54,14 @@ import static eu.maveniverse.domtrip.maven.MavenPomElements.Plugins.MAVEN_PLUGIN
  * <p>Maven 4 rejects duplicate {@code <dependency>} entries (same groupId, artifactId,
  * type, and classifier) that Maven 3 silently accepted. This strategy scans each POM's
  * {@code <dependencies>} and {@code <dependencyManagement>/<dependencies>} sections and
- * removes duplicates, keeping the last declaration (matching Maven 3's last-wins behavior
- * at runtime).
+ * removes duplicates using last-wins semantics (keeping the last declaration). Note that
+ * Maven 3's dependency resolver uses first-wins for same-depth conflicts; last-wins is
+ * chosen here intentionally so the most recently added (and presumably most up-to-date)
+ * declaration is preserved.
  *
  * <p>The strategy also handles duplicate {@code <plugin>} entries in {@code <plugins>}
- * and {@code <pluginManagement>/<plugins>} sections with the same last-wins semantics.
+ * and {@code <pluginManagement>/<plugins>} sections with the same last-wins semantics
+ * (which does match Maven 3's plugin configuration merging behavior).
  *
  * <p>Profile-scoped dependency and plugin sections are processed as well.
  */

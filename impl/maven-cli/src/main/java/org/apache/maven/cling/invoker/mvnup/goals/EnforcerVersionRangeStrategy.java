@@ -76,13 +76,13 @@ public class EnforcerVersionRangeStrategy extends AbstractUpgradeStrategy {
     private static final String EXECUTION = "execution";
 
     /**
-     * Pattern to match Maven version ranges with an exclusive upper bound at 4.x.
+     * Pattern to match Maven version ranges with an exclusive upper bound at any 4.x version.
      * Captures:
      *   Group 1: opening bracket ([ or ()
      *   Group 2: lower bound (e.g., 3.8.8, 3, 3.6.3)
-     *   Group 3: upper bound starting with 4 (e.g., 4, 4.0, 4.0.0)
+     *   Group 3: upper bound starting with 4 (e.g., 4, 4.0, 4.0.0, 4.1, 4.2.1)
      *
-     * Examples matched: [3.8.8,4), [3,4), (3.6.3,4), [3.8.8,4.0), [3.8.8,4.0.0)
+     * Examples matched: [3.8.8,4), [3,4), (3.6.3,4), [3.8.8,4.0), [3.8.8,4.0.0), [3.8.8,4.1)
      * Examples not matched: [3.8.8,), 3.8.8, [3.8.8,5), [3.8.8,4]
      */
     static final Pattern MAVEN4_EXCLUSIVE_UPPER_BOUND = Pattern.compile("^(\\[|\\()(.+?),\\s*(4(?:\\.\\d+)*)\\s*\\)$");

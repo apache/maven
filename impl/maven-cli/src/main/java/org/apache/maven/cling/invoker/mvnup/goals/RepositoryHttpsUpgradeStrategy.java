@@ -68,8 +68,7 @@ public class RepositoryHttpsUpgradeStrategy extends AbstractUpgradeStrategy {
 
     /**
      * Well-known repository URL mappings from HTTP to their canonical HTTPS equivalents.
-     * Uses a LinkedHashMap to ensure longer prefixes are checked before shorter ones,
-     * preventing partial matches.
+     * Uses a LinkedHashMap to preserve insertion order for predictable iteration.
      */
     private static final Map<String, String> WELL_KNOWN_URL_MAPPINGS = createWellKnownMappings();
 

@@ -55,7 +55,7 @@ import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PROFILES;
  * <p>This strategy scans all {@code <resource>} and {@code <testResource>} blocks.
  * If any resource directory has filtering enabled and the {@code maven-resources-plugin}
  * does not already declare {@code <nonFilteredFileExtensions>}, this strategy adds a
- * comprehensive list of binary file extensions to prevent the exception.
+ * list of common binary file extensions to prevent the exception.
  *
  * @see <a href="https://github.com/apache/maven/issues/12455">#12455</a>
  */
@@ -75,34 +75,51 @@ public class ResourceFilteringStrategy extends AbstractUpgradeStrategy {
     private static final String MAVEN_PLUGINS_GROUP_ID = "org.apache.maven.plugins";
 
     /**
-     * Comprehensive list of binary file extensions that should not be filtered.
-     * These extensions cover common binary formats that would cause
-     * {@code MalformedInputException} when processed as UTF-8 text.
+     * Common binary file extensions that should not be filtered.
+     * These extensions cover binary formats frequently found in Maven projects that would
+     * cause {@code MalformedInputException} when processed as UTF-8 text.
      */
     static final List<String> BINARY_EXTENSIONS = List.of(
+            // Document formats
             "xlsx",
             "xls",
             "docx",
             "doc",
             "pptx",
             "pdf",
+            // Archive and package formats
             "zip",
             "tar",
             "gz",
             "jar",
+            // Compiled and native binaries
             "class",
             "so",
             "dll",
             "exe",
+            // Image formats
+            "png",
+            "jpg",
+            "jpeg",
+            "gif",
+            "bmp",
+            "tiff",
             "ico",
+            // Font formats
             "woff",
             "woff2",
             "ttf",
             "eot",
+            // Media formats
+            "mp3",
+            "mp4",
+            // Other binary formats
             "swf",
             "ser",
             "keystore",
-            "jks");
+            "jks",
+            "p12",
+            "pfx");
 
     @Override
     public boolean isApplicable(UpgradeContext context) {
