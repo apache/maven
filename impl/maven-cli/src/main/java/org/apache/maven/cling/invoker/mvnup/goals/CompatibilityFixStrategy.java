@@ -19,8 +19,6 @@
 package org.apache.maven.cling.invoker.mvnup.goals;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -159,8 +157,6 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
 
                 hasIssues |= fixUnsupportedCombineChildrenAttributes(pomDocument, context);
                 hasIssues |= fixUnsupportedCombineSelfAttributes(pomDocument, context);
-                hasIssues |= fixDuplicateDependencies(pomDocument, context);
-                hasIssues |= fixDuplicatePlugins(pomDocument, context);
                 hasIssues |= fixUnsupportedRepositoryExpressions(pomDocument, context);
                 hasIssues |= fixDeprecatedPropertyExpressions(pomDocument, context);
                 hasIssues |= fixIncorrectParentRelativePaths(pomDocument, pomPath, pomMap, context);
@@ -230,87 +226,6 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
         }
 
         return !invalidElements.isEmpty();
-    }
-
-    /**
-     * Fixes duplicate dependencies in dependencies and dependencyManagement sections.
-     */
-    private boolean fixDuplicateDependencies(Document pomDocument, UpgradeContext context) {
-        Element root = pomDocument.root();
-
-        // Collect all dependency containers to process
-        Stream<DependencyContainer> dependencyContainers = Stream.concat(
-                // Root level dependencies
-                Stream.of(
-                                new DependencyContainer(
-                                        root.childElement(DEPENDENCIES).orElse(null), DEPENDENCIES),
-                                new DependencyContainer(
-                                        root.childElement(DEPENDENCY_MANAGEMENT)
-                                                .flatMap(dm -> dm.childElement(DEPENDENCIES))
-                                                .orElse(null),
-                                        DEPENDENCY_MANAGEMENT))
-                        .filter(container -> container.element != null),
-                // Profile dependencies
-                root.childElement(PROFILES).stream()
-                        .flatMap(profiles -> profiles.childElements(PROFILE))
-                        .flatMap(profile -> Stream.of(
-                                        new DependencyContainer(
-                                                profile.childElement(DEPENDENCIES)
-                                                        .orElse(null),
-                                                "profile dependencies"),
-                                        new DependencyContainer(
-                                                profile.childElement(DEPENDENCY_MANAGEMENT)
-                                                        .flatMap(dm -> dm.childElement(DEPENDENCIES))
-                                                        .orElse(null),
-                                                "profile dependencyManagement"))
-                                .filter(container -> container.element != null)));
-
-        return dependencyContainers
-                .map(container -> fixDuplicateDependenciesInSection(container.element, context, container.sectionName))
-                .reduce(false, Boolean::logicalOr);
-    }
-
-    private static class DependencyContainer {
-        final Element element;
-        final String sectionName;
-
-        DependencyContainer(Element element, String sectionName) {
-            this.element = element;
-            this.sectionName = sectionName;
-        }
-    }
-
-    /**
-     * Fixes duplicate plugins in plugins and pluginManagement sections.
-     */
-    private boolean fixDuplicatePlugins(Document pomDocument, UpgradeContext context) {
-        Element root = pomDocument.root();
-
-        // Collect all build elements to process
-        Stream<BuildContainer> buildContainers = Stream.concat(
-                // Root level build
-                Stream.of(new BuildContainer(root.childElement(BUILD).orElse(null), BUILD))
-                        .filter(container -> container.element != null),
-                // Profile builds
-                root.childElement(PROFILES).stream()
-                        .flatMap(profiles -> profiles.childElements(PROFILE))
-                        .map(profile ->
-                                new BuildContainer(profile.childElement(BUILD).orElse(null), "profile build"))
-                        .filter(container -> container.element != null));
-
-        return buildContainers
-                .map(container -> fixPluginsInBuildElement(container.element, context, container.sectionName))
-                .reduce(false, Boolean::logicalOr);
-    }
-
-    private static class BuildContainer {
-        final Element element;
-        final String sectionName;
-
-        BuildContainer(Element element, String sectionName) {
-            this.element = element;
-            this.sectionName = sectionName;
-        }
     }
 
     /**
@@ -414,6 +329,16 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
             }
         }
         return properties;
+    }
+
+    private static class DependencyContainer {
+        final Element element;
+        final String sectionName;
+
+        DependencyContainer(Element element, String sectionName) {
+            this.element = element;
+            this.sectionName = sectionName;
+        }
     }
 
     /**
@@ -650,110 +575,6 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
                 }),
                 element.childElements()
                         .flatMap(child -> findElementsWithInvalidAttribute(child, attributeName, validValues)));
-    }
-
-    /**
-     * Helper methods extracted from BaseUpgradeGoal for compatibility fixes.
-     */
-    private boolean fixDuplicateDependenciesInSection(
-            Element dependenciesElement, UpgradeContext context, String sectionName) {
-        List<Element> dependencies =
-                dependenciesElement.childElements(DEPENDENCY).toList();
-        Map<String, Element> seenDependencies = new HashMap<>();
-        List<Element> duplicates = new ArrayList<>();
-
-        // Last-wins: when a duplicate is found, mark the earlier occurrence for removal
-        // and keep the later one (which is what Maven 3 does at runtime)
-        for (Element dependency : dependencies) {
-            String key = createDependencyKey(dependency);
-            Element previous = seenDependencies.put(key, dependency);
-            if (previous != null) {
-                duplicates.add(previous);
-                String keptVersion = dependency.childText(MavenPomElements.Elements.VERSION);
-                String versionInfo = keptVersion != null ? " (keeping version " + keptVersion + ")" : "";
-                context.detail(
-                        "Removed duplicate dependency declaration for " + key + versionInfo + " in " + sectionName);
-            }
-        }
-
-        // Remove duplicates while preserving formatting
-        duplicates.forEach(DomUtils::removeElement);
-
-        return !duplicates.isEmpty();
-    }
-
-    private String createDependencyKey(Element dependency) {
-        String groupId = dependency.childText(MavenPomElements.Elements.GROUP_ID);
-        String artifactId = dependency.childText(MavenPomElements.Elements.ARTIFACT_ID);
-        String type = dependency.childText(MavenPomElements.Elements.TYPE);
-        String classifier = dependency.childText(MavenPomElements.Elements.CLASSIFIER);
-
-        return groupId + ":" + artifactId + ":" + (type != null ? type : "jar") + ":"
-                + (classifier != null ? classifier : "");
-    }
-
-    private boolean fixPluginsInBuildElement(Element buildElement, UpgradeContext context, String sectionName) {
-        boolean fixed = false;
-
-        Element pluginsElement = buildElement.childElement(PLUGINS).orElse(null);
-        if (pluginsElement != null) {
-            fixed |= fixDuplicatePluginsInSection(pluginsElement, context, sectionName + "/" + PLUGINS);
-        }
-
-        Element pluginManagementElement =
-                buildElement.childElement(PLUGIN_MANAGEMENT).orElse(null);
-        if (pluginManagementElement != null) {
-            Element managedPluginsElement =
-                    pluginManagementElement.childElement(PLUGINS).orElse(null);
-            if (managedPluginsElement != null) {
-                fixed |= fixDuplicatePluginsInSection(
-                        managedPluginsElement, context, sectionName + "/" + PLUGIN_MANAGEMENT + "/" + PLUGINS);
-            }
-        }
-
-        return fixed;
-    }
-
-    /**
-     * Fixes duplicate plugins within a specific plugins section.
-     */
-    private boolean fixDuplicatePluginsInSection(Element pluginsElement, UpgradeContext context, String sectionName) {
-        List<Element> plugins = pluginsElement.childElements(PLUGIN).toList();
-        Map<String, Element> seenPlugins = new HashMap<>();
-        List<Element> duplicates = new ArrayList<>();
-
-        // Last-wins: when a duplicate is found, mark the earlier occurrence for removal
-        // and keep the later one (which is what Maven 3 does at runtime)
-        for (Element plugin : plugins) {
-            String key = createPluginKey(plugin);
-            if (key != null) {
-                Element previous = seenPlugins.put(key, plugin);
-                if (previous != null) {
-                    duplicates.add(previous);
-                    String keptVersion = plugin.childText(MavenPomElements.Elements.VERSION);
-                    String versionInfo = keptVersion != null ? " (keeping version " + keptVersion + ")" : "";
-                    context.detail(
-                            "Removed duplicate plugin declaration for " + key + versionInfo + " in " + sectionName);
-                }
-            }
-        }
-
-        // Remove duplicates while preserving formatting
-        duplicates.forEach(DomUtils::removeElement);
-
-        return !duplicates.isEmpty();
-    }
-
-    private String createPluginKey(Element plugin) {
-        String groupId = plugin.childText(MavenPomElements.Elements.GROUP_ID);
-        String artifactId = plugin.childText(MavenPomElements.Elements.ARTIFACT_ID);
-
-        // Default groupId for Maven plugins
-        if (groupId == null && artifactId != null && artifactId.startsWith(MAVEN_PLUGIN_PREFIX)) {
-            groupId = DEFAULT_MAVEN_PLUGIN_GROUP_ID;
-        }
-
-        return (groupId != null && artifactId != null) ? groupId + ":" + artifactId : null;
     }
 
     private boolean fixRepositoryExpressions(
