@@ -36,10 +36,7 @@ import org.apache.maven.api.services.Result;
  * @since 4.0.0
  */
 @Experimental
-public record RequestResult<REQ extends Request<?>, REP extends Result<REQ>>(
-        REQ request,
-        REP result,
-        Throwable error) {
+public record RequestResult<REQ extends Request<?>, REP extends Result<REQ>>(REQ request, REP result, Throwable error) {
 
     /**
      * Determines if the request was processed successfully.
