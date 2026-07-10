@@ -18,17 +18,13 @@
  */
 package org.apache.maven.cling.invoker.mvnup;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Consumer;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.ParserRequest;
@@ -147,44 +143,6 @@ public class CommonsCliUpgradeOptions extends CommonsCliOptions implements Upgra
         public static final String MODEL = "model";
         public static final String PLUGINS = "plugins";
         public static final String ALL = "a";
-
-        /**
-         * Overrides the default strict parsing to silently ignore unrecognized options.
-         * This is necessary because mvnup inherits the Maven launcher's argument handling,
-         * which appends options from {@code .mvn/maven.config}. That file often contains
-         * Maven build options like {@code -ntp}, {@code -U}, or {@code -T} that mvnup
-         * does not recognize. Without this override, mvnup would abort with a
-         * {@link ParseException} before applying any fixes.
-         */
-        @Override
-        public CommandLine parse(String[] args) throws ParseException {
-            List<String> currentArgs = new ArrayList<>(List.of(args));
-            Set<String> removed = new HashSet<>();
-            while (true) {
-                try {
-                    return super.parse(currentArgs.toArray(new String[0]));
-                } catch (UnrecognizedOptionException e) {
-                    String badOption = e.getOption();
-                    if (removed.contains(badOption)) {
-                        // Already tried removing this option — give up
-                        throw e;
-                    }
-                    int idx = currentArgs.indexOf(badOption);
-                    if (idx < 0) {
-                        throw e;
-                    }
-                    currentArgs.remove(idx);
-                    // Also remove a trailing argument value (e.g. "-T" "4" → remove both)
-                    if (idx < currentArgs.size()) {
-                        String next = currentArgs.get(idx);
-                        if (!next.startsWith("-")) {
-                            currentArgs.remove(idx);
-                        }
-                    }
-                    removed.add(badOption);
-                }
-            }
-        }
 
         @Override
         protected void prepareOptions(org.apache.commons.cli.Options options) {
