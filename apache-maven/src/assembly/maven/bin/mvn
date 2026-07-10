@@ -290,10 +290,20 @@ cmd="\"$JAVACMD\" \
 
 if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
   echo "[DEBUG] Launching JVM with command:" >&2
-  printf '[DEBUG]   %s' "$cmd" >&2; printf ' %s' "$MAVEN_ARGS" >&2; printf ' "%s"' "$@" >&2; echo >&2
+  printf '[DEBUG]   %s' "$cmd" >&2
+  if [ "$MAVEN_MAIN_CLASS" = "org.apache.maven.cling.MavenCling" ]; then
+    printf ' %s' "$MAVEN_ARGS" >&2
+  fi
+  printf ' "%s"' "$@" >&2; echo >&2
 fi
 
 # User arguments ("$@") and MAVEN_ARGS are passed outside the eval'd string
 # to preserve literal values (backslashes, ${...} placeholders) without
 # shell re-parsing. Only the base command uses eval for MAVEN_OPTS word splitting.
-eval exec "$cmd" '$MAVEN_ARGS' '"$@"'
+# MAVEN_ARGS is only passed for the default Maven build command (MavenCling),
+# not for sub-commands like --up, --enc, or --shell which have their own options.
+if [ "$MAVEN_MAIN_CLASS" = "org.apache.maven.cling.MavenCling" ]; then
+  eval exec "$cmd" '$MAVEN_ARGS' '"$@"'
+else
+  eval exec "$cmd" '"$@"'
+fi
