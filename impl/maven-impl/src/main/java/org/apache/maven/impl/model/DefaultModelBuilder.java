@@ -2368,9 +2368,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     private List<Activation> getProfileActivations(Model model) {
-        return model.getProfiles().stream()
-                .map(Profile::getActivation)
-                .collect(Collectors.toList());
+        return model.getProfiles().stream().map(Profile::getActivation).collect(Collectors.toList());
     }
 
     private Model injectProfileActivations(Model model, List<Activation> activations) {

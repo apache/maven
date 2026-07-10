@@ -161,7 +161,8 @@ class DefaultModelBuilderTest {
                 .source(Sources.resolvedSource(
                         getPom("duplicate-profile-ids"), "org.apache.maven.test:duplicate-profile-ids:1.0.0"))
                 .build();
-        ModelBuilderResult result = assertDoesNotThrow(() -> builder.newSession().build(request));
+        ModelBuilderResult result =
+                assertDoesNotThrow(() -> builder.newSession().build(request));
         assertNotNull(result);
 
         List<Profile> profiles = result.getEffectiveModel().getProfiles();
@@ -174,9 +175,7 @@ class DefaultModelBuilderTest {
         assertEquals(
                 "duplicate.profile",
                 profiles.get(1).getActivation().getProperty().getName());
-        assertEquals(
-                "enabled",
-                profiles.get(1).getActivation().getProperty().getValue());
+        assertEquals("enabled", profiles.get(1).getActivation().getProperty().getValue());
     }
 
     @Test
