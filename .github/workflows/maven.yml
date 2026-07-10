@@ -136,6 +136,7 @@ jobs:
           java-version: ${{ matrix.java }}
           distribution: 'zulu'
           cache: 'maven'
+          show-download-progress: true # ITs verify transfer progress output
 
       - name: Set up Maven
         run:
