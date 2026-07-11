@@ -690,9 +690,8 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
                                 build.childElement(PLUGIN_MANAGEMENT).stream()
                                         .flatMap(pm -> pm.childElement(PLUGINS).stream()))));
 
-        pluginContainers.forEach(pluginsElement -> pluginsElement
-                .childElements(PLUGIN)
-                .forEach(pluginElement -> {
+        pluginContainers.forEach(
+                pluginsElement -> pluginsElement.childElements(PLUGIN).forEach(pluginElement -> {
                     String groupId = pluginElement.childText(MavenPomElements.Elements.GROUP_ID);
                     String artifactId = pluginElement.childText(MavenPomElements.Elements.ARTIFACT_ID);
 
