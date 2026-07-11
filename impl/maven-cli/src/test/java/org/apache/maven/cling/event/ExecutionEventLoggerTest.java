@@ -270,7 +270,7 @@ class ExecutionEventLoggerTest {
     }
 
     @Test
-    public void testSessionEndedSingleProject() {
+    void testSessionEndedSingleProject() {
         // prepare
         MavenExecutionResult executionResult = new DefaultMavenExecutionResult();
 
@@ -297,7 +297,7 @@ class ExecutionEventLoggerTest {
     }
 
     @Test
-    public void testSessionEndedSuccessMultimodule() {
+    void testSessionEndedSuccessMultimodule() {
         // prepare
         MavenProject project1 = generateMavenProject("Maven Project artifact1");
         MavenProject project2 = generateMavenProject("Maven Project artifact2");
@@ -343,10 +343,9 @@ class ExecutionEventLoggerTest {
     }
 
     @Test
-    public void testSessionEndedFailureMultimodule() {
+    void testSessionEndedFailureMultimodule() {
         // prepare
         MavenProject project1 = generateMavenProject("Maven Project artifact1");
-        when(project1.isExecutionRoot()).thenReturn(true);
 
         MavenProject project2 = generateMavenProject("Maven Project artifact2");
         MavenProject project3 = generateMavenProject("Maven Project artifact3");
@@ -381,6 +380,63 @@ class ExecutionEventLoggerTest {
         inOrder.verify(logger).info("");
         inOrder.verify(logger).info("...");
         inOrder.verify(logger).info("Maven Project artifact2 ............................ FAILURE [  2.000 s]");
+        inOrder.verify(logger).info("...");
+        inOrder.verify(logger).info("------------------------------------------------------------------------");
+        inOrder.verify(logger).info("BUILD FAILURE");
+        inOrder.verify(logger).info("------------------------------------------------------------------------");
+        inOrder.verify(logger).info(eq("Total time:  {}{}"), anyString(), anyString());
+        inOrder.verify(logger).info(eq("Finished at: {}"), anyString());
+        inOrder.verify(logger).info("------------------------------------------------------------------------");
+    }
+
+    @Test
+    void testSessionEndedFailureMultimoduleWithSeparatedFailures() {
+        // prepare
+        MavenProject project1 = generateMavenProject("Maven Project artifact1");
+        MavenProject project2 = generateMavenProject("Maven Project artifact2");
+        MavenProject project3 = generateMavenProject("Maven Project artifact3");
+        MavenProject project4 = generateMavenProject("Maven Project artifact4");
+        MavenProject project5 = generateMavenProject("Maven Project artifact5");
+        MavenProject project6 = generateMavenProject("Maven Project artifact6");
+
+        MavenExecutionResult executionResult = new DefaultMavenExecutionResult();
+        executionResult.addBuildSummary(new BuildSuccess(project1, 1000));
+        executionResult.addBuildSummary(new BuildFailure(project2, 2000, new Exception("Failure 1")));
+        executionResult.addBuildSummary(new BuildSuccess(project3, 3000));
+        executionResult.addBuildSummary(new BuildSuccess(project4, 4000));
+        executionResult.addBuildSummary(new BuildFailure(project5, 5000, new Exception("Failure 2")));
+        executionResult.addException(new Exception("Failure 1"));
+        executionResult.addException(new Exception("Failure 2"));
+
+        MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
+
+        ProjectDependencyGraph projectDependencyGraph = mock(ProjectDependencyGraph.class);
+        when(projectDependencyGraph.getSortedProjects())
+                .thenReturn(Arrays.asList(project1, project2, project3, project4, project5, project6));
+
+        MavenSession mavenSession = mock(MavenSession.class);
+        when(mavenSession.getResult()).thenReturn(executionResult);
+        when(mavenSession.getRequest()).thenReturn(executionRequest);
+        when(mavenSession.getProjects())
+                .thenReturn(Arrays.asList(project1, project2, project3, project4, project5, project6));
+        when(mavenSession.getTopLevelProject()).thenReturn(project1);
+        when(mavenSession.getProjectDependencyGraph()).thenReturn(projectDependencyGraph);
+
+        ExecutionEvent event = mock(ExecutionEvent.class);
+        when(event.getSession()).thenReturn(mavenSession);
+
+        // execute
+        executionEventLogger.sessionEnded(event);
+
+        // verify
+        InOrder inOrder = inOrder(logger);
+        inOrder.verify(logger).info("------------------------------------------------------------------------");
+        inOrder.verify(logger).info("Reactor Summary for Maven Project artifact1 3.5.4-SNAPSHOT:");
+        inOrder.verify(logger).info("");
+        inOrder.verify(logger).info("...");
+        inOrder.verify(logger).info("Maven Project artifact2 ............................ FAILURE [  2.000 s]");
+        inOrder.verify(logger).info("...");
+        inOrder.verify(logger).info("Maven Project artifact5 ............................ FAILURE [  5.000 s]");
         inOrder.verify(logger).info("...");
         inOrder.verify(logger).info("------------------------------------------------------------------------");
         inOrder.verify(logger).info("BUILD FAILURE");
