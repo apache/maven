@@ -170,6 +170,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
         String failureMessage = builder().failure("FAILURE").build();
         String unknownMessage = builder().warning("UNKNOWN").build();
 
+        boolean lastWasSkipped = false;
         for (MavenProject project : projects) {
             BuildSummary buildSummary = result.getBuildSummary(project);
 
@@ -187,10 +188,12 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
             }
 
             if (shouldSkip) {
-                if (project.isExecutionRoot()) {
-                    logger.info("...");
-                }
+                lastWasSkipped = true;
                 continue;
+            }
+            if (lastWasSkipped) {
+                logger.info("...");
+                lastWasSkipped = false;
             }
 
             StringBuilder buffer = new StringBuilder(128);
@@ -218,7 +221,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
             logger.info(buffer.toString());
         }
 
-        if (result.hasExceptions()) {
+        if (lastWasSkipped) {
             logger.info("...");
         }
     }

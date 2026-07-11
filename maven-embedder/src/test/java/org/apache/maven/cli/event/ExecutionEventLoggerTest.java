@@ -35,19 +35,25 @@ import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
+import org.mockito.Mockito;
+import org.mockito.MockitoSession;
 import org.slf4j.Logger;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ExecutionEventLoggerTest {
+    private MockitoSession mockitoSession;
+
     private ExecutionEventLogger executionEventLogger;
 
     private Logger logger;
@@ -64,9 +70,15 @@ public class ExecutionEventLoggerTest {
 
     @BeforeEach
     public void setup() {
+        mockitoSession = Mockito.mockitoSession().startMocking();
         logger = mock(Logger.class);
         when(logger.isInfoEnabled()).thenReturn(true);
         executionEventLogger = new ExecutionEventLogger(logger);
+    }
+
+    @AfterEach
+    public void afterEach() {
+        mockitoSession.finishMocking();
     }
 
     @Test
@@ -135,7 +147,6 @@ public class ExecutionEventLoggerTest {
     @Test
     public void testProjectStartedNoPom() {
         // prepare
-        File basedir = new File("").getAbsoluteFile();
         ExecutionEvent event = mock(ExecutionEvent.class);
         MavenProject project = mock(MavenProject.class);
         when(project.getGroupId()).thenReturn("org.apache.maven");
@@ -145,7 +156,6 @@ public class ExecutionEventLoggerTest {
         when(project.getVersion()).thenReturn("1");
         when(event.getProject()).thenReturn(project);
         when(project.getFile()).thenReturn(null);
-        when(project.getBasedir()).thenReturn(basedir);
 
         // execute
         executionEventLogger.projectStarted(event);
@@ -237,8 +247,6 @@ public class ExecutionEventLoggerTest {
     public void testSessionEndedFailureMultimodule() {
         // prepare
         MavenProject project1 = aProject("artifact1");
-        when(project1.isExecutionRoot()).thenReturn(true);
-
         MavenProject project2 = aProject("artifact2");
         MavenProject project3 = aProject("artifact3");
 
@@ -282,12 +290,70 @@ public class ExecutionEventLoggerTest {
         inOrder.verify(logger).info("------------------------------------------------------------------------");
     }
 
+    @Test
+    public void testSessionEndedFailureMultimoduleWithSeparatedFailures() {
+        // prepare
+        MavenProject project1 = aProject("artifact1");
+        MavenProject project2 = aProject("artifact2");
+        MavenProject project3 = aProject("artifact3");
+        MavenProject project4 = aProject("artifact4");
+        MavenProject project5 = aProject("artifact5");
+        MavenProject project6 = aProject("artifact6");
+
+        MavenExecutionResult executionResult = new DefaultMavenExecutionResult();
+        executionResult.addBuildSummary(new BuildSuccess(project1, 1000));
+        executionResult.addBuildSummary(new BuildFailure(project2, 2000, new Exception("Failure 1")));
+        executionResult.addBuildSummary(new BuildSuccess(project3, 3000));
+        executionResult.addBuildSummary(new BuildSuccess(project4, 4000));
+        executionResult.addBuildSummary(new BuildFailure(project5, 5000, new Exception("Failure 2")));
+        executionResult.addException(new Exception("Failure 1"));
+        executionResult.addException(new Exception("Failure 2"));
+
+        MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
+        executionRequest.setStartTime(new Date());
+
+        ProjectDependencyGraph projectDependencyGraph = mock(ProjectDependencyGraph.class);
+        when(projectDependencyGraph.getSortedProjects())
+                .thenReturn(Arrays.asList(project1, project2, project3, project4, project5, project6));
+
+        MavenSession mavenSession = mock(MavenSession.class);
+        when(mavenSession.getResult()).thenReturn(executionResult);
+        when(mavenSession.getRequest()).thenReturn(executionRequest);
+        when(mavenSession.getProjects())
+                .thenReturn(Arrays.asList(project1, project2, project3, project4, project5, project6));
+        when(mavenSession.getTopLevelProject()).thenReturn(project1);
+        when(mavenSession.getProjectDependencyGraph()).thenReturn(projectDependencyGraph);
+
+        ExecutionEvent event = mock(ExecutionEvent.class);
+        when(event.getSession()).thenReturn(mavenSession);
+
+        // execute
+        executionEventLogger.sessionEnded(event);
+
+        // verify
+        InOrder inOrder = inOrder(logger);
+        inOrder.verify(logger).info("------------------------------------------------------------------------");
+        inOrder.verify(logger).info("Reactor Summary for Maven Project artifact1 1.0.0-SNAPSHOT:");
+        inOrder.verify(logger).info("");
+        inOrder.verify(logger).info("...");
+        inOrder.verify(logger).info("Maven Project artifact2 ............................ FAILURE [  2.000 s]");
+        inOrder.verify(logger).info("...");
+        inOrder.verify(logger).info("Maven Project artifact5 ............................ FAILURE [  5.000 s]");
+        inOrder.verify(logger).info("...");
+        inOrder.verify(logger).info("------------------------------------------------------------------------");
+        inOrder.verify(logger).info("BUILD FAILURE");
+        inOrder.verify(logger).info("------------------------------------------------------------------------");
+        inOrder.verify(logger).info(eq("Total time:  {}{}"), anyString(), anyString());
+        inOrder.verify(logger).info(eq("Finished at: {}"), anyString());
+        inOrder.verify(logger).info("------------------------------------------------------------------------");
+    }
+
     private MavenProject aProject(String artifactId) {
         MavenProject project = mock(MavenProject.class);
-        when(project.getGroupId()).thenReturn("org.apache.maven");
-        when(project.getArtifactId()).thenReturn(artifactId);
-        when(project.getName()).thenReturn("Maven Project " + artifactId);
-        when(project.getVersion()).thenReturn("1.0.0-SNAPSHOT");
+        lenient().when(project.getGroupId()).thenReturn("org.apache.maven");
+        lenient().when(project.getArtifactId()).thenReturn(artifactId);
+        lenient().when(project.getName()).thenReturn("Maven Project " + artifactId);
+        lenient().when(project.getVersion()).thenReturn("1.0.0-SNAPSHOT");
 
         return project;
     }
