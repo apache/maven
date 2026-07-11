@@ -47,8 +47,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for the {@link PluginUpgradeStrategy} class.
- * Tests plugin version upgrades, plugin management additions, and Maven 4 compatibility.
+ * Unit tests for the {@link PluginUpgradeStrategy} class. Tests plugin version upgrades, plugin management additions,
+ * and Maven 4 compatibility.
  */
 @DisplayName("PluginUpgradeStrategy")
 class PluginUpgradeStrategyTest {
@@ -161,23 +161,23 @@ class PluginUpgradeStrategyTest {
         @DisplayName("should not modify plugin when version is already sufficient")
         void shouldNotModifyPluginWhenVersionAlreadySufficient() throws Exception {
             String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                    <build>
-                        <plugins>
-                            <plugin>
-                                <groupId>org.apache.maven.plugins</groupId>
-                                <artifactId>maven-compiler-plugin</artifactId>
-                                <version>3.13.0</version>
-                            </plugin>
-                        </plugins>
-                    </build>
-                </project>
-                """;
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>test</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-compiler-plugin</artifactId>
+                                    <version>3.13.0</version>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
 
             Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
@@ -193,23 +193,23 @@ class PluginUpgradeStrategyTest {
         @DisplayName("should upgrade milestone version below release minimum")
         void shouldUpgradeMilestoneVersionBelowRelease() throws Exception {
             String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                    <build>
-                        <plugins>
-                            <plugin>
-                                <groupId>org.apache.maven.plugins</groupId>
-                                <artifactId>maven-enforcer-plugin</artifactId>
-                                <version>3.0.0-M1</version>
-                            </plugin>
-                        </plugins>
-                    </build>
-                </project>
-                """;
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>test</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-enforcer-plugin</artifactId>
+                                    <version>3.0.0-M1</version>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
 
             Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
@@ -232,25 +232,25 @@ class PluginUpgradeStrategyTest {
         @DisplayName("should upgrade plugin in pluginManagement")
         void shouldUpgradePluginInPluginManagement() throws Exception {
             String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                    <build>
-                        <pluginManagement>
-                            <plugins>
-                                <plugin>
-                                    <groupId>org.apache.maven.plugins</groupId>
-                                    <artifactId>maven-enforcer-plugin</artifactId>
-                                    <version>2.0.0</version>
-                                </plugin>
-                            </plugins>
-                        </pluginManagement>
-                    </build>
-                </project>
-                """;
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>test</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0.0</version>
+                        <build>
+                            <pluginManagement>
+                                <plugins>
+                                    <plugin>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-enforcer-plugin</artifactId>
+                                        <version>2.0.0</version>
+                                    </plugin>
+                                </plugins>
+                            </pluginManagement>
+                        </build>
+                    </project>
+                    """;
 
             Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
@@ -274,26 +274,26 @@ class PluginUpgradeStrategyTest {
         @DisplayName("should upgrade plugin with property version")
         void shouldUpgradePluginWithPropertyVersion() throws Exception {
             String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                    <properties>
-                        <shade.plugin.version>3.0.0</shade.plugin.version>
-                    </properties>
-                    <build>
-                        <plugins>
-                            <plugin>
-                                <groupId>org.apache.maven.plugins</groupId>
-                                <artifactId>maven-shade-plugin</artifactId>
-                                <version>${shade.plugin.version}</version>
-                            </plugin>
-                        </plugins>
-                    </build>
-                </project>
-                """;
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>test</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0.0</version>
+                        <properties>
+                            <shade.plugin.version>3.0.0</shade.plugin.version>
+                        </properties>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-shade-plugin</artifactId>
+                                    <version>${shade.plugin.version}</version>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
 
             Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
@@ -317,23 +317,23 @@ class PluginUpgradeStrategyTest {
         @DisplayName("should upgrade surefire plugin when below minimum")
         void shouldUpgradeSurefirePluginWhenBelowMinimum() throws Exception {
             String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                    <build>
-                        <plugins>
-                            <plugin>
-                                <groupId>org.apache.maven.plugins</groupId>
-                                <artifactId>maven-surefire-plugin</artifactId>
-                                <version>3.1.2</version>
-                            </plugin>
-                        </plugins>
-                    </build>
-                </project>
-                """;
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>test</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-surefire-plugin</artifactId>
+                                    <version>3.1.2</version>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
 
             Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
@@ -356,23 +356,23 @@ class PluginUpgradeStrategyTest {
         @DisplayName("should upgrade failsafe plugin when below minimum")
         void shouldUpgradeFailsafePluginWhenBelowMinimum() throws Exception {
             String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                    <build>
-                        <plugins>
-                            <plugin>
-                                <groupId>org.apache.maven.plugins</groupId>
-                                <artifactId>maven-failsafe-plugin</artifactId>
-                                <version>3.1.2</version>
-                            </plugin>
-                        </plugins>
-                    </build>
-                </project>
-                """;
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>test</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-failsafe-plugin</artifactId>
+                                    <version>3.1.2</version>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
 
             Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
@@ -395,23 +395,23 @@ class PluginUpgradeStrategyTest {
         @DisplayName("should upgrade surefire-report plugin when below minimum")
         void shouldUpgradeSurefireReportPluginWhenBelowMinimum() throws Exception {
             String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                    <build>
-                        <plugins>
-                            <plugin>
-                                <groupId>org.apache.maven.plugins</groupId>
-                                <artifactId>maven-surefire-report-plugin</artifactId>
-                                <version>3.1.2</version>
-                            </plugin>
-                        </plugins>
-                    </build>
-                </project>
-                """;
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>test</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-surefire-report-plugin</artifactId>
+                                    <version>3.1.2</version>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
 
             Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
@@ -434,23 +434,23 @@ class PluginUpgradeStrategyTest {
         @DisplayName("should upgrade jaxb2-maven-plugin when below minimum")
         void shouldUpgradeJaxb2MavenPluginWhenBelowMinimum() throws Exception {
             String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                    <build>
-                        <plugins>
-                            <plugin>
-                                <groupId>org.codehaus.mojo</groupId>
-                                <artifactId>jaxb2-maven-plugin</artifactId>
-                                <version>3.1.0</version>
-                            </plugin>
-                        </plugins>
-                    </build>
-                </project>
-                """;
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>test</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.codehaus.mojo</groupId>
+                                    <artifactId>jaxb2-maven-plugin</artifactId>
+                                    <version>3.1.0</version>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
 
             Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
@@ -473,23 +473,23 @@ class PluginUpgradeStrategyTest {
         @DisplayName("should not upgrade when version is already higher")
         void shouldNotUpgradeWhenVersionAlreadyHigher() throws Exception {
             String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                    <build>
-                        <plugins>
-                            <plugin>
-                                <groupId>org.codehaus.mojo</groupId>
-                                <artifactId>flatten-maven-plugin</artifactId>
-                                <version>1.3.0</version>
-                            </plugin>
-                        </plugins>
-                    </build>
-                </project>
-                """;
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>test</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.codehaus.mojo</groupId>
+                                    <artifactId>flatten-maven-plugin</artifactId>
+                                    <version>1.3.0</version>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
 
             Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
@@ -512,22 +512,22 @@ class PluginUpgradeStrategyTest {
         @DisplayName("should upgrade plugin without explicit groupId")
         void shouldUpgradePluginWithoutExplicitGroupId() throws Exception {
             String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                    <build>
-                        <plugins>
-                            <plugin>
-                                <artifactId>maven-shade-plugin</artifactId>
-                                <version>3.1.0</version>
-                            </plugin>
-                        </plugins>
-                    </build>
-                </project>
-                """;
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>test</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <artifactId>maven-shade-plugin</artifactId>
+                                    <version>3.1.0</version>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
 
             Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
@@ -553,23 +553,23 @@ class PluginUpgradeStrategyTest {
         @DisplayName("should not upgrade plugin without version")
         void shouldNotUpgradePluginWithoutVersion() throws Exception {
             String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                    <build>
-                        <plugins>
-                            <plugin>
-                                <groupId>org.codehaus.mojo</groupId>
-                                <artifactId>exec-maven-plugin</artifactId>
-                                <!-- No version - inherited from parent or pluginManagement -->
-                            </plugin>
-                        </plugins>
-                    </build>
-                </project>
-                """;
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>test</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.codehaus.mojo</groupId>
+                                    <artifactId>exec-maven-plugin</artifactId>
+                                    <!-- No version - inherited from parent or pluginManagement -->
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
 
             Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
@@ -585,23 +585,23 @@ class PluginUpgradeStrategyTest {
         @DisplayName("should not upgrade when property is not found")
         void shouldNotUpgradeWhenPropertyNotFound() throws Exception {
             String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                    <build>
-                        <plugins>
-                            <plugin>
-                                <groupId>org.codehaus.mojo</groupId>
-                                <artifactId>exec-maven-plugin</artifactId>
-                                <version>${exec.plugin.version}</version>
-                            </plugin>
-                        </plugins>
-                    </build>
-                </project>
-                """;
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>test</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.codehaus.mojo</groupId>
+                                    <artifactId>exec-maven-plugin</artifactId>
+                                    <version>${exec.plugin.version}</version>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
 
             Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
@@ -622,30 +622,30 @@ class PluginUpgradeStrategyTest {
         @DisplayName("should upgrade extra-enforcer-rules dependency when below minimum")
         void shouldUpgradeExtraEnforcerRulesDependency() throws Exception {
             String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                    <build>
-                        <plugins>
-                            <plugin>
-                                <groupId>org.apache.maven.plugins</groupId>
-                                <artifactId>maven-enforcer-plugin</artifactId>
-                                <version>3.5.0</version>
-                                <dependencies>
-                                    <dependency>
-                                        <groupId>org.codehaus.mojo</groupId>
-                                        <artifactId>extra-enforcer-rules</artifactId>
-                                        <version>1.0-beta-4</version>
-                                    </dependency>
-                                </dependencies>
-                            </plugin>
-                        </plugins>
-                    </build>
-                </project>
-                """;
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>test</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-enforcer-plugin</artifactId>
+                                    <version>3.5.0</version>
+                                    <dependencies>
+                                        <dependency>
+                                            <groupId>org.codehaus.mojo</groupId>
+                                            <artifactId>extra-enforcer-rules</artifactId>
+                                            <version>1.0-beta-4</version>
+                                        </dependency>
+                                    </dependencies>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
 
             Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
@@ -665,30 +665,30 @@ class PluginUpgradeStrategyTest {
         @DisplayName("should not upgrade extra-enforcer-rules when version is already sufficient")
         void shouldNotUpgradeExtraEnforcerRulesWhenSufficient() throws Exception {
             String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                    <build>
-                        <plugins>
-                            <plugin>
-                                <groupId>org.apache.maven.plugins</groupId>
-                                <artifactId>maven-enforcer-plugin</artifactId>
-                                <version>3.5.0</version>
-                                <dependencies>
-                                    <dependency>
-                                        <groupId>org.codehaus.mojo</groupId>
-                                        <artifactId>extra-enforcer-rules</artifactId>
-                                        <version>1.8.0</version>
-                                    </dependency>
-                                </dependencies>
-                            </plugin>
-                        </plugins>
-                    </build>
-                </project>
-                """;
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>test</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-enforcer-plugin</artifactId>
+                                    <version>3.5.0</version>
+                                    <dependencies>
+                                        <dependency>
+                                            <groupId>org.codehaus.mojo</groupId>
+                                            <artifactId>extra-enforcer-rules</artifactId>
+                                            <version>1.8.0</version>
+                                        </dependency>
+                                    </dependencies>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
 
             Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
@@ -709,23 +709,23 @@ class PluginUpgradeStrategyTest {
         @DisplayName("should add pluginManagement before existing plugins section")
         void shouldAddPluginManagementBeforeExistingPluginsSection() throws Exception {
             String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                    <build>
-                        <plugins>
-                            <plugin>
-                                <groupId>org.apache.maven.plugins</groupId>
-                                <artifactId>maven-compiler-plugin</artifactId>
-                                <version>3.8.1</version>
-                            </plugin>
-                        </plugins>
-                    </build>
-                </project>
-                """;
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>test</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-compiler-plugin</artifactId>
+                                    <version>3.8.1</version>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
 
             Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
@@ -819,19 +819,19 @@ class PluginUpgradeStrategyTest {
             // still get a pluginManagement override with a comment explaining it overrides
             // the parent, so that Maven 4 incompatible plugin versions get upgraded.
             String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <parent>
-                        <groupId>org.apache</groupId>
-                        <artifactId>apache</artifactId>
-                        <version>23</version>
-                    </parent>
-                    <groupId>org.example</groupId>
-                    <artifactId>test-child</artifactId>
-                    <version>1.0.0-SNAPSHOT</version>
-                </project>
-                """;
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <parent>
+                            <groupId>org.apache</groupId>
+                            <artifactId>apache</artifactId>
+                            <version>23</version>
+                        </parent>
+                        <groupId>org.example</groupId>
+                        <artifactId>test-child</artifactId>
+                        <version>1.0.0-SNAPSHOT</version>
+                    </project>
+                    """;
 
             Path tempDir = Files.createTempDirectory("mvnup-test-");
             try {
@@ -858,6 +858,9 @@ class PluginUpgradeStrategyTest {
                 assertTrue(
                         xml.contains("<artifactId>maven-enforcer-plugin</artifactId>"),
                         "Should add pluginManagement for maven-enforcer-plugin");
+                // Verify the comment is on its own line, not appended to the previous closing tag
+                assertFalse(
+                        xml.contains("</plugin><!--"), "Comment should be on its own line, not appended to </plugin>");
             } finally {
                 try (var walk = Files.walk(tempDir)) {
                     walk.sorted(java.util.Comparator.reverseOrder()).forEach(p -> {
@@ -878,19 +881,19 @@ class PluginUpgradeStrategyTest {
             // In this case, adding a pluginManagement override with a comment in the child
             // is sufficient; no direct build/plugins entry should be added for enforcer.
             String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <parent>
-                        <groupId>org.apache</groupId>
-                        <artifactId>apache</artifactId>
-                        <version>23</version>
-                    </parent>
-                    <groupId>org.example</groupId>
-                    <artifactId>test-child</artifactId>
-                    <version>1.0.0-SNAPSHOT</version>
-                </project>
-                """;
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <parent>
+                            <groupId>org.apache</groupId>
+                            <artifactId>apache</artifactId>
+                            <version>23</version>
+                        </parent>
+                        <groupId>org.example</groupId>
+                        <artifactId>test-child</artifactId>
+                        <version>1.0.0-SNAPSHOT</version>
+                    </project>
+                    """;
 
             Document document = Document.of(pomXml);
             Path pomPath = Paths.get("/project/pom.xml").toAbsolutePath();
@@ -918,6 +921,8 @@ class PluginUpgradeStrategyTest {
             assertTrue(
                     xml.contains("Override version inherited from parent"),
                     "Should add comment explaining the override");
+            // Verify the comment is on its own line, not appended to the previous closing tag
+            assertFalse(xml.contains("</plugin><!--"), "Comment should be on its own line, not appended to </plugin>");
 
             // Verify NO direct build/plugins entry for enforcer (PM override is sufficient)
             Element buildPlugins = root.childElement("build")
@@ -940,28 +945,28 @@ class PluginUpgradeStrategyTest {
         @DisplayName("should not duplicate plugin in build/plugins when already locally declared")
         void shouldNotDuplicatePluginInBuildPluginsWhenAlreadyDeclared() throws Exception {
             String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <parent>
-                        <groupId>org.apache</groupId>
-                        <artifactId>apache</artifactId>
-                        <version>23</version>
-                    </parent>
-                    <groupId>org.example</groupId>
-                    <artifactId>test-child</artifactId>
-                    <version>1.0.0-SNAPSHOT</version>
-                    <build>
-                        <plugins>
-                            <plugin>
-                                <groupId>org.apache.maven.plugins</groupId>
-                                <artifactId>maven-enforcer-plugin</artifactId>
-                                <version>3.0.0</version>
-                            </plugin>
-                        </plugins>
-                    </build>
-                </project>
-                """;
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <parent>
+                            <groupId>org.apache</groupId>
+                            <artifactId>apache</artifactId>
+                            <version>23</version>
+                        </parent>
+                        <groupId>org.example</groupId>
+                        <artifactId>test-child</artifactId>
+                        <version>1.0.0-SNAPSHOT</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-enforcer-plugin</artifactId>
+                                    <version>3.0.0</version>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
 
             Document document = Document.of(pomXml);
             Path pomPath = Paths.get("/project/pom.xml").toAbsolutePath();
@@ -1009,27 +1014,27 @@ class PluginUpgradeStrategyTest {
             // Since the child does declare the plugin, mvnup should add a pluginManagement
             // entry to override the inherited version.
             String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <parent>
-                        <groupId>org.apache</groupId>
-                        <artifactId>apache</artifactId>
-                        <version>23</version>
-                    </parent>
-                    <groupId>org.example</groupId>
-                    <artifactId>test-child</artifactId>
-                    <version>1.0.0-SNAPSHOT</version>
-                    <build>
-                        <plugins>
-                            <plugin>
-                                <groupId>org.apache.maven.plugins</groupId>
-                                <artifactId>maven-enforcer-plugin</artifactId>
-                            </plugin>
-                        </plugins>
-                    </build>
-                </project>
-                """;
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <parent>
+                            <groupId>org.apache</groupId>
+                            <artifactId>apache</artifactId>
+                            <version>23</version>
+                        </parent>
+                        <groupId>org.example</groupId>
+                        <artifactId>test-child</artifactId>
+                        <version>1.0.0-SNAPSHOT</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-enforcer-plugin</artifactId>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
 
             Path tempDir = Files.createTempDirectory("mvnup-test-");
             try {
@@ -1074,17 +1079,17 @@ class PluginUpgradeStrategyTest {
         @DisplayName("should warn when effective model analysis fails for POM with unresolvable remote parent")
         void shouldWarnWhenEffectiveModelAnalysisFailsForUnresolvableRemoteParent() throws Exception {
             String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <parent>
-                        <groupId>com.nonexistent.test</groupId>
-                        <artifactId>nonexistent-parent</artifactId>
-                        <version>1.0.0</version>
-                    </parent>
-                    <artifactId>test-child</artifactId>
-                </project>
-                """;
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <parent>
+                            <groupId>com.nonexistent.test</groupId>
+                            <artifactId>nonexistent-parent</artifactId>
+                            <version>1.0.0</version>
+                        </parent>
+                        <artifactId>test-child</artifactId>
+                    </project>
+                    """;
 
             Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
@@ -1104,21 +1109,21 @@ class PluginUpgradeStrategyTest {
         @DisplayName("should handle malformed POM gracefully")
         void shouldHandleMalformedPOMGracefully() throws Exception {
             String malformedPomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                    <build>
-                        <plugins>
-                            <plugin>
-                                <!-- Missing required elements -->
-                            </plugin>
-                        </plugins>
-                    </build>
-                </project>
-                """;
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>test</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <!-- Missing required elements -->
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
 
             Document document = Document.of(malformedPomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
@@ -1129,6 +1134,478 @@ class PluginUpgradeStrategyTest {
             // Strategy should handle malformed POMs gracefully
             assertNotNull(result, "Result should not be null");
             assertTrue(result.processedPoms().contains(Paths.get("pom.xml")), "POM should be marked as processed");
+        }
+    }
+
+    @Nested
+    @DisplayName("Quarkus Plugin Upgrades")
+    class QuarkusPluginUpgradeTests {
+
+        @Test
+        @DisplayName("should upgrade quarkus-maven-plugin with io.quarkus groupId when below minimum")
+        void shouldUpgradeQuarkusPluginWithIoQuarkusGroupId() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>io.quarkus</groupId>
+                                <artifactId>quarkus-maven-plugin</artifactId>
+                                <version>3.16.3</version>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Plugin upgrade should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have upgraded quarkus-maven-plugin");
+
+            Editor editor = new Editor(document);
+            String version = editor.root()
+                    .path("build", "plugins", "plugin", "version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals("3.26.0", version, "quarkus-maven-plugin should be upgraded to 3.26.0");
+        }
+
+        @Test
+        @DisplayName("should upgrade quarkus-maven-plugin with io.quarkus.platform groupId when below minimum")
+        void shouldUpgradeQuarkusPluginWithPlatformGroupId() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>io.quarkus.platform</groupId>
+                                <artifactId>quarkus-maven-plugin</artifactId>
+                                <version>3.16.3</version>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Plugin upgrade should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have upgraded quarkus-maven-plugin");
+
+            Editor editor = new Editor(document);
+            String version = editor.root()
+                    .path("build", "plugins", "plugin", "version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals("3.26.0", version, "quarkus-maven-plugin should be upgraded to 3.26.0");
+        }
+
+        @Test
+        @DisplayName("should not upgrade quarkus-maven-plugin when version is already sufficient")
+        void shouldNotUpgradeQuarkusPluginWhenVersionSufficient() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>io.quarkus</groupId>
+                                <artifactId>quarkus-maven-plugin</artifactId>
+                                <version>3.31.4</version>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            strategy.doApply(context, pomMap);
+
+            Editor editor = new Editor(document);
+            String version = editor.root()
+                    .path("build", "plugins", "plugin", "version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals("3.31.4", version, "Version 3.31.4 should be preserved");
+        }
+
+        @Test
+        @DisplayName("should decouple plugin version from shared BOM property")
+        void shouldDecouplePluginVersionFromSharedBomProperty() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <properties>
+                        <quarkus.platform.version>3.16.3</quarkus.platform.version>
+                    </properties>
+                    <dependencyManagement>
+                        <dependencies>
+                            <dependency>
+                                <groupId>io.quarkus.platform</groupId>
+                                <artifactId>quarkus-bom</artifactId>
+                                <version>${quarkus.platform.version}</version>
+                                <type>pom</type>
+                                <scope>import</scope>
+                            </dependency>
+                        </dependencies>
+                    </dependencyManagement>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>io.quarkus</groupId>
+                                <artifactId>quarkus-maven-plugin</artifactId>
+                                <version>${quarkus.platform.version}</version>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Plugin upgrade should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have modified POM");
+
+            // BOM property should be unchanged
+            Editor editor = new Editor(document);
+            String bomVersion = editor.root()
+                    .path("properties", "quarkus.platform.version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals("3.16.3", bomVersion, "BOM property should remain unchanged at 3.16.3");
+
+            // New property should be introduced
+            String pluginVersion = editor.root()
+                    .path("properties", "quarkus-plugin.version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals("3.26.0", pluginVersion, "New quarkus-plugin.version property should be 3.26.0");
+
+            // Plugin version should reference the new property
+            String pluginVersionRef = editor.root()
+                    .path("build", "plugins", "plugin", "version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals(
+                    "${quarkus-plugin.version}",
+                    pluginVersionRef,
+                    "Plugin should reference the new quarkus-plugin.version property");
+        }
+
+        @Test
+        @DisplayName("should not decouple when plugin has its own property not shared with BOM")
+        void shouldNotDecoupleWhenPluginHasOwnProperty() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <properties>
+                        <quarkus-plugin.version>3.16.3</quarkus-plugin.version>
+                    </properties>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>io.quarkus</groupId>
+                                <artifactId>quarkus-maven-plugin</artifactId>
+                                <version>${quarkus-plugin.version}</version>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Plugin upgrade should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have upgraded quarkus-maven-plugin");
+
+            // The property should be upgraded directly (no decoupling needed)
+            Editor editor = new Editor(document);
+            String version = editor.root()
+                    .path("properties", "quarkus-plugin.version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals("3.26.0", version, "Property should be upgraded directly to 3.26.0");
+
+            // Plugin should still reference the same property
+            String pluginVersionRef = editor.root()
+                    .path("build", "plugins", "plugin", "version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals(
+                    "${quarkus-plugin.version}", pluginVersionRef, "Plugin should still reference the same property");
+        }
+
+        @Test
+        @DisplayName("should not decouple when BOM version is already sufficient")
+        void shouldNotDecoupleWhenBomVersionSufficient() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <properties>
+                        <quarkus.platform.version>3.31.4</quarkus.platform.version>
+                    </properties>
+                    <dependencyManagement>
+                        <dependencies>
+                            <dependency>
+                                <groupId>io.quarkus.platform</groupId>
+                                <artifactId>quarkus-bom</artifactId>
+                                <version>${quarkus.platform.version}</version>
+                                <type>pom</type>
+                                <scope>import</scope>
+                            </dependency>
+                        </dependencies>
+                    </dependencyManagement>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>io.quarkus</groupId>
+                                <artifactId>quarkus-maven-plugin</artifactId>
+                                <version>${quarkus.platform.version}</version>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            strategy.doApply(context, pomMap);
+
+            // No new property should be introduced — version is already sufficient
+            Editor editor = new Editor(document);
+            String bomVersion = editor.root()
+                    .path("properties", "quarkus.platform.version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals("3.31.4", bomVersion, "BOM property should remain unchanged");
+
+            // No quarkus-plugin.version should exist
+            Element newProp =
+                    editor.root().path("properties", "quarkus-plugin.version").orElse(null);
+            assertTrue(newProp == null, "Should not introduce new property when version is already sufficient");
+        }
+
+        @Test
+        @DisplayName("should emit version gap warning when decoupling")
+        void shouldEmitVersionGapWarningWhenDecoupling() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <properties>
+                        <quarkus.platform.version>3.16.3</quarkus.platform.version>
+                    </properties>
+                    <dependencyManagement>
+                        <dependencies>
+                            <dependency>
+                                <groupId>io.quarkus.platform</groupId>
+                                <artifactId>quarkus-bom</artifactId>
+                                <version>${quarkus.platform.version}</version>
+                                <type>pom</type>
+                                <scope>import</scope>
+                            </dependency>
+                        </dependencies>
+                    </dependencyManagement>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>io.quarkus</groupId>
+                                <artifactId>quarkus-maven-plugin</artifactId>
+                                <version>${quarkus.platform.version}</version>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            strategy.doApply(context, pomMap);
+
+            // Verify warning was emitted about the version gap
+            verify(context.logger, atLeastOnce())
+                    .warn(argThat(msg -> msg.contains("quarkus-maven-plugin upgraded to 3.26.0")
+                            && msg.contains("3.16.3")
+                            && msg.contains("mismatched plugin and platform")));
+        }
+
+        @Test
+        @DisplayName("should include quarkus-maven-plugin in predefined plugin upgrades")
+        void shouldIncludeQuarkusPluginInPredefinedUpgrades() {
+            List<PluginUpgrade> upgrades = PluginUpgradeStrategy.getPluginUpgrades();
+
+            boolean hasIoQuarkus = upgrades.stream()
+                    .anyMatch(u -> "io.quarkus".equals(u.groupId()) && "quarkus-maven-plugin".equals(u.artifactId()));
+            boolean hasIoQuarkusPlatform = upgrades.stream()
+                    .anyMatch(u ->
+                            "io.quarkus.platform".equals(u.groupId()) && "quarkus-maven-plugin".equals(u.artifactId()));
+
+            assertTrue(hasIoQuarkus, "Should include io.quarkus:quarkus-maven-plugin upgrade");
+            assertTrue(hasIoQuarkusPlatform, "Should include io.quarkus.platform:quarkus-maven-plugin upgrade");
+
+            // Verify the reason text
+            upgrades.stream()
+                    .filter(u -> "quarkus-maven-plugin".equals(u.artifactId()))
+                    .forEach(u -> assertEquals(
+                            "Maven 4 compatibility (Aether API changes)",
+                            u.reason(),
+                            "Quarkus plugin upgrade should have the correct reason"));
+        }
+
+        @Test
+        @DisplayName("should upgrade quarkus-maven-plugin in pluginManagement")
+        void shouldUpgradeQuarkusPluginInPluginManagement() throws Exception {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <pluginManagement>
+                            <plugins>
+                                <plugin>
+                                    <groupId>io.quarkus</groupId>
+                                    <artifactId>quarkus-maven-plugin</artifactId>
+                                    <version>3.16.3</version>
+                                </plugin>
+                            </plugins>
+                        </pluginManagement>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Plugin upgrade should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have upgraded quarkus-maven-plugin in pluginManagement");
+
+            Editor editor = new Editor(document);
+            String version = editor.root()
+                    .path("build", "pluginManagement", "plugins", "plugin", "version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals("3.26.0", version, "quarkus-maven-plugin in pluginManagement should be upgraded to 3.26.0");
+        }
+
+        @Test
+        @DisplayName("should not decouple when shared property is inherited from parent POM")
+        void shouldNotDecoupleWhenSharedPropertyIsInherited() throws Exception {
+            // The shared property is NOT declared in this POM — it's inherited from a parent.
+            // We cannot resolve its value, so decoupling should be skipped to avoid
+            // introducing a quarkus-plugin.version=3.26.0 that might downgrade an already-sufficient version.
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <parent>
+                        <groupId>org.example</groupId>
+                        <artifactId>parent</artifactId>
+                        <version>1.0.0</version>
+                    </parent>
+                    <artifactId>child</artifactId>
+                    <dependencyManagement>
+                        <dependencies>
+                            <dependency>
+                                <groupId>io.quarkus.platform</groupId>
+                                <artifactId>quarkus-bom</artifactId>
+                                <version>${quarkus.platform.version}</version>
+                                <type>pom</type>
+                                <scope>import</scope>
+                            </dependency>
+                        </dependencies>
+                    </dependencyManagement>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>io.quarkus</groupId>
+                                <artifactId>quarkus-maven-plugin</artifactId>
+                                <version>${quarkus.platform.version}</version>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            strategy.doApply(context, pomMap);
+
+            Editor editor = new Editor(document);
+            Element newProp =
+                    editor.root().path("properties", "quarkus-plugin.version").orElse(null);
+            assertTrue(
+                    newProp == null, "Should not introduce quarkus-plugin.version when shared property is inherited");
+
+            // The plugin version reference should remain unchanged
+            String pluginVersion = editor.root()
+                    .path("build", "plugins", "plugin", "version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals(
+                    "${quarkus.platform.version}",
+                    pluginVersion,
+                    "Plugin version should remain as the inherited property reference");
         }
     }
 
@@ -1155,23 +1632,23 @@ class PluginUpgradeStrategyTest {
         @DisplayName("should format pluginManagement with proper indentation")
         void shouldFormatPluginManagementWithProperIndentation() throws Exception {
             String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                    <build>
-                        <plugins>
-                            <plugin>
-                                <groupId>org.apache.maven.plugins</groupId>
-                                <artifactId>maven-compiler-plugin</artifactId>
-                                <version>3.1</version>
-                            </plugin>
-                        </plugins>
-                    </build>
-                </project>
-                """;
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>test</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-compiler-plugin</artifactId>
+                                    <version>3.1</version>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
 
             Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
@@ -1200,23 +1677,23 @@ class PluginUpgradeStrategyTest {
         void shouldFormatPluginManagementWithProperIndentationWhenAdded() throws Exception {
             // Use a POM that will trigger pluginManagement addition by having a plugin without version
             String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                    <build>
-                        <plugins>
-                            <plugin>
-                                <groupId>org.apache.maven.plugins</groupId>
-                                <artifactId>maven-enforcer-plugin</artifactId>
-                                <!-- No version - should trigger pluginManagement addition -->
-                            </plugin>
-                        </plugins>
-                    </build>
-                </project>
-                """;
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>test</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-enforcer-plugin</artifactId>
+                                    <!-- No version - should trigger pluginManagement addition -->
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
 
             Document document = Document.of(pomXml);
             Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
