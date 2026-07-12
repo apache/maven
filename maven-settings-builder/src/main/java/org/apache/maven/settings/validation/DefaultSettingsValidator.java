@@ -93,6 +93,23 @@ public class DefaultSettingsValidator implements SettingsValidator {
                             "must be unique but found duplicate server with id " + server.getId());
                 }
             }
+
+            for (int i = 0; i < servers.size(); i++) {
+                Server server = servers.get(i);
+                for (int a = 0; a < server.getAliases().size(); a++) {
+                    String alias = server.getAliases().get(a);
+                    validateStringNotEmpty(
+                            problems, "servers.server[" + i + "].aliases[" + a + "]", alias, server.getId());
+                    if (!serverIds.add(alias)) {
+                        addViolation(
+                                problems,
+                                Severity.WARNING,
+                                "servers.server[" + i + "].aliases[" + a + "]",
+                                server.getId(),
+                                "must be unique across all server ids and aliases but found duplicate alias " + alias);
+                    }
+                }
+            }
         }
 
         List<Mirror> mirrors = settings.getMirrors();
