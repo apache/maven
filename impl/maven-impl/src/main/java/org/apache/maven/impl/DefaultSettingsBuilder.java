@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.ProtoSession;
@@ -62,7 +63,6 @@ import org.codehaus.plexus.components.secdispatcher.internal.DefaultSecDispatche
 
 /**
  * Builds the effective settings from a user settings file and/or a global settings file.
- *
  */
 @Named
 public class DefaultSettingsBuilder implements SettingsBuilder {
@@ -205,7 +205,9 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
         settingsValidator.validate(settings, isProjectSettings, problems);
 
-        if (isProjectSettings) {
+        if (!isProjectSettings) {
+            settings = settings.withServers(serversByIds(settings.getServers()));
+        } else {
             settings = Settings.newBuilder(settings, true)
                     .localRepository(null)
                     .interactiveMode(false)
@@ -220,12 +222,24 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                                     .password(null)
                                     .filePermissions(null)
                                     .directoryPermissions(null)
+                                    .aliases(List.of())
                                     .build())
                             .toList())
                     .build();
         }
 
         return settings;
+    }
+
+    private List<Server> serversByIds(List<Server> servers) {
+        return servers.stream()
+                .flatMap(server -> Stream.concat(
+                        Stream.of(server), server.getAliases().stream().map(id -> serverAlias(server, id))))
+                .toList();
+    }
+
+    private Server serverAlias(Server server, String id) {
+        return Server.newBuilder(server, true).id(id).aliases(List.of()).build();
     }
 
     private Settings interpolate(
@@ -348,7 +362,6 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
     /**
      * Collects the output of the settings builder.
-     *
      */
     static class DefaultSettingsBuilderResult implements SettingsBuilderResult {
 
