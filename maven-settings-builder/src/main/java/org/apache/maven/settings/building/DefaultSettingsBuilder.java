@@ -27,12 +27,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.maven.building.FileSource;
 import org.apache.maven.building.Source;
+import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.TrackableBase;
 import org.apache.maven.settings.io.SettingsParseException;
@@ -209,6 +213,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         }
 
         settingsValidator.validate(settings, problems);
+        settings.setServers(new ArrayList<>(serversByIds(settings.getServers())));
 
         return settings;
     }
@@ -268,5 +273,19 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                     SettingsProblem.Severity.ERROR, "Failed to interpolate settings: " + e.getMessage(), -1, -1, e);
             return serializedSettings;
         }
+    }
+
+    private List<Server> serversByIds(List<Server> servers) {
+        return servers.stream()
+                .flatMap(server -> Stream.concat(
+                        Stream.of(server), server.getAliases().stream().map(id -> serverAlias(server, id))))
+                .collect(Collectors.toList());
+    }
+
+    private Server serverAlias(Server server, String id) {
+        Server alias = server.clone();
+        alias.setId(id);
+        alias.setAliases(Collections.emptyList());
+        return alias;
     }
 }
