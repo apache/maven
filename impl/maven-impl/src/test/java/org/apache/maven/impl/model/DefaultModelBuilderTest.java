@@ -444,6 +444,78 @@ class DefaultModelBuilderTest {
                 "Managed dependency version should be interpolated, not ${managed.version}");
     }
 
+    @Test
+    void testFilterUninterpolatedManagedDependenciesNoManagement() {
+        Model model = Model.newInstance();
+        Model result = DefaultModelBuilder.filterUninterpolatedManagedDependencies(model);
+        assertNull(result.getDependencyManagement());
+    }
+
+    @Test
+    void testFilterUninterpolatedManagedDependenciesAllInterpolated() {
+        Model model = Model.newBuilder()
+                .dependencyManagement(org.apache.maven.api.model.DependencyManagement.newBuilder()
+                        .dependencies(List.of(
+                                Dependency.newBuilder()
+                                        .groupId("org.example")
+                                        .artifactId("lib-a")
+                                        .version("1.0")
+                                        .build(),
+                                Dependency.newBuilder()
+                                        .groupId("org.example")
+                                        .artifactId("lib-b")
+                                        .version("2.0")
+                                        .build()))
+                        .build())
+                .build();
+        Model result = DefaultModelBuilder.filterUninterpolatedManagedDependencies(model);
+        assertEquals(2, result.getDependencyManagement().getDependencies().size());
+    }
+
+    @Test
+    void testFilterUninterpolatedManagedDependenciesRemovesUninterpolatedVersion() {
+        Model model = Model.newBuilder()
+                .dependencyManagement(org.apache.maven.api.model.DependencyManagement.newBuilder()
+                        .dependencies(List.of(
+                                Dependency.newBuilder()
+                                        .groupId("org.example")
+                                        .artifactId("lib-a")
+                                        .version("1.0")
+                                        .build(),
+                                Dependency.newBuilder()
+                                        .groupId("org.example")
+                                        .artifactId("lib-bad")
+                                        .version("${undefined.version}")
+                                        .build(),
+                                Dependency.newBuilder()
+                                        .groupId("org.example")
+                                        .artifactId("lib-c")
+                                        .version("3.0")
+                                        .build()))
+                        .build())
+                .build();
+        Model result = DefaultModelBuilder.filterUninterpolatedManagedDependencies(model);
+        List<Dependency> deps = result.getDependencyManagement().getDependencies();
+        assertEquals(2, deps.size());
+        assertEquals("lib-a", deps.get(0).getArtifactId());
+        assertEquals("lib-c", deps.get(1).getArtifactId());
+    }
+
+    @Test
+    void testFilterUninterpolatedManagedDependenciesRemovesUninterpolatedGroupId() {
+        Model model = Model.newBuilder()
+                .dependencyManagement(org.apache.maven.api.model.DependencyManagement.newBuilder()
+                        .dependencies(List.of(Dependency.newBuilder()
+                                .groupId("${project.groupId}")
+                                .artifactId("lib")
+                                .version("1.0")
+                                .build()))
+                        .build())
+                .build();
+        Model result = DefaultModelBuilder.filterUninterpolatedManagedDependencies(model);
+        assertTrue(result.getDependencyManagement().getDependencies().isEmpty());
+    }
+
     private Path getPom(String name) {
         return Paths.get("src/test/resources/poms/factory/" + name + ".xml").toAbsolutePath();
     }

@@ -1009,6 +1009,14 @@ public class DefaultModelBuilder implements ModelBuilder {
                 resultModel = transformer.transformEffectiveModel(resultModel);
             }
 
+            // Filter out managed dependencies with uninterpolated property expressions.
+            // Published POMs may declare managed dependencies whose versions reference properties
+            // not defined in the consumer's context (e.g. ${osgi.version}, ${guava-version}).
+            // Maven 3 silently ignored these when unused; Maven 4's resolver validator rejects
+            // them during collectDependencies(), causing "Invalid Collect Request: null" errors.
+            // By stripping them here, all consumers (plugins, lifecycle, etc.) get a clean model.
+            resultModel = filterUninterpolatedManagedDependencies(resultModel);
+
             result.setEffectiveModel(resultModel);
             // Set the default relative path for the parent in the file model
             if (result.getFileModel().getParent() != null
@@ -2387,6 +2395,56 @@ public class DefaultModelBuilder implements ModelBuilder {
             profiles.add(profile);
         }
         return modified ? model.withProfiles(profiles) : model;
+    }
+
+    /**
+     * Filters out managed dependencies whose groupId, artifactId, or version still contains
+     * unresolved {@code ${…}} property expressions after model interpolation.
+     * <p>
+     * Published POMs in Maven repositories sometimes declare managed dependencies that reference
+     * properties defined only in their own build context. When such a POM is consumed as a
+     * transitive dependency or imported BOM, those properties may not be available, leaving
+     * the expressions unresolved. Maven 3 silently tolerated these entries (they only mattered
+     * if actually used). Maven 4's stricter resolver validator rejects them during
+     * {@code collectDependencies()}, causing an "Invalid Collect Request: null" build failure
+     * even when the managed dependency is never actually used.
+     * <p>
+     * Filtering at the effective model level ensures all consumers — lifecycle dependency
+     * resolution, third-party plugins (e.g. enforcer), and any code using
+     * {@code project.getDependencyManagement()} — see only fully interpolated entries.
+     *
+     * @param model the effective model after interpolation
+     * @return the model with uninterpolated managed dependencies removed
+     * @see <a href="https://github.com/apache/maven/issues/12474">gh-12474</a>
+     */
+    static Model filterUninterpolatedManagedDependencies(Model model) {
+        DependencyManagement mgmt = model.getDependencyManagement();
+        if (mgmt == null || mgmt.getDependencies().isEmpty()) {
+            return model;
+        }
+        List<Dependency> filtered = null;
+        List<Dependency> deps = mgmt.getDependencies();
+        for (int i = 0; i < deps.size(); i++) {
+            Dependency dep = deps.get(i);
+            if (containsExpression(dep.getGroupId())
+                    || containsExpression(dep.getArtifactId())
+                    || containsExpression(dep.getVersion())) {
+                if (filtered == null) {
+                    // lazily copy the list up to this point
+                    filtered = new ArrayList<>(deps.subList(0, i));
+                }
+            } else if (filtered != null) {
+                filtered.add(dep);
+            }
+        }
+        if (filtered == null) {
+            return model;
+        }
+        return model.withDependencyManagement(mgmt.withDependencies(filtered));
+    }
+
+    private static boolean containsExpression(String value) {
+        return value != null && value.contains("${");
     }
 
     private Model interpolateModel(Model model, ModelBuilderRequest request, ModelProblemCollector problems) {
