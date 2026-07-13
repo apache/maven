@@ -47,6 +47,6 @@ public abstract class AbstractProjectInheritanceTestCase extends AbstractMavenPr
     // ----------------------------------------------------------------------
 
     protected File getLocalRepositoryPath() {
-        return getTestFile("src/test/resources/inheritance-repo/" + getTestSeries());
+        return getTestFile("target/test-classes/inheritance-repo/" + getTestSeries());
     }
 }
