@@ -103,6 +103,13 @@ public interface MavenOptions extends Options {
     Optional<Boolean> failFast();
 
     /**
+     * Requests that Maven print the reactor build order and exit, without executing the build.
+     *
+     * @return {@code true} if the reactor build order should be printed and the build skipped.
+     */
+    Optional<Boolean> printBuildOrder();
+
+    /**
      * Indicates whether Maven should run all builds but defer error reporting to the end.
      *
      * @return an {@link Optional} containing true if error reporting should be deferred to the end, false if not, or empty if not specified
