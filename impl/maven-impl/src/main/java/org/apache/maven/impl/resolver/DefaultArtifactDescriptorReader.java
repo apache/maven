@@ -121,7 +121,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
         Model model = loadPom(session, request, result);
         if (model != null) {
             populateResult(InternalSession.from(session), result, model);
-            filterUninterpolated(result);
+            filterUninterpolatedRepositories(result);
         }
 
         return result;
@@ -351,20 +351,12 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
         }
 
         for (org.apache.maven.api.model.Dependency dependency : model.getDependencies()) {
-            if (hasUninterpolatedExpression(dependency)) {
-                logger.debug("Filtered dependency with uninterpolated expression: {}", dependency);
-                continue;
-            }
             result.addDependency(convert(dependency, stereotypes));
         }
 
         DependencyManagement dependencyManagement = model.getDependencyManagement();
         if (dependencyManagement != null) {
             for (org.apache.maven.api.model.Dependency dependency : dependencyManagement.getDependencies()) {
-                if (hasUninterpolatedExpression(dependency)) {
-                    logger.debug("Filtered managed dependency with uninterpolated expression: {}", dependency);
-                    continue;
-                }
                 result.addManagedDependency(convert(dependency, stereotypes));
             }
         }
@@ -431,13 +423,12 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
         return new Exclusion(exclusion.getGroupId(), exclusion.getArtifactId(), "*", "*");
     }
 
-    private static boolean hasUninterpolatedExpression(org.apache.maven.api.model.Dependency dependency) {
-        return containsPlaceholder(dependency.getGroupId())
-                || containsPlaceholder(dependency.getArtifactId())
-                || containsPlaceholder(dependency.getVersion());
-    }
-
-    private void filterUninterpolated(ArtifactDescriptorResult result) {
+    /**
+     * Filters out repositories with uninterpolated expressions in their ID or URL.
+     * Unlike dependency filtering (which is now handled by the resolver's re-entrancy detection),
+     * repository filtering has independent value: you cannot connect to a URL like {@code ${something}}.
+     */
+    private void filterUninterpolatedRepositories(ArtifactDescriptorResult result) {
         result.getRepositories().removeIf(repo -> {
             if (containsPlaceholder(repo.getId()) || containsPlaceholder(repo.getUrl())) {
                 logger.debug("Filtered repository with uninterpolated expression: {}", repo);
@@ -445,26 +436,6 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
             }
             return false;
         });
-        result.getDependencies().removeIf(dep -> {
-            if (hasUninterpolatedExpression(dep.getArtifact())) {
-                logger.debug("Filtered dependency with uninterpolated expression: {}", dep);
-                return true;
-            }
-            return false;
-        });
-        result.getManagedDependencies().removeIf(dep -> {
-            if (hasUninterpolatedExpression(dep.getArtifact())) {
-                logger.debug("Filtered managed dependency with uninterpolated expression: {}", dep);
-                return true;
-            }
-            return false;
-        });
-    }
-
-    private static boolean hasUninterpolatedExpression(Artifact artifact) {
-        return containsPlaceholder(artifact.getGroupId())
-                || containsPlaceholder(artifact.getArtifactId())
-                || containsPlaceholder(artifact.getVersion());
     }
 
     private static boolean containsPlaceholder(String value) {
