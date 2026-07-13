@@ -105,7 +105,8 @@ public interface MavenOptions extends Options {
     /**
      * Requests that Maven print the reactor build order and exit, without executing the build.
      *
-     * @return {@code true} if the reactor build order should be printed and the build skipped.
+     * @return an {@link Optional} containing true if the reactor build order should be printed
+     *         and the build skipped, false if not, or empty if not specified.
      */
     @Nonnull
     Optional<Boolean> printBuildOrder();
