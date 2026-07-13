@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -414,6 +415,125 @@ class AbstractRequestCacheTest {
         } finally {
             executor.shutdownNow();
         }
+    }
+
+    /**
+     * Tests that two concurrent {@code requests()} (batch) calls with overlapping keys
+     * do not deadlock when they share a CachingSupplier through an equals-based cache.
+     * <p>
+     * This is the exact regression test for issue
+     * <a href="https://github.com/apache/maven/issues/12472">#12472</a>:
+     * Maven 4.0.0-rc-5 hangs indefinitely during multi-module builds because two threads
+     * both call {@code requests()} with overlapping request keys. Through the equals-based
+     * cache (old {@code SoftIdentityMap} which used {@code equals()}, not identity), both
+     * threads get back the <b>same</b> CachingSupplier for the shared key.
+     * <p>
+     * Before the fix (commit c6de104bff), the old {@code individualSupplier} lambda would
+     * wait on the outer call's {@code IdentityHashMap} using {@code synchronized + wait()}.
+     * Thread B, entering the shared CachingSupplier's {@code apply()}, would wait on
+     * that map — but since Thread B held a different set of request object references,
+     * the identity-based map lookup could never match, creating a permanent deadlock.
+     * <p>
+     * The fix replaced the wait-on-map pattern with {@link CachingSupplier#complete}
+     * (direct value setting + notifyAll) and a ThreadLocal re-entrancy guard, eliminating
+     * the cross-thread dependency cycle.
+     */
+    @Test
+    void testConcurrentBatchRequestsWithSharedKeyDoNotDeadlock() throws Exception {
+        // Use equals-based cache: two threads will get the same CachingSupplier for matching keys
+        CachingTestRequestCache cachingCache = new CachingTestRequestCache();
+
+        TestRequest reqOnlyA = createTestRequest("onlyA");
+        TestRequest reqOnlyB = createTestRequest("onlyB");
+        // Both threads request "shared" — different objects, but equals() returns true
+        TestRequest sharedByA = createTestRequest("shared");
+        TestRequest sharedByB = createTestRequest("shared");
+
+        // Barrier ensures both threads are inside their batch supplier simultaneously,
+        // maximizing the chance of the deadlock scenario
+        CyclicBarrier bothInSupplier = new CyclicBarrier(2);
+
+        Function<List<TestRequest>, List<TestResult>> supplierA = reqs -> {
+            try {
+                bothInSupplier.await(5, TimeUnit.SECONDS);
+            } catch (Exception e) {
+                // Thread B may be blocked waiting on the shared CachingSupplier instead
+                // of reaching its supplier — that's what we're testing against
+            }
+            return reqs.stream().map(TestResult::new).toList();
+        };
+
+        Function<List<TestRequest>, List<TestResult>> supplierB = reqs -> {
+            try {
+                bothInSupplier.await(5, TimeUnit.SECONDS);
+            } catch (Exception e) {
+                // Same — Thread A may not reach the barrier
+            }
+            return reqs.stream().map(TestResult::new).toList();
+        };
+
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        try {
+            Future<List<TestResult>> futureA =
+                    executor.submit(() -> cachingCache.requests(List.of(reqOnlyA, sharedByA), supplierA));
+            Future<List<TestResult>> futureB =
+                    executor.submit(() -> cachingCache.requests(List.of(reqOnlyB, sharedByB), supplierB));
+
+            // If the old cross-thread deadlock exists, both futures will hang forever
+            List<TestResult> resultsA = futureA.get(10, TimeUnit.SECONDS);
+            List<TestResult> resultsB = futureB.get(10, TimeUnit.SECONDS);
+
+            assertEquals(2, resultsA.size());
+            assertEquals(2, resultsB.size());
+        } catch (TimeoutException e) {
+            throw new AssertionError(
+                    "Cross-thread deadlock detected: two concurrent batch requests() calls "
+                            + "with shared keys did not complete within 10 seconds "
+                            + "(regression for #12472)",
+                    e);
+        } finally {
+            executor.shutdownNow();
+        }
+    }
+
+    /**
+     * Tests that two concurrent {@code requests()} calls with overlapping keys
+     * correctly deliver results to both callers, even when one thread's batch
+     * completes before the other begins.
+     * <p>
+     * This is a timing variant of the #12472 scenario: Thread A starts and completes
+     * its batch resolution (setting the shared CachingSupplier's value via
+     * {@link CachingSupplier#complete}). Thread B starts its batch call afterwards,
+     * finds the shared CachingSupplier already has a value, and should skip resolution
+     * for that key. Thread B's unique key still needs fresh resolution.
+     */
+    @Test
+    void testSequentialBatchRequestsWithSharedKeyReuseResult() throws Exception {
+        CachingTestRequestCache cachingCache = new CachingTestRequestCache();
+
+        TestRequest reqOnlyA = createTestRequest("onlyA");
+        TestRequest reqOnlyB = createTestRequest("onlyB");
+        TestRequest sharedByA = createTestRequest("shared");
+        TestRequest sharedByB = createTestRequest("shared");
+
+        java.util.concurrent.atomic.AtomicInteger supplierCallCount = new java.util.concurrent.atomic.AtomicInteger(0);
+
+        Function<List<TestRequest>, List<TestResult>> batchSupplier = reqs -> {
+            supplierCallCount.incrementAndGet();
+            return reqs.stream().map(TestResult::new).toList();
+        };
+
+        // Thread A resolves [onlyA, shared] — both get cached
+        List<TestResult> resultsA = cachingCache.requests(List.of(reqOnlyA, sharedByA), batchSupplier);
+        assertEquals(2, resultsA.size());
+        assertEquals(1, supplierCallCount.get());
+
+        // Thread B resolves [onlyB, shared] — "shared" should come from cache;
+        // only "onlyB" needs resolution
+        List<TestResult> resultsB = cachingCache.requests(List.of(reqOnlyB, sharedByB), batchSupplier);
+        assertEquals(2, resultsB.size());
+        // Supplier should have been called twice: once for [onlyA, shared], once for [onlyB] only
+        assertEquals(2, supplierCallCount.get());
     }
 
     /**
