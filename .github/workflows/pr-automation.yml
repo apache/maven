@@ -24,4 +24,4 @@ on:
 jobs:
   pr-automation:
     name: PR Automation
-    uses: apache/maven-gh-actions-shared/.github/workflows/pr-automation.yml@v4
+    uses: apache/maven-gh-actions-shared/.github/workflows/pr-automation.yml@v5
