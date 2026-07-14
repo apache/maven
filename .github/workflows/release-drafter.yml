@@ -24,4 +24,4 @@ on:
 
 jobs:
    update_release_draft:
-      uses: apache/maven-gh-actions-shared/.github/workflows/release-drafter.yml@v4
+      uses: apache/maven-gh-actions-shared/.github/workflows/release-drafter.yml@v5
