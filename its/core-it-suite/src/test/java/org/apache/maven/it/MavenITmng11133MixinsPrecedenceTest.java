@@ -18,12 +18,12 @@
  */
 package org.apache.maven.it;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * MNG-11133: Mixins should override properties inherited from parent.
@@ -37,13 +37,15 @@ public class MavenITmng11133MixinsPrecedenceTest extends AbstractMavenIntegratio
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.addCliArgument("help:effective-pom");
-        verifier.addCliArgument("-Doutput=target/effective-pom.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyFilePresent("target/effective-pom.xml");
-        String effectivePom = Files.readString(testDir.resolve("target/effective-pom.xml"));
-        assertTrue(effectivePom.contains("<maven.compiler.release>21</maven.compiler.release>"));
+        verifier.verifyFilePresent("target/model.properties");
+        Properties props = verifier.loadProperties("target/model.properties");
+        assertEquals(
+                "21",
+                props.getProperty("project.properties.maven.compiler.release"),
+                "Property from mixin should override the parent's value");
     }
 }
