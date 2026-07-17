@@ -18,12 +18,12 @@
  */
 package org.apache.maven.it;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8432">MNG-8432</a>.
@@ -54,26 +54,24 @@ public class MavenITmng8432MixinsPropertiesTest extends AbstractMavenIntegration
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        // 2. Build the consuming project and dump its effective POM
-        Path projectDir = testDir.resolve("project");
-        verifier = newVerifier(projectDir);
+        // 2. Build the consuming project and evaluate model expressions
+        verifier = newVerifier(testDir.resolve("project"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.addCliArgument("help:effective-pom");
-        verifier.addCliArgument("-Doutput=target/effective-pom.xml");
+        verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        // 3. Verify the effective POM contains the mixin's property
-        verifier.verifyFilePresent("target/effective-pom.xml");
-        String effectivePom = Files.readString(projectDir.resolve("target/effective-pom.xml"));
-        assertTrue(
-                effectivePom.contains("<mixin.property>mixin-value</mixin.property>"),
+        // 3. Verify the model contains the mixin's property and managed dependency
+        verifier.verifyFilePresent("target/model.properties");
+        Properties props = verifier.loadProperties("target/model.properties");
+        assertEquals(
+                "mixin-value",
+                props.getProperty("project.properties.mixin.property"),
                 "Property from mixin BOM should be inherited by the consuming project");
-
-        // 4. Verify the effective POM contains the managed dependency from the mixin
-        assertTrue(
-                effectivePom.contains("<artifactId>managed-dep</artifactId>"),
+        assertEquals(
+                "org.apache.maven.its.mng8432:managed-dep:jar",
+                props.getProperty("project.dependencyManagement.dependencies.0.managementKey"),
                 "Dependency management from mixin BOM should be inherited by the consuming project");
     }
 }
