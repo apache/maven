@@ -33,8 +33,8 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.artifact.repository.RepositoryRequest;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
+import org.apache.maven.repository.internal.metadata.ValidatingMetadataXpp3Reader;
 import org.apache.maven.repository.legacy.UpdateCheckManager;
 import org.apache.maven.repository.legacy.WagonManager;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
@@ -270,7 +270,7 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
         Metadata result;
 
         try (Reader reader = ReaderFactory.newXmlReader(mappingFile)) {
-            MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
+            ValidatingMetadataXpp3Reader mappingReader = new ValidatingMetadataXpp3Reader();
 
             result = mappingReader.read(reader, false);
         } catch (FileNotFoundException e) {

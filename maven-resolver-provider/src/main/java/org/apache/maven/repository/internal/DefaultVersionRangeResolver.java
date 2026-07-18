@@ -34,7 +34,7 @@ import java.util.Objects;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
+import org.apache.maven.repository.internal.metadata.ValidatingMetadataXpp3Reader;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.RepositorySystemSession;
@@ -274,8 +274,9 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver, Servic
 
                     if (metadata.getFile() != null && metadata.getFile().exists()) {
                         try (InputStream in = new FileInputStream(metadata.getFile())) {
-                            versioning =
-                                    new MetadataXpp3Reader().read(in, false).getVersioning();
+                            versioning = new ValidatingMetadataXpp3Reader()
+                                    .read(in, false)
+                                    .getVersioning();
                         }
                     }
                 }

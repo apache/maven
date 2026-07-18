@@ -27,8 +27,8 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
+import org.apache.maven.repository.internal.metadata.ValidatingMetadataXpp3Reader;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -64,7 +64,7 @@ public abstract class AbstractRepositoryMetadata implements RepositoryMetadata {
 
     protected void updateRepositoryMetadata(ArtifactRepository localRepository, ArtifactRepository remoteRepository)
             throws IOException, XmlPullParserException {
-        MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
+        ValidatingMetadataXpp3Reader mappingReader = new ValidatingMetadataXpp3Reader();
 
         Metadata metadata = null;
 

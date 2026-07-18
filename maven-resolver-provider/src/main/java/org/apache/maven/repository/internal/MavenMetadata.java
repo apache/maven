@@ -28,8 +28,8 @@ import java.util.Date;
 import java.util.Map;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
+import org.apache.maven.repository.internal.metadata.ValidatingMetadataXpp3Reader;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -99,7 +99,7 @@ abstract class MavenMetadata extends AbstractMetadata implements MergeableMetada
         }
 
         try (Reader reader = ReaderFactory.newXmlReader(metadataFile)) {
-            return new MetadataXpp3Reader().read(reader, false);
+            return new ValidatingMetadataXpp3Reader().read(reader, false);
         } catch (IOException e) {
             throw new RepositoryException("Could not read metadata " + metadataFile + ": " + e.getMessage(), e);
         } catch (XmlPullParserException e) {

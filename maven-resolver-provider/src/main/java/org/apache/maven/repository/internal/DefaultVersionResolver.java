@@ -36,7 +36,7 @@ import java.util.Objects;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
+import org.apache.maven.repository.internal.metadata.ValidatingMetadataXpp3Reader;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositoryCache;
 import org.eclipse.aether.RepositoryEvent;
@@ -278,8 +278,9 @@ public class DefaultVersionResolver implements VersionResolver, Service {
 
                     if (metadata.getFile() != null && metadata.getFile().exists()) {
                         try (InputStream in = new FileInputStream(metadata.getFile())) {
-                            versioning =
-                                    new MetadataXpp3Reader().read(in, false).getVersioning();
+                            versioning = new ValidatingMetadataXpp3Reader()
+                                    .read(in, false)
+                                    .getVersioning();
 
                             /*
                             NOTE: Users occasionally misuse the id "local" for remote repos which screws up the metadata

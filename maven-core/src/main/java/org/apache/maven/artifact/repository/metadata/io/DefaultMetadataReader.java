@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
+import org.apache.maven.repository.internal.metadata.ValidatingMetadataXpp3Reader;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -54,7 +54,7 @@ public class DefaultMetadataReader implements MetadataReader {
         Objects.requireNonNull(input, "input cannot be null");
 
         try (Reader in = input) {
-            return new MetadataXpp3Reader().read(in, isStrict(options));
+            return new ValidatingMetadataXpp3Reader().read(in, isStrict(options));
         } catch (XmlPullParserException e) {
             throw new MetadataParseException(e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e);
         }
@@ -64,7 +64,7 @@ public class DefaultMetadataReader implements MetadataReader {
         Objects.requireNonNull(input, "input cannot be null");
 
         try (InputStream in = input) {
-            return new MetadataXpp3Reader().read(in, isStrict(options));
+            return new ValidatingMetadataXpp3Reader().read(in, isStrict(options));
         } catch (XmlPullParserException e) {
             throw new MetadataParseException(e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e);
         }
