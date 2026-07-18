@@ -106,7 +106,6 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.repository.RemoteRepository;
-import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyResult;
 import org.eclipse.aether.util.filter.AndDependencyFilter;
 
@@ -394,10 +393,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                 project.getRemotePluginRepositories(),
                 repositorySession);
 
-        pluginArtifacts = result.getArtifactResults().stream()
-                .filter(ArtifactResult::isResolved)
-                .map(r -> RepositoryUtils.toArtifact(r.getArtifact()))
-                .collect(Collectors.toList());
+        pluginArtifacts = toMavenArtifacts(result);
 
         pluginRealm = classRealmManager.createPluginRealm(
                 plugin, parent, null, foreignImports, toAetherArtifacts(pluginArtifacts));
@@ -433,6 +429,13 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
 
     private List<org.eclipse.aether.artifact.Artifact> toAetherArtifacts(final List<Artifact> pluginArtifacts) {
         return new ArrayList<>(RepositoryUtils.toArtifacts(pluginArtifacts));
+    }
+
+    private List<Artifact> toMavenArtifacts(DependencyResult dependencyResult) {
+        return dependencyResult.getDependencyNodeResults().stream()
+                .filter(n -> n.getArtifact().getPath() != null)
+                .map(n -> RepositoryUtils.toArtifact(n.getDependency()))
+                .collect(Collectors.toList());
     }
 
     private Map<String, ClassLoader> calcImports(MavenProject project, ClassLoader parent, List<String> imports) {
@@ -829,9 +832,6 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             throws PluginResolutionException {
         DependencyResult result =
                 pluginDependenciesResolver.resolvePluginAndFlatten(extensionPlugin, null, null, repositories, session);
-        return result.getArtifactResults().stream()
-                .filter(ArtifactResult::isResolved)
-                .map(r -> RepositoryUtils.toArtifact(r.getArtifact()))
-                .collect(Collectors.toList());
+        return toMavenArtifacts(result);
     }
 }

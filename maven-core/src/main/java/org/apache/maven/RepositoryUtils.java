@@ -64,7 +64,16 @@ public class RepositoryUtils {
         return (string == null || string.length() <= 0) ? null : string;
     }
 
-    private static org.apache.maven.artifact.Artifact toArtifact(Dependency dependency) {
+    /**
+     * Converts a {@link Dependency} object to a Maven {@link org.apache.maven.artifact.Artifact} object.
+     *
+     * @param dependency the dependency to be converted; may be null. If null, the method returns null.
+     * @return the equivalent {@link org.apache.maven.artifact.Artifact} object with the same attributes as the
+     *         provided dependency, or null if the input dependency is null.
+     *
+     * @since 3.10.0
+     */
+    public static org.apache.maven.artifact.Artifact toArtifact(Dependency dependency) {
         if (dependency == null) {
             return null;
         }
