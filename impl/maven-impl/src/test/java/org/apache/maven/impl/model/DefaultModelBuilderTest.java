@@ -29,6 +29,7 @@ import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderRequest;
@@ -150,6 +151,31 @@ class DefaultModelBuilderTest {
         result = builder.newSession().build(request);
         assertNotNull(result);
         assertEquals("0.2.0", result.getEffectiveModel().getVersion());
+    }
+
+    @Test
+    public void testDuplicateProfileIdsRetainActivations() {
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                .source(Sources.resolvedSource(
+                        getPom("duplicate-profile-ids"), "org.apache.maven.test:duplicate-profile-ids:1.0.0"))
+                .build();
+        ModelBuilderResult result =
+                assertDoesNotThrow(() -> builder.newSession().build(request));
+        assertNotNull(result);
+
+        List<Profile> profiles = result.getEffectiveModel().getProfiles();
+        assertEquals(2, profiles.size());
+        assertEquals("default", profiles.get(0).getId());
+        assertEquals("default", profiles.get(1).getId());
+        assertNotNull(profiles.get(0).getActivation());
+        assertNotNull(profiles.get(1).getActivation());
+        assertTrue(profiles.get(0).getActivation().isActiveByDefault());
+        assertEquals(
+                "duplicate.profile",
+                profiles.get(1).getActivation().getProperty().getName());
+        assertEquals("enabled", profiles.get(1).getActivation().getProperty().getValue());
     }
 
     @Test
