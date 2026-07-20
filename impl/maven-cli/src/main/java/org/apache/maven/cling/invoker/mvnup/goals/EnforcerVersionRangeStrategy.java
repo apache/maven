@@ -87,6 +87,22 @@ public class EnforcerVersionRangeStrategy extends AbstractUpgradeStrategy {
      */
     static final Pattern MAVEN4_EXCLUSIVE_UPPER_BOUND = Pattern.compile("^(\\[|\\()(.+?),\\s*(4(?:\\.\\d+)*)\\s*\\)$");
 
+    /**
+     * Pattern to match version ranges where the upper bound has a major version below 4,
+     * which blocks Maven 4. This includes exact version pins like {@code [3.8.6,3.8.6]}
+     * and ranges like {@code [3.8.0,3.9)}, {@code (,3.9]}.
+     * Captures:
+     *   Group 1: opening bracket ([ or ()
+     *   Group 2: lower bound (may be empty for unbounded lower ranges like {@code (,3.9]})
+     *   Group 3: upper bound (numeric version like 3.8.6, 3.9, 3)
+     *   Group 4: closing bracket () or ])
+     *
+     * Examples matched: [3.8.6,3.8.6], [3.8.0,3.9), (,3.9], [3.0,3.0], [3.9.0,3.9.0]
+     * Examples not matched: [3.8.8,), 3.8.8, [3.8.8,5), [3.8.8,4) (handled by MAVEN4_EXCLUSIVE_UPPER_BOUND)
+     */
+    static final Pattern UPPER_BOUND_BELOW_MAVEN4 =
+            Pattern.compile("^(\\[|\\()(.*?),\\s*(\\d+(?:\\.\\d+)*)\\s*(\\)|\\])$");
+
     @Override
     public boolean isApplicable(UpgradeContext context) {
         UpgradeOptions options = getOptions(context);
@@ -269,18 +285,54 @@ public class EnforcerVersionRangeStrategy extends AbstractUpgradeStrategy {
     }
 
     /**
-     * Widens a Maven version range that has an exclusive upper bound at 4.x.
+     * Widens a Maven version range that blocks Maven 4.
+     *
+     * <p>Handles three cases:
+     * <ul>
+     *   <li>Ranges with an exclusive upper bound at 4.x (e.g., {@code [3.8.8,4)} → {@code [3.8.8,5)})</li>
+     *   <li>Exact version pins (e.g., {@code [3.8.6,3.8.6]} → {@code [3.8.6,5)})</li>
+     *   <li>Ranges with an upper bound below 4 (e.g., {@code [3.8.0,3.9)} → {@code [3.8.0,5)})</li>
+     * </ul>
      *
      * @param versionRange the version range string (e.g., "[3.8.8,4)")
      * @return the widened range (e.g., "[3.8.8,5)"), or null if no widening is needed
      */
     static String widenVersionRange(String versionRange) {
+        // Check for ranges with exclusive upper bound at 4.x
         Matcher matcher = MAVEN4_EXCLUSIVE_UPPER_BOUND.matcher(versionRange);
         if (matcher.matches()) {
             String openBracket = matcher.group(1);
             String lowerBound = matcher.group(2);
             return openBracket + lowerBound + ",5)";
         }
+
+        // Check for ranges where the upper bound's major version is below 4,
+        // which block Maven 4. This catches exact version pins like [3.8.6,3.8.6]
+        // and ranges like [3.8.0,3.9), (,3.9].
+        Matcher belowMatcher = UPPER_BOUND_BELOW_MAVEN4.matcher(versionRange);
+        if (belowMatcher.matches()) {
+            String openBracket = belowMatcher.group(1);
+            String lowerBound = belowMatcher.group(2);
+            String upperBound = belowMatcher.group(3);
+            if (getMajorVersion(upperBound) < 4) {
+                return openBracket + lowerBound + ",5)";
+            }
+        }
+
         return null;
+    }
+
+    /**
+     * Extracts the major version number from a version string.
+     *
+     * @param version the version string (e.g., "3.8.6", "3", "4.0.0")
+     * @return the major version number, or {@link Integer#MAX_VALUE} if unparseable
+     */
+    private static int getMajorVersion(String version) {
+        try {
+            return Integer.parseInt(version.split("\\.")[0]);
+        } catch (NumberFormatException e) {
+            return Integer.MAX_VALUE;
+        }
     }
 }
