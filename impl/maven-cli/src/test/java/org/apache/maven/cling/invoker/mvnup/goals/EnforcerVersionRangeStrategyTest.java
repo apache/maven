@@ -153,9 +153,33 @@ class EnforcerVersionRangeStrategyTest {
         }
 
         @Test
-        @DisplayName("should not widen [3.8.8,3.9) — upper bound is not at 4")
-        void shouldNotWidenNon4UpperBound() {
-            assertNull(EnforcerVersionRangeStrategy.widenVersionRange("[3.8.8,3.9)"));
+        @DisplayName("should widen [3.8.8,3.9) to [3.8.8,5) — upper bound below 4 blocks Maven 4")
+        void shouldWidenSub4UpperBound() {
+            assertEquals("[3.8.8,5)", EnforcerVersionRangeStrategy.widenVersionRange("[3.8.8,3.9)"));
+        }
+
+        @Test
+        @DisplayName("should widen exact version pin [3.8.6,3.8.6] to [3.8.6,5)")
+        void shouldWidenExactVersionPin() {
+            assertEquals("[3.8.6,5)", EnforcerVersionRangeStrategy.widenVersionRange("[3.8.6,3.8.6]"));
+        }
+
+        @Test
+        @DisplayName("should widen exact version pin [3.0,3.0] to [3.0,5)")
+        void shouldWidenExactVersionPinShort() {
+            assertEquals("[3.0,5)", EnforcerVersionRangeStrategy.widenVersionRange("[3.0,3.0]"));
+        }
+
+        @Test
+        @DisplayName("should widen exact version pin [3.9.0,3.9.0] to [3.9.0,5)")
+        void shouldWidenExactVersionPinHighMinor() {
+            assertEquals("[3.9.0,5)", EnforcerVersionRangeStrategy.widenVersionRange("[3.9.0,3.9.0]"));
+        }
+
+        @Test
+        @DisplayName("should not widen [4.0.0,4.0.0] — already allows Maven 4")
+        void shouldNotWidenExactPinAtMaven4() {
+            assertNull(EnforcerVersionRangeStrategy.widenVersionRange("[4.0.0,4.0.0]"));
         }
     }
 
@@ -365,6 +389,48 @@ class EnforcerVersionRangeStrategyTest {
 
             assertTrue(result.success());
             assertEquals(0, result.modifiedCount(), "No changes expected for non-enforcer plugins");
+        }
+
+        @Test
+        @DisplayName("should widen exact version pin in requireMavenVersion configuration")
+        void shouldWidenExactVersionPinInConfiguration() {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-enforcer-plugin</artifactId>
+                                <configuration>
+                                    <rules>
+                                        <requireMavenVersion>
+                                            <version>[3.8.6,3.8.6]</version>
+                                        </requireMavenVersion>
+                                    </rules>
+                                </configuration>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success());
+            assertTrue(result.modifiedCount() > 0, "Exact version pin should be widened");
+
+            String xml = DomUtils.toXml(document);
+            assertTrue(xml.contains("[3.8.6,5)"), "Version range should be widened to [3.8.6,5)");
+            assertFalse(xml.contains("[3.8.6,3.8.6]"), "Original exact pin should be replaced");
         }
 
         @Test
