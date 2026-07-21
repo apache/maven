@@ -159,11 +159,17 @@ public class DefaultArtifactResolver implements ArtifactResolver {
                     ArtifactCoordinates coordinates = session.getArtifact(
                                     result.getRequest().getArtifact())
                             .toCoordinates();
-                    Repository repository =
-                            result.getRepository() != null ? session.getRepository(result.getRepository()) : null;
+                    // null repository (ArtifactResult.NO_REPOSITORY); can come ONLY in error exceptions
+                    // when no local/remote/workspace repository was involved in error
+                    // (usually resolving when every involved repo "abstained" for some reason)
+                    Repository repository = result.getRepository() != null
+                            ? session.getRepository(result.getRepository()).orElse(null)
+                            : null;
                     Map<Repository, List<Exception>> mappedExceptions = result.getMappedExceptions().entrySet().stream()
                             .collect(Collectors.toMap(
-                                    entry -> session.getRepository(entry.getKey()), Map.Entry::getValue));
+                                    entry -> session.getRepository(entry.getKey())
+                                            .orElse(null),
+                                    Map.Entry::getValue));
                     return new DefaultArtifactResolverResultItem(
                             coordinates,
                             artifact,
