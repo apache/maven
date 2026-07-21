@@ -438,7 +438,11 @@ public abstract class BaseParser implements Parser {
         Map<String, String> userSpecifiedProperties = context.options != null
                 ? new HashMap<>(context.options.userProperties().orElse(new HashMap<>()))
                 : new HashMap<>();
-        createInterpolator().interpolate(userSpecifiedProperties, paths::get);
+        // Resolve only early-available path placeholders (session.topDirectory & co); leave everything
+        // else literal so it can be evaluated later with full session/project context by the
+        // plugin parameter expression evaluator (gh-12507: wiping unresolved ${...} to the empty
+        // string silently broke e.g. -DaltDeploymentRepository=id::file://${project.build.directory}/x).
+        createInterpolator().interpolate(userSpecifiedProperties, paths::get, false);
 
         // ----------------------------------------------------------------------
         // Load config files
