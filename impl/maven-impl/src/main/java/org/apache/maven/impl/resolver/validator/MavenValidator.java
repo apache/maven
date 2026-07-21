@@ -24,6 +24,7 @@ import org.eclipse.aether.metadata.Metadata;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.spi.validator.Validator;
+import org.eclipse.aether.util.PathUtils;
 
 /**
  * Simplest Maven specific validator that is meant to prevent un-interpolated
@@ -43,6 +44,7 @@ public class MavenValidator implements Validator {
                 || containsPlaceholder(artifact.getExtension())) {
             throw new IllegalArgumentException("Not fully interpolated artifact " + artifact);
         }
+        PathUtils.validateArtifactComponents(artifact);
     }
 
     @Override
@@ -53,6 +55,7 @@ public class MavenValidator implements Validator {
                 || containsPlaceholder(metadata.getType())) {
             throw new IllegalArgumentException("Not fully interpolated metadata " + metadata);
         }
+        PathUtils.validateMetadataComponents(metadata);
     }
 
     @Override
@@ -71,6 +74,7 @@ public class MavenValidator implements Validator {
                                 || containsPlaceholder(e.getExtension()))) {
             throw new IllegalArgumentException("Not fully interpolated dependency " + dependency);
         }
+        PathUtils.validateArtifactComponents(artifact);
     }
 
     @Override

@@ -295,12 +295,14 @@ public class RepositorySystemSupplier {
             RepositoryKeyFunctionFactory repositoryKeyFunctionFactory,
             MetadataResolver metadataResolver,
             RemoteRepositoryManager remoteRepositoryManager,
-            RepositoryLayoutProvider repositoryLayoutProvider) {
+            RepositoryLayoutProvider repositoryLayoutProvider,
+            TransporterProvider transporterProvider) {
         return new PrefixesRemoteRepositoryFilterSource(
                 repositoryKeyFunctionFactory,
                 () -> metadataResolver,
                 () -> remoteRepositoryManager,
-                repositoryLayoutProvider);
+                repositoryLayoutProvider,
+                transporterProvider);
     }
 
     @Singleton
