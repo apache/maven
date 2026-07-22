@@ -18,9 +18,6 @@
  */
 package org.apache.maven.impl.resolver.validator;
 
-import java.util.Locale;
-
-import org.apache.maven.api.Constants;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.metadata.Metadata;
@@ -34,23 +31,11 @@ import org.eclipse.aether.util.PathUtils;
  * elements enter resolver; if it does, is most likely some bug.
  */
 public class MavenValidator implements Validator {
-    private enum ValidationLevel {
-        DEFAULT(true, true),
-        MILD(true, false),
-        OFF(false, false);
+    private final boolean validatePathComponents;
 
-        private final boolean validatePlaceholder;
-        private final boolean validatePathComponents;
-
-        ValidationLevel(boolean validatePlaceholder, boolean validatePathComponents) {
-            this.validatePlaceholder = validatePlaceholder;
-            this.validatePathComponents = validatePathComponents;
-        }
+    public MavenValidator(boolean validatePathComponents) {
+        this.validatePathComponents = validatePathComponents;
     }
-
-    private static final ValidationLevel VALIDATION_LEVEL = ValidationLevel.valueOf(
-            System.getProperty(Constants.MAVEN_RESOLVER_VALIDATION, ValidationLevel.DEFAULT.name())
-                    .toUpperCase(Locale.ROOT));
 
     protected boolean containsPlaceholder(String value) {
         return value != null && value.contains("${");
@@ -58,31 +43,27 @@ public class MavenValidator implements Validator {
 
     @Override
     public void validateArtifact(Artifact artifact) throws IllegalArgumentException {
-        if (VALIDATION_LEVEL.validatePlaceholder) {
-            if (containsPlaceholder(artifact.getGroupId())
-                    || containsPlaceholder(artifact.getArtifactId())
-                    || containsPlaceholder(artifact.getVersion())
-                    || containsPlaceholder(artifact.getClassifier())
-                    || containsPlaceholder(artifact.getExtension())) {
-                throw new IllegalArgumentException("Not fully interpolated artifact " + artifact);
-            }
+        if (containsPlaceholder(artifact.getGroupId())
+                || containsPlaceholder(artifact.getArtifactId())
+                || containsPlaceholder(artifact.getVersion())
+                || containsPlaceholder(artifact.getClassifier())
+                || containsPlaceholder(artifact.getExtension())) {
+            throw new IllegalArgumentException("Not fully interpolated artifact " + artifact);
         }
-        if (VALIDATION_LEVEL.validatePathComponents) {
+        if (validatePathComponents) {
             PathUtils.validateArtifactComponents(artifact);
         }
     }
 
     @Override
     public void validateMetadata(Metadata metadata) throws IllegalArgumentException {
-        if (VALIDATION_LEVEL.validatePlaceholder) {
-            if (containsPlaceholder(metadata.getGroupId())
-                    || containsPlaceholder(metadata.getArtifactId())
-                    || containsPlaceholder(metadata.getVersion())
-                    || containsPlaceholder(metadata.getType())) {
-                throw new IllegalArgumentException("Not fully interpolated metadata " + metadata);
-            }
+        if (containsPlaceholder(metadata.getGroupId())
+                || containsPlaceholder(metadata.getArtifactId())
+                || containsPlaceholder(metadata.getVersion())
+                || containsPlaceholder(metadata.getType())) {
+            throw new IllegalArgumentException("Not fully interpolated metadata " + metadata);
         }
-        if (VALIDATION_LEVEL.validatePathComponents) {
+        if (validatePathComponents) {
             PathUtils.validateMetadataComponents(metadata);
         }
     }
@@ -90,45 +71,39 @@ public class MavenValidator implements Validator {
     @Override
     public void validateDependency(Dependency dependency) throws IllegalArgumentException {
         Artifact artifact = dependency.getArtifact();
-        if (VALIDATION_LEVEL.validatePlaceholder) {
-            if (containsPlaceholder(artifact.getGroupId())
-                    || containsPlaceholder(artifact.getArtifactId())
-                    || containsPlaceholder(artifact.getVersion())
-                    || containsPlaceholder(artifact.getClassifier())
-                    || containsPlaceholder(artifact.getExtension())
-                    || containsPlaceholder(dependency.getScope())
-                    || dependency.getExclusions().stream()
-                            .anyMatch(e -> containsPlaceholder(e.getGroupId())
-                                    || containsPlaceholder(e.getArtifactId())
-                                    || containsPlaceholder(e.getClassifier())
-                                    || containsPlaceholder(e.getExtension()))) {
-                throw new IllegalArgumentException("Not fully interpolated dependency " + dependency);
-            }
+        if (containsPlaceholder(artifact.getGroupId())
+                || containsPlaceholder(artifact.getArtifactId())
+                || containsPlaceholder(artifact.getVersion())
+                || containsPlaceholder(artifact.getClassifier())
+                || containsPlaceholder(artifact.getExtension())
+                || containsPlaceholder(dependency.getScope())
+                || dependency.getExclusions().stream()
+                        .anyMatch(e -> containsPlaceholder(e.getGroupId())
+                                || containsPlaceholder(e.getArtifactId())
+                                || containsPlaceholder(e.getClassifier())
+                                || containsPlaceholder(e.getExtension()))) {
+            throw new IllegalArgumentException("Not fully interpolated dependency " + dependency);
         }
-        if (VALIDATION_LEVEL.validatePathComponents) {
+        if (validatePathComponents) {
             PathUtils.validateArtifactComponents(artifact);
         }
     }
 
     @Override
     public void validateLocalRepository(LocalRepository localRepository) throws IllegalArgumentException {
-        if (VALIDATION_LEVEL.validatePlaceholder) {
-            if (containsPlaceholder(localRepository.getBasePath().toString())
-                    || containsPlaceholder(localRepository.getContentType())
-                    || containsPlaceholder(localRepository.getId())) {
-                throw new IllegalArgumentException("Not fully interpolated local repository " + localRepository);
-            }
+        if (containsPlaceholder(localRepository.getBasePath().toString())
+                || containsPlaceholder(localRepository.getContentType())
+                || containsPlaceholder(localRepository.getId())) {
+            throw new IllegalArgumentException("Not fully interpolated local repository " + localRepository);
         }
     }
 
     @Override
     public void validateRemoteRepository(RemoteRepository remoteRepository) throws IllegalArgumentException {
-        if (VALIDATION_LEVEL.validatePlaceholder) {
-            if (containsPlaceholder(remoteRepository.getUrl())
-                    || containsPlaceholder(remoteRepository.getContentType())
-                    || containsPlaceholder(remoteRepository.getId())) {
-                throw new IllegalArgumentException("Not fully interpolated remote repository " + remoteRepository);
-            }
+        if (containsPlaceholder(remoteRepository.getUrl())
+                || containsPlaceholder(remoteRepository.getContentType())
+                || containsPlaceholder(remoteRepository.getId())) {
+            throw new IllegalArgumentException("Not fully interpolated remote repository " + remoteRepository);
         }
     }
 }
