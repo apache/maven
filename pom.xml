@@ -157,7 +157,7 @@ under the License.
     <checkstyle.violation.ignore>None</checkstyle.violation.ignore>
     <checkstyle.excludes>**/package-info.java</checkstyle.excludes>
     <project.build.outputTimestamp>2026-07-09T19:25:45Z</project.build.outputTimestamp>
-    <jlineVersion>3.30.15</jlineVersion>
+    <jlineVersion>3.30.16</jlineVersion>
 
     <!-- The JPMS module name elements used in the Automatic-Module-Name -->
     <!-- Note: Maven 3 can never become "pure modular" thing, we leave that to Maven 4+ -->
