@@ -446,6 +446,17 @@ public final class Constants {
     public static final String MAVEN_RESOLVER_TRANSPORT = "maven.resolver.transport";
 
     /**
+     * Resolver validation control. Source of this config is Java System properties, as it is early configuration.
+     * This configuration provides "escape hatch" for those projects, that are forced to use non-conformant solutions.
+     * Can be <code>default</code> (full validation), <code>mild</code> (only uninterpolated placeholders) or
+     * <code>off</code> (no validation, as in Maven 3.9.x).
+     *
+     * @since 3.10.0
+     */
+    @Config(defaultValue = "default")
+    public static final String MAVEN_RESOLVER_VALIDATION = "maven.resolver.validation";
+
+    /**
      * Plugin validation level.
      *
      * @since 3.9.2
