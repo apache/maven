@@ -497,6 +497,77 @@ class AbstractRequestCacheTest {
     }
 
     /**
+     * Variant of the #12472 regression scenario where the shared request's
+     * {@code equals()}/{@code hashCode()} change <b>during</b> batch resolution
+     * (mirroring mutable {@link RequestTrace} data in real requests).
+     * <p>
+     * Pre-fix, Thread B waits on Thread A's equals-based {@code nonCachedResults}
+     * map for a key that no longer matches — forever. The identity-based fix
+     * (c6de104bff) eliminates this because lookups use reference identity, not
+     * {@code equals()}/{@code hashCode()}.
+     * <p>
+     * Unlike {@link #testConcurrentBatchRequestsWithSharedKeyDoNotDeadlock()}, this
+     * variant actually deadlocks on the pre-fix code (verified empirically by
+     * &#064;ascheman in PR review).
+     *
+     * @see <a href="https://github.com/apache/maven/issues/12472">#12472</a>
+     */
+    @Test
+    void testConcurrentBatchRequestsWithMutatingSharedKeyDoNotDeadlock() throws Exception {
+        GenericCachingTestRequestCache cachingCache = new GenericCachingTestRequestCache();
+
+        MutableHashCodeRequest reqOnlyA = new MutableHashCodeRequest("onlyA", "trace");
+        MutableHashCodeRequest reqOnlyB = new MutableHashCodeRequest("onlyB", "trace");
+        MutableHashCodeRequest sharedByA = new MutableHashCodeRequest("shared", "trace");
+        MutableHashCodeRequest sharedByB = new MutableHashCodeRequest("shared", "trace");
+
+        CountDownLatch aInBatch = new CountDownLatch(1);
+
+        Function<List<MutableHashCodeRequest>, List<MutableHashCodeResult>> supplierA = reqs -> {
+            aInBatch.countDown();
+            try {
+                Thread.sleep(1500);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            // Mutate trace data during resolution — changes equals()/hashCode()
+            for (MutableHashCodeRequest r : reqs) {
+                r.setTraceData(r.getTraceData() + "-A");
+            }
+            return reqs.stream().map(MutableHashCodeResult::new).toList();
+        };
+
+        Function<List<MutableHashCodeRequest>, List<MutableHashCodeResult>> supplierB = reqs -> {
+            for (MutableHashCodeRequest r : reqs) {
+                r.setTraceData(r.getTraceData() + "-B");
+            }
+            return reqs.stream().map(MutableHashCodeResult::new).toList();
+        };
+
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        try {
+            Future<List<MutableHashCodeResult>> futureA =
+                    executor.submit(() -> cachingCache.requests(List.of(reqOnlyA, sharedByA), supplierA));
+            assertTrue(aInBatch.await(5, TimeUnit.SECONDS), "Thread A should have entered its batch supplier");
+            Future<List<MutableHashCodeResult>> futureB =
+                    executor.submit(() -> cachingCache.requests(List.of(reqOnlyB, sharedByB), supplierB));
+
+            List<MutableHashCodeResult> resultsA = futureA.get(10, TimeUnit.SECONDS);
+            List<MutableHashCodeResult> resultsB = futureB.get(10, TimeUnit.SECONDS);
+
+            assertEquals(2, resultsA.size());
+            assertEquals(2, resultsB.size());
+        } catch (TimeoutException e) {
+            throw new AssertionError(
+                    "Cross-thread deadlock detected: batch requests() with a shared key whose "
+                            + "equals()/hashCode() mutate during resolution did not complete (#12472)",
+                    e);
+        } finally {
+            executor.shutdownNow();
+        }
+    }
+
+    /**
      * Tests that two concurrent {@code requests()} calls with overlapping keys
      * correctly deliver results to both callers, even when one thread's batch
      * completes before the other begins.
@@ -649,6 +720,24 @@ class AbstractRequestCacheTest {
                 REQ req, Function<REQ, REP> supplier) {
             return (CachingSupplier<REQ, REP>)
                     cache.computeIfAbsent((TestRequest) req, r -> new CachingSupplier<>(supplier));
+        }
+    }
+
+    /**
+     * Equals-based cache that accepts any {@link Request} type (not just {@link TestRequest}).
+     * Uses {@link ConcurrentHashMap} so lookups depend on {@code equals()}/{@code hashCode()} —
+     * two request objects that are {@code equals()} will share the same {@link CachingSupplier}.
+     * This is needed by tests that use {@link MutableHashCodeRequest}.
+     */
+    static class GenericCachingTestRequestCache extends AbstractRequestCache {
+        private final Map<Request<?>, CachingSupplier<?, ?>> cache = new ConcurrentHashMap<>();
+
+        @Override
+        @SuppressWarnings("unchecked")
+        protected <REQ extends Request<?>, REP extends Result<REQ>> CachingSupplier<REQ, REP> doCache(
+                REQ req, Function<REQ, REP> supplier) {
+            return (CachingSupplier<REQ, REP>)
+                    cache.computeIfAbsent(req, r -> new CachingSupplier<>(supplier));
         }
     }
 
