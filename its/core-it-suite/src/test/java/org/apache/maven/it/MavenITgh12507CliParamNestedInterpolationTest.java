@@ -35,14 +35,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class MavenITgh12507CliParamNestedInterpolationTest extends AbstractMavenIntegrationTestCase {
 
+    MavenITgh12507CliParamNestedInterpolationTest() {
+        super("[4.0.0-rc-6,)");
+    }
+
     /**
      * Verify that a system-property expression inside a CLI-supplied parameter value is resolved.
      */
     @Test
     void testNestedSystemPropertyExpression() throws Exception {
-        Path basedir = extractResources("gh-12507-cli-param-nested-interpolation");
+        Path basedir = extractResources("/gh-12507-cli-param-nested-interpolation")
+                .getAbsoluteFile()
+                .toPath();
 
-        Verifier verifier = newVerifier(basedir);
+        Verifier verifier = newVerifier(basedir.toString());
         verifier.addCliArgument("-Dconfig.stringParam=PRE-${user.dir}-POST");
         verifier.addCliArgument("validate");
         verifier.execute();
@@ -57,9 +63,11 @@ class MavenITgh12507CliParamNestedInterpolationTest extends AbstractMavenIntegra
      */
     @Test
     void testNestedProjectExpression() throws Exception {
-        Path basedir = extractResources("gh-12507-cli-param-nested-interpolation");
+        Path basedir = extractResources("/gh-12507-cli-param-nested-interpolation")
+                .getAbsoluteFile()
+                .toPath();
 
-        Verifier verifier = newVerifier(basedir);
+        Verifier verifier = newVerifier(basedir.toString());
         verifier.addCliArgument("-Dconfig.stringParam=PRE-${project.build.directory}-POST");
         verifier.addCliArgument("validate");
         verifier.execute();
