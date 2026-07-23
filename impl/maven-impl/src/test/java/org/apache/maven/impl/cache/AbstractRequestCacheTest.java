@@ -456,6 +456,8 @@ class AbstractRequestCacheTest {
         Function<List<TestRequest>, List<TestResult>> supplierA = reqs -> {
             try {
                 bothInSupplier.await(5, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             } catch (Exception e) {
                 // Thread B may be blocked waiting on the shared CachingSupplier instead
                 // of reaching its supplier — that's what we're testing against
@@ -466,6 +468,8 @@ class AbstractRequestCacheTest {
         Function<List<TestRequest>, List<TestResult>> supplierB = reqs -> {
             try {
                 bothInSupplier.await(5, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             } catch (Exception e) {
                 // Same — Thread A may not reach the barrier
             }
@@ -568,8 +572,8 @@ class AbstractRequestCacheTest {
     }
 
     /**
-     * Tests that two concurrent {@code requests()} calls with overlapping keys
-     * correctly deliver results to both callers, even when one thread's batch
+     * Tests that two sequential {@code requests()} calls with overlapping keys
+     * correctly deliver results to both callers, when one thread's batch
      * completes before the other begins.
      * <p>
      * This is a timing variant of the #12472 scenario: Thread A starts and completes
