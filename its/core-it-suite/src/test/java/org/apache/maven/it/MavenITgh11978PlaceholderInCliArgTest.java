@@ -50,8 +50,10 @@ class MavenITgh11978PlaceholderInCliArgTest extends AbstractMavenIntegrationTest
         verifier.verifyErrorFreeLog(); // primary check: shell crash produces non-zero exit
 
         // Secondary: verify the literal placeholder flowed through Maven.
-        // Maven resolves the unknown ${some.maven.placeholder} to empty.
+        // Unknown ${...} expressions are preserved as literals (Maven 3 semantics, see gh-12507);
+        // they are not replaced with empty strings at CLI parse time.
         Properties props = verifier.loadProperties("target/pom.properties");
-        assertEquals("-value__end-", props.getProperty("project.properties.pom.placeholder"));
+        assertEquals(
+                "-value_${some.maven.placeholder}_end-", props.getProperty("project.properties.pom.placeholder"));
     }
 }
