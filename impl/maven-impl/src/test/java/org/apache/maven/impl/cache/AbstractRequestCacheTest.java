@@ -736,8 +736,7 @@ class AbstractRequestCacheTest {
         @SuppressWarnings("unchecked")
         protected <REQ extends Request<?>, REP extends Result<REQ>> CachingSupplier<REQ, REP> doCache(
                 REQ req, Function<REQ, REP> supplier) {
-            return (CachingSupplier<REQ, REP>)
-                    cache.computeIfAbsent(req, r -> new CachingSupplier<>(supplier));
+            return (CachingSupplier<REQ, REP>) cache.computeIfAbsent(req, r -> new CachingSupplier<>(supplier));
         }
     }
 
