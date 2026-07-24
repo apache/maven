@@ -426,15 +426,15 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             // Update property value if it's below minimum version
             return upgradePropertyVersion(pomDocument, propertyName, upgrade, sectionName, context);
         } else {
-            // Check for Maven 4 pre-release versions (beta/alpha) that use removed API methods.
+            // Check for Maven 4 pre-release versions (alpha/beta/rc) that use removed API methods.
             // These versions are numerically higher than 3.x but compiled against unstable Maven 4
-            // API where methods were renamed/removed before RC.
+            // API where methods were renamed or removed before GA.
             if (isMaven4PreRelease(currentVersion)) {
                 Editor editor = new Editor(pomDocument);
                 editor.setTextContent(versionElement, upgrade.minVersion);
                 context.detail("Upgraded " + upgrade.groupId + ":" + upgrade.artifactId + " from pre-release "
                         + currentVersion + " to " + upgrade.minVersion
-                        + " in " + sectionName + " (Maven 4 beta API methods were renamed/removed before RC)");
+                        + " in " + sectionName + " (Maven 4 pre-release API methods were renamed/removed before GA)");
                 return true;
             }
 
@@ -590,8 +590,8 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
     }
 
     /**
-     * Checks if a version string is a Maven 4 pre-release (alpha or beta) version.
-     * These versions use API methods that were renamed or removed before the RC/GA release,
+     * Checks if a version string is a Maven 4 pre-release version.
+     * These versions use API methods that were renamed or removed before the GA release,
      * causing NoSuchMethodError at runtime. They need to be upgraded regardless of the
      * numeric version comparison (since 4.0.0-beta-1 > 3.x in Maven version semantics).
      */
@@ -600,7 +600,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             return false;
         }
         // Match patterns like: 4.0.0-beta-1, 4.0.0-alpha-1, 4.0.0-SNAPSHOT, 4.0.0-beta1
-        return version.startsWith("4.0.0-") && !version.startsWith("4.0.0-rc");
+        return version.startsWith("4.0.0-");
     }
 
     /**

@@ -1766,11 +1766,11 @@ class PluginUpgradeStrategyTest {
         }
 
         @Test
-        @DisplayName("should not detect 4.0.0-rc-1 as Maven 4 pre-release")
-        void shouldNotDetectRc1AsMaven4PreRelease() {
-            assertFalse(
+        @DisplayName("should detect 4.0.0-rc-1 as Maven 4 pre-release")
+        void shouldDetectRc1AsMaven4PreRelease() {
+            assertTrue(
                     PluginUpgradeStrategy.isMaven4PreRelease("4.0.0-rc-1"),
-                    "4.0.0-rc-1 should not be detected as Maven 4 pre-release");
+                    "4.0.0-rc-1 should be detected as Maven 4 pre-release");
         }
 
         @Test
