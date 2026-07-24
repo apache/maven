@@ -21,6 +21,7 @@ package org.apache.maven.impl;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -165,15 +166,25 @@ public class DefaultArtifactResolver implements ArtifactResolver {
                     Repository repository = result.getRepository() != null
                             ? session.getRepository(result.getRepository()).orElse(null)
                             : null;
-                    Map<Repository, List<Exception>> mappedExceptions = result.getMappedExceptions().entrySet().stream()
-                            .collect(Collectors.toMap(
-                                    entry -> session.getRepository(entry.getKey())
-                                            .orElse(null),
-                                    Map.Entry::getValue));
+                    // Build mapped exceptions, filtering out NO_REPOSITORY sentinel entries
+                    // (those represent errors with no associated repository). Keep a flat list
+                    // of all exceptions so isMissing() can still check all of them.
+                    Map<Repository, List<Exception>> mappedExceptions = new HashMap<>();
+                    List<Exception> allExceptions = new ArrayList<>();
+                    for (var entry : result.getMappedExceptions().entrySet()) {
+                        allExceptions.addAll(entry.getValue());
+                        session.getRepository(entry.getKey())
+                                .ifPresent(repo -> mappedExceptions.merge(repo, entry.getValue(), (a, b) -> {
+                                    var merged = new ArrayList<>(a);
+                                    merged.addAll(b);
+                                    return merged;
+                                }));
+                    }
                     return new DefaultArtifactResolverResultItem(
                             coordinates,
                             artifact,
                             mappedExceptions,
+                            allExceptions,
                             repository,
                             result.getArtifact() != null ? result.getArtifact().getPath() : null);
                 })
@@ -186,6 +197,7 @@ public class DefaultArtifactResolver implements ArtifactResolver {
             @Nonnull ArtifactCoordinates coordinates,
             @Nullable DownloadedArtifact artifact,
             @Nonnull Map<Repository, List<Exception>> exceptions,
+            @Nonnull List<Exception> allExceptions,
             @Nullable Repository repository,
             Path path)
             implements ArtifactResolverResult.ResultItem {
@@ -221,10 +233,9 @@ public class DefaultArtifactResolver implements ArtifactResolver {
 
         @Override
         public boolean isMissing() {
-            return exceptions.values().stream()
-                            .flatMap(List::stream)
-                            .allMatch(e -> e instanceof ArtifactNotFoundException)
-                    && !isResolved();
+            // Use allExceptions (not the mapped exceptions map) so that exceptions
+            // recorded under ArtifactResult.NO_REPOSITORY are still considered.
+            return allExceptions.stream().allMatch(e -> e instanceof ArtifactNotFoundException) && !isResolved();
         }
     }
 
