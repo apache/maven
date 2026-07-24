@@ -537,10 +537,12 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
     /**
      * Returns the map of plugin migrations keyed by old groupId:artifactId.
      */
+    private static final Map<String, PluginMigration> PLUGIN_MIGRATIONS_MAP = PLUGIN_MIGRATIONS.stream()
+            .collect(Collectors.toMap(
+                    migration -> migration.oldGroupId() + ":" + migration.oldArtifactId(), migration -> migration));
+
     private Map<String, PluginMigration> getPluginMigrationsMap() {
-        return PLUGIN_MIGRATIONS.stream()
-                .collect(Collectors.toMap(
-                        migration -> migration.oldGroupId() + ":" + migration.oldArtifactId(), migration -> migration));
+        return PLUGIN_MIGRATIONS_MAP;
     }
 
     /**

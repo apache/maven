@@ -170,7 +170,7 @@ public class DuplicateElementStrategy extends AbstractUpgradeStrategy {
 
         // Remove duplicates
         for (Element duplicate : duplicates) {
-            String elementPath = buildElementPath(element, duplicate);
+            String elementPath = buildElementPath(element);
             context.detail("Removed duplicate <" + duplicate.name() + "> element in " + elementPath);
             DomUtils.removeElement(duplicate);
             removed = true;
@@ -188,9 +188,9 @@ public class DuplicateElementStrategy extends AbstractUpgradeStrategy {
     /**
      * Builds a human-readable path for the element for logging purposes.
      */
-    private String buildElementPath(Element parent, Element child) {
+    private String buildElementPath(Element element) {
         List<String> segments = new ArrayList<>();
-        Element current = parent;
+        Element current = element;
         while (current != null) {
             segments.add(0, current.name());
             current = current.parent() instanceof Element p ? p : null;
