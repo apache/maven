@@ -201,4 +201,41 @@ class DefaultArtifactResolverTest {
         // Exceptions map should not have null keys
         assertFalse(item.getExceptions().containsKey(null));
     }
+
+    /**
+     * Verifies that {@code isMissing()} returns {@code false} when there are no exceptions
+     * at all, even if the artifact is unresolved. An empty exception list should not trigger
+     * vacuous-truth: "all zero exceptions are ArtifactNotFoundException" must not mean missing.
+     */
+    @Test
+    void isMissingReturnsFalseWhenNoExceptions() {
+        InternalSession session = mock(InternalSession.class);
+        ArtifactResolverRequest request = mock(ArtifactResolverRequest.class);
+        when(request.getSession()).thenReturn(session);
+
+        DefaultArtifact aetherArtifact = new DefaultArtifact("g:a:1.0");
+        ArtifactCoordinates coordinates = mock(ArtifactCoordinates.class);
+        org.apache.maven.api.Artifact mavenArtifact = mock(org.apache.maven.api.Artifact.class);
+        when(mavenArtifact.toCoordinates()).thenReturn(coordinates);
+        doReturn(mavenArtifact).when(session).getArtifact(any(org.eclipse.aether.artifact.Artifact.class));
+
+        // Create an ArtifactResult with no exceptions and no resolved artifact
+        ArtifactRequest artRequest = new ArtifactRequest();
+        artRequest.setArtifact(aetherArtifact);
+        ArtifactResult aetherResult = new ArtifactResult(artRequest);
+        // No exceptions added, artifact not resolved (no path)
+
+        DefaultArtifactResolver resolver = new DefaultArtifactResolver();
+        DefaultArtifactResolver.ResolverResult resolverResult =
+                new DefaultArtifactResolver.ResolverResult(null, aetherResult);
+        ArtifactResolverResult result = resolver.toResult(request, Stream.of(resolverResult));
+
+        ArtifactResolverResult.ResultItem item = result.getResult(coordinates);
+
+        // No exceptions, not resolved
+        assertTrue(item.getExceptions().isEmpty());
+        assertFalse(item.isResolved());
+        // isMissing() must be false — no exceptions means we cannot conclude it's "missing"
+        assertFalse(item.isMissing(), "isMissing() must not return true on empty exceptions (vacuous truth)");
+    }
 }

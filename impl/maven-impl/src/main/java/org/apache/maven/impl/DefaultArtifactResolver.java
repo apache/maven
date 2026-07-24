@@ -184,7 +184,7 @@ public class DefaultArtifactResolver implements ArtifactResolver {
                             coordinates,
                             artifact,
                             mappedExceptions,
-                            allExceptions,
+                            List.copyOf(allExceptions),
                             repository,
                             result.getArtifact() != null ? result.getArtifact().getPath() : null);
                 })
@@ -235,7 +235,11 @@ public class DefaultArtifactResolver implements ArtifactResolver {
         public boolean isMissing() {
             // Use allExceptions (not the mapped exceptions map) so that exceptions
             // recorded under ArtifactResult.NO_REPOSITORY are still considered.
-            return allExceptions.stream().allMatch(e -> e instanceof ArtifactNotFoundException) && !isResolved();
+            // Guard against vacuous truth: an empty list means no exceptions at all,
+            // not "all exceptions are ArtifactNotFoundException".
+            return !allExceptions.isEmpty()
+                    && allExceptions.stream().allMatch(e -> e instanceof ArtifactNotFoundException)
+                    && !isResolved();
         }
     }
 
