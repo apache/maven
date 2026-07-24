@@ -71,6 +71,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     DEFAULT_MAVEN_PLUGIN_GROUP_ID,
                     "maven-compiler-plugin",
                     "3.11.0",
+                    "4.0.0-beta-4",
                     "Versions before 3.11 cannot find ErrorProne plug-in under Maven 4 classloading"),
             new PluginUpgrade("org.codehaus.mojo", "exec-maven-plugin", "3.5.0", MAVEN_4_COMPATIBILITY_REASON),
             new PluginUpgrade(
@@ -101,7 +102,32 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     DEFAULT_MAVEN_PLUGIN_GROUP_ID,
                     "maven-resources-plugin",
                     "3.3.1",
-                    "Beta/RC versions compiled against different Maven 4 API signatures"),
+                    "4.0.0-beta-1",
+                    "Pre-release versions compiled against different Maven 4 API signatures"),
+            new PluginUpgrade(
+                    DEFAULT_MAVEN_PLUGIN_GROUP_ID,
+                    "maven-jar-plugin",
+                    "3.5.0",
+                    "4.0.0-beta-1",
+                    "Pre-release versions compiled against different Maven 4 API signatures"),
+            new PluginUpgrade(
+                    DEFAULT_MAVEN_PLUGIN_GROUP_ID,
+                    "maven-install-plugin",
+                    "3.1.4",
+                    "4.0.0-beta-2",
+                    "Pre-release versions compiled against different Maven 4 API signatures"),
+            new PluginUpgrade(
+                    DEFAULT_MAVEN_PLUGIN_GROUP_ID,
+                    "maven-deploy-plugin",
+                    "3.1.4",
+                    "4.0.0-beta-2",
+                    "Pre-release versions compiled against different Maven 4 API signatures"),
+            new PluginUpgrade(
+                    DEFAULT_MAVEN_PLUGIN_GROUP_ID,
+                    "maven-clean-plugin",
+                    "3.5.0",
+                    "4.0.0-beta-2",
+                    "Pre-release versions compiled against different Maven 4 API signatures"),
             new PluginUpgrade(
                     "org.codehaus.mojo",
                     "jaxb2-maven-plugin",
@@ -272,53 +298,14 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
      * Returns the map of plugins that need to be upgraded for Maven 4 compatibility.
      */
     private Map<String, PluginUpgradeInfo> getPluginUpgradesMap() {
-        Map<String, PluginUpgradeInfo> upgrades = new HashMap<>();
-        upgrades.put(
-                DEFAULT_MAVEN_PLUGIN_GROUP_ID + ":maven-compiler-plugin",
-                new PluginUpgradeInfo(DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-compiler-plugin", "3.11.0"));
-        upgrades.put(
-                "org.codehaus.mojo:exec-maven-plugin",
-                new PluginUpgradeInfo("org.codehaus.mojo", "exec-maven-plugin", "3.5.0"));
-        upgrades.put(
-                DEFAULT_MAVEN_PLUGIN_GROUP_ID + ":maven-enforcer-plugin",
-                new PluginUpgradeInfo(DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-enforcer-plugin", "3.5.0"));
-        upgrades.put(
-                "org.codehaus.mojo:flatten-maven-plugin",
-                new PluginUpgradeInfo("org.codehaus.mojo", "flatten-maven-plugin", "1.2.7"));
-        upgrades.put(
-                DEFAULT_MAVEN_PLUGIN_GROUP_ID + ":maven-shade-plugin",
-                new PluginUpgradeInfo(DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-shade-plugin", "3.5.0"));
-        upgrades.put(
-                DEFAULT_MAVEN_PLUGIN_GROUP_ID + ":maven-remote-resources-plugin",
-                new PluginUpgradeInfo(DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-remote-resources-plugin", "3.0.0"));
-        upgrades.put(
-                DEFAULT_MAVEN_PLUGIN_GROUP_ID + ":maven-surefire-plugin",
-                new PluginUpgradeInfo(DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-surefire-plugin", "3.5.2"));
-        upgrades.put(
-                DEFAULT_MAVEN_PLUGIN_GROUP_ID + ":maven-failsafe-plugin",
-                new PluginUpgradeInfo(DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-failsafe-plugin", "3.5.2"));
-        upgrades.put(
-                DEFAULT_MAVEN_PLUGIN_GROUP_ID + ":maven-surefire-report-plugin",
-                new PluginUpgradeInfo(DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-surefire-report-plugin", "3.5.2"));
-        upgrades.put(
-                "net.alchim31.maven:scala-maven-plugin",
-                new PluginUpgradeInfo("net.alchim31.maven", "scala-maven-plugin", "4.9.5"));
-        upgrades.put(
-                DEFAULT_MAVEN_PLUGIN_GROUP_ID + ":maven-resources-plugin",
-                new PluginUpgradeInfo(DEFAULT_MAVEN_PLUGIN_GROUP_ID, "maven-resources-plugin", "3.3.1"));
-        upgrades.put(
-                "org.codehaus.mojo:jaxb2-maven-plugin",
-                new PluginUpgradeInfo("org.codehaus.mojo", "jaxb2-maven-plugin", "3.2.0"));
-        upgrades.put(
-                "io.quarkus:quarkus-maven-plugin",
-                new PluginUpgradeInfo("io.quarkus", "quarkus-maven-plugin", "3.26.0"));
-        upgrades.put(
-                "io.quarkus.platform:quarkus-maven-plugin",
-                new PluginUpgradeInfo("io.quarkus.platform", "quarkus-maven-plugin", "3.26.0"));
-        upgrades.put(
-                "org.codehaus.gmavenplus:gmavenplus-plugin",
-                new PluginUpgradeInfo("org.codehaus.gmavenplus", "gmavenplus-plugin", "4.2.0"));
-        return upgrades;
+        return PLUGIN_UPGRADES.stream()
+                .collect(Collectors.toMap(
+                        upgrade -> upgrade.groupId() + ":" + upgrade.artifactId(),
+                        upgrade -> new PluginUpgradeInfo(
+                                upgrade.groupId(),
+                                upgrade.artifactId(),
+                                upgrade.minVersion(),
+                                upgrade.latestPreRelease())));
     }
 
     /**
@@ -426,19 +413,23 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             // Update property value if it's below minimum version
             return upgradePropertyVersion(pomDocument, propertyName, upgrade, sectionName, context);
         } else {
-            // Check for Maven 4 pre-release versions (alpha/beta/rc) that use removed API methods.
-            // These versions are numerically higher than 3.x but compiled against unstable Maven 4
-            // API where methods were renamed or removed before GA.
-            if (isMaven4PreRelease(currentVersion)) {
-                Editor editor = new Editor(pomDocument);
-                editor.setTextContent(versionElement, upgrade.minVersion);
-                context.detail("Upgraded " + upgrade.groupId + ":" + upgrade.artifactId + " from pre-release "
-                        + currentVersion + " to " + upgrade.minVersion
-                        + " in " + sectionName + " (Maven 4 pre-release API methods were renamed/removed before GA)");
-                return true;
+            // Check for Maven 4 pre-release versions (alpha/beta/rc) that should be
+            // upgraded to the latest available pre-release rather than downgraded to 3.x.
+            if (isMaven4PreRelease(currentVersion) && upgrade.latestPreRelease != null) {
+                if (isVersionBelow(currentVersion, upgrade.latestPreRelease)) {
+                    Editor editor = new Editor(pomDocument);
+                    editor.setTextContent(versionElement, upgrade.latestPreRelease);
+                    context.detail("Upgraded " + upgrade.groupId + ":" + upgrade.artifactId + " from pre-release "
+                            + currentVersion + " to " + upgrade.latestPreRelease + " in " + sectionName);
+                    return true;
+                } else {
+                    context.debug("Plugin " + upgrade.groupId + ":" + upgrade.artifactId + " version " + currentVersion
+                            + " is already >= " + upgrade.latestPreRelease);
+                }
+                return false;
             }
 
-            // Direct version comparison and upgrade
+            // Direct version comparison and upgrade (for 3.x versions)
             if (isVersionBelow(currentVersion, upgrade.minVersion)) {
                 Editor editor = new Editor(pomDocument);
                 editor.setTextContent(versionElement, upgrade.minVersion);
@@ -472,13 +463,23 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     propertiesElement.childElement(propertyName).orElse(null);
             if (propertyElement != null) {
                 String currentVersion = propertyElement.textContentTrimmed();
-                if (isMaven4PreRelease(currentVersion) || isVersionBelow(currentVersion, upgrade.minVersion)) {
-                    String reason = isMaven4PreRelease(currentVersion) ? " (Maven 4 pre-release API)" : "";
+                // For 4.x pre-release versions, upgrade to latest pre-release (not 3.x)
+                if (isMaven4PreRelease(currentVersion) && upgrade.latestPreRelease != null) {
+                    if (isVersionBelow(currentVersion, upgrade.latestPreRelease)) {
+                        editor.setTextContent(propertyElement, upgrade.latestPreRelease);
+                        context.detail("Upgraded property " + propertyName + " (for " + upgrade.groupId + ":"
+                                + upgrade.artifactId + ") from pre-release " + currentVersion + " to "
+                                + upgrade.latestPreRelease + " in " + sectionName);
+                        return true;
+                    } else {
+                        context.debug("Property " + propertyName + " version " + currentVersion + " is already >= "
+                                + upgrade.latestPreRelease);
+                    }
+                } else if (isVersionBelow(currentVersion, upgrade.minVersion)) {
                     editor.setTextContent(propertyElement, upgrade.minVersion);
                     context.detail(
                             "Upgraded property " + propertyName + " (for " + upgrade.groupId + ":" + upgrade.artifactId
-                                    + ") from " + currentVersion + " to " + upgrade.minVersion + " in " + sectionName
-                                    + reason);
+                                    + ") from " + currentVersion + " to " + upgrade.minVersion + " in " + sectionName);
                     return true;
                 } else {
                     context.debug("Property " + propertyName + " version " + currentVersion + " is already >= "
@@ -585,8 +586,11 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         return PLUGIN_DEPENDENCY_UPGRADES.stream()
                 .collect(Collectors.toMap(
                         upgrade -> upgrade.groupId() + ":" + upgrade.artifactId(),
-                        upgrade ->
-                                new PluginUpgradeInfo(upgrade.groupId(), upgrade.artifactId(), upgrade.minVersion())));
+                        upgrade -> new PluginUpgradeInfo(
+                                upgrade.groupId(),
+                                upgrade.artifactId(),
+                                upgrade.minVersion(),
+                                upgrade.latestPreRelease())));
     }
 
     /**
@@ -1279,8 +1283,11 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         /** The Maven artifactId of the plugin */
         final String artifactId;
 
-        /** The minimum version required for Maven 4 compatibility */
+        /** The minimum version required for Maven 4 compatibility (for 3.x users) */
         final String minVersion;
+
+        /** The latest available 4.x pre-release version, or null if none exists */
+        final String latestPreRelease;
 
         /**
          * Creates a new plugin upgrade information holder.
@@ -1291,11 +1298,18 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
          *            the Maven artifactId of the plugin
          * @param minVersion
          *            the minimum version required for Maven 4 compatibility
+         * @param latestPreRelease
+         *            the latest 4.x pre-release version, or null
          */
-        PluginUpgradeInfo(String groupId, String artifactId, String minVersion) {
+        PluginUpgradeInfo(String groupId, String artifactId, String minVersion, String latestPreRelease) {
             this.groupId = groupId;
             this.artifactId = artifactId;
             this.minVersion = minVersion;
+            this.latestPreRelease = latestPreRelease;
+        }
+
+        PluginUpgradeInfo(String groupId, String artifactId, String minVersion) {
+            this(groupId, artifactId, minVersion, null);
         }
     }
 }

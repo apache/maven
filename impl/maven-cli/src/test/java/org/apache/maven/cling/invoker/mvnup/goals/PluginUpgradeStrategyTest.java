@@ -1734,75 +1734,60 @@ class PluginUpgradeStrategyTest {
     class Maven4PreReleaseTests {
 
         @Test
-        @DisplayName("should detect 4.0.0-beta-1 as Maven 4 pre-release")
-        void shouldDetectBeta1AsMaven4PreRelease() {
+        @DisplayName("should detect 4.0.0 pre-release versions")
+        void shouldDetectPreReleaseVersions() {
+            assertTrue(PluginUpgradeStrategy.isMaven4PreRelease("4.0.0-beta-1"));
+            assertTrue(PluginUpgradeStrategy.isMaven4PreRelease("4.0.0-beta-2"));
+            assertTrue(PluginUpgradeStrategy.isMaven4PreRelease("4.0.0-alpha-1"));
+            assertTrue(PluginUpgradeStrategy.isMaven4PreRelease("4.0.0-SNAPSHOT"));
+            assertTrue(PluginUpgradeStrategy.isMaven4PreRelease("4.0.0-rc-1"));
+        }
+
+        @Test
+        @DisplayName("should not detect non-pre-release versions")
+        void shouldNotDetectNonPreReleaseVersions() {
+            assertFalse(PluginUpgradeStrategy.isMaven4PreRelease("4.0.0"));
+            assertFalse(PluginUpgradeStrategy.isMaven4PreRelease("3.5.0"));
+            assertFalse(PluginUpgradeStrategy.isMaven4PreRelease("3.14.0"));
+            assertFalse(PluginUpgradeStrategy.isMaven4PreRelease(null));
+        }
+
+        @Test
+        @DisplayName("should upgrade beta-1 to latest pre-release, not downgrade to 3.x")
+        void shouldUpgradeBetaToLatestPreRelease() throws Exception {
+            Document doc = PomBuilder.create()
+                    .plugin("org.apache.maven.plugins", "maven-compiler-plugin", "4.0.0-beta-1")
+                    .buildDocument();
+            strategy.doApply(createMockContext(), Map.of(Paths.get("pom.xml"), doc));
+            String xml = DomUtils.toXml(doc);
             assertTrue(
-                    PluginUpgradeStrategy.isMaven4PreRelease("4.0.0-beta-1"),
-                    "4.0.0-beta-1 should be detected as Maven 4 pre-release");
+                    xml.contains("<version>4.0.0-beta-4</version>"),
+                    "Should upgrade to latest pre-release, not downgrade to 3.11.0");
         }
 
         @Test
-        @DisplayName("should detect 4.0.0-beta-2 as Maven 4 pre-release")
-        void shouldDetectBeta2AsMaven4PreRelease() {
+        @DisplayName("should not downgrade when already at latest pre-release")
+        void shouldNotDowngradeWhenAtLatestPreRelease() throws Exception {
+            Document doc = PomBuilder.create()
+                    .plugin("org.apache.maven.plugins", "maven-compiler-plugin", "4.0.0-beta-4")
+                    .buildDocument();
+            strategy.doApply(createMockContext(), Map.of(Paths.get("pom.xml"), doc));
             assertTrue(
-                    PluginUpgradeStrategy.isMaven4PreRelease("4.0.0-beta-2"),
-                    "4.0.0-beta-2 should be detected as Maven 4 pre-release");
+                    DomUtils.toXml(doc).contains("<version>4.0.0-beta-4</version>"),
+                    "Should keep latest pre-release unchanged");
         }
 
         @Test
-        @DisplayName("should detect 4.0.0-alpha-1 as Maven 4 pre-release")
-        void shouldDetectAlpha1AsMaven4PreRelease() {
+        @DisplayName("should upgrade pre-release property to latest pre-release")
+        void shouldUpgradePreReleaseProperty() throws Exception {
+            Document doc = PomBuilder.create()
+                    .property("compiler.version", "4.0.0-beta-1")
+                    .plugin("org.apache.maven.plugins", "maven-compiler-plugin", "${compiler.version}")
+                    .buildDocument();
+            strategy.doApply(createMockContext(), Map.of(Paths.get("pom.xml"), doc));
             assertTrue(
-                    PluginUpgradeStrategy.isMaven4PreRelease("4.0.0-alpha-1"),
-                    "4.0.0-alpha-1 should be detected as Maven 4 pre-release");
-        }
-
-        @Test
-        @DisplayName("should detect 4.0.0-SNAPSHOT as Maven 4 pre-release")
-        void shouldDetectSnapshotAsMaven4PreRelease() {
-            assertTrue(
-                    PluginUpgradeStrategy.isMaven4PreRelease("4.0.0-SNAPSHOT"),
-                    "4.0.0-SNAPSHOT should be detected as Maven 4 pre-release");
-        }
-
-        @Test
-        @DisplayName("should detect 4.0.0-rc-1 as Maven 4 pre-release")
-        void shouldDetectRc1AsMaven4PreRelease() {
-            assertTrue(
-                    PluginUpgradeStrategy.isMaven4PreRelease("4.0.0-rc-1"),
-                    "4.0.0-rc-1 should be detected as Maven 4 pre-release");
-        }
-
-        @Test
-        @DisplayName("should not detect 4.0.0 release as Maven 4 pre-release")
-        void shouldNotDetect400ReleaseAsMaven4PreRelease() {
-            assertFalse(
-                    PluginUpgradeStrategy.isMaven4PreRelease("4.0.0"),
-                    "4.0.0 should not be detected as Maven 4 pre-release");
-        }
-
-        @Test
-        @DisplayName("should not detect 3.5.0 as Maven 4 pre-release")
-        void shouldNotDetect350AsMaven4PreRelease() {
-            assertFalse(
-                    PluginUpgradeStrategy.isMaven4PreRelease("3.5.0"),
-                    "3.5.0 should not be detected as Maven 4 pre-release");
-        }
-
-        @Test
-        @DisplayName("should not detect 3.14.0 as Maven 4 pre-release")
-        void shouldNotDetect3140AsMaven4PreRelease() {
-            assertFalse(
-                    PluginUpgradeStrategy.isMaven4PreRelease("3.14.0"),
-                    "3.14.0 should not be detected as Maven 4 pre-release");
-        }
-
-        @Test
-        @DisplayName("should not detect null as Maven 4 pre-release")
-        void shouldNotDetectNullAsMaven4PreRelease() {
-            assertFalse(
-                    PluginUpgradeStrategy.isMaven4PreRelease(null),
-                    "null should not be detected as Maven 4 pre-release");
+                    DomUtils.toXml(doc).contains(">4.0.0-beta-4</"),
+                    "Should upgrade property to latest pre-release, not 3.x");
         }
     }
 

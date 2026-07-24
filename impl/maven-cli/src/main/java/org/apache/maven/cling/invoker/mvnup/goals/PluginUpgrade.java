@@ -25,7 +25,19 @@ package org.apache.maven.cling.invoker.mvnup.goals;
  *
  * @param groupId the Maven groupId of the plugin
  * @param artifactId the Maven artifactId of the plugin
- * @param minVersion the minimum version required for Maven 4 compatibility
+ * @param minVersion the minimum version required for Maven 4 compatibility (for 3.x users)
+ * @param latestPreRelease the latest available 4.x pre-release version, or {@code null} if
+ *     the plugin has no 4.x pre-release line. Used to upgrade old 4.x alpha/beta/RC versions
+ *     to the latest pre-release rather than downgrading to a 3.x version.
  * @param reason the reason why this plugin needs to be upgraded
  */
-public record PluginUpgrade(String groupId, String artifactId, String minVersion, String reason) {}
+public record PluginUpgrade(
+        String groupId, String artifactId, String minVersion, String latestPreRelease, String reason) {
+
+    /**
+     * Convenience constructor for plugins without a 4.x pre-release line.
+     */
+    public PluginUpgrade(String groupId, String artifactId, String minVersion, String reason) {
+        this(groupId, artifactId, minVersion, null, reason);
+    }
+}
