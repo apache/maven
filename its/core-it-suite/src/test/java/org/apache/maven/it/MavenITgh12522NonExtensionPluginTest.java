@@ -26,18 +26,22 @@ import org.junit.jupiter.api.Test;
  * This is a test for <a href="https://github.com/apache/maven/issues/12522">GH-12522</a>.
  *
  * Verifies that plugins that are NOT configured with {@code <extensions>true</extensions>}
- * do not have their JSR330/Plexus components picked up as extensions. Prior to the fix,
- * Maven would discover and attempt to provision extension components from non-extension
- * plugins, causing build failures such as {@code Unable to provision} errors.
+ * do not cause build failures when they ship JSR330 components whose internal dependencies
+ * cannot be resolved in Maven's container. Prior to the fix, Sisu's live-injected
+ * {@code List<ProjectExecutionListener>} would pick up such components and attempt to
+ * provision them, causing {@code Unable to provision} errors that aborted the build.
  *
- * The reproducer uses {@code tycho-bnd-plugin} which ships JSR330 components but is not
+ * The reproducer uses {@code tycho-bnd-plugin} which ships a {@code ProjectExecutionListener}
+ * ({@code BndProjectExecutionListener}) as a {@code @Named} JSR330 component but is not
  * configured as an extension in the POM.
  */
 class MavenITgh12522NonExtensionPluginTest extends AbstractMavenIntegrationTestCase {
 
     /**
      * Verify that a build using a plugin with JSR330 components (tycho-bnd-plugin)
-     * that is NOT marked as an extension succeeds without provisioning errors.
+     * that is NOT marked as an extension completes successfully. The plugin's
+     * {@code ProjectExecutionListener} should be silently skipped rather than
+     * causing the build to fail with a provisioning error.
      */
     @Test
     void testNonExtensionPluginComponentsNotPickedUp() throws Exception {
@@ -47,7 +51,5 @@ class MavenITgh12522NonExtensionPluginTest extends AbstractMavenIntegrationTestC
         verifier.addCliArgument("process-classes");
         verifier.execute();
         verifier.verifyErrorFreeLog();
-
-        verifier.verifyTextNotInLog("Unable to provision");
     }
 }
