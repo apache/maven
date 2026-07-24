@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.dualapi</groupId>
+  <artifactId>dual-api-maven-plugin</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>maven-plugin</packaging>
+
+  <name>Dual-API Maven Plugin (IT)</name>
+  <description>
+    Integration test plugin that compiles against Maven 3 API but detects
+    and leverages Maven 4 immutable API at runtime via reflection.
+    Demonstrates the "compile for 3, enhance for 4" pattern.
+  </description>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.release>17</maven.compiler.release>
+    <maven3.version>3.9.9</maven3.version>
+    <!--
+      Maven 4 API version for optional compile-time access.
+      At runtime on Maven 3 these classes are absent; the plugin
+      catches NoClassDefFoundError at the boundary and falls back.
+    -->
+    <maven4.api.version>4.0.0-rc-3</maven4.api.version>
+  </properties>
+
+  <dependencies>
+    <!-- ════════════════════════════════════════════════════════════
+         Maven 3 Plugin API — the mandatory compile-time contract.
+         These are always available at runtime (Maven 3 ships them
+         directly; Maven 4 provides them via its compat module).
+         ════════════════════════════════════════════════════════════ -->
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>${maven3.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-core</artifactId>
+      <version>${maven3.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugin-tools</groupId>
+      <artifactId>maven-plugin-annotations</artifactId>
+      <version>3.15.1</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+      <version>1</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- ════════════════════════════════════════════════════════════
+         Maven 4 API — optional compile-time dependency.
+         Lets Maven4Enhancer use real typed imports (Session, Project,
+         Version, etc.) instead of reflection for every method call.
+         At runtime on Maven 3 these classes simply don't exist;
+         the Mojo catches NoClassDefFoundError at the boundary.
+         ════════════════════════════════════════════════════════════ -->
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-core</artifactId>
+      <version>${maven4.api.version}</version>
+      <scope>provided</scope>
+      <optional>true</optional>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <!--
+            The IT framework injects -Dmaven.compiler.release=8 via MAVEN_OPTS.
+            Using explicit <release> in plugin config overrides that property.
+          -->
+          <release>17</release>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <version>3.15.1</version>
+      </plugin>
+    </plugins>
+  </build>
+</project>
