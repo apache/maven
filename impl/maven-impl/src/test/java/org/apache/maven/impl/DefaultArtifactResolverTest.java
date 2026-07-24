@@ -103,9 +103,12 @@ class DefaultArtifactResolverTest {
         // Verify the result
         ArtifactResolverResult.ResultItem item = result.getResult(coordinates);
 
-        // The exceptions map should NOT contain a null key
+        // The exceptions map should NOT contain a null key (Map.copyOf() guarantees this —
+        // containsKey(null) throws NPE on immutable maps, so verify via keySet instead)
         Map<Repository, List<Exception>> exceptions = item.getExceptions();
-        assertFalse(exceptions.containsKey(null), "Exceptions map should not contain null key from NO_REPOSITORY");
+        assertTrue(
+                exceptions.keySet().stream().noneMatch(k -> k == null),
+                "Exceptions map should not contain null key from NO_REPOSITORY");
 
         // The real repository's exceptions should still be present
         assertTrue(exceptions.containsKey(mavenLocalRepo), "Exceptions map should contain the real repository");
@@ -198,8 +201,8 @@ class DefaultArtifactResolverTest {
         assertTrue(item.isResolved());
         // Should NOT be missing (it's resolved)
         assertFalse(item.isMissing());
-        // Exceptions map should not have null keys
-        assertFalse(item.getExceptions().containsKey(null));
+        // Exceptions map should not have null keys (verify via keySet — immutable map throws NPE on containsKey(null))
+        assertTrue(item.getExceptions().keySet().stream().noneMatch(k -> k == null));
     }
 
     /**

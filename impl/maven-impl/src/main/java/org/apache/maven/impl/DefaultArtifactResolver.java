@@ -183,7 +183,7 @@ public class DefaultArtifactResolver implements ArtifactResolver {
                     return new DefaultArtifactResolverResultItem(
                             coordinates,
                             artifact,
-                            mappedExceptions,
+                            Map.copyOf(mappedExceptions),
                             List.copyOf(allExceptions),
                             repository,
                             result.getArtifact() != null ? result.getArtifact().getPath() : null);
