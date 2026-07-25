@@ -116,7 +116,7 @@ public class ${className} {
       #if ( $field.type == "String" )
         String src = source.get${capField}();
         String tgt = target.get${capField}();
-        if (src != null && (sourceDominant || tgt == null) && src != tgt) {
+        if (src != null && (sourceDominant || tgt == null) && !Objects.equals(src, tgt)) {
             builder.${field.name}(src);
         #if ( $locationTracking )
             builder.location("${field.name}", source.getLocation("${field.name}"));
@@ -140,13 +140,15 @@ public class ${className} {
                 builder.location("${field.name}", source.getLocation("${field.name}"));
         #end
             } else {
-                Map<String, String> merged = new HashMap<>();
-                merged.putAll(sourceDominant ? target.get${capField}() : source.get${capField}());
-                merged.putAll(sourceDominant ? source.get${capField}() : target.get${capField}());
-                builder.${field.name}(merged);
+                Map<String, String> merged = new HashMap<>(tgt.size() + src.size());
+                merged.putAll(sourceDominant ? tgt : src);
+                merged.putAll(sourceDominant ? src : tgt);
+                if (!merged.equals(tgt)) {
+                    builder.${field.name}(merged);
         #if ( $locationTracking )
-                builder.location("${field.name}", InputLocation.merge(target.getLocation("${field.name}"), source.getLocation("${field.name}"), sourceDominant));
+                    builder.location("${field.name}", InputLocation.merge(target.getLocation("${field.name}"), source.getLocation("${field.name}"), sourceDominant));
         #end
+                }
             }
         }
       #elseif ( $field.to && $field.multiplicity == "1" )
@@ -260,7 +262,14 @@ public class ${className} {
             list.mergeAll(tgt, (t, s) -> s);
         }
 
+        int sizeBefore = list.size();
         list.mergeAll(src, remapping);
+        // If the merge didn't change the list size and all values are identical,
+        // return the original target to preserve reference identity for the
+        // Builder.build() short-circuit.
+        if (list.size() == sizeBefore && sizeBefore == tgt.size() && list.contentEquals(tgt)) {
+            return tgt;
+        }
         return list;
     }
 
@@ -354,6 +363,25 @@ public class ${className} {
             } else {
                 return list.size();
             }
+        }
+
+        /**
+         * Check if this list's values are identical (by reference) to another list's values.
+         * Used to detect no-op merges so the original target reference can be returned,
+         * preserving the Builder.build() short-circuit.
+         */
+        boolean contentEquals(List<V> other) {
+            if (size() != other.size()) {
+                return false;
+            }
+            Iterator<V> it1 = iterator();
+            Iterator<V> it2 = other.iterator();
+            while (it1.hasNext()) {
+                if (it1.next() != it2.next()) {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

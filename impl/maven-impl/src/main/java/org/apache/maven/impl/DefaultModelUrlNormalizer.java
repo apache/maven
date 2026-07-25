@@ -18,6 +18,8 @@
  */
 package org.apache.maven.impl;
 
+import java.util.Objects;
+
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
@@ -51,24 +53,42 @@ public class DefaultModelUrlNormalizer implements ModelUrlNormalizer {
             return;
         }
 
-        builder.url(normalize(model.getUrl()));
+        String url = model.getUrl();
+        String normalizedUrl = normalize(url);
+        if (normalizedUrl != null && !normalizedUrl.equals(url)) {
+            builder.url(normalizedUrl);
+        }
 
         Scm scm = model.getScm();
         if (scm != null) {
-            builder.scm(Scm.newBuilder(scm)
-                    .url(normalize(scm.getUrl()))
-                    .connection(normalize(scm.getConnection()))
-                    .developerConnection(normalize(scm.getDeveloperConnection()))
-                    .build());
+            String scmUrl = normalize(scm.getUrl());
+            String scmConn = normalize(scm.getConnection());
+            String scmDevConn = normalize(scm.getDeveloperConnection());
+            if (!equals(scmUrl, scm.getUrl())
+                    || !equals(scmConn, scm.getConnection())
+                    || !equals(scmDevConn, scm.getDeveloperConnection())) {
+                builder.scm(Scm.newBuilder(scm)
+                        .url(scmUrl)
+                        .connection(scmConn)
+                        .developerConnection(scmDevConn)
+                        .build());
+            }
         }
 
         DistributionManagement dist = model.getDistributionManagement();
         if (dist != null) {
             Site site = dist.getSite();
             if (site != null) {
-                builder.distributionManagement(dist.withSite(site.withUrl(normalize(site.getUrl()))));
+                String siteUrl = normalize(site.getUrl());
+                if (siteUrl != null && !siteUrl.equals(site.getUrl())) {
+                    builder.distributionManagement(dist.withSite(site.withUrl(siteUrl)));
+                }
             }
         }
+    }
+
+    private static boolean equals(String s1, String s2) {
+        return Objects.equals(s1, s2);
     }
 
     private String normalize(String url) {
