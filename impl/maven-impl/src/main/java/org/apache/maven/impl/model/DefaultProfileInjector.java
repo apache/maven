@@ -98,6 +98,17 @@ public class DefaultProfileInjector implements ProfileInjector {
             return false;
         }
 
+        // For a single profile, write directly to the passed builder
+        if (lastIdx == 0) {
+            return doInjectSingleProfile(model, builder, profiles.get(0));
+        }
+
+        // For multiple profiles, process them all into intermediate models,
+        // then transfer the final result to the passed builder.
+        // We cannot write directly to the passed builder for intermediate profiles
+        // because the builder was created from the original model (before any injection),
+        // and the merge methods only write fields present in the CURRENT profile —
+        // fields from earlier profiles would be lost when build() falls back to base.
         Model current = model;
         boolean changed = false;
         for (int i = 0; i <= lastIdx; i++) {
@@ -105,8 +116,7 @@ public class DefaultProfileInjector implements ProfileInjector {
             if (profile == null) {
                 continue;
             }
-            boolean isLast = (i == lastIdx);
-            Model.Builder b = isLast ? builder : Model.newBuilder(current);
+            Model.Builder b = Model.newBuilder(current);
             merger.mergeModelBase(b, current, profile);
 
             if (profile.getBuild() != null) {
@@ -119,19 +129,46 @@ public class DefaultProfileInjector implements ProfileInjector {
                 }
             }
 
-            if (!isLast) {
-                Model next = b.build();
-                if (next != current) {
-                    changed = true;
-                }
-                current = next;
-            } else {
-                // For the last profile, we can't easily detect change without building,
-                // but if we got here, at least one profile was non-null and merge was attempted
+            Model next = b.build();
+            if (next != current) {
                 changed = true;
+            }
+            current = next;
+        }
+
+        // Transfer all accumulated changes to the passed builder
+        if (changed) {
+            merger.mergeModelBase(builder, model, current);
+            if (current.getBuild() != null) {
+                Build origBuild = model.getBuild() != null ? model.getBuild() : Build.newInstance();
+                if (current.getBuild() != origBuild) {
+                    builder.build(current.getBuild());
+                }
             }
         }
         return changed;
+    }
+
+    /**
+     * Injects a single profile directly into the passed builder.
+     */
+    private boolean doInjectSingleProfile(Model model, Model.Builder builder, Profile profile) {
+        if (profile == null) {
+            return false;
+        }
+        merger.mergeModelBase(builder, model, profile);
+
+        if (profile.getBuild() != null) {
+            Build build = model.getBuild() != null ? model.getBuild() : Build.newInstance();
+            Build.Builder bbuilder = Build.newBuilder(build);
+            merger.mergeBuildBase(bbuilder, build, profile.getBuild());
+            Build newBuild = bbuilder.build();
+            if (newBuild != build) {
+                builder.build(newBuild);
+            }
+        }
+        // We can't easily detect change without building, but merge was attempted
+        return true;
     }
 
     /**
