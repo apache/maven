@@ -53,44 +53,85 @@ import org.apache.maven.api.services.model.ProfileInjector;
 @Singleton
 public class DefaultProfileInjector implements ProfileInjector {
 
-    private static final Map<Model, Map<List<Profile>, Model>> CACHE = Collections.synchronizedMap(new WeakHashMap<>());
-
-    // In order for the weak hash map to work correctly, we must not hold any reference to
-    // the model used as the key.  So we use a dummy model as a placeholder to indicate that
-    // we want to store the model used as they key.
-    private static final Model KEY = Model.newInstance();
+    /**
+     * Cache to detect no-change profile injections (avoids redundant merge work).
+     * Maps model → (profiles → true if profiles produce changes).
+     */
+    private static final Map<Model, Map<List<Profile>, Boolean>> CACHE =
+            Collections.synchronizedMap(new WeakHashMap<>());
 
     private final ProfileModelMerger merger = new ProfileModelMerger();
 
     @Override
-    public Model injectProfiles(
-            Model model, List<Profile> profiles, ModelBuilderRequest request, ModelProblemCollector problems) {
-        Model result = CACHE.computeIfAbsent(model, k -> new ConcurrentHashMap<>())
-                .computeIfAbsent(profiles, l -> doInjectProfiles(model, profiles));
-        return result == KEY ? model : result;
+    public void injectProfiles(
+            Model model,
+            Model.Builder builder,
+            List<Profile> profiles,
+            ModelBuilderRequest request,
+            ModelProblemCollector problems) {
+        // Check cache for known no-op
+        Boolean hasChanges =
+                CACHE.computeIfAbsent(model, k -> new ConcurrentHashMap<>()).get(profiles);
+        if (hasChanges != null && !hasChanges) {
+            return;
+        }
+        boolean changed = doInjectProfiles(model, builder, profiles);
+        CACHE.get(model).putIfAbsent(profiles, changed);
     }
 
-    private Model doInjectProfiles(Model model, List<Profile> profiles) {
-        Model orgModel = model;
-        for (Profile profile : profiles) {
-            if (profile != null) {
-                Model.Builder builder = Model.newBuilder(model);
-                merger.mergeModelBase(builder, model, profile);
-
-                if (profile.getBuild() != null) {
-                    Build build = model.getBuild() != null ? model.getBuild() : Build.newInstance();
-                    Build.Builder bbuilder = Build.newBuilder(build);
-                    merger.mergeBuildBase(bbuilder, build, profile.getBuild());
-                    Build newBuild = bbuilder.build();
-                    if (newBuild != build) {
-                        builder.build(newBuild);
-                    }
-                }
-
-                model = builder.build();
+    /**
+     * Merges profiles into the builder. For multiple profiles, intermediate results are built
+     * into temporary models; the last profile writes directly to the passed builder.
+     *
+     * @return true if any profile actually changed the model
+     */
+    private boolean doInjectProfiles(Model model, Model.Builder builder, List<Profile> profiles) {
+        // Find the last non-null profile index
+        int lastIdx = -1;
+        for (int i = profiles.size() - 1; i >= 0; i--) {
+            if (profiles.get(i) != null) {
+                lastIdx = i;
+                break;
             }
         }
-        return model == orgModel ? KEY : model;
+        if (lastIdx < 0) {
+            return false;
+        }
+
+        Model current = model;
+        boolean changed = false;
+        for (int i = 0; i <= lastIdx; i++) {
+            Profile profile = profiles.get(i);
+            if (profile == null) {
+                continue;
+            }
+            boolean isLast = (i == lastIdx);
+            Model.Builder b = isLast ? builder : Model.newBuilder(current);
+            merger.mergeModelBase(b, current, profile);
+
+            if (profile.getBuild() != null) {
+                Build build = current.getBuild() != null ? current.getBuild() : Build.newInstance();
+                Build.Builder bbuilder = Build.newBuilder(build);
+                merger.mergeBuildBase(bbuilder, build, profile.getBuild());
+                Build newBuild = bbuilder.build();
+                if (newBuild != build) {
+                    b.build(newBuild);
+                }
+            }
+
+            if (!isLast) {
+                Model next = b.build();
+                if (next != current) {
+                    changed = true;
+                }
+                current = next;
+            } else {
+                // For the last profile, we can't easily detect change without building,
+                // but if we got here, at least one profile was non-null and merge was attempted
+                changed = true;
+            }
+        }
+        return changed;
     }
 
     /**

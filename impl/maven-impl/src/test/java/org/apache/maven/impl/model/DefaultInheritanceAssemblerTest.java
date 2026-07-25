@@ -74,7 +74,9 @@ class DefaultInheritanceAssemblerTest {
             child = child.withPomFile(getPom(baseName + "-child").toAbsolutePath());
         }
 
-        Model assembled = assembler.assembleModelInheritance(child, parent, null, null);
+        Model.Builder assembledBuilder = Model.newBuilder(child);
+        assembler.assembleModelInheritance(child, assembledBuilder, parent, null, null);
+        Model assembled = assembledBuilder.build();
 
         // write baseName + "-actual"
         Path actual = Paths.get(

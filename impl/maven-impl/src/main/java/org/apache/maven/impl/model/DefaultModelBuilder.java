@@ -1383,8 +1383,13 @@ public class DefaultModelBuilder implements ModelBuilder {
             inputModel = injectProfileActivations(inputModel, interpolatedActivations);
 
             // profile injection
-            inputModel = profileInjector.injectProfiles(inputModel, activePomProfiles, request, this);
-            inputModel = profileInjector.injectProfiles(inputModel, activeExternalProfiles, request, this);
+            Model.Builder piBuilder = Model.newBuilder(inputModel);
+            profileInjector.injectProfiles(inputModel, piBuilder, activePomProfiles, request, this);
+            inputModel = piBuilder.build();
+
+            piBuilder = Model.newBuilder(inputModel);
+            profileInjector.injectProfiles(inputModel, piBuilder, activeExternalProfiles, request, this);
+            inputModel = piBuilder.build();
 
             return inputModel;
         }
@@ -1440,7 +1445,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                         .build();
             }
 
-            Model model = inheritanceAssembler.assembleModelInheritance(inputModel, parentModel, request, this);
+            Model.Builder iaBuilder = Model.newBuilder(inputModel);
+            inheritanceAssembler.assembleModelInheritance(inputModel, iaBuilder, parentModel, request, this);
+            Model model = iaBuilder.build();
 
             // profile activation
             profileActivationContext.setModel(model);
@@ -1452,8 +1459,13 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             // profile injection - inject all profiles (local + inherited) into the model
             List<Profile> activePomProfiles = getActiveProfiles(model.getProfiles(), profileActivationContext);
-            model = profileInjector.injectProfiles(model, activePomProfiles, request, this);
-            model = profileInjector.injectProfiles(model, activeExternalProfiles, request, this);
+            Model.Builder piBuilder2 = Model.newBuilder(model);
+            profileInjector.injectProfiles(model, piBuilder2, activePomProfiles, request, this);
+            model = piBuilder2.build();
+
+            piBuilder2 = Model.newBuilder(model);
+            profileInjector.injectProfiles(model, piBuilder2, activeExternalProfiles, request, this);
+            model = piBuilder2.build();
 
             // Track only the local profiles for this model
             // Use ModelProblemUtils.toId() to get groupId:artifactId:version format (without packaging)
@@ -1940,7 +1952,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 throws ModelBuilderException {
             Model raw = readRawModel();
             Model parentData = readParent(raw, raw.getParent(), childProfileActivationContext, parentChain);
-            Model parent = new DefaultInheritanceAssembler(new DefaultInheritanceAssembler.InheritanceModelMerger() {
+            Model.Builder parentBuilder = Model.newBuilder(raw);
+            new DefaultInheritanceAssembler(new DefaultInheritanceAssembler.InheritanceModelMerger() {
                         @Override
                         protected void mergeModel_Modules(
                                 Model.Builder builder,
@@ -1957,7 +1970,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                                 boolean sourceDominant,
                                 Map<Object, Object> context) {}
                     })
-                    .assembleModelInheritance(raw, parentData, request, this);
+                    .assembleModelInheritance(raw, parentBuilder, parentData, request, this);
+            Model parent = parentBuilder.build();
 
             // Profile injection SHOULD be performed on parent models to ensure
             // that profile content becomes part of the parent model before inheritance.
@@ -1970,7 +1984,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                     getActiveProfiles(parent.getProfiles(), childProfileActivationContext);
 
             // Inject profiles into parent model
-            Model injectedParentModel = profileInjector.injectProfiles(parent, parentActivePomProfiles, request, this);
+            Model.Builder piParentBuilder = Model.newBuilder(parent);
+            profileInjector.injectProfiles(parent, piParentBuilder, parentActivePomProfiles, request, this);
+            Model injectedParentModel = piParentBuilder.build();
             // Remove profiles and parent after injection using a single builder
             // Use forceCopy=true because setting parent to null must override the base value;
             // with forceCopy=false, null is indistinguishable from "not set" in build()

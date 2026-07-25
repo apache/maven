@@ -36,10 +36,15 @@ public interface InheritanceAssembler {
      *
      * @param child The child model into which to merge the values inherited from the parent, must not be
      *            <code>null</code>.
+     * @param builder The builder to write inherited values into, must not be {@code null}.
      * @param parent The (read-only) parent model from which to inherit the values, may be <code>null</code>.
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    Model assembleModelInheritance(
-            Model child, Model parent, ModelBuilderRequest request, ModelProblemCollector problems);
+    void assembleModelInheritance(
+            Model child,
+            Model.Builder builder,
+            Model parent,
+            ModelBuilderRequest request,
+            ModelProblemCollector problems);
 }

@@ -37,7 +37,6 @@ import org.apache.maven.api.model.Reporting;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.model.InheritanceAssembler;
-import org.apache.maven.model.v4.MavenMerger;
 
 /**
  * Handles inheritance of model values.
@@ -52,25 +51,32 @@ public class DefaultInheritanceAssembler implements InheritanceAssembler {
 
     private static final String CHILD_DIRECTORY_PROPERTY = "project.directory";
 
-    private final MavenMerger merger;
+    private final InheritanceModelMerger merger;
 
     @Inject
     public DefaultInheritanceAssembler() {
         this(new InheritanceModelMerger());
     }
 
-    public DefaultInheritanceAssembler(MavenMerger merger) {
+    public DefaultInheritanceAssembler(InheritanceModelMerger merger) {
         this.merger = merger;
     }
 
     @Override
-    public Model assembleModelInheritance(
-            Model child, Model parent, ModelBuilderRequest request, ModelProblemCollector problems) {
+    public void assembleModelInheritance(
+            Model child,
+            Model.Builder builder,
+            Model parent,
+            ModelBuilderRequest request,
+            ModelProblemCollector problems) {
+        if (parent == null) {
+            return;
+        }
         Map<Object, Object> hints = new HashMap<>();
         String childPath = child.getProperties().getOrDefault(CHILD_DIRECTORY_PROPERTY, child.getArtifactId());
         hints.put(CHILD_DIRECTORY, childPath);
         hints.put(MavenModelMerger.CHILD_PATH_ADJUSTMENT, getChildPathAdjustment(child, parent, childPath));
-        return merger.merge(child, parent, false, hints);
+        merger.mergeIntoBuilder(builder, child, parent, false, hints);
     }
 
     /**
@@ -139,6 +145,15 @@ public class DefaultInheritanceAssembler implements InheritanceAssembler {
      * InheritanceModelMerger
      */
     protected static class InheritanceModelMerger extends MavenModelMerger {
+
+        public void mergeIntoBuilder(
+                Model.Builder builder, Model target, Model source, boolean sourceDominant, Map<?, ?> hints) {
+            Map<Object, Object> context = new HashMap<>();
+            if (hints != null) {
+                context.putAll(hints);
+            }
+            mergeModel(builder, target, source, sourceDominant, context);
+        }
 
         @Override
         protected String extrapolateChildUrl(String parentUrl, boolean appendPath, Map<Object, Object> context) {

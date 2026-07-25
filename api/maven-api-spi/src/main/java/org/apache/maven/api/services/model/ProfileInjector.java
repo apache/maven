@@ -37,24 +37,34 @@ public interface ProfileInjector {
      * and model completely decoupled by injecting deep copies rather than the original objects from the profile.
      *
      * @param model The model into which to merge the values defined by the profile, must not be <code>null</code>.
+     * @param builder The builder to write profile-injected values into, must not be {@code null}.
      * @param profile The (read-only) profile whose values should be injected, may be <code>null</code>.
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    default Model injectProfile(
-            Model model, Profile profile, ModelBuilderRequest request, ModelProblemCollector problems) {
-        return injectProfiles(model, List.of(profile), request, problems);
+    default void injectProfile(
+            Model model,
+            Model.Builder builder,
+            Profile profile,
+            ModelBuilderRequest request,
+            ModelProblemCollector problems) {
+        injectProfiles(model, builder, List.of(profile), request, problems);
     }
 
     /**
-     * Merges values from the specified profile into the given model. Implementations are expected to keep the profile
+     * Merges values from the specified profiles into the given model. Implementations are expected to keep the profile
      * and model completely decoupled by injecting deep copies rather than the original objects from the profile.
      *
-     * @param model The model into which to merge the values defined by the profile, must not be <code>null</code>.
+     * @param model The model into which to merge the values defined by the profiles, must not be <code>null</code>.
+     * @param builder The builder to write profile-injected values into, must not be {@code null}.
      * @param profiles The (read-only) list of profiles whose values should be injected, must not be <code>null</code>.
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    Model injectProfiles(
-            Model model, List<Profile> profiles, ModelBuilderRequest request, ModelProblemCollector problems);
+    void injectProfiles(
+            Model model,
+            Model.Builder builder,
+            List<Profile> profiles,
+            ModelBuilderRequest request,
+            ModelProblemCollector problems);
 }
