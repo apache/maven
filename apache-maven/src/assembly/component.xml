@@ -69,6 +69,7 @@ under the License.
         <include>*.cmd</include>
         <include>*.conf</include>
         <include>*.java</include>
+        <include>*.ps1</include>
       </includes>
       <lineEnding>dos</lineEnding>
     </fileSet>
