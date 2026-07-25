@@ -46,12 +46,11 @@ public class DefaultModelUrlNormalizer implements ModelUrlNormalizer {
     }
 
     @Override
-    public Model normalize(Model model, ModelBuilderRequest request) {
+    public void normalize(Model model, Model.Builder builder, ModelBuilderRequest request) {
         if (model == null) {
-            return null;
+            return;
         }
 
-        Model.Builder builder = Model.newBuilder(model);
         builder.url(normalize(model.getUrl()));
 
         Scm scm = model.getScm();
@@ -70,8 +69,6 @@ public class DefaultModelUrlNormalizer implements ModelUrlNormalizer {
                 builder.distributionManagement(dist.withSite(site.withUrl(normalize(site.getUrl()))));
             }
         }
-
-        return builder.build();
     }
 
     private String normalize(String url) {

@@ -32,9 +32,11 @@ public interface PluginConfigurationExpander {
     /**
      * Merges values from general build plugin configuration into the individual plugin executions of the given model.
      *
-     * @param model The model whose build plugin configuration should be expanded, must not be <code>null</code>.
+     * @param model The model to read from, must not be {@code null}.
+     * @param builder The model builder to write changes to, must not be {@code null}.
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    Model expandPluginConfiguration(Model model, ModelBuilderRequest request, ModelProblemCollector problems);
+    void expandPluginConfiguration(
+            Model model, Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems);
 }

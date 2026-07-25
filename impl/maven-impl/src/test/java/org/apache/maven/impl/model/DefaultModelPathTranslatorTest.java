@@ -48,7 +48,9 @@ class DefaultModelPathTranslatorTest {
                 .build(Build.newBuilder().sources(java.util.List.of(source)).build())
                 .build();
 
-        Model result = translator.alignToBaseDirectory(model, basedir, null);
+        Model.Builder builder = Model.newBuilder(model);
+        translator.alignToBaseDirectory(model, builder, basedir, null);
+        Model result = builder.build();
 
         String dir = result.getBuild().getSources().get(0).getDirectory();
         assertTrue(Path.of(dir).isAbsolute(), "directory should be absolute after alignment");
@@ -65,7 +67,9 @@ class DefaultModelPathTranslatorTest {
                 .build(Build.newBuilder().sources(java.util.List.of(source)).build())
                 .build();
 
-        Model result = translator.alignToBaseDirectory(model, basedir, null);
+        Model.Builder builder = Model.newBuilder(model);
+        translator.alignToBaseDirectory(model, builder, basedir, null);
+        Model result = builder.build();
 
         String targetPath = result.getBuild().getSources().get(0).getTargetPath();
         assertEquals("META-INF/resources", targetPath, "targetPath should remain relative");
@@ -81,7 +85,9 @@ class DefaultModelPathTranslatorTest {
                 .build(Build.newBuilder().sources(java.util.List.of(source)).build())
                 .build();
 
-        Model result = translator.alignToBaseDirectory(model, basedir, null);
+        Model.Builder builder = Model.newBuilder(model);
+        translator.alignToBaseDirectory(model, builder, basedir, null);
+        Model result = builder.build();
 
         String targetPath = result.getBuild().getSources().get(0).getTargetPath();
         assertEquals(".grammar", targetPath, "dot-prefixed targetPath should remain relative");
@@ -97,7 +103,9 @@ class DefaultModelPathTranslatorTest {
                 .build(Build.newBuilder().resources(java.util.List.of(resource)).build())
                 .build();
 
-        Model result = translator.alignToBaseDirectory(model, basedir, null);
+        Model.Builder builder = Model.newBuilder(model);
+        translator.alignToBaseDirectory(model, builder, basedir, null);
+        Model result = builder.build();
 
         Resource aligned = result.getBuild().getResources().get(0);
         assertTrue(

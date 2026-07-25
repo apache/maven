@@ -46,10 +46,9 @@ public class DefaultModelNormalizer implements ModelNormalizer {
     private DuplicateMerger merger = new DuplicateMerger();
 
     @Override
-    public Model mergeDuplicates(Model model, ModelBuilderRequest request, ModelProblemCollector problems) {
-        boolean modified = false;
+    public void mergeDuplicates(
+            Model model, Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems) {
         Build build = model.getBuild();
-        Build newBuild = null;
         if (build != null) {
             List<Plugin> plugins = build.getPlugins();
             Map<Object, Plugin> normalized = new LinkedHashMap<>(plugins.size() * 2);
@@ -64,8 +63,8 @@ public class DefaultModelNormalizer implements ModelNormalizer {
             }
 
             if (plugins.size() != normalized.size()) {
-                newBuild = Build.newBuilder(build).plugins(normalized.values()).build();
-                modified = true;
+                builder.build(
+                        Build.newBuilder(build).plugins(normalized.values()).build());
             }
         }
 
@@ -83,18 +82,9 @@ public class DefaultModelNormalizer implements ModelNormalizer {
             normalized.put(dependency.getManagementKey(), dependency);
         }
 
-        boolean depsModified = dependencies.size() != normalized.size();
-        if (modified || depsModified) {
-            Model.Builder builder = Model.newBuilder(model);
-            if (newBuild != null) {
-                builder.build(newBuild);
-            }
-            if (depsModified) {
-                builder.dependencies(normalized.values());
-            }
-            return builder.build();
+        if (dependencies.size() != normalized.size()) {
+            builder.dependencies(normalized.values());
         }
-        return model;
     }
 
     /**
@@ -108,29 +98,20 @@ public class DefaultModelNormalizer implements ModelNormalizer {
     }
 
     @Override
-    public Model injectDefaultValues(Model model, ModelBuilderRequest request, ModelProblemCollector problems) {
+    public void injectDefaultValues(
+            Model model, Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems) {
         List<Dependency> newDeps = injectList(model.getDependencies(), this::injectDependency);
+        if (newDeps != null) {
+            builder.dependencies(newDeps);
+        }
 
         Build build = model.getBuild();
-        Build newBuild = null;
         if (build != null) {
             List<Plugin> newPlugins = injectList(build.getPlugins(), this::injectPlugin);
             if (newPlugins != null) {
-                newBuild = Build.newBuilder(build).plugins(newPlugins).build();
+                builder.build(Build.newBuilder(build).plugins(newPlugins).build());
             }
         }
-
-        if (newDeps != null || newBuild != null) {
-            Model.Builder builder = Model.newBuilder(model);
-            if (newDeps != null) {
-                builder.dependencies(newDeps);
-            }
-            if (newBuild != null) {
-                builder.build(newBuild);
-            }
-            return builder.build();
-        }
-        return model;
     }
 
     private Plugin injectPlugin(Plugin p) {

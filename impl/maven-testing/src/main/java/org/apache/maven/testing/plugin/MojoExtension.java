@@ -236,8 +236,10 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                     try (Reader r = openPomUrl(holder, pom, new Path[1])) {
                         Model localModel = new MavenStaxReader().read(r);
                         model = new MavenMerger().merge(localModel, model, false, null);
-                        model = new DefaultModelPathTranslator(new DefaultPathTranslator())
-                                .alignToBaseDirectory(model, Paths.get(getBasedir()), null);
+                        Model.Builder pathBuilder = Model.newBuilder(model);
+                        new DefaultModelPathTranslator(new DefaultPathTranslator())
+                                .alignToBaseDirectory(model, pathBuilder, Paths.get(getBasedir()), null);
+                        model = pathBuilder.build();
                     }
                 }
                 goal = parameterInjectMojo[0];
@@ -414,9 +416,11 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
         } else {
             model = new MavenMerger().merge(tmodel, defaultModel, false, null);
         }
-        tmodel = new DefaultModelPathTranslator(new DefaultPathTranslator())
-                .alignToBaseDirectory(tmodel, Paths.get(getBasedir()), null);
-        context.getStore(MOJO_EXTENSION).put(Model.class, tmodel);
+        Model.Builder alignBuilder = Model.newBuilder(model);
+        new DefaultModelPathTranslator(new DefaultPathTranslator())
+                .alignToBaseDirectory(model, alignBuilder, Paths.get(getBasedir()), null);
+        final Model alignedModel = alignBuilder.build();
+        context.getStore(MOJO_EXTENSION).put(Model.class, alignedModel);
 
         // mojo execution
         // Map<Object, Object> map = getInjector().getContext().getContextData();

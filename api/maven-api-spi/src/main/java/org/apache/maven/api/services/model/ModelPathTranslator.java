@@ -34,10 +34,11 @@ public interface ModelPathTranslator {
      * Resolves the well-known paths of the specified model against the given base directory. Paths within plugin
      * configuration are not processed.
      *
-     * @param model The model whose paths should be resolved, may be {@code null}.
+     * @param model The model to read from, may be {@code null}.
+     * @param builder The model builder to write changes to, must not be {@code null}.
      * @param basedir The base directory to resolve relative paths against, may be {@code null}.
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @since 4.0.0
      */
-    Model alignToBaseDirectory(Model model, Path basedir, ModelBuilderRequest request);
+    void alignToBaseDirectory(Model model, Model.Builder builder, Path basedir, ModelBuilderRequest request);
 }

@@ -52,15 +52,14 @@ public class DefaultModelPathTranslator implements ModelPathTranslator {
     }
 
     @Override
-    public Model alignToBaseDirectory(Model model, Path basedir, ModelBuilderRequest request) {
+    public void alignToBaseDirectory(Model model, Model.Builder builder, Path basedir, ModelBuilderRequest request) {
         if (model == null || basedir == null) {
-            return model;
+            return;
         }
 
         Build build = model.getBuild();
-        Build newBuild = null;
         if (build != null) {
-            newBuild = Build.newBuilder(build)
+            Build newBuild = Build.newBuilder(build)
                     .sources(map(build.getSources(), this::alignToBaseDirectory, basedir))
                     .directory(alignToBaseDirectory(build.getDirectory(), basedir))
                     .sourceDirectory(alignToBaseDirectory(build.getSourceDirectory(), basedir))
@@ -72,22 +71,20 @@ public class DefaultModelPathTranslator implements ModelPathTranslator {
                     .outputDirectory(alignToBaseDirectory(build.getOutputDirectory(), basedir))
                     .testOutputDirectory(alignToBaseDirectory(build.getTestOutputDirectory(), basedir))
                     .build();
+            if (newBuild != build) {
+                builder.build(newBuild);
+            }
         }
 
         Reporting reporting = model.getReporting();
-        Reporting newReporting = null;
         if (reporting != null) {
-            newReporting = Reporting.newBuilder(reporting)
+            Reporting newReporting = Reporting.newBuilder(reporting)
                     .outputDirectory(alignToBaseDirectory(reporting.getOutputDirectory(), basedir))
                     .build();
+            if (newReporting != reporting) {
+                builder.reporting(newReporting);
+            }
         }
-        if (newBuild != build || newReporting != reporting) {
-            model = Model.newBuilder(model)
-                    .build(newBuild)
-                    .reporting(newReporting)
-                    .build();
-        }
-        return model;
     }
 
     /**

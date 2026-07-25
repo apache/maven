@@ -46,8 +46,9 @@ public class DefaultDependencyManagementInjector implements DependencyManagement
     private ManagementModelMerger merger = new ManagementModelMerger();
 
     @Override
-    public Model injectManagement(Model model, ModelBuilderRequest request, ModelProblemCollector problems) {
-        return merger.mergeManagedDependencies(model);
+    public void injectManagement(
+            Model model, Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems) {
+        merger.mergeManagedDependencies(model, builder);
     }
 
     /**
@@ -55,7 +56,7 @@ public class DefaultDependencyManagementInjector implements DependencyManagement
      */
     protected static class ManagementModelMerger extends MavenModelMerger {
 
-        public Model mergeManagedDependencies(Model model) {
+        public void mergeManagedDependencies(Model model, Model.Builder builder) {
             DependencyManagement dependencyManagement = model.getDependencyManagement();
             if (dependencyManagement != null) {
                 Map<Object, Dependency> dependencies = new HashMap<>();
@@ -86,10 +87,9 @@ public class DefaultDependencyManagementInjector implements DependencyManagement
                         Dependency dependency = dependencies.get(key);
                         newDeps.add(dependency);
                     }
-                    return Model.newBuilder(model).dependencies(newDeps).build();
+                    builder.dependencies(newDeps);
                 }
             }
-            return model;
         }
 
         @Override

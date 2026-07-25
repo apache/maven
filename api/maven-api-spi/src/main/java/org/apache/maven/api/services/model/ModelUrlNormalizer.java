@@ -32,8 +32,9 @@ public interface ModelUrlNormalizer {
     /**
      * Normalizes the well-known URLs of the specified model.
      *
-     * @param model The model whose URLs should be normalized, may be {@code null}.
+     * @param model The model to read from, may be {@code null}.
+     * @param builder The model builder to write changes to, must not be {@code null}.
      * @param request The model building request that holds further settings, must not be {@code null}.
      */
-    Model normalize(Model model, ModelBuilderRequest request);
+    void normalize(Model model, Model.Builder builder, ModelBuilderRequest request);
 }

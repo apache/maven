@@ -32,10 +32,11 @@ public interface PluginManagementInjector {
     /**
      * Merges default values from the plugin management section of the given model into itself.
      *
-     * @param model The model into which to merge the values specified by its plugin management section, must not be
-     *            <code>null</code>.
+     * @param model The model to read from, must not be {@code null}.
+     * @param builder The model builder to write changes to, must not be {@code null}.
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    Model injectManagement(Model model, ModelBuilderRequest request, ModelProblemCollector problems);
+    void injectManagement(
+            Model model, Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems);
 }

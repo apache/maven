@@ -964,11 +964,14 @@ public class DefaultModelBuilder implements ModelBuilder {
             setRootModel(resultModel);
 
             // model path translation
-            resultModel =
-                    modelPathTranslator.alignToBaseDirectory(resultModel, resultModel.getProjectDirectory(), request);
+            Model.Builder builder = Model.newBuilder(resultModel);
+            modelPathTranslator.alignToBaseDirectory(resultModel, builder, resultModel.getProjectDirectory(), request);
+            resultModel = builder.build();
 
             // plugin management injection
-            resultModel = pluginManagementInjector.injectManagement(resultModel, request, this);
+            builder = Model.newBuilder(resultModel);
+            pluginManagementInjector.injectManagement(resultModel, builder, request, this);
+            resultModel = builder.build();
 
             // lifecycle bindings injection
             if (request.getRequestType() != ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY) {
@@ -983,13 +986,19 @@ public class DefaultModelBuilder implements ModelBuilder {
             resultModel = importDependencyManagement(resultModel, importIds);
 
             // dependency management injection
-            resultModel = dependencyManagementInjector.injectManagement(resultModel, request, this);
+            builder = Model.newBuilder(resultModel);
+            dependencyManagementInjector.injectManagement(resultModel, builder, request, this);
+            resultModel = builder.build();
 
-            resultModel = modelNormalizer.injectDefaultValues(resultModel, request, this);
+            builder = Model.newBuilder(resultModel);
+            modelNormalizer.injectDefaultValues(resultModel, builder, request, this);
+            resultModel = builder.build();
 
             if (request.getRequestType() != ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY) {
                 // plugins configuration
-                resultModel = pluginConfigurationExpander.expandPluginConfiguration(resultModel, request, this);
+                builder = Model.newBuilder(resultModel);
+                pluginConfigurationExpander.expandPluginConfiguration(resultModel, builder, request, this);
+                resultModel = builder.build();
             }
 
             for (var transformer : transformers) {
@@ -1366,7 +1375,9 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             // model normalization
             setSource(inputModel);
-            inputModel = modelNormalizer.mergeDuplicates(inputModel, request, this);
+            Model.Builder mdBuilder = Model.newBuilder(inputModel);
+            modelNormalizer.mergeDuplicates(inputModel, mdBuilder, request, this);
+            inputModel = mdBuilder.build();
 
             List<Activation> interpolatedActivations = getProfileActivations(inputModel);
             inputModel = injectProfileActivations(inputModel, interpolatedActivations);
@@ -1452,11 +1463,11 @@ public class DefaultModelBuilder implements ModelBuilder {
             Model resultModel = model;
             resultModel = interpolateModel(resultModel, request, this);
 
-            // model normalization
-            resultModel = modelNormalizer.mergeDuplicates(resultModel, request, this);
-
-            // url normalization
-            resultModel = modelUrlNormalizer.normalize(resultModel, request);
+            // model normalization + url normalization (different fields, shared builder)
+            Model.Builder normBuilder = Model.newBuilder(resultModel);
+            modelNormalizer.mergeDuplicates(resultModel, normBuilder, request, this);
+            modelUrlNormalizer.normalize(resultModel, normBuilder, request);
+            resultModel = normBuilder.build();
 
             // Now the fully interpolated model is available: reconfigure the resolver
             if (!resultModel.getRepositories().isEmpty()) {

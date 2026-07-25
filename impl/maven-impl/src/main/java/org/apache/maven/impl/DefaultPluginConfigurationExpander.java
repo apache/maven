@@ -45,7 +45,8 @@ import org.apache.maven.api.xml.XmlService;
 public class DefaultPluginConfigurationExpander implements PluginConfigurationExpander {
 
     @Override
-    public Model expandPluginConfiguration(Model model, ModelBuilderRequest request, ModelProblemCollector problems) {
+    public void expandPluginConfiguration(
+            Model model, Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems) {
         Build build = model.getBuild();
         if (build != null) {
             List<Plugin> expandedPlugins = expandPlugin(build.getPlugins());
@@ -77,18 +78,15 @@ public class DefaultPluginConfigurationExpander implements PluginConfigurationEx
         boolean modelModified = build != model.getBuild()
                 || (expandedReportPlugins != null && expandedReportPlugins != reporting.getPlugins());
         if (modelModified) {
-            Model.Builder mb = Model.newBuilder(model);
             if (build != model.getBuild()) {
-                mb.build(build);
+                builder.build(build);
             }
             if (expandedReportPlugins != null && expandedReportPlugins != reporting.getPlugins()) {
-                mb.reporting(Reporting.newBuilder(reporting)
+                builder.reporting(Reporting.newBuilder(reporting)
                         .plugins(expandedReportPlugins)
                         .build());
             }
-            return mb.build();
         }
-        return model;
     }
 
     private List<Plugin> expandPlugin(List<Plugin> oldPlugins) {
