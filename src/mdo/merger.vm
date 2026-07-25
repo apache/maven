@@ -116,14 +116,20 @@ public class ${className} {
       #if ( $field.type == "String" )
         String src = source.get${capField}();
         String tgt = target.get${capField}();
-        if (src != null && (sourceDominant || tgt == null)) {
+        if (src != null && (sourceDominant || tgt == null) && src != tgt) {
             builder.${field.name}(src);
         #if ( $locationTracking )
             builder.location("${field.name}", source.getLocation("${field.name}"));
         #end
         }
       #elseif ( $field.type == "java.util.List" && $field.to == "String" && $field.multiplicity == "*" )
-        builder.${field.name}(merge(target.get${capField}(), source.get${capField}(), sourceDominant, e -> e));
+        {
+            List<String> tgt${capField} = target.get${capField}();
+            List<String> merged${capField} = merge(tgt${capField}, source.get${capField}(), sourceDominant, e -> e);
+            if (merged${capField} != tgt${capField}) {
+                builder.${field.name}(merged${capField});
+            }
+        }
       #elseif ( $field.type == "java.util.Properties" && $field.to == "String" && $field.multiplicity == "*" )
         Map<String, String> src = source.get${capField}();
         if (!src.isEmpty()) {
@@ -151,21 +157,27 @@ public class ${className} {
                 tgt = ${field.to}.newInstance(false);
             }
             ${field.to} merged = merge${field.to}(tgt, src, sourceDominant, context);
-            builder.${field.name}(merged);
+            if (merged != target.get${capField}()) {
+                builder.${field.name}(merged);
         #if ( $locationTracking )
-            if (target.get${capField}() == null) {
-                builder.location("${field.name}", source.getLocation("${field.name}"));
-            } else if (merged != tgt) {
-                builder.location("${field.name}", new InputLocation(-1, -1));
-            }
+                if (target.get${capField}() == null) {
+                    builder.location("${field.name}", source.getLocation("${field.name}"));
+                } else {
+                    builder.location("${field.name}", new InputLocation(-1, -1));
+                }
         #end
+            }
         }
       #elseif ( $field.to && $field.multiplicity == "*" )
-        if (deepMerge) {
-            builder.${field.name}(merge(target.get${capField}(), source.get${capField}(), get${field.to}Key(),
-                    (t, s) -> merge${field.to}(t, s, sourceDominant, context)));
-        } else {
-            builder.${field.name}(merge(target.get${capField}(), source.get${capField}(), sourceDominant, get${field.to}Key()));
+        {
+            List<${field.to}> tgt${capField} = target.get${capField}();
+            List<${field.to}> merged${capField} = deepMerge
+                ? merge(tgt${capField}, source.get${capField}(), get${field.to}Key(),
+                        (t, s) -> merge${field.to}(t, s, sourceDominant, context))
+                : merge(tgt${capField}, source.get${capField}(), sourceDominant, get${field.to}Key());
+            if (merged${capField} != tgt${capField}) {
+                builder.${field.name}(merged${capField});
+            }
         }
       #elseif ( $field.type == "DOM" )
         XmlNode src = source.getConfiguration();
@@ -189,12 +201,19 @@ public class ${className} {
             }
         }
       #elseif ($field.type == "boolean")
-        if (sourceDominant) {
+        if (sourceDominant && source.is${capField}() != target.is${capField}()) {
             builder.${field.name}(source.is${capField}());
         }
-      #elseif ($field.type == "int" || $field.type == "java.nio.file.Path")
-        if (sourceDominant) {
+      #elseif ($field.type == "int")
+        if (sourceDominant && source.get${capField}() != target.get${capField}()) {
             builder.${field.name}(source.get${capField}());
+        }
+      #elseif ($field.type == "java.nio.file.Path")
+        if (sourceDominant) {
+            ${field.type} srcPath = source.get${capField}();
+            if (!Objects.equals(srcPath, target.get${capField}())) {
+                builder.${field.name}(srcPath);
+            }
         }
       #else
         // TODO: type=${field.type} to=${field.to} multiplicity=${field.multiplicity}

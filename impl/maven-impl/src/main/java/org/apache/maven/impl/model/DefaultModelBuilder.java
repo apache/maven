@@ -1000,10 +1000,12 @@ public class DefaultModelBuilder implements ModelBuilder {
             // Set the default relative path for the parent in the file model
             if (result.getFileModel().getParent() != null
                     && result.getFileModel().getParent().getRelativePath() == null) {
-                result.setFileModel(result.getFileModel()
-                        .withParent(result.getFileModel()
-                                .getParent()
-                                .withRelativePath(resultModel.getParent().getRelativePath())));
+                Model fileModel = result.getFileModel();
+                result.setFileModel(Model.newBuilder(fileModel)
+                        .parent(Parent.newBuilder(fileModel.getParent())
+                                .relativePath(resultModel.getParent().getRelativePath())
+                                .build())
+                        .build());
             }
 
             // effective model validation
@@ -1420,7 +1422,11 @@ public class DefaultModelBuilder implements ModelBuilder {
                 } else {
                     relPath = "..";
                 }
-                inputModel = inputModel.withParent(inputModel.getParent().withRelativePath(relPath));
+                inputModel = Model.newBuilder(inputModel)
+                        .parent(Parent.newBuilder(inputModel.getParent())
+                                .relativePath(relPath)
+                                .build())
+                        .build();
             }
 
             Model model = inheritanceAssembler.assembleModelInheritance(inputModel, parentModel, request, this);
@@ -1619,11 +1625,13 @@ public class DefaultModelBuilder implements ModelBuilder {
                                         && (version == null
                                                 || version.equals(parentVersion)
                                                 || versionContainsExpression)) {
-                                    model = model.withParent(parent.with()
-                                            .groupId(parentGroupId)
-                                            .artifactId(parentArtifactId)
-                                            .version(parentVersion)
-                                            .build());
+                                    model = Model.newBuilder(model)
+                                            .parent(Parent.newBuilder(parent)
+                                                    .groupId(parentGroupId)
+                                                    .artifactId(parentArtifactId)
+                                                    .version(parentVersion)
+                                                    .build())
+                                            .build();
                                 } else {
                                     mismatchRelativePathAndGA(model, parentGroupId, parentArtifactId);
                                 }
@@ -1951,12 +1959,17 @@ public class DefaultModelBuilder implements ModelBuilder {
                     getActiveProfiles(parent.getProfiles(), childProfileActivationContext);
 
             // Inject profiles into parent model
-            Model injectedParentModel = profileInjector
-                    .injectProfiles(parent, parentActivePomProfiles, request, this)
-                    .withProfiles(List.of()); // Remove profiles after injection to avoid double-processing
+            Model injectedParentModel = profileInjector.injectProfiles(parent, parentActivePomProfiles, request, this);
+            // Remove profiles and parent after injection using a single builder
+            // Use forceCopy=true because setting parent to null must override the base value;
+            // with forceCopy=false, null is indistinguishable from "not set" in build()
+            injectedParentModel = Model.newBuilder(injectedParentModel, true)
+                    .profiles(List.of())
+                    .parent(null)
+                    .build();
 
             // Note: addActivePomProfiles() will be called by the caller for cache miss case
-            return new ParentModelWithProfiles(injectedParentModel.withParent(null), parentActivePomProfiles);
+            return new ParentModelWithProfiles(injectedParentModel, parentActivePomProfiles);
         }
 
         private Model importDependencyManagement(Model model, Collection<String> importIds) {
@@ -2332,10 +2345,15 @@ public class DefaultModelBuilder implements ModelBuilder {
             Map<String, String> map3 = request.getSession().getSystemProperties();
             UnaryOperator<String> cb = Interpolator.chain(map1::get, map2::get, map3::get);
             try {
-                String interpolated =
-                        interpolator.interpolate(interpolatedModel.getParent().getVersion(), cb);
-                interpolatedModel = interpolatedModel.withParent(
-                        interpolatedModel.getParent().withVersion(interpolated));
+                Parent parent = interpolatedModel.getParent();
+                String interpolated = interpolator.interpolate(parent.getVersion(), cb);
+                if (interpolated != parent.getVersion()) {
+                    interpolatedModel = Model.newBuilder(interpolatedModel)
+                            .parent(Parent.newBuilder(parent)
+                                    .version(interpolated)
+                                    .build())
+                            .build();
+                }
             } catch (Exception e) {
                 problems.add(
                         Severity.ERROR,
@@ -2346,7 +2364,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                         e);
             }
         }
-        interpolatedModel = interpolatedModel.withPomFile(model.getPomFile());
+        if (interpolatedModel.getPomFile() != model.getPomFile()) {
+            interpolatedModel = interpolatedModel.withPomFile(model.getPomFile());
+        }
         return interpolatedModel;
     }
 

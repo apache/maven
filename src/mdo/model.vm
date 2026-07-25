@@ -166,7 +166,9 @@ public class ${class.name}
     #end
     #foreach ( $field in $class.getFields($version) )
       #if ( $field.type == "java.util.List" || $field.type == "java.util.Properties" || $field.type == "java.util.Map" )
-        this.${field.name} = ImmutableCollections.copy(builder.${field.name} != null ? builder.${field.name} : (builder.base != null ? builder.base.${field.name} : null));
+        this.${field.name} = builder.${field.name} != null
+                ? ImmutableCollections.copy(builder.${field.name})
+                : (builder.base != null ? builder.base.${field.name} : #if($field.type == "java.util.List")List.of()#else Map.of()#end);
       #else
         #if ( $field.type == "boolean" || $field.type == "int" )
         this.${field.name} = builder.${field.name} != null ? builder.${field.name} : (builder.base != null ? builder.base.${field.name} : ${field.defaultValue});
@@ -510,14 +512,17 @@ public class ${class.name}
             Map<Object, InputLocation> newlocs = locations != null ? locations : Map.of();
             Map<Object, InputLocation> oldlocs = base != null ? base.locations : Map.of();
             if (newlocs.isEmpty()) {
-                return Map.copyOf(oldlocs);
+                // oldlocs is already immutable from a previous build()
+                return oldlocs;
             }
             if (oldlocs.isEmpty()) {
                 return Map.copyOf(newlocs);
             }
-            return Stream.concat(newlocs.entrySet().stream(), oldlocs.entrySet().stream())
-                    // Keep value from newlocs in case of duplicates
-                    .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue, (v1, v2) -> v1));
+            // Merge: oldlocs as base, newlocs wins on conflict
+            Map<Object, InputLocation> merged = new HashMap<>(oldlocs.size() + newlocs.size());
+            merged.putAll(oldlocs);
+            merged.putAll(newlocs);
+            return Map.copyOf(merged);
         }
     #end
     }

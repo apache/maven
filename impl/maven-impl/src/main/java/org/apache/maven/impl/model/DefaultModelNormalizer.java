@@ -47,9 +47,9 @@ public class DefaultModelNormalizer implements ModelNormalizer {
 
     @Override
     public Model mergeDuplicates(Model model, ModelBuilderRequest request, ModelProblemCollector problems) {
-        Model.Builder builder = Model.newBuilder(model);
-
+        boolean modified = false;
         Build build = model.getBuild();
+        Build newBuild = null;
         if (build != null) {
             List<Plugin> plugins = build.getPlugins();
             Map<Object, Plugin> normalized = new LinkedHashMap<>(plugins.size() * 2);
@@ -64,8 +64,8 @@ public class DefaultModelNormalizer implements ModelNormalizer {
             }
 
             if (plugins.size() != normalized.size()) {
-                builder.build(
-                        Build.newBuilder(build).plugins(normalized.values()).build());
+                newBuild = Build.newBuilder(build).plugins(normalized.values()).build();
+                modified = true;
             }
         }
 
@@ -83,11 +83,18 @@ public class DefaultModelNormalizer implements ModelNormalizer {
             normalized.put(dependency.getManagementKey(), dependency);
         }
 
-        if (dependencies.size() != normalized.size()) {
-            builder.dependencies(normalized.values());
+        boolean depsModified = dependencies.size() != normalized.size();
+        if (modified || depsModified) {
+            Model.Builder builder = Model.newBuilder(model);
+            if (newBuild != null) {
+                builder.build(newBuild);
+            }
+            if (depsModified) {
+                builder.dependencies(normalized.values());
+            }
+            return builder.build();
         }
-
-        return builder.build();
+        return model;
     }
 
     /**
@@ -102,24 +109,36 @@ public class DefaultModelNormalizer implements ModelNormalizer {
 
     @Override
     public Model injectDefaultValues(Model model, ModelBuilderRequest request, ModelProblemCollector problems) {
-        Model.Builder builder = Model.newBuilder(model);
+        List<Dependency> newDeps = injectList(model.getDependencies(), this::injectDependency);
 
-        builder.dependencies(injectList(model.getDependencies(), this::injectDependency));
         Build build = model.getBuild();
+        Build newBuild = null;
         if (build != null) {
-            Build newBuild = Build.newBuilder(build)
-                    .plugins(injectList(build.getPlugins(), this::injectPlugin))
-                    .build();
-            builder.build(newBuild != build ? newBuild : null);
+            List<Plugin> newPlugins = injectList(build.getPlugins(), this::injectPlugin);
+            if (newPlugins != null) {
+                newBuild = Build.newBuilder(build).plugins(newPlugins).build();
+            }
         }
 
-        return builder.build();
+        if (newDeps != null || newBuild != null) {
+            Model.Builder builder = Model.newBuilder(model);
+            if (newDeps != null) {
+                builder.dependencies(newDeps);
+            }
+            if (newBuild != null) {
+                builder.build(newBuild);
+            }
+            return builder.build();
+        }
+        return model;
     }
 
     private Plugin injectPlugin(Plugin p) {
-        return Plugin.newBuilder(p)
-                .dependencies(injectList(p.getDependencies(), this::injectDependency))
-                .build();
+        List<Dependency> newDeps = injectList(p.getDependencies(), this::injectDependency);
+        if (newDeps != null) {
+            return Plugin.newBuilder(p).dependencies(newDeps).build();
+        }
+        return p;
     }
 
     private Dependency injectDependency(Dependency d) {

@@ -81,7 +81,10 @@ public class DefaultProfileInjector implements ProfileInjector {
                     Build build = model.getBuild() != null ? model.getBuild() : Build.newInstance();
                     Build.Builder bbuilder = Build.newBuilder(build);
                     merger.mergeBuildBase(bbuilder, build, profile.getBuild());
-                    builder.build(bbuilder.build());
+                    Build newBuild = bbuilder.build();
+                    if (newBuild != build) {
+                        builder.build(newBuild);
+                    }
                 }
 
                 model = builder.build();

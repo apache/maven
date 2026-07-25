@@ -48,19 +48,47 @@ public class DefaultPluginConfigurationExpander implements PluginConfigurationEx
     public Model expandPluginConfiguration(Model model, ModelBuilderRequest request, ModelProblemCollector problems) {
         Build build = model.getBuild();
         if (build != null) {
-            build = build.withPlugins(expandPlugin(build.getPlugins()));
+            List<Plugin> expandedPlugins = expandPlugin(build.getPlugins());
             PluginManagement pluginManagement = build.getPluginManagement();
-            if (pluginManagement != null) {
-                build = build.withPluginManagement(
-                        pluginManagement.withPlugins(expandPlugin(pluginManagement.getPlugins())));
+            List<Plugin> expandedMgmtPlugins =
+                    pluginManagement != null ? expandPlugin(pluginManagement.getPlugins()) : null;
+
+            boolean buildModified = expandedPlugins != build.getPlugins()
+                    || (expandedMgmtPlugins != null && expandedMgmtPlugins != pluginManagement.getPlugins());
+
+            if (buildModified) {
+                Build.Builder bb = Build.newBuilder(build);
+                if (expandedPlugins != build.getPlugins()) {
+                    bb.plugins(expandedPlugins);
+                }
+                if (expandedMgmtPlugins != null && expandedMgmtPlugins != pluginManagement.getPlugins()) {
+                    bb.pluginManagement(PluginManagement.newBuilder(pluginManagement)
+                            .plugins(expandedMgmtPlugins)
+                            .build());
+                }
+                build = bb.build();
             }
-            model = model.withBuild(build);
         }
         Reporting reporting = model.getReporting();
+        List<ReportPlugin> expandedReportPlugins = null;
         if (reporting != null) {
-            expandReport(reporting.getPlugins());
+            expandedReportPlugins = expandReport(reporting.getPlugins());
         }
-        return model.withBuild(build);
+        boolean modelModified = build != model.getBuild()
+                || (expandedReportPlugins != null && expandedReportPlugins != reporting.getPlugins());
+        if (modelModified) {
+            Model.Builder mb = Model.newBuilder(model);
+            if (build != model.getBuild()) {
+                mb.build(build);
+            }
+            if (expandedReportPlugins != null && expandedReportPlugins != reporting.getPlugins()) {
+                mb.reporting(Reporting.newBuilder(reporting)
+                        .plugins(expandedReportPlugins)
+                        .build());
+            }
+            return mb.build();
+        }
+        return model;
     }
 
     private List<Plugin> expandPlugin(List<Plugin> oldPlugins) {
