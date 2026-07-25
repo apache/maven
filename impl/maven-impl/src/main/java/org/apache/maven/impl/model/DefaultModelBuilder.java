@@ -767,6 +767,8 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         private void buildBuildPom() throws ModelBuilderException {
+            long t0 = System.nanoTime();
+
             // Retrieve and normalize the source path, ensuring it's non-null and in absolute form
             Path top = request.getSource().getPath();
             if (top == null) {
@@ -793,6 +795,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             // Load all models starting from the root
             loadFromRoot(root, top);
 
+            long t1 = System.nanoTime();
+
             // Check for errors after loading models
             if (hasErrors()) {
                 throw newModelBuilderException();
@@ -801,6 +805,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             // For the top model and all its children, build the effective model.
             // This is done through the phased executor
             var allResults = results(result).toList();
+            int projectCount = allResults.size();
             List<RuntimeException> exceptions = new CopyOnWriteArrayList<>();
             InternalSession session = InternalSession.from(this.session);
             RequestTrace trace = session.getCurrentTrace();
@@ -828,6 +833,14 @@ public class DefaultModelBuilder implements ModelBuilder {
                     });
                 }
             }
+
+            long t2 = System.nanoTime();
+            logger.info(
+                    "[TIMING] Reactor model building for {} projects: loadFromRoot={} ms, buildEffectiveModels={} ms, total={} ms",
+                    projectCount,
+                    (t1 - t0) / 1_000_000,
+                    (t2 - t1) / 1_000_000,
+                    (t2 - t0) / 1_000_000);
 
             // Check for errors again after execution
             if (exceptions.size() == 1) {
