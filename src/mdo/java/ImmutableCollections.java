@@ -120,12 +120,6 @@ class ImmutableCollections {
                     Map.Entry<K, V> entry = map.entrySet().iterator().next();
                     return singletonMap(entry.getKey(), entry.getValue());
                 default:
-                    // Check if this is already an immutable JDK map (from Map.of(), Map.copyOf(), etc.)
-                    // Those throw UnsupportedOperationException on put() and don't need copying
-                    String className = map.getClass().getName();
-                    if (className.startsWith("java.util.ImmutableCollections$")) {
-                        return map;
-                    }
                     return new MapN<>(map);
             }
         }
