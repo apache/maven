@@ -83,6 +83,7 @@ public final class RequirementMatcherFactory {
 
         private static final Pattern PATTERN_MAJOR_VERSION = Pattern.compile("^[0-9]+$");
         private static final Pattern PATTERN_MAJOR_MINOR_VERSION = Pattern.compile("^[0-9]+\\.[0-9]+$");
+
         private VersionRange convertRequirementToVersionRange(String requirement)
                 throws InvalidVersionSpecificationException {
             // Specific for Version _requirement_ matching;

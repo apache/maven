@@ -95,6 +95,4 @@ public class RequirementMatcherFactoryTest {
         matcher = RequirementMatcherFactory.createVersionMatcher("11.55");
         assertEquals("11.55", matcher.toString());
     }
-
-
 }
