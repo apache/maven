@@ -70,4 +70,31 @@ public class RequirementMatcherFactoryTest {
         matcher = RequirementMatcherFactory.createVersionMatcher("1.5");
         assertEquals("1.5", matcher.toString());
     }
+
+    @Test
+    public void testCreateVersionMatcherMultiDigit() {
+        RequirementMatcher matcher;
+        matcher = RequirementMatcherFactory.createVersionMatcher("11.55.22");
+        assertTrue(matcher.matches("11")); // Major matches
+        assertTrue(matcher.matches("11.55")); // Major.Minor matches
+        assertTrue(matcher.matches("11.55.22")); // Full match
+        assertFalse(matcher.matches("11.66")); // Wrong minor
+        assertFalse(matcher.matches("22")); // Wrong major
+        assertFalse(matcher.matches("22.55")); // Wrong major, right minor
+        assertFalse(matcher.matches("[11.54,11.55)"));
+        assertFalse(matcher.matches("[11.55,11.55.22)"));
+        assertTrue(matcher.matches("[11.55,11.55.33)"));
+        assertTrue(matcher.matches("(11.55.11,11.56)"));
+        assertFalse(matcher.matches("(11.55.22,11.56)"));
+        assertTrue(matcher.matches("[11.55.22,11.56)"));
+        assertTrue(matcher.matches("(11.54,11.55.22]"));
+        assertTrue(matcher.matches("(11.55,)"));
+        assertEquals("11.55.22", matcher.toString());
+
+        // Ensure it is not printed as 1.5.0
+        matcher = RequirementMatcherFactory.createVersionMatcher("11.55");
+        assertEquals("11.55", matcher.toString());
+    }
+
+
 }
