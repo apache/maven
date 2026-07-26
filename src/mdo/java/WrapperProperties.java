@@ -26,20 +26,15 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.AbstractSet;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.InvalidPropertiesFormatException;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -335,9 +330,12 @@ class WrapperProperties extends Properties {
     }
 
     private class OrderedProperties extends Properties {
-        private final List<Object> keyOrder = new CopyOnWriteArrayList<>();
+        // Use LinkedHashMap for O(1) put/contains/remove while preserving insertion order.
+        // The previous CopyOnWriteArrayList had O(n) contains(), making putAll() O(n²).
+        private final LinkedHashMap<Object, Object> ordered;
 
         OrderedProperties(Map<?, ?> map) {
+            ordered = new LinkedHashMap<>(map.size() * 4 / 3 + 1);
             putAll(map);
         }
 
@@ -348,126 +346,46 @@ class WrapperProperties extends Properties {
 
         @Override
         public Set<Object> keySet() {
-            return new KeySet();
+            return ordered.keySet();
         }
 
         @Override
         public Set<Map.Entry<Object, Object>> entrySet() {
-            return new EntrySet();
+            return ordered.entrySet();
+        }
+
+        @Override
+        public Collection<Object> values() {
+            return ordered.values();
         }
 
         @Override
         public synchronized Object put(Object key, Object value) {
-            if (!keyOrder.contains(key)) {
-                keyOrder.add(key);
-            }
+            ordered.put(key, value);
             return super.put(key, value);
         }
 
         @Override
         public synchronized Object setProperty(String key, String value) {
-            if (!keyOrder.contains(key)) {
-                keyOrder.add(key);
-            }
+            ordered.put(key, value);
             return super.setProperty(key, value);
         }
 
         @Override
         public synchronized Object remove(Object key) {
-            keyOrder.remove(key);
+            ordered.remove(key);
             return super.remove(key);
         }
 
         @Override
         public synchronized void clear() {
-            keyOrder.clear();
+            ordered.clear();
             super.clear();
         }
 
         @Override
         public synchronized void forEach(BiConsumer<? super Object, ? super Object> action) {
-            entrySet().forEach(e -> action.accept(e.getKey(), e.getValue()));
-        }
-
-        private class EntrySet extends AbstractSet<Map.Entry<Object, Object>> {
-            @Override
-            public Iterator<Map.Entry<Object, Object>> iterator() {
-                return new Iterator<Map.Entry<Object, Object>>() {
-                    Iterator<Object> keyIterator = keyOrder.iterator();
-                    @Override
-                    public boolean hasNext() {
-                        return keyIterator.hasNext();
-                    }
-
-                    @Override
-                    public Map.Entry<Object, Object> next() {
-                        Object key = keyIterator.next();
-                        return new Map.Entry<>() {
-                            @Override
-                            public Object getKey() {
-                                return key;
-                            }
-
-                            @Override
-                            public Object getValue() {
-                                return get(key);
-                            }
-
-                            @Override
-                            public Object setValue(Object value) {
-                                return WrapperProperties.this.put(key, value);
-                            }
-                        };
-                    }
-                };
-            }
-
-            @Override
-            public int size() {
-                return keyOrder.size();
-            }
-        }
-
-        private class KeySet extends AbstractSet<Object> {
-            public Iterator<Object> iterator() {
-                final Iterator<Object> iter = keyOrder.iterator();
-                return new Iterator<Object>() {
-                    Object lastRet = null;
-                    @Override
-                    public boolean hasNext() {
-                        return iter.hasNext();
-                    }
-
-                    @Override
-                    public Object next() {
-                        lastRet = iter.next();
-                        return lastRet;
-                    }
-
-                    @Override
-                    public void remove() {
-                        WrapperProperties.super.remove(lastRet);
-                    }
-                };
-            }
-
-            public int size() {
-                return keyOrder.size();
-            }
-
-            public boolean contains(Object o) {
-                return containsKey(o);
-            }
-
-            public boolean remove(Object o) {
-                boolean b = WrapperProperties.this.containsKey(o);
-                WrapperProperties.this.remove(o);
-                return b;
-            }
-
-            public void clear() {
-                WrapperProperties.this.clear();
-            }
+            ordered.forEach(action);
         }
     }
 }
