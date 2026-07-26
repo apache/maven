@@ -199,6 +199,13 @@ public class DefaultInterpolator implements Interpolator {
             UnaryOperator<String> callback,
             BinaryOperator<String> postprocessor,
             boolean defaultsToEmptyString) {
+        // Fast path: if the string contains no '$', there can be no ${...} placeholders
+        // and no $__ escape markers, so we can return immediately. This avoids HashSet
+        // allocation, delimiter scanning, and unescape processing for the majority of
+        // POM string values that contain no variable references.
+        if (val == null || val.indexOf('$') < 0) {
+            return val;
+        }
         return unescape(
                 doSubstVars(val, currentKey, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString));
     }
