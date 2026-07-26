@@ -81,19 +81,21 @@ public final class RequirementMatcherFactory {
             }
         }
 
+        private static final Pattern PATTERN_MAJOR_VERSION = Pattern.compile("^[0-9]+$");
+        private static final Pattern PATTERN_MAJOR_MINOR_VERSION = Pattern.compile("^[0-9]\\.[0-9]+$");
         private VersionRange convertRequirementToVersionRange(String requirement)
                 throws InvalidVersionSpecificationException {
             // Specific for Version _requirement_ matching;
             // If the version is a simple integer (like "25")
             // then treat this as the requirement "the major version is 25"
-            if (Pattern.matches("^[0-9]+$", requirement)) {
+            if (PATTERN_MAJOR_VERSION.matcher(requirement).matches()) {
                 int majorVersion = Integer.parseInt(requirement);
                 return VersionRange.createFromVersionSpec("[" + majorVersion + "," + (majorVersion + 1) + ")");
             }
 
             // If the version is a major.minor (like "1.5")
             // then treat this as the requirement "the major version is 1 and the minor is 5"
-            if (Pattern.matches("^[0-9]\\.[0-9]+$", requirement)) {
+            if (PATTERN_MAJOR_MINOR_VERSION.matcher(requirement).matches()) {
                 String[] split = requirement.split("\\.", 2);
                 int majorVersion = Integer.parseInt(split[0]);
                 int minorVersion = Integer.parseInt(split[1]);
