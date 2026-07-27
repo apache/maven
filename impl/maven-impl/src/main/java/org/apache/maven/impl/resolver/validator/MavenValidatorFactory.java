@@ -18,19 +18,34 @@
  */
 package org.apache.maven.impl.resolver.validator;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.spi.validator.Validator;
 import org.eclipse.aether.spi.validator.ValidatorFactory;
+import org.eclipse.aether.util.ConfigUtils;
 
 @Named
 @Singleton
 public class MavenValidatorFactory implements ValidatorFactory {
-    private final MavenValidator instance = new MavenValidator();
+    public enum ValidationLevel {
+        DEFAULT,
+        MILD,
+        OFF;
+    }
+
+    private final MavenValidator defaultValidator = new MavenValidator(true);
+    private final MavenValidator mildValidator = new MavenValidator(false);
+    private final Validator offValidator = new Validator() {};
 
     @Override
-    public Validator newInstance(RepositorySystemSession repositorySystemSession) {
-        return instance;
+    public Validator newInstance(RepositorySystemSession session) {
+        return switch (ConfigUtils.getEnum(
+                session, ValidationLevel.class, ValidationLevel.DEFAULT, Constants.MAVEN_RESOLVER_VALIDATION)) {
+            case DEFAULT -> defaultValidator;
+            case MILD -> mildValidator;
+            case OFF -> offValidator;
+        };
     }
 }
