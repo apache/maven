@@ -24,14 +24,44 @@ import javax.inject.Singleton;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.spi.validator.Validator;
 import org.eclipse.aether.spi.validator.ValidatorFactory;
+import org.eclipse.aether.util.ConfigUtils;
 
 @Named
 @Singleton
 public class MavenValidatorFactory implements ValidatorFactory {
-    private final MavenValidator instance = new MavenValidator();
+    /**
+     * Resolver validation control.
+     * Can be <code>default</code> (full validation), <code>mild</code> (only uninterpolated placeholders) or
+     * <code>off</code> (no validation, as in Maven 3.9.x).
+     * This configuration provides "escape hatch" for those projects, that are forced to use non-conformant solutions.
+     * Default value is {@code default}.
+     *
+     * @since 3.10.0
+     */
+    public static final String MAVEN_RESOLVER_VALIDATION = "maven.resolver.validation";
+
+    public enum ValidationLevel {
+        DEFAULT,
+        MILD,
+        OFF;
+    }
+
+    private final MavenValidator defaultValidator = new MavenValidator(true);
+    private final MavenValidator mildValidator = new MavenValidator(false);
+    private final Validator offValidator = new Validator() {};
 
     @Override
-    public Validator newInstance(RepositorySystemSession repositorySystemSession) {
-        return instance;
+    public Validator newInstance(RepositorySystemSession session) {
+        switch (ConfigUtils.getEnum(
+                session, ValidationLevel.class, ValidationLevel.DEFAULT, MAVEN_RESOLVER_VALIDATION)) {
+            case DEFAULT:
+                return defaultValidator;
+            case MILD:
+                return mildValidator;
+            case OFF:
+                return offValidator;
+            default:
+                throw new IllegalArgumentException("Unknown validation level");
+        }
     }
 }

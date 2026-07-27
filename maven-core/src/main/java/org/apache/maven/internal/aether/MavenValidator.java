@@ -34,6 +34,12 @@ import org.eclipse.aether.util.PathUtils;
  * and to keep very same behavior as Maven 3 did so far. If you want more, upgrade to Maven 4 ;)
  */
 public class MavenValidator implements Validator {
+    private final boolean validatePathComponents;
+
+    public MavenValidator(boolean validatePathComponents) {
+        this.validatePathComponents = validatePathComponents;
+    }
+
     protected boolean containsPlaceholder(String value) {
         return value != null && value.contains("${");
     }
@@ -47,7 +53,9 @@ public class MavenValidator implements Validator {
                 || containsPlaceholder(artifact.getExtension())) {
             throw new IllegalArgumentException("Not fully interpolated artifact " + artifact);
         }
-        PathUtils.validateArtifactComponents(artifact);
+        if (validatePathComponents) {
+            PathUtils.validateArtifactComponents(artifact);
+        }
     }
 
     @Override
@@ -58,7 +66,9 @@ public class MavenValidator implements Validator {
                 || containsPlaceholder(metadata.getType())) {
             throw new IllegalArgumentException("Not fully interpolated metadata " + metadata);
         }
-        PathUtils.validateMetadataComponents(metadata);
+        if (validatePathComponents) {
+            PathUtils.validateMetadataComponents(metadata);
+        }
     }
 
     @Override
@@ -77,7 +87,9 @@ public class MavenValidator implements Validator {
                                 || containsPlaceholder(e.getExtension()))) {
             throw new IllegalArgumentException("Not fully interpolated dependency " + dependency);
         }
-        PathUtils.validateArtifactComponents(artifact);
+        if (validatePathComponents) {
+            PathUtils.validateArtifactComponents(artifact);
+        }
     }
 
     @Override
