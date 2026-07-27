@@ -89,6 +89,7 @@ import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.terminal.impl.AbstractPosixTerminal;
 import org.jline.terminal.spi.TerminalExt;
+import org.jline.utils.OSUtils;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.slf4j.spi.LocationAwareLogger;
@@ -103,6 +104,8 @@ import static org.apache.maven.cling.invoker.CliUtils.toProperties;
  * @param <C> The context type.
  */
 public abstract class LookupInvoker<C extends LookupContext> implements Invoker {
+    private static final int SIGINT_EXIT_CODE = 130;
+
     protected final Lookup protoLookup;
 
     @Nullable
@@ -317,9 +320,13 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                     new ProjectBuildLogAppender(determineBuildEventListener(context));
             context.closeables.add(projectBuildLogAppender);
 
-            MessageUtils.systemInstall(
-                    builder -> doCreateTerminal(context, builder),
-                    terminal -> doConfigureWithTerminal(context, terminal));
+            MessageUtils.systemInstall(builder -> doCreateTerminal(context, builder), terminal -> {
+                if (OSUtils.IS_WINDOWS && !context.invokerRequest.embedded()) {
+                    // JLine may consume Ctrl+C as terminal input, bypassing the JVM's shutdown hooks.
+                    terminal.handle(Terminal.Signal.INT, signal -> System.exit(SIGINT_EXIT_CODE));
+                }
+                doConfigureWithTerminal(context, terminal);
+            });
 
             context.terminal = MessageUtils.getTerminal();
             context.closeables.add(MessageUtils::systemUninstall);
