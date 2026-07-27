@@ -130,6 +130,10 @@ public class DefaultModelInterpolator implements ModelInterpolator {
         // The set is cleared after each substVars call returns, avoiding a new HashSet
         // allocation per interpolated string (~550 allocations per Camel build).
         HashSet<String> cycleMap = new HashSet<>();
+        // Downcast to access the package-private interpolate() overload that accepts
+        // an externally-managed cycleMap, allowing us to reuse the same HashSet across
+        // all strings in this model. Safe because DefaultInterpolator is the only
+        // implementation bound via DI in the Maven runtime.
         DefaultInterpolator di = (DefaultInterpolator) interpolator;
         return value -> {
             try {

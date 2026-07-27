@@ -1361,6 +1361,10 @@ public class DefaultModelValidator implements ModelValidator {
                             SourceHint.dependencyManagementKey(dependency),
                             dependency);
 
+                    /*
+                     * Extensions like Flex Mojos use custom scopes like "merged", "internal", "external", etc. In
+                     * order to not break backward-compat with those, only warn but don't error out.
+                     */
                     validateDependencyScope(
                             prefix,
                             "scope",
