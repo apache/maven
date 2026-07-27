@@ -43,6 +43,7 @@ import java.util.stream.Stream;
 
 import org.apache.maven.api.Lifecycle;
 import org.apache.maven.api.MonotonicClock;
+import org.apache.maven.api.plugin.descriptor.AfterLink;
 import org.apache.maven.api.services.LifecycleRegistry;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.xml.XmlNode;
@@ -622,6 +623,8 @@ public class BuildPlanExecutor {
                                                             .executeAfter(a));
                                         }
                                     }
+                                    // Apply @After annotation ordering constraints from the mojo descriptor
+                                    applyAfterLinks(mojoDescriptor, project, resolvedPhase);
                                 });
                             }
                         }
@@ -647,6 +650,83 @@ public class BuildPlanExecutor {
             } finally {
                 lock.writeLock().unlock();
             }
+        }
+
+        /**
+         * Applies lifecycle ordering constraints from {@code @After} annotations on a mojo descriptor.
+         * Each {@link AfterLink} is translated into build step ordering edges, matching the same
+         * semantics as {@link Lifecycle.Link} processing in {@code calculateLifecycleMappings}.
+         *
+         * @param mojoDescriptor the mojo descriptor that may contain after links
+         * @param project the project the mojo is bound to
+         * @param resolvedPhase the resolved phase the mojo is bound to
+         */
+        private void applyAfterLinks(MojoDescriptor mojoDescriptor, MavenProject project, String resolvedPhase) {
+            List<AfterLink> afterLinks = mojoDescriptor.getMojoDescriptorV4().getAfterLinks();
+            if (afterLinks == null || afterLinks.isEmpty()) {
+                return;
+            }
+            for (AfterLink afterLink : afterLinks) {
+                String targetPhase = afterLink.getPhase();
+                String type = afterLink.getType();
+                if ("PROJECT".equals(type)) {
+                    // Same-project ordering: this phase starts after target phase completes
+                    plan.step(project, AFTER + targetPhase)
+                            .ifPresent(targetAfter -> plan.requiredStep(project, BEFORE + resolvedPhase)
+                                    .executeAfter(targetAfter));
+                } else if ("DEPENDENCIES".equals(type)) {
+                    // Cross-project ordering: this phase starts after each dependency's target phase completes
+                    String scope = afterLink.getScope();
+                    for (MavenProject dep :
+                            filterByScope(project, plan.getAllProjects().get(project), scope)) {
+                        plan.step(dep, AFTER + targetPhase)
+                                .ifPresent(depAfter -> plan.requiredStep(project, BEFORE + resolvedPhase)
+                                        .executeAfter(depAfter));
+                    }
+                } else if ("CHILDREN".equals(type)) {
+                    // Parent-child ordering: bidirectional coordination with child modules
+                    BuildStep before = plan.requiredStep(project, BEFORE + resolvedPhase);
+                    BuildStep after = plan.requiredStep(project, AFTER + resolvedPhase);
+                    if (project.getCollectedProjects() != null) {
+                        project.getCollectedProjects().forEach(child -> {
+                            plan.step(child, BEFORE + targetPhase).ifPresent(before::executeBefore);
+                            plan.step(child, AFTER + targetPhase).ifPresent(after::executeAfter);
+                        });
+                    }
+                }
+            }
+        }
+
+        /**
+         * Filters upstream projects by dependency scope. If the scope is null or empty,
+         * all upstream projects are returned. Otherwise, only projects that the given
+         * project depends on with a matching scope are included.
+         * <p>
+         * Matching is exact on the dependency's declared scope string (e.g. "compile",
+         * "provided", "test"). Maven's default dependency scope is "compile" (when no
+         * scope is declared), so a null scope in the model is treated as "compile" for
+         * matching purposes. Note that this does <em>not</em> perform path-scope
+         * resolution — for example, filtering by "compile" will not include
+         * "provided"-scoped dependencies even though they contribute to
+         * {@code PathScope.MAIN_COMPILE}. This keeps the filter simple and predictable;
+         * broader scope-aware filtering can be added in a follow-up if needed.
+         *
+         * @param project the project whose dependencies to check
+         * @param upstreamProjects the list of upstream reactor projects
+         * @param scope the dependency scope to filter by, or null/empty for all
+         * @return the filtered list of upstream projects
+         */
+        static List<MavenProject> filterByScope(
+                MavenProject project, List<MavenProject> upstreamProjects, String scope) {
+            if (scope == null || scope.isEmpty()) {
+                return upstreamProjects;
+            }
+            return upstreamProjects.stream()
+                    .filter(dep -> project.getDependencies().stream()
+                            .anyMatch(d -> dep.getGroupId().equals(d.getGroupId())
+                                    && dep.getArtifactId().equals(d.getArtifactId())
+                                    && scope.equals(d.getScope() != null ? d.getScope() : "compile")))
+                    .collect(Collectors.toList());
         }
 
         protected BuildPlan computeForkPlan(BuildStep step, MojoExecution execution, BuildPlan buildPlan) {
@@ -968,8 +1048,8 @@ public class BuildPlanExecutor {
                     if (pointer instanceof Lifecycle.DependenciesPointer) {
                         // For dependencies: ensure current project's phase starts after dependency's phase completes
                         // Example: project's compile starts after dependency's package completes
-                        // TODO: String scope = ((Lifecycle.DependenciesPointer) pointer).scope();
-                        projects.get(project)
+                        String scope = ((Lifecycle.DependenciesPointer) pointer).scope();
+                        filterByScope(project, projects.get(project), scope)
                                 .forEach(p -> plan.step(p, AFTER + n2).ifPresent(before::executeAfter));
                     } else if (pointer instanceof Lifecycle.ChildrenPointer) {
                         // For children: ensure bidirectional phase coordination
