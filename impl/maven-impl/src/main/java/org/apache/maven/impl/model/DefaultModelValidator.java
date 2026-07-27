@@ -1212,6 +1212,26 @@ public class DefaultModelValidator implements ModelValidator {
 
         String prefix = management ? "dependencyManagement.dependencies.dependency." : "dependencies.dependency.";
 
+        // Pre-compute scope validation data once before the loop instead of per-dependency.
+        // On Camel (676 modules, ~20+ deps each), this avoids thousands of redundant
+        // InternalSession.from() calls, stream pipelines, and array allocations.
+        String[] validScopes = null;
+        if (validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_2_0 && !dependencies.isEmpty()) {
+            ScopeManager scopeManager = InternalSession.from(s).getSession().getScopeManager();
+            if (management) {
+                Set<String> scopes = scopeManager.getDependencyScopeUniverse().stream()
+                        .map(DependencyScope::getId)
+                        .collect(Collectors.toCollection(HashSet::new));
+                scopes.add("import");
+                validScopes = scopes.toArray(new String[0]);
+            } else {
+                validScopes = scopeManager.getDependencyScopeUniverse().stream()
+                        .map(DependencyScope::getId)
+                        .distinct()
+                        .toArray(String[]::new);
+            }
+        }
+
         for (Dependency d : dependencies) {
             validateEffectiveDependency(problems, d, management, prefix, validationLevel);
 
@@ -1237,12 +1257,6 @@ public class DefaultModelValidator implements ModelValidator {
                             SourceHint.dependencyManagementKey(d),
                             d);
 
-                    /*
-                     * Extensions like Flex Mojos use custom scopes like "merged", "internal", "external", etc. In
-                     * order to not break backward-compat with those, only warn but don't error out.
-                     */
-                    ScopeManager scopeManager =
-                            InternalSession.from(s).getSession().getScopeManager();
                     validateDependencyScope(
                             prefix,
                             "scope",
@@ -1252,20 +1266,11 @@ public class DefaultModelValidator implements ModelValidator {
                             d.getScope(),
                             SourceHint.dependencyManagementKey(d),
                             d,
-                            scopeManager.getDependencyScopeUniverse().stream()
-                                    .map(DependencyScope::getId)
-                                    .distinct()
-                                    .toArray(String[]::new),
+                            validScopes,
                             false);
 
                     validateEffectiveModelAgainstDependency(prefix, problems, m, d);
                 } else {
-                    ScopeManager scopeManager =
-                            InternalSession.from(s).getSession().getScopeManager();
-                    Set<String> scopes = scopeManager.getDependencyScopeUniverse().stream()
-                            .map(DependencyScope::getId)
-                            .collect(Collectors.toCollection(HashSet::new));
-                    scopes.add("import");
                     validateDependencyScope(
                             prefix,
                             "scope",
@@ -1275,7 +1280,7 @@ public class DefaultModelValidator implements ModelValidator {
                             d.getScope(),
                             SourceHint.dependencyManagementKey(d),
                             d,
-                            scopes.toArray(new String[0]),
+                            validScopes,
                             true);
                 }
             }
