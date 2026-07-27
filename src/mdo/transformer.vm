@@ -71,12 +71,7 @@ public class ${className} {
      * The transformation function.
      */
     protected String transform(String value) {
-        // Fast path: skip the interpolation callback chain entirely for strings
-        // that cannot contain variable references (the vast majority in a typical model).
-        if (value == null || value.indexOf('$') < 0) {
-            return value;
-        }
-        return transformer.apply(value);
+        return value != null ? transformer.apply(value) : null;
     }
 
 #foreach ( $class in $model.allClasses )

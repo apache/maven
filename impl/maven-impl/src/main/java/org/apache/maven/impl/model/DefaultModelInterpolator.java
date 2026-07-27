@@ -103,7 +103,19 @@ public class DefaultModelInterpolator implements ModelInterpolator {
     public Model interpolateModel(
             Model model, Path projectDir, ModelBuilderRequest request, ModelProblemCollector problems) {
         InnerInterpolator innerInterpolator = createInterpolator(model, projectDir, request, problems);
-        return new MavenTransformer(innerInterpolator::interpolate).visit(model);
+        return new MavenTransformer(innerInterpolator::interpolate) {
+            @Override
+            protected String transform(String value) {
+                // Fast path: skip the interpolation callback chain for strings
+                // that cannot contain variable references (the vast majority).
+                // This is safe here because this transformer is only used for
+                // interpolation (${...}), NOT for decryption ({...}).
+                if (value == null || value.indexOf('$') < 0) {
+                    return value;
+                }
+                return super.transform(value);
+            }
+        }.visit(model);
     }
 
     private InnerInterpolator createInterpolator(
