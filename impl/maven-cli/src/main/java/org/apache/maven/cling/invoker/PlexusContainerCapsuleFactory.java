@@ -252,6 +252,13 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
                     // sisu uses realm imports to establish component visibility
                     extRealm.importFrom(realm, realm.getId());
                 }
+                // Make the container realm (maven.ext) visible from extension realms.
+                // Beans discovered in the container are sourced from maven.ext, but extension
+                // realms have plexus.core as parent and cannot reach maven.ext through the parent
+                // chain alone. Without this import, Sisu 1.1.0's FilteredBeans (enabled by
+                // jsr330ComponentVisibilityFollowsPlexusVisibility) would hide container-sourced
+                // beans when TCCL is set to an extension realm during lifecycle callbacks.
+                realm.importFrom(extRealm, extRealm.getId());
             }
 
             return extRealm;
