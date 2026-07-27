@@ -339,7 +339,10 @@ under the License.
         <field xdoc.separator="blank">
           <name>requirements</name>
           <version>1.0.0</version>
-          <description>Use Maven 4 Dependency Injection (for v4 plugins) or JSR 330 annotations (for v3 plugins) to inject dependencies instead.</description>
+          <description><![CDATA[
+            Deprecated: Component requirements (plugin tools {@code @Component} annotation), that will be injected to Mojo fields.
+            <a href="https://maven.apache.org/maven-jsr330.html">Use JSR 330 annotations</a> to inject components instead, without this descriptor.
+          ]]></description>
           <association>
             <type>Requirement</type>
             <multiplicity>*</multiplicity>
@@ -469,7 +472,10 @@ under the License.
     <class xdoc.anchorName="requirement">
       <name>Requirement</name>
       <version>1.0.0</version>
-      <description>Describes a component requirement.</description>
+      <description><![CDATA[
+        Deprecated: Describes a component requirement (plugin tools' {@code @Component} annotation), that will be injected to a Mojo field.
+        <a href="https://maven.apache.org/maven-jsr330.html">Use JSR 330 annotations</a> to inject components instead, without this descriptor.
+      ]]></description>
       <!-- see o.a.m.plugin.descriptor.Requirement -->
       <fields>
         <field>
@@ -477,7 +483,7 @@ under the License.
           <required>true</required>
           <version>1.0.0</version>
           <type>String</type>
-          <description></description>
+          <description>Plexus role of the component to inject.</description>
         </field>
         <field xml.tagName="role-hint">
           <name>roleHint</name>
@@ -490,7 +496,7 @@ under the License.
           <required>true</required>
           <version>1.0.0</version>
           <type>String</type>
-          <description>The field name which has this requirement.</description>
+          <description>The field name which has this component requirement.</description>
         </field>
       </fields>
     </class>
