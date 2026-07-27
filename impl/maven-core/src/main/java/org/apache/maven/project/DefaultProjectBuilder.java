@@ -555,16 +555,13 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
             List<ProjectBuildingResult> results = new ArrayList<>();
             List<ModelBuilderResult> allModels = results(result).toList();
-            // All modules in the reactor share the same root directory —
-            // compute it once from the top-level pom instead of re-parsing
-            // pom.xml at every directory level for each of the N modules.
-            Path rootDirectory = rootLocator.findRoot(pomFile.getParentFile().toPath());
             for (ModelBuilderResult r : allModels) {
                 if (r.getEffectiveModel() != null) {
                     File pom = r.getSource().getPath().toFile();
                     MavenProject project =
                             projectIndex.get(r.getEffectiveModel().getId());
-                    project.setRootDirectory(rootDirectory);
+                    project.setRootDirectory(
+                            rootLocator.findRoot(pom.getParentFile().toPath()));
                     project.setFile(pom);
                     project.setExecutionRoot(pom.equals(pomFile));
                     initProject(project, r);
