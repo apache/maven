@@ -560,9 +560,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     File pom = r.getSource().getPath().toFile();
                     MavenProject project =
                             projectIndex.get(r.getEffectiveModel().getId());
-                    Path rootDirectory =
-                            rootLocator.findRoot(pom.getParentFile().toPath());
-                    project.setRootDirectory(rootDirectory);
+                    project.setRootDirectory(
+                            rootLocator.findRoot(pom.getParentFile().toPath()));
                     project.setFile(pom);
                     project.setExecutionRoot(pom.equals(pomFile));
                     initProject(project, r);

@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -102,7 +103,19 @@ public class DefaultModelInterpolator implements ModelInterpolator {
     public Model interpolateModel(
             Model model, Path projectDir, ModelBuilderRequest request, ModelProblemCollector problems) {
         InnerInterpolator innerInterpolator = createInterpolator(model, projectDir, request, problems);
-        return new MavenTransformer(innerInterpolator::interpolate).visit(model);
+        return new MavenTransformer(innerInterpolator::interpolate) {
+            @Override
+            protected String transform(String value) {
+                // Fast path: skip the interpolation callback chain for strings
+                // that cannot contain variable references (the vast majority).
+                // This is safe here because this transformer is only used for
+                // interpolation (${...}), NOT for decryption ({...}).
+                if (value == null || value.indexOf('$') < 0) {
+                    return value;
+                }
+                return super.transform(value);
+            }
+        }.visit(model);
     }
 
     private InnerInterpolator createInterpolator(
@@ -113,9 +126,15 @@ public class DefaultModelInterpolator implements ModelInterpolator {
                 v -> Optional.ofNullable(callback(model, projectDir, request, problems, v));
         UnaryOperator<String> cb = v -> cache.computeIfAbsent(v, ucb).orElse(null);
         BinaryOperator<String> postprocessor = (e, v) -> postProcess(projectDir, request, e, v);
+        // Reuse a single HashSet for cycle detection across all strings in this model.
+        // The set is cleared after each substVars call returns, avoiding a new HashSet
+        // allocation per interpolated string (~550 allocations per Camel build).
+        HashSet<String> cycleMap = new HashSet<>();
+        DefaultInterpolator di = (DefaultInterpolator) interpolator;
         return value -> {
             try {
-                return interpolator.interpolate(value, cb, postprocessor, false);
+                cycleMap.clear();
+                return di.interpolate(value, null, cycleMap, cb, postprocessor, false);
             } catch (InterpolatorException e) {
                 problems.add(BuilderProblem.Severity.ERROR, ModelProblem.Version.BASE, e.getMessage(), e);
                 return null;
