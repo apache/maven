@@ -49,6 +49,9 @@ import static org.apache.maven.impl.ImplUtils.cast;
 public interface InternalSession extends Session {
 
     static InternalSession from(Session session) {
+        if (session instanceof InternalSession is) {
+            return is;
+        }
         return cast(InternalSession.class, session, "session should be an " + InternalSession.class);
     }
 
