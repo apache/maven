@@ -414,7 +414,14 @@ public class DefaultInterpolator implements Interpolator {
         if (val == null || val.isEmpty()) {
             return val;
         }
-        val = val.replace(MARKER, "$");
+        // Fast path: if the string contains neither the escape marker ($__)
+        // nor the escape char (\), there is nothing to unescape.
+        if (val.indexOf(MARKER.charAt(0)) < 0 && val.indexOf(ESCAPE_CHAR) < 0) {
+            return val;
+        }
+        if (val.contains(MARKER)) {
+            val = val.replace(MARKER, "$");
+        }
         int escape = val.indexOf(ESCAPE_CHAR);
         while (escape >= 0 && escape < val.length() - 1) {
             char c = val.charAt(escape + 1);

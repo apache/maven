@@ -18,6 +18,9 @@
  */
 package org.apache.maven.internal.aether;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 import org.apache.maven.api.PathType;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.services.TypeRegistry;
@@ -27,8 +30,14 @@ import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * Adapter between Maven {@link TypeRegistry} and Resolver {@link ArtifactTypeRegistry}.
+ * <p>
+ * Results are cached per typeId since type definitions are immutable during a build.
+ */
 class TypeRegistryAdapter implements ArtifactTypeRegistry {
     private final TypeRegistry typeRegistry;
+    private final ConcurrentMap<String, ArtifactType> cache = new ConcurrentHashMap<>();
 
     TypeRegistryAdapter(TypeRegistry typeRegistry) {
         this.typeRegistry = requireNonNull(typeRegistry, "typeRegistry");
@@ -36,6 +45,10 @@ class TypeRegistryAdapter implements ArtifactTypeRegistry {
 
     @Override
     public ArtifactType get(String typeId) {
+        return cache.computeIfAbsent(typeId, this::doGet);
+    }
+
+    private ArtifactType doGet(String typeId) {
         Type type = typeRegistry.require(typeId);
         if (type instanceof ArtifactType artifactType) {
             return artifactType;
