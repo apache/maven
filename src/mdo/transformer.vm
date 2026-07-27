@@ -71,6 +71,14 @@ public class ${className} {
      * The transformation function.
      */
     protected String transform(String value) {
+        // Fast path: skip the callback entirely when the string cannot
+        // contain a variable reference. This avoids the entire interpolation
+        // call chain (lambda invocation, substVars, HashSet allocation,
+        // delimiter scanning, unescape) for the vast majority of strings
+        // in a typical model (only a handful use ${...} placeholders).
+        if (value == null || value.indexOf('$') < 0) {
+            return value;
+        }
         return transformer.apply(value);
     }
 

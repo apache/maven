@@ -18,13 +18,11 @@
  */
 package org.apache.maven.impl.model;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.model.Dependency;
@@ -60,6 +58,7 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultModelObjectPool.class);
 
     private final Map<?, ?> properties;
+    private final Set<String> pooledTypes;
 
     public DefaultModelObjectPool() {
         this(System.getProperties());
@@ -67,6 +66,7 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
 
     DefaultModelObjectPool(Map<?, ?> properties) {
         this.properties = properties;
+        this.pooledTypes = parsePooledTypes(properties);
     }
 
     @Override
@@ -79,8 +79,8 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
         Class<?> objectType = object.getClass();
         String simpleClassName = objectType.getSimpleName();
 
-        // Check if this object type should be pooled (read configuration dynamically)
-        if (!getPooledTypes(properties).contains(simpleClassName)) {
+        // Check if this object type should be pooled
+        if (!pooledTypes.contains(simpleClassName)) {
             return object;
         }
 
@@ -96,14 +96,27 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
     }
 
     /**
-     * Gets the set of object types that should be pooled.
+     * Parses the set of object types that should be pooled from configuration.
+     * Called once at construction time to avoid re-parsing on every {@link #process} call.
      */
-    private Set<String> getPooledTypes(Map<?, ?> properties) {
+    private Set<String> parsePooledTypes(Map<?, ?> props) {
         String pooledTypesProperty = getProperty(Constants.MAVEN_MODEL_PROCESSOR_POOLED_TYPES, "Dependency");
-        return Arrays.stream(pooledTypesProperty.split(","))
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .collect(Collectors.toSet());
+        String[] parts = pooledTypesProperty.split(",");
+        Set<String> result = Set.of(); // start empty, build up
+        for (String part : parts) {
+            String trimmed = part.trim();
+            if (!trimmed.isEmpty()) {
+                // Build incrementally — typical case is 1-2 types
+                if (result.isEmpty()) {
+                    result = Set.of(trimmed);
+                } else {
+                    Set<String> next = new java.util.HashSet<>(result);
+                    next.add(trimmed);
+                    result = Set.copyOf(next);
+                }
+            }
+        }
+        return result;
     }
 
     /**

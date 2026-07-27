@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -113,9 +114,15 @@ public class DefaultModelInterpolator implements ModelInterpolator {
                 v -> Optional.ofNullable(callback(model, projectDir, request, problems, v));
         UnaryOperator<String> cb = v -> cache.computeIfAbsent(v, ucb).orElse(null);
         BinaryOperator<String> postprocessor = (e, v) -> postProcess(projectDir, request, e, v);
+        // Reuse a single HashSet for cycle detection across all strings in this model.
+        // The set is cleared after each substVars call returns, avoiding a new HashSet
+        // allocation per interpolated string (~550 allocations per Camel build).
+        HashSet<String> cycleMap = new HashSet<>();
+        DefaultInterpolator di = (DefaultInterpolator) interpolator;
         return value -> {
             try {
-                return interpolator.interpolate(value, cb, postprocessor, false);
+                cycleMap.clear();
+                return di.interpolate(value, null, cycleMap, cb, postprocessor, false);
             } catch (InterpolatorException e) {
                 problems.add(BuilderProblem.Severity.ERROR, ModelProblem.Version.BASE, e.getMessage(), e);
                 return null;
