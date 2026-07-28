@@ -55,8 +55,8 @@ class PluginDescriptorRequirementsValidator implements MavenPluginConfigurationV
                     mavenSession,
                     mojoDescriptor,
                     mojoClass,
-                    "Plugin use Plexus Component (plugin tools {@code @Component} annotation). "
-                            + "Maven 4 Dependency Injection (for v4 plugins) or JSR 330 annotations (for v3 plugins) to inject dependencies should be used instead.");
+                    "Plugin uses Plexus Component requirements (@Component annotation). "
+                            + "Use Maven 4 Dependency Injection (for v4 plugins) or JSR 330 annotations (for v3 plugins) to inject dependencies instead.");
         }
     }
 }

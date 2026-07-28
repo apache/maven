@@ -34,7 +34,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -68,7 +67,7 @@ class PluginDescriptorRequirementsValidatorTest {
                         eq(mavenSession),
                         eq(mojoDescriptor),
                         eq(mojoClass),
-                        contains("Plugin use Plexus Component"));
+                        contains("Plugin uses Plexus Component requirements"));
     }
 
     @Test
