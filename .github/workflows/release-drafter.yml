@@ -24,7 +24,7 @@ on:
 
 jobs:
    update_release_draft:
-      uses: apache/maven-gh-actions-shared/.github/workflows/release-drafter.yml@v4
+      uses: apache/maven-gh-actions-shared/.github/workflows/release-drafter.yml@v5
       with:
         config-name: 'release-drafter-3.x.yml'
         initial-commits-since: '2026-03-09T10:55:05Z' # date of first commit on maven-3.10.x branch, 465a93ceb620266bf88bb1a0c9d69228630a4fb6
