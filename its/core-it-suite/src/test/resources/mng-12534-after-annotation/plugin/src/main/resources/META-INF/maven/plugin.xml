@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://maven.apache.org/PLUGIN/2.0.0">
+  <name>MNG-12534 Test Plugin</name>
+  <groupId>org.apache.maven.its.mng12534</groupId>
+  <artifactId>mng12534-plugin</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <goalPrefix>mng12534</goalPrefix>
+  <mojos>
+    <mojo>
+      <goal>touch</goal>
+      <phase>compile</phase>
+      <implementation>org.apache.maven.its.mng12534.TouchMojo</implementation>
+      <language>java</language>
+      <description>Creates a marker file; has afterLinks to test @After wiring</description>
+      <afterLinks>
+        <afterLink>
+          <phase>resources</phase>
+          <type>PROJECT</type>
+        </afterLink>
+      </afterLinks>
+    </mojo>
+  </mojos>
+</plugin>
