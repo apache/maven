@@ -1666,7 +1666,7 @@ class PluginUpgradeStrategyTest {
             String result = DomUtils.toXml(document);
 
             // Check that the plugin version was upgraded
-            assertTrue(result.contains("<version>3.2</version>"), "Plugin version should be upgraded to 3.2");
+            assertTrue(result.contains("<version>3.11.0</version>"), "Plugin version should be upgraded to 3.11.0");
 
             // Verify that the XML formatting is correct - no malformed closing tags
             assertFalse(result.contains("</plugin></plugins>"), "Should not have malformed closing tags");
@@ -1726,6 +1726,255 @@ class PluginUpgradeStrategyTest {
                         result.contains("        </pluginManagement>"),
                         "PluginManagement closing tag should be properly indented");
             }
+        }
+    }
+
+    @Nested
+    @DisplayName("Maven 4 Pre-release Version Detection")
+    class Maven4PreReleaseTests {
+
+        @Test
+        @DisplayName("should detect 4.0.0 pre-release versions")
+        void shouldDetectPreReleaseVersions() {
+            assertTrue(PluginUpgradeStrategy.isMaven4PreRelease("4.0.0-beta-1"));
+            assertTrue(PluginUpgradeStrategy.isMaven4PreRelease("4.0.0-beta-2"));
+            assertTrue(PluginUpgradeStrategy.isMaven4PreRelease("4.0.0-alpha-1"));
+            assertTrue(PluginUpgradeStrategy.isMaven4PreRelease("4.0.0-SNAPSHOT"));
+            assertTrue(PluginUpgradeStrategy.isMaven4PreRelease("4.0.0-rc-1"));
+        }
+
+        @Test
+        @DisplayName("should not detect non-pre-release versions")
+        void shouldNotDetectNonPreReleaseVersions() {
+            assertFalse(PluginUpgradeStrategy.isMaven4PreRelease("4.0.0"));
+            assertFalse(PluginUpgradeStrategy.isMaven4PreRelease("3.5.0"));
+            assertFalse(PluginUpgradeStrategy.isMaven4PreRelease("3.14.0"));
+            assertFalse(PluginUpgradeStrategy.isMaven4PreRelease(null));
+        }
+
+        @Test
+        @DisplayName("should upgrade beta-1 to latest pre-release, not downgrade to 3.x")
+        void shouldUpgradeBetaToLatestPreRelease() throws Exception {
+            Document doc = PomBuilder.create()
+                    .plugin("org.apache.maven.plugins", "maven-compiler-plugin", "4.0.0-beta-1")
+                    .buildDocument();
+            strategy.doApply(createMockContext(), Map.of(Paths.get("pom.xml"), doc));
+            String xml = DomUtils.toXml(doc);
+            assertTrue(
+                    xml.contains("<version>4.0.0-beta-4</version>"),
+                    "Should upgrade to latest pre-release, not downgrade to 3.11.0");
+        }
+
+        @Test
+        @DisplayName("should not downgrade when already at latest pre-release")
+        void shouldNotDowngradeWhenAtLatestPreRelease() throws Exception {
+            Document doc = PomBuilder.create()
+                    .plugin("org.apache.maven.plugins", "maven-compiler-plugin", "4.0.0-beta-4")
+                    .buildDocument();
+            strategy.doApply(createMockContext(), Map.of(Paths.get("pom.xml"), doc));
+            assertTrue(
+                    DomUtils.toXml(doc).contains("<version>4.0.0-beta-4</version>"),
+                    "Should keep latest pre-release unchanged");
+        }
+
+        @Test
+        @DisplayName("should upgrade pre-release property to latest pre-release")
+        void shouldUpgradePreReleaseProperty() throws Exception {
+            Document doc = PomBuilder.create()
+                    .property("compiler.version", "4.0.0-beta-1")
+                    .plugin("org.apache.maven.plugins", "maven-compiler-plugin", "${compiler.version}")
+                    .buildDocument();
+            strategy.doApply(createMockContext(), Map.of(Paths.get("pom.xml"), doc));
+            assertTrue(
+                    DomUtils.toXml(doc).contains(">4.0.0-beta-4</"),
+                    "Should upgrade property to latest pre-release, not 3.x");
+        }
+    }
+
+    @Nested
+    @DisplayName("Plugin Migration")
+    class PluginMigrationTests {
+
+        @Test
+        @DisplayName("should migrate org.scala-tools:maven-scala-plugin in build/plugins")
+        void shouldMigrateScalaPluginInBuildPlugins() throws Exception {
+            String pomXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>test</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.scala-tools</groupId>
+                                    <artifactId>maven-scala-plugin</artifactId>
+                                    <version>2.15.2</version>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Plugin migration should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have migrated maven-scala-plugin");
+
+            Editor editor = new Editor(document);
+            Element root = editor.root();
+            Element pluginElement = root.path("build", "plugins", "plugin").orElse(null);
+            assertNotNull(pluginElement, "Plugin element should exist");
+
+            String groupId = pluginElement
+                    .childElement("groupId")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            String artifactId = pluginElement
+                    .childElement("artifactId")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            String version = pluginElement
+                    .childElement("version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+
+            assertEquals("net.alchim31.maven", groupId, "groupId should be migrated to net.alchim31.maven");
+            assertEquals("scala-maven-plugin", artifactId, "artifactId should be migrated to scala-maven-plugin");
+            assertEquals("4.9.5", version, "version should be set to 4.9.5");
+        }
+
+        @Test
+        @DisplayName("should migrate org.scala-tools:maven-scala-plugin in pluginManagement")
+        void shouldMigrateScalaPluginInPluginManagement() throws Exception {
+            String pomXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>test</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0.0</version>
+                        <build>
+                            <pluginManagement>
+                                <plugins>
+                                    <plugin>
+                                        <groupId>org.scala-tools</groupId>
+                                        <artifactId>maven-scala-plugin</artifactId>
+                                        <version>2.15.2</version>
+                                    </plugin>
+                                </plugins>
+                            </pluginManagement>
+                        </build>
+                    </project>
+                    """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Plugin migration should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have migrated maven-scala-plugin in pluginManagement");
+
+            Editor editor = new Editor(document);
+            Element root = editor.root();
+            Element pluginElement =
+                    root.path("build", "pluginManagement", "plugins", "plugin").orElse(null);
+            assertNotNull(pluginElement, "Plugin element should exist in pluginManagement");
+
+            String groupId = pluginElement
+                    .childElement("groupId")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            String artifactId = pluginElement
+                    .childElement("artifactId")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            String version = pluginElement
+                    .childElement("version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+
+            assertEquals("net.alchim31.maven", groupId, "groupId should be migrated to net.alchim31.maven");
+            assertEquals("scala-maven-plugin", artifactId, "artifactId should be migrated to scala-maven-plugin");
+            assertEquals("4.9.5", version, "version should be set to 4.9.5");
+        }
+
+        @Test
+        @DisplayName("should not modify POM without migratable plugins")
+        void shouldNotModifyPomWithoutMigratablePlugins() throws Exception {
+            String pomXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>test</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>net.alchim31.maven</groupId>
+                                    <artifactId>scala-maven-plugin</artifactId>
+                                    <version>4.9.5</version>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            strategy.doApply(context, pomMap);
+
+            // Verify the plugin was not changed
+            Editor editor = new Editor(document);
+            Element root = editor.root();
+            String groupId = root.path("build", "plugins", "plugin", "groupId")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            String artifactId = root.path("build", "plugins", "plugin", "artifactId")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            String version = root.path("build", "plugins", "plugin", "version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+
+            assertEquals("net.alchim31.maven", groupId, "groupId should remain net.alchim31.maven");
+            assertEquals("scala-maven-plugin", artifactId, "artifactId should remain scala-maven-plugin");
+            assertEquals("4.9.5", version, "version should remain 4.9.5");
+        }
+
+        @Test
+        @DisplayName("should have predefined plugin migrations")
+        void shouldHavePredefinedPluginMigrations() {
+            List<PluginMigration> migrations = PluginUpgradeStrategy.getPluginMigrations();
+
+            assertFalse(migrations.isEmpty(), "Should have predefined plugin migrations");
+
+            boolean hasScalaPlugin = migrations.stream()
+                    .anyMatch(m ->
+                            "org.scala-tools".equals(m.oldGroupId()) && "maven-scala-plugin".equals(m.oldArtifactId()));
+
+            assertTrue(hasScalaPlugin, "Should include org.scala-tools:maven-scala-plugin migration");
+
+            // Verify migration target coordinates
+            PluginMigration scalaMigration = migrations.stream()
+                    .filter(m ->
+                            "org.scala-tools".equals(m.oldGroupId()) && "maven-scala-plugin".equals(m.oldArtifactId()))
+                    .findFirst()
+                    .orElse(null);
+            assertNotNull(scalaMigration, "Scala plugin migration should exist");
+            assertEquals("net.alchim31.maven", scalaMigration.newGroupId());
+            assertEquals("scala-maven-plugin", scalaMigration.newArtifactId());
+            assertEquals("4.9.5", scalaMigration.minVersion());
         }
     }
 }
