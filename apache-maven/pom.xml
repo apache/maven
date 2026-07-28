@@ -354,5 +354,41 @@ under the License.
         <finalName>${project.artifactId}</finalName>
       </build>
     </profile>
+    <!-- Runs the bin/mvn path conversion test as part of the build. The test is
+         a POSIX shell script driving the launcher, so it only applies to the
+         platforms that use bin/mvn; Windows ships and runs bin/mvn.cmd. -->
+    <profile>
+      <id>shell-script-tests</id>
+      <activation>
+        <os>
+          <family>unix</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>3.6.3</version>
+            <executions>
+              <execution>
+                <id>test-mvn-path-conversion</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>test</phase>
+                <configuration>
+                  <skip>${skipTests}</skip>
+                  <executable>sh</executable>
+                  <arguments>
+                    <argument>${project.basedir}/src/test/scripts/test-mvn-path-conversion.sh</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 </project>
