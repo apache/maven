@@ -611,28 +611,59 @@ public class DefaultModelBuilder implements ModelBuilder {
         // Infer inner reactor dependencies version
         //
         Model transformFileToRaw(Model model) {
-            if (model.getDependencies().isEmpty()) {
+            List<Dependency> newDeps = null;
+            boolean depsChanged = false;
+            if (!model.getDependencies().isEmpty()) {
+                newDeps = new ArrayList<>(model.getDependencies().size());
+                depsChanged = inferDependencies(model, model.getDependencies(), newDeps);
+            }
+
+            DependencyManagement depMgmt = model.getDependencyManagement();
+            List<Dependency> newManagedDeps = null;
+            boolean managedDepsChanged = false;
+            if (depMgmt != null && !depMgmt.getDependencies().isEmpty()) {
+                newManagedDeps = new ArrayList<>(depMgmt.getDependencies().size());
+                managedDepsChanged = inferDependencies(model, depMgmt.getDependencies(), newManagedDeps);
+            }
+
+            if (!depsChanged && !managedDepsChanged) {
                 return model;
             }
-            List<Dependency> newDeps = new ArrayList<>(model.getDependencies().size());
+            Model.Builder builder = Model.newBuilder(model);
+            if (depsChanged) {
+                builder.dependencies(newDeps);
+            }
+            if (managedDepsChanged) {
+                builder.dependencyManagement(depMgmt.withDependencies(newManagedDeps));
+            }
+            return builder.build();
+        }
+
+        /**
+         * Infers the missing version or groupId of the given dependencies by looking them up in the reactor.
+         * Each dependency, either the original one or the inferred one, is added to {@code result}.
+         *
+         * @param model the model declaring the dependencies
+         * @param dependencies the dependencies to process
+         * @param result the list collecting the resulting dependencies
+         * @return whether at least one dependency has been inferred
+         */
+        private boolean inferDependencies(Model model, List<Dependency> dependencies, List<Dependency> result) {
             boolean changed = false;
-            for (Dependency dep : model.getDependencies()) {
+            for (Dependency dep : dependencies) {
                 Dependency newDep = null;
                 if (dep.getVersion() == null) {
                     newDep = inferDependencyVersion(model, dep);
-                    if (newDep != null) {
-                        changed = true;
-                    }
                 } else if (dep.getGroupId() == null) {
                     // Handle missing groupId when version is present
                     newDep = inferDependencyGroupId(model, dep);
-                    if (newDep != null) {
-                        changed = true;
-                    }
                 }
-                newDeps.add(newDep == null ? dep : newDep);
+                if (newDep != null) {
+                    changed = true;
+                }
+                result.add(newDep == null ? dep : newDep);
             }
-            return changed ? model.withDependencies(newDeps) : model;
+            return changed;
         }
 
         private Dependency inferDependencyVersion(Model model, Dependency dep) {
