@@ -27,7 +27,6 @@ import java.util.stream.Stream;
 
 import org.apache.maven.internal.impl.DefaultLifecycleRegistry;
 import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.Test;
