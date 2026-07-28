@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.nio.file.Path;
+import java.io.File;
 
 import org.junit.jupiter.api.Test;
 
@@ -37,22 +37,26 @@ import org.junit.jupiter.api.Test;
  */
 class MavenITmng12534AfterAnnotationTest extends AbstractMavenIntegrationTestCase {
 
+    MavenITmng12534AfterAnnotationTest() {
+        super("[4.0.0-rc-6,)");
+    }
+
     /**
      * Verify that a plugin with {@code afterLinks} in its V2 descriptor
      * is correctly loaded and the mojo executes under the concurrent builder.
      */
     @Test
     void testAfterLinksLoadedAndMojoExecutes() throws Exception {
-        Path testDir = extractResources("/mng-12534-after-annotation");
+        File testDir = extractResources("/mng-12534-after-annotation");
 
         // Step 1: install the test plugin with a handcrafted V2 plugin descriptor
-        Verifier pluginVerifier = newVerifier(testDir.resolve("plugin"));
+        Verifier pluginVerifier = newVerifier(new File(testDir, "plugin").getAbsolutePath());
         pluginVerifier.addCliArgument("install");
         pluginVerifier.execute();
         pluginVerifier.verifyErrorFreeLog();
 
         // Step 2: build the consumer project using the concurrent builder
-        Verifier consumerVerifier = newVerifier(testDir.resolve("consumer"));
+        Verifier consumerVerifier = newVerifier(new File(testDir, "consumer").getAbsolutePath());
         consumerVerifier.addCliArgument("-b");
         consumerVerifier.addCliArgument("concurrent");
         consumerVerifier.addCliArgument("compile");
