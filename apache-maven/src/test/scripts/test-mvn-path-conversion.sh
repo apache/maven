@@ -52,6 +52,10 @@ fi
 sh_bin=`unset -f command; command -v sh`
 
 work_dir=`mktemp -d "${TMPDIR:-/tmp}/mvn-path-conversion.XXXXXX"`
+# Normalize the path: on macOS $TMPDIR ends with '/', producing a double
+# slash that pwd(1) inside the launcher will collapse.  Resolving through
+# cd/pwd keeps the test's reference paths in sync with the launcher output.
+work_dir=`cd "$work_dir" && pwd`
 trap 'rm -rf "$work_dir"' EXIT INT TERM
 
 stub_dir="$work_dir/stubs"
