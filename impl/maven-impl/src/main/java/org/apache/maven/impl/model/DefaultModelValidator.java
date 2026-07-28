@@ -1800,6 +1800,9 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     private boolean isValidCoordinatesId(String id) {
+        if (isPathTraversalSegment(id)) {
+            return false;
+        }
         for (int index = 0; index < id.length(); index++) {
             char character = id.charAt(index);
             if (!isValidCoordinatesIdCharacter(character)) {
@@ -1807,6 +1810,16 @@ public class DefaultModelValidator implements ModelValidator {
             }
         }
         return true;
+    }
+
+    /**
+     * {@code .} and {@code ..} pass the allowed-character checks, but the default local repository layout uses
+     * coordinate ids and versions verbatim as directory names, so these values map onto the {@code .} and
+     * {@code ..} filesystem path segments and escape the coordinate's directory. They are rejected because of
+     * that mapping, not because the names themselves are otherwise invalid.
+     */
+    private static boolean isPathTraversalSegment(String id) {
+        return ".".equals(id) || "..".equals(id);
     }
 
     private boolean isValidCoordinatesIdCharacter(char character) {
@@ -1889,6 +1902,9 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     private boolean isValidCoordinatesIdWithWildCards(String id) {
+        if (isPathTraversalSegment(id)) {
+            return false;
+        }
         for (int index = 0; index < id.length(); index++) {
             char character = id.charAt(index);
             if (!isValidCoordinatesIdWithWildCardCharacter(character)) {
@@ -2341,6 +2357,18 @@ public class DefaultModelValidator implements ModelValidator {
         }
 
         if (hasExpression(string)) {
+            addViolation(
+                    problems,
+                    severity,
+                    version,
+                    prefix + fieldName,
+                    sourceHint,
+                    "must be a valid version but is '" + string + "'.",
+                    tracker);
+            return false;
+        }
+
+        if (isPathTraversalSegment(string)) {
             addViolation(
                     problems,
                     severity,

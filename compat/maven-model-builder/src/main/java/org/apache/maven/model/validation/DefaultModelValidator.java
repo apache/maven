@@ -1151,6 +1151,9 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     private boolean isValidId(String id) {
+        if (isPathTraversalSegment(id)) {
+            return false;
+        }
         for (int i = 0; i < id.length(); i++) {
             char c = id.charAt(i);
             if (!isValidIdCharacter(c)) {
@@ -1158,6 +1161,16 @@ public class DefaultModelValidator implements ModelValidator {
             }
         }
         return true;
+    }
+
+    /**
+     * {@code .} and {@code ..} pass the allowed-character checks, but the default local repository layout uses
+     * ids and versions verbatim as directory names, so these values map onto the {@code .} and {@code ..}
+     * filesystem path segments and escape the coordinate's directory. They are rejected because of that mapping,
+     * not because the names themselves are otherwise invalid.
+     */
+    private static boolean isPathTraversalSegment(String id) {
+        return ".".equals(id) || "..".equals(id);
     }
 
     private boolean isValidIdCharacter(char c) {
@@ -1193,6 +1206,9 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     private boolean isValidIdWithWildCards(String id) {
+        if (isPathTraversalSegment(id)) {
+            return false;
+        }
         for (int i = 0; i < id.length(); i++) {
             char c = id.charAt(i);
             if (!isValidIdWithWildCardCharacter(c)) {
@@ -1633,6 +1649,18 @@ public class DefaultModelValidator implements ModelValidator {
         }
 
         if (hasExpression(string)) {
+            addViolation(
+                    problems,
+                    severity,
+                    version,
+                    prefix + fieldName,
+                    sourceHint,
+                    "must be a valid version but is '" + string + "'.",
+                    tracker);
+            return false;
+        }
+
+        if (isPathTraversalSegment(string)) {
             addViolation(
                     problems,
                     severity,
