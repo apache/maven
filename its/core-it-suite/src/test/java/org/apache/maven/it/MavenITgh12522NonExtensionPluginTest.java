@@ -21,6 +21,8 @@ package org.apache.maven.it;
 import java.io.File;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 
 /**
  * This is a test for <a href="https://github.com/apache/maven/issues/12522">GH-12522</a>.
@@ -58,6 +60,7 @@ class MavenITgh12522NonExtensionPluginTest extends AbstractMavenIntegrationTestC
      * is not visible from the container realm and should not be provisioned at all.
      */
     @Test
+    @EnabledForJreRange(min = JRE.JAVA_21, disabledReason = "tycho-bnd-plugin 5.0.3 requires Java 21")
     void testNonExtensionPluginComponentsNotPickedUp() throws Exception {
         File testDir = extractResources("/gh-12522-non-extension-plugin");
 
