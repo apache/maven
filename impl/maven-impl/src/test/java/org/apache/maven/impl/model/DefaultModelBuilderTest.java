@@ -28,6 +28,7 @@ import java.util.Map;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.Repository;
@@ -468,6 +469,53 @@ class DefaultModelBuilderTest {
                 "1.2.3",
                 managedDep.getVersion(),
                 "Managed dependency version should be interpolated, not ${managed.version}");
+    }
+
+    /**
+     * Verifies that the versions of sibling reactor modules declared in {@code <dependencyManagement>}
+     * are inferred, just like they already are for regular dependencies (GH-11147).
+     * This is the typical BOM use case where a subproject lists its siblings without their versions.
+     */
+    @Test
+    public void testBomDependencyManagementVersionInference() {
+        // Build the lib POM first: this creates the main session and registers the sibling module
+        ModelBuilder.ModelBuilderSession mbs = builder.newSession();
+        mbs.build(ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("bom-dep-mgmt-lib")))
+                .build());
+
+        // Access the main session (package-private) to invoke the file to raw model transformation
+        DefaultModelBuilder.ModelBuilderSessionState mainState =
+                ((DefaultModelBuilder.ModelBuilderSessionImpl) mbs).mainSession;
+
+        // A BOM declaring a sibling module in dependencyManagement, without a version
+        Model bomModel = Model.newBuilder()
+                .modelVersion("4.1.0")
+                .groupId("org.apache.maven.tests")
+                .artifactId("bom-dep-mgmt-bom")
+                .version("1.0-SNAPSHOT")
+                .packaging("pom")
+                .pomFile(getPom("bom-dep-mgmt-bom"))
+                .dependencyManagement(DependencyManagement.newBuilder()
+                        .dependencies(List.of(Dependency.newBuilder()
+                                .groupId("org.apache.maven.tests")
+                                .artifactId("bom-dep-mgmt-lib")
+                                .build()))
+                        .build())
+                .build();
+
+        Model transformed = mainState.transformFileToRaw(bomModel);
+
+        assertNotNull(transformed.getDependencyManagement());
+        Dependency managedDep = transformed.getDependencyManagement().getDependencies().stream()
+                .filter(d -> "bom-dep-mgmt-lib".equals(d.getArtifactId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(managedDep, "Managed dependency for the sibling module should be kept");
+        assertEquals(
+                "1.0-SNAPSHOT", managedDep.getVersion(), "Version should be inferred from the reactor sibling module");
     }
 
     private Path getPom(String name) {
