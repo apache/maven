@@ -21,7 +21,6 @@ package org.apache.maven.api.plugin.annotations;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
-import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -29,7 +28,7 @@ import java.lang.annotation.Target;
 import org.apache.maven.api.annotations.Experimental;
 
 /**
- * Specifies that the mojo should be run after the specific phase.
+ * Container annotation for repeatable {@link After} annotations.
  *
  * @since 4.0.0
  */
@@ -38,31 +37,10 @@ import org.apache.maven.api.annotations.Experimental;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Inherited
-@Repeatable(Afters.class)
-public @interface After {
+public @interface Afters {
 
     /**
-     * Type of pointer.
-     * @see org.apache.maven.api.Lifecycle.Pointer.Type
+     * The contained {@link After} annotations.
      */
-    enum Type {
-        PROJECT,
-        DEPENDENCIES,
-        CHILDREN
-    }
-
-    /**
-     * The phase name.
-     */
-    String phase();
-
-    /**
-     * The type of this pointer.
-     */
-    Type type() default Type.PROJECT;
-
-    /**
-     * The scope for dependencies, only if {@code type() == Type.Dependencies}.
-     */
-    String scope() default "";
+    After[] value();
 }

@@ -26,10 +26,14 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.apache.maven.internal.impl.DefaultLifecycleRegistry;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.Test;
 
+import static org.apache.maven.api.Lifecycle.AFTER;
+import static org.apache.maven.api.Lifecycle.BEFORE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -127,6 +131,181 @@ class BuildPlanCreatorTest {
         BuildPlanExecutor builder = new BuildPlanExecutor(null, null, null, null, null, null, null, null, lifecycles);
         BuildPlanExecutor.BuildContext context = builder.new BuildContext();
         return context.calculateLifecycleMappings(projects, phase);
+    }
+
+    /**
+     * Tests that PROJECT-type @After link ordering constraints work correctly.
+     * Simulates what {@code applyAfterLinks} does for {@code @After(phase="resources", type=PROJECT)}.
+     * <p>
+     * This is a real constraint: in the V4 lifecycle, "compile" and "resources" are
+     * parallel siblings (compile depends on sources, not resources), so the @After
+     * link creates a genuine ordering edge that doesn't exist naturally.
+     */
+    @Test
+    void testAfterLinkProjectOrdering() {
+        MavenProject project = new MavenProject();
+        project.setCollectedProjects(List.of());
+        Map<MavenProject, List<MavenProject>> projects = Collections.singletonMap(project, Collections.emptyList());
+
+        BuildPlan plan = calculateLifecycleMappings(projects, "package");
+
+        // Simulate @After(phase="resources", type=PROJECT) on a mojo bound to "compile"
+        // This means: compile's BEFORE step must wait for resources' AFTER step
+        // This is a real constraint since compile and resources are parallel in the lifecycle
+        BuildStep compileBefore = plan.requiredStep(project, BEFORE + "compile");
+        BuildStep resourcesAfter = plan.requiredStep(project, AFTER + "resources");
+        compileBefore.executeAfter(resourcesAfter);
+
+        // Verify: compile is now a successor of resources (via the after link)
+        assertIsSuccessor(resourcesAfter, compileBefore);
+    }
+
+    /**
+     * Tests that DEPENDENCIES-type @After link ordering constraints work correctly.
+     * Simulates what {@code applyAfterLinks} does for {@code @After(phase="ready", type=DEPENDENCIES)}.
+     */
+    @Test
+    void testAfterLinkDependenciesOrdering() {
+        MavenProject p1 = new MavenProject();
+        p1.setArtifactId("p1");
+        p1.setCollectedProjects(List.of());
+        MavenProject p2 = new MavenProject();
+        p2.setArtifactId("p2");
+        p2.setCollectedProjects(List.of());
+        Map<MavenProject, List<MavenProject>> projects = new HashMap<>();
+        projects.put(p1, Collections.emptyList());
+        projects.put(p2, Collections.singletonList(p1));
+
+        BuildPlan plan = calculateLifecycleMappings(projects, "package");
+
+        // Simulate @After(phase="ready", type=DEPENDENCIES, scope="compile") on p2's compile phase
+        // This means: p2's compile BEFORE must wait for p1's ready AFTER
+        BuildStep p2CompileBefore = plan.requiredStep(p2, BEFORE + "compile");
+        BuildStep p1ReadyAfter = plan.requiredStep(p1, AFTER + "ready");
+
+        // Apply the DEPENDENCIES link (same logic as applyAfterLinks)
+        for (MavenProject dep : projects.get(p2)) {
+            plan.step(dep, AFTER + "ready").ifPresent(p2CompileBefore::executeAfter);
+        }
+
+        // Verify: p2's compile is now a successor of p1's ready
+        assertIsSuccessor(p1ReadyAfter, p2CompileBefore);
+    }
+
+    /**
+     * Tests that CHILDREN-type @After link ordering constraints work correctly.
+     * Simulates what {@code applyAfterLinks} does for {@code @After(phase="package", type=CHILDREN)}.
+     */
+    @Test
+    void testAfterLinkChildrenOrdering() {
+        MavenProject child = new MavenProject();
+        child.setArtifactId("child");
+        child.setCollectedProjects(List.of());
+        MavenProject parent = new MavenProject();
+        parent.setArtifactId("parent");
+        parent.setCollectedProjects(List.of(child));
+        Map<MavenProject, List<MavenProject>> projects = Map.of(parent, List.of(), child, List.of());
+
+        BuildPlan plan = calculateLifecycleMappings(projects, "install");
+
+        // Simulate @After(phase="package", type=CHILDREN) on parent's install phase
+        // This means: parent waits for children's package before its install completes
+        BuildStep parentInstallBefore = plan.requiredStep(parent, BEFORE + "install");
+        BuildStep parentInstallAfter = plan.requiredStep(parent, AFTER + "install");
+
+        // Apply the CHILDREN link (same logic as applyAfterLinks)
+        parent.getCollectedProjects().forEach(c -> {
+            plan.step(c, BEFORE + "package").ifPresent(parentInstallBefore::executeBefore);
+            plan.step(c, AFTER + "package").ifPresent(parentInstallAfter::executeAfter);
+        });
+
+        // Verify: parent's install after waits for child's package after
+        BuildStep childPackageAfter = plan.requiredStep(child, AFTER + "package");
+        assertIsSuccessor(childPackageAfter, parentInstallAfter);
+    }
+
+    /**
+     * Tests that {@code filterByScope} returns all upstream projects when scope is null or empty.
+     */
+    @Test
+    void testFilterByScopeNullReturnsAll() {
+        MavenProject p1 = createProjectWithId("g", "p1");
+        MavenProject p2 = createProjectWithId("g", "p2");
+        List<MavenProject> upstream = List.of(p1, p2);
+
+        MavenProject consumer = new MavenProject();
+        assertEquals(upstream, BuildPlanExecutor.BuildContext.filterByScope(consumer, upstream, null));
+        assertEquals(upstream, BuildPlanExecutor.BuildContext.filterByScope(consumer, upstream, ""));
+    }
+
+    /**
+     * Tests that {@code filterByScope} filters upstream projects by exact scope match,
+     * treating null-scoped dependencies as "compile" (Maven default).
+     */
+    @Test
+    void testFilterByScopeMatchesExact() {
+        MavenProject compileDep = createProjectWithId("g", "compile-dep");
+        MavenProject providedDep = createProjectWithId("g", "provided-dep");
+        MavenProject testDep = createProjectWithId("g", "test-dep");
+        MavenProject nullScopeDep = createProjectWithId("g", "null-scope-dep");
+        List<MavenProject> upstream = List.of(compileDep, providedDep, testDep, nullScopeDep);
+
+        MavenProject consumer = new MavenProject();
+        consumer.getDependencies().add(createDependency("g", "compile-dep", "compile"));
+        consumer.getDependencies().add(createDependency("g", "provided-dep", "provided"));
+        consumer.getDependencies().add(createDependency("g", "test-dep", "test"));
+        consumer.getDependencies().add(createDependency("g", "null-scope-dep", null));
+
+        // "compile" matches explicit compile + null-scoped (Maven default is compile)
+        List<MavenProject> compileFiltered =
+                BuildPlanExecutor.BuildContext.filterByScope(consumer, upstream, "compile");
+        assertEquals(2, compileFiltered.size());
+        assertTrue(compileFiltered.contains(compileDep));
+        assertTrue(compileFiltered.contains(nullScopeDep));
+
+        // "provided" matches only provided-scoped
+        List<MavenProject> providedFiltered =
+                BuildPlanExecutor.BuildContext.filterByScope(consumer, upstream, "provided");
+        assertEquals(1, providedFiltered.size());
+        assertTrue(providedFiltered.contains(providedDep));
+
+        // "test" matches only test-scoped
+        List<MavenProject> testFiltered = BuildPlanExecutor.BuildContext.filterByScope(consumer, upstream, "test");
+        assertEquals(1, testFiltered.size());
+        assertTrue(testFiltered.contains(testDep));
+    }
+
+    /**
+     * Tests that {@code filterByScope} excludes upstream projects not declared as dependencies.
+     */
+    @Test
+    void testFilterByScopeExcludesNonDependencies() {
+        MavenProject dep = createProjectWithId("g", "dep");
+        MavenProject nonDep = createProjectWithId("g", "non-dep");
+        List<MavenProject> upstream = List.of(dep, nonDep);
+
+        MavenProject consumer = new MavenProject();
+        consumer.getDependencies().add(createDependency("g", "dep", "compile"));
+
+        List<MavenProject> filtered = BuildPlanExecutor.BuildContext.filterByScope(consumer, upstream, "compile");
+        assertEquals(1, filtered.size());
+        assertTrue(filtered.contains(dep));
+    }
+
+    private static MavenProject createProjectWithId(String groupId, String artifactId) {
+        MavenProject project = new MavenProject();
+        project.setGroupId(groupId);
+        project.setArtifactId(artifactId);
+        project.setCollectedProjects(List.of());
+        return project;
+    }
+
+    private static Dependency createDependency(String groupId, String artifactId, String scope) {
+        Dependency dep = new Dependency();
+        dep.setGroupId(groupId);
+        dep.setArtifactId(artifactId);
+        dep.setScope(scope);
+        return dep;
     }
 
     /*

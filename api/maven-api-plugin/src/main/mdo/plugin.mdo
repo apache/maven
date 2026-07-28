@@ -425,6 +425,21 @@ under the License.
           <type>String</type>
           <description>the full goal name</description>
         </field>
+        <field xdoc.separator="blank">
+          <name>afterLinks</name>
+          <version>2.0.0+</version>
+          <description>
+            Lifecycle ordering constraints declared by {@code @After} annotations on the Mojo class.
+            Each entry specifies that this Mojo's bound phase should execute after a given target phase,
+            with a pointer type ({@code PROJECT}, {@code DEPENDENCIES}, or {@code CHILDREN}) that controls
+            how the ordering applies across project boundaries.
+            @since 4.0.0
+          </description>
+          <association>
+            <type>AfterLink</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
       </fields>
     </class>
 
@@ -581,6 +596,46 @@ under the License.
           <type>String</type>
           <defaultValue>jar</defaultValue>
           <description>The type of dependency.</description>
+        </field>
+      </fields>
+    </class>
+
+    <class xdoc.anchorName="afterLink">
+      <name>AfterLink</name>
+      <version>2.0.0+</version>
+      <description>
+        A lifecycle ordering constraint from an {@code @After} annotation on a Mojo class.
+        Specifies that the Mojo's bound phase should execute after a given target phase,
+        with a pointer type controlling how the ordering applies across project boundaries.
+        @since 4.0.0
+      </description>
+      <fields>
+        <field>
+          <name>phase</name>
+          <required>true</required>
+          <version>2.0.0+</version>
+          <type>String</type>
+          <description>The target phase name that this Mojo should run after.</description>
+        </field>
+        <field>
+          <name>type</name>
+          <required>true</required>
+          <version>2.0.0+</version>
+          <type>String</type>
+          <description>
+            The type of pointer: {@code PROJECT} (same-project phase ordering),
+            {@code DEPENDENCIES} (cross-project dependency ordering),
+            or {@code CHILDREN} (parent-child module ordering).
+          </description>
+        </field>
+        <field>
+          <name>scope</name>
+          <version>2.0.0+</version>
+          <type>String</type>
+          <description>
+            The dependency scope, only meaningful when type is {@code DEPENDENCIES}.
+            Examples: {@code compile}, {@code runtime}, {@code test}.
+          </description>
         </field>
       </fields>
     </class>
