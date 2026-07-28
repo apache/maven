@@ -490,9 +490,9 @@ public final class Constants {
 
     /**
      * User property for controlling consumer POM flattening behavior.
-     * When set to <code>true</code> (default), consumer POMs are flattened by removing
+     * When set to <code>true</code>, consumer POMs are flattened by removing
      * dependency management and keeping only direct dependencies with transitive scopes.
-     * When set to <code>false</code>, consumer POMs preserve dependency management
+     * When set to <code>false</code> (default), consumer POMs preserve dependency management
      * like parent POMs, allowing dependency management to be inherited by consumers.
      *
      * @since 4.1.0
