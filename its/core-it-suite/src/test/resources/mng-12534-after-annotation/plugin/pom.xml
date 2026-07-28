@@ -11,7 +11,7 @@
 
   <properties>
     <javaVersion>17</javaVersion>
-    <mavenVersion>4.0.0-SNAPSHOT</mavenVersion>
+    <mavenVersion>4.0.0-rc-6</mavenVersion>
   </properties>
 
   <dependencies>
