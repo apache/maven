@@ -214,13 +214,6 @@ final class PathSelector implements PathMatcher {
     private final Path baseDirectory;
 
     /**
-     * Whether paths must be relativized before being given to a matcher. If {@code true}, then every paths
-     * will be made relative to {@link #baseDirectory} for allowing patterns like {@code "foo/bar/*.java"}
-     * to work. As a slight optimization, we can skip this step if all patterns start with {@code "**"}.
-     */
-    private final boolean needRelativize;
-
-    /**
      * Creates a new selector from the given includes and excludes.
      *
      * @param directory the base directory of the files to filter
@@ -240,7 +233,6 @@ final class PathSelector implements PathMatcher {
         FileSystem fileSystem = baseDirectory.getFileSystem();
         this.includes = matchers(fileSystem, includePatterns);
         this.excludes = matchers(fileSystem, excludePatterns);
-        needRelativize = needRelativize(includePatterns) || needRelativize(excludePatterns);
     }
 
     /**
@@ -473,21 +465,6 @@ final class PathSelector implements PathMatcher {
     }
 
     /**
-     * Returns {@code true} if at least one pattern requires path being relativized before to be matched.
-     *
-     * @param patterns include or exclude patterns
-     * @return whether at least one pattern require relativization
-     */
-    private static boolean needRelativize(String[] patterns) {
-        for (String pattern : patterns) {
-            if (!pattern.startsWith(DEFAULT_SYNTAX + WILDCARD_FOR_ANY_PREFIX)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Creates the path matchers for the given patterns.
      * The syntax (usually {@value #DEFAULT_SYNTAX}) must be specified for each pattern.
      */
@@ -504,16 +481,8 @@ final class PathSelector implements PathMatcher {
      */
     @SuppressWarnings("checkstyle:MissingSwitchDefault")
     private PathMatcher simplify() {
-        if (excludes.length == 0) {
-            switch (includes.length) {
-                case 0:
-                    return INCLUDES_ALL;
-                case 1:
-                    if (needRelativize) {
-                        break;
-                    }
-                    return includes[0];
-            }
+        if (excludes.length == 0 && includes.length == 0) {
+            return INCLUDES_ALL;
         }
         return this;
     }
@@ -527,9 +496,7 @@ final class PathSelector implements PathMatcher {
      */
     @Override
     public boolean matches(Path path) {
-        if (needRelativize) {
-            path = baseDirectory.relativize(path);
-        }
+        path = baseDirectory.relativize(path);
         return (includes.length == 0 || isMatched(path, includes))
                 && (excludes.length == 0 || !isMatched(path, excludes));
     }
@@ -648,9 +615,7 @@ final class PathSelector implements PathMatcher {
             if (baseDirectory.equals(directory)) {
                 return true;
             }
-            if (needRelativize) {
-                directory = baseDirectory.relativize(directory);
-            }
+            directory = baseDirectory.relativize(directory);
             if (isMatched(directory, dirExcludes)) {
                 return false;
             }
