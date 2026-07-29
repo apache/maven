@@ -260,14 +260,14 @@ public class DefaultPathMatcherFactoryTest {
         assertTrue(dirMatcher.matches(dir.resolve(Path.of("org", "0foo0", "more"))));
         assertTrue(anyMatcher.matches(dir.resolve(Path.of("org", "0foo0", "more"))));
 
-        // Before to match an "org/foo" directory, a `FileVisitor` will need to traverse the "org" directory first.
+        // Before matching an "org/foo" directory, a `FileVisitor` will need to traverse the "org" directory first.
         assertTrue(dirMatcher.matches(dir.resolve(Path.of("org"))));
 
         // Ideally, `dirMatcher` would return false. But it is hard to implement without false negative on "org".
         assertTrue(dirMatcher.matches(dir.resolve(Path.of("org", "bar", "more"))));
         assertFalse(anyMatcher.matches(dir.resolve(Path.of("org", "bar", "more"))));
 
-        // Same reason than above.
+        // Same reason as above.
         assertTrue(dirMatcher.matches(dir.resolve(Path.of("bar"))));
         assertFalse(anyMatcher.matches(dir.resolve(Path.of("bar"))));
     }
