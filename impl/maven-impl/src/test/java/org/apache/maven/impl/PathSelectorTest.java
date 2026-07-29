@@ -145,6 +145,44 @@ public class PathSelectorTest {
         assertTrue(matcher.matches(file));
     }
 
+    /**
+     * Regression test for <a href="https://github.com/apache/maven/pull/12617">#12617</a>.
+     * Verifies that when the base directory path itself contains a segment matching a {@code **} pattern,
+     * files that are not actually under a matching child directory are not falsely included.
+     *
+     * <p>The removed optimization skipped path relativization when all patterns started with {@code "**"},
+     * which caused the full (non-relativized) path to be matched against the pattern. If the base directory
+     * happened to contain the matching segment (e.g. base = {@code "something/target/test-classes"} with
+     * pattern <code>"**&sol;test-classes&sol;**"</code>), every file under the base directory would be
+     * falsely matched because the base directory itself satisfied the pattern.</p>
+     */
+    @Test
+    public void testNoFalsePositiveWhenBaseDirectoryMatchesPattern(@TempDir Path tempDir) throws IOException {
+        // Base directory path contains "test-classes" as a segment — this is the trigger for the false positive
+        Path baseDir = Files.createDirectories(tempDir.resolve("something/target/test-classes"));
+
+        // A child directory that also happens to be named "test-classes"
+        Path testClassesChild = Files.createDirectories(baseDir.resolve("test-classes"));
+        // Another child directory with a different name
+        Path otherChild = Files.createDirectories(baseDir.resolve("other"));
+
+        Path fileInTestClasses = Files.createFile(testClassesChild.resolve("MyTest.class"));
+        Path fileInOther = Files.createFile(otherChild.resolve("Other.class"));
+
+        // Include pattern: anything under a "test-classes" directory
+        PathMatcher matcher = PathSelector.of(baseDir, List.of("**/test-classes/**"), null, false);
+
+        // Should match: file is inside the test-classes/ child directory (relative: test-classes/MyTest.class)
+        assertTrue(matcher.matches(fileInTestClasses), "File inside test-classes/ child directory should be matched");
+
+        // Should NOT match: file is inside other/, not test-classes/.
+        // Before the fix, the non-relativized path "something/target/test-classes/other/Other.class"
+        // would satisfy "**/test-classes/**" because "test-classes" appears in the base directory path.
+        assertFalse(
+                matcher.matches(fileInOther),
+                "File in other/ should not be matched just because the base directory path contains 'test-classes'");
+    }
+
     @Test
     public void testBraceAlternationOnlyWithExplicitGlob(@TempDir Path directory) throws IOException {
         // Create src/main/java and src/test/java with files
