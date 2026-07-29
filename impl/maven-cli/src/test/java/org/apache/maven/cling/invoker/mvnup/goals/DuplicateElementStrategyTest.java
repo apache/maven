@@ -458,6 +458,296 @@ class DuplicateElementStrategyTest {
     }
 
     @Nested
+    @DisplayName("Plugin Configuration Skipping")
+    class PluginConfigurationSkippingTests {
+
+        @Test
+        @DisplayName("should not remove multiple arg elements inside compilerArgs in configuration")
+        void shouldNotRemoveCompilerArgsInConfiguration() {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-compiler-plugin</artifactId>
+                                <configuration>
+                                    <compilerArgs>
+                                        <arg>-Xlint:all</arg>
+                                        <arg>-Xlint:-processing</arg>
+                                        <arg>-Xmaxwarns</arg>
+                                        <arg>5</arg>
+                                    </compilerArgs>
+                                </configuration>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Strategy should succeed");
+            assertEquals(0, result.modifiedCount(), "Should not have modified any POM");
+
+            String xml = DomUtils.toXml(document);
+            assertTrue(xml.contains("<arg>-Xlint:all</arg>"), "Should keep -Xlint:all arg");
+            assertTrue(xml.contains("<arg>-Xlint:-processing</arg>"), "Should keep -Xlint:-processing arg");
+            assertTrue(xml.contains("<arg>-Xmaxwarns</arg>"), "Should keep -Xmaxwarns arg");
+            assertTrue(xml.contains("<arg>5</arg>"), "Should keep 5 arg");
+        }
+
+        @Test
+        @DisplayName("should not remove elements inside execution configuration")
+        void shouldNotRemoveElementsInsideExecutionConfiguration() {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <groupId>org.codehaus.mojo</groupId>
+                                <artifactId>exec-maven-plugin</artifactId>
+                                <executions>
+                                    <execution>
+                                        <configuration>
+                                            <arguments>
+                                                <argument>-classpath</argument>
+                                                <argument>${project.build.outputDirectory}</argument>
+                                                <argument>com.example.Main</argument>
+                                            </arguments>
+                                        </configuration>
+                                    </execution>
+                                </executions>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Strategy should succeed");
+            assertEquals(0, result.modifiedCount(), "Should not have modified any POM");
+
+            String xml = DomUtils.toXml(document);
+            // Count argument occurrences
+            int count = xml.split("<argument>", -1).length - 1;
+            assertEquals(3, count, "Should still have 3 argument elements");
+        }
+
+        @Test
+        @DisplayName("should not remove checkstyle module elements inside configuration")
+        void shouldNotRemoveCheckstyleModulesInConfiguration() {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <artifactId>maven-checkstyle-plugin</artifactId>
+                                <configuration>
+                                    <checkstyleRules>
+                                        <module name="Checker">
+                                            <property name="charset" value="UTF-8" />
+                                            <property name="severity" value="warning" />
+                                            <module name="FileTabCharacter" />
+                                            <module name="TreeWalker">
+                                                <module name="AvoidStarImport" />
+                                                <module name="NeedBraces" />
+                                            </module>
+                                        </module>
+                                    </checkstyleRules>
+                                </configuration>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Strategy should succeed");
+            assertEquals(0, result.modifiedCount(), "Should not have modified any POM");
+
+            String xml = DomUtils.toXml(document);
+            // Count module occurrences (Checker, FileTabCharacter, TreeWalker, AvoidStarImport, NeedBraces = 5)
+            int moduleCount = xml.split("<module ", -1).length - 1;
+            assertEquals(5, moduleCount, "Should still have 5 module elements");
+            // Count property occurrences (charset, severity = 2)
+            int propertyCount = xml.split("<property ", -1).length - 1;
+            assertEquals(2, propertyCount, "Should still have 2 property elements");
+        }
+
+        @Test
+        @DisplayName("should still remove POM-level duplicates when configuration is present")
+        void shouldStillRemovePomDuplicatesWithConfiguration() {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>old-name</artifactId>
+                    <artifactId>new-name</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <artifactId>maven-compiler-plugin</artifactId>
+                                <configuration>
+                                    <compilerArgs>
+                                        <arg>-Xlint:all</arg>
+                                        <arg>-Xmaxwarns</arg>
+                                        <arg>5</arg>
+                                    </compilerArgs>
+                                </configuration>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Strategy should succeed");
+            assertEquals(1, result.modifiedCount(), "Should have modified 1 POM");
+
+            String xml = DomUtils.toXml(document);
+            // POM-level duplicate should be removed
+            assertTrue(xml.contains("<artifactId>new-name</artifactId>"), "Should keep last artifactId");
+            assertFalse(xml.contains("<artifactId>old-name</artifactId>"), "Should remove first artifactId");
+            // Configuration args should be preserved
+            assertTrue(xml.contains("<arg>-Xlint:all</arg>"), "Should keep -Xlint:all arg");
+            assertTrue(xml.contains("<arg>-Xmaxwarns</arg>"), "Should keep -Xmaxwarns arg");
+            assertTrue(xml.contains("<arg>5</arg>"), "Should keep 5 arg");
+        }
+
+        @Test
+        @DisplayName("should not remove exclude elements inside inputExcludes in configuration")
+        void shouldNotRemoveExcludesInConfiguration() {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <plugins>
+                            <plugin>
+                                <artifactId>apache-rat-plugin</artifactId>
+                                <configuration>
+                                    <inputExcludes>
+                                        <exclude>.github/**</exclude>
+                                        <exclude>src/main/antlr4/Abnf.g4</exclude>
+                                    </inputExcludes>
+                                </configuration>
+                            </plugin>
+                        </plugins>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Strategy should succeed");
+            assertEquals(0, result.modifiedCount(), "Should not have modified any POM");
+
+            String xml = DomUtils.toXml(document);
+            assertTrue(xml.contains("<exclude>.github/**</exclude>"), "Should keep first exclude");
+            assertTrue(xml.contains("<exclude>src/main/antlr4/Abnf.g4</exclude>"), "Should keep second exclude");
+        }
+
+        @Test
+        @DisplayName("should not remove pluginExecution elements inside lifecycleMappingMetadata in configuration")
+        void shouldNotRemovePluginExecutionsInConfiguration() {
+            String pomXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                    <modelVersion>4.0.0</modelVersion>
+                    <groupId>test</groupId>
+                    <artifactId>test</artifactId>
+                    <version>1.0.0</version>
+                    <build>
+                        <pluginManagement>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.eclipse.m2e</groupId>
+                                    <artifactId>lifecycle-mapping</artifactId>
+                                    <configuration>
+                                        <lifecycleMappingMetadata>
+                                            <pluginExecutions>
+                                                <pluginExecution>
+                                                    <pluginExecutionFilter>
+                                                        <groupId>org.apache.maven.plugins</groupId>
+                                                        <artifactId>maven-dependency-plugin</artifactId>
+                                                    </pluginExecutionFilter>
+                                                </pluginExecution>
+                                                <pluginExecution>
+                                                    <pluginExecutionFilter>
+                                                        <groupId>org.codehaus.mojo</groupId>
+                                                        <artifactId>exec-maven-plugin</artifactId>
+                                                    </pluginExecutionFilter>
+                                                </pluginExecution>
+                                            </pluginExecutions>
+                                        </lifecycleMappingMetadata>
+                                    </configuration>
+                                </plugin>
+                            </plugins>
+                        </pluginManagement>
+                    </build>
+                </project>
+                """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Strategy should succeed");
+            assertEquals(0, result.modifiedCount(), "Should not have modified any POM");
+
+            String xml = DomUtils.toXml(document);
+            int count = xml.split("<pluginExecution>", -1).length - 1;
+            assertEquals(2, count, "Should still have 2 pluginExecution elements");
+        }
+    }
+
+    @Nested
     @DisplayName("Strategy Description")
     class StrategyDescriptionTests {
 
