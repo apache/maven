@@ -180,6 +180,11 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
         return getProjects(getMavenSession().getProjects());
     }
 
+    @Override
+    public boolean hasModelProblems() {
+        return SessionModelProblems.hasModelProblems(this);
+    }
+
     @Nonnull
     @Override
     public Map<String, Object> getPluginContext(Project project) {

@@ -420,6 +420,10 @@ public class DefaultModelBuilder implements ModelBuilder {
             return derive(request, new DefaultModelBuilderResult(request, ProblemCollector.create(session)));
         }
 
+        ModelBuilderSessionState deriveWithProblemCollector(ModelBuilderRequest request) {
+            return derive(request, new DefaultModelBuilderResult(request, getProblemCollector()));
+        }
+
         ModelBuilderSessionState derive(ModelBuilderRequest request, DefaultModelBuilderResult result) {
             return derive(request, result, reportedImportWarnings, reactorProblemCollectors);
         }
@@ -1356,7 +1360,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             try {
-                ModelBuilderSessionState derived = derive(
+                ModelBuilderSessionState derived = deriveWithProblemCollector(
                         request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_CONSUMER
                                 ? ModelBuilderRequest.builder(request)
                                         .requestType(ModelBuilderRequest.RequestType.CONSUMER_PARENT)
@@ -1530,7 +1534,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     .source(modelSource)
                     .build();
 
-            ModelBuilderSessionState derived = derive(lenientRequest);
+            ModelBuilderSessionState derived = deriveWithProblemCollector(lenientRequest);
             Model parentModel = derived.readAsParentModel(profileActivationContext, parentChain);
             // Add profiles from parent, preserving model ID tracking
             for (Map.Entry<String, List<Profile>> entry :
@@ -2561,7 +2565,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                         .source(importSource)
                         .repositories(repositories)
                         .build();
-                ModelBuilderSessionState modelBuilderSession = derive(importRequest);
+                ModelBuilderSessionState modelBuilderSession = deriveWithProblemCollector(importRequest);
                 // build the effective model
                 modelBuilderSession.buildEffectiveModel(importIds);
                 importResult = modelBuilderSession.result;

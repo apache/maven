@@ -499,6 +499,48 @@ class DefaultModelBuilderTest {
     }
 
     @Test
+    void defaultSessionModelProblemCollectorIsWritable() {
+        ModelProblem problem = new DefaultModelProblem(
+                "model warning",
+                org.apache.maven.api.services.BuilderProblem.Severity.WARNING,
+                ModelProblem.Version.BASE,
+                "pom.xml",
+                -1,
+                -1,
+                "org.apache.maven.tests:project:1.0",
+                null);
+
+        session.getModelProblemCollector().reportProblem(problem);
+
+        assertTrue(session.hasModelProblems());
+        assertEquals(1, session.getModelProblemCollector().totalProblemsReported());
+    }
+
+    @Test
+    void externalParentProblemsAreRetainedInProjectResult() {
+        ModelBuilderResult result = buildWithTestRepository("model-problems-external-parent-child");
+
+        assertTrue(
+                result.getProblemCollector()
+                        .problems()
+                        .anyMatch(
+                                problem -> problem.getMessage().contains("Duplicate activation for profile duplicate")),
+                "The project result should contain problems encountered while building its external parent");
+    }
+
+    @Test
+    void importedBomProblemsAreRetainedInProjectResult() {
+        ModelBuilderResult result = buildWithTestRepository("model-problems-imported-bom");
+
+        assertTrue(
+                result.getProblemCollector()
+                        .problems()
+                        .anyMatch(
+                                problem -> problem.getMessage().contains("Duplicate activation for profile duplicate")),
+                "The project result should contain problems encountered while building an imported BOM");
+    }
+
+    @Test
     public void testMergeRepositories() throws Exception {
         // this is here only to trigger mainSession creation; unrelated
         ModelBuilderRequest request = ModelBuilderRequest.builder()
@@ -1722,5 +1764,23 @@ class DefaultModelBuilderTest {
 
     private Path getPom(String name) {
         return Paths.get("src/test/resources/poms/factory/" + name + ".xml").toAbsolutePath();
+    }
+
+    private ModelBuilderResult buildWithTestRepository(String pom) {
+        Path basedir = Paths.get(System.getProperty("basedir", "")).toAbsolutePath();
+        Session repositorySession = ApiRunner.createSession(
+                injector -> injector.bindInstance(DefaultModelBuilderTest.class, this),
+                basedir.resolve("target/model-problems-test-repository"));
+        RemoteRepository testRepository = repositorySession.createRemoteRepository(
+                RemoteRepository.CENTRAL_ID,
+                basedir.resolve("src/test/remote-repo").toUri().toString());
+        repositorySession = repositorySession.withRemoteRepositories(List.of(testRepository));
+        ModelBuilder repositoryBuilder = repositorySession.getService(ModelBuilder.class);
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(repositorySession)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom(pom)))
+                .build();
+        return repositoryBuilder.newSession().build(request);
     }
 }
