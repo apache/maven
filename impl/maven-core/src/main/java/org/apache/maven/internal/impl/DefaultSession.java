@@ -182,7 +182,7 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
 
     @Override
     public boolean hasModelProblems() {
-        return SessionModelProblems.hasModelProblems(this);
+        return SessionModelProblemsBridge.hasModelProblems(this);
     }
 
     @Nonnull
