@@ -98,7 +98,7 @@ public class DefaultTransport implements Transport {
     public void put(Path source, URI relativeTarget) {
         requireNonNull(source, "source is null");
         requireNonNull(relativeTarget, "relativeTarget is null");
-        if (Files.isRegularFile(source)) {
+        if (!Files.isRegularFile(source)) {
             throw new IllegalArgumentException("source file does not exist or is not a file");
         }
         if (relativeTarget.isAbsolute()) {
