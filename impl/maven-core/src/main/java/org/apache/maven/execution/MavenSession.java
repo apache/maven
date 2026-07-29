@@ -34,7 +34,7 @@ import org.apache.maven.api.Session;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.impl.SettingsUtilsV4;
-import org.apache.maven.internal.impl.SessionModelProblems;
+import org.apache.maven.internal.impl.SessionModelProblemsBridge;
 import org.apache.maven.model.Profile;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -530,14 +530,14 @@ public class MavenSession implements Cloneable {
     public void setModelProblems(boolean modelProblems) {
         this.modelProblems = modelProblems;
         if (session != null) {
-            SessionModelProblems.setLegacyFlag(session, modelProblems);
+            SessionModelProblemsBridge.setLegacyFlag(session, modelProblems);
         }
     }
 
     public void setSession(Session session) {
         this.session = session;
         if (session != null) {
-            SessionModelProblems.setLegacyFlag(session, modelProblems);
+            SessionModelProblemsBridge.setLegacyFlag(session, modelProblems);
         }
     }
     /*end[MAVEN4]*/
