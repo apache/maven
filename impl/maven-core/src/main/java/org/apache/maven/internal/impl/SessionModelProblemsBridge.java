@@ -28,11 +28,11 @@ import static java.util.Objects.requireNonNull;
 /**
  * Stores the legacy model-problem flag in session data so that derived sessions see the same state.
  */
-public final class SessionModelProblems {
+public final class SessionModelProblemsBridge {
 
-    private static final SessionData.Key<State> KEY = SessionData.key(State.class, SessionModelProblems.class);
+    private static final SessionData.Key<State> KEY = SessionData.key(State.class, SessionModelProblemsBridge.class);
 
-    private SessionModelProblems() {}
+    private SessionModelProblemsBridge() {}
 
     public static boolean hasModelProblems(Session session) {
         return getState(session).legacyFlag.get()
