@@ -18,45 +18,48 @@
  */
 package org.apache.maven.impl;
 
-import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.eclipse.aether.spi.connector.transport.PutTask;
 import org.eclipse.aether.spi.connector.transport.Transporter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 class DefaultTransportTest {
 
     @Test
-    void testPutWithNonExistentFileThrows() {
+    void testPutWithNonExistentFileThrows(@TempDir Path tempDir) {
         Transporter transporter = mock(Transporter.class);
         DefaultTransport transport = new DefaultTransport(URI.create("http://example.com/test/"), transporter);
-        Path nonExistentFile = Path.of("/nonexistent/file.txt");
+        Path nonExistentFile = tempDir.resolve("missing.txt");
         assertThrows(IllegalArgumentException.class, () -> transport.put(nonExistentFile, URI.create("dest.txt")));
     }
 
     @Test
-    void testPutWithExistingFileSucceeds(@TempDir Path tempDir) throws IOException {
+    void testPutWithExistingFileSucceeds(@TempDir Path tempDir) throws Exception {
         Path sourceFile = tempDir.resolve("source.txt");
         Files.writeString(sourceFile, "test content");
 
         Transporter transporter = mock(Transporter.class);
         DefaultTransport transport = new DefaultTransport(URI.create("http://example.com/test/"), transporter);
         URI dest = URI.create("dest.txt");
-        assertDoesNotThrow(() -> transport.put(sourceFile, dest));
+        transport.put(sourceFile, dest);
+        verify(transporter).put(any(PutTask.class));
     }
 
     @Test
-    void testPutBytesSucceeds(@TempDir Path tempDir) {
+    void testPutBytesSucceeds() throws Exception {
         Transporter transporter = mock(Transporter.class);
         DefaultTransport transport = new DefaultTransport(URI.create("http://example.com/test/"), transporter);
         URI dest = URI.create("dest.txt");
-        assertDoesNotThrow(() -> transport.putBytes("test content".getBytes(), dest));
+        transport.putBytes("test content".getBytes(), dest);
+        verify(transporter).put(any(PutTask.class));
     }
 }
