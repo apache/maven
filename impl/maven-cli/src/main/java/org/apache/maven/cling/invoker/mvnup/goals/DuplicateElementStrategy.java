@@ -43,12 +43,19 @@ import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
  * each POM element's children and removes duplicates, keeping only the last
  * occurrence of each element name.
  *
- * <p>This strategy only targets "scalar" elements — elements that should appear
- * at most once within their parent according to the Maven POM schema. Elements
- * inside list containers (e.g., {@code <dependency>} inside {@code <dependencies>},
+ * <p>This strategy only targets "scalar" elements at well-known POM schema
+ * positions — elements that should appear at most once within their parent
+ * according to the Maven POM schema. Elements inside list containers
+ * (e.g., {@code <dependency>} inside {@code <dependencies>},
  * {@code <plugin>} inside {@code <plugins>}) are not affected by this strategy
  * since duplicate dependencies and plugins are handled by
  * {@link DeduplicateDependenciesStrategy}.
+ *
+ * <p>Plugin {@code <configuration>} elements are skipped entirely, because they
+ * contain free-form, plugin-specific XML whose schema is not known to this tool.
+ * Treating same-named children as duplicates in configuration sections (e.g.,
+ * multiple {@code <arg>} entries inside {@code <compilerArgs>}) would silently
+ * remove valid list entries and break builds.
  *
  * @see <a href="https://github.com/apache/maven/issues/12530">#12530</a>
  */
@@ -135,6 +142,14 @@ public class DuplicateElementStrategy extends AbstractUpgradeStrategy {
     }
 
     /**
+     * Parent element names whose contents are free-form, plugin-specific XML.
+     * Deduplication is skipped entirely for these elements and their descendants,
+     * because same-named children (e.g., multiple {@code <arg>} in
+     * {@code <compilerArgs>}) are list entries, not schema-level duplicates.
+     */
+    static final Set<String> FREEFORM_ELEMENTS = Set.of("configuration");
+
+    /**
      * Recursively scans an element's children for duplicates and removes them.
      * Uses last-wins semantics (consistent with Maven 3's behavior).
      *
@@ -144,6 +159,14 @@ public class DuplicateElementStrategy extends AbstractUpgradeStrategy {
      */
     private boolean removeDuplicateElements(Element element, UpgradeContext context) {
         boolean removed = false;
+
+        // Skip free-form plugin configuration elements — their XML schema is
+        // plugin-specific and unknown to this tool.  Treating same-named children
+        // as duplicates here would silently remove valid list entries (e.g.,
+        // <arg> elements inside <compilerArgs>) and break builds.
+        if (FREEFORM_ELEMENTS.contains(element.name())) {
+            return false;
+        }
 
         // Skip list container elements — their children naturally repeat
         if (LIST_CONTAINER_ELEMENTS.contains(element.name())) {
