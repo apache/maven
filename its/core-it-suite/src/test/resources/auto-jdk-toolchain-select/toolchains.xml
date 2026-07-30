@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<toolchains>
+  <toolchain>
+    <type>jdk</type>
+    <provides>
+      <version>11</version>
+    </provides>
+    <configuration>
+      <jdkHome>@javaHome@</jdkHome>
+    </configuration>
+  </toolchain>
+</toolchains>
