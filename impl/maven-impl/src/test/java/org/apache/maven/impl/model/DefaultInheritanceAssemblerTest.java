@@ -26,7 +26,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class DefaultInheritanceAssemblerTest {
 
@@ -52,7 +51,6 @@ class DefaultInheritanceAssemblerTest {
                 .version("1.0")
                 .build();
 
-        assertNotNull(assembler);
         assertDoesNotThrow(() -> assembler.assembleModelInheritance(child, parent, null, null));
     }
 
@@ -75,7 +73,6 @@ class DefaultInheritanceAssemblerTest {
                 .pomFile(Paths.get("/pom.xml"))
                 .build();
 
-        assertNotNull(assembler);
         assertDoesNotThrow(() -> assembler.assembleModelInheritance(child, parent, null, null));
     }
 
@@ -96,7 +93,6 @@ class DefaultInheritanceAssemblerTest {
                 .pomFile(Paths.get("/pom.xml"))
                 .build();
 
-        assertNotNull(assembler);
         assertDoesNotThrow(() -> assembler.assembleModelInheritance(child, parent, null, null));
     }
 }
