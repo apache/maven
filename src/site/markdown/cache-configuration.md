@@ -18,7 +18,7 @@ under the License.
 -->
 # Maven Cache Configuration Enhancement
 
-This document describes the enhanced cache configuration functionality in DefaultRequestCache.
+This document describes the enhanced cache configuration functionality in `DefaultRequestCache`.
 
 ## Overview
 
