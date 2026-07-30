@@ -23,6 +23,7 @@ import java.nio.file.Paths;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ProtoSessionTest {
 
@@ -35,5 +36,7 @@ class ProtoSessionTest {
         assertNotNull(session);
         assertNotNull(session.getUserProperties());
         assertNotNull(session.getSystemProperties());
+        assertTrue(session.getUserProperties().isEmpty(), "User properties should default to empty");
+        assertTrue(session.getSystemProperties().isEmpty(), "System properties should default to empty");
     }
 }
