@@ -89,9 +89,12 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         if (!flattenEnabled) {
             // When flattening is disabled, treat non-POM projects like parent POMs
             // Apply only basic transformations without flattening dependency management
-            // However, BOMs still need special handling to transform packaging from "bom" to "pom"
+            // BOMs always need the effective (interpolated) model because transformBom()
+            // strips parent and properties — any ${...} references would become dangling.
+            // The flatten flag has no semantic effect on BOMs (transformBom always produces
+            // a self-contained POM), so we use the same buildBom() path regardless.
             if (isBom) {
-                return buildBomWithoutFlatten(session, project, src);
+                return buildBom(session, project, src);
             } else {
                 Model result = buildPom(session, project, src);
                 // Validate POM-packaged projects (parent POMs): if the consumer POM cannot be
@@ -134,15 +137,6 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         ModelBuilderResult result = buildModel(session, project, src);
         Model model = result.getRawModel();
         return transformPom(model, project);
-    }
-
-    protected Model buildBomWithoutFlatten(RepositorySystemSession session, MavenProject project, ModelSource src)
-            throws ModelBuilderException {
-        ModelBuilderResult result = buildModel(session, project, src);
-        Model model = result.getRawModel();
-        // For BOMs without flattening, we just need to transform the packaging from "bom" to "pom"
-        // but keep everything else from the raw model (including unresolved versions)
-        return transformBom(model, project);
     }
 
     protected Model buildBom(RepositorySystemSession session, MavenProject project, ModelSource src)
