@@ -96,9 +96,9 @@ and `${maven.installation.conf}/settings.xml` (Maven installation level). See
 
 ## Extensions
 
-Extensions allow you to add additional functionality to Maven. They are 
-configured in the `~/.m2/extensions.xml` file (user level) and 
-`${maven.installation.conf}/extensions.xml` (Maven installation level).
+Extensions allow you to add additional functionality to Maven. They are
+configured in the `~/.m2/extensions.xml` file (user level),
+`${session.rootDirectory}/.mvn/extensions.xml` (project level) and `${maven.installation.conf}/extensions.xml` (Maven installation level).
 
 ## Maven Command Line Arguments
 
