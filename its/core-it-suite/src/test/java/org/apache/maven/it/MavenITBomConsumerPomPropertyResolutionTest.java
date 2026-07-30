@@ -20,7 +20,9 @@ package org.apache.maven.it;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 
@@ -46,6 +48,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class MavenITBomConsumerPomPropertyResolutionTest extends AbstractMavenIntegrationTestCase {
 
+    MavenITBomConsumerPomPropertyResolutionTest() {
+        super("[4.0.0-rc-4,)");
+    }
+
     /**
      * Verify that the BOM consumer POM (default, no flatten) resolves
      * property-referenced versions in dependencyManagement.
@@ -58,21 +64,25 @@ class MavenITBomConsumerPomPropertyResolutionTest extends AbstractMavenIntegrati
      */
     @Test
     void testBomConsumerPomResolvesParentProperties() throws Exception {
-        Path basedir = extractResources("/bom-consumer-pom-property-resolution");
+        Path basedir =
+                extractResources("/bom-consumer-pom-property-resolution").getAbsoluteFile().toPath();
 
-        Verifier verifier = newVerifier(basedir);
+        Verifier verifier = newVerifier(basedir.toString());
         verifier.deleteArtifacts("org.apache.maven.its.bom-property");
         verifier.addCliArguments("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // Read the consumer POM that was installed to the local repo
-        Path consumerPomPath =
-                verifier.getArtifactPath("org.apache.maven.its.bom-property", "bom", "1.0.0-SNAPSHOT", "pom");
+        Path consumerPomPath = Paths.get(
+                verifier.getArtifactPath("org.apache.maven.its.bom-property", "bom", "1.0.0-SNAPSHOT", "pom"));
 
         assertTrue(Files.exists(consumerPomPath), "Consumer POM not found at " + consumerPomPath);
 
-        List<String> lines = Files.readAllLines(consumerPomPath);
+        List<String> lines;
+        try (Stream<String> stream = Files.lines(consumerPomPath)) {
+            lines = stream.toList();
+        }
         String content = String.join("\n", lines);
 
         // 1. Packaging must be "pom" (not "bom")
@@ -109,20 +119,24 @@ class MavenITBomConsumerPomPropertyResolutionTest extends AbstractMavenIntegrati
      */
     @Test
     void testBomConsumerPomWithFlattenResolvesParentProperties() throws Exception {
-        Path basedir = extractResources("/bom-consumer-pom-property-resolution");
+        Path basedir =
+                extractResources("/bom-consumer-pom-property-resolution").getAbsoluteFile().toPath();
 
-        Verifier verifier = newVerifier(basedir);
+        Verifier verifier = newVerifier(basedir.toString());
         verifier.deleteArtifacts("org.apache.maven.its.bom-property");
         verifier.addCliArguments("install", "-Dmaven.consumer.pom.flatten=true");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Path consumerPomPath =
-                verifier.getArtifactPath("org.apache.maven.its.bom-property", "bom", "1.0.0-SNAPSHOT", "pom");
+        Path consumerPomPath = Paths.get(
+                verifier.getArtifactPath("org.apache.maven.its.bom-property", "bom", "1.0.0-SNAPSHOT", "pom"));
 
         assertTrue(Files.exists(consumerPomPath), "Consumer POM not found at " + consumerPomPath);
 
-        List<String> lines = Files.readAllLines(consumerPomPath);
+        List<String> lines;
+        try (Stream<String> stream = Files.lines(consumerPomPath)) {
+            lines = stream.toList();
+        }
         String content = String.join("\n", lines);
 
         // Packaging must be "pom"
@@ -146,9 +160,10 @@ class MavenITBomConsumerPomPropertyResolutionTest extends AbstractMavenIntegrati
      */
     @Test
     void testConsumerPomInProjectLocalRepo() throws Exception {
-        Path basedir = extractResources("/bom-consumer-pom-property-resolution");
+        Path basedir =
+                extractResources("/bom-consumer-pom-property-resolution").getAbsoluteFile().toPath();
 
-        Verifier verifier = newVerifier(basedir);
+        Verifier verifier = newVerifier(basedir.toString());
         verifier.deleteArtifacts("org.apache.maven.its.bom-property");
         verifier.addCliArguments("install");
         verifier.execute();
