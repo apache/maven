@@ -91,14 +91,14 @@ from `${session.rootDirectory}/.mvn/maven-user.properties`.
 ## Settings
 
 Settings are configured in the `~/.m2/settings.xml` file (user level),
-`${session.rootDirectory}/.mvn/settings.xml` (project level) and
+`${session.rootDirectory}/.mvn/settings.xml` (project level), and
 `${maven.installation.conf}/settings.xml` (Maven installation level). See [Settings Reference](./api/maven-api-settings/settings.html) for details.
 
 ## Extensions
 
 Extensions allow you to add additional functionality to Maven. They are
 configured in the `~/.m2/extensions.xml` file (user level),
-`${session.rootDirectory}/.mvn/extensions.xml` (project level) and `${maven.installation.conf}/extensions.xml` (Maven installation level).
+`${session.rootDirectory}/.mvn/extensions.xml` (project level), and `${maven.installation.conf}/extensions.xml` (Maven installation level).
 
 ## Maven Command Line Arguments
 
