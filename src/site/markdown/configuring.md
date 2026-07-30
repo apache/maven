@@ -91,20 +91,20 @@ from `${session.rootDirectory}/.mvn/maven-user.properties`.
 ## Settings
 
 Settings are configured in the `~/.m2/settings.xml` file (user level) 
-and `${maven.conf}/settings.xml` (Maven installation level). See 
+and `${maven.installation.conf}/settings.xml` (Maven installation level). See 
 [Settings Reference](./api/maven-api-settings/settings.html) for details.
 
 ## Extensions
 
 Extensions allow you to add additional functionality to Maven. They are 
 configured in the `~/.m2/extensions.xml` file (user level) and 
-`${maven.conf}/extensions.xml` (Maven installation level).
+`${maven.installation.conf}/extensions.xml` (Maven installation level).
 
 ## Maven Command Line Arguments
 
 Maven is a command line tool, and, as such, accepts various command
-line arguments.  The `MAVEN_ARGS` environment value is used to
-provide additional arguments to Maven.  Those arguments will be
+line arguments.  The `MAVEN_ARGS` environment variable is used to
+provide additional arguments to Maven. These arguments will be
 prepended to the actual list of command line arguments.
 
 For example, options and goals could be defined with the value
