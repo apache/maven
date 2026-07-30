@@ -124,11 +124,16 @@ public class DefaultToolchainManager implements ToolchainManager {
      */
     Optional<Toolchain> autoSelectJdkToolchain(Session session) {
         int requiredSourceLevel = getProjectRequiredSourceLevel(session);
+        logger.debug("Auto-select JDK toolchain: requiredSourceLevel={}", requiredSourceLevel);
         if (requiredSourceLevel <= 0) {
             return Optional.empty();
         }
 
         int runningJdkMajor = getRunningJdkMajor();
+        logger.debug(
+                "Auto-select JDK toolchain: runningJdkMajor={}, supportsLevel={}",
+                runningJdkMajor,
+                JdkSourceLevelSupport.supportsSourceLevel(runningJdkMajor, requiredSourceLevel));
         if (JdkSourceLevelSupport.supportsSourceLevel(runningJdkMajor, requiredSourceLevel)) {
             return Optional.empty();
         }
