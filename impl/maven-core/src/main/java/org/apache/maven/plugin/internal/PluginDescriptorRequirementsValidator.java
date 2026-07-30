@@ -28,6 +28,8 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Verify that plugin descriptor does not contain Plexus Component requirements.
  */
@@ -39,7 +41,7 @@ class PluginDescriptorRequirementsValidator implements MavenPluginConfigurationV
 
     @Inject
     PluginDescriptorRequirementsValidator(PluginValidationManager pluginValidationManager) {
-        this.pluginValidationManager = pluginValidationManager;
+        this.pluginValidationManager = requireNonNull(pluginValidationManager);
     }
 
     @Override
