@@ -21,7 +21,6 @@ package org.apache.maven.impl;
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamException;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -128,11 +127,13 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                     .build();
         }
 
-        // for the special case of a drive-relative Windows path, make sure it's absolute to save plugins from trouble
+        // resolve relative local repository paths to absolute to save plugins from trouble.
+        // paths containing property placeholders like ${user.home} must be left as-is
+        // so that later interpolation can resolve them.
         String localRepository = effective.getLocalRepository();
         if (localRepository != null && !localRepository.isEmpty()) {
             Path file = Paths.get(localRepository);
-            if (!file.isAbsolute() && file.toString().startsWith(File.separator)) {
+            if (!file.isAbsolute() && !localRepository.contains("${")) {
                 effective = effective.withLocalRepository(file.toAbsolutePath().toString());
             }
         }
