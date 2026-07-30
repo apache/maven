@@ -26,7 +26,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.eclipse.aether.graph.DependencyFilter;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,7 +38,6 @@ class DefaultProjectRealmCacheTest {
     void testConcurrentPutWithSameKey() throws Exception {
         DefaultProjectRealmCache cache = new DefaultProjectRealmCache();
         ClassRealm realm = mock(ClassRealm.class);
-        DependencyFilter filter = mock(DependencyFilter.class);
         ProjectRealmCache.Key key = cache.createKey(List.of(realm));
 
         int threadCount = 10;
@@ -53,15 +51,15 @@ class DefaultProjectRealmCacheTest {
                 try {
                     cache.put(key, mock(ClassRealm.class), mock(DependencyFilter.class));
                     return true;
-                } catch (IllegalStateException e) {
+                } catch (IllegalStateException ex) {
                     return false;
                 }
             }));
         }
 
         int successCount = 0;
-        for (Future<Boolean> f : futures) {
-            if (f.get()) {
+        for (Future<Boolean> futre : futures) {
+            if (futre.get()) {
                 successCount++;
             }
         }
