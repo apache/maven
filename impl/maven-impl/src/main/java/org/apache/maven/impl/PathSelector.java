@@ -537,13 +537,6 @@ final class PathSelector implements PathMatcher {
         private final PathMatcher[] dirExcludes;
 
         /**
-         * Whether to ignore the includes defined by the enclosing class.
-         * This flag can be {@code false} if we determined that all includes are applicable to directories.
-         * This flag should be {@code true} in case of doubt since directory filtering is only an optimization.
-         */
-        private final boolean ignoreIncludes;
-
-        /**
          * Creates a new matcher for directories.
          */
         @SuppressWarnings("StringEquality")
@@ -558,17 +551,9 @@ final class PathSelector implements PathMatcher {
             if (excludeDirPatterns.contains(DEFAULT_SYNTAX)) {
                 // A pattern was something like "glob:{/**,}", which exclude everything.
                 dirExcludes = new PathMatcher[] {INCLUDES_ALL};
-                ignoreIncludes = true;
-                return;
+            } else {
+                dirExcludes = matchers(baseDirectory.getFileSystem(), excludeDirPatterns.toArray(String[]::new));
             }
-            dirExcludes = matchers(baseDirectory.getFileSystem(), excludeDirPatterns.toArray(String[]::new));
-            for (String pattern : includePatterns) {
-                if (trimSuffixes(pattern) == pattern) { // Identity comparison is sufficient here.
-                    ignoreIncludes = true;
-                    return;
-                }
-            }
-            ignoreIncludes = (includes.length == 0);
         }
 
         /**
@@ -593,12 +578,7 @@ final class PathSelector implements PathMatcher {
          */
         PathMatcher simplify() {
             if (dirExcludes.length == 0) {
-                if (ignoreIncludes) {
-                    return INCLUDES_ALL;
-                }
-                if (includes.length == 1) {
-                    return includes[0];
-                }
+                return INCLUDES_ALL;
             }
             return this;
         }
@@ -619,7 +599,7 @@ final class PathSelector implements PathMatcher {
             if (isMatched(directory, dirExcludes)) {
                 return false;
             }
-            return ignoreIncludes || isMatched(directory, includes);
+            return true;
         }
     }
 
