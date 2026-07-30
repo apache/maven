@@ -94,13 +94,13 @@ public class DefaultProjectRealmCache implements ProjectRealmCache, Disposable {
     public CacheRecord put(Key key, ClassRealm projectRealm, DependencyFilter extensionArtifactFilter) {
         Objects.requireNonNull(projectRealm, "projectRealm cannot be null");
 
-        if (cache.containsKey(key)) {
-            throw new IllegalStateException("Duplicate project realm for extensions " + key);
-        }
-
         CacheRecord record = new CacheRecord(projectRealm, extensionArtifactFilter);
 
-        cache.put(key, record);
+        CacheRecord existing = cache.putIfAbsent(key, record);
+
+        if (existing != null) {
+            throw new IllegalStateException("Duplicate project realm for extensions " + key);
+        }
 
         return record;
     }

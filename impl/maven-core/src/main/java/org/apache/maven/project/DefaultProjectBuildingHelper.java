@@ -143,7 +143,7 @@ public class DefaultProjectBuildingHelper implements ProjectBuildingHelper {
     }
 
     @Override
-    public synchronized ProjectRealmCache.CacheRecord createProjectRealm(
+    public ProjectRealmCache.CacheRecord createProjectRealm(
             MavenProject project, Model model, ProjectBuildingRequest request)
             throws PluginResolutionException, PluginVersionResolutionException, PluginManagerException {
         ClassRealm projectRealm;
