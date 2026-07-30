@@ -35,11 +35,8 @@ class ProtoSessionTest {
                 .build();
         assertNotNull(session);
         assertNotNull(session.getUserProperties());
-        assertNotNull(session.getUserProperties());
-        assertTrue(session.getUserProperties().isEmpty());
-        assertNotNull(session.getSystemProperties());
-        assertTrue(session.getSystemProperties().isEmpty());
         assertTrue(session.getUserProperties().isEmpty(), "User properties should default to empty");
+        assertNotNull(session.getSystemProperties());
         assertTrue(session.getSystemProperties().isEmpty(), "System properties should default to empty");
     }
 }
