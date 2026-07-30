@@ -60,26 +60,42 @@ class DefaultInheritanceAssemblerTest {
         testInheritance("plugin-configuration");
     }
 
+    /**
+     * Check most classical urls inheritance: directory structure where parent POM in parent directory
+     * and child directory == artifactId
+     */
     @Test
     void testUrls() throws Exception {
         testInheritance("urls");
     }
 
+    /**
+     * Flat directory structure: parent & child POMs in sibling directories, child directory == artifactId.
+     */
     @Test
     void testFlatUrls() throws Exception {
         testInheritance("flat-urls");
     }
 
+    /**
+     * MNG-5951 MNG-6059 child.x.y.inherit.append.path="false" test
+     */
     @Test
     void testNoAppendUrls() throws Exception {
         testInheritance("no-append-urls");
     }
 
+    /**
+     * MNG-5951 special case test: inherit with partial override
+     */
     @Test
     void testNoAppendUrls2() throws Exception {
         testInheritance("no-append-urls2");
     }
 
+    /**
+     * MNG-5951 special case test: child.x.y.inherit.append.path="true" in child should not reset content
+     */
     @Test
     void testNoAppendUrls3() throws Exception {
         testInheritance("no-append-urls3");
