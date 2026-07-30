@@ -157,8 +157,6 @@ public class DefaultMaven implements Maven {
                 result = addExceptionToResult(
                         new DefaultMavenExecutionResult(), new InternalErrorException("Internal error: " + e, e));
             }
-        } finally {
-            legacySupport.setSession(null);
         }
 
         return result;
@@ -221,9 +219,13 @@ public class DefaultMaven implements Maven {
             sessionScope.seed(Session.class, session.getSession());
             sessionScope.seed(InternalMavenSession.class, InternalMavenSession.from(session.getSession()));
 
+            MavenSession previousSession = legacySupport.getSession();
             legacySupport.setSession(session);
-
-            return doExecute(request, session, result, chainedWorkspaceReader);
+            try {
+                return doExecute(request, session, result, chainedWorkspaceReader);
+            } finally {
+                legacySupport.setSession(previousSession);
+            }
         } finally {
             sessionScope.exit();
         }
