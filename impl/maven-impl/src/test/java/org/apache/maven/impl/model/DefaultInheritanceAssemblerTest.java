@@ -140,12 +140,15 @@ class DefaultInheritanceAssemblerTest {
         Model child = getModel(baseName + "-child");
 
         if (!fromRepo) {
+            // when model is built from disk, pomFile is set
+            // (has consequences in inheritance algorithm since getProjectDirectory() returns non-null)
             parent = parent.withPomFile(getPom(baseName + "-parent").toAbsolutePath());
             child = child.withPomFile(getPom(baseName + "-child").toAbsolutePath());
         }
 
         Model assembled = assembler.assembleModelInheritance(child, parent, null, null);
 
+        // write baseName + "-actual"
         Path actual = Paths.get(
                 "target/test-classes/poms/inheritance/" + baseName + (fromRepo ? "-build" : "-repo") + "-actual.xml");
         Files.createDirectories(actual.getParent());
@@ -154,6 +157,7 @@ class DefaultInheritanceAssemblerTest {
                 .path(actual)
                 .build());
 
+        // check with getPom( baseName + "-expected" )
         Path expected = getPom(baseName + "-expected");
 
         Diff diff = DiffBuilder.compare(expected.toFile())
