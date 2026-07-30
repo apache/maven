@@ -18,22 +18,135 @@
  */
 package org.apache.maven.impl.model;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.services.xml.XmlReaderRequest;
+import org.apache.maven.api.services.xml.XmlWriterRequest;
+import org.apache.maven.impl.DefaultModelXmlFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.Diff;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class DefaultInheritanceAssemblerTest {
+
+    private DefaultModelXmlFactory xmlFactory;
 
     private DefaultInheritanceAssembler assembler;
 
     @BeforeEach
     void setUp() {
+        xmlFactory = new DefaultModelXmlFactory();
         assembler = new DefaultInheritanceAssembler();
+    }
+
+    private Path getPom(String name) {
+        return Paths.get("../../compat/maven-model-builder/src/test/resources/poms/inheritance/" + name + ".xml");
+    }
+
+    private Model getModel(String name) throws Exception {
+        return xmlFactory.read(XmlReaderRequest.builder().path(getPom(name)).build());
+    }
+
+    @Test
+    void testPluginConfiguration() throws Exception {
+        testInheritance("plugin-configuration");
+    }
+
+    @Test
+    void testUrls() throws Exception {
+        testInheritance("urls");
+    }
+
+    @Test
+    void testFlatUrls() throws Exception {
+        testInheritance("flat-urls");
+    }
+
+    @Test
+    void testNoAppendUrls() throws Exception {
+        testInheritance("no-append-urls");
+    }
+
+    @Test
+    void testNoAppendUrls2() throws Exception {
+        testInheritance("no-append-urls2");
+    }
+
+    @Test
+    void testNoAppendUrls3() throws Exception {
+        testInheritance("no-append-urls3");
+    }
+
+    @Test
+    void testWithEmptyUrl() throws Exception {
+        testInheritance("empty-urls", false);
+    }
+
+    @Test
+    void testModulePathNotArtifactId() throws Exception {
+        Model parent = getModel("module-path-not-artifactId-parent");
+        Model child = getModel("module-path-not-artifactId-child");
+
+        Model assembled = assembler.assembleModelInheritance(child, parent, null, null);
+
+        Path actual = Paths.get("target/test-classes/poms/inheritance/module-path-not-artifactId-actual.xml");
+        Files.createDirectories(actual.getParent());
+        xmlFactory.write(XmlWriterRequest.<Model>builder()
+                .content(assembled)
+                .path(actual)
+                .build());
+
+        Path expected = getPom("module-path-not-artifactId-expected");
+
+        Diff diff = DiffBuilder.compare(expected.toFile())
+                .withTest(actual.toFile())
+                .ignoreComments()
+                .ignoreWhitespace()
+                .build();
+        assertFalse(diff.hasDifferences(), "XML files should be identical: " + diff.toString());
+    }
+
+    public void testInheritance(String baseName) throws Exception {
+        testInheritance(baseName, false);
+        testInheritance(baseName, true);
+    }
+
+    public void testInheritance(String baseName, boolean fromRepo) throws Exception {
+        Model parent = getModel(baseName + "-parent");
+        Model child = getModel(baseName + "-child");
+
+        if (!fromRepo) {
+            parent = parent.withPomFile(getPom(baseName + "-parent").toAbsolutePath());
+            child = child.withPomFile(getPom(baseName + "-child").toAbsolutePath());
+        }
+
+        Model assembled = assembler.assembleModelInheritance(child, parent, null, null);
+
+        Path actual = Paths.get(
+                "target/test-classes/poms/inheritance/" + baseName + (fromRepo ? "-build" : "-repo") + "-actual.xml");
+        Files.createDirectories(actual.getParent());
+        xmlFactory.write(XmlWriterRequest.<Model>builder()
+                .content(assembled)
+                .path(actual)
+                .build());
+
+        Path expected = getPom(baseName + "-expected");
+
+        Diff diff = DiffBuilder.compare(expected.toFile())
+                .withTest(actual.toFile())
+                .ignoreComments()
+                .ignoreWhitespace()
+                .build();
+        assertFalse(diff.hasDifferences(), "XML files should be identical: " + diff.toString());
     }
 
     @Test
@@ -63,8 +176,6 @@ class DefaultInheritanceAssemblerTest {
                 .version("1.0")
                 .build();
 
-        // child has pomFile at root, so getProjectDirectory() returns root path
-        // and getFileName() on root path returns null
         Model child = Model.newBuilder()
                 .modelVersion("4.0.0")
                 .groupId("test")
