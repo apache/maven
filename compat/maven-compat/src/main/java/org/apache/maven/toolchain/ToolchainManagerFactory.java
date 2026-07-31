@@ -155,7 +155,10 @@ public class ToolchainManagerFactory {
             });
         }
         allFactories.putAll(v4Factories);
-        return new org.apache.maven.impl.DefaultToolchainManager(allFactories, logger) {};
+        org.apache.maven.impl.JdkToolchainDiscoverer discoverer = lookup.lookupOptional(
+                        org.apache.maven.impl.JdkToolchainDiscoverer.class)
+                .orElse(null);
+        return new org.apache.maven.impl.DefaultToolchainManager(allFactories, discoverer, logger) {};
     }
 
     public class DefaultToolchainManagerV4 implements org.apache.maven.api.services.ToolchainManager {
