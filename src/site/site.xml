@@ -43,29 +43,26 @@ under the License.
     </menu>
 
     <menu inherit="bottom" name="Descriptors Reference">
-    <!-- API documentation must be built separately with javadoc:javadoc -->
-      <!--item name="POM" href="./api/maven-api-model/maven.html"/-->
-      <!--item name="Settings" href="./api/maven-api-settings/settings.html"/-->
-      <!--item name="Toolchains" href="./api/maven-api-toolchain/toolchains.html"/-->
-      <!--item name="Core Extensions" href="./api/maven-api-cli/core-extensions.html"/-->
-      <!--item name="Repository Metadata" href="./api/maven-api-metadata/repository-metadata.html"/-->
-      <!--item name="Plugin Descriptor" href="./api/maven-api-plugin/plugin.html"/-->
-      <!--item name="Lifecycle Descriptor" href="./api/maven-api-plugin/lifecycle.html"/-->
+      <item name="POM" href="./api/maven-api-model/maven.html"/>
+      <item name="Settings" href="./api/maven-api-settings/settings.html"/>
+      <item name="Toolchains" href="./api/maven-api-toolchain/toolchains.html"/>
+      <item name="Core Extensions" href="./api/maven-api-cli/core-extensions.html"/>
+      <item name="Repository Metadata" href="./api/maven-api-metadata/repository-metadata.html"/>
+      <item name="Plugin Descriptor" href="./api/maven-api-plugin/plugin.html"/>
+      <item name="Lifecycle Descriptor" href="./api/maven-api-plugin/lifecycle.html"/>
     </menu>
 
     <menu inherit="bottom" name="Reference">
-    <!-- Implementation modules documentation must be built separately -->
-      <!--item name="Lifecycles" href="./impl/maven-core/lifecycles.html"/-->
-      <!--item name="Plugin Bindings to Default Lifecycle" href="./impl/maven-core/default-bindings.html"/-->
-      <!--item name="Artifact Handlers" href="./impl/maven-core/artifact-handlers.html"/-->
-      <!--item name="CLI options" href="./compat/maven-embedder/cli.html"/-->
-      <!--item name="Super POM" href="./compat/maven-model-builder/super-pom.html"/-->
+      <item name="Lifecycles" href="./impl/maven-core/lifecycles.html"/>
+      <item name="Plugin Bindings to Default Lifecycle" href="./impl/maven-core/default-bindings.html"/>
+      <item name="Artifact Handlers" href="./impl/maven-core/artifact-handlers.html"/>
+      <item name="CLI options" href="./compat/maven-embedder/cli.html"/>
+      <item name="Super POM" href="./compat/maven-model-builder/super-pom.html"/>
     </menu>
 
     <menu inherit="bottom" name="Development">
-      <!-- Developer documentation exists in separate repositories -->
-      <!--item name="Maven Developer Centre" href="../../developers/index.html"/-->
-      <!--item name="Maven Core ITs" href="../../core-its/index.html"/-->
+      <item name="Maven Developer Centre" href="../../developers/index.html"/>
+      <item name="Maven Core ITs" href="../../core-its/index.html"/>
     </menu>
 
     <menu inherit="bottom" ref="modules"/>
