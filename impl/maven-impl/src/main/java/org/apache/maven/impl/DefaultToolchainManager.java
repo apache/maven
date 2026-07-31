@@ -62,24 +62,25 @@ public class DefaultToolchainManager implements ToolchainManager {
     }
 
     /**
-     * Used for tests only (no discoverer)
+     * Convenience constructor without a discoverer — auto-selection will skip
+     * filesystem discovery. Used by tests and IT harnesses.
      */
-    protected DefaultToolchainManager(Map<String, ToolchainFactory> factories) {
+    public DefaultToolchainManager(Map<String, ToolchainFactory> factories) {
         this(factories, null, null);
     }
 
     /**
-     * Used for tests only (no discoverer, custom logger)
+     * Convenience constructor without a discoverer, with custom logger.
+     * Used by tests.
      */
-    protected DefaultToolchainManager(Map<String, ToolchainFactory> factories, Logger logger) {
+    DefaultToolchainManager(Map<String, ToolchainFactory> factories, Logger logger) {
         this(factories, null, logger);
     }
 
     /**
-     * Used for tests only (full control)
+     * Full-control constructor. Used by tests.
      */
-    protected DefaultToolchainManager(
-            Map<String, ToolchainFactory> factories, JdkToolchainDiscoverer discoverer, Logger logger) {
+    DefaultToolchainManager(Map<String, ToolchainFactory> factories, JdkToolchainDiscoverer discoverer, Logger logger) {
         this.factories = factories;
         this.discoverer = discoverer;
         this.logger = logger != null ? logger : LoggerFactory.getLogger(DefaultToolchainManager.class);
