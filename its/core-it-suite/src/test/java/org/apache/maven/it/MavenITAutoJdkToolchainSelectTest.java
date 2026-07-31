@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * When the running JDK does not support the project's required {@code --source}/{@code --release}
  * level, Maven should automatically search configured toolchains and select a compatible JDK.
  */
-public class MavenITAutoJdkToolchainSelectTest extends AbstractMavenIntegrationTestCase {
+class MavenITAutoJdkToolchainSelectTest extends AbstractMavenIntegrationTestCase {
 
     /**
      * Verifies that Maven auto-selects a JDK toolchain when the running JDK
@@ -45,7 +45,7 @@ public class MavenITAutoJdkToolchainSelectTest extends AbstractMavenIntegrationT
      * A JDK 11 toolchain is configured in toolchains.xml and should be auto-selected.
      */
     @Test
-    public void testAutoSelectToolchainWhenSourceLevelUnsupported() throws Exception {
+    void testAutoSelectToolchainWhenSourceLevelUnsupported() throws Exception {
         Path testDir = extractResources("auto-jdk-toolchain-select");
 
         // Create a fake JDK home with bin/javac for the toolchain
@@ -96,7 +96,7 @@ public class MavenITAutoJdkToolchainSelectTest extends AbstractMavenIntegrationT
      * by JDK 12+ (all current CI JDKs). No auto-selection should occur.
      */
     @Test
-    public void testNoAutoSelectWhenSourceLevelSupported() throws Exception {
+    void testNoAutoSelectWhenSourceLevelSupported() throws Exception {
         Path testDir = extractResources("auto-jdk-toolchain-no-select");
 
         // Create a fake JDK home (needed to create a valid toolchain)
