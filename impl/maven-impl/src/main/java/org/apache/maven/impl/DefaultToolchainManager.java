@@ -37,6 +37,7 @@ import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.Build;
+import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.model.Source;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.ToolchainFactory;
@@ -44,6 +45,7 @@ import org.apache.maven.api.services.ToolchainFactoryException;
 import org.apache.maven.api.services.ToolchainManager;
 import org.apache.maven.api.services.ToolchainManagerException;
 import org.apache.maven.api.toolchain.ToolchainModel;
+import org.apache.maven.api.xml.XmlNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -264,6 +266,57 @@ public class DefaultToolchainManager implements ToolchainManager {
             }
         }
 
+        // Fall back to compiler plugin configuration (<release>, <source>)
+        int pluginLevel = getSourceLevelFromCompilerPlugin(build);
+        if (pluginLevel > 0) {
+            return pluginLevel;
+        }
+
+        return -1;
+    }
+
+    /**
+     * Reads the source level from the maven-compiler-plugin configuration.
+     * Checks both {@code <release>} and {@code <source>} elements in the plugin's
+     * {@code <configuration>} block.
+     *
+     * @return the source level, or {@code -1} if not configured
+     */
+    private int getSourceLevelFromCompilerPlugin(Build build) {
+        if (build == null) {
+            return -1;
+        }
+        for (Plugin plugin : build.getPlugins()) {
+            if ("maven-compiler-plugin".equals(plugin.getArtifactId())
+                    && (plugin.getGroupId() == null
+                            || plugin.getGroupId().isEmpty()
+                            || "org.apache.maven.plugins".equals(plugin.getGroupId()))) {
+                XmlNode config = plugin.getConfiguration();
+                if (config != null) {
+                    // <release> takes precedence over <source>
+                    XmlNode releaseNode = config.child("release");
+                    if (releaseNode != null
+                            && releaseNode.value() != null
+                            && !releaseNode.value().isBlank()) {
+                        int level = JdkSourceLevelSupport.normalizeSourceLevel(
+                                releaseNode.value().trim());
+                        if (level > 0) {
+                            return level;
+                        }
+                    }
+                    XmlNode sourceNode = config.child("source");
+                    if (sourceNode != null
+                            && sourceNode.value() != null
+                            && !sourceNode.value().isBlank()) {
+                        int level = JdkSourceLevelSupport.normalizeSourceLevel(
+                                sourceNode.value().trim());
+                        if (level > 0) {
+                            return level;
+                        }
+                    }
+                }
+            }
+        }
         return -1;
     }
 
