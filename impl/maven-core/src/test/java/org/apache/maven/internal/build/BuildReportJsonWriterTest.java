@@ -30,7 +30,6 @@ import org.apache.maven.api.build.report.LogLevel;
 import org.apache.maven.api.build.report.ModuleReport;
 import org.apache.maven.api.build.report.MojoReport;
 import org.apache.maven.api.services.BuilderProblem;
-import org.apache.maven.impl.DefaultBuilderProblem;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -404,27 +403,23 @@ class BuildReportJsonWriterTest {
 
     @Test
     void testProblemsSerialization() {
-        BuilderProblem p1 = new DefaultBuilderProblem(
-                "maven-compiler-plugin:3.15.0:compile",
-                42,
-                1,
-                null,
-                "source/target value 8 is deprecated",
-                BuilderProblem.Severity.WARNING,
-                "deprecated-source-target",
-                "Update <maven.compiler.source> to 11 or higher",
-                "https://example.com/docs/compiler");
+        BuilderProblem p1 = BuilderProblem.builder()
+                .source("maven-compiler-plugin:3.15.0:compile")
+                .lineNumber(42)
+                .columnNumber(1)
+                .message("source/target value 8 is deprecated")
+                .severity(BuilderProblem.Severity.WARNING)
+                .key("deprecated-source-target")
+                .suggestion("Update <maven.compiler.source> to 11 or higher")
+                .documentationUrl("https://example.com/docs/compiler")
+                .build();
 
-        BuilderProblem p2 = new DefaultBuilderProblem(
-                "maven-compiler-plugin",
-                -1,
-                -1,
-                null,
-                "3 errors found",
-                BuilderProblem.Severity.ERROR,
-                "compilation-failure",
-                null,
-                null);
+        BuilderProblem p2 = BuilderProblem.builder()
+                .source("maven-compiler-plugin")
+                .message("3 errors found")
+                .severity(BuilderProblem.Severity.ERROR)
+                .key("compilation-failure")
+                .build();
 
         BuildReport report = new DefaultBuildReport(
                 BuildStatus.FAILURE,

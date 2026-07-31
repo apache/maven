@@ -43,6 +43,7 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Prerequisites;
 import org.apache.maven.api.model.Profile;
+import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.LookupException;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -59,6 +60,7 @@ import org.apache.maven.execution.ProjectActivation;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.graph.GraphBuilder;
 import org.apache.maven.graph.ProjectSelector;
+import org.apache.maven.internal.build.DefaultDiagnosticCollector;
 import org.apache.maven.internal.impl.DefaultSessionFactory;
 import org.apache.maven.internal.impl.InternalMavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
@@ -113,6 +115,8 @@ public class DefaultMaven implements Maven {
 
     private final ProjectSelector projectSelector;
 
+    private final DefaultDiagnosticCollector diagnosticCollector;
+
     @Inject
     @SuppressWarnings("checkstyle:ParameterNumber")
     public DefaultMaven(
@@ -126,7 +130,8 @@ public class DefaultMaven implements Maven {
             BuildResumptionDataRepository buildResumptionDataRepository,
             SuperPomProvider superPomProvider,
             DefaultSessionFactory defaultSessionFactory,
-            @Nullable @Named("ide") WorkspaceReader ideWorkspaceReader) {
+            @Nullable @Named("ide") WorkspaceReader ideWorkspaceReader,
+            DefaultDiagnosticCollector diagnosticCollector) {
         this.lookup = lookup;
         this.eventCatapult = eventCatapult;
         this.legacySupport = legacySupport;
@@ -138,6 +143,7 @@ public class DefaultMaven implements Maven {
         this.superPomProvider = superPomProvider;
         this.ideWorkspaceReader = ideWorkspaceReader;
         this.defaultSessionFactory = defaultSessionFactory;
+        this.diagnosticCollector = diagnosticCollector;
         this.projectSelector = new ProjectSelector(); // if necessary switch to DI
     }
 
@@ -648,6 +654,10 @@ public class DefaultMaven implements Maven {
             } else {
                 logger.error(problem.getMessage());
             }
+            // Pipe structured problem directly to DiagnosticCollector so that
+            // source location and severity are preserved in the build report.
+            // The SLF4J hook excludes this logger to avoid double-counting.
+            diagnosticCollector.report(toBuilderProblem(problem));
         }
 
         if (!graphResult.hasErrors()) {
@@ -658,6 +668,28 @@ public class DefaultMaven implements Maven {
         }
 
         return graphResult;
+    }
+
+    /**
+     * Converts a compat {@link ModelProblem} to the Maven 4 {@link BuilderProblem} API,
+     * preserving source, line, column, severity, and message.
+     */
+    private static BuilderProblem toBuilderProblem(ModelProblem problem) {
+        BuilderProblem.Severity severity =
+                switch (problem.getSeverity()) {
+                    case FATAL -> BuilderProblem.Severity.FATAL;
+                    case ERROR -> BuilderProblem.Severity.ERROR;
+                    default -> BuilderProblem.Severity.WARNING;
+                };
+        return BuilderProblem.builder()
+                .source(problem.getSource())
+                .lineNumber(problem.getLineNumber())
+                .columnNumber(problem.getColumnNumber())
+                .exception(problem.getException())
+                .message(problem.getMessage())
+                .severity(severity)
+                .key("model:" + problem.getMessage().hashCode())
+                .build();
     }
 
     @Deprecated
