@@ -40,10 +40,10 @@ public class ReactorGraph {
     private static final LinkedHashMap<String, Pattern> CLUSTER_PATTERNS = new LinkedHashMap<>();
     static {
         CLUSTER_PATTERNS.put("JLine", Pattern.compile("^org\\.jline:.*"));
-        CLUSTER_PATTERNS.put("Maven API", Pattern.compile("^org\\.apache\\.maven:maven-api-(?!impl).*"));
-        CLUSTER_PATTERNS.put("Maven Resolver", Pattern.compile("^org\\.apache\\.maven\\.resolver:.*"));
-        CLUSTER_PATTERNS.put("Maven Implementation", Pattern.compile("^org\\.apache\\.maven:maven-(support|impl|di|core|cli|xml|jline|logging|executor|testing):.*"));
-        CLUSTER_PATTERNS.put("Maven Compatibility", Pattern.compile("^org\\.apache\\.maven:maven-(artifact|builder-support|compat|embedder|model|model-builder|plugin-api|repository-metadata|resolver-provider|settings|settings-builder|toolchain-builder|toolchain-model):.*"));
+        CLUSTER_PATTERNS.put("Maven 4 API", Pattern.compile("^org\\.apache\\.maven:maven-api-(?!impl).*"));
+        CLUSTER_PATTERNS.put("Maven Resolver 2", Pattern.compile("^org\\.apache\\.maven\\.resolver:.*"));
+        CLUSTER_PATTERNS.put("Maven 4 Implementation", Pattern.compile("^org\\.apache\\.maven:maven-(support|impl|di|core|cli|xml|jline|logging|executor|testing):.*"));
+        CLUSTER_PATTERNS.put("Maven 3 Compatibility", Pattern.compile("^org\\.apache\\.maven:maven-(artifact|builder-support|compat|embedder|model|model-builder|plugin-api|repository-metadata|resolver-provider|settings|settings-builder|toolchain-builder|toolchain-model):.*"));
         CLUSTER_PATTERNS.put("Sisu", Pattern.compile("(^org\\.eclipse\\.sisu:.*)|(.*:guice:.*)|(.*:javax.inject:.*)|(.*:javax.annotation-api:.*)|(.*:aopalliance:.*)"));
         CLUSTER_PATTERNS.put("Plexus", Pattern.compile("^org\\.codehaus\\.plexus:.*"));
         CLUSTER_PATTERNS.put("XML Parsing", Pattern.compile("(.*:woodstox-core:.*)|(.*:stax2-api:.*)"));
