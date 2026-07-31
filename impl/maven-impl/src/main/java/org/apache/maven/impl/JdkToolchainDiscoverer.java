@@ -111,6 +111,9 @@ public class JdkToolchainDiscoverer {
     /**
      * Collects JDK candidates from environment variables matching {@code JAVA*_HOME}.
      * Environment variables are read from the properties map as {@code env.VAR_NAME} entries.
+     * Also scans the parent directory of {@code JAVA_HOME} for sibling JDK installations
+     * (common in CI environments and container images where multiple JDKs are installed
+     * under the same parent directory).
      */
     void collectFromEnvironment(Set<Path> candidates, Map<String, String> properties) {
         // Current JDK (from java.home system property)
@@ -123,7 +126,15 @@ public class JdkToolchainDiscoverer {
         for (Map.Entry<String, String> entry : properties.entrySet()) {
             String name = entry.getKey();
             if (name.startsWith("env.JAVA") && name.endsWith("_HOME")) {
-                addCandidate(candidates, Paths.get(entry.getValue()));
+                Path jdkPath = Paths.get(entry.getValue());
+                addCandidate(candidates, jdkPath);
+                // Also scan sibling directories — in CI and container environments,
+                // multiple JDKs are often installed under the same parent directory
+                // (e.g. /toolchain/jdk-8, /toolchain/jdk-11, /toolchain/jdk-21)
+                Path parent = jdkPath.getParent();
+                if (parent != null) {
+                    scanSubdirectories(candidates, parent);
+                }
             }
         }
     }
