@@ -35,7 +35,6 @@ import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.impl.DefaultBuilderProblem;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -72,21 +71,41 @@ class BuildReportIntegrationTest {
     }
 
     private static BuilderProblem warning(String key, String message, String source) {
-        return new DefaultBuilderProblem(
-                source, -1, -1, null, message, BuilderProblem.Severity.WARNING, key, null, null);
+        return BuilderProblem.builder()
+                .source(source)
+                .message(message)
+                .severity(BuilderProblem.Severity.WARNING)
+                .key(key)
+                .build();
     }
 
     private static BuilderProblem warning(String key, String message, String source, String suggestion, String docUrl) {
-        return new DefaultBuilderProblem(
-                source, -1, -1, null, message, BuilderProblem.Severity.WARNING, key, suggestion, docUrl);
+        return BuilderProblem.builder()
+                .source(source)
+                .message(message)
+                .severity(BuilderProblem.Severity.WARNING)
+                .key(key)
+                .suggestion(suggestion)
+                .documentationUrl(docUrl)
+                .build();
     }
 
     private static BuilderProblem info(String key, String message, String source) {
-        return new DefaultBuilderProblem(source, -1, -1, null, message, BuilderProblem.Severity.INFO, key, null, null);
+        return BuilderProblem.builder()
+                .source(source)
+                .message(message)
+                .severity(BuilderProblem.Severity.INFO)
+                .key(key)
+                .build();
     }
 
     private static BuilderProblem error(String key, String message, String source) {
-        return new DefaultBuilderProblem(source, -1, -1, null, message, BuilderProblem.Severity.ERROR, key, null, null);
+        return BuilderProblem.builder()
+                .source(source)
+                .message(message)
+                .severity(BuilderProblem.Severity.ERROR)
+                .key(key)
+                .build();
     }
 
     /**
