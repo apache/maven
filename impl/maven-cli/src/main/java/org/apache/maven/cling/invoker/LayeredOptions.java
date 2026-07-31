@@ -133,6 +133,16 @@ public abstract class LayeredOptions<O extends Options> implements Options {
     }
 
     @Override
+    public Optional<String> console() {
+        return returnFirstPresentOrEmpty(Options::console);
+    }
+
+    @Override
+    public Optional<String> warningMode() {
+        return returnFirstPresentOrEmpty(Options::warningMode);
+    }
+
+    @Override
     public Optional<Boolean> offline() {
         return returnFirstPresentOrEmpty(Options::offline);
     }

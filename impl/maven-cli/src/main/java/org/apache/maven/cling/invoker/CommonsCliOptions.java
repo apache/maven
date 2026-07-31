@@ -213,6 +213,26 @@ public class CommonsCliOptions implements Options {
     }
 
     @Override
+    public Optional<String> console() {
+        if (commandLine.hasOption(CLIManager.CONSOLE)) {
+            if (commandLine.getOptionValue(CLIManager.CONSOLE) != null) {
+                return Optional.of(commandLine.getOptionValue(CLIManager.CONSOLE));
+            } else {
+                return Optional.of("auto");
+            }
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<String> warningMode() {
+        if (commandLine.hasOption(CLIManager.WARNING_MODE)) {
+            return Optional.of(commandLine.getOptionValue(CLIManager.WARNING_MODE));
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public Optional<Boolean> offline() {
         if (commandLine.hasOption(CLIManager.OFFLINE)) {
             return Optional.of(Boolean.TRUE);
@@ -315,6 +335,8 @@ public class CommonsCliOptions implements Options {
         public static final String LOG_FILE = "l";
         public static final String RAW_STREAMS = "raw-streams";
         public static final String COLOR = "color";
+        public static final String CONSOLE = "console";
+        public static final String WARNING_MODE = "warning-mode";
         public static final String OFFLINE = "o";
         public static final String HELP = "h";
 
@@ -327,6 +349,7 @@ public class CommonsCliOptions implements Options {
         public static final String UPGRADE = "up";
         public static final String SHELL = "shell";
         public static final String YJP = "yjp";
+        public static final String LOG = "log";
 
         // deprecated ones
         @Deprecated
@@ -344,6 +367,7 @@ public class CommonsCliOptions implements Options {
             prepareOptions(options);
         }
 
+        @SuppressWarnings("checkstyle:MethodLength")
         protected void prepareOptions(org.apache.commons.cli.Options options) {
             options.addOption(Option.builder(HELP)
                     .longOpt("help")
@@ -432,6 +456,23 @@ public class CommonsCliOptions implements Options {
                     .optionalArg(true)
                     .desc("Defines the color mode of the output. Supported are 'auto', 'always', 'never'.")
                     .get());
+            options.addOption(Option.builder()
+                    .longOpt(CONSOLE)
+                    .hasArg()
+                    .optionalArg(true)
+                    .desc("Defines the console output mode. Supported are 'auto' (default),"
+                            + " 'plain', 'rich', 'verbose', 'machine'."
+                            + " In 'auto' mode, CI environments use 'plain',"
+                            + " interactive TTYs use 'rich' (status bar)."
+                            + " 'machine' outputs one JSON line per lifecycle event.")
+                    .get());
+            options.addOption(Option.builder()
+                    .longOpt(WARNING_MODE)
+                    .hasArg()
+                    .desc("Controls how build warnings are displayed."
+                            + " Supported modes: 'summary' (default, deduplicated summary at end),"
+                            + " 'all' (inline + summary), 'none' (suppress), 'fail' (treat warnings as errors).")
+                    .get());
             options.addOption(Option.builder(OFFLINE)
                     .longOpt("offline")
                     .desc("Work offline")
@@ -457,6 +498,10 @@ public class CommonsCliOptions implements Options {
             options.addOption(Option.builder()
                     .longOpt(YJP)
                     .desc("Launch the JVM with Yourkit profiler (script option).")
+                    .get());
+            options.addOption(Option.builder()
+                    .longOpt(LOG)
+                    .desc("Launch the Maven Build Log Viewer (script option).")
                     .get());
 
             // Deprecated

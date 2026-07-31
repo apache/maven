@@ -18,11 +18,25 @@
  */
 package org.apache.maven.logging;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.time.Instant;
+
+import org.apache.maven.api.MonotonicClock;
+import org.apache.maven.api.build.report.LogEvent;
+import org.apache.maven.api.build.report.LogLevel;
+import org.apache.maven.internal.build.DefaultLogEvent;
 import org.apache.maven.slf4j.MavenSimpleLogger;
 import org.slf4j.MDC;
+import org.slf4j.spi.LocationAwareLogger;
 
 /**
- * Forwards log messages to the client.
+ * Forwards log messages to the client as structured {@link LogEvent} objects.
+ * <p>
+ * Installs itself as a {@link MavenSimpleLogger.LogSink} to intercept all
+ * SLF4J log output, enrich it with structured metadata (level, logger name,
+ * clean message, formatted output), and forward to the active
+ * {@link BuildEventListener}.
  */
 public class ProjectBuildLogAppender implements AutoCloseable {
 
@@ -76,13 +90,35 @@ public class ProjectBuildLogAppender implements AutoCloseable {
         MavenSimpleLogger.setLogSink(this::accept);
     }
 
-    protected void accept(String message) {
+    protected void accept(
+            int level, String loggerName, String cleanMessage, String formattedMessage, Throwable throwable) {
         String projectId = MDC.get(KEY_PROJECT_ID);
-        buildEventListener.projectLogMessage(projectId, message);
+        Instant timestamp = MonotonicClock.now();
+        LogLevel logLevel = toLogLevel(level);
+        String stackTrace = throwable != null ? formatStackTrace(throwable) : null;
+        LogEvent event =
+                new DefaultLogEvent(timestamp, logLevel, cleanMessage, loggerName, stackTrace, formattedMessage);
+        buildEventListener.projectLogMessage(projectId, event);
     }
 
     @Override
     public void close() throws Exception {
         MavenSimpleLogger.setLogSink(null);
+    }
+
+    private static LogLevel toLogLevel(int level) {
+        return switch (level) {
+            case LocationAwareLogger.TRACE_INT -> LogLevel.TRACE;
+            case LocationAwareLogger.DEBUG_INT -> LogLevel.DEBUG;
+            case LocationAwareLogger.INFO_INT -> LogLevel.INFO;
+            case LocationAwareLogger.WARN_INT -> LogLevel.WARN;
+            default -> LogLevel.ERROR;
+        };
+    }
+
+    private static String formatStackTrace(Throwable t) {
+        StringWriter sw = new StringWriter();
+        t.printStackTrace(new PrintWriter(sw));
+        return sw.toString();
     }
 }

@@ -183,6 +183,43 @@ public interface Options {
     Optional<String> color();
 
     /**
+     * Returns the console output mode.
+     * <p>
+     * Supported modes:
+     * <ul>
+     *   <li>{@code "auto"} — selects {@code "plain"} in CI, {@code "rich"} on interactive TTYs,
+     *       {@code "verbose"} otherwise</li>
+     *   <li>{@code "plain"} — compact one-line-per-module output with structured summary</li>
+     *   <li>{@code "rich"} — JLine status bar with live reactor progress (requires TTY)</li>
+     *   <li>{@code "verbose"} — full mojo-level output (Maven 4.0 default behavior)</li>
+     *   <li>{@code "machine"} — JSON lines: one typed JSON object per lifecycle event,
+     *       designed for piping to external tools, CI systems, and LLM agents</li>
+     * </ul>
+     *
+     * @return an {@link Optional} containing the console mode, or empty if not set
+     * @since 4.1.0
+     */
+    @Nonnull
+    Optional<String> console();
+
+    /**
+     * Returns the warning display mode.
+     * <p>
+     * Controls how build warnings (diagnostics) are displayed:
+     * <ul>
+     *   <li>{@code "summary"} (default) — collect warnings, show deduplicated summary at end of build</li>
+     *   <li>{@code "all"} — show warnings inline as they occur AND show summary at end</li>
+     *   <li>{@code "none"} — suppress the diagnostic summary entirely</li>
+     *   <li>{@code "fail"} — show summary AND fail the build if any warnings exist</li>
+     * </ul>
+     *
+     * @return an {@link Optional} containing the warning mode, or empty if not set
+     * @since 4.1.0
+     */
+    @Nonnull
+    Optional<String> warningMode();
+
+    /**
      * Indicates whether Maven should operate in offline mode.
      *
      * @return an {@link Optional} containing true if offline mode is enabled, false if disabled, or empty if not specified

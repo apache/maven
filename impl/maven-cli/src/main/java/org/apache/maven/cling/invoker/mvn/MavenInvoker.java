@@ -48,6 +48,11 @@ import org.apache.maven.api.services.ToolchainsBuilderResult;
 import org.apache.maven.api.services.model.ModelProcessor;
 import org.apache.maven.api.toolchain.PersistedToolchains;
 import org.apache.maven.cling.event.ExecutionEventLogger;
+import org.apache.maven.cling.event.MachineBuildEventListener;
+import org.apache.maven.cling.event.MachineExecutionEventLogger;
+import org.apache.maven.cling.event.PlainExecutionEventLogger;
+import org.apache.maven.cling.event.RichBuildEventListener;
+import org.apache.maven.cling.event.RichExecutionEventLogger;
 import org.apache.maven.cling.invoker.CliUtils;
 import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.LookupInvoker;
@@ -66,6 +71,7 @@ import org.apache.maven.execution.ProfileActivation;
 import org.apache.maven.execution.ProjectActivation;
 import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.logging.BuildEventListener;
 import org.apache.maven.logging.LoggingExecutionListener;
 import org.apache.maven.logging.MavenTransferListener;
 import org.apache.maven.project.MavenProject;
@@ -257,6 +263,14 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             }
         }
 
+        // Propagate warning mode and diagnostic suppression to the session so
+        // BuildReportCollector (an EventSpy) can read them from user properties
+        String warningMode = context.options().warningMode().orElse("summary");
+        request.getUserProperties().put("maven.build.warningMode", warningMode);
+
+        // Diagnostic suppression: forward -Dmaven.diagnostic.suppress if set
+        // (already in user properties via -D, just ensure it's visible)
+
         request.setTransferListener(determineTransferListener(
                 context, context.options().noTransferProgress().orElse(false)));
         request.setExecutionListener(determineExecutionListener(context));
@@ -343,11 +357,86 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
     }
 
     protected ExecutionListener determineExecutionListener(MavenContext context) {
-        ExecutionListener listener = new ExecutionEventLogger(context.invokerRequest.messageBuilderFactory());
+        ExecutionListener listener;
+        String consoleMode = determineConsoleMode(context);
+        switch (consoleMode) {
+            case "machine":
+                BuildEventListener machineBel = determineBuildEventListener(context);
+                if (machineBel instanceof MachineBuildEventListener machineListener) {
+                    listener = new MachineExecutionEventLogger(machineListener);
+                } else {
+                    // Fallback if machine listener couldn't be created
+                    listener = new PlainExecutionEventLogger(context.invokerRequest.messageBuilderFactory());
+                }
+                break;
+            case "rich":
+                BuildEventListener richBel = determineBuildEventListener(context);
+                if (richBel instanceof RichBuildEventListener richListener) {
+                    listener =
+                            new RichExecutionEventLogger(context.invokerRequest.messageBuilderFactory(), richListener);
+                } else {
+                    // Fallback if status bar couldn't be created
+                    listener = new PlainExecutionEventLogger(context.invokerRequest.messageBuilderFactory());
+                }
+                break;
+            case "plain":
+                listener = new PlainExecutionEventLogger(context.invokerRequest.messageBuilderFactory());
+                break;
+            default:
+                listener = new ExecutionEventLogger(context.invokerRequest.messageBuilderFactory());
+                break;
+        }
         if (context.eventSpyDispatcher != null) {
             listener = context.eventSpyDispatcher.chainListener(listener);
         }
         return new LoggingExecutionListener(listener, determineBuildEventListener(context));
+    }
+
+    @Override
+    protected BuildEventListener doDetermineBuildEventListener(MavenContext context) {
+        String consoleMode = determineConsoleMode(context);
+        if ("machine".equals(consoleMode)) {
+            return new MachineBuildEventListener(determineWriter(context));
+        }
+        if ("rich".equals(consoleMode) && context.terminal != null) {
+            return new RichBuildEventListener(context.terminal, determineWriter(context));
+        }
+        return super.doDetermineBuildEventListener(context);
+    }
+
+    /**
+     * Resolves the effective console mode from the {@code --console} flag and CI/TTY detection.
+     * <p>
+     * Resolution order:
+     * <ol>
+     *   <li>Explicit {@code --console=plain}, {@code --console=verbose}, {@code --console=rich},
+     *       or {@code --console=machine} — always honored</li>
+     *   <li>{@code --console=auto} (or unset) — selects mode based on environment:
+     *     <ul>
+     *       <li>CI detected → "plain"</li>
+     *       <li>Interactive TTY → "rich"</li>
+     *       <li>Otherwise → "verbose"</li>
+     *     </ul>
+     *   </li>
+     * </ol>
+     */
+    String determineConsoleMode(MavenContext context) {
+        String consoleMode = context.options().console().orElse("auto");
+        if ("plain".equalsIgnoreCase(consoleMode)
+                || "verbose".equalsIgnoreCase(consoleMode)
+                || "rich".equalsIgnoreCase(consoleMode)
+                || "machine".equalsIgnoreCase(consoleMode)) {
+            return consoleMode.toLowerCase();
+        }
+        // "auto" mode: CI → plain, interactive TTY → rich, otherwise → verbose
+        if (context.invokerRequest.ciInfo().isPresent()
+                && !context.options().forceInteractive().orElse(false)) {
+            return "plain";
+        }
+        if (context.interactive && context.terminal != null && !context.invokerRequest.embedded()) {
+            return "rich";
+        }
+        return "verbose";
     }
 
     protected TransferListener determineTransferListener(MavenContext context, boolean noTransferProgress) {
@@ -355,9 +444,15 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
         boolean logFile = context.options().logFile().isPresent();
         boolean quietCI = context.invokerRequest.ciInfo().isPresent()
                 && !context.options().forceInteractive().orElse(false);
+        String mode = determineConsoleMode(context);
+        boolean richMode = "rich".equals(mode);
+        boolean machineMode = "machine".equals(mode);
 
         TransferListener delegate;
-        if (quiet || noTransferProgress || quietCI) {
+        if (quiet || noTransferProgress || quietCI || richMode || machineMode) {
+            // In rich mode, transfer progress is shown in the JLine status bar.
+            // In machine mode, transfer events are emitted as JSON lines.
+            // In both cases, suppress the console transfer listener.
             delegate = new QuietMavenTransferListener();
         } else if (context.interactive && !logFile) {
             if (context.simplexTransferListener == null) {
