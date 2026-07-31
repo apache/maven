@@ -32,12 +32,14 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Verify that plugin descriptor does not contain Plexus Component requirements.
+ *
+ * @since 3.10.0
  */
 @Singleton
 @Named
 class PluginDescriptorRequirementsValidator implements MavenPluginConfigurationValidator {
 
-    protected final PluginValidationManager pluginValidationManager;
+    private final PluginValidationManager pluginValidationManager;
 
     @Inject
     PluginDescriptorRequirementsValidator(PluginValidationManager pluginValidationManager) {
