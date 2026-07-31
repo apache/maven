@@ -85,10 +85,16 @@ final class JdkSourceLevelSupport {
             return -1;
         }
         version = version.trim();
-        // Handle "1.x" legacy format (e.g., "1.5", "1.8")
+        // Handle "1.x" legacy format (e.g., "1.5", "1.8", "1.8.0_392")
         if (version.startsWith("1.") && version.length() > 2) {
+            String rest = version.substring(2);
+            // Strip any trailing qualifiers (e.g. "8.0_392" → "8")
+            int sep = indexOfNonDigit(rest);
+            if (sep > 0) {
+                rest = rest.substring(0, sep);
+            }
             try {
-                return Integer.parseInt(version.substring(2));
+                return Integer.parseInt(rest);
             } catch (NumberFormatException e) {
                 return -1;
             }
@@ -103,6 +109,18 @@ final class JdkSourceLevelSupport {
         } catch (NumberFormatException e) {
             return -1;
         }
+    }
+
+    /**
+     * Returns the index of the first non-digit character in the string, or -1 if all characters are digits.
+     */
+    private static int indexOfNonDigit(String s) {
+        for (int i = 0; i < s.length(); i++) {
+            if (!Character.isDigit(s.charAt(i))) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /**
