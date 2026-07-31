@@ -167,6 +167,8 @@ public class DefaultDependencyManagementImporter implements DependencyManagement
         if (dependencySource == null
                 || bomSource == null
                 || Objects.equals(dependencySource.getModelId(), bomSource.getModelId())) {
+            // Use forceCopy=true since we only set importedFrom (no field changes that would
+            // trigger copy-on-write), and build immediately as we need the immutable result.
             return Dependency.newBuilder(dependency, true)
                     .importedFrom(bomLocation)
                     .build();

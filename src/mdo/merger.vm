@@ -101,6 +101,17 @@ public class ${className} {
         return builder.build();
     }
 
+    /**
+     * Merges the source into a builder based on the target, returning the Builder
+     * without calling build(). This allows callers to defer the build() call and
+     * avoid intermediate immutable object allocations in multi-stage pipelines.
+     */
+    protected ${class.name}.Builder merge${class.name}ToBuilder(${class.name} target, ${class.name} source, boolean sourceDominant, Map<Object, Object> context) {
+        ${class.name}.Builder builder = ${class.name}.newBuilder(target);
+        merge${class.name}(builder, target, source, sourceDominant, context);
+        return builder;
+    }
+
     protected void merge${class.name}(${class.name}.Builder builder, ${class.name} target, ${class.name} source, boolean sourceDominant, Map<Object, Object> context) {
     #if ( $class.superClass )
         merge${class.superClass}(builder, target, source, sourceDominant, context);

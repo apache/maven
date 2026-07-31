@@ -58,33 +58,39 @@ public class DefaultDependencyManagementInjector implements DependencyManagement
         public Model mergeManagedDependencies(Model model) {
             DependencyManagement dependencyManagement = model.getDependencyManagement();
             if (dependencyManagement != null) {
-                Map<Object, Dependency> dependencies = new HashMap<>();
+                // Use Builders to accumulate changes across all managed dependencies,
+                // deferring build() until after all merges are complete
+                Map<Object, Dependency> originalDeps = new HashMap<>();
+                Map<Object, Dependency.Builder> builderDeps = new HashMap<>();
                 Map<Object, Object> context = Collections.emptyMap();
 
                 for (Dependency dependency : model.getDependencies()) {
                     Object key = getDependencyKey().apply(dependency);
-                    dependencies.put(key, dependency);
+                    originalDeps.put(key, dependency);
                 }
 
                 boolean modified = false;
                 for (Dependency managedDependency : dependencyManagement.getDependencies()) {
                     Object key = getDependencyKey().apply(managedDependency);
-                    Dependency dependency = dependencies.get(key);
+                    Dependency dependency = originalDeps.get(key);
                     if (dependency != null) {
-                        Dependency merged = mergeDependency(dependency, managedDependency, false, context);
-                        if (merged != dependency) {
-                            dependencies.put(key, merged);
+                        Dependency.Builder merged =
+                                mergeDependencyToBuilder(dependency, managedDependency, false, context);
+                        // Only track modifications if the builder actually changed something
+                        if (merged != null) {
+                            builderDeps.put(key, merged);
                             modified = true;
                         }
                     }
                 }
 
                 if (modified) {
-                    List<Dependency> newDeps = new ArrayList<>(dependencies.size());
+                    List<Dependency> newDeps = new ArrayList<>(originalDeps.size());
                     for (Dependency dep : model.getDependencies()) {
                         Object key = getDependencyKey().apply(dep);
-                        Dependency dependency = dependencies.get(key);
-                        newDeps.add(dependency);
+                        Dependency.Builder builder = builderDeps.get(key);
+                        // Only build() the dependencies that were actually merged
+                        newDeps.add(builder != null ? builder.build() : dep);
                     }
                     return Model.newBuilder(model).dependencies(newDeps).build();
                 }

@@ -151,6 +151,8 @@ public class ${class.name}
     #if ( $locationTracking && ! $class.superClass )
     /** Locations */
     final Map<Object, InputLocation> locations;
+    /** Cached hash code for the locations map, precomputed at build time */
+    final int locationsHashCode;
     /** Location tracking */
     final InputLocation importedFrom;
     #end
@@ -180,6 +182,7 @@ public class ${class.name}
     #end
     #if ( $locationTracking && ! $class.superClass )
         this.locations = builder.computeLocations();
+        this.locationsHashCode = this.locations.hashCode();
         this.importedFrom = builder.importedFrom;
     #end
     }
@@ -262,6 +265,26 @@ public class ${class.name}
 
     protected Stream<Object> getLocationKeyStream() {
         return locations.keySet().stream();
+    }
+
+    /**
+     * Gets the locations map. Provides direct access to avoid individual key lookups
+     * when comparing or hashing all locations at once.
+     *
+     * @return an unmodifiable map of locations, never {@code null}
+     */
+    public Map<Object, InputLocation> getLocations() {
+        return locations;
+    }
+
+    /**
+     * Gets the precomputed hash code for the locations map.
+     * This avoids re-iterating the map entries during pooling/interning operations.
+     *
+     * @return the cached hash code of the locations map
+     */
+    public int getLocationsHashCode() {
+        return locationsHashCode;
     }
 
     /**
@@ -475,6 +498,33 @@ public class ${class.name}
         }
 
     #end
+    #foreach ( $field in $allFields )
+      #set ( $cap = $Helper.capitalise( $field.name ) )
+      #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
+      ## Builder stores List fields as Collection — match that type for the getter
+      #if ( $type.startsWith("List<") )
+        #set ( $type = ${type.replace('List<','Collection<')} )
+      #end
+      #if ( $type == "boolean" || $type == "Boolean" )
+        #set ( $pfx = "is" )
+      #else
+        #set ( $pfx = "get" )
+      #end
+      #if ( $type == "boolean" )
+        public ${type} ${pfx}${cap}() {
+            return ${field.name} != null ? ${field.name} : (base != null ? base.${pfx}${cap}() : ${field.defaultValue});
+        }
+      #elseif ( $type == "int" )
+        public ${type} ${pfx}${cap}() {
+            return ${field.name} != null ? ${field.name} : (base != null ? base.${pfx}${cap}() : ${field.defaultValue});
+        }
+      #else
+        public ${type} ${pfx}${cap}() {
+            return ${field.name} != null ? ${field.name} : (base != null ? base.${pfx}${cap}() : null);
+        }
+      #end
+
+    #end
 
     #if ( $locationTracking )
         @Nonnull
@@ -492,6 +542,17 @@ public class ${class.name}
         public Builder importedFrom(InputLocation importedFrom) {
             this.importedFrom = importedFrom;
             return this;
+        }
+
+        public InputLocation getLocation(Object key) {
+            if (locations != null && locations.containsKey(key)) {
+                return locations.get(key);
+            }
+            return base != null ? base.getLocation(key) : null;
+        }
+
+        public InputLocation getImportedFrom() {
+            return importedFrom != null ? importedFrom : (base != null ? base.getImportedFrom() : null);
         }
 
     #end
@@ -518,14 +579,16 @@ public class ${class.name}
             Map<Object, InputLocation> newlocs = locations != null ? locations : Map.of();
             Map<Object, InputLocation> oldlocs = base != null ? base.locations : Map.of();
             if (newlocs.isEmpty()) {
-                return Map.copyOf(oldlocs);
+                return oldlocs;
             }
             if (oldlocs.isEmpty()) {
                 return Map.copyOf(newlocs);
             }
-            return Stream.concat(newlocs.entrySet().stream(), oldlocs.entrySet().stream())
-                    // Keep value from newlocs in case of duplicates
-                    .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue, (v1, v2) -> v1));
+            // Use HashMap.putAll instead of Stream.concat().collect() to avoid
+            // Stream allocation and intermediate Map.Entry iteration overhead
+            HashMap<Object, InputLocation> merged = new HashMap<>(oldlocs);
+            merged.putAll(newlocs); // newlocs entries override oldlocs (same semantics as before)
+            return Map.copyOf(merged);
         }
     #end
     }
