@@ -163,7 +163,7 @@ public class DefaultToolchainManager implements ToolchainManager {
         // 2. Fall back to lazy filesystem discovery
         if (bestMatch == null && discoverer != null) {
             logger.debug("No compatible JDK in configured toolchains, discovering JDKs from filesystem...");
-            List<ToolchainModel> discoveredModels = discoverer.discoverToolchains();
+            List<ToolchainModel> discoveredModels = discoverer.discoverToolchains(session.getSystemProperties());
             List<Toolchain> discoveredToolchains = discoveredModels.stream()
                     .map(this::createToolchain)
                     .flatMap(Optional::stream)
