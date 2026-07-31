@@ -396,6 +396,8 @@ under the License.
               <exclude>org.apache.maven.toolchain.ToolchainManagerPrivate</exclude>
               <exclude>org.apache.maven.toolchain.ToolchainPrivate</exclude>
               <exclude>org.apache.maven.toolchain.ToolchainsBuilder</exclude>
+              <!-- PluginValidationManager: String issue → BuilderProblem problem (4.1.0) -->
+              <exclude>org.apache.maven.plugin.PluginValidationManager</exclude>
             </excludes>
           </parameter>
         </configuration>
