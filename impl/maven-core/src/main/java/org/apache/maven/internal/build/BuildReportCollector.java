@@ -102,7 +102,8 @@ public final class BuildReportCollector extends AbstractEventSpy {
     private static final Set<String> EXCLUDED_LOGGERS = Set.of(
             BuildReportCollector.class.getName(),
             "org.apache.maven.DefaultMaven",
-            "org.apache.maven.project.collector.DefaultProjectsSelector");
+            "org.apache.maven.project.collector.DefaultProjectsSelector",
+            "org.apache.maven.plugin.internal.DefaultPluginValidationManager");
 
     private final DefaultDiagnosticCollector diagnosticCollector;
 

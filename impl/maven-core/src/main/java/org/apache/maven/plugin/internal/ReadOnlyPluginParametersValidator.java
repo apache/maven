@@ -48,6 +48,11 @@ class ReadOnlyPluginParametersValidator extends AbstractMavenPluginDescriptorSou
     }
 
     @Override
+    protected String getValidationKeyPrefix() {
+        return "readonly-param";
+    }
+
+    @Override
     protected void doValidate(
             MavenSession mavenSession,
             MojoDescriptor mojoDescriptor,
@@ -79,7 +84,7 @@ class ReadOnlyPluginParametersValidator extends AbstractMavenPluginDescriptorSou
                     mavenSession,
                     mojoDescriptor,
                     mojoClass,
-                    formatParameter(parameter));
+                    buildParameterProblem(parameter));
         }
     }
 }
