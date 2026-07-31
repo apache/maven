@@ -51,18 +51,35 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class DefaultToolchainManager implements ToolchainManager {
     private final Map<String, ToolchainFactory> factories;
+    private final JdkToolchainDiscoverer discoverer;
     private final Logger logger;
 
     @Inject
-    public DefaultToolchainManager(Map<String, ToolchainFactory> factories) {
-        this(factories, null);
+    public DefaultToolchainManager(Map<String, ToolchainFactory> factories, JdkToolchainDiscoverer discoverer) {
+        this(factories, discoverer, null);
     }
 
     /**
-     * Used for tests only
+     * Used for tests only (no discoverer)
+     */
+    protected DefaultToolchainManager(Map<String, ToolchainFactory> factories) {
+        this(factories, null, null);
+    }
+
+    /**
+     * Used for tests only (no discoverer, custom logger)
      */
     protected DefaultToolchainManager(Map<String, ToolchainFactory> factories, Logger logger) {
+        this(factories, null, logger);
+    }
+
+    /**
+     * Used for tests only (full control)
+     */
+    protected DefaultToolchainManager(
+            Map<String, ToolchainFactory> factories, JdkToolchainDiscoverer discoverer, Logger logger) {
         this.factories = factories;
+        this.discoverer = discoverer;
         this.logger = logger != null ? logger : LoggerFactory.getLogger(DefaultToolchainManager.class);
     }
 
@@ -119,8 +136,9 @@ public class DefaultToolchainManager implements ToolchainManager {
      * Attempts to automatically select a JDK toolchain when the running JDK
      * does not support the project's required {@code --source}/{@code --release} level.
      * <p>
-     * Searches configured toolchains for the newest JDK that supports the required
-     * source level. If found, emits a warning and returns it.
+     * First searches configured toolchains (from {@code toolchains.xml}), then falls back
+     * to lazy filesystem discovery. Normal builds pay zero cost — discovery only runs
+     * when the running JDK is incompatible and no configured toolchain matches.
      */
     Optional<Toolchain> autoSelectJdkToolchain(Session session) {
         int requiredSourceLevel = getProjectRequiredSourceLevel(session);
@@ -138,22 +156,19 @@ public class DefaultToolchainManager implements ToolchainManager {
             return Optional.empty();
         }
 
-        // Search available toolchains for a compatible JDK, preferring the newest
-        List<Toolchain> allToolchains = getToolchains(session, "jdk", null);
-        Toolchain bestMatch = null;
-        int bestVersion = 0;
+        // 1. Search configured toolchains (from toolchains.xml)
+        List<Toolchain> configuredToolchains = getToolchains(session, "jdk", null);
+        Toolchain bestMatch = findNewestCompatible(configuredToolchains, requiredSourceLevel);
 
-        for (Toolchain tc : allToolchains) {
-            if (tc instanceof JavaToolchain jtc && jtc.getJavaVersion() != null) {
-                int tcMajor = JdkSourceLevelSupport.normalizeSourceLevel(
-                        jtc.getJavaVersion().toString());
-                if (tcMajor > 0 && JdkSourceLevelSupport.supportsSourceLevel(tcMajor, requiredSourceLevel)) {
-                    if (tcMajor > bestVersion) {
-                        bestVersion = tcMajor;
-                        bestMatch = tc;
-                    }
-                }
-            }
+        // 2. Fall back to lazy filesystem discovery
+        if (bestMatch == null && discoverer != null) {
+            logger.debug("No compatible JDK in configured toolchains, discovering JDKs from filesystem...");
+            List<ToolchainModel> discoveredModels = discoverer.discoverToolchains();
+            List<Toolchain> discoveredToolchains = discoveredModels.stream()
+                    .map(this::createToolchain)
+                    .flatMap(Optional::stream)
+                    .toList();
+            bestMatch = findNewestCompatible(discoveredToolchains, requiredSourceLevel);
         }
 
         if (bestMatch != null) {
@@ -172,6 +187,27 @@ public class DefaultToolchainManager implements ToolchainManager {
         }
 
         return Optional.empty();
+    }
+
+    /**
+     * Finds the newest JDK toolchain that supports the given source level.
+     */
+    private Toolchain findNewestCompatible(List<Toolchain> toolchains, int requiredSourceLevel) {
+        Toolchain bestMatch = null;
+        int bestVersion = 0;
+        for (Toolchain tc : toolchains) {
+            if (tc instanceof JavaToolchain jtc && jtc.getJavaVersion() != null) {
+                int tcMajor = JdkSourceLevelSupport.normalizeSourceLevel(
+                        jtc.getJavaVersion().toString());
+                if (tcMajor > 0 && JdkSourceLevelSupport.supportsSourceLevel(tcMajor, requiredSourceLevel)) {
+                    if (tcMajor > bestVersion) {
+                        bestVersion = tcMajor;
+                        bestMatch = tc;
+                    }
+                }
+            }
+        }
+        return bestMatch;
     }
 
     /**
