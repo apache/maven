@@ -49,6 +49,11 @@ import org.slf4j.LoggerFactory;
  * <p>
  * JDK version is read from the {@code release} file present in every JDK since Java 9
  * (and backported to JDK 8u updates), avoiding the need to execute {@code java} processes.
+ * <p>
+ * All environment and system property access goes through the {@code properties} map
+ * supplied by the caller (typically {@link org.apache.maven.api.Session#getSystemProperties()}),
+ * where environment variables are available as {@code env.VAR_NAME} entries and JVM system
+ * properties as plain keys ({@code java.home}, {@code user.home}, etc.).
  */
 @Named
 @Singleton
@@ -59,15 +64,20 @@ public class JdkToolchainDiscoverer {
     private volatile List<ToolchainModel> cachedToolchains;
 
     /**
-     * Returns discovered JDK toolchain models. Results are cached after first invocation.
+     * Returns discovered JDK toolchain models. Results are cached after first invocation
+     * (the properties map from the first call wins; subsequent calls with different
+     * properties still return the cached result, since JDK locations don't change mid-build).
+     *
+     * @param properties system properties map (from {@code Session.getSystemProperties()}).
+     *                   Environment variables are expected as {@code env.VAR_NAME} entries.
      */
-    public List<ToolchainModel> discoverToolchains() {
+    public List<ToolchainModel> discoverToolchains(Map<String, String> properties) {
         List<ToolchainModel> result = cachedToolchains;
         if (result == null) {
             synchronized (this) {
                 result = cachedToolchains;
                 if (result == null) {
-                    result = doDiscover();
+                    result = doDiscover(properties);
                     cachedToolchains = result;
                 }
             }
@@ -75,11 +85,11 @@ public class JdkToolchainDiscoverer {
         return result;
     }
 
-    private List<ToolchainModel> doDiscover() {
+    private List<ToolchainModel> doDiscover(Map<String, String> properties) {
         Set<Path> candidates = new LinkedHashSet<>();
-        collectFromEnvironment(candidates);
-        collectFromToolManagers(candidates);
-        collectFromSystemDirectories(candidates);
+        collectFromEnvironment(candidates, properties);
+        collectFromToolManagers(candidates, properties);
+        collectFromSystemDirectories(candidates, properties);
 
         List<ToolchainModel> toolchains = new ArrayList<>();
         for (Path candidate : candidates) {
@@ -100,34 +110,33 @@ public class JdkToolchainDiscoverer {
 
     /**
      * Collects JDK candidates from environment variables matching {@code JAVA*_HOME}.
+     * Environment variables are read from the properties map as {@code env.VAR_NAME} entries.
      */
-    void collectFromEnvironment(Set<Path> candidates) {
-        // Current JDK
-        String javaHome = System.getProperty("java.home");
+    void collectFromEnvironment(Set<Path> candidates, Map<String, String> properties) {
+        // Current JDK (from java.home system property)
+        String javaHome = properties.get("java.home");
         if (javaHome != null) {
             addCandidate(candidates, Paths.get(javaHome));
         }
 
-        // JAVA*_HOME env vars (e.g. JAVA11_HOME, JAVA17_HOME)
-        for (Map.Entry<String, String> entry : System.getenv().entrySet()) {
+        // env.JAVA*_HOME env vars (e.g. env.JAVA11_HOME, env.JAVA17_HOME, env.JAVA_HOME)
+        for (Map.Entry<String, String> entry : properties.entrySet()) {
             String name = entry.getKey();
-            if (name.startsWith("JAVA") && name.endsWith("_HOME")) {
+            if (name.startsWith("env.JAVA") && name.endsWith("_HOME")) {
                 addCandidate(candidates, Paths.get(entry.getValue()));
             }
-        }
-
-        // JAVA_HOME
-        String envJavaHome = System.getenv("JAVA_HOME");
-        if (envJavaHome != null) {
-            addCandidate(candidates, Paths.get(envJavaHome));
         }
     }
 
     /**
      * Collects JDK candidates from common tool manager directories under the user's home.
      */
-    void collectFromToolManagers(Set<Path> candidates) {
-        Path userHome = Paths.get(System.getProperty("user.home"));
+    void collectFromToolManagers(Set<Path> candidates, Map<String, String> properties) {
+        String userHomeProp = properties.get("user.home");
+        if (userHomeProp == null) {
+            return;
+        }
+        Path userHome = Paths.get(userHomeProp);
 
         // IntelliJ IDEA / common
         scanSubdirectories(candidates, userHome.resolve(".jdks"));
@@ -161,11 +170,11 @@ public class JdkToolchainDiscoverer {
     /**
      * Collects JDK candidates from OS-specific system directories.
      */
-    void collectFromSystemDirectories(Set<Path> candidates) {
+    void collectFromSystemDirectories(Set<Path> candidates, Map<String, String> properties) {
         if (Os.IS_WINDOWS) {
-            collectWindowsDirectories(candidates);
+            collectWindowsDirectories(candidates, properties);
         } else if (Os.isFamily("mac")) {
-            collectMacDirectories(candidates);
+            collectMacDirectories(candidates, properties);
         } else {
             collectLinuxDirectories(candidates);
         }
@@ -181,14 +190,17 @@ public class JdkToolchainDiscoverer {
         scanSubdirectories(candidates, Paths.get("/opt/hostedtoolcache"));
     }
 
-    private void collectMacDirectories(Set<Path> candidates) {
-        Path userHome = Paths.get(System.getProperty("user.home"));
+    private void collectMacDirectories(Set<Path> candidates, Map<String, String> properties) {
         scanSubdirectories(candidates, Paths.get("/Library/Java/JavaVirtualMachines"));
-        scanSubdirectories(
-                candidates, userHome.resolve("Library").resolve("Java").resolve("JavaVirtualMachines"));
+        String userHomeProp = properties.get("user.home");
+        if (userHomeProp != null) {
+            Path userHome = Paths.get(userHomeProp);
+            scanSubdirectories(
+                    candidates, userHome.resolve("Library").resolve("Java").resolve("JavaVirtualMachines"));
+        }
     }
 
-    private void collectWindowsDirectories(Set<Path> candidates) {
+    private void collectWindowsDirectories(Set<Path> candidates, Map<String, String> properties) {
         Path progFiles = Paths.get("C:\\Program Files");
         scanSubdirectories(candidates, progFiles.resolve("Java"));
         scanSubdirectories(candidates, progFiles.resolve("Eclipse Adoptium"));
@@ -196,8 +208,11 @@ public class JdkToolchainDiscoverer {
         scanSubdirectories(candidates, progFiles.resolve("Amazon Corretto"));
         scanSubdirectories(candidates, progFiles.resolve("BellSoft"));
         // Scoop
-        Path userHome = Paths.get(System.getProperty("user.home"));
-        scanSubdirectories(candidates, userHome.resolve("scoop").resolve("apps"));
+        String userHomeProp = properties.get("user.home");
+        if (userHomeProp != null) {
+            Path userHome = Paths.get(userHomeProp);
+            scanSubdirectories(candidates, userHome.resolve("scoop").resolve("apps"));
+        }
     }
 
     /**

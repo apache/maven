@@ -21,7 +21,10 @@ package org.apache.maven.impl;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.apache.maven.api.toolchain.ToolchainModel;
 import org.junit.jupiter.api.Test;
@@ -157,11 +160,54 @@ class JdkToolchainDiscovererTest {
 
     @Test
     void discoverToolchainsIsCached() {
+        Map<String, String> properties = Map.of("user.home", tempDir.toString());
         // Two calls should return the same list instance (cached)
-        var first = discoverer.discoverToolchains();
-        var second = discoverer.discoverToolchains();
+        var first = discoverer.discoverToolchains(properties);
+        var second = discoverer.discoverToolchains(properties);
         assertNotNull(first);
         assertTrue(first == second, "Expected cached result (same instance)");
+    }
+
+    @Test
+    void collectFromEnvironmentUsesProperties() throws IOException {
+        Path jdkHome = createFakeJdk(tempDir, "jdk-21");
+        Map<String, String> properties = Map.of(
+                "java.home", jdkHome.toString(),
+                "env.JAVA17_HOME", tempDir.resolve("jdk-17-env").toString());
+
+        Set<Path> candidates = new LinkedHashSet<>();
+        discoverer.collectFromEnvironment(candidates, properties);
+
+        assertTrue(candidates.stream().anyMatch(p -> p.toString().contains("jdk-21")), "Should include java.home");
+        assertTrue(
+                candidates.stream().anyMatch(p -> p.toString().contains("jdk-17-env")),
+                "Should include env.JAVA17_HOME");
+    }
+
+    @Test
+    void collectFromToolManagersUsesProperties() throws IOException {
+        Path fakeHome = tempDir.resolve("fakehome");
+        Path jdksDir = fakeHome.resolve(".jdks");
+        Path jdk21 = jdksDir.resolve("temurin-21");
+        Files.createDirectories(jdk21);
+
+        Map<String, String> properties = Map.of("user.home", fakeHome.toString());
+
+        Set<Path> candidates = new LinkedHashSet<>();
+        discoverer.collectFromToolManagers(candidates, properties);
+
+        assertTrue(
+                candidates.stream().anyMatch(p -> p.toString().contains("temurin-21")), "Should find JDK in ~/.jdks");
+    }
+
+    @Test
+    void collectFromToolManagersSkipsWhenNoUserHome() {
+        Map<String, String> properties = Map.of();
+
+        Set<Path> candidates = new LinkedHashSet<>();
+        discoverer.collectFromToolManagers(candidates, properties);
+
+        assertTrue(candidates.isEmpty(), "Should collect nothing without user.home");
     }
 
     private Path createFakeJdk(Path parent, String name) throws IOException {
