@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -82,6 +83,11 @@ class ReactorReader implements MavenWorkspaceReader {
     private Path projectLocalRepository;
     // projectId -> Deque<lifecycle>
     private final Map<String, Deque<String>> lifecycles = new ConcurrentHashMap<>();
+    // Coordinates access to project-local-repo between clean and install operations.
+    // When the project that owns the project-local-repo directory is being cleaned
+    // (maven-clean-plugin deletes its entire target/ directory), the write lock prevents
+    // concurrent installs from writing into the directory being deleted.
+    private final ReentrantReadWriteLock projectLocalRepoLock = new ReentrantReadWriteLock();
 
     @Inject
     ReactorReader(MavenSession session) {
@@ -352,6 +358,11 @@ class ReactorReader implements MavenWorkspaceReader {
      * The mojo started event is also captured to determine the lifecycle
      * phases the project has been through.
      *
+     * <p>When the project that owns the project-local-repo directory enters its clean phase,
+     * we acquire a write lock to prevent concurrent installs from writing into the directory
+     * while maven-clean-plugin is deleting it. The lock is released when the clean mojo
+     * succeeds or fails.</p>
+     *
      * @param event the execution event
      */
     private void processEvent(ExecutionEvent event) {
@@ -360,6 +371,9 @@ class ReactorReader implements MavenWorkspaceReader {
             case MojoStarted:
                 String phase = event.getMojoExecution().getLifecyclePhase();
                 if (phase != null) {
+                    if ("clean".equals(phase) && isProjectLocalRepoOwner(project)) {
+                        projectLocalRepoLock.writeLock().lock();
+                    }
                     Deque<String> phases = getLifecycles(project);
                     if (!Objects.equals(phase, phases.peekLast())) {
                         phases.addLast(phase);
@@ -371,10 +385,24 @@ class ReactorReader implements MavenWorkspaceReader {
                     }
                 }
                 break;
+            case MojoSucceeded:
+            case MojoFailed:
+                String endedPhase = event.getMojoExecution().getLifecyclePhase();
+                if ("clean".equals(endedPhase) && isProjectLocalRepoOwner(project)) {
+                    if (projectLocalRepoLock.isWriteLockedByCurrentThread()) {
+                        projectLocalRepoLock.writeLock().unlock();
+                    }
+                }
+                break;
             case ProjectSucceeded:
             case ForkedProjectSucceeded:
-                synchronized (project) {
-                    installIntoProjectLocalRepository(project);
+                projectLocalRepoLock.readLock().lock();
+                try {
+                    synchronized (project) {
+                        installIntoProjectLocalRepository(project);
+                    }
+                } finally {
+                    projectLocalRepoLock.readLock().unlock();
                 }
                 break;
             default:
@@ -384,6 +412,17 @@ class ReactorReader implements MavenWorkspaceReader {
 
     private Deque<String> getLifecycles(MavenProject project) {
         return lifecycles.computeIfAbsent(project.getId(), k -> new ArrayDeque<>());
+    }
+
+    /**
+     * Checks whether the given project's build directory contains the project-local-repo.
+     * When this project's clean phase runs, maven-clean-plugin will delete the build directory,
+     * which would race with concurrent installs writing to project-local-repo.
+     */
+    private boolean isProjectLocalRepoOwner(MavenProject project) {
+        Path projectLocalRepo = getProjectLocalRepo();
+        Path buildDir = Paths.get(project.getBuild().getDirectory());
+        return projectLocalRepo.startsWith(buildDir);
     }
 
     /**
