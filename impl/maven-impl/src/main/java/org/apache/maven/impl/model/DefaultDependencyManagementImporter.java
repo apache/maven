@@ -70,29 +70,65 @@ public class DefaultDependencyManagementImporter implements DependencyManagement
 
             Set<String> directDependencies = new HashSet<>(dependencies.keySet());
 
-            for (DependencyManagement source : sources) {
-                for (Dependency dependency : source.getDependencies()) {
-                    String key = dependency.getManagementKey();
-                    Dependency present = dependencies.putIfAbsent(key, dependency);
-                    if (present != null && !equals(dependency, present) && !directDependencies.contains(key)) {
-                        // TODO: https://issues.apache.org/jira/browse/MNG-8004
-                        problems.add(
-                                Severity.WARNING,
-                                Version.V40,
-                                "Ignored POM import for: " + toString(dependency) + " as already imported "
-                                        + toString(present) + ". Add the conflicting managed dependency directly "
-                                        + "to the dependencyManagement section of the POM.");
-                    }
-                    if (present == null && request.isLocationTracking()) {
-                        Dependency updatedDependency = updateWithImportedFrom(dependency, source);
-                        dependencies.put(key, updatedDependency);
-                    }
-                }
-            }
+            mergeSources(sources, dependencies, directDependencies, request, problems);
 
             return target.withDependencyManagement(depMgmt.withDependencies(dependencies.values()));
         }
         return target;
+    }
+
+    @Override
+    public void importManagement(
+            Model.Builder builder,
+            List<? extends DependencyManagement> sources,
+            ModelBuilderRequest request,
+            ModelProblemCollector problems) {
+        if (sources != null && !sources.isEmpty()) {
+            Map<String, Dependency> dependencies = new LinkedHashMap<>();
+
+            DependencyManagement depMgmt = builder.getDependencyManagement();
+
+            if (depMgmt != null) {
+                for (Dependency dependency : depMgmt.getDependencies()) {
+                    dependencies.put(dependency.getManagementKey(), dependency);
+                }
+            } else {
+                depMgmt = DependencyManagement.newInstance();
+            }
+
+            Set<String> directDependencies = new HashSet<>(dependencies.keySet());
+
+            mergeSources(sources, dependencies, directDependencies, request, problems);
+
+            builder.dependencyManagement(depMgmt.withDependencies(dependencies.values()));
+        }
+    }
+
+    private void mergeSources(
+            List<? extends DependencyManagement> sources,
+            Map<String, Dependency> dependencies,
+            Set<String> directDependencies,
+            ModelBuilderRequest request,
+            ModelProblemCollector problems) {
+        for (DependencyManagement source : sources) {
+            for (Dependency dependency : source.getDependencies()) {
+                String key = dependency.getManagementKey();
+                Dependency present = dependencies.putIfAbsent(key, dependency);
+                if (present != null && !equals(dependency, present) && !directDependencies.contains(key)) {
+                    // TODO: https://issues.apache.org/jira/browse/MNG-8004
+                    problems.add(
+                            Severity.WARNING,
+                            Version.V40,
+                            "Ignored POM import for: " + toString(dependency) + " as already imported "
+                                    + toString(present) + ". Add the conflicting managed dependency directly "
+                                    + "to the dependencyManagement section of the POM.");
+                }
+                if (present == null && request.isLocationTracking()) {
+                    Dependency updatedDependency = updateWithImportedFrom(dependency, source);
+                    dependencies.put(key, updatedDependency);
+                }
+            }
+        }
     }
 
     private String toString(Dependency dependency) {

@@ -1031,12 +1031,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
             }
 
-            // dependency management import (complex — needs Model access internally)
-            Model builtForImport = builder.build();
-            Model imported = importDependencyManagement(builtForImport, importIds);
-            if (imported != builtForImport) {
-                builder.reset(imported);
-            }
+            // dependency management import — works directly on the builder
+            importDependencyManagement(builder, resultModel, importIds);
 
             // dependency management injection
             dependencyManagementInjector.injectManagement(builder, request, this);
@@ -2065,11 +2061,11 @@ public class DefaultModelBuilder implements ModelBuilder {
             return new ParentModelWithProfiles(injectedParentModel.withParent(null), parentActivePomProfiles);
         }
 
-        private Model importDependencyManagement(Model model, Collection<String> importIds) {
-            DependencyManagement depMgmt = model.getDependencyManagement();
+        private void importDependencyManagement(Model.Builder builder, Model model, Collection<String> importIds) {
+            DependencyManagement depMgmt = builder.getDependencyManagement();
 
             if (depMgmt == null) {
-                return model;
+                return;
             }
 
             String importing = model.getGroupId() + ':' + model.getArtifactId() + ':' + model.getVersion();
@@ -2102,10 +2098,11 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             importIds.remove(importing);
 
-            model = model.withDependencyManagement(
-                    model.getDependencyManagement().withDependencies(deps));
+            // Set the deps (with import-scoped entries removed) back on the builder
+            builder.dependencyManagement(depMgmt.withDependencies(deps));
 
-            return dependencyManagementImporter.importManagement(model, importMgmts, request, this);
+            // Merge BOM deps directly into the builder
+            dependencyManagementImporter.importManagement(builder, importMgmts, request, this);
         }
 
         private DependencyManagement loadDependencyManagement(Dependency dependency, Collection<String> importIds) {
