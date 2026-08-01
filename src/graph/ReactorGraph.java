@@ -89,6 +89,11 @@ public class ReactorGraph {
                 String nodeName = oldNodeName;
                 if (originalNode.get("label") instanceof Label l) {
                     nodeName = l.value();
+                    // fix "guice\njar:classes" label caused by classifier
+                    int i = nodeName.indexOf('\\');
+                    if (i > 0) {
+                        nodeName = nodeName.substring(0, i);
+                    }
                 }
                 MutableNode newNode = mutNode(nodeName);
                 nodeMap.put(nodeName, newNode);
