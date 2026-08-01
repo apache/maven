@@ -187,10 +187,10 @@ public class ReactorGraph {
             String headerColor = clusterName.startsWith("Maven") ? "black" : "#808080";  // #808080 is a middle gray
             String prefix;
             switch (clusterName) {
-                case "MavenAPI": prefix = "../api/"; break;
-                case "MavenImplementation": prefix = "../impl/"; break;
-                case "MavenCompatibility": prefix = "../compat/"; break;
-                case "MavenResolver": prefix = "https://maven.apache.org/resolver/"; break;
+                case "Maven4API": prefix = "../api/"; break;
+                case "Maven4Implementation": prefix = "../impl/"; break;
+                case "Maven3Compatibility": prefix = "../compat/"; break;
+                case "MavenResolver2": prefix = "https://maven.apache.org/resolver/"; break;
                 default: prefix = null;
             }
 
@@ -252,9 +252,9 @@ public class ReactorGraph {
                 .setDirected(true)
                 .graphAttrs().add(Rank.inSubgraph(Rank.RankType.SAME))
                 .add(
-                        mutNode("MavenResolver"),
-                        mutNode("MavenAPI"),
-                        mutNode("MavenImplementation")
+                        mutNode("MavenResolver2"),
+                        mutNode("Maven4API"),
+                        mutNode("Maven4Implementation")
                 );
         highLevelGraph.add(topGroup);
 
