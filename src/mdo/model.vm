@@ -20,6 +20,11 @@
 #
 #set ( $package = "${packageModelV4}" )
 #set ( $root = $model.getClass( $model.getRoot($version), $version ) )
+## Build set of model class names for detecting list-of-model-object fields
+#set ( $modelClassNames = [] )
+#foreach ( $c in $model.allClasses )
+  #set ( $dummy = $modelClassNames.add($c.name) )
+#end
 #foreach ( $class in $model.allClasses )
   #set ( $ancestors = $Helper.ancestors( $class ) )
   #set ( $allFields = [] )
@@ -170,7 +175,22 @@ public class ${class.name}
         this.modelEncoding = builder.modelEncoding != null ? builder.modelEncoding : (builder.base != null ? builder.base.modelEncoding :  "UTF-8");
     #end
     #foreach ( $field in $class.getFields($version) )
-      #if ( $field.type == "java.util.List" || $field.type == "java.util.Properties" || $field.type == "java.util.Map" )
+      #set ( $cType = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
+      #set ( $cIsModelObjList = false )
+      #if ( $cType.startsWith("List<") && $field.to && $field.to != "String" && $modelClassNames.contains($field.to) )
+        #set ( $cIsModelObjList = true )
+      #end
+      #if ( $cIsModelObjList )
+        if (builder.${field.name} != null) {
+            ArrayList<${field.to}> bl = new ArrayList<>(builder.${field.name}.size());
+            for (${field.to}.Builder b : builder.${field.name}) {
+                bl.add(b.build());
+            }
+            this.${field.name} = ImmutableCollections.copy(bl);
+        } else {
+            this.${field.name} = ImmutableCollections.copy(builder.base != null ? builder.base.${field.name} : null);
+        }
+      #elseif ( $field.type == "java.util.List" || $field.type == "java.util.Properties" || $field.type == "java.util.Map" )
         this.${field.name} = ImmutableCollections.copy(builder.${field.name} != null ? builder.${field.name} : (builder.base != null ? builder.base.${field.name} : null));
       #else
         #if ( $field.type == "boolean" || $field.type == "int" )
@@ -414,8 +434,14 @@ public class ${class.name}
     #end
     #foreach ( $field in $class.getFields($version) )
       #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
+      #set ( $isModelObjList = false )
       #if ( $type.startsWith("List<") )
-        #set ( $type = ${type.replace('List<','Collection<')} )
+        #if ( $field.to && $field.to != "String" && $modelClassNames.contains($field.to) )
+          #set ( $isModelObjList = true )
+          #set ( $type = "Collection<${field.to}.Builder>" )
+        #else
+          #set ( $type = ${type.replace('List<','Collection<')} )
+        #end
       #end
       #if ( $type == 'boolean' )
         Boolean ${field.name};
@@ -458,7 +484,22 @@ public class ${class.name}
     #end
             if (forceCopy) {
     #foreach ( $field in $class.getFields($version) )
+      #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
+      #set ( $fcIsModelObjList = false )
+      #if ( $type.startsWith("List<") && $field.to && $field.to != "String" && $modelClassNames.contains($field.to) )
+        #set ( $fcIsModelObjList = true )
+      #end
+      #if ( $fcIsModelObjList )
+                if (base.${field.name} != null && !base.${field.name}.isEmpty()) {
+                    ArrayList<${field.to}.Builder> bl = new ArrayList<>(base.${field.name}.size());
+                    for (${field.to} v : base.${field.name}) {
+                        bl.add(${field.to}.newBuilder(v, false));
+                    }
+                    this.${field.name} = bl;
+                }
+      #else
                 this.${field.name} = base.${field.name};
+      #end
     #end
     #if ( $locationTracking )
                 this.locations = base.locations;
@@ -484,33 +525,100 @@ public class ${class.name}
 
     #end
     #foreach ( $field in $allFields )
+      #set ( $cap = $Helper.capitalise( $field.name ) )
       #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
+      #set ( $sIsModelObjList = false )
       #if ( $type.startsWith("List<") )
-        #set ( $type = ${type.replace('List<','Collection<')} )
+        #if ( $field.to && $field.to != "String" && $modelClassNames.contains($field.to) )
+          #set ( $sIsModelObjList = true )
+        #else
+          #set ( $type = ${type.replace('List<','Collection<')} )
+        #end
       #end
       #foreach( $ann in ${field.annotations} )
         ${ann}
       #end
+      #if ( $sIsModelObjList )
+        /**
+         * Sets the {@code ${field.name}} for this builder. Each element is wrapped
+         * in a lightweight builder to support deferred materialization.
+         *
+         * @param ${field.name} the elements to set
+         * @return this builder
+         */
+        @Nonnull
+        public Builder ${field.name}(Collection<${field.to}> ${field.name}) {
+            if (${field.name} != null) {
+                ArrayList<${field.to}.Builder> bl = new ArrayList<>(${field.name}.size());
+                for (${field.to} v : ${field.name}) {
+                    bl.add(${field.to}.newBuilder(v, false));
+                }
+                this.${field.name} = bl;
+            } else {
+                this.${field.name} = null;
+            }
+            return this;
+        }
+
+        /**
+         * Returns the mutable list of {@code ${field.to}.Builder} elements.
+         * If the builder has not been explicitly set, lazily wraps the base
+         * object's immutable list into builders and caches the result.
+         *
+         * @return a mutable list of element builders, never {@code null}
+         */
+        @Nonnull
+        public List<${field.to}.Builder> getModifiable${cap}() {
+            if (${field.name} == null) {
+                if (base != null && !base.${field.name}.isEmpty()) {
+                    ArrayList<${field.to}.Builder> bl = new ArrayList<>(base.${field.name}.size());
+                    for (${field.to} v : base.${field.name}) {
+                        bl.add(${field.to}.newBuilder(v, false));
+                    }
+                    this.${field.name} = bl;
+                } else {
+                    this.${field.name} = new ArrayList<>();
+                }
+            }
+            @SuppressWarnings("unchecked")
+            List<${field.to}.Builder> result = (List<${field.to}.Builder>) (List<?>) ${field.name};
+            return result;
+        }
+
+      #else
         @Nonnull
         public Builder ${field.name}(${type} ${field.name}) {
             this.${field.name} = ${field.name};
             return this;
         }
 
+      #end
     #end
     #foreach ( $field in $allFields )
       #set ( $cap = $Helper.capitalise( $field.name ) )
       #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
+      #set ( $gIsModelObjList = false )
       ## Builder stores List fields as Collection — match that type for the getter
       #if ( $type.startsWith("List<") )
-        #set ( $type = ${type.replace('List<','Collection<')} )
+        #if ( $field.to && $field.to != "String" && $modelClassNames.contains($field.to) )
+          #set ( $gIsModelObjList = true )
+          #set ( $type = "Collection<${field.to}.Builder>" )
+        #else
+          #set ( $type = ${type.replace('List<','Collection<')} )
+        #end
       #end
       #if ( $type == "boolean" || $type == "Boolean" )
         #set ( $pfx = "is" )
       #else
         #set ( $pfx = "get" )
       #end
-      #if ( $type == "boolean" )
+      #if ( $gIsModelObjList )
+        ## For model-object lists, return the raw field only (don't resolve through base
+        ## to avoid unwanted lazy-wrapping that would defeat the short-circuit optimization)
+        public ${type} ${pfx}${cap}() {
+            return ${field.name};
+        }
+      #elseif ( $type == "boolean" )
         public ${type} ${pfx}${cap}() {
             return ${field.name} != null ? ${field.name} : (base != null ? base.${pfx}${cap}() : ${field.defaultValue});
         }
@@ -556,12 +664,50 @@ public class ${class.name}
         }
 
     #end
+        /**
+         * Resets this builder to wrap the specified base object, clearing all
+         * explicitly set fields. After reset, all getters resolve through the
+         * new base. Used by pipeline stage default methods to replace the
+         * builder's state with a stage's result without allocating a new Builder.
+         *
+         * @param base the new base object to wrap
+         * @return this builder
+         */
+        @Nonnull
+        public Builder reset(${class.name} base) {
+    #if ( $class.superClass )
+            super.reset(base);
+    #end
+            this.base = base;
+    #if ( $class == $root )
+            this.namespaceUri = null;
+            this.modelEncoding = null;
+    #end
+    #foreach ( $field in $class.getFields($version) )
+            this.${field.name} = null;
+    #end
+    #if ( ! $class.superClass && $locationTracking )
+            this.locations = null;
+            this.importedFrom = null;
+    #end
+            return this;
+        }
+
         @Nonnull
         public ${class.name} build() {
             // this method should not contain any logic other than creating (or reusing) an object in order to ease subclassing
             if (base != null
     #foreach ( $field in $allFields )
+      #set ( $bType = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
+      #set ( $bIsModelObjList = false )
+      #if ( $bType.startsWith("List<") && $field.to && $field.to != "String" && $modelClassNames.contains($field.to) )
+        #set ( $bIsModelObjList = true )
+      #end
+      #if ( $bIsModelObjList )
+                    && (${field.name} == null || (${field.name}.isEmpty() && base.${field.name}.isEmpty()))
+      #else
                     && (${field.name} == null || ${field.name} == base.${field.name})
+      #end
     #end
             ) {
                 return base;

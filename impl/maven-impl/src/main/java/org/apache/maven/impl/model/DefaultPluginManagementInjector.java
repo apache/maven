@@ -48,6 +48,21 @@ public class DefaultPluginManagementInjector implements PluginManagementInjector
     private ManagementModelMerger merger = new ManagementModelMerger();
 
     @Override
+    public void injectManagement(Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems) {
+        Model model = builder.build();
+        Build build = model.getBuild();
+        if (build != null) {
+            PluginManagement pluginManagement = build.getPluginManagement();
+            if (pluginManagement != null) {
+                Build newBuild = merger.mergePluginContainerPlugins(build, pluginManagement);
+                if (newBuild != build) {
+                    builder.build(newBuild);
+                }
+            }
+        }
+    }
+
+    @Override
     public Model injectManagement(Model model, ModelBuilderRequest request, ModelProblemCollector problems) {
         return merger.mergeManagedBuildPlugins(model);
     }

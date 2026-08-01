@@ -52,10 +52,33 @@ public class DefaultModelPathTranslator implements ModelPathTranslator {
     }
 
     @Override
+    public void alignToBaseDirectory(Model.Builder builder, Path basedir, ModelBuilderRequest request) {
+        if (basedir == null) {
+            return;
+        }
+        Model model = builder.build();
+        alignToBaseDirectory(model, basedir, builder);
+    }
+
+    @Override
     public Model alignToBaseDirectory(Model model, Path basedir, ModelBuilderRequest request) {
         if (model == null || basedir == null) {
             return model;
         }
+
+        Model.Builder builder = Model.newBuilder(model);
+        if (alignToBaseDirectory(model, basedir, builder)) {
+            return builder.build();
+        }
+        return model;
+    }
+
+    /**
+     * Shared logic: reads from {@code model}, writes modified fields to {@code builder}.
+     * Returns {@code true} if any field was modified.
+     */
+    private boolean alignToBaseDirectory(Model model, Path basedir, Model.Builder builder) {
+        boolean modified = false;
 
         Build build = model.getBuild();
         Build newBuild = null;
@@ -82,12 +105,11 @@ public class DefaultModelPathTranslator implements ModelPathTranslator {
                     .build();
         }
         if (newBuild != build || newReporting != reporting) {
-            model = Model.newBuilder(model)
-                    .build(newBuild)
-                    .reporting(newReporting)
-                    .build();
+            builder.build(newBuild);
+            builder.reporting(newReporting);
+            modified = true;
         }
-        return model;
+        return modified;
     }
 
     /**

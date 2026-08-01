@@ -1007,35 +1007,48 @@ public class DefaultModelBuilder implements ModelBuilder {
             setSource(resultModel);
             setRootModel(resultModel);
 
+            // Thread remaining stages through a Model.Builder to avoid intermediate build() calls.
+            // The builder-accepting default methods on each interface bridge to the Model-accepting
+            // versions; Phase E overrides these defaults for the hot stages.
+            Model.Builder builder = Model.newBuilder(resultModel, false);
+
             // model path translation
-            resultModel =
-                    modelPathTranslator.alignToBaseDirectory(resultModel, resultModel.getProjectDirectory(), request);
+            modelPathTranslator.alignToBaseDirectory(builder, resultModel.getProjectDirectory(), request);
 
             // plugin management injection
-            resultModel = pluginManagementInjector.injectManagement(resultModel, request, this);
+            pluginManagementInjector.injectManagement(builder, request, this);
 
-            // lifecycle bindings injection
+            // lifecycle bindings injection (ModelTransformer API — no builder variant)
             if (request.getRequestType() != ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY) {
                 org.apache.maven.api.services.ModelTransformer lifecycleBindingsInjector =
                         request.getLifecycleBindingsInjector();
                 if (lifecycleBindingsInjector != null) {
-                    resultModel = lifecycleBindingsInjector.transform(resultModel, request, this);
+                    Model built = builder.build();
+                    Model transformed = lifecycleBindingsInjector.transform(built, request, this);
+                    if (transformed != built) {
+                        builder.reset(transformed);
+                    }
                 }
             }
 
-            // dependency management import
-            resultModel = importDependencyManagement(resultModel, importIds);
+            // dependency management import (complex — needs Model access internally)
+            Model builtForImport = builder.build();
+            Model imported = importDependencyManagement(builtForImport, importIds);
+            if (imported != builtForImport) {
+                builder.reset(imported);
+            }
 
             // dependency management injection
-            resultModel = dependencyManagementInjector.injectManagement(resultModel, request, this);
+            dependencyManagementInjector.injectManagement(builder, request, this);
 
-            resultModel = modelNormalizer.injectDefaultValues(resultModel, request, this);
+            modelNormalizer.injectDefaultValues(builder, request, this);
 
             if (request.getRequestType() != ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY) {
                 // plugins configuration
-                resultModel = pluginConfigurationExpander.expandPluginConfiguration(resultModel, request, this);
+                pluginConfigurationExpander.expandPluginConfiguration(builder, request, this);
             }
 
+            resultModel = builder.build();
             for (var transformer : transformers) {
                 resultModel = transformer.transformEffectiveModel(resultModel);
             }
@@ -1431,11 +1444,12 @@ public class DefaultModelBuilder implements ModelBuilder {
             List<Activation> interpolatedActivations = getProfileActivations(inputModel);
             inputModel = injectProfileActivations(inputModel, interpolatedActivations);
 
-            // profile injection
-            inputModel = profileInjector.injectProfiles(inputModel, activePomProfiles, request, this);
-            inputModel = profileInjector.injectProfiles(inputModel, activeExternalProfiles, request, this);
+            // profile injection via builder to avoid intermediate build between injections
+            Model.Builder builder = Model.newBuilder(inputModel, false);
+            profileInjector.injectProfiles(builder, activePomProfiles, request, this);
+            profileInjector.injectProfiles(builder, activeExternalProfiles, request, this);
 
-            return inputModel;
+            return builder.build();
         }
 
         @SuppressWarnings("checkstyle:methodlength")
@@ -1513,22 +1527,25 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             // profile injection - inject all profiles (local + inherited) into the model
             List<Profile> activePomProfiles = getActiveProfiles(model.getProfiles(), profileActivationContext);
-            model = profileInjector.injectProfiles(model, activePomProfiles, request, this);
-            model = profileInjector.injectProfiles(model, activeExternalProfiles, request, this);
+            Model.Builder builder = Model.newBuilder(model, false);
+            profileInjector.injectProfiles(builder, activePomProfiles, request, this);
+            profileInjector.injectProfiles(builder, activeExternalProfiles, request, this);
+            model = builder.build();
 
             // Track only the local profiles for this model
             // Use ModelProblemUtils.toId() to get groupId:artifactId:version format (without packaging)
             addActivePomProfiles(ModelProblemUtils.toId(model), localActivePomProfiles);
 
-            // model interpolation
-            Model resultModel = model;
-            resultModel = interpolateModel(resultModel, request, this);
+            // model interpolation + normalization + url normalization via builder
+            builder = Model.newBuilder(model, false);
+            interpolateModel(builder, request, this);
 
             // model normalization
-            resultModel = modelNormalizer.mergeDuplicates(resultModel, request, this);
+            modelNormalizer.mergeDuplicates(builder, request, this);
 
             // url normalization
-            resultModel = modelUrlNormalizer.normalize(resultModel, request);
+            modelUrlNormalizer.normalize(builder, request);
+            Model resultModel = builder.build();
 
             // Now the fully interpolated model is available: reconfigure the resolver
             if (!resultModel.getRepositories().isEmpty()) {
@@ -2417,6 +2434,14 @@ public class DefaultModelBuilder implements ModelBuilder {
             profiles.add(profile);
         }
         return modified ? model.withProfiles(profiles) : model;
+    }
+
+    private void interpolateModel(Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems) {
+        Model model = builder.build();
+        Model result = interpolateModel(model, request, problems);
+        if (result != model) {
+            builder.reset(result);
+        }
     }
 
     private Model interpolateModel(Model model, ModelBuilderRequest request, ModelProblemCollector problems) {

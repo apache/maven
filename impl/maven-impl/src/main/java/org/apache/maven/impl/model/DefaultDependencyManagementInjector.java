@@ -46,6 +46,15 @@ public class DefaultDependencyManagementInjector implements DependencyManagement
     private ManagementModelMerger merger = new ManagementModelMerger();
 
     @Override
+    public void injectManagement(Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems) {
+        Model model = builder.build();
+        List<Dependency> merged = merger.computeMergedDependencies(model);
+        if (merged != null) {
+            builder.dependencies(merged);
+        }
+    }
+
+    @Override
     public Model injectManagement(Model model, ModelBuilderRequest request, ModelProblemCollector problems) {
         return merger.mergeManagedDependencies(model);
     }
@@ -55,11 +64,12 @@ public class DefaultDependencyManagementInjector implements DependencyManagement
      */
     protected static class ManagementModelMerger extends MavenModelMerger {
 
-        public Model mergeManagedDependencies(Model model) {
+        /**
+         * Computes the merged dependency list, or returns {@code null} if no dependencies were modified.
+         */
+        List<Dependency> computeMergedDependencies(Model model) {
             DependencyManagement dependencyManagement = model.getDependencyManagement();
             if (dependencyManagement != null) {
-                // Use Builders to accumulate changes across all managed dependencies,
-                // deferring build() until after all merges are complete
                 Map<Object, Dependency> originalDeps = new HashMap<>();
                 Map<Object, Dependency.Builder> builderDeps = new HashMap<>();
                 Map<Object, Object> context = Collections.emptyMap();
@@ -76,7 +86,6 @@ public class DefaultDependencyManagementInjector implements DependencyManagement
                     if (dependency != null) {
                         Dependency.Builder merged =
                                 mergeDependencyToBuilder(dependency, managedDependency, false, context);
-                        // Only track modifications if the builder actually changed something
                         if (merged != null) {
                             builderDeps.put(key, merged);
                             modified = true;
@@ -89,13 +98,17 @@ public class DefaultDependencyManagementInjector implements DependencyManagement
                     for (Dependency dep : model.getDependencies()) {
                         Object key = getDependencyKey().apply(dep);
                         Dependency.Builder builder = builderDeps.get(key);
-                        // Only build() the dependencies that were actually merged
                         newDeps.add(builder != null ? builder.build() : dep);
                     }
-                    return Model.newBuilder(model).dependencies(newDeps).build();
+                    return newDeps;
                 }
             }
-            return model;
+            return null;
+        }
+
+        public Model mergeManagedDependencies(Model model) {
+            List<Dependency> merged = computeMergedDependencies(model);
+            return merged != null ? Model.newBuilder(model).dependencies(merged).build() : model;
         }
 
         @Override

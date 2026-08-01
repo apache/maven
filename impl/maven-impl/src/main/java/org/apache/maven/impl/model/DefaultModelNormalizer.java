@@ -46,6 +46,42 @@ public class DefaultModelNormalizer implements ModelNormalizer {
     private DuplicateMerger merger = new DuplicateMerger();
 
     @Override
+    public void mergeDuplicates(Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems) {
+        Model model = builder.build();
+
+        Build build = model.getBuild();
+        if (build != null) {
+            List<Plugin> plugins = build.getPlugins();
+            Map<Object, Plugin> normalized = new LinkedHashMap<>(plugins.size() * 2);
+
+            for (Plugin plugin : plugins) {
+                Object key = plugin.getKey();
+                Plugin first = normalized.get(key);
+                if (first != null) {
+                    plugin = merger.mergePlugin(plugin, first);
+                }
+                normalized.put(key, plugin);
+            }
+
+            if (plugins.size() != normalized.size()) {
+                builder.build(
+                        Build.newBuilder(build).plugins(normalized.values()).build());
+            }
+        }
+
+        List<Dependency> dependencies = model.getDependencies();
+        Map<String, Dependency> normalizedDeps = new LinkedHashMap<>(dependencies.size() * 2);
+
+        for (Dependency dependency : dependencies) {
+            normalizedDeps.put(dependency.getManagementKey(), dependency);
+        }
+
+        if (dependencies.size() != normalizedDeps.size()) {
+            builder.dependencies(normalizedDeps.values());
+        }
+    }
+
+    @Override
     public Model mergeDuplicates(Model model, ModelBuilderRequest request, ModelProblemCollector problems) {
         Model.Builder builder = Model.newBuilder(model);
 
@@ -97,6 +133,26 @@ public class DefaultModelNormalizer implements ModelNormalizer {
 
         public Plugin mergePlugin(Plugin target, Plugin source) {
             return super.mergePlugin(target, source, false, Collections.emptyMap());
+        }
+    }
+
+    @Override
+    public void injectDefaultValues(
+            Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems) {
+        Model model = builder.build();
+
+        List<Dependency> newDeps = injectList(model.getDependencies(), this::injectDependency);
+        if (newDeps != null) {
+            builder.dependencies(newDeps);
+        }
+        Build build = model.getBuild();
+        if (build != null) {
+            Build newBuild = Build.newBuilder(build)
+                    .plugins(injectList(build.getPlugins(), this::injectPlugin))
+                    .build();
+            if (newBuild != build) {
+                builder.build(newBuild);
+            }
         }
     }
 
