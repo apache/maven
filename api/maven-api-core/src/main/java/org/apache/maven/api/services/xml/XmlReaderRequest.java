@@ -66,20 +66,6 @@ public interface XmlReaderRequest {
 
     boolean isAddDefaultEntities();
 
-    /**
-     * Indicates whether location information (line/column tracking) should be
-     * recorded during parsing. Defaults to {@code true}. Setting this to
-     * {@code false} for imported dependency management POMs avoids allocating
-     * location maps that are never read, significantly reducing memory churn
-     * in large reactors.
-     *
-     * @return {@code true} if location information should be tracked
-     * @since 4.0.0
-     */
-    default boolean isAddLocationInformation() {
-        return true;
-    }
-
     interface Transformer {
         /**
          * Interpolate the value read from the xml document
@@ -109,7 +95,6 @@ public interface XmlReaderRequest {
         String modelId;
         String location;
         boolean addDefaultEntities = true;
-        boolean addLocationInformation = true;
 
         public XmlReaderRequestBuilder path(Path path) {
             this.path = path;
@@ -161,11 +146,6 @@ public interface XmlReaderRequest {
             return this;
         }
 
-        public XmlReaderRequestBuilder addLocationInformation(boolean addLocationInformation) {
-            this.addLocationInformation = addLocationInformation;
-            return this;
-        }
-
         public XmlReaderRequest build() {
             return new DefaultXmlReaderRequest(
                     path,
@@ -177,8 +157,7 @@ public interface XmlReaderRequest {
                     strict,
                     modelId,
                     location,
-                    addDefaultEntities,
-                    addLocationInformation);
+                    addDefaultEntities);
         }
 
         private static class DefaultXmlReaderRequest implements XmlReaderRequest {
@@ -192,7 +171,6 @@ public interface XmlReaderRequest {
             final String modelId;
             final String location;
             final boolean addDefaultEntities;
-            final boolean addLocationInformation;
 
             @SuppressWarnings("checkstyle:ParameterNumber")
             DefaultXmlReaderRequest(
@@ -205,8 +183,7 @@ public interface XmlReaderRequest {
                     boolean strict,
                     String modelId,
                     String location,
-                    boolean addDefaultEntities,
-                    boolean addLocationInformation) {
+                    boolean addDefaultEntities) {
                 this.path = path;
                 this.rootDirectory = rootDirectory;
                 this.url = url;
@@ -217,7 +194,6 @@ public interface XmlReaderRequest {
                 this.modelId = modelId;
                 this.location = location;
                 this.addDefaultEntities = addDefaultEntities;
-                this.addLocationInformation = addLocationInformation;
             }
 
             @Override
@@ -268,11 +244,6 @@ public interface XmlReaderRequest {
             @Override
             public boolean isAddDefaultEntities() {
                 return addDefaultEntities;
-            }
-
-            @Override
-            public boolean isAddLocationInformation() {
-                return addLocationInformation;
             }
         }
     }
