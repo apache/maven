@@ -48,8 +48,6 @@ public class DefaultModelNormalizer implements ModelNormalizer {
     @Override
     public void mergeDuplicates(Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems) {
 
-        // Use builder getters instead of builder.build() to avoid materializing
-        // all model-object lists (especially dependencies) just to read Build
         Build build = builder.getBuild();
         if (build != null) {
             List<Plugin> plugins = build.getPlugins();
@@ -70,15 +68,18 @@ public class DefaultModelNormalizer implements ModelNormalizer {
             }
         }
 
-        List<Dependency> dependencies = builder.getBuiltDependencies();
-        Map<String, Dependency> normalizedDeps = new LinkedHashMap<>(dependencies.size() * 2);
+        // Work with mutable builder list directly — deduplicate in place
+        // without wrapping/unwrapping through immutable Dependency objects.
+        List<Dependency.Builder> deps = builder.getModifiableDependencies();
+        Map<String, Dependency.Builder> normalizedDeps = new LinkedHashMap<>(deps.size() * 2);
 
-        for (Dependency dependency : dependencies) {
-            normalizedDeps.put(dependency.getManagementKey(), dependency);
+        for (Dependency.Builder db : deps) {
+            normalizedDeps.put(managementKey(db), db);
         }
 
-        if (dependencies.size() != normalizedDeps.size()) {
-            builder.dependencies(normalizedDeps.values());
+        if (deps.size() != normalizedDeps.size()) {
+            deps.clear();
+            deps.addAll(normalizedDeps.values());
         }
     }
 
@@ -141,11 +142,13 @@ public class DefaultModelNormalizer implements ModelNormalizer {
     public void injectDefaultValues(
             Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems) {
 
-        // Use builder getters instead of builder.build() to avoid materializing
-        // all model-object lists just to read Dependencies and Build
-        List<Dependency> newDeps = injectList(builder.getBuiltDependencies(), this::injectDependency);
-        if (newDeps != null) {
-            builder.dependencies(newDeps);
+        // Work with mutable builders directly — modify scope in place without
+        // wrapping/unwrapping through immutable Dependency objects.
+        for (Dependency.Builder db : builder.getModifiableDependencies()) {
+            String scope = db.getScope();
+            if (scope == null || scope.isEmpty()) {
+                db.scope("compile");
+            }
         }
         Build build = builder.getBuild();
         if (build != null) {
@@ -183,6 +186,15 @@ public class DefaultModelNormalizer implements ModelNormalizer {
     private Dependency injectDependency(Dependency d) {
         // we cannot set this directly in the MDO due to the interactions with dependency management
         return (d.getScope() == null || d.getScope().isEmpty()) ? d.withScope("compile") : d;
+    }
+
+    /**
+     * Computes the management key from a Dependency.Builder without building.
+     */
+    private static String managementKey(Dependency.Builder b) {
+        String classifier = b.getClassifier();
+        return b.getGroupId() + ":" + b.getArtifactId() + ":" + b.getType()
+                + (classifier != null && !classifier.isEmpty() ? ":" + classifier : "");
     }
 
     /**

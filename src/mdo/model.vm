@@ -182,11 +182,15 @@ public class ${class.name}
       #end
       #if ( $cIsModelObjList )
         if (builder.${field.name} != null) {
+            ## Builder list is set — build each element builder into an immutable object
             ArrayList<${field.to}> bl = new ArrayList<>(builder.${field.name}.size());
             for (${field.to}.Builder b : builder.${field.name}) {
                 bl.add(b.build());
             }
             this.${field.name} = ImmutableCollections.copy(bl);
+        } else if (builder.${field.name}Imm != null) {
+            ## Immutable list was set via setter — use directly, no builder overhead
+            this.${field.name} = ImmutableCollections.copy(builder.${field.name}Imm);
         } else {
             this.${field.name} = ImmutableCollections.copy(builder.base != null ? builder.base.${field.name} : null);
         }
@@ -449,6 +453,11 @@ public class ${class.name}
         Integer ${field.name};
       #else
         ${type} ${field.name};
+      #if ( $isModelObjList )
+        ## Second field: stores immutable list set via the setter, avoiding wrapping.
+        ## Mutually exclusive with the builder list field above.
+        Collection<${field.to}> ${field.name}Imm;
+      #end
     #end
     #end
     #if ( ! $class.superClass && $locationTracking )
@@ -490,12 +499,11 @@ public class ${class.name}
         #set ( $fcIsModelObjList = true )
       #end
       #if ( $fcIsModelObjList )
+                ## Store the immutable list directly — no wrapping overhead.
+                ## The list is already immutable, so a reference is safe.
+                ## getModifiable*() will lazily wrap into builders if mutation is needed.
                 if (base.${field.name} != null && !base.${field.name}.isEmpty()) {
-                    ArrayList<${field.to}.Builder> bl = new ArrayList<>(base.${field.name}.size());
-                    for (${field.to} v : base.${field.name}) {
-                        bl.add(${field.to}.newBuilder(v, false));
-                    }
-                    this.${field.name} = bl;
+                    this.${field.name}Imm = base.${field.name};
                 }
       #else
                 this.${field.name} = base.${field.name};
@@ -540,45 +548,46 @@ public class ${class.name}
       #end
       #if ( $sIsModelObjList )
         /**
-         * Sets the {@code ${field.name}} for this builder. Each element is wrapped
-         * in a lightweight builder to support deferred materialization.
+         * Sets the {@code ${field.name}} for this builder. The immutable list is stored
+         * directly without wrapping into element builders, avoiding allocation overhead.
+         * Any previously cached builder list is invalidated.
          *
          * @param ${field.name} the elements to set
          * @return this builder
          */
         @Nonnull
         public Builder ${field.name}(Collection<${field.to}> ${field.name}) {
-            if (${field.name} != null) {
-                ArrayList<${field.to}.Builder> bl = new ArrayList<>(${field.name}.size());
-                for (${field.to} v : ${field.name}) {
-                    bl.add(${field.to}.newBuilder(v, false));
-                }
-                this.${field.name} = bl;
-            } else {
-                this.${field.name} = null;
-            }
+            this.${field.name}Imm = ${field.name};
+            this.${field.name} = null;
             return this;
         }
 
         /**
          * Returns the mutable list of {@code ${field.to}.Builder} elements.
-         * If the builder has not been explicitly set, lazily wraps the base
-         * object's immutable list into builders and caches the result.
+         * If the builder list has not been populated, lazily wraps the immutable
+         * list (from the setter or from the base object) into builders and caches
+         * the result. The immutable field is cleared since the builder list is
+         * now the canonical source.
          *
          * @return a mutable list of element builders, never {@code null}
          */
         @Nonnull
         public List<${field.to}.Builder> getModifiable${cap}() {
             if (${field.name} == null) {
-                if (base != null && !base.${field.name}.isEmpty()) {
-                    ArrayList<${field.to}.Builder> bl = new ArrayList<>(base.${field.name}.size());
-                    for (${field.to} v : base.${field.name}) {
+                Collection<${field.to}> source = ${field.name}Imm;
+                if (source == null) {
+                    source = base != null ? base.${field.name} : null;
+                }
+                if (source != null && !source.isEmpty()) {
+                    ArrayList<${field.to}.Builder> bl = new ArrayList<>(source.size());
+                    for (${field.to} v : source) {
                         bl.add(${field.to}.newBuilder(v, false));
                     }
                     this.${field.name} = bl;
                 } else {
                     this.${field.name} = new ArrayList<>();
                 }
+                this.${field.name}Imm = null;
             }
             @SuppressWarnings("unchecked")
             List<${field.to}.Builder> result = (List<${field.to}.Builder>) (List<?>) ${field.name};
@@ -613,23 +622,24 @@ public class ${class.name}
         #set ( $pfx = "get" )
       #end
       #if ( $gIsModelObjList )
-        ## For model-object lists, return the raw field only (don't resolve through base
-        ## to avoid unwanted lazy-wrapping that would defeat the short-circuit optimization)
+        ## For model-object lists, return the raw builder field only (don't resolve through base)
         public ${type} ${pfx}${cap}() {
             return ${field.name};
         }
-        ## Provide a method to get the built list, resolving through base when unmodified.
-        ## This avoids the overhead of a full model build() just to read one list field
-        ## in pipeline stages that only need to inspect a specific list.
+        ## Provide a method to get the built list, checking both the builder list
+        ## and the immutable list fields, resolving through base when both are null.
         public List<${field.to}> getBuilt${cap}() {
-            if (${field.name} == null) {
-                return base != null ? base.get${cap}() : List.of();
+            if (${field.name} != null) {
+                ArrayList<${field.to}> result = new ArrayList<>(${field.name}.size());
+                for (${field.to}.Builder b : ${field.name}) {
+                    result.add(b.build());
+                }
+                return result;
             }
-            ArrayList<${field.to}> result = new ArrayList<>(${field.name}.size());
-            for (${field.to}.Builder b : ${field.name}) {
-                result.add(b.build());
+            if (${field.name}Imm != null) {
+                return ${field.name}Imm instanceof List ? (List<${field.to}>) ${field.name}Imm : new ArrayList<>(${field.name}Imm);
             }
-            return result;
+            return base != null ? base.get${cap}() : List.of();
         }
       #elseif ( $type == "boolean" )
         public ${type} ${pfx}${cap}() {
@@ -697,7 +707,11 @@ public class ${class.name}
             this.modelEncoding = null;
     #end
     #foreach ( $field in $class.getFields($version) )
+      #set ( $rType = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
             this.${field.name} = null;
+      #if ( $rType.startsWith("List<") && $field.to && $field.to != "String" && $modelClassNames.contains($field.to) )
+            this.${field.name}Imm = null;
+      #end
     #end
     #if ( ! $class.superClass && $locationTracking )
             this.locations = null;
@@ -717,7 +731,8 @@ public class ${class.name}
         #set ( $bIsModelObjList = true )
       #end
       #if ( $bIsModelObjList )
-                    && (${field.name} == null || (${field.name}.isEmpty() && base.${field.name}.isEmpty()))
+                    && ${field.name} == null
+                    && (${field.name}Imm == null || (${field.name}Imm.isEmpty() && base.${field.name}.isEmpty()))
       #else
                     && (${field.name} == null || ${field.name} == base.${field.name})
       #end

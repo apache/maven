@@ -47,15 +47,11 @@ public class DefaultDependencyManagementInjector implements DependencyManagement
 
     @Override
     public void injectManagement(Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems) {
-        // Use builder getters instead of builder.build() to avoid materializing
-        // all model-object lists just to read Dependencies and DependencyManagement
+        // Work with mutable builders directly — merge managed dep fields in place
+        // without wrapping/unwrapping through immutable Dependency objects.
         DependencyManagement depMgmt = builder.getDependencyManagement();
         if (depMgmt != null) {
-            List<Dependency> deps = builder.getBuiltDependencies();
-            List<Dependency> merged = merger.computeMergedDependencies(deps, depMgmt);
-            if (merged != null) {
-                builder.dependencies(merged);
-            }
+            merger.mergeManagementIntoBuilders(builder.getModifiableDependencies(), depMgmt);
         }
     }
 
@@ -68,6 +64,68 @@ public class DefaultDependencyManagementInjector implements DependencyManagement
      * ManagementModelMerger
      */
     protected static class ManagementModelMerger extends MavenModelMerger {
+
+        /**
+         * Merges managed dependency fields directly into Dependency.Builder objects,
+         * avoiding the overhead of building/wrapping through immutable Dependency objects.
+         * Builder getters resolve through base (the original immutable dep), so the
+         * merge logic is equivalent to the immutable-object version.
+         */
+        void mergeManagementIntoBuilders(List<Dependency.Builder> deps, DependencyManagement dependencyManagement) {
+            Map<String, Dependency.Builder> depsByKey = new HashMap<>(deps.size() * 2);
+            for (Dependency.Builder db : deps) {
+                depsByKey.put(managementKey(db), db);
+            }
+            for (Dependency managed : dependencyManagement.getDependencies()) {
+                Dependency.Builder target = depsByKey.get(managed.getManagementKey());
+                if (target != null) {
+                    mergeManagementFields(target, managed);
+                }
+            }
+        }
+
+        /**
+         * Merges fields from a managed dependency into an existing builder.
+         * Only sets fields that are not already present on the builder (target-dominant).
+         * Optional is not managed. Exclusions are only copied if the target has none.
+         */
+        private void mergeManagementFields(Dependency.Builder target, Dependency source) {
+            if (target.getVersion() == null && source.getVersion() != null) {
+                target.version(source.getVersion());
+                target.location("version", source.getLocation("version"));
+            }
+            if (target.getScope() == null && source.getScope() != null) {
+                target.scope(source.getScope());
+                target.location("scope", source.getLocation("scope"));
+            }
+            if (target.getType() == null && source.getType() != null) {
+                target.type(source.getType());
+                target.location("type", source.getLocation("type"));
+            }
+            if (target.getClassifier() == null && source.getClassifier() != null) {
+                target.classifier(source.getClassifier());
+                target.location("classifier", source.getLocation("classifier"));
+            }
+            if (target.getSystemPath() == null && source.getSystemPath() != null) {
+                target.systemPath(source.getSystemPath());
+                target.location("systemPath", source.getLocation("systemPath"));
+            }
+            // Optional is NOT managed (ManagementModelMerger behavior)
+            // Exclusions: only copy from managed dep if target has none
+            List<Exclusion> targetExclusions = target.getBuiltExclusions();
+            if (targetExclusions.isEmpty()) {
+                List<Exclusion> srcExclusions = source.getExclusions();
+                if (!srcExclusions.isEmpty()) {
+                    target.exclusions(srcExclusions);
+                }
+            }
+        }
+
+        private static String managementKey(Dependency.Builder b) {
+            String classifier = b.getClassifier();
+            return b.getGroupId() + ":" + b.getArtifactId() + ":" + b.getType()
+                    + (classifier != null && !classifier.isEmpty() ? ":" + classifier : "");
+        }
 
         /**
          * Computes the merged dependency list, or returns {@code null} if no dependencies were modified.
