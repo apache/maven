@@ -47,8 +47,10 @@ public class DefaultPluginConfigurationExpander implements PluginConfigurationEx
     @Override
     public void expandPluginConfiguration(
             Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems) {
-        Model model = builder.build();
-        Build build = model.getBuild();
+
+        // Use builder getters instead of builder.build() to avoid materializing
+        // all model-object lists (especially dependencies) just to read Build/Reporting
+        Build build = builder.getBuild();
         if (build != null) {
             Build newBuild = build.withPlugins(expandPlugin(build.getPlugins()));
             PluginManagement pluginManagement = newBuild.getPluginManagement();
@@ -60,7 +62,7 @@ public class DefaultPluginConfigurationExpander implements PluginConfigurationEx
                 builder.build(newBuild);
             }
         }
-        Reporting reporting = model.getReporting();
+        Reporting reporting = builder.getReporting();
         if (reporting != null) {
             expandReport(reporting.getPlugins());
         }

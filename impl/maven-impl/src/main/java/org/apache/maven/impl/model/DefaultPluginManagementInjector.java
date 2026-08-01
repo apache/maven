@@ -49,8 +49,9 @@ public class DefaultPluginManagementInjector implements PluginManagementInjector
 
     @Override
     public void injectManagement(Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems) {
-        Model model = builder.build();
-        Build build = model.getBuild();
+        // Use builder getter instead of builder.build() to avoid materializing
+        // all model-object lists just to read Build
+        Build build = builder.getBuild();
         if (build != null) {
             PluginManagement pluginManagement = build.getPluginManagement();
             if (pluginManagement != null) {

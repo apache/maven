@@ -56,8 +56,35 @@ public class DefaultModelPathTranslator implements ModelPathTranslator {
         if (basedir == null) {
             return;
         }
-        Model model = builder.build();
-        alignToBaseDirectory(model, basedir, builder);
+        // Use builder getters instead of builder.build() to avoid materializing
+        // all model-object lists just to read Build and Reporting
+        Build build = builder.getBuild();
+        Build newBuild = null;
+        if (build != null) {
+            newBuild = Build.newBuilder(build)
+                    .sources(map(build.getSources(), this::alignToBaseDirectory, basedir))
+                    .directory(alignToBaseDirectory(build.getDirectory(), basedir))
+                    .sourceDirectory(alignToBaseDirectory(build.getSourceDirectory(), basedir))
+                    .testSourceDirectory(alignToBaseDirectory(build.getTestSourceDirectory(), basedir))
+                    .scriptSourceDirectory(alignToBaseDirectory(build.getScriptSourceDirectory(), basedir))
+                    .resources(map(build.getResources(), this::alignToBaseDirectory, basedir))
+                    .testResources(map(build.getTestResources(), this::alignToBaseDirectory, basedir))
+                    .filters(map(build.getFilters(), this::alignToBaseDirectory, basedir))
+                    .outputDirectory(alignToBaseDirectory(build.getOutputDirectory(), basedir))
+                    .testOutputDirectory(alignToBaseDirectory(build.getTestOutputDirectory(), basedir))
+                    .build();
+        }
+        Reporting reporting = builder.getReporting();
+        Reporting newReporting = null;
+        if (reporting != null) {
+            newReporting = Reporting.newBuilder(reporting)
+                    .outputDirectory(alignToBaseDirectory(reporting.getOutputDirectory(), basedir))
+                    .build();
+        }
+        if (newBuild != build || newReporting != reporting) {
+            builder.build(newBuild);
+            builder.reporting(newReporting);
+        }
     }
 
     @Override

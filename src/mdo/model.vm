@@ -618,6 +618,19 @@ public class ${class.name}
         public ${type} ${pfx}${cap}() {
             return ${field.name};
         }
+        ## Provide a method to get the built list, resolving through base when unmodified.
+        ## This avoids the overhead of a full model build() just to read one list field
+        ## in pipeline stages that only need to inspect a specific list.
+        public List<${field.to}> getBuilt${cap}() {
+            if (${field.name} == null) {
+                return base != null ? base.get${cap}() : List.of();
+            }
+            ArrayList<${field.to}> result = new ArrayList<>(${field.name}.size());
+            for (${field.to}.Builder b : ${field.name}) {
+                result.add(b.build());
+            }
+            return result;
+        }
       #elseif ( $type == "boolean" )
         public ${type} ${pfx}${cap}() {
             return ${field.name} != null ? ${field.name} : (base != null ? base.${pfx}${cap}() : ${field.defaultValue});

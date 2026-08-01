@@ -47,10 +47,15 @@ public class DefaultDependencyManagementInjector implements DependencyManagement
 
     @Override
     public void injectManagement(Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems) {
-        Model model = builder.build();
-        List<Dependency> merged = merger.computeMergedDependencies(model);
-        if (merged != null) {
-            builder.dependencies(merged);
+        // Use builder getters instead of builder.build() to avoid materializing
+        // all model-object lists just to read Dependencies and DependencyManagement
+        DependencyManagement depMgmt = builder.getDependencyManagement();
+        if (depMgmt != null) {
+            List<Dependency> deps = builder.getBuiltDependencies();
+            List<Dependency> merged = merger.computeMergedDependencies(deps, depMgmt);
+            if (merged != null) {
+                builder.dependencies(merged);
+            }
         }
     }
 
@@ -70,38 +75,47 @@ public class DefaultDependencyManagementInjector implements DependencyManagement
         List<Dependency> computeMergedDependencies(Model model) {
             DependencyManagement dependencyManagement = model.getDependencyManagement();
             if (dependencyManagement != null) {
-                Map<Object, Dependency> originalDeps = new HashMap<>();
-                Map<Object, Dependency.Builder> builderDeps = new HashMap<>();
-                Map<Object, Object> context = Collections.emptyMap();
+                return computeMergedDependencies(model.getDependencies(), dependencyManagement);
+            }
+            return null;
+        }
 
-                for (Dependency dependency : model.getDependencies()) {
-                    Object key = getDependencyKey().apply(dependency);
-                    originalDeps.put(key, dependency);
-                }
+        /**
+         * Computes the merged dependency list from pre-extracted deps and dep management,
+         * or returns {@code null} if no dependencies were modified.
+         */
+        List<Dependency> computeMergedDependencies(
+                List<Dependency> dependencies, DependencyManagement dependencyManagement) {
+            Map<Object, Dependency> originalDeps = new HashMap<>();
+            Map<Object, Dependency.Builder> builderDeps = new HashMap<>();
+            Map<Object, Object> context = Collections.emptyMap();
 
-                boolean modified = false;
-                for (Dependency managedDependency : dependencyManagement.getDependencies()) {
-                    Object key = getDependencyKey().apply(managedDependency);
-                    Dependency dependency = originalDeps.get(key);
-                    if (dependency != null) {
-                        Dependency.Builder merged =
-                                mergeDependencyToBuilder(dependency, managedDependency, false, context);
-                        if (merged != null) {
-                            builderDeps.put(key, merged);
-                            modified = true;
-                        }
+            for (Dependency dependency : dependencies) {
+                Object key = getDependencyKey().apply(dependency);
+                originalDeps.put(key, dependency);
+            }
+
+            boolean modified = false;
+            for (Dependency managedDependency : dependencyManagement.getDependencies()) {
+                Object key = getDependencyKey().apply(managedDependency);
+                Dependency dependency = originalDeps.get(key);
+                if (dependency != null) {
+                    Dependency.Builder merged = mergeDependencyToBuilder(dependency, managedDependency, false, context);
+                    if (merged != null) {
+                        builderDeps.put(key, merged);
+                        modified = true;
                     }
                 }
+            }
 
-                if (modified) {
-                    List<Dependency> newDeps = new ArrayList<>(originalDeps.size());
-                    for (Dependency dep : model.getDependencies()) {
-                        Object key = getDependencyKey().apply(dep);
-                        Dependency.Builder builder = builderDeps.get(key);
-                        newDeps.add(builder != null ? builder.build() : dep);
-                    }
-                    return newDeps;
+            if (modified) {
+                List<Dependency> newDeps = new ArrayList<>(originalDeps.size());
+                for (Dependency dep : dependencies) {
+                    Object key = getDependencyKey().apply(dep);
+                    Dependency.Builder builder = builderDeps.get(key);
+                    newDeps.add(builder != null ? builder.build() : dep);
                 }
+                return newDeps;
             }
             return null;
         }

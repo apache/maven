@@ -47,9 +47,10 @@ public class DefaultModelNormalizer implements ModelNormalizer {
 
     @Override
     public void mergeDuplicates(Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems) {
-        Model model = builder.build();
 
-        Build build = model.getBuild();
+        // Use builder getters instead of builder.build() to avoid materializing
+        // all model-object lists (especially dependencies) just to read Build
+        Build build = builder.getBuild();
         if (build != null) {
             List<Plugin> plugins = build.getPlugins();
             Map<Object, Plugin> normalized = new LinkedHashMap<>(plugins.size() * 2);
@@ -69,7 +70,7 @@ public class DefaultModelNormalizer implements ModelNormalizer {
             }
         }
 
-        List<Dependency> dependencies = model.getDependencies();
+        List<Dependency> dependencies = builder.getBuiltDependencies();
         Map<String, Dependency> normalizedDeps = new LinkedHashMap<>(dependencies.size() * 2);
 
         for (Dependency dependency : dependencies) {
@@ -139,13 +140,14 @@ public class DefaultModelNormalizer implements ModelNormalizer {
     @Override
     public void injectDefaultValues(
             Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems) {
-        Model model = builder.build();
 
-        List<Dependency> newDeps = injectList(model.getDependencies(), this::injectDependency);
+        // Use builder getters instead of builder.build() to avoid materializing
+        // all model-object lists just to read Dependencies and Build
+        List<Dependency> newDeps = injectList(builder.getBuiltDependencies(), this::injectDependency);
         if (newDeps != null) {
             builder.dependencies(newDeps);
         }
-        Build build = model.getBuild();
+        Build build = builder.getBuild();
         if (build != null) {
             Build newBuild = Build.newBuilder(build)
                     .plugins(injectList(build.getPlugins(), this::injectPlugin))
