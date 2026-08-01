@@ -318,6 +318,38 @@ public class ${class.name}
         return importedFrom;
     }
 
+    /**
+     * Creates a copy of this object with a different {@code importedFrom} value.
+     * This is a lightweight operation that bypasses the Builder and object pool
+     * interning, suitable for metadata-only changes that don't affect model field
+     * values (all model fields are shared by reference with the original).
+     *
+     * @param importedFrom the new imported-from location
+     * @return a new instance with the updated importedFrom, or {@code this} if unchanged
+     */
+    @Nonnull
+    public ${class.name} withImportedFrom(InputLocation importedFrom) {
+        return this.importedFrom == importedFrom ? this : new ${class.name}(this, importedFrom);
+    }
+
+    /**
+     * Copy constructor for {@link #withImportedFrom(InputLocation)}.
+     * Copies all fields by reference (they are immutable) and sets
+     * a new {@code importedFrom}. Bypasses Builder and object pool.
+     */
+    private ${class.name}(${class.name} base, InputLocation importedFrom) {
+    #if ( $class == $root )
+        this.namespaceUri = base.namespaceUri;
+        this.modelEncoding = base.modelEncoding;
+    #end
+    #foreach ( $field in $class.getFields($version) )
+        this.${field.name} = base.${field.name};
+    #end
+        this.locations = base.locations;
+        this.locationsHashCode = base.locationsHashCode;
+        this.importedFrom = importedFrom;
+    }
+
     #end
     /**
      * Creates a new builder with this object as the basis.

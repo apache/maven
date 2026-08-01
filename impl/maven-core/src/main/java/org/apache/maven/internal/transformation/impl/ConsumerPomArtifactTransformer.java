@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.Model;
@@ -62,7 +62,7 @@ class ConsumerPomArtifactTransformer extends TransformerSupport {
 
     private static final String BUILD_POM_CLASSIFIER = "build";
 
-    private final Set<Path> toDelete = new CopyOnWriteArraySet<>();
+    private final Set<Path> toDelete = ConcurrentHashMap.newKeySet();
 
     private final PomBuilder builder;
 

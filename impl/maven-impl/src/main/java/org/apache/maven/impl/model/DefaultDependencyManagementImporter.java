@@ -167,11 +167,9 @@ public class DefaultDependencyManagementImporter implements DependencyManagement
         if (dependencySource == null
                 || bomSource == null
                 || Objects.equals(dependencySource.getModelId(), bomSource.getModelId())) {
-            // Use forceCopy=true since we only set importedFrom (no field changes that would
-            // trigger copy-on-write), and build immediately as we need the immutable result.
-            return Dependency.newBuilder(dependency, true)
-                    .importedFrom(bomLocation)
-                    .build();
+            // Use withImportedFrom() — a lightweight copy that shares all model fields
+            // by reference and bypasses Builder wrapping and object pool interning.
+            return dependency.withImportedFrom(bomLocation);
         }
 
         while (dependencySource.getImportedFrom() != null) {
@@ -187,6 +185,6 @@ public class DefaultDependencyManagementImporter implements DependencyManagement
 
         // We modify the input location that is used for the whole file.
         // This is likely correct because the POM hierarchy applies to the whole POM, not just one dependency.
-        return Dependency.newBuilder(dependency, true).importedFrom(bomLocation).build();
+        return dependency.withImportedFrom(bomLocation);
     }
 }
