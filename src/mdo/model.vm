@@ -20,6 +20,11 @@
 #
 #set ( $package = "${packageModelV4}" )
 #set ( $root = $model.getClass( $model.getRoot($version), $version ) )
+## Build set of model class names for detecting list-of-model-object fields
+#set ( $modelClassNames = [] )
+#foreach ( $c in $model.allClasses )
+  #set ( $dummy = $modelClassNames.add($c.name) )
+#end
 #foreach ( $class in $model.allClasses )
   #set ( $ancestors = $Helper.ancestors( $class ) )
   #set ( $allFields = [] )
@@ -151,6 +156,8 @@ public class ${class.name}
     #if ( $locationTracking && ! $class.superClass )
     /** Locations */
     final Map<Object, InputLocation> locations;
+    /** Cached hash code for the locations map, precomputed at build time */
+    final int locationsHashCode;
     /** Location tracking */
     final InputLocation importedFrom;
     #end
@@ -168,7 +175,28 @@ public class ${class.name}
         this.modelEncoding = builder.modelEncoding != null ? builder.modelEncoding : (builder.base != null ? builder.base.modelEncoding :  "UTF-8");
     #end
     #foreach ( $field in $class.getFields($version) )
-      #if ( $field.type == "java.util.List" || $field.type == "java.util.Properties" || $field.type == "java.util.Map" )
+      #set ( $cType = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
+      #set ( $cIsModelObjList = false )
+      #if ( $cType.startsWith("List<") && $field.to && $field.to != "String" && $modelClassNames.contains($field.to) )
+        #set ( $cIsModelObjList = true )
+      #end
+      #set ( $cIsModelObj = false )
+      #if ( !$cType.startsWith("List<") && $modelClassNames.contains($cType) )
+        #set ( $cIsModelObj = true )
+      #end
+      #if ( $cIsModelObjList )
+        if (builder.${field.name} != null) {
+            ArrayList<${field.to}> bl = new ArrayList<>(builder.${field.name}.size());
+            for (${field.to}.Builder b : builder.${field.name}) {
+                bl.add(b.build());
+            }
+            this.${field.name} = ImmutableCollections.copy(bl);
+        } else {
+            this.${field.name} = ImmutableCollections.copy(builder.base != null ? builder.base.${field.name} : null);
+        }
+      #elseif ( $cIsModelObj )
+        this.${field.name} = builder.${field.name} != null ? builder.${field.name}.build() : (builder.base != null ? builder.base.${field.name} : null);
+      #elseif ( $field.type == "java.util.List" || $field.type == "java.util.Properties" || $field.type == "java.util.Map" )
         this.${field.name} = ImmutableCollections.copy(builder.${field.name} != null ? builder.${field.name} : (builder.base != null ? builder.base.${field.name} : null));
       #else
         #if ( $field.type == "boolean" || $field.type == "int" )
@@ -180,6 +208,7 @@ public class ${class.name}
     #end
     #if ( $locationTracking && ! $class.superClass )
         this.locations = builder.computeLocations();
+        this.locationsHashCode = this.locations.hashCode();
         this.importedFrom = builder.importedFrom;
     #end
     }
@@ -262,6 +291,26 @@ public class ${class.name}
 
     protected Stream<Object> getLocationKeyStream() {
         return locations.keySet().stream();
+    }
+
+    /**
+     * Gets the locations map. Provides direct access to avoid individual key lookups
+     * when comparing or hashing all locations at once.
+     *
+     * @return an unmodifiable map of locations, never {@code null}
+     */
+    public Map<Object, InputLocation> getLocations() {
+        return locations;
+    }
+
+    /**
+     * Gets the precomputed hash code for the locations map.
+     * This avoids re-iterating the map entries during pooling/interning operations.
+     *
+     * @return the cached hash code of the locations map
+     */
+    public int getLocationsHashCode() {
+        return locationsHashCode;
     }
 
     /**
@@ -391,8 +440,18 @@ public class ${class.name}
     #end
     #foreach ( $field in $class.getFields($version) )
       #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
+      #set ( $isModelObjList = false )
+      #set ( $isModelObj = false )
       #if ( $type.startsWith("List<") )
-        #set ( $type = ${type.replace('List<','Collection<')} )
+        #if ( $field.to && $field.to != "String" && $modelClassNames.contains($field.to) )
+          #set ( $isModelObjList = true )
+          #set ( $type = "Collection<${field.to}.Builder>" )
+        #else
+          #set ( $type = ${type.replace('List<','Collection<')} )
+        #end
+      #elseif ( $modelClassNames.contains($type) )
+        #set ( $isModelObj = true )
+        #set ( $type = "${type}.Builder" )
       #end
       #if ( $type == 'boolean' )
         Boolean ${field.name};
@@ -435,7 +494,27 @@ public class ${class.name}
     #end
             if (forceCopy) {
     #foreach ( $field in $class.getFields($version) )
+      #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
+      #set ( $fcIsModelObjList = false )
+      #set ( $fcIsModelObj = false )
+      #if ( $type.startsWith("List<") && $field.to && $field.to != "String" && $modelClassNames.contains($field.to) )
+        #set ( $fcIsModelObjList = true )
+      #elseif ( !$type.startsWith("List<") && $modelClassNames.contains($type) )
+        #set ( $fcIsModelObj = true )
+      #end
+      #if ( $fcIsModelObjList )
+                if (base.${field.name} != null && !base.${field.name}.isEmpty()) {
+                    ArrayList<${field.to}.Builder> bl = new ArrayList<>(base.${field.name}.size());
+                    for (${field.to} v : base.${field.name}) {
+                        bl.add(${field.to}.newBuilder(v, false));
+                    }
+                    this.${field.name} = bl;
+                }
+      #elseif ( $fcIsModelObj )
+                this.${field.name} = base.${field.name} != null ? ${type}.newBuilder(base.${field.name}, false) : null;
+      #else
                 this.${field.name} = base.${field.name};
+      #end
     #end
     #if ( $locationTracking )
                 this.locations = base.locations;
@@ -461,18 +540,167 @@ public class ${class.name}
 
     #end
     #foreach ( $field in $allFields )
+      #set ( $cap = $Helper.capitalise( $field.name ) )
       #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
+      #set ( $sIsModelObjList = false )
+      #set ( $sIsModelObj = false )
       #if ( $type.startsWith("List<") )
-        #set ( $type = ${type.replace('List<','Collection<')} )
+        #if ( $field.to && $field.to != "String" && $modelClassNames.contains($field.to) )
+          #set ( $sIsModelObjList = true )
+        #else
+          #set ( $type = ${type.replace('List<','Collection<')} )
+        #end
+      #elseif ( $modelClassNames.contains($type) )
+        #set ( $sIsModelObj = true )
       #end
       #foreach( $ann in ${field.annotations} )
         ${ann}
       #end
+      #if ( $sIsModelObjList )
+        /**
+         * Sets the {@code ${field.name}} for this builder. Each element is wrapped
+         * in a lightweight builder to support deferred materialization.
+         *
+         * @param ${field.name} the elements to set
+         * @return this builder
+         */
+        @Nonnull
+        public Builder ${field.name}(Collection<${field.to}> ${field.name}) {
+            if (${field.name} != null) {
+                ArrayList<${field.to}.Builder> bl = new ArrayList<>(${field.name}.size());
+                for (${field.to} v : ${field.name}) {
+                    bl.add(${field.to}.newBuilder(v, false));
+                }
+                this.${field.name} = bl;
+            } else {
+                this.${field.name} = null;
+            }
+            return this;
+        }
+
+        /**
+         * Returns the mutable list of {@code ${field.to}.Builder} elements.
+         * If the builder has not been explicitly set, lazily wraps the base
+         * object's immutable list into builders and caches the result.
+         *
+         * @return a mutable list of element builders, never {@code null}
+         */
+        @Nonnull
+        public List<${field.to}.Builder> getModifiable${cap}() {
+            if (${field.name} == null) {
+                if (base != null && !base.${field.name}.isEmpty()) {
+                    ArrayList<${field.to}.Builder> bl = new ArrayList<>(base.${field.name}.size());
+                    for (${field.to} v : base.${field.name}) {
+                        bl.add(${field.to}.newBuilder(v, false));
+                    }
+                    this.${field.name} = bl;
+                } else {
+                    this.${field.name} = new ArrayList<>();
+                }
+            }
+            @SuppressWarnings("unchecked")
+            List<${field.to}.Builder> result = (List<${field.to}.Builder>) (List<?>) ${field.name};
+            return result;
+        }
+
+      #elseif ( $sIsModelObj )
+        /**
+         * Sets the {@code ${field.name}} for this builder, wrapping the immutable
+         * object in a lightweight builder to support deferred materialization.
+         *
+         * @param ${field.name} the {@code ${type}} to set, or {@code null}
+         * @return this builder
+         */
+        @Nonnull
+        public Builder ${field.name}(${type} ${field.name}) {
+            this.${field.name} = ${field.name} != null ? ${type}.newBuilder(${field.name}, false) : null;
+            return this;
+        }
+
+        /**
+         * Returns the mutable {@code ${type}.Builder} for the {@code ${field.name}} field.
+         * If the builder has not been explicitly set, lazily wraps the base
+         * object's immutable value into a builder and caches the result.
+         *
+         * @return a mutable builder for the ${field.name}, never {@code null}
+         */
+        @Nonnull
+        public ${type}.Builder getModifiable${cap}() {
+            if (${field.name} == null) {
+                ${type} baseVal = base != null ? base.get${cap}() : null;
+                ${field.name} = baseVal != null ? ${type}.newBuilder(baseVal, false) : ${type}.newBuilder(false);
+            }
+            return ${field.name};
+        }
+
+      #else
         @Nonnull
         public Builder ${field.name}(${type} ${field.name}) {
             this.${field.name} = ${field.name};
             return this;
         }
+
+      #end
+    #end
+    #foreach ( $field in $allFields )
+      #set ( $cap = $Helper.capitalise( $field.name ) )
+      #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
+      #set ( $gIsModelObjList = false )
+      #set ( $gIsModelObj = false )
+      ## Builder stores List fields as Collection — match that type for the getter
+      #if ( $type.startsWith("List<") )
+        #if ( $field.to && $field.to != "String" && $modelClassNames.contains($field.to) )
+          #set ( $gIsModelObjList = true )
+          #set ( $type = "Collection<${field.to}.Builder>" )
+        #else
+          #set ( $type = ${type.replace('List<','Collection<')} )
+        #end
+      #elseif ( $modelClassNames.contains($type) )
+        #set ( $gIsModelObj = true )
+      #end
+      #if ( $type == "boolean" || $type == "Boolean" )
+        #set ( $pfx = "is" )
+      #else
+        #set ( $pfx = "get" )
+      #end
+      #if ( $gIsModelObjList )
+        ## For model-object lists, return the raw field only (don't resolve through base
+        ## to avoid unwanted lazy-wrapping that would defeat the short-circuit optimization)
+        public ${type} ${pfx}${cap}() {
+            return ${field.name};
+        }
+        ## Provide a method to get the built list, resolving through base when unmodified.
+        ## This avoids the overhead of a full model build() just to read one list field
+        ## in pipeline stages that only need to inspect a specific list.
+        public List<${field.to}> getBuilt${cap}() {
+            if (${field.name} == null) {
+                return base != null ? base.get${cap}() : List.of();
+            }
+            ArrayList<${field.to}> result = new ArrayList<>(${field.name}.size());
+            for (${field.to}.Builder b : ${field.name}) {
+                result.add(b.build());
+            }
+            return result;
+        }
+      #elseif ( $gIsModelObj )
+        ## For single model-object fields, resolve through .build() when the
+        ## sub-builder has been explicitly set; fall through to base otherwise.
+        public ${type} ${pfx}${cap}() {
+            return ${field.name} != null ? ${field.name}.build() : (base != null ? base.${pfx}${cap}() : null);
+        }
+      #elseif ( $type == "boolean" )
+        public ${type} ${pfx}${cap}() {
+            return ${field.name} != null ? ${field.name} : (base != null ? base.${pfx}${cap}() : ${field.defaultValue});
+        }
+      #elseif ( $type == "int" )
+        public ${type} ${pfx}${cap}() {
+            return ${field.name} != null ? ${field.name} : (base != null ? base.${pfx}${cap}() : ${field.defaultValue});
+        }
+      #else
+        public ${type} ${pfx}${cap}() {
+            return ${field.name} != null ? ${field.name} : (base != null ? base.${pfx}${cap}() : null);
+        }
+      #end
 
     #end
 
@@ -494,13 +722,67 @@ public class ${class.name}
             return this;
         }
 
+        public InputLocation getLocation(Object key) {
+            if (locations != null && locations.containsKey(key)) {
+                return locations.get(key);
+            }
+            return base != null ? base.getLocation(key) : null;
+        }
+
+        public InputLocation getImportedFrom() {
+            return importedFrom != null ? importedFrom : (base != null ? base.getImportedFrom() : null);
+        }
+
     #end
+        /**
+         * Resets this builder to wrap the specified base object, clearing all
+         * explicitly set fields. After reset, all getters resolve through the
+         * new base. Used by pipeline stage default methods to replace the
+         * builder's state with a stage's result without allocating a new Builder.
+         *
+         * @param base the new base object to wrap
+         * @return this builder
+         */
+        @Nonnull
+        public Builder reset(${class.name} base) {
+    #if ( $class.superClass )
+            super.reset(base);
+    #end
+            this.base = base;
+    #if ( $class == $root )
+            this.namespaceUri = null;
+            this.modelEncoding = null;
+    #end
+    #foreach ( $field in $class.getFields($version) )
+            this.${field.name} = null;
+    #end
+    #if ( ! $class.superClass && $locationTracking )
+            this.locations = null;
+            this.importedFrom = null;
+    #end
+            return this;
+        }
+
         @Nonnull
         public ${class.name} build() {
             // this method should not contain any logic other than creating (or reusing) an object in order to ease subclassing
             if (base != null
     #foreach ( $field in $allFields )
+      #set ( $bType = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
+      #set ( $bIsModelObjList = false )
+      #set ( $bIsModelObj = false )
+      #if ( $bType.startsWith("List<") && $field.to && $field.to != "String" && $modelClassNames.contains($field.to) )
+        #set ( $bIsModelObjList = true )
+      #elseif ( !$bType.startsWith("List<") && $modelClassNames.contains($bType) )
+        #set ( $bIsModelObj = true )
+      #end
+      #if ( $bIsModelObjList )
+                    && (${field.name} == null || (${field.name}.isEmpty() && base.${field.name}.isEmpty()))
+      #elseif ( $bIsModelObj )
+                    && ${field.name} == null
+      #else
                     && (${field.name} == null || ${field.name} == base.${field.name})
+      #end
     #end
             ) {
                 return base;
@@ -518,14 +800,16 @@ public class ${class.name}
             Map<Object, InputLocation> newlocs = locations != null ? locations : Map.of();
             Map<Object, InputLocation> oldlocs = base != null ? base.locations : Map.of();
             if (newlocs.isEmpty()) {
-                return Map.copyOf(oldlocs);
+                return oldlocs;
             }
             if (oldlocs.isEmpty()) {
                 return Map.copyOf(newlocs);
             }
-            return Stream.concat(newlocs.entrySet().stream(), oldlocs.entrySet().stream())
-                    // Keep value from newlocs in case of duplicates
-                    .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue, (v1, v2) -> v1));
+            // Use HashMap.putAll instead of Stream.concat().collect() to avoid
+            // Stream allocation and intermediate Map.Entry iteration overhead
+            HashMap<Object, InputLocation> merged = new HashMap<>(oldlocs);
+            merged.putAll(newlocs); // newlocs entries override oldlocs (same semantics as before)
+            return Map.copyOf(merged);
         }
     #end
     }

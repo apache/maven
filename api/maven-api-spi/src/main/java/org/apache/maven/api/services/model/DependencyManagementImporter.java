@@ -45,4 +45,21 @@ public interface DependencyManagementImporter {
             List<? extends DependencyManagement> sources,
             ModelBuilderRequest request,
             ModelProblemCollector problems);
+
+    /**
+     * Builder-accepting variant of {@link #importManagement}.
+     *
+     * @since 4.0.0
+     */
+    default void importManagement(
+            Model.Builder builder,
+            List<? extends DependencyManagement> sources,
+            ModelBuilderRequest request,
+            ModelProblemCollector problems) {
+        Model built = builder.build();
+        Model result = importManagement(built, sources, request, problems);
+        if (result != built) {
+            builder.reset(result);
+        }
+    }
 }

@@ -74,10 +74,23 @@ public class MavenModelMerger extends MavenMerger {
     }
 
     @Override
+    public void merge(Model.Builder builder, Model target, Model source, boolean sourceDominant, Map<?, ?> hints) {
+        super.merge(builder, target, source, sourceDominant, hints);
+    }
+
+    @Override
     protected Model mergeModel(Model target, Model source, boolean sourceDominant, Map<Object, Object> context) {
         context.put(ARTIFACT_ID, target.getArtifactId());
 
         return super.mergeModel(target, source, sourceDominant, context);
+    }
+
+    @Override
+    protected void mergeModel(
+            Model.Builder builder, Model target, Model source, boolean sourceDominant, Map<Object, Object> context) {
+        context.put(ARTIFACT_ID, target.getArtifactId());
+
+        super.mergeModel(builder, target, source, sourceDominant, context);
     }
 
     @Override

@@ -36,4 +36,17 @@ public interface ModelUrlNormalizer {
      * @param request The model building request that holds further settings, must not be {@code null}.
      */
     Model normalize(Model model, ModelBuilderRequest request);
+
+    /**
+     * Builder-accepting variant of {@link #normalize}.
+     *
+     * @since 4.0.0
+     */
+    default void normalize(Model.Builder builder, ModelBuilderRequest request) {
+        Model built = builder.build();
+        Model result = normalize(built, request);
+        if (result != built) {
+            builder.reset(result);
+        }
+    }
 }
