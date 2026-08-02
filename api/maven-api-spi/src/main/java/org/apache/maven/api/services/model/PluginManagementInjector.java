@@ -38,4 +38,17 @@ public interface PluginManagementInjector {
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
     Model injectManagement(Model model, ModelBuilderRequest request, ModelProblemCollector problems);
+
+    /**
+     * Builder-accepting variant of {@link #injectManagement}.
+     *
+     * @since 4.0.0
+     */
+    default void injectManagement(Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems) {
+        Model built = builder.build();
+        Model result = injectManagement(built, request, problems);
+        if (result != built) {
+            builder.reset(result);
+        }
+    }
 }

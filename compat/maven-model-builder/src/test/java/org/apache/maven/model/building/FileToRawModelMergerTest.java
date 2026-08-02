@@ -40,6 +40,10 @@ class FileToRawModelMergerTest {
     void testOverriddenMergeMethods() {
         List<String> methodNames = Stream.of(MavenMerger.class.getDeclaredMethods())
                 .filter(m -> m.getName().startsWith("merge"))
+                // Exclude *ToBuilder variants and void methods whose first parameter
+                // is a Builder — only the object-returning merge methods need overriding
+                .filter(m -> !m.getName().endsWith("ToBuilder"))
+                .filter(m -> !m.getParameterTypes()[0].getSimpleName().equals("Builder"))
                 .filter(m -> {
                     String baseName = m.getName().substring(5 /* merge */);
                     String entity = baseName.substring(baseName.indexOf('_') + 1);

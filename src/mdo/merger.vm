@@ -88,6 +88,29 @@ public class ${className} {
         return merge${root.name}(target, source, sourceDominant, context);
     }
 
+    /**
+     * Builder-accepting variant that merges the source into an existing builder,
+     * avoiding the intermediate immutable object allocation that {@link #merge} performs.
+     *
+     * @param builder The builder to merge into, must not be {@code null}.
+     * @param target The immutable snapshot to read current field values from, must not be {@code null}.
+     * @param source The (read-only) source object to merge from, may be {@code null}.
+     * @param sourceDominant Whether the source provides the dominant data.
+     * @param hints Domain-specific hints, may be {@code null}.
+     */
+    public void merge(${root.name}.Builder builder, ${root.name} target, ${root.name} source, boolean sourceDominant, Map<?, ?> hints) {
+        Objects.requireNonNull(builder, "builder cannot be null");
+        Objects.requireNonNull(target, "target cannot be null");
+        if (source == null) {
+            return;
+        }
+        Map<Object, Object> context = new HashMap<>();
+        if (hints != null) {
+            context.putAll(hints);
+        }
+        merge${root.name}(builder, target, source, sourceDominant, context);
+    }
+
 #foreach ( $class in $model.allClasses )
   #if ( $class.name != "InputSource" && $class.name != "InputLocation" )
     #set ( $ancestors = $Helper.ancestors( $class ) )
@@ -99,6 +122,17 @@ public class ${className} {
         ${class.name}.Builder builder = ${class.name}.newBuilder(target);
         merge${class.name}(builder, target, source, sourceDominant, context);
         return builder.build();
+    }
+
+    /**
+     * Merges the source into a builder based on the target, returning the Builder
+     * without calling build(). This allows callers to defer the build() call and
+     * avoid intermediate immutable object allocations in multi-stage pipelines.
+     */
+    protected ${class.name}.Builder merge${class.name}ToBuilder(${class.name} target, ${class.name} source, boolean sourceDominant, Map<Object, Object> context) {
+        ${class.name}.Builder builder = ${class.name}.newBuilder(target);
+        merge${class.name}(builder, target, source, sourceDominant, context);
+        return builder;
     }
 
     protected void merge${class.name}(${class.name}.Builder builder, ${class.name} target, ${class.name} source, boolean sourceDominant, Map<Object, Object> context) {
