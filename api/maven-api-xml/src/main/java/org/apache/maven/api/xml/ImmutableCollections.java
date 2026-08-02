@@ -297,7 +297,7 @@ class ImmutableCollections {
 
             @Override
             public E get(int index) {
-                if (index < 0 || index > size()) {
+                if (index < 0 || index >= size()) {
                     throw outOfBounds(index);
                 }
                 return AbstractImmutableList.this.get(fromIndex + index);
