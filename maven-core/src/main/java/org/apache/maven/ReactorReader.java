@@ -129,7 +129,8 @@ class ReactorReader implements MavenWorkspaceReader {
     //
 
     private File find(MavenProject project, Artifact artifact) {
-        if ("pom".equals(artifact.getExtension())) {
+        if ("pom".equals(artifact.getExtension())
+                && (artifact.getClassifier() == null || artifact.getClassifier().isEmpty())) {
             return project.getFile();
         }
 
