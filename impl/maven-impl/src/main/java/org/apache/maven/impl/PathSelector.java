@@ -25,10 +25,13 @@ import java.nio.file.PathMatcher;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.StringTokenizer;
 
 import org.apache.maven.api.annotations.Nonnull;
 
@@ -259,6 +262,150 @@ final class PathSelector implements PathMatcher {
             Collection<String> excludes,
             boolean useDefaultExcludes) {
         return new PathSelector(directory, includes, excludes, useDefaultExcludes).simplify();
+    }
+
+    /**
+     * Creates a map of subdirectory paths to path matchers, optimized for targeted directory walks.
+     * <p>
+     * This method decomposes include patterns by parsing their literal leading path segments
+     * (the segments before the first wildcard) to determine the narrowest possible subdirectories
+     * that need to be walked. For example, includes {@code ["src/main/java/**&#47;*.java",
+     * "src/test/**&#47;*.java"]} produces two entries keyed by {@code src/main/java} and
+     * {@code src/test}, each with a matcher scoped to only those patterns.
+     * <p>
+     * For patterns with no literal prefix (e.g. {@code "**&#47;*.xml"}), the base directory
+     * itself is used as the key. For single-file patterns with no wildcards at all, the map
+     * key is the file path itself and the matcher does a direct equality check.
+     *
+     * @param basedir the base directory for resolving paths
+     * @param includes the include patterns, may be {@code null} or empty (meaning include all)
+     * @param excludes the exclude patterns, may be {@code null} or empty (meaning exclude none)
+     * @return a map of subdirectory (or file) paths to their corresponding path matchers
+     * @throws NullPointerException if basedir is null
+     * @since 4.1.0
+     */
+    public static Map<Path, PathMatcher> ofSubdirectories(
+            @Nonnull Path basedir, Collection<String> includes, Collection<String> excludes) {
+        Objects.requireNonNull(basedir, "basedir cannot be null");
+        if (includes == null || includes.isEmpty()) {
+            // No includes → match everything under basedir
+            return Map.of(basedir, of(basedir, includes, excludes, false));
+        }
+
+        // Build a trie from include patterns, splitting on literal path segments.
+        // Each leaf holds the glob portion (from the first wildcard segment onward).
+        IncludesTrie root = new IncludesTrie();
+        for (String include : includes) {
+            // Ant shorthand: trailing "/" means "everything under this directory"
+            if (include.endsWith("/")) {
+                include = include + "**";
+            }
+            IncludesTrie trie = root;
+            StringTokenizer st = new StringTokenizer(include, "/");
+            while (st.hasMoreTokens()) {
+                String segment = st.nextToken();
+                if (segment.contains("*") || segment.contains("?")) {
+                    // This segment has wildcards — collect it and remaining segments as a glob
+                    StringBuilder glob = new StringBuilder(segment);
+                    while (st.hasMoreTokens()) {
+                        glob.append('/').append(st.nextToken());
+                    }
+                    trie.addPattern(glob.toString());
+                    break;
+                }
+                trie = trie.child(segment);
+            }
+        }
+
+        // Convert trie leaves into Path → PathMatcher entries
+        Map<Path, PathMatcher> result = new HashMap<>();
+        trie2map(root, basedir, null, excludes, result);
+        return result;
+    }
+
+    /**
+     * Recursively converts an {@link IncludesTrie} into map entries.
+     */
+    private static void trie2map(
+            IncludesTrie node,
+            Path basedir,
+            String relpath,
+            Collection<String> excludes,
+            Map<Path, PathMatcher> result) {
+        if (node.children != null) {
+            for (Map.Entry<String, IncludesTrie> entry : node.children.entrySet()) {
+                String childPath = relpath != null ? relpath + "/" + entry.getKey() : entry.getKey();
+                trie2map(entry.getValue(), basedir, childPath, excludes, result);
+            }
+        } else {
+            Path entryPath = relpath != null ? basedir.resolve(relpath) : basedir;
+            if (node.patterns != null) {
+                // Reconstruct full include patterns by prepending the literal prefix
+                List<String> scopedIncludes = new ArrayList<>(node.patterns.size());
+                for (String pattern : node.patterns) {
+                    scopedIncludes.add(relpath != null ? relpath + "/" + pattern : pattern);
+                }
+                result.put(entryPath, of(basedir, scopedIncludes, excludes, false));
+            } else {
+                // No wildcards at all — this is a single exact file path
+                result.put(entryPath, singlePathMatcher(basedir, relpath));
+            }
+        }
+    }
+
+    /**
+     * Creates a matcher that matches exactly one file by path equality.
+     */
+    private static PathMatcher singlePathMatcher(Path basedir, String relpath) {
+        Path target = relpath != null ? basedir.resolve(relpath) : basedir;
+        return path -> path.equals(target);
+    }
+
+    /**
+     * A trie for decomposing include patterns into per-subdirectory groups.
+     * Each non-leaf node represents a literal directory segment; each leaf
+     * holds the wildcard-containing glob tail(s) for that subtree.
+     */
+    private static class IncludesTrie {
+        Map<String, IncludesTrie> children;
+        Collection<String> patterns;
+
+        void addPattern(String glob) {
+            if (patterns == null) {
+                patterns = new LinkedHashSet<>();
+            }
+            patterns.add(glob);
+            // Once we have patterns at this level, collapse any children into patterns too
+            if (children != null) {
+                for (Map.Entry<String, IncludesTrie> entry : children.entrySet()) {
+                    entry.getValue().collectInto(entry.getKey(), patterns);
+                }
+                children = null;
+            }
+        }
+
+        private void collectInto(String prefix, Collection<String> target) {
+            if (children != null) {
+                for (Map.Entry<String, IncludesTrie> entry : children.entrySet()) {
+                    entry.getValue().collectInto(prefix + "/" + entry.getKey(), target);
+                }
+            }
+            if (patterns != null) {
+                for (String pattern : patterns) {
+                    target.add(prefix + "/" + pattern);
+                }
+            }
+        }
+
+        IncludesTrie child(String name) {
+            if (patterns != null) {
+                return this; // already collecting patterns at this level
+            }
+            if (children == null) {
+                children = new HashMap<>();
+            }
+            return children.computeIfAbsent(name, k -> new IncludesTrie());
+        }
     }
 
     /**

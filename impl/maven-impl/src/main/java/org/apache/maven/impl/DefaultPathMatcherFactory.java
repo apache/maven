@@ -21,6 +21,7 @@ package org.apache.maven.impl;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 
 import org.apache.maven.api.annotations.Nonnull;
@@ -53,6 +54,15 @@ public class DefaultPathMatcherFactory implements PathMatcherFactory {
         requireNonNull(baseDirectory, "baseDirectory cannot be null");
 
         return PathSelector.of(baseDirectory, includes, excludes, useDefaultExcludes);
+    }
+
+    @Nonnull
+    @Override
+    public Map<Path, PathMatcher> createSubdirectoryMatchers(
+            @Nonnull Path baseDirectory, Collection<String> includes, Collection<String> excludes) {
+        requireNonNull(baseDirectory, "baseDirectory cannot be null");
+
+        return PathSelector.ofSubdirectories(baseDirectory, includes, excludes);
     }
 
     @Nonnull
