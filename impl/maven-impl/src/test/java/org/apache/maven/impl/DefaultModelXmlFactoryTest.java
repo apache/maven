@@ -150,6 +150,34 @@ class DefaultModelXmlFactoryTest {
     }
 
     @Test
+    void testReadPomWithDoctypeDeclaration() throws Exception {
+        // Verify that a POM containing a DOCTYPE declaration with an external entity
+        // is handled gracefully: the pre-parse (extractModelId) should ignore DTDs
+        // and still extract the GAV coordinates correctly
+        String xml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!DOCTYPE project [
+                  <!ENTITY ext SYSTEM "file:///nonexistent/path">
+                ]>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                  <modelVersion>4.0.0</modelVersion>
+                  <groupId>com.example</groupId>
+                  <artifactId>doctype-test</artifactId>
+                  <version>1.0.0</version>
+                </project>""";
+
+        // Use a Reader (not a Path) so the extractModelId pre-parse is triggered
+        // when no modelId is set on the request
+        XmlReaderRequest request =
+                XmlReaderRequest.builder().reader(new StringReader(xml)).build();
+
+        Model model = factory.read(request);
+        assertEquals("com.example", model.getGroupId());
+        assertEquals("doctype-test", model.getArtifactId());
+        assertEquals("1.0.0", model.getVersion());
+    }
+
+    @Test
     void testWriteWithFormatterEnablesLocationTracking() throws Exception {
         String xml = """
                 <project xmlns="http://maven.apache.org/POM/4.0.0">
