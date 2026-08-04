@@ -458,8 +458,13 @@ public class RichBuildEventListener implements BuildEventListener {
 
     /**
      * Build exactly {@link #statusHeight} status lines.
-     * Layout: 1 header + active projects (packed top) + empty padding + 1 separator + 1 summary.
-     * The separator and summary are always at the bottom — they never move.
+     * <p>
+     * For small reactors (modules fit as individual indicators):
+     * Layout: header + active slots + padding + separator + summary (indicators + counter).
+     * <p>
+     * For large reactors (progress bar mode):
+     * Layout: header + active slots + padding + progress bar (full-width, acts as separator + counter).
+     * The progress bar replaces the separator — no redundant horizontal rule.
      */
     private List<String> buildStatusLines() {
         int termWidth = Math.max(terminal.getWidth(), 40);
@@ -468,8 +473,12 @@ public class RichBuildEventListener implements BuildEventListener {
         List<ProjectState> active = new ArrayList<>(activeProjects.values());
         active.sort((a, b) -> a.startTime.compareTo(b.startTime));
 
-        // Number of project slot lines = statusHeight - 3 (header, separator, summary)
-        int slotCount = statusHeight - 3;
+        // Determine if we're in progress bar mode (reactor too large for per-module indicators)
+        int maxIndicators = Math.min(projectOrder.size(), (termWidth - 40) / 3);
+        boolean useProgressBar = totalProjects > 1 && maxIndicators > 0 && totalProjects > maxIndicators;
+
+        // Number of project slot lines: subtract header (1) + bottom lines (2 for separator+summary, 1 for bar)
+        int slotCount = statusHeight - (useProgressBar ? 2 : 3);
 
         List<String> lines = new ArrayList<>(statusHeight);
 
@@ -491,11 +500,15 @@ public class RichBuildEventListener implements BuildEventListener {
             lines.add("");
         }
 
-        // Separator line (always at the same position)
-        lines.add(DIM + "─".repeat(Math.min(termWidth, 120)) + RESET);
-
-        // Summary line (progress indicators + counter + elapsed + downloads)
-        lines.add(buildSummaryLine(termWidth));
+        if (useProgressBar) {
+            // Progress bar replaces separator + summary as a single full-width line
+            lines.add(buildProgressBarLine(termWidth));
+        } else {
+            // Separator line (always at the same position)
+            lines.add(DIM + "─".repeat(Math.min(termWidth, 120)) + RESET);
+            // Summary line (per-module indicators + counter + elapsed + downloads)
+            lines.add(buildSummaryLine(termWidth));
+        }
 
         return lines;
     }
@@ -518,18 +531,100 @@ public class RichBuildEventListener implements BuildEventListener {
         return b.toString();
     }
 
+    /**
+     * Build a full-width progress bar line for large reactors.
+     * Replaces both the separator and summary — one line with the proportional
+     * bar, counter, elapsed time, and download status.
+     */
+    private String buildProgressBarLine(int termWidth) {
+        // Build the suffix first so we know how much width the bar can use
+        StringBuilder suffix = new StringBuilder();
+        suffix.append(" [");
+        suffix.append(completedProjects).append('/').append(totalProjects);
+        suffix.append(']');
+        if (buildStartTime != null) {
+            Duration elapsed = Duration.between(buildStartTime, MonotonicClock.now());
+            suffix.append("  ").append(formatCompactDuration(elapsed));
+        }
+        if (!activeTransfers.isEmpty()) {
+            suffix.append("  ↓ ");
+            if (activeTransfers.size() == 1) {
+                TransferInfo ti = activeTransfers.values().iterator().next();
+                suffix.append(ti.artifactName);
+                if (ti.totalBytes > 0) {
+                    suffix.append(' ')
+                            .append(formatBytes(ti.transferred))
+                            .append('/')
+                            .append(formatBytes(ti.totalBytes));
+                }
+            } else {
+                suffix.append(activeTransfers.size()).append(" artifacts");
+            }
+        }
+        int suffixLen = suffix.length();
+
+        // Bar fills from column 0 to (lineWidth - suffixLen)
+        int lineWidth = Math.min(termWidth, 120);
+        int barWidth = Math.max(10, lineWidth - suffixLen);
+
+        int activeCount = activeProjects.size();
+        int doneChars = (int) ((long) completedProjects * barWidth / totalProjects);
+        int activeChars = (int) ((long) activeCount * barWidth / totalProjects);
+        if (activeCount > 0 && activeChars < 1) {
+            activeChars = 1;
+        }
+        if (doneChars + activeChars > barWidth) {
+            activeChars = barWidth - doneChars;
+        }
+        int remainChars = barWidth - doneChars - activeChars;
+
+        StringBuilder s = new StringBuilder();
+        s.append(GREEN).append("━".repeat(doneChars)).append(RESET);
+        s.append(YELLOW).append("━".repeat(activeChars)).append(RESET);
+        s.append(DIM).append("─".repeat(remainChars)).append(RESET);
+
+        // Append suffix with styling
+        s.append(" [");
+        s.append(BOLD)
+                .append(completedProjects)
+                .append('/')
+                .append(totalProjects)
+                .append(RESET);
+        s.append(']');
+        if (buildStartTime != null) {
+            Duration elapsed = Duration.between(buildStartTime, MonotonicClock.now());
+            s.append("  ").append(DIM).append(formatCompactDuration(elapsed)).append(RESET);
+        }
+        if (!activeTransfers.isEmpty()) {
+            s.append("  ").append(BLUE).append("↓ ").append(RESET);
+            if (activeTransfers.size() == 1) {
+                TransferInfo ti = activeTransfers.values().iterator().next();
+                s.append(ti.artifactName);
+                if (ti.totalBytes > 0) {
+                    s.append(' ')
+                            .append(DIM)
+                            .append(formatBytes(ti.transferred))
+                            .append('/')
+                            .append(formatBytes(ti.totalBytes))
+                            .append(RESET);
+                }
+            } else {
+                s.append(activeTransfers.size()).append(" artifacts");
+            }
+        }
+
+        return s.toString();
+    }
+
+    /**
+     * Build the summary line for small reactors (per-module indicators + counter).
+     */
     private String buildSummaryLine(int termWidth) {
         StringBuilder s = new StringBuilder(" ");
 
-        // Module status indicators (✓ done, ● active, ○ pending)
-        int maxIndicators = Math.min(projectOrder.size(), (termWidth - 40) / 3);
-        if (totalProjects > 1 && maxIndicators > 0) {
-            int shown = 0;
+        // Per-module indicators — each module gets its own symbol
+        if (totalProjects > 1) {
             for (String pid : projectOrder) {
-                if (shown >= maxIndicators) {
-                    s.append("… ");
-                    break;
-                }
                 if (activeProjects.containsKey(pid)) {
                     ProjectState ps = activeProjects.get(pid);
                     if (ps != null && ps.failed) {
@@ -542,7 +637,6 @@ public class RichBuildEventListener implements BuildEventListener {
                 } else {
                     s.append(DIM).append("○ ").append(RESET);
                 }
-                shown++;
             }
         }
 

@@ -243,6 +243,47 @@ class RichBuildEventListenerTest {
     }
 
     @Test
+    void testLargeReactorProgressBar() {
+        // With 50 modules on a 120-char terminal, maxIndicators = (120-40)/3 = 26.
+        // 50 > 26, so the summary line should use a progress bar instead of
+        // per-module ✓/●/○ indicators.
+        List<MavenProject> projects = new java.util.ArrayList<>();
+        for (int i = 0; i < 50; i++) {
+            projects.add(createProject("module-" + i));
+        }
+        MavenSession session = createSession(projects);
+        listener.initReactor(session);
+
+        // Start and finish some modules to exercise the progress bar rendering
+        for (int i = 0; i < 10; i++) {
+            listener.projectStarted("module-" + i);
+        }
+        for (int i = 0; i < 5; i++) {
+            listener.projectFinished("module-" + i);
+        }
+        // 5 completed, 5 active, 40 pending — should render without error
+        for (int i = 5; i < 10; i++) {
+            listener.projectFinished("module-" + i);
+        }
+    }
+
+    @Test
+    void testSmallReactorUsesIndicators() {
+        // With 3 modules on a 120-char terminal, maxIndicators = 26 > 3,
+        // so the summary line should use per-module ✓/●/○ indicators.
+        MavenSession session =
+                createSession(List.of(createProject("api"), createProject("core"), createProject("cli")));
+        listener.initReactor(session);
+
+        listener.projectStarted("api");
+        listener.projectFinished("api");
+        listener.projectStarted("core");
+        listener.projectFinished("core");
+        listener.projectStarted("cli");
+        listener.projectFinished("cli");
+    }
+
+    @Test
     void testTruncateAnsiPlainText() {
         String truncated = RichBuildEventListener.truncateAnsi("hello world", 5);
         // When truncated, a RESET escape is appended to close any open styling
