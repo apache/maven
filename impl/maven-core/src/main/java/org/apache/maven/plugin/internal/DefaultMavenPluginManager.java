@@ -60,6 +60,7 @@ import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.internal.impl.DefaultLog;
@@ -556,9 +557,11 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         org.apache.maven.api.MojoExecution execution = new DefaultMojoExecution(sessionV4, mojoExecution);
         org.apache.maven.api.plugin.Log log = new DefaultLog(
                 LoggerFactory.getLogger(mojoExecution.getMojoDescriptor().getFullGoalName()));
+        Injector injector;
         try {
-            Injector injector = Injector.create();
+            injector = Injector.create();
             injector.discover(pluginRealm);
+            configureV4MojoInjector(injector);
             // Add known classes
             // TODO: get those from the existing plexus scopes ?
             injector.bindInstance(Session.class, sessionV4);
@@ -676,7 +679,94 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             }
         }
 
-        return mojo;
+        return wrapV4MojoWithIncrementalContextFinalizer(mojoInterface, mojo, injector, session, mojoExecution);
+    }
+
+    /**
+     * Configures scope handling and core implementation bindings for the V4 mojo injector.
+     * Registers {@code @MojoExecutionScoped} as a singleton scope (safe because one injector
+     * is created per mojo execution) and makes the {@code IncrementalContext}
+     * implementation available for injection into V4 mojos.
+     */
+    private void configureV4MojoInjector(Injector injector) {
+        // Treat @MojoExecutionScoped as a singleton scope since each V4 injector
+        // is created per mojo execution. Use a shared key-based cache so that different
+        // injection points for the same type get the same instance (the DI framework may
+        // compile the same binding multiple times for qualified vs unqualified keys).
+        // Use HashMap (not ConcurrentHashMap) because ConcurrentHashMap.computeIfAbsent
+        // throws "Recursive update" when scoped beans depend on each other and hash to
+        // the same bucket. V4 mojo execution is single-threaded, so HashMap is safe.
+        HashMap<Key<?>, Object> scopeCache = new HashMap<>();
+        injector.bindScope(org.apache.maven.api.di.MojoExecutionScoped.class, new org.apache.maven.di.Scope() {
+            @SuppressWarnings("unchecked")
+            @Override
+            public <U> Supplier<U> scope(Key<U> key, Supplier<U> unscoped) {
+                return () -> {
+                    U existing = (U) scopeCache.get(key);
+                    if (existing == null) {
+                        existing = unscoped.get();
+                        scopeCache.put(key, existing);
+                    }
+                    return existing;
+                };
+            }
+        });
+
+        // Bind IncrementalContext implementation classes.
+        // We skip MavenIncrementalContext here because it requires Supplier<MojoExecutionScopedIncrementalContext>
+        // for lazy per-execution creation in the V3 (Plexus/Sisu) path, and the Maven DI system does
+        // not auto-wrap T bindings into Supplier<T>. Since each V4 injector is already per-execution,
+        // we bind IncrementalContext directly to MojoExecutionScopedIncrementalContext instead.
+        injector.bindImplicit(org.apache.maven.internal.build.incremental.impl.FilesystemWorkspace.class);
+        injector.bindImplicit(org.apache.maven.internal.build.incremental.impl.maven.ProjectWorkspace.class);
+        injector.bindImplicit(
+                org.apache.maven.internal.build.incremental.impl.maven.digest.MojoConfigurationDigester.class);
+        injector.bindImplicit(
+                org.apache.maven.internal.build.incremental.impl.maven.MavenIncrementalContextFinalizer.class);
+        injector.bindImplicit(
+                org.apache.maven.internal.build.incremental.impl.maven.MavenIncrementalContextConfiguration.class);
+        injector.bindImplicit(
+                org.apache.maven.internal.build.incremental.impl.maven.MavenIncrementalContext
+                        .MojoExecutionScopedIncrementalContext.class);
+        // Expose the scoped MojoExecutionScopedIncrementalContext as IncrementalContext for plugin injection.
+        // @Typed on the inner class restricts its implicit bindings to its own type only,
+        // so we need an explicit binding to make it available as the IncrementalContext interface.
+        injector.bindSupplier(
+                org.apache.maven.api.build.incremental.IncrementalContext.class,
+                () -> injector.getInstance(
+                        org.apache.maven.internal.build.incremental.impl.maven.MavenIncrementalContext
+                                .MojoExecutionScopedIncrementalContext.class));
+    }
+
+    /**
+     * Wraps a V4 mojo to call the IncrementalContext finalizer after successful execution.
+     * <p>
+     * V4 mojos bypass the Sisu {@code MojoExecutionScope}, so {@code WeakMojoExecutionListener}
+     * instances created by the V4 injector are never notified by the normal lifecycle. This method
+     * detects when a {@code MavenIncrementalContextFinalizer} was created (because the mojo injects
+     * {@code IncrementalContext}) and wraps the mojo's {@code execute()} to call
+     * {@code afterMojoExecutionSuccess()} afterward, ensuring incremental build state is persisted.
+     */
+    @SuppressWarnings("unchecked")
+    private <T> T wrapV4MojoWithIncrementalContextFinalizer(
+            Class<T> mojoInterface, T mojo, Injector injector, MavenSession session, MojoExecution mojoExecution) {
+        if (mojoInterface != org.apache.maven.api.plugin.Mojo.class) {
+            return mojo;
+        }
+        org.apache.maven.internal.build.incremental.impl.maven.MavenIncrementalContextFinalizer finalizer;
+        try {
+            finalizer = injector.getInstance(
+                    org.apache.maven.internal.build.incremental.impl.maven.MavenIncrementalContextFinalizer.class);
+        } catch (org.apache.maven.di.impl.DIException ignored) {
+            return mojo;
+        }
+        org.apache.maven.internal.build.incremental.impl.maven.MavenIncrementalContextFinalizer f = finalizer;
+        org.apache.maven.api.plugin.Mojo realMojo = (org.apache.maven.api.plugin.Mojo) mojo;
+        return (T) (org.apache.maven.api.plugin.Mojo) () -> {
+            realMojo.execute();
+            f.afterMojoExecutionSuccess(
+                    new MojoExecutionEvent(session, session.getCurrentProject(), mojoExecution, null));
+        };
     }
 
     private <T> T loadV3Mojo(
