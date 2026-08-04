@@ -110,14 +110,19 @@ class MonotonicClockTest {
         @DisplayName("Elapsed time should match time difference")
         void testElapsedTimeConsistency() {
             MonotonicClock clock = MonotonicClock.get();
+            // Sandwich the instant() sample between two elapsedTime() samples: since both are
+            // derived from the same monotonic source, the duration computed from the instant
+            // must fall within the surrounding measurements, however long the JVM is paused
+            // between the calls.
+            Duration before = clock.elapsedTime();
             Instant now = clock.instant();
-            Duration elapsed = clock.elapsedTime();
+            Duration after = clock.elapsedTime();
             Duration calculated = Duration.between(clock.startInstant(), now);
 
-            // Allow for small timing differences (1ms) due to execution time between measurements
             assertTrue(
-                    Math.abs(elapsed.toMillis() - calculated.toMillis()) <= 1,
-                    "Elapsed time should match calculated duration between start and now");
+                    calculated.compareTo(before) >= 0 && calculated.compareTo(after) <= 0,
+                    "Elapsed time should match calculated duration between start and now: " + before + " <= "
+                            + calculated + " <= " + after);
         }
     }
 
