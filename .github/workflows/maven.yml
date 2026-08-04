@@ -37,9 +37,12 @@ env:
   MIMIR_BASEDIR: ~/.mimir
   MIMIR_LOCAL: ~/.mimir/local
   MAVEN_OPTS: -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./target/java_heapdump.hprof
-  # No MVNW_REPOURL: the Google Cloud mirror of Central lags a fresh release by
-  # a day or more, so the wrapper cannot fetch a just-published distribution
-  # from it. Leaving it unset makes the wrapper download from Central itself.
+  # The Google Cloud mirror of Central lags a fresh release: 4.0.0-rc-6 was
+  # still a 404 there days after Central served it, so the wrapper could not
+  # fetch the distribution this workflow had just asked for. Unset, the
+  # wrapper downloads from Central. Uncomment to put the mirror back once its
+  # sync latency stops breaking release-day builds.
+  # MVNW_REPOURL: https://maven-central.storage-download.googleapis.com/maven2
 
 jobs:
   initial-build:
