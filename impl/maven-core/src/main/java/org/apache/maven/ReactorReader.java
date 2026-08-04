@@ -354,9 +354,10 @@ class ReactorReader implements MavenWorkspaceReader {
      *
      * <p>When a project enters its clean phase, its artifacts are cleaned from the
      * project-local-repo (per-GAV scope). Since the project-local-repo is located
-     * under {@code .mvn/} (not under {@code target/}), it is not affected by
-     * maven-clean-plugin's deletion of {@code target/}, eliminating the race
-     * condition between clean and install operations in parallel builds.</p>
+     * under {@code .mvn/target/} (not under the project's own {@code target/}),
+     * it is not affected by maven-clean-plugin's deletion of {@code target/},
+     * eliminating the race condition between clean and install operations in
+     * parallel builds.</p>
      *
      * @param event the execution event
      */
@@ -408,9 +409,10 @@ class ReactorReader implements MavenWorkspaceReader {
 
     /**
      * Cleans the project-local-repo artifacts for the given project's GAV coordinates.
-     * Since the project-local-repo is under {@code .mvn/} and not {@code target/},
-     * it is not affected by maven-clean-plugin's deletion of {@code target/},
-     * so there is no race between clean and install operations in parallel builds.
+     * Since the project-local-repo is under {@code .mvn/target/} and not the project's
+     * own {@code target/}, it is not affected by maven-clean-plugin's deletion of
+     * {@code target/}, so there is no race between clean and install operations
+     * in parallel builds.
      */
     private void cleanProjectLocalRepository(MavenProject project) {
         try {
@@ -515,7 +517,7 @@ class ReactorReader implements MavenWorkspaceReader {
     private Path getProjectLocalRepo() {
         if (projectLocalRepository == null) {
             Path root = session.getRequest().getRootDirectory();
-            projectLocalRepository = root.resolve(".mvn").resolve(PROJECT_LOCAL_REPO);
+            projectLocalRepository = root.resolve(".mvn").resolve("target").resolve(PROJECT_LOCAL_REPO);
         }
         return projectLocalRepository;
     }
