@@ -140,7 +140,7 @@ public class ToolchainPluginStrategy extends AbstractUpgradeStrategy {
                 }
 
                 int latestJdk = JdkSourceLevelSupport.latestJdkForSourceLevel(sourceLevel);
-                addToolchainsPlugin(pomDocument);
+                addToolchainsPlugin(pomDocument, latestJdk);
                 modifiedPoms.add(pomPath);
                 context.success("Added maven-toolchains-plugin with " + SELECT_JDK_TOOLCHAIN_GOAL + " goal (--source "
                         + sourceLevel + " requires JDK <= " + latestJdk + ")");
@@ -311,9 +311,13 @@ public class ToolchainPluginStrategy extends AbstractUpgradeStrategy {
 
     /**
      * Adds the {@code maven-toolchains-plugin} with {@code select-jdk-toolchain} goal
-     * to the POM's {@code <build><plugins>} section.
+     * to the POM's {@code <build><plugins>} section, configured with a version constraint
+     * so the plugin selects a JDK that supports the project's source level.
+     *
+     * @param pomDocument the POM document to modify
+     * @param maxJdkVersion the latest JDK major version that supports the source level
      */
-    void addToolchainsPlugin(Document pomDocument) {
+    void addToolchainsPlugin(Document pomDocument, int maxJdkVersion) {
         Element root = pomDocument.root();
         Element build = root.childElement(BUILD).orElse(null);
         if (build == null) {
@@ -329,6 +333,8 @@ public class ToolchainPluginStrategy extends AbstractUpgradeStrategy {
         Element execution = DomUtils.insertNewElement("execution", executions);
         Element goals = DomUtils.insertNewElement("goals", execution);
         DomUtils.insertContentElement(goals, "goal", SELECT_JDK_TOOLCHAIN_GOAL);
+        Element configuration = DomUtils.insertNewElement(CONFIGURATION, execution);
+        DomUtils.insertContentElement(configuration, "version", "(," + maxJdkVersion + "]");
     }
 
     /**
