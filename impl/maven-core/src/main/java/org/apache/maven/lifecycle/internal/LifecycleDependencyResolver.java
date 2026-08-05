@@ -131,9 +131,17 @@ public class LifecycleDependencyResolver {
             Map<Artifact, File> reactorProjects =
                     new HashMap<>(session.getProjects().size());
             for (MavenProject reactorProject : session.getProjects()) {
-                reactorProjects.put(
-                        reactorProject.getArtifact(),
-                        reactorProject.getArtifact().getFile());
+                File file = reactorProject.getArtifact().getFile();
+                // In the concurrent builder, a reactor project may have compiled (output directory
+                // exists) but not yet been packaged (artifact file is null).  Use the output
+                // directory as a fallback so that downstream projects see the compiled classes.
+                if (file == null) {
+                    File outputDir = new File(reactorProject.getBuild().getOutputDirectory());
+                    if (outputDir.isDirectory()) {
+                        file = outputDir;
+                    }
+                }
+                reactorProjects.put(reactorProject.getArtifact(), file);
             }
 
             Map<String, Artifact> map = new HashMap<>();
