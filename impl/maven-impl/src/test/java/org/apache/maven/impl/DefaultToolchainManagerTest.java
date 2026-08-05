@@ -23,12 +23,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.maven.api.JavaToolchain;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.SessionData;
 import org.apache.maven.api.Toolchain;
-import org.apache.maven.api.Version;
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Source;
@@ -46,7 +44,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -131,30 +131,40 @@ class DefaultToolchainManagerTest {
         assertThrows(NullPointerException.class, () -> manager.getToolchains(session, null, null));
     }
 
-    // --- Auto-selection tests ---
+    // --- Source level compatibility check tests ---
 
     @Test
-    void autoSelectJdkToolchainWhenNoTargetVersion() {
-        // Project has no targetVersion configured — should not auto-select
-        when(session.getService(Lookup.class)).thenReturn(lookup);
-        when(lookup.lookupOptional(Project.class)).thenReturn(Optional.of(project));
-        Model model = Model.newBuilder().build(Build.newBuilder().build()).build();
-        when(project.getModel()).thenReturn(model);
-
-        DefaultToolchainManager testManager = new DefaultToolchainManager(Map.of("jdk", jdkFactory)) {
+    void checkCompatibilityNoTargetVersion() {
+        // Project has no targetVersion configured — no error
+        Logger testLogger = mock(Logger.class);
+        DefaultToolchainManager testManager = new DefaultToolchainManager(Map.of("jdk", jdkFactory), testLogger) {
             @Override
             int getRunningJdkMajor() {
                 return 17;
             }
         };
 
-        Optional<Toolchain> result = testManager.autoSelectJdkToolchain(session);
-        assertTrue(result.isEmpty());
+        when(session.getService(Lookup.class)).thenReturn(lookup);
+        when(lookup.lookupOptional(Project.class)).thenReturn(Optional.of(project));
+        Model model = Model.newBuilder().build(Build.newBuilder().build()).build();
+        when(project.getModel()).thenReturn(model);
+
+        testManager.checkJdkSourceLevelCompatibility(session);
+
+        verify(testLogger, never()).error(any(String.class), any(), any(), any());
     }
 
     @Test
-    void autoSelectJdkToolchainWhenRunningJdkSupportsLevel() {
-        // Project targets source 11, running JDK 17 supports it — no auto-select
+    void checkCompatibilityRunningJdkSupportsLevel() {
+        // Project targets source 11, running JDK 17 supports it — no error
+        Logger testLogger = mock(Logger.class);
+        DefaultToolchainManager testManager = new DefaultToolchainManager(Map.of("jdk", jdkFactory), testLogger) {
+            @Override
+            int getRunningJdkMajor() {
+                return 17;
+            }
+        };
+
         when(session.getService(Lookup.class)).thenReturn(lookup);
         when(lookup.lookupOptional(Project.class)).thenReturn(Optional.of(project));
         Model model = Model.newBuilder()
@@ -164,21 +174,14 @@ class DefaultToolchainManagerTest {
                 .build();
         when(project.getModel()).thenReturn(model);
 
-        DefaultToolchainManager testManager = new DefaultToolchainManager(Map.of("jdk", jdkFactory)) {
-            @Override
-            int getRunningJdkMajor() {
-                return 17;
-            }
-        };
+        testManager.checkJdkSourceLevelCompatibility(session);
 
-        Optional<Toolchain> result = testManager.autoSelectJdkToolchain(session);
-        assertTrue(result.isEmpty());
+        verify(testLogger, never()).error(any(String.class), any(), any(), any());
     }
 
     @Test
-    void autoSelectJdkToolchainWhenRunningJdkDoesNotSupportLevel() {
-        // Project targets source 6, running JDK 17 doesn't support it
-        // JDK 11 toolchain available and supports source 6
+    void checkCompatibilityEmitsErrorWhenIncompatible() {
+        // Project targets source 6, running JDK 17 doesn't support it — should emit error
         Logger testLogger = mock(Logger.class);
         DefaultToolchainManager testManager = new DefaultToolchainManager(Map.of("jdk", jdkFactory), testLogger) {
             @Override
@@ -187,7 +190,6 @@ class DefaultToolchainManagerTest {
             }
         };
 
-        // Set up project with targetVersion 6
         when(session.getService(Lookup.class)).thenReturn(lookup);
         when(lookup.lookupOptional(Project.class)).thenReturn(Optional.of(project));
         Model model = Model.newBuilder()
@@ -197,92 +199,24 @@ class DefaultToolchainManagerTest {
                 .build();
         when(project.getModel()).thenReturn(model);
 
-        // Set up available JDK 11 toolchain
-        JavaToolchain jdk11Toolchain = mock(JavaToolchain.class);
-        Version jdk11Version = mock(Version.class);
-        when(jdk11Version.toString()).thenReturn("11");
-        when(jdk11Toolchain.getJavaVersion()).thenReturn(jdk11Version);
-        when(jdk11Toolchain.getJavaHome()).thenReturn("/usr/lib/jvm/java-11");
+        testManager.checkJdkSourceLevelCompatibility(session);
 
-        ToolchainModel jdk11Model = ToolchainModel.newBuilder().type("jdk").build();
-        when(session.getToolchains()).thenReturn(List.of(jdk11Model));
-        when(jdkFactory.createToolchain(jdk11Model)).thenReturn(jdk11Toolchain);
-        when(jdkFactory.createDefaultToolchain()).thenReturn(Optional.empty());
-
-        Optional<Toolchain> result = testManager.autoSelectJdkToolchain(session);
-
-        assertTrue(result.isPresent());
-        assertEquals(jdk11Toolchain, result.get());
-        verify(testLogger).warn("Project requires --source {} which is not supported by JDK {}.", 6, 17);
         verify(testLogger)
-                .warn(
-                        "Automatically selected JDK {} (discovered at {}) for compilation.",
-                        jdk11Version,
-                        "/usr/lib/jvm/java-11");
+                .error(
+                        "Project requires --source {} which needs JDK <= {}, but the running JDK {} no longer supports it.",
+                        6,
+                        11,
+                        17);
     }
 
     @Test
-    void autoSelectJdkToolchainPrefersNewestCompatible() {
-        // Project targets source 6, running JDK 17
-        // JDK 8 and JDK 11 both support source 6; should select JDK 11 (newest)
+    void checkCompatibilityEmitsErrorForSource5() {
+        // Project targets source 5, running JDK 21 — max JDK is 8
         Logger testLogger = mock(Logger.class);
         DefaultToolchainManager testManager = new DefaultToolchainManager(Map.of("jdk", jdkFactory), testLogger) {
             @Override
             int getRunningJdkMajor() {
-                return 17;
-            }
-        };
-
-        when(session.getService(Lookup.class)).thenReturn(lookup);
-        when(lookup.lookupOptional(Project.class)).thenReturn(Optional.of(project));
-        Model model = Model.newBuilder()
-                .build(Build.newBuilder()
-                        .sources(List.of(Source.newBuilder().targetVersion("6").build()))
-                        .build())
-                .build();
-        when(project.getModel()).thenReturn(model);
-
-        // JDK 8 toolchain
-        JavaToolchain jdk8Toolchain = mock(JavaToolchain.class);
-        Version jdk8Version = mock(Version.class);
-        when(jdk8Version.toString()).thenReturn("8");
-        when(jdk8Toolchain.getJavaVersion()).thenReturn(jdk8Version);
-
-        // JDK 11 toolchain
-        JavaToolchain jdk11Toolchain = mock(JavaToolchain.class);
-        Version jdk11Version = mock(Version.class);
-        when(jdk11Version.toString()).thenReturn("11");
-        when(jdk11Toolchain.getJavaVersion()).thenReturn(jdk11Version);
-        when(jdk11Toolchain.getJavaHome()).thenReturn("/usr/lib/jvm/java-11");
-
-        // Use distinct provides so ToolchainModel.equals() distinguishes them
-        ToolchainModel jdk8Model = ToolchainModel.newBuilder()
-                .type("jdk")
-                .provides(Map.of("version", "8"))
-                .build();
-        ToolchainModel jdk11Model = ToolchainModel.newBuilder()
-                .type("jdk")
-                .provides(Map.of("version", "11"))
-                .build();
-        when(session.getToolchains()).thenReturn(List.of(jdk8Model, jdk11Model));
-        when(jdkFactory.createToolchain(jdk8Model)).thenReturn(jdk8Toolchain);
-        when(jdkFactory.createToolchain(jdk11Model)).thenReturn(jdk11Toolchain);
-        when(jdkFactory.createDefaultToolchain()).thenReturn(Optional.empty());
-
-        Optional<Toolchain> result = testManager.autoSelectJdkToolchain(session);
-
-        assertTrue(result.isPresent());
-        assertEquals(jdk11Toolchain, result.get());
-    }
-
-    @Test
-    void autoSelectJdkToolchainNoCompatibleToolchainAvailable() {
-        // Project targets source 5, running JDK 17
-        // Only JDK 11 toolchain available (min source 6, doesn't support 5)
-        DefaultToolchainManager testManager = new DefaultToolchainManager(Map.of("jdk", jdkFactory)) {
-            @Override
-            int getRunningJdkMajor() {
-                return 17;
+                return 21;
             }
         };
 
@@ -295,24 +229,19 @@ class DefaultToolchainManagerTest {
                 .build();
         when(project.getModel()).thenReturn(model);
 
-        // JDK 11 doesn't support source 5
-        JavaToolchain jdk11Toolchain = mock(JavaToolchain.class);
-        Version jdk11Version = mock(Version.class);
-        when(jdk11Version.toString()).thenReturn("11");
-        when(jdk11Toolchain.getJavaVersion()).thenReturn(jdk11Version);
+        testManager.checkJdkSourceLevelCompatibility(session);
 
-        ToolchainModel jdk11Model = ToolchainModel.newBuilder().type("jdk").build();
-        when(session.getToolchains()).thenReturn(List.of(jdk11Model));
-        when(jdkFactory.createToolchain(jdk11Model)).thenReturn(jdk11Toolchain);
-        when(jdkFactory.createDefaultToolchain()).thenReturn(Optional.empty());
-
-        Optional<Toolchain> result = testManager.autoSelectJdkToolchain(session);
-        assertTrue(result.isEmpty());
+        verify(testLogger)
+                .error(
+                        "Project requires --source {} which needs JDK <= {}, but the running JDK {} no longer supports it.",
+                        5,
+                        8,
+                        21);
     }
 
     @Test
-    void autoSelectJdkToolchainFromLegacyProperties() {
-        // Project uses maven.compiler.release=6 (legacy property), running JDK 17
+    void checkCompatibilityFromLegacyProperties() {
+        // Project uses maven.compiler.release=6, running JDK 17
         Logger testLogger = mock(Logger.class);
         DefaultToolchainManager testManager = new DefaultToolchainManager(Map.of("jdk", jdkFactory), testLogger) {
             @Override
@@ -328,26 +257,19 @@ class DefaultToolchainManagerTest {
                 .build();
         when(project.getModel()).thenReturn(model);
 
-        JavaToolchain jdk11Toolchain = mock(JavaToolchain.class);
-        Version jdk11Version = mock(Version.class);
-        when(jdk11Version.toString()).thenReturn("11");
-        when(jdk11Toolchain.getJavaVersion()).thenReturn(jdk11Version);
-        when(jdk11Toolchain.getJavaHome()).thenReturn("/usr/lib/jvm/java-11");
+        testManager.checkJdkSourceLevelCompatibility(session);
 
-        ToolchainModel jdk11Model = ToolchainModel.newBuilder().type("jdk").build();
-        when(session.getToolchains()).thenReturn(List.of(jdk11Model));
-        when(jdkFactory.createToolchain(jdk11Model)).thenReturn(jdk11Toolchain);
-        when(jdkFactory.createDefaultToolchain()).thenReturn(Optional.empty());
-
-        Optional<Toolchain> result = testManager.autoSelectJdkToolchain(session);
-
-        assertTrue(result.isPresent());
-        assertEquals(jdk11Toolchain, result.get());
+        verify(testLogger)
+                .error(
+                        "Project requires --source {} which needs JDK <= {}, but the running JDK {} no longer supports it.",
+                        6,
+                        11,
+                        17);
     }
 
     @Test
-    void autoSelectJdkToolchainFromLegacySourceProperty() {
-        // Project uses maven.compiler.source=1.6 (legacy property), running JDK 17
+    void checkCompatibilityFromLegacySourceProperty() {
+        // Project uses maven.compiler.source=1.6, running JDK 17
         Logger testLogger = mock(Logger.class);
         DefaultToolchainManager testManager = new DefaultToolchainManager(Map.of("jdk", jdkFactory), testLogger) {
             @Override
@@ -363,26 +285,20 @@ class DefaultToolchainManagerTest {
                 .build();
         when(project.getModel()).thenReturn(model);
 
-        JavaToolchain jdk11Toolchain = mock(JavaToolchain.class);
-        Version jdk11Version = mock(Version.class);
-        when(jdk11Version.toString()).thenReturn("11");
-        when(jdk11Toolchain.getJavaVersion()).thenReturn(jdk11Version);
-        when(jdk11Toolchain.getJavaHome()).thenReturn("/usr/lib/jvm/java-11");
+        testManager.checkJdkSourceLevelCompatibility(session);
 
-        ToolchainModel jdk11Model = ToolchainModel.newBuilder().type("jdk").build();
-        when(session.getToolchains()).thenReturn(List.of(jdk11Model));
-        when(jdkFactory.createToolchain(jdk11Model)).thenReturn(jdk11Toolchain);
-        when(jdkFactory.createDefaultToolchain()).thenReturn(Optional.empty());
-
-        Optional<Toolchain> result = testManager.autoSelectJdkToolchain(session);
-
-        assertTrue(result.isPresent());
-        assertEquals(jdk11Toolchain, result.get());
+        verify(testLogger)
+                .error(
+                        eq(
+                                "Project requires --source {} which needs JDK <= {}, but the running JDK {} no longer supports it."),
+                        eq(6),
+                        eq(11),
+                        eq(17));
     }
 
     @Test
-    void getToolchainFromBuildContextAutoSelectsFallback() {
-        // Verify getToolchainFromBuildContext calls auto-selection when no explicit toolchain
+    void getToolchainFromBuildContextChecksCompatibility() {
+        // Verify getToolchainFromBuildContext calls compatibility check for jdk type
         Logger testLogger = mock(Logger.class);
         Map<String, Object> context = new ConcurrentHashMap<>();
         SessionData data = mock(SessionData.class);
@@ -406,28 +322,22 @@ class DefaultToolchainManagerTest {
                 .build();
         when(project.getModel()).thenReturn(model);
 
-        JavaToolchain jdk11Toolchain = mock(JavaToolchain.class);
-        Version jdk11Version = mock(Version.class);
-        when(jdk11Version.toString()).thenReturn("11");
-        when(jdk11Toolchain.getJavaVersion()).thenReturn(jdk11Version);
-        when(jdk11Toolchain.getJavaHome()).thenReturn("/usr/lib/jvm/java-11");
-
-        ToolchainModel jdk11Model = ToolchainModel.newBuilder().type("jdk").build();
-        when(jdk11Toolchain.getModel()).thenReturn(jdk11Model);
-        when(session.getToolchains()).thenReturn(List.of(jdk11Model));
-        when(jdkFactory.createToolchain(jdk11Model)).thenReturn(jdk11Toolchain);
-        when(jdkFactory.createDefaultToolchain()).thenReturn(Optional.empty());
-
         Optional<Toolchain> result = testManager.getToolchainFromBuildContext(session, "jdk");
 
-        assertTrue(result.isPresent());
-        assertEquals(jdk11Toolchain, result.get());
+        // Should return empty (no auto-selection) but emit error
+        assertTrue(result.isEmpty());
+        verify(testLogger)
+                .error(
+                        "Project requires --source {} which needs JDK <= {}, but the running JDK {} no longer supports it.",
+                        6,
+                        11,
+                        17);
     }
 
     @Test
-    void getToolchainFromBuildContextReturnsExplicitOverAutoSelect() {
+    void getToolchainFromBuildContextReturnsExplicitToolchain() {
         // When an explicit toolchain is stored via storeToolchainToBuildContext,
-        // it takes precedence over auto-selection
+        // it takes precedence — no compatibility check needed
         Map<String, Object> context = new ConcurrentHashMap<>();
         SessionData data = mock(SessionData.class);
         toolchainModel = ToolchainModel.newBuilder().type("jdk").build();
@@ -440,10 +350,7 @@ class DefaultToolchainManagerTest {
         when(mockToolchain.getModel()).thenReturn(toolchainModel);
         when(jdkFactory.createToolchain(any(ToolchainModel.class))).thenReturn(mockToolchain);
 
-        // Store explicit toolchain using the proper API
         manager.storeToolchainToBuildContext(session, mockToolchain);
-
-        // Now retrieve — should get the explicit one, not auto-select
         Optional<Toolchain> result = manager.getToolchainFromBuildContext(session, "jdk");
 
         assertTrue(result.isPresent());
@@ -451,8 +358,8 @@ class DefaultToolchainManagerTest {
     }
 
     @Test
-    void getToolchainFromBuildContextNonJdkTypeDoesNotAutoSelect() {
-        // Auto-selection should only apply to "jdk" type
+    void getToolchainFromBuildContextNonJdkTypeNoCheck() {
+        // Compatibility check should only apply to "jdk" type
         Map<String, Object> context = new ConcurrentHashMap<>();
         SessionData data = mock(SessionData.class);
 
@@ -461,8 +368,6 @@ class DefaultToolchainManagerTest {
         when(session.getData()).thenReturn(data);
         when(data.computeIfAbsent(any(), any())).thenReturn(context);
 
-        // No "otherType" factory registered; getToolchainFromBuildContext should return empty
-        // without attempting auto-selection
         Optional<Toolchain> result = manager.getToolchainFromBuildContext(session, "otherType");
         assertTrue(result.isEmpty());
     }
@@ -470,8 +375,6 @@ class DefaultToolchainManagerTest {
     @Test
     void getProjectRequiredSourceLevelTargetVersionTakesPrecedence() {
         // targetVersion in sources should take precedence over properties
-        DefaultToolchainManager testManager = new DefaultToolchainManager(Map.of("jdk", jdkFactory));
-
         when(session.getService(Lookup.class)).thenReturn(lookup);
         when(lookup.lookupOptional(Project.class)).thenReturn(Optional.of(project));
         Model model = Model.newBuilder()
@@ -482,7 +385,7 @@ class DefaultToolchainManagerTest {
                 .build();
         when(project.getModel()).thenReturn(model);
 
-        assertEquals(8, testManager.getProjectRequiredSourceLevel(session));
+        assertEquals(8, manager.getProjectRequiredSourceLevel(session));
     }
 
     @Test
