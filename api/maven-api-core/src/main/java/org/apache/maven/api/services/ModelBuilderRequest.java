@@ -174,7 +174,7 @@ public interface ModelBuilderRequest extends RepositoryAwareRequest {
         Session session;
         RequestTrace trace;
         RequestType requestType;
-        boolean locationTracking = true;
+        boolean locationTracking;
         boolean recursive;
         ModelSource source;
         Collection<Profile> profiles;
