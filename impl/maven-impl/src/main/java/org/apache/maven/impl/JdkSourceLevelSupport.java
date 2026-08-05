@@ -32,7 +32,7 @@ package org.apache.maven.impl;
  *   <li>JDK 21: removed {@code --source 7}, minimum is {@code 8}</li>
  * </ul>
  */
-final class JdkSourceLevelSupport {
+public final class JdkSourceLevelSupport {
 
     private JdkSourceLevelSupport() {}
 
@@ -42,7 +42,7 @@ final class JdkSourceLevelSupport {
      * @param jdkMajor the JDK major version (e.g., {@code 17}, {@code 21})
      * @return the minimum supported source level
      */
-    static int minimumSupportedSourceLevel(int jdkMajor) {
+    public static int minimumSupportedSourceLevel(int jdkMajor) {
         if (jdkMajor <= 8) {
             return 1;
         }
@@ -62,7 +62,7 @@ final class JdkSourceLevelSupport {
      * @param sourceLevel the desired source level
      * @return {@code true} if the JDK supports the source level
      */
-    static boolean supportsSourceLevel(int jdkMajor, int sourceLevel) {
+    public static boolean supportsSourceLevel(int jdkMajor, int sourceLevel) {
         return sourceLevel >= minimumSupportedSourceLevel(jdkMajor) && sourceLevel <= jdkMajor;
     }
 
@@ -80,7 +80,7 @@ final class JdkSourceLevelSupport {
      * @param version the source level string
      * @return the normalized major version, or {@code -1} if the string cannot be parsed
      */
-    static int normalizeSourceLevel(String version) {
+    public static int normalizeSourceLevel(String version) {
         if (version == null || version.isEmpty()) {
             return -1;
         }
@@ -138,7 +138,7 @@ final class JdkSourceLevelSupport {
      * @return the latest JDK major version that supports it, or {@code -1} if the source level
      *         is still supported by all current JDKs
      */
-    static int latestJdkForSourceLevel(int sourceLevel) {
+    public static int latestJdkForSourceLevel(int sourceLevel) {
         if (sourceLevel <= 5) {
             return 8;
         }
@@ -156,7 +156,7 @@ final class JdkSourceLevelSupport {
      *
      * @return the running JDK major version
      */
-    static int getRunningJdkMajor() {
+    public static int getRunningJdkMajor() {
         return Runtime.version().feature();
     }
 }
