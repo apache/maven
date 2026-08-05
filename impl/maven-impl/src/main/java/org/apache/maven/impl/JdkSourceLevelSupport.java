@@ -124,6 +124,34 @@ final class JdkSourceLevelSupport {
     }
 
     /**
+     * Returns the latest JDK major version that still supports the given {@code --source} level.
+     * <p>
+     * Based on the retirement schedule:
+     * <ul>
+     *   <li>source 1–5 → last supported by JDK 8</li>
+     *   <li>source 6 → last supported by JDK 11</li>
+     *   <li>source 7 → last supported by JDK 20</li>
+     *   <li>source 8+ → still supported by current JDKs</li>
+     * </ul>
+     *
+     * @param sourceLevel the source level
+     * @return the latest JDK major version that supports it, or {@code -1} if the source level
+     *         is still supported by all current JDKs
+     */
+    static int latestJdkForSourceLevel(int sourceLevel) {
+        if (sourceLevel <= 5) {
+            return 8;
+        }
+        if (sourceLevel == 6) {
+            return 11;
+        }
+        if (sourceLevel == 7) {
+            return 20;
+        }
+        return -1; // still supported
+    }
+
+    /**
      * Returns the major version of the currently running JDK.
      *
      * @return the running JDK major version
