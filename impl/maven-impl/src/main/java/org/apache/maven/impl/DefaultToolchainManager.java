@@ -26,7 +26,6 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
-import org.apache.maven.api.JavaToolchain;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.SessionData;
@@ -53,38 +52,18 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class DefaultToolchainManager implements ToolchainManager {
     private final Map<String, ToolchainFactory> factories;
-    private final JdkToolchainDiscoverer discoverer;
     private final Logger logger;
 
     @Inject
-    public DefaultToolchainManager(Map<String, ToolchainFactory> factories, JdkToolchainDiscoverer discoverer) {
-        this(factories, discoverer, null);
-    }
-
-    /**
-     * Convenience constructor without a discoverer — auto-selection will skip
-     * filesystem discovery. Used by tests and IT harnesses.
-     */
     public DefaultToolchainManager(Map<String, ToolchainFactory> factories) {
-        this(factories, null, null);
+        this(factories, (Logger) null);
     }
 
     /**
-     * Convenience constructor without a discoverer, with custom logger.
-     * Used by the compatibility layer and tests.
+     * Constructor with custom logger. Used by the compatibility layer and tests.
      */
     public DefaultToolchainManager(Map<String, ToolchainFactory> factories, Logger logger) {
-        this(factories, null, logger);
-    }
-
-    /**
-     * Full-control constructor with all parameters.
-     * Used by the compatibility layer ({@code ToolchainManagerFactory}) and tests.
-     */
-    public DefaultToolchainManager(
-            Map<String, ToolchainFactory> factories, JdkToolchainDiscoverer discoverer, Logger logger) {
         this.factories = factories;
-        this.discoverer = discoverer;
         this.logger = logger != null ? logger : LoggerFactory.getLogger(DefaultToolchainManager.class);
     }
 
@@ -118,14 +97,10 @@ public class DefaultToolchainManager implements ToolchainManager {
             return createToolchain(model);
         }
 
-        // For JDK type, try auto-selection based on project's target version
+        // For JDK type, check if the running JDK supports the project's source level
+        // and emit a clear, actionable error if not
         if ("jdk".equals(type)) {
-            Optional<Toolchain> autoSelected = autoSelectJdkToolchain(session);
-            if (autoSelected.isPresent()) {
-                // Cache the selection so subsequent calls for this project return the same toolchain
-                context.put("toolchain-" + type, autoSelected.get().getModel());
-            }
-            return autoSelected;
+            checkJdkSourceLevelCompatibility(session);
         }
 
         return Optional.empty();
@@ -138,87 +113,41 @@ public class DefaultToolchainManager implements ToolchainManager {
     }
 
     /**
-     * Attempts to automatically select a JDK toolchain when the running JDK
-     * does not support the project's required {@code --source}/{@code --release} level.
+     * Checks whether the running JDK supports the project's required {@code --source}/{@code --release}
+     * level. If not, emits a clear, actionable error message instead of letting the build fail later
+     * with a cryptic javac error.
      * <p>
-     * First searches configured toolchains (from {@code toolchains.xml}), then falls back
-     * to lazy filesystem discovery. Normal builds pay zero cost — discovery only runs
-     * when the running JDK is incompatible and no configured toolchain matches.
+     * The error tells the user exactly which JDK version they need and how to fix it
+     * (run {@code mvnup} to add the {@code maven-toolchains-plugin} with automatic JDK discovery).
      */
-    Optional<Toolchain> autoSelectJdkToolchain(Session session) {
+    void checkJdkSourceLevelCompatibility(Session session) {
         int requiredSourceLevel = getProjectRequiredSourceLevel(session);
-        logger.debug("Auto-select JDK toolchain: requiredSourceLevel={}", requiredSourceLevel);
         if (requiredSourceLevel <= 0) {
-            return Optional.empty();
+            return;
         }
 
         int runningJdkMajor = getRunningJdkMajor();
-        logger.debug(
-                "Auto-select JDK toolchain: runningJdkMajor={}, supportsLevel={}",
-                runningJdkMajor,
-                JdkSourceLevelSupport.supportsSourceLevel(runningJdkMajor, requiredSourceLevel));
         if (JdkSourceLevelSupport.supportsSourceLevel(runningJdkMajor, requiredSourceLevel)) {
-            return Optional.empty();
+            return;
         }
 
-        // 1. Search configured toolchains (from toolchains.xml)
-        List<Toolchain> configuredToolchains = getToolchains(session, "jdk", null);
-        Toolchain bestMatch = findNewestCompatible(configuredToolchains, requiredSourceLevel);
-
-        // 2. Fall back to lazy filesystem discovery
-        if (bestMatch == null && discoverer != null) {
-            logger.debug("No compatible JDK in configured toolchains, discovering JDKs from filesystem...");
-            List<ToolchainModel> discoveredModels = discoverer.discoverToolchains(session.getSystemProperties());
-            List<Toolchain> discoveredToolchains = discoveredModels.stream()
-                    .map(this::createToolchain)
-                    .flatMap(Optional::stream)
-                    .toList();
-            bestMatch = findNewestCompatible(discoveredToolchains, requiredSourceLevel);
-        }
-
-        if (bestMatch != null) {
-            JavaToolchain jtc = (JavaToolchain) bestMatch;
-            logger.warn(
-                    "Project requires --source {} which is not supported by JDK {}.",
-                    requiredSourceLevel,
-                    runningJdkMajor);
-            logger.warn(
-                    "Automatically selected JDK {} (discovered at {}) for compilation.",
-                    jtc.getJavaVersion(),
-                    jtc.getJavaHome());
-            logger.warn("To suppress this warning, configure the maven-toolchains-plugin explicitly");
-            logger.warn("or set <targetVersion> to a value supported by your JDK.");
-            return Optional.of(bestMatch);
-        }
-
-        return Optional.empty();
+        // Running JDK is incompatible — emit clear, actionable error
+        int latestJdk = JdkSourceLevelSupport.latestJdkForSourceLevel(requiredSourceLevel);
+        logger.error(
+                "Project requires --source {} which needs JDK <= {}, but the running JDK {} no longer supports it.",
+                requiredSourceLevel,
+                latestJdk,
+                runningJdkMajor);
+        logger.error("To fix: run 'mvnup' to add the maven-toolchains-plugin with automatic JDK discovery,");
+        logger.error(
+                "or install JDK {} and configure it in toolchains.xml or via the maven-toolchains-plugin.", latestJdk);
     }
 
     /**
-     * Finds the newest JDK toolchain that supports the given source level.
-     */
-    private Toolchain findNewestCompatible(List<Toolchain> toolchains, int requiredSourceLevel) {
-        Toolchain bestMatch = null;
-        int bestVersion = 0;
-        for (Toolchain tc : toolchains) {
-            if (tc instanceof JavaToolchain jtc && jtc.getJavaVersion() != null) {
-                int tcMajor = JdkSourceLevelSupport.normalizeSourceLevel(
-                        jtc.getJavaVersion().toString());
-                if (tcMajor > 0 && JdkSourceLevelSupport.supportsSourceLevel(tcMajor, requiredSourceLevel)) {
-                    if (tcMajor > bestVersion) {
-                        bestVersion = tcMajor;
-                        bestMatch = tc;
-                    }
-                }
-            }
-        }
-        return bestMatch;
-    }
-
-    /**
-     * Reads the project's required source level from either Model 4.1.0
-     * {@code <source><targetVersion>} elements or legacy properties
-     * ({@code maven.compiler.release}, {@code maven.compiler.source}).
+     * Reads the project's required source level from Model 4.1.0
+     * {@code <source><targetVersion>} elements, legacy properties
+     * ({@code maven.compiler.release}, {@code maven.compiler.source}),
+     * or compiler plugin configuration ({@code <release>}, {@code <source>}).
      *
      * @return the required source level as a major version, or {@code -1} if none is specified
      */
