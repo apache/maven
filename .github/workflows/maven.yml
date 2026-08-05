@@ -217,6 +217,16 @@ jobs:
           echo "MAVEN_HOME=$PWD/maven-local" >> $GITHUB_ENV
           echo "$PWD/maven-local/bin" >> $GITHUB_PATH
 
+      - name: Test PowerShell 7 launcher
+        if: matrix.java == '17'
+        shell: pwsh
+        run: ./apache-maven/src/test/powershell/MavenLauncher.Tests.ps1 -MavenHome "$env:MAVEN_HOME"
+
+      - name: Test Windows PowerShell 5.1 launcher
+        if: runner.os == 'Windows' && matrix.java == '17'
+        shell: powershell
+        run: ./apache-maven/src/test/powershell/MavenLauncher.Tests.ps1 -MavenHome "$env:MAVEN_HOME"
+
       - name: Build with downloaded Maven
         shell: bash
         run: mvn verify -Papache-release -Dgpg.skip=true -e -B -V
