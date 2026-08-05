@@ -135,6 +135,43 @@ class JdkSourceLevelSupportTest {
     }
 
     @Test
+    void normalizeSourceLevelLegacyFormatWithPatchVersion() {
+        // "1.8.0_392" format from some JDK distributions
+        assertEquals(8, JdkSourceLevelSupport.normalizeSourceLevel("1.8.0_392"));
+        assertEquals(7, JdkSourceLevelSupport.normalizeSourceLevel("1.7.0_80"));
+        assertEquals(6, JdkSourceLevelSupport.normalizeSourceLevel("1.6.0_45"));
+    }
+
+    @Test
+    void latestJdkForSourceLevelRetiredLevels() {
+        // source 1-5 → last supported by JDK 8
+        assertEquals(8, JdkSourceLevelSupport.latestJdkForSourceLevel(1));
+        assertEquals(8, JdkSourceLevelSupport.latestJdkForSourceLevel(3));
+        assertEquals(8, JdkSourceLevelSupport.latestJdkForSourceLevel(5));
+    }
+
+    @Test
+    void latestJdkForSourceLevel6() {
+        // source 6 → last supported by JDK 11
+        assertEquals(11, JdkSourceLevelSupport.latestJdkForSourceLevel(6));
+    }
+
+    @Test
+    void latestJdkForSourceLevel7() {
+        // source 7 → last supported by JDK 20
+        assertEquals(20, JdkSourceLevelSupport.latestJdkForSourceLevel(7));
+    }
+
+    @Test
+    void latestJdkForSourceLevelStillSupported() {
+        // source 8+ → still supported by current JDKs
+        assertEquals(-1, JdkSourceLevelSupport.latestJdkForSourceLevel(8));
+        assertEquals(-1, JdkSourceLevelSupport.latestJdkForSourceLevel(11));
+        assertEquals(-1, JdkSourceLevelSupport.latestJdkForSourceLevel(17));
+        assertEquals(-1, JdkSourceLevelSupport.latestJdkForSourceLevel(21));
+    }
+
+    @Test
     void getRunningJdkMajorReturnsPositive() {
         assertTrue(JdkSourceLevelSupport.getRunningJdkMajor() > 0);
     }
