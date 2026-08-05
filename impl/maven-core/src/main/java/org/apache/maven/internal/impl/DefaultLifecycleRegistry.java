@@ -459,7 +459,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
                                     BUILD,
                                     after(VALIDATE),
                                     phase(SOURCES),
-                                    phase(RESOURCES, after(SOURCES)),
+                                    phase(RESOURCES),
                                     phase(COMPILE, after(SOURCES), dependencies(SCOPE_COMPILE, READY)),
                                     phase(READY, after(COMPILE), after(RESOURCES)),
                                     phase(PACKAGE, after(READY), dependencies(SCOPE_RUNTIME, PACKAGE))),

@@ -894,7 +894,7 @@ public class MavenProject implements Cloneable {
      * @return {@link Set} &lt; {@link Artifact} &gt;
      * @see #getDependencyArtifacts() to get only direct dependencies
      */
-    public synchronized Set<Artifact> getArtifacts() {
+    public Set<Artifact> getArtifacts() {
         if (artifacts == null) {
             if (artifactFilter == null || resolvedArtifacts == null) {
                 artifacts = new LinkedHashSet<>();
@@ -910,7 +910,7 @@ public class MavenProject implements Cloneable {
         return artifacts;
     }
 
-    public synchronized Map<String, Artifact> getArtifactMap() {
+    public Map<String, Artifact> getArtifactMap() {
         if (artifactMap == null) {
             artifactMap = ArtifactUtils.artifactMapByVersionlessId(getArtifacts());
         }
@@ -1505,42 +1505,53 @@ public class MavenProject implements Cloneable {
         return extensionDependencyFilter;
     }
 
-    /** Sets resolved artifacts; merges to preserve file references. Thread-safe. */
-    public synchronized void setResolvedArtifacts(Set<Artifact> artifacts) {
-        Set<Artifact> newArtifacts = (artifacts != null) ? artifacts : Collections.emptySet();
-        if (this.resolvedArtifacts != null && !this.resolvedArtifacts.isEmpty() && !newArtifacts.isEmpty()) {
-            // Merge: start from old set (preserving all artifacts), override with new
-            Map<String, Artifact> merged = new LinkedHashMap<>();
-            for (Artifact a : this.resolvedArtifacts) {
-                merged.put(a.getDependencyConflictId(), a);
-            }
-            for (Artifact a : newArtifacts) {
-                Artifact existing = merged.get(a.getDependencyConflictId());
-                // Replace old with new UNLESS old has a file and new doesn't
-                if (existing == null || existing.getFile() == null || a.getFile() != null) {
-                    merged.put(a.getDependencyConflictId(), a);
-                }
-            }
-            newArtifacts = new LinkedHashSet<>(merged.values());
-        }
-        this.resolvedArtifacts = newArtifacts;
+    /**
+     * Sets the transitive dependency artifacts that have been resolved/collected for this project.
+     * <strong>Warning:</strong> This is an internal utility method that is only public for technical reasons, it is not
+     * part of the public API. In particular, this method can be changed or deleted without prior notice and must not be
+     * used by plugins.
+     *
+     * @param artifacts The set of artifacts, may be {@code null}.
+     */
+    public void setResolvedArtifacts(Set<Artifact> artifacts) {
+        this.resolvedArtifacts = (artifacts != null) ? artifacts : Collections.emptySet();
         this.artifacts = null;
         this.artifactMap = null;
     }
 
-    /** Sets the scope filter for artifacts exposed to the executing mojo. Thread-safe. */
-    public synchronized void setArtifactFilter(ArtifactFilter artifactFilter) {
+    /**
+     * Sets the scope filter to select the artifacts being exposed to the currently executed mojo.
+     * <strong>Warning:</strong> This is an internal utility method that is only public for technical reasons, it is not
+     * part of the public API. In particular, this method can be changed or deleted without prior notice and must not be
+     * used by plugins.
+     *
+     * @param artifactFilter The artifact filter, may be {@code null} to exclude all artifacts.
+     */
+    public void setArtifactFilter(ArtifactFilter artifactFilter) {
         this.artifactFilter = artifactFilter;
         this.artifacts = null;
         this.artifactMap = null;
     }
 
-    /** Internal: checks if a lifecycle phase has been executed for this project. */
+    /**
+     * <strong>Warning:</strong> This is an internal utility method that is only public for technical reasons, it is not
+     * part of the public API. In particular, this method can be changed or deleted without prior notice and must not be
+     * used by plugins.
+     *
+     * @param phase The phase to check for, must not be {@code null}.
+     * @return {@code true} if the phase has been seen.
+     */
     public boolean hasLifecyclePhase(String phase) {
         return lifecyclePhases.contains(phase);
     }
 
-    /** Internal: records that a lifecycle phase has been executed for this project. */
+    /**
+     * <strong>Warning:</strong> This is an internal utility method that is only public for technical reasons, it is not
+     * part of the public API. In particular, this method can be changed or deleted without prior notice and must not be
+     * used by plugins.
+     *
+     * @param lifecyclePhase The lifecycle phase to add, must not be {@code null}.
+     */
     public void addLifecyclePhase(String lifecyclePhase) {
         lifecyclePhases.add(lifecyclePhase);
     }

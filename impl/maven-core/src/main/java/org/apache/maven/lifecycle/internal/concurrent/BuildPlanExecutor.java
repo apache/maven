@@ -43,6 +43,7 @@ import java.util.stream.Stream;
 
 import org.apache.maven.api.Lifecycle;
 import org.apache.maven.api.MonotonicClock;
+import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.plugin.descriptor.AfterLink;
 import org.apache.maven.api.services.LifecycleRegistry;
 import org.apache.maven.api.services.MavenException;
@@ -95,6 +96,8 @@ import static org.apache.maven.api.Lifecycle.AT;
 import static org.apache.maven.api.Lifecycle.BEFORE;
 import static org.apache.maven.api.Lifecycle.Phase.PACKAGE;
 import static org.apache.maven.api.Lifecycle.Phase.READY;
+import static org.apache.maven.api.Lifecycle.Phase.RESOURCES;
+import static org.apache.maven.api.Lifecycle.Phase.SOURCES;
 import static org.apache.maven.lifecycle.internal.concurrent.BuildStep.CREATED;
 import static org.apache.maven.lifecycle.internal.concurrent.BuildStep.EXECUTED;
 import static org.apache.maven.lifecycle.internal.concurrent.BuildStep.FAILED;
@@ -1066,6 +1069,22 @@ public class BuildPlanExecutor {
                                 }
                             });
                 });
+
+                // Maven 3 personality: enforce sequential SOURCES → RESOURCES ordering.
+                // In Maven 3, generate-resources always ran after process-sources, so plugins
+                // bound to resource phases could rely on source generation being complete.
+                // The V4 lifecycle allows them to run in parallel; V4-native plugins should
+                // use @After(phase="sources") to declare the dependency explicitly.
+                @SuppressWarnings("unchecked")
+                Map<String, Object> userProps =
+                        session != null ? (Map<String, Object>) (Map<?, ?>) session.getUserProperties() : null;
+                if (Features.mavenMaven3Personality(userProps)) {
+                    BuildStep afterSources = steps.get(AFTER + SOURCES);
+                    BuildStep beforeResources = steps.get(BEFORE + RESOURCES);
+                    if (afterSources != null && beforeResources != null) {
+                        beforeResources.executeAfter(afterSources);
+                    }
+                }
 
                 // Only keep mojo executions before the end phase
                 String endPhase = lifecyclePhase.startsWith(BEFORE) || lifecyclePhase.startsWith(AFTER)
