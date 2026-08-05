@@ -342,7 +342,7 @@ class ToolchainPluginStrategyTest {
         }
 
         @Test
-        @DisplayName("should add toolchains plugin to POM without build section")
+        @DisplayName("should add toolchains plugin with version constraint to POM without build section")
         void addToEmptyPom() {
             String pomXml = """
                     <?xml version="1.0" encoding="UTF-8"?>
@@ -354,13 +354,15 @@ class ToolchainPluginStrategyTest {
                     </project>
                     """;
             Document doc = Document.of(pomXml);
-            strategy.addToolchainsPlugin(doc);
+            strategy.addToolchainsPlugin(doc, 11);
 
             assertTrue(strategy.hasToolchainsPluginWithSelectGoal(doc));
+            String output = doc.toXml();
+            assertTrue(output.contains("<version>(,11]</version>"), "Expected version constraint in output: " + output);
         }
 
         @Test
-        @DisplayName("should add toolchains plugin to POM with existing build section")
+        @DisplayName("should add toolchains plugin with version constraint to POM with existing build section")
         void addToExistingBuild() {
             String pomXml = """
                     <?xml version="1.0" encoding="UTF-8"?>
@@ -379,9 +381,11 @@ class ToolchainPluginStrategyTest {
                     </project>
                     """;
             Document doc = Document.of(pomXml);
-            strategy.addToolchainsPlugin(doc);
+            strategy.addToolchainsPlugin(doc, 8);
 
             assertTrue(strategy.hasToolchainsPluginWithSelectGoal(doc));
+            String output = doc.toXml();
+            assertTrue(output.contains("<version>(,8]</version>"), "Expected version constraint in output: " + output);
         }
     }
 
