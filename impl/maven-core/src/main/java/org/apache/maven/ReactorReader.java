@@ -43,6 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.eventspy.EventSpy;
@@ -517,7 +518,13 @@ class ReactorReader implements MavenWorkspaceReader {
     private Path getProjectLocalRepo() {
         if (projectLocalRepository == null) {
             Path root = session.getRequest().getRootDirectory();
-            projectLocalRepository = root.resolve(".mvn").resolve("target").resolve(PROJECT_LOCAL_REPO);
+            String userPath = session.getRequest().getUserProperties().getProperty(Constants.MAVEN_PROJECT_LOCAL_REPO);
+            if (userPath != null && !userPath.isEmpty()) {
+                Path path = Paths.get(userPath);
+                projectLocalRepository = path.isAbsolute() ? path : root.resolve(path);
+            } else {
+                projectLocalRepository = root.resolve(".mvn").resolve("target").resolve(PROJECT_LOCAL_REPO);
+            }
         }
         return projectLocalRepository;
     }
