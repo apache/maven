@@ -140,6 +140,14 @@ public class ToolchainPluginStrategy extends AbstractUpgradeStrategy {
                 }
 
                 int latestJdk = JdkSourceLevelSupport.latestJdkForSourceLevel(sourceLevel);
+                if (latestJdk <= 0) {
+                    // Source level is still supported by modern JDKs — the project needs a newer JDK,
+                    // not an older one. Don't add the toolchains plugin (it would produce an invalid
+                    // version range like "(,-1]"). Let the build fail with a clear "unsupported source" error.
+                    context.success("Project requires --source " + sourceLevel + " which needs a newer JDK than "
+                            + runningJdkMajor + "; upgrade the JDK rather than adding toolchains");
+                    continue;
+                }
                 addToolchainsPlugin(pomDocument, latestJdk);
                 modifiedPoms.add(pomPath);
                 context.success("Added maven-toolchains-plugin with " + SELECT_JDK_TOOLCHAIN_GOAL + " goal (--source "

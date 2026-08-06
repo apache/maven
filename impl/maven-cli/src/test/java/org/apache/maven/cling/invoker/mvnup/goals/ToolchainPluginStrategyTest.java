@@ -484,6 +484,40 @@ class ToolchainPluginStrategyTest {
         }
 
         @Test
+        @DisplayName("should not add toolchains plugin when source level is higher than running JDK")
+        void noToolchainWhenSourceTooHigh() {
+            // Simulate running JDK 17, project targets source 20
+            // The project needs a NEWER JDK, not an older one — adding a toolchain
+            // with version range (,-1] would be invalid
+            ToolchainPluginStrategy strategy = new ToolchainPluginStrategy() {
+                @Override
+                int getRunningJdkMajor() {
+                    return 17;
+                }
+            };
+
+            String pomXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>com.example</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0</version>
+                        <properties>
+                            <maven.compiler.source>20</maven.compiler.source>
+                        </properties>
+                    </project>
+                    """;
+            Document doc = Document.of(pomXml);
+            UpgradeContext context = TestUtils.createMockContext();
+
+            UpgradeResult result = strategy.doApply(context, Map.of(POM_PATH, doc));
+
+            assertEquals(0, result.modifiedPoms().size());
+            assertFalse(strategy.hasToolchainsPluginWithSelectGoal(doc));
+        }
+
+        @Test
         @DisplayName("should not add duplicate plugin when already present")
         void noDuplicatePlugin() {
             ToolchainPluginStrategy strategy = new ToolchainPluginStrategy() {
