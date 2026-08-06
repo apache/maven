@@ -1,102 +1,64 @@
-~~ Licensed to the Apache Software Foundation (ASF) under one
-~~ or more contributor license agreements.  See the NOTICE file
-~~ distributed with this work for additional information
-~~ regarding copyright ownership.  The ASF licenses this file
-~~ to you under the Apache License, Version 2.0 (the
-~~ "License"); you may not use this file except in compliance
-~~ with the License.  You may obtain a copy of the License at
-~~
-~~ http://www.apache.org/licenses/LICENSE-2.0
-~~
-~~ Unless required by applicable law or agreed to in writing,
-~~ software distributed under the License is distributed on an
-~~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-~~ KIND, either express or implied.  See the License for the
-~~ specific language governing permissions and limitations
-~~ under the License.
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
 
-  ---
-  Getting to Plexus-configured Mojos
-  ---
-  John Casey
-  ---
-  2005-04-29
+http://www.apache.org/licenses/LICENSE-2.0
 
-Abstract
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
 
-  We're moving toward integrating mojos as first-class plexus components, while
-  at the same time avoiding introducing required plexus dependencies into the
-  mojo development model.
+# Abstract
 
-  In order to really achieve this, we need mojo configurations (which are
-  provided both in terms of static expressions that are just looked up, and
-  in terms of user-provided configuration from properties or the POM).
-  If these mojos are to be first-class components, the configuration from these
-  various sources must be consolidated and injected using the container.
+We're moving toward integrating mojos as first-class plexus components, while at the same time avoiding introducing required plexus dependencies into the mojo development model.
 
-  Currently, mojo configuration is done externally to the container, in the
-  DefaultPluginManager in the maven-core API. In order to get from here to
-  there, we need to do several things to add capability to the default
-  configuration of plexus. This document will detail those changes.
+In order to really achieve this, we need mojo configurations (which are provided both in terms of static expressions that are just looked up, and in terms of user-provided configuration from properties or the POM). If these mojos are to be first-class components, the configuration from these various sources must be consolidated and injected using the container.
 
-Container Enhancements
+Currently, mojo configuration is done externally to the container, in the DefaultPluginManager in the maven-core API. In order to get from here to there, we need to do several things to add capability to the default configuration of plexus. This document will detail those changes.
 
-* ExpressionEvaluator
+# Container Enhancements
 
-  Currently, the expression evaluator used to resolve configuration values
-  is the DefaultExpressionEvaluator, which is a local variable within the
-  implementation of the BasicComponentConfigurator. This ExpressionEvaluator
-  simply returns the expression itself as the resolved value, which adds
-  very little value to the container. Things like ${project.build.resources}
-  are not resolved, and result in a type mismatch for the member injection.
+## ExpressionEvaluator
 
-  We need a replacement for DefaultExpressionEvaluator that is capable of
-  traversing an object graph and extracting Object values, not just Strings.
+Currently, the expression evaluator used to resolve configuration values is the DefaultExpressionEvaluator, which is a local variable within the implementation of the BasicComponentConfigurator. This ExpressionEvaluator simply returns the expression itself as the resolved value, which adds very little value to the container. Things like `${project.build.resources}` are not resolved, and result in a type mismatch for the member injection.
 
-* ComponentConfigurator
+We need a replacement for DefaultExpressionEvaluator that is capable of traversing an object graph and extracting Object values, not just Strings.
 
-  Currently, the container uses BasicComponentConfigurator, to configure
-  components. This wouldn't be a problem, except for the local instance of
-  DefaultExpressionEvaluator used within. See the above discussion for more
-  on why this evaluator is bad. We need to provide either an alternative
-  implementation under a different roleHint, or else replace the
-  BasicComponentConfigurator.
+## ComponentConfigurator
 
-* Other
+Currently, the container uses BasicComponentConfigurator, to configure components. This wouldn't be a problem, except for the local instance of DefaultExpressionEvaluator used within. See the above discussion for more on why this evaluator is bad. We need to provide either an alternative implementation under a different roleHint, or else replace the BasicComponentConfigurator.
 
-  We may need to define a new lifecycle/phase to contextualize a mojo right
-  before it's used, and reset it's state afterward. Up to now, the approach
-  of most plexus components has been to avoid instance state like the plague.
-  With the current parameter passing model of mojos, this will not be possible,
-  particularly when we move mojos to a singleton instantiation model, and then
-  run a reactorized project...the successive calls may leave behind configuration
-  artifacts from invocation to invocation.
+## Other
 
-Maven Modifications
+We may need to define a new lifecycle/phase to contextualize a mojo right before it's used, and reset it's state afterward. Up to now, the approach of most plexus components has been to avoid instance state like the plague. With the current parameter passing model of mojos, this will not be possible, particularly when we move mojos to a singleton instantiation model, and then run a reactorized project...the successive calls may leave behind configuration artifacts from invocation to invocation.
 
-* DefaultPluginManager
+# Maven Modifications
 
-  s/getMojoConfiguration()/getConfiguration()/g
+## DefaultPluginManager
 
-  That should re-enable usage of mojo configuration. Ideally, we won't need any
-  of the code that references this method, since the container should provide
-  some way of recontextualizing the mojo, and all we would need to do is inject
-  POM configuration via the lookup method or something.
+s/getMojoConfiguration()/getConfiguration()/g
 
-* PluginDescriptorBuilder
+That should re-enable usage of mojo configuration. Ideally, we won't need any of the code that references this method, since the container should provide some way of recontextualizing the mojo, and all we would need to do is inject POM configuration via the lookup method or something.
 
-  s/getMojoConfiguration()/getConfiguration()/g
+## PluginDescriptorBuilder
 
-  That should be all there is to it.
+s/getMojoConfiguration()/getConfiguration()/g
 
-* MojoDescriptor
+That should be all there is to it.
 
-  Remove set/getMojoConfiguration(..), as it will become obsolete.
+## MojoDescriptor
 
-* MavenSession
+Remove set/getMojoConfiguration(..), as it will become obsolete.
 
-  We may need to enable the context injection here, since this will be
-  instantiated per-project. If we always inject the same context parameters,
-  and are careful to inject nulls where things are missing, we should be
-  able to minimize reconfiguration artifacts injected from basic parameters.
+## MavenSession
 
+We may need to enable the context injection here, since this will be instantiated per-project. If we always inject the same context parameters, and are careful to inject nulls where things are missing, we should be able to minimize reconfiguration artifacts injected from basic parameters.
