@@ -60,6 +60,7 @@ import static org.apache.maven.di.impl.Binding.getPriorityComparator;
 public class InjectorImpl implements Injector {
 
     private final Map<Key<?>, Set<Binding<?>>> bindings = new HashMap<>();
+    private final Map<Class<?>, Function<Key<?>, ?>> factories = new HashMap<>();
     private final Map<Class<? extends Annotation>, Supplier<Scope>> scopes = new HashMap<>();
     private final Set<String> loadedUrls = new HashSet<>();
     private final ThreadLocal<Set<Key<?>>> resolutionStack = new ThreadLocal<>();
@@ -149,6 +150,15 @@ public class InjectorImpl implements Injector {
 
     @Nonnull
     @Override
+    public <U> Injector bindFactory(@Nonnull Class<U> clazz, @Nonnull Function<Key<U>, U> factory) {
+        @SuppressWarnings("unchecked")
+        Function<Key<?>, ?> raw = (Function<Key<?>, ?>) (Function<?, ?>) factory;
+        factories.put(clazz, raw);
+        return this;
+    }
+
+    @Nonnull
+    @Override
     public Injector bindImplicit(@Nonnull Class<?> clazz) {
         Key<?> key = Key.of(clazz, ReflectionUtils.qualifierOf(clazz));
         if (clazz.isInterface()) {
@@ -230,6 +240,14 @@ public class InjectorImpl implements Injector {
             bindingList.sort(getPriorityComparator());
             Binding<Q> binding = bindingList.get(0);
             return compile(binding);
+        }
+        // Factory fallback: if no exact binding, try a registered factory for the raw type.
+        // The factory receives the full Key (including qualifier) and produces the instance.
+        Function<Key<?>, ?> factory = factories.get(key.getRawType());
+        if (factory != null) {
+            @SuppressWarnings("unchecked")
+            Function<Key<?>, Q> typedFactory = (Function<Key<?>, Q>) factory;
+            return () -> typedFactory.apply(key);
         }
         if (key.getRawType() == List.class) {
             Set<Binding<Object>> res2 = getBindings(key.getTypeParameter(0));
@@ -486,6 +504,7 @@ public class InjectorImpl implements Injector {
 
         // Now clear everything else
         bindings.clear();
+        factories.clear();
         scopes.clear();
         loadedUrls.clear();
         resolutionStack.remove();

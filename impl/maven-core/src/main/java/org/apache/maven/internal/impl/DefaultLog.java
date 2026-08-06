@@ -18,18 +18,35 @@
  */
 package org.apache.maven.internal.impl;
 
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.apache.maven.api.plugin.Log;
+import org.apache.maven.api.services.BuilderProblem;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.requireNonNull;
 
 public class DefaultLog implements Log {
+
+    /**
+     * Thread-local flag set by {@link #problem(BuilderProblem)} around the SLF4J call
+     * so that {@code BuildReportCollector} can skip auto-promotion for messages that
+     * are already reported as structured problems. This avoids double-counting.
+     */
+    public static final ThreadLocal<Boolean> STRUCTURED_PROBLEM_ACTIVE = ThreadLocal.withInitial(() -> Boolean.FALSE);
+
     private final Logger logger;
+    private final Consumer<BuilderProblem> problemSink;
 
     public DefaultLog(Logger logger) {
+        this(logger, p -> {});
+    }
+
+    public DefaultLog(Logger logger, Consumer<BuilderProblem> problemSink) {
         this.logger = requireNonNull(logger);
+        this.problemSink = requireNonNull(problemSink);
     }
 
     @Override
@@ -127,7 +144,7 @@ public class DefaultLog implements Log {
     @Override
     public void warn(Supplier<String> content, Throwable error) {
         if (isWarnEnabled()) {
-            logger.info(content.get(), error);
+            logger.warn(content.get(), error);
         }
     }
 
@@ -182,6 +199,33 @@ public class DefaultLog implements Log {
     @Override
     public boolean isErrorEnabled() {
         return logger.isErrorEnabled();
+    }
+
+    @Override
+    public Log child(String name) {
+        requireNonNull(name, "child logger name must not be null");
+        return new DefaultLog(LoggerFactory.getLogger(logger.getName() + "." + name), problemSink);
+    }
+
+    @Override
+    public void problem(BuilderProblem problem) {
+        requireNonNull(problem, "problem must not be null");
+        // Report to the diagnostic collector for dedup and end-of-build summary
+        problemSink.accept(problem);
+        // Also log the message at the appropriate level for console output.
+        // Set the thread-local flag so BuildReportCollector skips auto-promotion
+        // (avoiding double-counting as both a structured problem and a synthetic one).
+        STRUCTURED_PROBLEM_ACTIVE.set(Boolean.TRUE);
+        try {
+            String message = problem.getMessage();
+            switch (problem.getSeverity()) {
+                case FATAL, ERROR -> logger.error(message);
+                case WARNING -> logger.warn(message);
+                default -> logger.info(message);
+            }
+        } finally {
+            STRUCTURED_PROBLEM_ACTIVE.set(Boolean.FALSE);
+        }
     }
 
     private String toString(CharSequence content) {

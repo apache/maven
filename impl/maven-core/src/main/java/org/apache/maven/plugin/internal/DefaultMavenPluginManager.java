@@ -63,6 +63,7 @@ import org.apache.maven.di.Key;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
+import org.apache.maven.internal.build.DefaultDiagnosticCollector;
 import org.apache.maven.internal.impl.DefaultLog;
 import org.apache.maven.internal.impl.DefaultMojoExecution;
 import org.apache.maven.internal.impl.InternalMavenSession;
@@ -164,6 +165,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
     private final List<MavenPluginConfigurationValidator> configurationValidators;
     private final PluginValidationManager pluginValidationManager;
     private final List<MavenPluginPrerequisitesChecker> prerequisitesCheckers;
+    private final DefaultDiagnosticCollector diagnosticCollector;
     private final ExtensionDescriptorBuilder extensionDescriptorBuilder = new ExtensionDescriptorBuilder();
     private final PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
 
@@ -181,7 +183,8 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             MavenPluginValidator pluginValidator,
             List<MavenPluginConfigurationValidator> configurationValidators,
             PluginValidationManager pluginValidationManager,
-            List<MavenPluginPrerequisitesChecker> prerequisitesCheckers) {
+            List<MavenPluginPrerequisitesChecker> prerequisitesCheckers,
+            DefaultDiagnosticCollector diagnosticCollector) {
         this.container = container;
         this.classRealmManager = classRealmManager;
         this.pluginDescriptorCache = pluginDescriptorCache;
@@ -194,6 +197,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         this.configurationValidators = configurationValidators;
         this.pluginValidationManager = pluginValidationManager;
         this.prerequisitesCheckers = prerequisitesCheckers;
+        this.diagnosticCollector = diagnosticCollector;
     }
 
     @Override
@@ -555,8 +559,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         Project project = sessionV4.getProject(session.getCurrentProject());
 
         org.apache.maven.api.MojoExecution execution = new DefaultMojoExecution(sessionV4, mojoExecution);
-        org.apache.maven.api.plugin.Log log = new DefaultLog(
-                LoggerFactory.getLogger(mojoExecution.getMojoDescriptor().getFullGoalName()));
+        String baseLoggerName = mojoExecution.getMojoDescriptor().getFullGoalName();
         try {
             Injector injector = Injector.create();
             injector.discover(pluginRealm);
@@ -565,7 +568,16 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             injector.bindInstance(Session.class, sessionV4);
             injector.bindInstance(Project.class, project);
             injector.bindInstance(org.apache.maven.api.MojoExecution.class, execution);
-            injector.bindInstance(org.apache.maven.api.plugin.Log.class, log);
+            // Factory-based Log binding: unqualified @Inject Log gets the base logger
+            // (e.g. "compiler:compile"), while @Inject @Named("diagnostics") Log gets
+            // a child logger ("compiler:compile.diagnostics") — enabling hierarchical
+            // logger namespacing within a plugin's sub-components.
+            injector.bindFactory(org.apache.maven.api.plugin.Log.class, key -> {
+                String qualifier = key.getQualifier() instanceof String s ? s : null;
+                String loggerName =
+                        qualifier != null && !qualifier.isEmpty() ? baseLoggerName + "." + qualifier : baseLoggerName;
+                return new DefaultLog(LoggerFactory.getLogger(loggerName), diagnosticCollector::report);
+            });
 
             Map<Class<? extends Service>, Supplier<? extends Service>> services = sessionV4.getAllServices();
             services.forEach((itf, svc) -> injector.bindSupplier((Class<Service>) itf, (Supplier<Service>) svc));
