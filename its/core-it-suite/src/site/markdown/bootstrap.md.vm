@@ -1,96 +1,101 @@
- -----
- Maven Core Integration Tests Bootstrap
- -----
- Hervé Boutemy
- -----
- 2017-04-04
- -----
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
 
-~~ Licensed to the Apache Software Foundation (ASF) under one
-~~ or more contributor license agreements.  See the NOTICE file
-~~ distributed with this work for additional information
-~~ regarding copyright ownership.  The ASF licenses this file
-~~ to you under the Apache License, Version 2.0 (the
-~~ "License"); you may not use this file except in compliance
-~~ with the License.  You may obtain a copy of the License at
-~~
-~~   http://www.apache.org/licenses/LICENSE-2.0
-~~
-~~ Unless required by applicable law or agreed to in writing,
-~~ software distributed under the License is distributed on an
-~~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-~~ KIND, either express or implied.  See the License for the
-~~ specific language governing permissions and limitations
-~~ under the License.
+http://www.apache.org/licenses/LICENSE-2.0
 
-~~ NOTE: For help with the syntax of this file, see:
-~~ http://maven.apache.org/doxia/references/apt-format.html
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
 
-Maven Core Integration Tests Bootstrap
+# Maven Core Integration Tests Bootstrap
 
-  Core IT Bootstrapping downloads from Central repository every dependency (artifacts, plugins) required to let
-  Core ITs Suite run without downloading anything later (see {{{./index.html#Core_ITs_Suite_and_Dependencies_.28incl._Plugins.29}Core ITs Suite and dependencies}} rationale).
-  
-  Content to download is defined in {{{https://github.com/apache/maven-integration-testing/tree/master/core-it-suite/src/test/resources/bootstrap}a series of bootstrap projects}}:
+Core IT Bootstrapping downloads from Central repository every dependency (artifacts, plugins) required to let Core ITs Suite run without downloading anything later (see [Core ITs Suite and dependencies](./index.html#Core_ITs_Suite_and_Dependencies_.28incl._Plugins.29) rationale).
 
-%{toc|section=1|fromDepth=2}
+Content to download is defined in [a series of bootstrap projects](https://github.com/apache/maven-integration-testing/tree/master/core-it-suite/src/test/resources/bootstrap):
 
-* Base Plugins And Their Dependencies
+<!-- MACRO{toc|section=1|fromDepth=2} -->
 
-%{snippet|file=${project.build.directory}/test-classes/bootstrap/target/resolve-plugins.txt}
+Base Plugins And Their Dependencies
+-----------------------------------
 
-* Group 1 Dependencies
+<!-- MACRO{snippet|file=${project.build.directory}/test-classes/bootstrap/target/resolve-plugins.txt} -->
 
-%{snippet|file=${project.build.directory}/test-classes/bootstrap/group-1/target/resolve.txt}
+Group 1 Dependencies
+--------------------
 
-* Group 2 Dependencies
+<!-- MACRO{snippet|file=${project.build.directory}/test-classes/bootstrap/group-1/target/resolve.txt} -->
 
-%{snippet|file=${project.build.directory}/test-classes/bootstrap/group-2/target/resolve.txt}
+Group 2 Dependencies
+--------------------
 
-* Group 3 Dependencies
+<!-- MACRO{snippet|file=${project.build.directory}/test-classes/bootstrap/group-2/target/resolve.txt} -->
 
-%{snippet|file=${project.build.directory}/test-classes/bootstrap/group-3/target/resolve.txt}
+Group 3 Dependencies
+--------------------
 
-* Group 4 Dependencies
+<!-- MACRO{snippet|file=${project.build.directory}/test-classes/bootstrap/group-3/target/resolve.txt} -->
 
-%{snippet|file=${project.build.directory}/test-classes/bootstrap/group-4/target/resolve.txt}
+Group 4 Dependencies
+--------------------
 
-* Group 5 Dependencies
+<!-- MACRO{snippet|file=${project.build.directory}/test-classes/bootstrap/group-4/target/resolve.txt} -->
 
-%{snippet|file=${project.build.directory}/test-classes/bootstrap/group-5/target/resolve.txt}
+Group 5 Dependencies
+--------------------
 
-* Group 6 Dependencies
+<!-- MACRO{snippet|file=${project.build.directory}/test-classes/bootstrap/group-5/target/resolve.txt} -->
 
-%{snippet|file=${project.build.directory}/test-classes/bootstrap/group-6/target/resolve.txt}
+Group 6 Dependencies
+--------------------
 
-* Group 7 Dependencies
+<!-- MACRO{snippet|file=${project.build.directory}/test-classes/bootstrap/group-6/target/resolve.txt} -->
 
-%{snippet|file=${project.build.directory}/test-classes/bootstrap/group-7/target/resolve.txt}
+Group 7 Dependencies
+--------------------
 
-* Group 8 Dependencies
+<!-- MACRO{snippet|file=${project.build.directory}/test-classes/bootstrap/group-7/target/resolve.txt} -->
 
-%{snippet|file=${project.build.directory}/test-classes/bootstrap/group-8/target/resolve.txt}
+Group 8 Dependencies
+--------------------
 
-* Group 9 Dependencies
+<!-- MACRO{snippet|file=${project.build.directory}/test-classes/bootstrap/group-8/target/resolve.txt} -->
 
-%{snippet|file=${project.build.directory}/test-classes/bootstrap/group-9/target/resolve.txt}
+Group 9 Dependencies
+--------------------
 
-* Group 10 Dependencies
+<!-- MACRO{snippet|file=${project.build.directory}/test-classes/bootstrap/group-9/target/resolve.txt} -->
 
-%{snippet|file=${project.build.directory}/test-classes/bootstrap/group-10/target/resolve.txt}
+Group 10 Dependencies
+---------------------
 
-* Group 11 Dependencies
+<!-- MACRO{snippet|file=${project.build.directory}/test-classes/bootstrap/group-10/target/resolve.txt} -->
 
-%{snippet|file=${project.build.directory}/test-classes/bootstrap/group-11/target/resolve.txt}
+Group 11 Dependencies
+---------------------
 
-* Group 12 Dependencies
+<!-- MACRO{snippet|file=${project.build.directory}/test-classes/bootstrap/group-11/target/resolve.txt} -->
 
-%{snippet|file=${project.build.directory}/test-classes/bootstrap/group-12/target/resolve.txt}
+Group 12 Dependencies
+---------------------
 
-* Group 13 Dependencies
+<!-- MACRO{snippet|file=${project.build.directory}/test-classes/bootstrap/group-12/target/resolve.txt} -->
 
-%{snippet|file=${project.build.directory}/test-classes/bootstrap/group-13/target/resolve.txt}
+Group 13 Dependencies
+---------------------
 
-* Group 14 Dependencies
+<!-- MACRO{snippet|file=${project.build.directory}/test-classes/bootstrap/group-13/target/resolve.txt} -->
 
-%{snippet|file=${project.build.directory}/test-classes/bootstrap/group-14/target/resolve.txt}
+Group 14 Dependencies
+---------------------
+
+<!-- MACRO{snippet|file=${project.build.directory}/test-classes/bootstrap/group-14/target/resolve.txt} -->
