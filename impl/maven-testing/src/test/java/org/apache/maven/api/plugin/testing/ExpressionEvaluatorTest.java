@@ -40,6 +40,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 
@@ -96,6 +97,17 @@ public class ExpressionEvaluatorTest {
         assertNotNull(mojo.workdir);
         assertEquals("paramValue", mojo.param);
         assertEquals("param2Value", mojo.param2);
+        assertDoesNotThrow(mojo::execute);
+    }
+
+    @Test
+    @SuppressWarnings("removal")
+    @org.apache.maven.api.plugin.testing.InjectMojo(goal = COORDINATES, pom = CONFIG)
+    @org.apache.maven.api.plugin.testing.Basedir("${basedir}/target/test-classes")
+    @org.apache.maven.api.plugin.testing.MojoParameter(name = "param", value = "deprecatedParamValue")
+    public void testDeprecatedAnnotations(ExpressionEvaluatorMojo mojo) throws IllegalAccessException {
+        assertTrue(Paths.get(MojoExtension.getBasedir()).endsWith(Paths.get("target", "test-classes")));
+        assertEquals("deprecatedParamValue", MojoExtension.getVariableValueFromObject(mojo, "param"));
         assertDoesNotThrow(mojo::execute);
     }
 
