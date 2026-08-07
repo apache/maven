@@ -44,23 +44,23 @@ import java.net.URL;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * Creates a touch file if and only if a resource from the plugin dependency was successfully loaded, fails otherwise.
  *
- * @goal load
- * @phase validate
  *
  * @author Benjamin Bentmann
- *
  */
+@Mojo(name = "load", defaultPhase = LifecyclePhase.VALIDATE)
 public class LoadMojo extends AbstractMojo {
 
     /**
      * The path to the output file, relative to the project base directory.
-     *
-     * @parameter expression="${touch.file}" default-value="target/touch.txt"
      */
+    @Parameter(property = "touch.file", defaultValue = "target/touch.txt")
     private File file;
 
     /**

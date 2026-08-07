@@ -36,11 +36,10 @@ package jar;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 
-/**
- * @goal plain1
- * @requiresDependencyResolution compile
- */
+@Mojo(name = "plain1", requiresDependencyResolution = ResolutionScope.COMPILE)
 public class Plain1Mojo extends AbstractMojo {
     public void execute() throws MojoExecutionException {}
 }
