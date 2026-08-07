@@ -1,3 +1,10 @@
+---
+title: Legacy Artifact Handlers Reference
+author: 
+  - Hervé Boutemy
+date: 2013-08-02
+---
+
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file

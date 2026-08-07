@@ -1,3 +1,10 @@
+---
+title: Default Dependency Types
+author: 
+  - Hervé Boutemy
+date: 2024-04-02
+---
+
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
