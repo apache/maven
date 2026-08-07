@@ -145,6 +145,42 @@ public interface LogEvent {
     String formattedMessage();
 
     /**
+     * The project that was active when this log event was produced.
+     * <p>
+     * Corresponds to the Maven project's artifact ID (e.g. {@code "maven-core"}).
+     * Set by the lifecycle engine when a project build starts and cleared when
+     * it finishes; log events emitted outside any project lifecycle (e.g. during
+     * session setup) will return {@code null}.
+     *
+     * @return the project artifact ID, or {@code null}
+     * @since 4.1.0
+     */
+    @Nullable
+    default String projectId() {
+        return null;
+    }
+
+    /**
+     * The mojo execution that was active when this log event was produced.
+     * <p>
+     * The format is {@code "goal@executionId"} (e.g. {@code "compile@default-compile"}).
+     * Set by the lifecycle engine when a mojo starts and cleared when it finishes;
+     * log events emitted outside any mojo execution (e.g. during project setup or
+     * between mojos) will return {@code null}.
+     * <p>
+     * This enables mojo-scoped attribution for <em>all</em> log messages,
+     * including those arriving through the JUL-to-SLF4J bridge from plugins
+     * that use {@code java.util.logging} directly.
+     *
+     * @return the mojo execution identifier, or {@code null}
+     * @since 4.1.0
+     */
+    @Nullable
+    default String mojoId() {
+        return null;
+    }
+
+    /**
      * The intended audience for this log event.
      * <p>
      * Console modes use this to filter output — for example, {@code --console=rich}

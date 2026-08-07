@@ -41,7 +41,9 @@ import org.slf4j.spi.LocationAwareLogger;
 public class ProjectBuildLogAppender implements AutoCloseable {
 
     private static final String KEY_PROJECT_ID = "maven.project.id";
+    private static final String KEY_MOJO_ID = "maven.mojo.id";
     private static final ThreadLocal<String> PROJECT_ID = new InheritableThreadLocal<>();
+    private static final ThreadLocal<String> MOJO_ID = new InheritableThreadLocal<>();
     private static final ThreadLocal<String> FORKING_PROJECT_ID = new InheritableThreadLocal<>();
 
     public static String getProjectId() {
@@ -63,6 +65,20 @@ public class ProjectBuildLogAppender implements AutoCloseable {
         } else {
             PROJECT_ID.remove();
             MDC.remove(KEY_PROJECT_ID);
+        }
+    }
+
+    public static String getMojoId() {
+        return MOJO_ID.get();
+    }
+
+    public static void setMojoId(String mojoId) {
+        if (mojoId != null) {
+            MOJO_ID.set(mojoId);
+            MDC.put(KEY_MOJO_ID, mojoId);
+        } else {
+            MOJO_ID.remove();
+            MDC.remove(KEY_MOJO_ID);
         }
     }
 
@@ -93,11 +109,20 @@ public class ProjectBuildLogAppender implements AutoCloseable {
     protected void accept(
             int level, String loggerName, String cleanMessage, String formattedMessage, Throwable throwable) {
         String projectId = MDC.get(KEY_PROJECT_ID);
+        String mojoId = MDC.get(KEY_MOJO_ID);
         Instant timestamp = MonotonicClock.now();
         LogLevel logLevel = toLogLevel(level);
         String stackTrace = throwable != null ? formatStackTrace(throwable) : null;
-        LogEvent event =
-                new DefaultLogEvent(timestamp, logLevel, cleanMessage, loggerName, stackTrace, formattedMessage);
+        LogEvent event = new DefaultLogEvent(
+                timestamp,
+                logLevel,
+                cleanMessage,
+                loggerName,
+                stackTrace,
+                formattedMessage,
+                projectId,
+                mojoId,
+                LogEvent.Audience.USER);
         buildEventListener.projectLogMessage(projectId, event);
     }
 

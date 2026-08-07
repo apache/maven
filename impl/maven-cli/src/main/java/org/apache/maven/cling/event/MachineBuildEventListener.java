@@ -89,6 +89,7 @@ public class MachineBuildEventListener implements BuildEventListener {
         emitEvent(new JsonLine("log")
                 .field("level", event.level().name())
                 .field("module", projectId)
+                .field("mojo", event.mojoId())
                 .field("logger", event.loggerName())
                 .field("message", event.message())
                 .build());
