@@ -22,6 +22,7 @@ import java.util.function.Supplier;
 
 import org.apache.maven.api.plugin.Log;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.requireNonNull;
 
@@ -30,6 +31,44 @@ public class DefaultLog implements Log {
 
     public DefaultLog(Logger logger) {
         this.logger = requireNonNull(logger);
+    }
+
+    @Override
+    public boolean isTraceEnabled() {
+        return logger.isTraceEnabled();
+    }
+
+    @Override
+    public void trace(CharSequence content) {
+        if (isTraceEnabled()) {
+            logger.trace(toString(content));
+        }
+    }
+
+    @Override
+    public void trace(CharSequence content, Throwable error) {
+        if (isTraceEnabled()) {
+            logger.trace(toString(content), error);
+        }
+    }
+
+    @Override
+    public void trace(Throwable error) {
+        logger.trace("", error);
+    }
+
+    @Override
+    public void trace(Supplier<String> content) {
+        if (isTraceEnabled()) {
+            logger.trace(content.get());
+        }
+    }
+
+    @Override
+    public void trace(Supplier<String> content, Throwable error) {
+        if (isTraceEnabled()) {
+            logger.trace(content.get(), error);
+        }
     }
 
     @Override
@@ -127,7 +166,7 @@ public class DefaultLog implements Log {
     @Override
     public void warn(Supplier<String> content, Throwable error) {
         if (isWarnEnabled()) {
-            logger.info(content.get(), error);
+            logger.warn(content.get(), error);
         }
     }
 
@@ -182,6 +221,12 @@ public class DefaultLog implements Log {
     @Override
     public boolean isErrorEnabled() {
         return logger.isErrorEnabled();
+    }
+
+    @Override
+    public Log child(String name) {
+        requireNonNull(name, "name");
+        return new DefaultLog(LoggerFactory.getLogger(logger.getName() + "." + name));
     }
 
     private String toString(CharSequence content) {

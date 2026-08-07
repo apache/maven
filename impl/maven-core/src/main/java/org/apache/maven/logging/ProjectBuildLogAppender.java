@@ -27,7 +27,9 @@ import org.slf4j.MDC;
 public class ProjectBuildLogAppender implements AutoCloseable {
 
     private static final String KEY_PROJECT_ID = "maven.project.id";
+    private static final String KEY_MOJO_ID = "maven.mojo.id";
     private static final ThreadLocal<String> PROJECT_ID = new InheritableThreadLocal<>();
+    private static final ThreadLocal<String> MOJO_ID = new InheritableThreadLocal<>();
     private static final ThreadLocal<String> FORKING_PROJECT_ID = new InheritableThreadLocal<>();
 
     public static String getProjectId() {
@@ -49,6 +51,31 @@ public class ProjectBuildLogAppender implements AutoCloseable {
         } else {
             PROJECT_ID.remove();
             MDC.remove(KEY_PROJECT_ID);
+        }
+    }
+
+    public static String getMojoId() {
+        return MOJO_ID.get();
+    }
+
+    /**
+     * Sets or clears the mojo execution identifier in both the thread-local
+     * and the SLF4J MDC.  The value is available to any SLF4J appender via
+     * the MDC key {@code maven.mojo.id} and to JUL-bridged messages through
+     * the same MDC path.
+     * <p>
+     * Format: {@code "prefix:goal@executionId"}
+     * (e.g. {@code "compiler:compile@default-compile"}).
+     *
+     * @param mojoId the mojo identifier, or {@code null} to clear
+     */
+    public static void setMojoId(String mojoId) {
+        if (mojoId != null) {
+            MOJO_ID.set(mojoId);
+            MDC.put(KEY_MOJO_ID, mojoId);
+        } else {
+            MOJO_ID.remove();
+            MDC.remove(KEY_MOJO_ID);
         }
     }
 
