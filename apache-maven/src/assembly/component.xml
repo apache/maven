@@ -87,6 +87,7 @@ under the License.
       <includes>
         <include>mvn</include>
         <include>mvnenc</include>
+        <include>mvnlog</include>
         <include>mvnsh</include>
         <include>mvnup</include>
         <include>mvnDebug</include>
