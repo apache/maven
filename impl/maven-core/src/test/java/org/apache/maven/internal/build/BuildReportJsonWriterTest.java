@@ -331,6 +331,74 @@ class BuildReportJsonWriterTest {
     }
 
     @Test
+    void testLogEventWithJulMetadata() {
+        // LogEvent with JUL source class, method, and thread ID
+        LogEvent julEvent = new DefaultLogEvent(
+                BASE_TIME.plusSeconds(1),
+                LogLevel.WARN,
+                "Unsupported class file major version 65",
+                "org.apache.maven.plugins.compiler",
+                null,
+                null,
+                "com.sun.tools.javac.processing.JavacProcessingEnvironment",
+                "doProcessing",
+                42L);
+
+        // LogEvent without JUL metadata (from SLF4J)
+        LogEvent slf4jEvent = new DefaultLogEvent(
+                BASE_TIME.plusSeconds(2), LogLevel.INFO, "Compiling 10 files", "o.a.m.compiler", null);
+
+        MojoReport mojo = new DefaultMojoReport(
+                "org.apache.maven.plugins",
+                "maven-compiler-plugin",
+                "3.15.0",
+                "compile",
+                "default-compile",
+                "compile",
+                BuildStatus.SUCCESS,
+                BASE_TIME,
+                Duration.ofMillis(1000),
+                List.of(julEvent, slf4jEvent));
+
+        BuildReport report = new DefaultBuildReport(
+                BuildStatus.SUCCESS,
+                Duration.ofSeconds(1),
+                BASE_TIME,
+                "4.1.0",
+                "21",
+                List.of("compile"),
+                "test:test:1.0",
+                false,
+                1,
+                List.of(new DefaultModuleReport(
+                        "test",
+                        "test",
+                        "1.0",
+                        BuildStatus.SUCCESS,
+                        BASE_TIME,
+                        Duration.ofSeconds(1),
+                        List.of(mojo),
+                        List.of())),
+                List.of(),
+                List.of(),
+                List.of());
+
+        String json = BuildReportJsonWriter.toJson(report);
+
+        // JUL event should have sourceClassName, sourceMethodName, and threadId
+        assertTrue(
+                json.contains("\"sourceClassName\": \"com.sun.tools.javac.processing.JavacProcessingEnvironment\""),
+                "sourceClassName");
+        assertTrue(json.contains("\"sourceMethodName\": \"doProcessing\""), "sourceMethodName");
+        assertTrue(json.contains("\"threadId\": 42"), "threadId");
+        // SLF4J event should NOT have JUL fields
+        // (the second log event in the output array has no sourceClassName)
+        assertFalse(
+                json.contains("\"sourceClassName\": \"o.a.m.compiler\""),
+                "SLF4J event should not have sourceClassName");
+    }
+
+    @Test
     void testEmptyProblems() {
         BuildReport report = new DefaultBuildReport(
                 BuildStatus.SUCCESS,
