@@ -135,7 +135,7 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest extends AbstractMa
         SecurityHandler.PathMapped securityHandler = new SecurityHandler.PathMapped();
         securityHandler.setLoginService(userRealm);
         securityHandler.setAuthenticator(new BasicAuthenticator());
-        securityHandler.put("/*", Constraint.from("auth", Constraint.Authorization.ANY_USER));
+        securityHandler.put("/*", Constraint.from("auth", Constraint.Authorization.SPECIFIC_ROLE, "deployer"));
 
         securityHandler.setHandler(repoHandler);
 

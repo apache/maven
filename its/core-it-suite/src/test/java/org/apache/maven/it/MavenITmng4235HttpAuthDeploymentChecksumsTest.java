@@ -46,6 +46,7 @@ import org.eclipse.jetty.util.security.Password;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -81,7 +82,7 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest extends AbstractMaven
         SecurityHandler.PathMapped securityHandler = new SecurityHandler.PathMapped();
         securityHandler.setLoginService(userRealm);
         securityHandler.setAuthenticator(new BasicAuthenticator());
-        securityHandler.put("/*", Constraint.from("auth", Constraint.Authorization.ANY_USER));
+        securityHandler.put("/*", Constraint.from("auth", Constraint.Authorization.SPECIFIC_ROLE, "deployer"));
 
         server = new Server(0);
 
@@ -181,7 +182,7 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest extends AbstractMaven
                     dir.mkdirs();
                 }
 
-                Files.copy(Request.asInputStream(request), resource, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(Request.asInputStream(request), resource, REPLACE_EXISTING);
 
                 DeployedResource deployedResource = new DeployedResource();
 

@@ -87,19 +87,20 @@ public class MavenITmng4360WebDavSupportTest extends AbstractMavenIntegrationTes
 
                 PrintWriter writer = new PrintWriter(Content.Sink.asOutputStream(response));
 
+                String uri = Request.getPathInContext(request);
                 response.setStatus(200);
 
-                if (Request.getPathInContext(request).endsWith(".pom")) {
+                if (uri.endsWith(".pom")) {
                     writer.println("<project>");
                     writer.println("  <modelVersion>4.0.0</modelVersion>");
                     writer.println("  <groupId>org.apache.maven.its.mng4360</groupId>");
                     writer.println("  <artifactId>dep</artifactId>");
                     writer.println("  <version>0.1</version>");
                     writer.println("</project>");
-                } else if (Request.getPathInContext(request).endsWith(".jar")) {
+                } else if (uri.endsWith(".jar")) {
                     writer.println("empty");
-                } else if (Request.getPathInContext(request).endsWith(".md5")
-                        || Request.getPathInContext(request).endsWith(".sha1")) {
+                } else if (uri.endsWith(".md5")
+                        || uri.endsWith(".sha1")) {
                     response.setStatus(404);
                 }
                 writer.flush();
