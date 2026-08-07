@@ -167,4 +167,27 @@ public interface Log {
     void error(Supplier<String> content);
 
     void error(Supplier<String> content, Throwable error);
+
+    /**
+     * Returns a child logger whose name is derived from this logger's name
+     * by appending a dot and the given suffix.
+     *
+     * <p>For example, if a plugin's logger is named {@code "compiler:compile"},
+     * then {@code child("diagnostics")} returns a logger named
+     * {@code "compiler:compile.diagnostics"}. This lets sub-components log
+     * under an independently filterable name without requiring a separate
+     * injection point.</p>
+     *
+     * <p>The default implementation returns {@code this}, so existing
+     * {@code Log} implementations continue to work without changes.
+     * Implementations that wrap a hierarchical logging backend (such as
+     * SLF4J) should override this to create a real child logger.</p>
+     *
+     * @param name the suffix to append (must not be {@code null} or blank)
+     * @return a child logger — never {@code null}
+     * @since 4.0.0
+     */
+    default Log child(String name) {
+        return this;
+    }
 }

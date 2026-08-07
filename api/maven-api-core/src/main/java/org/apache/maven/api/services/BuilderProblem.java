@@ -25,18 +25,35 @@ import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.annotations.ThreadSafe;
 
 /**
- * Describes a problem that was encountered during project building or
- * build execution. A problem can either be an exception that was thrown
- * or a simple string message. In addition, a problem carries a hint
- * about its source.
+ * An actionable finding discovered during the build — something the user
+ * <em>needs to fix</em> or <em>should be aware of</em>.
  * <p>
- * Since 4.1.0, problems can optionally carry a deduplication
- * {@link #getKey() key}, an actionable {@link #getSuggestion() suggestion},
- * and a {@link #getDocumentationUrl() documentation URL}. These fields
- * enable richer build reports and a deduplicated warning summary at
- * the end of the build.
+ * A {@code BuilderProblem} is always user-facing and always at least
+ * {@link Severity#WARNING} severity. It carries structured metadata
+ * — a source location, a deduplication {@link #getKey() key}, an optional
+ * {@link #getSuggestion() fix suggestion}, and a {@link #getDocumentationUrl()
+ * documentation link} — so the build can collect, deduplicate, and summarize
+ * problems at the end rather than repeating each occurrence inline.
+ *
+ * <h3>BuilderProblem vs {@link org.apache.maven.api.build.report.LogEvent LogEvent}</h3>
+ * <p>
+ * These two types serve complementary roles:
+ * <ul>
+ *   <li>{@code BuilderProblem} — <em>"something needs attention"</em>: an actionable
+ *       finding ({@code "unchecked cast at Foo.java:42"}). Collected, deduplicated
+ *       by {@link #getKey() key}, and summarized at the end of the build.
+ *       Always {@code WARNING+}, always user-facing.</li>
+ *   <li>{@code LogEvent} — <em>"something happened"</em>: informational progress
+ *       ({@code "Compiling 42 source files"}). Streams to the console and is
+ *       recorded in the build report, but not deduplicated or summarized.</li>
+ * </ul>
+ * <p>
+ * The deciding question is: <strong>can the user act on it?</strong> If yes,
+ * use {@code BuilderProblem}. If it's informational or progress-related,
+ * use {@code LogEvent}.
  *
  * @since 4.0.0
+ * @see org.apache.maven.api.build.report.LogEvent
  */
 @Experimental
 @Immutable
@@ -168,6 +185,10 @@ public interface BuilderProblem {
 
     /**
      * The different severity levels for a problem, in decreasing order.
+     * <p>
+     * A {@code BuilderProblem} is always at least {@code WARNING} — purely
+     * informational messages belong in {@link org.apache.maven.api.build.report.LogEvent}
+     * instead.
      *
      * @since 4.0.0
      */
@@ -175,8 +196,7 @@ public interface BuilderProblem {
     enum Severity {
         FATAL, //
         ERROR, //
-        WARNING, //
-        INFO //
+        WARNING //
     }
 
     /**

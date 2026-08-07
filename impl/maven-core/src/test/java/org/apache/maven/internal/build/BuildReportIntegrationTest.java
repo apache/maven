@@ -90,15 +90,6 @@ class BuildReportIntegrationTest {
                 .build();
     }
 
-    private static BuilderProblem info(String key, String message, String source) {
-        return BuilderProblem.builder()
-                .source(source)
-                .message(message)
-                .severity(BuilderProblem.Severity.INFO)
-                .key(key)
-                .build();
-    }
-
     private static BuilderProblem error(String key, String message, String source) {
         return BuilderProblem.builder()
                 .source(source)
@@ -163,8 +154,8 @@ class BuildReportIntegrationTest {
         // Same warning fires again in a different module — should be deduplicated
         diagnosticCollector.report(warning("deprecated-source-target", "source/target value 8 is deprecated", "impl"));
 
-        // Also report a unique info problem
-        diagnosticCollector.report(info("build-note", "Using JDK 21 toolchain", "toolchain"));
+        // Also report a unique error problem
+        diagnosticCollector.report(error("build-error", "Missing required dependency", "impl"));
 
         collector.onEvent(createEvent(ExecutionEvent.Type.MojoSucceeded, session, impl, compileImpl));
         result.addBuildSummary(new BuildSuccess(impl, 2000));
@@ -183,8 +174,8 @@ class BuildReportIntegrationTest {
         assertEquals(2, report.problems().size());
         assertEquals("deprecated-source-target", report.problems().get(0).getKey());
         assertEquals(BuilderProblem.Severity.WARNING, report.problems().get(0).getSeverity());
-        assertEquals("build-note", report.problems().get(1).getKey());
-        assertEquals(BuilderProblem.Severity.INFO, report.problems().get(1).getSeverity());
+        assertEquals("build-error", report.problems().get(1).getKey());
+        assertEquals(BuilderProblem.Severity.ERROR, report.problems().get(1).getSeverity());
 
         // Summary should show count = 2 for the warning
         assertEquals(2, diagnosticCollector.getSummary().get(0).count());
@@ -227,8 +218,8 @@ class BuildReportIntegrationTest {
         assertTrue(json.contains("\"key\": \"deprecated-source-target\""));
         assertTrue(json.contains("\"severity\": \"WARNING\""));
         assertTrue(json.contains("\"suggestion\": \"Update <maven.compiler.source> to 11 or higher\""));
-        assertTrue(json.contains("\"key\": \"build-note\""));
-        assertTrue(json.contains("\"severity\": \"INFO\""));
+        assertTrue(json.contains("\"key\": \"build-error\""));
+        assertTrue(json.contains("\"severity\": \"ERROR\""));
 
         // Failures should be empty
         assertTrue(json.contains("\"failures\": []"));
@@ -254,7 +245,7 @@ class BuildReportIntegrationTest {
         diagnosticCollector.report(warning("warn-1", "first warning", null));
         diagnosticCollector.report(warning("warn-1", "first warning (dup)", null));
         diagnosticCollector.report(error("err-1", "first error", null));
-        diagnosticCollector.report(info("info-1", "info note", null));
+        diagnosticCollector.report(warning("warn-2", "second warning", null));
 
         // Should not throw
         collector.printDiagnosticSummary();

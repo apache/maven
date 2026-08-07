@@ -25,15 +25,52 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 
 /**
- * A structured log event captured during the build.
+ * A log message emitted during the build — the narrative stream that tells
+ * you <em>what the build is doing</em>.
  * <p>
- * Each event carries the log level, timestamp, message, and optionally
- * the logger name and a stack trace. This replaces raw log line strings
- * in the build report, enabling programmatic filtering by level and
- * correlation by timestamp.
+ * A {@code LogEvent} is the Maven equivalent of an SLF4J log line: it carries
+ * a timestamp, a severity level, the emitting logger, and the message text.
+ * Log events <strong>stream through</strong> the console and are recorded in
+ * the build report, but they are not deduplicated or summarized.
+ *
+ * <h3>LogEvent vs {@link org.apache.maven.api.services.BuilderProblem BuilderProblem}</h3>
  * <p>
- * Log events are captured at three levels forming a non-overlapping
- * partition of the full build log:
+ * These two types serve complementary roles:
+ * <ul>
+ *   <li>{@code LogEvent} — <em>"something happened"</em>: informational progress
+ *       ({@code "Compiling 42 source files"}, {@code "Downloading commons-lang3.jar"}).
+ *       Streams to the console and is recorded in the build report.</li>
+ *   <li>{@code BuilderProblem} — <em>"something needs attention"</em>: an actionable
+ *       finding with a source location, deduplication key, and optional fix suggestion
+ *       ({@code "unchecked cast at Foo.java:42"}). Collected, deduplicated, and
+ *       summarized at the end of the build. Always {@code WARNING} severity or higher,
+ *       always user-facing.</li>
+ * </ul>
+ * <p>
+ * The deciding question is: <strong>can the user act on it?</strong> If yes, use
+ * {@code BuilderProblem}. If it's informational or progress-related, use {@code LogEvent}.
+ *
+ * <h3>Audience</h3>
+ * <p>
+ * Each log event carries an {@link #audience()} that identifies who the message
+ * is intended for. Audiences are <strong>cumulative</strong> — each tier includes
+ * all messages from lower tiers:
+ * <ul>
+ *   <li>{@link Audience#USER} — messages the build user acts on:
+ *       compilation results, test outcomes, dependency conflicts</li>
+ *   <li>{@link Audience#PLUGIN} — adds plugin-internal messages:
+ *       mojo parameters, plugin configuration details</li>
+ *   <li>{@link Audience#INTERNAL} — adds Maven core internals:
+ *       lifecycle ordering, model interpolation, resolver decisions</li>
+ * </ul>
+ * <p>
+ * Console modes use the audience to filter output: {@code --console=rich} shows
+ * only {@code USER} messages inline, while {@code -X} shows all three tiers.
+ *
+ * <h3>Capture hierarchy</h3>
+ * <p>
+ * Log events are captured at three levels forming a non-overlapping partition
+ * of the full build log:
  * <ul>
  *   <li>{@link BuildReport#output()} — events outside any module lifecycle</li>
  *   <li>{@link ModuleReport#output()} — events during a module build but outside any mojo</li>
@@ -41,6 +78,7 @@ import org.apache.maven.api.annotations.Nullable;
  * </ul>
  *
  * @since 4.1.0
+ * @see org.apache.maven.api.services.BuilderProblem
  */
 @Experimental
 public interface LogEvent {
@@ -105,4 +143,63 @@ public interface LogEvent {
      */
     @Nullable
     String formattedMessage();
+
+    /**
+     * The intended audience for this log event.
+     * <p>
+     * Console modes use this to filter output — for example, {@code --console=rich}
+     * shows only {@link Audience#USER} messages inline, while {@code -X} shows all
+     * three tiers. The build report always records all events regardless of audience.
+     * <p>
+     * Defaults to {@link Audience#USER} if not specified.
+     *
+     * @return the audience tier, never {@code null}
+     * @since 4.1.0
+     */
+    @Nonnull
+    default Audience audience() {
+        return Audience.USER;
+    }
+
+    /**
+     * Identifies the intended audience for a log event.
+     * <p>
+     * Audiences are <strong>cumulative</strong>: each tier includes all messages
+     * from the tiers below it. A console configured for {@code PLUGIN} will show
+     * both {@code USER} and {@code PLUGIN} messages; a console configured for
+     * {@code INTERNAL} shows everything.
+     *
+     * <table>
+     *   <caption>Audience tiers and what they add</caption>
+     *   <tr><th>Tier</th><th>Shows</th><th>Examples</th></tr>
+     *   <tr><td>{@code USER}</td><td>Build outcomes and progress</td>
+     *       <td>"Compiling 42 source files", "Tests run: 10, Failures: 0"</td></tr>
+     *   <tr><td>{@code PLUGIN}</td><td>+ plugin internals</td>
+     *       <td>Mojo parameter dumps, plugin configuration details</td></tr>
+     *   <tr><td>{@code INTERNAL}</td><td>+ Maven core internals</td>
+     *       <td>Lifecycle phase ordering, model interpolation, resolver traces</td></tr>
+     * </table>
+     *
+     * @since 4.1.0
+     */
+    @Experimental
+    enum Audience {
+        /**
+         * Messages intended for the build user: compilation results,
+         * test outcomes, dependency conflicts, download progress.
+         */
+        USER,
+        /**
+         * Messages intended for plugin developers: mojo parameters,
+         * classpath details, plugin-internal diagnostics. Includes
+         * all {@link #USER} messages.
+         */
+        PLUGIN,
+        /**
+         * Messages intended for Maven core developers: lifecycle
+         * ordering, model interpolation, resolver negotiation.
+         * Includes all {@link #USER} and {@link #PLUGIN} messages.
+         */
+        INTERNAL
+    }
 }

@@ -35,6 +35,7 @@ import org.apache.maven.api.build.report.LogLevel;
  * @param loggerName       the name of the logger, or {@code null}
  * @param stackTrace       the stack trace string, or {@code null}
  * @param formattedMessage the fully formatted console line, or {@code null}
+ * @param audience         the intended audience tier, never {@code null}
  */
 public record DefaultLogEvent(
         Instant timestamp,
@@ -42,14 +43,28 @@ public record DefaultLogEvent(
         String message,
         String loggerName,
         String stackTrace,
-        String formattedMessage)
+        String formattedMessage,
+        Audience audience)
         implements LogEvent {
 
     /**
+     * Convenience constructor that defaults the audience to {@link Audience#USER}.
+     */
+    public DefaultLogEvent(
+            Instant timestamp,
+            LogLevel level,
+            String message,
+            String loggerName,
+            String stackTrace,
+            String formattedMessage) {
+        this(timestamp, level, message, loggerName, stackTrace, formattedMessage, Audience.USER);
+    }
+
+    /**
      * Convenience constructor for events created without a formatted message
-     * (e.g. in tests or programmatic construction).
+     * (e.g. in tests or programmatic construction). Defaults audience to {@link Audience#USER}.
      */
     DefaultLogEvent(Instant timestamp, LogLevel level, String message, String loggerName, String stackTrace) {
-        this(timestamp, level, message, loggerName, stackTrace, null);
+        this(timestamp, level, message, loggerName, stackTrace, null, Audience.USER);
     }
 }

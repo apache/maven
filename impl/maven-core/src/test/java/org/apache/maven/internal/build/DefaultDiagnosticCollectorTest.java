@@ -61,15 +61,6 @@ class DefaultDiagnosticCollectorTest {
                 .build();
     }
 
-    private static BuilderProblem info(String key, String message, String source) {
-        return BuilderProblem.builder()
-                .source(source)
-                .message(message)
-                .severity(BuilderProblem.Severity.INFO)
-                .key(key)
-                .build();
-    }
-
     @Test
     void testEmptyCollector() {
         assertTrue(collector.getProblems().isEmpty());
@@ -100,12 +91,12 @@ class DefaultDiagnosticCollectorTest {
     }
 
     @Test
-    void testInfoDoesNotCountAsWarningOrError() {
-        BuilderProblem p = info("build-summary", "Build completed", "reactor");
+    void testWarningCountsAsWarning() {
+        BuilderProblem p = warning("deprecated-api", "API is deprecated", "reactor");
         collector.report(p);
 
         assertEquals(1, collector.getProblems().size());
-        assertFalse(collector.hasWarnings());
+        assertTrue(collector.hasWarnings());
         assertFalse(collector.hasErrors());
     }
 
