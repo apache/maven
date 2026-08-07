@@ -34,6 +34,44 @@ public class DefaultLog implements Log {
     }
 
     @Override
+    public boolean isTraceEnabled() {
+        return logger.isTraceEnabled();
+    }
+
+    @Override
+    public void trace(CharSequence content) {
+        if (isTraceEnabled()) {
+            logger.trace(toString(content));
+        }
+    }
+
+    @Override
+    public void trace(CharSequence content, Throwable error) {
+        if (isTraceEnabled()) {
+            logger.trace(toString(content), error);
+        }
+    }
+
+    @Override
+    public void trace(Throwable error) {
+        logger.trace("", error);
+    }
+
+    @Override
+    public void trace(Supplier<String> content) {
+        if (isTraceEnabled()) {
+            logger.trace(content.get());
+        }
+    }
+
+    @Override
+    public void trace(Supplier<String> content, Throwable error) {
+        if (isTraceEnabled()) {
+            logger.trace(content.get(), error);
+        }
+    }
+
+    @Override
     public void debug(CharSequence content) {
         if (isDebugEnabled()) {
             logger.debug(toString(content));

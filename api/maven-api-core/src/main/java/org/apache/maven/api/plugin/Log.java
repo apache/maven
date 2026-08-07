@@ -37,12 +37,74 @@ import org.apache.maven.api.annotations.Provider;
 @Provider
 public interface Log {
     /**
+     * {@return true if the <b>trace</b> error level is enabled}
+     */
+    boolean isTraceEnabled();
+
+    /**
+     * Sends a message to the user in the <b>trace</b> error level.
+     * <p>
+     * Trace is the most verbose level, intended for Maven core internals
+     * such as resolver negotiation, model interpolation, and lifecycle
+     * ordering details.  Use {@link #debug(CharSequence)} instead for
+     * messages that help <em>users</em> investigate their build
+     * (e.g. why a module was recompiled).
+     *
+     * @param content the message to log
+     * @since 4.1.0
+     */
+    void trace(CharSequence content);
+
+    /**
+     * Sends a message (and accompanying exception) to the user at the <b>trace</b> error level.
+     * The error's stacktrace will be output when this error level is enabled.
+     *
+     * @param content the message to log
+     * @param error the error that caused this log
+     * @since 4.1.0
+     */
+    void trace(CharSequence content, Throwable error);
+
+    /**
+     * Sends an exception to the user in the <b>trace</b> error level.
+     * The stack trace for this exception will be output when this error level is enabled.
+     *
+     * @param error the error that caused this log
+     * @since 4.1.0
+     */
+    void trace(Throwable error);
+
+    /**
+     * Sends a lazily-computed message in the <b>trace</b> error level.
+     * The supplier is only evaluated if trace is enabled.
+     *
+     * @param content the message supplier
+     * @since 4.1.0
+     */
+    void trace(Supplier<String> content);
+
+    /**
+     * Sends a lazily-computed message (and accompanying exception) in the <b>trace</b> error level.
+     * The supplier is only evaluated if trace is enabled.
+     *
+     * @param content the message supplier
+     * @param error the error that caused this log
+     * @since 4.1.0
+     */
+    void trace(Supplier<String> content, Throwable error);
+
+    /**
      * {@return true if the <b>debug</b> error level is enabled}
      */
     boolean isDebugEnabled();
 
     /**
      * Sends a message to the user in the <b>debug</b> error level.
+     * <p>
+     * Debug is intended for messages that help <em>users</em> investigate
+     * their build — for example, why a module was recompiled or what
+     * classpath was resolved.  For Maven core internals, use
+     * {@link #trace(CharSequence)} instead.
      *
      * @param content the message to log
      */
