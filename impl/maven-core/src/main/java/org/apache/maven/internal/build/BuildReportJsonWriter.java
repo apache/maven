@@ -255,12 +255,21 @@ final class BuildReportJsonWriter {
         if (event.loggerName() != null) {
             writeField(sb, indent + 1, "loggerName", event.loggerName());
         }
+        writeField(sb, indent + 1, "message", event.message());
         if (event.stackTrace() != null) {
-            writeField(sb, indent + 1, "message", event.message());
-            writeLastField(sb, indent + 1, "stackTrace", event.stackTrace());
-        } else {
-            writeLastField(sb, indent + 1, "message", event.message());
+            writeField(sb, indent + 1, "stackTrace", event.stackTrace());
         }
+        // JUL metadata — only present for events from java.util.logging
+        if (event.sourceClassName() != null) {
+            writeField(sb, indent + 1, "sourceClassName", event.sourceClassName());
+        }
+        if (event.sourceMethodName() != null) {
+            writeField(sb, indent + 1, "sourceMethodName", event.sourceMethodName());
+        }
+        if (event.threadId() >= 0) {
+            writeField(sb, indent + 1, "threadId", event.threadId());
+        }
+        removeTrailingComma(sb);
         writeIndent(sb, indent);
         sb.append('}');
     }
@@ -279,9 +288,25 @@ final class BuildReportJsonWriter {
         sb.append('"').append(key).append("\": ").append(value).append(",\n");
     }
 
+    private static void writeField(StringBuilder sb, int indent, String key, long value) {
+        writeIndent(sb, indent);
+        sb.append('"').append(key).append("\": ").append(value).append(",\n");
+    }
+
     private static void writeField(StringBuilder sb, int indent, String key, boolean value) {
         writeIndent(sb, indent);
         sb.append('"').append(key).append("\": ").append(value).append(",\n");
+    }
+
+    /**
+     * Removes the trailing comma from the last field in a JSON object.
+     * Turns {@code "field": value,\n} into {@code "field": value\n}.
+     */
+    private static void removeTrailingComma(StringBuilder sb) {
+        int len = sb.length();
+        if (len >= 2 && sb.charAt(len - 2) == ',' && sb.charAt(len - 1) == '\n') {
+            sb.deleteCharAt(len - 2);
+        }
     }
 
     private static void writeLastField(StringBuilder sb, int indent, String key, String value) {
