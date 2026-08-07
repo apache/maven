@@ -21,9 +21,7 @@ package org.apache.maven.api.plugin;
 import java.util.function.Supplier;
 
 import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Provider;
-import org.apache.maven.api.services.BuilderProblem;
 
 /**
  * This interface supplies the API for providing feedback to the user from the {@code Mojo},
@@ -169,55 +167,4 @@ public interface Log {
     void error(Supplier<String> content);
 
     void error(Supplier<String> content, Throwable error);
-
-    /**
-     * Returns a child logger with the given name appended to this logger's name,
-     * enabling hierarchical logger namespacing within a plugin.
-     * <p>
-     * For example, if the current logger is named {@code "compiler:compile"},
-     * calling {@code child("diagnostics")} returns a logger named
-     * {@code "compiler:compile.diagnostics"}.
-     * <p>
-     * This is useful when a plugin delegates to sub-components (e.g. options
-     * resolution, diagnostic reporting, incremental build decisions) and wants
-     * each component's log output to be independently filterable.
-     *
-     * @param name the child logger name segment (appended after a dot separator)
-     * @return a child logger; the default implementation returns {@code this}
-     * @since 4.1.0
-     */
-    @Nonnull
-    default Log child(@Nonnull String name) {
-        return this;
-    }
-
-    /**
-     * Reports a structured {@link BuilderProblem} to the build's diagnostic collector.
-     * <p>
-     * Unlike {@link #warn(CharSequence)}, a structured problem carries a deduplication
-     * {@linkplain BuilderProblem#getKey() key}, an optional
-     * {@linkplain BuilderProblem#getSuggestion() suggestion}, and an optional
-     * {@linkplain BuilderProblem#getDocumentationUrl() documentation URL} — enabling
-     * Maven to deduplicate repeated warnings across modules and present an actionable
-     * end-of-build summary.
-     * <p>
-     * The problem is also logged at the appropriate level (WARN or ERROR) so it
-     * appears in the normal console output. Callers should <em>not</em> additionally
-     * call {@link #warn(CharSequence)} for the same message, as that would produce
-     * duplicate output.
-     * <p>
-     * The default implementation falls back to {@link #warn(CharSequence)} or
-     * {@link #error(CharSequence)} based on the problem's severity.
-     *
-     * @param problem the structured problem to report
-     * @since 4.1.0
-     */
-    default void problem(@Nonnull BuilderProblem problem) {
-        if (problem.getSeverity() == BuilderProblem.Severity.ERROR
-                || problem.getSeverity() == BuilderProblem.Severity.FATAL) {
-            error(problem.getMessage());
-        } else {
-            warn(problem.getMessage());
-        }
-    }
 }

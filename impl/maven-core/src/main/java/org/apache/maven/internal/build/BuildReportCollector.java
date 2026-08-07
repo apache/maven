@@ -57,7 +57,6 @@ import org.apache.maven.execution.BuildSummary;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.internal.impl.DefaultLog;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.slf4j.MavenSimpleLogger;
@@ -368,13 +367,9 @@ public final class BuildReportCollector extends AbstractEventSpy {
         // Auto-collect WARN-level log events as build problems, giving Maven 3 plugins
         // automatic deduplication and summary at end of build without code changes.
         // Skip loggers that already pipe structured BuilderProblems directly to the
-        // DiagnosticCollector (avoiding double-counting), our own logger to avoid
-        // feedback loops from problem summary printing, and messages triggered by
-        // Log.problem() which are already reported as structured problems.
-        if (level == LocationAwareLogger.WARN_INT
-                && message != null
-                && !EXCLUDED_LOGGERS.contains(loggerName)
-                && !DefaultLog.STRUCTURED_PROBLEM_ACTIVE.get()) {
+        // DiagnosticCollector (avoiding double-counting), and our own logger to avoid
+        // feedback loops from problem summary printing.
+        if (level == LocationAwareLogger.WARN_INT && message != null && !EXCLUDED_LOGGERS.contains(loggerName)) {
             String syntheticKey = syntheticDiagnosticKey(loggerName, message);
             diagnosticCollector.report(BuilderProblem.builder()
                     .source(loggerName)

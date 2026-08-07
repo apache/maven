@@ -19,7 +19,6 @@
 package org.apache.maven.di;
 
 import java.lang.annotation.Annotation;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.apache.maven.api.annotations.Nonnull;
@@ -138,36 +137,6 @@ public interface Injector {
      */
     @Nonnull
     <T> Injector bindSupplier(@Nonnull Class<T> cls, @Nonnull Supplier<T> supplier);
-
-    /**
-     * Binds a factory that creates instances based on the injection-point {@link Key}.
-     * <p>
-     * Unlike {@link #bindInstance} or {@link #bindSupplier}, a factory receives the full
-     * {@link Key} (type + qualifier) requested at the injection site and can produce a
-     * different instance per qualifier. This enables patterns like qualifier-derived
-     * hierarchical logger names:
-     * <pre>
-     * injector.bindFactory(Log.class, key -&gt; {
-     *     String qualifier = key.getQualifier() instanceof String s ? s : null;
-     *     String name = qualifier != null ? baseName + "." + qualifier : baseName;
-     *     return new DefaultLog(LoggerFactory.getLogger(name));
-     * });
-     * </pre>
-     * A field annotated {@code @Inject @Named("diagnostics") Log logger} would then
-     * receive a logger named {@code "compiler:compile.diagnostics"}.
-     * <p>
-     * The factory also serves as the fallback for unqualified injection points
-     * ({@code @Inject Log logger}) — the key's qualifier will be {@code null}.
-     *
-     * @param <T> the type of instances the factory produces
-     * @param cls the class to bind the factory to
-     * @param factory a function from injection-point {@link Key} to instance
-     * @return this injector instance for method chaining
-     * @throws NullPointerException if either parameter is null
-     * @since 4.1.0
-     */
-    @Nonnull
-    <T> Injector bindFactory(@Nonnull Class<T> cls, @Nonnull Function<Key<T>, T> factory);
 
     /**
      * Performs field and method injection on an existing instance.
