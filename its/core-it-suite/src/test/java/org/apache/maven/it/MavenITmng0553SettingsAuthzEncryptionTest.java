@@ -70,7 +70,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
         SecurityHandler.PathMapped securityHandler = new SecurityHandler.PathMapped();
         securityHandler.setLoginService(userRealm);
         securityHandler.setAuthenticator(new BasicAuthenticator());
-        securityHandler.put("/*", Constraint.from("auth", Constraint.Authorization.ANY_USER));
+        securityHandler.put("/*", Constraint.from("auth", Constraint.Authorization.SPECIFIC_ROLE, "user"));
 
         ResourceHandler repoHandler = new ResourceHandler();
         repoHandler.setBaseResource(ResourceFactory.of(server).newResource(new File(testDir, "repo").toPath()));

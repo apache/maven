@@ -74,10 +74,11 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test extends AbstractMavenInt
                 response.getHeaders().put(HttpHeader.CONTENT_TYPE, "text/plain");
 
                 System.out.println("Checking for 'Proxy-Connection' header...");
+                String uri = Request.getPathInContext(request);
                 PrintWriter writer = new PrintWriter(Content.Sink.asOutputStream(response));
                 if (request.getHeaders().get("Proxy-Connection") != null) {
                     response.setStatus(200);
-                    if (Request.getPathInContext(request).endsWith(".sha1")) {
+                    if (uri.endsWith(".sha1")) {
                         writer.print(CONTENT_CHECKSUM_SHA1);
                     } else {
                         writer.print(CONTENT);
@@ -91,10 +92,10 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test extends AbstractMavenInt
                  * Changing the code to test for more generalized case: local proxy receives a request with
                  * correct server url and resource uri
                  */
-                else if (Request.getPathInContext(request).startsWith("/org/apache/maven/its/mng3599/test-dependency")
+                else if (uri.startsWith("/org/apache/maven/its/mng3599/test-dependency")
                         && request.getHttpURI().toString().startsWith("http://www.example.com")) {
                     response.setStatus(200);
-                    if (Request.getPathInContext(request).endsWith(".sha1")) {
+                    if (uri.endsWith(".sha1")) {
                         writer.print(CONTENT_CHECKSUM_SHA1);
                     } else {
                         writer.print(CONTENT);
