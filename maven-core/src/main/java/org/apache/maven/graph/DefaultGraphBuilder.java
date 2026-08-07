@@ -342,11 +342,12 @@ public class DefaultGraphBuilder implements GraphBuilder {
         }
 
         List<File> files = Arrays.asList(request.getPom().getAbsoluteFile());
-        collectProjects(projects, files, request);
+        boolean problems = collectProjects(projects, files, request);
+        session.setModelProblems(problems);
         return projects;
     }
 
-    private void collectProjects(List<MavenProject> projects, List<File> files, MavenExecutionRequest request)
+    private boolean collectProjects(List<MavenProject> projects, List<File> files, MavenExecutionRequest request)
             throws ProjectBuildingException {
         ProjectBuildingRequest projectBuildingRequest = request.getProjectBuildingRequest();
 
@@ -358,17 +359,19 @@ public class DefaultGraphBuilder implements GraphBuilder {
         for (ProjectBuildingResult result : results) {
             projects.add(result.getProject());
 
-            if (!result.getProblems().isEmpty() && logger.isWarnEnabled()) {
-                logger.warn("");
-                logger.warn("Some problems were encountered while building the effective model for "
-                        + result.getProject().getId());
-
-                for (ModelProblem problem : result.getProblems()) {
-                    String loc = ModelProblemUtils.formatLocation(problem, result.getProjectId());
-                    logger.warn(problem.getMessage() + (StringUtils.isNotEmpty(loc) ? " @ " + loc : ""));
-                }
-
+            if (!result.getProblems().isEmpty()) {
                 problems = true;
+
+                if (logger.isWarnEnabled()) {
+                    logger.warn("");
+                    logger.warn("Some problems were encountered while building the effective model for "
+                            + result.getProject().getId());
+
+                    for (ModelProblem problem : result.getProblems()) {
+                        String loc = ModelProblemUtils.formatLocation(problem, result.getProjectId());
+                        logger.warn(problem.getMessage() + (StringUtils.isNotEmpty(loc) ? " @ " + loc : ""));
+                    }
+                }
             }
         }
 
@@ -381,6 +384,8 @@ public class DefaultGraphBuilder implements GraphBuilder {
                     + " longer support building such malformed projects.");
             logger.warn("");
         }
+
+        return problems;
     }
 
     private void validateProjects(List<MavenProject> projects) {
