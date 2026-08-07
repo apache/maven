@@ -24,11 +24,15 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jetty.http.UriCompliance;
 import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.io.Content;
 import org.eclipse.jetty.util.Callback;
 import org.junit.jupiter.api.Test;
@@ -105,7 +109,13 @@ public class MavenITmng4360WebDavSupportTest extends AbstractMavenIntegrationTes
             }
         };
 
-        Server server = new Server(0);
+        // NOTE: The WebDAV wagons under test request "//org/apache/..." with an empty leading path segment. Jetty 9
+        // served those, Jetty 12 rejects them with 400 unless the ambiguous URI is explicitly allowed.
+        HttpConfiguration httpConfiguration = new HttpConfiguration();
+        httpConfiguration.setUriCompliance(UriCompliance.LEGACY);
+
+        Server server = new Server();
+        server.addConnector(new ServerConnector(server, new HttpConnectionFactory(httpConfiguration)));
         server.setHandler(repoHandler);
 
         try {
