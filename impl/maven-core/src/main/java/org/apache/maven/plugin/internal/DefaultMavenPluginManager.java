@@ -555,8 +555,8 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         Project project = sessionV4.getProject(session.getCurrentProject());
 
         org.apache.maven.api.MojoExecution execution = new DefaultMojoExecution(sessionV4, mojoExecution);
-        org.apache.maven.api.plugin.Log log = new DefaultLog(
-                LoggerFactory.getLogger(mojoExecution.getMojoDescriptor().getFullGoalName()));
+        org.apache.maven.api.plugin.Log log =
+                new DefaultLog(LoggerFactory.getLogger(mojoDescriptor.getImplementation()));
         try {
             Injector injector = Injector.create();
             injector.discover(pluginRealm);

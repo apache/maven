@@ -163,7 +163,8 @@ public interface LogEvent {
     /**
      * The mojo execution that was active when this log event was produced.
      * <p>
-     * The format is {@code "goal@executionId"} (e.g. {@code "compile@default-compile"}).
+     * The format is {@code "prefix:goal@executionId"}
+     * (e.g. {@code "compiler:compile@default-compile"}).
      * Set by the lifecycle engine when a mojo starts and cleared when it finishes;
      * log events emitted outside any mojo execution (e.g. during project setup or
      * between mojos) will return {@code null}.

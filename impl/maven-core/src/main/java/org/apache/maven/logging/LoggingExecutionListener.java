@@ -193,7 +193,7 @@ public class LoggingExecutionListener implements ExecutionListener, ProjectExecu
 
     private void setMojoMdc(ExecutionEvent event) {
         if (event.getMojoExecution() != null) {
-            String mojoId = event.getMojoExecution().getGoal() + "@"
+            String mojoId = event.getMojoExecution().getMojoDescriptor().getFullGoalName() + "@"
                     + event.getMojoExecution().getExecutionId();
             ProjectBuildLogAppender.setMojoId(mojoId);
         }
