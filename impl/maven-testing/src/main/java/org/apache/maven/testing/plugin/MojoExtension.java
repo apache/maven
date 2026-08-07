@@ -315,9 +315,10 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
 
         String pluginBasedir = MavenDIExtension.getBasedir();
 
-        String basedir = AnnotationSupport.findAnnotation(context.getElement().orElseThrow(), Basedir.class)
-                .map(Basedir::value)
-                .orElse(pluginBasedir);
+        String basedir = findBasedirValue(context.getElement().orElseThrow());
+        if (basedir == null) {
+            basedir = pluginBasedir;
+        }
         if (basedir.isEmpty()) {
             basedir = pluginBasedir + "/target/tests/"
                     + context.getRequiredTestClass().getSimpleName() + "/"
@@ -744,6 +745,18 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
         requireNonNull(field, "Field " + variable + " not found");
         field.setAccessible(true);
         field.set(object, value);
+    }
+
+    @SuppressWarnings("deprecation")
+    private static String findBasedirValue(AnnotatedElement element) {
+        Basedir a = AnnotationSupport.findAnnotation(element, Basedir.class).orElse(null);
+        if (a != null) {
+            return a.value();
+        }
+        org.apache.maven.api.plugin.testing.Basedir d = AnnotationSupport.findAnnotation(
+                        element, org.apache.maven.api.plugin.testing.Basedir.class)
+                .orElse(null);
+        return d != null ? d.value() : null;
     }
 
     @SuppressWarnings("deprecation")

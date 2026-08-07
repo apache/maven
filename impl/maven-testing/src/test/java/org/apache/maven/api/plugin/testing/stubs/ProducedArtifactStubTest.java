@@ -18,13 +18,21 @@
  */
 package org.apache.maven.api.plugin.testing.stubs;
 
-/** @deprecated Use {@link org.apache.maven.testing.plugin.stubs.ProducedArtifactStub} instead */
-@Deprecated(since = "4.0.0-rc-6", forRemoval = true)
-public class ProducedArtifactStub extends org.apache.maven.testing.plugin.stubs.ProducedArtifactStub {
-    public ProducedArtifactStub() {}
+import org.junit.jupiter.api.Test;
 
-    public ProducedArtifactStub(
-            String groupId, String artifactId, String classifier, String version, String extension) {
-        super(groupId, artifactId, classifier, version, extension);
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class ProducedArtifactStubTest {
+
+    @Test
+    @SuppressWarnings("removal")
+    void deprecatedConstructorRemainsSourceCompatible() {
+        ProducedArtifactStub artifact = new ProducedArtifactStub("group", "artifact", "tests", "1.0", "jar");
+
+        assertEquals("group", artifact.getGroupId());
+        assertEquals("artifact", artifact.getArtifactId());
+        assertEquals("tests", artifact.getClassifier());
+        assertEquals("1.0", artifact.getVersion().toString());
+        assertEquals("jar", artifact.getExtension());
     }
 }
