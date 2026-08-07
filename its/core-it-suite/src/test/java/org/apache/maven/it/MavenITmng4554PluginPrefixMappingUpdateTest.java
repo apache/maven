@@ -26,6 +26,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.eclipse.jetty.http.content.HttpContent;
+import org.eclipse.jetty.http.content.ResourceHttpContentFactory;
+import org.eclipse.jetty.io.ByteBufferPool;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -75,7 +78,14 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
 
         Server server = new Server(0);
 
-        ResourceHandler repoHandler = new ResourceHandler();
+        // NOTE: Serve the repository straight off disk. Jetty 12 caches file content by default, but these tests
+        // rewrite the served metadata while the server is running and must not be answered from a stale cache.
+        ResourceHandler repoHandler = new ResourceHandler() {
+            @Override
+            protected HttpContent.Factory newHttpContentFactory(ByteBufferPool.Sized bufferPool) {
+                return new ResourceHttpContentFactory(getBaseResource(), getMimeTypes(), bufferPool);
+            }
+        };
         repoHandler.setBaseResource(ResourceFactory.of(server).newResource(testDir.toPath()));
 
         Handler.Sequence handlerList = new Handler.Sequence();
@@ -155,7 +165,14 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
 
         Server server = new Server(0);
 
-        ResourceHandler repoHandler = new ResourceHandler();
+        // NOTE: Serve the repository straight off disk. Jetty 12 caches file content by default, but these tests
+        // rewrite the served metadata while the server is running and must not be answered from a stale cache.
+        ResourceHandler repoHandler = new ResourceHandler() {
+            @Override
+            protected HttpContent.Factory newHttpContentFactory(ByteBufferPool.Sized bufferPool) {
+                return new ResourceHttpContentFactory(getBaseResource(), getMimeTypes(), bufferPool);
+            }
+        };
         repoHandler.setBaseResource(ResourceFactory.of(server).newResource(testDir.toPath()));
 
         Handler.Sequence handlerList = new Handler.Sequence();
@@ -238,7 +255,14 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest extends AbstractMavenIn
 
         Server server = new Server(0);
 
-        ResourceHandler repoHandler = new ResourceHandler();
+        // NOTE: Serve the repository straight off disk. Jetty 12 caches file content by default, but these tests
+        // rewrite the served metadata while the server is running and must not be answered from a stale cache.
+        ResourceHandler repoHandler = new ResourceHandler() {
+            @Override
+            protected HttpContent.Factory newHttpContentFactory(ByteBufferPool.Sized bufferPool) {
+                return new ResourceHttpContentFactory(getBaseResource(), getMimeTypes(), bufferPool);
+            }
+        };
         repoHandler.setBaseResource(ResourceFactory.of(server).newResource(testDir.toPath()));
 
         Handler.Sequence handlerList = new Handler.Sequence();
