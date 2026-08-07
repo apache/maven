@@ -110,7 +110,7 @@ public class HttpServer {
             SecurityHandler.PathMapped security = new SecurityHandler.PathMapped();
             security.setAuthenticator(new BasicAuthenticator());
             security.setLoginService(loginService);
-            security.put("/*", Constraint.from("auth", Constraint.Authorization.ANY_USER));
+            security.put("/*", Constraint.from("auth", Constraint.Authorization.SPECIFIC_ROLE, "user", "admin"));
             security.setHandler(handler);
             server.setHandler(security);
         } else {
