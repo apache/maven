@@ -83,7 +83,6 @@ import org.apache.maven.logging.LoggingOutputStream;
 import org.apache.maven.logging.ProjectBuildLogAppender;
 import org.apache.maven.logging.SimpleBuildEventListener;
 import org.apache.maven.logging.api.LogLevelRecorder;
-import org.apache.maven.slf4j.MavenJulHandler;
 import org.apache.maven.slf4j.MavenSimpleLogger;
 import org.codehaus.plexus.PlexusContainer;
 import org.jline.terminal.Terminal;
@@ -92,6 +91,7 @@ import org.jline.terminal.impl.AbstractPosixTerminal;
 import org.jline.terminal.spi.TerminalExt;
 import org.jline.utils.OSUtils;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.slf4j.spi.LocationAwareLogger;
 
 import static java.util.Objects.requireNonNull;
@@ -155,6 +155,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         pushUserProperties(context);
         setupGuiceClassLoading(context);
         configureLogging(context);
+        preliminaryInteractiveDetection(context);
         createTerminal(context);
         activateLogging(context);
         helpOrVersionAndMayExit(context);
@@ -301,6 +302,30 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         }
     }
 
+    /**
+     * Sets {@code context.interactive} based on CLI flags and CI detection <em>before</em>
+     * {@link #createTerminal(LookupContext)} runs. This is necessary because
+     * {@code createTerminal} caches the {@link BuildEventListener} (via
+     * {@link #determineBuildEventListener}), and the console-mode auto-detection
+     * in subclasses reads {@code context.interactive} to decide between rich/plain/verbose.
+     *
+     * <p>The full settings-based interactive-mode resolution still runs later in
+     * {@link #settings}, so this is a best-effort early pass using only CLI flags and
+     * CI environment detection — which is sufficient for the console-mode decision.</p>
+     */
+    protected void preliminaryInteractiveDetection(C context) {
+        if (context.options().forceInteractive().orElse(false)) {
+            context.interactive = true;
+        } else if (context.options().nonInteractive().orElse(false)) {
+            context.interactive = false;
+        } else if (context.invokerRequest.ciInfo().isPresent()) {
+            context.interactive = false;
+        } else {
+            // Default: assume interactive (settings may refine later)
+            context.interactive = true;
+        }
+    }
+
     protected BuildEventListener determineBuildEventListener(C context) {
         if (context.buildEventListener == null) {
             context.buildEventListener = doDetermineBuildEventListener(context);
@@ -436,8 +461,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected void activateLogging(C context) throws Exception {
-        if (!MavenJulHandler.isInstalled()) {
-            MavenJulHandler.install();
+        if (!SLF4JBridgeHandler.isInstalled()) {
+            SLF4JBridgeHandler.removeHandlersForRootLogger();
+            SLF4JBridgeHandler.install();
         }
 
         context.slf4jConfiguration.activate();
