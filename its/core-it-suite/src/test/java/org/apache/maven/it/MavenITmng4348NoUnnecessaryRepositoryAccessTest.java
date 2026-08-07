@@ -62,9 +62,10 @@ public class MavenITmng4348NoUnnecessaryRepositoryAccessTest extends AbstractMav
                 System.out.println("Handling " + request.getMethod() + " "
                         + request.getHttpURI().toString());
 
+                String uri = Request.getPathInContext(request);
                 // NOTE: Old Maven versions use the test repo also to check for plugin updates so we need to filter
-                if (Request.getPathInContext(request).startsWith("/org/apache/maven/its/mng4348")) {
-                    requestedUris.add(Request.getPathInContext(request));
+                if (uri.startsWith("/org/apache/maven/its/mng4348")) {
+                    requestedUris.add(uri);
                 }
 
                 response.setStatus(404);

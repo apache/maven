@@ -79,7 +79,7 @@ public class MavenITmng3953AuthenticatedDeploymentTest extends AbstractMavenInte
         SecurityHandler.PathMapped securityHandler = new SecurityHandler.PathMapped();
         securityHandler.setLoginService(userRealm);
         securityHandler.setAuthenticator(new BasicAuthenticator());
-        securityHandler.put("/*", Constraint.from("auth", Constraint.Authorization.ANY_USER));
+        securityHandler.put("/*", Constraint.from("auth", Constraint.Authorization.SPECIFIC_ROLE, "deployer"));
 
         securityHandler.setHandler(repoHandler);
         server.setHandler(securityHandler);

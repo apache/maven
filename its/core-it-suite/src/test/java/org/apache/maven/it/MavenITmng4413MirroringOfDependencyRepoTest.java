@@ -61,7 +61,7 @@ public class MavenITmng4413MirroringOfDependencyRepoTest extends AbstractMavenIn
         SecurityHandler.PathMapped securityHandler = new SecurityHandler.PathMapped();
         securityHandler.setLoginService(userRealm);
         securityHandler.setAuthenticator(new BasicAuthenticator());
-        securityHandler.put("/*", Constraint.from("auth", Constraint.Authorization.ANY_USER));
+        securityHandler.put("/*", Constraint.from("auth", Constraint.Authorization.SPECIFIC_ROLE, "user"));
 
         ResourceHandler repoHandler = new ResourceHandler();
         repoHandler.setBaseResource(ResourceFactory.of(server).newResource(testDir.resolve("repo-a")));
