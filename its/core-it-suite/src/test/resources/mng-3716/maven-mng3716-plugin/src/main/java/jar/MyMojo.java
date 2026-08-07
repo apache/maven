@@ -36,12 +36,12 @@ package jar;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Execute;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
 
-/**
- * @goal run
- * @aggregator
- * @execute phase="package"
- */
+@Execute(phase = LifecyclePhase.PACKAGE)
+@Mojo(name = "run", aggregator = true)
 public class MyMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException {
         getLog().info("Aggregator mojo executed.");

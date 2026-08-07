@@ -23,15 +23,15 @@ import java.io.IOException;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * Creates a marker file to prove the goal was executed.
- * @goal touch
  */
+@Mojo(name = "touch")
 public class TouchMojo extends AbstractMojo {
-    /**
-     * @parameter default-value="${project.build.directory}"
-     */
+    @Parameter(defaultValue = "${project.build.directory}")
     private File outputDirectory;
 
     public void execute() throws MojoExecutionException {
