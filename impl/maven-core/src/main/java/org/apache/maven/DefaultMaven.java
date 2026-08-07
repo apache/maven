@@ -220,8 +220,8 @@ public class DefaultMaven implements Maven {
             sessionScope.seed(InternalMavenSession.class, InternalMavenSession.from(session.getSession()));
 
             MavenSession previousSession = legacySupport.getSession();
-            legacySupport.setSession(session);
             try {
+                legacySupport.setSession(session);
                 return doExecute(request, session, result, chainedWorkspaceReader);
             } finally {
                 legacySupport.setSession(previousSession);
