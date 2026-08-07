@@ -1,3 +1,12 @@
+---
+title: Introduction
+author: 
+  - Jason van Zyl
+  - Vincent Siveton
+  - Hervé Boutemy
+date: 2011-06-12
+---
+
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file

@@ -1,3 +1,10 @@
+---
+title: Getting to Plexus-configured Mojos
+author: 
+  - John Casey
+date: 2005-04-29
+---
+
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file

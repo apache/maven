@@ -1,3 +1,10 @@
+---
+title: Offline Mode Design
+author: 
+  - John Casey
+date: 2005-04-08
+---
+
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
