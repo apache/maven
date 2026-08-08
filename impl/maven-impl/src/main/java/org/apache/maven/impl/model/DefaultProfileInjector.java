@@ -70,6 +70,27 @@ public class DefaultProfileInjector implements ProfileInjector {
         return result == KEY ? model : result;
     }
 
+    @Override
+    public void injectProfiles(
+            Model.Builder builder,
+            List<Profile> profiles,
+            ModelBuilderRequest request,
+            ModelProblemCollector problems) {
+        for (Profile profile : profiles) {
+            if (profile != null) {
+                Model model = builder.build();
+                merger.mergeModelBase(builder, model, profile);
+
+                if (profile.getBuild() != null) {
+                    Build build = model.getBuild() != null ? model.getBuild() : Build.newInstance();
+                    Build.Builder bbuilder = Build.newBuilder(build);
+                    merger.mergeBuildBase(bbuilder, build, profile.getBuild());
+                    builder.build(bbuilder.build());
+                }
+            }
+        }
+    }
+
     private Model doInjectProfiles(Model model, List<Profile> profiles) {
         Model orgModel = model;
         for (Profile profile : profiles) {

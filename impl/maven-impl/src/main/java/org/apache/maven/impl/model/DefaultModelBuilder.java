@@ -634,7 +634,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 builder.dependencies(newDeps);
             }
             if (managedDepsChanged) {
-                builder.dependencyManagement(depMgmt.withDependencies(newManagedDeps));
+                builder.getModifiableDependencyManagement().dependencies(newManagedDeps);
             }
             return builder.build();
         }
@@ -1007,35 +1007,44 @@ public class DefaultModelBuilder implements ModelBuilder {
             setSource(resultModel);
             setRootModel(resultModel);
 
+            // Thread remaining stages through a Model.Builder to avoid intermediate build() calls.
+            // The builder-accepting default methods on each interface bridge to the Model-accepting
+            // versions; Phase E overrides these defaults for the hot stages.
+            Model.Builder builder = Model.newBuilder(resultModel, false);
+
             // model path translation
-            resultModel =
-                    modelPathTranslator.alignToBaseDirectory(resultModel, resultModel.getProjectDirectory(), request);
+            modelPathTranslator.alignToBaseDirectory(builder, resultModel.getProjectDirectory(), request);
 
             // plugin management injection
-            resultModel = pluginManagementInjector.injectManagement(resultModel, request, this);
+            pluginManagementInjector.injectManagement(builder, request, this);
 
-            // lifecycle bindings injection
+            // lifecycle bindings injection (ModelTransformer API — no builder variant)
             if (request.getRequestType() != ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY) {
                 org.apache.maven.api.services.ModelTransformer lifecycleBindingsInjector =
                         request.getLifecycleBindingsInjector();
                 if (lifecycleBindingsInjector != null) {
-                    resultModel = lifecycleBindingsInjector.transform(resultModel, request, this);
+                    Model built = builder.build();
+                    Model transformed = lifecycleBindingsInjector.transform(built, request, this);
+                    if (transformed != built) {
+                        builder.reset(transformed);
+                    }
                 }
             }
 
             // dependency management import
-            resultModel = importDependencyManagement(resultModel, importIds);
+            importDependencyManagement(builder, importIds);
 
             // dependency management injection
-            resultModel = dependencyManagementInjector.injectManagement(resultModel, request, this);
+            dependencyManagementInjector.injectManagement(builder, request, this);
 
-            resultModel = modelNormalizer.injectDefaultValues(resultModel, request, this);
+            modelNormalizer.injectDefaultValues(builder, request, this);
 
             if (request.getRequestType() != ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY) {
                 // plugins configuration
-                resultModel = pluginConfigurationExpander.expandPluginConfiguration(resultModel, request, this);
+                pluginConfigurationExpander.expandPluginConfiguration(builder, request, this);
             }
 
+            resultModel = builder.build();
             for (var transformer : transformers) {
                 resultModel = transformer.transformEffectiveModel(resultModel);
             }
@@ -1431,11 +1440,12 @@ public class DefaultModelBuilder implements ModelBuilder {
             List<Activation> interpolatedActivations = getProfileActivations(inputModel);
             inputModel = injectProfileActivations(inputModel, interpolatedActivations);
 
-            // profile injection
-            inputModel = profileInjector.injectProfiles(inputModel, activePomProfiles, request, this);
-            inputModel = profileInjector.injectProfiles(inputModel, activeExternalProfiles, request, this);
+            // profile injection via builder to avoid intermediate build between injections
+            Model.Builder builder = Model.newBuilder(inputModel, false);
+            profileInjector.injectProfiles(builder, activePomProfiles, request, this);
+            profileInjector.injectProfiles(builder, activeExternalProfiles, request, this);
 
-            return inputModel;
+            return builder.build();
         }
 
         @SuppressWarnings("checkstyle:methodlength")
@@ -1485,25 +1495,34 @@ public class DefaultModelBuilder implements ModelBuilder {
                 inputModel = inputModel.withParent(inputModel.getParent().withRelativePath(relPath));
             }
 
-            Model model = inheritanceAssembler.assembleModelInheritance(inputModel, parentModel, request, this);
+            // Thread a single builder from inheritance assembly through the final build().
+            // Each stage that needs an immutable snapshot calls builder.build() internally.
+            Model.Builder builder = Model.newBuilder(inputModel, false);
+            inheritanceAssembler.assembleModelInheritance(builder, parentModel, request, this);
 
-            // Mixins
-            for (Mixin mixin : model.getMixins()) {
-                Model parent = resolveParent(model, mixin, profileActivationContext, parentChain);
-                // Merge mixin into model
-                model = inheritanceAssembler.assembleModelInheritance(model, parent, request, this);
-                // Ensure mixin properties override any previously inherited properties
-                // This is necessary because normal inheritance gives child precedence, but for mixins
-                // we want the mixin to take precedence over inherited parent properties
-                Map<String, String> mergedProperties = new java.util.HashMap<>(model.getProperties());
-                mergedProperties.putAll(parent.getProperties());
-                model = model.withProperties(mergedProperties);
+            // Mixins — the mixin list is fixed by the child POM, so read it from the
+            // builder's base model.  Each iteration needs a snapshot for resolveParent
+            // and assembleModelInheritance (which builds one internally anyway).
+            List<Mixin> mixins = builder.getBuiltMixins();
+            if (!mixins.isEmpty()) {
+                for (Mixin mixin : mixins) {
+                    Model snapshot = builder.build();
+                    Model parent = resolveParent(snapshot, mixin, profileActivationContext, parentChain);
+                    inheritanceAssembler.assembleModelInheritance(builder, parent, request, this);
+                    // Ensure mixin properties override any previously inherited properties
+                    // This is necessary because normal inheritance gives child precedence, but for mixins
+                    // we want the mixin to take precedence over inherited parent properties
+                    Map<String, String> mergedProperties = new java.util.HashMap<>(builder.getProperties());
+                    mergedProperties.putAll(parent.getProperties());
+                    builder.properties(mergedProperties);
+                }
             }
 
             // model normalization
-            model = modelNormalizer.mergeDuplicates(model, request, this);
+            modelNormalizer.mergeDuplicates(builder, request, this);
 
-            // profile activation
+            // profile activation — needs an immutable snapshot for the activation context
+            Model model = builder.build();
             profileActivationContext.setModel(model);
 
             // Activate profiles from the input model (before inheritance) to get only local profiles
@@ -1513,22 +1532,31 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             // profile injection - inject all profiles (local + inherited) into the model
             List<Profile> activePomProfiles = getActiveProfiles(model.getProfiles(), profileActivationContext);
-            model = profileInjector.injectProfiles(model, activePomProfiles, request, this);
-            model = profileInjector.injectProfiles(model, activeExternalProfiles, request, this);
+            profileInjector.injectProfiles(builder, activePomProfiles, request, this);
+            profileInjector.injectProfiles(builder, activeExternalProfiles, request, this);
 
             // Track only the local profiles for this model
-            // Use ModelProblemUtils.toId() to get groupId:artifactId:version format (without packaging)
-            addActivePomProfiles(ModelProblemUtils.toId(model), localActivePomProfiles);
+            // Use the builder's getters to compute the id without an intermediate build()
+            String groupId = builder.getGroupId();
+            if (groupId == null && builder.getParent() != null) {
+                groupId = builder.getParent().getGroupId();
+            }
+            String version = builder.getVersion();
+            if (version == null && builder.getParent() != null) {
+                version = builder.getParent().getVersion();
+            }
+            addActivePomProfiles(
+                    ModelProblemUtils.toId(groupId, builder.getArtifactId(), version), localActivePomProfiles);
 
-            // model interpolation
-            Model resultModel = model;
-            resultModel = interpolateModel(resultModel, request, this);
+            // model interpolation + normalization + url normalization via builder
+            interpolateModel(builder, request, this);
 
             // model normalization
-            resultModel = modelNormalizer.mergeDuplicates(resultModel, request, this);
+            modelNormalizer.mergeDuplicates(builder, request, this);
 
             // url normalization
-            resultModel = modelUrlNormalizer.normalize(resultModel, request);
+            modelUrlNormalizer.normalize(builder, request);
+            Model resultModel = builder.build();
 
             // Now the fully interpolated model is available: reconfigure the resolver
             if (!resultModel.getRepositories().isEmpty()) {
@@ -2048,14 +2076,14 @@ public class DefaultModelBuilder implements ModelBuilder {
             return new ParentModelWithProfiles(injectedParentModel.withParent(null), parentActivePomProfiles);
         }
 
-        private Model importDependencyManagement(Model model, Collection<String> importIds) {
-            DependencyManagement depMgmt = model.getDependencyManagement();
+        private void importDependencyManagement(Model.Builder builder, Collection<String> importIds) {
+            DependencyManagement depMgmt = builder.getDependencyManagement();
 
             if (depMgmt == null) {
-                return model;
+                return;
             }
 
-            String importing = model.getGroupId() + ':' + model.getArtifactId() + ':' + model.getVersion();
+            String importing = builder.getGroupId() + ':' + builder.getArtifactId() + ':' + builder.getVersion();
 
             importIds.add(importing);
 
@@ -2085,10 +2113,12 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             importIds.remove(importing);
 
-            model = model.withDependencyManagement(
-                    model.getDependencyManagement().withDependencies(deps));
+            // Use sub-builder mutation instead of immutable rebuild
+            builder.getModifiableDependencyManagement().dependencies(deps);
 
-            return dependencyManagementImporter.importManagement(model, importMgmts, request, this);
+            if (importMgmts != null) {
+                dependencyManagementImporter.importManagement(builder, importMgmts, request, this);
+            }
         }
 
         private DependencyManagement loadDependencyManagement(Dependency dependency, Collection<String> importIds) {
@@ -2417,6 +2447,33 @@ public class DefaultModelBuilder implements ModelBuilder {
             profiles.add(profile);
         }
         return modified ? model.withProfiles(profiles) : model;
+    }
+
+    private void interpolateModel(Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems) {
+        // The model interpolator transforms builder fields in place via visitBuilder,
+        // avoiding the intermediate Model materialization + reset the SPI default performs.
+        Path projectDir = builder.getPomFile() != null ? builder.getPomFile().getParent() : null;
+        modelInterpolator.interpolateModel(builder, projectDir, request, problems);
+
+        // Parent version interpolation: use sub-builder mutation to avoid
+        // intermediate immutable Model/Parent rebuilds
+        Parent parent = builder.getParent();
+        if (parent != null) {
+            Map<String, String> map1 = request.getSession().getUserProperties();
+            Map<String, String> map2 = builder.getProperties();
+            Map<String, String> map3 = request.getSession().getSystemProperties();
+            UnaryOperator<String> cb = Interpolator.chain(map1::get, map2::get, map3::get);
+            try {
+                String interpolated = interpolator.interpolate(parent.getVersion(), cb);
+                builder.getModifiableParent().version(interpolated);
+            } catch (Exception e) {
+                problems.add(
+                        Severity.ERROR,
+                        Version.BASE,
+                        "Failed to interpolate field: " + parent.getVersion() + " on class: ",
+                        e);
+            }
+        }
     }
 
     private Model interpolateModel(Model model, ModelBuilderRequest request, ModelProblemCollector problems) {

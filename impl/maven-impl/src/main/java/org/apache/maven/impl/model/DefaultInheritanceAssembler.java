@@ -66,11 +66,24 @@ public class DefaultInheritanceAssembler implements InheritanceAssembler {
     @Override
     public Model assembleModelInheritance(
             Model child, Model parent, ModelBuilderRequest request, ModelProblemCollector problems) {
-        Map<Object, Object> hints = new HashMap<>();
+        Map<Object, Object> context = createContext(child, parent);
+        return merger.merge(child, parent, false, context);
+    }
+
+    @Override
+    public void assembleModelInheritance(
+            Model.Builder childBuilder, Model parent, ModelBuilderRequest request, ModelProblemCollector problems) {
+        Model child = childBuilder.build();
+        Map<Object, Object> context = createContext(child, parent);
+        merger.merge(childBuilder, child, parent, false, context);
+    }
+
+    private Map<Object, Object> createContext(Model child, Model parent) {
+        Map<Object, Object> context = new HashMap<>();
         String childPath = child.getProperties().getOrDefault(CHILD_DIRECTORY_PROPERTY, child.getArtifactId());
-        hints.put(CHILD_DIRECTORY, childPath);
-        hints.put(MavenModelMerger.CHILD_PATH_ADJUSTMENT, getChildPathAdjustment(child, parent, childPath));
-        return merger.merge(child, parent, false, hints);
+        context.put(CHILD_DIRECTORY, childPath);
+        context.put(MavenModelMerger.CHILD_PATH_ADJUSTMENT, getChildPathAdjustment(child, parent, childPath));
+        return context;
     }
 
     /**

@@ -45,6 +45,26 @@ import org.apache.maven.api.xml.XmlService;
 public class DefaultPluginConfigurationExpander implements PluginConfigurationExpander {
 
     @Override
+    public void expandPluginConfiguration(
+            Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems) {
+
+        // Mutate the Build sub-builder in place to avoid intermediate immutable allocations
+        Build build = builder.getBuild();
+        if (build != null) {
+            Build.Builder bb = builder.getModifiableBuild();
+            bb.plugins(expandPlugin(build.getPlugins()));
+            PluginManagement pluginManagement = build.getPluginManagement();
+            if (pluginManagement != null) {
+                bb.getModifiablePluginManagement().plugins(expandPlugin(pluginManagement.getPlugins()));
+            }
+        }
+        Reporting reporting = builder.getReporting();
+        if (reporting != null) {
+            expandReport(reporting.getPlugins());
+        }
+    }
+
+    @Override
     public Model expandPluginConfiguration(Model model, ModelBuilderRequest request, ModelProblemCollector problems) {
         Build build = model.getBuild();
         if (build != null) {

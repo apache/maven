@@ -38,4 +38,24 @@ public interface DependencyManagementInjector {
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
     Model injectManagement(Model model, ModelBuilderRequest request, ModelProblemCollector problems);
+
+    /**
+     * Builder-accepting variant that operates on a {@link Model.Builder} directly,
+     * avoiding an intermediate {@code Model.build()} between pipeline stages.
+     * <p>
+     * The default implementation bridges to {@link #injectManagement(Model, ModelBuilderRequest, ModelProblemCollector)}
+     * by building the model, processing it, and resetting the builder to the result.
+     *
+     * @param builder The model builder to modify in place, must not be {@code null}.
+     * @param request The model building request, must not be {@code null}.
+     * @param problems The container used to collect problems, must not be {@code null}.
+     * @since 4.0.0
+     */
+    default void injectManagement(Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems) {
+        Model built = builder.build();
+        Model result = injectManagement(built, request, problems);
+        if (result != built) {
+            builder.reset(result);
+        }
+    }
 }

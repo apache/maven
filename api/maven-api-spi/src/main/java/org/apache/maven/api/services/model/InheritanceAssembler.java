@@ -42,4 +42,18 @@ public interface InheritanceAssembler {
      */
     Model assembleModelInheritance(
             Model child, Model parent, ModelBuilderRequest request, ModelProblemCollector problems);
+
+    /**
+     * Builder-accepting variant that merges parent values into the child builder directly.
+     *
+     * @since 4.0.0
+     */
+    default void assembleModelInheritance(
+            Model.Builder childBuilder, Model parent, ModelBuilderRequest request, ModelProblemCollector problems) {
+        Model built = childBuilder.build();
+        Model result = assembleModelInheritance(built, parent, request, problems);
+        if (result != built) {
+            childBuilder.reset(result);
+        }
+    }
 }

@@ -68,6 +68,25 @@ public class ${className} {
     }
 
     /**
+     * Transforms fields of the given {@code target} directly on the provided {@code builder},
+     * avoiding the intermediate immutable model materialization that {@link #visit} performs.
+     * Each field is read from the immutable {@code target}, transformed, and any changed
+     * value is written to the existing {@code builder}.
+     *
+     * @param builder the existing builder to update in place
+     * @param target the immutable model to read field values from
+     */
+    public void visitBuilder(${root.name}.Builder builder, ${root.name} target) {
+        Objects.requireNonNull(builder, "builder cannot be null");
+        Objects.requireNonNull(target, "target cannot be null");
+#set ( $rootAllFields = $Helper.xmlFields( $root ) )
+        Supplier<${root.name}.Builder> creator = () -> builder;
+#foreach ( $field in $rootAllFields )
+        transform${field.modelClass.name}_${Helper.capitalise($field.name)}(creator, builder, target);
+#end
+    }
+
+    /**
      * The transformation function.
      */
     protected String transform(String value) {
