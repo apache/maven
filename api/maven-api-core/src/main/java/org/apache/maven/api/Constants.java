@@ -333,7 +333,9 @@ public final class Constants {
      * so even plugins will get relocated artifacts) relocation.
      * <br/>
      * For example,
-     * <pre>maven.relocations.entries = org.foo:*:*>, \\<br/>    org.here:*:*>org.there:*:*, \\<br/>    javax.inject:javax.inject:1>>jakarta.inject:jakarta.inject:1.0.5</pre>
+     * <pre>maven.relocations.entries = org.foo:*:*>,\
+     *     org.here:*:*>org.there:*:*,\
+     *     javax.inject:javax.inject:1>>jakarta.inject:jakarta.inject:1.0.5</pre>
      * means: 3 entries, ban <code>org.foo group</code> (exactly, so <code>org.foo.bar</code> is allowed),
      * relocate <code>org.here</code> to <code>org.there</code> and finally globally relocate (see <code>&gt;&gt;</code> above)
      * <code>javax.inject:javax.inject:1</code> to <code>jakarta.inject:jakarta.inject:1.0.5</code>.
@@ -428,7 +430,7 @@ public final class Constants {
      * dependency management entries in transitive dependency POMs. Maven 4 enables "transitivity" by default, hence
      * unlike Maven2, obeys dependency management entries deep in dependency graph as well.
      * <br/>
-     * Default: <code>"true"</code>.
+     * Default: <code>true</code>.
      *
      * @since 4.0.0
      */
@@ -490,10 +492,12 @@ public final class Constants {
 
     /**
      * User property for controlling consumer POM flattening behavior.
-     * When set to <code>true</code>, consumer POMs are flattened by removing
-     * dependency management and keeping only direct dependencies with transitive scopes.
-     * When set to <code>false</code> (default), consumer POMs preserve dependency management
-     * like parent POMs, allowing dependency management to be inherited by consumers.
+     * <ul>
+     *     <li>When set to <code>true</code>, consumer POMs are flattened by removing
+     * dependency management and keeping only direct dependencies with transitive scopes.</li>
+     *     <li>When set to <code>false</code> (default), consumer POMs preserve dependency management
+     * like parent POMs, allowing dependency management to be inherited by consumers.</li>
+     * </ul>
      *
      * @since 4.1.0
      */
@@ -502,12 +506,14 @@ public final class Constants {
 
     /**
      * User property for controlling removal of unused managed dependencies during consumer POM flattening.
-     * When set to {@code true} (default), managed dependencies that do not appear in the resolved
+     * <ul>
+     *     <li>When set to <code>true</code> (default), managed dependencies that do not appear in the resolved
      * dependency tree are removed from the consumer POM to keep it lean. This is important when using
-     * BOMs like Spring Boot or Quarkus that contain hundreds of managed dependency entries.
-     * When set to {@code false}, all managed dependencies are preserved in the consumer POM,
+     * BOMs like Spring Boot or Quarkus that contain hundreds of managed dependency entries.</li>
+     *     <li>When set to <code>false</code>, all managed dependencies are preserved in the consumer POM,
      * which may be needed in rare cases where downstream consumers override transitive dependency
-     * versions and rely on the original managed dependencies for alignment.
+     * versions and rely on the original managed dependencies for alignment.</li>
+     * </ul>
      *
      * @since 4.1.0
      */
@@ -573,7 +579,7 @@ public final class Constants {
      *     <li>"snapshot" - query only snapshot repositories to discover versions</li>
      * </ul>
      * Default (when unset) is using request carried nature. Hence, this configuration really makes sense with value
-     * {@code "auto"}, while ideally callers needs update and use newly added method on version range request to
+     * <code>auto</code>, while ideally callers needs update and use newly added method on version range request to
      * express preference.
      *
      * @since 4.0.0

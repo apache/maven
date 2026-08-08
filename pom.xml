@@ -1100,12 +1100,12 @@ under the License.
                     <!--
                     TODO: templates are loaded from classpath, in "normal" JAR project local template would override docgen one,
                     but in this case the packaging=pom all I could do is use additionalClasspathElement that APPENDS classpath,
-                    hence template is renamed to maven-configuration.md.vm, to avoid conflict (and picking up resolver template)
+                    hence template is renamed to configuration.xml.vm, to avoid conflict (and picking up resolver template)
                     -->
-                    <argument>--templates=maven-configuration.md</argument>
+                    <argument>--templates=configuration.xml</argument>
                     <!-- only look at maven-api-core, as it only contains configuration class org.apache.maven.api.Constants  -->
                     <argument>${project.basedir}/api/maven-api-core</argument>
-                    <argument>${project.build.directory}/generated-site/markdown</argument>
+                    <argument>${project.build.directory}/generated-site/xdoc</argument>
                   </arguments>
                 </configuration>
               </execution>
