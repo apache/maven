@@ -20,6 +20,7 @@ package org.apache.maven.cling.event;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.execution.BuildFailure;
@@ -444,6 +445,66 @@ class ExecutionEventLoggerTest {
         inOrder.verify(logger).info(eq("Total time:  {}{}"), anyString(), anyString());
         inOrder.verify(logger).info(eq("Finished at: {}"), anyString());
         inOrder.verify(logger).info("------------------------------------------------------------------------");
+    }
+
+    @Test
+    void testProjectSkippedBecauseADependencyFailed() {
+        // prepare
+        MavenProject failed = generateMavenProject("Maven Project artifact1");
+        MavenProject skipped = generateMavenProject("Maven Project artifact2");
+
+        DefaultMavenExecutionResult executionResult = new DefaultMavenExecutionResult();
+        executionResult.addBuildSummary(new BuildFailure(failed, 1000, new Exception("Failure")));
+
+        ExecutionEvent event = skipEvent(skipped, executionResult, Arrays.asList(failed));
+
+        // execute
+        executionEventLogger.projectSkipped(event);
+
+        // verify
+        InOrder inOrder = inOrder(logger);
+        inOrder.verify(logger).info("Skipping Maven Project artifact2");
+        inOrder.verify(logger)
+                .info("{} was not built because a module it depends on failed to build.", "Maven Project artifact2");
+    }
+
+    @Test
+    void testProjectSkippedBecauseTheBuildWasStopped() {
+        // prepare
+        MavenProject unrelated = generateMavenProject("Maven Project artifact1");
+        MavenProject skipped = generateMavenProject("Maven Project artifact2");
+
+        DefaultMavenExecutionResult executionResult = new DefaultMavenExecutionResult();
+        executionResult.addBuildSummary(new BuildFailure(unrelated, 1000, new Exception("Failure")));
+
+        // the skipped project has no upstream projects at all, so the failure cannot be blamed on one
+        ExecutionEvent event = skipEvent(skipped, executionResult, Collections.emptyList());
+
+        // execute
+        executionEventLogger.projectSkipped(event);
+
+        // verify
+        InOrder inOrder = inOrder(logger);
+        inOrder.verify(logger).info("Skipping Maven Project artifact2");
+        inOrder.verify(logger)
+                .info(
+                        "{} was not built because the build was stopped after an earlier failure.",
+                        "Maven Project artifact2");
+    }
+
+    private ExecutionEvent skipEvent(
+            MavenProject skipped, MavenExecutionResult executionResult, List<MavenProject> upstream) {
+        ProjectDependencyGraph projectDependencyGraph = mock(ProjectDependencyGraph.class);
+        when(projectDependencyGraph.getUpstreamProjects(skipped, true)).thenReturn(upstream);
+
+        MavenSession mavenSession = mock(MavenSession.class);
+        when(mavenSession.getResult()).thenReturn(executionResult);
+        when(mavenSession.getProjectDependencyGraph()).thenReturn(projectDependencyGraph);
+
+        ExecutionEvent event = mock(ExecutionEvent.class);
+        when(event.getProject()).thenReturn(skipped);
+        when(event.getSession()).thenReturn(mavenSession);
+        return event;
     }
 
     private static MavenProject generateMavenProject(String projectName) {
