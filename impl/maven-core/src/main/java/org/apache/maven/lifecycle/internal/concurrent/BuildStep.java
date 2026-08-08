@@ -130,6 +130,16 @@ public class BuildStep {
         return mojos.values().stream().flatMap(m -> m.values().stream());
     }
 
+    /**
+     * Indicates whether executing this step performs any actual work.
+     * Steps without mojo executions are pure ordering nodes: this is the case for the
+     * {@code before:} and {@code after:} steps of a phase, and for every phase that lies
+     * outside the scope of the tasks the user requested.
+     */
+    public boolean hasExecutions() {
+        return !mojos.isEmpty();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
