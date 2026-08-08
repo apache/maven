@@ -54,7 +54,9 @@ public class DefaultLog implements Log {
 
     @Override
     public void trace(Throwable error) {
-        logger.trace("", error);
+        if (isTraceEnabled()) {
+            logger.trace("", error);
+        }
     }
 
     @Override
@@ -87,7 +89,9 @@ public class DefaultLog implements Log {
 
     @Override
     public void debug(Throwable error) {
-        logger.debug("", error);
+        if (isDebugEnabled()) {
+            logger.debug("", error);
+        }
     }
 
     @Override
@@ -120,7 +124,9 @@ public class DefaultLog implements Log {
 
     @Override
     public void info(Throwable error) {
-        logger.info("", error);
+        if (isInfoEnabled()) {
+            logger.info("", error);
+        }
     }
 
     @Override
@@ -153,7 +159,9 @@ public class DefaultLog implements Log {
 
     @Override
     public void warn(Throwable error) {
-        logger.warn("", error);
+        if (isWarnEnabled()) {
+            logger.warn("", error);
+        }
     }
 
     @Override
@@ -186,7 +194,9 @@ public class DefaultLog implements Log {
 
     @Override
     public void error(Throwable error) {
-        logger.error("", error);
+        if (isErrorEnabled()) {
+            logger.error("", error);
+        }
     }
 
     @Override
