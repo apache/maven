@@ -216,6 +216,12 @@ under the License.
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.apache.maven.resolver</groupId>
+      <artifactId>maven-resolver-test-util</artifactId>
+      <version>${resolverVersion}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-junit-jupiter</artifactId>
       <version>${mockitoVersion}</version>
