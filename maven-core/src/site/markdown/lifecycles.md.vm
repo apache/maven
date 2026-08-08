@@ -1,49 +1,52 @@
-~~ Licensed to the Apache Software Foundation (ASF) under one
-~~ or more contributor license agreements.  See the NOTICE file
-~~ distributed with this work for additional information
-~~ regarding copyright ownership.  The ASF licenses this file
-~~ to you under the Apache License, Version 2.0 (the
-~~ "License"); you may not use this file except in compliance
-~~ with the License.  You may obtain a copy of the License at
-~~
-~~ http://www.apache.org/licenses/LICENSE-2.0
-~~
-~~ Unless required by applicable law or agreed to in writing,
-~~ software distributed under the License is distributed on an
-~~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-~~ KIND, either express or implied.  See the License for the
-~~ specific language governing permissions and limitations
-~~ under the License.
+---
+title: Lifecycles Reference
+author:
+  - Hervé Boutemy
+date: 2013-08-02
+---
 
- -----
- Lifecycles Reference
- -----
- Hervé Boutemy
- -----
- 2013-08-02
- -----
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
 
-Lifecycles Reference
+http://www.apache.org/licenses/LICENSE-2.0
 
-  Maven defines 3 lifecycles in <<<META-INF/plexus/components.xml>>>:
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
 
-%{toc|fromDepth=2}
+# Lifecycles Reference
 
-* <<<default>>> Lifecycle
+Maven defines 3 lifecycles in `META-INF/plexus/components.xml`:
 
-  <<<default>>> lifecycle is defined <<without>> any associated plugin.
-  Plugin bindings for this lifecycle are {{{./default-bindings.html}defined separately for every packaging}}:
+<!-- MACRO{toc|fromDepth=2} -->
 
-%{snippet|id=lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/components.xml}
+`default` Lifecycle
+-------------------
 
-* <<<clean>>> Lifecycle
+`default` lifecycle is defined **without** any associated plugin. Plugin bindings for this lifecycle are [defined separately for every packaging](./default-bindings.html):
 
-  <<<clean>>> lifecycle is defined directly with its plugin bindings.
+<!-- MACRO{snippet|id=lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/components.xml} -->
 
-%{snippet|id=clean|file=${project.basedir}/src/main/resources/META-INF/plexus/components.xml}
+`clean` Lifecycle
+-----------------
 
-* <<<site>>> Lifecycle
+`clean` lifecycle is defined directly with its plugin bindings.
 
-  <<<site>>> lifecycle is defined directly with its plugin bindings.
+<!-- MACRO{snippet|id=clean|file=${project.basedir}/src/main/resources/META-INF/plexus/components.xml} -->
 
-%{snippet|id=site|file=${project.basedir}/src/main/resources/META-INF/plexus/components.xml}
+`site` Lifecycle
+----------------
+
+`site` lifecycle is defined directly with its plugin bindings.
+
+<!-- MACRO{snippet|id=site|file=${project.basedir}/src/main/resources/META-INF/plexus/components.xml} -->
