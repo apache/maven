@@ -47,13 +47,13 @@ At the project level all configuration is achieved by tweaking the POM. One of t
 
 For many of the more advanced features in Maven2 it is critical that POMs be available in the local repository. Features like transitive dependencies and the new parent specification mechanism. The problem we run into is that currently we have information about a project scattered across the project.xml and the various properties files. What needs to be done is to encapsulate all of this in the POM.
 
-Typically users parameterize the use of plugins, or have custom values like `${user.name}` for use in elements like the _developerConnection/_. It would be idea if we could encapsulate everything we need about the project in the POM including plugin parameters and anything else.
+Typically users parameterize the use of plugins, or have custom values like `${user.name}` for use in elements like the `<developerConnection/>`. It would be idea if we could encapsulate everything we need about the project in the POM including plugin parameters and anything else.
 
 We once had a document that Vincent and I agreed upon and I was about to implement it and then I disappeared for 8 months so it never came to pass.
 
-So I guess it's important to figure out what people are using properties files for and see if we can't incorporate it all into the POM. Or if we do have properties file (something I would like to avoid) say they don't contribute in any meaningful way to information in the POM. For example a properties file could be used the specify $ so it can be interpolated in _developerConnection/_ but you couldn't use a properties file to specify the version of your project say. Anyway, food for thought to begin with.
+So I guess it's important to figure out what people are using properties files for and see if we can't incorporate it all into the POM. Or if we do have properties file (something I would like to avoid) say they don't contribute in any meaningful way to information in the POM. For example a properties file could be used the specify $ so it can be interpolated in `<developerConnection/>` but you couldn't use a properties file to specify the version of your project say. Anyway, food for thought to begin with.
 
-\- elements that are critical for pom dissemination - those that are used locally by the user like _developerConnection/_
+\- elements that are critical for pom dissemination - those that are used locally by the user like `<developerConnection/>`
 
 ## User configuration
 
@@ -86,11 +86,18 @@ Unified source directory structure that is analagous to the repository itself. T
 
 here's what I do currently in the netbeans part of the mavenide project to find the relevant subprojects/sibling projects. I check if the user has defined the maven.multiproject.includes property in any of his properties files for the current project. if yes. then I'm able to find projects that can be offered to be opened together with the current project. problems with the current solution are: 1. information is duplicate. once in POM's dependencies and once in the maven.multiproject.includes property. 2. it works without problems only for projects with relative paths, e.g., from one CVS repository.. for projects from multiple SCM repositories it's harder to maintain the same relative links on all developer computers. not sure the unified source directory structure addresses this issue.
 
-Properties
+### Properties
 
-maven.user.config.dir (system,default=`${user.home}`/.m2) maven.home (system,user,default=`${user.home}`/m2) maven.repo.local (system,user,default=`${maven.user.config.dir}`/repository)
+```
+maven.user.config.dir (system,default=${user.home}/.m2)
+maven.home            (system,user,default=${user.home}/m2)
+maven.repo.local      (system,user,default=${maven.user.config.dir}/repository)
+```
 
 We need to define what happens in the when things are not setup correctly
 
-o ~/.m2 directory does not exist o ~/.m2/maven.properties does not exist o if they once existed but now to do not exist o what the installer will take care of of what we can recover from
+- `~/.m2` directory does not exist
+- `~/.m2/maven.properties` does not exist
+- if they once existed but now to do not exist
+- what the installer will take care of of what we can recover from
 
