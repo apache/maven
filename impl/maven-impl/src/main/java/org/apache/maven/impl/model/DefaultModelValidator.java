@@ -339,9 +339,7 @@ public class DefaultModelValidator implements ModelValidator {
 
             if (parent.getRelativePath() != null
                     && !parent.getRelativePath().isEmpty()
-                    && (parent.getGroupId() != null && !parent.getGroupId().isEmpty()
-                            || parent.getArtifactId() != null
-                                    && !parent.getArtifactId().isEmpty())
+                    && (parent.getLocation("groupId") != null || parent.getLocation("artifactId") != null)
                     && validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_4_0
                     && ModelBuilder.KNOWN_MODEL_VERSIONS.contains(model.getModelVersion())
                     && !Objects.equals(model.getModelVersion(), ModelBuilder.MODEL_VERSION_4_0_0)) {
