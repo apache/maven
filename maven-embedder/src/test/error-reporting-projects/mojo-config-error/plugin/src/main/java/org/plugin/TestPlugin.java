@@ -5,11 +5,9 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 
-/**
- * @goal test
- */
+@org.apache.maven.plugins.annotations.Mojo(name = "test")
 public class TestPlugin
-    implements Mojo
+        implements Mojo
 {
 
     private Log log;

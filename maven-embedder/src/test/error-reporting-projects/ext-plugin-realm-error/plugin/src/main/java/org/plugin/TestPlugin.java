@@ -4,21 +4,20 @@ import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.annotations.Component;
 
 /**
- * @goal test
  *
  * @author jdcasey
  */
+@org.apache.maven.plugins.annotations.Mojo(name = "test")
 public class TestPlugin
-    implements Mojo
+        implements Mojo
 {
 
     private Log log;
 
-    /**
-     * @component
-     */
+    @Component
     private ComponentOne one;
 
     public void execute()
