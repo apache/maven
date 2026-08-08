@@ -132,6 +132,7 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
                     ? new MavenStaxReader(request.getTransformer()::transform)
                     : new MavenStaxReader();
             xml.setAddDefaultEntities(request.isAddDefaultEntities());
+            xml.setAddLocationInformation(request.isAddLocationInformation());
             if (inputStream != null) {
                 return xml.read(inputStream, request.isStrict(), source);
             } else if (reader != null) {
