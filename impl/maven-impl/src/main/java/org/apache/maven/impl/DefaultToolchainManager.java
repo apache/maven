@@ -35,12 +35,16 @@ import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
+import org.apache.maven.api.model.Build;
+import org.apache.maven.api.model.Plugin;
+import org.apache.maven.api.model.Source;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.ToolchainFactory;
 import org.apache.maven.api.services.ToolchainFactoryException;
 import org.apache.maven.api.services.ToolchainManager;
 import org.apache.maven.api.services.ToolchainManagerException;
 import org.apache.maven.api.toolchain.ToolchainModel;
+import org.apache.maven.api.xml.XmlNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,13 +56,13 @@ public class DefaultToolchainManager implements ToolchainManager {
 
     @Inject
     public DefaultToolchainManager(Map<String, ToolchainFactory> factories) {
-        this(factories, null);
+        this(factories, (Logger) null);
     }
 
     /**
-     * Used for tests only
+     * Constructor with custom logger. Used by the compatibility layer and tests.
      */
-    protected DefaultToolchainManager(Map<String, ToolchainFactory> factories, Logger logger) {
+    public DefaultToolchainManager(Map<String, ToolchainFactory> factories, Logger logger) {
         this.factories = factories;
         this.logger = logger != null ? logger : LoggerFactory.getLogger(DefaultToolchainManager.class);
     }
@@ -89,13 +93,171 @@ public class DefaultToolchainManager implements ToolchainManager {
             throws ToolchainManagerException {
         Map<String, Object> context = retrieveContext(session);
         ToolchainModel model = (ToolchainModel) context.get("toolchain-" + type);
-        return Optional.ofNullable(model).flatMap(this::createToolchain);
+        if (model != null) {
+            return createToolchain(model);
+        }
+
+        // For JDK type, check if the running JDK supports the project's source level
+        // and emit a clear, actionable error if not
+        if ("jdk".equals(type)) {
+            checkJdkSourceLevelCompatibility(session);
+        }
+
+        return Optional.empty();
     }
 
     @Override
     public void storeToolchainToBuildContext(@Nonnull Session session, @Nonnull Toolchain toolchain) {
         Map<String, Object> context = retrieveContext(session);
         context.put("toolchain-" + toolchain.getType(), toolchain.getModel());
+    }
+
+    /**
+     * Checks whether the running JDK supports the project's required {@code --source}/{@code --release}
+     * level. If not, emits a clear, actionable error message instead of letting the build fail later
+     * with a cryptic javac error.
+     * <p>
+     * The error tells the user exactly which JDK version they need and how to fix it
+     * (run {@code mvnup} to add the {@code maven-toolchains-plugin} with automatic JDK discovery).
+     */
+    void checkJdkSourceLevelCompatibility(Session session) {
+        int requiredSourceLevel = getProjectRequiredSourceLevel(session);
+        if (requiredSourceLevel <= 0) {
+            return;
+        }
+
+        int runningJdkMajor = getRunningJdkMajor();
+        if (JdkSourceLevelSupport.supportsSourceLevel(runningJdkMajor, requiredSourceLevel)) {
+            return;
+        }
+
+        // Running JDK is incompatible — emit clear, actionable error
+        int latestJdk = JdkSourceLevelSupport.latestJdkForSourceLevel(requiredSourceLevel);
+        logger.error(
+                "Project requires --source {} which needs JDK <= {}, but the running JDK {} no longer supports it.",
+                requiredSourceLevel,
+                latestJdk,
+                runningJdkMajor);
+        logger.error("To fix: run 'mvnup' to add the maven-toolchains-plugin with automatic JDK discovery,");
+        logger.error(
+                "or install JDK {} and configure it in toolchains.xml or via the maven-toolchains-plugin.", latestJdk);
+    }
+
+    /**
+     * Reads the project's required source level from Model 4.1.0
+     * {@code <source><targetVersion>} elements, legacy properties
+     * ({@code maven.compiler.release}, {@code maven.compiler.source}),
+     * or compiler plugin configuration ({@code <release>}, {@code <source>}).
+     *
+     * @return the required source level as a major version, or {@code -1} if none is specified
+     */
+    int getProjectRequiredSourceLevel(Session session) {
+        Optional<Project> current = session.getService(Lookup.class).lookupOptional(Project.class);
+        if (current.isEmpty()) {
+            return -1;
+        }
+
+        Project project = current.get();
+
+        // Check Model 4.1.0 <source><targetVersion> elements
+        Build build = project.getModel().getBuild();
+        if (build != null) {
+            List<Source> sources = build.getSources();
+            if (sources != null) {
+                for (Source source : sources) {
+                    String targetVersion = source.getTargetVersion();
+                    if (targetVersion != null && !targetVersion.isEmpty()) {
+                        int level = JdkSourceLevelSupport.normalizeSourceLevel(targetVersion);
+                        if (level > 0) {
+                            return level;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Fall back to legacy properties
+        Map<String, String> properties = project.getModel().getProperties();
+        if (properties != null) {
+            // maven.compiler.release takes precedence
+            String release = properties.get("maven.compiler.release");
+            if (release != null && !release.isEmpty()) {
+                int level = JdkSourceLevelSupport.normalizeSourceLevel(release);
+                if (level > 0) {
+                    return level;
+                }
+            }
+
+            // Then maven.compiler.source
+            String source = properties.get("maven.compiler.source");
+            if (source != null && !source.isEmpty()) {
+                int level = JdkSourceLevelSupport.normalizeSourceLevel(source);
+                if (level > 0) {
+                    return level;
+                }
+            }
+        }
+
+        // Fall back to compiler plugin configuration (<release>, <source>)
+        int pluginLevel = getSourceLevelFromCompilerPlugin(build);
+        if (pluginLevel > 0) {
+            return pluginLevel;
+        }
+
+        return -1;
+    }
+
+    /**
+     * Reads the source level from the maven-compiler-plugin configuration.
+     * Checks both {@code <release>} and {@code <source>} elements in the plugin's
+     * {@code <configuration>} block.
+     *
+     * @return the source level, or {@code -1} if not configured
+     */
+    private int getSourceLevelFromCompilerPlugin(Build build) {
+        if (build == null) {
+            return -1;
+        }
+        for (Plugin plugin : build.getPlugins()) {
+            if ("maven-compiler-plugin".equals(plugin.getArtifactId())
+                    && (plugin.getGroupId() == null
+                            || plugin.getGroupId().isEmpty()
+                            || "org.apache.maven.plugins".equals(plugin.getGroupId()))) {
+                XmlNode config = plugin.getConfiguration();
+                if (config != null) {
+                    // <release> takes precedence over <source>
+                    XmlNode releaseNode = config.child("release");
+                    if (releaseNode != null
+                            && releaseNode.value() != null
+                            && !releaseNode.value().isBlank()) {
+                        int level = JdkSourceLevelSupport.normalizeSourceLevel(
+                                releaseNode.value().trim());
+                        if (level > 0) {
+                            return level;
+                        }
+                    }
+                    XmlNode sourceNode = config.child("source");
+                    if (sourceNode != null
+                            && sourceNode.value() != null
+                            && !sourceNode.value().isBlank()) {
+                        int level = JdkSourceLevelSupport.normalizeSourceLevel(
+                                sourceNode.value().trim());
+                        if (level > 0) {
+                            return level;
+                        }
+                    }
+                }
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Returns the major version of the running JDK.
+     * Extracted as a method so tests can override it.
+     */
+    int getRunningJdkMajor() {
+        return JdkSourceLevelSupport.getRunningJdkMajor();
     }
 
     private Optional<Toolchain> createToolchain(ToolchainModel model) {
