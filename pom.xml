@@ -1046,12 +1046,34 @@ under the License.
               </execution>
             </executions>
           </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>maven-configuration</id>
+      <activation>
+        <property>
+          <name>skipConfiguration</name>
+          <value>!false</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
             <version>3.6.3</version>
             <inherited>false</inherited>
+            <configuration>
+              <additionalClasspathElements>
+                <additionalClasspathElement>${project.basedir}/src/configuration-templates</additionalClasspathElement>
+              </additionalClasspathElements>
+              <includePluginDependencies>true</includePluginDependencies>
+              <!-- https://maven.apache.org/resolver/maven-resolver-tools/apidocs/org/eclipse/aether/tools/CollectConfiguration.html -->
+              <mainClass>org.eclipse.aether.tools.CollectConfiguration</mainClass>
+            </configuration>
             <dependencies>
+              <!-- https://maven.apache.org/resolver/maven-resolver-tools/ that contains the invoked class -->
               <dependency>
                 <groupId>org.apache.maven.resolver</groupId>
                 <artifactId>maven-resolver-tools</artifactId>
@@ -1067,17 +1089,12 @@ under the License.
             </dependencies>
             <executions>
               <execution>
-                <id>render-configuration-page</id>
+                <id>render-maven-configuration-md</id>
                 <goals>
                   <goal>java</goal>
                 </goals>
                 <phase>pre-site</phase>
                 <configuration>
-                  <additionalClasspathElements>
-                    <additionalClasspathElement>${project.basedir}/src/configuration-templates</additionalClasspathElement>
-                  </additionalClasspathElements>
-                  <includePluginDependencies>true</includePluginDependencies>
-                  <mainClass>org.eclipse.aether.tools.CollectConfiguration</mainClass>
                   <arguments>
                     <argument>--mode=maven</argument>
                     <!--
@@ -1093,17 +1110,12 @@ under the License.
                 </configuration>
               </execution>
               <execution>
-                <id>render-configuration-properties</id>
+                <id>render-configuration-properties+yaml</id>
                 <goals>
                   <goal>java</goal>
                 </goals>
                 <phase>pre-site</phase>
                 <configuration>
-                  <additionalClasspathElements>
-                    <additionalClasspathElement>${project.basedir}/src/configuration-templates</additionalClasspathElement>
-                  </additionalClasspathElements>
-                  <includePluginDependencies>true</includePluginDependencies>
-                  <mainClass>org.eclipse.aether.tools.CollectConfiguration</mainClass>
                   <arguments>
                     <argument>--mode=maven</argument>
                     <!--

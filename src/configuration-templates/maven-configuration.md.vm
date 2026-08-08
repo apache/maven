@@ -17,7 +17,7 @@
 ## under the License.
 ##
 #[[
-# Configuration Options
+# Maven Configuration Options
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -37,17 +37,7 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<!--
-THIS FILE IS GENERATED - DO NOT EDIT
-Generated from: apache-maven/src/test/resources/maven-configuration.md.vm
-To modify this file, edit the template and regenerate.
--->
-
 ]]#
-
-#macro(yesno $val)
-  #if ($val) Yes #else No #end
-#end
 
 #macro(value $val)
 #if ($val) `$val` #else - #end
