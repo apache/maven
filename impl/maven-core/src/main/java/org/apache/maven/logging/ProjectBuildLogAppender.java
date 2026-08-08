@@ -18,16 +18,34 @@
  */
 package org.apache.maven.logging;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.time.Instant;
+
+import org.apache.maven.api.MonotonicClock;
+import org.apache.maven.api.build.report.LogEvent;
+import org.apache.maven.api.build.report.LogLevel;
+import org.apache.maven.internal.build.DefaultLogEvent;
+import org.apache.maven.internal.impl.DefaultLog;
+import org.apache.maven.slf4j.MavenJulHandler;
 import org.apache.maven.slf4j.MavenSimpleLogger;
 import org.slf4j.MDC;
+import org.slf4j.spi.LocationAwareLogger;
 
 /**
- * Forwards log messages to the client.
+ * Forwards log messages to the client as structured {@link LogEvent} objects.
+ * <p>
+ * Installs itself as a {@link MavenSimpleLogger.LogSink} to intercept all
+ * SLF4J log output, enrich it with structured metadata (level, logger name,
+ * clean message, formatted output), and forward to the active
+ * {@link BuildEventListener}.
  */
 public class ProjectBuildLogAppender implements AutoCloseable {
 
     private static final String KEY_PROJECT_ID = "maven.project.id";
+    private static final String KEY_MOJO_ID = "maven.mojo.id";
     private static final ThreadLocal<String> PROJECT_ID = new InheritableThreadLocal<>();
+    private static final ThreadLocal<String> MOJO_ID = new InheritableThreadLocal<>();
     private static final ThreadLocal<String> FORKING_PROJECT_ID = new InheritableThreadLocal<>();
 
     public static String getProjectId() {
@@ -49,6 +67,31 @@ public class ProjectBuildLogAppender implements AutoCloseable {
         } else {
             PROJECT_ID.remove();
             MDC.remove(KEY_PROJECT_ID);
+        }
+    }
+
+    public static String getMojoId() {
+        return MOJO_ID.get();
+    }
+
+    /**
+     * Sets or clears the mojo execution identifier in both the thread-local
+     * and the SLF4J MDC.  The value is available to any SLF4J appender via
+     * the MDC key {@code maven.mojo.id} and to JUL-bridged messages through
+     * the same MDC path.
+     * <p>
+     * Format: {@code "prefix:goal@executionId"}
+     * (e.g. {@code "compiler:compile@default-compile"}).
+     *
+     * @param mojoId the mojo identifier, or {@code null} to clear
+     */
+    public static void setMojoId(String mojoId) {
+        if (mojoId != null) {
+            MOJO_ID.set(mojoId);
+            MDC.put(KEY_MOJO_ID, mojoId);
+        } else {
+            MOJO_ID.remove();
+            MDC.remove(KEY_MOJO_ID);
         }
     }
 
@@ -76,13 +119,66 @@ public class ProjectBuildLogAppender implements AutoCloseable {
         MavenSimpleLogger.setLogSink(this::accept);
     }
 
-    protected void accept(String message) {
+    protected void accept(
+            int level, String loggerName, String cleanMessage, String formattedMessage, Throwable throwable) {
         String projectId = MDC.get(KEY_PROJECT_ID);
-        buildEventListener.projectLogMessage(projectId, message);
+        Instant timestamp = MonotonicClock.now();
+        LogLevel logLevel = toLogLevel(level);
+        String stackTrace = throwable != null ? formatStackTrace(throwable) : null;
+
+        // Read source metadata: JUL events carry it via MavenJulHandler,
+        // Log API events carry it via DefaultLog's ThreadLocal.
+        MavenJulHandler.JulMetadata julMeta = MavenJulHandler.getJulMetadata();
+        DefaultLog.LogApiMetadata logApiMeta = DefaultLog.getLogApiMetadata();
+        LogEvent event;
+        if (julMeta != null) {
+            event = new DefaultLogEvent(
+                    timestamp,
+                    logLevel,
+                    cleanMessage,
+                    loggerName,
+                    stackTrace,
+                    formattedMessage,
+                    julMeta.sourceClassName(),
+                    julMeta.sourceMethodName(),
+                    julMeta.threadId(),
+                    julMeta.sequenceNumber());
+        } else if (logApiMeta != null) {
+            event = new DefaultLogEvent(
+                    timestamp,
+                    logLevel,
+                    cleanMessage,
+                    loggerName,
+                    stackTrace,
+                    formattedMessage,
+                    logApiMeta.sourceClassName(),
+                    logApiMeta.sourceMethodName(),
+                    logApiMeta.threadId(),
+                    -1);
+        } else {
+            event = new DefaultLogEvent(timestamp, logLevel, cleanMessage, loggerName, stackTrace, formattedMessage);
+        }
+        buildEventListener.projectLogMessage(projectId, event);
     }
 
     @Override
     public void close() throws Exception {
         MavenSimpleLogger.setLogSink(null);
+    }
+
+    private static LogLevel toLogLevel(int level) {
+        return switch (level) {
+            case LocationAwareLogger.TRACE_INT -> LogLevel.TRACE;
+            case LocationAwareLogger.DEBUG_INT -> LogLevel.DEBUG;
+            case LocationAwareLogger.INFO_INT -> LogLevel.INFO;
+            case LocationAwareLogger.WARN_INT -> LogLevel.WARN;
+            default -> LogLevel.ERROR;
+        };
+    }
+
+    private static String formatStackTrace(Throwable t) {
+        StringWriter sw = new StringWriter();
+        t.printStackTrace(new PrintWriter(sw));
+        return sw.toString();
     }
 }

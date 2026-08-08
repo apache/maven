@@ -121,6 +121,7 @@ public class LoggingExecutionListener implements ExecutionListener, ProjectExecu
     @Override
     public void mojoStarted(ExecutionEvent event) {
         setMdc(event);
+        setMojoMdc(event);
         buildEventListener.mojoStarted(event);
         delegate.mojoStarted(event);
     }
@@ -128,12 +129,14 @@ public class LoggingExecutionListener implements ExecutionListener, ProjectExecu
     @Override
     public void mojoSucceeded(ExecutionEvent event) {
         setMdc(event);
+        ProjectBuildLogAppender.setMojoId(null);
         delegate.mojoSucceeded(event);
     }
 
     @Override
     public void mojoFailed(ExecutionEvent event) {
         setMdc(event);
+        ProjectBuildLogAppender.setMojoId(null);
         delegate.mojoFailed(event);
     }
 
@@ -185,6 +188,14 @@ public class LoggingExecutionListener implements ExecutionListener, ProjectExecu
     private void setMdc(ExecutionEvent event) {
         if (event.getProject() != null) {
             ProjectBuildLogAppender.setProjectId(event.getProject().getArtifactId());
+        }
+    }
+
+    private void setMojoMdc(ExecutionEvent event) {
+        if (event.getMojoExecution() != null) {
+            String mojoId = event.getMojoExecution().getMojoDescriptor().getFullGoalName() + "@"
+                    + event.getMojoExecution().getExecutionId();
+            ProjectBuildLogAppender.setMojoId(mojoId);
         }
     }
 }
