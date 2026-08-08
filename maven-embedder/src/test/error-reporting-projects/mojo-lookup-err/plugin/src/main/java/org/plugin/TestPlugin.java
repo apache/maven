@@ -18,7 +18,7 @@ public class TestPlugin
 
     private Log log;
 
-    @Component
+    @Component(hint = "nonexistent")
     private MavenProject project;
 
     public void execute()
