@@ -332,7 +332,7 @@ class BuildReportJsonWriterTest {
 
     @Test
     void testLogEventWithJulMetadata() {
-        // LogEvent with JUL source class, method, and thread ID
+        // LogEvent with JUL source class, method, thread ID, and sequence number
         LogEvent julEvent = new DefaultLogEvent(
                 BASE_TIME.plusSeconds(1),
                 LogLevel.WARN,
@@ -342,7 +342,8 @@ class BuildReportJsonWriterTest {
                 null,
                 "com.sun.tools.javac.processing.JavacProcessingEnvironment",
                 "doProcessing",
-                42L);
+                42L,
+                1001L);
 
         // LogEvent without JUL metadata (from SLF4J)
         LogEvent slf4jEvent = new DefaultLogEvent(
@@ -385,12 +386,13 @@ class BuildReportJsonWriterTest {
 
         String json = BuildReportJsonWriter.toJson(report);
 
-        // JUL event should have sourceClassName, sourceMethodName, and threadId
+        // JUL event should have sourceClassName, sourceMethodName, threadId, and sequenceNumber
         assertTrue(
                 json.contains("\"sourceClassName\": \"com.sun.tools.javac.processing.JavacProcessingEnvironment\""),
                 "sourceClassName");
         assertTrue(json.contains("\"sourceMethodName\": \"doProcessing\""), "sourceMethodName");
         assertTrue(json.contains("\"threadId\": 42"), "threadId");
+        assertTrue(json.contains("\"sequenceNumber\": 1001"), "sequenceNumber");
         // SLF4J event should NOT have JUL fields
         // (the second log event in the output array has no sourceClassName)
         assertFalse(

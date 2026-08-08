@@ -259,7 +259,7 @@ final class BuildReportJsonWriter {
         if (event.stackTrace() != null) {
             writeField(sb, indent + 1, "stackTrace", event.stackTrace());
         }
-        // JUL metadata — only present for events from java.util.logging
+        // Source metadata — present for Log API and JUL events
         if (event.sourceClassName() != null) {
             writeField(sb, indent + 1, "sourceClassName", event.sourceClassName());
         }
@@ -268,6 +268,9 @@ final class BuildReportJsonWriter {
         }
         if (event.threadId() >= 0) {
             writeField(sb, indent + 1, "threadId", event.threadId());
+        }
+        if (event.sequenceNumber() >= 0) {
+            writeField(sb, indent + 1, "sequenceNumber", event.sequenceNumber());
         }
         removeTrailingComma(sb);
         writeIndent(sb, indent);
