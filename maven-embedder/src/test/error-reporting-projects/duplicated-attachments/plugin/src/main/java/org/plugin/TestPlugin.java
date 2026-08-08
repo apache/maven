@@ -4,30 +4,26 @@ import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.project.MavenProject;
 
 /**
- * @goal test
  *
  * @author jdcasey
  */
+@org.apache.maven.plugins.annotations.Mojo(name = "test")
 public class TestPlugin
-    implements Mojo
+        implements Mojo
 {
 
     private Log log;
 
-    /**
-     * @component
-     */
+    @Component
     private MavenProjectHelper mavenProjectHelper;
 
-    /**
-     * @parameter default-value="${project}"
-     * @required
-     * @readonly
-     */
+    @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;
 
     public void execute()

@@ -6,13 +6,12 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 
 /**
- * @goal test-unused
- * @aggregator
  *
  * @author jdcasey
  */
+@org.apache.maven.plugins.annotations.Mojo(name = "test-unused", aggregator = true)
 public class TestPlugin
-    implements Mojo
+        implements Mojo
 {
 
     private Log log;

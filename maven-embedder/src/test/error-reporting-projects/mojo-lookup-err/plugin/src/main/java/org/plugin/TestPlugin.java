@@ -1,26 +1,24 @@
 package org.plugin;
 
 import org.apache.maven.plugin.Mojo;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 
 /**
- * @goal test
- * @requiresProject false
  *
  * @author jdcasey
  */
+@org.apache.maven.plugins.annotations.Mojo(name = "test", requiresProject = false)
 public class TestPlugin
-    implements Mojo
+        implements Mojo
 {
 
     private Log log;
 
-    /**
-     * @component role-hint="nonexistent"
-     */
+    @Component
     private MavenProject project;
 
     public void execute()
