@@ -78,6 +78,7 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.impl.SettingsUtilsV4;
 import org.apache.maven.jline.FastTerminal;
 import org.apache.maven.jline.MessageUtils;
+import org.apache.maven.logging.AsyncDrainWriter;
 import org.apache.maven.logging.BuildEventListener;
 import org.apache.maven.logging.LoggingOutputStream;
 import org.apache.maven.logging.ProjectBuildLogAppender;
@@ -415,24 +416,30 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected Consumer<String> doDetermineWriter(C context) {
+        Consumer<String> raw;
         if (context.options().logFile().isPresent()) {
             Path logFile = context.cwd.resolve(context.options().logFile().get());
             try {
                 PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(logFile), true);
                 context.closeables.add(printWriter);
-                return printWriter::println;
+                raw = printWriter::println;
             } catch (IOException e) {
                 throw new MavenException("Unable to redirect logging to " + logFile, e);
             }
         } else {
             // Given the terminal creation has been offloaded to a different thread,
             // do not pass directly the terminal writer
-            return msg -> {
+            raw = msg -> {
                 PrintWriter pw = context.terminal.writer();
                 pw.println(msg);
                 pw.flush();
             };
         }
+        // Wrap with lock-free async drain to eliminate PrintWriter synchronized contention
+        // when multiple PhasingExecutor threads log concurrently during parallel model building.
+        AsyncDrainWriter asyncWriter = new AsyncDrainWriter(raw);
+        context.closeables.add(asyncWriter);
+        return asyncWriter;
     }
 
     protected void activateLogging(C context) throws Exception {
