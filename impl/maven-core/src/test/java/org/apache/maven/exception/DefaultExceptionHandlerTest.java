@@ -18,17 +18,23 @@
  */
 package org.apache.maven.exception;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.ConnectException;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.building.DefaultModelProblem;
+import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginContainerException;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.ProjectBuildingResult;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
@@ -38,6 +44,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  */
@@ -178,5 +186,73 @@ class DefaultExceptionHandlerTest {
         assertEquals("", summary.getReference());
         assertEquals(0, summary.getChildren().size());
         assertEquals(boom1, summary.getException());
+    }
+
+    @Test
+    void testProjectBuildingExceptionNotRenderedTwice() {
+        ModelProblem problem = new DefaultModelProblem(
+                "Malformed POM test.xml: unexpected element",
+                ModelProblem.Severity.FATAL,
+                null,
+                "test.xml",
+                8,
+                3,
+                null,
+                null);
+
+        ProjectBuildingResult result = mock(ProjectBuildingResult.class);
+        when(result.getProjectId()).thenReturn("test:fail-build:0.1-SNAPSHOT");
+        when(result.getPomFile()).thenReturn(new File("test.xml"));
+        when(result.getProblems()).thenReturn(List.of(problem));
+
+        ProjectBuildingException exception = new ProjectBuildingException(List.of(result));
+
+        assertEquals(
+                "Some problems were encountered while processing the POMs",
+                exception.getMessage(),
+                "exception message must stay the short summary, not per-problem detail");
+
+        ExceptionSummary summary = new DefaultExceptionHandler().handleException(exception);
+
+        ExceptionSummary projectSummary = summary.getChildren().get(0);
+        ExceptionSummary problemSummary = projectSummary.getChildren().get(0);
+
+        assertTrue(
+                problemSummary.getMessage().contains("Malformed POM test.xml"),
+                "the handler's own tree should still render the problem detail exactly once");
+
+        assertEquals(1, countOccurrences(flatten(summary), "Malformed POM test.xml: unexpected element"));
+    }
+
+    private static String flatten(ExceptionSummary summary) {
+        if (summary == null) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        if (summary.getMessage() != null) {
+            sb.append(summary.getMessage());
+        }
+
+        for (ExceptionSummary child : summary.getChildren()) {
+            if (!sb.isEmpty()) {
+                sb.append('\n');
+            }
+            sb.append(flatten(child));
+        }
+
+        return sb.toString();
+    }
+
+    private static int countOccurrences(String text, String substring) {
+        int count = 0;
+        int index = 0;
+
+        while ((index = text.indexOf(substring, index)) != -1) {
+            count++;
+            index += substring.length();
+        }
+
+        return count;
     }
 }
