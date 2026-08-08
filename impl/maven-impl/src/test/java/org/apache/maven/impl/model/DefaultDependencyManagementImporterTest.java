@@ -18,16 +18,55 @@
  */
 package org.apache.maven.impl.model;
 
+import java.util.List;
+
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputSource;
+import org.apache.maven.api.model.Model;
+import org.apache.maven.api.services.ModelBuilderRequest;
+import org.apache.maven.api.services.ModelProblemCollector;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class DefaultDependencyManagementImporterTest {
+    @Test
+    void testBuildConsumerUsesImportedVersionForDirectManagedDependency() {
+        Dependency managedDependency = Dependency.newBuilder()
+                .groupId("org.junit.jupiter")
+                .artifactId("junit-jupiter-api")
+                .scope("provided")
+                .build();
+        Model target = Model.newBuilder()
+                .dependencyManagement(DependencyManagement.newBuilder()
+                        .dependencies(List.of(managedDependency))
+                        .build())
+                .build();
+        Dependency importedDependency = Dependency.newBuilder()
+                .groupId("org.junit.jupiter")
+                .artifactId("junit-jupiter-api")
+                .version("6.1.1")
+                .build();
+        DependencyManagement importedManagement = DependencyManagement.newBuilder()
+                .dependencies(List.of(importedDependency))
+                .build();
+        ModelBuilderRequest request = mock(ModelBuilderRequest.class);
+        when(request.getRequestType()).thenReturn(ModelBuilderRequest.RequestType.BUILD_CONSUMER);
+
+        Model result = new DefaultDependencyManagementImporter()
+                .importManagement(target, List.of(importedManagement), request, mock(ModelProblemCollector.class));
+
+        Dependency resultDependency =
+                result.getDependencyManagement().getDependencies().get(0);
+        assertEquals("6.1.1", resultDependency.getVersion());
+        assertEquals("provided", resultDependency.getScope());
+    }
+
     @Test
     void testUpdateWithImportedFromDependencyLocationAndBomLocationAreNullDependencyReturned() {
         final Dependency dependency = Dependency.newBuilder().build();
