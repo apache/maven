@@ -32,12 +32,12 @@ import org.apache.maven.api.annotations.Nullable;
  * in the build report, enabling programmatic filtering by level and
  * correlation by timestamp.
  * <p>
- * Events originating from JUL ({@code java.util.logging}) may carry
- * additional metadata that is normally lost when routed through the
- * SLF4J bridge: the source class name, source method name, and thread
- * identifier.  These fields are populated by Maven's custom JUL
- * {@link java.util.logging.Handler} and are {@code null} for events
- * from other logging paths (Log API, SLF4J direct).
+ * Events originating from the Maven Log API or from JUL
+ * ({@code java.util.logging}) carry additional source metadata: the
+ * source class name, source method name, and thread identifier.
+ * For Log API events the source class name is the mojo implementation
+ * FQCN; for JUL events it comes from {@code LogRecord}.  Events from
+ * direct SLF4J logging have these fields set to {@code null}.
  *
  * @since 4.1.0
  */
@@ -105,14 +105,14 @@ public interface LogEvent {
     @Nullable
     String formattedMessage();
 
-    // ---- JUL metadata (populated only for events from java.util.logging) ----
+    // ---- Source metadata (populated for Log API and JUL events) ----
 
     /**
-     * The fully qualified class name of the source that issued the log call,
-     * as reported by JUL's {@code LogRecord.getSourceClassName()}.
+     * The fully qualified class name of the source that issued the log call.
      * <p>
-     * This field is only populated for events originating from JUL.  For
-     * events from the Maven Log API or SLF4J, it is {@code null}.
+     * For Maven Log API events this is the mojo implementation class name.
+     * For JUL events it is the value from {@code LogRecord.getSourceClassName()}.
+     * For direct SLF4J logging it is {@code null}.
      *
      * @return the source class name, or {@code null}
      * @since 4.1.0
@@ -123,8 +123,11 @@ public interface LogEvent {
     }
 
     /**
-     * The method name of the source that issued the log call,
-     * as reported by JUL's {@code LogRecord.getSourceMethodName()}.
+     * The method name of the source that issued the log call.
+     * <p>
+     * For Maven Log API events this is resolved via {@link StackWalker}.
+     * For JUL events it is the value from {@code LogRecord.getSourceMethodName()}.
+     * For direct SLF4J logging it is {@code null}.
      *
      * @return the source method name, or {@code null}
      * @since 4.1.0
@@ -135,16 +138,30 @@ public interface LogEvent {
     }
 
     /**
-     * The thread identifier from which this log event originated,
-     * as reported by JUL's {@code LogRecord.getLongThreadID()}.
+     * The thread identifier from which this log event originated.
      * <p>
-     * Returns {@code -1} if the thread ID is not available (i.e. for
-     * non-JUL events).
+     * Populated for both Log API and JUL events.  Returns {@code -1}
+     * if the thread ID is not available (i.e. for direct SLF4J events).
      *
      * @return the thread ID, or {@code -1} if unavailable
      * @since 4.1.0
      */
     default long threadId() {
+        return -1;
+    }
+
+    /**
+     * A monotonically increasing sequence number for total ordering of
+     * log events, useful when multiple events share the same timestamp.
+     * <p>
+     * For JUL events this is the value from
+     * {@code LogRecord.getSequenceNumber()}.  For other event sources
+     * it is {@code -1}.
+     *
+     * @return the sequence number, or {@code -1} if unavailable
+     * @since 4.1.0
+     */
+    default long sequenceNumber() {
         return -1;
     }
 }

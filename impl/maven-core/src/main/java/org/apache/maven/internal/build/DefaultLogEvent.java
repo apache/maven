@@ -35,9 +35,10 @@ import org.apache.maven.api.build.report.LogLevel;
  * @param loggerName       the name of the logger, or {@code null}
  * @param stackTrace       the stack trace string, or {@code null}
  * @param formattedMessage the fully formatted console line, or {@code null}
- * @param sourceClassName  the JUL source class name, or {@code null}
- * @param sourceMethodName the JUL source method name, or {@code null}
- * @param threadId         the JUL thread ID, or {@code -1} if unavailable
+ * @param sourceClassName  the source class name (Log API mojo FQCN or JUL source), or {@code null}
+ * @param sourceMethodName the source method name (via StackWalker or JUL), or {@code null}
+ * @param threadId         the originating thread ID, or {@code -1} if unavailable
+ * @param sequenceNumber   the JUL sequence number for ordering, or {@code -1} if unavailable
  */
 public record DefaultLogEvent(
         Instant timestamp,
@@ -48,12 +49,13 @@ public record DefaultLogEvent(
         String formattedMessage,
         String sourceClassName,
         String sourceMethodName,
-        long threadId)
+        long threadId,
+        long sequenceNumber)
         implements LogEvent {
 
     /**
-     * Convenience constructor for events without JUL metadata
-     * (i.e. events from the SLF4J pipeline).
+     * Convenience constructor for events without source metadata
+     * (i.e. direct SLF4J events).
      */
     public DefaultLogEvent(
             Instant timestamp,
@@ -62,7 +64,7 @@ public record DefaultLogEvent(
             String loggerName,
             String stackTrace,
             String formattedMessage) {
-        this(timestamp, level, message, loggerName, stackTrace, formattedMessage, null, null, -1);
+        this(timestamp, level, message, loggerName, stackTrace, formattedMessage, null, null, -1, -1);
     }
 
     /**
@@ -70,6 +72,6 @@ public record DefaultLogEvent(
      * (e.g. in tests or programmatic construction).
      */
     DefaultLogEvent(Instant timestamp, LogLevel level, String message, String loggerName, String stackTrace) {
-        this(timestamp, level, message, loggerName, stackTrace, null, null, null, -1);
+        this(timestamp, level, message, loggerName, stackTrace, null, null, null, -1, -1);
     }
 }

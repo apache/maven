@@ -18,6 +18,7 @@
  */
 package org.apache.maven.internal.impl;
 
+import java.lang.StackWalker.StackFrame;
 import java.util.function.Supplier;
 
 import org.apache.maven.api.plugin.Log;
@@ -27,10 +28,62 @@ import org.slf4j.LoggerFactory;
 import static java.util.Objects.requireNonNull;
 
 public class DefaultLog implements Log {
+
+    /**
+     * Metadata captured from Log API calls, mirroring the JUL metadata
+     * pattern in {@code MavenJulHandler}.
+     *
+     * @param sourceClassName  the fully qualified class name of the caller
+     * @param sourceMethodName the method that issued the log call
+     * @param threadId         the originating thread ID
+     */
+    public record LogApiMetadata(String sourceClassName, String sourceMethodName, long threadId) {}
+
+    private static final ThreadLocal<LogApiMetadata> LOG_API_METADATA = new ThreadLocal<>();
+    private static final StackWalker WALKER = StackWalker.getInstance();
+    private static final String THIS_CLASS = DefaultLog.class.getName();
+
+    /**
+     * Returns the Log API metadata for the current log event being processed,
+     * or {@code null} if the current event did not originate from the Log API.
+     * <p>
+     * Called from {@code ProjectBuildLogAppender.accept()} to populate
+     * {@code LogEvent.sourceClassName()} and {@code LogEvent.sourceMethodName()}.
+     *
+     * @return the current Log API metadata, or {@code null}
+     */
+    public static LogApiMetadata getLogApiMetadata() {
+        return LOG_API_METADATA.get();
+    }
+
     private final Logger logger;
 
     public DefaultLog(Logger logger) {
         this.logger = requireNonNull(logger);
+    }
+
+    /**
+     * Wraps a logging call with Log API metadata: captures the caller's
+     * method name via {@link StackWalker}, sets the ThreadLocal, executes
+     * the actual SLF4J call, and clears the ThreadLocal.
+     * <p>
+     * The source class name is taken from the SLF4J logger name (which
+     * is the mojo implementation FQCN, set at injection time).  The
+     * source method name is resolved by walking the stack past this class
+     * to find the first external caller frame.
+     */
+    private void withMetadata(Runnable logAction) {
+        String callerMethodName = WALKER.walk(frames -> frames.dropWhile(f -> THIS_CLASS.equals(f.getClassName()))
+                .findFirst()
+                .map(StackFrame::getMethodName)
+                .orElse(null));
+        LOG_API_METADATA.set(new LogApiMetadata(
+                logger.getName(), callerMethodName, Thread.currentThread().getId()));
+        try {
+            logAction.run();
+        } finally {
+            LOG_API_METADATA.remove();
+        }
     }
 
     @Override
@@ -41,165 +94,175 @@ public class DefaultLog implements Log {
     @Override
     public void trace(CharSequence content) {
         if (isTraceEnabled()) {
-            logger.trace(toString(content));
+            withMetadata(() -> logger.trace(toString(content)));
         }
     }
 
     @Override
     public void trace(CharSequence content, Throwable error) {
         if (isTraceEnabled()) {
-            logger.trace(toString(content), error);
+            withMetadata(() -> logger.trace(toString(content), error));
         }
     }
 
     @Override
     public void trace(Throwable error) {
-        logger.trace("", error);
+        if (isTraceEnabled()) {
+            withMetadata(() -> logger.trace("", error));
+        }
     }
 
     @Override
     public void trace(Supplier<String> content) {
         if (isTraceEnabled()) {
-            logger.trace(content.get());
+            withMetadata(() -> logger.trace(content.get()));
         }
     }
 
     @Override
     public void trace(Supplier<String> content, Throwable error) {
         if (isTraceEnabled()) {
-            logger.trace(content.get(), error);
+            withMetadata(() -> logger.trace(content.get(), error));
         }
     }
 
     @Override
     public void debug(CharSequence content) {
         if (isDebugEnabled()) {
-            logger.debug(toString(content));
+            withMetadata(() -> logger.debug(toString(content)));
         }
     }
 
     @Override
     public void debug(CharSequence content, Throwable error) {
         if (isDebugEnabled()) {
-            logger.debug(toString(content), error);
+            withMetadata(() -> logger.debug(toString(content), error));
         }
     }
 
     @Override
     public void debug(Throwable error) {
-        logger.debug("", error);
+        if (isDebugEnabled()) {
+            withMetadata(() -> logger.debug("", error));
+        }
     }
 
     @Override
     public void debug(Supplier<String> content) {
         if (isDebugEnabled()) {
-            logger.debug(content.get());
+            withMetadata(() -> logger.debug(content.get()));
         }
     }
 
     @Override
     public void debug(Supplier<String> content, Throwable error) {
         if (isDebugEnabled()) {
-            logger.debug(content.get(), error);
+            withMetadata(() -> logger.debug(content.get(), error));
         }
     }
 
     @Override
     public void info(CharSequence content) {
         if (isInfoEnabled()) {
-            logger.info(toString(content));
+            withMetadata(() -> logger.info(toString(content)));
         }
     }
 
     @Override
     public void info(CharSequence content, Throwable error) {
         if (isInfoEnabled()) {
-            logger.info(toString(content), error);
+            withMetadata(() -> logger.info(toString(content), error));
         }
     }
 
     @Override
     public void info(Throwable error) {
-        logger.info("", error);
+        if (isInfoEnabled()) {
+            withMetadata(() -> logger.info("", error));
+        }
     }
 
     @Override
     public void info(Supplier<String> content) {
         if (isInfoEnabled()) {
-            logger.info(content.get());
+            withMetadata(() -> logger.info(content.get()));
         }
     }
 
     @Override
     public void info(Supplier<String> content, Throwable error) {
         if (isInfoEnabled()) {
-            logger.info(content.get(), error);
+            withMetadata(() -> logger.info(content.get(), error));
         }
     }
 
     @Override
     public void warn(CharSequence content) {
         if (isWarnEnabled()) {
-            logger.warn(toString(content));
+            withMetadata(() -> logger.warn(toString(content)));
         }
     }
 
     @Override
     public void warn(CharSequence content, Throwable error) {
         if (isWarnEnabled()) {
-            logger.warn(toString(content), error);
+            withMetadata(() -> logger.warn(toString(content), error));
         }
     }
 
     @Override
     public void warn(Throwable error) {
-        logger.warn("", error);
+        if (isWarnEnabled()) {
+            withMetadata(() -> logger.warn("", error));
+        }
     }
 
     @Override
     public void warn(Supplier<String> content) {
         if (isWarnEnabled()) {
-            logger.warn(content.get());
+            withMetadata(() -> logger.warn(content.get()));
         }
     }
 
     @Override
     public void warn(Supplier<String> content, Throwable error) {
         if (isWarnEnabled()) {
-            logger.warn(content.get(), error);
+            withMetadata(() -> logger.warn(content.get(), error));
         }
     }
 
     @Override
     public void error(CharSequence content) {
         if (isErrorEnabled()) {
-            logger.error(toString(content));
+            withMetadata(() -> logger.error(toString(content)));
         }
     }
 
     @Override
     public void error(CharSequence content, Throwable error) {
         if (isErrorEnabled()) {
-            logger.error(toString(content), error);
+            withMetadata(() -> logger.error(toString(content), error));
         }
     }
 
     @Override
     public void error(Throwable error) {
-        logger.error("", error);
+        if (isErrorEnabled()) {
+            withMetadata(() -> logger.error("", error));
+        }
     }
 
     @Override
     public void error(Supplier<String> content) {
         if (isErrorEnabled()) {
-            logger.error(content.get());
+            withMetadata(() -> logger.error(content.get()));
         }
     }
 
     @Override
     public void error(Supplier<String> content, Throwable error) {
         if (isErrorEnabled()) {
-            logger.error(content.get(), error);
+            withMetadata(() -> logger.error(content.get(), error));
         }
     }
 

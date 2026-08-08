@@ -66,8 +66,9 @@ public class MavenJulHandler extends Handler {
      * @param sourceClassName  the source class, or {@code null}
      * @param sourceMethodName the source method, or {@code null}
      * @param threadId         the originating thread ID
+     * @param sequenceNumber   the JUL sequence number for total ordering
      */
-    public record JulMetadata(String sourceClassName, String sourceMethodName, long threadId) {}
+    public record JulMetadata(String sourceClassName, String sourceMethodName, long threadId, long sequenceNumber) {}
 
     private static final ThreadLocal<JulMetadata> METADATA = new ThreadLocal<>();
 
@@ -138,7 +139,10 @@ public class MavenJulHandler extends Handler {
         MavenSimpleLogger.LogSink sink = MavenSimpleLogger.getLogSink();
         if (sink != null) {
             METADATA.set(new JulMetadata(
-                    record.getSourceClassName(), record.getSourceMethodName(), record.getLongThreadID()));
+                    record.getSourceClassName(),
+                    record.getSourceMethodName(),
+                    record.getLongThreadID(),
+                    record.getSequenceNumber()));
             try {
                 String formatted = formatForConsole(slf4jLevel, message);
                 sink.accept(slf4jLevel, loggerName, message, formatted, throwable);

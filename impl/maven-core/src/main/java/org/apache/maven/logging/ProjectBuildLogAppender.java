@@ -26,6 +26,7 @@ import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.build.report.LogEvent;
 import org.apache.maven.api.build.report.LogLevel;
 import org.apache.maven.internal.build.DefaultLogEvent;
+import org.apache.maven.internal.impl.DefaultLog;
 import org.apache.maven.slf4j.MavenJulHandler;
 import org.apache.maven.slf4j.MavenSimpleLogger;
 import org.slf4j.MDC;
@@ -125,8 +126,10 @@ public class ProjectBuildLogAppender implements AutoCloseable {
         LogLevel logLevel = toLogLevel(level);
         String stackTrace = throwable != null ? formatStackTrace(throwable) : null;
 
-        // Read JUL metadata if this event originated from java.util.logging
+        // Read source metadata: JUL events carry it via MavenJulHandler,
+        // Log API events carry it via DefaultLog's ThreadLocal.
         MavenJulHandler.JulMetadata julMeta = MavenJulHandler.getJulMetadata();
+        DefaultLog.LogApiMetadata logApiMeta = DefaultLog.getLogApiMetadata();
         LogEvent event;
         if (julMeta != null) {
             event = new DefaultLogEvent(
@@ -138,7 +141,20 @@ public class ProjectBuildLogAppender implements AutoCloseable {
                     formattedMessage,
                     julMeta.sourceClassName(),
                     julMeta.sourceMethodName(),
-                    julMeta.threadId());
+                    julMeta.threadId(),
+                    julMeta.sequenceNumber());
+        } else if (logApiMeta != null) {
+            event = new DefaultLogEvent(
+                    timestamp,
+                    logLevel,
+                    cleanMessage,
+                    loggerName,
+                    stackTrace,
+                    formattedMessage,
+                    logApiMeta.sourceClassName(),
+                    logApiMeta.sourceMethodName(),
+                    logApiMeta.threadId(),
+                    -1);
         } else {
             event = new DefaultLogEvent(timestamp, logLevel, cleanMessage, loggerName, stackTrace, formattedMessage);
         }
