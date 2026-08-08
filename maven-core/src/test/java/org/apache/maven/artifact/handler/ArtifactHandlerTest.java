@@ -21,11 +21,11 @@ package org.apache.maven.artifact.handler;
 import javax.inject.Inject;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.List;
 
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
-import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
@@ -38,22 +38,24 @@ public class ArtifactHandlerTest {
     private PlexusContainer container;
 
     @Test
-    public void testAptConsistency() throws Exception {
-        File apt = getTestFile("src/site/apt/artifact-handlers.apt");
+    public void testDocumentationConsistency() throws Exception {
+        File doc = getTestFile("src/site/markdown/artifact-handlers.md");
 
-        List<String> lines = FileUtils.loadFile(apt);
+        List<String> lines = Files.readAllLines(doc.toPath());
 
         for (String line : lines) {
-            if (line.startsWith("||")) {
-                String[] cols = line.split("\\|\\|");
+            if (line.startsWith("|type|")) {
+                String[] cols = line.split("\\|");
                 String[] expected = new String[] {
-                    "", "type", "classifier", "extension", "language", "added to classpath", "includesDependencies", ""
+                    "", "type", "classifier", "extension", "language", "added to classpath", "includesDependencies"
                 };
 
                 int i = 0;
                 for (String col : cols) {
                     assertEquals(expected[i++], col.trim(), "Wrong column header");
                 }
+            } else if (line.startsWith("|:-")) {
+                continue; // the alignment row beneath the header
             } else if (line.startsWith("|")) {
                 String[] cols = line.split("\\|");
 
@@ -85,7 +87,12 @@ public class ArtifactHandlerTest {
     }
 
     private String trimApt(String content) {
-        content = content.replace('<', ' ').replace('>', ' ').trim();
+        content = content.replace('`', ' ')
+                .replace('_', ' ')
+                .replace('*', ' ')
+                .replace('<', ' ')
+                .replace('>', ' ')
+                .trim();
 
         return (content.length() == 0) ? null : content;
     }
