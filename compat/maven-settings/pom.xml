@@ -31,6 +31,10 @@ under the License.
   <name>Maven Settings</name>
   <description>Maven Settings model.</description>
 
+  <properties>
+    <javaModuleName>org.apache.maven.settings</javaModuleName>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>

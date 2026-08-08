@@ -31,6 +31,10 @@ under the License.
   <name>Maven 4 API :: Model</name>
   <description>Maven 4 API - Immutable Model for Maven POM (Project Object Model).</description>
 
+  <properties>
+    <javaModuleName>org.apache.maven.api.model</javaModuleName>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
