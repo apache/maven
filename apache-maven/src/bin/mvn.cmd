@@ -161,14 +161,28 @@ cd /d "%EXEC_DIR%"
 
 :endDetectBaseDir
 
-set "jvmConfig=\.mvn\jvm.config"
-if not exist "%MAVEN_PROJECTBASEDIR%%jvmConfig%" goto endReadAdditionalConfig
+if not exist "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" goto endReadJvmConfig
 
 @setlocal EnableExtensions EnableDelayedExpansion
-for /F "usebackq delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config") do set JVM_CONFIG_MAVEN_PROPS=!JVM_CONFIG_MAVEN_PROPS! %%a
-@endlocal & set JVM_CONFIG_MAVEN_PROPS=%JVM_CONFIG_MAVEN_PROPS%
+set JVM_CONFIG_MAVEN_OPTS=
+for /F "usebackq tokens=* delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config") do (
+    set "line=%%a"
 
-:endReadAdditionalConfig
+    rem Replace MAVEN_PROJECTBASEDIR placeholders
+    set "line=!line:${MAVEN_PROJECTBASEDIR}=%MAVEN_PROJECTBASEDIR%!"
+    set "line=!line:$MAVEN_PROJECTBASEDIR=%MAVEN_PROJECTBASEDIR%!"
+
+    if not "!line!"=="" (
+        if "!JVM_CONFIG_MAVEN_OPTS!"=="" (
+            set "JVM_CONFIG_MAVEN_OPTS=!line!"
+        ) else (
+            set "JVM_CONFIG_MAVEN_OPTS=!JVM_CONFIG_MAVEN_OPTS! !line!"
+        )
+    )
+)
+@endlocal & set JVM_CONFIG_MAVEN_OPTS=%JVM_CONFIG_MAVEN_OPTS%
+
+:endReadJvmConfig
 
 @REM do not let MAVEN_PROJECTBASEDIR end with a single backslash which would escape the double quote. This happens when .mvn at drive root.
 if "_%MAVEN_PROJECTBASEDIR:~-1%"=="_\" set "MAVEN_PROJECTBASEDIR=%MAVEN_PROJECTBASEDIR%\"
@@ -183,7 +197,7 @@ set "INTERNAL_MAVEN_OPTS=--enable-native-access=ALL-UNNAMED %INTERNAL_MAVEN_OPTS
 :skipEnableNativeAccess
 
 "%JAVACMD%" ^
-  %JVM_CONFIG_MAVEN_PROPS% ^
+  %JVM_CONFIG_MAVEN_OPTS% ^
   %INTERNAL_MAVEN_OPTS% ^
   %MAVEN_OPTS% ^
   %MAVEN_DEBUG_OPTS% ^
