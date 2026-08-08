@@ -1,97 +1,61 @@
-~~ Licensed to the Apache Software Foundation (ASF) under one
-~~ or more contributor license agreements.  See the NOTICE file
-~~ distributed with this work for additional information
-~~ regarding copyright ownership.  The ASF licenses this file
-~~ to you under the Apache License, Version 2.0 (the
-~~ "License"); you may not use this file except in compliance
-~~ with the License.  You may obtain a copy of the License at
-~~
-~~ http://www.apache.org/licenses/LICENSE-2.0
-~~
-~~ Unless required by applicable law or agreed to in writing,
-~~ software distributed under the License is distributed on an
-~~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-~~ KIND, either express or implied.  See the License for the
-~~ specific language governing permissions and limitations
-~~ under the License.
+---
+title: Introduction
+author:
+  - Hervé Boutemy
+date: 2013-07-27
+---
 
- -----
- Introduction
- -----
- Hervé Boutemy
- -----
- 2013-07-27
- -----
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
 
-Maven Core
+http://www.apache.org/licenses/LICENSE-2.0
 
- Maven Core classes managing the whole build process.
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
 
-* Reference Documentation
+# Maven Core
 
- * {{{./lifecycles.html}lifecycles}} and {{{./default-bindings.html}plugin bindings to <<<default>>> lifecycle}},
+Maven Core classes managing the whole build process.
 
- * {{{./artifact-handlers.html}default artifact handlers}}, to manage {{{../../api/maven-api-model/maven.html#class_dependency}dependency types}},
+## Reference Documentation
 
- * {{{./extension.html}extension descriptor}} and {{{./core-extensions.html}core extensions}},
+- [lifecycles](./lifecycles.html) and [plugin bindings to `default` lifecycle](./default-bindings.html),
+- [default artifact handlers](./artifact-handlers.html), to manage [dependency types](../../api/maven-api-model/maven.html#class_dependency),
+- [extension descriptor](./extension.html) and [core extensions](./core-extensions.html),
+- [classloader hierarchy](/guides/mini/guide-maven-classloading.html) done by `ClassRealmManager` component ([javadoc](./apidocs/org/apache/maven/classrealm/ClassRealmManager.html)), with its `DefaultClassRealmManager` implementation ([source](./xref/org/apache/maven/classrealm/DefaultClassRealmManager.html)), using [Plexus Classworlds](https://codehaus-plexus.github.io/plexus-classworlds/),
 
- * {{{/guides/mini/guide-maven-classloading.html}classloader hierarchy}} done by <<<ClassRealmManager>>> component
- ({{{./apidocs/org/apache/maven/classrealm/ClassRealmManager.html}javadoc}}),
- with its <<<DefaultClassRealmManager>>> implementation
- ({{{./xref/org/apache/maven/classrealm/DefaultClassRealmManager.html}source}}), using
- {{{https://codehaus-plexus.github.io/plexus-classworlds/}Plexus Classworlds}},
+## Useful entry points
 
-* Useful entry points
+- `Maven` component ([javadoc](./apidocs/org/apache/maven/Maven.html)), with its `DefaultMaven` implementation ([source](./xref/org/apache/maven/DefaultMaven.html)), to drive a full Maven execution session
+- `ProjectBuilder` component ([javadoc](./apidocs/org/apache/maven/project/ProjectBuilder.html)), with its `DefaultProjectBuilder` implementation ([source](./xref/org/apache/maven/project/DefaultProjectBuilder.html)), to prepare [`MavenProject` descriptor](./apidocs/org/apache/maven/project/MavenProject.html) from POM files,
+- `LifecycleExecutor` component ([javadoc](./apidocs/org/apache/maven/lifecycle/LifecycleExecutor.html)), with its `DefaultLifecycleExecutor` implementation([source](/xref/org/apache/maven/lifecycle/DefaultLifecycleExecutor.html)), to plan or execute tasks.  
+    on plugin goals execution order:
+    - **in a given phase, goals order is not expected to be guaranteed nor finely tuned**: it is just a consequence of the order obtained during [effective model building](../maven-model-builder/), which combines profile activation+injection and inheritance assembly from parents,
+    - known limitations are notably that:
 
- * <<<Maven>>> component ({{{./apidocs/org/apache/maven/Maven.html}javadoc}}),
- with its <<<DefaultMaven>>> implementation ({{{./xref/org/apache/maven/DefaultMaven.html}source}}), to drive
- a full Maven execution session
+        1\. plugin goal execution in a child is usually simply appended (at end): you can't try to insert in the middle of pre-existing inherited executions,
 
- * <<<ProjectBuilder>>> component ({{{./apidocs/org/apache/maven/project/ProjectBuilder.html}javadoc}}),
- with its <<<DefaultProjectBuilder>>> implementation
- ({{{./xref/org/apache/maven/project/DefaultProjectBuilder.html}source}}), to prepare {{{./apidocs/org/apache/maven/project/MavenProject.html}<<<MavenProject>>> descriptor}} from POM files,
+        2\. append happens at plugin level first, then goal level, independently from phases. This means for example that adding pluginA:goal2 to pre-existing (pluginA:goal1, pluginB:goal) will lead to (pluginA:goal1, pluginA:goal2, pluginB:goal)
 
- * <<<LifecycleExecutor>>> component ({{{./apidocs/org/apache/maven/lifecycle/LifecycleExecutor.html}javadoc}}),
- with its <<<DefaultLifecycleExecutor>>> implementation({{{/xref/org/apache/maven/lifecycle/DefaultLifecycleExecutor.html}source}}), to plan or execute tasks.\
-   on plugin goals execution order:
+    - see effective POM as shown by [`help:effective-pom`](/plugins/maven-help-plugin/effective-pom-mojo.html) to see the effective plugins then goals order.
+- `MavenPluginManager` component ([javadoc](./apidocs/org/apache/maven/plugin/MavenPluginManager.html)), with its `DefaultMavenPluginManager` implementation ([source](./xref/org/apache/maven/plugin/internal/DefaultMavenPluginManager.html)),
+- [PluginParameterExpressionEvaluator](./apidocs/org/apache/maven/plugin/PluginParameterExpressionEvaluator.html), used to evaluate plugin parameters values during Mojo configuration,
+- `ExceptionHandler` component ([javadoc](./apidocs/org/apache/maven/exception/ExceptionHandler.html)), with its `DefaultExceptionHandler` implementation ([source](./xref/org/apache/maven/exception/DefaultExceptionHandler.html)), use to transform exception into useful end-user messages.
 
-   * <<in a given phase, goals order is not expected to be guaranteed nor finely tuned>>:
-     it is just a consequence of the order obtained during {{{../maven-model-builder/}effective model building}},
-     which combines profile activation+injection and inheritance assembly from parents,
+## Toolchains
 
-   * known limitations are notably that:
-
-     1. plugin goal execution in a child is usually simply appended (at end): you can't try to insert in the middle of pre-existing inherited executions,
-
-     2. append happens at plugin level first, then goal level, independently from phases.
-        This means for example that adding pluginA:goal2 to pre-existing (pluginA:goal1, pluginB:goal) will lead to (pluginA:goal1, pluginA:goal2, pluginB:goal)
-
-   * see effective POM as shown by {{{/plugins/maven-help-plugin/effective-pom-mojo.html}<<<help:effective-pom>>>}} to see the effective plugins then goals order.
-
- * <<<MavenPluginManager>>> component ({{{./apidocs/org/apache/maven/plugin/MavenPluginManager.html}javadoc}}),
- with its <<<DefaultMavenPluginManager>>> implementation
- ({{{./xref/org/apache/maven/plugin/internal/DefaultMavenPluginManager.html}source}}),
-
- * {{{./apidocs/org/apache/maven/plugin/PluginParameterExpressionEvaluator.html}PluginParameterExpressionEvaluator}}, used to
- evaluate plugin parameters values during Mojo configuration,
-
- * <<<ExceptionHandler>>> component ({{{./apidocs/org/apache/maven/exception/ExceptionHandler.html}javadoc}}),
- with its <<<DefaultExceptionHandler>>> implementation
- ({{{./xref/org/apache/maven/exception/DefaultExceptionHandler.html}source}}), use to transform exception into useful end-user messages.
-
-* Toolchains
-
- * {{{../../api/maven-api-toolchain/toolchains.html}Toolchains descriptor reference}},
-
- * public API for toolchains-aware plugins: <<<ToolchainManager>>> component ({{{./apidocs/org/apache/maven/toolchain/ToolchainManager.html}javadoc}})
- with its <<<DefaultToolchainManager>>> implementation ({{{./xref/org/apache/maven/toolchain/DefaultToolchainManager.html}source}}),
- to get selected <<<Toolchain>>> ({{{./apidocs/org/apache/maven/toolchain/Toolchain.html}javadoc}}) instance,
-
- * internal <<<ToolchainManagerPrivate>>> component ({{{./apidocs/org/apache/maven/toolchain/ToolchainManagerPrivate.html}javadoc}})
- with its <<<DefaultToolchainManagerPrivate>>> implementation ({{{./xref/org/apache/maven/toolchain/DefaultToolchainManagerPrivate.html}source}}),
- to manage toolchain selection,
-
- * internal JDK toolchain implementation: <<<JavaToolchain>>> interface ({{{./apidocs/org/apache/maven/toolchain/java/JavaToolchain.html}javadoc}}),
- with its <<<JavaToolchainImpl>>> implementation
- ({{{./xref/org/apache/maven/toolchain/java/JavaToolchainImpl.html}source}}) and <<<JavaToolchainFactory>>>
- factory ({{{./xref/org/apache/maven/toolchain/java/JavaToolchainFactory.html}source}}).
+- [Toolchains descriptor reference](../../api/maven-api-toolchain/toolchains.html),
+- public API for toolchains-aware plugins: `ToolchainManager` component ([javadoc](./apidocs/org/apache/maven/toolchain/ToolchainManager.html)) with its `DefaultToolchainManager` implementation ([source](./xref/org/apache/maven/toolchain/DefaultToolchainManager.html)), to get selected `Toolchain` ([javadoc](./apidocs/org/apache/maven/toolchain/Toolchain.html)) instance,
+- internal `ToolchainManagerPrivate` component ([javadoc](./apidocs/org/apache/maven/toolchain/ToolchainManagerPrivate.html)) with its `DefaultToolchainManagerPrivate` implementation ([source](./xref/org/apache/maven/toolchain/DefaultToolchainManagerPrivate.html)), to manage toolchain selection,
+- internal JDK toolchain implementation: `JavaToolchain` interface ([javadoc](./apidocs/org/apache/maven/toolchain/java/JavaToolchain.html)), with its `JavaToolchainImpl` implementation ([source](./xref/org/apache/maven/toolchain/java/JavaToolchainImpl.html)) and `JavaToolchainFactory` factory ([source](./xref/org/apache/maven/toolchain/java/JavaToolchainFactory.html)).

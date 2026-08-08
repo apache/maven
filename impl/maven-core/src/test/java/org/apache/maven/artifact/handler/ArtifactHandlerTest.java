@@ -39,14 +39,14 @@ class ArtifactHandlerTest {
 
     @Test
     @SuppressWarnings("checkstyle:UnusedLocalVariable")
-    void testAptConsistency() throws Exception {
-        File apt = getTestFile("src/site/apt/artifact-handlers.apt");
+    void testDocumentationConsistency() throws Exception {
+        File doc = getTestFile("src/site/markdown/artifact-handlers.md");
 
-        List<String> lines = Files.readAllLines(apt.toPath());
+        List<String> lines = Files.readAllLines(doc.toPath());
 
         for (String line : lines) {
-            if (line.startsWith("||")) {
-                String[] cols = line.split("\\|\\|");
+            if (line.startsWith("|type|")) {
+                String[] cols = line.split("\\|");
                 String[] expected = new String[] {
                     "",
                     "type",
@@ -55,14 +55,15 @@ class ArtifactHandlerTest {
                     "packaging",
                     "language",
                     "added to classpath",
-                    "includesDependencies",
-                    ""
+                    "includesDependencies"
                 };
 
                 int i = 0;
                 for (String col : cols) {
                     assertEquals(expected[i++], col.trim(), "Wrong column header");
                 }
+            } else if (line.startsWith("|:-")) {
+                continue; // the alignment row beneath the header
             } else if (line.startsWith("|")) {
                 String[] cols = line.split("\\|");
 
@@ -97,7 +98,11 @@ class ArtifactHandlerTest {
     }
 
     private String trimApt(String content) {
-        content = content.replace('<', ' ').replace('>', ' ').trim();
+        content = content.replace('`', ' ')
+                .replace('_', ' ')
+                .replace('<', ' ')
+                .replace('>', ' ')
+                .trim();
 
         return (content.length() == 0) ? null : content;
     }
