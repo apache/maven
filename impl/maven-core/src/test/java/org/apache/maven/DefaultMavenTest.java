@@ -32,6 +32,7 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.impl.resolver.MavenWorkspaceReader;
+import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,7 @@ import org.junit.jupiter.api.Test;
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DefaultMavenTest extends AbstractCoreMavenComponentTestCase {
@@ -95,6 +97,25 @@ class DefaultMavenTest extends AbstractCoreMavenComponentTestCase {
         MavenExecutionResult result = maven.execute(request);
 
         assertTrue(result.getExceptions().isEmpty());
+    }
+
+    @Test
+    void testThatLegacySupportSessionIsRestoredAfterExecute() throws Exception {
+        LegacySupport legacySupport = getContainer().lookup(LegacySupport.class);
+        MavenSession preSetSession = createMavenSession(getProject("simple"));
+
+        legacySupport.setSession(preSetSession);
+        try {
+            MavenExecutionRequest request =
+                    createMavenExecutionRequest(getProject("simple")).setGoals(asList("validate"));
+
+            MavenExecutionResult result = maven.execute(request);
+
+            assertNotNull(result);
+            assertSame(preSetSession, legacySupport.getSession());
+        } finally {
+            legacySupport.setSession(null);
+        }
     }
 
     @Test
