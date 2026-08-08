@@ -1078,6 +1078,13 @@ under the License.
                 <artifactId>maven-resolver-tools</artifactId>
                 <version>${resolverVersion}</version>
               </dependency>
+              <dependency>
+                <!-- we need a dependency on maven-api-annotations to be able to load org.apache.maven.api.annotations.Config class -->
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-api-annotations</artifactId>
+                <!-- use previous version to avoid dependency cycles -->
+                <version>4.0.0-rc-6</version>
+              </dependency>
             </dependencies>
             <executions>
               <execution>
@@ -1100,7 +1107,8 @@ under the License.
                     hence template is renamed to maven-configuration.md.vm, to avoid conflict (and picking up resolver template)
                     -->
                     <argument>--templates=maven-configuration.md</argument>
-                    <argument>${project.basedir}</argument>
+                    <!-- only look at maven-api-core, as it only contains configuration class org.apache.maven.api.Constants  -->
+                    <argument>${project.basedir}/api/maven-api-core</argument>
                     <argument>${project.build.directory}/generated-site/markdown</argument>
                   </arguments>
                 </configuration>
@@ -1124,7 +1132,7 @@ under the License.
                     to avoid double execution
                     -->
                     <argument>--templates=configuration.properties,configuration.yaml</argument>
-                    <argument>${project.basedir}</argument>
+                    <argument>${project.basedir}/api/maven-api-core</argument>
                     <argument>${project.build.directory}/generated-site/resources</argument>
                   </arguments>
                 </configuration>
