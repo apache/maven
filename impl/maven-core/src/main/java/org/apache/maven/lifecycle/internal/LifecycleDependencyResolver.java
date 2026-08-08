@@ -130,10 +130,24 @@ public class LifecycleDependencyResolver {
 
             Map<Artifact, File> reactorProjects =
                     new HashMap<>(session.getProjects().size());
+            // Build a GAV-keyed map for fallback lookups when exact Artifact.equals() misses
+            // (e.g. type/classifier mismatch between resolved dependency and reactor artifact).
+            Map<String, MavenProject> reactorGavMap =
+                    new HashMap<>(session.getProjects().size());
             for (MavenProject reactorProject : session.getProjects()) {
-                reactorProjects.put(
-                        reactorProject.getArtifact(),
-                        reactorProject.getArtifact().getFile());
+                File file = reactorProject.getArtifact().getFile();
+                // In the concurrent builder, a reactor project may have compiled (output directory
+                // exists) but not yet been packaged (artifact file is null).  Use the output
+                // directory as a fallback so that downstream projects see the compiled classes.
+                if (file == null) {
+                    File outputDir = new File(reactorProject.getBuild().getOutputDirectory());
+                    if (outputDir.isDirectory()) {
+                        file = outputDir;
+                    }
+                }
+                reactorProjects.put(reactorProject.getArtifact(), file);
+                String gavKey = ArtifactUtils.key(reactorProject.getArtifact());
+                reactorGavMap.put(gavKey, reactorProject);
             }
 
             Map<String, Artifact> map = new HashMap<>();
@@ -146,6 +160,38 @@ public class LifecycleDependencyResolver {
                 File reactorProjectFile = reactorProjects.get(artifact);
                 if (reactorProjectFile != null) {
                     artifact.setFile(reactorProjectFile);
+                } else if (artifact.getFile() == null) {
+                    // Fallback: try matching reactor projects by GAV (handles type/classifier
+                    // mismatches) or look up the artifact in the local repository.
+                    String gavKey = ArtifactUtils.key(artifact);
+                    MavenProject reactorProject = reactorGavMap.get(gavKey);
+                    if (reactorProject != null) {
+                        File fallback = reactorProject.getArtifact().getFile();
+                        if (fallback == null) {
+                            File outputDir = new File(reactorProject.getBuild().getOutputDirectory());
+                            if (outputDir.isDirectory()) {
+                                fallback = outputDir;
+                            }
+                        }
+                        if (fallback != null) {
+                            artifact.setFile(fallback);
+                        }
+                    } else {
+                        // Non-reactor artifact with null file — the Aether resolver may not have
+                        // resolved it (e.g. it was only collected, or a race condition in the
+                        // concurrent builder prevented the file from being set).  Try looking
+                        // up the file in the local repository.
+                        org.eclipse.aether.artifact.Artifact aetherArtifact = RepositoryUtils.toArtifact(artifact);
+                        org.eclipse.aether.repository.LocalRepositoryManager lrm =
+                                session.getRepositorySession().getLocalRepositoryManager();
+                        if (lrm != null) {
+                            String path = lrm.getPathForLocalArtifact(aetherArtifact);
+                            File localFile = new File(lrm.getRepository().getBasedir(), path);
+                            if (localFile.isFile()) {
+                                artifact.setFile(localFile);
+                            }
+                        }
+                    }
                 }
 
                 map.put(artifact.getDependencyConflictId(), artifact);
