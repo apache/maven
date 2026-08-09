@@ -254,7 +254,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                         clearRequestScopedCache(request);
                     } catch (Exception e) {
                         // Log but don't fail the build due to cache cleanup issues
-                        logger.debug("Failed to clear REQUEST_SCOPED cache for request: {}", request, e);
+                        logger.trace("Failed to clear REQUEST_SCOPED cache for request: {}", request, e);
                     }
                 }
                 RequestTraceHelper.exit(trace);
@@ -791,7 +791,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 // If profile activation fails, log a warning but continue with base properties
                 // This ensures that CI-friendly versions still work even if profile activation has issues
                 logger.warn("Failed to activate profiles for CI-friendly version processing: {}", e.getMessage());
-                logger.debug("Profile activation failure details", e);
+                logger.trace("Profile activation failure details", e);
             }
 
             // System and user properties override everything (use request properties
@@ -1315,8 +1315,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 var previousRepositories = repositories;
                 mergeRepositories(childModel, false);
                 if (!Objects.equals(previousRepositories, repositories)) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Merging repositories from " + childModel.getId() + "\n"
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("Merging repositories from " + childModel.getId() + "\n"
                                 + repositories.stream()
                                         .map(Object::toString)
                                         .collect(Collectors.joining("\n", "    ", "")));
@@ -1538,7 +1538,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 List<String> newRepos =
                         repositories.stream().map(Object::toString).toList();
                 if (!Objects.equals(oldRepos, newRepos)) {
-                    logger.debug("Replacing repositories from " + resultModel.getId() + "\n"
+                    logger.trace("Replacing repositories from " + resultModel.getId() + "\n"
                             + newRepos.stream().map(s -> "    " + s).collect(Collectors.joining("\n")));
                 }
             }
@@ -1580,7 +1580,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             Path rootDirectory;
             boolean rootDirectoryFromSession = false;
             setSource(modelSource.getLocation());
-            logger.debug("Reading file model from " + modelSource.getLocation());
+            logger.trace("Reading file model from " + modelSource.getLocation());
             Path sourcePath = modelSource.getPath();
             Path normalizedPath = sourcePath != null ? sourcePath.normalize() : null;
             boolean trackRead = normalizedPath != null && activeModelReads.add(normalizedPath);
@@ -1792,7 +1792,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                                                     : null)
                                     .build();
                         } catch (ModelBuilderException e) {
-                            logger.debug(
+                            logger.trace(
                                     "Could not read root model properties for CI-friendly version interpolation", e);
                         }
                     }
@@ -2365,7 +2365,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 clearRequestScopedCache(request);
             } catch (Exception e) {
                 // Log but don't fail the build due to cache cleanup issues
-                logger.debug("Failed to clear REQUEST_SCOPED cache for raw model request: {}", request, e);
+                logger.trace("Failed to clear REQUEST_SCOPED cache for raw model request: {}", request, e);
             }
             RequestTraceHelper.exit(trace);
         }
@@ -2715,8 +2715,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                     int beforeSize = map.size();
                     map.removeIf((k, v) -> !(k instanceof RgavCacheKey) && !(k instanceof SourceCacheKey));
                     int afterSize = map.size();
-                    if (logger.isDebugEnabled()) {
-                        logger.debug(
+                    if (logger.isTraceEnabled()) {
+                        logger.trace(
                                 "Cleared REQUEST_SCOPED cache for request: {}, removed {} entries, remaining entries: {}",
                                 outerRequestKey.getClass().getSimpleName(),
                                 afterSize - beforeSize,
