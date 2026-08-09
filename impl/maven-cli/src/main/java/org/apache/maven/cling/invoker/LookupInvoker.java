@@ -84,6 +84,7 @@ import org.apache.maven.logging.LoggingOutputStream;
 import org.apache.maven.logging.ProjectBuildLogAppender;
 import org.apache.maven.logging.SimpleBuildEventListener;
 import org.apache.maven.logging.api.LogLevelRecorder;
+import org.apache.maven.slf4j.MavenJulHandler;
 import org.apache.maven.slf4j.MavenSimpleLogger;
 import org.codehaus.plexus.PlexusContainer;
 import org.jline.terminal.Terminal;
@@ -92,7 +93,6 @@ import org.jline.terminal.impl.AbstractPosixTerminal;
 import org.jline.terminal.spi.TerminalExt;
 import org.jline.utils.OSUtils;
 import org.slf4j.LoggerFactory;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.slf4j.spi.LocationAwareLogger;
 
 import static java.util.Objects.requireNonNull;
@@ -447,9 +447,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected void activateLogging(C context) throws Exception {
-        if (!SLF4JBridgeHandler.isInstalled()) {
-            SLF4JBridgeHandler.removeHandlersForRootLogger();
-            SLF4JBridgeHandler.install();
+        if (!MavenJulHandler.isInstalled()) {
+            MavenJulHandler.install();
         }
 
         context.slf4jConfiguration.activate();

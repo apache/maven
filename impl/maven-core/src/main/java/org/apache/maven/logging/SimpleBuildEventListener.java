@@ -20,6 +20,7 @@ package org.apache.maven.logging;
 
 import java.util.function.Consumer;
 
+import org.apache.maven.api.build.report.LogEvent;
 import org.apache.maven.execution.ExecutionEvent;
 import org.eclipse.aether.transfer.TransferEvent;
 
@@ -38,8 +39,9 @@ public class SimpleBuildEventListener implements BuildEventListener {
     public void projectStarted(String projectId) {}
 
     @Override
-    public void projectLogMessage(String projectId, String event) {
-        log(event);
+    public void projectLogMessage(String projectId, LogEvent event) {
+        String formatted = event.formattedMessage();
+        log(formatted != null ? formatted : event.message());
     }
 
     @Override
