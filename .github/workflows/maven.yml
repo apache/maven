@@ -211,11 +211,15 @@ jobs:
             # Move contents up one level
             mv "maven-local/$MAVEN_DIR"/* maven-local/
             rm -r "maven-local/$MAVEN_DIR"
+            MAVEN_HOME=$(cygpath --windows "$PWD/maven-local")
+            MAVEN_BIN=$(cygpath --windows "$PWD/maven-local/bin")
           else
             tar xzf maven-dist/apache-maven-*-bin.tar.gz -C maven-local --strip-components 1
+            MAVEN_HOME="$PWD/maven-local"
+            MAVEN_BIN="$MAVEN_HOME/bin"
           fi
-          echo "MAVEN_HOME=$PWD/maven-local" >> $GITHUB_ENV
-          echo "$PWD/maven-local/bin" >> $GITHUB_PATH
+          echo "MAVEN_HOME=$MAVEN_HOME" >> "$GITHUB_ENV"
+          echo "$MAVEN_BIN" >> "$GITHUB_PATH"
 
       - name: Test PowerShell 7 launcher
         if: matrix.java == '17'
@@ -322,11 +326,15 @@ jobs:
             # Move contents up one level
             mv "maven-local/$MAVEN_DIR"/* maven-local/
             rm -r "maven-local/$MAVEN_DIR"
+            MAVEN_HOME=$(cygpath --windows "$PWD/maven-local")
+            MAVEN_BIN=$(cygpath --windows "$PWD/maven-local/bin")
           else
             tar xzf maven-dist/apache-maven-*-bin.tar.gz -C maven-local --strip-components 1
+            MAVEN_HOME="$PWD/maven-local"
+            MAVEN_BIN="$MAVEN_HOME/bin"
           fi
-          echo "MAVEN_HOME=$PWD/maven-local" >> $GITHUB_ENV
-          echo "$PWD/maven-local/bin" >> $GITHUB_PATH
+          echo "MAVEN_HOME=$MAVEN_HOME" >> "$GITHUB_ENV"
+          echo "$MAVEN_BIN" >> "$GITHUB_PATH"
 
       - name: Build Maven and ITs and run them
         shell: bash
