@@ -1,4 +1,8 @@
-<?xml version="1.0"?>
+---
+title: Introduction
+author:
+  - Hervé Boutemy
+---
 
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
@@ -19,35 +23,23 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<document>
+# Apache Maven 4.x
 
-  <properties>
-    <title>Introduction</title>
-    <author email="hboutemy_AT_apache_DOT_org">Hervé Boutemy</author>
-  </properties>
+Maven is a project development management and
+comprehension tool.
 
-  <body>
+Based on the concept of a project object model:
+builds, dependency management, documentation creation, site
+publication, and distribution publication are all controlled from
+[the `pom.xml` declarative file](./api/maven-api-model/maven.html).
 
-    <section name="Apache Maven 4.x">
+Maven can be extended by
+[plugins](https://maven.apache.org/plugins/) to utilise a
+number of other development tools for reporting or the build
+process.
 
-      <p>Maven is a project development management and
-    comprehension tool.</p>
-      <p> Based on the concept of a project object model:
-    builds, dependency management, documentation creation, site
-    publication, and distribution publication are all controlled from
-    <a href="./api/maven-api-model/maven.html">the <code>pom.xml</code> declarative file</a>.</p>
-      <p>Maven can be extended by
-    <a href="https://maven.apache.org/plugins/">plugins</a> to utilise a
-    number of other development tools for reporting or the build
-    process.</p>
+Learn more about [configuring Maven](configuring.html) and [Maven's configuration](maven-configuration.html).
 
-      <p>Learn more about <a href="configuring.html">configuring Maven</a> and <a href="maven-configuration.html">Maven's configuration</a>.</p>
-
-      <p>
-        <object data="images/maven-deps.svg"></object>
-      </p>
-    </section>
-
-  </body>
-
-</document>
+<p>
+<object data="images/maven-deps.svg"></object>
+</p>
