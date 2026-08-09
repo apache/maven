@@ -1054,7 +1054,7 @@ under the License.
       <activation>
         <property>
           <name>skipConfiguration</name>
-          <value>!false</value>
+          <value>!true</value>
         </property>
       </activation>
       <build>
