@@ -1122,7 +1122,7 @@ under the License.
                     TODO: add feature to resolver-tools to allow multiple output directory for different templates
                     to avoid double execution
                     -->
-                    <argument>--templates=configuration.properties,configuration.yaml</argument>
+                    <argument>--templates=configuration.yaml</argument>
                     <argument>${project.basedir}/api/maven-api-core</argument>
                     <argument>${project.build.directory}/generated-site/resources</argument>
                   </arguments>

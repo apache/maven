@@ -51,7 +51,7 @@ under the License.
 #end
 
 <p>These parameters don't configure plugins, but Maven itself. The parameters's list is also available as
-<a href="./configuration.properties">properties</a> or <a href="./configuration.yaml">yaml</a>.</p>
+<a href="./configuration.yaml">yaml file</a>.</p>
 
 <table>
   <thead>
