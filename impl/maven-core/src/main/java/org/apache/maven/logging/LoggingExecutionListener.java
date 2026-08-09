@@ -121,6 +121,7 @@ public class LoggingExecutionListener implements ExecutionListener, ProjectExecu
     @Override
     public void mojoStarted(ExecutionEvent event) {
         setMdc(event);
+        setMojoMdc(event);
         buildEventListener.mojoStarted(event);
         delegate.mojoStarted(event);
     }
@@ -129,12 +130,14 @@ public class LoggingExecutionListener implements ExecutionListener, ProjectExecu
     public void mojoSucceeded(ExecutionEvent event) {
         setMdc(event);
         delegate.mojoSucceeded(event);
+        ProjectBuildLogAppender.setMojoId(null);
     }
 
     @Override
     public void mojoFailed(ExecutionEvent event) {
         setMdc(event);
         delegate.mojoFailed(event);
+        ProjectBuildLogAppender.setMojoId(null);
     }
 
     @Override
@@ -148,18 +151,22 @@ public class LoggingExecutionListener implements ExecutionListener, ProjectExecu
         setMdc(event);
         delegate.forkStarted(event);
         ProjectBuildLogAppender.setForkingProjectId(event.getProject().getArtifactId());
+        // Save the forking mojo's ID so it can be restored when the fork completes
+        ProjectBuildLogAppender.setForkingMojoId(ProjectBuildLogAppender.getMojoId());
     }
 
     @Override
     public void forkSucceeded(ExecutionEvent event) {
         delegate.forkSucceeded(event);
         ProjectBuildLogAppender.setForkingProjectId(null);
+        ProjectBuildLogAppender.setForkingMojoId(null);
     }
 
     @Override
     public void forkFailed(ExecutionEvent event) {
         delegate.forkFailed(event);
         ProjectBuildLogAppender.setForkingProjectId(null);
+        ProjectBuildLogAppender.setForkingMojoId(null);
     }
 
     @Override
@@ -185,6 +192,14 @@ public class LoggingExecutionListener implements ExecutionListener, ProjectExecu
     private void setMdc(ExecutionEvent event) {
         if (event.getProject() != null) {
             ProjectBuildLogAppender.setProjectId(event.getProject().getArtifactId());
+        }
+    }
+
+    private void setMojoMdc(ExecutionEvent event) {
+        if (event.getMojoExecution() != null) {
+            String mojoId = event.getMojoExecution().getMojoDescriptor().getFullGoalName() + "@"
+                    + event.getMojoExecution().getExecutionId();
+            ProjectBuildLogAppender.setMojoId(mojoId);
         }
     }
 }
