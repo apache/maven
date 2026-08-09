@@ -91,6 +91,19 @@ public final class BuildReportCollector extends AbstractEventSpy {
 
     private static final int MAX_STACKTRACE_LINES = 30;
 
+    /**
+     * Logger names excluded from SLF4J auto-collection because these classes
+     * already pipe structured {@link org.apache.maven.api.services.BuilderProblem}
+     * objects directly to the {@link DefaultDiagnosticCollector}. Without this
+     * exclusion, each problem would be counted twice: once from the direct pipe
+     * and once from the SLF4J WARN interception.
+     */
+    private static final Set<String> EXCLUDED_LOGGERS = Set.of(
+            BuildReportCollector.class.getName(),
+            "org.apache.maven.DefaultMaven",
+            "org.apache.maven.project.collector.DefaultProjectsSelector",
+            "org.apache.maven.plugin.internal.DefaultPluginValidationManager");
+
     private final DefaultDiagnosticCollector diagnosticCollector;
 
     @Inject
@@ -353,10 +366,12 @@ public final class BuildReportCollector extends AbstractEventSpy {
 
         // Auto-collect WARN-level log events as build problems, giving Maven 3 plugins
         // automatic deduplication and summary at end of build without code changes.
-        // Skip our own logger to avoid feedback loops from problem summary printing.
+        // Skip loggers that already pipe structured BuilderProblems directly to the
+        // DiagnosticCollector (avoiding double-counting), and our own logger to avoid
+        // feedback loops from problem summary printing.
         if (event.level() == LogLevel.WARN
                 && event.message() != null
-                && !event.loggerName().equals(BuildReportCollector.class.getName())) {
+                && !EXCLUDED_LOGGERS.contains(event.loggerName())) {
             String syntheticKey = syntheticDiagnosticKey(event.loggerName(), event.message());
             diagnosticCollector.report(BuilderProblem.builder()
                     .source(event.loggerName())

@@ -303,6 +303,9 @@ handle_args() {
       --up)
         MAVEN_MAIN_CLASS="org.apache.maven.cling.MavenUpCling"
         ;;
+      --log)
+        MAVEN_MAIN_CLASS="org.apache.maven.cling.MavenLogCling"
+        ;;
       *)
         ;;
     esac
@@ -311,6 +314,21 @@ handle_args() {
 }
 
 handle_args "$@"
+
+# Strip routing flags (--debug, --yjp, --enc, --shell, --up, --log) from $@
+# so they are not passed to the Java process where they may collide with
+# Commons CLI option-prefix matching (e.g. --log matches --log-file).
+_argc=$#
+_i=0
+while [ $_i -lt $_argc ]; do
+  _arg="$1"
+  shift
+  case $_arg in
+    --debug|--yjp|--enc|--shell|--up|--log) ;;
+    *) set -- "$@" "$_arg" ;;
+  esac
+  _i=$((_i + 1))
+done
 MAVEN_MAIN_CLASS=${MAVEN_MAIN_CLASS:=org.apache.maven.cling.MavenCling}
 
 # Build base command string for eval (only contains Maven-controlled values)
