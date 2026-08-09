@@ -50,6 +50,9 @@ under the License.
 #if ($val) <code>$val</code> #else - #end
 #end
 
+<p>These parameters don't configure plugins, but Maven itself. The parameters's list is also available as
+<a href="./configuration.properties">properties</a> or <a href="./configuration.yaml">yaml</a>.</p>
+
 <table>
   <thead>
     <tr><th>Key</th><th>Type</th><th>Description</th><th>Default Value</th><th>Since</th><th>Source</th></tr>
