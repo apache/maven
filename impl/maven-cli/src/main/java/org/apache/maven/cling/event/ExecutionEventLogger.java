@@ -31,6 +31,7 @@ import java.util.Objects;
 import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.MessageBuilderFactory;
+import org.apache.maven.cling.utils.CLIReportingUtils;
 import org.apache.maven.execution.AbstractExecutionListener;
 import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.BuildSuccess;
@@ -303,6 +304,15 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
         String wallClock = session.getRequest().getDegreeOfConcurrency() > 1 ? " (Wall Clock)" : "";
 
         logger.info("Total time:  {}{}", formatDuration(time), wallClock);
+
+        // On failure, show Maven and Java version to help with bug reports (MNG-7372)
+        if (session.getResult().hasExceptions()) {
+            logger.info("Maven:       {}", CLIReportingUtils.showVersionMinimal());
+            logger.info(
+                    "Java:        {} ({})",
+                    System.getProperty("java.version", "<unknown>"),
+                    System.getProperty("java.vendor", "<unknown>"));
+        }
 
         ZonedDateTime rounded = finish.truncatedTo(ChronoUnit.SECONDS).atZone(ZoneId.systemDefault());
         logger.info("Finished at: {}", formatTimestamp(rounded));
