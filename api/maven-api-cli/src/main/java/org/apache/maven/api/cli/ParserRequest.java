@@ -254,6 +254,31 @@ public interface ParserRequest {
     }
 
     /**
+     * Creates a new Builder instance for constructing a Maven Log Viewer Tool ParserRequest.
+     *
+     * @param args the command-line arguments
+     * @param messageBuilderFactory the factory for creating message builders
+     * @return a new Builder instance
+     */
+    @Nonnull
+    static Builder mvnlog(@Nonnull String[] args, @Nonnull MessageBuilderFactory messageBuilderFactory) {
+        return mvnlog(Arrays.asList(args), messageBuilderFactory);
+    }
+
+    /**
+     * Creates a new Builder instance for constructing a Maven Log Viewer Tool ParserRequest.
+     *
+     * @param args the command-line arguments
+     * @param messageBuilderFactory the factory for creating message builders
+     * @return a new Builder instance
+     */
+    @Nonnull
+    static Builder mvnlog(@Nonnull List<String> args, @Nonnull MessageBuilderFactory messageBuilderFactory) {
+        return builder(Tools.MVNLOG_CMD, Tools.MVNLOG_NAME, args, messageBuilderFactory);
+    }
+
+
+    /**
      * Creates a new Builder instance for constructing a ParserRequest.
      *
      * @param command the Maven command to be executed

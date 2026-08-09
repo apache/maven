@@ -303,6 +303,10 @@ handle_args() {
       --up)
         MAVEN_MAIN_CLASS="org.apache.maven.cling.MavenUpCling"
         ;;
+      --log)
+        MAVEN_MAIN_CLASS="org.apache.maven.cling.MavenLogCling"
+        ;;
+
       *)
         ;;
     esac

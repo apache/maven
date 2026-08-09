@@ -16,36 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.logging;
-
-import org.apache.maven.execution.ExecutionEvent;
-import org.eclipse.aether.transfer.TransferEvent;
 
 /**
- * An abstract build event sink.
+ * Provides the API for the Maven Log Viewer tool ({@code mvnlog}).
+ *
+ * @see org.apache.maven.api.cli.Tools#MVNLOG_CMD
+ * @see org.apache.maven.api.cli.Tools#MVNLOG_NAME
+ * @since 4.0.0
  */
-public interface BuildEventListener {
-
-    void sessionStarted(ExecutionEvent event);
-
-    void projectStarted(String projectId);
-
-    void projectLogMessage(String projectId, String event);
-
-    void projectFinished(String projectId, String status);
-
-    void executionFailure(String projectId, boolean halted, String exception);
-
-    void mojoStarted(ExecutionEvent event);
-
-    void mojoFinished(ExecutionEvent event, String status);
-
-
-    void finish(int exitCode) throws Exception;
-
-    void fail(Throwable t) throws Exception;
-
-    void log(String msg);
-
-    void transfer(String projectId, TransferEvent e);
-}
+package org.apache.maven.api.cli.mvnlog;
