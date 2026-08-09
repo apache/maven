@@ -88,7 +88,7 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
 
     @Override
     public PluginPrefixResult resolve(PluginPrefixRequest request) throws NoPluginFoundForPrefixException {
-        logger.debug("Resolving plugin prefix {} from {}", request.getPrefix(), request.getPluginGroups());
+        logger.trace("Resolving plugin prefix {} from {}", request.getPrefix(), request.getPluginGroups());
 
         Model pom = request.getPom();
         Build build = pom != null ? pom.getBuild() : null;
@@ -132,7 +132,7 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
                     request.getRepositorySession().getLocalRepository(),
                     request.getRepositories());
         } else {
-            logger.debug(
+            logger.trace(
                     "Resolved plugin prefix {} to {}:{} from repository {}",
                     request.getPrefix(),
                     result.getGroupId(),

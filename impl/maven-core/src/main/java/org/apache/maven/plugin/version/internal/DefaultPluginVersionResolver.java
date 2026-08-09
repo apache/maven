@@ -106,7 +106,7 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
             if (result == null) {
                 result = resolveFromRepository(request);
 
-                logger.debug(
+                logger.trace(
                         "Resolved plugin version for {}:{} to {} from repository {}",
                         request.getGroupId(),
                         request.getArtifactId(),
@@ -115,7 +115,7 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
 
                 cache.putIfAbsent(key, result);
             } else {
-                logger.debug(
+                logger.trace(
                         "Reusing cached resolved plugin version for {}:{} to {} from POM {}",
                         request.getGroupId(),
                         request.getArtifactId(),
@@ -123,7 +123,7 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
                         request.getPom());
             }
         } else {
-            logger.debug(
+            logger.trace(
                     "Reusing cached resolved plugin version for {}:{} to {} from POM {}",
                     request.getGroupId(),
                     request.getArtifactId(),
@@ -282,7 +282,7 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
             pluginDescriptor = pluginManager.getPluginDescriptor(
                     plugin, request.getRepositories(), request.getRepositorySession());
         } catch (PluginResolutionException e) {
-            logger.debug("Ignoring unresolvable plugin version {}", version, e);
+            logger.trace("Ignoring unresolvable plugin version {}", version, e);
             return false;
         } catch (Exception e) {
             // ignore for now and delay failure to higher level processing
