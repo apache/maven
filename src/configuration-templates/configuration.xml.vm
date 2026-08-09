@@ -16,8 +16,8 @@
 ## specific language governing permissions and limitations
 ## under the License.
 ##
-#[[
-# Configuration Options
+<?xml version="1.0"?>
+
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -27,7 +27,7 @@ to you under the Apache License, Version 2.0 (the
 "License"); you may not use this file except in compliance
 with the License.  You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+  http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing,
 software distributed under the License is distributed on an
@@ -37,25 +37,33 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<!--
-THIS FILE IS GENERATED - DO NOT EDIT
-Generated from: apache-maven/src/test/resources/maven-configuration.md.vm
-To modify this file, edit the template and regenerate.
--->
+<document>
 
-]]#
+  <properties>
+    <title>Maven Configuration Options</title>
+  </properties>
 
-#macro(yesno $val)
-  #if ($val) Yes #else No #end
-#end
+  <body>
 
+    <section name="Maven Configuration Options">
 #macro(value $val)
-#if ($val) `$val` #else - #end
+#if ($val) <code>$val</code> #else - #end
 #end
 
-| Key | Type | Description | Default Value | Since | Source |
-| --- | --- | --- | --- | --- | --- |
+<p>These parameters don't configure plugins, but Maven itself. The parameters's list is also available as
+<a href="./configuration.yaml">yaml file</a>.</p>
+
+<table>
+  <thead>
+    <tr><th>Key</th><th>Type</th><th>Description</th><th>Default Value</th><th>Since</th><th>Source</th></tr>
+  </thead>
 #foreach($key in $keys)
-| `$key.key` | `$key.configurationType` | $key.description | #value( $key.defaultValue ) | $key.since | $key.configurationSource |
+<tr><td><code>$key.key</code></td><td><code>$key.configurationType</code></td>
+   <td>$key.description</td>
+   <td>#value( $key.defaultValue )</td><td>$key.since</td><td>$key.configurationSource</td>
+</tr>
 #end
-
+</table>
+    </section>
+  </body>
+</document>

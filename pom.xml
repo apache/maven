@@ -1014,64 +1014,84 @@ under the License.
               </execution>
             </executions>
           </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>maven-configuration</id>
+      <activation>
+        <property>
+          <name>skipConfiguration</name>
+          <value>!true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
             <version>3.6.3</version>
             <inherited>false</inherited>
+            <configuration>
+              <additionalClasspathElements>
+                <additionalClasspathElement>${project.basedir}/src/configuration-templates</additionalClasspathElement>
+              </additionalClasspathElements>
+              <includePluginDependencies>true</includePluginDependencies>
+              <!-- https://maven.apache.org/resolver/maven-resolver-tools/apidocs/org/eclipse/aether/tools/CollectConfiguration.html -->
+              <mainClass>org.eclipse.aether.tools.CollectConfiguration</mainClass>
+            </configuration>
             <dependencies>
+              <!-- https://maven.apache.org/resolver/maven-resolver-tools/ that contains the invoked class -->
               <dependency>
                 <groupId>org.apache.maven.resolver</groupId>
                 <artifactId>maven-resolver-tools</artifactId>
                 <version>${resolverVersion}</version>
               </dependency>
+              <dependency>
+                <!-- we need a dependency on maven-api-annotations to be able to load org.apache.maven.api.annotations.Config class -->
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-api-annotations</artifactId>
+                <!-- use previous version to avoid dependency cycles -->
+                <version>4.0.0-rc-6</version>
+              </dependency>
             </dependencies>
             <executions>
               <execution>
-                <id>render-configuration-page</id>
+                <id>render-maven-configuration-md</id>
                 <goals>
                   <goal>java</goal>
                 </goals>
                 <phase>pre-site</phase>
                 <configuration>
-                  <additionalClasspathElements>
-                    <additionalClasspathElement>${project.basedir}/src/configuration-templates</additionalClasspathElement>
-                  </additionalClasspathElements>
-                  <includePluginDependencies>true</includePluginDependencies>
-                  <mainClass>org.eclipse.aether.tools.CollectConfiguration</mainClass>
                   <arguments>
                     <argument>--mode=maven</argument>
                     <!--
                     TODO: templates are loaded from classpath, in "normal" JAR project local template would override docgen one,
                     but in this case the packaging=pom all I could do is use additionalClasspathElement that APPENDS classpath,
-                    hence template is renamed to maven-configuration.md.vm, to avoid conflict (and picking up resolver template)
+                    hence template is renamed to configuration.xml.vm, to avoid conflict (and picking up resolver template)
                     -->
-                    <argument>--templates=maven-configuration.md</argument>
-                    <argument>${project.basedir}</argument>
-                    <argument>${project.build.directory}/generated-site/markdown</argument>
+                    <argument>--templates=configuration.xml</argument>
+                    <!-- only look at maven-api-core, as it only contains configuration class org.apache.maven.api.Constants  -->
+                    <argument>${project.basedir}/api/maven-api-core</argument>
+                    <argument>${project.build.directory}/generated-site/xdoc</argument>
                   </arguments>
                 </configuration>
               </execution>
               <execution>
-                <id>render-configuration-properties</id>
+                <id>render-configuration-properties+yaml</id>
                 <goals>
                   <goal>java</goal>
                 </goals>
                 <phase>pre-site</phase>
                 <configuration>
-                  <additionalClasspathElements>
-                    <additionalClasspathElement>${project.basedir}/src/configuration-templates</additionalClasspathElement>
-                  </additionalClasspathElements>
-                  <includePluginDependencies>true</includePluginDependencies>
-                  <mainClass>org.eclipse.aether.tools.CollectConfiguration</mainClass>
                   <arguments>
                     <argument>--mode=maven</argument>
                     <!--
                     TODO: add feature to resolver-tools to allow multiple output directory for different templates
                     to avoid double execution
                     -->
-                    <argument>--templates=configuration.properties,configuration.yaml</argument>
-                    <argument>${project.basedir}</argument>
+                    <argument>--templates=configuration.yaml</argument>
+                    <argument>${project.basedir}/api/maven-api-core</argument>
                     <argument>${project.build.directory}/generated-site/resources</argument>
                   </arguments>
                 </configuration>
