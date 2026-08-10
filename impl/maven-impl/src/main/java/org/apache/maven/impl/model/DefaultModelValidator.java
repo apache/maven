@@ -1193,14 +1193,14 @@ public class DefaultModelValidator implements ModelValidator {
             String key = dependency.getManagementKey();
 
             if ("import".equals(dependency.getScope())) {
-                if (!"pom".equals(dependency.getType())) {
+                if (!"pom".equals(dependency.getType()) && !"bom".equals(dependency.getType())) {
                     addViolation(
                             problems,
                             Severity.WARNING,
                             Version.V20,
                             prefix + prefix2 + "type",
                             SourceHint.dependencyManagementKey(dependency),
-                            "must be 'pom' to import the managed dependencies.",
+                            "must be 'pom' or 'bom' to import the managed dependencies.",
                             dependency);
                 } else if (!is41OrBeyond
                         && dependency.getClassifier() != null
