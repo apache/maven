@@ -27,6 +27,8 @@ import java.util.Map;
 
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
@@ -37,6 +39,10 @@ import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.Sources;
 import org.apache.maven.impl.standalone.ApiRunner;
+import org.eclipse.aether.spi.connector.transport.http.ChecksumExtractor;
+import org.eclipse.aether.spi.io.PathProcessor;
+import org.eclipse.aether.transport.apache.ApacheTransporterFactory;
+import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -516,6 +522,53 @@ class DefaultModelBuilderTest {
         assertNotNull(managedDep, "Managed dependency for the sibling module should be kept");
         assertEquals(
                 "1.0-SNAPSHOT", managedDep.getVersion(), "Version should be inferred from the reactor sibling module");
+    }
+
+    /**
+     * BOM-type import-scoped dependencyManagement entries must be processed.
+     * Operator precedence previously skipped {@code type=bom} always (GH-12589).
+     */
+    @Test
+    public void testImportScopeBomTypeIsProcessed() {
+        Path basedir = Paths.get(System.getProperty("basedir", ""));
+        Path localRepoPath = basedir.resolve("target/local-repo-bom-import");
+        Path remoteRepoPath = basedir.resolve("src/test/remote-repo");
+        Session bomSession = ApiRunner.createSession(
+                injector -> injector.bindInstance(DefaultModelBuilderTest.class, this), localRepoPath);
+        RemoteRepository remoteRepository = bomSession.createRemoteRepository(
+                RemoteRepository.CENTRAL_ID, remoteRepoPath.toUri().toString());
+        bomSession = bomSession.withRemoteRepositories(List.of(remoteRepository));
+        ModelBuilder bomBuilder = bomSession.getService(ModelBuilder.class);
+
+        ModelBuilderResult result = bomBuilder
+                .newSession()
+                .build(ModelBuilderRequest.builder()
+                        .session(bomSession)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                        .source(Sources.buildSource(getPom("import-bom-type")))
+                        .build());
+
+        assertNotNull(result);
+        assertNotNull(result.getEffectiveModel().getDependencyManagement());
+        Dependency managed = result.getEffectiveModel().getDependencyManagement().getDependencies().stream()
+                .filter(d -> "a".equals(d.getArtifactId()) && "org.apache.maven.its".equals(d.getGroupId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(managed, "Managed dependency from type=bom import should be present");
+        assertEquals("0.1", managed.getVersion());
+    }
+
+    @Provides
+    @Named(FileTransporterFactory.NAME)
+    static FileTransporterFactory newFileTransporterFactory() {
+        return new FileTransporterFactory();
+    }
+
+    @Provides
+    @Named(ApacheTransporterFactory.NAME)
+    static ApacheTransporterFactory newApacheTransporterFactory(
+            ChecksumExtractor checksumExtractor, PathProcessor pathProcessor) {
+        return new ApacheTransporterFactory(checksumExtractor, pathProcessor);
     }
 
     private Path getPom(String name) {
