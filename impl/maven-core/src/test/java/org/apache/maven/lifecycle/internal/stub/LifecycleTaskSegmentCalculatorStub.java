@@ -44,7 +44,7 @@ public class LifecycleTaskSegmentCalculatorStub extends DefaultLifecycleTaskSegm
     public static final String INSTALL = "install";
 
     public LifecycleTaskSegmentCalculatorStub() {
-        super(null, null);
+        super(null);
     }
 
     @Override
