@@ -43,6 +43,11 @@ import org.apache.maven.api.annotations.Nonnull;
 public enum DependencyScope {
 
     /**
+     * API scope. Compile, runtime and test, exported transitively.
+     */
+    API("api", true),
+
+    /**
      * None. Allows you to declare dependencies (for example to alter reactor build order) but in reality dependencies
      * in this scope are not part of any path scope.
      */
@@ -64,7 +69,7 @@ public enum DependencyScope {
     /**
      * Compile, runtime and test.
      */
-    COMPILE("compile", true),
+    COMPILE("compile", false),
 
     /**
      * Runtime and test.

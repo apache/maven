@@ -119,6 +119,7 @@ class DefaultModelValidatorTest {
         validator = new DefaultModelValidator();
 
         Collection<DependencyScope> scopes = new ArrayList<>();
+        scopes.add(new DepScope("api"));
         scopes.add(new DepScope("compile"));
         scopes.add(new DepScope("runtime"));
         scopes.add(new DepScope("provided"));

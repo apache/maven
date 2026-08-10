@@ -89,6 +89,8 @@ public final class Maven4ScopeManagerConfiguration implements ScopeManagerConfig
             InternalScopeManager internalScopeManager) {
         ArrayList<org.eclipse.aether.scope.DependencyScope> result = new ArrayList<>();
         result.add(internalScopeManager.createDependencyScope(
+                DependencyScope.API.id(), DependencyScope.API.isTransitive(), all()));
+        result.add(internalScopeManager.createDependencyScope(
                 DependencyScope.COMPILE.id(), DependencyScope.COMPILE.isTransitive(), all()));
         result.add(internalScopeManager.createDependencyScope(
                 DependencyScope.RUNTIME.id(),
