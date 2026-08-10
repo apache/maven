@@ -37,12 +37,61 @@ import org.apache.maven.api.annotations.Provider;
 @Provider
 public interface Log {
     /**
+     * {@return true if the <b>trace</b> error level is enabled}
+     * @since 4.1.0
+     */
+    boolean isTraceEnabled();
+
+    /**
+     * Sends a message to the user in the <b>trace</b> error level.
+     * <p>
+     * Trace is intended for Maven core internals and low-level framework
+     * diagnostics.  Plugin authors should normally use {@link #debug} for
+     * developer-facing diagnostic output.
+     *
+     * @param content the message to log
+     * @since 4.1.0
+     */
+    void trace(CharSequence content);
+
+    /**
+     * Sends a message (and accompanying exception) to the user at the <b>trace</b> error level.
+     *
+     * @param content the message to log
+     * @param error the error that caused this log
+     * @since 4.1.0
+     */
+    void trace(CharSequence content, Throwable error);
+
+    /**
+     * Sends an exception to the user in the <b>trace</b> error level.
+     *
+     * @param error the error that caused this log
+     * @since 4.1.0
+     */
+    void trace(Throwable error);
+
+    /**
+     * @since 4.1.0
+     */
+    void trace(Supplier<String> content);
+
+    /**
+     * @since 4.1.0
+     */
+    void trace(Supplier<String> content, Throwable error);
+
+    /**
      * {@return true if the <b>debug</b> error level is enabled}
      */
     boolean isDebugEnabled();
 
     /**
      * Sends a message to the user in the <b>debug</b> error level.
+     * <p>
+     * Debug is the recommended level for diagnostic output that helps
+     * plugin users troubleshoot build problems (e.g. resolved paths,
+     * computed values).  For Maven core internals, prefer {@link #trace}.
      *
      * @param content the message to log
      */
@@ -167,4 +216,21 @@ public interface Log {
     void error(Supplier<String> content);
 
     void error(Supplier<String> content, Throwable error);
+
+    /**
+     * Returns a child logger whose name is derived from this logger's name
+     * by appending {@code "." + name}.  This allows plugins to create
+     * sub-loggers for different concerns while keeping hierarchical level
+     * control (e.g. setting the level for the parent silences the children).
+     * <p>
+     * The default implementation returns {@code this} so that existing
+     * implementations continue to work without changes.
+     *
+     * @param name the child logger name segment (must not be {@code null})
+     * @return a child {@code Log}, never {@code null}
+     * @since 4.1.0
+     */
+    default Log child(String name) {
+        return this;
+    }
 }
