@@ -19,9 +19,12 @@
 package org.apache.maven.lifecycle.internal;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.DefaultLifecycles;
+import org.apache.maven.lifecycle.Lifecycle;
+import org.apache.maven.lifecycle.LifecycleMappingDelegate;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -60,5 +63,32 @@ class DefaultLifecycleExecutionPlanCalculatorTest {
         calculator.calculateExecutionPlan(session, project, List.of(new GoalTask("help:help")), false);
 
         verify(lifecyclePluginResolver, never()).resolveMissingPluginVersions(project, session);
+    }
+
+    @Test
+    void resolvesProjectPluginsForLifecycleTask() throws Exception {
+        LifecyclePluginResolver lifecyclePluginResolver = mock(LifecyclePluginResolver.class);
+        MavenSession session = mock(MavenSession.class);
+        MavenProject project = new MavenProject();
+        DefaultLifecycles defaultLifecycles = mock(DefaultLifecycles.class);
+        Lifecycle lifecycle = new Lifecycle("default", List.of("validate"), Map.of());
+        LifecycleMappingDelegate lifecycleMappingDelegate = mock(LifecycleMappingDelegate.class);
+
+        when(defaultLifecycles.get("validate")).thenReturn(lifecycle);
+        when(lifecycleMappingDelegate.calculateLifecycleMappings(session, project, lifecycle, "validate"))
+                .thenReturn(Map.of());
+
+        DefaultLifecycleExecutionPlanCalculator calculator = new DefaultLifecycleExecutionPlanCalculator(
+                mock(BuildPluginManager.class),
+                defaultLifecycles,
+                mock(MojoDescriptorCreator.class),
+                lifecyclePluginResolver,
+                lifecycleMappingDelegate,
+                Map.of(),
+                Map.of());
+
+        calculator.calculateExecutionPlan(session, project, List.of(new LifecycleTask("validate")), false);
+
+        verify(lifecyclePluginResolver).resolveMissingPluginVersions(project, session);
     }
 }
