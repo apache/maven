@@ -115,6 +115,7 @@ function Test-ScriptSyntax {
 
 $environmentNames = @(
   "HOME",
+  "JAVA_TOOL_OPTIONS",
   "MAVEN_ARGS",
   "MAVEN_DEBUG_ADDRESS",
   "MAVEN_DEBUG_OPTS",
@@ -174,6 +175,19 @@ try {
   Assert-ExitCode 0 $stderrResult "Native stderr from the Maven JVM should not fail the launcher."
   $env:MAVEN_OPTS = $null
   Write-Output "[PASS] native stderr does not override the Maven exit code"
+
+  $env:JAVA_TOOL_OPTIONS = "-Dmaven.launcher.stderr=true"
+  Push-Location $nestedDirectory
+  try {
+    $noisyJavaResult = Invoke-Launcher -ScriptName "mvn.ps1" -Arguments @("--version")
+  }
+  finally {
+    Pop-Location
+  }
+  Assert-ExitCode 0 $noisyJavaResult "Native stderr should not contaminate parsed JVM options."
+  Assert-Contains $noisyJavaResult.Output "Picked up JAVA_TOOL_OPTIONS" "The test JVM should emit stderr."
+  $env:JAVA_TOOL_OPTIONS = $null
+  Write-Output "[PASS] native stderr stays separate from parsed JVM options"
 
   $invalid = Invoke-Launcher -ScriptName "mvn.ps1" -Arguments @("--not-a-real-option")
   if ($invalid.ExitCode -eq 0) {
