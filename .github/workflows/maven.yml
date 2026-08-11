@@ -222,12 +222,11 @@ jobs:
           echo "$MAVEN_BIN" >> "$GITHUB_PATH"
 
       - name: Test PowerShell 7 launcher
-        if: matrix.java == '17'
         shell: pwsh
         run: ./apache-maven/src/test/powershell/MavenLauncher.Tests.ps1 -MavenHome "$env:MAVEN_HOME"
 
       - name: Test Windows PowerShell 5.1 launcher
-        if: runner.os == 'Windows' && matrix.java == '17'
+        if: runner.os == 'Windows'
         shell: powershell
         run: ./apache-maven/src/test/powershell/MavenLauncher.Tests.ps1 -MavenHome "$env:MAVEN_HOME"
 
