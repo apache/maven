@@ -139,12 +139,22 @@ function Get-MavenJavaCommand {
 function Test-MavenJavaVersion {
   param([string] $JavaCommand)
 
-  & $JavaCommand --enable-native-access=ALL-UNNAMED -version *> $null
-  if ($LASTEXITCODE -ne 0) {
-    Write-MavenError "Error: Apache Maven 4.x requires Java 17 or newer to run."
-    & $JavaCommand -version
-    Write-MavenError "Please upgrade your Java installation or set JAVA_HOME to point to a compatible JDK."
-    throw "Unsupported Java version"
+  $originalErrorActionPreference = $ErrorActionPreference
+  try {
+    # Windows PowerShell 5.1 reports native stderr as an error record when it is redirected.
+    # java -version writes its normal output to stderr, so do not let a caller's Stop preference abort the probe.
+    $ErrorActionPreference = "Continue"
+    & $JavaCommand --enable-native-access=ALL-UNNAMED -version *> $null
+    $javaVersionExitCode = $LASTEXITCODE
+    if ($javaVersionExitCode -ne 0) {
+      Write-MavenError "Error: Apache Maven 4.x requires Java 17 or newer to run."
+      & $JavaCommand -version
+      Write-MavenError "Please upgrade your Java installation or set JAVA_HOME to point to a compatible JDK."
+      throw "Unsupported Java version"
+    }
+  }
+  finally {
+    $ErrorActionPreference = $originalErrorActionPreference
   }
 }
 
