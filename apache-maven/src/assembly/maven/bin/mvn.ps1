@@ -352,6 +352,9 @@ function Invoke-MavenLauncher {
     Write-MavenDebug "  $debugCommand"
   }
 
+  # Native stderr does not indicate failure. In Windows PowerShell 5.1 it can become an error record
+  # when the caller redirects output, so let Java finish and use its exit code as the result.
+  $ErrorActionPreference = "Continue"
   & $javaCommand @javaArguments
   $script:MavenProcessExitCode = $LASTEXITCODE
 }
