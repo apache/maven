@@ -27,15 +27,15 @@ $MavenHome = (Get-Item -LiteralPath $MavenHome).FullName
 $binDirectory = Join-Path $MavenHome "bin"
 $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) ("maven-powershell-tests-" + [guid]::NewGuid().ToString("N"))
 
-function Assert-Equal {
+function Assert-ExitCode {
   param(
-    $Expected,
-    $Actual,
+    [int] $Expected,
+    $Result,
     [string] $Message
   )
 
-  if ($Expected -ne $Actual) {
-    throw "$Message Expected: <$Expected>; actual: <$Actual>."
+  if ($Expected -ne $Result.ExitCode) {
+    throw "$Message Expected: <$Expected>; actual: <$($Result.ExitCode)>. Output:`n$($Result.Output)"
   }
 }
 
@@ -130,6 +130,12 @@ foreach ($name in $environmentNames) {
   $savedEnvironment[$name] = [Environment]::GetEnvironmentVariable($name)
 }
 
+$powerShellExecutable = (Get-Process -Id $PID).Path
+Write-Output "[INFO] PowerShell executable: $powerShellExecutable"
+Write-Output "[INFO] PowerShell edition: $($PSVersionTable.PSEdition)"
+Write-Output "[INFO] PowerShell version: $($PSVersionTable.PSVersion)"
+Write-Output "[INFO] PSHOME: $PSHOME"
+
 try {
   New-Item -ItemType Directory -Path $temporaryRoot > $null
   $projectDirectory = Join-Path $temporaryRoot "project with spaces"
@@ -159,7 +165,7 @@ try {
   Write-Output "[PASS] launcher scripts parse"
 
   $version = Invoke-Launcher -ScriptName "mvn.ps1" -Arguments @("--version")
-  Assert-Equal 0 $version.ExitCode "mvn.ps1 --version should succeed."
+  Assert-ExitCode 0 $version "mvn.ps1 --version should succeed."
   Assert-Contains $version.Output "Apache Maven" "Version output should identify Maven."
   Write-Output "[PASS] core launcher executes Maven"
 
@@ -179,7 +185,7 @@ try {
   finally {
     Pop-Location
   }
-  Assert-Equal 0 $quoted.ExitCode "Launcher with quoted options should succeed."
+  Assert-ExitCode 0 $quoted "Launcher with quoted options should succeed."
   Assert-Contains $quoted.Output '"-Dps.maven=maven value"' "MAVEN_OPTS should preserve spaces."
   Assert-Contains $quoted.Output '"-Dps.jvm=jvm value"' "jvm.config should preserve spaces."
   Assert-Contains $quoted.Output "-Dps.pipe=foo|bar" "jvm.config should preserve pipe characters."
@@ -193,7 +199,7 @@ try {
     (Join-Path $projectDirectory "pom.xml"),
     "--version"
   )
-  Assert-Equal 0 $fileResult.ExitCode "-f with an existing POM should succeed."
+  Assert-ExitCode 0 $fileResult "-f with an existing POM should succeed."
   Assert-Contains $fileResult.Output "-Dmaven.multiModuleProjectDirectory=$projectDirectory" "-f should select the POM directory."
 
   $missingResult = Invoke-Launcher -ScriptName "mvn.ps1" -Arguments @(
@@ -201,12 +207,12 @@ try {
     (Join-Path $temporaryRoot "missing.xml"),
     "--version"
   )
-  Assert-Equal 1 $missingResult.ExitCode "-f with a missing POM should fail."
+  Assert-ExitCode 1 $missingResult "-f with a missing POM should fail."
   Write-Output "[PASS] -f file selection and validation work"
 
   $env:MAVEN_DEBUG_OPTS = "-Dps.debug=true"
   $debugResult = Invoke-Launcher -ScriptName "mvnDebug.ps1" -Arguments @("--version")
-  Assert-Equal 0 $debugResult.ExitCode "mvnDebug.ps1 should delegate successfully."
+  Assert-ExitCode 0 $debugResult "mvnDebug.ps1 should delegate successfully."
   Assert-Contains $debugResult.Output "deprecated for removal" "The debug wrapper should report deprecation."
   Write-Output "[PASS] debug wrapper delegates and preserves custom debug options"
 
@@ -218,7 +224,7 @@ try {
   )
   foreach ($modeTest in $modeTests) {
     $modeResult = Invoke-Launcher -ScriptName $modeTest[0] -Arguments @("--help")
-    Assert-Equal 0 $modeResult.ExitCode "$($modeTest[0]) --help should succeed."
+    Assert-ExitCode 0 $modeResult "$($modeTest[0]) --help should succeed."
     Assert-Contains $modeResult.Output "-Dmaven.mainClass=$($modeTest[1])" "$($modeTest[0]) should select its MavenCling class."
     Assert-NotContains $modeResult.Output "-Dshould.not.reach.specialized.launchers=true" "MAVEN_ARGS should not reach specialized launchers."
   }
@@ -226,7 +232,7 @@ try {
 
   $env:YJPLIB = $null
   $yjpResult = Invoke-Launcher -ScriptName "mvnyjp.ps1" -Arguments @("--version")
-  Assert-Equal 1 $yjpResult.ExitCode "mvnyjp.ps1 should fail when YJPLIB is unavailable."
+  Assert-ExitCode 1 $yjpResult "mvnyjp.ps1 should fail when YJPLIB is unavailable."
   Assert-Contains $yjpResult.Output "Please set YJPLIB" "YourKit failure should explain the required variable."
   Write-Output "[PASS] YourKit validation fails clearly"
 
@@ -246,13 +252,13 @@ try {
   $env:MAVEN_OPTS = $null
   $env:MAVEN_SKIP_RC = $null
   $rcResult = Invoke-Launcher -ScriptName "mvn.ps1" -Arguments @("--version")
-  Assert-Equal 0 $rcResult.ExitCode "A user Maven RC script should load successfully."
+  Assert-ExitCode 0 $rcResult "A user Maven RC script should load successfully."
   Assert-Contains $rcResult.Output "-Dps.rc=loaded" "The user Maven RC script should affect launcher options."
 
   $env:MAVEN_OPTS = $null
   $env:MAVEN_SKIP_RC = "1"
   $skipRcResult = Invoke-Launcher -ScriptName "mvn.ps1" -Arguments @("--version")
-  Assert-Equal 0 $skipRcResult.ExitCode "MAVEN_SKIP_RC should not prevent Maven startup."
+  Assert-ExitCode 0 $skipRcResult "MAVEN_SKIP_RC should not prevent Maven startup."
   Assert-NotContains $skipRcResult.Output "-Dps.rc=loaded" "MAVEN_SKIP_RC should suppress RC scripts."
   Write-Output "[PASS] user RC loading and MAVEN_SKIP_RC work"
 }
