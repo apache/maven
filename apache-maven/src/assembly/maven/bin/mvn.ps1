@@ -244,7 +244,9 @@ function Get-MavenJvmConfigArguments {
   Write-MavenDebug "Found jvm.config file at: $jvmConfig"
   Write-MavenDebug "Running JvmConfigParser with Java: $JavaCommand"
 
-  $parserOutput = @(& $JavaCommand $parser $jvmConfig $ProjectBaseDirectory 2>&1)
+  # Keep compiler and JVM diagnostics out of the option text while relying on the native exit code.
+  $ErrorActionPreference = "Continue"
+  $parserOutput = @(& $JavaCommand $parser $jvmConfig $ProjectBaseDirectory)
   $parserExitCode = $LASTEXITCODE
   Write-MavenDebug "JvmConfigParser exit code: $parserExitCode"
   if ($parserExitCode -ne 0) {
