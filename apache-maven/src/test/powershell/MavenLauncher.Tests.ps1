@@ -169,6 +169,12 @@ try {
   Assert-Contains $version.Output "Apache Maven" "Version output should identify Maven."
   Write-Output "[PASS] core launcher executes Maven"
 
+  $env:MAVEN_OPTS = "-XshowSettings:vm"
+  $stderrResult = Invoke-Launcher -ScriptName "mvn.ps1" -Arguments @("--version")
+  Assert-ExitCode 0 $stderrResult "Native stderr from the Maven JVM should not fail the launcher."
+  $env:MAVEN_OPTS = $null
+  Write-Output "[PASS] native stderr does not override the Maven exit code"
+
   $invalid = Invoke-Launcher -ScriptName "mvn.ps1" -Arguments @("--not-a-real-option")
   if ($invalid.ExitCode -eq 0) {
     throw "Invalid Maven arguments should return a nonzero exit code."
