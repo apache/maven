@@ -136,6 +136,30 @@ function Get-MavenJavaCommand {
   return $java.Source
 }
 
+function Get-MavenPowerShellExecutable {
+  $executableName = if ($PSVersionTable.PSEdition -eq "Desktop") {
+    "powershell.exe"
+  }
+  elseif ($script:IsWindowsPlatform) {
+    "pwsh.exe"
+  }
+  else {
+    "pwsh"
+  }
+
+  $powerShellExecutable = Join-Path $PSHOME $executableName
+  if (Test-Path -LiteralPath $powerShellExecutable -PathType Leaf) {
+    return (Get-Item -LiteralPath $powerShellExecutable).FullName
+  }
+
+  if ($env:MAVEN_POWERSHELL_EXECUTABLE -and
+      (Test-Path -LiteralPath $env:MAVEN_POWERSHELL_EXECUTABLE -PathType Leaf)) {
+    return (Get-Item -LiteralPath $env:MAVEN_POWERSHELL_EXECUTABLE).FullName
+  }
+
+  return $null
+}
+
 function Test-MavenJavaVersion {
   param([string] $JavaCommand)
 
@@ -356,6 +380,17 @@ function Invoke-MavenLauncher {
 
   # Native stderr does not indicate failure. In Windows PowerShell 5.1 it can become an error record
   # when the caller redirects output, so let Java finish and use its exit code as the result.
+  # Let nested Maven Invoker calls reuse this PowerShell installation without starting a process to probe it.
+  $powerShellExecutable = Get-MavenPowerShellExecutable
+  if ($powerShellExecutable) {
+    $env:MAVEN_POWERSHELL_EXECUTABLE = $powerShellExecutable
+    Write-MavenDebug "MAVEN_POWERSHELL_EXECUTABLE=$env:MAVEN_POWERSHELL_EXECUTABLE"
+  }
+  else {
+    Remove-Item Env:MAVEN_POWERSHELL_EXECUTABLE -ErrorAction SilentlyContinue
+    Write-MavenDebug "MAVEN_POWERSHELL_EXECUTABLE is unavailable"
+  }
+
   $ErrorActionPreference = "Continue"
   & $javaCommand @javaArguments
   $script:MavenProcessExitCode = $LASTEXITCODE
