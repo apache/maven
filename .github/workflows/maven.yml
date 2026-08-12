@@ -19,7 +19,9 @@ name: Java CI
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - master
+      - mng-7541-powershell-4x
   pull_request:
     branches: [ master ]
 
