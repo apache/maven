@@ -121,6 +121,7 @@ $environmentNames = @(
   "MAVEN_DEBUG_OPTS",
   "MAVEN_DEBUG_SCRIPT",
   "MAVEN_OPTS",
+  "MAVEN_POWERSHELL_EXECUTABLE",
   "MAVEN_SKIP_RC",
   "PROGRAMDATA",
   "USERPROFILE",
@@ -131,7 +132,16 @@ foreach ($name in $environmentNames) {
   $savedEnvironment[$name] = [Environment]::GetEnvironmentVariable($name)
 }
 
-$powerShellExecutable = (Get-Process -Id $PID).Path
+$powerShellExecutableName = if ($PSVersionTable.PSEdition -eq "Desktop") {
+  "powershell.exe"
+}
+elseif ($env:OS -eq "Windows_NT") {
+  "pwsh.exe"
+}
+else {
+  "pwsh"
+}
+$powerShellExecutable = (Get-Item -LiteralPath (Join-Path $PSHOME $powerShellExecutableName)).FullName
 Write-Output "[INFO] PowerShell executable: $powerShellExecutable"
 Write-Output "[INFO] PowerShell edition: $($PSVersionTable.PSEdition)"
 Write-Output "[INFO] PowerShell version: $($PSVersionTable.PSVersion)"
@@ -196,6 +206,7 @@ try {
   Write-Output "[PASS] launcher propagates Maven failures"
 
   $env:MAVEN_DEBUG_SCRIPT = "1"
+  $env:MAVEN_POWERSHELL_EXECUTABLE = "must be replaced for the child Maven process"
   $env:MAVEN_OPTS = "-Dps.maven=`"maven value`" -Dps.ampersand=`"foo&bar`""
   $env:MAVEN_ARGS = "-Dps.maven.args=`"argument value`""
   Push-Location $nestedDirectory
@@ -211,7 +222,12 @@ try {
   Assert-Contains $quoted.Output "-Dps.pipe=foo|bar" "jvm.config should preserve pipe characters."
   Assert-Contains $quoted.Output "-Dps.at=@literal" "jvm.config should preserve at signs."
   Assert-Contains $quoted.Output '"-Dps.maven.args=argument value"' "MAVEN_ARGS should preserve spaces."
+  Assert-Contains $quoted.Output "MAVEN_POWERSHELL_EXECUTABLE=$powerShellExecutable" "The launcher should expose its current PowerShell host to Maven."
   Assert-Contains $quoted.Output "-Dmaven.multiModuleProjectDirectory=$projectDirectory" "The nearest .mvn directory should be used."
+  if ($env:MAVEN_POWERSHELL_EXECUTABLE -ne $powerShellExecutable) {
+    throw "The launcher should retain the PowerShell executable used to run Maven."
+  }
+  $env:MAVEN_POWERSHELL_EXECUTABLE = $null
   Write-Output "[PASS] options, jvm.config, and project discovery preserve arguments"
 
   $fileResult = Invoke-Launcher -ScriptName "mvn.ps1" -Arguments @(
