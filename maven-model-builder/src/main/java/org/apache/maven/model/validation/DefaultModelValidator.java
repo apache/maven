@@ -82,7 +82,8 @@ public class DefaultModelValidator implements ModelValidator {
 
     private static final String ILLEGAL_FS_CHARS = "\\/:\"<>|?*";
 
-    private static final String ILLEGAL_RELATIVE_PATH_FS_CHARS = ":\"<>|?*"; // same as above but FS sep removed (unix+win)
+    private static final String ILLEGAL_RELATIVE_PATH_FS_CHARS =
+            ":\"<>|?*"; // same as above but FS sep removed (unix+win)
 
     private static final String ILLEGAL_VERSION_CHARS = ILLEGAL_FS_CHARS;
 

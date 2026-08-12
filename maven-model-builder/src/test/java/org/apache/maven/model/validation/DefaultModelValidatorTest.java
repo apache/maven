@@ -893,8 +893,7 @@ public class DefaultModelValidatorTest {
 
     @Test
     public void testBadParentRelativePath1() throws Exception {
-        SimpleProblemCollector result =
-                validateRaw("raw-model/bad-parent-relativePath1.xml");
+        SimpleProblemCollector result = validateRaw("raw-model/bad-parent-relativePath1.xml");
         assertViolations(result, 0, 1, 0);
 
         assertEquals(
@@ -904,8 +903,7 @@ public class DefaultModelValidatorTest {
 
     @Test
     public void testOkParentRelativePath1() throws Exception {
-        SimpleProblemCollector result =
-                validateRaw("raw-model/ok-parent-relativePath1.xml");
+        SimpleProblemCollector result = validateRaw("raw-model/ok-parent-relativePath1.xml");
         assertViolations(result, 0, 0, 0);
     }
 }
