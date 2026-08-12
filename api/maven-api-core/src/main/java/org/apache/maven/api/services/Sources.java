@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Objects;
 
@@ -228,7 +229,12 @@ public final class Sources {
         @Nullable
         public ModelSource resolve(@Nonnull ModelLocator locator, @Nonnull String relative) {
             String norm = relative.replace('\\', File.separatorChar).replace('/', File.separatorChar);
-            Path path = getPath().getParent().resolve(norm);
+            Path path;
+            try {
+                path = getPath().getParent().resolve(norm);
+            } catch (InvalidPathException e) {
+                return null;
+            }
             Path relatedPom = locator.locateExistingPom(path);
             if (relatedPom != null) {
                 return new BuildPathSource(relatedPom);

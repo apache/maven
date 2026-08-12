@@ -136,6 +136,26 @@ class SourcesTest {
         }
     }
 
+    /**
+     * Tests that BuildPathSource.resolve() gracefully handles relative paths
+     * that are not valid filesystem paths (e.g. containing ':' which is illegal
+     * on Windows) by returning null instead of throwing InvalidPathException.
+     * This reproduces MNG-8129.
+     */
+    @Test
+    void testBuildPathSourceResolveWithInvalidPath() throws IOException {
+        Path pomFile = tempDir.resolve("pom.xml");
+        Files.writeString(pomFile, "<project/>");
+
+        Sources.BuildPathSource source = (Sources.BuildPathSource) Sources.buildSource(pomFile);
+        ModelSource.ModelLocator locator = mock(ModelSource.ModelLocator.class);
+        when(locator.locateExistingPom(any(Path.class))).thenReturn(null);
+
+        // Must not throw InvalidPathException on any platform (MNG-8129)
+        ModelSource result = source.resolve(locator, "org.apache:apache");
+        assertNull(result);
+    }
+
     @Test
     void testNullHandling() {
         assertThrows(NullPointerException.class, () -> Sources.fromPath(null));
