@@ -338,8 +338,14 @@ jobs:
           echo "$MAVEN_BIN" >> "$GITHUB_PATH"
 
       - name: Build Maven and ITs and run them
+        if: runner.os != 'Windows'
         shell: bash
         run: mvn install -e -B -V -Prun-its,mimir
+
+      - name: Build Maven and run hanging IT
+        if: runner.os == 'Windows'
+        shell: bash
+        run: mvn install -e -B -V -Prun-its,mimir -Dits.test=MavenITgh11055DIServiceInjectionTest
 
       - name: Upload Mimir caches
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
