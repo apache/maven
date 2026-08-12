@@ -31,7 +31,7 @@ under the License.
 	<version>1.0</version>
 
 	<description>
-        This will test if the validation for the parent version
-        is working correct in case of usage of RELEASE
+		This will test if the validation for the parent relativePath
+		is working correct in case of file separators
 	</description>
 </project>
