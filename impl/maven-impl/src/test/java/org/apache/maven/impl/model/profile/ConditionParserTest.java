@@ -18,6 +18,7 @@
  */
 package org.apache.maven.impl.model.profile;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
@@ -92,6 +93,49 @@ class ConditionParserTest {
     void testCaseConversionFunctions() {
         assertEquals("HELLO", parser.parse("upper('hello')"));
         assertEquals("world", parser.parse("lower('WORLD')"));
+    }
+
+    /**
+     * The result of {@code upper()} and {@code lower()} must not depend on the default locale of
+     * the machine running the build. In the Turkish locale the default case mapping turns
+     * {@code i} into the dotted {@code İ} and {@code I} into the dotless {@code ı}, which would
+     * silently change whether a profile is activated.
+     */
+    @Test
+    void testCaseConversionFunctionsAreLocaleIndependent() {
+        Locale orig = Locale.getDefault();
+        try {
+            Locale[] locales = {Locale.ENGLISH, new Locale("tr")};
+            for (Locale locale : locales) {
+                Locale.setDefault(locale);
+                assertEquals("WINDOWS", parser.parse("upper('windows')"), "upper() in " + locale);
+                assertEquals("LINUX", parser.parse("upper('linux')"), "upper() in " + locale);
+                assertEquals("linux", parser.parse("lower('LINUX')"), "lower() in " + locale);
+                assertEquals("ci", parser.parse("lower('CI')"), "lower() in " + locale);
+            }
+        } finally {
+            Locale.setDefault(orig);
+        }
+    }
+
+    /**
+     * Numbers must render with latin digits regardless of the default locale, otherwise a
+     * condition comparing against a string literal would evaluate differently on a machine
+     * whose locale uses a non-latin numbering system.
+     */
+    @Test
+    void testNumberFormattingIsLocaleIndependent() {
+        Locale orig = Locale.getDefault();
+        try {
+            // this locale's default numbering system is Devanagari rather than latin
+            Locale.setDefault(Locale.forLanguageTag("hi-IN-u-nu-deva"));
+            assertEquals("42", ConditionParser.toString(42.0));
+            assertEquals("42", ConditionParser.toString(42.0f));
+            assertEquals("The answer is 42", parser.parse("'The answer is ' + 42.0"));
+            assertEquals(2, parser.parse("length(42.0)"));
+        } finally {
+            Locale.setDefault(orig);
+        }
     }
 
     @Test
