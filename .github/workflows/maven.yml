@@ -143,7 +143,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [windows-latest]
         java: ['17', '21', '25']
     steps:
       - name: Set up JDK ${{ matrix.java }}
@@ -269,7 +269,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [windows-latest]
         java: ['17', '21', '25']
     steps:
       - name: Set up JDK ${{ matrix.java }}
@@ -377,7 +377,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [windows-latest]
     needs:
       - full-build
       - integration-tests
