@@ -27,7 +27,7 @@ under the License.
 		<relativePath>g:a:v</relativePath>
 	</parent>
 	<groupId>com.example.group</groupId>
-	<artifactId>valid-version-wrong</artifactId>
+	<artifactId>invalid-relative-path</artifactId>
 	<version>1.0</version>
 
 	<description>

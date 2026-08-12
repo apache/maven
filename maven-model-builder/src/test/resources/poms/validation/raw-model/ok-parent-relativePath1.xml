@@ -27,7 +27,7 @@ under the License.
 		<relativePath>a\b</relativePath>
 	</parent>
 	<groupId>com.example.group</groupId>
-	<artifactId>valid-version-wrong</artifactId>
+	<artifactId>valid-relative-path</artifactId>
 	<version>1.0</version>
 
 	<description>
