@@ -82,6 +82,8 @@ public class DefaultModelValidator implements ModelValidator {
 
     private static final String ILLEGAL_FS_CHARS = "\\/:\"<>|?*";
 
+    private static final String ILLEGAL_RELATIVE_PATH_FS_CHARS = "\\:\"<>|?*"; // same as above but allow / (slash)
+
     private static final String ILLEGAL_VERSION_CHARS = ILLEGAL_FS_CHARS;
 
     private static final String ILLEGAL_REPO_ID_CHARS = ILLEGAL_FS_CHARS;
@@ -152,6 +154,19 @@ public class DefaultModelValidator implements ModelValidator {
             }
         } else if (request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0) {
             Severity errOn30 = getSeverity(request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
+
+            if (parent != null && parent.getRelativePath() != null) {
+                validateBannedCharacters(
+                        "parent.",
+                        "relativePath",
+                        problems,
+                        Severity.ERROR,
+                        Version.BASE,
+                        parent.getRelativePath(),
+                        null,
+                        parent,
+                        ILLEGAL_RELATIVE_PATH_FS_CHARS);
+            }
 
             // [MNG-6074] Maven should produce an error if no model version has been set in a POM file used to build an
             // effective model.
