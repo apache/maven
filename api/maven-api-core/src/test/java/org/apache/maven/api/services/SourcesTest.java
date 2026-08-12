@@ -142,4 +142,27 @@ class SourcesTest {
         assertThrows(NullPointerException.class, () -> Sources.buildSource(null));
         assertThrows(NullPointerException.class, () -> Sources.resolvedSource(null, "location"));
     }
+
+    /**
+     * Tests that BuildPathSource.resolve() gracefully handles invalid path strings
+     * (e.g. containing ':' which is illegal on Windows) by returning null instead
+     * of throwing InvalidPathException. This reproduces MNG-8129.
+     * <p>
+     * On Linux/macOS, ':' is valid in paths so Path.resolve() does not throw
+     * and the method returns null because no POM exists at that path.
+     * On Windows, the catch clause handles the InvalidPathException.
+     */
+    @Test
+    void testBuildPathSourceResolveWithInvalidPath() throws IOException {
+        Path pomFile = tempDir.resolve("pom.xml");
+        Files.writeString(pomFile, "<project/>");
+
+        Sources.BuildPathSource source = (Sources.BuildPathSource) Sources.buildSource(pomFile);
+        ModelSource.ModelLocator locator = mock(ModelSource.ModelLocator.class);
+        when(locator.locateExistingPom(any(Path.class))).thenReturn(null);
+
+        // Must not throw InvalidPathException on any platform (MNG-8129)
+        ModelSource result = source.resolve(locator, "org.apache:apache");
+        assertNull(result);
+    }
 }

@@ -63,6 +63,26 @@ class FileModelSourceTest {
         assertTrue(upperCaseFileSource.equals(lowerCaseFileSource));
     }
 
+    /**
+     * Tests that getRelatedSource() gracefully handles invalid path strings
+     * (e.g. containing ':' which is illegal on Windows) by returning null instead
+     * of throwing InvalidPathException. This reproduces MNG-8129.
+     * <p>
+     * On Linux/macOS, ':' is valid in paths so Path.resolve() does not throw
+     * and the method returns null because the file does not exist.
+     * On Windows, without this fix, Path.resolve() would throw InvalidPathException.
+     */
+    @Test
+    void testGetRelatedSourceWithInvalidRelativePath() throws Exception {
+        File tempFile = createTempFile("pomTest");
+        FileModelSource source = new FileModelSource(tempFile);
+
+        // Must not throw InvalidPathException on any platform (MNG-8129)
+        ModelSource2 result = source.getRelatedSource("org.apache:apache");
+        // The nonsense path cannot resolve to an existing file, so result should be null
+        org.junit.jupiter.api.Assertions.assertNull(result);
+    }
+
     private File createTempFile(String name) throws IOException {
         File tempFile = File.createTempFile(name, ".xml");
         tempFile.deleteOnExit();

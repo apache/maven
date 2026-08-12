@@ -21,6 +21,7 @@ package org.apache.maven.model.building;
 import java.io.File;
 import java.net.URI;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 
 import org.apache.maven.building.FileSource;
@@ -61,7 +62,17 @@ public class FileModelSource extends FileSource implements ModelSource2 {
     public ModelSource2 getRelatedSource(String relPath) {
         relPath = relPath.replace('\\', File.separatorChar).replace('/', File.separatorChar);
 
-        Path relatedPom = getPath().getParent().resolve(relPath);
+        Path relatedPom;
+        try {
+            relatedPom = getPath().getParent().resolve(relPath);
+        } catch (InvalidPathException e) {
+            // The relative path is not a valid filesystem path (e.g. contains ':' on Windows).
+            // Some POMs in the wild have <relativePath> set to a groupId:artifactId coordinate
+            // rather than a filesystem path (e.g. artemis-project-2.33.0.pom uses
+            // <relativePath>org.apache:apache</relativePath>).
+            // Return null to let the caller fall through to repository resolution.
+            return null;
+        }
 
         if (Files.isDirectory(relatedPom)) {
             // TODO figure out how to reuse ModelLocator.locatePom(File) here
