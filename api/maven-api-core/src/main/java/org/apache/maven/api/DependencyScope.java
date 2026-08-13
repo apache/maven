@@ -64,7 +64,12 @@ public enum DependencyScope {
     /**
      * Compile, runtime and test.
      */
-    COMPILE("compile", true),
+    COMPILE("compile", false),
+
+    /**
+     * Compile, runtime and test, transitively.
+     */
+    API("api", true),
 
     /**
      * Runtime and test.
