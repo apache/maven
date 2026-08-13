@@ -21,9 +21,11 @@ package org.apache.maven.internal.transformation.impl;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -33,7 +35,9 @@ import org.apache.maven.api.Node;
 import org.apache.maven.api.PathScope;
 import org.apache.maven.api.SessionData;
 import org.apache.maven.api.feature.Features;
+import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.DistributionManagement;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.ModelBase;
@@ -359,6 +363,10 @@ class DefaultConsumerPomBuilder implements PomBuilder {
 
     static Model transformNonPom(Model model, MavenProject project) {
         boolean preserveModelVersion = model.isPreserveModelVersion();
+        String packaging = model.getPackaging();
+
+        // Inline packaging-activated profiles into the model
+        model = inlinePackagingActivatedProfiles(model, packaging);
 
         Model.Builder builder = prune(
                         Model.newBuilder(model, true)
@@ -392,6 +400,10 @@ class DefaultConsumerPomBuilder implements PomBuilder {
 
     private static Model transformBom(Model model, MavenProject project) {
         boolean preserveModelVersion = model.isPreserveModelVersion();
+        String packaging = model.getPackaging();
+
+        // Inline packaging-activated profiles into the model
+        model = inlinePackagingActivatedProfiles(model, packaging);
 
         Model.Builder builder = prune(
                 Model.newBuilder(model, true)
@@ -449,6 +461,105 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                 + "the features that request a newer model version.  If you're fine with having the "
                 + "consumer POM not consumable with Maven 3, add the `preserve.model.version='true'` "
                 + "attribute on the <project> element of your POM.");
+    }
+
+    /**
+     * Inlines packaging-activated profiles into the model.
+     * <p>
+     * When a profile is activated by packaging and the packaging matches the project's packaging,
+     * the profile's content (dependencies, dependency management, repositories) is merged into
+     * the main model and the profile is removed. This ensures consistent behavior across all
+     * tools consuming the POM, since packaging activation is a 4.1.0+ feature not available
+     * in Maven 3 or other tools like Gradle.
+     * <p>
+     * If the profile has other activation conditions besides packaging, only the packaging
+     * part is stripped from the activation.
+     *
+     * @param model the model to process
+     * @param packaging the project's packaging type
+     * @return the model with packaging-activated profiles inlined
+     */
+    static Model inlinePackagingActivatedProfiles(Model model, String packaging) {
+        List<Profile> remainingProfiles = new ArrayList<>();
+        List<Dependency> additionalDeps = new ArrayList<>();
+        List<Dependency> additionalManagedDeps = new ArrayList<>();
+        List<Repository> additionalRepos = new ArrayList<>();
+
+        for (Profile profile : model.getProfiles()) {
+            Activation activation = profile.getActivation();
+            if (activation != null && activation.getPackaging() != null) {
+                if (Objects.equals(activation.getPackaging(), packaging)) {
+                    // Packaging matches — inline profile content into the model
+                    additionalDeps.addAll(profile.getDependencies());
+                    if (profile.getDependencyManagement() != null) {
+                        additionalManagedDeps.addAll(
+                                profile.getDependencyManagement().getDependencies());
+                    }
+                    additionalRepos.addAll(profile.getRepositories());
+
+                    // Check if the profile has other activation conditions besides packaging
+                    Activation strippedActivation = stripPackagingActivation(activation);
+                    if (strippedActivation != null) {
+                        // Keep the profile but remove the packaging activation part
+                        remainingProfiles.add(profile.withActivation(strippedActivation));
+                    }
+                    // else: profile only had packaging activation, fully inlined, drop it
+                } else {
+                    // Packaging does not match — keep the profile as-is
+                    remainingProfiles.add(profile);
+                }
+            } else {
+                // No packaging activation — keep the profile as-is
+                remainingProfiles.add(profile);
+            }
+        }
+
+        // Merge additional dependencies into the model
+        if (!additionalDeps.isEmpty()) {
+            List<Dependency> allDeps = new ArrayList<>(model.getDependencies());
+            allDeps.addAll(additionalDeps);
+            model = model.withDependencies(allDeps);
+        }
+
+        // Merge additional managed dependencies into the model
+        if (!additionalManagedDeps.isEmpty()) {
+            DependencyManagement dm = model.getDependencyManagement();
+            List<Dependency> allManagedDeps = dm != null
+                    ? new ArrayList<>(dm.getDependencies())
+                    : new ArrayList<>();
+            allManagedDeps.addAll(additionalManagedDeps);
+            model = model.withDependencyManagement(
+                    (dm != null ? dm : DependencyManagement.newInstance()).withDependencies(allManagedDeps));
+        }
+
+        // Merge additional repositories into the model
+        if (!additionalRepos.isEmpty()) {
+            List<Repository> allRepos = new ArrayList<>(model.getRepositories());
+            allRepos.addAll(additionalRepos);
+            model = model.withRepositories(allRepos);
+        }
+
+        return model.withProfiles(remainingProfiles);
+    }
+
+    /**
+     * Strips the packaging activation from an activation, returning the remaining activation
+     * or {@code null} if packaging was the only activation condition.
+     */
+    private static Activation stripPackagingActivation(Activation activation) {
+        Activation stripped = Activation.newBuilder(activation, true)
+                .packaging(null)
+                .build();
+        // Check if the remaining activation has any other conditions
+        if (!stripped.isActiveByDefault()
+                && stripped.getJdk() == null
+                && stripped.getOs() == null
+                && stripped.getProperty() == null
+                && stripped.getFile() == null
+                && stripped.getCondition() == null) {
+            return null;
+        }
+        return stripped;
     }
 
     private static List<Profile> prune(List<Profile> profiles) {

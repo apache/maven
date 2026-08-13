@@ -30,7 +30,11 @@ import org.apache.maven.api.Node;
 import org.apache.maven.api.PathScope;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.SessionData;
+import org.apache.maven.api.model.Activation;
+import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.Scm;
 import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.DependencyResolverResult;
@@ -54,6 +58,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -275,5 +280,50 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         boolean hasCustomRepo =
                 consumerRequest.getRepositories().stream().anyMatch(r -> "custom-repo".equals(r.getId()));
         assertTrue(hasCustomRepo, "Consumer POM model builder request should include the project's custom repository");
+    }
+
+    @Test
+    void testInlinePackagingActivatedProfiles() {
+        Dependency dep1 = Dependency.newBuilder().groupId("g").artifactId("a1").version("1").build();
+        Dependency dep2 = Dependency.newBuilder().groupId("g").artifactId("a2").version("2").build();
+        
+        Profile profileMatching = Profile.newBuilder()
+                .id("matching")
+                .activation(Activation.newBuilder().packaging("jar").build())
+                .dependencies(List.of(dep1))
+                .build();
+                
+        Profile profileNotMatching = Profile.newBuilder()
+                .id("not-matching")
+                .activation(Activation.newBuilder().packaging("war").build())
+                .dependencies(List.of(dep2))
+                .build();
+                
+        Profile profileMixed = Profile.newBuilder()
+                .id("mixed")
+                .activation(Activation.newBuilder().packaging("jar").jdk("11").build())
+                .dependencies(List.of(dep2))
+                .build();
+                
+        Model model = Model.newBuilder()
+                .packaging("jar")
+                .profiles(List.of(profileMatching, profileNotMatching, profileMixed))
+                .build();
+                
+        Model transformed = DefaultConsumerPomBuilder.inlinePackagingActivatedProfiles(model, "jar");
+        
+        // matching profile should be removed and its deps added to model
+        // not-matching profile should be kept intact
+        // mixed profile should be kept but packaging activation stripped
+        assertEquals(2, transformed.getProfiles().size());
+        assertEquals("not-matching", transformed.getProfiles().get(0).getId());
+        assertEquals("war", transformed.getProfiles().get(0).getActivation().getPackaging());
+        
+        assertEquals("mixed", transformed.getProfiles().get(1).getId());
+        assertNull(transformed.getProfiles().get(1).getActivation().getPackaging());
+        assertEquals("11", transformed.getProfiles().get(1).getActivation().getJdk());
+        
+        assertEquals(1, transformed.getDependencies().size());
+        assertEquals("a1", transformed.getDependencies().get(0).getArtifactId());
     }
 }
