@@ -32,7 +32,6 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.SessionData;
 import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.Dependency;
-import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.Scm;
@@ -138,6 +137,32 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
 
         assertNotNull(model);
         assertNotNull(model.getDependencies());
+    }
+
+    @Test
+    void testPackagingActivatedProfiles() throws Exception {
+        MavenExecutionRequest request = setRootDirectory("packaging-profiles");
+        request.getUserProperties().setProperty("maven.consumer.pom.flatten", "true");
+        java.nio.file.Path file = java.nio.file.Paths.get("src/test/resources/consumer/packaging-profiles/pom.xml");
+
+        org.apache.maven.project.MavenProject project = getEffectiveModel(file);
+
+        org.apache.maven.api.model.Model model =
+                builder.build(session, project, org.apache.maven.api.services.Sources.buildSource(file));
+
+        assertNotNull(model);
+
+        assertEquals(1, model.getProfiles().size());
+        org.apache.maven.api.model.Profile mixedProfile = model.getProfiles().get(0);
+        assertEquals("mixed-profile", mixedProfile.getId());
+        assertNotNull(mixedProfile.getActivation());
+        assertNull(mixedProfile.getActivation().getPackaging());
+        assertNotNull(mixedProfile.getActivation().getProperty());
+        assertEquals("foo", mixedProfile.getActivation().getProperty().getName());
+
+        assertNotNull(model.getDependencies());
+        assertEquals(1, model.getDependencies().size());
+        assertEquals("slf4j-api", model.getDependencies().get(0).getArtifactId());
     }
 
     @Test
@@ -284,45 +309,51 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
 
     @Test
     void testInlinePackagingActivatedProfiles() {
-        Dependency dep1 = Dependency.newBuilder().groupId("g").artifactId("a1").version("1").build();
-        Dependency dep2 = Dependency.newBuilder().groupId("g").artifactId("a2").version("2").build();
-        
+        Dependency dep1 = Dependency.newBuilder()
+                .groupId("g")
+                .artifactId("a1")
+                .version("1")
+                .build();
+        Dependency dep2 = Dependency.newBuilder()
+                .groupId("g")
+                .artifactId("a2")
+                .version("2")
+                .build();
+
         Profile profileMatching = Profile.newBuilder()
                 .id("matching")
                 .activation(Activation.newBuilder().packaging("jar").build())
                 .dependencies(List.of(dep1))
                 .build();
-                
+
         Profile profileNotMatching = Profile.newBuilder()
                 .id("not-matching")
                 .activation(Activation.newBuilder().packaging("war").build())
                 .dependencies(List.of(dep2))
                 .build();
-                
+
         Profile profileMixed = Profile.newBuilder()
                 .id("mixed")
                 .activation(Activation.newBuilder().packaging("jar").jdk("11").build())
                 .dependencies(List.of(dep2))
                 .build();
-                
+
         Model model = Model.newBuilder()
                 .packaging("jar")
                 .profiles(List.of(profileMatching, profileNotMatching, profileMixed))
                 .build();
-                
+
         Model transformed = DefaultConsumerPomBuilder.inlinePackagingActivatedProfiles(model, "jar");
-        
+
         // matching profile should be removed and its deps added to model
-        // not-matching profile should be kept intact
+        // not-matching profile should be dropped entirely since its packaging condition can never be met
         // mixed profile should be kept but packaging activation stripped
-        assertEquals(2, transformed.getProfiles().size());
-        assertEquals("not-matching", transformed.getProfiles().get(0).getId());
-        assertEquals("war", transformed.getProfiles().get(0).getActivation().getPackaging());
-        
-        assertEquals("mixed", transformed.getProfiles().get(1).getId());
-        assertNull(transformed.getProfiles().get(1).getActivation().getPackaging());
-        assertEquals("11", transformed.getProfiles().get(1).getActivation().getJdk());
-        
+        assertEquals(1, transformed.getProfiles().size());
+
+        assertEquals("mixed", transformed.getProfiles().get(0).getId());
+        assertNull(transformed.getProfiles().get(0).getActivation().getPackaging());
+        assertEquals("11", transformed.getProfiles().get(0).getActivation().getJdk());
+
         assertEquals(1, transformed.getDependencies().size());
         assertEquals("a1", transformed.getDependencies().get(0).getArtifactId());
     }

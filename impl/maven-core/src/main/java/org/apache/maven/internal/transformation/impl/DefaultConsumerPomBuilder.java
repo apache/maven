@@ -426,6 +426,10 @@ class DefaultConsumerPomBuilder implements PomBuilder {
 
     static Model transformPom(Model model, MavenProject project) {
         boolean preserveModelVersion = model.isPreserveModelVersion();
+        String packaging = model.getPackaging();
+
+        // Inline packaging-activated profiles into the model
+        model = inlinePackagingActivatedProfiles(model, packaging);
 
         // raw to consumer transform
         model = model.withRoot(false).withModules(null).withSubprojects(null);
@@ -489,24 +493,23 @@ class DefaultConsumerPomBuilder implements PomBuilder {
             Activation activation = profile.getActivation();
             if (activation != null && activation.getPackaging() != null) {
                 if (Objects.equals(activation.getPackaging(), packaging)) {
-                    // Packaging matches — inline profile content into the model
-                    additionalDeps.addAll(profile.getDependencies());
-                    if (profile.getDependencyManagement() != null) {
-                        additionalManagedDeps.addAll(
-                                profile.getDependencyManagement().getDependencies());
-                    }
-                    additionalRepos.addAll(profile.getRepositories());
-
-                    // Check if the profile has other activation conditions besides packaging
                     Activation strippedActivation = stripPackagingActivation(activation);
                     if (strippedActivation != null) {
                         // Keep the profile but remove the packaging activation part
+                        // Do not inline its contents since it has other activation conditions
                         remainingProfiles.add(profile.withActivation(strippedActivation));
+                    } else {
+                        // Packaging is the ONLY condition.
+                        // Inline profile content into the model
+                        additionalDeps.addAll(profile.getDependencies());
+                        if (profile.getDependencyManagement() != null) {
+                            additionalManagedDeps.addAll(
+                                    profile.getDependencyManagement().getDependencies());
+                        }
+                        additionalRepos.addAll(profile.getRepositories());
                     }
-                    // else: profile only had packaging activation, fully inlined, drop it
                 } else {
-                    // Packaging does not match — keep the profile as-is
-                    remainingProfiles.add(profile);
+                    // Packaging does not match — drop the profile entirely
                 }
             } else {
                 // No packaging activation — keep the profile as-is
@@ -516,6 +519,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
 
         // Merge additional dependencies into the model
         if (!additionalDeps.isEmpty()) {
+            additionalDeps.removeIf(DefaultConsumerPomBuilder::hasDependencyScope);
             List<Dependency> allDeps = new ArrayList<>(model.getDependencies());
             allDeps.addAll(additionalDeps);
             model = model.withDependencies(allDeps);
@@ -524,9 +528,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         // Merge additional managed dependencies into the model
         if (!additionalManagedDeps.isEmpty()) {
             DependencyManagement dm = model.getDependencyManagement();
-            List<Dependency> allManagedDeps = dm != null
-                    ? new ArrayList<>(dm.getDependencies())
-                    : new ArrayList<>();
+            List<Dependency> allManagedDeps = dm != null ? new ArrayList<>(dm.getDependencies()) : new ArrayList<>();
             allManagedDeps.addAll(additionalManagedDeps);
             model = model.withDependencyManagement(
                     (dm != null ? dm : DependencyManagement.newInstance()).withDependencies(allManagedDeps));
@@ -547,9 +549,8 @@ class DefaultConsumerPomBuilder implements PomBuilder {
      * or {@code null} if packaging was the only activation condition.
      */
     private static Activation stripPackagingActivation(Activation activation) {
-        Activation stripped = Activation.newBuilder(activation, true)
-                .packaging(null)
-                .build();
+        Activation stripped =
+                Activation.newBuilder(activation, true).packaging(null).build();
         // Check if the remaining activation has any other conditions
         if (!stripped.isActiveByDefault()
                 && stripped.getJdk() == null
