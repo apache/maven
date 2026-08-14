@@ -444,10 +444,6 @@ class DefaultConsumerPomBuilder implements PomBuilder {
 
     private static Model transformBom(Model model, MavenProject project) {
         boolean preserveModelVersion = model.isPreserveModelVersion();
-        String packaging = model.getPackaging();
-
-        // Inline packaging-activated profiles into the model
-        model = inlinePackagingActivatedProfiles(model, packaging);
 
         Model.Builder builder = prune(
                 Model.newBuilder(model, true)
@@ -470,10 +466,6 @@ class DefaultConsumerPomBuilder implements PomBuilder {
 
     static Model transformPom(Model model, MavenProject project) {
         boolean preserveModelVersion = model.isPreserveModelVersion();
-        String packaging = model.getPackaging();
-
-        // Inline packaging-activated profiles into the model
-        model = inlinePackagingActivatedProfiles(model, packaging);
 
         // raw to consumer transform
         model = model.withRoot(false).withModules(null).withSubprojects(null);

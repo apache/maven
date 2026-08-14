@@ -128,6 +128,17 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         return project;
     }
 
+    private Model getConsumerModel(Path file, boolean raw) {
+        ModelBuilder.ModelBuilderSession mbs = modelBuilder.newSession();
+        InternalSession.from(session).getData().set(SessionData.key(ModelBuilder.ModelBuilderSession.class), mbs);
+        var result = mbs.build(ModelBuilderRequest.builder()
+                .session(InternalSession.from(session))
+                .source(Sources.buildSource(file))
+                .requestType(ModelBuilderRequest.RequestType.BUILD_CONSUMER)
+                .build());
+        return raw ? result.getRawModel() : result.getEffectiveModel();
+    }
+
     @Test
     void testTrivialConsumer() throws Exception {
         setRootDirectory("trivial");
@@ -142,14 +153,12 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
 
     @Test
     void testPackagingActivatedProfiles() throws Exception {
-        MavenExecutionRequest request = setRootDirectory("packaging-profiles");
-        request.getUserProperties().setProperty("maven.consumer.pom.flatten", "true");
-        java.nio.file.Path file = java.nio.file.Paths.get("src/test/resources/consumer/packaging-profiles/pom.xml");
+        setRootDirectory("packaging-profiles");
+        Path file = Paths.get("src/test/resources/consumer/packaging-profiles/pom.xml");
 
-        org.apache.maven.project.MavenProject project = getEffectiveModel(file);
+        MavenProject project = getEffectiveModel(file);
 
-        org.apache.maven.api.model.Model model =
-                builder.build(session, project, org.apache.maven.api.services.Sources.buildSource(file));
+        Model model = DefaultConsumerPomBuilder.transformNonPom(getConsumerModel(file, false), project);
 
         assertNotNull(model);
 
@@ -164,6 +173,21 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         assertNotNull(model.getDependencies());
         assertEquals(1, model.getDependencies().size());
         assertEquals("slf4j-api", model.getDependencies().get(0).getArtifactId());
+    }
+
+    @Test
+    void testParentPomPackagingActivatedProfilesArePreserved() throws Exception {
+        setRootDirectory("packaging-parent-profiles");
+        Path file = Paths.get("src/test/resources/consumer/packaging-parent-profiles/pom.xml");
+
+        MavenProject project = getEffectiveModel(file);
+        Model model = DefaultConsumerPomBuilder.transformPom(getConsumerModel(file, true), project);
+
+        assertEquals(1, model.getProfiles().size());
+        Profile profile = model.getProfiles().get(0);
+        assertEquals("jar-profile", profile.getId());
+        assertEquals("jar", profile.getActivation().getPackaging());
+        assertEquals("slf4j-api", profile.getDependencies().get(0).getArtifactId());
     }
 
     @Test
