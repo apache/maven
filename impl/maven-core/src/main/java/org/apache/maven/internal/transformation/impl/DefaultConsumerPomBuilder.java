@@ -442,7 +442,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         return model;
     }
 
-    private static Model transformBom(Model model, MavenProject project) {
+    static Model transformBom(Model model, MavenProject project) {
         boolean preserveModelVersion = model.isPreserveModelVersion();
 
         Model.Builder builder = prune(
@@ -513,7 +513,15 @@ class DefaultConsumerPomBuilder implements PomBuilder {
      * in Maven 3 or other tools like Gradle.
      * <p>
      * If the profile has other activation conditions besides packaging, only the packaging
-     * part is stripped from the activation.
+     * part is stripped from the activation; the profile's content is <b>not</b> inlined to
+     * preserve AND semantics (the content remains gated by the remaining conditions).
+     * <p>
+     * Profiles with a non-matching packaging activation are dropped entirely, since they
+     * can never activate for this artifact's fixed packaging and their presence would block
+     * model version downgrade to 4.0.0.
+     * <p>
+     * Non-transitive scope dependencies (test, provided, system) from inlined profiles are
+     * filtered out to prevent leakage into the consumer POM.
      *
      * @param model the model to process
      * @param packaging the project's packaging type
@@ -553,28 +561,45 @@ class DefaultConsumerPomBuilder implements PomBuilder {
             }
         }
 
-        // Merge additional dependencies into the model
+        // Merge additional dependencies into the model, deduplicating by key
         if (!additionalDeps.isEmpty()) {
             additionalDeps.removeIf(DefaultConsumerPomBuilder::hasDependencyScope);
-            List<Dependency> allDeps = new ArrayList<>(model.getDependencies());
-            allDeps.addAll(additionalDeps);
-            model = model.withDependencies(allDeps);
+            Map<String, Dependency> mergedDeps = new LinkedHashMap<>();
+            for (Dependency dep : model.getDependencies()) {
+                mergedDeps.put(getDependencyKey(dep), dep);
+            }
+            for (Dependency dep : additionalDeps) {
+                mergedDeps.putIfAbsent(getDependencyKey(dep), dep);
+            }
+            model = model.withDependencies(mergedDeps.values());
         }
 
-        // Merge additional managed dependencies into the model
+        // Merge additional managed dependencies into the model, deduplicating by key
         if (!additionalManagedDeps.isEmpty()) {
             DependencyManagement dm = model.getDependencyManagement();
-            List<Dependency> allManagedDeps = dm != null ? new ArrayList<>(dm.getDependencies()) : new ArrayList<>();
-            allManagedDeps.addAll(additionalManagedDeps);
-            model = model.withDependencyManagement(
-                    (dm != null ? dm : DependencyManagement.newInstance()).withDependencies(allManagedDeps));
+            Map<String, Dependency> mergedManagedDeps = new LinkedHashMap<>();
+            if (dm != null) {
+                for (Dependency dep : dm.getDependencies()) {
+                    mergedManagedDeps.put(getDependencyKey(dep), dep);
+                }
+            }
+            for (Dependency dep : additionalManagedDeps) {
+                mergedManagedDeps.putIfAbsent(getDependencyKey(dep), dep);
+            }
+            model = model.withDependencyManagement((dm != null ? dm : DependencyManagement.newInstance())
+                    .withDependencies(mergedManagedDeps.values()));
         }
 
-        // Merge additional repositories into the model
+        // Merge additional repositories into the model, deduplicating by id
         if (!additionalRepos.isEmpty()) {
-            List<Repository> allRepos = new ArrayList<>(model.getRepositories());
-            allRepos.addAll(additionalRepos);
-            model = model.withRepositories(allRepos);
+            Map<String, Repository> mergedRepos = new LinkedHashMap<>();
+            for (Repository repo : model.getRepositories()) {
+                mergedRepos.put(repo.getId(), repo);
+            }
+            for (Repository repo : additionalRepos) {
+                mergedRepos.putIfAbsent(repo.getId(), repo);
+            }
+            model = model.withRepositories(mergedRepos.values());
         }
 
         return model.withProfiles(remainingProfiles);
