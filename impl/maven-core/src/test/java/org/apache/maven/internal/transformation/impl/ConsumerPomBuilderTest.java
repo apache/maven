@@ -276,4 +276,108 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
                 consumerRequest.getRepositories().stream().anyMatch(r -> "custom-repo".equals(r.getId()));
         assertTrue(hasCustomRepo, "Consumer POM model builder request should include the project's custom repository");
     }
+
+    @Test
+    void testConsumerPomRetainsCompileApiRuntimeDeps() throws Exception {
+        // Consumer POMs must retain compile, api, and runtime dependencies
+        org.apache.maven.api.model.Dependency compileDep = org.apache.maven.api.model.Dependency.newBuilder()
+                .groupId("g")
+                .artifactId("compile-dep")
+                .version("1")
+                .scope("compile")
+                .build();
+        org.apache.maven.api.model.Dependency apiDep = org.apache.maven.api.model.Dependency.newBuilder()
+                .groupId("g")
+                .artifactId("api-dep")
+                .version("1")
+                .scope("api")
+                .build();
+        org.apache.maven.api.model.Dependency runtimeDep = org.apache.maven.api.model.Dependency.newBuilder()
+                .groupId("g")
+                .artifactId("runtime-dep")
+                .version("1")
+                .scope("runtime")
+                .build();
+        org.apache.maven.api.model.Dependency unscopedDep = org.apache.maven.api.model.Dependency.newBuilder()
+                .groupId("g")
+                .artifactId("unscoped-dep")
+                .version("1")
+                .build();
+
+        Model model = Model.newBuilder()
+                .groupId("test")
+                .artifactId("test")
+                .version("1.0")
+                .dependencies(List.of(compileDep, apiDep, runtimeDep, unscopedDep))
+                .build();
+
+        Model transformed = DefaultConsumerPomBuilder.transformNonPom(model, null);
+        assertNotNull(transformed.getDependencies());
+        // All four should be retained
+        assertTrue(
+                transformed.getDependencies().stream().anyMatch(d -> "compile-dep".equals(d.getArtifactId())),
+                "compile-scoped dep should be retained");
+        assertTrue(
+                transformed.getDependencies().stream().anyMatch(d -> "api-dep".equals(d.getArtifactId())),
+                "api-scoped dep should be retained");
+        assertTrue(
+                transformed.getDependencies().stream().anyMatch(d -> "runtime-dep".equals(d.getArtifactId())),
+                "runtime-scoped dep should be retained");
+        assertTrue(
+                transformed.getDependencies().stream().anyMatch(d -> "unscoped-dep".equals(d.getArtifactId())),
+                "unscoped (default compile) dep should be retained");
+    }
+
+    @Test
+    void testConsumerPomStripsProvidedTestSystemDeps() throws Exception {
+        // Consumer POMs must strip provided, test, and system dependencies
+        org.apache.maven.api.model.Dependency compileDep = org.apache.maven.api.model.Dependency.newBuilder()
+                .groupId("g")
+                .artifactId("compile-dep")
+                .version("1")
+                .scope("compile")
+                .build();
+        org.apache.maven.api.model.Dependency providedDep = org.apache.maven.api.model.Dependency.newBuilder()
+                .groupId("g")
+                .artifactId("provided-dep")
+                .version("1")
+                .scope("provided")
+                .build();
+        org.apache.maven.api.model.Dependency testDep = org.apache.maven.api.model.Dependency.newBuilder()
+                .groupId("g")
+                .artifactId("test-dep")
+                .version("1")
+                .scope("test")
+                .build();
+        org.apache.maven.api.model.Dependency systemDep = org.apache.maven.api.model.Dependency.newBuilder()
+                .groupId("g")
+                .artifactId("system-dep")
+                .version("1")
+                .scope("system")
+                .build();
+
+        Model model = Model.newBuilder()
+                .groupId("test")
+                .artifactId("test")
+                .version("1.0")
+                .dependencies(List.of(compileDep, providedDep, testDep, systemDep))
+                .build();
+
+        Model transformed = DefaultConsumerPomBuilder.transformNonPom(model, null);
+        assertNotNull(transformed.getDependencies());
+        // compile should be retained
+        assertTrue(
+                transformed.getDependencies().stream().anyMatch(d -> "compile-dep".equals(d.getArtifactId())),
+                "compile-scoped dep should be retained");
+        // provided, test, system should be stripped
+        assertFalse(
+                transformed.getDependencies().stream().anyMatch(d -> "provided-dep".equals(d.getArtifactId())),
+                "provided-scoped dep should be stripped");
+        assertFalse(
+                transformed.getDependencies().stream().anyMatch(d -> "test-dep".equals(d.getArtifactId())),
+                "test-scoped dep should be stripped");
+        assertFalse(
+                transformed.getDependencies().stream().anyMatch(d -> "system-dep".equals(d.getArtifactId())),
+                "system-scoped dep should be stripped");
+    }
 }
