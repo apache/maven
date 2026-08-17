@@ -20,8 +20,11 @@ package org.apache.maven.model.v4;
 
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.List;
 
 import org.apache.maven.api.model.Build;
+import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.model.PluginExecution;
@@ -70,6 +73,44 @@ class MavenModelVersionTest {
                 .withPlugins(Collections.singleton(Plugin.newInstance()
                         .withExecutions(Collections.singleton(
                                 PluginExecution.newInstance().withPriority(5))))));
+        assertEquals("4.0.0", new MavenModelVersion().getModelVersion(m));
+    }
+
+    @Test
+    void testApiScopeDependencyRequires410() {
+        // A model with an api-scoped dependency should require modelVersion 4.1.0
+        Model m = model.withDependencies(List.of(Dependency.newBuilder()
+                .groupId("org.example")
+                .artifactId("api-lib")
+                .version("1.0")
+                .scope("api")
+                .build()));
+        assertEquals("4.1.0", new MavenModelVersion().getModelVersion(m));
+    }
+
+    @Test
+    void testApiScopeInDependencyManagementRequires410() {
+        // A model with an api-scoped dependency in dependencyManagement should require 4.1.0
+        Model m = model.withDependencyManagement(DependencyManagement.newBuilder()
+                .dependencies(List.of(Dependency.newBuilder()
+                        .groupId("org.example")
+                        .artifactId("api-lib")
+                        .version("1.0")
+                        .scope("api")
+                        .build()))
+                .build());
+        assertEquals("4.1.0", new MavenModelVersion().getModelVersion(m));
+    }
+
+    @Test
+    void testCompileScopeDependencyRemains400() {
+        // A model with only compile-scoped dependencies should stay at 4.0.0
+        Model m = model.withDependencies(List.of(Dependency.newBuilder()
+                .groupId("org.example")
+                .artifactId("compile-lib")
+                .version("1.0")
+                .scope("compile")
+                .build()));
         assertEquals("4.0.0", new MavenModelVersion().getModelVersion(m));
     }
 }

@@ -185,6 +185,7 @@ public class ${className} {
                                 && model.getDependencyManagement().getDependencies().stream()
                                         .anyMatch(dependency -> "api".equals(dependency.getScope()))));
     }
+
     private boolean has(String str) {
         return str != null;
     }
