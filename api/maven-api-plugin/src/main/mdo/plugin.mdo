@@ -283,13 +283,6 @@ under the License.
           <defaultValue>true</defaultValue>
         </field>
         <field>
-          <name>requiresReports</name>
-          <version>1.0.0</version><!-- no longer part of 1.1.0 -->
-          <type>boolean</type>
-          <description>Flags this Mojo to require running inside of a reports context. Unsupported since Maven 3.0.</description>
-          <defaultValue>false</defaultValue>
-        </field>
-        <field>
           <name>requiresOnline</name>
           <version>1.0.0/1.1.0</version>
           <type>boolean</type>
