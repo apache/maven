@@ -49,6 +49,7 @@ public class MonotonicClock extends Clock {
 
     private final long startNanos;
     private final Instant startInstant;
+    private final ZoneId zone;
 
     /**
      * Private constructor to enforce singleton pattern.
@@ -57,6 +58,7 @@ public class MonotonicClock extends Clock {
     private MonotonicClock() {
         this.startNanos = System.nanoTime();
         this.startInstant = Clock.systemUTC().instant();
+        this.zone = ZoneOffset.UTC;
     }
 
     /**
@@ -146,27 +148,50 @@ public class MonotonicClock extends Clock {
     }
 
     /**
-     * Returns the zone ID of this clock, which is always UTC.
+     * Returns the zone ID of this clock.
+     * <p>
+     * The singleton instance always returns UTC. Clock instances created
+     * via {@link #withZone(ZoneId)} return their configured timezone.
      *
-     * @return the UTC zone ID
+     * @return the zone ID
      */
     @Override
     public ZoneId getZone() {
-        return ZoneOffset.UTC;
+        return zone;
     }
 
     /**
-     * Returns this clock since timezone adjustments are not supported.
+     * Returns a copy of this clock with the specified timezone.
      * <p>
-     * This implementation maintains UTC time to ensure monotonic behavior.
-     * The provided zone parameter is ignored.
+     * Since {@link Instant} instances are timezone-agnostic and the monotonic
+     * property derives from {@link System#nanoTime()}, the returned clock
+     * maintains identical monotonic timing but reports the requested timezone.
      *
-     * @param zone the target timezone (ignored)
-     * @return this clock instance
+     * @param zone the target timezone, or {@code null} to use UTC
+     * @return a new clock with the specified timezone
+     * @throws IllegalArgumentException if zone is {@code null}
      */
     @Override
     public Clock withZone(ZoneId zone) {
-        // Monotonic clock is always UTC-based
-        return this;
+        if (zone == null) {
+            throw new IllegalArgumentException("Zone must not be null");
+        }
+        return new MonotonicClock(startNanos, startInstant, zone);
+    }
+
+    /**
+     * Creates a new MonotonicClock with the specified timezone.
+     * <p>
+     * This constructor allows creating timezone variants of the clock while
+     * maintaining the same monotonic timing base.
+     *
+     * @param startNanos the monotonic start time in nanoseconds
+     * @param startInstant the wall-clock start time
+     * @param zone the timezone for this clock variant
+     */
+    private MonotonicClock(long startNanos, Instant startInstant, ZoneId zone) {
+        this.startNanos = startNanos;
+        this.startInstant = startInstant;
+        this.zone = zone;
     }
 }
