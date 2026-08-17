@@ -291,7 +291,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         } else {
             scope = DependencyScope.forId(scopeId);
         }
-        return scope == null || !scope.isTransitive();
+        return scope != DependencyScope.COMPILE && scope != DependencyScope.RUNTIME && scope != DependencyScope.API;
     }
 
     private Dependency merge(Dependency dep1, Dependency dep2) {

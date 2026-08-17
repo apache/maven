@@ -62,7 +62,7 @@ public enum DependencyScope {
     COMPILE_ONLY("compile-only", false),
 
     /**
-     * Compile, runtime and test.
+     * Compile, runtime and test (non-transitive).
      */
     COMPILE("compile", false),
 
