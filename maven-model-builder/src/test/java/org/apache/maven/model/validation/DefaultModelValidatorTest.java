@@ -890,4 +890,20 @@ public class DefaultModelValidatorTest {
         SimpleProblemCollector result = validateRaw("raw-model/minimal-without-parent.xml");
         assertViolations(result, 0, 0, 0);
     }
+
+    @Test
+    public void testBadParentRelativePath1() throws Exception {
+        SimpleProblemCollector result = validateRaw("raw-model/bad-parent-relativePath1.xml");
+        assertViolations(result, 0, 1, 0);
+
+        assertEquals(
+                "'parent.relativePath' must not contain any of these characters :\"<>|?* but found :",
+                result.getErrors().get(0));
+    }
+
+    @Test
+    public void testOkParentRelativePath1() throws Exception {
+        SimpleProblemCollector result = validateRaw("raw-model/ok-parent-relativePath1.xml");
+        assertViolations(result, 0, 0, 0);
+    }
 }
