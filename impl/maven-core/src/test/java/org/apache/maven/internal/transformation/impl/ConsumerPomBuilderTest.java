@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.api.DependencyCoordinates;
@@ -32,8 +33,10 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.SessionData;
 import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Profile;
+import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.model.Scm;
 import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.DependencyResolverResult;
@@ -187,6 +190,23 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         assertEquals("jar-profile", profile.getId());
         assertEquals("jar", profile.getActivation().getPackaging());
         assertEquals("slf4j-api", profile.getDependencies().get(0).getArtifactId());
+    }
+
+    @Test
+    void testBomPackagingActivatedProfilesArePreserved() throws Exception {
+        setRootDirectory("packaging-bom-profiles");
+        Path file = Paths.get("src/test/resources/consumer/packaging-bom-profiles/pom.xml");
+
+        MavenProject project = getEffectiveModel(file);
+        Model model = DefaultConsumerPomBuilder.transformBom(getConsumerModel(file, true), project);
+
+        assertEquals(1, model.getProfiles().size());
+        Profile profile = model.getProfiles().get(0);
+        assertEquals("jar-profile", profile.getId());
+        assertEquals("jar", profile.getActivation().getPackaging());
+        assertEquals(
+                "slf4j-api",
+                profile.getDependencyManagement().getDependencies().get(0).getArtifactId());
     }
 
     @Test
@@ -380,5 +400,104 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
 
         assertEquals(1, transformed.getDependencies().size());
         assertEquals("a1", transformed.getDependencies().get(0).getArtifactId());
+    }
+
+    @Test
+    void testInlinePackagingActivatedProfilesDependencyManagement() {
+        Dependency managedDep = Dependency.newBuilder()
+                .groupId("g")
+                .artifactId("managed1")
+                .version("1.0")
+                .build();
+
+        Profile profileWithDM = Profile.newBuilder()
+                .id("dm-profile")
+                .activation(Activation.newBuilder().packaging("jar").build())
+                .dependencyManagement(DependencyManagement.newBuilder()
+                        .dependencies(Collections.singletonList(managedDep))
+                        .build())
+                .build();
+
+        Model model = Model.newBuilder()
+                .packaging("jar")
+                .profiles(List.of(profileWithDM))
+                .build();
+
+        Model transformed = DefaultConsumerPomBuilder.inlinePackagingActivatedProfiles(model, "jar");
+
+        // Profile should be removed
+        assertTrue(transformed.getProfiles().isEmpty());
+
+        // Managed dependency should be inlined
+        assertNotNull(transformed.getDependencyManagement());
+        assertEquals(1, transformed.getDependencyManagement().getDependencies().size());
+        assertEquals(
+                "managed1",
+                transformed.getDependencyManagement().getDependencies().get(0).getArtifactId());
+    }
+
+    @Test
+    void testInlinePackagingActivatedProfilesRepositories() {
+        Repository repo = Repository.newBuilder()
+                .id("custom-repo")
+                .url("https://repo.example.com/maven2")
+                .build();
+
+        Profile profileWithRepo = Profile.newBuilder()
+                .id("repo-profile")
+                .activation(Activation.newBuilder().packaging("jar").build())
+                .repositories(Collections.singletonList(repo))
+                .build();
+
+        Model model = Model.newBuilder()
+                .packaging("jar")
+                .profiles(List.of(profileWithRepo))
+                .build();
+
+        Model transformed = DefaultConsumerPomBuilder.inlinePackagingActivatedProfiles(model, "jar");
+
+        // Profile should be removed
+        assertTrue(transformed.getProfiles().isEmpty());
+
+        // Repository should be inlined
+        assertEquals(1, transformed.getRepositories().size());
+        assertEquals("custom-repo", transformed.getRepositories().get(0).getId());
+    }
+
+    @Test
+    void testInlinePackagingActivatedProfilesDeduplication() {
+        Dependency existingDep = Dependency.newBuilder()
+                .groupId("g")
+                .artifactId("a1")
+                .version("1.0")
+                .build();
+
+        // Profile re-declares the same dependency with a different version
+        Dependency duplicateDep = Dependency.newBuilder()
+                .groupId("g")
+                .artifactId("a1")
+                .version("2.0")
+                .build();
+
+        Profile profileWithDuplicate = Profile.newBuilder()
+                .id("dup-profile")
+                .activation(Activation.newBuilder().packaging("jar").build())
+                .dependencies(List.of(duplicateDep))
+                .build();
+
+        Model model = Model.newBuilder()
+                .packaging("jar")
+                .dependencies(List.of(existingDep))
+                .profiles(List.of(profileWithDuplicate))
+                .build();
+
+        Model transformed = DefaultConsumerPomBuilder.inlinePackagingActivatedProfiles(model, "jar");
+
+        // Should NOT have duplicates — existing model dependency takes precedence
+        assertEquals(1, transformed.getDependencies().size());
+        assertEquals(
+                "1.0",
+                transformed.getDependencies().get(0).getVersion(),
+                "Existing model dependency should take precedence over profile duplicate");
     }
 }
