@@ -19,12 +19,18 @@
 package org.apache.maven.impl.resolver;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 
 import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.services.ModelBuilder;
 import org.eclipse.aether.artifact.ArtifactType;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 import org.eclipse.aether.artifact.DefaultArtifactType;
+import org.eclipse.aether.impl.ArtifactResolver;
+import org.eclipse.aether.impl.RepositoryEventDispatcher;
+import org.eclipse.aether.impl.VersionResolver;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -33,7 +39,12 @@ class DefaultArtifactDescriptorReaderTest {
     @Test
     void testRemapCompileToApi() throws Exception {
         // Create an instance of DefaultArtifactDescriptorReader
-        DefaultArtifactDescriptorReader reader = new DefaultArtifactDescriptorReader(null, null, null, null, null);
+        DefaultArtifactDescriptorReader reader = new DefaultArtifactDescriptorReader(
+                Mockito.mock(VersionResolver.class),
+                Mockito.mock(ArtifactResolver.class),
+                Mockito.mock(ModelBuilder.class),
+                Mockito.mock(RepositoryEventDispatcher.class),
+                Collections.emptyMap());
 
         // Get the private convert() method via reflection
         Method convertMethod = DefaultArtifactDescriptorReader.class.getDeclaredMethod(
