@@ -161,11 +161,30 @@ public class ${className} {
             #end
             #set ( $pfx = "||" )
         #end
+        #if ( $v == "4_1_0" && $class.name == "Model" )
+            $pfx hasApiDependency(${var}) // Dependency scope api
+        #end
         );
     }
     #end
 
 #end
+    private boolean hasApiDependency(Model model) {
+        return hasApiDependency((ModelBase) model)
+                || model.getProfiles().stream().anyMatch(this::hasApiDependency);
+    }
+
+    private boolean hasApiDependency(Profile profile) {
+        return hasApiDependency((ModelBase) profile);
+    }
+
+    private boolean hasApiDependency(ModelBase model) {
+        return model != null
+                && (model.getDependencies().stream().anyMatch(dependency -> "api".equals(dependency.getScope()))
+                        || (model.getDependencyManagement() != null
+                                && model.getDependencyManagement().getDependencies().stream()
+                                        .anyMatch(dependency -> "api".equals(dependency.getScope()))));
+    }
     private boolean has(String str) {
         return str != null;
     }
