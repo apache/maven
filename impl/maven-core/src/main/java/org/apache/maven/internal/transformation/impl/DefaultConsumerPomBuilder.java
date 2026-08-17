@@ -257,7 +257,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                 }
                 return dependency;
             });
-            // Only keep transitive scopes (null/empty => COMPILE)
+            // Only keep consumer-visible scopes (compile, api, runtime)
             directDependencies.values().removeIf(DefaultConsumerPomBuilder::hasDependencyScope);
             managedDependencies.keySet().removeAll(directDependencies.keySet());
 
@@ -275,7 +275,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                             Function.identity(),
                             this::merge,
                             LinkedHashMap::new));
-            // Only keep transitive scopes
+            // Only keep consumer-visible scopes (compile, api, runtime)
             directDependencies.values().removeIf(DefaultConsumerPomBuilder::hasDependencyScope);
             model = model.withDependencies(directDependencies.isEmpty() ? null : directDependencies.values());
         }
