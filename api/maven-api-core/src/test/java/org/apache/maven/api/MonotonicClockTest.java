@@ -78,14 +78,24 @@ class MonotonicClockTest {
     }
 
     @Test
-    @DisplayName("withZone() should throw on null zone")
+    @DisplayName("withZone() with the same zone should return the same instance")
+    void testWithZoneSameZoneReturnsThis() {
+        MonotonicClock clock = MonotonicClock.get();
+
+        // Requesting UTC from a UTC clock should return the same instance
+        assertSame(
+                clock, clock.withZone(ZoneOffset.UTC), "withZone(UTC) should return this when the zone is already UTC");
+    }
+
+    @Test
+    @DisplayName("withZone() should throw NullPointerException on null zone")
     void testWithZoneNullThrows() {
         MonotonicClock clock = MonotonicClock.get();
 
         org.junit.jupiter.api.Assertions.assertThrows(
-                IllegalArgumentException.class,
+                NullPointerException.class,
                 () -> clock.withZone(null),
-                "withZone(null) should throw IllegalArgumentException");
+                "withZone(null) should throw NullPointerException");
     }
 
     @Test

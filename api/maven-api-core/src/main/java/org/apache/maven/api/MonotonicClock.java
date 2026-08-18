@@ -32,9 +32,10 @@ import java.time.ZoneOffset;
  * is computed from the monotonic duration since system start to ensure consistency
  * between time measurements.
  * <p>
- * This implementation is singleton-based and always uses UTC timezone. The clock
- * cannot be adjusted to different timezones to maintain consistent monotonic behavior.
- * Users needing local time representation should convert the result of {@link #instant()}
+ * This implementation uses UTC timezone for the singleton instance.
+ * Timezone variants can be created via {@link #withZone(ZoneId)} while maintaining
+ * the same monotonic timing base. Users needing local time representation can either
+ * use {@link #withZone(ZoneId)} or convert the result of {@link #instant()}
  * to their desired timezone:
  * <pre>{@code
  * Instant now = MonotonicClock.now();
@@ -167,14 +168,15 @@ public class MonotonicClock extends Clock {
      * property derives from {@link System#nanoTime()}, the returned clock
      * maintains identical monotonic timing but reports the requested timezone.
      *
-     * @param zone the target timezone, or {@code null} to use UTC
+     * @param zone the target timezone, not null
      * @return a new clock with the specified timezone
-     * @throws IllegalArgumentException if zone is {@code null}
+     * @throws NullPointerException if zone is {@code null}
      */
     @Override
     public Clock withZone(ZoneId zone) {
-        if (zone == null) {
-            throw new IllegalArgumentException("Zone must not be null");
+        java.util.Objects.requireNonNull(zone, "zone");
+        if (zone.equals(this.zone)) {
+            return this;
         }
         return new MonotonicClock(startNanos, startInstant, zone);
     }
