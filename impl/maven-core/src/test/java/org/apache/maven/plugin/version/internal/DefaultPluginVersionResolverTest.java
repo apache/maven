@@ -83,6 +83,7 @@ class DefaultPluginVersionResolverTest {
                 "1.0-rc-1",
                 "1.0-rc1",
                 "1.0-cr1",
+                "1.0-b2", // short form, as GenericQualifiers reads it
                 "1.0.beta.1", // the scheme treats '.' and '-' as the same separator
                 "1.0_alpha_1",
                 "1.0-SNAPSHOT"
@@ -99,6 +100,7 @@ class DefaultPluginVersionResolverTest {
                 "3.15.0",
                 "4.0.0",
                 "33.7.0-jre", // vendor/classifier qualifier, not a pre-release
+                "1.0-arc", // contains "rc" but is not a release candidate
                 "1.0-sp1", // service pack: sorts *after* the release
                 "1.0-final", // alias of the release itself
                 "1.0-ga"

@@ -58,6 +58,7 @@ import org.eclipse.aether.repository.ArtifactRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.MetadataRequest;
 import org.eclipse.aether.resolution.MetadataResult;
+import org.eclipse.aether.util.version.GenericQualifiers;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionScheme;
@@ -317,53 +318,22 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
     }
 
     /**
-     * Does this version sort <em>before</em> the version it qualifies, i.e. is it an unstable
-     * precursor of it such as {@code 4.0.0-beta-1}, {@code 1.0-alpha-2} or {@code 1.0-SNAPSHOT}?
+     * Is this an unstable precursor of its base version, such as {@code 4.0.0-beta-1},
+     * {@code 1.0-alpha-2} or {@code 1.0-SNAPSHOT}?
      * <p>
-     * Decided with the version scheme itself rather than with a list of qualifier names: a pre-release
-     * qualifier sorts before its base version ({@code 1.0-beta-1 < 1.0}), while a build or vendor
-     * qualifier does not ({@code 1.0-jre > 1.0}). Snapshots satisfy this too; callers classify them
-     * first, so they never reach the pre-release bucket.
+     * Delegates to the version scheme's own qualifier table: a negative qualifier shift marks a
+     * preview version (alpha, beta, milestone, rc/cr, snapshot), zero a final one (ga, final,
+     * release) and a positive one a service pack. Versions without a recognised qualifier -- and
+     * that includes build or vendor qualifiers such as {@code 33.7.0-jre} -- are not pre-releases.
+     * Snapshots satisfy this too; callers classify them first, so they never reach the pre-release
+     * bucket.
      *
-     * @param version the version to inspect, may be unparseable
+     * @param version the version to inspect, may carry no qualifier at all
      * @return {@code true} if the version is an unstable precursor of its base version
      */
     // package-private for testing
     boolean isPreRelease(String version) {
-        String base = baseVersionOf(version);
-        if (base.isEmpty() || base.length() == version.length()) {
-            return false;
-        }
-        try {
-            return versionScheme.parseVersion(version).compareTo(versionScheme.parseVersion(base)) < 0;
-        } catch (InvalidVersionSpecificationException e) {
-            return false;
-        }
-    }
-
-    /**
-     * The numeric prefix of a version, i.e. everything before its first non-numeric token.
-     * <p>
-     * Tokens are separated by {@code -}, {@code .} or {@code _}, which the version scheme treats
-     * interchangeably: {@code 1.0-beta-1} and {@code 1.0.beta.1} are the same version, and both have
-     * the base version {@code 1.0}.
-     */
-    private static String baseVersionOf(String version) {
-        int end = 0;
-        int token = 0;
-        for (int i = 0; i <= version.length(); i++) {
-            char c = i < version.length() ? version.charAt(i) : '-';
-            if (c == '-' || c == '.' || c == '_') {
-                if (i == token) {
-                    break; // empty token, e.g. a leading or doubled separator
-                }
-                end = i;
-                token = i + 1;
-            } else if (c < '0' || c > '9') {
-                break;
-            }
-        }
-        return version.substring(0, end);
+        return GenericQualifiers.qualifier(version).orElse(GenericQualifiers.QUALIFIER_ZERO) < 0;
     }
 
     private boolean isCompatible(PluginVersionRequest request, String version) {
