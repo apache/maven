@@ -293,7 +293,8 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
     /**
      * Does the repository offer at least one version that is neither a snapshot nor a pre-release?
      */
-    private boolean hasStableVersion(Versions versions) {
+    // package-private for testing
+    boolean hasStableVersion(Versions versions) {
         for (String ver : versions.versions.keySet()) {
             if (!ver.endsWith("-SNAPSHOT") && !isPreRelease(ver)) {
                 return true;
@@ -309,7 +310,8 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
      * qualifier sorts <em>before</em> the version it qualifies ({@code 1.0-beta-1 < 1.0}), while a build
      * or vendor qualifier does not ({@code 1.0-jre > 1.0}).
      */
-    private boolean isPreRelease(String version) {
+    // package-private for testing
+    boolean isPreRelease(String version) {
         int qualifier = version.indexOf('-');
         if (qualifier <= 0) {
             return false;
