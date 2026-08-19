@@ -172,7 +172,8 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
         return result;
     }
 
-    private void selectVersion(DefaultPluginVersionResult result, PluginVersionRequest request, Versions versions)
+    // package-private for testing
+    void selectVersion(DefaultPluginVersionResult result, PluginVersionRequest request, Versions versions)
             throws PluginVersionResolutionException {
         String version = null;
         ArtifactRepository repo = null;
@@ -234,7 +235,7 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
 
             version = selectCompatible(request, releases, "RELEASE");
             if (version == null) {
-                version = selectCompatible(request, preReleases, "pre-release");
+                version = selectCompatible(request, preReleases, "PRE-RELEASE");
             }
             if (version == null) {
                 version = selectCompatible(request, snapshots, "SNAPSHOT");
@@ -296,7 +297,7 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
     // package-private for testing
     boolean hasStableVersion(Versions versions) {
         for (String ver : versions.versions.keySet()) {
-            if (!ver.endsWith("-SNAPSHOT") && !isPreRelease(ver)) {
+            if (!ver.endsWith("-SNAPSHOT") && !isPreRelease(ver) && isParseable(ver)) {
                 return true;
             }
         }
@@ -304,26 +305,65 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
     }
 
     /**
-     * Is this a pre-release version such as {@code 4.0.0-beta-1} or {@code 1.0-alpha-2}?
-     * <p>
-     * Decided with the version scheme itself rather than with a list of qualifier names: a pre-release
-     * qualifier sorts <em>before</em> the version it qualifies ({@code 1.0-beta-1 < 1.0}), while a build
-     * or vendor qualifier does not ({@code 1.0-jre > 1.0}).
+     * Only versions the scheme can parse are selectable, so only those may count as a stable fallback.
      */
-    // package-private for testing
-    boolean isPreRelease(String version) {
-        int qualifier = version.indexOf('-');
-        if (qualifier <= 0) {
-            return false;
-        }
+    private boolean isParseable(String version) {
         try {
-            return versionScheme
-                            .parseVersion(version)
-                            .compareTo(versionScheme.parseVersion(version.substring(0, qualifier)))
-                    < 0;
+            versionScheme.parseVersion(version);
+            return true;
         } catch (InvalidVersionSpecificationException e) {
             return false;
         }
+    }
+
+    /**
+     * Does this version sort <em>before</em> the version it qualifies, i.e. is it an unstable
+     * precursor of it such as {@code 4.0.0-beta-1}, {@code 1.0-alpha-2} or {@code 1.0-SNAPSHOT}?
+     * <p>
+     * Decided with the version scheme itself rather than with a list of qualifier names: a pre-release
+     * qualifier sorts before its base version ({@code 1.0-beta-1 < 1.0}), while a build or vendor
+     * qualifier does not ({@code 1.0-jre > 1.0}). Snapshots satisfy this too; callers classify them
+     * first, so they never reach the pre-release bucket.
+     *
+     * @param version the version to inspect, may be unparseable
+     * @return {@code true} if the version is an unstable precursor of its base version
+     */
+    // package-private for testing
+    boolean isPreRelease(String version) {
+        String base = baseVersionOf(version);
+        if (base.isEmpty() || base.length() == version.length()) {
+            return false;
+        }
+        try {
+            return versionScheme.parseVersion(version).compareTo(versionScheme.parseVersion(base)) < 0;
+        } catch (InvalidVersionSpecificationException e) {
+            return false;
+        }
+    }
+
+    /**
+     * The numeric prefix of a version, i.e. everything before its first non-numeric token.
+     * <p>
+     * Tokens are separated by {@code -}, {@code .} or {@code _}, which the version scheme treats
+     * interchangeably: {@code 1.0-beta-1} and {@code 1.0.beta.1} are the same version, and both have
+     * the base version {@code 1.0}.
+     */
+    private static String baseVersionOf(String version) {
+        int end = 0;
+        int token = 0;
+        for (int i = 0; i <= version.length(); i++) {
+            char c = i < version.length() ? version.charAt(i) : '-';
+            if (c == '-' || c == '.' || c == '_') {
+                if (i == token) {
+                    break; // empty token, e.g. a leading or doubled separator
+                }
+                end = i;
+                token = i + 1;
+            } else if (c < '0' || c > '9') {
+                break;
+            }
+        }
+        return version.substring(0, end);
     }
 
     private boolean isCompatible(PluginVersionRequest request, String version) {
