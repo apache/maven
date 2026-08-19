@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <plugins>
+    <plugin>
+      <name>Maven IT Plugin :: pre-release version selection</name>
+      <prefix>it-prerelease</prefix>
+      <artifactId>maven-it-plugin-prerelease</artifactId>
+    </plugin>
+  </plugins>
+</metadata>
