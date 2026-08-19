@@ -186,6 +186,21 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
             version = versions.latestVersion;
             repo = versions.latestRepository;
         }
+        // A pre-release (alpha/beta/milestone/rc) is a "release" as far as repository metadata is
+        // concerned, but it is not what a user asking for an unversioned plugin expects: such
+        // versions are typically built against unstable APIs. Prefer a stable version whenever the
+        // repository offers one, and fall back to the pre-release only when it does not.
+        if (version != null && isPreRelease(version) && hasStableVersion(versions)) {
+            logger.info(
+                    "Metadata of plugin {}:{} points at pre-release version {}, looking for a stable version",
+                    request.getGroupId(),
+                    request.getArtifactId(),
+                    version);
+            version = null;
+            repo = null;
+            searchPerformed = true;
+        }
+
         if (version != null && !isCompatible(request, version)) {
             logger.info(
                     "Latest version of plugin {}:{} failed compatibility check",
@@ -198,6 +213,7 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
 
         if (version == null) {
             TreeSet<Version> releases = new TreeSet<>(Collections.reverseOrder());
+            TreeSet<Version> preReleases = new TreeSet<>(Collections.reverseOrder());
             TreeSet<Version> snapshots = new TreeSet<>(Collections.reverseOrder());
 
             for (String ver : versions.versions.keySet()) {
@@ -206,6 +222,8 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
 
                     if (ver.endsWith("-SNAPSHOT")) {
                         snapshots.add(v);
+                    } else if (isPreRelease(ver)) {
+                        preReleases.add(v);
                     } else {
                         releases.add(v);
                     }
@@ -214,34 +232,15 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
                 }
             }
 
-            if (!releases.isEmpty()) {
-                logger.info(
-                        "Looking for compatible RELEASE version of plugin {}:{}",
-                        request.getGroupId(),
-                        request.getArtifactId());
-                for (Version v : releases) {
-                    String ver = v.toString();
-                    if (isCompatible(request, ver)) {
-                        version = ver;
-                        repo = versions.versions.get(version);
-                        break;
-                    }
-                }
+            version = selectCompatible(request, releases, "RELEASE");
+            if (version == null) {
+                version = selectCompatible(request, preReleases, "pre-release");
             }
-
-            if (version == null && !snapshots.isEmpty()) {
-                logger.info(
-                        "Looking for compatible SNAPSHOT version of plugin {}:{}",
-                        request.getGroupId(),
-                        request.getArtifactId());
-                for (Version v : snapshots) {
-                    String ver = v.toString();
-                    if (isCompatible(request, ver)) {
-                        version = ver;
-                        repo = versions.versions.get(version);
-                        break;
-                    }
-                }
+            if (version == null) {
+                version = selectCompatible(request, snapshots, "SNAPSHOT");
+            }
+            if (version != null) {
+                repo = versions.versions.get(version);
             }
         }
 
@@ -267,6 +266,61 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
                     resolvedPluginVersions
                             ? "Could not find compatible plugin version in any plugin repository"
                             : "Plugin not found in any plugin repository");
+        }
+    }
+
+    /**
+     * Returns the newest version of {@code candidates} that passes {@link #isCompatible}, or {@code null}.
+     */
+    private String selectCompatible(PluginVersionRequest request, TreeSet<Version> candidates, String kind) {
+        if (candidates.isEmpty()) {
+            return null;
+        }
+        logger.info(
+                "Looking for compatible {} version of plugin {}:{}",
+                kind,
+                request.getGroupId(),
+                request.getArtifactId());
+        for (Version v : candidates) {
+            String ver = v.toString();
+            if (isCompatible(request, ver)) {
+                return ver;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Does the repository offer at least one version that is neither a snapshot nor a pre-release?
+     */
+    private boolean hasStableVersion(Versions versions) {
+        for (String ver : versions.versions.keySet()) {
+            if (!ver.endsWith("-SNAPSHOT") && !isPreRelease(ver)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Is this a pre-release version such as {@code 4.0.0-beta-1} or {@code 1.0-alpha-2}?
+     * <p>
+     * Decided with the version scheme itself rather than with a list of qualifier names: a pre-release
+     * qualifier sorts <em>before</em> the version it qualifies ({@code 1.0-beta-1 < 1.0}), while a build
+     * or vendor qualifier does not ({@code 1.0-jre > 1.0}).
+     */
+    private boolean isPreRelease(String version) {
+        int qualifier = version.indexOf('-');
+        if (qualifier <= 0) {
+            return false;
+        }
+        try {
+            return versionScheme
+                            .parseVersion(version)
+                            .compareTo(versionScheme.parseVersion(version.substring(0, qualifier)))
+                    < 0;
+        } catch (InvalidVersionSpecificationException e) {
+            return false;
         }
     }
 
