@@ -21,9 +21,17 @@ package org.apache.maven.impl.model;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Spliterator;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
@@ -35,6 +43,7 @@ import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
+import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.Sources;
 import org.apache.maven.impl.standalone.ApiRunner;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,6 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -71,6 +81,78 @@ class DefaultModelBuilderTest {
         ModelBuilderResult result = builder.newSession().build(request);
         assertNotNull(result);
         assertEquals("21", result.getEffectiveModel().getProperties().get("maven.compiler.release"));
+    }
+
+    @Test
+    void testMappedSourcesSupportsConcurrentUpdates() throws Exception {
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("simple-standalone")))
+                .build();
+        DefaultModelBuilder.ModelBuilderSessionState state =
+                ((DefaultModelBuilder) builder).new ModelBuilderSessionState(request);
+
+        int threadCount = 16;
+        int sourcesPerThread = 500;
+        CountDownLatch ready = new CountDownLatch(threadCount);
+        CountDownLatch start = new CountDownLatch(1);
+        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+        List<Future<?>> futures = new ArrayList<>(threadCount);
+        try {
+            for (int thread = 0; thread < threadCount; thread++) {
+                int threadId = thread;
+                futures.add(executor.submit(() -> {
+                    ready.countDown();
+                    assertTrue(start.await(10, TimeUnit.SECONDS));
+                    for (int source = 0; source < sourcesPerThread; source++) {
+                        state.putSource(
+                                "org.apache.maven.test",
+                                "shared-artifact",
+                                Sources.buildSource(Path.of("target", "source-" + threadId + '-' + source, "pom.xml")));
+                    }
+                    return null;
+                }));
+            }
+            assertTrue(ready.await(10, TimeUnit.SECONDS));
+            start.countDown();
+            for (Future<?> future : futures) {
+                future.get(30, TimeUnit.SECONDS);
+            }
+        } finally {
+            executor.shutdownNow();
+        }
+
+        int expectedSources = threadCount * sourcesPerThread;
+        Set<ModelSource> sources =
+                state.mappedSources.get(new DefaultModelBuilder.GAKey("org.apache.maven.test", "shared-artifact"));
+        assertTrue(sources.spliterator().hasCharacteristics(Spliterator.CONCURRENT));
+        assertEquals(expectedSources, sources.size());
+        assertEquals(
+                expectedSources,
+                state.mappedSources
+                        .get(new DefaultModelBuilder.GAKey(null, "shared-artifact"))
+                        .size());
+        assertThrows(IllegalStateException.class, () -> state.getSource("org.apache.maven.test", "shared-artifact"));
+        assertThrows(IllegalStateException.class, () -> state.getSource(null, "shared-artifact"));
+    }
+
+    @Test
+    void testMappedSourcesSuppressesDuplicateSources() {
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("simple-standalone")))
+                .build();
+        DefaultModelBuilder.ModelBuilderSessionState state =
+                ((DefaultModelBuilder) builder).new ModelBuilderSessionState(request);
+        ModelSource source = Sources.buildSource(Path.of("target", "duplicate-source", "pom.xml"));
+
+        state.putSource("org.apache.maven.test", "duplicate-artifact", source);
+        state.putSource("org.apache.maven.test", "duplicate-artifact", source);
+
+        assertEquals(source, state.getSource("org.apache.maven.test", "duplicate-artifact"));
+        assertEquals(source, state.getSource(null, "duplicate-artifact"));
     }
 
     @Test
