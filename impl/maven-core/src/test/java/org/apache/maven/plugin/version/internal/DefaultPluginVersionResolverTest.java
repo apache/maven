@@ -18,11 +18,16 @@
  */
 package org.apache.maven.plugin.version.internal;
 
+import org.apache.maven.plugin.MavenPluginManager;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.plugin.version.DefaultPluginVersionRequest;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mockito;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -33,6 +38,38 @@ class DefaultPluginVersionResolverTest {
 
     private final DefaultPluginVersionResolver resolver =
             new DefaultPluginVersionResolver(null, null, null, new GenericVersionScheme());
+
+    /**
+     * A resolver for which every candidate passes the compatibility check, so the tests observe the
+     * selection order alone.
+     */
+    private static DefaultPluginVersionResolver resolverAcceptingEveryVersion() throws Exception {
+        MavenPluginManager pluginManager = Mockito.mock(MavenPluginManager.class);
+        Mockito.when(pluginManager.getPluginDescriptor(Mockito.any(), Mockito.any(), Mockito.any()))
+                .thenReturn(new PluginDescriptor());
+        return new DefaultPluginVersionResolver(null, null, pluginManager, new GenericVersionScheme());
+    }
+
+    private static DefaultPluginVersionResolver.Versions versions(String release, String... available) {
+        DefaultPluginVersionResolver.Versions versions = new DefaultPluginVersionResolver.Versions();
+        versions.releaseVersion = release;
+        for (String version : available) {
+            versions.versions.put(version, null);
+        }
+        return versions;
+    }
+
+    private static String select(DefaultPluginVersionResolver resolver, DefaultPluginVersionResolver.Versions versions)
+            throws Exception {
+        DefaultPluginVersionResult result = new DefaultPluginVersionResult();
+        resolver.selectVersion(
+                result,
+                new DefaultPluginVersionRequest()
+                        .setGroupId("org.apache.maven.plugins")
+                        .setArtifactId("maven-it-plugin"),
+                versions);
+        return result.getVersion();
+    }
 
     @ParameterizedTest
     @ValueSource(
@@ -46,6 +83,8 @@ class DefaultPluginVersionResolverTest {
                 "1.0-rc-1",
                 "1.0-rc1",
                 "1.0-cr1",
+                "1.0.beta.1", // the scheme treats '.' and '-' as the same separator
+                "1.0_alpha_1",
                 "1.0-SNAPSHOT"
             })
     void preReleaseQualifiersAreExcluded(String version) {
@@ -86,5 +125,43 @@ class DefaultPluginVersionResolverTest {
 
         versions.versions.put("1.0", null);
         assertTrue(resolver.hasStableVersion(versions), "1.0 is a stable fallback");
+    }
+
+    @Test
+    void aStableVersionWinsOverThePreReleaseNamedByTheMetadata() throws Exception {
+        assertEquals(
+                "1.0",
+                select(resolverAcceptingEveryVersion(), versions("2.0-beta-1", "1.0", "2.0-beta-1")),
+                "metadata says 2.0-beta-1 is the RELEASE, but 1.0 is the newest stable one");
+    }
+
+    @Test
+    void theNewestStableVersionIsSelected() throws Exception {
+        assertEquals(
+                "1.2", select(resolverAcceptingEveryVersion(), versions("2.0-beta-1", "1.0", "1.2", "2.0-beta-1")));
+    }
+
+    @Test
+    void aPreReleaseIsUsedWhenNoStableVersionExists() throws Exception {
+        assertEquals(
+                "2.0-beta-2",
+                select(resolverAcceptingEveryVersion(), versions("2.0-beta-2", "2.0-beta-1", "2.0-beta-2")),
+                "a plugin that only ever published pre-releases must still resolve");
+    }
+
+    @Test
+    void aSnapshotIsTheLastResort() throws Exception {
+        assertEquals(
+                "1.0-SNAPSHOT",
+                select(resolverAcceptingEveryVersion(), versions("", "1.0-SNAPSHOT")),
+                "snapshots rank below pre-releases");
+    }
+
+    @Test
+    void aStableReleaseVersionIsTakenAsIs() throws Exception {
+        assertEquals(
+                "2.0",
+                select(resolverAcceptingEveryVersion(), versions("2.0", "1.0", "2.0")),
+                "no search is needed when the metadata already names a stable version");
     }
 }
