@@ -18,7 +18,6 @@
  */
 package org.apache.maven.impl;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -187,17 +186,6 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
         }
     }
 
-    static class InputFactoryHolder {
-        static final XMLInputFactory XML_INPUT_FACTORY;
-
-        static {
-            XMLInputFactory factory = XmlService.newXMLInputFactory();
-            factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, true);
-            factory.setProperty(XMLInputFactory.IS_COALESCING, true);
-            XML_INPUT_FACTORY = factory;
-        }
-    }
-
     /**
      * Extracts the modelId (groupId:artifactId:version) from a POM XML stream
      * by parsing just enough XML to get the GAV coordinates.
@@ -207,7 +195,7 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
      */
     private static String extractModelId(InputStream inputStream) {
         try {
-            XMLStreamReader xmlReader = XMLInputFactory.newFactory().createXMLStreamReader(inputStream);
+            XMLStreamReader xmlReader = XmlService.newXMLInputFactory().createXMLStreamReader(inputStream);
             try {
                 return extractModelId(xmlReader);
             } finally {
@@ -220,7 +208,7 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
 
     private static String extractModelId(Reader reader) {
         try {
-            XMLStreamReader xmlReader = XMLInputFactory.newFactory().createXMLStreamReader(reader);
+            XMLStreamReader xmlReader = XmlService.newXMLInputFactory().createXMLStreamReader(reader);
             try {
                 return extractModelId(xmlReader);
             } finally {
