@@ -88,7 +88,8 @@ public class DefaultToolchainManager implements ToolchainManager {
                             toolchains.add(toolchain);
                         }
                     } catch (MisconfiguredToolchainException ex) {
-                        logger.error("Misconfigured toolchain.", ex);
+                        throw new IllegalStateException(
+                                "Misconfigured toolchain of type " + type + ": " + ex.getMessage(), ex);
                     }
                 }
             }
