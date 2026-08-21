@@ -208,7 +208,7 @@ class DefaultExceptionHandlerTest {
         ProjectBuildingException exception = new ProjectBuildingException(List.of(result));
 
         assertEquals(
-                "Some problems were encountered while processing the POMs",
+                "Encountered 1 problem(s) while processing the POMs",
                 exception.getMessage(),
                 "exception message must stay the short summary, not per-problem detail");
 
