@@ -61,8 +61,10 @@ public class ProjectBuildingException extends Exception {
     }
 
     public ProjectBuildingException(List<ProjectBuildingResult> results) {
-        super("Encountered %d problem(s) while processing the POMs".formatted(
-             results.size()));
+        super("Encountered %d problem(s) while processing the POMs"
+                .formatted(results.stream()
+                        .mapToLong(result -> result.getProblems().size())
+                        .sum()));
         this.projectId = "";
         this.results = results;
     }

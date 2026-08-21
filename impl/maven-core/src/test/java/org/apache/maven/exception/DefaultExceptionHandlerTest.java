@@ -190,7 +190,7 @@ class DefaultExceptionHandlerTest {
 
     @Test
     void testProjectBuildingExceptionNotRenderedTwice() {
-        ModelProblem problem = new DefaultModelProblem(
+        ModelProblem problem1 = new DefaultModelProblem(
                 "Malformed POM test.xml: unexpected element",
                 ModelProblem.Severity.FATAL,
                 null,
@@ -200,17 +200,27 @@ class DefaultExceptionHandlerTest {
                 null,
                 null);
 
+        ModelProblem problem2 = new DefaultModelProblem(
+                "Malformed POM test.xml: missing artifactId",
+                ModelProblem.Severity.ERROR,
+                null,
+                "test.xml",
+                12,
+                5,
+                null,
+                null);
+
         ProjectBuildingResult result = mock(ProjectBuildingResult.class);
         when(result.getProjectId()).thenReturn("test:fail-build:0.1-SNAPSHOT");
         when(result.getPomFile()).thenReturn(new File("test.xml"));
-        when(result.getProblems()).thenReturn(List.of(problem));
+        when(result.getProblems()).thenReturn(List.of(problem1, problem2));
 
         ProjectBuildingException exception = new ProjectBuildingException(List.of(result));
 
         assertEquals(
-                "Encountered 1 problem(s) while processing the POMs",
+                "Encountered 2 problem(s) while processing the POMs",
                 exception.getMessage(),
-                "exception message must stay the short summary, not per-problem detail");
+                "exception message must report the total number of problems");
 
         ExceptionSummary summary = new DefaultExceptionHandler().handleException(exception);
 
