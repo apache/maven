@@ -229,7 +229,7 @@ public final class EnhancedCompositeBeanHelper {
         for (Object member : new DeclaredMembers(beanType, View.FIELDS)) {
             Field field = (Field) member;
             if (!Modifier.isStatic(field.getModifiers())) {
-                fieldMap.put(field.getName(), field);
+                fieldMap.putIfAbsent(field.getName(), field);
             }
         }
 
