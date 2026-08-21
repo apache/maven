@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.model.Dependency;
@@ -71,6 +72,20 @@ class DefaultModelBuilderTest {
         ModelBuilderResult result = builder.newSession().build(request);
         assertNotNull(result);
         assertEquals("21", result.getEffectiveModel().getProperties().get("maven.compiler.release"));
+    }
+
+    @Test
+    void testMavenVersionRangeProfileActivation() {
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("maven-version-range-profile")))
+                .systemProperties(Map.of(Constants.MAVEN_VERSION, "4.1.0"))
+                .build();
+
+        ModelBuilderResult result = builder.newSession().build(request);
+
+        assertEquals("true", result.getEffectiveModel().getProperties().get("maven.range.profile.active"));
     }
 
     @Test
