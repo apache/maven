@@ -772,6 +772,14 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             validator.validate(session, mojoDescriptor, mojo.getClass(), pomConfiguration, expressionEvaluator);
         }
 
+        // MNG-8765: Pre-interpolate configuration values using the expression evaluator before
+        // the ComponentConfigurator processes them. This ensures that ${...} property references
+        // are fully resolved before type converters (like UriConverter) attempt to parse the values.
+        // Without this, properties that are not available during model interpolation (e.g., set
+        // dynamically at runtime by scripts) would reach type converters unresolved, causing
+        // failures like URISyntaxException for URI-typed parameters containing ${...}.
+        pomConfiguration = interpolateConfiguration(pomConfiguration, expressionEvaluator);
+
         populateMojoExecutionFields(
                 mojo,
                 mojoExecution.getExecutionId(),
@@ -870,6 +878,64 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                 }
             }
         }
+    }
+
+    /**
+     * Pre-interpolates a PlexusConfiguration tree by resolving all ${...} property references
+     * in configuration values using the given expression evaluator. This ensures that type
+     * converters (such as UriConverter for java.net.URI parameters) receive fully-resolved
+     * strings instead of raw expressions containing characters like curly braces that are
+     * illegal in certain types.
+     *
+     * <p>This is a defensive measure for properties that are not resolved during model
+     * interpolation — for example, properties set dynamically at runtime by scripts
+     * (e.g., Groovy/GMaven plugins that call {@code project.properties.setProperty(...)}).
+     * Model interpolation runs before the build lifecycle, so it cannot see such properties.
+     * The expression evaluator, which runs at mojo execution time, CAN see them.</p>
+     *
+     * @param configuration the plugin configuration to interpolate
+     * @param evaluator the expression evaluator to resolve ${...} references
+     * @return a new PlexusConfiguration with all resolvable expressions replaced
+     */
+    private PlexusConfiguration interpolateConfiguration(
+            PlexusConfiguration configuration, ExpressionEvaluator evaluator) {
+        // Interpolate the value of this node
+        String value = configuration.getValue(null);
+        if (value != null && value.contains("${")) {
+            try {
+                Object evaluated = evaluator.evaluate(value);
+                if (evaluated instanceof String evaluatedStr) {
+                    if (!evaluatedStr.equals(value)) {
+                        configuration.setValue(evaluatedStr);
+                    }
+                }
+            } catch (ExpressionEvaluationException e) {
+                // Leave value as-is if evaluation fails; the ComponentConfigurator
+                // will report any conversion errors downstream
+            }
+        }
+
+        // Interpolate the default-value attribute if present
+        String defaultValue = configuration.getAttribute("default-value", null);
+        if (defaultValue != null && defaultValue.contains("${")) {
+            try {
+                Object evaluated = evaluator.evaluate(defaultValue);
+                if (evaluated instanceof String evaluatedStr) {
+                    if (!evaluatedStr.equals(defaultValue)) {
+                        configuration.setAttribute("default-value", evaluatedStr);
+                    }
+                }
+            } catch (ExpressionEvaluationException e) {
+                // Leave default-value as-is if evaluation fails
+            }
+        }
+
+        // Recurse into children
+        for (PlexusConfiguration child : configuration.getChildren()) {
+            interpolateConfiguration(child, evaluator);
+        }
+
+        return configuration;
     }
 
     private void validateParameters(
