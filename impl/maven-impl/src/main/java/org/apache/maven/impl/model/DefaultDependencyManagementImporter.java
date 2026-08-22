@@ -74,6 +74,18 @@ public class DefaultDependencyManagementImporter implements DependencyManagement
                 for (Dependency dependency : source.getDependencies()) {
                     String key = dependency.getManagementKey();
                     Dependency present = dependencies.putIfAbsent(key, dependency);
+                    if (present != null
+                            && directDependencies.contains(key)
+                            && request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_CONSUMER
+                            && present.getVersion() == null
+                            && dependency.getVersion() != null) {
+                        dependencies.put(
+                                key,
+                                Dependency.newBuilder(present)
+                                        .version(dependency.getVersion())
+                                        .location("version", dependency.getLocation("version"))
+                                        .build());
+                    }
                     if (present != null && !equals(dependency, present) && !directDependencies.contains(key)) {
                         // TODO: https://issues.apache.org/jira/browse/MNG-8004
                         problems.add(
