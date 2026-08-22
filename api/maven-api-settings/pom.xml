@@ -76,6 +76,12 @@ under the License.
             <id>modello</id>
             <goals>
               <goal>velocity</goal>
+            </goals>
+            <phase>generate-sources</phase>
+          </execution>
+          <execution>
+            <id>modello-docs</id>
+            <goals>
               <goal>xdoc</goal>
               <goal>xsd</goal>
             </goals>
