@@ -157,8 +157,7 @@ public class DefaultGraphBuilder implements GraphBuilder {
         if (request.getPom() != null) {
             result = getProjectsInRequestScope(request, activeProjects);
 
-            List<MavenProject> sortedProjects = graph.getSortedProjects();
-            result.sort(comparing(sortedProjects::indexOf));
+            result.sort(comparing(buildProjectIndexMap(graph.getSortedProjects())::get));
 
             result = includeAlsoMakeTransitively(result, request, graph);
         }
@@ -189,8 +188,7 @@ public class DefaultGraphBuilder implements GraphBuilder {
                 result = includeAlsoMakeTransitively(result, request, graph);
 
                 // Order the new list in the original order
-                List<MavenProject> sortedProjects = graph.getSortedProjects();
-                result.sort(comparing(sortedProjects::indexOf));
+                result.sort(comparing(buildProjectIndexMap(graph.getSortedProjects())::get));
             }
         }
 
@@ -290,11 +288,22 @@ public class DefaultGraphBuilder implements GraphBuilder {
             result = new ArrayList<>(projectsSet);
 
             // Order the new list in the original order
-            List<MavenProject> sortedProjects = graph.getSortedProjects();
-            result.sort(comparing(sortedProjects::indexOf));
+            result.sort(comparing(buildProjectIndexMap(graph.getSortedProjects())::get));
         }
 
         return result;
+    }
+
+    /**
+     * Builds a Map from MavenProject to its index in the sorted list, enabling O(1) index lookups
+     * for sorting instead of O(n) ArrayList.indexOf() scans that cause O(n² log n) sort performance.
+     */
+    private static Map<MavenProject, Integer> buildProjectIndexMap(List<MavenProject> sortedProjects) {
+        Map<MavenProject, Integer> indexMap = new HashMap<>(sortedProjects.size() * 2);
+        for (int i = 0; i < sortedProjects.size(); i++) {
+            indexMap.put(sortedProjects.get(i), i);
+        }
+        return indexMap;
     }
 
     private void enrichRequestFromResumptionData(List<MavenProject> projects, MavenExecutionRequest request) {
