@@ -159,8 +159,9 @@ class ReactorReader implements MavenWorkspaceReader {
     //
 
     private File findArtifact(MavenProject project, Artifact artifact, boolean checkUptodate) {
-        // POMs are always returned from the file system
-        if ("pom".equals(artifact.getExtension())) {
+        // Unclassified POMs are always returned from the file system
+        if ("pom".equals(artifact.getExtension())
+                && (artifact.getClassifier() == null || artifact.getClassifier().isEmpty())) {
             return project.getFile();
         }
 
