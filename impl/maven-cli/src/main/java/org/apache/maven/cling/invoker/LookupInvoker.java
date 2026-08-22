@@ -396,8 +396,13 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     protected void doConfigureWithTerminalWithRawStreamsDisabled(C context) {
         MavenSimpleLogger stdout = (MavenSimpleLogger) context.loggerFactory.getLogger("stdout");
         MavenSimpleLogger stderr = (MavenSimpleLogger) context.loggerFactory.getLogger("stderr");
-        stdout.setLogLevel(LocationAwareLogger.INFO_INT);
-        stderr.setLogLevel(LocationAwareLogger.INFO_INT);
+        int streamLogLevel = switch (context.loggerLevel) {
+            case DEBUG -> LocationAwareLogger.DEBUG_INT;
+            case INFO -> LocationAwareLogger.INFO_INT;
+            case ERROR -> LocationAwareLogger.ERROR_INT;
+        };
+        stdout.setLogLevel(streamLogLevel);
+        stderr.setLogLevel(streamLogLevel);
         PrintStream psOut = new LoggingOutputStream(s -> stdout.info("[stdout] " + s)).printStream();
         context.closeables.add(() -> LoggingOutputStream.forceFlush(psOut));
         PrintStream psErr = new LoggingOutputStream(s -> stderr.warn("[stderr] " + s)).printStream();
