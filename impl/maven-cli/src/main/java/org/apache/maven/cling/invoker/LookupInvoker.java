@@ -310,8 +310,13 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected BuildEventListener doDetermineBuildEventListener(C context) {
         Consumer<String> writer = determineWriter(context);
-        return new SimpleBuildEventListener(writer);
+        BuildEventListener delegate = new SimpleBuildEventListener(writer);
+        if (context.invokerRequest.command().equals("mvn")) {
+            return new org.apache.maven.logging.BuildReportEventListener(delegate);
+        }
+        return delegate;
     }
+
 
     protected final void createTerminal(C context) {
         if (context.terminal == null) {

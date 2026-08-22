@@ -275,7 +275,10 @@ if "%~1"=="--debug" (
       set "MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenShellCling"
 ) else if "%~1"=="--up" (
       set "MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenUpCling"
+) else if "%~1"=="--log" (
+      set "MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenLogCling"
 )
+
 exit /b 0
 
 :processArgs
