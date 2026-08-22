@@ -201,7 +201,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         this.dependencyManagementImporter = dependencyManagementImporter;
         this.pluginConfigurationExpander = pluginConfigurationExpander;
         this.versionParser = versionParser;
-        this.transformers = transformers;
+        this.transformers = transformers != null ? transformers : List.of();
         this.modelResolver = modelResolver;
         this.interpolator = interpolator;
         this.pathTranslator = pathTranslator;

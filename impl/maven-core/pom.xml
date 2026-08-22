@@ -31,6 +31,10 @@ under the License.
   <name>Maven 4 Core</name>
   <description>Maven Core classes.</description>
 
+  <properties>
+    <javaModuleName>org.apache.maven.core</javaModuleName>
+  </properties>
+
   <dependencies>
     <!--  Maven4 API -->
     <dependency>
