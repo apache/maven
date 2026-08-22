@@ -52,26 +52,35 @@ public class DefaultModelUrlNormalizer implements ModelUrlNormalizer {
         }
 
         Model.Builder builder = Model.newBuilder(model);
-        builder.url(normalize(model.getUrl()));
+        normalizeBuilder(builder);
+        return builder.build();
+    }
 
-        Scm scm = model.getScm();
+    @Override
+    public void normalize(Model.Builder builder, ModelBuilderRequest request) {
+        normalizeBuilder(builder);
+    }
+
+    private void normalizeBuilder(Model.Builder builder) {
+        builder.url(normalize(builder.getUrl()));
+
+        Scm scm = builder.getScm();
         if (scm != null) {
-            builder.scm(Scm.newBuilder(scm)
+            builder.getModifiableScm()
                     .url(normalize(scm.getUrl()))
                     .connection(normalize(scm.getConnection()))
-                    .developerConnection(normalize(scm.getDeveloperConnection()))
-                    .build());
+                    .developerConnection(normalize(scm.getDeveloperConnection()));
         }
 
-        DistributionManagement dist = model.getDistributionManagement();
+        DistributionManagement dist = builder.getDistributionManagement();
         if (dist != null) {
             Site site = dist.getSite();
             if (site != null) {
-                builder.distributionManagement(dist.withSite(site.withUrl(normalize(site.getUrl()))));
+                builder.getModifiableDistributionManagement()
+                        .getModifiableSite()
+                        .url(normalize(site.getUrl()));
             }
         }
-
-        return builder.build();
     }
 
     private String normalize(String url) {

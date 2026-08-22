@@ -103,6 +103,22 @@ public class DefaultModelInterpolator implements ModelInterpolator {
     public Model interpolateModel(
             Model model, Path projectDir, ModelBuilderRequest request, ModelProblemCollector problems) {
         InnerInterpolator innerInterpolator = createInterpolator(model, projectDir, request, problems);
+        return newTransformer(innerInterpolator).visit(model);
+    }
+
+    @Override
+    public void interpolateModel(
+            Model.Builder builder, Path projectDir, ModelBuilderRequest request, ModelProblemCollector problems) {
+        // Build a snapshot for consistent property resolution during interpolation.
+        // The per-field transform methods read from this immutable target and write
+        // changed values to the existing builder, avoiding the second Model
+        // materialization and reset that the SPI default method performs.
+        Model model = builder.build();
+        InnerInterpolator innerInterpolator = createInterpolator(model, projectDir, request, problems);
+        newTransformer(innerInterpolator).visitBuilder(builder, model);
+    }
+
+    private MavenTransformer newTransformer(InnerInterpolator innerInterpolator) {
         return new MavenTransformer(innerInterpolator::interpolate) {
             @Override
             protected String transform(String value) {
@@ -115,7 +131,7 @@ public class DefaultModelInterpolator implements ModelInterpolator {
                 }
                 return super.transform(value);
             }
-        }.visit(model);
+        };
     }
 
     private InnerInterpolator createInterpolator(

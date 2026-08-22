@@ -48,6 +48,21 @@ public class DefaultPluginManagementInjector implements PluginManagementInjector
     private ManagementModelMerger merger = new ManagementModelMerger();
 
     @Override
+    public void injectManagement(Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems) {
+        // Use sub-builder mutation to avoid intermediate immutable allocations
+        Build build = builder.getBuild();
+        if (build != null) {
+            PluginManagement pluginManagement = build.getPluginManagement();
+            if (pluginManagement != null) {
+                List<Plugin> mergedPlugins = merger.mergeManagedPluginList(build, pluginManagement);
+                if (mergedPlugins != null) {
+                    builder.getModifiableBuild().plugins(mergedPlugins);
+                }
+            }
+        }
+    }
+
+    @Override
     public Model injectManagement(Model model, ModelBuilderRequest request, ModelProblemCollector problems) {
         return merger.mergeManagedBuildPlugins(model);
     }
@@ -57,18 +72,12 @@ public class DefaultPluginManagementInjector implements PluginManagementInjector
      */
     protected static class ManagementModelMerger extends MavenModelMerger {
 
-        public Model mergeManagedBuildPlugins(Model model) {
-            Build build = model.getBuild();
-            if (build != null) {
-                PluginManagement pluginManagement = build.getPluginManagement();
-                if (pluginManagement != null) {
-                    return model.withBuild(mergePluginContainerPlugins(build, pluginManagement));
-                }
-            }
-            return model;
-        }
-
-        private Build mergePluginContainerPlugins(Build target, PluginContainer source) {
+        /**
+         * Returns the merged plugin list, or {@code null} if no changes were made.
+         * Used by the builder-accepting pipeline stage to set plugins directly on
+         * the Build sub-builder without creating intermediate immutable Build objects.
+         */
+        List<Plugin> mergeManagedPluginList(Build target, PluginContainer source) {
             List<Plugin> src = source.getPlugins();
             if (!src.isEmpty()) {
                 Map<Object, Plugin> managedPlugins = new LinkedHashMap<>(src.size() * 2);
@@ -89,9 +98,23 @@ public class DefaultPluginManagementInjector implements PluginManagementInjector
                     }
                     newPlugins.add(element);
                 }
-                return target.withPlugins(newPlugins);
+                return newPlugins;
             }
-            return target;
+            return null;
+        }
+
+        public Model mergeManagedBuildPlugins(Model model) {
+            Build build = model.getBuild();
+            if (build != null) {
+                PluginManagement pluginManagement = build.getPluginManagement();
+                if (pluginManagement != null) {
+                    List<Plugin> mergedPlugins = mergeManagedPluginList(build, pluginManagement);
+                    if (mergedPlugins != null) {
+                        return model.withBuild(build.withPlugins(mergedPlugins));
+                    }
+                }
+            }
+            return model;
         }
 
         @Override

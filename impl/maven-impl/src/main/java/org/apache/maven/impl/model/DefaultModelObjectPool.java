@@ -246,29 +246,29 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
                     && Objects.equals(dep1.getSystemPath(), dep2.getSystemPath())
                     && Objects.equals(dep1.getExclusions(), dep2.getExclusions())
                     && Objects.equals(dep1.getOptional(), dep2.getOptional())
-                    && Objects.equals(dep1.getLocationKeys(), dep2.getLocationKeys())
                     && locationsEqual(dep1, dep2)
                     && Objects.equals(dep1.getImportedFrom(), dep2.getImportedFrom());
         }
 
         /**
          * Compare locations maps for two dependencies.
+         * Uses the direct getLocations() map instead of iterating through
+         * individual keys to avoid KeyValueHolder allocation overhead.
+         * Short-circuits on empty maps (common for imported dependencies).
          */
         private static boolean locationsEqual(
                 org.apache.maven.api.model.Dependency dep1, org.apache.maven.api.model.Dependency dep2) {
-            var keys1 = dep1.getLocationKeys();
-            var keys2 = dep2.getLocationKeys();
-
-            if (!Objects.equals(keys1, keys2)) {
+            var locs1 = dep1.getLocations();
+            var locs2 = dep2.getLocations();
+            // Fast path: both empty (common for imported deps with location tracking off)
+            if (locs1.isEmpty() && locs2.isEmpty()) {
+                return true;
+            }
+            // Use precomputed hash code for fast inequality check
+            if (dep1.getLocationsHashCode() != dep2.getLocationsHashCode()) {
                 return false;
             }
-
-            for (Object key : keys1) {
-                if (!Objects.equals(dep1.getLocation(key), dep2.getLocation(key))) {
-                    return false;
-                }
-            }
-            return true;
+            return locs1.equals(locs2);
         }
 
         /**
@@ -283,33 +283,24 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
 
         /**
          * Custom hash code for Dependency objects based on all fields.
+         * Inlined to avoid the Object[] varargs allocation from Objects.hash().
+         * Uses the precomputed locations hash code to avoid re-iterating
+         * the locations map entries.
          */
         private static int dependencyHashCode(org.apache.maven.api.model.Dependency dep) {
-            return Objects.hash(
-                    dep.getGroupId(),
-                    dep.getArtifactId(),
-                    dep.getVersion(),
-                    dep.getType(),
-                    dep.getClassifier(),
-                    dep.getScope(),
-                    dep.getSystemPath(),
-                    dep.getExclusions(),
-                    dep.getOptional(),
-                    dep.getLocationKeys(),
-                    locationsHashCode(dep),
-                    dep.getImportedFrom());
-        }
-
-        /**
-         * Compute hash code for locations map.
-         */
-        private static int locationsHashCode(org.apache.maven.api.model.Dependency dep) {
-            int hash = 1;
-            for (Object key : dep.getLocationKeys()) {
-                hash = 31 * hash + Objects.hashCode(key);
-                hash = 31 * hash + Objects.hashCode(dep.getLocation(key));
-            }
-            return hash;
+            int h = 1;
+            h = 31 * h + Objects.hashCode(dep.getGroupId());
+            h = 31 * h + Objects.hashCode(dep.getArtifactId());
+            h = 31 * h + Objects.hashCode(dep.getVersion());
+            h = 31 * h + Objects.hashCode(dep.getType());
+            h = 31 * h + Objects.hashCode(dep.getClassifier());
+            h = 31 * h + Objects.hashCode(dep.getScope());
+            h = 31 * h + Objects.hashCode(dep.getSystemPath());
+            h = 31 * h + Objects.hashCode(dep.getExclusions());
+            h = 31 * h + Objects.hashCode(dep.getOptional());
+            h = 31 * h + dep.getLocationsHashCode();
+            h = 31 * h + Objects.hashCode(dep.getImportedFrom());
+            return h;
         }
     }
 

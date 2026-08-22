@@ -51,4 +51,21 @@ public interface ModelInterpolator {
             @Nullable Path projectDir,
             @Nonnull ModelBuilderRequest request,
             @Nonnull ModelProblemCollector problems);
+
+    /**
+     * Builder-accepting variant of {@link #interpolateModel}.
+     *
+     * @since 4.0.0
+     */
+    default void interpolateModel(
+            @Nonnull Model.Builder builder,
+            @Nullable Path projectDir,
+            @Nonnull ModelBuilderRequest request,
+            @Nonnull ModelProblemCollector problems) {
+        Model built = builder.build();
+        Model result = interpolateModel(built, projectDir, request, problems);
+        if (result != built) {
+            builder.reset(result);
+        }
+    }
 }

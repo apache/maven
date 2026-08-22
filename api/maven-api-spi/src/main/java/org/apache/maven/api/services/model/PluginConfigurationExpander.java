@@ -37,4 +37,18 @@ public interface PluginConfigurationExpander {
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
     Model expandPluginConfiguration(Model model, ModelBuilderRequest request, ModelProblemCollector problems);
+
+    /**
+     * Builder-accepting variant of {@link #expandPluginConfiguration}.
+     *
+     * @since 4.0.0
+     */
+    default void expandPluginConfiguration(
+            Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems) {
+        Model built = builder.build();
+        Model result = expandPluginConfiguration(built, request, problems);
+        if (result != built) {
+            builder.reset(result);
+        }
+    }
 }

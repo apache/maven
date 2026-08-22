@@ -40,4 +40,17 @@ public interface ModelPathTranslator {
      * @since 4.0.0
      */
     Model alignToBaseDirectory(Model model, Path basedir, ModelBuilderRequest request);
+
+    /**
+     * Builder-accepting variant of {@link #alignToBaseDirectory}.
+     *
+     * @since 4.0.0
+     */
+    default void alignToBaseDirectory(Model.Builder builder, Path basedir, ModelBuilderRequest request) {
+        Model built = builder.build();
+        Model result = alignToBaseDirectory(built, basedir, request);
+        if (result != built) {
+            builder.reset(result);
+        }
+    }
 }

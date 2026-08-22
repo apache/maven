@@ -48,4 +48,31 @@ public interface ModelNormalizer {
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
     Model injectDefaultValues(Model model, ModelBuilderRequest request, ModelProblemCollector problems);
+
+    /**
+     * Builder-accepting variant of {@link #mergeDuplicates}.
+     *
+     * @since 4.0.0
+     */
+    default void mergeDuplicates(Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems) {
+        Model built = builder.build();
+        Model result = mergeDuplicates(built, request, problems);
+        if (result != built) {
+            builder.reset(result);
+        }
+    }
+
+    /**
+     * Builder-accepting variant of {@link #injectDefaultValues}.
+     *
+     * @since 4.0.0
+     */
+    default void injectDefaultValues(
+            Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems) {
+        Model built = builder.build();
+        Model result = injectDefaultValues(built, request, problems);
+        if (result != built) {
+            builder.reset(result);
+        }
+    }
 }

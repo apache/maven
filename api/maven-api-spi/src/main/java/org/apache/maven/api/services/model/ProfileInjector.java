@@ -57,4 +57,21 @@ public interface ProfileInjector {
      */
     Model injectProfiles(
             Model model, List<Profile> profiles, ModelBuilderRequest request, ModelProblemCollector problems);
+
+    /**
+     * Builder-accepting variant that injects profile values into the model builder directly.
+     *
+     * @since 4.0.0
+     */
+    default void injectProfiles(
+            Model.Builder builder,
+            List<Profile> profiles,
+            ModelBuilderRequest request,
+            ModelProblemCollector problems) {
+        Model built = builder.build();
+        Model result = injectProfiles(built, profiles, request, problems);
+        if (result != built) {
+            builder.reset(result);
+        }
+    }
 }

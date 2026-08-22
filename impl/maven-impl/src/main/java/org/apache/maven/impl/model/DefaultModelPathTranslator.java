@@ -52,16 +52,16 @@ public class DefaultModelPathTranslator implements ModelPathTranslator {
     }
 
     @Override
-    public Model alignToBaseDirectory(Model model, Path basedir, ModelBuilderRequest request) {
-        if (model == null || basedir == null) {
-            return model;
+    public void alignToBaseDirectory(Model.Builder builder, Path basedir, ModelBuilderRequest request) {
+        if (basedir == null) {
+            return;
         }
-
-        Build build = model.getBuild();
-        Build newBuild = null;
+        // Mutate the Build and Reporting sub-builders in place, avoiding
+        // intermediate immutable object allocations
+        Build build = builder.getBuild();
         if (build != null) {
-            newBuild = Build.newBuilder(build)
-                    .sources(map(build.getSources(), this::alignToBaseDirectory, basedir))
+            Build.Builder bb = builder.getModifiableBuild();
+            bb.sources(map(build.getSources(), this::alignToBaseDirectory, basedir))
                     .directory(alignToBaseDirectory(build.getDirectory(), basedir))
                     .sourceDirectory(alignToBaseDirectory(build.getSourceDirectory(), basedir))
                     .testSourceDirectory(alignToBaseDirectory(build.getTestSourceDirectory(), basedir))
@@ -70,24 +70,58 @@ public class DefaultModelPathTranslator implements ModelPathTranslator {
                     .testResources(map(build.getTestResources(), this::alignToBaseDirectory, basedir))
                     .filters(map(build.getFilters(), this::alignToBaseDirectory, basedir))
                     .outputDirectory(alignToBaseDirectory(build.getOutputDirectory(), basedir))
-                    .testOutputDirectory(alignToBaseDirectory(build.getTestOutputDirectory(), basedir))
-                    .build();
+                    .testOutputDirectory(alignToBaseDirectory(build.getTestOutputDirectory(), basedir));
+        }
+        Reporting reporting = builder.getReporting();
+        if (reporting != null) {
+            builder.getModifiableReporting()
+                    .outputDirectory(alignToBaseDirectory(reporting.getOutputDirectory(), basedir));
+        }
+    }
+
+    @Override
+    public Model alignToBaseDirectory(Model model, Path basedir, ModelBuilderRequest request) {
+        if (model == null || basedir == null) {
+            return model;
+        }
+
+        Model.Builder builder = Model.newBuilder(model);
+        if (alignToBaseDirectory(model, basedir, builder)) {
+            return builder.build();
+        }
+        return model;
+    }
+
+    /**
+     * Shared logic: reads from {@code model}, writes modified fields to {@code builder}.
+     * Returns {@code true} if any field was modified.
+     */
+    private boolean alignToBaseDirectory(Model model, Path basedir, Model.Builder builder) {
+        boolean modified = false;
+
+        Build build = model.getBuild();
+        if (build != null) {
+            Build.Builder bb = builder.getModifiableBuild();
+            bb.sources(map(build.getSources(), this::alignToBaseDirectory, basedir))
+                    .directory(alignToBaseDirectory(build.getDirectory(), basedir))
+                    .sourceDirectory(alignToBaseDirectory(build.getSourceDirectory(), basedir))
+                    .testSourceDirectory(alignToBaseDirectory(build.getTestSourceDirectory(), basedir))
+                    .scriptSourceDirectory(alignToBaseDirectory(build.getScriptSourceDirectory(), basedir))
+                    .resources(map(build.getResources(), this::alignToBaseDirectory, basedir))
+                    .testResources(map(build.getTestResources(), this::alignToBaseDirectory, basedir))
+                    .filters(map(build.getFilters(), this::alignToBaseDirectory, basedir))
+                    .outputDirectory(alignToBaseDirectory(build.getOutputDirectory(), basedir))
+                    .testOutputDirectory(alignToBaseDirectory(build.getTestOutputDirectory(), basedir));
+            modified = true;
         }
 
         Reporting reporting = model.getReporting();
-        Reporting newReporting = null;
         if (reporting != null) {
-            newReporting = Reporting.newBuilder(reporting)
-                    .outputDirectory(alignToBaseDirectory(reporting.getOutputDirectory(), basedir))
-                    .build();
+            builder.getModifiableReporting()
+                    .outputDirectory(alignToBaseDirectory(reporting.getOutputDirectory(), basedir));
+            modified = true;
         }
-        if (newBuild != build || newReporting != reporting) {
-            model = Model.newBuilder(model)
-                    .build(newBuild)
-                    .reporting(newReporting)
-                    .build();
-        }
-        return model;
+        return modified;
     }
 
     /**

@@ -56,43 +56,63 @@ public class DefaultDependencyManagementImporter implements DependencyManagement
             ModelBuilderRequest request,
             ModelProblemCollector problems) {
         if (sources != null && !sources.isEmpty()) {
-            Map<String, Dependency> dependencies = new LinkedHashMap<>();
-
-            DependencyManagement depMgmt = target.getDependencyManagement();
-
-            if (depMgmt != null) {
-                for (Dependency dependency : depMgmt.getDependencies()) {
-                    dependencies.put(dependency.getManagementKey(), dependency);
-                }
-            } else {
-                depMgmt = DependencyManagement.newInstance();
-            }
-
-            Set<String> directDependencies = new HashSet<>(dependencies.keySet());
-
-            for (DependencyManagement source : sources) {
-                for (Dependency dependency : source.getDependencies()) {
-                    String key = dependency.getManagementKey();
-                    Dependency present = dependencies.putIfAbsent(key, dependency);
-                    if (present != null && !equals(dependency, present) && !directDependencies.contains(key)) {
-                        // TODO: https://issues.apache.org/jira/browse/MNG-8004
-                        problems.add(
-                                Severity.WARNING,
-                                Version.V40,
-                                "Ignored POM import for: " + toString(dependency) + " as already imported "
-                                        + toString(present) + ". Add the conflicting managed dependency directly "
-                                        + "to the dependencyManagement section of the POM.");
-                    }
-                    if (present == null && request.isLocationTracking()) {
-                        Dependency updatedDependency = updateWithImportedFrom(dependency, source);
-                        dependencies.put(key, updatedDependency);
-                    }
-                }
-            }
-
-            return target.withDependencyManagement(depMgmt.withDependencies(dependencies.values()));
+            Map<String, Dependency> dependencies =
+                    collectDependencies(target.getDependencyManagement(), sources, request, problems);
+            return target.withDependencyManagement(
+                    target.getDependencyManagement().withDependencies(dependencies.values()));
         }
         return target;
+    }
+
+    @Override
+    public void importManagement(
+            Model.Builder builder,
+            List<? extends DependencyManagement> sources,
+            ModelBuilderRequest request,
+            ModelProblemCollector problems) {
+        if (sources != null && !sources.isEmpty()) {
+            Map<String, Dependency> dependencies =
+                    collectDependencies(builder.getDependencyManagement(), sources, request, problems);
+            builder.getModifiableDependencyManagement().dependencies(dependencies.values());
+        }
+    }
+
+    private Map<String, Dependency> collectDependencies(
+            DependencyManagement depMgmt,
+            List<? extends DependencyManagement> sources,
+            ModelBuilderRequest request,
+            ModelProblemCollector problems) {
+        Map<String, Dependency> dependencies = new LinkedHashMap<>();
+
+        if (depMgmt != null) {
+            for (Dependency dependency : depMgmt.getDependencies()) {
+                dependencies.put(dependency.getManagementKey(), dependency);
+            }
+        }
+
+        Set<String> directDependencies = new HashSet<>(dependencies.keySet());
+
+        for (DependencyManagement source : sources) {
+            for (Dependency dependency : source.getDependencies()) {
+                String key = dependency.getManagementKey();
+                Dependency present = dependencies.putIfAbsent(key, dependency);
+                if (present != null && !equals(dependency, present) && !directDependencies.contains(key)) {
+                    // TODO: https://issues.apache.org/jira/browse/MNG-8004
+                    problems.add(
+                            Severity.WARNING,
+                            Version.V40,
+                            "Ignored POM import for: " + toString(dependency) + " as already imported "
+                                    + toString(present) + ". Add the conflicting managed dependency directly "
+                                    + "to the dependencyManagement section of the POM.");
+                }
+                if (present == null && request.isLocationTracking()) {
+                    Dependency updatedDependency = updateWithImportedFrom(dependency, source);
+                    dependencies.put(key, updatedDependency);
+                }
+            }
+        }
+
+        return dependencies;
     }
 
     private String toString(Dependency dependency) {
@@ -167,6 +187,8 @@ public class DefaultDependencyManagementImporter implements DependencyManagement
         if (dependencySource == null
                 || bomSource == null
                 || Objects.equals(dependencySource.getModelId(), bomSource.getModelId())) {
+            // Use forceCopy=true since we only set importedFrom (no field changes that would
+            // trigger copy-on-write), and build immediately as we need the immutable result.
             return Dependency.newBuilder(dependency, true)
                     .importedFrom(bomLocation)
                     .build();

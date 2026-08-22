@@ -46,6 +46,41 @@ public class DefaultModelNormalizer implements ModelNormalizer {
     private DuplicateMerger merger = new DuplicateMerger();
 
     @Override
+    public void mergeDuplicates(Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems) {
+
+        // Use sub-builder mutation to avoid intermediate immutable allocations
+        Build build = builder.getBuild();
+        if (build != null) {
+            List<Plugin> plugins = build.getPlugins();
+            Map<Object, Plugin> normalized = new LinkedHashMap<>(plugins.size() * 2);
+
+            for (Plugin plugin : plugins) {
+                Object key = plugin.getKey();
+                Plugin first = normalized.get(key);
+                if (first != null) {
+                    plugin = merger.mergePlugin(plugin, first);
+                }
+                normalized.put(key, plugin);
+            }
+
+            if (plugins.size() != normalized.size()) {
+                builder.getModifiableBuild().plugins(normalized.values());
+            }
+        }
+
+        List<Dependency> dependencies = builder.getBuiltDependencies();
+        Map<String, Dependency> normalizedDeps = new LinkedHashMap<>(dependencies.size() * 2);
+
+        for (Dependency dependency : dependencies) {
+            normalizedDeps.put(dependency.getManagementKey(), dependency);
+        }
+
+        if (dependencies.size() != normalizedDeps.size()) {
+            builder.dependencies(normalizedDeps.values());
+        }
+    }
+
+    @Override
     public Model mergeDuplicates(Model model, ModelBuilderRequest request, ModelProblemCollector problems) {
         Model.Builder builder = Model.newBuilder(model);
 
@@ -64,8 +99,7 @@ public class DefaultModelNormalizer implements ModelNormalizer {
             }
 
             if (plugins.size() != normalized.size()) {
-                builder.build(
-                        Build.newBuilder(build).plugins(normalized.values()).build());
+                builder.getModifiableBuild().plugins(normalized.values());
             }
         }
 
@@ -101,16 +135,33 @@ public class DefaultModelNormalizer implements ModelNormalizer {
     }
 
     @Override
+    public void injectDefaultValues(
+            Model.Builder builder, ModelBuilderRequest request, ModelProblemCollector problems) {
+
+        List<Dependency> newDeps = injectList(builder.getBuiltDependencies(), this::injectDependency);
+        if (newDeps != null) {
+            builder.dependencies(newDeps);
+        }
+        Build build = builder.getBuild();
+        if (build != null) {
+            List<Plugin> newPlugins = injectList(build.getPlugins(), this::injectPlugin);
+            if (newPlugins != null) {
+                builder.getModifiableBuild().plugins(newPlugins);
+            }
+        }
+    }
+
+    @Override
     public Model injectDefaultValues(Model model, ModelBuilderRequest request, ModelProblemCollector problems) {
         Model.Builder builder = Model.newBuilder(model);
 
         builder.dependencies(injectList(model.getDependencies(), this::injectDependency));
         Build build = model.getBuild();
         if (build != null) {
-            Build newBuild = Build.newBuilder(build)
-                    .plugins(injectList(build.getPlugins(), this::injectPlugin))
-                    .build();
-            builder.build(newBuild != build ? newBuild : null);
+            List<Plugin> newPlugins = injectList(build.getPlugins(), this::injectPlugin);
+            if (newPlugins != null) {
+                builder.getModifiableBuild().plugins(newPlugins);
+            }
         }
 
         return builder.build();
