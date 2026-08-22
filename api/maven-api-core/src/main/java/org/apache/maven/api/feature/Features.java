@@ -62,6 +62,13 @@ public final class Features {
     }
 
     /**
+     * Check if automatic subproject discovery is enabled for POM-packaged projects.
+     */
+    public static boolean discoverSubprojects(@Nullable Map<String, ?> userProperties) {
+        return doGet(userProperties, Constants.MAVEN_PROJECT_DISCOVER_SUBPROJECTS, true);
+    }
+
+    /**
      * Check if build POM deployment is enabled.
      */
     public static boolean deployBuildPom(@Nullable Map<String, ?> userProperties) {

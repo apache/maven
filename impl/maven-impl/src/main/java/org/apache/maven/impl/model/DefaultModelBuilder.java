@@ -1721,7 +1721,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                             && !MODEL_VERSION_4_0_0.equals(model.getModelVersion())
                             // and if packaging is POM (we check type, but the session is not yet available,
                             // we would require the project realm if we want to support extensions
-                            && Type.POM.equals(model.getPackaging())) {
+                            && Type.POM.equals(model.getPackaging())
+                            // and if discovery is not disabled via property
+                            && Features.discoverSubprojects(request.getUserProperties())) {
                         List<String> subprojects = new ArrayList<>();
                         try (Stream<Path> files = Files.list(model.getProjectDirectory())) {
                             for (Path f : files.toList()) {
@@ -2336,17 +2338,16 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     /**
-     * Checks if subprojects are explicitly defined in the main model.
-     * This method distinguishes between:
-     * 1. No subprojects/modules element present - returns false (should auto-discover)
-     * 2. Empty subprojects/modules element present - returns true (should NOT auto-discover)
-     * 3. Non-empty subprojects/modules - returns true (should NOT auto-discover)
+     * Checks whether the model has a non-empty {@code <subprojects>} or {@code <modules>} element.
+     * <p>
+     * When this returns {@code false} and auto-discovery is enabled (via
+     * {@link Features#discoverSubprojects(Map)}), Maven will scan subdirectories
+     * for POM files. Users who want to suppress discovery without listing subprojects
+     * can set {@code -Dmaven.project.discoverSubprojects=false}.
      */
     @SuppressWarnings("deprecation")
     private static boolean hasSubprojectsDefined(Model model) {
-        // Only consider the main model: profiles do not influence auto-discovery
-        // Inline the check for explicit elements using location tracking
-        return model.getLocation("subprojects") != null || model.getLocation("modules") != null;
+        return !model.getSubprojects().isEmpty() || !model.getModules().isEmpty();
     }
 
     @Override
