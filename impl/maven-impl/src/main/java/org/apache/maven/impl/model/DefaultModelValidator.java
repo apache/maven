@@ -1233,13 +1233,14 @@ public class DefaultModelValidator implements ModelValidator {
                 }
             }
 
-            // MNG-8750: New dependency scopes are only supported starting with modelVersion 4.1.0
+            // MNG-8750 / MNG-8099: New dependency scopes are only supported starting with modelVersion 4.1.0
             // When using modelVersion 4.0.0, fail validation if one of the new scopes is present
             if (!is41OrBeyond) {
                 String scope = dependency.getScope();
                 if (DependencyScope.COMPILE_ONLY.id().equals(scope)
                         || DependencyScope.TEST_ONLY.id().equals(scope)
-                        || DependencyScope.TEST_RUNTIME.id().equals(scope)) {
+                        || DependencyScope.TEST_RUNTIME.id().equals(scope)
+                        || DependencyScope.API.id().equals(scope)) {
                     addViolation(
                             problems,
                             Severity.ERROR,
