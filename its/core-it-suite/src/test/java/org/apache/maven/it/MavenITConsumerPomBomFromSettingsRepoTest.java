@@ -75,6 +75,7 @@ class MavenITConsumerPomBomFromSettingsRepoTest extends AbstractMavenIntegration
 
         // Verify the consumer POM was generated
         Path consumerPom = basedir.resolve(Path.of(
+                ".mvn",
                 "target",
                 "project-local-repo",
                 "org.apache.maven.its.cpbom",
